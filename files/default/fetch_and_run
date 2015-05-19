@@ -1,0 +1,24 @@
+#!/bin/bash
+
+function run_preinstall () {
+  RC=0
+  if [ "${cfn_preinstall}" != "NONE" ]; then
+    scheme=$(echo "${cfn_preinstall}"| cut -d: -f1)
+    tmpfile=$(mktemp)
+    if [ "${scheme}" == "s3" ]; then
+      aws --region ${cfn_region} s3 cp ${cfn_preinstall} - > $tmpfile || RC=1
+    else
+      wget -qO- ${cfn_preinstall} > $tmpfile || RC=1
+    fi
+    if [ "${cfn_preinstall_args}" != "NONE" ]; then
+      args=${cfn_preinstall_args}
+    fi
+    /bin/sh $tmpfile $args || RC=1
+    /bin/rm $tmpfile
+  fi
+  if [ $RC -ne 0 ]; then
+    error_exit "Failed to run boot_as_master preinstall"
+  fi
+}
+
+exit 0

@@ -1,0 +1,19 @@
+{
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-west-2",
+    "source_ami": "ami-45466e75",
+    "instance_type": "m3.2xlarge",
+    "ssh_username": "ec2-user",
+    "ami_name": "packer-example {{timestamp}}",
+    "subnet_id": "subnet-c06054b4",
+    "vpc_id": "vpc-0a4c5868",
+    "associate_public_ip_address": true,
+    "enhanced_networking": true
+  }],
+  "provisioners" : [{
+  "type": "chef-solo",
+  "cookbook_paths": ["../vendor/cookbooks"],
+  "run_list" : [ "cfncluster::default" ]
+}]
+}
