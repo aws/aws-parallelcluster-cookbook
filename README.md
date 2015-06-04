@@ -1,0 +1,1 @@
+# cfncluster-cookbook
