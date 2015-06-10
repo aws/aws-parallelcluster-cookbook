@@ -2,10 +2,10 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-45466e75",
+    "source_ami": "ami-e7527ed7",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
-    "ami_name": "packer-example {{timestamp}}",
+    "ami_name": "cfncluster-amzn-hvm-{{timestamp}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,

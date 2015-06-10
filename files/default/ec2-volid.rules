@@ -1,0 +1,1 @@
+KERNEL=="xvd*", ENV{DEVTYPE}=="disk", PROGRAM="/sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c"

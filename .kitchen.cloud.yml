@@ -1,13 +1,11 @@
 ---
 driver_config:
-  aws_access_key_id: <%= ENV['AWS_ACCESS_KEY_ID'] %>
-  aws_secret_access_key: <%= ENV['AWS_SECRET_ACCESS_KEY'] %>
   aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
   region: <%= ENV['AWS_DEFAULT_REGION'] %>
-  flavor_id: <%= ENV['AWS_FLAVOR_ID'] %>
+  instance_type: <%= ENV['AWS_FLAVOR_ID'] %>
   availability_zone: <%= ENV['AWS_AVAILABILITY_ZONE'] %>
   subnet_id: <%= ENV['AWS_SUBNET_ID'] %>
-  security_group_ids:  <%= ENV['AWS_SECURITY_GROUP_ID'] %>
+  security_group_ids:  [ <%= ENV['AWS_SECURITY_GROUP_ID'] %> ]
   iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
 
 provisioner:
@@ -20,41 +18,62 @@ platforms:
     driver_plugin: ec2
     driver_config:
       image_id: ami-e7527ed7
+    transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: marketplace_centos_6_updates
     driver_plugin: ec2
     driver_config:
       image_id: ami-81d092b1
+    transport:
       username: root
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: marketplace_centos_7_updates
     driver_plugin: ec2
     driver_config:
       image_id: ami-c7d092f7
+    transport:
       username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: rhel_6
     driver_plugin: ec2
     driver_config:
       image_id: ami-5fbcf36f
-      username: ec2-user
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: bashton_centos_6
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-503bae60
+    transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: centos_66_minimal_sriov
     driver_plugin: ec2
     driver_config:
       image_id: ami-45466e75
+    transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: cfncluster-default-centos-66-minimal-sriov
     driver_plugin: ec2
     driver_config:
       image_id: ami-6dfbd25d
+    transport:
       username: ec2-user
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: ubuntu-14-04-lts
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-3789b807
+    transport:
+      username: ubuntu
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: sles11
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-3b0f420b
+    transport:
+      username: root
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: sles12
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-d7450be7
+    transport:
+      username: root
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>

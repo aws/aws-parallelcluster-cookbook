@@ -16,7 +16,9 @@ directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 
 ## Being explicit about the included recipes and when they should be run
-include_recipe "yum-epel"
+if platform_family?("rhel")
+  include_recipe "yum-epel"
+end
 include_recipe "build-essential"
 
 # Setup Python (require extra work due to setuptools bug)
@@ -49,29 +51,7 @@ cookbook_file 'setup-ephemeral-drives.sh' do
   mode '0744'
 end
 
-ec2_udev_rules_tarball = "#{node['cfncluster']['sources_dir']}/ec2-udev.tar.gz"
-
-# Get ec2-udev-rules tarball
-remote_file ec2_udev_rules_tarball do
-  source node['cfncluster']['udev_url']
-  mode '0644'
-  # TODO: Add version or checksum checks
-  not_if { ::File.exists?(ec2_udev_rules_tarball) }
-end
-
-# Install ec2-udev-rules
-bash 'make install' do
-  user 'root'
-  group 'root'
-  cwd Chef::Config[:file_cache_path]
-  code <<-EOF
-    tar xf #{ec2_udev_rules_tarball}
-    cd ec2-udev-scripts-*
-    make install
-  EOF
-  # TODO: Fix, so it works for upgrade
-  creates '/usr/local/sbin/attachVolume.py'
-end
+include_recipe 'cfncluster::_ec2_udev_rules'
 
 # Install ec2-metadata script
 remote_file '/usr/bin/ec2-metadata' do
@@ -98,6 +78,14 @@ end
 # Put init script in place
 cookbook_file "supervisord-init" do
   path "/etc/init.d/supervisord"
+  owner "root"
+  group "root"
+  mode "0755"
+end
+
+# Install jq for manipulating json files
+cookbook_file "jq-1.3" do
+  path "/usr/local/bin/jq"
   owner "root"
   group "root"
   mode "0755"

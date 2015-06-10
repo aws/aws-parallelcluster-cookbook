@@ -23,8 +23,14 @@ default['cfncluster']['ganglia']['url'] = 'http://downloads.sourceforge.net/proj
 default['cfncluster']['ganglia']['web_version'] = '3.6.2'
 default['cfncluster']['ganglia']['web_url'] = 'http://downloads.sourceforge.net/project/ganglia/ganglia-web/3.6.2/ganglia-web-3.6.2.tar.gz?r=&ts=1426042690&use_mirror=hivelocity'
 
-# Default packages are for CentOS6
-default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool)
+# Packages based on platform_family
+case node['platform_family']
+when 'rhel'
+  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd)
+when 'debian'
+  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2)
+end
+
 
 # Update for NFS on Amazon Linux
 case node['platform']
