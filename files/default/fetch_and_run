@@ -1,5 +1,15 @@
 #!/bin/bash
 
+. /etc/cfncluster/cfnconfig
+
+# Error exit function
+function error_exit () {
+  script=`basename $0`
+  echo "cfncluster: $script - $1"
+  logger -t cfncluster "$script - $1"
+  exit 1
+}
+
 function run_preinstall () {
   RC=0
   if [ "${cfn_preinstall}" != "NONE" ]; then
@@ -21,4 +31,40 @@ function run_preinstall () {
   fi
 }
 
-exit 0
+function run_postinstall () {
+  RC=0
+  if [ "${cfn_postinstall}" != "NONE" ]; then
+    scheme=$(echo "${cfn_postinstall}"| cut -d: -f1)
+    tmpfile=$(mktemp)
+    if [ "${scheme}" == "s3" ]; then
+      aws --region ${cfn_region} s3 cp ${cfn_postinstall} - > $tmpfile || RC=1
+    else
+      wget -qO- ${cfn_postinstall} > $tmpfile || RC=1
+    fi
+    if [ "${cfn_postinstall_args}" != "NONE" ]; then
+      args=${cfn_postinstall_args}
+    fi
+    /bin/sh $tmpfile $args || RC=1
+    /bin/rm $tmpfile
+  fi
+  if [ $RC -ne 0 ]; then
+    error_exit "Failed to run boot_as_master postinstall"
+  fi
+}
+
+ACTION=${1#?}
+
+case $ACTION in
+  preinstall)
+    run_preinstall
+    ;;
+
+  postinstall)
+    run_postinstall
+    ;;
+
+  *)
+    echo "Unknown action. Exit gracefully"
+    exit 0
+
+esac
