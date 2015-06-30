@@ -84,7 +84,7 @@ cookbook_file "supervisord-init" do
 end
 
 # Install jq for manipulating json files
-cookbook_file "jq-1.3" do
+cookbook_file "jq-1.4" do
   path "/usr/local/bin/jq"
   owner "root"
   group "root"
