@@ -14,6 +14,7 @@
   "provisioners" : [{
   "type": "chef-solo",
   "cookbook_paths": ["../vendor/cookbooks"],
+  "install_command" : "curl -L https://www.chef.io/chef/install.sh -v 12.4.1 | {{if .Sudo}}sudo{{end}} bash",
   "run_list" : [ "cfncluster::default" ]
 }]
 }

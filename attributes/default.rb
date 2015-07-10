@@ -40,6 +40,7 @@ when 'amazon'
   default['nfs']['service']['lock'] = 'nfslock'
   default['nfs']['service']['server'] = 'nfs'
   default['nfs']['service']['idmap'] = 'rpcidmapd'
+  default['nfs']['client-services'] = %w(portmap lock)
 end
 
 # cfncluster variables (also in /etc/cfncluster/cfnconfig)

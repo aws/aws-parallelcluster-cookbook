@@ -13,6 +13,7 @@
   }],
   "provisioners" : [{
   "type": "chef-solo",
+  "install_command" : "curl -L https://www.chef.io/chef/install.sh -v 12.4.1 | {{if .Sudo}}sudo{{end}} bash",
   "cookbook_paths": ["../vendor/cookbooks"],
   "run_list" : [ "cfncluster::default" ]
 }]
