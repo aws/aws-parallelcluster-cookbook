@@ -18,7 +18,7 @@ bash 'make install' do
   code <<-EOF
     tar xf #{torque_tarball}
     cd torque-#{node['cfncluster']['torque']['version']}
-    ./bootstrap
+    ./autogen.sh
     ./configure --prefix=/opt/torque
     make install
   EOF

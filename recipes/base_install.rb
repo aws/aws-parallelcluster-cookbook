@@ -14,6 +14,7 @@ end
 directory '/etc/cfncluster'
 directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
+directory node['cfncluster']['scripts_dir']
 
 ## Being explicit about the included recipes and when they should be run
 if platform_family?("rhel")

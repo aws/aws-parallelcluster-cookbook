@@ -5,10 +5,8 @@ driver:
 provisioner:
   name: chef_zero
   require_chef_omnibus: 12.4.1
-  kitchen_root: /tmp/dougal
 
 platforms:
-  - name: ubuntu-14.04
   - name: centos-6.6
   - name: centos-7.0
 
@@ -33,6 +31,16 @@ suites:
       - recipe[cfncluster::openlava_install]
     attributes:
 
+  - name: torque_install
+    run_list:
+      - recipe[cfncluster::torque_install]
+    attributes:
+
+  - name: slurm_install
+    run_list:
+      - recipe[cfncluster::slurm_install]
+    attributes:
+
   - name: base_config_MasterServer
     run_list:
       - recipe[cfncluster::base_config]
@@ -48,7 +56,8 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
-        cfn_volume: 'vol-95228087'
+        cfn_sqs_queue: 'cfncluster-chef'
+        cfn_ddb_table: 'cfncluster-chef'
 
   - name: sge_config_CompeteFleet
     run_list:
@@ -56,4 +65,4 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-0-233'
+        cfn_master: 'ip-192-168-0-38'

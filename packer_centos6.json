@@ -2,7 +2,7 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-45466e75",
+    "source_ami": "ami-c5a5bcf5",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
     "ami_name": "cfncluster-centos6-hvm-{{timestamp}}",
@@ -11,10 +11,40 @@
     "associate_public_ip_address": true,
     "enhanced_networking": true
   }],
-  "provisioners" : [{
+  "provisioners" : [
+  {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef"
+      ]
+  },
+  {
+      "type": "file",
+      "source": "{{pwd}}/../vendor/cookbooks",
+      "destination": "/tmp/cookbooks"
+  },
+  {
+      "type": "shell",
+      "inline":  [ "sudo cp -pr /tmp/cookbooks /etc/chef && sudo chown -R root:root /etc/chef" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "curl -L https://www.chef.io/chef/install.sh -v 12.5.1 | sudo bash" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip" , "sudo easy_install /tmp/aws-cfn-bootstrap-latest.zip" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri berkshelf" ]
+  },
+  {
   "type": "chef-solo",
-  "install_command" : "curl -L https://www.chef.io/chef/install.sh -v 12.4.1 | {{if .Sudo}}sudo{{end}} bash",
-  "cookbook_paths": ["../vendor/cookbooks"],
+  "remote_cookbook_paths": ["/etc/chef/cookbooks"],
+  "skip_install" : "true",
+  "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
   "run_list" : [ "cfncluster::default" ]
-}]
+}
+]
 }

@@ -24,3 +24,11 @@ bash 'make install' do
   creates '/opt/torque/bin/pbsnodes'
 end
 
+
+# Get slurm tarball
+remote_file "/opt/cfncluster/sources/slurm.tar.gz" do
+  source node['cfncluster']['slurm']['munge_url']
+  mode '0644'
+  # TODO: Add version or checksum checks
+  not_if { ::File.exists?("/opt/cfncluster/sources/munge.tar.gz") }
+end

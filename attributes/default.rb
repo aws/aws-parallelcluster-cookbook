@@ -1,6 +1,7 @@
 # Base dir
 default['cfncluster']['base_dir'] = '/opt/cfncluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
+default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 # URLs to software packages used during install receipes
 default['cfncluster']['udev_url'] = 'https://github.com/awslabs/ec2-udev-scripts/archive/v0.1.0.tar.gz'
 # Gridengine software
@@ -10,8 +11,8 @@ default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releas
 default['cfncluster']['openlava']['version'] = '3.0'
 default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.0.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '4.2.9'
-default['cfncluster']['torque']['url'] = 'http://www.adaptivecomputing.com/index.php?wpfb_dl=2849'
+default['cfncluster']['torque']['version'] = '5.1.1'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/5.1.1.tar.gz'
 
 default['cfncluster']['slurm']['version'] = '14.11.5'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-14-11-5-1.tar.gz'
@@ -26,7 +27,7 @@ default['cfncluster']['ganglia']['web_url'] = 'http://downloads.sourceforge.net/
 # Packages based on platform_family
 case node['platform_family']
 when 'rhel'
-  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd)
+  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel)
 when 'debian'
   default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2)
 end

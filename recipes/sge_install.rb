@@ -46,3 +46,6 @@ end
   system true
   shell '/bin/bash'
 end
+
+# Install publish_pending
+

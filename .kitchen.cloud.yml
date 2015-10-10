@@ -11,13 +11,12 @@ driver_config:
 provisioner:
   name: chef_zero
   require_chef_omnibus: 12.4.1
-  kitchen_root: /tmp/dougal
 
 platforms:
-  - name: amazon_linux_2015_03
+  - name: amazon_linux_2015_09
     driver_plugin: ec2
     driver_config:
-      image_id: ami-e7527ed7
+      image_id: ami-9ff7e8af
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
@@ -35,24 +34,24 @@ platforms:
     transport:
       username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: rhel_6
+  - name: rhel_6-7_HVM_GA
     driver_plugin: ec2
     driver_config:
-      image_id: ami-5fbcf36f
+      image_id: ami-75f3f145
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos_66_minimal_sriov
+  - name: rhel_7-1_HVM_GA
     driver_plugin: ec2
     driver_config:
-      image_id: ami-45466e75
+      image_id: ami-4dbf9e7d
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: cfncluster-default-centos-66-minimal-sriov
+  - name: centos_67_minimal_sriov
     driver_plugin: ec2
     driver_config:
-      image_id: ami-6dfbd25d
+      image_id: ami-c5a5bcf5
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
