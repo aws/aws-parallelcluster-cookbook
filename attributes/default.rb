@@ -32,7 +32,6 @@ when 'debian'
   default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2)
 end
 
-
 # Update for NFS on Amazon Linux
 case node['platform']
 when 'amazon'
