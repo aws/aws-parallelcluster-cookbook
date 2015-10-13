@@ -1,17 +1,26 @@
 {
+  "variables" : {
+    "cfncluster_version" : ""
+  },
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
     "source_ami": "ami-c5a5bcf5",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
-    "ami_name": "cfncluster-centos6-hvm-{{timestamp}}",
+    "ami_name": "cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{timestamp}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,
     "enhanced_networking": true
   }],
   "provisioners" : [
+  {
+      "type": "shell",
+      "inline": [
+        "sudo yum -y groupinstall development"
+      ]
+  },
   {
       "type": "shell",
       "inline": [
@@ -29,11 +38,7 @@
   },
   {
       "type": "shell",
-      "inline": [ "curl -L https://www.chef.io/chef/install.sh -v 12.5.1 | sudo bash" ]
-  },
-  {
-      "type": "shell",
-      "inline": [ "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip" , "sudo easy_install /tmp/aws-cfn-bootstrap-latest.zip" ]
+      "inline": [ "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v 12.4.3" ]
   },
   {
       "type": "shell",
@@ -45,6 +50,14 @@
   "skip_install" : "true",
   "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
   "run_list" : [ "cfncluster::default" ]
+},
+  {
+      "type": "shell",
+      "inline": [ "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip" , "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip" ]
+  },
+{
+      "type": "shell",
+      "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys /home/ec2-user/.ssh/authorized_keys", "echo cfncluster-1.0.0b0 | sudo tee /opt/cfncluster/.bootstrapped" ]
 }
 ]
 }

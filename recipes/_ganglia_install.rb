@@ -46,7 +46,7 @@ end
 
 # Setup init.d scripts
 case node['platform']
-when "redhat", "centos"
+when "redhat", "centos", "amazon"
   execute "copy gmetad init script" do
     command "cp " +
       "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
@@ -77,8 +77,8 @@ end
 
 # Setup ganglia-web.conf apache config
 case node['platform']
-when "redhat", "centos"
-  execute "copy gmetad init script" do
+when "redhat", "centos", "amazon"
+  execute "copy ganglia apache conf" do
     command "cp " +
       "#{Chef::Config[:file_cache_path]}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}/apache.conf " +
       "/etc/httpd/conf.d/ganglia-webfrontend.conf"

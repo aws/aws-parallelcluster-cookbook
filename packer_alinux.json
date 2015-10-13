@@ -1,20 +1,59 @@
 {
+  "variables" : {
+    "cfncluster_version" : ""
+  },
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-e7527ed7",
+    "source_ami": "ami-9ff7e8af",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
-    "ami_name": "cfncluster-amzn-hvm-{{timestamp}}",
+    "ami_name": "cfncluster-{{user `cfncluster_version`}}-alinux-hvm-{{timestamp}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,
     "enhanced_networking": true
   }],
-  "provisioners" : [{
+  "provisioners" : [
+  {
+      "type": "shell",
+      "inline": [
+        "sudo yum -y groupinstall development"
+      ]
+  },
+  {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef"
+      ]
+  },
+  {
+      "type": "file",
+      "source": "{{pwd}}/../vendor/cookbooks",
+      "destination": "/tmp/cookbooks"
+  },
+  {
+      "type": "shell",
+      "inline":  [ "sudo cp -pr /tmp/cookbooks /etc/chef && sudo chown -R root:root /etc/chef" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v 12.4.3" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri berkshelf" ]
+  },
+  {
   "type": "chef-solo",
-  "cookbook_paths": ["../vendor/cookbooks"],
-  "install_command" : "curl -L https://www.chef.io/chef/install.sh -v 12.4.1 | {{if .Sudo}}sudo{{end}} bash",
+  "remote_cookbook_paths": ["/etc/chef/cookbooks"],
+  "skip_install" : "true",
+  "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
   "run_list" : [ "cfncluster::default" ]
-}]
+},
+{
+      "type": "shell",
+      "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys /home/ec2-user/.ssh/authorized_keys", "echo cfncluster-1.0.0b0 | sudo tee /opt/cfncluster/.bootstrapped" ]
+}
+]
 }
