@@ -43,6 +43,18 @@ when 'amazon'
   default['nfs']['client-services'] = %w(portmap lock)
 end
 
+# OpenSSH settings for CfnCluster instances
+default['openssh']['server']['protocol'] = '2'
+default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
+default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
+default['openssh']['server']['password_authentication'] = 'no'
+default['openssh']['server']['gssapi_authentication'] = 'yes'
+default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
+default['openssh']['server']['x11_forwarding'] = 'yes'
+default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
+default['openssh']['client']['gssapi_authentication'] = 'yes'
+
+
 # cfncluster variables (also in /etc/cfncluster/cfnconfig)
 default['cfncluster']['cfn_region'] = 'us-east-1'
 default['cfncluster']['stack_name'] = nil

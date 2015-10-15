@@ -4,6 +4,9 @@
 #
 # Copyright (c) 2015 Amazon Web Services, All Rights Reserved.
 
+# Manage SSH via Chef
+include_recipe "openssh"
+
 # Disable selinux
 selinux_state "SELinux Disabled" do
   action :disabled
