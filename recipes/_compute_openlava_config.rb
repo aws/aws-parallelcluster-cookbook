@@ -28,13 +28,6 @@ template '/opt/openlava/etc/lsf.shared' do
   mode '0644'
 end
 
-template '/opt/cfncluster/scripts/publish_pending' do
-  source 'publish_pending.openlava.erb'
-  owner 'root'
-  group 'root'
-  mode '0744'
-end
-
 execute "openlava.setup" do
   environment ( { "LSF_ENVDIR" => "/opt/openlava/etc" } )
   cwd '/opt/openlava/etc'
@@ -45,13 +38,4 @@ end
 service "openlava" do
   supports :status => true, :restart => true, :reload => true
   action [ :enable, :start ]
-end
-
-execute "badmin hclose" do
-  environment ( { "LSF_ENVDIR" => "/opt/openlava/etc" } )
-  command '/opt/openlava/bin/badmin hclose'
-end
-
-cron 'publish_pending' do
-  command '/opt/cfncluster/scripts/publish_pending'
 end

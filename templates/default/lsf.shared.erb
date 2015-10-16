@@ -1,0 +1,44 @@
+# $Id: lsf.shared,v 1.1.4.4 2006/04/28 21:36:01 mblack Exp $
+
+# ----------------------------------------------------------------------
+# T H I S   F I L E:  Is shared by all clusters in the openlava system.
+#
+# This file contains all definitions referenced by individual
+# lsf.cluster.<clustername> files. The definitions in this file can be
+# a superset, i.e., not all definitions in this file need to be used in
+# other files.
+#
+# See lsf.cluster(5)
+# ----------------------------------------------------------------------
+
+Begin Cluster
+ClusterName			# Keyword
+openlava
+End Cluster
+
+Begin HostType
+TYPENAME                        # Keyword
+linux
+End HostType
+
+#
+# The CPU factor values are derived from SPECfp95 given by hardware vendors
+# or SpecBench (unless indicated otherwise)
+# See http://www.specbench.org for more information on CPU benchmarking
+# To find out an architecture string for a new model, run 'lim -t'
+#
+Begin HostModel
+MODELNAME  CPUFACTOR   ARCHITECTURE # keyword
+# CPU factors are only comparisons.
+IntelI5      100        (x86_64)
+IntelXeon    100        (x86_64)
+End HostModel
+
+Begin Resource
+RESOURCENAME  TYPE    INTERVAL INCREASING  DESCRIPTION 	      # Keywords
+   fs         Boolean ()       ()          (File server)
+   cs         Boolean ()       ()          (Compute server)
+   ms         Boolean ()       ()          (Master server)
+#  nio        Numeric 60       Y           (Network I/O in Kbytes/second)
+#  console    String  60       ()          (Console user name)
+End Resource

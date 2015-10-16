@@ -26,6 +26,34 @@ bash 'make install' do
   creates '/opt/openlava/bin/lsid'
 end
 
+# Install Openlava config files
+for cfile in [ "lsf.conf", "lsb.hosts", "lsb.params", "lsb.queues", "lsb.users", "lsf.cluster.openlava", "lsf.shared", "lsf.task", "openlava.csh", "openlava.setup", "openlava.sh" ] do
+  bash "copy #{cfile}" do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-EOF
+      cd openlava-#{node['cfncluster']['openlava']['version']}/config
+      cp #{cfile} /opt/openlava/etc
+    EOF
+    creates "/opt/openlava/etc/#{cfile}"
+  end
+end
+
+# Setup openlava user
+  user "openlava" do
+  supports :manage_home => true
+  comment 'openlava user'
+  home "/home/openlava"
+  system true
+  shell '/bin/bash'
+end
+
+# Set ownership of /opt/openlava to openlava user
+execute 'chown' do
+  command 'chown -R openlava:openlava /opt/openlava'
+end
+
 # Install openlava-python bindings
 python_pip 'cython'
 
