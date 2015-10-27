@@ -66,10 +66,14 @@ remote_file '/usr/bin/ec2-metadata' do
 end
 
 # Install cfncluster-nodes packages
-python_pip "cfncluster-node"
+python_pip "cfncluster-node" do
+  version "0.0.6"
+end
 
 # Supervisord
-python_pip "supervisor"
+python_pip "supervisor" do
+  version "3.1.3"
+end
 
 # Put supervisord config in place
 cookbook_file "supervisord.conf" do
