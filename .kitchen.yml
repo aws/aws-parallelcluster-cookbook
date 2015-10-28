@@ -78,7 +78,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-0-38'
+        cfn_master: 'ip-192-168-0-194.us-west-2.compute.internal'
 
   - name: openlava_config_CompeteFleet
     run_list:
