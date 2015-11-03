@@ -7,16 +7,19 @@ driver_config:
   subnet_id: <%= ENV['AWS_SUBNET_ID'] %>
   security_group_ids:  [ <%= ENV['AWS_SECURITY_GROUP_ID'] %> ]
   iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
+  tags:
+    created-by: test-kitchen
+    Name: test-kitchen-cfncluster
 
 provisioner:
   name: chef_zero
   require_chef_omnibus: 12.4.3
 
 platforms:
-  - name: amazon_linux_2015_09
+  - name: amazon_linux_2015_09_1
     driver_plugin: ec2
     driver_config:
-      image_id: ami-9ff7e8af
+      image_id: ami-f0091d91
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
