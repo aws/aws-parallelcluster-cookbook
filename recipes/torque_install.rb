@@ -21,8 +21,16 @@ bash 'make install' do
     ./autogen.sh
     ./configure --prefix=/opt/torque
     make install
+    cp -vpR contrib /opt/torque
   EOF
   # TODO: Fix, so it works for upgrade
   creates '/opt/torque/bin/pbsnodes'
 end
 
+# Modified torque.setup
+cookbook_file 'torque.setup' do
+  path '/opt/torque/bin/torque.setup'
+  user 'root'
+  group 'root'
+  mode '0755'
+end  
