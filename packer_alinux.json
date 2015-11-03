@@ -5,7 +5,7 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-9ff7e8af",
+    "source_ami": "ami-f0091d91",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
     "ami_name": "cfncluster-{{user `cfncluster_version`}}-alinux-hvm-{{timestamp}}",
