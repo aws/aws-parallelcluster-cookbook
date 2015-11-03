@@ -15,3 +15,5 @@ bin/*
 
 .kitchen/
 .kitchen.local.yml
+
+build.log
