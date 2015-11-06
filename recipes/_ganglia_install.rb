@@ -1,13 +1,14 @@
 include_recipe 'cfncluster::base_install'
 
-if platform?( "redhat", "centos", "amazon" )
-  package "httpd"
-  package "apr-devel"
-  package "libconfuse-devel"
-  package "expat-devel"
-  package "rrdtool-devel"
-  package "pcre-devel"
-end
+case node['platform']
+when "redhat", "centos", "amazon"
+
+package "httpd"
+package "apr-devel"
+package "libconfuse-devel"
+package "expat-devel"
+package "rrdtool-devel"
+package "pcre-devel"
 
 ganglia_tarball = "#{node['cfncluster']['sources_dir']}/ganglia-#{node['cfncluster']['ganglia']['version']}.tar.gz"
 
@@ -45,20 +46,17 @@ bash 'make install' do
 end
 
 # Setup init.d scripts
-case node['platform']
-when "redhat", "centos", "amazon"
-  execute "copy gmetad init script" do
-    command "cp " +
-      "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
-      "/etc/init.d/gmetad"
-    not_if "test -f /etc/init.d/gmetad"
-  end
-  execute "copy gmmond init script" do
-    command "cp " +
-      "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " +
-      "/etc/init.d/gmond"
-    not_if "test -f /etc/init.d/gmond"
-  end
+execute "copy gmetad init script" do
+  command "cp " +
+    "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
+    "/etc/init.d/gmetad"
+  not_if "test -f /etc/init.d/gmetad"
+end
+execute "copy gmmond init script" do
+  command "cp " +
+    "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " +
+    "/etc/init.d/gmond"
+  not_if "test -f /etc/init.d/gmond"
 end
 
 # Install Ganglia Web
@@ -69,20 +67,26 @@ bash 'make install' do
   code <<-EOF
     tar xf #{ganglia_web_tarball}
     cd ganglia-web-#{node['cfncluster']['ganglia']['web_version']}
-    make install APACHE_USER=apache
+    make install APACHE_USER=#{node['cfncluster']['ganglia']['apache_user']}
   EOF
   # TODO: Fix, so it works for upgrade
   creates '/usr/share/ganglia-webfrontend/index.php'
 end
 
 # Setup ganglia-web.conf apache config
-case node['platform']
-when "redhat", "centos", "amazon"
-  execute "copy ganglia apache conf" do
-    command "cp " +
-      "#{Chef::Config[:file_cache_path]}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}/apache.conf " +
-      "/etc/httpd/conf.d/ganglia-webfrontend.conf"
-    not_if "test -f /etc/httpd/conf.d/ganglia-webfrontend.conf"
-  end
+execute "copy ganglia apache conf" do
+  command "cp " +
+    "#{Chef::Config[:file_cache_path]}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}/apache.conf " +
+    "/etc/httpd/conf.d/ganglia-webfrontend.conf"
+  not_if "test -f /etc/httpd/conf.d/ganglia-webfrontend.conf"
+end
+
+when "ubuntu"
+
+package "ganglia-monitor"
+package "rrdtool"
+package "gmetad"
+package "ganglia-webfrontend"
+
 end
 

@@ -89,12 +89,12 @@ service "gmetad" do
   action [ :enable, :start ]
 end
 
-service "gmond" do
+service "#{node['cfncluster']['ganglia']['gmond_service']}" do
   supports :restart => true
   action [ :enable, :start ]
 end
 
-service "httpd" do
+service "#{node['cfncluster']['ganglia']['httpd_service']}" do
   supports :restart => true
   action [ :enable, :start ]
 end

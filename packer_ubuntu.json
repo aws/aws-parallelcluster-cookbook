@@ -1,0 +1,59 @@
+{
+  "variables" : {
+    "cfncluster_version" : ""
+  },
+  "builders": [{
+    "type": "amazon-ebs",
+    "region": "us-west-2",
+    "source_ami": "ami-8ee605bd",
+    "instance_type": "m3.2xlarge",
+    "ssh_username": "ubuntu",
+    "ami_name": "cfncluster-{{user `cfncluster_version`}}-ubuntu-1404-lts-hvm-{{timestamp}}",
+    "subnet_id": "subnet-c06054b4",
+    "vpc_id": "vpc-0a4c5868",
+    "associate_public_ip_address": true,
+    "enhanced_networking": true
+  }],
+  "provisioners" : [
+  {
+      "type": "shell",
+      "inline": [
+        "sudo apt-get update && sudo apt-get install -y build-essential"
+      ]
+  },
+  {
+      "type": "shell",
+      "inline": [
+        "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef"
+      ]
+  },
+  {
+      "type": "file",
+      "source": "{{pwd}}/../vendor/cookbooks",
+      "destination": "/tmp/cookbooks"
+  },
+  {
+      "type": "shell",
+      "inline":  [ "sudo cp -pr /tmp/cookbooks /etc/chef && sudo chown -R root:root /etc/chef" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v 12.4.3" ]
+  },
+  {
+      "type": "shell",
+      "inline": [ "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri berkshelf" ]
+  },
+  {
+  "type": "chef-solo",
+  "remote_cookbook_paths": ["/etc/chef/cookbooks"],
+  "skip_install" : "true",
+  "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+  "run_list" : [ "cfncluster::default" ]
+},
+{
+      "type": "shell",
+      "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys /home/ec2-user/.ssh/authorized_keys", "echo cfncluster-1.0.0b0 | sudo tee /opt/cfncluster/.bootstrapped" ]
+}
+]
+}

@@ -8,15 +8,16 @@ default['cfncluster']['udev_url'] = 'https://github.com/awslabs/ec2-udev-scripts
 default['cfncluster']['sge']['version'] = '8.1.8'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.8/sge-8.1.8.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.0'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.0.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.1'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '5.1.1'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/5.1.1.tar.gz'
-
-default['cfncluster']['slurm']['version'] = '14.11.5'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-14-11-5-1.tar.gz'
-default['cfncluster']['slurm']['munge_url'] = 'https://munge.googlecode.com/files/munge-0.5.11.tar.bz2'
+default['cfncluster']['torque']['version'] = '6.0.0'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
+# Slurm software
+default['cfncluster']['slurm']['version'] = '15-08-2-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-2-1.tar.gz'
+default['cfncluster']['slurm']['munge_version'] = '0.5.11'
+default['cfncluster']['slurm']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
 
 # Ganglia
 default['cfncluster']['ganglia']['version'] = '3.6.1'
@@ -24,12 +25,18 @@ default['cfncluster']['ganglia']['url'] = 'http://downloads.sourceforge.net/proj
 default['cfncluster']['ganglia']['web_version'] = '3.6.2'
 default['cfncluster']['ganglia']['web_url'] = 'http://downloads.sourceforge.net/project/ganglia/ganglia-web/3.6.2/ganglia-web-3.6.2.tar.gz?r=&ts=1426042690&use_mirror=hivelocity'
 
-# Packages based on platform_family
+# Platform defaults
 case node['platform_family']
 when 'rhel'
   default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel)
+  default['cfncluster']['ganglia']['apache_user'] = 'apache'
+  default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
+  default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
 when 'debian'
-  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2)
+  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db)
+  default['cfncluster']['ganglia']['apache_user'] = 'www-data'
+  default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
+  default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
 end
 
 # Update for NFS on Amazon Linux
@@ -53,6 +60,9 @@ default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
 default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
+
+# Munge key for Slurm
+default['cfncluster']['slurm']['munge_key'] = 'YflQEFLjoxsmEK5vQyKk'
 
 
 # cfncluster variables (also in /etc/cfncluster/cfnconfig)

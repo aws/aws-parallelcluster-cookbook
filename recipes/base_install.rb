@@ -3,6 +3,9 @@
 # Recipe:: base_install
 #
 # Copyright (c) 2015 Amazon Web Services, All Rights Reserved.
+if platform_family?("ubuntu")
+  include_recipe "apt"
+end
 
 # Manage SSH via Chef
 include_recipe "openssh"

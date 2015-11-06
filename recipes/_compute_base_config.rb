@@ -33,7 +33,7 @@ template '/etc/ganglia/gmond.conf' do
   mode '0644'
 end
 
-service "gmond" do
+service "#{node['cfncluster']['ganglia']['gmond_service']}" do
   supports :restart => true
   action [ :enable, :start ]
 end

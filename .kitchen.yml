@@ -89,7 +89,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-0-194.us-west-2.compute.internal'
+        cfn_master: 'ip-192-168-0-24.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_region: 'us-west-2'
 

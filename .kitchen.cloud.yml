@@ -26,14 +26,14 @@ platforms:
   - name: marketplace_centos_6_updates
     driver_plugin: ec2
     driver_config:
-      image_id: ami-81d092b1
+      image_id: ami-1255b321
     transport:
-      username: root
+      username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: marketplace_centos_7_updates
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c7d092f7
+      image_id: ami-d440a6e7
     transport:
       username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
@@ -61,7 +61,7 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-3789b807
+      image_id: ami-8ee605bd
     transport:
       username: ubuntu
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
