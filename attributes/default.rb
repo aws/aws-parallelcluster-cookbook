@@ -32,11 +32,19 @@ when 'rhel'
   default['cfncluster']['ganglia']['apache_user'] = 'apache'
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
   default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
+  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/trqauthd'
+  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/pbs_mom'
+  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/pbs_sched'
+  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 when 'debian'
   default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db)
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
+  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/debian.trqauthd'
+  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
+  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
+  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
 end
 
 # Update for NFS on Amazon Linux
