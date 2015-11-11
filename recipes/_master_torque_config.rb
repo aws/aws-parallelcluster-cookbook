@@ -10,7 +10,7 @@ end
 # Copy pbs_server service script
 remote_file "install pbs_server service" do
   path "/etc/init.d/pbs_server"
-  source "file:///opt/torque/contrib/init.d/pbs_server"
+  source node['cfncluster']['torque']['pbs_server_source']
   owner 'root'
   group 'root'
   mode 0755
@@ -25,7 +25,7 @@ end
 # Copy pbs_sched service script
 remote_file "install pbs_sched service" do
   path "/etc/init.d/pbs_sched"
-  source "file:///opt/torque/contrib/init.d/pbs_sched"
+  source node['cfncluster']['torque']['pbs_sched_source']
   owner 'root'
   group 'root'
   mode 0755

@@ -9,7 +9,7 @@ end
 # Copy pbs_mom service script
 remote_file "install pbs_mom service" do
   path "/etc/init.d/pbs_mom"
-  source "file:///opt/torque/contrib/init.d/pbs_mom"
+  source node['cfncluster']['torque']['pbs_mom_source']
   owner 'root'
   group 'root'
   mode 0755

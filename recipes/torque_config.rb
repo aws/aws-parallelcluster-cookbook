@@ -24,7 +24,7 @@ end
 # Install trqauthd service
 remote_file "install trqauthd service" do
   path "/etc/init.d/trqauthd"
-  source "file:///opt/torque/contrib/init.d/trqauthd"
+  source node['cfncluster']['torque']['trqauthd_source']
   owner 'root'
   group 'root'
   mode 0755
