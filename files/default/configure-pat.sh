@@ -13,7 +13,7 @@
 
 set -x
 echo "Determining the MAC address on eth0"
-ETH0_MAC=`/sbin/ifconfig  | /bin/grep eth0 | awk '{print tolower($5)}' | grep '^[0-9a-f]\{2\}\(:[0-9a-f]\{2\}\)\{5\}$'`
+ETH0_MAC=`ip addr show eth0 | /bin/grep 'link/ether' | awk '{print tolower($2)}' | grep '^[0-9a-f]\{2\}\(:[0-9a-f]\{2\}\)\{5\}$'`
 if [ $? -ne 0 ] ; then
    echo "Unable to determine MAC address on eth0" | logger -t "ec2"
    exit 1
