@@ -10,3 +10,11 @@ when 'ComputeFleet'
 else
   fail "cfn_node_type must be MasterServer or ComputeFleet"
 end
+
+link '/etc/profile.d/openlava.sh' do
+  to '/opt/openlava/etc/openlava.sh'
+end
+
+link '/etc/profile.d/openlava.csh' do
+  to '/opt/openlava/etc/openlava.csh'
+end

@@ -28,11 +28,11 @@ template '/opt/openlava/etc/lsf.shared' do
   mode '0644'
 end
 
-execute "openlava.setup" do
-  environment ( { "LSF_ENVDIR" => "/opt/openlava/etc" } )
-  cwd '/opt/openlava/etc'
-  command 'sh ./openlava.setup'
-  not_if { ::File.exists?('/etc/init.d/openlava') }
+cookbook_file 'openlava-init' do
+  path '/etc/init.d/openlava'
+  user 'root'
+  group 'root'
+  mode '0755'
 end
 
 service "openlava" do
