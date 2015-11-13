@@ -1,14 +1,15 @@
 {
   "variables" : {
-    "cfncluster_version" : ""
+    "cfncluster_version" : "",
+    "build_date" : "{{env `BUILD_DATE`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-c5a5bcf5",
+    "source_ami": "ami-1255b321",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
-    "ami_name": "cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{timestamp}}",
+    "ami_name": "cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,
@@ -18,7 +19,7 @@
   {
       "type": "shell",
       "inline": [
-        "sudo yum -y groupinstall development"
+        "sudo yum -y groupinstall development && sudo yum -y install curl"
       ]
   },
   {

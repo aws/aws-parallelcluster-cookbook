@@ -1,6 +1,7 @@
 {
   "variables" : {
-    "cfncluster_version" : ""
+    "cfncluster_version" : "",
+    "build_date" : "{{ubuntu `BUILD_DATE`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
@@ -8,7 +9,7 @@
     "source_ami": "ami-8ee605bd",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ubuntu",
-    "ami_name": "cfncluster-{{user `cfncluster_version`}}-ubuntu-1404-lts-hvm-{{timestamp}}",
+    "ami_name": "cfncluster-{{user `cfncluster_version`}}-ubuntu-1404-lts-hvm-{{user `build_date`}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,
@@ -18,7 +19,7 @@
   {
       "type": "shell",
       "inline": [
-        "sudo apt-get update && sudo apt-get install -y build-essential"
+        "sudo apt-get update && sudo apt-get -y install build-essential curl"
       ]
   },
   {
