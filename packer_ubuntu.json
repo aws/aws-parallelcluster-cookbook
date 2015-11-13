@@ -1,7 +1,7 @@
 {
   "variables" : {
     "cfncluster_version" : "",
-    "build_date" : "{{ubuntu `BUILD_DATE`}}"
+    "build_date" : "{{env `BUILD_DATE`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
