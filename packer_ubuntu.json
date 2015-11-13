@@ -20,7 +20,7 @@
   {
       "type": "shell",
       "inline": [
-        "sudo apt-get update && sudo apt-get -y install build-essential curl"
+        "sudo apt-get update && sudo apt-get -y install build-essential curl wget"
       ]
   },
   {

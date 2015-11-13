@@ -20,7 +20,7 @@
   {
       "type": "shell",
       "inline": [
-        "sudo yum -y groupinstall development && sudo yum -y install curl"
+        "sudo yum -y groupinstall development && sudo yum -y install curl wget"
       ]
   },
   {
