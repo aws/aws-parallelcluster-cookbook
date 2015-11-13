@@ -9,6 +9,7 @@
     "source_ami": "ami-8ee605bd",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ubuntu",
+    "ssh_pty" : true,
     "ami_name": "cfncluster-{{user `cfncluster_version`}}-ubuntu-1404-lts-hvm-{{user `build_date`}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",

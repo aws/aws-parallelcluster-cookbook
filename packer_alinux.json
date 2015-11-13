@@ -9,6 +9,7 @@
     "source_ami": "ami-f0091d91",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ec2-user",
+    "ssh_pty" : true,
     "ami_name": "cfncluster-{{user `cfncluster_version`}}-alinux-hvm-{{user `build_date`}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
