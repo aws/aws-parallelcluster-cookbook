@@ -8,7 +8,7 @@
     "region": "us-west-2",
     "source_ami": "ami-1255b321",
     "instance_type": "m3.2xlarge",
-    "ssh_username": "ec2-user",
+    "ssh_username": "centos",
     "ami_name": "cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
