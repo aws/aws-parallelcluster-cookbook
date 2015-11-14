@@ -1,12 +1,16 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "build_for" : "{{env `BUILD_FOR`}}",
+    "ami_groups" : "{{env `AMI_GROUPS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
     "source_ami": "ami-1255b321",
+    "ami_regions" : "{{user `build_for`}}",
+    "ami_groups" : "{{user `ami_groups`}}",
     "instance_type": "m3.2xlarge",
     "ssh_username": "centos",
     "ssh_pty" : true,
