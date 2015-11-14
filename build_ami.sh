@@ -38,16 +38,16 @@ all)
   done
   ;;
 centos6)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build_$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   ;;
 centos7)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build_$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   ;;
 alinux)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build_$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   ;;
 ubuntu)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build_$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   ;;
 *)
   echo "Unknown OS: $os"
