@@ -58,6 +58,13 @@ platforms:
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: centos_67_minimal_sriov
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-33a1b052
+    transport:
+      username: ec2-user
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:

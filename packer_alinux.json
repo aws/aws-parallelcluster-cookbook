@@ -55,7 +55,7 @@
 },
 {
       "type": "shell",
-      "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys /home/ec2-user/.ssh/authorized_keys", "echo cfncluster-1.0.0b0 | sudo tee /opt/cfncluster/.bootstrapped" ]
+      "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys", "echo cfncluster-1.0.0b0 | sudo tee /opt/cfncluster/.bootstrapped" ]
 }
 ]
 }

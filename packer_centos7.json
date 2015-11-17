@@ -1,16 +1,20 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "build_for" : "{{env `BUILD_FOR`}}",
+    "ami_groups" : "{{env `AMI_GROUPS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-8ee605bd",
+    "source_ami": "ami-33a1b052",
+    "ami_regions" : "{{user `build_for`}}",
+    "ami_groups" : "{{user `ami_groups`}}",
     "instance_type": "m3.2xlarge",
-    "ssh_username": "ubuntu",
+    "ssh_username": "centos",
     "ssh_pty" : true,
-    "ami_name": "cfncluster-{{user `cfncluster_version`}}-ubuntu-1404-lts-hvm-{{user `build_date`}}",
+    "ami_name": "cfncluster-{{user `cfncluster_version`}}-centos7-hvm-{{user `build_date`}}",
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,
@@ -20,7 +24,7 @@
   {
       "type": "shell",
       "inline": [
-        "sudo apt-get update && sudo apt-get -y install build-essential curl wget"
+        "sudo yum -y groupinstall development && sudo yum -y install curl wget"
       ]
   },
   {
@@ -53,6 +57,10 @@
   "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
   "run_list" : [ "cfncluster::default" ]
 },
+  {
+      "type": "shell",
+      "inline": [ "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip" , "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip" ]
+  },
 {
       "type": "shell",
       "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys", "echo cfncluster-1.0.0b0 | sudo tee /opt/cfncluster/.bootstrapped" ]
