@@ -25,6 +25,7 @@
       "type": "shell",
       "inline": [
         "env ; sudo env",
+        "sudo apt-get clean",
         "sudo apt-get update",
         "sudo apt-get -y install build-essential curl wget"
       ]

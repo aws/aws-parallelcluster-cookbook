@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 os=$1
 region=$2
