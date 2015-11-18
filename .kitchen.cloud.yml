@@ -51,19 +51,19 @@ platforms:
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos_67_minimal_sriov
+  - name: centos_67_minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c5a5bcf5
+      image_id: ami-30a3b251
     transport:
-      username: ec2-user
+      username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos_67_minimal_sriov
+  - name: centos_71_minimal
     driver_plugin: ec2
     driver_config:
       image_id: ami-33a1b052
     transport:
-      username: ec2-user
+      username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: ubuntu-14-04-lts
     driver_plugin: ec2

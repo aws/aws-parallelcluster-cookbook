@@ -1,11 +1,15 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "build_for" : "{{env `BUILD_FOR`}}",
+    "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
+    "ami_regions" : "{{user `build_for`}}",
+    "ami_groups" : "{{user `ami_perms`}}",
     "source_ami": "ami-8ee605bd",
     "instance_type": "m3.2xlarge",
     "ssh_username": "ubuntu",

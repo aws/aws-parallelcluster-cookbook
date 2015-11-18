@@ -40,7 +40,14 @@ include_recipe "awscli"
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
+if node['platform_family'] == 'rhel' && node['platform_version'].to_f >= 7.0 && node['platform'] != 'amazon'
+  service "rpcbind" do
+    action [:start, :enable]
+    supports status: true
+  end
+end
 include_recipe "nfs::server"
+include_recipe "nfs::server4"
 
 # Put configure-pat.sh onto the host
 cookbook_file 'configure-pat.sh' do

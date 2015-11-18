@@ -20,7 +20,7 @@ if [ "x$region" == "x" ]; then
 fi
 
 if [ "$public" == "public" ]; then
-  export AMI_GROUPS="all"
+  export AMI_PERMS="all"
 fi
 
 if [ "$region" == "all" ]; then
@@ -34,7 +34,7 @@ export BUILD_DATE=`date +%Y%m%d%H%M`
 case $os in
 all)
   for x in $available_os; do
-    packer build -var-file=packer_variables.json packer_$x.json | tee build_$x.log
+    packer build -var-file=packer_variables.json packer_$x.json | tee build-$x.log
   done
   ;;
 centos6)
