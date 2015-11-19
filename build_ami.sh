@@ -27,27 +27,29 @@ if [ "$region" == "all" ]; then
   export BUILD_FOR=$available_regions
 fi
 
-rm -rf ../vendor/cookbooks
-berks vendor ../vendor/cookbooks
+RC=0
+
+rm -rf ../vendor/cookbooks || RC=1
+berks vendor ../vendor/cookbooks || RC=1
 export BUILD_DATE=`date +%Y%m%d%H%M`
 
 case $os in
 all)
   for x in $available_os; do
-    packer build -var-file=packer_variables.json packer_$x.json | tee build-$x.log
+    packer build -var-file=packer_variables.json packer_$x.json || RC=1 | tee build-$x.log
   done
   ;;
 centos6)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
   ;;
 centos7)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json || RC=1  | tee build-$os.log
   ;;
 alinux)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
   ;;
 ubuntu1404)
-  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
   ;;
 *)
   echo "Unknown OS: $os"
