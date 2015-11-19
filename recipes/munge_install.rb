@@ -10,6 +10,16 @@ remote_file munge_tarball do
   not_if { ::File.exists?(munge_tarball) }
 end
 
+case node['platform_family']
+when 'rhel'
+    case node['platform']
+    when 'centos', 'rhel'
+      if node['platform_version'].to_i >= 7
+        lib_opt =  '--libdir=/usr/lib64/'
+      end
+    end
+end
+
 # Install munge
 bash 'make install' do
   user 'root'
@@ -19,7 +29,7 @@ bash 'make install' do
     tar xf #{munge_tarball}
     cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
     ./bootstrap
-    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var
+    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var #{lib_opt}
     make install
   EOF
   # TODO: Fix, so it works for upgrade
