@@ -1,5 +1,7 @@
 #!/bin/bash -x
 
+set -e
+
 os=$1
 region=$2
 public=$3
@@ -37,19 +39,24 @@ case $os in
 all)
   for x in $available_os; do
     packer build -var-file=packer_variables.json packer_$x.json || RC=1 | tee build-$x.log
+    RC=$?
   done
   ;;
 centos6)
   packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
+  RC=$?
   ;;
 centos7)
   packer build -var-file=packer_variables.json packer_$os.json || RC=1  | tee build-$os.log
+  RC=$?
   ;;
 alinux)
   packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
+  RC=$?
   ;;
 ubuntu1404)
   packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
+  RC=$?
   ;;
 *)
   echo "Unknown OS: $os"
