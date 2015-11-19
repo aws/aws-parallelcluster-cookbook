@@ -16,8 +16,9 @@ default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/t
 # Slurm software
 default['cfncluster']['slurm']['version'] = '15-08-2-1'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-2-1.tar.gz'
-default['cfncluster']['slurm']['munge_version'] = '0.5.11'
-default['cfncluster']['slurm']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
+# Munge
+default['cfncluster']['munge']['munge_version'] = '0.5.11'
+default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
 
 # Ganglia
 default['cfncluster']['ganglia']['version'] = '3.6.1'
@@ -33,10 +34,13 @@ when 'rhel'
 
   when 'centos', 'rhel'
     default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb)
+    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     if node['platform_version'].to_i >= 7
+    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb)
     end
   when 'amazon'
+    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb)
 
   end
@@ -50,7 +54,7 @@ when 'rhel'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 
 when 'debian'
-
+  default['cfncluster']['torque_packages'] = %w(munge libmunge-dev boost boost-dev)
   default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db)
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
@@ -83,8 +87,8 @@ default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
 
-# Munge key for Slurm
-default['cfncluster']['slurm']['munge_key'] = 'YflQEFLjoxsmEK5vQyKk'
+# Munge key
+default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
 
 
 # cfncluster variables (also in /etc/cfncluster/cfnconfig)

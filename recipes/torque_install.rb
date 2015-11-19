@@ -1,6 +1,12 @@
 include_recipe 'cfncluster::base_install'
+include_recipe 'cfncluster::munge_install'
 
 torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster']['torque']['version']}.tar.gz"
+
+# Install packages required to build torque
+node['cfncluster']['torque_packages'].each do |p|
+  package p
+end
 
 # Get Torque tarball
 remote_file torque_tarball do
@@ -19,12 +25,29 @@ bash 'make install' do
     tar xf #{torque_tarball}
     cd torque-#{node['cfncluster']['torque']['version']}
     ./autogen.sh
-    ./configure --prefix=/opt/torque
+    ./configure --prefix=/opt/torque --enable-munge-auth
     make install
     cp -vpR contrib /opt/torque
   EOF
-  # TODO: Fix, so it works for upgrade
-  creates '/opt/torque/bin/pbsnodes'
+  # Only perform if running version doesn't match desired
+  not_if "/opt/torque/bin/pbsnodes --version 2>&1 | grep -q #{node['cfncluster']['torque']['version']}"
+  creates "/random/path"
+end
+
+directory '/opt/torque/bin/' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  recursive true
+end
+
+directory '/var/spool/torque' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  recursive true
 end
 
 # Modified torque.setup

@@ -16,6 +16,12 @@ remote_file "install pbs_server service" do
   mode 0755
 end
 
+# Enable and start munge service
+service "munge" do
+  supports :restart => true
+  action [ :enable, :start ]
+end
+
 # Enable and start pbs_server service
 service "pbs_server" do
   supports :restart => true
@@ -48,3 +54,4 @@ end
 cron 'publish_pending' do
   command '/opt/cfncluster/scripts/publish_pending'
 end
+
