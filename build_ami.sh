@@ -56,3 +56,6 @@ ubuntu1404)
   exit 1
   ;;
 esac
+
+echo "RC: $RC"
+exit $RC
