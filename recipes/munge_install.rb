@@ -14,9 +14,7 @@ case node['platform_family']
 when 'rhel'
     case node['platform']
     when 'centos', 'rhel'
-      if node['platform_version'].to_i >= 7
-        lib_opt =  '--libdir=/usr/lib64/'
-      end
+      lib_opt =  '--libdir=/usr/lib64/'
     end
 end
 

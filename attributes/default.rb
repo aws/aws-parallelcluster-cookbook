@@ -21,10 +21,11 @@ default['cfncluster']['munge']['munge_version'] = '0.5.11'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
 
 # Ganglia
+# TODO: Better sourceforge mirror handling
 default['cfncluster']['ganglia']['version'] = '3.6.1'
-default['cfncluster']['ganglia']['url'] = 'http://downloads.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.6.1/ganglia-3.6.1.tar.gz?r=&ts=1426042631&use_mirror=hivelocity'
+default['cfncluster']['ganglia']['url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.6.1/ganglia-3.6.1.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.6.2'
-default['cfncluster']['ganglia']['web_url'] = 'http://downloads.sourceforge.net/project/ganglia/ganglia-web/3.6.2/ganglia-web-3.6.2.tar.gz?r=&ts=1426042690&use_mirror=hivelocity'
+default['cfncluster']['ganglia']['web_url'] = 'http://superb-dca2.dl.sourceforge.net/project/ganglia/ganglia-web/3.6.2/ganglia-web-3.6.2.tar.gz'
 
 # Platform defaults
 case node['platform_family']
@@ -54,7 +55,9 @@ when 'rhel'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 
 when 'debian'
-  default['cfncluster']['torque_packages'] = %w(munge libmunge-dev boost boost-dev)
+  if node["platform_version"].to_f >= 14.04
+    default['cfncluster']['torque_packages'] = %w(libboost1.54 libboost1.54-dev)
+  end
   default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db)
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
