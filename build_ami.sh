@@ -38,24 +38,24 @@ export BUILD_DATE=`date +%Y%m%d%H%M`
 case $os in
 all)
   for x in $available_os; do
-    packer build -var-file=packer_variables.json packer_$x.json || RC=1 | tee build-$x.log
+    packer build -var-file=packer_variables.json packer_$x.json | tee build-$x.log
     RC=$?
   done
   ;;
 centos6)
-  packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   RC=$?
   ;;
 centos7)
-  packer build -var-file=packer_variables.json packer_$os.json || RC=1  | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   RC=$?
   ;;
 alinux)
-  packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   RC=$?
   ;;
 ubuntu1404)
-  packer build -var-file=packer_variables.json packer_$os.json || RC=1 | tee build-$os.log
+  packer build -var-file=packer_variables.json packer_$os.json | tee build-$os.log
   RC=$?
   ;;
 *)
