@@ -32,8 +32,10 @@ end
 include_recipe "build-essential"
 
 # Setup Python (require extra work due to setuptools bug)
-include_recipe "python"
-python_pip 'setuptools' do
+python_runtime '2' do
+ provider :system
+end
+python_package 'setuptools' do
   action :upgrade
   version node.default['python']['setuptools_version']
 end
@@ -79,12 +81,12 @@ remote_file '/usr/bin/ec2-metadata' do
 end
 
 # Install cfncluster-nodes packages
-python_pip "cfncluster-node" do
+python_package "cfncluster-node" do
   version "0.0.6"
 end
 
 # Supervisord
-python_pip "supervisor" do
+python_package "supervisor" do
   version "3.1.3"
 end
 

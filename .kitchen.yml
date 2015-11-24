@@ -48,7 +48,7 @@ suites:
       cfncluster:
         cfn_node_type: 'MasterServer'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: sge_config_MasterServer
     run_list:
@@ -59,7 +59,7 @@ suites:
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_ddb_table: 'cfncluster-chef'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: openlava_config_MasterServer
     run_list:
@@ -70,7 +70,7 @@ suites:
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_ddb_table: 'cfncluster-chef'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: torque_config_MasterServer
     run_list:
@@ -81,7 +81,7 @@ suites:
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_ddb_table: 'cfncluster-chef'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: sge_config_CompeteFleet
     run_list:
@@ -91,7 +91,7 @@ suites:
         cfn_node_type: 'ComputeFleet'
         cfn_master: 'ip-192-168-0-24.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: openlava_config_CompeteFleet
     run_list:
@@ -101,7 +101,7 @@ suites:
         cfn_node_type: 'ComputeFleet'
         cfn_master: 'ip-192-168-0-239.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: torque_config_CompeteFleet
     run_list:
@@ -111,4 +111,4 @@ suites:
         cfn_node_type: 'ComputeFleet'
         cfn_master: 'ip-192-168-0-57.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
-        cfn_region: 'us-west-2'
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>

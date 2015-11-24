@@ -36,6 +36,19 @@ service "trqauthd" do
   action [ :enable, :start ]
 end
 
+# Create the munge key from template
+template "/etc/munge/munge.key" do
+    source "munge.key.erb"
+    owner "munge"
+    mode "0600"
+end
+
+# Enable munge service
+service "munge" do
+  supports :restart => true
+  action [ :enable, :start ]
+end
+
 cookbook_file "/etc/profile.d/torque.sh" do
   source 'torque.sh'
   owner 'root'

@@ -10,14 +10,6 @@ remote_file munge_tarball do
   not_if { ::File.exists?(munge_tarball) }
 end
 
-case node['platform_family']
-when 'rhel'
-    case node['platform']
-    when 'centos', 'rhel'
-      lib_opt =  '--libdir=/usr/lib64/'
-    end
-end
-
 # Install munge
 bash 'make install' do
   user 'root'
@@ -27,12 +19,20 @@ bash 'make install' do
     tar xf #{munge_tarball}
     cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
     ./bootstrap
-    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var #{lib_opt}
+    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib64
     make install
   EOF
   # TODO: Fix, so it works for upgrade
   creates '/usr/bin/munge'
   not_if "/usr/sbin/munged --version | grep -q munge-#{node['cfncluster']['munge']['munge_version']}"
+end
+
+# Updated munge init script for Amazon Linux
+cookbook_file "munge-init" do
+  path '/etc/init.d/munge'
+  user 'root'
+  group 'root'
+  mode '0755'
 end
 
 # Make sure the munge user exists
@@ -55,17 +55,3 @@ directory "/var/run/munge" do
     action :create
     owner "munge"
 end
-
-# Create the munge key from template
-template "/etc/munge/munge.key" do
-    source "munge.key.erb"
-    owner "munge"
-    mode "0600"
-end
-
-# Enable munge service
-service "munge" do
-  supports :restart => true
-  action [ :enable, :start ]
-end
-

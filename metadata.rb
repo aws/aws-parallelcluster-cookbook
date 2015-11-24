@@ -7,7 +7,7 @@ long_description 'Installs/Configures cfncluster'
 version          '0.1.0'
 
 depends 'build-essential', '~> 2.2.4'
-depends 'python', '~> 1.4.6'
+depends 'poise-python', '~> 1.1.1'
 depends 'tar', '~> 0.7.0'
 depends 'awscli', '~> 1.1.2'
 depends 'selinux', '~> 0.9.0'

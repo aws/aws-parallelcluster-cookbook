@@ -68,7 +68,14 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-8ee605bd
+      image_id: ami-d24c5cb3
+    transport:
+      username: ubuntu
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: ubuntu-15-10
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-16b1a077
     transport:
       username: ubuntu
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
@@ -77,12 +84,12 @@ platforms:
     driver_config:
       image_id: ami-3b0f420b
     transport:
-      username: root
+      username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: sles12
     driver_plugin: ec2
     driver_config:
-      image_id: ami-d7450be7
+      image_id: ami-c5440af5
     transport:
       username: root
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>

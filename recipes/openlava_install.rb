@@ -55,5 +55,5 @@ execute 'chown' do
 end
 
 # Install openlava-python bindings
-python_pip 'cython'
+python_package 'cython'
 
