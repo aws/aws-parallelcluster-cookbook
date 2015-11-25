@@ -1,0 +1,4 @@
+/spec export-ignore
+/test export-ignore
+build* export-ignore
+packer* export-ignore
