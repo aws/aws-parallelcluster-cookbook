@@ -9,6 +9,8 @@ package "libconfuse-devel"
 package "expat-devel"
 package "rrdtool-devel"
 package "pcre-devel"
+package "php"
+package "php-gd"
 
 ganglia_tarball = "#{node['cfncluster']['sources_dir']}/ganglia-#{node['cfncluster']['ganglia']['version']}.tar.gz"
 
@@ -81,12 +83,26 @@ execute "copy ganglia apache conf" do
   not_if "test -f /etc/httpd/conf.d/ganglia-webfrontend.conf"
 end
 
+directory '/var/lib/ganglia/rrds' do
+  owner 'nobody'
+  group 'nobody'
+  mode 0755
+  recursive true
+  action :create
+end
+
 when "ubuntu"
 
 package "ganglia-monitor"
 package "rrdtool"
 package "gmetad"
 package "ganglia-webfrontend"
+
+# Setup ganglia-web.conf apache config
+execute "copy ganglia apache conf" do
+  command "cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/ganglia.conf"
+  not_if "test -f /etc/apache2/sites-enabled/ganglia.conf"
+end
 
 end
 

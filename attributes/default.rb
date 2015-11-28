@@ -22,10 +22,10 @@ default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/arch
 
 # Ganglia
 # TODO: Better sourceforge mirror handling
-default['cfncluster']['ganglia']['version'] = '3.6.1'
-default['cfncluster']['ganglia']['url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.6.1/ganglia-3.6.1.tar.gz'
-default['cfncluster']['ganglia']['web_version'] = '3.6.2'
-default['cfncluster']['ganglia']['web_url'] = 'http://superb-dca2.dl.sourceforge.net/project/ganglia/ganglia-web/3.6.2/ganglia-web-3.6.2.tar.gz'
+default['cfncluster']['ganglia']['version'] = '3.7.2'
+default['cfncluster']['ganglia']['url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz'
+default['cfncluster']['ganglia']['web_version'] = '3.7.1'
+default['cfncluster']['ganglia']['web_url'] = 'http://superb-dca2.dl.sourceforge.net/project/ganglia/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz'
 
 # Platform defaults
 case node['platform_family']

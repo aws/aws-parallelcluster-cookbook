@@ -31,17 +31,8 @@ if platform_family?("rhel")
 end
 include_recipe "build-essential"
 
-# Setup Python (require extra work due to setuptools bug)
-python_runtime '2' do
- provider :system
-end
-python_package 'setuptools' do
-  action :upgrade
-  version node.default['python']['setuptools_version']
-end
-
 # Install AWSCLI
-include_recipe "awscli"
+python_package 'awscli'
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"

@@ -47,6 +47,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
@@ -58,6 +59,7 @@ suites:
         cfn_node_type: 'MasterServer'
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_ddb_table: 'cfncluster-chef'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
@@ -69,6 +71,7 @@ suites:
         cfn_node_type: 'MasterServer'
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_ddb_table: 'cfncluster-chef'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
@@ -80,6 +83,7 @@ suites:
         cfn_node_type: 'MasterServer'
         cfn_sqs_queue: 'cfncluster-chef'
         cfn_ddb_table: 'cfncluster-chef'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
@@ -91,6 +95,7 @@ suites:
         cfn_node_type: 'ComputeFleet'
         cfn_master: 'ip-192-168-0-24.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: openlava_config_CompeteFleet
@@ -101,6 +106,7 @@ suites:
         cfn_node_type: 'ComputeFleet'
         cfn_master: 'ip-192-168-0-239.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
 
   - name: torque_config_CompeteFleet
@@ -111,4 +117,5 @@ suites:
         cfn_node_type: 'ComputeFleet'
         cfn_master: 'ip-192-168-0-57.us-west-2.compute.internal'
         cfn_sqs_queue: 'cfncluster-chef'
+        stack_name: 'cfncluster-test-kitchen'
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>

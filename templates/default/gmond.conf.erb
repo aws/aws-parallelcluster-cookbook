@@ -26,7 +26,7 @@ cluster {
 
 /* The host section describes attributes of the host, like the location */
 host {
-  location = "<%= node['cfncluster']['az'] %>"
+  location = "<%= node['ec2']['placement_availability_zone'] %>"
 }
 
 /* Feel free to specify as many udp_send_channels as you like.  Gmond
@@ -38,7 +38,7 @@ udp_send_channel {
                        # this, the metrics may appear to come from any
                        # interface and the DNS names associated with
                        # those IPs will be used to create the RRDs.
-  host = <%= node['hostname'] %>
+  host = <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%><%= node['hostname'] %><% end -%><% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%><%= node['cfncluster']['cfn_master'] %><%= node['hostname'] %><% end -%>
   port = 8649
   ttl = 1
 }
