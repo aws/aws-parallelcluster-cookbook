@@ -12,12 +12,12 @@ when 'rhel'
   else
     python_runtime '2' do
       version '2'
-      options :system
+      provider :system
     end
   end
 when 'debian'
   python_runtime '2' do
     version '2'
-    options :system
+    provider :system
   end
 end
