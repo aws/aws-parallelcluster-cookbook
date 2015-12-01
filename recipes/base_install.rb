@@ -6,9 +6,15 @@
 case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
+  include_recipe "yum-epel"
+  package 'python-pip'
+  package 'python-devel'
 when 'debian'
   include_recipe 'apt'
+  package 'python-pip'
+  package 'python-dev'
 end
+include_recipe "build-essential"
 
 # Manage SSH via Chef
 include_recipe "openssh"
@@ -24,12 +30,6 @@ directory '/etc/cfncluster'
 directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
-
-## Being explicit about the included recipes and when they should be run
-if platform_family?("rhel")
-  include_recipe "yum-epel"
-end
-include_recipe "build-essential"
 
 # Install AWSCLI
 python_package 'awscli'
