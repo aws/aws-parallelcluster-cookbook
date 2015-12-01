@@ -7,14 +7,11 @@ case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
   include_recipe "yum-epel"
-  package 'python-pip'
-  package 'python-devel'
 when 'debian'
   include_recipe 'apt'
-  package 'python-pip'
-  package 'python-dev'
 end
 include_recipe "build-essential"
+include_recipe "cfncluster::_setup_python"
 
 # Manage SSH via Chef
 include_recipe "openssh"
