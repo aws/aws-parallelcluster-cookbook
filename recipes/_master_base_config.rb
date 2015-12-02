@@ -30,7 +30,7 @@ end
 ruby_block "setup_disk" do
   block do
     fs_type = setup_disk(dev_path)
-    node.set['cfncluster']['cfn_volume_fs_type'] = fs_type
+    node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
   end
   subscribes :run, "ruby_block[sleeping_for_volume]", :immediately
 end
@@ -53,7 +53,7 @@ mount "#{node['cfncluster']['cfn_shared_dir']}" do
 end
 
 # Get VPC CIDR
-node.set['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
+node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
 
 # Export shared dir
 nfs_export "#{node['cfncluster']['cfn_shared_dir']}" do
