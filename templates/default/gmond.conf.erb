@@ -38,7 +38,12 @@ udp_send_channel {
                        # this, the metrics may appear to come from any
                        # interface and the DNS names associated with
                        # those IPs will be used to create the RRDs.
-  host = <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%><%= node['hostname'] %><% end -%><% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%><%= node['cfncluster']['cfn_master'] %><%= node['hostname'] %><% end -%>
+<% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
+  host = <%= node['hostname'] %>
+<% end -%>
+<% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
+  host = <%= node['cfncluster']['cfn_master'] %>
+<% end -%>
   port = 8649
   ttl = 1
 }
