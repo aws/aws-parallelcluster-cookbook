@@ -13,6 +13,7 @@ cfn_node_type=<%= node['cfncluster']['cfn_node_type'] %>
 cfn_cluster_user=<%= node['cfncluster']['cfn_cluster_user'] %>
 <% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
 cfn_sqs_queue=<%= node['cfncluster']['cfn_sqs_queue'] %>
+cfn_master=<%= node['cfncluster']['nfs_master'] %>
 <% end -%>
 <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
 cfn_volume=<%= node['cfncluster']['cfn_volume'] %>
