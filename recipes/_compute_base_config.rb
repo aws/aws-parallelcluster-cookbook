@@ -5,7 +5,7 @@ directory node['cfncluster']['cfn_shared_dir'] do
   group 'root'
 end
 
-node.set['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
+node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
 
 nfs_master = "#{node['cfncluster']['cfn_master']}"
 
