@@ -41,6 +41,8 @@ bash 'make install' do
     cd torque-#{node['cfncluster']['torque']['version']}
     ./autogen.sh
     ./configure --prefix=/opt/torque --enable-munge-auth
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
     cp -vpR contrib /opt/torque
   EOF

@@ -54,6 +54,8 @@ bash 'make install' do
     tar xf #{ganglia_tarball}
     cd ganglia-#{node['cfncluster']['ganglia']['version']}
     ./configure --with-gmetad --enable-status --sysconfdir=/etc/ganglia --prefix=/usr
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
   EOF
   # TODO: Fix, so it works for upgrade

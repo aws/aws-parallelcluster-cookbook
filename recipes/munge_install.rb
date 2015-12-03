@@ -35,6 +35,8 @@ bash 'make install' do
     cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
     ./bootstrap
     ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib64
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
   EOF
   # TODO: Fix, so it works for upgrade

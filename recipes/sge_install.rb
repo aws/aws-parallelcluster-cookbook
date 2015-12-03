@@ -34,9 +34,10 @@ bash 'make install' do
   code <<-EOF
     tar xf #{sge_tarball}
     cd sge*/source
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
     sh scripts/bootstrap.sh -no-java -no-jni -no-herd
-    ./aimk -pam -no-remote -no-java -no-jni -no-herd
-    ./aimk -man -no-java -no-jni -no-herd
+    ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
+    ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
     scripts/distinst -local -allall -noexit
     mkdir $SGE_ROOT
     echo instremote=false >> distinst.private

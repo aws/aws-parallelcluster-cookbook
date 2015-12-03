@@ -35,6 +35,8 @@ bash 'make install' do
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
     ./configure --prefix=/opt/slurm
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
   EOF
   # TODO: Fix, so it works for upgrade

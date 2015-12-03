@@ -35,6 +35,8 @@ bash 'make install' do
     cd openlava-#{node['cfncluster']['openlava']['version']}
     ./bootstrap.sh
     ./configure --prefix=/opt/openlava
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
   EOF
   # TODO: Fix, so it works for upgrade
