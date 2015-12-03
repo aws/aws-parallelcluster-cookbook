@@ -1,3 +1,18 @@
+#
+# Cookbook Name:: cfncluster
+# Recipe:: slurm_install
+#
+# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the
+# License. A copy of the License is located at
+#
+# http://aws.amazon.com/asl/
+#
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
 include_recipe 'cfncluster::base_install'
 include_recipe 'cfncluster::munge_install'
 
@@ -25,3 +40,17 @@ bash 'make install' do
   # TODO: Fix, so it works for upgrade
   creates '/opt/slurm/bin/srun'
 end
+
+# Setup slurm user
+  user "slurm" do
+  supports :manage_home => true
+  comment 'slurm user'
+  home "/home/slurm"
+  system true
+  shell '/bin/bash'
+end
+
+## Set ownership of /opt/slurm to slurm user
+#execute 'chown' do
+#  command 'chown -R slurm:slurm /opt/slurm'
+#end

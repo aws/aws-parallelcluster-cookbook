@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: cfncluster
-# Recipe:: _master_sge_config
+# Recipe:: _master_slurm_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -13,50 +13,48 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Export /opt/sge
-nfs_export "/opt/sge" do
+# Export /opt/slurm
+nfs_export "/opt/slurm" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
   writeable true
   options ['no_root_squash']
 end
 
-# Put sge_inst in place
-cookbook_file 'sge_inst.conf' do
-  path '/opt/sge/sge_inst.conf'
+# Ensure config directory is in place
+directory '/opt/slurm/etc' do
   user 'root'
+  group 'root'
+  mode '0755'
+end
+
+template '/opt/slurm/etc/slurm.conf' do
+  source 'slurm.conf.erb'
+  owner 'root'
   group 'root'
   mode '0644'
 end
 
-# Run inst_sge
-execute "inst_sge" do
-  command './inst_sge -m -auto ./sge_inst.conf'
-  cwd '/opt/sge'
-  not_if { ::File.exists?('/opt/sge/default/common/cluster_name') }
+cookbook_file '/opt/slurm/etc/slurm.sh' do
+  source 'slurm.sh'
+  owner 'root'
+  group 'root'
+  mode '0755'
 end
 
-link "/etc/profile.d/sge.sh" do
-  to "/opt/sge/default/common/settings.sh"
+cookbook_file '/opt/slurm/etc/slurm.csh' do
+  source 'slurm.csh'
+  owner 'root'
+  group 'root'
+  mode '0755'
 end
 
-link "/etc/profile.d/sge.csh" do
-  to "/opt/sge/default/common/settings.csh"
-end
-
-service "sgemaster.p6444" do
+service "slurm" do
   supports :restart => false
   action [ :enable, :start ]
 end
 
-bash "add_host_as_master" do
-  code <<-EOH
-    . /opt/sge/default/common/settings.sh
-    qconf -as #{node['hostname']}
-  EOH
-end  
-
 template '/opt/cfncluster/scripts/publish_pending' do
-  source 'publish_pending.sge.erb'
+  source 'publish_pending.slurm.erb'
   owner 'root'
   group 'root'
   mode '0744'
