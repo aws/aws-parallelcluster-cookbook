@@ -80,12 +80,12 @@ end
 
 # Install cfncluster-nodes packages
 python_package "cfncluster-node" do
-  version "0.0.6"
+  version node['cfncluster']['cfncluster-node-version']
 end
 
 # Supervisord
 python_package "supervisor" do
-  version "3.1.3"
+  version node['cfncluster']['supervisor-version']
 end
 
 # Put supervisord config in place
