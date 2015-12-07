@@ -45,6 +45,7 @@ remote_file ganglia_web_tarball do
   not_if { ::File.exists?(ganglia_web_tarball) }
 end
 
+##
 # Install Ganglia
 bash 'make install' do
   user 'root'
@@ -53,7 +54,7 @@ bash 'make install' do
   code <<-EOF
     tar xf #{ganglia_tarball}
     cd ganglia-#{node['cfncluster']['ganglia']['version']}
-    ./configure --with-gmetad --enable-status --sysconfdir=/etc/ganglia --prefix=/usr
+    ./configure --build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-gmetad --enable-status --sysconfdir=/etc/ganglia
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
@@ -62,7 +63,8 @@ bash 'make install' do
   creates '/usr/sbin/gmetad'
 end
 
-# Setup init.d scripts
+if node['init_package'] == 'init'
+# Setup init.d scripts if not systemd
 execute "copy gmetad init script" do
   command "cp " +
     "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
@@ -75,7 +77,9 @@ execute "copy gmmond init script" do
     "/etc/init.d/gmond"
   not_if "test -f /etc/init.d/gmond"
 end
+end
 
+##
 # Install Ganglia Web
 bash 'make install' do
   user 'root'
@@ -90,12 +94,11 @@ bash 'make install' do
   creates '/usr/share/ganglia-webfrontend/index.php'
 end
 
-# Setup ganglia-web.conf apache config
-execute "copy ganglia apache conf" do
-  command "cp " +
-    "#{Chef::Config[:file_cache_path]}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}/apache.conf " +
-    "/etc/httpd/conf.d/ganglia-webfrontend.conf"
-  not_if "test -f /etc/httpd/conf.d/ganglia-webfrontend.conf"
+cookbook_file 'ganglia-webfrontend.conf' do
+  path '/etc/httpd/conf.d/ganglia-webfrontend.conf'
+  user 'root'
+  group 'root'
+  mode '0644'
 end
 
 directory '/var/lib/ganglia/rrds' do
