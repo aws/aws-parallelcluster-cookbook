@@ -93,3 +93,5 @@ qmgr -c 'set queue batch resources_default.nodes = 1'
 qmgr -c 'set server default_queue = batch'
 
 qmgr -c 'set server auto_node_np = True'
+
+qmgr -c "set server query_other_jobs = True"
