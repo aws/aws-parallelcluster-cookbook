@@ -39,11 +39,3 @@ cookbook_file "compute_ready" do
   group "root"
   mode "0755"
 end
-
-# Install jq for manipulating json files
-cookbook_file "jq-1.4" do
-  path "/usr/local/bin/jq"
-  owner "root"
-  group "root"
-  mode "0755"
-end
