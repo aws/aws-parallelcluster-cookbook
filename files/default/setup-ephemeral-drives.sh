@@ -30,6 +30,7 @@ function setup_ephemeral_drives () {
   MAPPING=$(/usr/bin/ec2-metadata -b | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
   NUM_DEVS=0
   for m in $MAPPING; do
+    umount /dev/${m} >/dev/null 2>&1
     stat -t /dev/${m} >/dev/null 2>&1
     check=$?
     if [ ${check} -eq 0 ]; then
