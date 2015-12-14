@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 # Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
 #
@@ -65,11 +67,11 @@ function setup_ephemeral_drives () {
       chmod 0400 /root/keystore/keyfile || RC=1
       cryptsetup -q luksFormat /dev/vg.01/lv_ephemeral /root/keystore/keyfile || RC=1
       cryptsetup -d /root/keystore/keyfile luksOpen /dev/vg.01/lv_ephemeral ephemeral_luks || RC=1
-      mkfs.xfs /dev/mapper/ephemeral_luks || RC=1
-      mount -v -t xfs -o noatime,nodiratime /dev/mapper/ephemeral_luks ${cfn_ephemeral_dir} || RC=1
+      mkfs.ext4 /dev/mapper/ephemeral_luks || RC=1
+      mount -v -t ext4 -o noatime,nodiratime /dev/mapper/ephemeral_luks ${cfn_ephemeral_dir} || RC=1
     else
-      mkfs.xfs /dev/vg.01/lv_ephemeral || RC=1
-      echo "/dev/vg.01/lv_ephemeral ${cfn_ephemeral_dir} xfs noatime,nodiratime 0 0" >> /etc/fstab || RC=1
+      mkfs.ext4 /dev/vg.01/lv_ephemeral || RC=1
+      echo "/dev/vg.01/lv_ephemeral ${cfn_ephemeral_dir} ext4 noatime,nodiratime 0 0" >> /etc/fstab || RC=1
       mount -v ${cfn_ephemeral_dir} || RC=1
     fi
   fi

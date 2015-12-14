@@ -15,6 +15,12 @@
 
 include_recipe 'cfncluster::base_install'
 
+# Setup ephemeral drives
+execute 'setup ephemeral' do
+  command '/usr/local/sbin/setup-ephemeral-drives.sh'
+  creates '/scratch'
+end
+
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'

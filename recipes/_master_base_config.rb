@@ -54,7 +54,7 @@ end
 directory "#{node['cfncluster']['cfn_shared_dir']}" do
   owner 'root'
   group 'root'
-  mode '0777'
+  mode '1777'
   recursive true
   action :create
 end
