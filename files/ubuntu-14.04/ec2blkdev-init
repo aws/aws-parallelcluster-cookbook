@@ -31,6 +31,7 @@ do_start() {
     echo -n $"Starting ec2blkdev: "
     $prog trigger --action=change --subsystem-match=block
     retval=$?
+    sleep 15 # Wait for EC2 API calls to complete
     echo
     return $retval
 }
