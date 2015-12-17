@@ -60,7 +60,8 @@ case node['platform']
         make install
       EOF
       # TODO: Fix, so it works for upgrade
-      creates '/usr/sbin/gmetad'
+      # Removing to fix RHEL7 issue with existing install
+      # creates '/usr/sbin/gmetad'
     end
 
     if node['init_package'] == 'init'
