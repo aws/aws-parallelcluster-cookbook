@@ -23,6 +23,14 @@ end
 
 case node['platform_family']
 when 'rhel'
+  file 'pbs_mom_sysconfig' do
+    path '/etc/sysconfig/pbs_mom'
+    user 'root'
+    group 'root'
+    mode '0755'
+    action :create_if_missing
+  end
+
   ruby_block "report short name" do
     block do
       fe = Chef::Util::FileEdit.new("/etc/sysconfig/pbs_mom")
