@@ -64,19 +64,25 @@ bash 'make install' do
 end
 
 if node['init_package'] == 'init'
-# Setup init.d scripts if not systemd
-execute "copy gmetad init script" do
-  command "cp " +
-    "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
-    "/etc/init.d/gmetad"
-  not_if "test -f /etc/init.d/gmetad"
+  # Setup init.d scripts if not systemd
+  execute "copy gmetad init script" do
+    command "cp " +
+      "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
+      "/etc/init.d/gmetad"
+    not_if "test -f /etc/init.d/gmetad"
+  end
+  execute "copy gmmond init script" do
+    command "cp " +
+      "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " +
+      "/etc/init.d/gmond"
+    not_if "test -f /etc/init.d/gmond"
+  end
 end
-execute "copy gmmond init script" do
-  command "cp " +
-    "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " +
-    "/etc/init.d/gmond"
-  not_if "test -f /etc/init.d/gmond"
-end
+
+# Reload systemd
+execute 'systemctl-daemon-reload' do
+  command '/bin/systemctl --system daemon-reload'
+  if "test -f /bin/systemctl"
 end
 
 ##
