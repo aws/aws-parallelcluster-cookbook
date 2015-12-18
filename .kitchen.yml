@@ -124,7 +124,7 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
 
-  - name: sge_config_CompeteFleet
+  - name: sge_config_ComputeFleet
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::sge_config]
@@ -141,7 +141,7 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
 
-  - name: openlava_config_CompeteFleet
+  - name: openlava_config_ComputeFleet
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::openlava_config]
@@ -158,7 +158,7 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
 
-  - name: torque_config_CompeteFleet
+  - name: torque_config_ComputeFleet
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::torque_config]
@@ -175,7 +175,7 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
 
-  - name: slurm_config_CompeteFleet
+  - name: slurm_config_ComputeFleet
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::slurm_config]
