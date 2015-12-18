@@ -47,9 +47,13 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
-        stack_name: 'cfncluster-test-kitchen'
-        cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
 
   - name: sge_config_MasterServer
     run_list:
@@ -57,11 +61,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
-        cfn_sqs_queue: 'cfncluster-chef'
-        cfn_ddb_table: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
-        cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
 
   - name: openlava_config_MasterServer
     run_list:
@@ -69,11 +77,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
-        cfn_sqs_queue: 'cfncluster-chef'
-        cfn_ddb_table: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
-        cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
 
   - name: torque_config_MasterServer
     run_list:
@@ -81,11 +93,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
-        cfn_sqs_queue: 'cfncluster-chef'
-        cfn_ddb_table: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
-        cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
 
   - name: slurm_config_MasterServer
     run_list:
@@ -93,11 +109,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
-        cfn_sqs_queue: 'cfncluster-chef'
-        cfn_ddb_table: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
-        cfn_volume: <%= ENV['AWS_MASTER_VOLUME'] %>
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
 
   - name: sge_config_CompeteFleet
     run_list:
@@ -105,10 +125,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-0-24.us-west-2.compute.internal'
-        cfn_sqs_queue: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_master: <%= ENV['CFN_MASTER'] %>
 
   - name: openlava_config_CompeteFleet
     run_list:
@@ -116,10 +141,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-0-239.us-west-2.compute.internal'
-        cfn_sqs_queue: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_master: <%= ENV['CFN_MASTER'] %>
 
   - name: torque_config_CompeteFleet
     run_list:
@@ -127,10 +157,15 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-0-57.us-west-2.compute.internal'
-        cfn_sqs_queue: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_master: <%= ENV['CFN_MASTER'] %>
 
   - name: slurm_config_CompeteFleet
     run_list:
@@ -138,7 +173,12 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
-        cfn_master: 'ip-192-168-1-173.us-west-2.compute.internal'
-        cfn_sqs_queue: 'cfncluster-chef'
-        stack_name: 'cfncluster-test-kitchen'
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_master: <%= ENV['CFN_MASTER'] %>
