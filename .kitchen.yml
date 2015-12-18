@@ -43,6 +43,7 @@ suites:
 
   - name: base_config_MasterServer
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::base_config]
     attributes:
       cfncluster:
@@ -57,6 +58,7 @@ suites:
 
   - name: sge_config_MasterServer
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::sge_config]
     attributes:
       cfncluster:
@@ -73,6 +75,7 @@ suites:
 
   - name: openlava_config_MasterServer
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::openlava_config]
     attributes:
       cfncluster:
@@ -89,6 +92,7 @@ suites:
 
   - name: torque_config_MasterServer
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::torque_config]
     attributes:
       cfncluster:
@@ -105,6 +109,7 @@ suites:
 
   - name: slurm_config_MasterServer
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::slurm_config]
     attributes:
       cfncluster:
@@ -121,6 +126,7 @@ suites:
 
   - name: sge_config_CompeteFleet
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::sge_config]
     attributes:
       cfncluster:
@@ -137,6 +143,7 @@ suites:
 
   - name: openlava_config_CompeteFleet
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::openlava_config]
     attributes:
       cfncluster:
@@ -153,6 +160,7 @@ suites:
 
   - name: torque_config_CompeteFleet
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::torque_config]
     attributes:
       cfncluster:
@@ -169,6 +177,7 @@ suites:
 
   - name: slurm_config_CompeteFleet
     run_list:
+      - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::slurm_config]
     attributes:
       cfncluster:
