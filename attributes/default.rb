@@ -76,7 +76,7 @@ when 'debian'
   if node["platform_version"].to_f >= 14.04
     default['cfncluster']['torque_packages'] = %w(libboost1.54 libboost1.54-dev)
   end
-  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db)
+  default['cfncluster']['base_packages'] = %w(ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2)
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
