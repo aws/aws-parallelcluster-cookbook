@@ -15,6 +15,11 @@
 
 include_recipe 'cfncluster::base_install'
 
+# Setup hostnames to be short
+node.default['set_fqdn'] = node['ec2']['local_hostname']
+node.default['hostname_cookbook']['hostsfile_ip'] = node['ec2']['local_ipv4']
+include_recipe 'hostname::default'
+
 # Setup ephemeral drives
 execute 'setup ephemeral' do
   command '/usr/local/sbin/setup-ephemeral-drives.sh'
