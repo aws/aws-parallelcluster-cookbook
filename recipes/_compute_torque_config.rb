@@ -21,26 +21,6 @@ template '/var/spool/torque/mom_priv/config' do
   mode '0644'
 end
 
-case node['platform_family']
-when 'rhel'
-  file 'pbs_mom_sysconfig' do
-    path '/etc/sysconfig/pbs_mom'
-    user 'root'
-    group 'root'
-    mode '0755'
-    action :create_if_missing
-  end
-
-  ruby_block "report short name" do
-    block do
-      fe = Chef::Util::FileEdit.new("/etc/sysconfig/pbs_mom")
-      fe.insert_line_if_no_match(/#{node['hostname']}/,
-                               "export args=\"$args -A #{node['hostname']}\"")
-      fe.write_file
-    end
-  end
-end
-
 # Copy pbs_mom service script
 remote_file "install pbs_mom service" do
   path "/etc/init.d/pbs_mom"
