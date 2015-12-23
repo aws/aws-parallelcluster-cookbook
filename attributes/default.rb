@@ -56,7 +56,7 @@ when 'rhel'
     default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     if node['platform_version'].to_i >= 7
     default['cfncluster']['torque_packages'] = %w(boost boost-devel)
-    default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb mlocate)
+    default['cfncluster']['base_packages'] = %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb mlocate lvm2)
     end
   when 'amazon'
     default['cfncluster']['torque_packages'] = %w(boost boost-devel)
