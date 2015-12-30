@@ -25,6 +25,12 @@ remote_file munge_tarball do
   not_if { ::File.exists?(munge_tarball) }
 end
 
+# Set libdir based on platform, default is /usr/lib64 for RHEL/CentOS/Alinux
+munge_libdir = '/usr/lib64'
+if node['platform_family'] == 'debian'
+  munge_libdir = '/usr/lib'
+end
+
 # Install munge
 bash 'make install' do
   user 'root'
@@ -34,7 +40,7 @@ bash 'make install' do
     tar xf #{munge_tarball}
     cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
     ./bootstrap
-    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=/usr/lib64
+    ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=#{munge_libdir}
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
@@ -53,22 +59,17 @@ cookbook_file "munge-init" do
 end
 
 # Make sure the munge user exists
-user("munge")
-
-# Mown munge /var/log/munge/ke sure /etc/munge directory exists
-directory "/var/log/munge" do
-    action :create
-    owner "munge"
+user 'munge' do
+  supports :manage_home => false
+  comment 'munge user'
+  system true
+  shell '/sbin/nologin'
 end
 
-# Mown munge /var/log/munge/ke sure /etc/munge directory exists
-directory "/etc/munge" do
-    action :create
-    owner "munge"
-end
-
-# Mown munge /var/log/munge/ke sure /etc/munge directory exists
-directory "/var/run/munge" do
-    action :create
-    owner "munge"
+# Create required directories for munge
+for dir in [ "/var/log/munge", "/etc/munge", "/var/run/munge" ] do
+  directory "#{dir}" do
+      action :create
+      owner "munge"
+  end
 end
