@@ -52,7 +52,13 @@ end
   shell '/bin/bash'
 end
 
-## Set ownership of /opt/slurm to slurm user
-#execute 'chown' do
-#  command 'chown -R slurm:slurm /opt/slurm'
-#end
+if node['platform_family'] == 'debian'
+  cookbook_file '/etc/init.d/slurm' do
+    source 'slurm-init'
+    owner 'root'
+    group 'root'
+    mode '0755'
+    action :create
+  end
+end
+  
