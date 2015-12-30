@@ -11,7 +11,7 @@
 
 # PATH should only include /usr/* if it runs after the mountnfs.sh script
 PATH=/sbin:/usr/sbin:/bin:/usr/bin
-DESC="Description of the service"
+DESC="Triggers a re-read of the EBS volumes and populates /dev/disk/by-ebs-volumeid"
 NAME=ec2blkdev
 PROG=/sbin/udevadm
 SCRIPTNAME=/etc/init.d/$NAME
@@ -29,7 +29,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 
 do_start() {
     echo -n $"Starting ec2blkdev: "
-    $prog trigger --action=change --subsystem-match=block
+    $PROG trigger --action=change --subsystem-match=block
     retval=$?
     sleep 15 # Wait for EC2 API calls to complete
     echo
