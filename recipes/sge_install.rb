@@ -48,8 +48,8 @@ bash 'make install' do
   creates '/opt/sge/bin/lx-amd64/sge_qmaster'
 end
 
-# Setup cluster user
-  user "sgeadmin" do
+# Setup sgeadmin user
+user "sgeadmin" do
   supports :manage_home => true
   comment 'sgeadmin user'
   home "/home/sgeadmin"
