@@ -67,6 +67,10 @@
 },
 {
       "type": "shell",
+      "inline": [ "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip" , "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip" ]
+  },
+{
+      "type": "shell",
       "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys", "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped" ]
 }
 ]
