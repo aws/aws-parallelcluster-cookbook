@@ -11,9 +11,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-. /opt/cfncluster/cfnconfig
-. /etc/profile.d/torque.sh
+PATH=/bin:/usr/bin:/usr/local/bin
+export PATH
 
+. /opt/cfncluster/cfnconfig
+
+. /etc/profile.d/torque.sh
 pending=$(qstat -i | tail -n+6 | awk '{total = total+ $7}END{print total}')
 
 if [ "${pending}x" == "x" ]; then
