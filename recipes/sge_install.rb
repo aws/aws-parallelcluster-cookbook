@@ -48,6 +48,16 @@ bash 'make install' do
   creates '/opt/sge/bin/lx-amd64/sge_qmaster'
 end
 
+# Only on CentOS/RHEL7 update the initd
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
+  execute 'sed' do
+    command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgemaster_template'
+  end
+  execute 'sed' do
+    command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgeexecd_template'
+  end
+end
+
 # Setup sgeadmin user
 user "sgeadmin" do
   supports :manage_home => true

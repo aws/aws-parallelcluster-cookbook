@@ -28,13 +28,6 @@ cookbook_file 'sge_inst.conf' do
   mode '0644'
 end
 
-# Only on CentOS/RHEL7 update the initd
-if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
-  execute 'sed' do
-    command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgemaster_template'
-  end
-end
-
 # Run inst_sge
 execute "inst_sge" do
   command './inst_sge -m -auto ./sge_inst.conf'
