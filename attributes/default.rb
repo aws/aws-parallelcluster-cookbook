@@ -26,8 +26,8 @@ default['cfncluster']['udev_url'] = 'https://github.com/awslabs/ec2-udev-scripts
 default['cfncluster']['sge']['version'] = '8.1.8'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.8/sge-8.1.8.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.1'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.1.1'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.1.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.0'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
