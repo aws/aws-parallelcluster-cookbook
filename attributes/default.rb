@@ -32,8 +32,8 @@ default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava
 default['cfncluster']['torque']['version'] = '6.0.0'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '15-08-2-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-2-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '15-08-6-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-6-1.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.11'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
