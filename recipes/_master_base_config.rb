@@ -68,6 +68,13 @@ mount "#{node['cfncluster']['cfn_shared_dir']}" do
   action [:mount, :enable]
 end
 
+# Make sure shared directory permissions are correct
+directory "#{node['cfncluster']['cfn_shared_dir']}" do
+  owner 'root'
+  group 'root'
+  mode '1777'
+end
+
 # Get VPC CIDR
 node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
 
