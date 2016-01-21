@@ -20,8 +20,8 @@ when 'rhel'
     package 'python-devel'
     bash 'update pip and setuptools' do
       code <<-EOH
-        pip install --upgrade pip
-        pip install --upgrade setuptools
+        pip install --upgrade pip==7.1.2
+        pip install --upgrade setuptools==18.8
       EOH
     end
   else
