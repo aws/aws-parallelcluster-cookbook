@@ -539,7 +539,7 @@ platforms:
   - name: centos_67_minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-30a3b251
+      image_id: ami-8f6d88ef
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -643,7 +643,7 @@ platforms:
   - name: centos_71_minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-33a1b052
+      image_id: ami-44759024
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba

@@ -8,7 +8,7 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-30a3b251",
+    "source_ami": "ami-8f6d88ef",
     "ami_regions" : "{{user `build_for`}}",
     "ami_groups" : "{{user `ami_perms`}}",
     "instance_type": "m3.2xlarge",
