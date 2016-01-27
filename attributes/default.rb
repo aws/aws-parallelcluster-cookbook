@@ -18,16 +18,15 @@ default['cfncluster']['base_dir'] = '/opt/cfncluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '0.0.7'
+default['cfncluster']['cfncluster-node-version'] = '0.0.8'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 # URLs to software packages used during install receipes
-default['cfncluster']['udev_url'] = 'https://github.com/awslabs/ec2-udev-scripts/archive/v0.1.0.tar.gz'
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.8'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.8/sge-8.1.8.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.1.1'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.1.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.1.2'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.2.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.0'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
@@ -37,7 +36,6 @@ default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archiv
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.11'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
-
 # Ganglia
 # TODO: Better sourceforge mirror handling
 default['cfncluster']['ganglia']['version'] = '3.7.2'
