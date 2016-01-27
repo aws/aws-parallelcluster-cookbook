@@ -1,6 +1,9 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "chef_version" : "",
+    "ridley_version" : "",
+    "chef_version" : "",
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_groups" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
@@ -44,11 +47,11 @@
   },
   {
       "type": "shell",
-      "inline": [ "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v 12.4.3" ]
+      "inline": [ "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}" ]
   },
   {
       "type": "shell",
-      "inline": [ "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri berkshelf" ]
+      "inline": [ "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}}" ]
   },
   {
   "type": "chef-solo",
