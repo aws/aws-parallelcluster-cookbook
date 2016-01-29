@@ -21,7 +21,35 @@
     "subnet_id": "subnet-c06054b4",
     "vpc_id": "vpc-0a4c5868",
     "associate_public_ip_address": true,
-    "enhanced_networking": true
+    "enhanced_networking": true,
+    "tags": {
+       "cfncluster_version": "cfncluster-{{user `cfncluster_version`}}",
+       "build_date": "{{user `build_date`}}"
+    },
+    "run_tags": {
+       "cfncluster_version": "cfncluster-{{user `cfncluster_version`}}",
+       "build_date": "{{user `build_date`}}"
+    },
+    "launch_block_device_mappings": [
+    {
+      "device_name": "/dev/sdb",
+      "no_device": true
+    },
+    {
+      "device_name": "/dev/sdc",
+      "no_device": true
+    }
+  ],
+    "ami_block_device_mappings": [
+    {
+      "device_name": "/dev/sdb",
+      "no_device": true
+    },
+    {
+      "device_name": "/dev/sdc",
+      "no_device": true
+    }
+  ]
   }],
   "provisioners" : [
   {
