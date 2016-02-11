@@ -4,7 +4,7 @@ maintainer_email 'dougalb@amazon.com'
 license          'Amazon Software License'
 description      'Installs/Configures cfncluster'
 long_description 'Installs/Configures cfncluster'
-version          '0.4.0'
+version          '1.0.0'
 
 depends 'build-essential', '~> 2.2.4'
 depends 'poise-python', '~> 1.2.1'
