@@ -1,0 +1,20 @@
+stack_name=<%= node['cfncluster']['stack_name'] %>
+cfn_preinstall=<%= node['cfncluster']['cfn_preinstall'] %>
+cfn_preinstall_args=<%= node['cfncluster']['cfn_preinstall_args'] %>
+cfn_postinstall=<%= node['cfncluster']['cfn_postinstall'] %>
+cfn_postinstall_args="<%= node['cfncluster']['cfn_postinstall_args'] %>"
+cfn_region=<%= node['cfncluster']['cfn_region'] %>
+cfn_scheduler=<%= node['cfncluster']['cfn_scheduler'] %>
+cfn_encrypted_ephemeral=<%= node['cfncluster']['cfn_encrypted_ephemeral'] %>
+cfn_ephemeral_dir=<%= node['cfncluster']['cfn_ephemeral_dir'] %>
+cfn_shared_dir=<%= node['cfncluster']['cfn_shared_dir'] %>
+cfn_proxy=<%= node['cfncluster']['cfn_proxy'] %>
+cfn_node_type=<%= node['cfncluster']['cfn_node_type'] %>
+cfn_cluster_user=<%= node['cfncluster']['cfn_cluster_user'] %>
+<% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
+cfn_sqs_queue=<%= node['cfncluster']['cfn_sqs_queue'] %>
+cfn_master=<%= node['cfncluster']['cfn_master'] %>
+<% end -%>
+<% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
+cfn_volume=<%= node['cfncluster']['cfn_volume'] %>
+<% end -%>

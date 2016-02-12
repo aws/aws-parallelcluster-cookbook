@@ -1,0 +1,6 @@
+{
+  "cfncluster_version": "1.0.0",
+  "chef_version": "12.4.3",
+  "ridley_version": "4.3.2",
+  "berkshelf_version": "4.0.1"
+}

@@ -1,0 +1,1162 @@
+---
+driver_config:
+  aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
+  region: <%= ENV['AWS_DEFAULT_REGION'] %>
+  instance_type: <%= ENV['AWS_FLAVOR_ID'] %>
+  availability_zone: <%= ENV['AWS_AVAILABILITY_ZONE'] %>
+  subnet_id: <%= ENV['AWS_SUBNET_ID'] %>
+  security_group_ids:  [ <%= ENV['AWS_SECURITY_GROUP_ID'] %> ]
+  iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
+  tags:
+    created-by: test-kitchen
+    Name: test-kitchen-cfncluster
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: 12.4.3
+
+platforms:
+  - name: amazon_linux_2015_09_1
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-f0091d91
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: ec2-user
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: marketplace_centos_6_updates
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-1255b321
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: centos
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: marketplace_centos_7_updates
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-d440a6e7
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: centos
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: rhel_6-7_HVM_GA
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-75f3f145
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: ec2-user
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: rhel_7-1_HVM_GA
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-4dbf9e7d
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: ec2-user
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: centos_67_minimal
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-8f6d88ef
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: centos
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: centos_71_minimal
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-44759024
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: centos
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: ubuntu-14-04-lts
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-d24c5cb3
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: ubuntu
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: ubuntu-15-10
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-16b1a077
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: ubuntu
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: sles11
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-3b0f420b
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: ec2-user
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: sles12
+    driver_plugin: ec2
+    driver_config:
+      image_id: ami-c5440af5
+      block_device_mappings:
+        - ebs_virtual_name: ephemeral0
+          ebs_device_name: /dev/xvdba
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral1
+          ebs_device_name: /dev/xvdbb
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral2
+          ebs_device_name: /dev/xvdbc
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral3
+          ebs_device_name: /dev/xvdbd
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral4
+          ebs_device_name: /dev/xvdbe
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral5
+          ebs_device_name: /dev/xvdbf
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral6
+          ebs_device_name: /dev/xvdbg
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral7
+          ebs_device_name: /dev/xvdbh
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral8
+          ebs_device_name: /dev/xvdbi
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral9
+          ebs_device_name: /dev/xvdbj
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral10
+          ebs_device_name: /dev/xvdbk
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral11
+          ebs_device_name: /dev/xvdbl
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral12
+          ebs_device_name: /dev/xvdbm
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral13
+          ebs_device_name: /dev/xvdbn
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral14
+          ebs_device_name: /dev/xvdbo
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral15
+          ebs_device_name: /dev/xvdbp
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral16
+          ebs_device_name: /dev/xvdbq
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral17
+          ebs_device_name: /dev/xvdbr
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral18
+          ebs_device_name: /dev/xvdbs
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral19
+          ebs_device_name: /dev/xvdbt
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral20
+          ebs_device_name: /dev/xvdbu
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral21
+          ebs_device_name: /dev/xvdbv
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral22
+          ebs_device_name: /dev/xvdbw
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+        - ebs_virtual_name: ephemeral23
+          ebs_device_name: /dev/xvdbx
+          ebs_volume_size: null
+          ebs_delete_on_termination: null
+    transport:
+      username: root
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>

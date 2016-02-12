@@ -1,0 +1,6 @@
+[sqswatcher]
+region = <%= node['cfncluster']['cfn_region'] %>
+sqsqueue = <%= node['cfncluster']['cfn_sqs_queue'] %>
+table_name = <%= node['cfncluster']['cfn_ddb_table'] %>
+scheduler = <%= node['cfncluster']['cfn_scheduler'] %>
+cluster_user = <%= node['cfncluster']['cfn_cluster_user'] %>

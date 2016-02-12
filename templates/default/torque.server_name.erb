@@ -1,0 +1,6 @@
+<% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
+<%= node['hostname'] %>
+<% end -%>
+<% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
+<%= node['cfncluster']['cfn_master'] %>
+<% end -%>
