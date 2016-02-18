@@ -2,7 +2,7 @@
 # Cookbook Name:: cfncluster
 # Recipe:: _ganglia_install
 #
-# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -60,8 +60,7 @@ case node['platform']
         make install
       EOF
       # TODO: Fix, so it works for upgrade
-      # Removing to fix RHEL7 issue with existing install
-      # creates '/usr/sbin/gmetad'
+      creates '/usr/sbin/gmetad'
     end
 
     if node['init_package'] == 'init'
