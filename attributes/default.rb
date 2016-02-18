@@ -18,7 +18,7 @@ default['cfncluster']['base_dir'] = '/opt/cfncluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.0.0'
+default['cfncluster']['cfncluster-node-version'] = '1.0.1'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 # URLs to software packages used during install receipes
 # Gridengine software
@@ -41,7 +41,7 @@ default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/arch
 default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.7.1'
-default['cfncluster']['ganglia']['web_url'] = 'http://superb-dca2.dl.sourceforge.net/project/ganglia/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz'
+default['cfncluster']['ganglia']['web_url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz'
 
 # Platform defaults
 case node['platform_family']
