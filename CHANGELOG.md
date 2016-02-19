@@ -1,8 +1,22 @@
-cfncluster CHANGELOG
-====================
+cfncluster-cookbook CHANGELOG
+=============================
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.1.0
+-----
+- Dougal Ballantyne <dougalb at amazon dot com> - Updated to Amazon Linux 2015.09.2 for base AMI
+
+1.0.1
+-----
+- Dougal Ballantyne <dougalb at amazon dot com>
+  - Fix Ganglia rebuild on 2nd run
+  - Update to cfncluster-node==1.0.1
+
+1.0.0
+-----
+- Dougal Ballantyne <dougalb at amazon dot com> - 1.0.0 release of cookbook matching 1.0.0 release of cfncluster.
+
 0.1.0
 -----
-- Dougal Ballantyne <dougalb@amazon.com> - Initial release of cfncluster-cookbooks
+- Dougal Ballantyne <dougalb at amazon dot com> - Initial release of cfncluster-cookbooks
