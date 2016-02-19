@@ -42,6 +42,16 @@ default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.7.1'
 default['cfncluster']['ganglia']['web_url'] = 'http://superb-dca2.dl.sourceforge.net/project/ganglia/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz'
+# OpenSSH settings for CfnCluster instances
+default['openssh']['server']['protocol'] = '2'
+default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
+default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
+default['openssh']['server']['password_authentication'] = 'no'
+default['openssh']['server']['gssapi_authentication'] = 'yes'
+default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
+default['openssh']['server']['x11_forwarding'] = 'yes'
+default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
+default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # Platform defaults
 case node['platform_family']
@@ -82,6 +92,7 @@ when 'debian'
   default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
   default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
+  default['openssh']['server']['subsystem'] = 'sftp /usr/lib/openssh/sftp-server'
 end
 
 # Update for NFS on Amazon Linux
@@ -94,17 +105,6 @@ when 'amazon'
   default['nfs']['service']['idmap'] = 'rpcidmapd'
   default['nfs']['client-services'] = %w(portmap lock)
 end
-
-# OpenSSH settings for CfnCluster instances
-default['openssh']['server']['protocol'] = '2'
-default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
-default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
-default['openssh']['server']['password_authentication'] = 'no'
-default['openssh']['server']['gssapi_authentication'] = 'yes'
-default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
-default['openssh']['server']['x11_forwarding'] = 'yes'
-default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
-default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
