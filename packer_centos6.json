@@ -7,6 +7,7 @@
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
+    "berkshelf_version" : "{{env `BERKSHELF_VERSION`}}"
   },
   "builders": [{
     "type": "amazon-ebs",
