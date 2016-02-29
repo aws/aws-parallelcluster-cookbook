@@ -37,11 +37,10 @@ default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archiv
 default['cfncluster']['munge']['munge_version'] = '0.5.11'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
 # Ganglia
-# TODO: Better sourceforge mirror handling
 default['cfncluster']['ganglia']['version'] = '3.7.2'
-default['cfncluster']['ganglia']['url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz'
+default['cfncluster']['ganglia']['url'] = 'https://sourceforge.net/projects/ganglia/files/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz/download'
 default['cfncluster']['ganglia']['web_version'] = '3.7.1'
-default['cfncluster']['ganglia']['web_url'] = 'http://skylineservers.dl.sourceforge.net/project/ganglia/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz'
+default['cfncluster']['ganglia']['web_url'] = 'https://sourceforge.net/projects/ganglia/files/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz/download'
 
 # Platform defaults
 case node['platform_family']
