@@ -22,7 +22,7 @@ remote_file sge_tarball do
   source node['cfncluster']['sge']['url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(sge_tarball) }
+  not_if { ::File.exist?(sge_tarball) }
 end
 
 # Install SGE

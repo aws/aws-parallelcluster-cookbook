@@ -22,7 +22,7 @@ remote_file openlava_tarball do
   source node['cfncluster']['openlava']['url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(openlava_tarball) }
+  not_if { ::File.exist?(openlava_tarball) }
 end
 
 # Install Openlava
@@ -58,7 +58,7 @@ for cfile in [ "lsf.conf", "lsb.hosts", "lsb.params", "lsb.queues", "lsb.users",
 end
 
 # Setup openlava user
-  user "openlava" do
+user "openlava" do
   supports :manage_home => true
   comment 'openlava user'
   home "/home/openlava"

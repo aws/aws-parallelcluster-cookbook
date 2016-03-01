@@ -32,7 +32,7 @@ end
 execute "inst_sge" do
   command './inst_sge -m -auto ./sge_inst.conf'
   cwd '/opt/sge'
-  not_if { ::File.exists?('/opt/sge/default/common/cluster_name') }
+  not_if { ::File.exist?('/opt/sge/default/common/cluster_name') }
 end
 
 link "/etc/profile.d/sge.sh" do

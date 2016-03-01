@@ -23,7 +23,7 @@ remote_file slurm_tarball do
   source node['cfncluster']['slurm']['url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(slurm_tarball) }
+  not_if { ::File.exist?(slurm_tarball) }
 end
 
 # Install Slurm
@@ -44,7 +44,7 @@ bash 'make install' do
 end
 
 # Setup slurm user
-  user "slurm" do
+user "slurm" do
   supports :manage_home => true
   comment 'slurm user'
   home "/home/slurm"

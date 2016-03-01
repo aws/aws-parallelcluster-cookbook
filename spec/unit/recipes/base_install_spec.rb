@@ -5,8 +5,8 @@ describe 'cfncluster::base_install' do
 
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: 'centos', version: '6.6') do |node|
-			node.set['cfncluster']['udev_url'] = url
-		end.converge(described_recipe)
+      node.set['cfncluster']['udev_url'] = url
+    end.converge(described_recipe)
   end
 
   before do

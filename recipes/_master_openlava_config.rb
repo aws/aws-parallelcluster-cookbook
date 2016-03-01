@@ -62,7 +62,7 @@ service "openlava" do
 end
 
 execute "badmin hclose" do
-  environment ( { "LSF_ENVDIR" => "/opt/openlava/etc" } )
+  environment { "LSF_ENVDIR" => "/opt/openlava/etc" }
   command '/opt/openlava/bin/badmin hclose'
 end
 

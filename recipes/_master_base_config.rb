@@ -136,7 +136,7 @@ bash "ssh-keygen" do
   code <<-EOH
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
   EOH
-  not_if { ::File.exists?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
 end
 
 bash "copy_and_perms" do
@@ -144,7 +144,7 @@ bash "copy_and_perms" do
   code <<-EOH
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys2 && chmod 0600 ~/.ssh/authorized_keys2\"
   EOH
-  not_if { ::File.exists?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
 end
 
 bash "ssh-keyscan" do
@@ -152,7 +152,7 @@ bash "ssh-keyscan" do
   code <<-EOH
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
   EOH
-  not_if { ::File.exists?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
 end
 
 # Install sqswatcher.cfg

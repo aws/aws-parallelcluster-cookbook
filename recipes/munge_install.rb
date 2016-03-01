@@ -22,7 +22,7 @@ remote_file munge_tarball do
   source node['cfncluster']['munge']['munge_url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(munge_tarball) }
+  not_if { ::File.exist?(munge_tarball) }
 end
 
 # Set libdir based on platform, default is /usr/lib64 for RHEL/CentOS/Alinux

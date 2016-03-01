@@ -31,7 +31,7 @@ case node['platform']
       source node['cfncluster']['ganglia']['url']
       mode '0644'
       # TODO: Add version or checksum checks
-      not_if { ::File.exists?(ganglia_tarball) }
+      not_if { ::File.exist?(ganglia_tarball) }
     end
 
     ##
@@ -81,7 +81,7 @@ case node['platform']
       source node['cfncluster']['ganglia']['web_url']
       mode '0644'
       # TODO: Add version or checksum checks
-      not_if { ::File.exists?(ganglia_web_tarball) }
+      not_if { ::File.exist?(ganglia_web_tarball) }
     end
 
     ##
