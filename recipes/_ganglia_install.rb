@@ -25,24 +25,13 @@ case node['platform']
     package "php"
     package "php-gd"
 
-    ganglia_tarball = "#{node['cfncluster']['sources_dir']}/ganglia-#{node['cfncluster']['ganglia']['version']}.tar.gz"
-
     # Get Ganglia tarball
+    ganglia_tarball = "#{node['cfncluster']['sources_dir']}/monitor-core-#{node['cfncluster']['ganglia']['version']}.tar.gz"
     remote_file ganglia_tarball do
       source node['cfncluster']['ganglia']['url']
       mode '0644'
       # TODO: Add version or checksum checks
       not_if { ::File.exists?(ganglia_tarball) }
-    end
-
-    ganglia_web_tarball = "#{node['cfncluster']['sources_dir']}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}.tar.gz"
-
-    # Get Ganglia Web tarball
-    remote_file ganglia_web_tarball do
-      source node['cfncluster']['ganglia']['web_url']
-      mode '0644'
-      # TODO: Add version or checksum checks
-      not_if { ::File.exists?(ganglia_web_tarball) }
     end
 
     ##
@@ -53,7 +42,8 @@ case node['platform']
       cwd Chef::Config[:file_cache_path]
       code <<-EOF
         tar xf #{ganglia_tarball}
-        cd ganglia-#{node['cfncluster']['ganglia']['version']}
+        cd monitor-core-#{node['cfncluster']['ganglia']['version']}
+        ./bootstrap
         ./configure --build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu --program-prefix= --disable-dependency-tracking --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man --infodir=/usr/share/info --with-gmetad --enable-status --sysconfdir=/etc/ganglia
         CORES=$(grep processor /proc/cpuinfo | wc -l)
         make -j $CORES
@@ -67,13 +57,13 @@ case node['platform']
       # Setup init.d scripts if not systemd
       execute "copy gmetad init script" do
         command "cp " +
-          "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
+          "#{Chef::Config[:file_cache_path]}/monitor-core-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " +
           "/etc/init.d/gmetad"
         not_if "test -f /etc/init.d/gmetad"
       end
       execute "copy gmmond init script" do
         command "cp " +
-          "#{Chef::Config[:file_cache_path]}/ganglia-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " +
+          "#{Chef::Config[:file_cache_path]}/monitor-core-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " +
           "/etc/init.d/gmond"
         not_if "test -f /etc/init.d/gmond"
       end
@@ -83,6 +73,15 @@ case node['platform']
     execute 'systemctl-daemon-reload' do
       command '/bin/systemctl --system daemon-reload'
       only_if "test -f /bin/systemctl"
+    end
+
+    # Get Ganglia Web tarball
+    ganglia_web_tarball = "#{node['cfncluster']['sources_dir']}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}.tar.gz"
+    remote_file ganglia_web_tarball do
+      source node['cfncluster']['ganglia']['web_url']
+      mode '0644'
+      # TODO: Add version or checksum checks
+      not_if { ::File.exists?(ganglia_web_tarball) }
     end
 
     ##

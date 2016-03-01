@@ -38,9 +38,9 @@ default['cfncluster']['munge']['munge_version'] = '0.5.11'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
 # Ganglia
 default['cfncluster']['ganglia']['version'] = '3.7.2'
-default['cfncluster']['ganglia']['url'] = 'https://sourceforge.net/projects/ganglia/files/ganglia%20monitoring%20core/3.7.2/ganglia-3.7.2.tar.gz/download'
+default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.7.1'
-default['cfncluster']['ganglia']['web_url'] = 'https://sourceforge.net/projects/ganglia/files/ganglia-web/3.7.1/ganglia-web-3.7.1.tar.gz/download'
+default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.1.tar.gz'
 
 # Platform defaults
 case node['platform_family']
