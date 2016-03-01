@@ -68,7 +68,7 @@ end
 
 # Create required directories for munge
 for dir in [ "/var/log/munge", "/etc/munge", "/var/run/munge" ] do
-  directory "#{dir}" do
+  directory dir do
       action :create
       owner "munge"
   end

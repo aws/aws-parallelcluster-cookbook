@@ -52,13 +52,11 @@ end
   shell '/bin/bash'
 end
 
-if node['platform_family'] == 'debian'
-  cookbook_file '/etc/init.d/slurm' do
-    source 'slurm-init'
-    owner 'root'
-    group 'root'
-    mode '0755'
-    action :create
-  end
+cookbook_file '/etc/init.d/slurm' do
+  source 'slurm-init'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  only_if { node['platform_family'] == 'debian' }
 end
-  

@@ -17,10 +17,9 @@ case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
   include_recipe "yum-epel"
-  if node['platform'] == 'redhat'
-    execute 'yum-config-manager' do
-      command 'yum-config-manager --enable rhui-REGION-rhel-server-releases-optional'
-    end
+  execute 'yum-config-manager' do
+    command 'yum-config-manager --enable rhui-REGION-rhel-server-releases-optional'
+    only_if { node['platform'] == 'redhat' }
   end
 when 'debian'
   include_recipe 'apt'
@@ -48,11 +47,10 @@ python_package 'awscli'
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
-if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
-  service "rpcbind" do
-    action [:start, :enable]
-    supports status: true
-  end
+service "rpcbind" do
+  action [:start, :enable]
+  supports status: true
+  only_if { node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon' }
 end
 include_recipe "nfs::server"
 include_recipe "nfs::server4"

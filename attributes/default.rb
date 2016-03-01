@@ -48,7 +48,7 @@ case node['platform_family']
 when 'rhel'
   case node['platform']
 
-  when 'centos', 'redhat'
+  when 'centos', 'redhat', 'scientific' # ~FC024
     default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel blas-devel fftw-devel)
     default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     if node['platform_version'].to_i >= 7

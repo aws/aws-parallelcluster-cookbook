@@ -14,7 +14,7 @@
 # limitations under the License.
 
 case node['platform']
-  when "redhat", "centos", "amazon"
+  when "redhat", "centos", "amazon", "scientific" # ~FC024
 
     package "httpd"
     package "apr-devel"

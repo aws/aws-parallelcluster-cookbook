@@ -51,7 +51,7 @@ ruby_block "setup_disk" do
 end
 
 # Create the shared directory
-directory "#{node['cfncluster']['cfn_shared_dir']}" do
+directory node['cfncluster']['cfn_shared_dir'] do
   owner 'root'
   group 'root'
   mode '1777'
@@ -60,7 +60,7 @@ directory "#{node['cfncluster']['cfn_shared_dir']}" do
 end
 
 # Add volume to /etc/fstab
-mount "#{node['cfncluster']['cfn_shared_dir']}" do
+mount node['cfncluster']['cfn_shared_dir'] do
   device dev_path
   fstype DelayedEvaluator.new {node['cfncluster']['cfn_volume_fs_type']}
   options "_netdev"
@@ -69,7 +69,7 @@ mount "#{node['cfncluster']['cfn_shared_dir']}" do
 end
 
 # Make sure shared directory permissions are correct
-directory "#{node['cfncluster']['cfn_shared_dir']}" do
+directory node['cfncluster']['cfn_shared_dir'] do
   owner 'root'
   group 'root'
   mode '1777'
@@ -79,7 +79,7 @@ end
 node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
 
 # Export shared dir
-nfs_export "#{node['cfncluster']['cfn_shared_dir']}" do
+nfs_export node['cfncluster']['cfn_shared_dir'] do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
   writeable true 
   options ['no_root_squash']
@@ -112,18 +112,18 @@ service "gmetad" do
   action [ :enable, :start ]
 end
 
-service "#{node['cfncluster']['ganglia']['gmond_service']}" do
+service node['cfncluster']['ganglia']['gmond_service'] do
   supports :restart => true
   action [ :enable, :start ]
 end
 
-service "#{node['cfncluster']['ganglia']['httpd_service']}" do
+service node['cfncluster']['ganglia']['httpd_service'] do
   supports :restart => true
   action [ :enable, :start ]
 end
 
 # Setup cluster user
-user "#{node['cfncluster']['cfn_cluster_user']}" do
+user node['cfncluster']['cfn_cluster_user'] do
   supports :manage_home => true
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
