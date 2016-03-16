@@ -22,17 +22,17 @@ default['cfncluster']['cfncluster-node-version'] = '1.0.1'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 # URLs to software packages used during install receipes
 # Gridengine software
-default['cfncluster']['sge']['version'] = '8.1.8'
-default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.8/sge-8.1.8.tar.gz'
+default['cfncluster']['sge']['version'] = '8.1.9'
+default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.1.2'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.2.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.1.3'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.3.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.0'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '15-08-6-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-6-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '15-08-8-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-8-1.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.11'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
@@ -120,6 +120,8 @@ default['cfncluster']['cfn_preinstall_args'] = 'NONE'
 default['cfncluster']['cfn_postinstall'] = 'NONE'
 default['cfncluster']['cfn_postinstall_args'] = 'NONE'
 default['cfncluster']['cfn_scheduler'] = 'sge'
+default['cfncluster']['cfn_scheduler_slots'] = 'vcpus'
+default['cfncluster']['cfn_instance_slots'] = '1'
 default['cfncluster']['cfn_volume'] = nil
 default['cfncluster']['cfn_volume_fs_type'] = 'ext4'
 default['cfncluster']['cfn_encrypted_ephemeral'] = false
