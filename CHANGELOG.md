@@ -3,6 +3,15 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.2.0
+-----
+- Dougal Ballantyne <dougalb at amazon dot com>
+  - Updated Openlava to 3.1.3
+  - Updated SGE to 8.1.9
+  - Updated cfncluster-node to 1.1.0
+  - Added slots to compute-ready script
+  - Updated cookbook dependencies
+
 1.1.0
 -----
 - Dougal Ballantyne <dougalb at amazon dot com> - Updated to Amazon Linux 2015.09.2 for base AMI
