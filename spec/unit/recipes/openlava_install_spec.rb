@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 describe 'cfncluster::openlava_install' do
-  let(:url)   { 'http://www.example.com/blob.tar.gz' }
+  let(:url) { 'http://www.example.com/blob.tar.gz' }
 
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: 'centos', version: '6.6') do |node|

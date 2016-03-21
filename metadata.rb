@@ -4,6 +4,8 @@ maintainer_email 'dougalb@amazon.com'
 license 'Amazon Software License'
 description 'Installs/Configures cfncluster'
 long_description 'Installs/Configures cfncluster'
+issues_url 'https://github.com/awslabs/cfncluster-cookbook/issues'
+source_url 'https://github.com/awslabs/cfncluster-cookbook'
 version '1.2.0'
 
 depends 'build-essential', '~> 2.3.1'

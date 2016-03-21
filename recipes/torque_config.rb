@@ -79,5 +79,5 @@ when 'MasterServer'
 when 'ComputeFleet'
   include_recipe 'cfncluster::_compute_torque_config'
 else
-  fail "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

@@ -14,13 +14,13 @@
 # limitations under the License.
 
 # Determine cfn_scheduler_slots settings and update cfn_instance_slots appropriately
-if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
-  node.default['cfncluster']['cfn_instance_slots'] = node['cpu']['total']
-elsif node['cfncluster']['cfn_scheduler_slots'] == 'cores'
-  node.default['cfncluster']['cfn_instance_slots'] = node['cpu']['total'] / 2
-else
-  node.default['cfncluster']['cfn_instance_slots'] = node['cfncluster']['cfn_scheduler_slots']
-end
+node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
+                                                     node['cpu']['total']
+                                                   elsif node['cfncluster']['cfn_scheduler_slots'] == 'cores'
+                                                     node['cpu']['total'] / 2
+                                                   else
+                                                     node['cfncluster']['cfn_scheduler_slots']
+                                                   end
 
 directory '/etc/cfncluster'
 directory '/opt/cfncluster'

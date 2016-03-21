@@ -3,9 +3,9 @@ source 'https://rubygems.org'
 gem 'berkshelf'
 
 group :style do
-  gem 'rake', '~> 10.3'
-  gem 'rubocop', '~> 0.26'
-  gem 'foodcritic', '~> 4.0'
+  gem 'rake', '~> 11.1.1'
+  gem 'rubocop', '~> 0.38'
+  gem 'foodcritic', '~> 6.0.1'
 end
 
 group :test do

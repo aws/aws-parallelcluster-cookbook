@@ -23,7 +23,7 @@ when 'MasterServer'
 when 'ComputeFleet'
   include_recipe 'cfncluster::_compute_openlava_config'
 else
-  fail "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "cfn_node_type must be MasterServer or ComputeFleet"
 end
 
 link '/etc/profile.d/openlava.sh' do
