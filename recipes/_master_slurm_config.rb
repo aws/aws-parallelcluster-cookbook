@@ -49,8 +49,8 @@ cookbook_file '/opt/slurm/etc/slurm.csh' do
 end
 
 service "slurm" do
-  supports :restart => false
-  action [ :enable, :start ]
+  supports restart: false
+  action [:enable, :start]
 end
 
 template '/opt/cfncluster/scripts/publish_pending' do
@@ -63,4 +63,3 @@ end
 cron 'publish_pending' do
   command '/opt/cfncluster/scripts/publish_pending'
 end
-

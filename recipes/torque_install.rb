@@ -73,4 +73,4 @@ cookbook_file 'torque.setup' do
   user 'root'
   group 'root'
   mode '0755'
-end  
+end

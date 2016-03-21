@@ -23,8 +23,6 @@ mount '/opt/slurm' do
 end
 
 service "slurm" do
-  supports :restart => false
-  action [ :enable ]
+  supports restart: false
+  action [:enable]
 end
-
-

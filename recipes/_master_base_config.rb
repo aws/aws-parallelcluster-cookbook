@@ -62,7 +62,7 @@ end
 # Add volume to /etc/fstab
 mount node['cfncluster']['cfn_shared_dir'] do
   device dev_path
-  fstype DelayedEvaluator.new {node['cfncluster']['cfn_volume_fs_type']}
+  fstype DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] }
   options "_netdev"
   pass 0
   action [:mount, :enable]
@@ -81,7 +81,7 @@ node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4
 # Export shared dir
 nfs_export node['cfncluster']['cfn_shared_dir'] do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
-  writeable true 
+  writeable true
   options ['no_root_squash']
 end
 
@@ -108,23 +108,23 @@ template '/etc/ganglia/gmond.conf' do
 end
 
 service "gmetad" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 service node['cfncluster']['ganglia']['gmond_service'] do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 service node['cfncluster']['ganglia']['httpd_service'] do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
-  supports :manage_home => true
+  supports manage_home: true
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'

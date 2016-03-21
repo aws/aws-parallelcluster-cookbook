@@ -42,6 +42,6 @@ cookbook_file 'attachVolume.py' do
 end
 
 service "ec2blkdev" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end

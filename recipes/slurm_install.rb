@@ -45,7 +45,7 @@ end
 
 # Setup slurm user
 user "slurm" do
-  supports :manage_home => true
+  supports manage_home: true
   comment 'slurm user'
   home "/home/slurm"
   system true

@@ -49,13 +49,13 @@ template '/etc/ganglia/gmond.conf' do
 end
 
 service node['cfncluster']['ganglia']['gmond_service'] do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
-  supports :manage_home => false
+  supports manage_home: false
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'

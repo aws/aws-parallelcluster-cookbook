@@ -44,8 +44,8 @@ link "/etc/profile.d/sge.csh" do
 end
 
 service "sgemaster.p6444" do
-  supports :restart => false
-  action [ :enable, :start ]
+  supports restart: false
+  action [:enable, :start]
 end
 
 bash "add_host_as_master" do
@@ -53,7 +53,7 @@ bash "add_host_as_master" do
     . /opt/sge/default/common/settings.sh
     qconf -as #{node['hostname']}
   EOH
-end  
+end
 
 template '/opt/cfncluster/scripts/publish_pending' do
   source 'publish_pending.sge.erb'
@@ -65,4 +65,3 @@ end
 cron 'publish_pending' do
   command '/opt/cfncluster/scripts/publish_pending'
 end
-

@@ -1,7 +1,7 @@
 require_relative '../spec_helper'
 
 describe 'cfncluster::base_install' do
-	let(:url)   { 'http://www.example.com/blob.tar.gz' }
+  let(:url)   { 'http://www.example.com/blob.tar.gz' }
 
   let(:chef_run) do
     ChefSpec::SoloRunner.new(platform: 'centos', version: '6.6') do |node|
@@ -13,7 +13,7 @@ describe 'cfncluster::base_install' do
     stub_command("which getenforce").and_return(true)
   end
 
-  # TODO: Need matchers for selinux 
+  # TODO: Need matchers for selinux
 
   it 'requires proper recipes to build a single box stack' do
     expect(chef_run).to include_recipe('build-essential')
@@ -27,20 +27,20 @@ describe 'cfncluster::base_install' do
     expect(chef_run).to create_cookbook_file('/usr/local/sbin/configure-pat.sh')
   end
 
-	it 'testing remote file' do
-		expect(chef_run).to create_remote_file("#{Chef::Config[:file_cache_path]}/ec2-udev.tar.gz")
-			.with_source(url)
-			.with_mode('0644')
-	end
+  it 'testing remote file' do
+    expect(chef_run).to create_remote_file("#{Chef::Config[:file_cache_path]}/ec2-udev.tar.gz")
+      .with_source(url)
+      .with_mode('0644')
+  end
 
-	code = <<-EOF
+  code = <<-EOF
     tar xf ec2-udev.tar.gz
     cd ec2-udev-scripts-*
     make install
   EOF
 
   it 'properly installs ec2-udev-scripts' do
-		expect(chef_run).to run_bash('make install')
+    expect(chef_run).to run_bash('make install')
       .with_user('root')
       .with_group('root')
       .with_cwd(Chef::Config[:file_cache_path])
@@ -58,5 +58,4 @@ describe 'cfncluster::base_install' do
       expect(chef_run).to install_package(p)
     end
   end
-
 end

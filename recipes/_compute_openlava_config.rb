@@ -50,6 +50,6 @@ cookbook_file 'openlava-init' do
 end
 
 service "openlava" do
-  supports :status => true, :restart => true, :reload => true
-  action [ :enable, :start ]
+  supports status: true, restart: true, reload: true
+  action [:enable, :start]
 end

@@ -44,7 +44,8 @@ bash 'make install' do
 end
 
 # Install Openlava config files
-for cfile in [ "lsf.conf", "lsb.hosts", "lsb.params", "lsb.queues", "lsb.users", "lsf.cluster.openlava", "lsf.shared", "lsf.task", "openlava.csh", "openlava.setup", "openlava.sh" ] do
+cfiles = ["lsf.conf", "lsb.hosts", "lsb.params", "lsb.queues", "lsb.users", "lsf.cluster.openlava", "lsf.shared", "lsf.task", "openlava.csh", "openlava.setup", "openlava.sh"]
+cfiles.each do |cfile|
   bash "copy #{cfile}" do
     user 'root'
     group 'root'
@@ -59,7 +60,7 @@ end
 
 # Setup openlava user
 user "openlava" do
-  supports :manage_home => true
+  supports manage_home: true
   comment 'openlava user'
   home "/home/openlava"
   system true
@@ -73,4 +74,3 @@ end
 
 # Install openlava-python bindings
 python_package 'cython'
-

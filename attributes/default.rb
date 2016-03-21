@@ -49,16 +49,24 @@ when 'rhel'
   case node['platform']
 
   when 'centos', 'redhat', 'scientific' # ~FC024
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel blas-devel fftw-devel)
+    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
+                                                blas-devel fftw-devel)
     default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     if node['platform_version'].to_i >= 7
-    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel blas-devel fftw-devel)
+      default['cfncluster']['torque_packages'] = %w(boost boost-devel)
+      default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+                                                  libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                                  httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
+                                                  blas-devel fftw-devel)
     end
+
   when 'amazon'
     default['cfncluster']['torque_packages'] = %w(boost boost-devel)
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel)
-
+    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel)
   end
 
   default['cfncluster']['ganglia']['apache_user'] = 'apache'
@@ -73,7 +81,11 @@ when 'debian'
   if node["platform_version"].to_f >= 14.04
     default['cfncluster']['torque_packages'] = %w(libboost1.54 libboost1.54-dev)
   end
-  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev r-base libatlas-dev liblas-dev libfftw3-dev)
+  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev
+                                              tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
+                                              apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
+                                              r-base libatlas-dev liblas-dev libfftw3-dev)
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
@@ -107,7 +119,6 @@ default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
-
 
 # cfncluster variables (also in /etc/cfncluster/cfnconfig)
 default['cfncluster']['cfn_region'] = 'us-east-1'
