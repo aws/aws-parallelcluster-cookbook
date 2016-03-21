@@ -3,7 +3,7 @@
     "cfncluster_version" : "",
     "chef_version" : "",
     "ridley_version" : "",
-    "chef_version" : "",
+    "berkshelf_version" : "",
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
