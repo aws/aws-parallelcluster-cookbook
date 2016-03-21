@@ -17,7 +17,7 @@ export PATH
 . /etc/cfncluster/cfnconfig
 
 . /opt/sge/default/common/settings.sh
-pending=$(qstat -g d -s p -u '*' | tail -n+3 | awk '{total = total+ $8}END{print total}')
+pending=$(qstat -g d -s p -u '*' | tail -n+3 | awk '$5 == "qw" {total = total+ $8} END {print total}')
 
 if [ "${pending}x" == "x" ]; then
 pending=0

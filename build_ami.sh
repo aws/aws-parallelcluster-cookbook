@@ -34,11 +34,13 @@ RC=0
 
 rm -rf ../vendor/cookbooks || RC=1
 berks vendor ../vendor/cookbooks || RC=1
+export BERKSHELF_VERSION=`berks version`
 if [ "x$build_date" == "x" ]; then
   export BUILD_DATE=`date +%Y%m%d%H%M`
 else
   BUILD_DATE=$build_date
 fi
+=======
 
 case $os in
 all)
