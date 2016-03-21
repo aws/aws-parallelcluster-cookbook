@@ -5,6 +5,7 @@ set -e
 os=$1
 region=$2
 public=$3
+build_date=$4
 
 available_os="centos6 centos7 alinux ubuntu1404"
 available_regions="eu-west-1,ap-southeast-1,ap-southeast-2,eu-central-1,ap-northeast-1,ap-northeast-2,us-east-1,sa-east-1,us-west-1"
@@ -33,29 +34,33 @@ RC=0
 
 rm -rf ../vendor/cookbooks || RC=1
 berks vendor ../vendor/cookbooks || RC=1
-export BUILD_DATE=`date +%Y%m%d%H%M`
+if [ "x$build_date" == "x" ]; then
+  export BUILD_DATE=`date +%Y%m%d%H%M`
+else
+  BUILD_DATE=$build_date
+fi
 
 case $os in
 all)
   for x in $available_os; do
-    packer build -var-file=packer_variables.json packer_$x.json; RC=$? | tee build-$x.log
+    (packer build -machine-readable -var-file=packer_variables.json packer_$x.json; RC=$?) | tee build-$x.log
     RC=$?
   done
   ;;
 centos6)
-  packer build -var-file=packer_variables.json packer_$os.json; RC=$? | tee build-$os.log
+  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
   RC=$?
   ;;
 centos7)
-  packer build -var-file=packer_variables.json packer_$os.json; RC=$? | tee build-$os.log
+  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
   RC=$?
   ;;
 alinux)
-  packer build -var-file=packer_variables.json packer_$os.json; RC=$? | tee build-$os.log
+  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
   RC=$?
   ;;
 ubuntu1404)
-  packer build -var-file=packer_variables.json packer_$os.json; RC=$? | tee build-$os.log
+  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
   RC=$?
   ;;
 *)
