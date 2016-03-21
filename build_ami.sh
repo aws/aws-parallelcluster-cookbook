@@ -34,7 +34,6 @@ RC=0
 rm -rf ../vendor/cookbooks || RC=1
 berks vendor ../vendor/cookbooks || RC=1
 export BUILD_DATE=`date +%Y%m%d%H%M`
-export BERKSHELF_VERSION=`berks version`
 
 case $os in
 all)
