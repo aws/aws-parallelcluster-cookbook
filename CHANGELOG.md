@@ -6,6 +6,7 @@ This file is used to list changes made in each version of the cfncluster cookboo
 1.2.0
 -----
 - Dougal Ballantyne <dougalb at amazon dot com>
+  - Updated to Chef 12.8.1
   - Updated Openlava to 3.1.3
   - Updated SGE to 8.1.9
   - Updated cfncluster-node to 1.1.0
