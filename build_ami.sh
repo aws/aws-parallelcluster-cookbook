@@ -37,7 +37,7 @@ berks vendor ../vendor/cookbooks || RC=1
 if [ "x$build_date" == "x" ]; then
   export BUILD_DATE=`date +%Y%m%d%H%M`
 else
-  BUILD_DATE=$build_date
+  export BUILD_DATE=$build_date
 fi
 
 case $os in
