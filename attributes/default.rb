@@ -2,7 +2,7 @@
 # Cookbook Name:: cfncluster
 # Attributes:: default
 #
-# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Amazon Software License (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -18,7 +18,7 @@ default['cfncluster']['base_dir'] = '/opt/cfncluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.1.0'
+default['cfncluster']['cfncluster-node-version'] = '1.1.1'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 # URLs to software packages used during install receipes
 # Gridengine software
