@@ -18,6 +18,8 @@ directory node['cfncluster']['cfn_shared_dir'] do
   mode '1777'
   owner 'root'
   group 'root'
+  recursive true
+  action :create
 end
 
 node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
