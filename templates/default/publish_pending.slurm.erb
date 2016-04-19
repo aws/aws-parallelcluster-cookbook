@@ -16,7 +16,7 @@ export PATH
 
 . /opt/cfncluster/cfnconfig
 
-pending=$(/opt/slurm/bin/squeue -h -o '%t %D' | awk '$1 == "PD" { total = total + 1} END {print total}')
+pending=$(/opt/slurm/bin/squeue -r -h -o '%t %D' | awk '$1 == "PD" { total = total + 1} END {print total}')
 
 if [ "${pending}x" == "x" ]; then
 pending=0
