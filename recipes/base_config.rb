@@ -33,7 +33,7 @@ when 'MasterServer'
 when 'ComputeFleet'
   include_recipe 'cfncluster::_compute_base_config'
 else
-  fail "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "cfn_node_type must be MasterServer or ComputeFleet"
 end
 
 # Ensure cluster user can sudo on SSH
@@ -54,6 +54,6 @@ end
 
 # Restart supervisord
 service "supervisord" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end

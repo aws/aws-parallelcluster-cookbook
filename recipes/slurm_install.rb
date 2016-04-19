@@ -23,7 +23,7 @@ remote_file slurm_tarball do
   source node['cfncluster']['slurm']['url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(slurm_tarball) }
+  not_if { ::File.exist?(slurm_tarball) }
 end
 
 # Install Slurm
@@ -44,21 +44,19 @@ bash 'make install' do
 end
 
 # Setup slurm user
-  user "slurm" do
-  supports :manage_home => true
+user "slurm" do
+  supports manage_home: true
   comment 'slurm user'
   home "/home/slurm"
   system true
   shell '/bin/bash'
 end
 
-if node['platform_family'] == 'debian'
-  cookbook_file '/etc/init.d/slurm' do
-    source 'slurm-init'
-    owner 'root'
-    group 'root'
-    mode '0755'
-    action :create
-  end
+cookbook_file '/etc/init.d/slurm' do
+  source 'slurm-init'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  only_if { node['platform_family'] == 'debian' }
 end
-  

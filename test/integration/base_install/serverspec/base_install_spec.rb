@@ -12,5 +12,5 @@ describe command('aws --version') do
 end
 
 describe command('getenforce') do
-  its(:stdout) { should match /Permissive|Disabled/ }
+  its(:stdout) { should match(/Permissive|Disabled/) }
 end

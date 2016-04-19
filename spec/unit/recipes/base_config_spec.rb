@@ -1,7 +1,6 @@
 require_relative '../spec_helper'
 
 describe 'cfncluster::base_config' do
-
   before do
     stub_command("which getenforce").and_return(true)
   end
@@ -32,7 +31,6 @@ describe 'cfncluster::base_config' do
     it 'includes the _compute_base_config receipe' do
       expect(chef_run).to include_recipe('cfncluster::_compute_base_config')
     end
-
   end
 
   context 'using nil for cfn_node_type' do
@@ -60,5 +58,4 @@ describe 'cfncluster::base_config' do
         .to raise_error(RuntimeError, "cfn_node_type must be MasterServer or ComputeFleet")
     end
   end
-
 end

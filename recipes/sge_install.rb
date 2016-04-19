@@ -22,7 +22,7 @@ remote_file sge_tarball do
   source node['cfncluster']['sge']['url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(sge_tarball) }
+  not_if { ::File.exist?(sge_tarball) }
 end
 
 # Install SGE
@@ -48,6 +48,13 @@ bash 'make install' do
   creates '/opt/sge/bin/lx-amd64/sge_qmaster'
 end
 
+# Disbale the AddQueue, so that we can manage slots per instance
+replace_or_add "AddQueue" do
+  path "/opt/sge/inst_sge"
+  pattern "AddQueue"
+  line "#AddQueue"
+end
+
 # Only on CentOS/RHEL7 update the initd
 if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
   execute 'sed' do
@@ -60,7 +67,7 @@ end
 
 # Setup sgeadmin user
 user "sgeadmin" do
-  supports :manage_home => true
+  supports manage_home: true
   comment 'sgeadmin user'
   home "/home/sgeadmin"
   system true

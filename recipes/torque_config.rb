@@ -47,21 +47,21 @@ end
 
 # Enable and start trqauthd service
 service "trqauthd" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Create the munge key from template
 template "/etc/munge/munge.key" do
-    source "munge.key.erb"
-    owner "munge"
-    mode "0600"
+  source "munge.key.erb"
+  owner "munge"
+  mode "0600"
 end
 
 # Enable munge service
 service "munge" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 cookbook_file "/etc/profile.d/torque.sh" do
@@ -79,5 +79,5 @@ when 'MasterServer'
 when 'ComputeFleet'
   include_recipe 'cfncluster::_compute_torque_config'
 else
-  fail "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

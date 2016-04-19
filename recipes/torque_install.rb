@@ -28,7 +28,7 @@ remote_file torque_tarball do
   source node['cfncluster']['torque']['url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(torque_tarball) }
+  not_if { ::File.exist?(torque_tarball) }
 end
 
 # Install Torque
@@ -73,4 +73,4 @@ cookbook_file 'torque.setup' do
   user 'root'
   group 'root'
   mode '0755'
-end  
+end

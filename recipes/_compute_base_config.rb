@@ -18,11 +18,13 @@ directory node['cfncluster']['cfn_shared_dir'] do
   mode '1777'
   owner 'root'
   group 'root'
+  recursive true
+  action :create
 end
 
 node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
 
-nfs_master = "#{node['cfncluster']['cfn_master']}"
+nfs_master = node['cfncluster']['cfn_master']
 
 # Mount shared volume over NFS
 mount node['cfncluster']['cfn_shared_dir'] do
@@ -48,14 +50,14 @@ template '/etc/ganglia/gmond.conf' do
   mode '0644'
 end
 
-service "#{node['cfncluster']['ganglia']['gmond_service']}" do
-  supports :restart => true
-  action [ :enable, :start ]
+service node['cfncluster']['ganglia']['gmond_service'] do
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Setup cluster user
-user "#{node['cfncluster']['cfn_cluster_user']}" do
-  supports :manage_home => false
+user node['cfncluster']['cfn_cluster_user'] do
+  supports manage_home: false
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'

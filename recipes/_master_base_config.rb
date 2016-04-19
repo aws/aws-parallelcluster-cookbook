@@ -51,7 +51,7 @@ ruby_block "setup_disk" do
 end
 
 # Create the shared directory
-directory "#{node['cfncluster']['cfn_shared_dir']}" do
+directory node['cfncluster']['cfn_shared_dir'] do
   owner 'root'
   group 'root'
   mode '1777'
@@ -60,16 +60,16 @@ directory "#{node['cfncluster']['cfn_shared_dir']}" do
 end
 
 # Add volume to /etc/fstab
-mount "#{node['cfncluster']['cfn_shared_dir']}" do
+mount node['cfncluster']['cfn_shared_dir'] do
   device dev_path
-  fstype DelayedEvaluator.new {node['cfncluster']['cfn_volume_fs_type']}
+  fstype DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] }
   options "_netdev"
   pass 0
   action [:mount, :enable]
 end
 
 # Make sure shared directory permissions are correct
-directory "#{node['cfncluster']['cfn_shared_dir']}" do
+directory node['cfncluster']['cfn_shared_dir'] do
   owner 'root'
   group 'root'
   mode '1777'
@@ -79,9 +79,9 @@ end
 node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
 
 # Export shared dir
-nfs_export "#{node['cfncluster']['cfn_shared_dir']}" do
+nfs_export node['cfncluster']['cfn_shared_dir'] do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
-  writeable true 
+  writeable true
   options ['no_root_squash']
 end
 
@@ -108,23 +108,23 @@ template '/etc/ganglia/gmond.conf' do
 end
 
 service "gmetad" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
-service "#{node['cfncluster']['ganglia']['gmond_service']}" do
-  supports :restart => true
-  action [ :enable, :start ]
+service node['cfncluster']['ganglia']['gmond_service'] do
+  supports restart: true
+  action [:enable, :start]
 end
 
-service "#{node['cfncluster']['ganglia']['httpd_service']}" do
-  supports :restart => true
-  action [ :enable, :start ]
+service node['cfncluster']['ganglia']['httpd_service'] do
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Setup cluster user
-user "#{node['cfncluster']['cfn_cluster_user']}" do
-  supports :manage_home => true
+user node['cfncluster']['cfn_cluster_user'] do
+  supports manage_home: true
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'
@@ -136,7 +136,7 @@ bash "ssh-keygen" do
   code <<-EOH
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
   EOH
-  not_if { ::File.exists?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
 end
 
 bash "copy_and_perms" do
@@ -144,7 +144,7 @@ bash "copy_and_perms" do
   code <<-EOH
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys2 && chmod 0600 ~/.ssh/authorized_keys2\"
   EOH
-  not_if { ::File.exists?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
 end
 
 bash "ssh-keyscan" do
@@ -152,7 +152,7 @@ bash "ssh-keyscan" do
   code <<-EOH
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
   EOH
-  not_if { ::File.exists?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
 end
 
 # Install sqswatcher.cfg

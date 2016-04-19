@@ -26,7 +26,7 @@ def setup_disk(path)
     fs_type = 'ext4'
   end
 
-  return fs_type
+  fs_type
 end
 
 #
@@ -36,21 +36,18 @@ def get_fs_type(device)
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
   match = fs_check.stdout.match(/TYPE=\"(.*)\"/)
-  if match.nil?
-    match = ''
-  end
+  match = '' if match.nil?
 
-  return match[1]
+  match[1]
 end
 
 #
 # Get vpc-ipv4-cidr-block
 #
 def get_vpc_ipv4_cidr_block(eth0_mac)
-
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{eth0_mac.downcase}/vpc-ipv4-cidr-block")
   res = Net::HTTP.get_response(uri)
   vpc_ipv4_cidr_block = res.body if res.code == '200'
 
-  return vpc_ipv4_cidr_block  
+  vpc_ipv4_cidr_block
 end

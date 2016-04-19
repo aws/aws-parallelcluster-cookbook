@@ -22,14 +22,12 @@ remote_file munge_tarball do
   source node['cfncluster']['munge']['munge_url']
   mode '0644'
   # TODO: Add version or checksum checks
-  not_if { ::File.exists?(munge_tarball) }
+  not_if { ::File.exist?(munge_tarball) }
 end
 
 # Set libdir based on platform, default is /usr/lib64 for RHEL/CentOS/Alinux
 munge_libdir = '/usr/lib64'
-if node['platform_family'] == 'debian'
-  munge_libdir = '/usr/lib'
-end
+munge_libdir = '/usr/lib' if node['platform_family'] == 'debian'
 
 # Install munge
 bash 'make install' do
@@ -60,16 +58,17 @@ end
 
 # Make sure the munge user exists
 user 'munge' do
-  supports :manage_home => false
+  supports manage_home: false
   comment 'munge user'
   system true
   shell '/sbin/nologin'
 end
 
 # Create required directories for munge
-for dir in [ "/var/log/munge", "/etc/munge", "/var/run/munge" ] do
-  directory "#{dir}" do
-      action :create
-      owner "munge"
+dirs = ["/var/log/munge", "/etc/munge", "/var/run/munge"]
+dirs.each do |dir|
+  directory dir do
+    action :create
+    owner "munge"
   end
 end

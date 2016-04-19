@@ -13,13 +13,13 @@ driver_config:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.4.3
+  require_chef_omnibus: 12.8.1
 
 platforms:
-  - name: amazon_linux_2015_09_1
+  - name: amazon_linux_2016_03
     driver_plugin: ec2
     driver_config:
-      image_id: ami-f0091d91
+      image_id: ami-c229c0a2
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -123,7 +123,7 @@ platforms:
   - name: marketplace_centos_6_updates
     driver_plugin: ec2
     driver_config:
-      image_id: ami-1255b321
+      image_id: ami-05cf2265
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -227,7 +227,7 @@ platforms:
   - name: marketplace_centos_7_updates
     driver_plugin: ec2
     driver_config:
-      image_id: ami-d440a6e7
+      image_id: ami-d2c924b2
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -331,7 +331,7 @@ platforms:
   - name: rhel_6-7_HVM_GA
     driver_plugin: ec2
     driver_config:
-      image_id: ami-75f3f145
+      image_id: ami-274ba847
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -432,10 +432,10 @@ platforms:
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: rhel_7-1_HVM_GA
+  - name: rhel_7-2_HVM_GA
     driver_plugin: ec2
     driver_config:
-      image_id: ami-4dbf9e7d
+      image_id: ami-775e4f16
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -536,10 +536,10 @@ platforms:
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos_67_minimal
+  - name: centos_6_minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-8f6d88ef
+      image_id: ami-bfaf44df
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -640,10 +640,10 @@ platforms:
     transport:
       username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos_71_minimal
+  - name: centos_7_minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-44759024
+      image_id: ami-66a24906
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -747,7 +747,7 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-d24c5cb3
+      image_id: ami-37b95057
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba
@@ -851,7 +851,7 @@ platforms:
   - name: ubuntu-15-10
     driver_plugin: ec2
     driver_config:
-      image_id: ami-16b1a077
+      image_id: ami-12806972
       block_device_mappings:
         - ebs_virtual_name: ephemeral0
           ebs_device_name: /dev/xvdba

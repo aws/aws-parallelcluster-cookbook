@@ -33,14 +33,14 @@ end
 
 # Enable and start munge service
 service "munge" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Enable and start pbs_server service
 service "pbs_server" do
-  supports :restart => true
-  action [ :enable, :restart ]
+  supports restart: true
+  action [:enable, :restart]
 end
 
 # Copy pbs_sched service script
@@ -54,8 +54,8 @@ end
 
 # Enable and start pbs_sched service
 service "pbs_sched" do
-  supports :restart => true
-  action [ :enable, :start ]
+  supports restart: true
+  action [:enable, :start]
 end
 
 # Add publish_pending to cron
@@ -69,4 +69,3 @@ end
 cron 'publish_pending' do
   command '/opt/cfncluster/scripts/publish_pending'
 end
-

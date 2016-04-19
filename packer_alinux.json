@@ -3,7 +3,7 @@
     "cfncluster_version" : "",
     "chef_version" : "",
     "ridley_version" : "",
-    "chef_version" : "",
+    "berkshelf_version" : "",
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}"
@@ -11,7 +11,7 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-f0091d91",
+    "source_ami": "ami-c229c0a2",
     "ami_regions" : "{{user `build_for`}}",
     "ami_groups" : "{{user `ami_perms`}}",
     "instance_type": "m3.2xlarge",

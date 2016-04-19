@@ -32,6 +32,6 @@ end
 
 # Enable and start pbs_mom service
 service "pbs_mom" do
-  supports :restart => true
-  action [ :enable, :restart ]
+  supports restart: true
+  action [:enable, :restart]
 end
