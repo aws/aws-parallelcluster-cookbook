@@ -10,6 +10,19 @@ function error_exit () {
   exit 1
 }
 
+function download_run (){
+    url=$1
+    scheme=$(echo "${url}"| cut -d: -f1)
+    tmpfile=$(mktemp)
+    if [ "${scheme}" == "s3" ]; then
+      aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || RC=1
+    else
+      wget -qO- ${url} > $tmpfile || RC=1
+    fi
+    /bin/sh $tmpfile $@ || RC=1
+    /bin/rm $tmpfile
+}
+
 function run_preinstall () {
   RC=0
   if [ "${cfn_preinstall}" != "NONE" ]; then
