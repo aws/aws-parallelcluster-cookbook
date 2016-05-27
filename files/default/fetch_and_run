@@ -14,13 +14,13 @@ function download_run (){
     url=$1
     scheme=$(echo "${url}"| cut -d: -f1)
     tmpfile=$(mktemp)
+    trap "/bin/rm $tmpfile" RETURN
     if [ "${scheme}" == "s3" ]; then
       aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
     else
       wget -qO- ${url} > $tmpfile || return 1
     fi
     /bin/sh $tmpfile $@ || return 1
-    /bin/rm $tmpfile
 }
 
 function run_preinstall () {
