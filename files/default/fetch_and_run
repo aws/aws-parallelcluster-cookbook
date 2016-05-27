@@ -20,7 +20,8 @@ function download_run (){
     else
       wget -qO- ${url} > $tmpfile || return 1
     fi
-    /bin/sh $tmpfile $@ || return 1
+    chmod +x $tmpfile || return 1
+    $tmpfile $@ || return 1
 }
 
 function run_preinstall () {
