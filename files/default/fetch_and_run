@@ -15,26 +15,22 @@ function download_run (){
     scheme=$(echo "${url}"| cut -d: -f1)
     tmpfile=$(mktemp)
     if [ "${scheme}" == "s3" ]; then
-      aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || RC=1
+      aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
     else
-      wget -qO- ${url} > $tmpfile || RC=1
+      wget -qO- ${url} > $tmpfile || return 1
     fi
-    /bin/sh $tmpfile $@ || RC=1
+    /bin/sh $tmpfile $@ || return 1
     /bin/rm $tmpfile
 }
 
 function run_preinstall () {
-  RC=0
   if [ "${cfn_preinstall}" != "NONE" ]; then
     if [ "${cfn_preinstall_args}" != "NONE" ]; then
         download_run ${cfn_preinstall} ${cfn_preinstall_args}
     else
         download_run ${cfn_preinstall}
     fi
-  fi
-  if [ $RC -ne 0 ]; then
-    error_exit "Failed to run boot_as_master preinstall"
-  fi
+  fi || error_exit "Failed to run boot_as_master preinstall"
 }
 
 function run_postinstall () {
@@ -45,10 +41,7 @@ function run_postinstall () {
     else
         download_run ${cfn_postinstall}
     fi
-  fi
-  if [ $RC -ne 0 ]; then
-    error_exit "Failed to run boot_as_master postinstall"
-  fi
+  fi || error_exit "Failed to run boot_as_master postinstall"
 }
 
 ACTION=${1#?}
