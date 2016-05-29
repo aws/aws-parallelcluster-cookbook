@@ -28,8 +28,8 @@ default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releas
 default['cfncluster']['openlava']['version'] = '3.1.3'
 default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.3.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '6.0.0'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
+default['cfncluster']['torque']['version'] = '6.0.1'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.1.tar.gz'
 # Slurm software
 default['cfncluster']['slurm']['version'] = '15-08-8-1'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-8-1.tar.gz'
