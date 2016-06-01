@@ -27,6 +27,11 @@ end
 include_recipe "build-essential"
 include_recipe "cfncluster::_setup_python"
 
+# Install lots of packages
+node['cfncluster']['base_packages'].each do |p|
+  package p
+end
+
 # Manage SSH via Chef
 include_recipe "openssh"
 
@@ -113,11 +118,6 @@ cookbook_file "jq-1.4" do
   owner "root"
   group "root"
   mode "0755"
-end
-
-# Install lots of packages
-node['cfncluster']['base_packages'].each do |p|
-  package p
 end
 
 # Install Ganglia
