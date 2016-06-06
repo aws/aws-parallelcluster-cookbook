@@ -16,6 +16,12 @@ export PATH
 
 . /etc/cfncluster/cfnconfig
 
+if [ "$cfn_proxy" != "NONE" ]; then
+  export http_proxy=$cfn_proxy; export https_proxy=$cfn_proxy
+  export HTTP_PROXY=$cfn_proxy; export HTTPS_PROXY=$cfn_proxy
+  export no_proxy=169.254.169.254; export NO_PROXY=169.254.169.254
+fi
+
 . /opt/sge/default/common/settings.sh
 pending=$(qstat -g d -s p -u '*' | tail -n+3 | awk '$5 == "qw" {total = total+ $8} END {print total}')
 
