@@ -11,10 +11,10 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-66a24906",
+    "source_ami": "ami-d48642b4",
     "ami_regions" : "{{user `build_for`}}",
     "ami_groups" : "{{user `ami_perms`}}",
-    "instance_type": "m3.2xlarge",
+    "instance_type": "g2.2xlarge",
     "ssh_username": "centos",
     "ssh_pty" : true,
     "ami_name": "cfncluster-{{user `cfncluster_version`}}-centos7-hvm-{{user `build_date`}}",

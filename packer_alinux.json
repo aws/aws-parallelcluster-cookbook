@@ -11,10 +11,10 @@
   "builders": [{
     "type": "amazon-ebs",
     "region": "us-west-2",
-    "source_ami": "ami-c229c0a2",
+    "source_ami": "ami-f303fb93",
     "ami_regions" : "{{user `build_for`}}",
     "ami_groups" : "{{user `ami_perms`}}",
-    "instance_type": "m3.2xlarge",
+    "instance_type": "g2.2xlarge",
     "ssh_username": "ec2-user",
     "ssh_pty" : true,
     "ami_name": "cfncluster-{{user `cfncluster_version`}}-alinux-hvm-{{user `build_date`}}",
