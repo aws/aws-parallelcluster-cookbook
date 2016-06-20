@@ -17,9 +17,10 @@ case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
   include_recipe "yum-epel"
-  execute 'yum-config-manager' do
-    command 'yum-config-manager --enable rhui-REGION-rhel-server-releases-optional'
-    only_if { node['platform'] == 'redhat' }
+  if node['platform'] == 'redhat'
+    execute 'yum-config-manager-rhel' do
+      command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
+    end
   end
 when 'debian'
   include_recipe 'apt'

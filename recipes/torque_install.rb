@@ -18,11 +18,6 @@ include_recipe 'cfncluster::munge_install'
 
 torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster']['torque']['version']}.tar.gz"
 
-# Install packages required to build torque
-node['cfncluster']['torque_packages'].each do |p|
-  package p
-end
-
 # Get Torque tarball
 remote_file torque_tarball do
   source node['cfncluster']['torque']['url']
@@ -68,7 +63,8 @@ directory '/var/spool/torque' do
 end
 
 # Modified torque.setup
-cookbook_file 'torque.setup' do
+template 'torque.setup' do
+  source 'torque.setup.erb'
   path '/opt/torque/bin/torque.setup'
   user 'root'
   group 'root'

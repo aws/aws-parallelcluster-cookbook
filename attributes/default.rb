@@ -25,14 +25,14 @@ default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.3.1'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.3.1.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.3.2'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.3.2.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '6.0.2'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
+default['cfncluster']['torque']['version'] = '6.0.1'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.1.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '15-08-11-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-11-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '16-05-0-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-0-1.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.12'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
@@ -53,17 +53,20 @@ when 'rhel'
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel)
-    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     if node['platform_version'].to_i >= 7
-      default['cfncluster']['torque_packages'] = %w(boost boost-devel)
       default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel)
     end
+    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
+    end
+    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
+      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
+    end
 
   when 'amazon'
-    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
     default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel
@@ -79,10 +82,7 @@ when 'rhel'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 
 when 'debian'
-  if node["platform_version"].to_f >= 14.04
-    default['cfncluster']['torque_packages'] = %w(libboost1.54 libboost1.54-dev)
-  end
-  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev
+  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
@@ -94,10 +94,13 @@ when 'debian'
   default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
   default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
-  if node["platform_version"].to_f >= 16.04
-    default['nfs']['service_provider'] = Hash.new { |h, k| h[k] = Chef::Provider::Service::Systemd }
+  if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
+    default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
+    default['nfs']['service_provider']['portmap'] = Chef::Provider::Service::Systemd
+    default['nfs']['service_provider']['lock'] = Chef::Provider::Service::Systemd
     default['nfs']['service']['lock'] = 'rpc-statd'
-  end  
+    default['nfs']['service']['idmap'] = 'nfs-idmapd'
+  end
 end
 
 # Update for NFS on Amazon Linux
