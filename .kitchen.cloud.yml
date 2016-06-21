@@ -1,5 +1,7 @@
 ---
 driver_config:
+  retryable_sleep: 15
+  retryable_tries: 20
   aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
   region: <%= ENV['AWS_DEFAULT_REGION'] %>
   instance_type: <%= ENV['AWS_FLAVOR_ID'] %>
@@ -21,6 +23,11 @@ platforms:
     driver_config:
       image_id: ami-f303fb93
       block_device_mappings:
+        - device_name: /dev/xvda
+          ebs:
+            volume_size: 10
+            volume_type: gp2
+            delete_on_termination: true
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
         - device_name: /dev/xvdbb
@@ -355,7 +362,7 @@ platforms:
   - name: centos-7-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-d48642b4
+      image_id: ami-9bf733fb
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
@@ -413,6 +420,11 @@ platforms:
     driver_config:
       image_id: ami-6635cd06
       block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: 10
+            volume_type: gp2
+            delete_on_termination: true
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
         - device_name: /dev/xvdbb
@@ -469,6 +481,11 @@ platforms:
     driver_config:
       image_id: ami-d06a90b0
       block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: 10
+            volume_type: gp2
+            delete_on_termination: true
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
         - device_name: /dev/xvdbb

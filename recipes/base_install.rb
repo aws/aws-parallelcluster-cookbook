@@ -123,3 +123,6 @@ end
 
 # Install Ganglia
 include_recipe "cfncluster::_ganglia_install"
+
+# Install NVIDIA and CUDA
+include_recipe "cfncluster::_nvidia_install"

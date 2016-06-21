@@ -21,6 +21,14 @@ suites:
       - recipe[cfncluster::base_install]
     attributes:
 
+  - name: base_install_gpu
+    run_list:
+      - recipe[cfncluster::base_install]
+    attributes:
+      cfncluster:
+        nvidia:
+          enabled: true
+
   - name: sge_install
     run_list:
       - recipe[cfncluster::sge_install]
