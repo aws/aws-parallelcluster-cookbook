@@ -18,7 +18,7 @@ default['cfncluster']['base_dir'] = '/opt/cfncluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.1.3'
+default['cfncluster']['cfncluster-node-version'] = '1.3.0'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 # URLs to software packages used during install receipes
 # Gridengine software
@@ -30,6 +30,13 @@ default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.1'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.1.tar.gz'
+# PBSPro software
+default['cfncluster']['pbspro']['version'] = '14.1.0'
+default['cfncluster']['pbspro']['url'] = 'https://github.com/PBSPro/pbspro/archive/v14.1.0.tar.gz'
+default['cfncluster']['pbspro']['libical_version'] = '1.0.1'
+default['cfncluster']['pbspro']['libical_url'] = 'https://github.com/libical/libical/archive/v1.0.1.tar.gz'
+default['cfncluster']['pbspro']['tk_version'] = '8.5.7'
+default['cfncluster']['pbspro']['tk_url'] = 'ftp://ftp.tcl.tk/pub/tcl/tcl8_5/tk8.5.7-src.tar.gz'
 # Slurm software
 default['cfncluster']['slurm']['version'] = '16-05-0-1'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-0-1.tar.gz'
@@ -41,6 +48,10 @@ default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.7.1'
 default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.1.tar.gz'
+# NVIDIA
+default['cfncluster']['nvidia']['enabled'] = false
+default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/361.42/NVIDIA-Linux-x86_64-361.42.run'
+default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/7.5/Prod/local_installers/cuda_7.5.18_linux.run'
 
 # Platform defaults
 case node['platform_family']
@@ -52,12 +63,15 @@ when 'rhel'
     default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
-                                                blas-devel fftw-devel libffi-devel openssl-devel)
+                                                blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
+                                                libical-devel postgresql-devel postgresql-server sendmail)
+    default['cfncluster']['pbspro_packages'] = %w( )
     if node['platform_version'].to_i >= 7
       default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
-                                                  blas-devel fftw-devel libffi-devel openssl-devel)
+                                                  blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                                  libical-devel postgresql-devel postgresql-server sendmail)
     end
     if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
       default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
@@ -70,7 +84,8 @@ when 'rhel'
     default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel
-                                                libffi-devel openssl-devel)
+                                                libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
+                                                sendmail cmake byacc)
   end
 
   default['cfncluster']['ganglia']['apache_user'] = 'apache'
@@ -82,11 +97,13 @@ when 'rhel'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 
 when 'debian'
-  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev
+  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
-                                              r-base libatlas-dev liblas-dev libfftw3-dev libffi-dev libssl-dev)
+                                              r-base libatlas-dev liblas-dev libfftw3-dev libffi-dev libssl-dev) 
+  kernel_extra_pkg = "linux-image-extra-#{node['kernel']['release']}"
+  default['cfncluster']['base_packages'].push(kernel_extra_pkg)
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'

@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: cfncluster
-# Recipe:: default
+# Recipe:: _compute_pbspro_config
 #
 # Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -13,12 +13,26 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'cfncluster::sge_install'
-include_recipe 'cfncluster::openlava_install'
-include_recipe 'cfncluster::torque_install'
-include_recipe 'cfncluster::slurm_install'
-
-# Only builds on RHEL based systems at this time
-if node['platform_family'] == 'rhel'
-  include_recipe 'cfncluster::pbspro_install'
+execute 'pbs_postinstall' do
+  command '/opt/pbs/libexec/pbs_postinstall'
+  creates '/etc/pbs.conf'
 end
+
+%w{/opt/pbs/sbin/pbs_iff /opt/pbs/sbin/pbs_rcp}.each do |foo|
+  file foo do
+    mode '4755'
+  end
+end
+
+template '/etc/pbs.conf' do
+  source 'pbs.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+service "pbs" do
+  supports restart: true
+  action [:enable, :restart]
+end
+
