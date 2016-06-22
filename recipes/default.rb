@@ -17,8 +17,4 @@ include_recipe 'cfncluster::sge_install'
 include_recipe 'cfncluster::openlava_install'
 include_recipe 'cfncluster::torque_install'
 include_recipe 'cfncluster::slurm_install'
-
-# Only builds on RHEL based systems at this time
-if node['platform_family'] == 'rhel'
-  include_recipe 'cfncluster::pbspro_install'
-end
+include_recipe 'cfncluster::pbspro_install'

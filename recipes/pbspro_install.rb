@@ -15,6 +15,9 @@
 
 include_recipe 'cfncluster::base_install'
 
+# Only builds on RHEL based systems at this time
+if node['platform_family'] == 'rhel'
+
 pbspro_tarball = "#{node['cfncluster']['sources_dir']}/pbspro-#{node['cfncluster']['pbspro']['version']}.tar.gz"
 
 # Get pbspro tarball
@@ -120,6 +123,8 @@ bash 'make install' do
   ## Only perform if running version doesn't match desired
   #not_if "/opt/pbs/bin/pbsnodes --version 2>&1 | grep -q #{node['cfncluster']['torque']['version']}"
   creates '/opt/pbs/bin/pbsnodes'
+end
+
 end
 
 end
