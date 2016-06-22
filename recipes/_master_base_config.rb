@@ -109,12 +109,12 @@ end
 
 service "gmetad" do
   supports restart: true
-  action [:enable, :start]
+  action [:enable, :restart]
 end
 
 service node['cfncluster']['ganglia']['gmond_service'] do
   supports restart: true
-  action [:enable, :start]
+  action [:enable, :restart]
 end
 
 service node['cfncluster']['ganglia']['httpd_service'] do
