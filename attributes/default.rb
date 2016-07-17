@@ -25,8 +25,8 @@ default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '4.0.0'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/4.0.0.tar.gz'
+default['cfncluster']['openlava']['version'] = '4.0'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/4.0.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.1'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.1.tar.gz'
