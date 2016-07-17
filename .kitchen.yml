@@ -11,14 +11,6 @@ platforms:
   - name: centos-7.0
 
 suites:
-  - name: default_gpu
-    run_list:
-      - recipe[cfncluster::default]
-    attributes:
-      cfncluster:
-        nvidia:
-          enabled: true
-
   - name: default
     run_list:
       - recipe[cfncluster::default]
@@ -55,11 +47,6 @@ suites:
   - name: slurm_install
     run_list:
       - recipe[cfncluster::slurm_install]
-    attributes:
-
-  - name: pbspro_install
-    run_list:
-      - recipe[cfncluster::pbspro_install]
     attributes:
 
   - name: base_config_MasterServer
@@ -145,23 +132,6 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
 
-  - name: pbspro_config_MasterServer
-    run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::pbspro_config]
-    attributes:
-      cfncluster:
-        cfn_node_type: 'MasterServer'
-        stack_name: <%= ENV['AWS_STACK_NAME'] %>
-        cfn_volume: <%= ENV['CFN_VOLUME'] %>
-        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
-        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
-        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
-        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
-        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
-
   - name: sge_config_ComputeFleet
     run_list:
       - recipe[cfncluster::_prep_env]
@@ -217,23 +187,6 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::slurm_config]
-    attributes:
-      cfncluster:
-        cfn_node_type: 'ComputeFleet'
-        stack_name: <%= ENV['AWS_STACK_NAME'] %>
-        cfn_volume: <%= ENV['CFN_VOLUME'] %>
-        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
-        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
-        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
-        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
-        cfn_master: <%= ENV['CFN_MASTER'] %>
-
-  - name: pbspro_config_ComputeFleet
-    run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::pbspro_config]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'

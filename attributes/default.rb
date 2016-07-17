@@ -25,29 +25,22 @@ default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.3.2'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.3.2.tar.gz'
+default['cfncluster']['openlava']['version'] = '4.0.0'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/4.0.0.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.1'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.1.tar.gz'
-# PBSPro software
-default['cfncluster']['pbspro']['version'] = '14.1.0'
-default['cfncluster']['pbspro']['url'] = 'https://github.com/PBSPro/pbspro/archive/v14.1.0.tar.gz'
-default['cfncluster']['pbspro']['libical_version'] = '1.0.1'
-default['cfncluster']['pbspro']['libical_url'] = 'https://github.com/libical/libical/archive/v1.0.1.tar.gz'
-default['cfncluster']['pbspro']['tk_version'] = '8.5.7'
-default['cfncluster']['pbspro']['tk_url'] = 'ftp://ftp.tcl.tk/pub/tcl/tcl8_5/tk8.5.7-src.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '16-05-0-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-0-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '16-05-2-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-2-1.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.12'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
 # Ganglia
 default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
-default['cfncluster']['ganglia']['web_version'] = '3.7.1'
-default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.1.tar.gz'
+default['cfncluster']['ganglia']['web_version'] = '3.7.2'
+default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = false
 default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/361.42/NVIDIA-Linux-x86_64-361.42.run'
@@ -119,17 +112,6 @@ when 'debian'
     default['nfs']['service']['idmap'] = 'nfs-idmapd'
   end
 end
-
-# Update for NFS on Amazon Linux
-#case node['platform']
-#when 'amazon'
-#  default['nfs']['packages'] = %w(nfs-utils rpcbind)
-#  default['nfs']['service']['portmap'] = 'rpcbind'
-#  default['nfs']['service']['lock'] = 'nfslock'
-#  default['nfs']['service']['server'] = 'nfs'
-#  default['nfs']['service']['idmap'] = 'rpcidmapd'
-#  default['nfs']['client-services'] = %w(portmap lock)
-#end
 
 # OpenSSH settings for CfnCluster instances
 default['openssh']['server']['protocol'] = '2'
