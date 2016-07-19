@@ -46,6 +46,17 @@ default['cfncluster']['nvidia']['enabled'] = false
 default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/361.42/NVIDIA-Linux-x86_64-361.42.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/7.5/Prod/local_installers/cuda_7.5.18_linux.run'
 
+# OpenSSH settings for CfnCluster instances
+default['openssh']['server']['protocol'] = '2'
+default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
+default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
+default['openssh']['server']['password_authentication'] = 'no'
+default['openssh']['server']['gssapi_authentication'] = 'yes'
+default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
+default['openssh']['server']['x11_forwarding'] = 'yes'
+default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
+default['openssh']['client']['gssapi_authentication'] = 'yes'
+
 # Platform defaults
 case node['platform_family']
 when 'rhel'
@@ -92,6 +103,7 @@ when 'rhel'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 
 when 'debian'
+  default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
   default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
@@ -114,17 +126,6 @@ when 'debian'
     default['nfs']['service']['idmap'] = 'nfs-idmapd'
   end
 end
-
-# OpenSSH settings for CfnCluster instances
-default['openssh']['server']['protocol'] = '2'
-default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
-default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
-default['openssh']['server']['password_authentication'] = 'no'
-default['openssh']['server']['gssapi_authentication'] = 'yes'
-default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
-default['openssh']['server']['x11_forwarding'] = 'yes'
-default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
-default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
