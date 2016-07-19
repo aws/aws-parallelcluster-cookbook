@@ -47,6 +47,15 @@ directory '/etc/cfncluster'
 directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
+directory node['cfncluster']['license_dir']
+
+# Install LICENSE README
+cookbook_file 'CfnCluster-License-README.txt' do
+  path "#{node['cfncluster']['license_dir']}/CfnCluster-License-README.txt"
+  user 'root'
+  group 'root'
+  mode '0644'
+end
 
 # Install AWSCLI
 python_package 'awscli'

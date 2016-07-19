@@ -308,6 +308,11 @@ platforms:
     driver_config:
       image_id: ami-b48440d4
       block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: 15
+            volume_type: gp2
+            delete_on_termination: true
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
         - device_name: /dev/xvdbb
@@ -364,6 +369,11 @@ platforms:
     driver_config:
       image_id: ami-9bf733fb
       block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: 10
+            volume_type: gp2
+            delete_on_termination: true
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
         - device_name: /dev/xvdbb

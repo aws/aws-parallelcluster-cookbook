@@ -70,3 +70,20 @@ template 'torque.setup' do
   group 'root'
   mode '0755'
 end
+
+# Copy required licensing files
+directory "#{node['cfncluster']['license_dir']}/torque"
+
+bash 'copy license stuff' do
+  user 'root'
+  group 'root'
+  cwd Chef::Config[:file_cache_path]
+  code <<-EOF
+    cd torque-#{node['cfncluster']['torque']['version']}
+    cp -v PBS_License.txt #{node['cfncluster']['license_dir']}/torque/PBS_License.txt
+    cp -v LICENSE #{node['cfncluster']['license_dir']}/torque/LICENSE
+    cp -v README.md #{node['cfncluster']['license_dir']}/torque/README.md
+  EOF
+  # TODO: Fix, so it works for upgrade
+  creates "#{node['cfncluster']['license_dir']}/torque/README.md"
+end
