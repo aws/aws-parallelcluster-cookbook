@@ -52,7 +52,7 @@ end
 
 service node['cfncluster']['ganglia']['gmond_service'] do
   supports restart: true
-  action [:enable, :start]
+  action [:enable, :restart]
 end
 
 # Setup cluster user
