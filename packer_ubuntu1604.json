@@ -13,7 +13,7 @@
     "region": "us-west-2",
     "ami_regions" : "{{user `build_for`}}",
     "ami_groups" : "{{user `ami_perms`}}",
-    "source_ami": "ami-d06a90b0",
+    "source_ami": "ami-c8a964a8",
     "instance_type": "g2.2xlarge",
     "ssh_username": "ubuntu",
     "ssh_pty" : true,
