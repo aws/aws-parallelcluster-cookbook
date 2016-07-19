@@ -7,7 +7,7 @@
 #
 # http://aws.amazon.com/asl/
 #
-# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -22,7 +22,8 @@ if [ "$cfn_proxy" != "NONE" ]; then
   export no_proxy=169.254.169.254; export NO_PROXY=169.254.169.254
 fi
 
-pending=$(/opt/slurm/bin/squeue -r -h -o '%t %D' | awk '$1 == "PD" { total = total + 1} END {print total}')
+. /etc/profile.d/pbs.sh
+pending=$(qstat -i -t | tail -n+6 | awk '{total = total+ $7}END{print total}')
 
 if [ "${pending}x" == "x" ]; then
 pending=0

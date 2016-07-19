@@ -7,7 +7,7 @@ region=$2
 public=$3
 build_date=$4
 
-available_os="centos6 centos7 alinux ubuntu1404"
+available_os="centos6 centos7 alinux ubuntu1404 ubuntu1604"
 available_regions="eu-west-1,ap-southeast-1,ap-southeast-2,eu-central-1,ap-northeast-1,ap-northeast-2,us-east-1,sa-east-1,us-west-1"
 
 if [ "x$os" == "x" ]; then
@@ -60,6 +60,10 @@ alinux)
   RC=$?
   ;;
 ubuntu1404)
+  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
+  RC=$?
+  ;;
+ubuntu1604)
   (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
   RC=$?
   ;;

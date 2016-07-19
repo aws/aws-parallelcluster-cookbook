@@ -17,15 +17,21 @@ case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
   include_recipe "yum-epel"
-  execute 'yum-config-manager' do
-    command 'yum-config-manager --enable rhui-REGION-rhel-server-releases-optional'
-    only_if { node['platform'] == 'redhat' }
+  if node['platform'] == 'redhat'
+    execute 'yum-config-manager-rhel' do
+      command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
+    end
   end
 when 'debian'
   include_recipe 'apt'
 end
 include_recipe "build-essential"
 include_recipe "cfncluster::_setup_python"
+
+# Install lots of packages
+node['cfncluster']['base_packages'].each do |p|
+  package p
+end
 
 # Manage SSH via Chef
 include_recipe "openssh"
@@ -115,10 +121,8 @@ cookbook_file "jq-1.4" do
   mode "0755"
 end
 
-# Install lots of packages
-node['cfncluster']['base_packages'].each do |p|
-  package p
-end
-
 # Install Ganglia
 include_recipe "cfncluster::_ganglia_install"
+
+# Install NVIDIA and CUDA
+include_recipe "cfncluster::_nvidia_install"
