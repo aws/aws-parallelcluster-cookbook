@@ -60,6 +60,7 @@ when 'rhel'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail)
+    default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel"
     if node['platform_version'].to_i >= 7
       default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
@@ -69,7 +70,6 @@ when 'rhel'
     end
     if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
       default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
-      default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel-lt"
     end
     if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
       default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
