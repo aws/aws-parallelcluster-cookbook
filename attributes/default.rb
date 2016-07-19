@@ -48,17 +48,18 @@ default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.
 
 # Platform defaults
 case node['platform_family']
-
 when 'rhel'
-  case node['platform']
 
+  default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp!('.x86_64')
+
+  case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail)
-    default['cfncluster']['pbspro_packages'] = %w( )
     if node['platform_version'].to_i >= 7
       default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
@@ -68,6 +69,7 @@ when 'rhel'
     end
     if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
       default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
+      default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel-lt"
     end
     if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
       default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
@@ -95,8 +97,8 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
                                               r-base libatlas-dev liblas-dev libfftw3-dev libffi-dev libssl-dev) 
-  kernel_extra_pkg = "linux-image-extra-#{node['kernel']['release']}"
-  default['cfncluster']['base_packages'].push(kernel_extra_pkg)
+  default['cfncluster']['kernel_devel_pkg']['name'] = "linux-image-extra"
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'

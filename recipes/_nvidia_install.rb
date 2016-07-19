@@ -16,10 +16,16 @@
 # Only run if node['cfncluster']['nvidia']['enabled'] = true
 if node['cfncluster']['nvidia']['enabled'] == true
 
-#  if node['platform_family'] == 'debian'
-#    kernel_extra_pkg = "linux-image-extra-#{node['os_release']}"
-#    package kernel_extra_pkg
-#  end
+  case node['platform_family']
+  when 'rhel'
+    yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
+      version node['cfncluster']['kernel_devel_pkg']['version']
+      allow_downgrade true
+    end
+  when 'debian'
+    package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
+    apt_package package
+  end
 
   # Get NVIDIA run file
   nvidia_tmp_runfile = "/tmp/nvidia.run"
