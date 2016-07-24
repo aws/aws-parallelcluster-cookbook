@@ -22,7 +22,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ec2-user",
       "ssh_pty" : true,
-      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-alinux-hvm-{{user `build_date`}}",
+      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "associate_public_ip_address" : true,
@@ -38,7 +38,7 @@
       "launch_block_device_mappings" : [
         {
           "device_name" : "/dev/xvda",
-          "volume_size" : "10",
+          "volume_size" : "15",
           "volume_type" : "gp2",
           "delete_on_termination" : true
         },
