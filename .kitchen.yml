@@ -22,7 +22,7 @@ suites:
     attributes:
       cfncluster:
         nvidia:
-          enabled: true
+          enabled: 'yes'
 
   - name: base_install
     run_list:
@@ -35,7 +35,7 @@ suites:
     attributes:
       cfncluster:
         nvidia:
-          enabled: true
+          enabled: 'yes'
 
   - name: sge_install
     run_list:

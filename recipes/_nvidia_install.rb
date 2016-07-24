@@ -13,8 +13,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Only run if node['cfncluster']['nvidia']['enabled'] = true
-if node['cfncluster']['nvidia']['enabled'] == true
+# Only run if node['cfncluster']['nvidia']['enabled'] = 'yes'
+if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
   case node['platform_family']
   when 'rhel'
