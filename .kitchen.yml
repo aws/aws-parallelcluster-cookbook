@@ -16,6 +16,14 @@ suites:
       - recipe[cfncluster::default]
     attributes:
 
+  - name: default_gpu
+    run_list:
+      - recipe[cfncluster::default]
+    attributes:
+      cfncluster:
+        nvidia:
+          enabled: true
+
   - name: base_install
     run_list:
       - recipe[cfncluster::base_install]
