@@ -21,7 +21,7 @@ platforms:
   - name: amazon-linux-2016-03
     driver_plugin: ec2
     driver_config:
-      image_id: ami-f303fb93
+      image_id: ami-7172b611
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
