@@ -82,7 +82,7 @@ platforms:
   - name: marketplace-centos-6-updates
     driver_plugin: ec2
     driver_config:
-      image_id: ami-05cf2265
+      image_id: ami-1c221e76
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
@@ -138,7 +138,7 @@ platforms:
   - name: marketplace-centos-7-updates
     driver_plugin: ec2
     driver_config:
-      image_id: ami-d2c924b2
+      image_id: ami-6d1c2007
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
@@ -194,7 +194,7 @@ platforms:
   - name: rhel-6-7-HVM-GA-20160219
     driver_plugin: ec2
     driver_config:
-      image_id: ami-274ba847
+      image_id: ami-f37b4b99
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
@@ -250,7 +250,7 @@ platforms:
   - name: rhel-7-2-HVM-GA
     driver_plugin: ec2
     driver_config:
-      image_id: ami-775e4f16
+      image_id: ami-2051294a
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
@@ -306,7 +306,7 @@ platforms:
   - name: centos-6-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-b48440d4
+      image_id: ami-4e28b459
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -367,7 +367,7 @@ platforms:
   - name: centos-7-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-9bf733fb
+      image_id: ami-6c2ab67b
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -428,7 +428,7 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-6635cd06
+      image_id: ami-cf68e0d8
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -489,7 +489,7 @@ platforms:
   - name: ubuntu-16-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c8a964a8
+      image_id: ami-b42fb3a3
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -550,7 +550,7 @@ platforms:
   - name: sles11
     driver_plugin: ec2
     driver_config:
-      image_id: ami-3b0f420b
+      image_id: ami-3bf32750
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
@@ -606,7 +606,7 @@ platforms:
   - name: sles12
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c5440af5
+      image_id: ami-b7b4fedd
       block_device_mappings:
         - device_name: /dev/xvdba
           virtual_name: ephemeral0
