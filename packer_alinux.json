@@ -15,8 +15,8 @@
   "builders" : [
     {
       "type" : "amazon-ebs",
-      "region" : "us-west-2",
-      "source_ami" : "ami-7172b611",
+      "region" : "us-east-1",
+      "source_ami" : "ami-6869aa05",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",

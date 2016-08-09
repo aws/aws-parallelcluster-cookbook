@@ -15,10 +15,10 @@
   "builders" : [
     {
       "type" : "amazon-ebs",
-      "region" : "us-west-2",
+      "region" : "us-east-1",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
-      "source_ami" : "ami-6635cd06",
+      "source_ami" : "ami-cf68e0d8",
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
