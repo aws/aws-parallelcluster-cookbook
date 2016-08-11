@@ -20,20 +20,20 @@ default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/script
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
 default['cfncluster']['cfncluster-node-version'] = '1.3.2'
-default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
+default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install receipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '4.0'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/4.0.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.3.3'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.3.3.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '6.0.1'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.1.tar.gz'
+default['cfncluster']['torque']['version'] = '6.0.2'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '16-05-2-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-2-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '16-05-3-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-3-1.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.12'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
