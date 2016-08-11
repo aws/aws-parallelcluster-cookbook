@@ -43,33 +43,33 @@ fi
 case $os in
 all)
   for x in $available_os; do
-    (packer build -machine-readable -var-file=packer_variables.json packer_$x.json; RC=$?) | tee build-$x.log
+    packer build -machine-readable -var-file=packer_variables.json packer_$x.json
     RC=$?
   done
   ;;
 centos6)
-  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
+  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
   RC=$?
   ;;
 centos7)
-  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
+  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
   RC=$?
   ;;
 alinux)
-  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
+  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
   RC=$?
   ;;
 ubuntu1404)
-  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
+  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
   RC=$?
   ;;
 ubuntu1604)
-  (packer build -machine-readable -var-file=packer_variables.json packer_$os.json; RC=$?) | tee build-$os.log
+  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
   RC=$?
   ;;
 *)
   echo "Unknown OS: $os"
-  exit 1
+  RC=1
   ;;
 esac
 
