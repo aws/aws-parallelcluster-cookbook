@@ -1,6 +1,7 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "cfncluster_cookbook_version" : "",
     "chef_version" : "",
     "ridley_version" : "",
     "berkshelf_version" : "",
@@ -115,6 +116,12 @@
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "cfncluster::default"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo curl https://s3.amazonaws.com/us-east-1-cfncluster/cookbooks/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /opt/cfncluster/sources/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz"
       ]
     },
     {

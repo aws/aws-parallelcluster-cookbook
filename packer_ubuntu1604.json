@@ -1,6 +1,7 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "cfncluster_cookbook_version" : "",
     "chef_version" : "",
     "ridley_version" : "",
     "berkshelf_version" : "",
@@ -130,6 +131,12 @@
       "inline" : [
         "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip",
         "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo curl https://s3.amazonaws.com/us-east-1-cfncluster/cookbooks/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /opt/cfncluster/sources/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz"
       ]
     },
     {
