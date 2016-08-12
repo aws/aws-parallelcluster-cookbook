@@ -35,7 +35,7 @@ bash 'make install' do
     tar xf #{torque_tarball}
     cd torque-#{node['cfncluster']['torque']['version']}
     ./autogen.sh
-    ./configure --prefix=/opt/torque --enable-munge-auth
+    ./configure --prefix=/opt/torque --enable-munge-auth --disable-gui
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
