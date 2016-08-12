@@ -136,7 +136,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo curl https://s3.amazonaws.com/us-east-1-cfncluster/cookbooks/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /opt/cfncluster/sources/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz"
+        "sudo curl https://s3.amazonaws.com/us-east-1-cfncluster/cookbooks/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/cfncluster-cookbook.tgz"
       ]
     },
     {
