@@ -428,7 +428,7 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-cf68e0d8
+      image_id: ami-70b67d10
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
