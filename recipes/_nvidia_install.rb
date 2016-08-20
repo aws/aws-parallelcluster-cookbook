@@ -65,13 +65,11 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     creates '/usr/local/cuda-7.5'
   end
 
-  directory '/etc/modprobe.d'
-
-  cookbook_file ' /etc/modprobe.d/blacklist-nouveau.conf' do
-    source 'blacklist-nouveau.conf'
-    user 'root'
+  cookbook_file 'blacklist-nouveau.conf' do
+    path '/etc/modprobe.d/blacklist-nouveau.conf'
+    owner 'root'
     group 'root'
     mode '0644'
-    action :create 
   end
+
 end
