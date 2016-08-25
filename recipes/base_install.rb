@@ -130,6 +130,14 @@ cookbook_file "jq-1.4" do
   mode "0755"
 end
 
+# AMI cleanup script
+cookbook_file "ami_cleanup.sh" do
+  path '/usr/local/sbin/ami_cleanup.sh'
+  owner "root"
+  group "root"
+  mode "0755"
+end
+
 # Install Ganglia
 include_recipe "cfncluster::_ganglia_install"
 
