@@ -72,4 +72,11 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     mode '0644'
   end
 
+  if node['platform'] == 'ubuntu'
+    execute 'initramfs to remove nouveau' do
+      command 'update-initramfs -u'
+      only_if 'lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau'
+    end
+  end
+
 end
