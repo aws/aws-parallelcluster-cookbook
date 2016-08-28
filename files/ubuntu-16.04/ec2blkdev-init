@@ -15,7 +15,7 @@
 # Description: Script to call udevadm to setup any links to devices already attached at instance launch
 ### END INIT INFO
 
-. /etc/rc.d/init.d/functions
+. /lib/lsb/init-functions
 
 prog=/sbin/udevadm
 

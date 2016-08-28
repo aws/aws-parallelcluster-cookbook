@@ -117,6 +117,21 @@ when "redhat", "centos", "amazon", "scientific" # ~FC024
     action :create
   end
 
+  # Copy required licensing files
+  directory "#{node['cfncluster']['license_dir']}/ganglia"
+
+  bash 'copy license stuff' do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-EOF
+      cd monitor-core-#{node['cfncluster']['ganglia']['version']}
+      cp -v COPYING #{node['cfncluster']['license_dir']}/ganglia/COPYING
+    EOF
+    # TODO: Fix, so it works for upgrade
+    creates "#{node['cfncluster']['license_dir']}/ganglia/COPYING"
+  end
+
 when "ubuntu"
 
   package "ganglia-monitor"

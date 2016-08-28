@@ -17,94 +17,35 @@
 default['cfncluster']['base_dir'] = '/opt/cfncluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
+default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.1.3'
-default['cfncluster']['cfncluster-supervisor-version'] = '3.2.0'
+default['cfncluster']['cfncluster-node-version'] = '1.3.2'
+default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install receipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Openlava software
-default['cfncluster']['openlava']['version'] = '3.1.3'
-default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.1.3.tar.gz'
+default['cfncluster']['openlava']['version'] = '3.3.3'
+default['cfncluster']['openlava']['url'] = 'https://github.com/openlava/openlava/archive/3.3.3.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '6.0.0'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.0.tar.gz'
+default['cfncluster']['torque']['version'] = '6.0.2'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '15-08-8-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-15-08-8-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '16-05-3-1'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-3-1.tar.gz'
 # Munge
-default['cfncluster']['munge']['munge_version'] = '0.5.11'
-default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.11.tar.gz'
+default['cfncluster']['munge']['munge_version'] = '0.5.12'
+default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
 # Ganglia
 default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
-default['cfncluster']['ganglia']['web_version'] = '3.7.1'
-default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.1.tar.gz'
-
-# Platform defaults
-case node['platform_family']
-
-when 'rhel'
-  case node['platform']
-
-  when 'centos', 'redhat', 'scientific' # ~FC024
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
-                                                blas-devel fftw-devel)
-    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
-    if node['platform_version'].to_i >= 7
-      default['cfncluster']['torque_packages'] = %w(boost boost-devel)
-      default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                  libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                                  httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
-                                                  blas-devel fftw-devel)
-    end
-
-  when 'amazon'
-    default['cfncluster']['torque_packages'] = %w(boost boost-devel)
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel)
-  end
-
-  default['cfncluster']['ganglia']['apache_user'] = 'apache'
-  default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
-  default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
-  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/trqauthd'
-  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/pbs_mom'
-  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/pbs_sched'
-  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
-
-when 'debian'
-  if node["platform_version"].to_f >= 14.04
-    default['cfncluster']['torque_packages'] = %w(libboost1.54 libboost1.54-dev)
-  end
-  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libXmu-dev libhwloc-dev
-                                              tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
-                                              apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
-                                              r-base libatlas-dev liblas-dev libfftw3-dev)
-  default['cfncluster']['ganglia']['apache_user'] = 'www-data'
-  default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
-  default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
-  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/debian.trqauthd'
-  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
-  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
-  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
-end
-
-# Update for NFS on Amazon Linux
-case node['platform']
-when 'amazon'
-  default['nfs']['packages'] = %w(nfs-utils rpcbind)
-  default['nfs']['service']['portmap'] = 'rpcbind'
-  default['nfs']['service']['lock'] = 'nfslock'
-  default['nfs']['service']['server'] = 'nfs'
-  default['nfs']['service']['idmap'] = 'rpcidmapd'
-  default['nfs']['client-services'] = %w(portmap lock)
-end
+default['cfncluster']['ganglia']['web_version'] = '3.7.2'
+default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
+# NVIDIA
+default['cfncluster']['nvidia']['enabled'] = 'no'
+default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/361.42/NVIDIA-Linux-x86_64-361.42.run'
+default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/7.5/Prod/local_installers/cuda_7.5.18_linux.run'
 
 # OpenSSH settings for CfnCluster instances
 default['openssh']['server']['protocol'] = '2'
@@ -116,6 +57,78 @@ default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
 default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
+
+# Platform defaults
+case node['platform_family']
+when 'rhel'
+
+  default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp!('.x86_64')
+
+  case node['platform']
+  when 'centos', 'redhat', 'scientific' # ~FC024
+    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
+                                                blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
+                                                libical-devel postgresql-devel postgresql-server sendmail)
+    if node['platform_version'].to_i >= 7
+      default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+                                                  libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                                  httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
+                                                  blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                                  libical-devel postgresql-devel postgresql-server sendmail)
+    end
+    if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+      default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel"
+    end
+    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
+    end
+    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
+      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
+    end
+
+  when 'amazon'
+    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel
+                                                libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
+                                                sendmail cmake byacc)
+  end
+
+  default['cfncluster']['ganglia']['apache_user'] = 'apache'
+  default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
+  default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
+  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/trqauthd'
+  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/pbs_mom'
+  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/pbs_sched'
+  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
+
+when 'debian'
+  default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
+  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
+                                              tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
+                                              apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
+                                              r-base libatlas-dev liblas-dev libfftw3-dev libffi-dev libssl-dev) 
+  default['cfncluster']['kernel_devel_pkg']['name'] = "linux-image-extra"
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
+  default['cfncluster']['ganglia']['apache_user'] = 'www-data'
+  default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
+  default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
+  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/debian.trqauthd'
+  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
+  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
+  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
+  if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
+    default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
+    default['nfs']['service_provider']['portmap'] = Chef::Provider::Service::Systemd
+    default['nfs']['service_provider']['lock'] = Chef::Provider::Service::Systemd
+    default['nfs']['service']['lock'] = 'rpc-statd'
+    default['nfs']['service']['idmap'] = 'nfs-idmapd'
+  end
+end
 
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'

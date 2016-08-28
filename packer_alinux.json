@@ -1,96 +1,135 @@
 {
   "variables" : {
     "cfncluster_version" : "",
+    "cfncluster_cookbook_version" : "",
     "chef_version" : "",
     "ridley_version" : "",
     "berkshelf_version" : "",
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
-    "build_date" : "{{env `BUILD_DATE`}}"
+    "build_date" : "{{env `BUILD_DATE`}}",
+    "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
+    "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
+    "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
+    "vpc_id" : "{{env `AWS_VPC_ID`}}"
   },
-  "builders": [{
-    "type": "amazon-ebs",
-    "region": "us-west-2",
-    "source_ami": "ami-c229c0a2",
-    "ami_regions" : "{{user `build_for`}}",
-    "ami_groups" : "{{user `ami_perms`}}",
-    "instance_type": "m3.2xlarge",
-    "ssh_username": "ec2-user",
-    "ssh_pty" : true,
-    "ami_name": "cfncluster-{{user `cfncluster_version`}}-alinux-hvm-{{user `build_date`}}",
-    "subnet_id": "subnet-c06054b4",
-    "vpc_id": "vpc-0a4c5868",
-    "associate_public_ip_address": true,
-    "enhanced_networking": true,
-    "tags": {
-       "cfncluster_version": "cfncluster-{{user `cfncluster_version`}}",
-       "build_date": "{{user `build_date`}}"
-    },
-    "run_tags": {
-       "cfncluster_version": "cfncluster-{{user `cfncluster_version`}}",
-       "build_date": "{{user `build_date`}}"
-    },
-    "launch_block_device_mappings": [
+  "builders" : [
     {
-      "device_name": "/dev/sdb",
-      "no_device": true
-    },
-    {
-      "device_name": "/dev/sdc",
-      "no_device": true
+      "type" : "amazon-ebs",
+      "region" : "us-east-1",
+      "source_ami" : "ami-6869aa05",
+      "ami_regions" : "{{user `build_for`}}",
+      "ami_groups" : "{{user `ami_perms`}}",
+      "instance_type" : "{{user `instance_type`}}",
+      "ssh_username" : "ec2-user",
+      "ssh_pty" : true,
+      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
+      "subnet_id" : "{{user `subnet_id`}}",
+      "vpc_id" : "{{user `vpc_id`}}",
+      "associate_public_ip_address" : true,
+      "enhanced_networking" : true,
+      "tags" : {
+        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "build_date" : "{{user `build_date`}}"
+      },
+      "run_tags" : {
+        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "build_date" : "{{user `build_date`}}"
+      },
+      "launch_block_device_mappings" : [
+        {
+          "device_name" : "/dev/xvda",
+          "volume_size" : "15",
+          "volume_type" : "gp2",
+          "delete_on_termination" : true
+        },
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ],
+      "ami_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ]
     }
   ],
-    "ami_block_device_mappings": [
-    {
-      "device_name": "/dev/sdb",
-      "no_device": true
-    },
-    {
-      "device_name": "/dev/sdc",
-      "no_device": true
-    }
-  ]
-  }],
   "provisioners" : [
-  {
-      "type": "shell",
-      "inline": [
+    {
+      "type" : "shell",
+      "inline" : [
         "sudo yum -y groupinstall development && sudo yum -y install curl wget"
       ]
-  },
-  {
-      "type": "shell",
-      "inline": [
+    },
+    {
+      "type" : "shell",
+      "inline" : [
         "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef"
       ]
-  },
-  {
-      "type": "file",
-      "source": "{{pwd}}/../vendor/cookbooks",
-      "destination": "/tmp/cookbooks"
-  },
-  {
-      "type": "shell",
-      "inline":  [ "sudo cp -pr /tmp/cookbooks /etc/chef && sudo chown -R root:root /etc/chef" ]
-  },
-  {
-      "type": "shell",
-      "inline": [ "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}" ]
-  },
-  {
-      "type": "shell",
-      "inline": [ "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}}" ]
-  },
-  {
-  "type": "chef-solo",
-  "remote_cookbook_paths": ["/etc/chef/cookbooks"],
-  "skip_install" : "true",
-  "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
-  "run_list" : [ "cfncluster::default" ]
-},
-{
-      "type": "shell",
-      "inline": [ "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys", "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped" ]
-}
-]
+    },
+    {
+      "type" : "file",
+      "source" : "{{pwd}}/../vendor/cookbooks",
+      "destination" : "/tmp/cookbooks"
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo cp -pr /tmp/cookbooks /etc/chef && sudo chown -R root:root /etc/chef"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}}"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "json" : {
+        "cfncluster" : {
+          "nvidia" : {
+            "enabled" : "{{user `nvidia_enabled`}}"
+          }
+        }
+      },
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "run_list" : [
+        "cfncluster::default"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo curl https://s3.amazonaws.com/us-east-1-cfncluster/cookbooks/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/cfncluster-cookbook.tgz"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
+        "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped"
+      ]
+    }
+  ]
 }

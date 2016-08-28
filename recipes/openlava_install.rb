@@ -74,3 +74,19 @@ end
 
 # Install openlava-python bindings
 python_package 'cython'
+
+# Copy required licensing files
+directory "#{node['cfncluster']['license_dir']}/openlava"
+
+bash 'copy license stuff' do
+  user 'root'
+  group 'root'
+  cwd Chef::Config[:file_cache_path]
+  code <<-EOF
+    cd openlava-#{node['cfncluster']['openlava']['version']}
+    cp -v COPYING #{node['cfncluster']['license_dir']}/openlava/COPYING
+    cp -v README #{node['cfncluster']['license_dir']}/openlava/README
+  EOF
+  # TODO: Fix, so it works for upgrade
+  creates "#{node['cfncluster']['license_dir']}/openlava/README"
+end

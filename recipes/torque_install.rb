@@ -18,11 +18,6 @@ include_recipe 'cfncluster::munge_install'
 
 torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster']['torque']['version']}.tar.gz"
 
-# Install packages required to build torque
-node['cfncluster']['torque_packages'].each do |p|
-  package p
-end
-
 # Get Torque tarball
 remote_file torque_tarball do
   source node['cfncluster']['torque']['url']
@@ -40,7 +35,7 @@ bash 'make install' do
     tar xf #{torque_tarball}
     cd torque-#{node['cfncluster']['torque']['version']}
     ./autogen.sh
-    ./configure --prefix=/opt/torque --enable-munge-auth
+    ./configure --prefix=/opt/torque --enable-munge-auth --disable-gui
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
@@ -68,9 +63,27 @@ directory '/var/spool/torque' do
 end
 
 # Modified torque.setup
-cookbook_file 'torque.setup' do
+template 'torque.setup' do
+  source 'torque.setup.erb'
   path '/opt/torque/bin/torque.setup'
   user 'root'
   group 'root'
   mode '0755'
+end
+
+# Copy required licensing files
+directory "#{node['cfncluster']['license_dir']}/torque"
+
+bash 'copy license stuff' do
+  user 'root'
+  group 'root'
+  cwd Chef::Config[:file_cache_path]
+  code <<-EOF
+    cd torque-#{node['cfncluster']['torque']['version']}
+    cp -v PBS_License.txt #{node['cfncluster']['license_dir']}/torque/PBS_License.txt
+    cp -v LICENSE #{node['cfncluster']['license_dir']}/torque/LICENSE
+    cp -v README.md #{node['cfncluster']['license_dir']}/torque/README.md
+  EOF
+  # TODO: Fix, so it works for upgrade
+  creates "#{node['cfncluster']['license_dir']}/torque/README.md"
 end

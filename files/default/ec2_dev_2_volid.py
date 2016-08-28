@@ -32,4 +32,4 @@ devmap = attrib.get('blockDeviceMapping')
 if devmap.has_key(dev):
   print devmap[dev].volume_id
 else:
-  sys.exit(0)
+  sys.exit(1)

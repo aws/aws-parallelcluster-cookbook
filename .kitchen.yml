@@ -4,7 +4,7 @@ driver:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.8.1
+  require_chef_omnibus: 12.13.30
 
 platforms:
   - name: centos-6.6
@@ -16,10 +16,26 @@ suites:
       - recipe[cfncluster::default]
     attributes:
 
+  - name: default_gpu
+    run_list:
+      - recipe[cfncluster::default]
+    attributes:
+      cfncluster:
+        nvidia:
+          enabled: 'yes'
+
   - name: base_install
     run_list:
       - recipe[cfncluster::base_install]
     attributes:
+
+  - name: base_install_gpu
+    run_list:
+      - recipe[cfncluster::base_install]
+    attributes:
+      cfncluster:
+        nvidia:
+          enabled: 'yes'
 
   - name: sge_install
     run_list:

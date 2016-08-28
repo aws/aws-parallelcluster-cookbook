@@ -17,15 +17,21 @@ case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
   include_recipe "yum-epel"
-  execute 'yum-config-manager' do
-    command 'yum-config-manager --enable rhui-REGION-rhel-server-releases-optional'
-    only_if { node['platform'] == 'redhat' }
+  if node['platform'] == 'redhat'
+    execute 'yum-config-manager-rhel' do
+      command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
+    end
   end
 when 'debian'
   include_recipe 'apt'
 end
 include_recipe "build-essential"
 include_recipe "cfncluster::_setup_python"
+
+# Install lots of packages
+node['cfncluster']['base_packages'].each do |p|
+  package p
+end
 
 # Manage SSH via Chef
 include_recipe "openssh"
@@ -41,6 +47,15 @@ directory '/etc/cfncluster'
 directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
+directory node['cfncluster']['license_dir']
+
+# Install LICENSE README
+cookbook_file 'CfnCluster-License-README.txt' do
+  path "#{node['cfncluster']['license_dir']}/CfnCluster-License-README.txt"
+  user 'root'
+  group 'root'
+  mode '0644'
+end
 
 # Install AWSCLI
 python_package 'awscli'
@@ -115,10 +130,16 @@ cookbook_file "jq-1.4" do
   mode "0755"
 end
 
-# Install lots of packages
-node['cfncluster']['base_packages'].each do |p|
-  package p
+# AMI cleanup script
+cookbook_file "ami_cleanup.sh" do
+  path '/usr/local/sbin/ami_cleanup.sh'
+  owner "root"
+  group "root"
+  mode "0755"
 end
 
 # Install Ganglia
 include_recipe "cfncluster::_ganglia_install"
+
+# Install NVIDIA and CUDA
+include_recipe "cfncluster::_nvidia_install"

@@ -17,13 +17,13 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
-      "source_ami" : "ami-4e28b459",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
+      "source_ami" : "ami-b42fb3a3",
       "instance_type" : "{{user `instance_type`}}",
-      "ssh_username" : "centos",
+      "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-ubuntu-1604-lts-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "associate_public_ip_address" : true,
@@ -68,7 +68,15 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo yum -y groupinstall development && sudo yum -y install curl wget"
+        "sudo apt-cache search build-essential",
+        "sudo apt-get clean",
+        "sudo apt-get update"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo apt-get -y install build-essential curl wget"
       ]
     },
     {

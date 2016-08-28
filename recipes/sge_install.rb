@@ -33,7 +33,7 @@ bash 'make install' do
   environment 'SGE_ROOT' => '/opt/sge'
   code <<-EOF
     tar xf #{sge_tarball}
-    cd sge*/source
+    cd sge-#{node['cfncluster']['sge']['version']}/source
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     sh scripts/bootstrap.sh -no-java -no-jni -no-herd
     ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
@@ -72,4 +72,19 @@ user "sgeadmin" do
   home "/home/sgeadmin"
   system true
   shell '/bin/bash'
+end
+
+# Copy required licensing files
+directory "#{node['cfncluster']['license_dir']}/sge"
+
+bash 'copy license stuff' do
+  user 'root'
+  group 'root'
+  cwd Chef::Config[:file_cache_path]
+  code <<-EOF
+    cd sge-#{node['cfncluster']['sge']['version']}/LICENCES
+    cp -v SISSL #{node['cfncluster']['license_dir']}/sge/SISSL
+  EOF
+  # TODO: Fix, so it works for upgrade
+  creates "#{node['cfncluster']['license_dir']}/sge/SISSL"
 end

@@ -60,3 +60,21 @@ cookbook_file '/etc/init.d/slurm' do
   action :create
   only_if { node['platform_family'] == 'debian' }
 end
+
+# Copy required licensing files
+directory "#{node['cfncluster']['license_dir']}/slurm"
+
+bash 'copy license stuff' do
+  user 'root'
+  group 'root'
+  cwd Chef::Config[:file_cache_path]
+  code <<-EOF
+    cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
+    cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
+    cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
+    cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
+    cp -v README.rst #{node['cfncluster']['license_dir']}/slurm/README.rst
+  EOF
+  # TODO: Fix, so it works for upgrade
+  creates "#{node['cfncluster']['license_dir']}/slurm/README.rst"
+end

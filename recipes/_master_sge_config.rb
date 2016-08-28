@@ -30,7 +30,7 @@ end
 
 # Run inst_sge
 execute "inst_sge" do
-  command './inst_sge -m -auto ./sge_inst.conf'
+  command './inst_sge -noremote -m -auto ./sge_inst.conf'
   cwd '/opt/sge'
   not_if { ::File.exist?('/opt/sge/default/common/cluster_name') }
 end
