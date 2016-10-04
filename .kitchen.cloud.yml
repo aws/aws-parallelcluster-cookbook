@@ -306,7 +306,7 @@ platforms:
   - name: centos-6-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-4e28b459
+      image_id: ami-b7c484a0
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
