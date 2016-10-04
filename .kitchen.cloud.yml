@@ -489,7 +489,7 @@ platforms:
   - name: ubuntu-16-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-b42fb3a3
+      image_id: ami-45c18152
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
