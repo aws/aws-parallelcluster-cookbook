@@ -17,7 +17,7 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
-      "source_ami" : "ami-6869aa05",
+      "source_ami" : "ami-c481fad3",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
