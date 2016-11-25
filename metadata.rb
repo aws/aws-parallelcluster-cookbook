@@ -1,7 +1,7 @@
 name 'cfncluster'
 maintainer 'Dougal Ballantyne'
 maintainer_email 'dougalb@amazon.com'
-license 'Amazon Software License'
+license 'Apache License 2.0'
 description 'Installs/Configures cfncluster'
 long_description 'Installs/Configures cfncluster'
 issues_url 'https://github.com/awslabs/cfncluster-cookbook/issues'

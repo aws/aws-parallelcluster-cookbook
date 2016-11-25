@@ -1,4 +1,4 @@
-CfnCluster is licensed under the Amazon Software License (http://aws.amazon.com/asl/).
+CfnCluster is licensed under the Apache License 2.0 (http://aws.amazon.com/apache2.0/).
 
 CfnCluster AMIs ship with the following independent packages, which are offered 
 under separate terms.
