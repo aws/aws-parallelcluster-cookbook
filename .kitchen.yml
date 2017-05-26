@@ -4,7 +4,7 @@ driver:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.13.30
+  require_chef_omnibus: 12.19.36
 
 platforms:
   - name: centos-6.6

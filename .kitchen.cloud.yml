@@ -15,13 +15,13 @@ driver_config:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 12.13.30
+  require_chef_omnibus: 12.19.36
 
 platforms:
-  - name: amazon-linux-2016-09
+  - name: amazon-linux-2017-03
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c481fad3
+      image_id: ami-c58c1dd3
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:

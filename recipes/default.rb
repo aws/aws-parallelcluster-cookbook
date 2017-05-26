@@ -14,6 +14,5 @@
 # limitations under the License.
 
 include_recipe 'cfncluster::sge_install'
-include_recipe 'cfncluster::openlava_install'
 include_recipe 'cfncluster::torque_install'
 include_recipe 'cfncluster::slurm_install'
