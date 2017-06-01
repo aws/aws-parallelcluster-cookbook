@@ -44,8 +44,8 @@ default['cfncluster']['ganglia']['web_version'] = '3.7.2'
 default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/361.42/NVIDIA-Linux-x86_64-361.42.run'
-default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/7.5/Prod/local_installers/cuda_7.5.18_linux.run'
+default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/375.66/NVIDIA-Linux-x86_64-375.66.run'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/8.0/Prod2/local_installers/cuda_8.0.61_375.26_linux-run'
 
 # OpenSSH settings for CfnCluster instances
 default['openssh']['server']['protocol'] = '2'
@@ -77,7 +77,7 @@ when 'rhel'
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail)
+                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel)
     end
     if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
       default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel"
