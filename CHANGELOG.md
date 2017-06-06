@@ -3,6 +3,12 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.3.2
+-----
+  - Relicensed to Apache License 2.0
+  - Updated to Amazon Linux 2017.03
+  - Pulled in latest cookbook dependencies
+
 1.2.0
 -----
 - Dougal Ballantyne <dougalb at amazon dot com>
