@@ -5,7 +5,6 @@ under separate terms.
 
 ganglia
 sge
-openlava
 slurm
 torque
 
