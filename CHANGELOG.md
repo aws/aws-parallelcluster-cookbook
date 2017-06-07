@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the cfncluster cookboo
   - Relicensed to Apache License 2.0
   - Updated to Amazon Linux 2017.03
   - Pulled in latest cookbook dependencies
+  - Removed Openlava support
 
 1.2.0
 -----
