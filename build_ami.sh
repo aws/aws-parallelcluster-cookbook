@@ -8,7 +8,7 @@ public=$3
 build_date=$4
 
 available_os="centos6 centos7 alinux ubuntu1404 ubuntu1604"
-available_regions="eu-west-1,ap-southeast-1,ap-southeast-2,eu-central-1,ap-northeast-1,ap-northeast-2,us-west-2,sa-east-1,us-west-1,ap-south-1"
+available_regions="eu-west-1,eu-west-2,ap-southeast-1,ap-southeast-2,eu-central-1,ap-northeast-1,ap-northeast-2,us-west-2,sa-east-1,us-west-1,us-east-2,ap-south-1,ca-central-1"
 
 if [ "x$os" == "x" ]; then
   echo "Must provide OS to build."
