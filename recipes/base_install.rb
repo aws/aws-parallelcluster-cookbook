@@ -16,7 +16,9 @@
 case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
-  include_recipe "yum-epel"
+  if node['platform_version'].to_i < 7
+    include_recipe "yum-epel"
+  end
   if node['platform'] == 'redhat'
     execute 'yum-config-manager-rhel' do
       command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
