@@ -24,7 +24,7 @@ default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install receipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
-default['cfncluster']['sge']['url'] = 'http://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
+default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.0.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
