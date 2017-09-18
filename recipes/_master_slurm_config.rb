@@ -48,6 +48,15 @@ cookbook_file '/opt/slurm/etc/slurm.csh' do
   mode '0755'
 end
 
+cookbook_file '/etc/systemd/system/slurmctld.service' do
+  source 'slurmctld.service'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  only_if { ::File.exist?('/bin/systemctl') }
+end
+
 service "slurm" do
   supports restart: false
   action [:enable, :start]
