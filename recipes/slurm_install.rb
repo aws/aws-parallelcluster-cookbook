@@ -58,7 +58,7 @@ cookbook_file '/etc/init.d/slurm' do
   group 'root'
   mode '0755'
   action :create
-  only_if { node['platform_family'] == 'debian' }
+  only_if { node['platform_family'] == 'debian' && !(::File.exist?('/bin/systemctl')) }
 end
 
 # Copy required licensing files

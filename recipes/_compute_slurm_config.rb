@@ -22,6 +22,15 @@ mount '/opt/slurm' do
   action [:mount, :enable]
 end
 
+cookbook_file '/etc/systemd/system/slurmd.service' do
+  source 'slurmd.service'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  only_if { ::File.exist?('/bin/systemctl') }
+end
+
 service "slurm" do
   supports restart: false
   action [:enable]
