@@ -27,7 +27,11 @@ function setup_ephemeral_drives () {
   RC=0
   mkdir -p ${cfn_ephemeral_dir} || RC=1
   chmod 1777 ${cfn_ephemeral_dir} || RC=1
-  MAPPING=$(/usr/bin/ec2-metadata -b | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
+  if ls /dev/nvme* >& /dev/null; then
+    MAPPING=$(ls /dev/disk/by-id/ |& grep Instance_Storage | grep nvme)
+  else
+    MAPPING=$(/usr/bin/ec2-metadata -b | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
+  fi
   NUM_DEVS=0
   for m in $MAPPING; do
     umount /dev/${m} >/dev/null 2>&1
