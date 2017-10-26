@@ -1,5 +1,5 @@
 language: ruby
 rvm:
-  - 2.1.5 
+  - 2.2.2
 install: bundle install --without aws
 script: bundle exec rake
