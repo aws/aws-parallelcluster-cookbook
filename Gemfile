@@ -9,8 +9,8 @@ group :style do
 end
 
 group :test do
-  gem 'test-kitchen'
-  gem 'kitchen-vagrant'
+  gem 'test-kitchen', '~> 1.13.2'
+  gem 'kitchen-vagrant', '~> 1.1.0'
   gem 'chefspec', '~> 4.0'
 end
 
