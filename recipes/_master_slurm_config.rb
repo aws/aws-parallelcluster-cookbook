@@ -59,7 +59,7 @@ end
 
 service "slurm" do
   supports restart: false
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 template '/opt/cfncluster/scripts/publish_pending' do

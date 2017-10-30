@@ -48,7 +48,7 @@ end
 # Enable and start trqauthd service
 service "trqauthd" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 # Create the munge key from template
@@ -61,7 +61,7 @@ end
 # Enable munge service
 service "munge" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 cookbook_file "/etc/profile.d/torque.sh" do

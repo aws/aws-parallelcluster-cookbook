@@ -43,5 +43,5 @@ end
 
 service "ec2blkdev" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end

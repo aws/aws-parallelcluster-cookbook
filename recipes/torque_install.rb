@@ -31,7 +31,7 @@ bash 'make install' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
+  code <<-TORQUE
     tar xf #{torque_tarball}
     cd torque-#{node['cfncluster']['torque']['version']}
     ./autogen.sh
@@ -40,7 +40,7 @@ bash 'make install' do
     make -j $CORES
     make install
     cp -vpR contrib /opt/torque
-  EOF
+  TORQUE
   # Only perform if running version doesn't match desired
   not_if "/opt/torque/bin/pbsnodes --version 2>&1 | grep -q #{node['cfncluster']['torque']['version']}"
   creates "/random/path"
@@ -78,12 +78,12 @@ bash 'copy license stuff' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
+  code <<-TORQUEINSTALL
     cd torque-#{node['cfncluster']['torque']['version']}
     cp -v PBS_License.txt #{node['cfncluster']['license_dir']}/torque/PBS_License.txt
     cp -v LICENSE #{node['cfncluster']['license_dir']}/torque/LICENSE
     cp -v README.md #{node['cfncluster']['license_dir']}/torque/README.md
-  EOF
+  TORQUEINSTALL
   # TODO: Fix, so it works for upgrade
   creates "#{node['cfncluster']['license_dir']}/torque/README.md"
 end

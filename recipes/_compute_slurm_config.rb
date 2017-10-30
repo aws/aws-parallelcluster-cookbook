@@ -19,7 +19,7 @@ mount '/opt/slurm' do
   device "#{nfs_master}:/opt/slurm"
   fstype "nfs"
   options 'hard,intr,noatime,vers=3,_netdev'
-  action [:mount, :enable]
+  action %i[mount enable]
 end
 
 cookbook_file '/etc/systemd/system/slurmd.service' do
@@ -33,5 +33,5 @@ end
 
 service "slurm" do
   supports restart: false
-  action [:enable]
+  action %i[enable]
 end
