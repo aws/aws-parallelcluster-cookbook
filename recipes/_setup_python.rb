@@ -19,10 +19,10 @@ when 'rhel'
     package 'python-pip'
     package 'python-devel'
     bash 'update pip and setuptools' do
-      code <<-EOH
+      code <<-PIP
         pip install --upgrade pip==7.1.2
         pip install --upgrade setuptools==18.8
-      EOH
+      PIP
     end
   else
     python_runtime '2' do

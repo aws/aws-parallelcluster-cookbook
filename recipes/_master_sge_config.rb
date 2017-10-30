@@ -45,14 +45,14 @@ end
 
 service "sgemaster.p6444" do
   supports restart: false
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 bash "add_host_as_master" do
-  code <<-EOH
+  code <<-ADDHOST
     . /opt/sge/default/common/settings.sh
     qconf -as #{node['hostname']}
-  EOH
+  ADDHOST
 end
 
 template '/opt/cfncluster/scripts/publish_pending' do

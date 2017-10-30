@@ -34,7 +34,7 @@ bash 'make install' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
+  code <<-MUNGE
     tar xf #{munge_tarball}
     cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
     ./bootstrap
@@ -42,7 +42,7 @@ bash 'make install' do
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
-  EOF
+  MUNGE
   # TODO: Fix, so it works for upgrade
   creates '/usr/bin/munge'
   not_if "/usr/sbin/munged --version | grep -q munge-#{node['cfncluster']['munge']['munge_version']}"

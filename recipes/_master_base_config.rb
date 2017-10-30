@@ -62,10 +62,10 @@ end
 # Add volume to /etc/fstab
 mount node['cfncluster']['cfn_shared_dir'] do
   device dev_path
-  fstype DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] }
+  fstype DelayedEvaluator.new(node['cfncluster']['cfn_volume_fs_type'])
   options "_netdev"
   pass 0
-  action [:mount, :enable]
+  action %i[mount enable]
 end
 
 # Make sure shared directory permissions are correct
@@ -109,17 +109,17 @@ end
 
 service "gmetad" do
   supports restart: true
-  action [:enable, :restart]
+  action %i[enable restart]
 end
 
 service node['cfncluster']['ganglia']['gmond_service'] do
   supports restart: true
-  action [:enable, :restart]
+  action %i[enable restart]
 end
 
 service node['cfncluster']['ganglia']['httpd_service'] do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 # Setup cluster user
@@ -133,25 +133,25 @@ end
 # Setup SSH auth for cluster user
 bash "ssh-keygen" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
-  code <<-EOH
+  code <<-KEYGEN
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
-  EOH
+  KEYGEN
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
 end
 
 bash "copy_and_perms" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
-  code <<-EOH
+  code <<-PERMS
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys2 && chmod 0600 ~/.ssh/authorized_keys2\"
-  EOH
+  PERMS
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
 end
 
 bash "ssh-keyscan" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
-  code <<-EOH
+  code <<-KEYSCAN
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
-  EOH
+  KEYSCAN
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
 end
 

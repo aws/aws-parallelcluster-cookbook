@@ -31,7 +31,7 @@ mount node['cfncluster']['cfn_shared_dir'] do
   device "#{nfs_master}:#{node['cfncluster']['cfn_shared_dir']}"
   fstype 'nfs'
   options 'hard,intr,noatime,vers=3,_netdev'
-  action [:mount, :enable]
+  action %i[mount enable]
 end
 
 # Mount /home over NFS
@@ -39,7 +39,7 @@ mount '/home' do
   device "#{nfs_master}:/home"
   fstype 'nfs'
   options 'hard,intr,noatime,vers=3,_netdev'
-  action [:mount, :enable]
+  action %i[mount enable]
 end
 
 # Configure Ganglia
@@ -52,7 +52,7 @@ end
 
 service node['cfncluster']['ganglia']['gmond_service'] do
   supports restart: true
-  action [:enable, :restart]
+  action %i[enable restart]
 end
 
 # Setup cluster user

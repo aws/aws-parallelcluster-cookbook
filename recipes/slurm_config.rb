@@ -26,7 +26,7 @@ end
 # Enable munge service
 service "munge" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 cookbook_file '/etc/init.d/slurm' do

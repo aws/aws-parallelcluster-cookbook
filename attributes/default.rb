@@ -64,17 +64,17 @@ when 'rhel'
 
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+    default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
-                                                libical-devel postgresql-devel postgresql-server sendmail)
+                                                libical-devel postgresql-devel postgresql-server sendmail]
     if node['platform_version'].to_i >= 7
-      default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+      default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel)
+                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel]
     end
     if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
       default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel"
@@ -87,11 +87,11 @@ when 'rhel'
     end
 
   when 'amazon'
-    default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+    default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel
                                                 libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
-                                                sendmail cmake byacc)
+                                                sendmail cmake byacc]
   end
 
   default['cfncluster']['ganglia']['apache_user'] = 'apache'
@@ -104,11 +104,11 @@ when 'rhel'
 
 when 'debian'
   default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
-  default['cfncluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
+  default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
-                                              apache2 libboost-dev libdb-dev tcsh libssl-dev  libncurses5-dev libpam0g-dev libxt-dev
+                                              apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
-                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev) 
+                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev]
   default['cfncluster']['kernel_devel_pkg']['name'] = "linux-image-extra"
   default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'

@@ -19,7 +19,7 @@ mount '/opt/sge' do
   device "#{nfs_master}:/opt/sge"
   fstype "nfs"
   options 'hard,intr,noatime,vers=3,_netdev'
-  action [:mount, :enable]
+  action %i[mount enable]
 end
 
 # Setup SGE

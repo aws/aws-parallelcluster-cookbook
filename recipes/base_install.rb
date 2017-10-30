@@ -16,9 +16,8 @@
 case node['platform_family']
 when 'rhel'
   include_recipe 'yum'
-  if node['platform_version'].to_i < 7
-    include_recipe "yum-epel"
-  end
+  include_recipe "yum-epel" if node['platform_version'].to_i < 7
+
   if node['platform'] == 'redhat'
     execute 'yum-config-manager-rhel' do
       command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
@@ -65,7 +64,7 @@ python_package 'awscli'
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
 service "rpcbind" do
-  action [:start, :enable]
+  action %i[start enable]
   supports status: true
   only_if { node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon' }
 end
