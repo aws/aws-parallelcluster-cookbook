@@ -18,10 +18,10 @@ provisioner:
   require_chef_omnibus: 12.19.36
 
 platforms:
-  - name: amazon-linux-2017-09
+  - name: amazon-linux-latest
     driver_plugin: ec2
     driver_config:
-      image_id: ami-8c1be5f6
+      image_id: ami-c555e0bf
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
