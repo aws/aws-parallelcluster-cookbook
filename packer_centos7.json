@@ -137,6 +137,12 @@
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
         "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped"
       ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo sed -i -e \"s/\\s*Defaults\\s\\s*requiretty//# Defaults  requiretty/\" /etc/sudoers"
+      ]
     }
   ]
 }
