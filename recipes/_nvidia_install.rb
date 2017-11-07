@@ -18,10 +18,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
   case node['platform_family']
   when 'rhel'
-    yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
-      version node['cfncluster']['kernel_devel_pkg']['version']
-      allow_downgrade true
-    end
+    yum_package node['cfncluster']['kernel_devel_pkg']['name']
   when 'debian'
     package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
     apt_package package
