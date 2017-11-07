@@ -57,9 +57,27 @@ cookbook_file '/etc/systemd/system/slurmctld.service' do
   only_if { ::File.exist?('/bin/systemctl') }
 end
 
-service "slurm" do
-  supports restart: false
-  action %i[enable start]
+if ::File.exist?('/bin/systemctl') 
+  service "slurmctld" do
+    supports restart: false
+    action %i[enable start]
+  end
+end
+
+if  ! ::File.exist?('/bin/systemctl') 
+  service "slurm" do
+    supports restart: false
+    action %i[enable start]
+  end
+end
+
+
+directory '/etc/systemd/system' do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  recursive true
+  action :create
 end
 
 template '/opt/cfncluster/scripts/publish_pending' do

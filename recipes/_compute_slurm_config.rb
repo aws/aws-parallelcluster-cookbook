@@ -31,7 +31,16 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   only_if { ::File.exist?('/bin/systemctl') }
 end
 
-service "slurm" do
-  supports restart: false
-  action %i[enable]
+if ::File.exist?('/bin/systemctl') 
+  service "slurmd" do
+    supports restart: false
+    action %i[enable]
+  end
+end
+
+if  ! ::File.exist?('/bin/systemctl') 
+  service "slurm" do
+    supports restart: false
+    action %i[enable]
+  end
 end
