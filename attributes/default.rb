@@ -91,7 +91,7 @@ when 'rhel'
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel
                                                 libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
-                                                sendmail cmake byacc]
+                                                sendmail cmake byacc libglvnd-devel]
   end
 
   default['cfncluster']['ganglia']['apache_user'] = 'apache'
