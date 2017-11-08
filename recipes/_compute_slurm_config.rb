@@ -28,17 +28,15 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   group 'root'
   mode '0755'
   action :create
-  only_if { ::File.exist?('/bin/systemctl') }
+  only_if { node['init_package'] == 'systemd' }
 end
 
-if ::File.exist?('/bin/systemctl') 
+if node['init_package'] == 'systemd' 
   service "slurmd" do
     supports restart: false
     action %i[enable]
   end
-end
-
-if  ! ::File.exist?('/bin/systemctl') 
+else
   service "slurm" do
     supports restart: false
     action %i[enable]
