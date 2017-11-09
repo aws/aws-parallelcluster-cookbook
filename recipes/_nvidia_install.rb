@@ -16,12 +16,14 @@
 # Only run if node['cfncluster']['nvidia']['enabled'] = 'yes'
 if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
-  case node['platform_family']
-  when 'rhel'
-    yum_package node['cfncluster']['kernel_devel_pkg']['name']
-  when 'debian'
-    package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
-    apt_package package
+  if node['cfncluster']['kernel_devel_pkg']['name'] != ""
+    case node['platform_family']
+    when 'rhel'
+      yum_package node['cfncluster']['kernel_devel_pkg']['name']
+    when 'debian'
+      package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
+      apt_package package
+    end
   end
 
   # Get NVIDIA run file
