@@ -82,7 +82,7 @@ platforms:
   - name: centos-6-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-b7c484a0
+      image_id: ami-2bce7151
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -143,7 +143,7 @@ platforms:
   - name: centos-7-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-9dc3838a
+      image_id: ami-64d06f1e
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
