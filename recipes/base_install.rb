@@ -23,14 +23,8 @@ when 'rhel'
       command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
     end
   end
-  execute 'yum-update' do
-    command "yum -y update"
-  end
 when 'debian'
   include_recipe 'apt'
-  execute 'apt-upgrade' do
-    command "apt-get update && apt-get -y upgrade"
-  end
 end
 include_recipe "build-essential"
 include_recipe "cfncluster::_setup_python"
