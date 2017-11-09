@@ -68,7 +68,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo yum -y update && sudo yum -y groupinstall development && sudo yum -y install curl wget"
+        "sudo yum -y groupinstall development && sudo yum -y install curl wget"
       ]
     },
     {
