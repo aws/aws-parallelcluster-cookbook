@@ -54,12 +54,19 @@ cookbook_file '/etc/systemd/system/slurmctld.service' do
   group 'root'
   mode '0755'
   action :create
-  only_if { ::File.exist?('/bin/systemctl') }
+  only_if { node['init_package'] == 'systemd' }
 end
 
-service "slurm" do
-  supports restart: false
-  action %i[enable start]
+if node['init_package'] == 'systemd' 
+  service "slurmctld" do
+    supports restart: false
+    action %i[enable start]
+  end
+else 
+  service "slurm" do
+    supports restart: false
+    action %i[enable start]
+  end
 end
 
 template '/opt/cfncluster/scripts/publish_pending' do
