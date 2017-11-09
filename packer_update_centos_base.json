@@ -1,0 +1,51 @@
+{
+  "variables" : {
+    "build_date" : "{{env `BUILD_DATE`}}"
+  },
+  "builders" : [
+    {
+      "type": "amazon-ebs",
+      "name" : "CentOS 6",
+      "region": "us-east-1",
+      "source_ami": "ami-b7c484a0",
+      "instance_type": "t2.micro",
+      "ssh_username": "centos",
+      "ssh_pty" : true,
+      "ami_name": "CentOS 6.x x86_64 - minimal with cloud-init - {{user `build_date`}}-0",
+      "associate_public_ip_address" : true,
+      "sriov_support" : true,
+      "ena_support" : true
+    },
+    {
+      "type": "amazon-ebs",
+      "name" : "CentOS 7",
+      "region": "us-east-1",
+      "source_ami": "ami-9dc3838a",
+      "instance_type": "t2.micro",
+      "ssh_username": "centos",
+      "ssh_pty" : true,
+      "ami_name": "CentOS 7.x x86_64 - minimal with cloud-init - {{user `build_date`}}-0",
+      "associate_public_ip_address" : true,
+      "sriov_support" : true,
+      "ena_support" : true
+    }
+  ],
+  "provisioners" : [
+    {
+      "type" : "shell",
+      "expect_disconnect" : true,
+      "inline" : [
+        "sudo yum -y upgrade",
+        "echo Update Complete.  Rebooting.",
+        "sudo reboot ; sleep 30"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo package-cleanup -y --oldkernels --count=1",
+        "sudo rm -rf /tmp/* /var/tmp/* /var/log/* /etc/ssh/ssh_host* /root/* /root/.ssh /root/.history /root/.bash_history ~/.history ~/.bash_history ~/.cache ~/.ssh/authorized_keys ~/amzn-drivers-master"
+      ]
+    }
+  ]
+}
