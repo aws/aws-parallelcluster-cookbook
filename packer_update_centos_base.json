@@ -34,18 +34,11 @@
     {
       "type" : "shell",
       "expect_disconnect" : true,
-      "inline" : [
-        "sudo yum -y upgrade",
-        "echo Update Complete.  Rebooting.",
-        "sudo reboot ; sleep 30"
-      ]
+      "script" : "centos-upgrade-first-stage.sh"
     },
     {
       "type" : "shell",
-      "inline" : [
-        "sudo package-cleanup -y --oldkernels --count=1",
-        "sudo rm -rf /tmp/* /var/tmp/* /var/log/* /etc/ssh/ssh_host* /root/* /root/.ssh /root/.history /root/.bash_history ~/.history ~/.bash_history ~/.cache ~/.ssh/authorized_keys ~/amzn-drivers-master"
-      ]
+      "script" : "centos-upgrade-second-stage.sh"
     }
   ]
 }
