@@ -26,7 +26,23 @@ if test $is_centos6 -eq 1 -a "`/sbin/lsmod | grep ena`" != "" ; then
     exit 1
 fi
 
+set -e
+
+echo "Enabling epel repo"
+sudo yum -y install epel-release
+
 if test $is_centos6 -eq 1; then
+    echo "Enabling elrepo repo"
+    sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+    sudo rpm -Uvh http://www.elrepo.org/elrepo-release-6-8.el6.elrepo.noarch.rpm
+
+    # elrepo by default enables their base repo, but not their kernel
+    # repo.  We want to enable the kernel repo, but not the base repo,
+    # to match what we've done in previous CfnCluster releases.
+    # Rather than some super-ugly sed, just copy an archived repo
+    # file.
+    sudo cp /tmp/centos6.elrepo.repo /etc/yum.repos.d/elrepo.repo
+
     # CfnCluster CentOS AMIs have always shipped with the elrepo -lt
     # kernel as the default, but it appears to have been set as the
     # default by hand in grub.conf.  Make the -lt kernel the default
@@ -34,11 +50,21 @@ if test $is_centos6 -eq 1; then
     # back to the 2.6.32 default kernel.
     echo "Setting kernel-lt as default kernel series"
     sudo /bin/sed -r -i -e 's/^DEFAULTKERNEL=kernel$/DEFAULTKERNEL=kernel-lt/' /etc/sysconfig/kernel || exit $?
+
+    # install the kernel-lt 3.10 kernel to match previous releases
+    echo "Installing kernel-lt kernel"
+    sudo yum -y install kernel-lt kernel-lt-devel
 fi
 
 # Upgrade everything!
 echo "Running upgrades!"
 sudo yum -y upgrade
+
+echo "Installing basic packages"
+sudo yum -y groupinstall development
+sudo yum -y install git yum-utils
+
+set +e
 
 echo "Update Complete.  Rebooting."
 # sleep for 30 seconds to make sure packer doesn't try to run the next

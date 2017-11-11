@@ -12,9 +12,11 @@ else
     is_centos6=0
 fi
 
-if test $is_centos6 -eq 1; then
+if ! sudo modprobe ena; then
+    set -e
+
     # upgrade to latest ENA
-    echo "Upgrading ENA module"
+    echo "Installing ENA module"
 
     echo "Getting ENA source"
     git clone https://github.com/amzn/amzn-drivers.git
@@ -22,13 +24,17 @@ if test $is_centos6 -eq 1; then
     git checkout ena_linux_1.3.0
 
     echo "Building ENA source"
+    BUILD_KERNEL=`uname -r`
     cd kernel/linux/ena
     make
 
     echo "Installing ENA source"
-    sudo cp ena.ko /lib/modules/`uname -r`/weak-updates/.
+    sudo make -C /lib/modules/${BUILD_KERNEL}/build M=`pwd` modules_install
     sudo depmod -a
 
+    set +e
+else
+    echo "Not installing ENA module"
 fi
 
 echo "Cleaning out old kernels"
