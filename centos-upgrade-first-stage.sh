@@ -64,7 +64,17 @@ echo "Installing basic packages"
 sudo yum -y groupinstall development
 sudo yum -y install git yum-utils
 
+if test $is_centos6 -eq 1; then
+    sudo yum -y install python-pip
+    sudo pip install awscli --upgrade
+else
+    sudo yum -y install python-pip python-wheel awscli
+fi
+
 set +e
+
+echo "Disabling SELinux"
+sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 
 echo "Update Complete.  Rebooting."
 # sleep for 30 seconds to make sure packer doesn't try to run the next
