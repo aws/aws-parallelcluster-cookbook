@@ -57,12 +57,12 @@ cookbook_file '/etc/systemd/system/slurmctld.service' do
   only_if { node['init_package'] == 'systemd' }
 end
 
-if node['init_package'] == 'systemd' 
+if node['init_package'] == 'systemd'
   service "slurmctld" do
     supports restart: false
     action %i[enable start]
   end
-else 
+else
   service "slurm" do
     supports restart: false
     action %i[enable start]
