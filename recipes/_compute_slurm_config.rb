@@ -31,7 +31,7 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   only_if { node['init_package'] == 'systemd' }
 end
 
-if node['init_package'] == 'systemd' 
+if node['init_package'] == 'systemd'
   service "slurmd" do
     supports restart: false
     action %i[enable]

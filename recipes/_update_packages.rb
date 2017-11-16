@@ -23,4 +23,3 @@ when 'debian'
     command "apt-get update && apt-get -y upgrade && apt-get autoremove"
   end
 end
-
