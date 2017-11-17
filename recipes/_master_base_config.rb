@@ -33,12 +33,18 @@ execute "attach_volume" do
   creates dev_path
 end
 
+reboot 'ec2_nvme_reboot' do
+  action :reboot_now
+  reason 'Reboot so the NVMe driver can discover the newly attached EBS volume.'
+  subscribes :reboot_now, "execute[attach_volume]", :immediately
+end
+
 # wait for the drive to attach, before making a filesystem
 ruby_block "sleeping_for_volume" do
   block do
     wait_for_block_dev(dev_path)
   end
-  subscribes :run, "execute[attach_volume]", :immediately
+  subscribes :run, "reboot[ec2_nvme_reboot]", :immediately
 end
 
 # Setup disk, will be formatted xfs if empty
