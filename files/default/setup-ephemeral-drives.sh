@@ -28,8 +28,10 @@ function setup_ephemeral_drives () {
   mkdir -p ${cfn_ephemeral_dir} || RC=1
   chmod 1777 ${cfn_ephemeral_dir} || RC=1
   if ls /dev/nvme* >& /dev/null; then
-    MAPPING=$(ls /dev/disk/by-id/ |& grep Instance_Storage | grep nvme)
+    IS_NVME=1
+    MAPPING=$(realpath --relative-to=/dev/ -P  /dev/disk/by-id/nvme*Instance_Storage*)
   else
+    IS_NVME=0
     MAPPING=$(/usr/bin/ec2-metadata -b | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
   fi
   NUM_DEVS=0
@@ -46,11 +48,16 @@ function setup_ephemeral_drives () {
     for d in $DEVS; do
       d=/dev/${d}
       dd if=/dev/zero of=${d} bs=32k count=1 || RC=1
-      parted -s ${d} mklabel msdos || RC=1
+      parted -s ${d} mklabel gpt || RC=1
       parted -s ${d} || RC=1
       parted -s -a optimal ${d} mkpart primary 1MB 100% || RC=1
+      partprobe
       parted -s ${d} set 1 lvm on || RC=1
-      PARTITIONS="${d}1 $PARTITIONS"
+      if [ $IS_NVME -eq 1 ]; then
+        PARTITIONS="${d}p1 $PARTITIONS"
+      else
+        PARTITIONS="${d}1 $PARTITIONS"
+      fi
     done
     if [ $RC -ne 0 ]; then
       error_exit "Failed to detect and/or partition ephemeral devices."
@@ -61,7 +68,7 @@ function setup_ephemeral_drives () {
 
     # Setup LVM
     RC=0
-    pvcreate $PARTITIONS || RC=1
+    pvcreate -y $PARTITIONS || RC=1
     vgcreate vg.01 $PARTITIONS || RC=1
     lvcreate -i $NUM_DEVS -I 64 -l 100%FREE -n lv_ephemeral vg.01 || RC=1
     if [ "$cfn_encrypted_ephemeral" == "true" ]; then
