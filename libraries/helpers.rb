@@ -7,9 +7,19 @@ require 'timeout'
 #
 def wait_for_block_dev(path)
   Timeout.timeout(60) do
-    sleep(1) until ::File.blockdev?(path)
+    until ::File.blockdev?(path)
+      sleep(5)
+      rescan_pci()
+    end
     Chef::Log.debug("device ${path} not ready - sleeping 1s")
   end
+end
+
+#
+# Rescan the PCI bus to discover newly added volumes.
+#
+def rescan_pci()
+  Mixlib::ShellOut.new("echo 1 > /sys/bus/pci/rescan").run_command
 end
 
 #
