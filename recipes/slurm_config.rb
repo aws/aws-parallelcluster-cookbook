@@ -34,6 +34,7 @@ cookbook_file '/etc/init.d/slurm' do
   owner 'root'
   group 'root'
   mode '0755'
+  only_if { node['init_package'] != 'systemd' }
 end
 
 # case node['cfncluster']['cfn_node_type']
