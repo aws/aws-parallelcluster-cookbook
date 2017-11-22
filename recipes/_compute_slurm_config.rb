@@ -26,7 +26,7 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   source 'slurmd.service'
   owner 'root'
   group 'root'
-  mode '0755'
+  mode '0644'
   action :create
   only_if { node['init_package'] == 'systemd' }
 end
