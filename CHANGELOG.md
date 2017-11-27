@@ -15,7 +15,7 @@ Major new features/updates:
   - Upgraded Centos 6 AMI
   - Updated to Nvidia driver 384 
   - Updated to CUDA 9
-  - Updated to latest cfncluster-node 1.4.1 
+  - Updated to latest cfncluster-node 1.4.2 
 
 Bug fixes/minor improvements:
 
