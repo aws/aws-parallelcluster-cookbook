@@ -20,6 +20,6 @@ when 'rhel'
   end
 when 'debian'
   execute 'apt-upgrade' do
-    command "apt-get update && apt-get -y upgrade && apt-get autoremove"
+    command "ucf --purge /boot/grub/menu.lst && apt-get update && UCF_FORCE_CONFFNEW=YES apt-get -yq upgrade && apt-get autoremove"
   end
 end
