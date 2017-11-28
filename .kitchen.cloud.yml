@@ -21,7 +21,7 @@ platforms:
   - name: amazon-linux-latest
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c555e0bf
+      image_id: ami-55ef662f
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
