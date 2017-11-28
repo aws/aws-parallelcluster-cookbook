@@ -19,7 +19,7 @@
       "region" : "us-east-1",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
-      "source_ami" : "ami-7dce6507",
+      "source_ami" : "ami-c29e1cb8",
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
