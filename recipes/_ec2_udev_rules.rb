@@ -20,6 +20,13 @@ cookbook_file 'ec2-volid.rules' do
   mode '0644'
 end
 
+cookbook_file 'cfncluster-ebsnvme-id' do
+  path '/usr/local/sbin/cfncluster-ebsnvme-id'
+  user 'root'
+  group 'root'
+  mode '0744'
+end
+
 cookbook_file 'ec2_dev_2_volid.py' do
   path '/sbin/ec2_dev_2_volid.py'
   user 'root'
@@ -43,5 +50,5 @@ end
 
 service "ec2blkdev" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end

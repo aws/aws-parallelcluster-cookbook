@@ -16,15 +16,14 @@
 # Only run if node['cfncluster']['nvidia']['enabled'] = 'yes'
 if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
-  case node['platform_family']
-  when 'rhel'
-    yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
-      version node['cfncluster']['kernel_devel_pkg']['version']
-      allow_downgrade true
+  if node['cfncluster']['kernel_devel_pkg']['name'] != ""
+    case node['platform_family']
+    when 'rhel'
+      yum_package node['cfncluster']['kernel_devel_pkg']['name']
+    when 'debian'
+      package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
+      apt_package package
     end
-  when 'debian'
-    package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
-    apt_package package
   end
 
   # Get NVIDIA run file
@@ -40,9 +39,9 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     user 'root'
     group 'root'
     cwd '/tmp'
-    code <<-EOF
+    code <<-NVIDIA
     ./nvidia.run --silent --no-network --dkms
-    EOF
+    NVIDIA
     creates '/usr/bin/nvidia-smi'
   end
 
@@ -59,9 +58,9 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     user 'root'
     group 'root'
     cwd '/tmp'
-    code <<-EOF
+    code <<-CUDA
     ./cuda.run --silent --toolkit
-    EOF
+    CUDA
     creates '/usr/local/cuda-7.5'
   end
 

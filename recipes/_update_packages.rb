@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: cfncluster
-# Recipe:: _setup_python
+# Recipe:: _update_packages
 #
-# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,24 +15,11 @@
 
 case node['platform_family']
 when 'rhel'
-  if node['platform_version'].to_i < 7
-    package 'python-pip'
-    package 'python-devel'
-    bash 'update pip and setuptools' do
-      code <<-PIP
-        pip install --upgrade pip==7.1.2
-        pip install --upgrade setuptools==18.8
-      PIP
-    end
-  else
-    python_runtime '2' do
-      version '2'
-      provider :system
-    end
+  execute 'yum-update' do
+    command "yum -y update && package-cleanup -y --oldkernels --count=1"
   end
 when 'debian'
-  python_runtime '2' do
-    version '2'
-    provider :system
+  execute 'apt-upgrade' do
+    command "apt-get update && apt-get -y upgrade && apt-get autoremove"
   end
 end

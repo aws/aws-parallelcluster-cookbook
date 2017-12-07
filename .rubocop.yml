@@ -9,3 +9,6 @@ LineLength:
 
 StringLiterals:
   Enabled: false
+
+Style/NumericLiteralPrefix:
+    EnforcedOctalStyle: zero_only

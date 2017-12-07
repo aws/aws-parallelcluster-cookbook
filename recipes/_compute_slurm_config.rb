@@ -19,10 +19,26 @@ mount '/opt/slurm' do
   device "#{nfs_master}:/opt/slurm"
   fstype "nfs"
   options 'hard,intr,noatime,vers=3,_netdev'
-  action [:mount, :enable]
+  action %i[mount enable]
 end
 
-service "slurm" do
-  supports restart: false
-  action [:enable]
+cookbook_file '/etc/systemd/system/slurmd.service' do
+  source 'slurmd.service'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+  only_if { node['init_package'] == 'systemd' }
+end
+
+if node['init_package'] == 'systemd'
+  service "slurmd" do
+    supports restart: false
+    action %i[enable]
+  end
+else
+  service "slurm" do
+    supports restart: false
+    action %i[enable]
+  end
 end

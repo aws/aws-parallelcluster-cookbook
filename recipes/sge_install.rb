@@ -31,7 +31,7 @@ bash 'make install' do
   group 'root'
   cwd Chef::Config[:file_cache_path]
   environment 'SGE_ROOT' => '/opt/sge'
-  code <<-EOF
+  code <<-SGE
     tar xf #{sge_tarball}
     cd sge-#{node['cfncluster']['sge']['version']}/source
     CORES=$(grep processor /proc/cpuinfo | wc -l)
@@ -43,7 +43,7 @@ bash 'make install' do
     echo instremote=false >> distinst.private
     gearch=`dist/util/arch`
     echo 'y'| scripts/distinst -local -allall ${gearch}
-  EOF
+  SGE
   # TODO: Fix, so it works for upgrade
   creates '/opt/sge/bin/lx-amd64/sge_qmaster'
 end
@@ -81,10 +81,10 @@ bash 'copy license stuff' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
+  code <<-SGELICENSE
     cd sge-#{node['cfncluster']['sge']['version']}/LICENCES
     cp -v SISSL #{node['cfncluster']['license_dir']}/sge/SISSL
-  EOF
+  SGELICENSE
   # TODO: Fix, so it works for upgrade
   creates "#{node['cfncluster']['license_dir']}/sge/SISSL"
 end

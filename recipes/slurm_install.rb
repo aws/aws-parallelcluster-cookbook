@@ -31,14 +31,14 @@ bash 'make install' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
+  code <<-SLURM
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
     ./configure --prefix=/opt/slurm
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
-  EOF
+  SLURM
   # TODO: Fix, so it works for upgrade
   creates '/opt/slurm/bin/srun'
 end
@@ -58,7 +58,7 @@ cookbook_file '/etc/init.d/slurm' do
   group 'root'
   mode '0755'
   action :create
-  only_if { node['platform_family'] == 'debian' }
+  only_if { node['platform_family'] == 'debian' && !node['init_package'] == 'systemd' }
 end
 
 # Copy required licensing files
@@ -68,13 +68,13 @@ bash 'copy license stuff' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
-  code <<-EOF
+  code <<-SLURMLICENSE
     cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
     cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
     cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
     cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
     cp -v README.rst #{node['cfncluster']['license_dir']}/slurm/README.rst
-  EOF
+  SLURMLICENSE
   # TODO: Fix, so it works for upgrade
   creates "#{node['cfncluster']['license_dir']}/slurm/README.rst"
 end

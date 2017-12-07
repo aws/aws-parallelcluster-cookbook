@@ -18,10 +18,10 @@ provisioner:
   require_chef_omnibus: 12.19.36
 
 platforms:
-  - name: amazon-linux-2017-03
+  - name: amazon-linux-latest
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c58c1dd3
+      image_id: ami-55ef662f
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
@@ -79,234 +79,10 @@ platforms:
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: marketplace-centos-6-updates
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-1c221e76
-      block_device_mappings:
-        - device_name: /dev/xvdba
-          virtual_name: ephemeral0
-        - device_name: /dev/xvdbb
-          virtual_name: ephemeral1
-        - device_name: /dev/xvdbc
-          virtual_name: ephemeral2
-        - device_name: /dev/xvdbd
-          virtual_name: ephemeral3
-        - device_name: /dev/xvdbe
-          virtual_name: ephemeral4
-        - device_name: /dev/xvdbf
-          virtual_name: ephemeral5
-        - device_name: /dev/xvdbg
-          virtual_name: ephemeral6
-        - device_name: /dev/xvdbh
-          virtual_name: ephemeral7
-        - device_name: /dev/xvdbi
-          virtual_name: ephemeral8
-        - device_name: /dev/xvdbj
-          virtual_name: ephemeral9
-        - device_name: /dev/xvdbk
-          virtual_name: ephemeral10
-        - device_name: /dev/xvdbl
-          virtual_name: ephemeral11
-        - device_name: /dev/xvdbm
-          virtual_name: ephemeral12
-        - device_name: /dev/xvdbn
-          virtual_name: ephemeral13
-        - device_name: /dev/xvdbo
-          virtual_name: ephemeral14
-        - device_name: /dev/xvdbp
-          virtual_name: ephemeral15
-        - device_name: /dev/xvdbq
-          virtual_name: ephemeral16
-        - device_name: /dev/xvdbr
-          virtual_name: ephemeral17
-        - device_name: /dev/xvdbs
-          virtual_name: ephemeral18
-        - device_name: /dev/xvdbt
-          virtual_name: ephemeral19
-        - device_name: /dev/xvdbu
-          virtual_name: ephemeral20
-        - device_name: /dev/xvdbv
-          virtual_name: ephemeral21
-        - device_name: /dev/xvdbw
-          virtual_name: ephemeral22
-        - device_name: /dev/xvdbx
-          virtual_name: ephemeral23
-    transport:
-      username: centos
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: marketplace-centos-7-updates
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-6d1c2007
-      block_device_mappings:
-        - device_name: /dev/xvdba
-          virtual_name: ephemeral0
-        - device_name: /dev/xvdbb
-          virtual_name: ephemeral1
-        - device_name: /dev/xvdbc
-          virtual_name: ephemeral2
-        - device_name: /dev/xvdbd
-          virtual_name: ephemeral3
-        - device_name: /dev/xvdbe
-          virtual_name: ephemeral4
-        - device_name: /dev/xvdbf
-          virtual_name: ephemeral5
-        - device_name: /dev/xvdbg
-          virtual_name: ephemeral6
-        - device_name: /dev/xvdbh
-          virtual_name: ephemeral7
-        - device_name: /dev/xvdbi
-          virtual_name: ephemeral8
-        - device_name: /dev/xvdbj
-          virtual_name: ephemeral9
-        - device_name: /dev/xvdbk
-          virtual_name: ephemeral10
-        - device_name: /dev/xvdbl
-          virtual_name: ephemeral11
-        - device_name: /dev/xvdbm
-          virtual_name: ephemeral12
-        - device_name: /dev/xvdbn
-          virtual_name: ephemeral13
-        - device_name: /dev/xvdbo
-          virtual_name: ephemeral14
-        - device_name: /dev/xvdbp
-          virtual_name: ephemeral15
-        - device_name: /dev/xvdbq
-          virtual_name: ephemeral16
-        - device_name: /dev/xvdbr
-          virtual_name: ephemeral17
-        - device_name: /dev/xvdbs
-          virtual_name: ephemeral18
-        - device_name: /dev/xvdbt
-          virtual_name: ephemeral19
-        - device_name: /dev/xvdbu
-          virtual_name: ephemeral20
-        - device_name: /dev/xvdbv
-          virtual_name: ephemeral21
-        - device_name: /dev/xvdbw
-          virtual_name: ephemeral22
-        - device_name: /dev/xvdbx
-          virtual_name: ephemeral23
-    transport:
-      username: centos
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: rhel-6-7-HVM-GA-20160219
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-f37b4b99
-      block_device_mappings:
-        - device_name: /dev/xvdba
-          virtual_name: ephemeral0
-        - device_name: /dev/xvdbb
-          virtual_name: ephemeral1
-        - device_name: /dev/xvdbc
-          virtual_name: ephemeral2
-        - device_name: /dev/xvdbd
-          virtual_name: ephemeral3
-        - device_name: /dev/xvdbe
-          virtual_name: ephemeral4
-        - device_name: /dev/xvdbf
-          virtual_name: ephemeral5
-        - device_name: /dev/xvdbg
-          virtual_name: ephemeral6
-        - device_name: /dev/xvdbh
-          virtual_name: ephemeral7
-        - device_name: /dev/xvdbi
-          virtual_name: ephemeral8
-        - device_name: /dev/xvdbj
-          virtual_name: ephemeral9
-        - device_name: /dev/xvdbk
-          virtual_name: ephemeral10
-        - device_name: /dev/xvdbl
-          virtual_name: ephemeral11
-        - device_name: /dev/xvdbm
-          virtual_name: ephemeral12
-        - device_name: /dev/xvdbn
-          virtual_name: ephemeral13
-        - device_name: /dev/xvdbo
-          virtual_name: ephemeral14
-        - device_name: /dev/xvdbp
-          virtual_name: ephemeral15
-        - device_name: /dev/xvdbq
-          virtual_name: ephemeral16
-        - device_name: /dev/xvdbr
-          virtual_name: ephemeral17
-        - device_name: /dev/xvdbs
-          virtual_name: ephemeral18
-        - device_name: /dev/xvdbt
-          virtual_name: ephemeral19
-        - device_name: /dev/xvdbu
-          virtual_name: ephemeral20
-        - device_name: /dev/xvdbv
-          virtual_name: ephemeral21
-        - device_name: /dev/xvdbw
-          virtual_name: ephemeral22
-        - device_name: /dev/xvdbx
-          virtual_name: ephemeral23
-    transport:
-      username: ec2-user
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: rhel-7-2-HVM-GA
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-2051294a
-      block_device_mappings:
-        - device_name: /dev/xvdba
-          virtual_name: ephemeral0
-        - device_name: /dev/xvdbb
-          virtual_name: ephemeral1
-        - device_name: /dev/xvdbc
-          virtual_name: ephemeral2
-        - device_name: /dev/xvdbd
-          virtual_name: ephemeral3
-        - device_name: /dev/xvdbe
-          virtual_name: ephemeral4
-        - device_name: /dev/xvdbf
-          virtual_name: ephemeral5
-        - device_name: /dev/xvdbg
-          virtual_name: ephemeral6
-        - device_name: /dev/xvdbh
-          virtual_name: ephemeral7
-        - device_name: /dev/xvdbi
-          virtual_name: ephemeral8
-        - device_name: /dev/xvdbj
-          virtual_name: ephemeral9
-        - device_name: /dev/xvdbk
-          virtual_name: ephemeral10
-        - device_name: /dev/xvdbl
-          virtual_name: ephemeral11
-        - device_name: /dev/xvdbm
-          virtual_name: ephemeral12
-        - device_name: /dev/xvdbn
-          virtual_name: ephemeral13
-        - device_name: /dev/xvdbo
-          virtual_name: ephemeral14
-        - device_name: /dev/xvdbp
-          virtual_name: ephemeral15
-        - device_name: /dev/xvdbq
-          virtual_name: ephemeral16
-        - device_name: /dev/xvdbr
-          virtual_name: ephemeral17
-        - device_name: /dev/xvdbs
-          virtual_name: ephemeral18
-        - device_name: /dev/xvdbt
-          virtual_name: ephemeral19
-        - device_name: /dev/xvdbu
-          virtual_name: ephemeral20
-        - device_name: /dev/xvdbv
-          virtual_name: ephemeral21
-        - device_name: /dev/xvdbw
-          virtual_name: ephemeral22
-        - device_name: /dev/xvdbx
-          virtual_name: ephemeral23
-    transport:
-      username: ec2-user
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
   - name: centos-6-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-b7c484a0
+      image_id: ami-9ff841e5
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -367,7 +143,7 @@ platforms:
   - name: centos-7-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-9dc3838a
+      image_id: ami-01098c7b
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -428,7 +204,7 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-2ac4843d
+      image_id: ami-c29e1cb8
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -489,7 +265,7 @@ platforms:
   - name: ubuntu-16-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-45c18152
+      image_id: ami-aa2ea6d0
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -546,116 +322,4 @@ platforms:
           virtual_name: ephemeral23
     transport:
       username: ubuntu
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: sles11
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-3bf32750
-      block_device_mappings:
-        - device_name: /dev/xvdba
-          virtual_name: ephemeral0
-        - device_name: /dev/xvdbb
-          virtual_name: ephemeral1
-        - device_name: /dev/xvdbc
-          virtual_name: ephemeral2
-        - device_name: /dev/xvdbd
-          virtual_name: ephemeral3
-        - device_name: /dev/xvdbe
-          virtual_name: ephemeral4
-        - device_name: /dev/xvdbf
-          virtual_name: ephemeral5
-        - device_name: /dev/xvdbg
-          virtual_name: ephemeral6
-        - device_name: /dev/xvdbh
-          virtual_name: ephemeral7
-        - device_name: /dev/xvdbi
-          virtual_name: ephemeral8
-        - device_name: /dev/xvdbj
-          virtual_name: ephemeral9
-        - device_name: /dev/xvdbk
-          virtual_name: ephemeral10
-        - device_name: /dev/xvdbl
-          virtual_name: ephemeral11
-        - device_name: /dev/xvdbm
-          virtual_name: ephemeral12
-        - device_name: /dev/xvdbn
-          virtual_name: ephemeral13
-        - device_name: /dev/xvdbo
-          virtual_name: ephemeral14
-        - device_name: /dev/xvdbp
-          virtual_name: ephemeral15
-        - device_name: /dev/xvdbq
-          virtual_name: ephemeral16
-        - device_name: /dev/xvdbr
-          virtual_name: ephemeral17
-        - device_name: /dev/xvdbs
-          virtual_name: ephemeral18
-        - device_name: /dev/xvdbt
-          virtual_name: ephemeral19
-        - device_name: /dev/xvdbu
-          virtual_name: ephemeral20
-        - device_name: /dev/xvdbv
-          virtual_name: ephemeral21
-        - device_name: /dev/xvdbw
-          virtual_name: ephemeral22
-        - device_name: /dev/xvdbx
-          virtual_name: ephemeral23
-    transport:
-      username: ec2-user
-      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: sles12
-    driver_plugin: ec2
-    driver_config:
-      image_id: ami-b7b4fedd
-      block_device_mappings:
-        - device_name: /dev/xvdba
-          virtual_name: ephemeral0
-        - device_name: /dev/xvdbb
-          virtual_name: ephemeral1
-        - device_name: /dev/xvdbc
-          virtual_name: ephemeral2
-        - device_name: /dev/xvdbd
-          virtual_name: ephemeral3
-        - device_name: /dev/xvdbe
-          virtual_name: ephemeral4
-        - device_name: /dev/xvdbf
-          virtual_name: ephemeral5
-        - device_name: /dev/xvdbg
-          virtual_name: ephemeral6
-        - device_name: /dev/xvdbh
-          virtual_name: ephemeral7
-        - device_name: /dev/xvdbi
-          virtual_name: ephemeral8
-        - device_name: /dev/xvdbj
-          virtual_name: ephemeral9
-        - device_name: /dev/xvdbk
-          virtual_name: ephemeral10
-        - device_name: /dev/xvdbl
-          virtual_name: ephemeral11
-        - device_name: /dev/xvdbm
-          virtual_name: ephemeral12
-        - device_name: /dev/xvdbn
-          virtual_name: ephemeral13
-        - device_name: /dev/xvdbo
-          virtual_name: ephemeral14
-        - device_name: /dev/xvdbp
-          virtual_name: ephemeral15
-        - device_name: /dev/xvdbq
-          virtual_name: ephemeral16
-        - device_name: /dev/xvdbr
-          virtual_name: ephemeral17
-        - device_name: /dev/xvdbs
-          virtual_name: ephemeral18
-        - device_name: /dev/xvdbt
-          virtual_name: ephemeral19
-        - device_name: /dev/xvdbu
-          virtual_name: ephemeral20
-        - device_name: /dev/xvdbv
-          virtual_name: ephemeral21
-        - device_name: /dev/xvdbw
-          virtual_name: ephemeral22
-        - device_name: /dev/xvdbx
-          virtual_name: ephemeral23
-    transport:
-      username: root
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>

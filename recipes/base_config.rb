@@ -55,5 +55,5 @@ end
 # Restart supervisord
 service "supervisord" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end

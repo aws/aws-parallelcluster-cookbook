@@ -19,7 +19,7 @@
       "region" : "us-east-1",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
-      "source_ami" : "ami-45c18152",
+      "source_ami" : "ami-aa2ea6d0",
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
@@ -27,7 +27,8 @@
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "associate_public_ip_address" : true,
-      "enhanced_networking" : true,
+      "sriov_support" : true,
+      "ena_support" : true,
       "tags" : {
         "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"
@@ -144,6 +145,13 @@
       "inline" : [
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
         "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX=\"(.*)\"/GRUB_CMDLINE_LINUX=\"net.ifnames=0 biosdevname=0\"/' /etc/default/grub",
+        "sudo grub-mkconfig -o /boot/grub/grub.cfg"
       ]
     }
   ]

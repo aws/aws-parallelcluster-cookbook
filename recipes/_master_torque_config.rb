@@ -15,10 +15,10 @@
 
 # Run torque.setup
 bash "run-torque-setup" do
-  code <<-EOH
+  code <<-SETUPTORQUE
     . /etc/profile.d/torque.sh
     ./torque.setup root
-  EOH
+  SETUPTORQUE
   cwd '/opt/torque/bin'
 end
 
@@ -34,13 +34,13 @@ end
 # Enable and start munge service
 service "munge" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 # Enable and start pbs_server service
 service "pbs_server" do
   supports restart: true
-  action [:enable, :restart]
+  action %i[enable restart]
 end
 
 # Copy pbs_sched service script
@@ -55,7 +55,7 @@ end
 # Enable and start pbs_sched service
 service "pbs_sched" do
   supports restart: true
-  action [:enable, :start]
+  action %i[enable start]
 end
 
 # Add publish_pending to cron

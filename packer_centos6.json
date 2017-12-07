@@ -17,7 +17,7 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
-      "source_ami" : "ami-b7c484a0",
+      "source_ami" : "ami-9ff841e5",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
@@ -27,7 +27,8 @@
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "associate_public_ip_address" : true,
-      "enhanced_networking" : true,
+      "sriov_support" : true,
+      "ena_support" : true,
       "tags" : {
         "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"

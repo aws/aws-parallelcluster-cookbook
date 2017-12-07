@@ -40,7 +40,7 @@ when "redhat", "centos", "amazon", "scientific" # ~FC024
     user 'root'
     group 'root'
     cwd Chef::Config[:file_cache_path]
-    code <<-EOF
+    code <<-GANGLIA
       tar xf #{ganglia_tarball}
       cd monitor-core-#{node['cfncluster']['ganglia']['version']}
       ./bootstrap
@@ -51,7 +51,7 @@ when "redhat", "centos", "amazon", "scientific" # ~FC024
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
       make install
-    EOF
+    GANGLIA
     # TODO: Fix, so it works for upgrade
     creates '/usr/sbin/gmetad'
   end
@@ -93,11 +93,11 @@ when "redhat", "centos", "amazon", "scientific" # ~FC024
     user 'root'
     group 'root'
     cwd Chef::Config[:file_cache_path]
-    code <<-EOF
+    code <<-GANGLIAWEB
       tar xf #{ganglia_web_tarball}
       cd ganglia-web-#{node['cfncluster']['ganglia']['web_version']}
       make install APACHE_USER=#{node['cfncluster']['ganglia']['apache_user']}
-    EOF
+    GANGLIAWEB
     # TODO: Fix, so it works for upgrade
     creates '/usr/share/ganglia-webfrontend/index.php'
   end
@@ -124,10 +124,10 @@ when "redhat", "centos", "amazon", "scientific" # ~FC024
     user 'root'
     group 'root'
     cwd Chef::Config[:file_cache_path]
-    code <<-EOF
+    code <<-GANGLIALICENSE
       cd monitor-core-#{node['cfncluster']['ganglia']['version']}
       cp -v COPYING #{node['cfncluster']['license_dir']}/ganglia/COPYING
-    EOF
+    GANGLIALICENSE
     # TODO: Fix, so it works for upgrade
     creates "#{node['cfncluster']['license_dir']}/ganglia/COPYING"
   end
