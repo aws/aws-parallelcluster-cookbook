@@ -69,14 +69,6 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo apt-cache search build-essential",
-        "sudo apt-get clean",
-        "sudo apt-get update"
-      ]
-    },
-    {
-      "type" : "shell",
-      "inline" : [
         "sudo apt-get -y install build-essential curl wget"
       ]
     },
@@ -124,6 +116,7 @@
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
+        "cfncluster::_update_packages",
         "cfncluster::default"
       ]
     },
