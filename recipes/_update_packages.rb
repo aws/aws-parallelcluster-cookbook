@@ -19,7 +19,10 @@ when 'rhel'
     command "yum -y update && package-cleanup -y --oldkernels --count=1"
   end
 when 'debian'
+  execute 'apt-update' do
+    command "apt-get update"
+  end
   execute 'apt-upgrade' do
-    command "apt-get update && apt-get -y upgrade && apt-get autoremove"
+    command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade && apt-get autoremove"
   end
 end
