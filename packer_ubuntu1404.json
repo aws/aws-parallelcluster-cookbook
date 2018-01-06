@@ -69,6 +69,14 @@
     {
       "type" : "shell",
       "inline" : [
+        "sudo apt-cache search build-essential",
+        "sudo apt-get clean",
+        "sudo apt-get update"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
         "sudo apt-get -y install build-essential curl wget"
       ]
     },
