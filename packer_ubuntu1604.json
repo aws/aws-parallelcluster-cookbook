@@ -111,6 +111,25 @@
     },
     {
       "type" : "chef-solo",
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "run_list" : [
+        "cfncluster::_update_packages"
+      ]
+    },
+    {
+      "type" : "shell",
+      "expect_disconnect" : "true",
+      "inline" : [
+        "sudo reboot"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "pause_before": "2m",
       "json" : {
         "cfncluster" : {
           "nvidia" : {
@@ -124,7 +143,6 @@
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
-        "cfncluster::_update_packages",
         "cfncluster::default"
       ]
     },
