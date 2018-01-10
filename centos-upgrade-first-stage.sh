@@ -80,8 +80,12 @@ sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/co
 # install) and turning off ifnames, because a bunch of the scripts expect
 # to find eth0.  Should handle the eth naming better, but that's todo.
 echo "Updating Grub command line"
-sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX="(.*)"/GRUB_CMDLINE_LINUX="\1 net.ifnames=0 rd.driver.blacklist=nouveau nouveau.modeset=0"/' /etc/default/grub
-sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+if test $is_centos6 -eq 1; then
+    sudo grubby --update-kernel=ALL --args="net.ifnames=0 rd.driver.blacklist=nouveau nouveau.modeset=0"
+else
+    sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX="(.*)"/GRUB_CMDLINE_LINUX="\1 net.ifnames=0 rd.driver.blacklist=nouveau nouveau.modeset=0"/' /etc/default/grub
+    sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+fi
 
 echo "Update Complete.  Rebooting."
 # sleep for 30 seconds to make sure packer doesn't try to run the next
