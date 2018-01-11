@@ -17,7 +17,7 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
-      "source_ami" : "ami-3b712841",
+      "source_ami" : "ami-44f1aa3e",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
@@ -103,25 +103,6 @@
     },
     {
       "type" : "chef-solo",
-      "remote_cookbook_paths" : [
-        "/etc/chef/cookbooks"
-      ],
-      "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
-      "run_list" : [
-        "cfncluster::_update_packages"
-      ]
-    },
-    {
-      "type" : "shell",
-      "expect_disconnect" : "true",
-      "inline" : [
-        "sudo reboot"
-      ]
-    },
-    {
-      "type" : "chef-solo",
-      "pause_before": "2m",
       "json" : {
         "cfncluster" : {
           "nvidia" : {
