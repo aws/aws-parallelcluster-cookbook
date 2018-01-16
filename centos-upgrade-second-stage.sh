@@ -40,6 +40,11 @@ fi
 echo "Cleaning out old kernels"
 sudo package-cleanup -y --oldkernels --count=1
 
+if test $is_centos6 -eq 1; then
+    sudo yum install -y cloud-init cloud-utils dracut-modules-growroot cloud-utils-growpart
+    rpm -qa kernel-lt | sed 's/^kernel-lt-//'  | xargs -I {} sudo dracut -f /boot/initramfs-{}.img {}
+fi
+
 echo "Cleaning up filesystem"
 sudo rm -rf /tmp/* /var/tmp/* /var/log/* /etc/ssh/ssh_host*
 sudo rm -rf /root/* /root/.ssh /root/.history /root/.bash_history

@@ -3,6 +3,13 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.4.1
+-----
+
+Major new features/updates:
+
+  - Updated to latest cfncluster-node 1.4.3
+
 1.4.0
 -----
 
