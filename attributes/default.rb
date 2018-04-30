@@ -76,15 +76,9 @@ when 'rhel'
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel]
     end
-    if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
-      default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel"
-    end
-    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
-      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
-    end
-    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
-      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
-    end
+    default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
 
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
