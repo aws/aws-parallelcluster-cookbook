@@ -16,6 +16,13 @@ driver_config:
 provisioner:
   name: chef_zero
   require_chef_omnibus: 12.19.36
+  retry_on_exit_code:
+    - 35 # 35 is the exit code signaling that the node is rebooting
+  max_retries: 1
+  wait_for_retry: 120
+  client_rb:
+    exit_status: :enabled # Opt-in to the standardized exit codes
+    client_fork: false  # Forked instances don't return the real exit code
 
 platforms:
   - name: amazon-linux-latest
