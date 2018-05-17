@@ -108,6 +108,13 @@
       ],
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "json" : {
+        "cfncluster" : {
+          "update_packages" : {
+            "reboot" : "false"
+          }
+        }
+      },
       "run_list" : [
         "cfncluster::_update_packages"
       ]

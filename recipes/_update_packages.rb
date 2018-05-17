@@ -26,3 +26,41 @@ when 'debian'
     command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade && apt-get autoremove"
   end
 end
+
+if tagged?('rebooted')
+  if node['platform'] == 'ubuntu'
+    if node['platform_version'] == "16.04"
+      file '/etc/tmpfiles.d/tmp.conf' do
+        action :delete
+        only_if { File.exist? '/etc/tmpfiles.d/tmp.conf' }
+      end
+    end
+    if node['platform_version'] == "14.04"
+      execute 'sed' do
+        command "sed -i s/TMPTIME=1/#TMPTIME=0/g /etc/default/rcS"
+      end
+    end
+  end
+end
+
+if (not tagged?('rebooted')) && node['cfncluster']['update_packages']['reboot'] == 'true'
+  if node['platform'] == 'ubuntu'
+    if node['platform_version'] == "16.04"
+      file '/etc/tmpfiles.d/tmp.conf' do
+        content 'd /tmp 1777 root root 1d'
+      end
+    end
+    if node['platform_version'] == "14.04"
+      execute 'sed' do
+        command "sed -i s/#TMPTIME=0/TMPTIME=1/g /etc/default/rcS"
+      end
+    end
+  end
+
+  tag('rebooted')
+  reboot 'now' do
+    action :reboot_now
+    delay_mins 1
+    reason 'Cannot continue Chef run without a reboot after packages update.'
+  end
+end
