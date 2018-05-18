@@ -27,23 +27,10 @@ when 'debian'
   end
 end
 
-if tagged?('rebooted')
-  if node['platform'] == 'ubuntu'
-    if node['platform_version'] == "16.04"
-      file '/etc/tmpfiles.d/tmp.conf' do
-        action :delete
-        only_if { File.exist? '/etc/tmpfiles.d/tmp.conf' }
-      end
-    end
-    if node['platform_version'] == "14.04"
-      execute 'sed' do
-        command "sed -i s/TMPTIME=1/#TMPTIME=0/g /etc/default/rcS"
-      end
-    end
-  end
-end
-
+# Reboot after packages update
 if !tagged?('rebooted') && node['cfncluster']['update_packages']['reboot'] == 'true'
+  # On Ubuntu, the /tmp folder is erased by default after a reboot and its lifecycle is managed
+  # by different tools, depending on the Ubuntu version
   if node['platform'] == 'ubuntu'
     if node['platform_version'] == "16.04"
       file '/etc/tmpfiles.d/tmp.conf' do
@@ -62,5 +49,22 @@ if !tagged?('rebooted') && node['cfncluster']['update_packages']['reboot'] == 't
     action :reboot_now
     delay_mins 1
     reason 'Cannot continue Chef run without a reboot after packages update.'
+  end
+end
+
+# Remove the configuration to keep the /tmp folder on Ubuntu after a reboot
+if tagged?('rebooted')
+  if node['platform'] == 'ubuntu'
+    if node['platform_version'] == "16.04"
+      file '/etc/tmpfiles.d/tmp.conf' do
+        action :delete
+        only_if { File.exist? '/etc/tmpfiles.d/tmp.conf' }
+      end
+    end
+    if node['platform_version'] == "14.04"
+      execute 'sed' do
+        command "sed -i s/TMPTIME=1/#TMPTIME=0/g /etc/default/rcS"
+      end
+    end
   end
 end
