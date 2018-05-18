@@ -43,7 +43,7 @@ if tagged?('rebooted')
   end
 end
 
-if (not tagged?('rebooted')) && node['cfncluster']['update_packages']['reboot'] == 'true'
+if !tagged?('rebooted') && node['cfncluster']['update_packages']['reboot'] == 'true'
   if node['platform'] == 'ubuntu'
     if node['platform_version'] == "16.04"
       file '/etc/tmpfiles.d/tmp.conf' do
