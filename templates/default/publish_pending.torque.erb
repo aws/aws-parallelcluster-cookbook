@@ -23,7 +23,7 @@ if [ "$cfn_proxy" != "NONE" ]; then
 fi
 
 . /etc/profile.d/torque.sh
-pending=$(qstat -i -t | tail -n+6 | awk '{total = total+ $7}END{print total}')
+pending=$(qstat -i -t | tail -n+6 | awk '{total = total+ $6}END{print total}')
 
 if [ "${pending}x" == "x" ]; then
 pending=0
