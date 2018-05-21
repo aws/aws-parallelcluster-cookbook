@@ -4,6 +4,7 @@ import sys
 import parted
 import urllib2
 import boto.ec2
+import time
 
 # Get volumeId
 try:
@@ -34,3 +35,19 @@ conn = boto.ec2.connect_to_region(region)
 # Attach the volume
 dev = availableDevices[0].replace('xvd', 'sd')
 conn.attach_volume(volumeId,instanceId,dev)
+
+# Poll for volume to attach
+vol = conn.get_all_volumes([volumeId])[0]
+x = 0
+while vol.attachment_state() != "attached":
+    if x == 36:
+        print "Volume %s failed to mount in 180 seconds." % (volumeId)
+        exit(1)
+    if vol.attachment_state() in ["busy" or "detached"]:
+        print "Volume %s in bad state %s" % (volumeId, vol.attachment_state())
+        exit(1)
+    print "Volume %s in state %s ... waiting to be 'attached'" % (volumeId, vol.attachment_state())
+    time.sleep(5)
+    vol = conn.get_all_volumes([volumeId])[0]
+    x += 1
+
