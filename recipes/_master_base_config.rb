@@ -62,7 +62,7 @@ end
 # Add volume to /etc/fstab
 mount node['cfncluster']['cfn_shared_dir'] do
   device dev_path
-  fstype(DelayedEvaluator.new) { node['cfncluster']['cfn_volume_fs_type'] }
+  fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
   options "_netdev"
   pass 0
   action %i[mount enable]
