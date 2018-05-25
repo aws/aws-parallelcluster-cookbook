@@ -97,9 +97,15 @@ remote_file '/usr/bin/ec2-metadata' do
   mode '0755'
 end
 
-# Install cfncluster-nodes packages
-python_package "cfncluster-node" do
-  version node['cfncluster']['cfncluster-node-version']
+if !node['cfncluster']['custom_cfncluster_node'].nil? && !node['cfncluster']['custom_cfncluster_node'].empty?
+  execute "install cfncluster-node" do
+    command "sudo pip uninstall --yes cfncluster-node && cd /tmp && curl -v -L -o /tmp/cfncluster-node.tgz #{node['cfncluster']['custom_cfncluster_node']} && tar -xzf /tmp/cfncluster-node.tgz && cd /tmp/cfncluster-node-* && sudo /usr/bin/python setup.py install"
+  end
+else
+  # Install cfncluster-nodes packages
+  python_package "cfncluster-node" do
+    version node['cfncluster']['cfncluster-node-version']
+  end
 end
 
 # Supervisord
