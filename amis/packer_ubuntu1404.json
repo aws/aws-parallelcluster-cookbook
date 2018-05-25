@@ -17,13 +17,13 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
-      "source_ami" : "ami-55ef662f",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
+      "source_ami" : "ami-c29e1cb8",
       "instance_type" : "{{user `instance_type`}}",
-      "ssh_username" : "ec2-user",
+      "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
+      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-ubuntu-1404-lts-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "associate_public_ip_address" : true,
@@ -39,7 +39,7 @@
       },
       "launch_block_device_mappings" : [
         {
-          "device_name" : "/dev/xvda",
+          "device_name" : "/dev/sda1",
           "volume_size" : "15",
           "volume_type" : "gp2",
           "delete_on_termination" : true
@@ -69,7 +69,15 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo yum -y groupinstall development && sudo yum -y install curl wget"
+        "sudo apt-cache search build-essential",
+        "sudo apt-get clean",
+        "sudo apt-get update"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo apt-get -y install build-essential curl wget"
       ]
     },
     {
@@ -80,7 +88,7 @@
     },
     {
       "type" : "file",
-      "source" : "{{pwd}}/../vendor/cookbooks",
+      "source" : "{{template_dir}}/../../vendor/cookbooks",
       "destination" : "/tmp/cookbooks"
     },
     {
@@ -141,6 +149,13 @@
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "cfncluster::default"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip",
+        "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip"
       ]
     },
     {
