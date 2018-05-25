@@ -9,6 +9,7 @@ build_date=$4
 
 available_os="centos6 centos7 alinux ubuntu1404 ubuntu1604"
 available_regions="eu-west-1,eu-west-2,ap-southeast-1,ap-southeast-2,eu-central-1,ap-northeast-1,ap-northeast-2,us-west-2,sa-east-1,us-west-1,us-east-2,ap-south-1,ca-central-1"
+cwd="$(dirname $0)"
 
 if [ "x$os" == "x" ]; then
   echo "Must provide OS to build."
@@ -32,8 +33,8 @@ fi
 
 RC=0
 
-rm -rf ../vendor/cookbooks || RC=1
-berks vendor ../vendor/cookbooks || RC=1
+rm -rf ${cwd}/../../vendor/cookbooks || RC=1
+berks vendor ${cwd}/../../vendor/cookbooks --berksfile ${cwd}/../Berksfile || RC=1
 if [ "x$build_date" == "x" ]; then
   export BUILD_DATE=`date +%Y%m%d%H%M`
 else
@@ -43,28 +44,28 @@ fi
 case $os in
 all)
   for x in $available_os; do
-    packer build -machine-readable -var-file=packer_variables.json packer_$x.json
+    packer build -machine-readable -var-file=${cwd}/packer_variables.json ${cwd}/packer_$x.json
     RC=$?
   done
   ;;
 centos6)
-  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
+  packer build -machine-readable -var-file=${cwd}/packer_variables.json ${cwd}/packer_$os.json
   RC=$?
   ;;
 centos7)
-  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
+  packer build -machine-readable -var-file=${cwd}/packer_variables.json ${cwd}/packer_$os.json
   RC=$?
   ;;
 alinux)
-  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
+  packer build -machine-readable -var-file=${cwd}/packer_variables.json ${cwd}/packer_$os.json
   RC=$?
   ;;
 ubuntu1404)
-  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
+  packer build -machine-readable -var-file=${cwd}/packer_variables.json ${cwd}/packer_$os.json
   RC=$?
   ;;
 ubuntu1604)
-  packer build -machine-readable -var-file=packer_variables.json packer_$os.json
+  packer build -machine-readable -var-file=${cwd}/packer_variables.json ${cwd}/packer_$os.json
   RC=$?
   ;;
 *)
