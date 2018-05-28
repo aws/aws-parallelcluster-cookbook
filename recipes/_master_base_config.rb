@@ -38,6 +38,7 @@ ruby_block "sleeping_for_volume" do
   block do
     wait_for_block_dev(dev_path)
   end
+  action :nothing
   subscribes :run, "execute[attach_volume]", :immediately
 end
 
@@ -47,6 +48,7 @@ ruby_block "setup_disk" do
     fs_type = setup_disk(dev_path)
     node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
   end
+  action :nothing
   subscribes :run, "ruby_block[sleeping_for_volume]", :immediately
 end
 
