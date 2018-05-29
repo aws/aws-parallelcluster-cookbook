@@ -32,7 +32,7 @@ case "$1" in
    do_reread
    ;;
  *)
-   echo "Usage: tomcat {start|stop|restart}" >&2
+   echo "Usage: $0 {start|stop|restart}" >&2
    exit 3
    ;;
 esac

@@ -8,10 +8,11 @@ require 'timeout'
 def wait_for_block_dev(path)
   Timeout.timeout(60) do
     until ::File.blockdev?(path)
+      Chef::Log.info("device #{path} not ready - sleeping 5s")
       sleep(5)
       rescan_pci
     end
-    Chef::Log.debug("device ${path} not ready - sleeping 1s")
+    Chef::Log.info("device #{path} is ready")
   end
 end
 
