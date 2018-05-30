@@ -8,6 +8,7 @@
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}",
+    "vendor_path" : "{{env `VENDOR_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
@@ -80,7 +81,7 @@
     },
     {
       "type" : "file",
-      "source" : "{{template_dir}}/../../vendor/cookbooks",
+      "source" : "{{user `vendor_path`}}",
       "destination" : "/tmp/cookbooks"
     },
     {
