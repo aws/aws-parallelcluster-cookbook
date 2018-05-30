@@ -61,14 +61,6 @@ end
 # Install AWSCLI
 python_package 'awscli'
 
-# TODO: update nfs receipes to stop, disable nfs services
-include_recipe "nfs"
-service "rpcbind" do
-  action %i[start enable]
-  supports status: true
-  only_if { node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon' }
-end
-include_recipe "nfs::server"
 include_recipe "nfs::server4"
 
 # Put configure-pat.sh onto the host
