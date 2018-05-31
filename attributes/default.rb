@@ -44,8 +44,8 @@ default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/390.48/NVIDIA-Linux-x86_64-390.48.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run'
 
-# Update Packages Reboot
-default['cfncluster']['update_packages']['reboot'] = 'true'
+# Reboot after default_pre recipe
+default['cfncluster']['default_pre_reboot'] = 'true'
 
 # OpenSSH settings for CfnCluster instances
 default['openssh']['server']['protocol'] = '2'

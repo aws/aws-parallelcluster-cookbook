@@ -1,8 +1,8 @@
 #
 # Cookbook Name:: cfncluster
-# Recipe:: _update_packages
+# Recipe:: _setup_network
 #
-# Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -13,16 +13,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['platform_family']
-when 'rhel'
-  execute 'yum-update' do
-    command "yum -y update && package-cleanup -y --oldkernels --count=1"
-  end
-when 'debian'
-  execute 'apt-update' do
-    command "apt-get update"
-  end
-  execute 'apt-upgrade' do
-    command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade && apt-get autoremove"
+if node['platform'] == 'ubuntu'
+  if node['platform_version'] == "16.04"
+    execute 'sed' do
+      command "/bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX=\"(.*)\"/GRUB_CMDLINE_LINUX=\"net.ifnames=0 biosdevname=0\"/' /etc/default/grub"
+    end
+    execute 'grub_mkconfig' do
+      command "grub-mkconfig -o /boot/grub/grub.cfg"
+    end
   end
 end
