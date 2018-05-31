@@ -118,13 +118,11 @@
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "json" : {
         "cfncluster" : {
-          "update_packages" : {
-            "reboot" : "false"
-          }
+          "default_pre_reboot" : "false"
         }
       },
       "run_list" : [
-        "cfncluster::_update_packages"
+        "cfncluster::_default_pre"
       ]
     },
     {
