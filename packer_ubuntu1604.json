@@ -118,13 +118,11 @@
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "json" : {
         "cfncluster" : {
-          "update_packages" : {
-            "reboot" : "false"
-          }
+          "default_pre_reboot" : "false"
         }
       },
       "run_list" : [
-        "cfncluster::_update_packages"
+        "cfncluster::_default_pre"
       ]
     },
     {
@@ -171,13 +169,6 @@
       "inline" : [
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
         "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped"
-      ]
-    },
-    {
-      "type" : "shell",
-      "inline" : [
-        "sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX=\"(.*)\"/GRUB_CMDLINE_LINUX=\"net.ifnames=0 biosdevname=0\"/' /etc/default/grub",
-        "sudo grub-mkconfig -o /boot/grub/grub.cfg"
       ]
     }
   ]
