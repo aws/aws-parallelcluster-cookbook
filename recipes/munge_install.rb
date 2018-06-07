@@ -58,7 +58,7 @@ end
 
 # Make sure the munge user exists
 user 'munge' do
-  supports manage_home: false
+  manage_home false
   comment 'munge user'
   system true
   shell '/sbin/nologin'

@@ -18,7 +18,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
   if node['cfncluster']['kernel_devel_pkg']['name'] != ""
     case node['platform_family']
-    when 'rhel'
+    when 'rhel', 'amazon'
       yum_package node['cfncluster']['kernel_devel_pkg']['name']
     when 'debian'
       package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"

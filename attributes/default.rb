@@ -60,10 +60,10 @@ default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # Platform defaults
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'amazon'
 
   default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
-  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp!('.x86_64')
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
 
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024

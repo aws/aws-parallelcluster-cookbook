@@ -67,7 +67,7 @@ end
 
 # Setup sgeadmin user
 user "sgeadmin" do
-  supports manage_home: true
+  manage_home true
   comment 'sgeadmin user'
   home "/home/sgeadmin"
   system true
