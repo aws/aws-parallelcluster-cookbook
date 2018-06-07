@@ -14,7 +14,7 @@
 # limitations under the License.
 
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'amazon'
   include_recipe 'yum'
   include_recipe "yum-epel" if node['platform_version'].to_i < 7
 
