@@ -27,6 +27,7 @@
       "ami_name" : "cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
       "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true,
