@@ -45,8 +45,11 @@ if [ "${public}" == "public" ]; then
   export AMI_PERMS="all"
 fi
 
+# NOTE: the AMI is always built in us-east-1 and then copied to the specified regions
 if [ "${region}" == "all" ]; then
   export BUILD_FOR=${available_regions}
+else
+  export BUILD_FOR=${region}
 fi
 
 RC=0
