@@ -59,7 +59,10 @@ cookbook_file 'CfnCluster-License-README.txt' do
 end
 
 # Install AWSCLI
-python_package 'awscli'
+python_package 'awscli' do
+  action :upgrade
+  version '1.15.40'
+end
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
