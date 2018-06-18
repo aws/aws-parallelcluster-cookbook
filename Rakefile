@@ -5,9 +5,11 @@ require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:chefspec)
 
 # foodcritic rake task
+# Rule FC061 was removed to avoid strict release number format x.y.z
+# and to allow alpha/beta/rc versions
 desc 'Foodcritic linter'
 task :foodcritic do
-  sh 'foodcritic -f correctness .'
+  sh 'foodcritic -f correctness . --tags ~FC061'
 end
 
 # rubocop rake task
