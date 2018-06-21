@@ -19,7 +19,7 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.4.3'
+default['cfncluster']['cfncluster-node-version'] = '1.5.1'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install receipes
 # Gridengine software
@@ -41,8 +41,11 @@ default['cfncluster']['ganglia']['web_version'] = '3.7.2'
 default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_url'] = 'http://us.download.nvidia.com/XFree86/Linux-x86_64/384.98/NVIDIA-Linux-x86_64-384.98.run'
+default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/390.48/NVIDIA-Linux-x86_64-390.48.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run'
+
+# Reboot after default_pre recipe
+default['cfncluster']['default_pre_reboot'] = 'true'
 
 # OpenSSH settings for CfnCluster instances
 default['openssh']['server']['protocol'] = '2'
@@ -76,15 +79,9 @@ when 'rhel'
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel]
     end
-    if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
-      default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel"
-    end
-    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
-      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional'
-    end
-    if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
-      default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
-    end
+    default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
+    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
 
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
@@ -156,3 +153,4 @@ default['cfncluster']['cfn_shared_dir'] = '/shared'
 default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_master'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
+default['cfncluster']['custom_node_package'] = nil

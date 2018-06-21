@@ -13,13 +13,13 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[cfncluster::_update_packages]
+      - recipe[cfncluster::_default_pre]
       - recipe[cfncluster::default]
     attributes:
 
   - name: default_gpu
     run_list:
-      - recipe[cfncluster::_update_packages]
+      - recipe[cfncluster::_default_pre]
       - recipe[cfncluster::default]
     attributes:
       cfncluster:

@@ -3,6 +3,20 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.5.1
+-----
+
+Major new features/updates: 
+
+  - Added parameter to specify custom cfncluster-node package
+
+Bug fixes/minor improvements:
+
+  - Fixed poise-python dependecy issue
+  - Poll on EBS Volume attachment status
+  - Added more info on failure of pre and post install files
+  - Fixed SLURM cron job to publish pending metric
+
 1.4.1
 -----
 

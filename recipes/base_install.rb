@@ -59,7 +59,10 @@ cookbook_file 'CfnCluster-License-README.txt' do
 end
 
 # Install AWSCLI
-python_package 'awscli'
+python_package 'awscli' do
+  action :upgrade
+  version '1.15.40'
+end
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
@@ -97,9 +100,20 @@ remote_file '/usr/bin/ec2-metadata' do
   mode '0755'
 end
 
-# Install cfncluster-nodes packages
-python_package "cfncluster-node" do
-  version node['cfncluster']['cfncluster-node-version']
+if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
+  execute "install cfncluster-node" do
+    command "sudo pip uninstall --yes cfncluster-node &&" \
+      "cd /tmp &&" \
+      "curl -v -L -o /tmp/cfncluster-node.tgz #{node['cfncluster']['custom_node_package']} &&" \
+      "tar -xzf /tmp/cfncluster-node.tgz &&" \
+      "cd /tmp/cfncluster-node-* &&" \
+      "sudo /usr/bin/python setup.py install"
+  end
+else
+  # Install cfncluster-nodes packages
+  python_package "cfncluster-node" do
+    version node['cfncluster']['cfncluster-node-version']
+  end
 end
 
 # Supervisord

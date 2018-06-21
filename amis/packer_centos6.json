@@ -8,6 +8,7 @@
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}",
+    "vendor_path" : "{{env `VENDOR_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
@@ -17,15 +18,16 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
-      "source_ami" : "ami-55ef662f",
+      "source_ami" : "ami-44f1aa3e",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
-      "ssh_username" : "ec2-user",
+      "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
+      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
       "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true,
@@ -39,7 +41,7 @@
       },
       "launch_block_device_mappings" : [
         {
-          "device_name" : "/dev/xvda",
+          "device_name" : "/dev/sda1",
           "volume_size" : "15",
           "volume_type" : "gp2",
           "delete_on_termination" : true
@@ -80,7 +82,7 @@
     },
     {
       "type" : "file",
-      "source" : "{{pwd}}/../vendor/cookbooks",
+      "source" : "{{user `vendor_path`}}",
       "destination" : "/tmp/cookbooks"
     },
     {
@@ -103,25 +105,6 @@
     },
     {
       "type" : "chef-solo",
-      "remote_cookbook_paths" : [
-        "/etc/chef/cookbooks"
-      ],
-      "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
-      "run_list" : [
-        "cfncluster::_update_packages"
-      ]
-    },
-    {
-      "type" : "shell",
-      "expect_disconnect" : "true",
-      "inline" : [
-        "sudo reboot"
-      ]
-    },
-    {
-      "type" : "chef-solo",
-      "pause_before": "2m",
       "json" : {
         "cfncluster" : {
           "nvidia" : {
@@ -136,6 +119,13 @@
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "cfncluster::default"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip",
+        "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip"
       ]
     },
     {

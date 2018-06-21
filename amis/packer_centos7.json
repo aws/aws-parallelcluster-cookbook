@@ -8,6 +8,7 @@
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}",
+    "vendor_path" : "{{env `VENDOR_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
@@ -17,15 +18,16 @@
     {
       "type" : "amazon-ebs",
       "region" : "us-east-1",
+      "source_ami" : "ami-06fea57c",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
-      "source_ami" : "ami-aa2ea6d0",
       "instance_type" : "{{user `instance_type`}}",
-      "ssh_username" : "ubuntu",
+      "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-ubuntu-1604-lts-hvm-{{user `build_date`}}",
+      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-centos7-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
       "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true,
@@ -69,15 +71,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo apt-cache search build-essential",
-        "sudo apt-get clean",
-        "sudo apt-get update"
-      ]
-    },
-    {
-      "type" : "shell",
-      "inline" : [
-        "sudo apt-get -y install build-essential curl wget"
+        "sudo yum -y groupinstall development && sudo yum -y install curl wget"
       ]
     },
     {
@@ -88,7 +82,7 @@
     },
     {
       "type" : "file",
-      "source" : "{{pwd}}/../vendor/cookbooks",
+      "source" : "{{user `vendor_path`}}",
       "destination" : "/tmp/cookbooks"
     },
     {
@@ -116,8 +110,13 @@
       ],
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "json" : {
+        "cfncluster" : {
+          "default_pre_reboot" : "false"
+        }
+      },
       "run_list" : [
-        "cfncluster::_update_packages"
+        "cfncluster::_default_pre"
       ]
     },
     {
@@ -169,8 +168,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX=\"(.*)\"/GRUB_CMDLINE_LINUX=\"net.ifnames=0 biosdevname=0\"/' /etc/default/grub",
-        "sudo grub-mkconfig -o /boot/grub/grub.cfg"
+        "sudo sed -i -e \"s/\\s*Defaults\\s\\s*requiretty//# Defaults  requiretty/\" /etc/sudoers"
       ]
     }
   ]
