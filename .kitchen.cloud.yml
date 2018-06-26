@@ -28,7 +28,7 @@ platforms:
   - name: amazon-linux-latest
     driver_plugin: ec2
     driver_config:
-      image_id: ami-55ef662f
+      image_id: <%= ENV['ALINUX_IMAGE_ID'] || "ami-55ef662f" %>
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
@@ -89,7 +89,7 @@ platforms:
   - name: centos-6-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-44f1aa3e
+      image_id: <%= ENV['CENTOS6_IMAGE_ID'] || "ami-44f1aa3e" %>
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -150,7 +150,7 @@ platforms:
   - name: centos-7-minimal
     driver_plugin: ec2
     driver_config:
-      image_id: ami-06fea57c
+      image_id: <%= ENV['CENTOS7_IMAGE_ID'] || "ami-06fea57c" %>
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -211,7 +211,7 @@ platforms:
   - name: ubuntu-14-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-c29e1cb8
+      image_id: <%= ENV['UBUNTU1404_IMAGE_ID'] || "ami-c29e1cb8" %>
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
@@ -272,7 +272,7 @@ platforms:
   - name: ubuntu-16-04-lts
     driver_plugin: ec2
     driver_config:
-      image_id: ami-aa2ea6d0
+      image_id: <%= ENV['UBUNTU1604_IMAGE_ID'] || "ami-aa2ea6d0" %>
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
