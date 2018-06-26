@@ -76,14 +76,12 @@ set +e
 echo "Disabling SELinux"
 sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config
 
-# Updating GRUB to blacklist the neuvou driver (so the nVidia driver can
-# install) and turning off ifnames, because a bunch of the scripts expect
-# to find eth0.  Should handle the eth naming better, but that's todo.
+# Updating GRUB to blacklist the nouveau driver (so the nVidia driver can install)
 echo "Updating Grub command line"
 if test $is_centos6 -eq 1; then
-    sudo grubby --update-kernel=ALL --args="net.ifnames=0 rd.driver.blacklist=nouveau nouveau.modeset=0"
+    sudo grubby --update-kernel=ALL --args="rd.driver.blacklist=nouveau nouveau.modeset=0"
 else
-    sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX="(.*)"/GRUB_CMDLINE_LINUX="\1 net.ifnames=0 rd.driver.blacklist=nouveau nouveau.modeset=0"/' /etc/default/grub
+    sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX="(.*)"/GRUB_CMDLINE_LINUX="\1 rd.driver.blacklist=nouveau nouveau.modeset=0"/' /etc/default/grub
     sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
 
