@@ -3,5 +3,5 @@
   "cfncluster_cookbook_version": "1.5.1",
   "chef_version": "14.2.0",
   "ridley_version": "5.1.1",
-  "berkshelf_version": "7.0.2"
+  "berkshelf_version": "7.0.4"
 }
