@@ -18,7 +18,7 @@ except IndexError:
 if 'nvme' in dev:
     # For newer instances which expose EBS volumes as NVMe devices, translate the
     # device name so boto can discover it.
-    output = os.popen('sudo /usr/local/sbin/cfncluster-ebsnvme-id -v /dev/nvme1').read().split(":")[1].strip()
+    output = os.popen('sudo /usr/local/sbin/cfncluster-ebsnvme-id -v /dev/' + dev).read().split(":")[1].strip()
     print(output)
     sys.exit(0)
 else:
