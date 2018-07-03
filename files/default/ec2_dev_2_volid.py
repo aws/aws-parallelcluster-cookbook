@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-import boto.ec2
 import urllib2
 import sys
 import os
 import syslog
 import time
+import boto3
 
 # Get dev
 try:
@@ -33,20 +33,21 @@ region = urllib2.urlopen("http://169.254.169.254/latest/meta-data/placement/avai
 region = region[:-1]
 
 # Connect to AWS using boto
-conn = boto.ec2.connect_to_region(region)
+ec2 = boto3.client('ec2', region_name=region)
 
 # Poll for blockdevicemapping
-attrib = conn.get_instance_attribute(instanceId, 'blockDeviceMapping')
-devmap = attrib.get('blockDeviceMapping')
+devices = ec2.describe_instance_attribute(InstanceId=instanceId, Attribute='blockDeviceMapping').get('BlockDeviceMappings')
+devmap = dict((d.get('DeviceName'), d) for d in devices)
 x = 0
 while not devmap.has_key(dev):
     if x == 36:
         syslog.syslog("Dev %s did not appears in 180 seconds." % dev)
         sys.exit(1)
-    syslog.syslog("Looking for dev %s into devmap %s" % (dev, devmap))
+    syslog.syslog("Looking for dev %s in devmap %s" % (dev, devmap))
     time.sleep(5)
-    attrib = conn.get_instance_attribute(instanceId, 'blockDeviceMapping')
-    devmap = attrib.get('blockDeviceMapping')
+    devices = ec2.describe_instance_attribute(InstanceId=instanceId, Attribute='blockDeviceMapping').get('BlockDeviceMappings')
+    devmap = dict((d.get('DeviceName'), d) for d in devices)
     x += 1
 
-print(devmap[dev].volume_id)
+volumeId = devmap.get(dev).get('Ebs').get('VolumeId')
+print(volumeId)

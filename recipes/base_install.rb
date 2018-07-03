@@ -64,6 +64,9 @@ python_package 'awscli' do
   version '1.15.40'
 end
 
+# Install boto3
+python_package 'boto3'
+
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
 service "rpcbind" do
