@@ -62,3 +62,7 @@ def get_vpc_ipv4_cidr_block(eth0_mac)
 
   vpc_ipv4_cidr_block
 end
+
+def pip_install_package(package, version)
+  Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
+end
