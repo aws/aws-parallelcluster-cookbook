@@ -1,0 +1,5 @@
+[jobwatcher]
+region = <%= node['cfncluster']['cfn_region'] %>
+asg_name = <%= node['cfncluster']['asg_name'] %>
+scheduler = <%= node['cfncluster']['cfn_scheduler'] %>
+compute_instance_type = <%= node['cfncluster']['compute_instance_type'] %>

@@ -68,14 +68,3 @@ else
     action %i[enable start]
   end
 end
-
-template '/opt/cfncluster/scripts/publish_pending' do
-  source 'publish_pending.slurm.erb'
-  owner 'root'
-  group 'root'
-  mode '0744'
-end
-
-cron 'publish_pending' do
-  command '/opt/cfncluster/scripts/publish_pending'
-end

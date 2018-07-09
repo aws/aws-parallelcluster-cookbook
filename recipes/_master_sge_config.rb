@@ -54,14 +54,3 @@ bash "add_host_as_master" do
     qconf -as #{node['hostname']}
   ADDHOST
 end
-
-template '/opt/cfncluster/scripts/publish_pending' do
-  source 'publish_pending.sge.erb'
-  owner 'root'
-  group 'root'
-  mode '0744'
-end
-
-cron 'publish_pending' do
-  command '/opt/cfncluster/scripts/publish_pending'
-end

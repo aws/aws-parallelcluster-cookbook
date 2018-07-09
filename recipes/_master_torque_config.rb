@@ -57,15 +57,3 @@ service "pbs_sched" do
   supports restart: true
   action %i[enable start]
 end
-
-# Add publish_pending to cron
-template '/opt/cfncluster/scripts/publish_pending' do
-  source 'publish_pending.torque.erb'
-  owner 'root'
-  group 'root'
-  mode '0744'
-end
-
-cron 'publish_pending' do
-  command '/opt/cfncluster/scripts/publish_pending'
-end
