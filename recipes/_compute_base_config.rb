@@ -57,7 +57,7 @@ end
 
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
-  supports manage_home: false
+  manage_home false
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'

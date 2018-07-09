@@ -12,7 +12,8 @@
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
-    "vpc_id" : "{{env `AWS_VPC_ID`}}"
+    "vpc_id" : "{{env `AWS_VPC_ID`}}",
+    "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}"
   },
   "builders" : [
     {
@@ -24,9 +25,10 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ec2-user",
       "ssh_pty" : true,
-      "ami_name" : "cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix`}}cfncluster-{{user `cfncluster_version`}}-amzn-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
       "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true,

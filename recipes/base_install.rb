@@ -14,7 +14,7 @@
 # limitations under the License.
 
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'amazon'
   include_recipe 'yum'
   include_recipe "yum-epel" if node['platform_version'].to_i < 7
 
@@ -59,7 +59,10 @@ cookbook_file 'CfnCluster-License-README.txt' do
 end
 
 # Install AWSCLI
-python_package 'awscli'
+python_package 'awscli' do
+  action :upgrade
+  version '1.15.40'
+end
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
@@ -107,9 +110,18 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       "sudo /usr/bin/python setup.py install"
   end
 else
-  # Install cfncluster-nodes packages
-  python_package "cfncluster-node" do
-    version node['cfncluster']['cfncluster-node-version']
+  # Install cfncluster-node package
+  if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+    # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
+    ruby_block "pip_install_cfncluster_node" do
+      block do
+        pip_install_package('cfncluster-node', node['cfncluster']['cfncluster-node-version'])
+      end
+    end
+  else
+    python_package "cfncluster-node" do
+      version node['cfncluster']['cfncluster-node-version']
+    end
   end
 end
 

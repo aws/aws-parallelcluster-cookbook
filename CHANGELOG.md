@@ -3,7 +3,7 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
-1.5.0
+1.5.1
 -----
 
 Major new features/updates: 

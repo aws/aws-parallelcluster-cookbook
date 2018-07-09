@@ -14,7 +14,7 @@
 # limitations under the License.
 
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'amazon'
   execute 'yum-update' do
     command "yum -y update && package-cleanup -y --oldkernels --count=1"
   end

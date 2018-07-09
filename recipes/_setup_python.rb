@@ -14,7 +14,7 @@
 # limitations under the License.
 
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'amazon'
   if node['platform_version'].to_i < 7
     package 'python-pip'
     package 'python-devel'
