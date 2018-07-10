@@ -34,10 +34,11 @@ ec2 = boto3.client('ec2', region_name=region)
 
 # Attach the volume
 dev = availableDevices[0].replace('xvd', 'sd')
-ec2.attach_volume(VolumeId=volumeId, InstanceId=instanceId, Device=dev)
+response = ec2.attach_volume(VolumeId=volumeId, InstanceId=instanceId, Device=dev)
 
 # Poll for volume to attach
-state = ec2.describe_volumes(VolumeIds=[volumeId]).get('Volumes')[0].get('Attachments')[0].get('State')
+state = response.get("State")
+
 x = 0
 while state != "attached":
     if x == 36:
