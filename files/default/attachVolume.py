@@ -49,5 +49,8 @@ while state != "attached":
         exit(1)
     print "Volume %s in state %s ... waiting to be 'attached'" % (volumeId, state)
     time.sleep(5)
-    state = ec2.describe_volumes(VolumeIds=[volumeId]).get('Volumes')[0].get('Attachments')[0].get('State')
     x += 1
+    try:
+      state = ec2.describe_volumes(VolumeIds=[volumeId]).get('Volumes')[0].get('Attachments')[0].get('State')
+    except IndexError as e:
+      continue
