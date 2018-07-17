@@ -62,7 +62,8 @@ SchedulerType=sched/backfill
 #SchedulerAuth=
 #SchedulerPort=
 #SchedulerRootFilter=
-SelectType=select/linear
+SelectType=select/cons_res
+SelectTypeParameters=CR_CPU
 
 # Disable fastscheduling to fall back on resource
 # metrics reported by compute nodes, slower scheduling
