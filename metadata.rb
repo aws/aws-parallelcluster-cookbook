@@ -6,7 +6,7 @@ description 'Installs/Configures cfncluster'
 long_description 'Installs/Configures cfncluster'
 issues_url 'https://github.com/awslabs/cfncluster-cookbook/issues'
 source_url 'https://github.com/awslabs/cfncluster-cookbook'
-version '1.5.1'
+version '1.5.2'
 
 depends 'build-essential', '~> 8.1.1'
 depends 'poise-python', '~> 1.7.0'

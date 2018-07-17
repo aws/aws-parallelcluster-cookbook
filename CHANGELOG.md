@@ -3,10 +3,16 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.5.2
+-----
+
+- Fix bug that prevented c5d/m5d instances from working
+- Set CPU as a consumable resource in slurm config
+
 1.5.1
 -----
 
-Major new features/updates: 
+Major new features/updates:
 
   - Added parameter to specify custom cfncluster-node package
 
@@ -27,21 +33,21 @@ Major new features/updates:
 1.4.0
 -----
 
-Major new features/updates: 
+Major new features/updates:
 
   - Updated to Amazon Linux 2017.09.1
   - Applied patches to Ubuntu 16.04
   - Applied patches to Ubuntu 14.04
   - Updated to Centos 7.4
   - Upgraded Centos 6 AMI
-  - Updated to Nvidia driver 384 
+  - Updated to Nvidia driver 384
   - Updated to CUDA 9
-  - Updated to latest cfncluster-node 1.4.2 
+  - Updated to latest cfncluster-node 1.4.2
 
 Bug fixes/minor improvements:
 
   - Added support for NVMe-based instance store
-  - Fixed ganglia plotting issue on ubuntu 
+  - Fixed ganglia plotting issue on ubuntu
   - Fixed slow SLURM scaling times on systemd platforms.
 
 1.3.2
