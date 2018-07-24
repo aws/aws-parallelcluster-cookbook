@@ -3,7 +3,7 @@
 import sys
 import parted
 import urllib2
-import boto.ec2
+import boto3
 import time
 
 # Get volumeId
@@ -30,24 +30,27 @@ blockDevices = [ '/dev/xvdb', '/dev/xvdc', '/dev/xvdd', '/dev/xvde', '/dev/xvdf'
 availableDevices = [a for a in blockDevices if a not in paths]
 
 # Connect to AWS using boto
-conn = boto.ec2.connect_to_region(region)
+ec2 = boto3.client('ec2', region_name=region)
 
 # Attach the volume
 dev = availableDevices[0].replace('xvd', 'sd')
-conn.attach_volume(volumeId,instanceId,dev)
+response = ec2.attach_volume(VolumeId=volumeId, InstanceId=instanceId, Device=dev)
 
 # Poll for volume to attach
-vol = conn.get_all_volumes([volumeId])[0]
+state = response.get("State")
+
 x = 0
-while vol.attachment_state() != "attached":
+while state != "attached":
     if x == 36:
         print "Volume %s failed to mount in 180 seconds." % (volumeId)
         exit(1)
-    if vol.attachment_state() in ["busy" or "detached"]:
-        print "Volume %s in bad state %s" % (volumeId, vol.attachment_state())
+    if state in ["busy" or "detached"]:
+        print "Volume %s in bad state %s" % (volumeId, state)
         exit(1)
-    print "Volume %s in state %s ... waiting to be 'attached'" % (volumeId, vol.attachment_state())
+    print "Volume %s in state %s ... waiting to be 'attached'" % (volumeId, state)
     time.sleep(5)
-    vol = conn.get_all_volumes([volumeId])[0]
     x += 1
-
+    try:
+      state = ec2.describe_volumes(VolumeIds=[volumeId]).get('Volumes')[0].get('Attachments')[0].get('State')
+    except IndexError as e:
+      continue

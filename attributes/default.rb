@@ -19,7 +19,7 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.5.1'
+default['cfncluster']['cfncluster-node-version'] = '1.5.2'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install receipes
 # Gridengine software
@@ -60,10 +60,10 @@ default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # Platform defaults
 case node['platform_family']
-when 'rhel'
+when 'rhel', 'amazon'
 
   default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
-  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp!('.x86_64')
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
 
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
