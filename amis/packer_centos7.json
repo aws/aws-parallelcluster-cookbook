@@ -13,13 +13,22 @@
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
     "vpc_id" : "{{env `AWS_VPC_ID`}}",
-    "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}"
+    "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
+    "region" : "{{env `AWS_REGION`}}"
   },
   "builders" : [
     {
       "type" : "amazon-ebs",
-      "region" : "us-east-1",
-      "source_ami" : "ami-06fea57c",
+      "region" : "{{user `region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "CentOS 7.x x86_64 - minimal with cloud-init - *",
+          "root-device-type": "ebs"
+        },
+        "owners": ["247102896272"],
+        "most_recent": true
+      },
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
