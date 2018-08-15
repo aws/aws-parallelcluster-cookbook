@@ -35,6 +35,7 @@ default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archiv
 default['cfncluster']['munge']['munge_version'] = '0.5.12'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
 # Ganglia
+default['cfncluster']['ganglia_enabled'] = 'yes'
 default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.7.2'
