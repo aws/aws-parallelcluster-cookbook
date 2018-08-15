@@ -93,33 +93,35 @@ nfs_export "/home" do
 end
 
 # Configure Ganglia on the Master
-template '/etc/ganglia/gmetad.conf' do
-  source 'gmetad.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
+if node['cfncluster']['ganglia_enabled'] == 'yes'
+  template '/etc/ganglia/gmetad.conf' do
+    source 'gmetad.conf.erb'
+    owner 'root'
+    group 'root'
+    mode '0644'
+  end
 
-template '/etc/ganglia/gmond.conf' do
-  source 'gmond.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
+  template '/etc/ganglia/gmond.conf' do
+    source 'gmond.conf.erb'
+    owner 'root'
+    group 'root'
+    mode '0644'
+  end
 
-service "gmetad" do
-  supports restart: true
-  action %i[enable restart]
-end
+  service "gmetad" do
+    supports restart: true
+    action %i[enable restart]
+  end
 
-service node['cfncluster']['ganglia']['gmond_service'] do
-  supports restart: true
-  action %i[enable restart]
-end
+  service node['cfncluster']['ganglia']['gmond_service'] do
+    supports restart: true
+    action %i[enable restart]
+  end
 
-service node['cfncluster']['ganglia']['httpd_service'] do
-  supports restart: true
-  action %i[enable start]
+  service node['cfncluster']['ganglia']['httpd_service'] do
+    supports restart: true
+    action %i[enable start]
+  end
 end
 
 # Setup cluster user
