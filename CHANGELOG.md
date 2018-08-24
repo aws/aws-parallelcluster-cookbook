@@ -3,6 +3,13 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.5.4
+-----
+
+- Set SGE Accounting summary to be true, this reports a single accounting record
+for a mpi job
+
+
 1.5.2
 -----
 
