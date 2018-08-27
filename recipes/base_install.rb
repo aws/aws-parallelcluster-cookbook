@@ -61,7 +61,9 @@ end
 # Install AWSCLI
 python_package 'awscli' do
   action :upgrade
-  version '1.15.40'
+  if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
+    install_options '--ignore-installed urllib3'
+  end
 end
 
 # Install boto3
