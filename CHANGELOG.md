@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the cfncluster cookboo
 
 - Set SGE Accounting summary to be true, this reports a single accounting record
 for a mpi job
+- Add option to disable ganglia `extra_json = { "cfncluster" : { "ganglia_enabled" : "no" } }`
 
 
 1.5.2
