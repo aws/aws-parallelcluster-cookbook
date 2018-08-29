@@ -54,3 +54,15 @@ bash "add_host_as_master" do
     qconf -as #{node['hostname']}
   ADDHOST
 end
+
+bash "set_accounting_summary" do
+  code <<-SETAS
+    . /opt/sge/default/common/settings.sh
+    TMPFILE=/tmp/pe.txt
+    qconf -sp mpi | grep -v 'accounting_summary' > $TMPFILE
+    echo 'accounting_summary TRUE' >> $TMPFILE
+    qconf -Mp $TMPFILE
+    rm $TMPFILE
+  SETAS
+end
+

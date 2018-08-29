@@ -13,15 +13,24 @@
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
     "vpc_id" : "{{env `AWS_VPC_ID`}}",
-    "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}"
+    "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
+    "region" : "{{env `AWS_REGION`}}"
   },
   "builders" : [
     {
       "type" : "amazon-ebs",
-      "region" : "us-east-1",
+      "region" : "{{user `region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*",
+          "root-device-type": "ebs"
+        },
+        "owners": ["099720109477", "513442679011"],
+        "most_recent": true
+      },
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
-      "source_ami" : "ami-c29e1cb8",
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
