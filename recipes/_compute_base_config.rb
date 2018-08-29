@@ -43,16 +43,18 @@ mount '/home' do
 end
 
 # Configure Ganglia
-template '/etc/ganglia/gmond.conf' do
-  source 'gmond.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
+if node['cfncluster']['ganglia_enabled'] == "yes"
+  template '/etc/ganglia/gmond.conf' do
+    source 'gmond.conf.erb'
+    owner 'root'
+    group 'root'
+    mode '0644'
+  end
 
-service node['cfncluster']['ganglia']['gmond_service'] do
-  supports restart: true
-  action %i[enable restart]
+  service node['cfncluster']['ganglia']['gmond_service'] do
+    supports restart: true
+    action %i[enable restart]
+  end
 end
 
 # Setup cluster user

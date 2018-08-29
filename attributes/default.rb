@@ -19,7 +19,7 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-node-version'] = '1.5.1'
+default['cfncluster']['cfncluster-node-version'] = '1.5.4'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install receipes
 # Gridengine software
@@ -35,6 +35,7 @@ default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archiv
 default['cfncluster']['munge']['munge_version'] = '0.5.12'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
 # Ganglia
+default['cfncluster']['ganglia_enabled'] = 'yes'
 default['cfncluster']['ganglia']['version'] = '3.7.2'
 default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
 default['cfncluster']['ganglia']['web_version'] = '3.7.2'
