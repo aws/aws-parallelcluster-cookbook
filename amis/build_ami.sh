@@ -13,19 +13,20 @@
 #
 # Usage: build_ami.sh <os> <region> [private|public] [<build-date>]
 #   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1404|ubuntu1604)
-#   region: region to build (supported values: all|us-east-1|...)
+#   partition: partition to build in (supported values: commercial|govcloud)
+#   region: region to copy ami too (supported values: all|us-east-1|us-gov-west-1|...)
 #   private|public: specifies AMIs visibility (optional, default is private)
 #   build-date: timestamp to append to the AMIs names (optional)
 
 set -e
 
 os=$1
-region=$2
-public=$3
-build_date=$4
+partition=$2
+region=$3
+public=$4
+build_date=$5
 
 available_os="centos6 centos7 alinux ubuntu1404 ubuntu1604"
-available_regions="$(aws ec2 --region us-east-1 describe-regions --query Regions[].RegionName --output text | tr '\t' ',')"
 cwd="$(dirname $0)"
 export VENDOR_PATH="${cwd}/../../vendor/cookbooks"
 
@@ -36,8 +37,8 @@ if [ "x${os}" == "x" ]; then
 fi
 
 if [ "x${region}" == "x" ]; then
-  echo "Must provide AWS region to build for."
-  echo "Options: us-east-1 all"
+  echo "Must provide AWS region to copy ami into"
+  echo "Options: all us-east-1 us-gov-west-1 ..."
   exit 1
 fi
 
@@ -45,8 +46,18 @@ if [ "${public}" == "public" ]; then
   export AMI_PERMS="all"
 fi
 
-# NOTE: the AMI is always built in us-east-1 and then copied to the specified regions
+if [ "${partition}" == "commercial" ]; then
+  export AWS_REGION="us-east-1"
+elif [ "${partition}" == "govcloud" ]; then
+  export AWS_REGION="us-gov-west-1"
+else
+  echo "Must provide AWS partition to build for."
+  echo "Options: commercial govcloud"
+  exit 1
+fi
+
 if [ "${region}" == "all" ]; then
+  available_regions="$(aws ec2 --region ${AWS_REGION} describe-regions --query Regions[].RegionName --output text | tr '\t' ',')"
   export BUILD_FOR=${available_regions}
 else
   export BUILD_FOR=${region}
