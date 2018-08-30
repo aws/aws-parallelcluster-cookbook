@@ -159,6 +159,14 @@ bash "ssh-keyscan" do
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
 end
 
+# Install jobwatcher.cfg
+template '/etc/jobwatcher.cfg' do
+  source 'jobwatcher.cfg.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 # Install sqswatcher.cfg
 template '/etc/sqswatcher.cfg' do
   source 'sqswatcher.cfg.erb'

@@ -1,0 +1,7 @@
+[jobwatcher]
+region = <%= node['cfncluster']['cfn_region'] %>
+scheduler = <%= node['cfncluster']['cfn_scheduler'] %>
+stack_name = <%= node['cfncluster']['stack_name'] %>
+cfncluster_dir = <%= node['cfncluster']['base_dir'] %>
+proxy = <%= node['cfncluster']['cfn_proxy'] %>
+compute_instance_type = <%= node['cfncluster']['compute_instance_type'] %>
