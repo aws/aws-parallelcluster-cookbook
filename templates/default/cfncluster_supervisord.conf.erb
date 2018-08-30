@@ -8,6 +8,11 @@ command = /usr/bin/sqswatcher
 redirect_stderr = true
 stdout_logfile = /var/log/sqswatcher
 
+[program:jobwatcher]
+command = /usr/bin/jobwatcher
+redirect_stderr = true
+stdout_logfile = /var/log/jobwatcher
+
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
 [program:nodewatcher]
