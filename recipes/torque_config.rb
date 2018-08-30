@@ -26,6 +26,7 @@ end
 # Run ldconfig
 execute "run-ldconfig" do
   command 'ldconfig'
+  action :nothing
 end
 
 # Set toruqe server_name
