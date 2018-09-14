@@ -1,5 +1,5 @@
 {
-  "cfncluster_version": "1.6.0rc1",
+  "cfncluster_version": "1.6.0rc2",
   "cfncluster_cookbook_version": "1.6.0",
   "chef_version": "14.2.0",
   "ridley_version": "5.1.1",
