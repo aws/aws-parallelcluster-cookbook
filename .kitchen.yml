@@ -73,6 +73,7 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::sge_config]
+      - recipe[cfncluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -90,6 +91,7 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::torque_config]
+      - recipe[cfncluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -107,6 +109,7 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::slurm_config]
+      - recipe[cfncluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -124,6 +127,7 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::sge_config]
+      - recipe[cfncluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
@@ -141,6 +145,7 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::torque_config]
+      - recipe[cfncluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
@@ -158,6 +163,7 @@ suites:
     run_list:
       - recipe[cfncluster::_prep_env]
       - recipe[cfncluster::slurm_config]
+      - recipe[cfncluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
