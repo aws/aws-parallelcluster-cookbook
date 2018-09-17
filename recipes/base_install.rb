@@ -60,8 +60,6 @@ end
 
 # Install AWSCLI
 python_package 'awscli' do
-  action :upgrade
-  version '1.16.2'
   if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
     install_options '--ignore-installed urllib3'
   end
