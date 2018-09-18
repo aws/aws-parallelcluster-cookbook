@@ -15,7 +15,6 @@
 
 include_recipe 'cfncluster::_update_packages'
 
-
 # Reboot after preliminary configuration steps
 if !tagged?('rebooted') && node['cfncluster']['default_pre_reboot'] == 'true'
   # On Ubuntu, the /tmp folder is erased by default after a reboot and its lifecycle is managed
