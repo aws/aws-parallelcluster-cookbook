@@ -13,7 +13,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-bash 'execute awscli' do
-  code "aws --version"
+execute 'execute awscli' do
+  command "aws --version"
+  environment('PATH' => '/usr/local/bin:$PATH')
+  user node['cfncluster']['cfn_cluster_user']
 end
