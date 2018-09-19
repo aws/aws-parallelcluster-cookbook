@@ -13,16 +13,36 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['platform_family']
-when 'rhel', 'amazon'
-  execute 'yum-update' do
-    command "yum -y update && package-cleanup -y --oldkernels --count=1"
+package 'aws-cli' do
+  action :remove
+  ignore_failure true
+end
+
+if !(node['platform'] == 'ubuntu' && node['platform_version'] == "16.04")
+  python_package 'awscli' do
+    action :remove
+    ignore_failure true
   end
-when 'debian'
-  execute 'apt-update' do
-    command "apt-get update"
+else
+  bash 'remove awscli' do
+    code "pip uninstall -y awscli"
+    ignore_failure true
   end
-  execute 'apt-upgrade' do
-    command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade && apt-get autoremove"
+end
+
+unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  # not CentOS6
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    execute 'yum-update' do
+      command "yum -y update && package-cleanup -y --oldkernels --count=1"
+    end
+  when 'debian'
+    execute 'apt-update' do
+      command "apt-get update"
+    end
+    execute 'apt-upgrade' do
+      command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade && apt-get autoremove"
+    end
   end
 end

@@ -115,6 +115,32 @@
     },
     {
       "type" : "chef-solo",
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "json" : {
+        "cfncluster" : {
+          "default_pre_reboot" : "false"
+        }
+      },
+      "run_list" : [
+        "cfncluster::_default_pre"
+      ]
+    },
+    {
+      "type" : "shell",
+      "expect_disconnect" : "true",
+      "inline" : [
+        "sudo /etc/init.d/sshd stop",
+        "nohup sudo shutdown -r now < /dev/null > /dev/null 2>&1 &",
+        "exit 0"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "pause_before": "2m",
       "json" : {
         "cfncluster" : {
           "nvidia" : {
