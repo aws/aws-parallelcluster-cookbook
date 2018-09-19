@@ -15,6 +15,6 @@
 
 execute 'execute awscli' do
   command "aws --version"
-  environment('PATH' => '/usr/local/bin:$PATH')
+  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
   user node['cfncluster']['cfn_cluster_user']
 end
