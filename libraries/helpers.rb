@@ -66,6 +66,6 @@ end
 def pip_install_package(package, version)
   command = Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
   unless command.exitstatus.zero?
-    Chef::Application.fatal!('Failed to install #{package} #{version} package!')
+    Chef::Application.fatal!("Failed to install #{package} #{version} package!", err = command.exitstatus)
   end
 end
