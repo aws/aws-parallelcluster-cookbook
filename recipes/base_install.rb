@@ -116,6 +116,9 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
 else
   # Install cfncluster-node package
   if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+    python_package "pycparser" do
+      version "2.18"
+    end
     # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
     ruby_block "pip_install_cfncluster_node" do
       block do
