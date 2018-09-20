@@ -5,6 +5,8 @@ import parted
 import urllib2
 import boto3
 import time
+import ConfigParser
+from botocore.config import Config
 
 
 def main():
@@ -34,8 +36,17 @@ def main():
     # List of available block devices after removing currently used block devices
     availableDevices = [a for a in blockDevices if a not in paths]
 
+    # Parse configuration file to read proxy settings
+    config = ConfigParser.RawConfigParser()
+    config.read('/etc/boto.cfg')
+    proxy_config = Config()
+    if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
+        proxy = config.get('Boto', 'proxy')
+        proxy_port = config.get('Boto', 'proxy_port')
+        proxy_config = Config(proxies={'https': "{}:{}".format(proxy, proxy_port)})
+
     # Connect to AWS using boto
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2', region_name=region, config=proxy_config)
 
     # Attach the volume
     dev = availableDevices[0].replace('xvd', 'sd')
