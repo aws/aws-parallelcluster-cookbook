@@ -64,5 +64,8 @@ def get_vpc_ipv4_cidr_block(eth0_mac)
 end
 
 def pip_install_package(package, version)
-  Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
+  command = Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
+  unless command.exitstatus.zero?
+    Chef::Application.fatal!("Failed to install package #{package} #{version}", command.exitstatus)
+  end
 end
