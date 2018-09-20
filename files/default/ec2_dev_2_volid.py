@@ -6,6 +6,8 @@ import os
 import syslog
 import time
 import boto3
+import ConfigParser
+from botocore.config import Config
 
 
 def main():
@@ -35,8 +37,17 @@ def main():
     region = urllib2.urlopen("http://169.254.169.254/latest/meta-data/placement/availability-zone").read()
     region = region[:-1]
 
+    # Parse configuration file to read proxy settings
+    config = ConfigParser.RawConfigParser()
+    config.read('/etc/boto.cfg')
+    proxy_config = Config()
+    if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
+        proxy = config.get('Boto', 'proxy')
+        proxy_port = config.get('Boto', 'proxy_port')
+        proxy_config = Config(proxies={'https': "{}:{}".format(proxy, proxy_port)})
+
     # Connect to AWS using boto
-    ec2 = boto3.client('ec2', region_name=region)
+    ec2 = boto3.client('ec2', region_name=region, config=proxy_config)
 
     # Poll for blockdevicemapping
     devices = ec2.describe_instance_attribute(InstanceId=instanceId, Attribute='blockDeviceMapping').get('BlockDeviceMappings')
