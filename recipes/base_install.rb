@@ -105,6 +105,11 @@ remote_file '/usr/bin/ec2-metadata' do
 end
 
 if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
+  if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+    python_package "pycparser" do
+      version "2.18"
+    end
+  end
   execute "install cfncluster-node" do
     command "sudo pip uninstall --yes cfncluster-node &&" \
       "cd /tmp &&" \
