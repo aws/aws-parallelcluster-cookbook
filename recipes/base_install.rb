@@ -104,12 +104,16 @@ remote_file '/usr/bin/ec2-metadata' do
   mode '0755'
 end
 
-if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
-  if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-    python_package "pycparser" do
-      version "2.18"
-    end
+# Fix dependencies for CentOS 6 (Python 2.6)
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+  python_package "pycparser" do
+    version "2.18"
   end
+end
+
+# Check whether install a custom cfncluster-node package or the standard one
+if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
+  # Install custom cfncluster-node package
   execute "install cfncluster-node" do
     command "sudo pip uninstall --yes cfncluster-node &&" \
       "cd /tmp &&" \
@@ -121,9 +125,6 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
 else
   # Install cfncluster-node package
   if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-    python_package "pycparser" do
-      version "2.18"
-    end
     # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
     ruby_block "pip_install_cfncluster_node" do
       block do
