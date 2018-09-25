@@ -31,7 +31,10 @@ include_recipe "cfncluster::_setup_python"
 
 # Install lots of packages
 node['cfncluster']['base_packages'].each do |p|
-  package p
+  package p do
+    retries 3
+    retry_delay 5
+  end
 end
 
 # Manage SSH via Chef
