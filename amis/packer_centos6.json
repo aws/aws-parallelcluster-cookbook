@@ -14,10 +14,12 @@
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
     "vpc_id" : "{{env `AWS_VPC_ID`}}",
     "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
-    "region" : "{{env `AWS_REGION`}}"
+    "region" : "{{env `AWS_REGION`}}",
+    "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}"
   },
   "builders" : [
     {
+      "name" : "centos6",
       "type" : "amazon-ebs",
       "region" : "{{user `region`}}",
       "source_ami_filter": {
@@ -34,13 +36,14 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix`}}cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
       "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true,
+      "shutdown_behavior" : "terminate",
       "tags" : {
         "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"
@@ -75,9 +78,69 @@
           "no_device" : true
         }
       ]
+    },
+    {
+      "name" : "custom-centos6",
+      "type" : "amazon-ebs",
+      "region" : "{{user `region`}}",
+      "source_ami": "{{user `custom_ami_id`}}",
+      "ami_regions" : "{{user `build_for`}}",
+      "ami_groups" : "{{user `ami_perms`}}",
+      "instance_type" : "{{user `instance_type`}}",
+      "ssh_username" : "centos",
+      "ssh_pty" : true,
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "subnet_id" : "{{user `subnet_id`}}",
+      "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
+      "associate_public_ip_address" : true,
+      "sriov_support" : true,
+      "ena_support" : true,
+      "shutdown_behavior" : "terminate",
+      "tags" : {
+        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "build_date" : "{{user `build_date`}}"
+      },
+      "run_tags" : {
+        "Name": "Packer Builder {{user `custom_ami_id`}}",
+        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "build_date" : "{{user `build_date`}}"
+      },
+      "launch_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sda1",
+          "volume_type" : "gp2",
+          "delete_on_termination" : true
+        },
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ],
+      "ami_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ]
     }
   ],
   "provisioners" : [
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo yum -y install epel-release",
+        "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
+      ]
+    },
     {
       "type" : "shell",
       "inline" : [
@@ -115,6 +178,7 @@
     },
     {
       "type" : "chef-solo",
+      "only": ["centos6"],
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
@@ -131,6 +195,7 @@
     },
     {
       "type" : "shell",
+      "only": ["centos6"],
       "expect_disconnect" : "true",
       "inline" : [
         "sudo /etc/init.d/sshd stop",
@@ -140,6 +205,7 @@
     },
     {
       "type" : "chef-solo",
+      "only": ["centos6"],
       "pause_before": "2m",
       "json" : {
         "cfncluster" : {
@@ -148,6 +214,18 @@
           }
         }
       },
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "run_list" : [
+        "cfncluster::default"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "only": ["custom-centos6"],
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
@@ -175,6 +253,13 @@
       "inline" : [
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
         "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped"
+      ]
+    },
+    {
+      "type" : "shell",
+      "only": ["custom-centos6"],
+      "inline" : [
+        "sudo /usr/local/sbin/ami_cleanup.sh"
       ]
     }
   ]

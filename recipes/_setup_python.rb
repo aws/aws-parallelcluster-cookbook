@@ -25,22 +25,32 @@ when 'rhel', 'amazon'
       PIP
     end
   else
-    edit_resource(:python_runtime, '2') do
+    bash 'pin pip to version 18.0' do
       # FIXME: https://github.com/poise/poise-python/issues/133
-      pip_version '18.0'
+      code <<-PIP
+        which pip
+        if [ $? -eq 0 ]; then pip install pip==18.0; fi
+      PIP
     end
     python_runtime '2' do
       version '2'
       provider :system
+      # FIXME: https://github.com/poise/poise-python/issues/133
+      pip_version '18.0'
     end
   end
 when 'debian'
-  edit_resource(:python_runtime, '2') do
+  bash 'pin pip to version 18.0' do
     # FIXME: https://github.com/poise/poise-python/issues/133
-    pip_version '18.0'
+    code <<-PIP
+      which pip
+      if [ $? -eq 0 ]; then pip install pip==18.0; fi
+    PIP
   end
   python_runtime '2' do
     version '2'
     provider :system
+    # FIXME: https://github.com/poise/poise-python/issues/133
+    pip_version '18.0'
   end
 end
