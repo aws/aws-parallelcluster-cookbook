@@ -18,6 +18,12 @@ when 'rhel', 'amazon'
   include_recipe 'yum'
   include_recipe "yum-epel" if node['platform_version'].to_i < 7
 
+  unless node['platform_version'].to_i < 7
+    execute 'yum-config-manager_skip_if_unavail' do
+      command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
+    end
+  end
+
   if node['platform'] == 'redhat'
     execute 'yum-config-manager-rhel' do
       command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
