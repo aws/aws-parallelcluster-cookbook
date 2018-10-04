@@ -13,26 +13,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Created shared mount point
-directory node['cfncluster']['cfn_shared_dir'] do
-  mode '1777'
-  owner 'root'
-  group 'root'
-  recursive true
-  action :create
-end
 
 node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
 
 nfs_master = node['cfncluster']['cfn_master']
 
-# Mount shared volume over NFS
-mount node['cfncluster']['cfn_shared_dir'] do
-  device "#{nfs_master}:#{node['cfncluster']['cfn_shared_dir']}"
-  fstype 'nfs'
-  options 'hard,intr,noatime,vers=3,_netdev'
-  action %i[mount enable]
-end
 
 # Mount /home over NFS
 mount '/home' do
@@ -63,6 +48,33 @@ user node['cfncluster']['cfn_cluster_user'] do
   comment 'cfncluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'
+end
+
+# Parse shared directory info and turn into an array
+_shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
+_shared_dir_array.each_with_index do |dir, index|
+    _shared_dir_array[index] = dir.strip
+    _shared_dir_array[index] = "/"+_shared_dir_array[index]
+end
+
+# Mount each volume with NFS
+_shared_dir_array.each do |dirname|
+    # Created shared mount point
+    directory dirname do
+      mode '1777'
+      owner 'root'
+      group 'root'
+      recursive true
+      action :create
+    end
+
+    # Mount shared volume over NFS
+    mount dirname do
+      device "#{nfs_master}:#{dirname}"
+      fstype 'nfs'
+      options 'hard,intr,noatime,vers=3,_netdev'
+      action %i[mount enable]
+    end
 end
 
 # Install nodewatcher.cfg
