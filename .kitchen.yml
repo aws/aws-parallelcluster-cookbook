@@ -77,6 +77,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
+        cfn_scheduler: 'sge'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -95,6 +96,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
+        cfn_scheduler: 'torque'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -113,6 +115,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
+        cfn_scheduler: 'slurm'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -131,6 +134,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
+        cfn_scheduler: 'sge'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -149,6 +153,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
+        cfn_scheduler: 'torque'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -167,6 +172,7 @@ suites:
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
+        cfn_scheduler: 'slurm'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         cfn_volume: <%= ENV['CFN_VOLUME'] %>
         cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
