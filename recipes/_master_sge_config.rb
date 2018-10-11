@@ -65,4 +65,3 @@ bash "set_accounting_summary" do
     rm $TMPFILE
   SETAS
 end
-
