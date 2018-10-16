@@ -165,14 +165,6 @@ cookbook_file "supervisord-init" do
   mode "0755"
 end
 
-# Install jq for manipulating json files
-cookbook_file "jq-1.4" do
-  path "/usr/local/bin/jq"
-  owner "root"
-  group "root"
-  mode "0755"
-end
-
 # AMI cleanup script
 cookbook_file "ami_cleanup.sh" do
   path '/usr/local/sbin/ami_cleanup.sh'
