@@ -3,6 +3,7 @@
 <% case node['cfncluster']['cfn_node_type'] -%>
 <%# MasterServer -%>
 <% when 'MasterServer' -%>
+<% unless node['cfncluster']['cfn_scheduler'] == 'awsbatch' -%>
 [program:sqswatcher]
 command = /usr/bin/sqswatcher
 redirect_stderr = true
@@ -12,6 +13,8 @@ stdout_logfile = /var/log/sqswatcher
 command = /usr/bin/jobwatcher
 redirect_stderr = true
 stdout_logfile = /var/log/jobwatcher
+
+<% end -%>
 
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
