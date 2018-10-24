@@ -19,9 +19,10 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
+default['cfncluster']['cfncluster-version'] = '1.6.0'
 default['cfncluster']['cfncluster-node-version'] = '1.6.0'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
-# URLs to software packages used during install receipes
+# URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
@@ -155,3 +156,4 @@ default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_master'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
 default['cfncluster']['custom_node_package'] = nil
+default['cfncluster']['custom_awsbatchcli_package'] = nil
