@@ -31,7 +31,10 @@ include_recipe "cfncluster::_setup_python"
 
 # Install lots of packages
 node['cfncluster']['base_packages'].each do |p|
-  package p
+  package p do
+    retries 3
+    retry_delay 5
+  end
 end
 
 # Manage SSH via Chef
@@ -60,8 +63,6 @@ end
 
 # Install AWSCLI
 python_package 'awscli' do
-  action :upgrade
-  version '1.16.2'
   if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
     install_options '--ignore-installed urllib3'
   end
@@ -106,14 +107,26 @@ remote_file '/usr/bin/ec2-metadata' do
   mode '0755'
 end
 
+# Fix dependencies for CentOS 6 (Python 2.6)
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+  python_package "pycparser" do
+    version "2.18"
+  end
+end
+
+# Check whether install a custom cfncluster-node package or the standard one
 if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
-  execute "install cfncluster-node" do
-    command "sudo pip uninstall --yes cfncluster-node &&" \
-      "cd /tmp &&" \
-      "curl -v -L -o /tmp/cfncluster-node.tgz #{node['cfncluster']['custom_node_package']} &&" \
-      "tar -xzf /tmp/cfncluster-node.tgz &&" \
-      "cd /tmp/cfncluster-node-* &&" \
-      "sudo /usr/bin/python setup.py install"
+  # Install custom cfncluster-node package
+  bash "install cfncluster-node" do
+    cwd '/tmp'
+    code <<-EOH
+      source /tmp/proxy.sh
+      sudo pip uninstall --yes cfncluster-node
+      curl -v -L -o cfncluster-node.tgz #{node['cfncluster']['custom_node_package']}
+      tar -xzf cfncluster-node.tgz
+      cd cfncluster-node-*
+      sudo /usr/bin/python setup.py install
+    EOH
   end
 else
   # Install cfncluster-node package

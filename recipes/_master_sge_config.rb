@@ -66,13 +66,3 @@ bash "set_accounting_summary" do
   SETAS
 end
 
-template '/opt/cfncluster/scripts/publish_pending' do
-  source 'publish_pending.sge.erb'
-  owner 'root'
-  group 'root'
-  mode '0744'
-end
-
-cron 'publish_pending' do
-  command '/opt/cfncluster/scripts/publish_pending'
-end

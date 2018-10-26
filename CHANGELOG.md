@@ -3,6 +3,14 @@ cfncluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the cfncluster cookbook.
 
+1.6.0
+-----
+
+- Add `scaledown_idletime` to nodewatcher config
+- Add cookbook recipes for jobwatcher
+- Remove publish_pending scripts
+
+
 1.5.4
 -----
 
