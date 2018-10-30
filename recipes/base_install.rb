@@ -62,12 +62,24 @@ cookbook_file 'CfnCluster-License-README.txt' do
 end
 
 # Install AWSCLI
-python_package 'awscli' do
-  install_options '--ignore-installed urllib3' if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
+if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
+  package 'awscli' do
+    retries 3
+    retry_delay 5
+  end
+else
+  python_package 'awscli'
 end
 
 # Install boto3
-python_package 'boto3'
+if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
+  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
+  python_package 'boto3' do
+    version '1.7.84' # This imply botocore 1.10.84 which does not require urllib3
+  end
+else
+  python_package 'boto3'
+end
 
 # TODO: update nfs receipes to stop, disable nfs services
 include_recipe "nfs"
@@ -126,13 +138,23 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       sudo /usr/bin/python setup.py install
     NODE
   end
-# Install cfncluster-node package
 elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
   # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
   ruby_block "pip_install_cfncluster_node" do
     block do
       pip_install_package('cfncluster-node', node['cfncluster']['cfncluster-node-version'])
     end
+  end
+elsif node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
+  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
+  python_package "cfncluster-node" do
+    version node['cfncluster']['cfncluster-node-version']
+    install_options '--no-deps'
+  end
+  # python_package 'boto3' installed above
+  # python_package 'python-dateutil' installed by 'botocore' -> 'boto3'
+  python_package 'paramiko' do
+    version '2.4.2'
   end
 else
   python_package "cfncluster-node" do
