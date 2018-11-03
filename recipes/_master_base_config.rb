@@ -25,67 +25,93 @@ execute "add_configure-pat" do
   not_if 'grep -qx /usr/local/sbin/configure-pat.sh /etc/rc.local'
 end
 
-dev_path = "/dev/disk/by-ebs-volumeid/#{node['cfncluster']['cfn_volume']}"
-
-# Attach EBS volume
-execute "attach_volume" do
-  command "/usr/local/sbin/attachVolume.py #{node['cfncluster']['cfn_volume']}"
-  creates dev_path
-end
-
-# wait for the drive to attach, before making a filesystem
-ruby_block "sleeping_for_volume" do
-  block do
-    wait_for_block_dev(dev_path)
-  end
-  action :nothing
-  subscribes :run, "execute[attach_volume]", :immediately
-end
-
-# Setup disk, will be formatted xfs if empty
-ruby_block "setup_disk" do
-  block do
-    fs_type = setup_disk(dev_path)
-    node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
-  end
-  action :nothing
-  subscribes :run, "ruby_block[sleeping_for_volume]", :immediately
-end
-
-# Create the shared directory
-directory node['cfncluster']['cfn_shared_dir'] do
-  owner 'root'
-  group 'root'
-  mode '1777'
-  recursive true
-  action :create
-end
-
-# Add volume to /etc/fstab
-mount node['cfncluster']['cfn_shared_dir'] do
-  device dev_path
-  fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
-  options "_netdev"
-  pass 0
-  action %i[mount enable]
-end
-
-# Make sure shared directory permissions are correct
-directory node['cfncluster']['cfn_shared_dir'] do
-  owner 'root'
-  group 'root'
-  mode '1777'
-end
-
 # Get VPC CIDR
 node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
 
-# Export shared dir
-nfs_export node['cfncluster']['cfn_shared_dir'] do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
-  writeable true
-  options ['no_root_squash']
+# Parse shared directory info and turn into an array
+_shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
+_shared_dir_array.each_with_index do |dir, index|
+    _shared_dir_array[index] = dir.strip
+    _shared_dir_array[index] = "/"+_shared_dir_array[index]
+    puts "Shared directory #{index}: #{dir}"
 end
+
+# Parse volume info into an arary
+_vol_array = node['cfncluster']['cfn_volume'].split(',')
+_vol_array.each_with_index do |vol, index|
+    _vol_array[index] = vol.strip
+    puts "Shared directory #{index}: #{vol}"
+end
+
+# Mount each volume
+dev_path = []
+
+_vol_array.each_with_index do |volumeid, index|
+    dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
+
+
+    # Attach EBS volume
+    execute "attach_volume_#{index}" do
+        command "/usr/local/sbin/attachVolume.py #{volumeid}"
+        creates dev_path[index]
+        puts "Attached index: #{index}, VolID: #{volumeid}"
+    end
+
+    # wait for the drive to attach, before making a filesystem
+    ruby_block "sleeping_for_volume_#{index}" do
+      block do
+         wait_for_block_dev(dev_path[index])
+      end
+      action :nothing
+      subscribes :run, "execute[attach_volume_#{index}]", :immediately
+    end
+
+    # Setup disk, will be formatted xfs if empty
+    ruby_block "setup_disk_#{index}" do
+        puts "Setting up #{dev_path[index]}"
+        block do
+            fs_type = setup_disk(dev_path[index])
+            node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
+        end
+        action :nothing
+        subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
+
+        puts "Finished Setup #{dev_path[index]}"
+    end
+
+    # Create the shared directories
+    directory _shared_dir_array[index] do
+      owner 'root'
+      group 'root'
+      mode '1777'
+      recursive true
+      action :create
+    end
+
+    # Add volume to /etc/fstab
+    mount _shared_dir_array[index] do
+      device dev_path[index]
+      fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
+      options "_netdev"
+      pass 0
+      action %i[mount enable]
+    end
+
+    # Make sure shared directory permissions are correct
+    directory _shared_dir_array[index] do
+      owner 'root'
+      group 'root'
+      mode '1777'
+    end
+
+    # Export shared dir
+    nfs_export _shared_dir_array[index] do
+      network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+      writeable true
+      options ['no_root_squash']
+    end
+end
+
 
 # Export /home
 nfs_export "/home" do
