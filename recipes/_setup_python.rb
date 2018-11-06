@@ -25,12 +25,20 @@ when 'rhel', 'amazon'
       PIP
     end
   else
+    edit_resource(:python_runtime, '2') do
+      # FIXME: https://github.com/poise/poise-python/issues/133
+      pip_version '18.0'
+    end
     python_runtime '2' do
       version '2'
       provider :system
     end
   end
 when 'debian'
+  edit_resource(:python_runtime, '2') do
+    # FIXME: https://github.com/poise/poise-python/issues/133
+    pip_version '18.0'
+  end
   python_runtime '2' do
     version '2'
     provider :system
