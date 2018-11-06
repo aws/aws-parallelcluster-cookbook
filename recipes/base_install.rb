@@ -63,9 +63,7 @@ end
 
 # Install AWSCLI
 python_package 'awscli' do
-  if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-    install_options '--ignore-installed urllib3'
-  end
+  install_options '--ignore-installed urllib3' if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
 end
 
 # Install boto3
@@ -119,28 +117,26 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
   # Install custom cfncluster-node package
   bash "install cfncluster-node" do
     cwd '/tmp'
-    code <<-EOH
+    code <<-NODE
       source /tmp/proxy.sh
       sudo pip uninstall --yes cfncluster-node
       curl -v -L -o cfncluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf cfncluster-node.tgz
       cd cfncluster-node-*
       sudo /usr/bin/python setup.py install
-    EOH
+    NODE
+  end
+# Install cfncluster-node package
+elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+  # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
+  ruby_block "pip_install_cfncluster_node" do
+    block do
+      pip_install_package('cfncluster-node', node['cfncluster']['cfncluster-node-version'])
+    end
   end
 else
-  # Install cfncluster-node package
-  if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-    # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
-    ruby_block "pip_install_cfncluster_node" do
-      block do
-        pip_install_package('cfncluster-node', node['cfncluster']['cfncluster-node-version'])
-      end
-    end
-  else
-    python_package "cfncluster-node" do
-      version node['cfncluster']['cfncluster-node-version']
-    end
+  python_package "cfncluster-node" do
+    version node['cfncluster']['cfncluster-node-version']
   end
 end
 
@@ -160,14 +156,6 @@ end
 # Put init script in place
 cookbook_file "supervisord-init" do
   path "/etc/init.d/supervisord"
-  owner "root"
-  group "root"
-  mode "0755"
-end
-
-# Install jq for manipulating json files
-cookbook_file "jq-1.4" do
-  path "/usr/local/bin/jq"
   owner "root"
   group "root"
   mode "0755"
