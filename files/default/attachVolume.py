@@ -2,11 +2,26 @@
 
 import sys
 import parted
+import os
 import urllib2
 import boto3
 import time
 import ConfigParser
 from botocore.config import Config
+
+
+def convert_dev(dev):
+    # Translate the device name as provided by the OS to the one used by EC2
+    # FIXME This approach could be broken in some OS variants, see
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html
+    if '/nvme' in dev:
+        return '/dev/' + os.popen('sudo /usr/local/sbin/cfncluster-ebsnvme-id -b ' + dev).read().strip()
+    elif '/hd' in dev:
+        return dev.replace('hd', 'sd')
+    elif '/xvd' in dev:
+        return dev.replace('xvd', 'sd')
+    else:
+        return dev
 
 
 def main():
@@ -25,13 +40,13 @@ def main():
     region = region[:-1]
 
     # Generate a list of system paths minus the root path
-    paths = [device.path for device in parted.getAllDevices()]
+    paths = [convert_dev(device.path) for device in parted.getAllDevices()]
 
     # List of possible block devices
-    blockDevices = ['/dev/xvdb', '/dev/xvdc', '/dev/xvdd', '/dev/xvde', '/dev/xvdf', '/dev/xvdg', '/dev/xvdh',
-                    '/dev/xvdi','/dev/xvdj', '/dev/xvdk', '/dev/xvdl', '/dev/xvdm', '/dev/xvdn', '/dev/xvdo',
-                    '/dev/xvdp', '/dev/xvdq', '/dev/xvdr', '/dev/xvds', '/dev/xvdt', '/dev/xvdu', '/dev/xvdv',
-                    '/dev/xvdw', '/dev/xvdx', '/dev/xvdy', '/dev/xvdz' ]
+    blockDevices = ['/dev/sdb', '/dev/sdc', '/dev/sdd', '/dev/sde', '/dev/sdf', '/dev/sdg', '/dev/sdh',
+                    '/dev/sdi','/dev/sdj', '/dev/sdk', '/dev/sdl', '/dev/sdm', '/dev/sdn', '/dev/sdo',
+                    '/dev/sdp', '/dev/sdq', '/dev/sdr', '/dev/sds', '/dev/sdt', '/dev/sdu', '/dev/sdv',
+                    '/dev/sdw', '/dev/sdx', '/dev/sdy', '/dev/sdz']
 
     # List of available block devices after removing currently used block devices
     availableDevices = [a for a in blockDevices if a not in paths]
@@ -49,7 +64,7 @@ def main():
     ec2 = boto3.client('ec2', region_name=region, config=proxy_config)
 
     # Attach the volume
-    dev = availableDevices[0].replace('xvd', 'sd')
+    dev = availableDevices[0]
     response = ec2.attach_volume(VolumeId=volumeId, InstanceId=instanceId, Device=dev)
 
     # Poll for volume to attach

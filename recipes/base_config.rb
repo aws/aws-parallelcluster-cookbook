@@ -19,6 +19,7 @@ include_recipe 'cfncluster::base_install'
 node.default['set_fqdn'] = node['ec2']['local_hostname']
 node.default['hostname_cookbook']['hostsfile_ip'] = node['ec2']['local_ipv4']
 include_recipe 'hostname::default'
+ignore_failure 'service[network]' if node['platform_family'] == 'rhel'
 
 # Setup ephemeral drives
 execute 'setup ephemeral' do
