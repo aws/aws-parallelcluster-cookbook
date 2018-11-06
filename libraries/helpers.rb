@@ -67,3 +67,13 @@ def pip_install_package(package, version)
   command = Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
   Chef::Application.fatal!("Failed to install package #{package} #{version}", command.exitstatus) unless command.exitstatus.zero?
 end
+
+def ignore_failure(lookup)
+  resource = resources(lookup)
+  if resource.nil?
+    Chef::Log.warn("Can't find resource to ignore: #{lookup}")
+  else
+    Chef::Log.info("Ignore failure for resource: #{lookup}")
+    resource.ignore_failure(true)
+  end
+end
