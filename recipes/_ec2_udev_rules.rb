@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: _ec2_udev_rules
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -20,8 +20,8 @@ cookbook_file 'ec2-volid.rules' do
   mode '0644'
 end
 
-cookbook_file 'cfncluster-ebsnvme-id' do
-  path '/usr/local/sbin/cfncluster-ebsnvme-id'
+cookbook_file 'parallelcluster-ebsnvme-id' do
+  path '/usr/local/sbin/parallelcluster-ebsnvme-id'
   user 'root'
   group 'root'
   mode '0744'

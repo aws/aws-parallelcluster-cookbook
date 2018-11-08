@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: base_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -13,7 +13,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'cfncluster::base_install'
+include_recipe 'aws-parallelcluster::base_install'
 
 # Setup hostnames to be short
 node.default['set_fqdn'] = node['ec2']['local_hostname']
@@ -30,24 +30,24 @@ end
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'cfncluster::_master_base_config'
+  include_recipe 'aws-parallelcluster::_master_base_config'
 when 'ComputeFleet'
-  include_recipe 'cfncluster::_compute_base_config'
+  include_recipe 'aws-parallelcluster::_compute_base_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end
 
 # Ensure cluster user can sudo on SSH
-template '/etc/sudoers.d/99-cfncluster-user-tty' do
-  source '99-cfncluster-user-tty.erb'
+template '/etc/sudoers.d/99-parallelcluster-user-tty' do
+  source '99-parallelcluster-user-tty.erb'
   owner 'root'
   group 'root'
   mode '0600'
 end
 
-# Install cfncluster specific supervisord config
-template '/etc/cfncluster/cfncluster_supervisord.conf' do
-  source 'cfncluster_supervisord.conf.erb'
+# Install parallelcluster specific supervisord config
+template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
+  source 'parallelcluster_supervisord.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'

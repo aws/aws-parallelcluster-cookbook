@@ -11,7 +11,7 @@ driver_config:
   iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
   tags:
     created-by: test-kitchen
-    Name: test-kitchen-cfncluster
+    Name: test-kitchen-parallelcluster
 
 provisioner:
   name: chef_zero

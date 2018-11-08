@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: custom_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -14,5 +14,5 @@
 # limitations under the License.
 
 # Use these recipes to add a custom scheduler
-include_recipe 'cfncluster::base_config'
-include_recipe 'cfncluster::custom_install'
+include_recipe 'aws-parallelcluster::base_config'
+include_recipe 'aws-parallelcluster::custom_install'

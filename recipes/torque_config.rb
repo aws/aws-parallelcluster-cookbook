@@ -13,8 +13,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'cfncluster::base_config'
-include_recipe 'cfncluster::torque_install'
+include_recipe 'aws-parallelcluster::base_config'
+include_recipe 'aws-parallelcluster::torque_install'
 
 # Update ld.conf
 append_if_no_line "add torque libs to ld.so.conf" do
@@ -76,9 +76,9 @@ end
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'cfncluster::_master_torque_config'
+  include_recipe 'aws-parallelcluster::_master_torque_config'
 when 'ComputeFleet'
-  include_recipe 'cfncluster::_compute_torque_config'
+  include_recipe 'aws-parallelcluster::_compute_torque_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

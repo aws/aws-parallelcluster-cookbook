@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: _prep_env
 #
 # Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -22,28 +22,28 @@ node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_sc
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
 
-directory '/etc/cfncluster'
-directory '/opt/cfncluster'
-directory '/opt/cfncluster/scripts'
+directory '/etc/parallelcluster'
+directory '/opt/parallelcluster'
+directory '/opt/parallelcluster/scripts'
 
-template '/etc/cfncluster/cfnconfig' do
+template '/etc/parallelcluster/cfnconfig' do
   source 'cfnconfig.erb'
   mode '0644'
 end
 
-link '/opt/cfncluster/cfnconfig' do
-  to '/etc/cfncluster/cfnconfig'
+link '/opt/parallelcluster/cfnconfig' do
+  to '/etc/parallelcluster/cfnconfig'
 end
 
 cookbook_file "fetch_and_run" do
-  path "/opt/cfncluster/scripts/fetch_and_run"
+  path "/opt/parallelcluster/scripts/fetch_and_run"
   owner "root"
   group "root"
   mode "0755"
 end
 
 cookbook_file "compute_ready" do
-  path "/opt/cfncluster/scripts/compute_ready"
+  path "/opt/parallelcluster/scripts/compute_ready"
   owner "root"
   group "root"
   mode "0755"

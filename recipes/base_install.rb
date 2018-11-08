@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: base_install
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -33,7 +33,7 @@ when 'debian'
   include_recipe 'apt'
 end
 include_recipe "build-essential"
-include_recipe "cfncluster::_setup_python"
+include_recipe "aws-parallelcluster::_setup_python"
 
 # Install lots of packages
 node['cfncluster']['base_packages'].each do |p|
@@ -53,15 +53,15 @@ selinux_state "SELinux Disabled" do
 end
 
 # Setup directories
-directory '/etc/cfncluster'
+directory '/etc/parallelcluster'
 directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
 directory node['cfncluster']['license_dir']
 
 # Install LICENSE README
-cookbook_file 'CfnCluster-License-README.txt' do
-  path "#{node['cfncluster']['license_dir']}/CfnCluster-License-README.txt"
+cookbook_file 'AWS-ParallelCluster-License-README.txt' do
+  path "#{node['cfncluster']['license_dir']}/AWS-ParallelCluster-License-README.txt"
   user 'root'
   group 'root'
   mode '0644'
@@ -113,7 +113,7 @@ cookbook_file 'setup-ephemeral-drives.sh' do
   mode '0744'
 end
 
-include_recipe 'cfncluster::_ec2_udev_rules'
+include_recipe 'aws-parallelcluster::_ec2_udev_rules'
 
 # Install ec2-metadata script
 remote_file '/usr/bin/ec2-metadata' do
@@ -130,30 +130,30 @@ if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
   end
 end
 
-# Check whether install a custom cfncluster-node package or the standard one
+# Check whether install a custom aws-parallelcluster-node package or the standard one
 if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
-  # Install custom cfncluster-node package
-  bash "install cfncluster-node" do
+  # Install custom aws-parallelcluster-node package
+  bash "install aws-parallelcluster-node" do
     cwd '/tmp'
     code <<-NODE
       source /tmp/proxy.sh
-      sudo pip uninstall --yes cfncluster-node
-      curl -v -L -o cfncluster-node.tgz #{node['cfncluster']['custom_node_package']}
-      tar -xzf cfncluster-node.tgz
-      cd cfncluster-node-*
+      sudo pip uninstall --yes aws-parallelcluster-node
+      curl -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
+      tar -xzf aws-parallelcluster-node.tgz
+      cd aws-parallelcluster-node-*
       sudo /usr/bin/python setup.py install
     NODE
   end
 elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-  # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile cfncluster-node dependencies
-  ruby_block "pip_install_cfncluster_node" do
+  # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile aws-parallelcluster-node dependencies
+  ruby_block "pip_install_parallelcluster_node" do
     block do
-      pip_install_package('cfncluster-node', node['cfncluster']['cfncluster-node-version'])
+      pip_install_package('aws-parallelcluster-node', node['cfncluster']['cfncluster-node-version'])
     end
   end
 elsif node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
   # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
-  python_package "cfncluster-node" do
+  python_package "aws-parallelcluster-node" do
     version node['cfncluster']['cfncluster-node-version']
     install_options '--no-deps'
   end
@@ -163,7 +163,7 @@ elsif node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
     version '2.4.2'
   end
 else
-  python_package "cfncluster-node" do
+  python_package "aws-parallelcluster-node" do
     version node['cfncluster']['cfncluster-node-version']
   end
 end
@@ -198,7 +198,7 @@ cookbook_file "ami_cleanup.sh" do
 end
 
 # Install Ganglia
-include_recipe "cfncluster::_ganglia_install"
+include_recipe "aws-parallelcluster::_ganglia_install"
 
 # Install NVIDIA and CUDA
-include_recipe "cfncluster::_nvidia_install"
+include_recipe "aws-parallelcluster::_nvidia_install"

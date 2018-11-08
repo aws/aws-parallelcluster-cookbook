@@ -36,7 +36,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -45,11 +45,11 @@
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
       "tags" : {
-        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "run_tags" : {
-        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "launch_block_device_mappings" : [
@@ -89,7 +89,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}cfncluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -98,12 +98,12 @@
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
       "tags" : {
-        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "run_tags" : {
         "Name": "Packer Builder {{user `custom_ami_id`}}",
-        "cfncluster_version" : "cfncluster-{{user `cfncluster_version`}}",
+        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "launch_block_device_mappings" : [
@@ -190,7 +190,7 @@
         }
       },
       "run_list" : [
-        "cfncluster::_default_pre"
+        "aws-parallelcluster::_default_pre"
       ]
     },
     {
@@ -220,7 +220,7 @@
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
-        "cfncluster::default"
+        "aws-parallelcluster::default"
       ]
     },
     {
@@ -232,7 +232,7 @@
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
-        "cfncluster::default"
+        "aws-parallelcluster::default"
       ]
     },
     {
@@ -245,14 +245,14 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo curl https://s3.amazonaws.com/us-east-1-cfncluster/cookbooks/cfncluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/cfncluster-cookbook.tgz"
+        "sudo curl https://s3.amazonaws.com/us-east-1-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
       ]
     },
     {
       "type" : "shell",
       "inline" : [
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
-        "echo cfncluster-{{user `cfncluster_version`}} | sudo tee /opt/cfncluster/.bootstrapped"
+        "echo aws-parallelcluster-{{user `cfncluster_version`}} | sudo tee /opt/parallelcluster/.bootstrapped"
       ]
     },
     {

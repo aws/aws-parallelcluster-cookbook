@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-# This script creates a set of CfnCluster AMIs.
+# This script creates a set of AWS ParallelCluster AMIs.
 #
 # The following variables must be exported in the environment:
 # AWS_FLAVOR_ID=<instance-type>
@@ -9,7 +9,7 @@
 # NVIDIA_ENABLED=<no|yes>
 #
 # NOTE: The VPC and the Subnet must be in the us-east-1 region, because the packer templates refer to
-# AMI IDs from this region. Moreover, the CentOs AMIs are private to the CfnCluster AWS account.
+# AMI IDs from this region. Moreover, the CentOs AMIs are private to the AWS ParallelCluster account.
 #
 # Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom] [--build-date <build-date>]
 #   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1404|ubuntu1604)

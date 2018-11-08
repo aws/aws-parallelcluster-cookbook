@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: default
 #
 # Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -13,6 +13,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'cfncluster::sge_install'
-include_recipe 'cfncluster::torque_install'
-include_recipe 'cfncluster::slurm_install'
+include_recipe 'aws-parallelcluster::sge_install'
+include_recipe 'aws-parallelcluster::torque_install'
+include_recipe 'aws-parallelcluster::slurm_install'
