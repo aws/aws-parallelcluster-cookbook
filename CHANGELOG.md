@@ -3,6 +3,15 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.0.0
+-----
+
+- Rename CfnCluster to AWS ParallelCluster
+- Support multiple EBS Volumes
+- Add AWS Batch as a supported scheduler
+- Support Custom AMI's
+
+
 1.6.0
 -----
 
