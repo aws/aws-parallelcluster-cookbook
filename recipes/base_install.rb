@@ -134,10 +134,10 @@ end
 if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
   # Install custom aws-parallelcluster-node package
   bash "install aws-parallelcluster-node" do
-    cwd '/tmp'
+    cwd Chef::Config[:file_cache_path]
     code <<-NODE
       source /tmp/proxy.sh
-      sudo pip uninstall --yes aws-parallelcluster-node
+      pip uninstall --yes aws-parallelcluster-node
       curl -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
       cd aws-parallelcluster-node-*

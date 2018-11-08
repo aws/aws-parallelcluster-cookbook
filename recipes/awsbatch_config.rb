@@ -38,7 +38,7 @@ end
 if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']['custom_awsbatchcli_package'].empty?
   # Install custom aws-parallelcluster package
   bash "install aws-parallelcluster-awsbatch-cli" do
-    cwd '/tmp'
+    cwd Chef::Config[:file_cache_path]
     code <<-EOH
       source /tmp/proxy.sh
       curl -v -L -o aws-parallelcluster.tgz #{node['cfncluster']['custom_awsbatchcli_package']}

@@ -1,4 +1,4 @@
-name 'aws-parallelcluster-cookbook'
+name 'aws-parallelcluster'
 maintainer 'Amazon Web Services'
 license 'Apache License 2.0'
 description 'Installs/Configures AWS ParallelCluster'
