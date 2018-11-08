@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: custom_install
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -15,4 +15,4 @@
 
 # Use these recipes to add a custom scheduler
 
-include_recipe 'cfncluster::base_install'
+include_recipe 'aws-parallelcluster::base_install'

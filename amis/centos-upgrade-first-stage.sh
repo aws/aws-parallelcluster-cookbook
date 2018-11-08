@@ -38,12 +38,12 @@ if test $is_centos6 -eq 1; then
 
     # elrepo by default enables their base repo, but not their kernel
     # repo.  We want to enable the kernel repo, but not the base repo,
-    # to match what we've done in previous CfnCluster releases.
+    # to match what we've done in previous AWS ParallelCluster releases.
     # Rather than some super-ugly sed, just copy an archived repo
     # file.
     sudo cp /tmp/centos6.elrepo.repo /etc/yum.repos.d/elrepo.repo
 
-    # CfnCluster CentOS AMIs have always shipped with the elrepo -lt
+    # AWS ParallelCluster CentOS AMIs have always shipped with the elrepo -lt
     # kernel as the default, but it appears to have been set as the
     # default by hand in grub.conf.  Make the -lt kernel the default
     # in systconfig, so yum upgrade won't revert the default kernel

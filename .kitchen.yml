@@ -13,14 +13,14 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[cfncluster::_default_pre]
-      - recipe[cfncluster::default]
+      - recipe[aws-parallelcluster::_default_pre]
+      - recipe[aws-parallelcluster::default]
     attributes:
 
   - name: default_gpu
     run_list:
-      - recipe[cfncluster::_default_pre]
-      - recipe[cfncluster::default]
+      - recipe[aws-parallelcluster::_default_pre]
+      - recipe[aws-parallelcluster::default]
     attributes:
       cfncluster:
         nvidia:
@@ -28,12 +28,12 @@ suites:
 
   - name: base_install
     run_list:
-      - recipe[cfncluster::base_install]
+      - recipe[aws-parallelcluster::base_install]
     attributes:
 
   - name: base_install_gpu
     run_list:
-      - recipe[cfncluster::base_install]
+      - recipe[aws-parallelcluster::base_install]
     attributes:
       cfncluster:
         nvidia:
@@ -41,23 +41,23 @@ suites:
 
   - name: sge_install
     run_list:
-      - recipe[cfncluster::sge_install]
+      - recipe[aws-parallelcluster::sge_install]
     attributes:
 
   - name: torque_install
     run_list:
-      - recipe[cfncluster::torque_install]
+      - recipe[aws-parallelcluster::torque_install]
     attributes:
 
   - name: slurm_install
     run_list:
-      - recipe[cfncluster::slurm_install]
+      - recipe[aws-parallelcluster::slurm_install]
     attributes:
 
   - name: base_config_MasterServer
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::base_config]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::base_config]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -71,9 +71,9 @@ suites:
 
   - name: sge_config_MasterServer
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::sge_config]
-      - recipe[cfncluster::tests]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::sge_config]
+      - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -90,9 +90,9 @@ suites:
 
   - name: torque_config_MasterServer
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::torque_config]
-      - recipe[cfncluster::tests]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::torque_config]
+      - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -109,9 +109,9 @@ suites:
 
   - name: slurm_config_MasterServer
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::slurm_config]
-      - recipe[cfncluster::tests]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'MasterServer'
@@ -128,9 +128,9 @@ suites:
 
   - name: sge_config_ComputeFleet
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::sge_config]
-      - recipe[cfncluster::tests]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::sge_config]
+      - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
@@ -147,9 +147,9 @@ suites:
 
   - name: torque_config_ComputeFleet
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::torque_config]
-      - recipe[cfncluster::tests]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::torque_config]
+      - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'
@@ -166,9 +166,9 @@ suites:
 
   - name: slurm_config_ComputeFleet
     run_list:
-      - recipe[cfncluster::_prep_env]
-      - recipe[cfncluster::slurm_config]
-      - recipe[cfncluster::tests]
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
         cfn_node_type: 'ComputeFleet'

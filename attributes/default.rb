@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Attributes:: default
 #
 # Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # Base dir
-default['cfncluster']['base_dir'] = '/opt/cfncluster'
+default['cfncluster']['base_dir'] = '/opt/parallelcluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
@@ -49,7 +49,7 @@ default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/comp
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
 
-# OpenSSH settings for CfnCluster instances
+# OpenSSH settings for AWS ParallelCluster instances
 default['openssh']['server']['protocol'] = '2'
 default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
 default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
@@ -134,7 +134,7 @@ end
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
 
-# cfncluster variables (also in /etc/cfncluster/cfnconfig)
+# ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cfncluster']['cfn_region'] = 'us-east-1'
 default['cfncluster']['stack_name'] = nil
 default['cfncluster']['cfn_sqs_queue'] = nil

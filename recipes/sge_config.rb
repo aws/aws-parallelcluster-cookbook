@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: sge_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -13,15 +13,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'cfncluster::base_config'
-include_recipe 'cfncluster::sge_install'
+include_recipe 'aws-parallelcluster::base_config'
+include_recipe 'aws-parallelcluster::sge_install'
 
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'cfncluster::_master_sge_config'
+  include_recipe 'aws-parallelcluster::_master_sge_config'
 when 'ComputeFleet'
-  include_recipe 'cfncluster::_compute_sge_config'
+  include_recipe 'aws-parallelcluster::_compute_sge_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

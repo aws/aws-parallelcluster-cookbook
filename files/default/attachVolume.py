@@ -15,7 +15,7 @@ def convert_dev(dev):
     # FIXME This approach could be broken in some OS variants, see
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html
     if '/nvme' in dev:
-        return '/dev/' + os.popen('sudo /usr/local/sbin/cfncluster-ebsnvme-id -b ' + dev).read().strip()
+        return '/dev/' + os.popen('sudo /usr/local/sbin/parallelcluster-ebsnvme-id -b ' + dev).read().strip()
     elif '/hd' in dev:
         return dev.replace('hd', 'sd')
     elif '/xvd' in dev:

@@ -11,13 +11,13 @@ set -x
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-. /etc/cfncluster/cfnconfig
+. /etc/parallelcluster/cfnconfig
 
 # Error exit function
 function error_exit () {
   script=`basename $0`
-  echo "cfncluster: $script - $1"
-  logger -t cfncluster "$script - $1"
+  echo "parallelcluster: $script - $1"
+  logger -t parallelcluster "$script - $1"
   exit 1
 }
 

@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: _compute_sge_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -31,8 +31,8 @@ link '/etc/profile.d/sge.csh' do
   to '/opt/sge/default/common/settings.csh'
 end
 
-directory '/opt/cfncluster/templates'
-directory '/opt/cfncluster/templates/sge'
-link '/opt/cfncluster/templates/sge/sge_inst.conf' do
+directory '/opt/parallelcluster/templates'
+directory '/opt/parallelcluster/templates/sge'
+link '/opt/parallelcluster/templates/sge/sge_inst.conf' do
   to '/opt/sge/sge_inst.conf'
 end

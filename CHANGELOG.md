@@ -1,7 +1,7 @@
-cfncluster-cookbook CHANGELOG
-=============================
+aws-parallelcluster-cookbook CHANGELOG
+======================================
 
-This file is used to list changes made in each version of the cfncluster cookbook.
+This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
 1.6.0
 -----

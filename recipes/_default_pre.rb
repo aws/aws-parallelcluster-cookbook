@@ -1,5 +1,5 @@
 #
-# Cookbook Name:: cfncluster
+# Cookbook Name:: aws-parallelcluster
 # Recipe:: _default_pre
 #
 # Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -13,7 +13,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'cfncluster::_update_packages'
+include_recipe 'aws-parallelcluster::_update_packages'
 
 # Reboot after preliminary configuration steps
 if !tagged?('rebooted') && node['cfncluster']['default_pre_reboot'] == 'true'
