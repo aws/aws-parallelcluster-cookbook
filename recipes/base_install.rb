@@ -141,7 +141,7 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       curl -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
       cd aws-parallelcluster-node-*
-      sudo /usr/bin/python setup.py install
+      /usr/bin/python setup.py install
     NODE
   end
 elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
