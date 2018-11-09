@@ -44,7 +44,7 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
       curl -v -L -o aws-parallelcluster.tgz #{node['cfncluster']['custom_awsbatchcli_package']}
       tar -xzf aws-parallelcluster.tgz
       cd aws-parallelcluster-*
-      sudo pip install cli/
+      pip install cli/
     EOH
   end
 else
