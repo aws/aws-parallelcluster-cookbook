@@ -53,7 +53,7 @@ else
     # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile aws-parallelcluster dependencies
     ruby_block "pip_install_parallelcluster" do
       block do
-        pip_install_package('cfncluster', node['cfncluster']['cfncluster-version'])
+        pip_install_package('aws-parallelcluster', node['cfncluster']['cfncluster-version'])
       end
     end
   else
