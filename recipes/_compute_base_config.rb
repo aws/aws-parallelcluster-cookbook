@@ -58,22 +58,22 @@ user node['cfncluster']['cfn_cluster_user'] do
 end
 
 # Parse shared directory info and turn into an array
-_shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
-_shared_dir_array.each_with_index do |dir, index|
-    _shared_dir_array[index] = dir.strip
-    _shared_dir_array[index] = "/"+_shared_dir_array[index]
+shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
+shared_dir_array.each_with_index do |dir, index|
+  shared_dir_array[index] = dir.strip
+  shared_dir_array[index] = "/" + shared_dir_array[index]
 end
 
 # Mount each volume with NFS
-_shared_dir_array.each do |dirname|
-    # Created shared mount point
-    directory dirname do
-      mode '1777'
-      owner 'root'
-      group 'root'
-      recursive true
-      action :create
-    end
+shared_dir_array.each do |dirname|
+  # Created shared mount point
+  directory dirname do
+    mode '1777'
+    owner 'root'
+    group 'root'
+    recursive true
+    action :create
+  end
 
     # Mount shared volume over NFS
     mount dirname do
