@@ -1,5 +1,6 @@
 name 'aws-parallelcluster'
 maintainer 'Amazon Web Services'
+maintainer_email ''
 license 'Apache License 2.0'
 description 'Installs/Configures AWS ParallelCluster'
 long_description 'Installs/Configures AWS ParallelCluster'
