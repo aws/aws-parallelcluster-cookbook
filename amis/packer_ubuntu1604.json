@@ -154,7 +154,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo apt-get -y install build-essential curl wget"
+        "sudo apt-get -y install build-essential curl wget jq"
       ]
     },
     {
