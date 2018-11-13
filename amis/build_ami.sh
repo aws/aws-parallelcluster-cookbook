@@ -131,9 +131,11 @@ check_options() {
       export AWS_REGION="us-east-1"
     elif [ "${_partition}" == "govcloud" ]; then
       export AWS_REGION="us-gov-west-1"
+    elif [ "${_partition}" == "region" ]; then
+      export AWS_REGION="${_region}"
     else
       echo "Must provide AWS partition to build for."
-      echo "Options: commercial govcloud"
+      echo "Options: commercial govcloud region"
       exit 1
     fi
 
