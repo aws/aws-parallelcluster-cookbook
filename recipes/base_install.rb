@@ -69,9 +69,9 @@ end
 
 # Install AWSCLI
 if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-  package 'awscli' do
-    retries 3
-    retry_delay 5
+  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
+  python_package 'awscli' do
+    version '1.15.85' # This imply botocore 1.10.84 which does not require urllib3
   end
 else
   python_package 'awscli'
