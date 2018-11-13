@@ -32,7 +32,7 @@ when 'rhel', 'amazon'
 when 'debian'
   include_recipe 'apt'
 end
-include_recipe "build-essential"
+build_essential
 include_recipe "aws-parallelcluster::_setup_python"
 
 # Install lots of packages
