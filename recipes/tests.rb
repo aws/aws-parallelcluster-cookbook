@@ -86,3 +86,8 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
     raise "cfn_node_type must be MasterServer or ComputeFleet"
   end
 end
+
+execute 'execute jq' do
+  command "jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster'"
+  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
+end
