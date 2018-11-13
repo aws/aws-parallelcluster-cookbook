@@ -189,6 +189,16 @@ cookbook_file "supervisord-init" do
   mode "0755"
 end
 
+if (node['platform'] == 'ubuntu' && node['platform_version'] == "14.04") || (node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7)
+  # Install jq for manipulating json files
+  cookbook_file "jq-1.4" do
+    path "/usr/local/bin/jq"
+    owner "root"
+    group "root"
+    mode "0755"
+  end
+end
+
 # AMI cleanup script
 cookbook_file "ami_cleanup.sh" do
   path '/usr/local/sbin/ami_cleanup.sh'
