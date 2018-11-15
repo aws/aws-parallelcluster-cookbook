@@ -115,6 +115,9 @@ nfs_export "/home" do
   options ['no_root_squash']
 end
 
+# Setup RAID array on master node
+include_recipe 'aws-parallelcluster::setup_raid_on_master'
+
 # Configure Ganglia on the Master
 if node['cfncluster']['ganglia_enabled'] == 'yes'
   template '/etc/ganglia/gmetad.conf' do
