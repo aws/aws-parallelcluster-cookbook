@@ -5,7 +5,7 @@ description 'Installs/Configures AWS ParallelCluster'
 long_description 'Installs/Configures AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
-version '2.0.0'
+version '2.0.2'
 
 depends 'build-essential', '~> 8.1.1'
 depends 'poise-python', '~> 1.7.0'
