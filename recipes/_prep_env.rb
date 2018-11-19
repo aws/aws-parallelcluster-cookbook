@@ -41,10 +41,3 @@ cookbook_file "fetch_and_run" do
   group "root"
   mode "0755"
 end
-
-cookbook_file "compute_ready" do
-  path "/opt/parallelcluster/scripts/compute_ready"
-  owner "root"
-  group "root"
-  mode "0755"
-end
