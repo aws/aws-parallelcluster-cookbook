@@ -115,8 +115,15 @@ nfs_export "/home" do
   options ['no_root_squash']
 end
 
+
 # Setup RAID array on master node
 include_recipe 'aws-parallelcluster::setup_raid_on_master'
+
+# Only run FSx on centos for now
+if node['platform'] == 'centos'
+  # Install FSx
+  include_recipe 'aws-parallelcluster::mount_fsx'
+end
 
 # Configure Ganglia on the Master
 if node['cfncluster']['ganglia_enabled'] == 'yes'
