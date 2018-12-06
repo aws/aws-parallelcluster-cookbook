@@ -26,6 +26,9 @@ node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].spli
 
 nfs_master = node['cfncluster']['cfn_master']
 
+# Mount EFS directory with efs_mount recipe
+include_recipe 'aws-parallelcluster::efs_mount'
+
 # Mount /home over NFS
 mount '/home' do
   device "#{nfs_master}:/home"
