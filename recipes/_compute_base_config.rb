@@ -53,6 +53,12 @@ if raid_shared_dir != "NONE"
   end
 end
 
+# Only run FSx on centos for now
+if node['platform'] == 'centos'
+  # Install FSx
+  include_recipe 'aws-parallelcluster::mount_fsx'
+end
+
 # Mount /home over NFS
 mount '/home' do
   device "#{nfs_master}:/home"
