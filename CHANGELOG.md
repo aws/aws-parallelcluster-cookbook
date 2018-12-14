@@ -3,6 +3,13 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.1.0
+-----
+
+- EFS support
+- RAID support
+- China region support
+
 2.0.2
 -----
 
