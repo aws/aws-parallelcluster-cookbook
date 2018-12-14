@@ -28,7 +28,7 @@
           "name": "ubuntu/images/hvm-ssd/ubuntu-trusty-14.04-amd64-server-*",
           "root-device-type": "ebs"
         },
-        "owners": ["099720109477", "513442679011"],
+        "owners": ["099720109477", "513442679011", "837727238323"],
         "most_recent": true
       },
       "ami_regions" : "{{user `build_for`}}",
