@@ -8,7 +8,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 - EFS support
 - RAID support
-- China region support
 
 2.0.2
 -----
