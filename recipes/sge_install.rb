@@ -21,8 +21,6 @@ sge_tarball = "#{node['cfncluster']['sources_dir']}/sge-#{node['cfncluster']['sg
 remote_file sge_tarball do
   source node['cfncluster']['sge']['url']
   mode '0644'
-  retries 3
-  retry_delay 5
   # TODO: Add version or checksum checks
   not_if { ::File.exist?(sge_tarball) }
 end

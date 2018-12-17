@@ -121,8 +121,6 @@ remote_file '/usr/bin/ec2-metadata' do
   user 'root'
   group 'root'
   mode '0755'
-  retries 3
-  retry_delay 5
 end
 
 # Fix dependencies for CentOS 6 (Python 2.6)
@@ -140,7 +138,7 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
     code <<-NODE
       source /tmp/proxy.sh
       pip uninstall --yes aws-parallelcluster-node
-      curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
+      curl -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
       cd aws-parallelcluster-node-*
       /usr/bin/python setup.py install
