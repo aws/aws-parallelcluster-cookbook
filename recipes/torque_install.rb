@@ -22,8 +22,6 @@ torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster
 remote_file torque_tarball do
   source node['cfncluster']['torque']['url']
   mode '0644'
-  retries 3
-  retry_delay 5
   # TODO: Add version or checksum checks
   not_if { ::File.exist?(torque_tarball) }
 end

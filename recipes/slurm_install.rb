@@ -22,8 +22,6 @@ slurm_tarball = "#{node['cfncluster']['sources_dir']}/slurm-#{node['cfncluster']
 remote_file slurm_tarball do
   source node['cfncluster']['slurm']['url']
   mode '0644'
-  retries 3
-  retry_delay 5
   # TODO: Add version or checksum checks
   not_if { ::File.exist?(slurm_tarball) }
 end
