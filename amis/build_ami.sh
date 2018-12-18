@@ -13,7 +13,7 @@
 #
 # Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom] [--build-date <build-date>]
 #   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1404|ubuntu1604)
-#   partition: partition to build in (supported values: commercial|govcloud)
+#   partition: partition to build in (supported values: commercial|govcloud|china)
 #   region: region to copy ami too (supported values: all|us-east-1|us-gov-west-1|...)
 #   custom: specifies to create the AMI from a custom AMI-id, which must be specified by variable CUSTOM_AMI_ID in the environment (optional)
 #   public: specifies AMIs visibility (optional, default is private)
@@ -131,9 +131,13 @@ check_options() {
       export AWS_REGION="us-east-1"
     elif [ "${_partition}" == "govcloud" ]; then
       export AWS_REGION="us-gov-west-1"
+    elif [ "${_partition}" == "china" ]; then
+      export AWS_REGION="cn-north-1"
+    elif [ "${_partition}" == "region" ]; then
+      export AWS_REGION="${_region}"
     else
       echo "Must provide AWS partition to build for."
-      echo "Options: commercial govcloud"
+      echo "Options: commercial govcloud china region"
       exit 1
     fi
 

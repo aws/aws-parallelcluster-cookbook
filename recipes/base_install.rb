@@ -32,7 +32,7 @@ when 'rhel', 'amazon'
 when 'debian'
   include_recipe 'apt'
 end
-include_recipe "build-essential"
+build_essential
 include_recipe "aws-parallelcluster::_setup_python"
 
 # Install lots of packages
@@ -69,9 +69,9 @@ end
 
 # Install AWSCLI
 if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-  package 'awscli' do
-    retries 3
-    retry_delay 5
+  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
+  python_package 'awscli' do
+    version '1.15.85' # This imply botocore 1.10.84 which does not require urllib3
   end
 else
   python_package 'awscli'
@@ -187,6 +187,16 @@ cookbook_file "supervisord-init" do
   owner "root"
   group "root"
   mode "0755"
+end
+
+if (node['platform'] == 'ubuntu' && node['platform_version'] == "14.04") || (node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7)
+  # Install jq for manipulating json files
+  cookbook_file "jq-1.4" do
+    path "/usr/local/bin/jq"
+    owner "root"
+    group "root"
+    mode "0755"
+  end
 end
 
 # AMI cleanup script

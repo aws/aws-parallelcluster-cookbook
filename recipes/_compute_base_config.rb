@@ -26,6 +26,30 @@ node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].spli
 
 nfs_master = node['cfncluster']['cfn_master']
 
+# Mount EFS directory with efs_mount recipe
+include_recipe 'aws-parallelcluster::efs_mount'
+
+# Parse and get RAID shared directory info and turn into an array
+raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
+
+if raid_shared_dir != "NONE"
+  # Created RAID shared mount point
+  directory raid_shared_dir do
+    mode '1777'
+    owner 'root'
+    group 'root'
+    action :create
+  end
+
+  # Mount RAID directory over NFS
+  mount raid_shared_dir do
+    device "#{nfs_master}:#{raid_shared_dir}"
+    fstype 'nfs'
+    options 'hard,intr,noatime,vers=3,_netdev'
+    action %i[mount enable]
+  end
+end
+
 # Mount /home over NFS
 mount '/home' do
   device "#{nfs_master}:/home"
@@ -58,30 +82,30 @@ user node['cfncluster']['cfn_cluster_user'] do
 end
 
 # Parse shared directory info and turn into an array
-_shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
-_shared_dir_array.each_with_index do |dir, index|
-    _shared_dir_array[index] = dir.strip
-    _shared_dir_array[index] = "/"+_shared_dir_array[index]
+shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
+shared_dir_array.each_with_index do |dir, index|
+  shared_dir_array[index] = dir.strip
+  shared_dir_array[index] = "/" + shared_dir_array[index]
 end
 
 # Mount each volume with NFS
-_shared_dir_array.each do |dirname|
-    # Created shared mount point
-    directory dirname do
-      mode '1777'
-      owner 'root'
-      group 'root'
-      recursive true
-      action :create
-    end
+shared_dir_array.each do |dirname|
+  # Created shared mount point
+  directory dirname do
+    mode '1777'
+    owner 'root'
+    group 'root'
+    recursive true
+    action :create
+  end
 
-    # Mount shared volume over NFS
-    mount dirname do
-      device "#{nfs_master}:#{dirname}"
-      fstype 'nfs'
-      options 'hard,intr,noatime,vers=3,_netdev'
-      action %i[mount enable]
-    end
+  # Mount shared volume over NFS
+  mount dirname do
+    device "#{nfs_master}:#{dirname}"
+    fstype 'nfs'
+    options 'hard,intr,noatime,vers=3,_netdev'
+    action %i[mount enable]
+  end
 end
 
 # Install nodewatcher.cfg
