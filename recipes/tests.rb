@@ -19,6 +19,18 @@ execute 'execute awscli' do
   user node['cfncluster']['cfn_cluster_user']
 end
 
+bash 'check awscli regions' do
+  cwd Chef::Config[:file_cache_path]
+  code <<-AWSREGIONS
+    export PATH="/usr/local/bin:/usr/bin/:$PATH"
+    regions=($(aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
+    for region in "${regions[@]}"
+    do
+      aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
+    done
+  AWSREGIONS
+end
+
 if node['cfncluster']['cfn_scheduler'] == 'sge'
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
@@ -85,4 +97,15 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   else
     raise "cfn_node_type must be MasterServer or ComputeFleet"
   end
+end
+
+bash 'execute jq' do
+  cwd Chef::Config[:file_cache_path]
+  code <<-JQMERGE
+    # Set PATH as in the UserData script of the CloudFormation template
+    export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
+    echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::sge_config]"}' > /tmp/dna.json
+    echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
+    jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster' || exit 1
+  JQMERGE
 end

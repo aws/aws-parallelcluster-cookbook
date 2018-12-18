@@ -17,20 +17,19 @@
 include_recipe 'aws-parallelcluster::base_config'
 include_recipe 'aws-parallelcluster::base_install'
 
-
 # Install aws-parallelcluster-awsbatch-cli.cfg
 awsbatch_cli_config_dir = "/home/#{node['cfncluster']['cfn_cluster_user']}/.parallelcluster/"
 
-directory "#{awsbatch_cli_config_dir}" do
-  owner "#{node['cfncluster']['cfn_cluster_user']}"
-  group "#{node['cfncluster']['cfn_cluster_user']}"
+directory awsbatch_cli_config_dir do
+  owner node['cfncluster']['cfn_cluster_user']
+  group node['cfncluster']['cfn_cluster_user']
   recursive true
 end
 
 template "#{awsbatch_cli_config_dir}/awsbatch-cli.cfg" do
   source 'awsbatch-cli.cfg.erb'
-  owner "#{node['cfncluster']['cfn_cluster_user']}"
-  group "#{node['cfncluster']['cfn_cluster_user']}"
+  owner node['cfncluster']['cfn_cluster_user']
+  group node['cfncluster']['cfn_cluster_user']
   mode '0644'
 end
 
@@ -39,26 +38,24 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
   # Install custom aws-parallelcluster package
   bash "install aws-parallelcluster-awsbatch-cli" do
     cwd Chef::Config[:file_cache_path]
-    code <<-EOH
+    code <<-CLI
       source /tmp/proxy.sh
       curl -v -L -o aws-parallelcluster.tgz #{node['cfncluster']['custom_awsbatchcli_package']}
       tar -xzf aws-parallelcluster.tgz
       cd aws-parallelcluster-*
       pip install cli/
-    EOH
+    CLI
+  end
+# Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
+elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
+  # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile aws-parallelcluster dependencies
+  ruby_block "pip_install_parallelcluster" do
+    block do
+      pip_install_package('aws-parallelcluster', node['cfncluster']['cfncluster-version'])
+    end
   end
 else
-  # Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
-  if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-    # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile aws-parallelcluster dependencies
-    ruby_block "pip_install_parallelcluster" do
-      block do
-        pip_install_package('aws-parallelcluster', node['cfncluster']['cfncluster-version'])
-      end
-    end
-  else
-    python_package "aws-parallelcluster" do
-      version node['cfncluster']['cfncluster-version']
-    end
+  python_package "aws-parallelcluster" do
+    version node['cfncluster']['cfncluster-version']
   end
 end

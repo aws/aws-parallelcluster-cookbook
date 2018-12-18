@@ -3,6 +3,18 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.1.0
+-----
+
+- EFS support
+- RAID support
+
+2.0.2
+-----
+
+- Fix issue with jq on ubuntu1404 and centos6. Now using version 1.4
+- Fix dependency issue with AWS CLI package on ubuntu1404
+
 2.0.0
 -----
 
