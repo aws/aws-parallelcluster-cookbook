@@ -153,7 +153,7 @@ do_command() {
     RC=0
 
     rm -rf "${VENDOR_PATH}" || RC=1
-    berks vendor "${VENDOR_PATH}" --berksfile "${cwd}/../Berksfile" || RC=1
+    berks vendor "${VENDOR_PATH}" --berksfile "${cwd}/../Berksfile_ami" || RC=1
     if [ "x${_build_date}" == "x" ]; then
       export BUILD_DATE=$(date +%Y%m%d%H%M)
     else
