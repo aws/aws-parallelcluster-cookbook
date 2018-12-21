@@ -257,7 +257,7 @@
       "inline" : [
         "region=\"{{user `region`}}\"",
         "bucket=\"s3.${region}.amazonaws.com\"",
-        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.${region}.amazonaws.com.cn\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn\"",
         "sudo curl --retry 3 https://${bucket}/${region}-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `parallelcluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
       ]
     },
