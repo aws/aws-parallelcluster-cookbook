@@ -236,7 +236,7 @@
       "type" : "shell",
       "inline" : [
         "region=\"{{user `region`}}\"",
-        "bucket=\"s3.${region}.amazonaws.com\"",
+        "bucket=\"s3.amazonaws.com\"",
         "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn\"",
         "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
         "which pip2",
