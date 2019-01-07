@@ -21,6 +21,8 @@ munge_tarball = "#{node['cfncluster']['sources_dir']}/munge-#{node['cfncluster']
 remote_file munge_tarball do
   source node['cfncluster']['munge']['munge_url']
   mode '0644'
+  retries 3
+  retry_delay 5
   # TODO: Add version or checksum checks
   not_if { ::File.exist?(munge_tarball) }
 end

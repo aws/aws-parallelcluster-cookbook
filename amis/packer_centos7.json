@@ -166,7 +166,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}"
+        "curl --retry 3 -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}"
       ]
     },
     {
@@ -235,15 +235,21 @@
     {
       "type" : "shell",
       "inline" : [
-        "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip",
+        "region=\"{{user `region`}}\"",
+        "bucket=\"s3.amazonaws.com\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn\"",
+        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
         "which pip2",
-        "if [ $? -eq 0 ]; then sudo pip2 install /tmp/aws-cfn-bootstrap-latest.zip; else sudo pip install /tmp/aws-cfn-bootstrap-latest.zip; fi"
+        "if [ $? -eq 0 ]; then sudo pip2 install /tmp/aws-cfn-bootstrap-latest.tar.gz; else sudo pip install /tmp/aws-cfn-bootstrap-latest.tar.gz; fi"
       ]
     },
     {
       "type" : "shell",
       "inline" : [
-        "sudo curl https://s3.amazonaws.com/us-east-1-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `parallelcluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
+        "region=\"{{user `region`}}\"",
+        "bucket=\"s3.${region}.amazonaws.com\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.${region}.amazonaws.com.cn\"",
+        "sudo curl --retry 3 https://${bucket}/${region}-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `parallelcluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
       ]
     },
     {
