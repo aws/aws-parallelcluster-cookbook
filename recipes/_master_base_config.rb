@@ -36,14 +36,12 @@ shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
 shared_dir_array.each_with_index do |dir, index|
   shared_dir_array[index] = dir.strip
   shared_dir_array[index] = "/" + shared_dir_array[index]
-  puts "Shared directory #{index}: #{dir}"
 end
 
 # Parse volume info into an arary
 vol_array = node['cfncluster']['cfn_volume'].split(',')
 vol_array.each_with_index do |vol, index|
   vol_array[index] = vol.strip
-  puts "Shared directory #{index}: #{vol}"
 end
 
 # Mount each volume
@@ -116,6 +114,9 @@ nfs_export "/home" do
   writeable true
   options ['no_root_squash']
 end
+
+# Setup RAID array on master node
+include_recipe 'aws-parallelcluster::setup_raid_on_master'
 
 # Configure Ganglia on the Master
 if node['cfncluster']['ganglia_enabled'] == 'yes'

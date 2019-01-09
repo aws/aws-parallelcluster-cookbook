@@ -1,7 +1,7 @@
 {
   "variables" : {
-    "cfncluster_version" : "",
-    "cfncluster_cookbook_version" : "",
+    "parallelcluster_version" : "",
+    "parallelcluster_cookbook_version" : "",
     "chef_version" : "",
     "ridley_version" : "",
     "berkshelf_version" : "",
@@ -36,7 +36,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-centos6-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -45,11 +45,11 @@
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
       "tags" : {
-        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "run_tags" : {
-        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "launch_block_device_mappings" : [
@@ -89,7 +89,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "centos",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `cfncluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-centos6-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -98,12 +98,12 @@
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
       "tags" : {
-        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "run_tags" : {
         "Name": "Packer Builder {{user `custom_ami_id`}}",
-        "cfncluster_version" : "aws-parallelcluster-{{user `cfncluster_version`}}",
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}"
       },
       "launch_block_device_mappings" : [
@@ -167,7 +167,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "curl -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}"
+        "curl --retry 3 -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}"
       ]
     },
     {
@@ -238,21 +238,27 @@
     {
       "type" : "shell",
       "inline" : [
-        "wget -O /tmp/aws-cfn-bootstrap-latest.zip https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.zip",
-        "sudo pip install /tmp/aws-cfn-bootstrap-latest.zip"
+        "region=\"{{user `region`}}\"",
+        "bucket=\"s3.amazonaws.com\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn\"",
+        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
+        "sudo pip install /tmp/aws-cfn-bootstrap-latest.tar.gz"
       ]
     },
     {
       "type" : "shell",
       "inline" : [
-        "sudo curl https://s3.amazonaws.com/us-east-1-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `cfncluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
+        "region=\"{{user `region`}}\"",
+        "bucket=\"s3.${region}.amazonaws.com\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.${region}.amazonaws.com.cn\"",
+        "sudo curl --retry 3 https://${bucket}/${region}-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `parallelcluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
       ]
     },
     {
       "type" : "shell",
       "inline" : [
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
-        "echo aws-parallelcluster-{{user `cfncluster_version`}} | sudo tee /opt/parallelcluster/.bootstrapped"
+        "echo aws-parallelcluster-{{user `parallelcluster_version`}} | sudo tee /opt/parallelcluster/.bootstrapped"
       ]
     },
     {

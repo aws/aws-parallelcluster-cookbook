@@ -31,6 +31,8 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
   remote_file nvidia_tmp_runfile do
     source node['cfncluster']['nvidia']['driver_url']
     mode '0755'
+    retries 3
+    retry_delay 5
     not_if { ::File.exist?(nvidia_tmp_runfile) }
   end
 
@@ -50,6 +52,8 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
   remote_file cuda_tmp_runfile do
     source node['cfncluster']['nvidia']['cuda_url']
     mode '0755'
+    retries 3
+    retry_delay 5
     not_if { ::File.exist?(cuda_tmp_runfile) }
   end
 

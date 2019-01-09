@@ -31,6 +31,8 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
     remote_file ganglia_tarball do
       source node['cfncluster']['ganglia']['url']
       mode '0644'
+      retries 3
+      retry_delay 5
       # TODO: Add version or checksum checks
       not_if { ::File.exist?(ganglia_tarball) }
     end
@@ -84,6 +86,8 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
     remote_file ganglia_web_tarball do
       source node['cfncluster']['ganglia']['web_url']
       mode '0644'
+      retries 3
+      retry_delay 5
       # TODO: Add version or checksum checks
       not_if { ::File.exist?(ganglia_web_tarball) }
     end
