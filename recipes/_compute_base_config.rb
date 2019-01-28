@@ -32,12 +32,12 @@ include_recipe 'aws-parallelcluster::efs_mount'
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 
-# Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-if !raid_shared_dir.start_with?("/")
-  raid_shared_dir = "/" + raid_shared_dir
-end
-
 if raid_shared_dir != "NONE"
+  # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
+  if !raid_shared_dir.start_with?("/")
+    raid_shared_dir = "/" + raid_shared_dir
+  end
+
   # Created RAID shared mount point
   directory raid_shared_dir do
     mode '1777'
