@@ -97,4 +97,18 @@ qmgr -c 'set server default_queue = batch'
 qmgr -c "set server query_other_jobs = True"
 
 qmgr -c 'create node <%= node['hostname'] %> np=1000'
+
+# Before setting the dummy node state to offline we need to wait for the updated okclients list
+# to be sent out to the cluster. Once this happens the state is set to free and that's when
+# we want to transition to offline.
+i=1
+while pbsnodes <%= node['hostname'] %> | grep "state = .*MOM-list-not-sent" > /dev/null; do
+  if [ $i -gt 240 ]; then
+    # Timeout after 4 minutes
+    echo "ERROR: cannot set MasterServer to offline"
+    exit 1;
+  fi
+  i=$((i + 1))
+  sleep 1
+done
 pbsnodes -o -N 'MasterServer' <%= node['hostname'] %>
