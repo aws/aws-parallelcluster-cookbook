@@ -50,6 +50,20 @@ bash 'make install' do
   creates '/opt/sge/bin/lx-amd64/sge_qmaster'
 end
 
+# Copy qconf utils (Downloaded from http://arc.liv.ac.uk/SGE/downloads/qconf_scripts.tar.gz)
+cookbook_file 'qconf_scripts.tar.gz' do
+  path '/opt/sge/util/qconf_scripts.tar.gz'
+  user 'root'
+  group 'root'
+  mode '0644'
+end
+
+bash "extract_qconf_util" do
+  code <<-EXTRACTQCONFUTIL
+    tar xf /opt/sge/util/qconf_scripts.tar.gz -C /opt/sge/util --strip-components=1 --no-same-permissions --no-same-owner
+  EXTRACTQCONFUTIL
+end
+
 # Disbale the AddQueue, so that we can manage slots per instance
 replace_or_add "AddQueue" do
   path "/opt/sge/inst_sge"
