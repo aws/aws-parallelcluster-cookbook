@@ -13,7 +13,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-fsx_shared_dir = node['cfncluster']['cfn_fsx_shared_dir'].split(',')[0]
+fsx_shared_dir = node['cfncluster']['cfn_fsx_options'].split(',')[0]
 
 # Check to see if FSx is created
 if fsx_shared_dir != "NONE"
@@ -31,7 +31,7 @@ if fsx_shared_dir != "NONE"
 
   # Mount FSx over NFS
   mount fsx_shared_dir do
-    device "#{node['cfncluster']['cfn_fsx']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com:/fsx"
+    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com:/fsx"
     fstype 'lustre'
     dump 0
     pass 0
