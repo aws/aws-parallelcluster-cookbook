@@ -58,3 +58,9 @@ service "supervisord" do
   supports restart: true
   action %i[enable start]
 end
+
+# Only run FSx on centos for now
+if node['platform'] == 'centos'
+  # Mount FSx
+  include_recipe 'aws-parallelcluster::fsx_mount'
+end
