@@ -16,8 +16,7 @@
 lustre_kmod_rpm = "#{node['cfncluster']['sources_dir']}/kmod-lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
 lustre_client_rpm = "#{node['cfncluster']['sources_dir']}/lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
 
-case node['platform_family']
-when 'rhel'
+if node['platform'] == 'centos'
   # Get Lustre Kernel Module RPM
   remote_file lustre_kmod_rpm do
     source node['cfncluster']['lustre']['kmod_url']

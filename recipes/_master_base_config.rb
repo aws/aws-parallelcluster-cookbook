@@ -118,12 +118,6 @@ end
 # Setup RAID array on master node
 include_recipe 'aws-parallelcluster::setup_raid_on_master'
 
-# Only run FSx on centos for now
-if node['platform'] == 'centos'
-  # Install FSx
-  include_recipe 'aws-parallelcluster::fsx_mount'
-end
-
 # Configure Ganglia on the Master
 if node['cfncluster']['ganglia_enabled'] == 'yes'
   template '/etc/ganglia/gmetad.conf' do
