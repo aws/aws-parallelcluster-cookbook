@@ -56,7 +56,7 @@ end
 # Only run FSx on centos for now
 if node['platform'] == 'centos'
   # Install FSx
-  include_recipe 'aws-parallelcluster::mount_fsx'
+  include_recipe 'aws-parallelcluster::fsx_mount'
 end
 
 # Mount /home over NFS
