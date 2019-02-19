@@ -35,21 +35,20 @@ if raid_shared_dir != "NONE"
   raid_vol_array.each_with_index do |volumeid, index|
     raid_dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
 
-    # Attach RAID EBS volume
-    execute "attach_raid_volume_#{index}" do
-      command "/usr/local/sbin/attachVolume.py #{volumeid}"
-      creates raid_dev_path[index]
-    end
+  # Attach RAID EBS volume
+  execute "attach_raid_volume_#{index}" do
+    command "/usr/local/sbin/attachVolume.py #{volumeid}"
+    creates raid_dev_path[index]
+  end
 
-    # wait for the drive to attach
-    ruby_block "sleeping_for_raid_volume_#{index}" do
-      block do
-        wait_for_block_dev(raid_dev_path[index])
-        puts "Attached index: #{index}, VolID: #{volumeid}"
-      end
-      action :nothing
-      subscribes :run, "execute[attach_raid_volume_#{index}]", :immediately
+  # wait for the drive to attach
+  ruby_block "sleeping_for_raid_volume_#{index}" do
+    block do
+      wait_for_block_dev(raid_dev_path[index])
+      puts "Attached index: #{index}, VolID: #{volumeid}"
     end
+    action :nothing
+    subscribes :run, "execute[attach_raid_volume_#{index}]", :immediately
   end
 
   raid_dev = "/dev/md0"
