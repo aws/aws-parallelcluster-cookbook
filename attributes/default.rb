@@ -74,12 +74,23 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail mdadm]
+
+    # Lustre Drivers for Centos 6
+    default['cfncluster']['lustre']['version'] = '2.10.6'
+    default['cfncluster']['lustre']['kmod_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el6/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el6.x86_64.rpm'
+    default['cfncluster']['lustre']['client_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el6/client/RPMS/x86_64/lustre-client-2.10.6-1.el6.x86_64.rpm'
+
     if node['platform_version'].to_i >= 7
       default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm]
+
+      # Lustre Drivers for Centos 7.6
+      default['cfncluster']['lustre']['version'] = '2.10.6'
+      default['cfncluster']['lustre']['kmod_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el7.x86_64.rpm'
+      default['cfncluster']['lustre']['client_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/lustre-client-2.10.6-1.el7.x86_64.rpm'
     end
     default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
@@ -157,9 +168,9 @@ default['cfncluster']['cfn_efs'] = nil
 default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_master'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
-default['cfncluster']['cfn_fsx_shared_dir'] = "NONE"
+default['cfncluster']['cfn_fsx_shared_dir'] = 'NONE'
 default['cfncluster']['cfn_fsx'] = nil
 default['cfncluster']['custom_node_package'] = nil
 default['cfncluster']['custom_awsbatchcli_package'] = nil
-default['cfncluster']['cfn_raid_parameters'] = "NONE"
+default['cfncluster']['cfn_raid_parameters'] = 'NONE'
 default['cfncluster']['cfn_raid_vol_ids'] = nil
