@@ -88,7 +88,7 @@ end
 shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
 shared_dir_array.each_with_index do |dir, index|
   shared_dir_array[index] = dir.strip
-  shared_dir_array[index] = "/" + shared_dir_array[index]
+  shared_dir_array[index] = "/" + shared_dir_array[index] unless shared_dir_array[index].start_with?("/")
 end
 
 # Mount each volume with NFS

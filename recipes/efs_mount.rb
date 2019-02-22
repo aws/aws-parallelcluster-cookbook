@@ -14,10 +14,14 @@
 # limitations under the License.
 
 # Get shared_dir path and mount EFS filesystem
-efs_shared_dir = "/" + node['cfncluster']['cfn_efs_shared_dir'].split(',')[0]
+efs_shared_dir =  node['cfncluster']['cfn_efs_shared_dir'].split(',')[0]
 
 # Check to see if EFS is created
-if efs_shared_dir != "/NONE"
+if efs_shared_dir != "NONE"
+
+  # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
+  efs_shared_dir = "/" + efs_shared_dir unless efs_shared_dir.start_with?("/")
+
   # Create the EFS shared directory
   directory efs_shared_dir do
     owner 'root'
