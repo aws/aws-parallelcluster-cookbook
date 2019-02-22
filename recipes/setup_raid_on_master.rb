@@ -19,9 +19,7 @@ raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  if !raid_shared_dir.start_with?("/")
-    raid_shared_dir = "/" + raid_shared_dir
-  end
+  raid_shared_dir = "/" + raid_shared_dir unless raid_shared_dir.start_with?("/")
 
   # Parse and determine RAID type (cast into integer)
   raid_type = node['cfncluster']['cfn_raid_parameters'].split(',')[1].strip.to_i
@@ -29,44 +27,44 @@ if raid_shared_dir != "NONE"
   # Parse volume info into an array
   raid_vol_array = node['cfncluster']['cfn_raid_vol_ids'].split(',')
   raid_vol_array.each_with_index do |vol, index|
-      raid_vol_array[index] = vol.strip
+    raid_vol_array[index] = vol.strip
   end
 
   # Attach each volume
   raid_dev_path = []
   raid_vol_array.each_with_index do |volumeid, index|
-      raid_dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
+    raid_dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
 
-      # Attach RAID EBS volume
-      execute "attach_raid_volume_#{index}" do
-          command "/usr/local/sbin/attachVolume.py #{volumeid}"
-          creates raid_dev_path[index]
-      end
+    # Attach RAID EBS volume
+    execute "attach_raid_volume_#{index}" do
+      command "/usr/local/sbin/attachVolume.py #{volumeid}"
+      creates raid_dev_path[index]
+    end
 
-      # wait for the drive to attach
-      ruby_block "sleeping_for_raid_volume_#{index}" do
-        block do
-           wait_for_block_dev(raid_dev_path[index])
-           puts "Attached index: #{index}, VolID: #{volumeid}"
-        end
-        action :nothing
-        subscribes :run, "execute[attach_raid_volume_#{index}]", :immediately
+    # wait for the drive to attach
+    ruby_block "sleeping_for_raid_volume_#{index}" do
+      block do
+        wait_for_block_dev(raid_dev_path[index])
+        puts "Attached index: #{index}, VolID: #{volumeid}"
       end
+      action :nothing
+      subscribes :run, "execute[attach_raid_volume_#{index}]", :immediately
+    end
   end
 
   raid_dev = "/dev/md0"
 
   # Create RAID device with mdadm
   mdadm "MY_RAID" do
-      raid_device raid_dev
-      level raid_type
-      devices raid_dev_path
+    raid_device raid_dev
+    level raid_type
+    devices raid_dev_path
   end
 
   # Wait for RAID to initialize
   ruby_block "sleeping_for_raid_block" do
     block do
-       wait_for_block_dev(raid_dev)
+      wait_for_block_dev(raid_dev)
     end
     action :nothing
     subscribes :run, "mdadm[MY_RAID]", :immediately
@@ -79,28 +77,27 @@ if raid_shared_dir != "NONE"
     subscribes :run, "ruby_block[sleeping_for_raid_block]", :immediately
   end
 
-
   # Create a configuration file to contain the RAID info, so the RAID array is reassembled automatically on boot
   if node['cfncluster']['cfn_base_os'] != "ubuntu1404"
-      execute "create_raid_config" do
-        command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf"
-        action :nothing
-        subscribes :run, "execute[setup_raid_disk]", :immediately
-      end
+    execute "create_raid_config" do
+      command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf"
+      action :nothing
+      subscribes :run, "execute[setup_raid_disk]", :immediately
+    end
 
   else
-      # Put config file in /etc/mdadm/mdadm.conf, Ubuntu1404 specific
-      execute "create_raid_config" do
-        command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf"
-        action :nothing
-        subscribes :run, "execute[setup_raid_disk]", :immediately
-      end
-      # Update initramfs to contain mdadm.conf settings, Ubuntu1404 specific
-      execute "update_raid_config" do
-        command "sudo update-initramfs -u"
-        action :nothing
-        subscribes :run, "execute[setup_raid_disk]", :immediately
-      end
+    # Put config file in /etc/mdadm/mdadm.conf, Ubuntu1404 specific
+    execute "create_raid_config" do
+      command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf"
+      action :nothing
+      subscribes :run, "execute[setup_raid_disk]", :immediately
+    end
+    # Update initramfs to contain mdadm.conf settings, Ubuntu1404 specific
+    execute "update_raid_config" do
+      command "sudo update-initramfs -u"
+      action :nothing
+      subscribes :run, "execute[setup_raid_disk]", :immediately
+    end
   end
 
   # Create the shared directory
