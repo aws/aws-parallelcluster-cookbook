@@ -56,3 +56,14 @@ if tagged?('rebooted')
     end
   end
 end
+
+# For FSx Lustre, we need to install the 4.4.0-131 kernel and restart
+if node['platform'] == 'ubuntu' && node['platform_version'] == '16.04'
+  package 'linux-image-4.4.0-131-generic'
+  package 'linux-headers-4.4.0-131-generic'
+
+  # Change Grub to use 4.4.0-131-generic kernel
+  execute 'GRUB' do
+    command "sed -i 's/GRUB_DEFAULT=.\+/GRUB\_DEFAULT=\"Advanced options for Ubuntu>Ubuntu, with Linux 4.4.0-131-generic\"/' /etc/default/grub && update-grub"
+  end
+end

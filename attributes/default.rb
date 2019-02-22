@@ -108,6 +108,12 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
+
+  # Lustre Drivers for Ubuntu 16.04
+  default['cfncluster']['lustre']['version'] = '2.10.6'
+  default['cfncluster']['lustre']['client'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/ubuntu1604/client/lustre-client-modules-4.4.0-131-generic_2.10.6-1_amd64.deb'
+  default['cfncluster']['lustre']['utils'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/ubuntu1604/client/lustre-utils_2.10.6-1_amd64.deb'
+
   if Chef::VersionConstraint.new('< 16.04').include?(node['platform_version'])
     default['cfncluster']['kernel_devel_pkg']['name'] = "linux-image-extra"
     default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
