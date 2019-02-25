@@ -214,3 +214,6 @@ include_recipe "aws-parallelcluster::_ganglia_install"
 
 # Install NVIDIA and CUDA
 include_recipe "aws-parallelcluster::_nvidia_install"
+
+# Install FSx options
+include_recipe "aws-parallelcluster::_lustre_install"

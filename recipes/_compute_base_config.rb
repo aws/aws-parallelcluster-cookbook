@@ -34,9 +34,7 @@ raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  if !raid_shared_dir.start_with?("/")
-    raid_shared_dir = "/" + raid_shared_dir
-  end
+  raid_shared_dir = "/" + raid_shared_dir unless raid_shared_dir.start_with?("/")
 
   # Created RAID shared mount point
   directory raid_shared_dir do
