@@ -3,6 +3,28 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.2.0
+-----
+
+**ENHANCEMENTS**
+- `FSx Lustre`: add support for FSx Lustre in Centos7. In case of custom AMI, FSx Lustre is
+  only supported with Centos 7.5 and Centos 7.6.
+
+**CHANGES**
+- `SGE`: allow users to force job deletion
+- `Centos7`: use official AMI as the base image when building ParallelCluster AMI
+
+**BUG FIXES**
+- `Torque`: wait for scheduler initialization before completing compute node setup
+- `EBS`: fix block device conversion to correctly attach ebs nvme volumes
+- `Packer`: retrieve `aws-cfn-bootstrap-latest` package from `cn-north-1` in all China regions.
+- `RAID`: automatically prepend `/` to `raid_shared_dir` when not specified in cluster config
+- `EBS`: remove extra leading `/` when mounting EBS volumes
+
+**TOOLING**
+- Add a script to simplify cookbook package upload when using `custom_chef_cookbook` option
+
+
 2.1.1
 -----
 
