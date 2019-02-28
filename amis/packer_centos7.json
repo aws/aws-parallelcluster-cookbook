@@ -25,10 +25,10 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "CentOS 7.x x86_64 - minimal with cloud-init - *",
+          "name": "CentOS Linux 7 x86_64 HVM EBS ENA *",
           "root-device-type": "ebs"
         },
-        "owners": ["247102896272"],
+        "owners": ["410186602215"],
         "most_recent": true
       },
       "ami_regions" : "{{user `build_for`}}",
@@ -138,6 +138,14 @@
       "inline" : [
         "sudo yum -y install epel-release",
         "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
+      ]
+    },
+    {
+      "type" : "shell",
+      "only": ["centos7"],
+      "inline" : [
+        "sudo /bin/sed -r -i -e 's/GRUB_CMDLINE_LINUX=\"(.*)\"/GRUB_CMDLINE_LINUX=\"\\1 rd.driver.blacklist=nouveau nouveau.modeset=0\"/' /etc/default/grub",
+        "sudo grub2-mkconfig -o /boot/grub2/grub.cfg"
       ]
     },
     {

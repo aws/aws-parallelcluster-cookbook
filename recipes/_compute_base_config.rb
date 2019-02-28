@@ -33,6 +33,9 @@ include_recipe 'aws-parallelcluster::efs_mount'
 raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
+  # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
+  raid_shared_dir = "/" + raid_shared_dir unless raid_shared_dir.start_with?("/")
+
   # Created RAID shared mount point
   directory raid_shared_dir do
     mode '1777'
@@ -85,7 +88,7 @@ end
 shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
 shared_dir_array.each_with_index do |dir, index|
   shared_dir_array[index] = dir.strip
-  shared_dir_array[index] = "/" + shared_dir_array[index]
+  shared_dir_array[index] = "/" + shared_dir_array[index] unless shared_dir_array[index].start_with?("/")
 end
 
 # Mount each volume with NFS

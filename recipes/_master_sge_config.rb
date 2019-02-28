@@ -65,3 +65,11 @@ bash "set_accounting_summary" do
     rm $TMPFILE
   SETAS
 end
+
+# Enable non-admin users to force delete a job
+bash "enable_forced_qdel" do
+  code <<-ENABLEFORCEDQDEL
+    . /opt/sge/default/common/settings.sh
+    /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_FORCED_QDEL global
+  ENABLEFORCEDQDEL
+end

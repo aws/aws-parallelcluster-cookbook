@@ -15,7 +15,7 @@ def convert_dev(dev):
     # FIXME This approach could be broken in some OS variants, see
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html
     if '/nvme' in dev:
-        return '/dev/' + os.popen('sudo /usr/local/sbin/parallelcluster-ebsnvme-id -b ' + dev).read().strip()
+        return '/dev/' + os.popen('sudo /usr/local/sbin/parallelcluster-ebsnvme-id -u -b ' + dev).read().strip()
     elif '/hd' in dev:
         return dev.replace('hd', 'sd')
     elif '/xvd' in dev:
@@ -58,7 +58,7 @@ def main():
     if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
         proxy = config.get('Boto', 'proxy')
         proxy_port = config.get('Boto', 'proxy_port')
-        proxy_config = Config(proxies={'https': "{}:{}".format(proxy, proxy_port)})
+        proxy_config = Config(proxies={'https': "{0}:{1}".format(proxy, proxy_port)})
 
     # Connect to AWS using boto
     ec2 = boto3.client('ec2', region_name=region, config=proxy_config)

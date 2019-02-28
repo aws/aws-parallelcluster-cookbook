@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: efs_mount
+# Recipe:: fsx_mount
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -13,35 +13,34 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Get shared_dir path and mount EFS filesystem
-efs_shared_dir =  node['cfncluster']['cfn_efs_shared_dir'].split(',')[0]
+fsx_shared_dir = node['cfncluster']['cfn_fsx_options'].split(',')[0]
 
-# Check to see if EFS is created
-if efs_shared_dir != "NONE"
+# Check to see if FSx is created
+if fsx_shared_dir != "NONE"
 
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  efs_shared_dir = "/" + efs_shared_dir unless efs_shared_dir.start_with?("/")
+  fsx_shared_dir = "/" + fsx_shared_dir unless fsx_shared_dir.start_with?("/")
 
-  # Create the EFS shared directory
-  directory efs_shared_dir do
+  # Create the shared directories
+  directory fsx_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'
     action :create
   end
 
-  # Mount EFS over NFS
-  mount efs_shared_dir do
-    device "#{node['cfncluster']['cfn_efs']}.efs.#{node['cfncluster']['cfn_region']}.amazonaws.com:/"
-    fstype 'nfs4'
-    options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
+  # Mount FSx over NFS
+  mount fsx_shared_dir do
+    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com@tcp:/fsx"
+    fstype 'lustre'
     dump 0
     pass 0
+    options %w[defaults _netdev]
     action %i[mount enable]
   end
 
-  # Make sure EFS shared directory permissions are correct
-  directory efs_shared_dir do
+  # Make sure permission is correct
+  directory fsx_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'

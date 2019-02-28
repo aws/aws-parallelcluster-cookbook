@@ -44,7 +44,7 @@ def main():
     if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
         proxy = config.get('Boto', 'proxy')
         proxy_port = config.get('Boto', 'proxy_port')
-        proxy_config = Config(proxies={'https': "{}:{}".format(proxy, proxy_port)})
+        proxy_config = Config(proxies={'https': "{0}:{1}".format(proxy, proxy_port)})
 
     # Connect to AWS using boto
     ec2 = boto3.client('ec2', region_name=region, config=proxy_config)
