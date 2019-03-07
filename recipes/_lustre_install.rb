@@ -47,4 +47,12 @@ if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split(
   end
 elsif node['platform'] == 'centos'
   Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are 7.6 and 7.5")
+elsif node['platform'] == 'amazon'
+
+  # Install lustre client module
+  package 'lustre-client' do
+    retries 3
+    retry_delay 5
+  end
+
 end
