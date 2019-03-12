@@ -240,15 +240,6 @@
     {
       "type" : "shell",
       "inline" : [
-        "region=\"{{user `region`}}\"",
-        "bucket=\"s3.${region}.amazonaws.com\"",
-        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.${region}.amazonaws.com.cn\"",
-        "sudo curl --retry 3 https://${bucket}/${region}-aws-parallelcluster/cookbooks/aws-parallelcluster-cookbook-{{user `parallelcluster_cookbook_version`}}.tgz --silent --location -o /etc/chef/aws-parallelcluster-cookbook.tgz"
-      ]
-    },
-    {
-      "type" : "shell",
-      "inline" : [
         "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
         "echo aws-parallelcluster-{{user `parallelcluster_version`}} | sudo tee /opt/parallelcluster/.bootstrapped"
       ]
