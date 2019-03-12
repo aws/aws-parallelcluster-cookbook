@@ -16,7 +16,10 @@
     "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
     "region" : "{{env `AWS_REGION`}}",
     "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}",
-    "custom_node_package" : "{{env `PARALLELCLUSTER_NODE_URL`}}"
+    "custom_node_package" : "{{env `PARALLELCLUSTER_NODE_URL`}}",
+    "parallelcluster_ref" : "{{env `PARALLELCLUSTER_REF`}}",
+    "parallelcluster_cookbook_ref" : "{{env `PARALLELCLUSTER_COOKBOOK_REF`}}",
+    "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}"
   },
   "builders" : [
     {
@@ -47,11 +50,17 @@
       "shutdown_behavior" : "terminate",
       "tags" : {
         "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
-        "build_date" : "{{user `build_date`}}"
+        "build_date" : "{{user `build_date`}}",
+        "parallelcluster_ref" : "{{user `parallelcluster_ref`}}",
+        "parallelcluster_cookbook_ref" : "{{user `parallelcluster_cookbook_ref`}}",
+        "parallelcluster_node_ref" : "{{user `parallelcluster_node_ref`}}"
       },
       "run_tags" : {
         "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
-        "build_date" : "{{user `build_date`}}"
+        "build_date" : "{{user `build_date`}}",
+        "parallelcluster_ref" : "{{user `parallelcluster_ref`}}",
+        "parallelcluster_cookbook_ref" : "{{user `parallelcluster_cookbook_ref`}}",
+        "parallelcluster_node_ref" : "{{user `parallelcluster_node_ref`}}"
       },
       "launch_block_device_mappings" : [
         {
