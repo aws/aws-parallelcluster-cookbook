@@ -15,7 +15,8 @@
     "vpc_id" : "{{env `AWS_VPC_ID`}}",
     "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
     "region" : "{{env `AWS_REGION`}}",
-    "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}"
+    "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}",
+    "custom_node_package" : "{{env `PARALLELCLUSTER_NODE_URL`}}"
   },
   "builders" : [
     {
@@ -219,7 +220,8 @@
         "cfncluster" : {
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
-          }
+          },
+          "custom_node_package" : "{{user `custom_node_package`}}"
         }
       },
       "remote_cookbook_paths" : [
