@@ -142,7 +142,7 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       pip uninstall --yes aws-parallelcluster-node
       curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
-      cd aws-parallelcluster-node-*
+      cd *aws-parallelcluster-node-*
       /usr/bin/python setup.py install
     NODE
   end
