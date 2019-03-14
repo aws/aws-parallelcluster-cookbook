@@ -42,7 +42,7 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
       source /tmp/proxy.sh
       curl --retry 3 -v -L -o aws-parallelcluster.tgz #{node['cfncluster']['custom_awsbatchcli_package']}
       tar -xzf aws-parallelcluster.tgz
-      cd aws-parallelcluster-*
+      cd *aws-parallelcluster-*
       pip install cli/
     CLI
   end
