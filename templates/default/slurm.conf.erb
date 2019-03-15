@@ -102,15 +102,5 @@ JobCompType=jobcomp/none
 # when manually editing! Default node is there to allow
 # submission of jobs to an empty cluster.
 #PARTITION:compute
-<%
-def append_dummy
-    if node['cfncluster']['cfn_max_queue_size'].to_i > 1
-        "dummy-compute[1-" + node['cfncluster']['cfn_max_queue_size'] + "]"
-    else
-        "dummy-compute"
-    end
-end
-%>
-NodeName=<%= append_dummy %> Procs=2048 State=UNKNOWN
-#NodeName= Procs=1 State=UNKNOWN
-PartitionName=compute Nodes=<%= append_dummy %> Default=YES MaxTime=INFINITE State=UP
+include slurm_parallelcluster_nodes.conf
+PartitionName=compute Nodes=ALL Default=YES MaxTime=INFINITE State=UP

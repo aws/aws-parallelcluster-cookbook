@@ -34,6 +34,13 @@ template '/opt/slurm/etc/slurm.conf' do
   mode '0644'
 end
 
+template '/opt/slurm/etc/slurm_parallelcluster_nodes.conf' do
+  source 'slurm_parallelcluster_nodes.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 cookbook_file '/opt/slurm/etc/slurm.sh' do
   source 'slurm.sh'
   owner 'root'
