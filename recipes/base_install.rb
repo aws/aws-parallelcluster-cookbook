@@ -138,12 +138,14 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
   bash "install aws-parallelcluster-node" do
     cwd Chef::Config[:file_cache_path]
     code <<-NODE
+      [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
+      echo "PATH is $PATH"
       source /tmp/proxy.sh
       pip uninstall --yes aws-parallelcluster-node
       curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
       cd *aws-parallelcluster-node-*
-      /usr/bin/python setup.py install
+      pip install .
     NODE
   end
 elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
