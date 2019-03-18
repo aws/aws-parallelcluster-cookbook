@@ -31,7 +31,11 @@ ProctrackType=proctrack/pgid
 #PluginDir=
 CacheGroups=0
 #FirstJobId=
-ReturnToService=0
+# A DOWN node will become available for use upon registration with a valid configuration only if it was set DOWN due to
+# being non-responsive. If the node was set DOWN for any other reason (low memory, unexpected reboot, etc.), its state
+# will not automatically be changed. A node registers with a valid configuration if its memory, GRES, CPU count, etc.
+# are equal to or greater than the values configured in slurm.conf.
+ReturnToService=1
 #MaxJobCount=
 #PlugStackConfig=
 #PropagatePrioProcess=
