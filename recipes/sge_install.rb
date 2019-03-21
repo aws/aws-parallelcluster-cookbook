@@ -124,4 +124,3 @@ when 'ComputeFleet'
     shell '/bin/bash'
   end
 end
-

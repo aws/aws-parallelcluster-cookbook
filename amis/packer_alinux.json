@@ -210,6 +210,7 @@
       "pause_before": "2m",
       "json" : {
         "cfncluster" : {
+          "cfn_region": "{{user `region`}}",
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },

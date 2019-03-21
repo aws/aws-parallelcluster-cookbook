@@ -45,6 +45,8 @@ default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/gangli
 default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
+# EFA
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-latest.tar.gz'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
