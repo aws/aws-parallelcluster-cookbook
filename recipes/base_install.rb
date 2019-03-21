@@ -235,3 +235,8 @@ include_recipe "aws-parallelcluster::_nvidia_install"
 
 # Install FSx options
 include_recipe "aws-parallelcluster::_lustre_install"
+
+# Install EFA
+if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) || node['platform'] == 'amazon'
+  include_recipe "aws-parallelcluster::_efa_install" unless node['cfncluster']['cfn_region'].start_with?("cn-")
+end
