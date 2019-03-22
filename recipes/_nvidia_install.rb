@@ -65,7 +65,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     code <<-CUDA
     ./cuda.run --silent --toolkit
     CUDA
-    creates '/usr/local/cuda-7.5'
+    creates '/usr/local/cuda-10.0'
   end
 
   cookbook_file 'blacklist-nouveau.conf' do
