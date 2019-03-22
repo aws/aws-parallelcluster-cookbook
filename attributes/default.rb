@@ -44,7 +44,7 @@ default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/gangli
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
