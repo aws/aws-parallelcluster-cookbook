@@ -132,6 +132,14 @@ if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
   end
 end
 
+# Upgrade six which is installed as distutils package and needed by node deps
+if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
+  python_package 'six' do
+    version '1.12.0'
+    install_options '--ignore-installed'
+  end
+end
+
 # Check whether install a custom aws-parallelcluster-node package or the standard one
 if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
   # Install custom aws-parallelcluster-node package
@@ -155,6 +163,8 @@ elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
       pip_install_package('aws-parallelcluster-node', node['cfncluster']['cfncluster-node-version'])
     end
   end
+# This elsif branch might be unneeded since node seems to work with custom package
+# which is installed without the --no-deps option
 elsif node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
   # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
   python_package "aws-parallelcluster-node" do
@@ -165,6 +175,12 @@ elsif node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
   # python_package 'python-dateutil' installed by 'botocore' -> 'boto3'
   python_package 'paramiko' do
     version '2.4.2'
+  end
+  python_package 'future' do
+    version '0.17.1'
+  end
+  python_package 'retrying' do
+    version '1.3.3'
   end
 else
   python_package "aws-parallelcluster-node" do
