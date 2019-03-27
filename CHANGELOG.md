@@ -3,6 +3,25 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.3.0
+-----
+
+**ENHANCEMENTS**
+- FSx Lustre - add support in Amazon Linux
+
+**CHANGES**
+- Slurm - upgrade to version 18.08.6.2
+- Slurm - declare nodes in separate config file and use FUTURE for dummy nodes
+- Slurm - set `ReturnToService=1` in scheduler config in order to recover instances that were initially marked as down
+  due to a transient issue.
+- NVIDIA - update drivers to version 418.56
+- CUDA - update toolkit to version 10.0
+- Increase default EBS volume size from 15GB to 17GB
+- Add `LocalHostname` to `COMPUTE_READY` events
+- Pin `future`, `retrying` and `six` packages in Ubuntu 14.04
+- Add `stackname` and `max_queue_size` to sqswatcher configuration
+
+
 2.2.1
 -----
 
