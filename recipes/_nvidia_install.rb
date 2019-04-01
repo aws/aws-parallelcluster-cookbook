@@ -21,8 +21,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     when 'rhel', 'amazon'
       yum_package node['cfncluster']['kernel_devel_pkg']['name']
     when 'debian'
-      package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
-      apt_package package
+      apt_package node['cfncluster']['kernel_devel_pkg']['name']
     end
   end
 
