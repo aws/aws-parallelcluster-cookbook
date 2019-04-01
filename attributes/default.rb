@@ -125,7 +125,8 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
-  default['cfncluster']['kernel_devel_pkg']['name'] = "linux-generic"
+  default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
+  default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
