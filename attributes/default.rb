@@ -19,8 +19,8 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.2.1'
-default['cfncluster']['cfncluster-node-version'] = '2.2.1'
+default['cfncluster']['cfncluster-version'] = '2.3.1'
+default['cfncluster']['cfncluster-node-version'] = '2.3.1'
 default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
 # URLs to software packages used during install recipes
 # Gridengine software
@@ -30,8 +30,8 @@ default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/relea
 default['cfncluster']['torque']['version'] = '6.0.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '16-05-3-1'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-16-05-3-1.tar.gz'
+default['cfncluster']['slurm']['version'] = '18-08-6-2'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.12'
 default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
@@ -43,8 +43,8 @@ default['cfncluster']['ganglia']['web_version'] = '3.7.2'
 default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/390.48/NVIDIA-Linux-x86_64-390.48.run'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run'
+default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
@@ -125,13 +125,8 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
-  if Chef::VersionConstraint.new('< 16.04').include?(node['platform_version'])
-    default['cfncluster']['kernel_devel_pkg']['name'] = "linux-image-extra"
-    default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
-  else
-    default['cfncluster']['kernel_devel_pkg']['name'] = ""
-    default['cfncluster']['kernel_devel_pkg']['version'] = ""
-  end
+  default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
+  default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'

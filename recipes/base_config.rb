@@ -60,7 +60,7 @@ service "supervisord" do
 end
 
 # Only run FSx on centos for now
-if node['platform'] == 'centos'
+if node['platform'] == 'centos' or node['platform'] == 'amazon'
   # Mount FSx
   include_recipe 'aws-parallelcluster::fsx_mount'
 end

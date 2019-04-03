@@ -16,13 +16,15 @@
 # Only run if node['cfncluster']['nvidia']['enabled'] = 'yes'
 if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
-  if node['cfncluster']['kernel_devel_pkg']['name'] != ""
-    case node['platform_family']
-    when 'rhel', 'amazon'
-      yum_package node['cfncluster']['kernel_devel_pkg']['name']
-    when 'debian'
-      package = "#{node['cfncluster']['kernel_devel_pkg']['name']}-#{node['cfncluster']['kernel_devel_pkg']['version']}"
-      apt_package package
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    yum_package node['cfncluster']['kernel_devel_pkg']['name']
+  when 'debian'
+    # Needed for new kernel version
+    apt_package node['cfncluster']['kernel_generic_pkg']
+    # Needed for old kernel version
+    apt_package node['cfncluster']['kernel_extra_pkg'] do
+      ignore_failure true
     end
   end
 
@@ -65,7 +67,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     code <<-CUDA
     ./cuda.run --silent --toolkit
     CUDA
-    creates '/usr/local/cuda-7.5'
+    creates '/usr/local/cuda-10.0'
   end
 
   cookbook_file 'blacklist-nouveau.conf' do

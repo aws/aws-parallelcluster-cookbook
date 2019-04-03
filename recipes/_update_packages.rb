@@ -42,7 +42,7 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
       command "apt-get update"
     end
     execute 'apt-upgrade' do
-      command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" upgrade && apt-get autoremove"
+      command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove"
     end
   end
 end
