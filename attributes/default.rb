@@ -19,9 +19,9 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.3.1'
-default['cfncluster']['cfncluster-node-version'] = '2.3.1'
-default['cfncluster']['supervisor-version'] = '3.4.0'
+default['cfncluster']['cfncluster-version'] = '2.3.2a1'
+default['cfncluster']['cfncluster-node-version'] = '2.3.2a1'
+default['cfncluster']['cfncluster-supervisor-version'] = '3.4.0'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
