@@ -68,6 +68,7 @@ suites:
         cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
 
   - name: sge_config_MasterServer
     run_list:
@@ -87,6 +88,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
 
   - name: torque_config_MasterServer
     run_list:
@@ -106,6 +108,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
 
   - name: slurm_config_MasterServer
     run_list:
@@ -125,6 +128,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
 
   - name: sge_config_ComputeFleet
     run_list:
@@ -144,6 +148,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
 
   - name: torque_config_ComputeFleet
     run_list:
@@ -163,6 +168,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
 
   - name: slurm_config_ComputeFleet
     run_list:
@@ -182,3 +188,4 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
