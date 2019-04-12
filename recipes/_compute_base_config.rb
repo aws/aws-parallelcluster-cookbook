@@ -13,15 +13,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Created shared mount point
-directory node['cfncluster']['cfn_shared_dir'] do
-  mode '1777'
-  owner 'root'
-  group 'root'
-  recursive true
-  action :create
-end
-
 node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
 
 nfs_master = node['cfncluster']['cfn_master']
