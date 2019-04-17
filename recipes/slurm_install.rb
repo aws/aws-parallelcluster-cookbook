@@ -40,6 +40,7 @@ bash 'make install' do
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
+    make install-contrib
   SLURM
   # TODO: Fix, so it works for upgrade
   creates '/opt/slurm/bin/srun'
