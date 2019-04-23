@@ -271,7 +271,6 @@
     },
     {
       "type" : "shell",
-      "only": ["custom-ubuntu1404"],
       "inline" : [
         "sudo /usr/local/sbin/ami_cleanup.sh"
       ]

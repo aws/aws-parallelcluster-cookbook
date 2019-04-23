@@ -277,7 +277,6 @@
     },
     {
       "type" : "shell",
-      "only": ["custom-centos7"],
       "inline" : [
         "sudo /usr/local/sbin/ami_cleanup.sh"
       ]

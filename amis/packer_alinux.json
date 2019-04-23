@@ -246,7 +246,6 @@
     },
     {
       "type" : "shell",
-      "only": ["custom-alinux"],
       "inline" : [
         "sudo /usr/local/sbin/ami_cleanup.sh"
       ]
