@@ -21,6 +21,13 @@ function error_exit () {
   exit 1
 }
 
+function exec_command() {
+  _command_output=$($@ 2>&1)
+  _exit_code=$?
+
+  # Do not set RC=1 if error says that changes have been written but a reboot is required to inform the kernel
+  [[ $_exit_code -ne 0 && $(echo "${_command_output}" | grep -i "you should reboot now") ]] && RC=1
+}
 
 # LVM stripe, format, mount ephemeral drives
 function setup_ephemeral_drives () {
@@ -48,11 +55,11 @@ function setup_ephemeral_drives () {
     for d in $DEVS; do
       d=/dev/${d}
       dd if=/dev/zero of=${d} bs=32k count=1 || RC=1
-      parted -s ${d} mklabel gpt || RC=1
-      parted -s ${d} || RC=1
-      parted -s -a optimal ${d} mkpart primary 1MB 100% || RC=1
-      partprobe
-      parted -s ${d} set 1 lvm on || RC=1
+      exec_command "parted -s ${d} mklabel gpt"
+      exec_command "parted -s ${d}"
+      exec_command "parted -s -a optimal ${d} mkpart primary 1MB 100%"
+      partprobe ${d}
+      exec_command "parted -s ${d} set 1 lvm on"
       if [ $IS_NVME -eq 1 ]; then
         PARTITIONS="${d}p1 $PARTITIONS"
       else
