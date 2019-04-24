@@ -102,10 +102,14 @@ end
 bash 'execute jq' do
   cwd Chef::Config[:file_cache_path]
   code <<-JQMERGE
-    # Set PATH as in the UserData script of the CloudFormation template
-    export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
-    echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::sge_config]"}' > /tmp/dna.json
-    echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
-    jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster' || exit 1
+    # Check if jq is able to merge dna.json and extra.json
+    # Skip test if jq is not installed, because for custom ami it is installed during bootstrap (cloudformation userdata)  
+    if [ "$(command -v js)" ]; then
+      # Set PATH as in the UserData script of the CloudFormation template
+      export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
+      echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::sge_config]"}' > /tmp/dna.json
+      echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
+      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster' || exit 1
+    fi
   JQMERGE
 end
