@@ -36,6 +36,6 @@ end
 service "pbs_mom" do
   supports restart: true
   action %i[enable start]
-  subscribes :restart, 'service[network]', :delayed
+  subscribes :restart, 'service[network]', :immediately
   subscribes :restart, 'ohai[reload_hostname]', :delayed
 end
