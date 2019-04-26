@@ -13,8 +13,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
-
 nfs_master = node['cfncluster']['cfn_master']
 
 # Mount EFS directory with efs_mount recipe
