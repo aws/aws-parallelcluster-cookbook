@@ -14,7 +14,7 @@
 # limitations under the License.
 
 # Mount /opt/slurm over NFS
-nfs_master = node['cfncluster']['cfn_master'].split('.')[0]
+nfs_master = node['cfncluster']['cfn_master']
 mount '/opt/slurm' do
   device "#{nfs_master}:/opt/slurm"
   fstype "nfs"
