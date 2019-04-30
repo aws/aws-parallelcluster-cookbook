@@ -53,12 +53,6 @@ template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   mode '0644'
 end
 
-# Restart supervisord
-service "supervisord" do
-  supports restart: true
-  action %i[enable start]
-end
-
 # Only run FSx on centos for now
 if node['platform'] == 'centos' or node['platform'] == 'amazon'
   # Mount FSx

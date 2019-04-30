@@ -75,6 +75,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::sge_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -96,6 +97,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::torque_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -117,6 +119,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -138,6 +141,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::sge_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -159,6 +163,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::torque_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -180,6 +185,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
