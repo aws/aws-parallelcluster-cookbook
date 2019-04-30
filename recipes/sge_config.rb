@@ -16,7 +16,6 @@
 include_recipe 'aws-parallelcluster::base_config'
 include_recipe 'aws-parallelcluster::sge_install'
 
-# case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
   include_recipe 'aws-parallelcluster::_master_sge_config'
