@@ -166,7 +166,6 @@ default['cfncluster']['cfn_ephemeral_dir'] = '/scratch'
 default['cfncluster']['cfn_shared_dir'] = '/shared'
 default['cfncluster']['cfn_efs_shared_dir'] = 'NONE'
 default['cfncluster']['cfn_efs'] = nil
-default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_master'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
 default['cfncluster']['cfn_fsx_options'] = 'NONE'
