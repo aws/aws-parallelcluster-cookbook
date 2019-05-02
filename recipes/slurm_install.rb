@@ -16,43 +16,81 @@
 include_recipe 'aws-parallelcluster::base_install'
 include_recipe 'aws-parallelcluster::munge_install'
 
-slurm_tarball = "#{node['cfncluster']['sources_dir']}/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
+case node['cfncluster']['cfn_node_type']
+when 'MasterServer', nil
+  slurm_tarball = "#{node['cfncluster']['sources_dir']}/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
 
-# Get slurm tarball
-remote_file slurm_tarball do
-  source node['cfncluster']['slurm']['url']
-  mode '0644'
-  retries 3
-  retry_delay 5
-  # TODO: Add version or checksum checks
-  not_if { ::File.exist?(slurm_tarball) }
-end
+  # Get slurm tarball
+  remote_file slurm_tarball do
+    source node['cfncluster']['slurm']['url']
+    mode '0644'
+    retries 3
+    retry_delay 5
+    # TODO: Add version or checksum checks
+    not_if { ::File.exist?(slurm_tarball) }
+  end
 
-# Install Slurm
-bash 'make install' do
-  user 'root'
-  group 'root'
-  cwd Chef::Config[:file_cache_path]
-  code <<-SLURM
-    tar xf #{slurm_tarball}
-    cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
-    ./configure --prefix=/opt/slurm
-    CORES=$(grep processor /proc/cpuinfo | wc -l)
-    make -j $CORES
-    make install
-    make install-contrib
-  SLURM
-  # TODO: Fix, so it works for upgrade
-  creates '/opt/slurm/bin/srun'
-end
+  # Install Slurm
+  bash 'make install' do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-SLURM
+      tar xf #{slurm_tarball}
+      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
+      ./configure --prefix=/opt/slurm
+      CORES=$(grep processor /proc/cpuinfo | wc -l)
+      make -j $CORES
+      make install
+      make install-contrib
+    SLURM
+    # TODO: Fix, so it works for upgrade
+    creates '/opt/slurm/bin/srun'
+  end
 
-# Setup slurm user
-user "slurm" do
-  manage_home true
-  comment 'slurm user'
-  home "/home/slurm"
-  system true
-  shell '/bin/bash'
+  # Setup slurm user
+  user "slurm" do
+    manage_home true
+    comment 'slurm user'
+    home "/home/slurm"
+    system true
+    shell '/bin/bash'
+  end
+
+  # Copy required licensing files
+  directory "#{node['cfncluster']['license_dir']}/slurm"
+
+  bash 'copy license stuff' do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-SLURMLICENSE
+      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
+      cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
+      cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
+      cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
+      cp -v README.rst #{node['cfncluster']['license_dir']}/slurm/README.rst
+    SLURMLICENSE
+    # TODO: Fix, so it works for upgrade
+    creates "#{node['cfncluster']['license_dir']}/slurm/README.rst"
+  end
+when 'ComputeFleet'
+  # Created Slurm shared mount point
+  directory "/opt/slurm" do
+    mode '1777'
+    owner 'root'
+    group 'root'
+    action :create
+  end
+
+  # Setup slurm user without creating the home (mounted from master)
+  user "slurm" do
+    manage_home false
+    comment 'slurm user'
+    home "/home/slurm"
+    system true
+    shell '/bin/bash'
+  end
 end
 
 cookbook_file '/etc/init.d/slurm' do
@@ -62,22 +100,4 @@ cookbook_file '/etc/init.d/slurm' do
   mode '0755'
   action :create
   only_if { node['platform_family'] == 'debian' && !node['init_package'] == 'systemd' }
-end
-
-# Copy required licensing files
-directory "#{node['cfncluster']['license_dir']}/slurm"
-
-bash 'copy license stuff' do
-  user 'root'
-  group 'root'
-  cwd Chef::Config[:file_cache_path]
-  code <<-SLURMLICENSE
-    cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
-    cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
-    cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
-    cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
-    cp -v README.rst #{node['cfncluster']['license_dir']}/slurm/README.rst
-  SLURMLICENSE
-  # TODO: Fix, so it works for upgrade
-  creates "#{node['cfncluster']['license_dir']}/slurm/README.rst"
 end
