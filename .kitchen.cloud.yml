@@ -2,6 +2,7 @@
 driver_config:
   retryable_sleep: 15
   retryable_tries: 20
+  retry_limit: 6
   aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
   region: <%= ENV['AWS_DEFAULT_REGION'] %>
   instance_type: <%= ENV['AWS_FLAVOR_ID'] %>
