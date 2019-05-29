@@ -99,6 +99,13 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
+if node['cfncluster']['os'] == 'alinux' || node['cfncluster']['os'] == 'centos7'
+  execute 'check efa rpm installed' do
+    command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
 unless node['cfncluster']['os'].end_with?("-custom")
   bash 'execute jq' do
     cwd Chef::Config[:file_cache_path]
