@@ -58,3 +58,8 @@ if node['platform'] == 'centos' || node['platform'] == 'amazon'
   # Mount FSx
   include_recipe 'aws-parallelcluster::fsx_mount'
 end
+
+# Install EFA
+if node['cfncluster']['enable_efa'] == 'compute' && node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+  include_recipe "aws-parallelcluster::_efa_install"
+end

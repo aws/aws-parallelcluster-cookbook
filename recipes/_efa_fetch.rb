@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _efa_install
+# Recipe:: _efa_fetch
 #
 # Copyright 2013-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,15 +15,11 @@
 
 efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer-latest.tar.gz"
 
-bash "install efa" do
-  cwd Chef::Config[:file_cache_path]
-  code <<-EFAINSTALL
-    # default openmpi installation conflicts with new install
-    # new one is installed in /opt/amazon/efa/bin/
-    yum remove -y openmpi openmpi-devel
-    tar -xzf #{efa_tarball}
-    cd aws-efa-installer
-    ./efa_installer.sh -y
-  EFAINSTALL
-  creates '/opt/amazon/efa/bin/mpirun'
+# Get EFA Installer
+remote_file efa_tarball do
+  source node['cfncluster']['efa']['installer_url']
+  mode '0644'
+  retries 3
+  retry_delay 5
+  not_if { ::File.exist?(efa_tarball) }
 end
