@@ -26,12 +26,13 @@ end
 
 bash "install efa" do
   cwd Chef::Config[:file_cache_path]
-  code <<-NODE
+  code <<-EFAINSTALL
     # default openmpi installation conflicts with new install
     # new one is installed in /opt/amazon/efa/bin/
     yum remove -y openmpi openmpi-devel
     tar -xzf #{efa_tarball}
     cd aws-efa-installer
     ./efa_installer.sh -y
-  NODE
+  EFAINSTALL
+  creates '/opt/amazon/efa/bin/mpirun'
 end
