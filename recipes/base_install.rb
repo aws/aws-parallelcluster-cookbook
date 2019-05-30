@@ -236,14 +236,7 @@ include_recipe "aws-parallelcluster::_nvidia_install"
 # Install FSx options
 include_recipe "aws-parallelcluster::_lustre_install"
 
-# Install EFA
-if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) || node['platform'] == 'amazon'
-  unless node['cfncluster']['cfn_region'].start_with?("cn-")
-    include_recipe "aws-parallelcluster::_efa_install"
-  else
-    package 'openmpi-devel' do
-      retries 3
-      retry_delay 5
-    end
-  end
+# Fetch EFA Driver
+unless node['cfncluster']['cfn_region'].start_with?("cn-")
+  include_recipe "aws-parallelcluster::_efa_fetch"
 end
