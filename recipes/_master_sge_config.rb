@@ -84,6 +84,6 @@ bash "configure_unknown_hosts_behaviour" do
     /opt/sge/util/qconf_mod_attr -mconf max_unheard 00:03:00 global
     /opt/sge/util/qconf_mod_attr -mconf reschedule_unknown 00:00:30 global
     /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_FORCED_QDEL_IF_UNKNOWN global
-    /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_RESCHEDULE_KILL global
+    /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_RESCHEDULE_KILL=1 global
   CONFIGUNKNOWN
 end
