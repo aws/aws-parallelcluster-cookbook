@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _efa_install
+# Recipe:: _efa_enable
 #
 # Copyright 2013-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -13,26 +13,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer-latest.tar.gz"
-
-# Get EFA Installer
-remote_file efa_tarball do
-  source node['cfncluster']['efa']['installer_url']
-  mode '0644'
-  retries 3
-  retry_delay 5
-  not_if { ::File.exist?(efa_tarball) }
-end
-
-bash "install efa" do
+bash "enable efa limits" do
   cwd node['cfncluster']['sources_dir']
-  code <<-EFAINSTALL
-    # default openmpi installation conflicts with new install
-    # new one is installed in /opt/amazon/efa/bin/
-    yum remove -y openmpi openmpi-devel
-    tar -xzf #{efa_tarball}
-    cd aws-efa-installer
-    ./efa_installer.sh -y --skip-limit-conf
-  EFAINSTALL
-  creates '/opt/amazon/efa/bin/mpirun'
+  code <<-EFAENABLE
+    cd aws-efa-installer/install
+    ./efa_limits_setup.sh
+  EFAENABLE
 end
