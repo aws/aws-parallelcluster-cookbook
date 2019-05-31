@@ -99,8 +99,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
-# Test EFA is installed
-if node['cfncluster']['enable_efa'] == 'compute'
+if node['cfncluster']['os'] == 'alinux' || node['cfncluster']['os'] == 'centos7'
   execute 'check efa rpm installed' do
     command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
     user node['cfncluster']['cfn_cluster_user']
