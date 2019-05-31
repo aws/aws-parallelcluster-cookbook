@@ -15,6 +15,15 @@
 
 efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer-latest.tar.gz"
 
+# Get EFA Installer
+remote_file efa_tarball do
+  source node['cfncluster']['efa']['installer_url']
+  mode '0644'
+  retries 3
+  retry_delay 5
+  not_if { ::File.exist?(efa_tarball) }
+end
+
 bash "install efa" do
   cwd Chef::Config[:file_cache_path]
   code <<-EFAINSTALL
