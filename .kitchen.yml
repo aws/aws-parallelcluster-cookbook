@@ -70,7 +70,6 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
 
   - name: sge_config_MasterServer
     run_list:
@@ -93,7 +92,6 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
 
   - name: torque_config_MasterServer
     run_list:
@@ -116,7 +114,6 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
 
   - name: slurm_config_MasterServer
     run_list:
@@ -139,7 +136,6 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
 
   - name: sge_config_ComputeFleet
     run_list:
@@ -162,7 +158,6 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
 
   - name: torque_config_ComputeFleet
     run_list:
@@ -185,7 +180,6 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
 
   - name: slurm_config_ComputeFleet
     run_list:
@@ -208,4 +202,3 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        enable_efa: <%= ENV['ENABLE_EFA'] || "NONE" %>
