@@ -62,8 +62,13 @@ when 'MasterServer', nil
 
   bash "extract_qconf_util" do
     code <<-EXTRACTQCONFUTIL
+      set -e
       tar xf /opt/sge/util/qconf_scripts.tar.gz -C /opt/sge/util --strip-components=1 --no-same-permissions --no-same-owner
+      # applying small patch for a bug in sge_edit_mod_attr script
+      # [[]] is incompatible with dash which is the default sh in ubuntu
+      sed -i 's/if \\[\\[ $cc -eq 0 ]]/if [ $cc -eq 0 ]/g' /opt/sge/util/sge_edit_mod_attr
     EXTRACTQCONFUTIL
+    creates '/opt/sge/util/sge_edit_mod_attr'
   end
 
   # Disbale the AddQueue, so that we can manage slots per instance
