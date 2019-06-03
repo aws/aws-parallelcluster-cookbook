@@ -80,6 +80,7 @@ end
 # ENABLE_RESCHEDULE_KILL: reschedule_unknown parameter affects also jobs which have the rerun flag not activated
 bash "configure_unknown_hosts_behaviour" do
   code <<-CONFIGUNKNOWN
+    set -e
     . /opt/sge/default/common/settings.sh
     /opt/sge/util/qconf_mod_attr -mconf max_unheard 00:03:00 global
     /opt/sge/util/qconf_mod_attr -mconf reschedule_unknown 00:00:30 global
