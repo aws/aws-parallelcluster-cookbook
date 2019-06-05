@@ -24,12 +24,22 @@ remote_file efa_tarball do
   not_if { ::File.exist?(efa_tarball) }
 end
 
+# default openmpi installation conflicts with new install
+# new one is installed in /opt/amazon/efa/bin/
+case node['platform_family']
+when 'rhel', 'amazon'
+  package %w[openmpi-devel openmpi] do
+    action :remove
+  end
+when 'debian'
+  package "libopenmpi-dev" do
+    action :remove
+  end
+end
+
 bash "install efa" do
   cwd node['cfncluster']['sources_dir']
   code <<-EFAINSTALL
-    # default openmpi installation conflicts with new install
-    # new one is installed in /opt/amazon/efa/bin/
-    yum remove -y openmpi openmpi-devel
     tar -xzf #{efa_tarball}
     cd aws-efa-installer
     ./efa_installer.sh -y --skip-limit-conf
