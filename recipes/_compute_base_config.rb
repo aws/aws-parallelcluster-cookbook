@@ -15,9 +15,6 @@
 
 nfs_master = node['cfncluster']['cfn_master']
 
-# Mount EFS directory with efs_mount recipe
-include_recipe 'aws-parallelcluster::efs_mount'
-
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 

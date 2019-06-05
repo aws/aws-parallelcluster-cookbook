@@ -28,9 +28,6 @@ end
 # Get VPC CIDR
 node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
 
-# Mount EFS directory with efs_mount recipe
-include_recipe 'aws-parallelcluster::efs_mount'
-
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
 shared_dir_array.each_with_index do |dir, index|
