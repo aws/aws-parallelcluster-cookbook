@@ -125,8 +125,11 @@ when 'debian'
   default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
+  if node['platform_version'] == '14.04'
+    default['cfncluster']['base_packages'].push('libopenmpi-dev')
+  end
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
