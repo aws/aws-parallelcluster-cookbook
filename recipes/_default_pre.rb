@@ -13,6 +13,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+execute 'set hard ulimit nofile' do
+  command 'echo "* hard nofile 10000" >> /etc/security/limits.conf'
+end
+execute 'set soft ulimit nofile' do
+  command 'echo "* soft nofile 10000" >> /etc/security/limits.conf'
+end
+
 include_recipe 'aws-parallelcluster::_update_packages'
 
 # Reboot after preliminary configuration steps
