@@ -31,6 +31,13 @@ bash 'check awscli regions' do
   AWSREGIONS
 end
 
+unless node['cfncluster']['os'].end_with?("-custom")
+  bash 'test soft ulimit nofile' do
+    code "if (($(ulimit -Sn) < 10000)); then exit 1; fi"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
 if node['cfncluster']['cfn_scheduler'] == 'sge'
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
