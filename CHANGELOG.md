@@ -7,8 +7,31 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 -----
 
 **ENHANCEMENTS**
-
+- Add support for EFA on Centos 7, Amazon Linux and Ubuntu 1604
 - Add support for Ubuntu in China region `cn-northwest-1`
+
+**CHANGES**
+- SGE: changed following parameters in global configuration
+  - `max_unheard 00:03:00`: allows a faster reaction in case of faulty nodes
+  - `reschedule_unknown 00:00:30`: enables rescheduling of jobs running on failing nodes
+  - `qmaster_params ENABLE_FORCED_QDEL_IF_UNKNOWN`: forces job deletion on unresponsive nodes
+  - `qmaster_params ENABLE_RESCHEDULE_KILL`: forces rescheduling or killing of jobs running on failing nodes
+- Slurm: decrease SlurmdTimeout to 120 seconds to speed up replacement of faulty nodes
+- Always use full master FQDN when mounting NFS on compute nodes. This solves some issues occurring with some networking
+  setups and custom DNS configurations
+- Set soft and hard ulimit on open files to 10000 for all supported OSs
+- Pin python `supervisor` version to 3.4.0
+- Remove unused `compute_instance_type` from jobwatcher.cfg
+- Removed unused `max_queue_size` from sqswatcher.cfg
+- Remove double quoting of the post_install args
+
+**BUG FIXES**
+- Fix issue that was preventing Torque from being used on Centos 7
+- Start node daemons at the end of instance initialization. The time spent for post-install script and node
+  initialization is not counted as part of node idletime anymore.
+- Fix issue which was causing an additional and invalid EBS mount point to be added in case of multiple EBS
+- Install Slurm libpmpi/libpmpi2 that is distributed in a separate package since Slurm 17
+
 
 2.3.1
 -----
