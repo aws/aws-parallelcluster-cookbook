@@ -106,16 +106,18 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
-case node['cfncluster']['os']
-when 'alinux', 'centos7'
-  execute 'check efa rpm installed' do
-    command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
-    user node['cfncluster']['cfn_cluster_user']
-  end
-when 'ubuntu1604'
-  execute 'check efa rpm installed' do
-    command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
-    user node['cfncluster']['cfn_cluster_user']
+unless node['cfncluster']['cfn_region'].start_with?("cn-")
+  case node['cfncluster']['os']
+  when 'alinux', 'centos7'
+    execute 'check efa rpm installed' do
+      command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
+      user node['cfncluster']['cfn_cluster_user']
+    end
+  when 'ubuntu1604'
+    execute 'check efa rpm installed' do
+      command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
+      user node['cfncluster']['cfn_cluster_user']
+    end
   end
 end
 
