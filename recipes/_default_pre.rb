@@ -13,6 +13,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+user_ulimit "*" do
+  filehandle_limit 10000
+end
+
 include_recipe 'aws-parallelcluster::_update_packages'
 
 # Reboot after preliminary configuration steps
