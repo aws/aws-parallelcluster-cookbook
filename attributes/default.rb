@@ -27,8 +27,8 @@ default['cfncluster']['supervisor-version'] = '3.4.0'
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '6.0.2'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
+default['cfncluster']['torque']['version'] = '6.1.2'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
 default['cfncluster']['slurm']['version'] = '18-08-6-2'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
