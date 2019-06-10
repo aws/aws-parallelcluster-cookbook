@@ -29,7 +29,7 @@ execute "run-ldconfig" do
   action :nothing
 end
 
-# Set toruqe server_name
+# Set torque server_name
 template '/var/spool/torque/server_name' do
   source 'torque.server_name.erb'
   owner 'root'
