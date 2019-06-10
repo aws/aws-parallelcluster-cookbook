@@ -62,4 +62,8 @@ include_recipe 'aws-parallelcluster::fsx_mount'
 # Enable EFA
 if node['cfncluster']['enable_efa'] == 'compute' && node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
   include_recipe "aws-parallelcluster::_efa_enable"
+elsif node['cfncluster']['enable_efa'] == 'compute'
+  user_ulimit "*" do
+    memory_limit 'unlimited'
+  end
 end
