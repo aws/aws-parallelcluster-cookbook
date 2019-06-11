@@ -73,3 +73,18 @@ bash "enable_forced_qdel" do
     /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_FORCED_QDEL global
   ENABLEFORCEDQDEL
 end
+
+# max_unheard: host is set to unknown after being unresponsive for the configured timeout
+# reschedule_unknown: jobs on hosts in an unknown state are rescheduled/deleted after the configured timeout
+# ENABLE_FORCED_QDEL_IF_UNKNOWN: force deletion on qdel command for hosts in unknown state
+# ENABLE_RESCHEDULE_KILL: reschedule_unknown parameter affects also jobs which have the rerun flag not activated
+bash "configure_unknown_hosts_behaviour" do
+  code <<-CONFIGUNKNOWN
+    set -e
+    . /opt/sge/default/common/settings.sh
+    /opt/sge/util/qconf_mod_attr -mconf max_unheard 00:03:00 global
+    /opt/sge/util/qconf_mod_attr -mconf reschedule_unknown 00:00:30 global
+    /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_FORCED_QDEL_IF_UNKNOWN global
+    /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_RESCHEDULE_KILL=1 global
+  CONFIGUNKNOWN
+end

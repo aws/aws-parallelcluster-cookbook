@@ -13,21 +13,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Created shared mount point
-directory node['cfncluster']['cfn_shared_dir'] do
-  mode '1777'
-  owner 'root'
-  group 'root'
-  recursive true
-  action :create
-end
-
-node.default['cfncluster']['cfn_master'] = node['cfncluster']['cfn_master'].split('.')[0]
-
 nfs_master = node['cfncluster']['cfn_master']
-
-# Mount EFS directory with efs_mount recipe
-include_recipe 'aws-parallelcluster::efs_mount'
 
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]

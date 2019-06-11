@@ -53,14 +53,17 @@ template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   mode '0644'
 end
 
-# Restart supervisord
-service "supervisord" do
-  supports restart: true
-  action %i[enable start]
-end
+# Mount EFS directory with efs_mount recipe
+include_recipe 'aws-parallelcluster::efs_mount'
 
-# Only run FSx on centos for now
-if node['platform'] == 'centos' or node['platform'] == 'amazon'
-  # Mount FSx
-  include_recipe 'aws-parallelcluster::fsx_mount'
+# Mount FSx directory with fsx_mount recipe
+include_recipe 'aws-parallelcluster::fsx_mount'
+
+# Enable EFA
+if node['cfncluster']['enable_efa'] == 'compute' && node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+  include_recipe "aws-parallelcluster::_efa_enable"
+elsif node['cfncluster']['enable_efa'] == 'compute'
+  user_ulimit "*" do
+    memory_limit 'unlimited'
+  end
 end

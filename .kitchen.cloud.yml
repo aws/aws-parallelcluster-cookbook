@@ -2,6 +2,7 @@
 driver_config:
   retryable_sleep: 15
   retryable_tries: 20
+  retry_limit: 6
   aws_ssh_key_id: <%= ENV['AWS_KEYPAIR_NAME'] %>
   region: <%= ENV['AWS_DEFAULT_REGION'] %>
   instance_type: <%= ENV['AWS_FLAVOR_ID'] %>
@@ -16,6 +17,8 @@ driver_config:
 provisioner:
   name: chef_zero
   require_chef_omnibus: 14.2.0
+  # use custom chef install URL to cope with issue https://github.com/chef/bento/issues/609
+  chef_omnibus_url: https://raw.githubusercontent.com/aws/aws-parallelcluster-cookbook/develop/util/chef-install.sh
   retry_on_exit_code:
     - 35 # 35 is the exit code signaling that the node is rebooting
   max_retries: 1

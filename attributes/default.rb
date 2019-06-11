@@ -19,9 +19,9 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.3.1'
-default['cfncluster']['cfncluster-node-version'] = '2.3.1'
-default['cfncluster']['cfncluster-supervisor-version'] = '3.3.1'
+default['cfncluster']['cfncluster-version'] = '2.4.0'
+default['cfncluster']['cfncluster-node-version'] = '2.4.0'
+default['cfncluster']['supervisor-version'] = '3.4.0'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
@@ -45,6 +45,8 @@ default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/gangli
 default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
+# EFA
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-latest.tar.gz'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
@@ -83,7 +85,7 @@ when 'rhel', 'amazon'
     if node['platform_version'].to_i >= 7
       default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                                  httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel openmpi-devel R atlas-devel
+                                                  httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm]
       if node['platform_version'].split('.')[1] == '6'
@@ -105,7 +107,7 @@ when 'rhel', 'amazon'
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel fftw-devel
+                                                httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
                                                 libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm]
   end
@@ -123,8 +125,11 @@ when 'debian'
   default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev libopenmpi-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
+  if node['platform_version'] == '14.04'
+    default['cfncluster']['base_packages'].push('libopenmpi-dev')
+  end
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
@@ -166,7 +171,6 @@ default['cfncluster']['cfn_ephemeral_dir'] = '/scratch'
 default['cfncluster']['cfn_shared_dir'] = '/shared'
 default['cfncluster']['cfn_efs_shared_dir'] = 'NONE'
 default['cfncluster']['cfn_efs'] = nil
-default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_master'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
 default['cfncluster']['cfn_fsx_options'] = 'NONE'

@@ -15,92 +15,117 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
-sge_tarball = "#{node['cfncluster']['sources_dir']}/sge-#{node['cfncluster']['sge']['version']}.tar.gz"
+case node['cfncluster']['cfn_node_type']
+when 'MasterServer', nil
+  sge_tarball = "#{node['cfncluster']['sources_dir']}/sge-#{node['cfncluster']['sge']['version']}.tar.gz"
 
-# Get SGE tarball
-remote_file sge_tarball do
-  source node['cfncluster']['sge']['url']
-  mode '0644'
-  retries 3
-  retry_delay 5
-  # TODO: Add version or checksum checks
-  not_if { ::File.exist?(sge_tarball) }
-end
-
-# Install SGE
-bash 'make install' do
-  user 'root'
-  group 'root'
-  cwd Chef::Config[:file_cache_path]
-  environment 'SGE_ROOT' => '/opt/sge'
-  code <<-SGE
-    tar xf #{sge_tarball}
-    cd sge-#{node['cfncluster']['sge']['version']}/source
-    CORES=$(grep processor /proc/cpuinfo | wc -l)
-    sh scripts/bootstrap.sh -no-java -no-jni -no-herd
-    ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
-    ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
-    scripts/distinst -local -allall -noexit
-    mkdir $SGE_ROOT
-    echo instremote=false >> distinst.private
-    gearch=`dist/util/arch`
-    echo 'y'| scripts/distinst -local -allall ${gearch}
-  SGE
-  # TODO: Fix, so it works for upgrade
-  creates '/opt/sge/bin/lx-amd64/sge_qmaster'
-end
-
-# Copy qconf utils (Downloaded from http://arc.liv.ac.uk/SGE/downloads/qconf_scripts.tar.gz)
-cookbook_file 'qconf_scripts.tar.gz' do
-  path '/opt/sge/util/qconf_scripts.tar.gz'
-  user 'root'
-  group 'root'
-  mode '0644'
-end
-
-bash "extract_qconf_util" do
-  code <<-EXTRACTQCONFUTIL
-    tar xf /opt/sge/util/qconf_scripts.tar.gz -C /opt/sge/util --strip-components=1 --no-same-permissions --no-same-owner
-  EXTRACTQCONFUTIL
-end
-
-# Disbale the AddQueue, so that we can manage slots per instance
-replace_or_add "AddQueue" do
-  path "/opt/sge/inst_sge"
-  pattern "AddQueue"
-  line "#AddQueue"
-end
-
-# Only on CentOS/RHEL7 update the initd
-if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
-  execute 'sed' do
-    command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgemaster_template'
+  # Get SGE tarball
+  remote_file sge_tarball do
+    source node['cfncluster']['sge']['url']
+    mode '0644'
+    retries 3
+    retry_delay 5
+    # TODO: Add version or checksum checks
+    not_if { ::File.exist?(sge_tarball) }
   end
-  execute 'sed' do
-    command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgeexecd_template'
+
+  # Install SGE
+  bash 'make install' do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    environment 'SGE_ROOT' => '/opt/sge'
+    code <<-SGE
+      tar xf #{sge_tarball}
+      cd sge-#{node['cfncluster']['sge']['version']}/source
+      CORES=$(grep processor /proc/cpuinfo | wc -l)
+      sh scripts/bootstrap.sh -no-java -no-jni -no-herd
+      ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
+      ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
+      scripts/distinst -local -allall -noexit
+      mkdir $SGE_ROOT
+      echo instremote=false >> distinst.private
+      gearch=`dist/util/arch`
+      echo 'y'| scripts/distinst -local -allall ${gearch}
+    SGE
+    # TODO: Fix, so it works for upgrade
+    creates '/opt/sge/bin/lx-amd64/sge_qmaster'
   end
-end
 
-# Setup sgeadmin user
-user "sgeadmin" do
-  manage_home true
-  comment 'sgeadmin user'
-  home "/home/sgeadmin"
-  system true
-  shell '/bin/bash'
-end
+  # Copy qconf utils (Downloaded from http://arc.liv.ac.uk/SGE/downloads/qconf_scripts.tar.gz)
+  cookbook_file 'qconf_scripts.tar.gz' do
+    path '/opt/sge/util/qconf_scripts.tar.gz'
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
 
-# Copy required licensing files
-directory "#{node['cfncluster']['license_dir']}/sge"
+  bash "extract_qconf_util" do
+    code <<-EXTRACTQCONFUTIL
+      set -e
+      tar xf /opt/sge/util/qconf_scripts.tar.gz -C /opt/sge/util --strip-components=1 --no-same-permissions --no-same-owner
+      # applying small patch for a bug in sge_edit_mod_attr script
+      # [[]] is incompatible with dash which is the default sh in ubuntu
+      sed -i 's/if \\[\\[ $cc -eq 0 ]]/if [ $cc -eq 0 ]/g' /opt/sge/util/sge_edit_mod_attr
+    EXTRACTQCONFUTIL
+    creates '/opt/sge/util/sge_edit_mod_attr'
+  end
 
-bash 'copy license stuff' do
-  user 'root'
-  group 'root'
-  cwd Chef::Config[:file_cache_path]
-  code <<-SGELICENSE
-    cd sge-#{node['cfncluster']['sge']['version']}/LICENCES
-    cp -v SISSL #{node['cfncluster']['license_dir']}/sge/SISSL
-  SGELICENSE
-  # TODO: Fix, so it works for upgrade
-  creates "#{node['cfncluster']['license_dir']}/sge/SISSL"
+  # Disbale the AddQueue, so that we can manage slots per instance
+  replace_or_add "AddQueue" do
+    path "/opt/sge/inst_sge"
+    pattern "AddQueue"
+    line "#AddQueue"
+  end
+
+  # Only on CentOS/RHEL7 update the initd
+  if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
+    execute 'sed' do
+      command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgemaster_template'
+    end
+    execute 'sed' do
+      command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgeexecd_template'
+    end
+  end
+
+  # Setup sgeadmin user
+  user "sgeadmin" do
+    manage_home true
+    comment 'sgeadmin user'
+    home "/home/sgeadmin"
+    system true
+    shell '/bin/bash'
+  end
+
+  # Copy required licensing files
+  directory "#{node['cfncluster']['license_dir']}/sge"
+
+  bash 'copy license stuff' do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-SGELICENSE
+      cd sge-#{node['cfncluster']['sge']['version']}/LICENCES
+      cp -v SISSL #{node['cfncluster']['license_dir']}/sge/SISSL
+    SGELICENSE
+    # TODO: Fix, so it works for upgrade
+    creates "#{node['cfncluster']['license_dir']}/sge/SISSL"
+  end
+when 'ComputeFleet'
+  # Created SGE shared mount point
+  directory "/opt/sge" do
+    mode '1777'
+    owner 'root'
+    group 'root'
+    action :create
+  end
+
+  # Setup sgeadmin user without creating the home (mounted from master)
+  user "sgeadmin" do
+    manage_home false
+    comment 'sgeadmin user'
+    home "/home/sgeadmin"
+    system true
+    shell '/bin/bash'
+  end
 end

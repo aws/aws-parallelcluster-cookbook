@@ -68,11 +68,14 @@ suites:
         cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
 
   - name: sge_config_MasterServer
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::sge_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -87,11 +90,14 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
 
   - name: torque_config_MasterServer
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::torque_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -106,11 +112,14 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
 
   - name: slurm_config_MasterServer
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -125,11 +134,14 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
 
   - name: sge_config_ComputeFleet
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::sge_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -144,11 +156,14 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
 
   - name: torque_config_ComputeFleet
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::torque_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -163,11 +178,14 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
 
   - name: slurm_config_ComputeFleet
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
       - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
       cfncluster:
@@ -182,3 +200,5 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>

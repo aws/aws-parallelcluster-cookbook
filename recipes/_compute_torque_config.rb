@@ -31,7 +31,11 @@ remote_file "install pbs_mom service" do
 end
 
 # Enable and start pbs_mom service
+# pbs_mom is restarted only after network service is restarted in
+# order to wait for the hostname changes to be applied
 service "pbs_mom" do
   supports restart: true
-  action %i[enable restart]
+  action %i[enable start]
+  subscribes :restart, 'service[network]', :immediately
+  subscribes :restart, 'ohai[reload_hostname]', :delayed
 end

@@ -227,6 +227,7 @@
       "pause_before": "2m",
       "json" : {
         "cfncluster" : {
+          "cfn_region": "{{user `region`}}",
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
@@ -260,7 +261,7 @@
       "inline" : [
         "region=\"{{user `region`}}\"",
         "bucket=\"s3.amazonaws.com\"",
-        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster\"",
         "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
         "sudo pip install /tmp/aws-cfn-bootstrap-latest.tar.gz"
       ]
@@ -274,7 +275,6 @@
     },
     {
       "type" : "shell",
-      "only": ["custom-ubuntu1604"],
       "inline" : [
         "sudo /usr/local/sbin/ami_cleanup.sh"
       ]

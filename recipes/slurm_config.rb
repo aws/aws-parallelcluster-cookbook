@@ -37,7 +37,6 @@ cookbook_file '/etc/init.d/slurm' do
   only_if { node['init_package'] != 'systemd' }
 end
 
-# case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
   include_recipe 'aws-parallelcluster::_master_slurm_config'
