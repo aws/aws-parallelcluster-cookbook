@@ -61,6 +61,7 @@ default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
 default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
+default["openssh"]["client"]["strict_host_key_checking"] = "no"
 
 # Platform defaults
 case node['platform_family']
