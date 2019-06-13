@@ -175,9 +175,9 @@ end
 bash "copy_and_perms" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
   code <<-PERMS
-    su - #{node['cfncluster']['cfn_cluster_user']} -c \"cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys2 && chmod 0600 ~/.ssh/authorized_keys2\"
+    su - #{node['cfncluster']['cfn_cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
   PERMS
-  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys_cluster") }
 end
 
 bash "ssh-keyscan" do
