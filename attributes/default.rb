@@ -62,6 +62,10 @@ default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
 
+# ulimit settings
+default['cfncluster']['filehandle_limit'] = 10000
+default['cfncluster']['memory_limit'] = 'unlimited'
+
 # Platform defaults
 case node['platform_family']
 when 'rhel', 'amazon'
