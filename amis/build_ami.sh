@@ -160,6 +160,9 @@ do_command() {
       export BUILD_DATE=${_build_date}
     fi
 
+    # set it to try for 1 hour, this is to resolve ami copy timeout issue
+    # https://github.com/hashicorp/packer/issues/6536
+    export AWS_TIMEOUT_SECONDS=3600
 
     case ${_os} in
       all)
