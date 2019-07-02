@@ -20,14 +20,14 @@
 #   build-date: timestamp to append to the AMIs names (optional)
 
 requirements_check() {
-    which packer >/dev/null 2>&1
+    packer --help >/dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "packer command not found. Is Packer installed?"
       echo "Please visit https://www.packer.io/downloads.html for instruction on how to download and install"
       exit 1
     fi
 
-    which berks >/dev/null 2>&1
+    berks --help >/dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "berks command not found. Is ChefDK installed?"
       echo "Please visit https://downloads.chef.io/chefdk/ for instruction on how to download and install"
