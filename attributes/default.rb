@@ -18,10 +18,12 @@ default['cfncluster']['base_dir'] = '/opt/parallelcluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
+default['cfncluster']['virtualenv'] = "#{node['cfncluster']['base_dir']}/virtualenv"
+# Python version
+default['cfncluster']['python-version'] = '2.7.8'
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.4.0'
 default['cfncluster']['cfncluster-node-version'] = '2.4.0'
-default['cfncluster']['supervisor-version'] = '3.4.0'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
@@ -112,7 +114,7 @@ when 'rhel', 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
-                                                libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
+                                                libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm]
   end
 
