@@ -22,18 +22,16 @@ def convert_dev(dev):
         return dev
 
 def get_all_devices():
-    # lsblk -d -n -p
-    # /dev/xvda 202:0    0  17G  0 disk
-    # /dev/xvdb 202:16   0  20G  0 disk /shared
-    command = ["/bin/lsblk", "-d", "-n", "-p"]
+    # lsblk -d -n
+    # xvda 202:0    0  17G  0 disk
+    # xvdb 202:16   0  20G  0 disk /shared
+    command = ["/bin/lsblk", "-d", "-n"]
 
-    env = {}
-    env.update(os.environ.copy())
     try:
-        output = subprocess.check_output(command, env=env, stderr=subprocess.STDOUT, universal_newlines=True).split("\n")
-        return [line.split()[0] for line in output if len(line.split()) > 0]
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).split("\n")
+        return ["/dev/{}".format(line.split()[0]) for line in output if len(line.split()) > 0]
     except subprocess.CalledProcessError as e:
-        print("Failed to get devices with lsblk -d -n -p")
+        print("Failed to get devices with lsblk -d -n")
         raise e
 
 def main():
@@ -52,7 +50,7 @@ def main():
     region = region[:-1]
 
     # Generate a list of system paths minus the root path
-    paths = [convert_dev(device.path) for device in get_all_devices()]
+    paths = [convert_dev(device) for device in get_all_devices()]
 
     # List of possible block devices
     blockDevices = ['/dev/sdb', '/dev/sdc', '/dev/sdd', '/dev/sde', '/dev/sdf', '/dev/sdg', '/dev/sdh',

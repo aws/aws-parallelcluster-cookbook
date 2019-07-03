@@ -32,6 +32,15 @@ when 'rhel', 'amazon'
 when 'debian'
   include_recipe 'apt'
 end
+
+# Setup directories
+directory '/etc/parallelcluster'
+directory node['cfncluster']['base_dir']
+directory node['cfncluster']['sources_dir']
+directory node['cfncluster']['scripts_dir']
+directory node['cfncluster']['license_dir']
+directory node['cfncluster']['virtualenv']
+
 build_essential
 include_recipe "aws-parallelcluster::_setup_python"
 
@@ -52,39 +61,12 @@ selinux_state "SELinux Disabled" do
   only_if 'which getenforce'
 end
 
-# Setup directories
-directory '/etc/parallelcluster'
-directory node['cfncluster']['base_dir']
-directory node['cfncluster']['sources_dir']
-directory node['cfncluster']['scripts_dir']
-directory node['cfncluster']['license_dir']
-
 # Install LICENSE README
 cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   path "#{node['cfncluster']['license_dir']}/AWS-ParallelCluster-License-README.txt"
   user 'root'
   group 'root'
   mode '0644'
-end
-
-# Install AWSCLI
-if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
-  python_package 'awscli' do
-    version '1.15.85' # This imply botocore 1.10.84 which does not require urllib3
-  end
-else
-  python_package 'awscli'
-end
-
-# Install boto3
-if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
-  python_package 'boto3' do
-    version '1.7.84' # This imply botocore 1.10.84 which does not require urllib3
-  end
-else
-  python_package 'boto3'
 end
 
 # TODO: update nfs receipes to stop, disable nfs services
@@ -125,21 +107,6 @@ remote_file '/usr/bin/ec2-metadata' do
   retry_delay 5
 end
 
-# Fix dependencies for CentOS 6 (Python 2.6)
-if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-  python_package "pycparser" do
-    version "2.18"
-  end
-end
-
-# Upgrade six which is installed as distutils package and needed by node deps
-if node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-  python_package 'six' do
-    version '1.12.0'
-    install_options '--ignore-installed'
-  end
-end
-
 # Check whether install a custom aws-parallelcluster-node package or the standard one
 if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
   # Install custom aws-parallelcluster-node package
@@ -149,48 +116,20 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
       echo "PATH is $PATH"
       source /tmp/proxy.sh
+      source #{node['cfncluster']['virtualenv']}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
       curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
       cd *aws-parallelcluster-node-*
       pip install .
+      deactivate
     NODE
   end
-elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-  # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile aws-parallelcluster-node dependencies
-  ruby_block "pip_install_parallelcluster_node" do
-    block do
-      pip_install_package('aws-parallelcluster-node', node['cfncluster']['cfncluster-node-version'])
-    end
-  end
-# This elsif branch might be unneeded since node seems to work with custom package
-# which is installed without the --no-deps option
-elsif node['platform'] == 'ubuntu' && node['platform_version'] == "14.04"
-  # For Ubuntu 14 manually install dependencies, in order to not break cloud-init
-  python_package "aws-parallelcluster-node" do
-    version node['cfncluster']['cfncluster-node-version']
-    install_options '--no-deps'
-  end
-  # python_package 'boto3' installed above
-  # python_package 'python-dateutil' installed by 'botocore' -> 'boto3'
-  python_package 'paramiko' do
-    version '2.4.2'
-  end
-  python_package 'future' do
-    version '0.17.1'
-  end
-  python_package 'retrying' do
-    version '1.3.3'
-  end
 else
-  python_package "aws-parallelcluster-node" do
+  pyenv_pip 'aws-parallelcluster-node' do
     version node['cfncluster']['cfncluster-node-version']
+    virtualenv node['cfncluster']['virtualenv']
   end
-end
-
-# Supervisord
-python_package "supervisor" do
-  version node['cfncluster']['supervisor-version']
 end
 
 # Put supervisord config in place
@@ -202,7 +141,8 @@ cookbook_file "supervisord.conf" do
 end
 
 # Put init script in place
-cookbook_file "supervisord-init" do
+template "supervisord-init" do
+  source 'supervisord-init.erb'
   path "/etc/init.d/supervisord"
   owner "root"
   group "root"
