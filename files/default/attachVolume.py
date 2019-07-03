@@ -1,7 +1,5 @@
-#!/usr/bin/env python
-
 import sys
-import parted
+import subprocess
 import os
 import urllib2
 import boto3
@@ -23,6 +21,20 @@ def convert_dev(dev):
     else:
         return dev
 
+def get_all_devices():
+    # lsblk -d -n -p
+    # /dev/xvda 202:0    0  17G  0 disk
+    # /dev/xvdb 202:16   0  20G  0 disk /shared
+    command = ["/bin/lsblk", "-d", "-n", "-p"]
+
+    env = {}
+    env.update(os.environ.copy())
+    try:
+        output = subprocess.check_output(command, env=env, stderr=subprocess.STDOUT, universal_newlines=True).split("\n")
+        return [line.split()[0] for line in output if len(line.split()) > 0]
+    except subprocess.CalledProcessError as e:
+        print("Failed to get devices with lsblk -d -n -p")
+        raise e
 
 def main():
     # Get EBS volume Id
@@ -40,7 +52,7 @@ def main():
     region = region[:-1]
 
     # Generate a list of system paths minus the root path
-    paths = [convert_dev(device.path) for device in parted.getAllDevices()]
+    paths = [convert_dev(device.path) for device in get_all_devices()]
 
     # List of possible block devices
     blockDevices = ['/dev/sdb', '/dev/sdc', '/dev/sdd', '/dev/sde', '/dev/sdf', '/dev/sdg', '/dev/sdh',
