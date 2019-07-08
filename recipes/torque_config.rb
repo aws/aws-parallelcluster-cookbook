@@ -73,6 +73,14 @@ cookbook_file "/etc/profile.d/torque.sh" do
   action :create
 end
 
+cookbook_file "/etc/profile.d/torque.csh" do
+  source 'torque.csh'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+end
+
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
