@@ -20,14 +20,14 @@
 #   build-date: timestamp to append to the AMIs names (optional)
 
 requirements_check() {
-    which packer >/dev/null 2>&1
+    packer build --help >/dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "packer command not found. Is Packer installed?"
       echo "Please visit https://www.packer.io/downloads.html for instruction on how to download and install"
       exit 1
     fi
 
-    which berks >/dev/null 2>&1
+    berks vendor --help >/dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "berks command not found. Is ChefDK installed?"
       echo "Please visit https://downloads.chef.io/chefdk/ for instruction on how to download and install"
@@ -160,6 +160,9 @@ do_command() {
       export BUILD_DATE=${_build_date}
     fi
 
+    # set it to try for 1 hour, this is to resolve ami copy timeout issue
+    # https://github.com/hashicorp/packer/issues/6536
+    export AWS_TIMEOUT_SECONDS=3600
 
     case ${_os} in
       all)
