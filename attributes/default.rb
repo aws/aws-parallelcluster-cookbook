@@ -20,7 +20,7 @@ default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/script
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 default['cfncluster']['virtualenv'] = "#{node['cfncluster']['base_dir']}/virtualenv"
 # Python version
-default['cfncluster']['python-version'] = '2.7.8'
+default['cfncluster']['python-version'] = '3.6.9'
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.4.0'
 default['cfncluster']['cfncluster-node-version'] = '2.4.0'

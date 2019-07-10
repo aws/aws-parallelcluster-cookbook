@@ -13,23 +13,29 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Install pyenv globally
-pyenv_system_install 'system'
+pyenv_user_install 'root'
 
-pyenv_python node['cfncluster']['python-version']
+pyenv_python node['cfncluster']['python-version'] do
+  user 'root'
+end
 
-pyenv_global node['cfncluster']['python-version']
+pyenv_global node['cfncluster']['python-version'] do
+  user 'root'
+end
 
 pyenv_plugin 'virtualenv' do
   git_url 'https://github.com/pyenv/pyenv-virtualenv'
+  user 'root'
 end
 
 pyenv_pip 'virtualenv' do
   version '16.2.0'
+  user 'root'
 end
 
 pyenv_script 'create virtualenv' do
   code "virtualenv #{node['cfncluster']['virtualenv']}"
+  user 'root'
 end
 
 # Install requirements file
@@ -43,4 +49,5 @@ end
 pyenv_pip "#{node['cfncluster']['virtualenv']}/requirements.txt" do
   virtualenv "#{node['cfncluster']['virtualenv']}"
   requirement true
+  user 'root'
 end
