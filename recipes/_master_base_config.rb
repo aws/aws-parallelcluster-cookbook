@@ -195,3 +195,8 @@ template '/etc/sqswatcher.cfg' do
   group 'root'
   mode '0644'
 end
+
+if node['cfncluster']['dcv_enabled'] == "master"
+  # Activate DCV on master Node
+  include_recipe 'aws-parallelcluster::dcv_config'
+end

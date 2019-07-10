@@ -10,6 +10,7 @@
     "build_date" : "{{env `BUILD_DATE`}}",
     "vendor_path" : "{{env `VENDOR_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
+    "dcv_installed": "{{env `DCV_INSTALLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
     "vpc_id" : "{{env `AWS_VPC_ID`}}",
@@ -227,6 +228,9 @@
           "cfn_region": "{{user `region`}}",
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
+          },
+          "dcv": {
+            "installed" : "{{user `dcv_installed`}}"
           },
           "custom_node_package" : "{{user `custom_node_package`}}"
         }

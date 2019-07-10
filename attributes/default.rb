@@ -60,7 +60,19 @@ default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFre
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.4.1.tar.gz'
-
+# DCV
+default['cfncluster']['dcv']['installed'] = 'yes'
+default['cfncluster']['dcv']['version'] = '2019.0-7318'
+default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.0/Servers/nice-dcv-#{node['cfncluster']['dcv']['version']}-el7.tgz"
+default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.0.7318-1.el7.x86_64.rpm"
+default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.0.224-1.el7.x86_64.rpm"
+default['cfncluster']['dcv']['ext_auth_user'] = "dcvextauth"
+default['cfncluster']['dcv']['ext_auth_user_home'] = "/home/#{node['cfncluster']['dcv']['ext_auth_user']}"
+default['cfncluster']['dcv']['certificate'] = "/etc/parallelcluster/cert.pem"
+# Virtualenv ParallelCluster External Authenticator Name
+default['cfncluster']['dcv_ext_auth_virtualenv'] = "dcv_ext_auth_virtualenv"
+# Ext_auth Virtualenv Path
+default['cfncluster']['dcv_ext_auth_virtualenv_path'] = "#{node['cfncluster']['dcv']['ext_auth_user_home']}/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['dcv_ext_auth_virtualenv']}"
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
 

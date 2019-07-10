@@ -111,6 +111,13 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
+if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['os'] == 'centos7' and node['cfncluster']['dcv']['installed'] == 'yes'
+  execute 'check dcv installed' do
+    command 'dcv version'
+  end
+end
+
+
 unless node['cfncluster']['cfn_region'].start_with?("cn-")
   case node['cfncluster']['os']
   when 'alinux', 'centos7'

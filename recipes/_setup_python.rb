@@ -12,40 +12,21 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-
-pyenv_user_install 'root'
-
-pyenv_python node['cfncluster']['python-version'] do
-  user 'root'
+pyenv_install "root" do
+  python_version node['cfncluster']['python-version']
 end
 
-pyenv_plugin 'virtualenv' do
-  git_url 'https://github.com/pyenv/pyenv-virtualenv'
-  user 'root'
+activate_virtual_env node['cfncluster']['cookbook_virtualenv'] do
+  pyenv_path node['cfncluster']['cookbook_virtualenv_path']
+  pyenv_user "root"
+  python_version node['cfncluster']['python-version']
+  requirements_path "requirements.txt"
+  not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
 end
 
-pyenv_script 'pyenv virtualenv cookbook' do
-    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['cookbook_virtualenv']}"
-    user 'root'
-    not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
-end
-
-pyenv_script 'pyenv virtualenv node' do
-    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['node_virtualenv']}"
-    user 'root'
-    not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
-end
-
-# Install requirements file
-cookbook_file "#{node['cfncluster']['cookbook_virtualenv_path']}/requirements.txt" do
-  source 'requirements.txt'
-  owner 'root'
-  group 'root'
-  mode '0755'
-end
-
-pyenv_pip "#{node['cfncluster']['cookbook_virtualenv_path']}/requirements.txt" do
-  virtualenv "#{node['cfncluster']['cookbook_virtualenv_path']}"
-  requirement true
-  user 'root'
+activate_virtual_env node['cfncluster']['node_virtualenv'] do
+  pyenv_path node['cfncluster']['node_virtualenv_path']
+  pyenv_user "root"
+  python_version node['cfncluster']['python-version']
+  not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
 end

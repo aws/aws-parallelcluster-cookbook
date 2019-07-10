@@ -63,6 +63,14 @@ def get_vpc_ipv4_cidr_block(eth0_mac)
   vpc_ipv4_cidr_block
 end
 
+def get_instance_type()
+  uri = URI("http://169.254.169.254/latest/meta-data/instance-type")
+  res = Net::HTTP.get_response(uri)
+  master_instance_type = res.body if res.code == '200'
+
+  master_instance_type
+end
+
 def pip_install_package(package, version)
   command = Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
   Chef::Application.fatal!("Failed to install package #{package} #{version}", command.exitstatus) unless command.exitstatus.zero?
