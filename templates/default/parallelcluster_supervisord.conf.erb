@@ -13,9 +13,17 @@ stdout_logfile = /var/log/sqswatcher
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/jobwatcher
 redirect_stderr = true
 stdout_logfile = /var/log/jobwatcher
-
 <% end -%>
 
+<% if node['cfncluster']['dcv_enabled'] == "master" -%>
+[program:pcluster_dcv_authenticator]
+command = <%= node['cfncluster']['dcv']['authenticator']['virtualenv_path'] %>/bin/python <%= node['cfncluster']['dcv']['authenticator']['user_home'] %>/pcluster_dcv_authenticator.py
+      --port <%= Integer(node['cfncluster']['dcv_port']) + 1 %>
+      --certificate <%= node['cfncluster']['dcv']['authenticator']['certificate'] %>
+      --key <%= node['cfncluster']['dcv']['authenticator']['private_key'] %>
+user = <%= node['cfncluster']['dcv']['authenticator']['user'] %>
+environment = HOME="<%= node['cfncluster']['dcv']['authenticator']['user_home'] %>",USER="<%= node['cfncluster']['dcv']['authenticator']['user'] %>"
+<% end -%>
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
 [program:nodewatcher]
