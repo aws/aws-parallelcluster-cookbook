@@ -28,6 +28,13 @@ directory '/etc/parallelcluster'
 directory '/opt/parallelcluster'
 directory '/opt/parallelcluster/scripts'
 
+# Create ParallelCluster log folder
+directory '/var/log/parallelcluster/' do
+  owner 'root'
+  mode '1777'
+  recursive true
+end
+
 template '/etc/parallelcluster/cfnconfig' do
   source 'cfnconfig.erb'
   mode '0644'

@@ -5,8 +5,20 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 2.5.0
 -----
+
+**ENHANCEMENTS**
+- CentOS7 AMI:
+  - Install NICE DCV packages and its requirements (it includes Gnome and Xorg packages) 
+  NOTE: NICE DCV is installed but can be used only if explicitly enabled from the configuration file
+  at cluster creation time.
+
 **CHANGES**
 - Upgrade to EFA Installer 1.6.2, this also upgrades Open MPI to 4.0.2
+- CentOS7 AMI:
+  - Disable X11Forwarding by default
+  - Limit SSH Ciphers to `aes256-gcm@openssh.com,aes256-ctr,aes256-cbc`
+  - Limit SSH MACs to `hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256`
+
 
 2.4.1
 -----

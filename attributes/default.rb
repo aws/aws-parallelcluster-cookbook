@@ -67,6 +67,20 @@ default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.6.2.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
 default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
+# NICE DCV
+default['cfncluster']['dcv']['installed'] = 'yes'
+default['cfncluster']['dcv']['version'] = '2019.1-7644'
+default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.1/Servers/nice-dcv-#{node['cfncluster']['dcv']['version']}-el7.tgz"
+default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm"  # NICE DCV server package
+default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm"  # required to create virtual sessions
+default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm"  # required to enable GPU sharing
+# DCV external authenticator configuration
+default['cfncluster']['dcv']['authenticator']['user'] = "dcvextauth"
+default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfncluster']['dcv']['authenticator']['user']}"
+default['cfncluster']['dcv']['authenticator']['certificate'] = "/etc/parallelcluster/ext-auth-certificate.pem"
+default['cfncluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
+default['cfncluster']['dcv']['authenticator']['virtualenv'] = "dcv_authenticator_virtualenv"
+default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cfncluster']['dcv']['authenticator']['user_home']}/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['dcv']['authenticator']['virtualenv']}"
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
@@ -78,8 +92,9 @@ default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
 default['openssh']['server']['password_authentication'] = 'no'
 default['openssh']['server']['gssapi_authentication'] = 'yes'
 default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
-default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
+default['openssh']['server']['ciphers'] = 'aes256-gcm@openssh.com,aes256-ctr,aes256-cbc'
+default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
 
 # ulimit settings
