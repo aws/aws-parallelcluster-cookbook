@@ -1,4 +1,4 @@
 awscli
 boto3
 supervisor
-six
+requests
