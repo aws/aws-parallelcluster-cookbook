@@ -42,7 +42,7 @@ fi
   
 # enable operator privileges
 
-USER=$1@$HOSTNAME
+USER=$1
 
 echo "initializing TORQUE (admin: $USER)"
 
@@ -66,15 +66,13 @@ if [ "$?" -ne "0" ] ; then
   exit 1;
 fi
 
-echo set server operators += $USER@* | qmgr
-
-if [ "$?" -ne "0" ] ; then
+if ! echo set server operators += "${USER}@*" | qmgr > /dev/null ; then
   echo "ERROR: cannot set TORQUE admins"
   qterm
   exit 1;
 fi
 
-echo set server managers += $USER | qmgr
+echo set server managers += "${USER}@${HOSTNAME}" | qmgr
 
 
 qmgr -c 'set server scheduling = true'
