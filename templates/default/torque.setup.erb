@@ -71,6 +71,10 @@ qmgr -c 'set server scheduling = true'
 qmgr -c 'set server keep_completed = 300'
 qmgr -c 'set server mom_job_sync = true'
 qmgr -c 'set server resources_available.nodect = <%= node['cfncluster']['cfn_max_queue_size'] %>'
+qmgr -c 'set server node_check_rate = 120'
+qmgr -c 'set server node_ping_rate = 60'
+qmgr -c 'set server timeout_for_job_delete = 30'
+qmgr -c 'set server timeout_for_job_requeue = 30'
 
 # create default queue
 
