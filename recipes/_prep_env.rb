@@ -35,8 +35,8 @@ link '/opt/parallelcluster/cfnconfig' do
   to '/etc/parallelcluster/cfnconfig'
 end
 
-cookbook_file "fetch_and_run" do
-  path "/opt/parallelcluster/scripts/fetch_and_run"
+template "/opt/parallelcluster/scripts/fetch_and_run" do
+  source 'fetch_and_run.erb'
   owner "root"
   group "root"
   mode "0755"
