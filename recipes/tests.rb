@@ -14,7 +14,7 @@
 # limitations under the License.
 
 execute 'execute awscli' do
-  command "aws --version"
+  command "#{node['cfncluster']['virtualenv']}/bin/aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
   user node['cfncluster']['cfn_cluster_user']
 end
@@ -23,10 +23,10 @@ bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
+    regions=($(#{node['cfncluster']['virtualenv']}/bin/aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
-      aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
+      #{node['cfncluster']['virtualenv']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
     done
   AWSREGIONS
 end

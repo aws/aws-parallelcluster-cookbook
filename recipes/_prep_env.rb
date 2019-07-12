@@ -42,8 +42,8 @@ cookbook_file "fetch_and_run" do
   mode "0755"
 end
 
-cookbook_file "compute_ready" do
-  path "/opt/parallelcluster/scripts/compute_ready"
+template '/opt/parallelcluster/scripts/compute_ready' do
+  source 'compute_ready.erb'
   owner "root"
   group "root"
   mode "0755"
