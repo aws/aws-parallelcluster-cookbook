@@ -36,6 +36,7 @@ end
 pyenv_script 'create virtualenv' do
   code "virtualenv #{node['cfncluster']['virtualenv']}"
   user 'root'
+  not_if { ::File.directory?(node['cfncluster']['virtualenv']) }
 end
 
 # Install requirements file
