@@ -18,7 +18,7 @@ default['cfncluster']['base_dir'] = '/opt/parallelcluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
-default['cfncluster']['virtualenv'] = "#{node['cfncluster']['base_dir']}/virtualenv"
+default['cfncluster']['virtualenv'] = "#{node['cfncluster']['base_dir']}/pcluster_virtualenv"
 # Python version
 default['cfncluster']['python-version'] = '3.6.9'
 # Python packages
