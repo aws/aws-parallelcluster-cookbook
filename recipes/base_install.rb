@@ -44,9 +44,6 @@ directory node['cfncluster']['virtualenv']
 build_essential
 include_recipe "aws-parallelcluster::_setup_python"
 
-# Install awscli outside of virtualenv
-python_package "awscli"
-
 # Install lots of packages
 node['cfncluster']['base_packages'].each do |p|
   package p do
@@ -54,6 +51,9 @@ node['cfncluster']['base_packages'].each do |p|
     retry_delay 5
   end
 end
+
+# Install awscli outside of virtualenv
+python_package "awscli"
 
 # Manage SSH via Chef
 include_recipe "openssh"

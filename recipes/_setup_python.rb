@@ -19,10 +19,6 @@ pyenv_python node['cfncluster']['python-version'] do
   user 'root'
 end
 
-pyenv_global node['cfncluster']['python-version'] do
-  user 'root'
-end
-
 pyenv_plugin 'virtualenv' do
   git_url 'https://github.com/pyenv/pyenv-virtualenv'
   user 'root'
@@ -34,6 +30,7 @@ pyenv_pip 'virtualenv' do
 end
 
 pyenv_script 'create virtualenv' do
+  pyenv_version "#{node['cfncluster']['python-version']}"
   code "virtualenv #{node['cfncluster']['virtualenv']}"
   user 'root'
   not_if { ::File.exist?("#{node['cfncluster']['virtualenv']}/bin/activate") }
