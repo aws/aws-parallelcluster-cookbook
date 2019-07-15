@@ -13,10 +13,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute 'execute awscli' do
-  command "#{node['cfncluster']['virtualenv']}/bin/aws --version"
+execute 'execute awscli as user' do
+  command "aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
   user node['cfncluster']['cfn_cluster_user']
+end
+
+execute 'execute awscli as root' do
+  command "#{node['cfncluster']['virtualenv']}/bin/aws --version"
+  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
 end
 
 bash 'check awscli regions' do
