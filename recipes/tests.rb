@@ -20,7 +20,7 @@ execute 'execute awscli as user' do
 end
 
 execute 'execute awscli as root' do
-  command "#{node['cfncluster']['virtualenv']}/bin/aws --version"
+  command "#{node['cfncluster']['virtualenv_path']}/bin/aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
 end
 
@@ -28,10 +28,10 @@ bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(#{node['cfncluster']['virtualenv']}/bin/aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
+    regions=($(#{node['cfncluster']['virtualenv_path']}/bin/aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
-      #{node['cfncluster']['virtualenv']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
+      #{node['cfncluster']['virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
     done
   AWSREGIONS
 end

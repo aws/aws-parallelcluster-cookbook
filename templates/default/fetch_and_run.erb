@@ -16,7 +16,7 @@ function download_run (){
     tmpfile=$(mktemp)
     trap "/bin/rm $tmpfile" RETURN
     if [ "${scheme}" == "s3" ]; then
-      <%= node['cfncluster']['virtualenv'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
+      <%= node['cfncluster']['virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
     else
       wget -qO- ${url} > $tmpfile || return 1
     fi

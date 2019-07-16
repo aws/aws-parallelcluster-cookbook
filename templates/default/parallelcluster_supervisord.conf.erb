@@ -5,12 +5,12 @@
 <% when 'MasterServer' -%>
 <% unless node['cfncluster']['cfn_scheduler'] == 'awsbatch' -%>
 [program:sqswatcher]
-command = <%= node['cfncluster']['virtualenv'] %>/bin/sqswatcher
+command = <%= node['cfncluster']['virtualenv_path'] %>/bin/sqswatcher
 redirect_stderr = true
 stdout_logfile = /var/log/sqswatcher
 
 [program:jobwatcher]
-command = <%= node['cfncluster']['virtualenv'] %>/bin/jobwatcher
+command = <%= node['cfncluster']['virtualenv_path'] %>/bin/jobwatcher
 redirect_stderr = true
 stdout_logfile = /var/log/jobwatcher
 
@@ -19,7 +19,7 @@ stdout_logfile = /var/log/jobwatcher
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
 [program:nodewatcher]
-command = <%= node['cfncluster']['virtualenv'] %>/bin/nodewatcher
+command = <%= node['cfncluster']['virtualenv_path'] %>/bin/nodewatcher
 redirect_stderr = true
 stdout_logfile = /var/log/nodewatcher
 <% end -%>

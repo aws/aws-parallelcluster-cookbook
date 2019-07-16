@@ -24,28 +24,22 @@ pyenv_plugin 'virtualenv' do
   user 'root'
 end
 
-pyenv_pip 'virtualenv' do
-  version '16.2.0'
-  user 'root'
-end
-
-pyenv_script 'create virtualenv' do
-  pyenv_version "#{node['cfncluster']['python-version']}"
-  code "virtualenv #{node['cfncluster']['virtualenv']}"
-  user 'root'
-  not_if { ::File.exist?("#{node['cfncluster']['virtualenv']}/bin/activate") }
+pyenv_script 'pyenv virtualenv' do
+    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['virtualenv']}"
+    user 'root'
+    not_if { ::File.exist?("#{node['cfncluster']['virtualenv_path']}/bin/activate") }
 end
 
 # Install requirements file
-cookbook_file "#{node['cfncluster']['virtualenv']}/requirements.txt" do
+cookbook_file "#{node['cfncluster']['virtualenv_path']}/requirements.txt" do
   source 'requirements.txt'
   owner 'root'
   group 'root'
   mode '0755'
 end
 
-pyenv_pip "#{node['cfncluster']['virtualenv']}/requirements.txt" do
-  virtualenv "#{node['cfncluster']['virtualenv']}"
+pyenv_pip "#{node['cfncluster']['virtualenv_path']}/requirements.txt" do
+  virtualenv "#{node['cfncluster']['virtualenv_path']}"
   requirement true
   user 'root'
 end
