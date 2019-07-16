@@ -37,7 +37,7 @@ if raid_shared_dir != "NONE"
 
     # Attach RAID EBS volume
     execute "attach_raid_volume_#{index}" do
-      command "#{node.default['cfncluster']['virtualenv']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
+      command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
       creates raid_dev_path[index]
     end
 

@@ -24,22 +24,28 @@ pyenv_plugin 'virtualenv' do
   user 'root'
 end
 
-pyenv_script 'pyenv virtualenv' do
-    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['virtualenv']}"
+pyenv_script 'pyenv virtualenv cookbook' do
+    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['cookbook_virtualenv']}"
     user 'root'
-    not_if { ::File.exist?("#{node['cfncluster']['virtualenv_path']}/bin/activate") }
+    not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
+end
+
+pyenv_script 'pyenv virtualenv node' do
+    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['node_virtualenv']}"
+    user 'root'
+    not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
 end
 
 # Install requirements file
-cookbook_file "#{node['cfncluster']['virtualenv_path']}/requirements.txt" do
+cookbook_file "#{node['cfncluster']['cookbook_virtualenv_path']}/requirements.txt" do
   source 'requirements.txt'
   owner 'root'
   group 'root'
   mode '0755'
 end
 
-pyenv_pip "#{node['cfncluster']['virtualenv_path']}/requirements.txt" do
-  virtualenv "#{node['cfncluster']['virtualenv_path']}"
+pyenv_pip "#{node['cfncluster']['cookbook_virtualenv_path']}/requirements.txt" do
+  virtualenv "#{node['cfncluster']['cookbook_virtualenv_path']}"
   requirement true
   user 'root'
 end
