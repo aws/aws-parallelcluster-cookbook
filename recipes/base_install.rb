@@ -39,7 +39,6 @@ directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
 directory node['cfncluster']['license_dir']
-directory node['cfncluster']['virtualenv']
 
 build_essential
 include_recipe "aws-parallelcluster::_setup_python"
@@ -52,8 +51,8 @@ node['cfncluster']['base_packages'].each do |p|
   end
 end
 
-# Install awscli outside of virtualenv
-python_package "awscli"
+# Install awscli with system python
+python_package 'awscli'
 
 # Manage SSH via Chef
 include_recipe "openssh"
@@ -119,7 +118,7 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
       echo "PATH is $PATH"
       source /tmp/proxy.sh
-      source #{node['cfncluster']['virtualenv']}/bin/activate
+      source #{node['cfncluster']['virtualenv_path']}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
       curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
       tar -xzf aws-parallelcluster-node.tgz
@@ -131,7 +130,7 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
 else
   pyenv_pip 'aws-parallelcluster-node' do
     version node['cfncluster']['cfncluster-node-version']
-    virtualenv node['cfncluster']['virtualenv']
+    virtualenv node['cfncluster']['virtualenv_path']
   end
 end
 
