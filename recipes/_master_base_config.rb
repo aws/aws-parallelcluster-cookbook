@@ -49,7 +49,7 @@ vol_array.each_with_index do |volumeid, index|
 
   # Attach EBS volume
   execute "attach_volume_#{index}" do
-    command "#{node.default['cfncluster']['virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
+    command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
     creates dev_path[index]
   end
 

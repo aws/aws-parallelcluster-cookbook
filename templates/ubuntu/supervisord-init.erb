@@ -28,8 +28,8 @@
 . /lib/lsb/init-functions
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-DAEMON="<%= node['cfncluster']['virtualenv_path'] %>/bin/supervisord"
-SUPERVISORCTL="<%= node['cfncluster']['virtualenv_path'] %>/bin/supervisorctl"
+DAEMON="<%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/supervisord"
+SUPERVISORCTL="<%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/supervisorctl"
 NAME=supervisord
 DESC=supervisor
 

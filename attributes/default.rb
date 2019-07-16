@@ -20,10 +20,14 @@ default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/script
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'
-# Virtualenv Name
-default['cfncluster']['virtualenv'] = 'pcluster_virtualenv'
-# Virtualenv Path
-default['cfncluster']['virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['virtualenv']}"
+# Virtualenv Cookbook Name
+default['cfncluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
+# Virtualenv Node Name
+default['cfncluster']['node_virtualenv'] = 'node_virtualenv'
+# Cookbook Virtualenv Path
+default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['cookbook_virtualenv']}"
+# Node Virtualenv Path
+default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.4.0'
 default['cfncluster']['cfncluster-node-version'] = '2.4.0'
