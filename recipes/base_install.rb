@@ -185,10 +185,11 @@ include_recipe "aws-parallelcluster::_nvidia_install"
 # Install FSx options
 include_recipe "aws-parallelcluster::_lustre_install"
 
-# Install EFA
+# Install EFA & Intel MPI
 if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) || node['platform'] == 'amazon' || (node['platform'] == 'ubuntu' && node['platform_version'] == "16.04")
   unless node['cfncluster']['cfn_region'].start_with?("cn-")
     include_recipe "aws-parallelcluster::_efa_install"
+    include_recipe "aws-parallelcluster::intel_mpi"
   else
     case node['platform_family']
       when 'rhel', 'amazon'
