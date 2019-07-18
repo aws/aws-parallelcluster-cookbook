@@ -13,40 +13,26 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-env2 = "#{node['cfncluster']['sources_dir']}/env2"
 intelmpi_modulefile = "#{node['cfncluster']['modulefile_dir']}/intelmpi/#{node['cfncluster']['intelmpi']['version']}"
+intelmpi_installer = "#{node['cfncluster']['sources_dir']}/intel_mpi.sh"
 
-cookbook_file 'intel_mpi.sh' do
-  path "#{node['cfncluster']['sources_dir']}/intel_mpi.sh"
-  user 'root'
-  group 'root'
-  mode '0744'
-end
-
-# Get env2
-remote_file env2 do
-  source node['cfncluster']['env2']['url']
+# Get intelmpi installer
+remote_file intelmpi_installer do
+  source node['cfncluster']['intelmpi']['url']
   mode '0744'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(env2) }
-end
-
-bash "install intel mpi" do
-  cwd node['cfncluster']['sources_dir']
-  code <<-INTELMPI
-    ./intel_mpi.sh
-  INTELMPI
-  creates '/opt/intel'
+  not_if { ::File.exist?(intelmpi_installer) }
 end
 
 directory "#{node['cfncluster']['modulefile_dir']}/intelmpi"
 
-bash "create intelmpi modulefile" do
+bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTELMPI
-    echo "#%Module" > #{intelmpi_modulefile}
-    ./env2 -from bash -to modulecmd "#{node['cfncluster']['mpivars']}" >> #{intelmpi_modulefile}
+    set -e
+    ./intel_mpi.sh install dont_check_efa
+    cp #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}
   INTELMPI
-  creates intelmpi_modulefile
+  creates '/opt/intel/impi'
 end
