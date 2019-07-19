@@ -44,5 +44,5 @@ bash "install efa" do
     cd aws-efa-installer
     ./efa_installer.sh -y --skip-limit-conf
   EFAINSTALL
-  creates '/opt/amazon/efa/bin/mpirun'
+  not_if { ::Dir.exist?('/opt/amazon/efa') }
 end
