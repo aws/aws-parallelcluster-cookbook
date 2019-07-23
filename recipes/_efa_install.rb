@@ -30,16 +30,19 @@ case node['platform_family']
 when 'rhel', 'amazon'
   package %w[openmpi-devel openmpi] do
     action :remove
+    not_if { ::Dir.exist?('/opt/amazon/efa') }
   end
 when 'debian'
   package "libopenmpi-dev" do
     action :remove
+    not_if { ::Dir.exist?('/opt/amazon/efa') }
   end
 end
 
 bash "install efa" do
   cwd node['cfncluster']['sources_dir']
   code <<-EFAINSTALL
+    set -e
     tar -xzf #{efa_tarball}
     cd aws-efa-installer
     ./efa_installer.sh -y --skip-limit-conf
