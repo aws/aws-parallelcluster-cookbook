@@ -60,6 +60,12 @@ default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFre
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-latest.tar.gz'
+# AWS CLI China Mirror
+if node['cfncluster']['cfn_region'].start_with?("cn-")
+  default['cfncluster']['awscli']['url'] = "https://s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster/aws-cli/awscli-bundle.zip"
+else
+  default['cfncluster']['awscli']['url'] = "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
+end
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
