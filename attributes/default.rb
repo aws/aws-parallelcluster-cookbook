@@ -28,6 +28,10 @@ default['cfncluster']['node_virtualenv'] = 'node_virtualenv'
 default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['cookbook_virtualenv']}"
 # Node Virtualenv Path
 default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
+# Intel MPI
+default['cfncluster']['intelmpi']['url'] = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/15553/aws_impi.sh"
+default['cfncluster']['intelmpi']['version'] = '2019.4.243'
+default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.4.0'
 default['cfncluster']['cfncluster-node-version'] = '2.4.0'
@@ -81,6 +85,9 @@ when 'rhel', 'amazon'
 
   default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
   default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
+
+  # Modulefile Directory
+  default['cfncluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
 
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
@@ -143,6 +150,8 @@ when 'debian'
   if node['platform_version'] == '14.04'
     default['cfncluster']['base_packages'].push('libopenmpi-dev')
   end
+  # Modulefile Directory
+  default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
