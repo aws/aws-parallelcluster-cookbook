@@ -51,6 +51,13 @@ node['cfncluster']['base_packages'].each do |p|
   end
 end
 
+# AWS CLI China Mirror
+if node['cfncluster']['cfn_region'].start_with?("cn-")
+  node.default['cfncluster']['awscli']['url'] = "https://s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster/aws-cli/awscli-bundle.zip"
+else
+  node.default['cfncluster']['awscli']['url'] = "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
+end
+
 bash "install awscli" do
   cwd Chef::Config[:file_cache_path]
   code <<-CLI
