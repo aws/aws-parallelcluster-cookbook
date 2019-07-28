@@ -54,7 +54,7 @@ end
 bash "install awscli" do
   cwd Chef::Config[:file_cache_path]
   code <<-CLI
-    curl --retry 5 --retry-delay 5 "#{node['cfncluster']['awscli']['url']}" -o "awscli-bundle.zip"
+    curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     unzip awscli-bundle.zip
     ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
   CLI
