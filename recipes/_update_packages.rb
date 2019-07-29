@@ -13,23 +13,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-package 'aws-cli' do
-  action :remove
-  ignore_failure true
-end
-
-if !(node['platform'] == 'ubuntu' && node['platform_version'] == "16.04")
-  python_package 'awscli' do
-    action :remove
-    ignore_failure true
-  end
-else
-  bash 'remove awscli' do
-    code "pip uninstall -y awscli"
-    ignore_failure true
-  end
-end
-
 unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
   # not CentOS6
   case node['platform_family']

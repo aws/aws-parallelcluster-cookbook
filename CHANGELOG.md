@@ -3,6 +3,43 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.4.1
+-----
+
+**ENHANCEMENTS**
+- Install IntelMPI on Alinux, Centos 7 and Ubuntu 1604
+- Upgrade EFA to version 1.4.1
+- Run all node daemons and cookbook recipes in isolated Python virtualenvs. This allows our code to always run with the
+  required Python dependencies and solves all conflicts and runtime failures that were being caused by user packages
+  installed in the system Python
+
+**CHANGES**
+- Torque: upgrade to version 6.1.2
+- Run all node daemons with Python 3.6
+- Torque: changed following parameters in global configuration:
+  - `server node_check_rate = 120` - Specifies the minimum duration (in seconds)
+    that a node can fail to send a status update before being marked down by the
+    pbs_server daemon. Previously was 600. This reduces scaling reaction times in
+    case of instance failure or unexpected termination (especially with spot)
+  - `server node_ping_rate = 60` - Specifies the maximum interval (in seconds)
+    between successive "pings" sent from the pbs_server daemon to the pbs_mom
+    daemon to determine node/daemon health. Previously was 300. Setting it to half
+    the node_check_rate.
+  - `server timeout_for_job_delete = 30` - The specific timeout used when deleting
+    jobs because the node they are executing on is being deleted. Previously was
+    120. This prevents job deletion to hang for more than 30 seconds when the node
+    they are running on is being deleted.
+  - `server timeout_for_job_requeue = 30` - The specific timeout used when requeuing
+    jobs because the node they are executing on is being deleted. Previously was
+    120. This prevents node deletion to hang for more than 30 seconds when a job
+    cannot be rescheduled.
+
+**BUG FIXES**
+- Restore correct value for `filehandle_limit` that was getting reset when setting `memory_limit` for EFA
+- Torque: fix configuration of server operators that was preventing compute nodes from disabling themselves
+  before termination
+
+
 2.4.0
 -----
 

@@ -29,7 +29,7 @@ execute "run-ldconfig" do
   action :nothing
 end
 
-# Set toruqe server_name
+# Set torque server_name
 template '/var/spool/torque/server_name' do
   source 'torque.server_name.erb'
   owner 'root'
@@ -67,6 +67,14 @@ end
 
 cookbook_file "/etc/profile.d/torque.sh" do
   source 'torque.sh'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  action :create
+end
+
+cookbook_file "/etc/profile.d/torque.csh" do
+  source 'torque.csh'
   owner 'root'
   group 'root'
   mode '0755'

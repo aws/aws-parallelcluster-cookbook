@@ -13,44 +13,39 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['platform_family']
-when 'rhel', 'amazon'
-  if node['platform_version'].to_i < 7
-    package 'python-pip'
-    package 'python-devel'
-    bash 'update pip and setuptools' do
-      code <<-PIP
-        pip install --upgrade pip==7.1.2
-        pip install --upgrade setuptools==18.8
-      PIP
-    end
-  else
-    bash 'pin pip to version 18.0' do
-      # FIXME: https://github.com/poise/poise-python/issues/133
-      code <<-PIP
-        which pip
-        if [ $? -eq 0 ]; then pip install pip==18.0; fi
-      PIP
-    end
-    python_runtime '2' do
-      version '2'
-      provider :system
-      # FIXME: https://github.com/poise/poise-python/issues/133
-      pip_version '18.0'
-    end
-  end
-when 'debian'
-  bash 'pin pip to version 18.0' do
-    # FIXME: https://github.com/poise/poise-python/issues/133
-    code <<-PIP
-      which pip
-      if [ $? -eq 0 ]; then pip install pip==18.0; fi
-    PIP
-  end
-  python_runtime '2' do
-    version '2'
-    provider :system
-    # FIXME: https://github.com/poise/poise-python/issues/133
-    pip_version '18.0'
-  end
+pyenv_user_install 'root'
+
+pyenv_python node['cfncluster']['python-version'] do
+  user 'root'
+end
+
+pyenv_plugin 'virtualenv' do
+  git_url 'https://github.com/pyenv/pyenv-virtualenv'
+  user 'root'
+end
+
+pyenv_script 'pyenv virtualenv cookbook' do
+    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['cookbook_virtualenv']}"
+    user 'root'
+    not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
+end
+
+pyenv_script 'pyenv virtualenv node' do
+    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['node_virtualenv']}"
+    user 'root'
+    not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
+end
+
+# Install requirements file
+cookbook_file "#{node['cfncluster']['cookbook_virtualenv_path']}/requirements.txt" do
+  source 'requirements.txt'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+pyenv_pip "#{node['cfncluster']['cookbook_virtualenv_path']}/requirements.txt" do
+  virtualenv "#{node['cfncluster']['cookbook_virtualenv_path']}"
+  requirement true
+  user 'root'
 end
