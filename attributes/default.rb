@@ -33,8 +33,8 @@ default['cfncluster']['intelmpi']['url'] = "http://registrationcenter-download.i
 default['cfncluster']['intelmpi']['version'] = '2019.4.243'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.4.0'
-default['cfncluster']['cfncluster-node-version'] = '2.4.0'
+default['cfncluster']['cfncluster-version'] = '2.4.1'
+default['cfncluster']['cfncluster-node-version'] = '2.4.1'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
@@ -59,7 +59,7 @@ default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-latest.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.4.1.tar.gz'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
