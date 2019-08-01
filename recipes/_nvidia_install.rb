@@ -45,6 +45,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     cwd '/tmp'
     code <<-NVIDIA
     ./nvidia.run --silent --no-network --dkms
+    rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
   end
@@ -66,6 +67,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     cwd '/tmp'
     code <<-CUDA
     ./cuda.run --silent --toolkit
+    rm -f /tmp/cuda.run
     CUDA
     creates '/usr/local/cuda-10.0'
   end
