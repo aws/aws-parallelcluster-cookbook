@@ -42,6 +42,8 @@ bash 'make install' do
     make -j $CORES
     make install
     cp -vpR contrib /opt/torque
+    # Removing torque generated profiles. These will be restored at runtime when scheduler is torque
+    rm -f /etc/profile.d/torque.csh /etc/profile.d/torque.sh
   TORQUE
   # Only perform if running version doesn't match desired
   not_if "/opt/torque/bin/pbsnodes --version 2>&1 | grep -q #{node['cfncluster']['torque']['version']}"

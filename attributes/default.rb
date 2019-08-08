@@ -18,17 +18,30 @@ default['cfncluster']['base_dir'] = '/opt/parallelcluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
+# Python Version
+default['cfncluster']['python-version'] = '3.6.9'
+# Virtualenv Cookbook Name
+default['cfncluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
+# Virtualenv Node Name
+default['cfncluster']['node_virtualenv'] = 'node_virtualenv'
+# Cookbook Virtualenv Path
+default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['cookbook_virtualenv']}"
+# Node Virtualenv Path
+default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
+# Intel MPI
+default['cfncluster']['intelmpi']['url'] = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/15553/aws_impi.sh"
+default['cfncluster']['intelmpi']['version'] = '2019.4.243'
+default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.4.0'
-default['cfncluster']['cfncluster-node-version'] = '2.4.0'
-default['cfncluster']['supervisor-version'] = '3.4.0'
+default['cfncluster']['cfncluster-version'] = '2.4.1'
+default['cfncluster']['cfncluster-node-version'] = '2.4.1'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
 default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
 # Torque software
-default['cfncluster']['torque']['version'] = '6.0.2'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.0.2.tar.gz'
+default['cfncluster']['torque']['version'] = '6.1.2'
+default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
 default['cfncluster']['slurm']['version'] = '18-08-6-2'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
@@ -46,7 +59,7 @@ default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-latest.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.4.1.tar.gz'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
@@ -62,6 +75,10 @@ default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
 
+# ulimit settings
+default['cfncluster']['filehandle_limit'] = 10000
+default['cfncluster']['memory_limit'] = 'unlimited'
+
 # Platform defaults
 case node['platform_family']
 when 'rhel', 'amazon'
@@ -69,13 +86,16 @@ when 'rhel', 'amazon'
   default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
   default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
 
+  # Modulefile Directory
+  default['cfncluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
+
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
-                                                libical-devel postgresql-devel postgresql-server sendmail mdadm]
+                                                libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip]
 
     # Lustre Drivers for Centos 6
     default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -87,7 +107,7 @@ when 'rhel', 'amazon'
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm]
+                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip]
       if node['platform_version'].split('.')[1] == '6'
         # Lustre Drivers for Centos 7.6
         default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -108,7 +128,7 @@ when 'rhel', 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
-                                                libffi-devel openssl-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
+                                                libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm]
   end
 
@@ -125,11 +145,13 @@ when 'debian'
   default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
   if node['platform_version'] == '14.04'
     default['cfncluster']['base_packages'].push('libopenmpi-dev')
   end
+  # Modulefile Directory
+  default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'

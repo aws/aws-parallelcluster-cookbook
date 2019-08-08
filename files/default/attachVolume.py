@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-
 import sys
-import parted
+import subprocess
 import os
-import urllib2
+import requests
 import boto3
 import time
-import ConfigParser
+import configparser
 from botocore.config import Config
 
 
@@ -23,24 +21,36 @@ def convert_dev(dev):
     else:
         return dev
 
+def get_all_devices():
+    # lsblk -d -n
+    # xvda 202:0    0  17G  0 disk
+    # xvdb 202:16   0  20G  0 disk /shared
+    command = ["/bin/lsblk", "-d", "-n"]
+
+    try:
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).split("\n")
+        return ["/dev/{}".format(line.split()[0]) for line in output if len(line.split()) > 0]
+    except subprocess.CalledProcessError as e:
+        print("Failed to get devices with lsblk -d -n")
+        raise e
 
 def main():
     # Get EBS volume Id
     try:
         volumeId = str(sys.argv[1])
     except IndexError:
-        print "Provide an EBS volume ID to attach i.e. vol-cc789ea5"
+        print("Provide an EBS volume ID to attach i.e. vol-cc789ea5")
         sys.exit(1)
 
     # Get instance ID
-    instanceId = urllib2.urlopen("http://169.254.169.254/latest/meta-data/instance-id").read()
+    instanceId = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
 
     # Get region
-    region = urllib2.urlopen("http://169.254.169.254/latest/meta-data/placement/availability-zone").read()
+    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone").text
     region = region[:-1]
 
     # Generate a list of system paths minus the root path
-    paths = [convert_dev(device.path) for device in parted.getAllDevices()]
+    paths = [convert_dev(device) for device in get_all_devices()]
 
     # List of possible block devices
     blockDevices = ['/dev/sdb', '/dev/sdc', '/dev/sdd', '/dev/sde', '/dev/sdf', '/dev/sdg', '/dev/sdh',
@@ -52,7 +62,7 @@ def main():
     availableDevices = [a for a in blockDevices if a not in paths]
 
     # Parse configuration file to read proxy settings
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read('/etc/boto.cfg')
     proxy_config = Config()
     if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
@@ -72,12 +82,12 @@ def main():
     x = 0
     while state != "attached":
         if x == 36:
-            print "Volume %s failed to mount in 180 seconds." % volumeId
+            print("Volume %s failed to mount in 180 seconds." % volumeId)
             exit(1)
         if state in ["busy" or "detached"]:
-            print "Volume %s in bad state %s" % (volumeId, state)
+            print("Volume %s in bad state %s" % (volumeId, state))
             exit(1)
-        print "Volume %s in state %s ... waiting to be 'attached'" % (volumeId, state)
+        print("Volume %s in state %s ... waiting to be 'attached'" % (volumeId, state))
         time.sleep(5)
         x += 1
         try:

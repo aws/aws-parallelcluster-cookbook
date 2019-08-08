@@ -1,12 +1,10 @@
-#!/usr/bin/env python
-
-import urllib2
+import requests
 import sys
 import os
 import syslog
 import time
 import boto3
-import ConfigParser
+import configparser
 from botocore.config import Config
 
 
@@ -31,14 +29,14 @@ def main():
         dev = '/dev/' + dev
 
     # Get instance ID
-    instanceId = urllib2.urlopen("http://169.254.169.254/latest/meta-data/instance-id").read()
+    instanceId = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
 
     # Get region
-    region = urllib2.urlopen("http://169.254.169.254/latest/meta-data/placement/availability-zone").read()
+    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone").text
     region = region[:-1]
 
     # Parse configuration file to read proxy settings
-    config = ConfigParser.RawConfigParser()
+    config = configparser.RawConfigParser()
     config.read('/etc/boto.cfg')
     proxy_config = Config()
     if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
@@ -53,7 +51,7 @@ def main():
     devices = ec2.describe_instance_attribute(InstanceId=instanceId, Attribute='blockDeviceMapping').get('BlockDeviceMappings')
     devmap = dict((d.get('DeviceName'), d) for d in devices)
     x = 0
-    while not devmap.has_key(dev):
+    while dev not in devmap:
         if x == 36:
             syslog.syslog("Dev %s did not appears in 180 seconds." % dev)
             sys.exit(1)

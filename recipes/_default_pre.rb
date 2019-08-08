@@ -13,8 +13,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Calling user_ulimit will override every existing limit
 user_ulimit "*" do
-  filehandle_limit 10000
+  filehandle_limit "#{node['cfncluster']['filehandle_limit']}"
 end
 
 include_recipe 'aws-parallelcluster::_update_packages'

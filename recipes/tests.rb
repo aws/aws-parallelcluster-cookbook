@@ -13,20 +13,25 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute 'execute awscli' do
+execute 'execute awscli as user' do
   command "aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
   user node['cfncluster']['cfn_cluster_user']
+end
+
+execute 'execute awscli as root' do
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws --version"
+  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
 end
 
 bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
+    regions=($(#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
-      aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
+      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
     done
   AWSREGIONS
 end
