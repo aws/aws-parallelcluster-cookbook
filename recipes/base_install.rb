@@ -199,3 +199,8 @@ if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) || node[
     end
   end
 end
+
+# Intel Runtime Libraries
+if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7)
+  include_recipe "aws-parallelcluster::intel_install"
+end
