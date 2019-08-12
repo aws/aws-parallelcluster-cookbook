@@ -13,6 +13,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This rpm installs a file /etc/intel-hpc-platform-release that contains the INTEL_HPC_PLATFORM_VERSION
 bash "install intel hpc platform" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTEL
@@ -24,6 +25,7 @@ bash "install intel hpc platform" do
   creates '/etc/intel-hpc-platform-release'
 end
 
+# parallel studio is intel's optimized libraries, this is the runtime (free) version
 bash "install intel psxe" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTEL
@@ -35,6 +37,7 @@ bash "install intel psxe" do
   creates '/opt/intel/psxe_runtime'
 end
 
+# intel optimized versions of python
 bash "install intel python" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTEL
@@ -43,4 +46,28 @@ bash "install intel python" do
     yum -y install intelpython2 intelpython3
   INTEL
   creates '/opt/intel/intelpython2'
+end
+
+# intel optimized math kernel library
+create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelmkl" do
+  source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
+  modulefile "2019.4"
+end
+
+# intel performance primitives
+create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelipp" do
+  source_path "/opt/intel/psxe_runtime/linux/ipp/bin/ippvars.sh"
+  modulefile "2019.4"
+end
+
+# intel threading building blocks
+create_modulefile "#{node['cfncluster']['modulefile_dir']}/inteltbb" do
+  source_path "/opt/intel/psxe_runtime/linux/tbb/bin/tbbvars.sh"
+  modulefile "2019.4"
+end
+
+# intel data analytics acceleration library
+create_modulefile "#{node['cfncluster']['modulefile_dir']}/inteldaal" do
+  source_path "/opt/intel/psxe_runtime/linux/daal/bin/daalvars.sh"
+  modulefile "2019.4"
 end
