@@ -107,7 +107,8 @@ when 'rhel', 'amazon'
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip]
+                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
+                                                  libssh2-devel]
       if node['platform_version'].split('.')[1] == '6'
         # Lustre Drivers for Centos 7.6
         default['cfncluster']['lustre']['version'] = '2.10.6'
