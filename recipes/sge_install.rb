@@ -19,13 +19,26 @@ case node['cfncluster']['cfn_node_type']
 when 'MasterServer', nil
   sge_tarball = "#{node['cfncluster']['sources_dir']}/sge-#{node['cfncluster']['sge']['version']}.tar.gz"
 
-  # Get SGE tarball
-  remote_file sge_tarball do
-    source node['cfncluster']['sge']['url']
+  # SGE preinstall script
+  cookbook_file 'sge_preinstall.sh' do
+    path '/tmp/sge_preinstall.sh'
+    user 'root'
+    group 'root'
     mode '0644'
-    retries 3
-    retry_delay 5
-    # TODO: Add version or checksum checks
+  end
+
+  execute 'sge_preinstall' do
+    user 'root'
+    group 'root'
+    cwd "/tmp"
+    environment(
+      'VERSION' => "#{node['cfncluster']['sge']['version']}",
+      'TARBALL_ROOT_DIR' => "sge-#{node['cfncluster']['sge']['version']}",
+      'TARBALL_PATH' => "#{sge_tarball}",
+      'TARBALL_URL' => node['cfncluster']['sge']['url']
+    )
+
+    command 'sh /tmp/sge_preinstall.sh'
     not_if { ::File.exist?(sge_tarball) }
   end
 
@@ -36,13 +49,13 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     environment 'SGE_ROOT' => '/opt/sge'
     code <<-SGE
+      set -e
       tar xf #{sge_tarball}
       cd sge-#{node['cfncluster']['sge']['version']}/source
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       sh scripts/bootstrap.sh -no-java -no-jni -no-herd
       ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
       ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
-      scripts/distinst -local -allall -noexit
       mkdir $SGE_ROOT
       echo instremote=false >> distinst.private
       gearch=`dist/util/arch`
