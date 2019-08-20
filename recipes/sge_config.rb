@@ -13,6 +13,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# SGE temporarily disabled on Ubuntu 18.04
+if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
+  Chef::Log.info("SGE temporarily disabled on Ubuntu 18.04")
+  return
+end
+
 include_recipe 'aws-parallelcluster::base_config'
 include_recipe 'aws-parallelcluster::sge_install'
 

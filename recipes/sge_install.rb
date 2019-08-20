@@ -13,6 +13,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# SGE temporarily disabled on Ubuntu 18.04
+if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
+  Chef::Log.info("SGE temporarily disabled on Ubuntu 18.04")
+  return
+end
+
 include_recipe 'aws-parallelcluster::base_install'
 
 case node['cfncluster']['cfn_node_type']
@@ -36,13 +42,14 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     environment 'SGE_ROOT' => '/opt/sge'
     code <<-SGE
+      set -e
       tar xf #{sge_tarball}
-      cd sge-#{node['cfncluster']['sge']['version']}/source
+      cd sge-#{node['cfncluster']['sge']['version']}
+      cd source
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       sh scripts/bootstrap.sh -no-java -no-jni -no-herd
       ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
       ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
-      scripts/distinst -local -allall -noexit
       mkdir $SGE_ROOT
       echo instremote=false >> distinst.private
       gearch=`dist/util/arch`

@@ -46,8 +46,8 @@ default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/t
 default['cfncluster']['slurm']['version'] = '18-08-6-2'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
 # Munge
-default['cfncluster']['munge']['munge_version'] = '0.5.12'
-default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
+default['cfncluster']['munge']['munge_version'] = '0.5.13'
+default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
 default['cfncluster']['ganglia']['version'] = '3.7.2'
@@ -153,6 +153,11 @@ when 'debian'
   if node['platform_version'] == '14.04'
     default['cfncluster']['base_packages'].push('libopenmpi-dev')
   end
+  if node['platform_version'] == '18.04'
+    default['cfncluster']['base_packages'].delete('libatlas-dev')
+    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libgcrypt20-dev')
+  end
+
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"

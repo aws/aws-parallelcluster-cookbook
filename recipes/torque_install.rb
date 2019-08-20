@@ -17,6 +17,9 @@ include_recipe 'aws-parallelcluster::base_install'
 include_recipe 'aws-parallelcluster::munge_install'
 
 torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster']['torque']['version']}.tar.gz"
+cxx_flags = "" # No make options by default
+c_flags = ""
+configure_flags = ""
 
 # Get Torque tarball
 remote_file torque_tarball do
@@ -28,16 +31,38 @@ remote_file torque_tarball do
   not_if { ::File.exist?(torque_tarball) }
 end
 
+if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
+  cxx_flags = "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/"
+  c_flags = "-fpermissive"
+  configure_flags = "--disable-gcc-warnings"
+  bash 'prepare_ubuntu_18' do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-TORQUE
+      set -e
+      # Headers needed for compilation
+      wget http://security.ubuntu.com/ubuntu/pool/main/i/icu/libicu-dev_55.1-7ubuntu0.4_amd64.deb
+      dpkg -x libicu-dev_55.1-7ubuntu0.4_amd64.deb extra_libs
+
+    TORQUE
+    not_if { ::Dir.exist?("/opt/torque/bin") }
+  end
+end
+
 # Install Torque
 bash 'make install' do
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
   code <<-TORQUE
+    set -e
+    export CFLAGS="#{c_flags}"
+    export CXXFLAGS="#{cxx_flags}"
     tar xf #{torque_tarball}
     cd torque-#{node['cfncluster']['torque']['version']}
     ./autogen.sh
-    ./configure --prefix=/opt/torque --enable-munge-auth --disable-gui
+    ./configure --prefix=/opt/torque --enable-munge-auth --disable-gui #{configure_flags}
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
