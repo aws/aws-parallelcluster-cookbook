@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 #
 # Cookbook Name:: aws-parallelcluster
 #
@@ -48,6 +47,13 @@ create_dcv_session() {
     echo "${sessionid}"
 }
 
+create_file () {
+    file="$1"
+    permissions="$2"
+    touch "${file}"
+    chmod "${permissions}" "${file}"
+}
+
 main() {
     if [[ -z "$1" ]]; then
       _fail "Required shared folder"
@@ -93,7 +99,7 @@ main() {
     request_token=$(echo "${user_token_request}" | jq -r .requestToken)
 
     # This is for the external authenticator to be sure you declared yourself as who you really are
-    touch "/run/parallelcluster/dcv_ext_auth/${filename}"
+    create_file "/run/parallelcluster/dcv_ext_auth/${filename}" 644
 
     session_token_request=$(curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=sessionToken -d requestToken="${request_token}")
     _check_if_empty "${session_token_request}" "Unable to obtain the Session Token from the NICE DCV external authenticator"

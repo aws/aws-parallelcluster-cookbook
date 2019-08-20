@@ -36,6 +36,14 @@ AUTHORIZATION_FILE_DIR = "/run/parallelcluster/dcv_ext_auth"
 LOG_FILE_PATH = "/var/log/parallelcluster/dcv_ext_auth.log"
 
 
+def generate_random_token(token_length):
+    """This function generate CSPRNG compliant random tokens."""
+    allowed_chars = "".join((string.ascii_letters, string.digits, "_", "-"))
+    max_int = len(allowed_chars) - 1
+    system_random = random.SystemRandom()
+    return "".join(allowed_chars[system_random.randint(0, max_int)] for _ in range(token_length))
+
+
 class OneTimeTokenHandler:
     """This class store tokens with information associated with them"""
 
@@ -73,6 +81,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     MAX_NUMBER_OF_TS = 100
     SECONDS_OF_LIFE_TR = 10
     SECONDS_OF_LIFE_TS = 30
+    SALT = generate_random_token(256)
 
     DCVAuthTokenValues = namedtuple("ExtAuthTokenValues", "user dcv_session_id creation_time")
 
@@ -80,7 +89,6 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     _session_token_manager = OneTimeTokenHandler(MAX_NUMBER_OF_TS)
     _request_token_ttl = timedelta(seconds=SECONDS_OF_LIFE_TR)
     _session_token_ttl = timedelta(seconds=SECONDS_OF_LIFE_TS)
-
 
     def do_GET(self):  # noqa N802
         """
@@ -193,7 +201,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         DCVAuthenticator._validate_request(session_id, DCVAuthenticator.SESSION_REGEX, "sessionId")
         DCVAuthenticator._verify_session_existence(user, session_id)
         request_token = generate_random_token(256)
-        filename = generate_sha512_hash(request_token)
+        filename = generate_sha512_hash(request_token, DCVAuthenticator.SALT)
         cls._request_token_manager.add_token(
             request_token, DCVAuthenticator.DCVAuthTokenValues(user, session_id, datetime.utcnow())
         )
@@ -215,7 +223,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         if datetime.utcnow() - tr_time > cls._request_token_ttl:
             raise DCVAuthenticator.IncorrectRequestException("The requestToken is not valid anymore")
 
-        file_name = generate_sha512_hash(request_token)
+        file_name = generate_sha512_hash(request_token, DCVAuthenticator.SALT)
         try:
             path = "{0}/{1}".format(AUTHORIZATION_FILE_DIR, file_name)
             file_details = os.stat(path)
@@ -316,14 +324,6 @@ def get_arguments():
     )
     parser.add_argument("--key", help="The .key of the certificate, if not included in it")
     return parser.parse_args()
-
-
-def generate_random_token(token_length):
-    """This function generate CSPRNG compliant random tokens."""
-    allowed_chars = "".join((string.ascii_letters, string.digits, "_", "-"))
-    max_int = len(allowed_chars) - 1
-    system_random = random.SystemRandom()
-    return "".join(allowed_chars[system_random.randint(0, max_int)] for _ in range(token_length))
 
 
 def generate_sha512_hash(*args):

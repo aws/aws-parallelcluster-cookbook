@@ -25,16 +25,15 @@ end
 if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && node['cfncluster']['cfn_node_type'] == "MasterServer"
   node.default['cfncluster']['dcv']['is_graphic_instance'] = is_graphic_instance
 
-  execute "create certificate" do
-    command "openssl req -new -x509 -days 365 -subj \"/CN=localhost\"  -nodes -out #{node['cfncluster']['dcv']['certificate']} -keyout #{node['cfncluster']['dcv']['certificate']}"
-    cwd node['cfncluster']['dcv']['ext_auth_user_home']
-    user 'root'
+  cookbook_file "/etc/parallelcluster/generate_certificate.sh" do
+    source 'ext_auth_files/generate_certificate.sh'
+    owner 'root'
+    mode '0700'
   end
 
-  file node['cfncluster']['dcv']['certificate'] do
-    group 'dcv'
-    owner node['cfncluster']['dcv']['ext_auth_user']
-    mode '440'
+  execute "certificate generation" do
+    command "/etc/parallelcluster/generate_certificate.sh \"#{node['cfncluster']['dcv']['certificate']}\" #{node['cfncluster']['dcv']['ext_auth_user']} dcv"
+    user 'root'
   end
 
   #Override dcv.conf file
@@ -48,7 +47,7 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && node['c
 
   directory '/run/parallelcluster/dcv_ext_auth' do
     owner node['cfncluster']['dcv']['ext_auth_user']
-    mode '1777'
+    mode '1733'
     recursive true
   end
 
