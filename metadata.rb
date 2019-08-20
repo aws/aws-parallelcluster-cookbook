@@ -14,6 +14,7 @@ supports 'centos', '= 6'
 supports 'centos', '= 7'
 supports 'ubuntu', '= 14.04'
 supports 'ubuntu', '= 16.04'
+supports 'ubuntu', '= 18.04'
 
 depends 'build-essential', '~> 8.1.1'
 depends 'poise-python', '~> 1.7.0'

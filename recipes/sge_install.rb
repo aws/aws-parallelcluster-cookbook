@@ -29,6 +29,14 @@ when 'MasterServer', nil
     not_if { ::File.exist?(sge_tarball) }
   end
 
+  # Patch file for SGE sources
+  cookbook_file 'sge_source.patch' do
+    path '/tmp/sge_source.patch'
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
   # Install SGE
   bash 'make install' do
     user 'root'
@@ -36,13 +44,15 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     environment 'SGE_ROOT' => '/opt/sge'
     code <<-SGE
+      set -e
       tar xf #{sge_tarball}
-      cd sge-#{node['cfncluster']['sge']['version']}/source
+      cd sge-#{node['cfncluster']['sge']['version']}
+      patch -p1 < /tmp/sge_source.patch
+      cd source
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       sh scripts/bootstrap.sh -no-java -no-jni -no-herd
       ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
       ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
-      scripts/distinst -local -allall -noexit
       mkdir $SGE_ROOT
       echo instremote=false >> distinst.private
       gearch=`dist/util/arch`
