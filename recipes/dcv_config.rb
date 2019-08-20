@@ -45,7 +45,7 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && node['c
     mode '0755'
   end
 
-  directory '/run/parallelcluster/dcv_ext_auth' do
+  directory '/var/spool/dcv_ext_auth' do
     owner node['cfncluster']['dcv']['ext_auth_user']
     mode '1733'
     recursive true

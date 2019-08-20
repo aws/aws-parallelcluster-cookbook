@@ -32,7 +32,7 @@ import argparse
 
 from retry.api import retry_call
 
-AUTHORIZATION_FILE_DIR = "/run/parallelcluster/dcv_ext_auth"
+AUTHORIZATION_FILE_DIR = "/var/spool/dcv_ext_auth"
 LOG_FILE_PATH = "/var/log/parallelcluster/dcv_ext_auth.log"
 
 
