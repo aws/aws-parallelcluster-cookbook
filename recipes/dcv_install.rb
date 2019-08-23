@@ -66,6 +66,11 @@ if node['platform'] == 'centos' and node['platform_version'].to_i == 7
       dcv_packages.map! {|x|  path + x}
       install_rpm_packages_from_path(dcv_packages)
 
+      # We don't expect X to ever run but who knows if there will be changes in centos7 release or in the gnome package
+      execute "Turn off X it it ever started" do
+        command "systemctl set-default multi-user.target"
+      end
+
       user node['cfncluster']['dcv']['ext_auth_user'] do
         manage_home true
         home node['cfncluster']['dcv']['ext_auth_user_home']

@@ -17,13 +17,51 @@
 # Based on this function, a setting that disable graphic acceleration will be written into the dcv conf file.
 # It should be disabled for graphic instance. For non graphic instance is needed to avoid bug
 def is_graphic_instance()
-  get_instance_type
+  #instance = get_instance_type
 
   false
 end
 
+def allow_gpu_acceleration
+  package "xorg-x11-server-Xorg"
+
+  execute "set up Nvidia drivers for X configuration" do
+    user 'root'
+    command "nvidia-xconfig --preserve-busid --enable-all-gpus"
+  end
+
+  # DCV GL has to be installed after Nvidia and before starting up X
+  dcv_gl = "#{Chef::Config[:file_cache_path]}/nice-dcv-#{node['cfncluster']['dcv']['version']}-el7/#{node['cfncluster']['dcv']['gl']}"
+  package dcv_gl do
+    action :install
+    source dcv_gl
+  end
+
+  # background process because chef seems to be stuck in this poitn otherwise for unknown reason.
+  # Doing the following manually works.
+  # You can assert that X is launched with pidof X
+  bash 'launch X' do
+    user 'root'
+    code <<-SETUPX
+          systemctl set-default graphical.target
+          systemctl isolate graphical.target &
+    SETUPX
+  end
+
+  execute 'wait for X to start' do
+    user 'root'
+    command "pidof X"
+    retries 5
+    retry_delay 5
+  end
+end
+
 if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && node['cfncluster']['cfn_node_type'] == "MasterServer"
   node.default['cfncluster']['dcv']['is_graphic_instance'] = is_graphic_instance
+
+  if node.default['cfncluster']['dcv']['is_graphic_instance']
+    allow_gpu_acceleration
+  end
 
   cookbook_file "/etc/parallelcluster/generate_certificate.sh" do
     source 'ext_auth_files/generate_certificate.sh'

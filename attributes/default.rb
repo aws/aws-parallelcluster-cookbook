@@ -66,6 +66,7 @@ default['cfncluster']['dcv']['version'] = '2019.0-7318'
 default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.0/Servers/nice-dcv-#{node['cfncluster']['dcv']['version']}-el7.tgz"
 default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.0.7318-1.el7.x86_64.rpm"
 default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.0.224-1.el7.x86_64.rpm"
+default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.0.529-1.el7.x86_64.rpm"
 default['cfncluster']['dcv']['ext_auth_user'] = "dcvextauth"
 default['cfncluster']['dcv']['ext_auth_user_home'] = "/home/#{node['cfncluster']['dcv']['ext_auth_user']}"
 default['cfncluster']['dcv']['certificate'] = "/etc/parallelcluster/cert.pem"
