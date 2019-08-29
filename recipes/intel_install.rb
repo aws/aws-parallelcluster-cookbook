@@ -48,6 +48,23 @@ bash "install intel python" do
   creates '/opt/intel/intelpython2'
 end
 
+# create intelpython module directory
+directory "#{node['cfncluster']['modulefile_dir']}/intelpython"
+
+cookbook_file 'intelpython2_modulefile' do
+  path "#{node['cfncluster']['modulefile_dir']}/intelpython/2"
+  user 'root'
+  group 'root'
+  mode '0755'
+end
+
+cookbook_file 'intelpython3_modulefile' do
+  path "#{node['cfncluster']['modulefile_dir']}/intelpython/3"
+  user 'root'
+  group 'root'
+  mode '0755'
+end
+
 # intel optimized math kernel library
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelmkl" do
   source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
@@ -69,5 +86,11 @@ end
 # intel data analytics acceleration library
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/inteldaal" do
   source_path "/opt/intel/psxe_runtime/linux/daal/bin/daalvars.sh"
+  modulefile "2019.4"
+end
+
+# intel psxe
+create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelpsxe" do
+  source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
   modulefile "2019.4"
 end
