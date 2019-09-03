@@ -57,5 +57,7 @@ elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
 else
   python_package "aws-parallelcluster" do
     version node['cfncluster']['cfncluster-version']
+    retries 3
+    retry_delay 5
   end
 end
