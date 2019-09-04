@@ -16,11 +16,17 @@
 # limitations under the License.
 
 intelmpi_modulefile = "#{node['cfncluster']['modulefile_dir']}/intelmpi/#{node['cfncluster']['intelmpi']['version']}"
-intelmpi_installer = "#{node['cfncluster']['sources_dir']}/intel_mpi.sh"
+intelmpi_installer = "#{node['cfncluster']['sources_dir']}/aws_impi.sh"
+if node['cfncluster']['cfn_region'].start_with?("cn-")
+  s3_suffix = '.cn'
+else
+  s3_suffix = ''
+end
+intelmpi_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.amazonaws.com#{s3_suffix}/#{node['cfncluster']['intelmpi']['s3_path']}"
 
-# Get intelmpi installer
+# fetch intelmpi installer script
 remote_file intelmpi_installer do
-  source node['cfncluster']['intelmpi']['url']
+  source intelmpi_url
   mode '0744'
   retries 3
   retry_delay 5
@@ -33,7 +39,7 @@ bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTELMPI
     set -e
-    ./intel_mpi.sh install dont_check_efa
+    ./aws_impi.sh install -check_efa 0 -version #{node['cfncluster']['intelmpi']['version']}
     cp #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}
   INTELMPI
   creates '/opt/intel/impi'
