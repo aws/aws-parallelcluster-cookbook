@@ -47,6 +47,15 @@ mount '/home' do
   action %i[mount enable]
 end
 
+# Mount /opt/intel over NFS
+mount '/opt/intel' do
+  device "#{nfs_master}:/opt/intel"
+  fstype 'nfs'
+  options 'hard,intr,noatime,vers=3,_netdev'
+  action %i[mount enable]
+  only_if { ::File.directory?("/opt/intel") }
+end
+
 # Configure Ganglia
 if node['cfncluster']['ganglia_enabled'] == "yes"
   template '/etc/ganglia/gmond.conf' do
