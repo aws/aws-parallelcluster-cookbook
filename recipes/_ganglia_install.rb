@@ -17,14 +17,10 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
   case node['platform']
   when "redhat", "centos", "amazon", "scientific" # ~FC024
 
-    package "httpd"
-    package "apr-devel"
-    package "libconfuse-devel"
-    package "expat-devel"
-    package "rrdtool-devel"
-    package "pcre-devel"
-    package "php"
-    package "php-gd"
+    package %w[httpd apr-devel libconfuse-devel expat-devel rrdtool-devel pcre-devel php php-gd] do
+      retries 3
+      retry_delay 5
+    end
 
     # Get Ganglia tarball
     ganglia_tarball = "#{node['cfncluster']['sources_dir']}/monitor-core-#{node['cfncluster']['ganglia']['version']}.tar.gz"
@@ -139,10 +135,10 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
 
   when "ubuntu"
 
-    package "ganglia-monitor"
-    package "rrdtool"
-    package "gmetad"
-    package "ganglia-webfrontend"
+    package %w[ganglia-monitor rrdtool gmetad ganglia-webfrontend] do
+      retries 3
+      retry_delay 5
+    end
 
     # Setup ganglia-web.conf apache config
     execute "copy ganglia apache conf" do
