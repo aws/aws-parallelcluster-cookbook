@@ -78,14 +78,10 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
-# TODO: update nfs receipes to stop, disable nfs services
-include_recipe "nfs"
-service "rpcbind" do
-  action %i[start enable]
-  supports status: true
-  only_if { node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon' }
+if node['platform'] == 'ubuntu' && node['platform_version'] == "16.04"
+  # FIXME https://github.com/atomic-penguin/cookbook-nfs/issues/93
+  include_recipe "nfs::server"
 end
-include_recipe "nfs::server"
 include_recipe "nfs::server4"
 
 # Put configure-pat.sh onto the host
