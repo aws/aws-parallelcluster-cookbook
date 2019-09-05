@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: lustre_install
+# Recipe:: _lustre_install
 #
 # Copyright 2013-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -45,6 +45,8 @@ if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split(
   yum_package 'lustre_client' do
     source lustre_client_rpm
   end
+
+  kernel_module 'lnet'
 elsif node['platform'] == 'centos'
   Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are 7.6 and 7.5")
 elsif node['platform'] == 'amazon'
@@ -55,4 +57,5 @@ elsif node['platform'] == 'amazon'
     retry_delay 5
   end
 
+  kernel_module 'lnet'
 end
