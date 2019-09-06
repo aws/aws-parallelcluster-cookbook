@@ -71,24 +71,6 @@ create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelmkl" do
   modulefile "2019.4"
 end
 
-# intel performance primitives
-create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelipp" do
-  source_path "/opt/intel/psxe_runtime/linux/ipp/bin/ippvars.sh"
-  modulefile "2019.4"
-end
-
-# intel threading building blocks
-create_modulefile "#{node['cfncluster']['modulefile_dir']}/inteltbb" do
-  source_path "/opt/intel/psxe_runtime/linux/tbb/bin/tbbvars.sh"
-  modulefile "2019.4"
-end
-
-# intel data analytics acceleration library
-create_modulefile "#{node['cfncluster']['modulefile_dir']}/inteldaal" do
-  source_path "/opt/intel/psxe_runtime/linux/daal/bin/daalvars.sh"
-  modulefile "2019.4"
-end
-
 # intel psxe
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelpsxe" do
   source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
