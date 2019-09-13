@@ -38,7 +38,7 @@ end
 
 unless node['cfncluster']['os'].end_with?("-custom")
   bash 'test soft ulimit nofile' do
-    code "if (($(ulimit -Sn) < 10000)); then exit 1; fi"
+    code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
     user node['cfncluster']['cfn_cluster_user']
   end
 end
