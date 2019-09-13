@@ -16,17 +16,11 @@
 # limitations under the License.
 
 intelmpi_modulefile = "#{node['cfncluster']['modulefile_dir']}/intelmpi/#{node['cfncluster']['intelmpi']['version']}"
-intelmpi_installer = "#{node['cfncluster']['sources_dir']}/aws_impi.sh"
-if node['cfncluster']['cfn_region'].start_with?("cn-")
-  s3_suffix = '.cn'
-else
-  s3_suffix = ''
-end
-intelmpi_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.amazonaws.com#{s3_suffix}/#{node['cfncluster']['intelmpi']['s3_path']}"
+intelmpi_installer = "#{node['cfncluster']['sources_dir']}/l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
 
 # fetch intelmpi installer script
 remote_file intelmpi_installer do
-  source intelmpi_url
+  source node['cfncluster']['intelmpi']['url']
   mode '0744'
   retries 3
   retry_delay 5
@@ -39,10 +33,20 @@ bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTELMPI
     set -e
-    ./aws_impi.sh install -check_efa 0 -version #{node['cfncluster']['intelmpi']['version']}
-    cp #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}
+    tar -xf l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz
+    cd l_mpi_#{node['cfncluster']['intelmpi']['version']}/
+    ./install.sh -s silent.cfg --accept_eula
   INTELMPI
-  creates '/opt/intel/impi'
+  creates "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}"
+end
+
+bash "create modulefile" do
+  cwd node['cfncluster']['modulefile_dir']
+  code <<-MODULEFILE
+    set -e
+    cp #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}
+  MODULEFILE
+  creates intelmpi_modulefile
 end
 
 if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \

@@ -129,18 +129,31 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster'][
 end
 
 
-unless node['cfncluster']['cfn_region'].start_with?("cn-")
-  case node['cfncluster']['os']
-  when 'alinux', 'centos7'
-    execute 'check efa rpm installed' do
-      command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
-      user node['cfncluster']['cfn_cluster_user']
-    end
-  when 'ubuntu1604', 'ubuntu1804'
-    execute 'check efa rpm installed' do
-      command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
-      user node['cfncluster']['cfn_cluster_user']
-    end
+case node['cfncluster']['os']
+when 'alinux', 'centos7'
+  execute 'check efa rpm installed' do
+    command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+  execute 'check intel mpi installed' do
+    command "rpm -qa | grep intel-mpi"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+when 'ubuntu1604', 'ubuntu1804'
+  execute 'check efa rpm installed' do
+    command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+  execute 'check intel mpi installed' do
+    command "dpkg -l | grep intel-mpi"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
+unless node['cfncluster']['os'] == 'centos6'
+  execute 'check intel mpi version' do
+    command "module load intelmpi && mpirun --help | grep 'Version 2019 Update 6'"
+    user node['cfncluster']['cfn_cluster_user']
   end
 end
 

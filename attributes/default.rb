@@ -31,14 +31,15 @@ default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{nod
 # Node Virtualenv Path
 default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 # Intel Packages
-default['cfncluster']['intelmpi']['installer_version'] = '1.0'
-default['cfncluster']['intelmpi']['s3_path'] = "scripts/intelmpi/aws_impi.#{node['cfncluster']['intelmpi']['installer_version']}.sh"
-default['cfncluster']['intelmpi']['version'] = '2019.5'
 default['cfncluster']['psxe']['version'] = '2019.5'
 default['cfncluster']['intelhpc']['version'] = '2018.0-1.el7'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/latest/modulefiles/mpi"
 default['cfncluster']['intelpython2']['version'] = '2019.4'
 default['cfncluster']['intelpython3']['version'] = '2019.4'
+# Intel MPI
+default['cfncluster']['intelmpi']['url'] = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16120/l_mpi_2019.6.166.tgz"
+default['cfncluster']['intelmpi']['version'] = '2019.6.166'
+default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.5.1'
 default['cfncluster']['cfncluster-node-version'] = '2.5.1'
