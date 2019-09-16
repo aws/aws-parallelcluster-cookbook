@@ -30,7 +30,7 @@ default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{nod
 default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 # Intel MPI
 default['cfncluster']['intelmpi']['url'] = "https://raw.githubusercontent.com/intel/mpi/master/scripts/aws_impi.sh"
-default['cfncluster']['intelmpi']['version'] = '2019.4'
+default['cfncluster']['intelmpi']['version'] = '2019.5'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/latest/modulefiles/mpi"
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.4.1'
