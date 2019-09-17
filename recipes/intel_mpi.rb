@@ -31,7 +31,7 @@ bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTELMPI
     set -e
-    ./intel_mpi.sh install -check_efa 0 -version #{node['cfncluster']['intelmpi']['version']}
+    ./intel_mpi.sh install dont_check_efa
     cp #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}
   INTELMPI
   creates '/opt/intel/impi'
