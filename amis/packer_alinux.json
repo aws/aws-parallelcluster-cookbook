@@ -176,7 +176,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}}"
+        "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}} ffi-libarchive"
       ]
     },
     {
