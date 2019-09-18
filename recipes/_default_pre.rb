@@ -30,11 +30,6 @@ if !tagged?('rebooted') && node['cfncluster']['default_pre_reboot'] == 'true'
         content 'd /tmp 1777 root root 1d'
       end
     end
-    if node['platform_version'] == "14.04"
-      execute 'sed' do
-        command "sed -i s/#TMPTIME=0/TMPTIME=1/g /etc/default/rcS"
-      end
-    end
   end
 
   tag('rebooted')
@@ -52,11 +47,6 @@ if tagged?('rebooted')
       file '/etc/tmpfiles.d/tmp.conf' do
         action :delete
         only_if { File.exist? '/etc/tmpfiles.d/tmp.conf' }
-      end
-    end
-    if node['platform_version'] == "14.04"
-      execute 'sed' do
-        command "sed -i s/TMPTIME=1/#TMPTIME=0/g /etc/default/rcS"
       end
     end
   end
