@@ -12,7 +12,7 @@
 # AMI IDs from this region. Moreover, the CentOs AMIs are private to the AWS ParallelCluster account.
 #
 # Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom] [--build-date <build-date>]
-#   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1404|ubuntu1604)
+#   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1604)
 #   partition: partition to build in (supported values: commercial|govcloud|china)
 #   region: region to copy ami too (supported values: all|us-east-1|us-gov-west-1|...)
 #   custom: specifies to create the AMI from a custom AMI-id, which must be specified by variable CUSTOM_AMI_ID in the environment (optional)
@@ -101,7 +101,7 @@ parse_options() {
 check_options() {
     set -e
 
-    available_os="centos6 centos7 alinux ubuntu1404 ubuntu1604"
+    available_os="centos6 centos7 alinux ubuntu1604"
     cwd="$(dirname $0)"
     tmp_dir=$(mktemp -d)
     export VENDOR_PATH="${tmp_dir}/vendor/cookbooks"
@@ -171,7 +171,7 @@ do_command() {
           RC=$?
         done
         ;;
-      centos6|centos7|alinux|ubuntu1404|ubuntu1604)
+      centos6|centos7|alinux|ubuntu1604)
         packer build -color=false -var-file="${cwd}/packer_variables.json" -only=${only} "${cwd}/packer_${_os}.json"
         RC=$?
         ;;
