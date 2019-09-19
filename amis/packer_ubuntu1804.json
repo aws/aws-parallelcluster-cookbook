@@ -23,24 +23,24 @@
   },
   "builders" : [
     {
-      "name" : "centos6",
+      "name" : "ubuntu1804",
       "type" : "amazon-ebs",
       "region" : "{{user `region`}}",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "CentOS 6.x x86_64 - minimal with cloud-init - *",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
           "root-device-type": "ebs"
         },
-        "owners": ["247102896272"],
+        "owners": ["099720109477", "513442679011", "837727238323"],
         "most_recent": true
       },
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
-      "ssh_username" : "centos",
+      "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1804-lts-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -90,16 +90,16 @@
       ]
     },
     {
-      "name" : "custom-centos6",
+      "name" : "custom-ubuntu1804",
       "type" : "amazon-ebs",
       "region" : "{{user `region`}}",
       "source_ami": "{{user `custom_ami_id`}}",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
-      "ssh_username" : "centos",
+      "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-centos6-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1804-lts-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -145,16 +145,26 @@
   ],
   "provisioners" : [
     {
-      "type" : "shell",
-      "inline" : [
-        "sudo yum -y install epel-release",
-        "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
       ]
     },
     {
       "type" : "shell",
       "inline" : [
-        "sudo yum -y groupinstall development && sudo yum -y install curl wget jq"
+        "sudo sed -i 's/APT::Periodic::Update-Package-Lists \"1\"/APT::Periodic::Update-Package-Lists \"0\"/' /etc/apt/apt.conf.d/20auto-upgrades",
+        "sudo sed -i 's/APT::Periodic::Update-Package-Lists \"1\"/APT::Periodic::Update-Package-Lists \"0\"/' /etc/apt/apt.conf.d/10periodic",
+        "sudo sed -i 's/APT::Periodic::Unattended-Upgrade \"1\"/APT::Periodic::Unattended-Upgrade \"0\"/' /etc/apt/apt.conf.d/20auto-upgrades",
+        "sudo apt-cache search build-essential",
+        "sudo apt-get clean",
+        "sudo apt-get update"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo apt-get -y install build-essential curl wget jq"
       ]
     },
     {
@@ -188,7 +198,7 @@
     },
     {
       "type" : "chef-solo",
-      "only": ["centos6"],
+      "only": ["ubuntu1804"],
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
@@ -205,17 +215,15 @@
     },
     {
       "type" : "shell",
-      "only": ["centos6"],
+      "only": ["ubuntu1804"],
       "expect_disconnect" : "true",
       "inline" : [
-        "sudo /etc/init.d/sshd stop",
-        "nohup sudo shutdown -r now < /dev/null > /dev/null 2>&1 &",
-        "exit 0"
+        "sudo reboot"
       ]
     },
     {
       "type" : "chef-solo",
-      "only": ["centos6"],
+      "only": ["ubuntu1804"],
       "pause_before": "2m",
       "json" : {
         "cfncluster" : {
@@ -237,7 +245,7 @@
     },
     {
       "type" : "chef-solo",
-      "only": ["custom-centos6"],
+      "only": ["custom-ubuntu1804"],
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
@@ -249,6 +257,7 @@
     },
     {
       "type" : "shell",
+      "inline_shebang" : "/bin/bash -e",
       "inline" : [
         "region=\"{{user `region`}}\"",
         "bucket=\"s3.amazonaws.com\"",

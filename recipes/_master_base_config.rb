@@ -112,6 +112,14 @@ nfs_export "/home" do
   options ['no_root_squash']
 end
 
+# Export /opt/intel if it exists
+nfs_export "/opt/intel" do
+  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+  writeable true
+  options ['no_root_squash']
+  only_if { ::File.directory?("/opt/intel") }
+end
+
 # Setup RAID array on master node
 include_recipe 'aws-parallelcluster::setup_raid_on_master'
 

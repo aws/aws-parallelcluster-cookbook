@@ -13,7 +13,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer-latest.tar.gz"
+efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer.tar.gz"
 
 # Get EFA Installer
 remote_file efa_tarball do
@@ -45,7 +45,7 @@ bash "install efa" do
     set -e
     tar -xzf #{efa_tarball}
     cd aws-efa-installer
-    ./efa_installer.sh -y --skip-limit-conf
+    ./efa_installer.sh -y
   EFAINSTALL
   not_if { ::Dir.exist?('/opt/amazon/efa') }
 end

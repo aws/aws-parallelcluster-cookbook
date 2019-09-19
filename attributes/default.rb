@@ -46,8 +46,8 @@ default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/t
 default['cfncluster']['slurm']['version'] = '18-08-6-2'
 default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
 # Munge
-default['cfncluster']['munge']['munge_version'] = '0.5.12'
-default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
+default['cfncluster']['munge']['munge_version'] = '0.5.13'
+default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
 default['cfncluster']['ganglia']['version'] = '3.7.2'
@@ -59,7 +59,9 @@ default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.4.1.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.5.3.tar.gz'
+# ENV2 - tool to capture environment and create modulefiles
+default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
@@ -107,7 +109,8 @@ when 'rhel', 'amazon'
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip]
+                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
+                                                  libssh2-devel]
       if node['platform_version'].split('.')[1] == '6'
         # Lustre Drivers for Centos 7.6
         default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -150,6 +153,12 @@ when 'debian'
   if node['platform_version'] == '14.04'
     default['cfncluster']['base_packages'].push('libopenmpi-dev')
   end
+  if node['platform_version'] == '18.04'
+    default['cfncluster']['base_packages'].delete('libatlas-dev')
+    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libgcrypt20-dev', 'libssl1.0-dev')
+    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
+  end
+
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
