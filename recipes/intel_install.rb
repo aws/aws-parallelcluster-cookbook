@@ -32,7 +32,7 @@ bash "install intel psxe" do
     set -e
     rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
     yum -y install https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
-    yum -y install intel-psxe-runtime
+    yum -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
   INTEL
   creates '/opt/intel/psxe_runtime'
 end
@@ -68,11 +68,11 @@ end
 # intel optimized math kernel library
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelmkl" do
   source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
-  modulefile "2019.4"
+  modulefile "#{node['cfncluster']['psxe']['version']}"
 end
 
 # intel psxe
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelpsxe" do
   source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
-  modulefile "2019.4"
+  modulefile "#{node['cfncluster']['psxe']['version']}"
 end
