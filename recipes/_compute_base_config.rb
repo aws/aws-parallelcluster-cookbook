@@ -76,7 +76,7 @@ end
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
   manage_home false
-  comment 'cfncluster user'
+  comment 'AWS ParallelCluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'
 end
