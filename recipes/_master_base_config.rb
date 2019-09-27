@@ -128,6 +128,12 @@ nfs_export "/home" do
   options ['no_root_squash']
 end
 
+# Intel Runtime Libraries
+if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
+  && (node['cfncluster']['enable_intel_hpc_platform'] == 'true')
+  include_recipe "aws-parallelcluster::intel_install"
+end
+
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
