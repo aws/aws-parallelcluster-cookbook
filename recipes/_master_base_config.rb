@@ -150,7 +150,7 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
   end
 
   service node['cfncluster']['ganglia']['httpd_service'] do
-    supports restart: true
+    supports restart: true, reload: true
     action %i[enable start]
   end
 end
