@@ -143,6 +143,7 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
     # Setup ganglia-web.conf apache config
     execute "copy ganglia apache conf" do
       command "cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/ganglia.conf"
+      notifies :reload, "service[#{node['cfncluster']['ganglia']['httpd_service']}]", :immediately
       not_if "test -f /etc/apache2/sites-enabled/ganglia.conf"
     end
 
