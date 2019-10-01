@@ -12,7 +12,6 @@ version '2.4.1'
 supports 'amazon'
 supports 'centos', '= 6'
 supports 'centos', '= 7'
-supports 'ubuntu', '= 14.04'
 supports 'ubuntu', '= 16.04'
 supports 'ubuntu', '= 18.04'
 

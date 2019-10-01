@@ -154,7 +154,7 @@ template "supervisord-init" do
   mode "0755"
 end
 
-if (node['platform'] == 'ubuntu' && node['platform_version'] == "14.04") || (node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7)
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
   # Install jq for manipulating json files
   cookbook_file "jq-1.4" do
     path "/usr/local/bin/jq"
