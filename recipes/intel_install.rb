@@ -19,6 +19,7 @@ bash "install intel hpc platform" do
   code <<-INTEL
     set -e
     yum-config-manager --add-repo http://yum.repos.intel.com/hpc-platform/el7/setup/intel-hpc-platform.repo
+    yum-config-manager --save --setopt=intel-hpc-platform.skip_if_unavailable=true
     rpm --import http://yum.repos.intel.com/hpc-platform/el7/setup/PUBLIC_KEY.PUB
     yum -y install intel-hpc-platform-*
   INTEL
@@ -32,6 +33,7 @@ bash "install intel psxe" do
     set -e
     rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
     yum -y install https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
+    yum-config-manager --save --setopt=intel-psxe-runtime-2019.skip_if_unavailable=true
     yum -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
   INTEL
   creates '/opt/intel/psxe_runtime'
@@ -43,6 +45,7 @@ bash "install intel python" do
   code <<-INTEL
     set -e
     yum-config-manager --add-repo https://yum.repos.intel.com/intelpython/setup/intelpython.repo
+    yum-config-manager --save --setopt=intelpython.skip_if_unavailable=true
     yum -y install intelpython2 intelpython3
   INTEL
   creates '/opt/intel/intelpython2'
