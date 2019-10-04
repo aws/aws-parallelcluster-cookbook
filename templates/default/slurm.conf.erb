@@ -67,8 +67,6 @@ SchedulerType=sched/backfill
 #SchedulerAuth=
 #SchedulerPort=
 #SchedulerRootFilter=
-SelectType=select/cons_res
-SelectTypeParameters=CR_CPU
 #PriorityType=priority/multifactor
 #PriorityDecayHalfLife=14-0
 #PriorityUsageResetPeriod=14-0
@@ -77,6 +75,11 @@ SelectTypeParameters=CR_CPU
 #PriorityWeightPartition=10000
 #PriorityWeightJobSize=1000
 #PriorityMaxAge=1-0
+#
+# TRES AND GPU CONFIG OPTIONS
+GresTypes=gpu
+SelectType=select/cons_tres
+SelectTypeParameters=CR_CPU
 #
 # LOGGING
 SlurmctldDebug=3

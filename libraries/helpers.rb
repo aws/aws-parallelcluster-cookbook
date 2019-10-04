@@ -79,3 +79,13 @@ def ignore_failure(lookup)
     resource.ignore_failure(true)
   end
 end
+
+#
+# Check if the instance has a GPU
+#
+def graphic_instance?
+  has_gpu = `lspci | grep -i -o 'NVIDIA'`
+  is_graphic_instance = !has_gpu.strip.empty?
+
+  is_graphic_instance
+end
