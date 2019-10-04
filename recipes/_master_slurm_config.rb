@@ -41,6 +41,20 @@ template '/opt/slurm/etc/slurm_parallelcluster_nodes.conf' do
   mode '0644'
 end
 
+template '/opt/slurm/etc/gres.conf' do
+  source 'gres.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+template '/opt/slurm/etc/slurm_parallelcluster_gres.conf' do
+  source 'slurm_parallelcluster_gres.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 cookbook_file '/opt/slurm/etc/slurm.sh' do
   source 'slurm.sh'
   owner 'root'
