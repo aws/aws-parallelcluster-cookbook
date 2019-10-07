@@ -44,7 +44,8 @@ vol_array.each_with_index do |vol, index|
 end
 
 # Mount each volume
-dev_path = []
+dev_path = []  # device labels
+dev_uuids = []     # device uuids
 
 vol_array.each_with_index do |volumeid, index|
   dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
@@ -67,8 +68,20 @@ vol_array.each_with_index do |volumeid, index|
   # Setup disk, will be formatted xfs if empty
   ruby_block "setup_disk_#{index}" do
     block do
-      fs_type = setup_disk(dev_path[index])
+      pt_type = get_pt_type(dev_path[index])
+      if pt_type.nil?
+        Chef::Log.info("device #{dev_path[index]} not partitioned, mounting directly")
+        fs_type = setup_disk(dev_path[index])
+      else
+        # Partitioned device, mount 1st partition
+        Chef::Log.info("device #{dev_path[index]} partitioned, mounting first partition")
+        partition_dev = get_1st_partition(dev_path[index])
+        Chef::Log.info("First partition for device #{dev_path[index]} is: #{partition_dev}")
+        fs_type = get_fs_type(partition_dev)
+        dev_path[index] = partition_dev
+      end
       node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
+      dev_uuids[index] = get_uuid(dev_path[index])
     end
     action :nothing
     subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
@@ -85,8 +98,9 @@ vol_array.each_with_index do |volumeid, index|
 
   # Add volume to /etc/fstab
   mount shared_dir_array[index] do
-    device dev_path[index]
+    device(DelayedEvaluator.new{dev_uuids[index]})
     fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
+    device_type :uuid
     options "_netdev"
     pass 0
     action %i[mount enable]
