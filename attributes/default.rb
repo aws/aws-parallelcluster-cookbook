@@ -83,6 +83,9 @@ default['cfncluster']['dcv']['authenticator']['certificate'] = "/etc/parallelclu
 default['cfncluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
 default['cfncluster']['dcv']['authenticator']['virtualenv'] = "dcv_authenticator_virtualenv"
 default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cfncluster']['dcv']['authenticator']['user_home']}/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['dcv']['authenticator']['virtualenv']}"
+# CloudWatch Agent
+default['cfncluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
+default['cfncluster']['cloudwatch']['public_key_local_path'] = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
