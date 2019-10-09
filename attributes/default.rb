@@ -66,6 +66,9 @@ default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.6.2.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
 default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
+# CloudWatch Agent
+default['cfncluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
+default['cfncluster']['cloudwatch']['public_key_local_path'] = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'

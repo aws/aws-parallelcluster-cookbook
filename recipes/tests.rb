@@ -205,3 +205,18 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     TESTCUDA
   end
 end
+
+# Verify that the CloudWatch agent is running or not depending on
+# whether or not the feature is enabled.
+case node['cfncluster']['cfn_cluster_cw_logging_enabled']
+when 'true'
+  execute 'cloudwatch-agent-status-running' do
+    user 'root'
+    command "[[ $(/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | jq --raw-output .status) = running ]] || exit 1"
+  end
+else
+  execute 'cloudwatch-agent-status-not-running' do
+    user 'root'
+    command "[[ $(/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | jq --raw-output .status) = stopped ]] || exit 1"
+  end
+end

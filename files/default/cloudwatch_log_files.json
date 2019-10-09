@@ -1,0 +1,302 @@
+{
+  "timestamp_formats": {
+    "month_first": "%b %-d %H:%M:%S",
+    "default": "%Y-%m-%d %H:%M:%S,%f",
+    "slurm": "%Y-%m-%dT%H:%M:%S.%f",
+    "sge": "%m/%d/%Y %H:%M:%S",
+    "torque_compute": "%Y-%m-%d %H:%M:%S.%f",
+    "torque_master": "%m/%d/%Y %H:%M:%S.%f"
+  },
+  "log_configs": [
+    {
+      "timestamp_format_key": "month_first",
+      "file_path": "/var/log/messages",
+      "log_stream_name": "system-messages",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "month_first",
+      "file_path": "/var/log/syslog",
+      "log_stream_name": "syslog",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cfn-init-cmd.log",
+      "log_stream_name": "cfn-init-cmd",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cfn-init.log",
+      "log_stream_name": "cfn-init",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cfn-wire.log",
+      "log_stream_name": "cfn-wire",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "month_first",
+      "file_path": "/var/log/cloud-init.log",
+      "log_stream_name": "cloud-init",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/supervisord.log",
+      "log_stream_name": "supervisord",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/nodewatcher",
+      "log_stream_name": "nodewatcher",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/jobwatcher",
+      "log_stream_name": "jobwatcher",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/sqswatcher",
+      "log_stream_name": "sqswatcher",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "slurm",
+      "file_path": "/var/log/slurmd.log",
+      "log_stream_name": "slurmd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ]
+    },
+    {
+      "timestamp_format_key": "slurm",
+      "file_path": "/var/log/slurmctld.log",
+      "log_stream_name": "slurmctld",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "sge",
+      "file_path": "/var/spool/sge/*/messages",
+      "log_stream_name": "sge-exec-daemon",
+      "schedulers": [
+        "sge"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ]
+    },
+    {
+      "timestamp_format_key": "sge",
+      "file_path": "/opt/sge/default/spool/qmaster/messages",
+      "log_stream_name": "sge-qmaster",
+      "schedulers": [
+        "sge"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ]
+    },
+    {
+      "timestamp_format_key": "torque_compute",
+      "file_path": "/var/spool/torque/client_logs/*",
+      "log_stream_name": "torque-client",
+      "schedulers": [
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ]
+    },
+    {
+      "timestamp_format_key": "torque_master",
+      "file_path": "/var/spool/torque/server_logs/*",
+      "log_stream_name": "torque-server",
+      "schedulers": [
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ]
+    }
+  ]
+}

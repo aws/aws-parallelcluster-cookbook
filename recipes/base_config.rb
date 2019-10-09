@@ -29,6 +29,9 @@ execute 'setup ephemeral' do
   creates '/scratch'
 end
 
+# Write cloudwatch log config and start it.
+include_recipe "aws-parallelcluster::cloudwatch_agent_config"
+
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
