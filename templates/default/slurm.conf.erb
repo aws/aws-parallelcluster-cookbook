@@ -68,13 +68,6 @@ SchedulerType=sched/backfill
 #SchedulerRootFilter=
 SelectType=select/cons_res
 SelectTypeParameters=CR_CPU
-
-# FastSchedule is deprecated in release 19.05.3-x
-# Disable fastscheduling to fall back on resource
-# metrics reported by compute nodes, slower scheduling
-# but more flexible if using different ec2 instance types
-#FastSchedule=0
-
 #PriorityType=priority/multifactor
 #PriorityDecayHalfLife=14-0
 #PriorityUsageResetPeriod=14-0
