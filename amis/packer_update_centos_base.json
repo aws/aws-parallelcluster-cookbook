@@ -12,7 +12,7 @@
       "ssh_username": "centos",
       "ssh_pty" : true,
       "ami_name": "CentOS 6.x x86_64 - minimal with cloud-init - {{user `build_date`}}-0",
-      "associate_public_ip_address" : false,
+      "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true
     },
@@ -25,7 +25,7 @@
       "ssh_username": "centos",
       "ssh_pty" : true,
       "ami_name": "CentOS 7.x x86_64 - minimal with cloud-init - {{user `build_date`}}-0",
-      "associate_public_ip_address" : false,
+      "associate_public_ip_address" : true,
       "sriov_support" : true,
       "ena_support" : true
     }
