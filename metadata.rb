@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 name 'aws-parallelcluster'
 maintainer 'Amazon Web Services'
 maintainer_email ''
