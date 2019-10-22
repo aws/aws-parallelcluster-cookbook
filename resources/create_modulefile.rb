@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 resource_name :create_modulefile
 provides :create_modulefile
 
@@ -13,7 +15,6 @@ property :modulefile, String, required: true
 default_action :run
 
 action :run do
-
   # Install env2
   env2 = "#{node['cfncluster']['scripts_dir']}/env2"
   remote_file env2 do
