@@ -46,8 +46,8 @@ default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/relea
 default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '18-08-6-2'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
+default['cfncluster']['slurm']['version'] = '19-05-3-2'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-19-05-3-2.tar.gz'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.13'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
