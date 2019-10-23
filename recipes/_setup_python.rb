@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _setup_python
@@ -25,15 +27,15 @@ pyenv_plugin 'virtualenv' do
 end
 
 pyenv_script 'pyenv virtualenv cookbook' do
-    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['cookbook_virtualenv']}"
-    user 'root'
-    not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
+  code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['cookbook_virtualenv']}"
+  user 'root'
+  not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
 end
 
 pyenv_script 'pyenv virtualenv node' do
-    code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['node_virtualenv']}"
-    user 'root'
-    not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
+  code "pyenv virtualenv #{node['cfncluster']['python-version']} #{node['cfncluster']['node_virtualenv']}"
+  user 'root'
+  not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
 end
 
 # Install requirements file
