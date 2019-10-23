@@ -58,10 +58,10 @@ elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_
   # grab lustre source
   bash "clone github repo" do
     cwd node['cfncluster']['sources_dir']
-    code <<-LUSTREBUILD
+    code <<-LUSTRECLONE
       set -e
       git clone git://git.whamcloud.com/fs/lustre-release.git --depth 2 -b 2.10.8
-      LUSTREBUILD
+    LUSTRECLONE
     not_if { ::Dir.exist?("#{node['cfncluster']['sources_dir']}/lustre-release") }
   end
 
