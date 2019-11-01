@@ -6,7 +6,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.5.0
 -----
 **CHANGES**
-- Upgrade to EFA Installer 1.6.1, this also upgrades Open MPI to 4.0.1
+- Upgrade to EFA Installer 1.6.2, this also upgrades Open MPI to 4.0.2
 
 2.4.1
 -----
