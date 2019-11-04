@@ -23,6 +23,6 @@ end
 
 execute "compute_ready" do
   command "/opt/parallelcluster/scripts/compute_ready"
-  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
+  environment('PATH' => '/usr/local/bin:/usr/bin/:/bin/:$PATH')
   only_if { node['cfncluster']['cfn_node_type'] == 'ComputeFleet' }
 end
