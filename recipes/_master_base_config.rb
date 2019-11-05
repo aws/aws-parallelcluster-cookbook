@@ -44,8 +44,8 @@ vol_array.each_with_index do |vol, index|
 end
 
 # Mount each volume
-dev_path = []  # device labels
-dev_uuids = []     # device uuids
+dev_path = [] # device labels
+dev_uuids = [] # device uuids
 
 vol_array.each_with_index do |volumeid, index|
   dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
@@ -98,7 +98,7 @@ vol_array.each_with_index do |volumeid, index|
 
   # Add volume to /etc/fstab
   mount shared_dir_array[index] do
-    device(DelayedEvaluator.new{dev_uuids[index]})
+    device(DelayedEvaluator.new { dev_uuids[index] })
     fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
     device_type :uuid
     options "_netdev"
