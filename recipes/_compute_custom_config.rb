@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _compute_custom_config

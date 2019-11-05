@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: torque_install
