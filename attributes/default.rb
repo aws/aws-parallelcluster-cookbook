@@ -37,8 +37,8 @@ default['cfncluster']['intelmpi']['version'] = '2019.5'
 default['cfncluster']['psxe']['version'] = '2019.5'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/latest/modulefiles/mpi"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.4.1'
-default['cfncluster']['cfncluster-node-version'] = '2.4.1'
+default['cfncluster']['cfncluster-version'] = '2.5.0'
+default['cfncluster']['cfncluster-node-version'] = '2.5.0'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
