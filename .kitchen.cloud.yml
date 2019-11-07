@@ -35,7 +35,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
-            volume_size: <%= ENV['VOLUME_SIZE'] || 20 %>
+            volume_size: <%= ENV['VOLUME_SIZE'] || 25 %>
             volume_type: gp2
             delete_on_termination: true
         - device_name: /dev/xvdba
@@ -96,7 +96,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['VOLUME_SIZE'] || 20 %>
+            volume_size: <%= ENV['VOLUME_SIZE'] || 25 %>
             volume_type: gp2
             delete_on_termination: true
         - device_name: /dev/xvdba
@@ -157,7 +157,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['VOLUME_SIZE'] || 20 %>
+            volume_size: <%= ENV['VOLUME_SIZE'] || 25 %>
             volume_type: gp2
             delete_on_termination: true
         - device_name: /dev/xvdba
@@ -218,7 +218,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['VOLUME_SIZE'] || 20 %>
+            volume_size: <%= ENV['VOLUME_SIZE'] || 25 %>
             volume_type: gp2
             delete_on_termination: true
         - device_name: /dev/xvdba
@@ -279,7 +279,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['VOLUME_SIZE'] || 20 %>
+            volume_size: <%= ENV['VOLUME_SIZE'] || 25 %>
             volume_type: gp2
             delete_on_termination: true
         - device_name: /dev/xvdba
