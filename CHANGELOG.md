@@ -7,18 +7,38 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 -----
 
 **ENHANCEMENTS**
-- CentOS7 AMI:
-  - Install NICE DCV packages and its requirements (it includes Gnome and Xorg packages) 
-  NOTE: NICE DCV is installed but can be used only if explicitly enabled from the configuration file
-  at cluster creation time.
+- Install NICE DCV on Centos 7 (this includes Gnome and Xorg packages).
+- Install Intel Parallel Studio 2019.5 Runtime in Centos 7 AMI and share /opt/intel over NFS.
+- Add support for Ubuntu 18.
 
 **CHANGES**
-- Upgrade to EFA Installer 1.6.2, this also upgrades Open MPI to 4.0.2
-- CentOS7 AMI:
+- Remove support for Ubuntu 14.
+- Upgrade Intel MPI to version U5.
+- Upgrade EFA Installer to version 1.6.2, this also upgrades Open MPI to 4.0.2.
+- Upgrade NVIDIA driver to Tesla version 418.87.
+- Upgrade CUDA library to version 10.1.
+- Upgrade Slurm to version 19.05.3-2.
+- Slurm: changed following parameters in global configuration:
+  - `SelectType=cons_tres`, `SelectTypeParameter=CR_CPU_Memory`, `GresTypes=gpu`: needed to enable support for GPU
+    scheduling.
+  - `EnforcePartLimits=ALL`: jobs which exceed a partition's size and/or time limits will be rejected at submission
+    time.
+  - Removed `FastSchedule` since deprecated.
+  - `SlurmdTimeout=180`, `UnkillableStepTimeout=180`: to allow scheduler to recover especially when under heavy load.
+- Echo compute instance type and memory information in COMPUTE_READY message
+- Changes to sshd config:
   - Disable X11Forwarding by default
-  - Limit SSH Ciphers to `aes256-gcm@openssh.com,aes256-ctr,aes256-cbc`
+  - Limit SSH Ciphers to 
+    `aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com`
   - Limit SSH MACs to `hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256`
+- Increase default root volume to 25GB.
+- Enable `flock user_xattr noatime` Lustre options by default everywhere and
+  `x-systemd.automount x-systemd.requires=lnet.service` for systemd based systems.
+- Install EFA in China AMIs. 
 
+**BUG FIXES**
+- Fix Ganglia not starting on Ubuntu 16
+- Fix bug that was preventing nodes to mount partitioned EBS volumes.
 
 2.4.1
 -----
