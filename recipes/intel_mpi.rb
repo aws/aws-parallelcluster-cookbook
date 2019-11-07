@@ -22,7 +22,7 @@ if node['cfncluster']['cfn_region'].start_with?("cn-")
 else
   s3_suffix = ''
 end
-intelmpi_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.amazonaws.com#{s3_suffix}/#{node['cfncluster']['intelmpi']['s3_path']}"
+intelmpi_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.amazonaws.com#{s3_suffix}/#{node['cfncluster']['intelmpi']['s3_path']}"
 
 # fetch intelmpi installer script
 remote_file intelmpi_installer do
