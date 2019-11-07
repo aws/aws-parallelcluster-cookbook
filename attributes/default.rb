@@ -32,7 +32,7 @@ default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{nod
 default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 # Intel Packages
 default['cfncluster']['intelmpi']['installer_version'] = '1.0'
-default['cfncluster']['intelmpi']['s3_path'] = "scripts/aws_impi-#{node['cfncluster']['intelmpi']['installer_version']}.sh"
+default['cfncluster']['intelmpi']['s3_path'] = "scripts/intelmpi/aws_impi.#{node['cfncluster']['intelmpi']['installer_version']}.sh"
 default['cfncluster']['intelmpi']['version'] = '2019.5'
 default['cfncluster']['psxe']['version'] = '2019.5'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/latest/modulefiles/mpi"
