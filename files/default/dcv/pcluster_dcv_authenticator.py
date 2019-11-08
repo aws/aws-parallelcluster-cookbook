@@ -464,7 +464,8 @@ def _config_logger():
         if e.errno == errno.EEXIST and os.path.isdir(logdir):
             pass
         else:
-            fail("Cannot create log file (%s). Failed with exception: %s" % (logfile, e))
+            print("Cannot create log file (%s). Failed with exception: %s" % (logfile, e))
+            exit(1)
 
     formatter = logging.Formatter("%(asctime)s %(levelname)s [%(module)s:%(funcName)s] %(message)s")
 

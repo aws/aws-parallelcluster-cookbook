@@ -10,18 +10,22 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 import json
+import logging
 import string
 import time
 from datetime import datetime
 
+import mock
 import pytest
 from assertpy import assert_that
-from pcluster_dcv_authenticator import (
-    DCVAuthenticator,
-    OneTimeTokenHandler,
-    generate_random_token,
-    generate_sha512_hash,
-)
+
+with mock.patch("pcluster_dcv_authenticator.LOGGER", return_value=logging.getLogger(__name__)):
+    from pcluster_dcv_authenticator import (
+        DCVAuthenticator,
+        OneTimeTokenHandler,
+        generate_random_token,
+        generate_sha512_hash,
+    )
 
 AUTH_MODULE_MOCK_PATH = "pcluster_dcv_authenticator."
 AUTH_CLASS_MOCK_PATH = AUTH_MODULE_MOCK_PATH + "DCVAuthenticator."
