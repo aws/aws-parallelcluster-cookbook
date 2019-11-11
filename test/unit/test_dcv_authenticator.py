@@ -15,6 +15,7 @@ import time
 from datetime import datetime
 
 import pytest
+
 from assertpy import assert_that
 from pcluster_dcv_authenticator import (
     DCVAuthenticator,
@@ -133,9 +134,9 @@ def mock_os(mocker, user, timestamp):
     file_property.pw_name = user
     file_property.st_mode = 0
 
-    mocker.patch(AUTH_MODULE_MOCK_PATH + "os.stat", return_value=file_property, autospec=True)
+    mocker.patch(AUTH_MODULE_MOCK_PATH + "os.stat", return_value=file_property)
     mocker.patch(AUTH_MODULE_MOCK_PATH + "os.remove")
-    mocker.patch(AUTH_MODULE_MOCK_PATH + "getpwuid", autospec=True, return_value=file_property)
+    mocker.patch(AUTH_MODULE_MOCK_PATH + "getpwuid", return_value=file_property)
 
 
 @pytest.mark.parametrize(
