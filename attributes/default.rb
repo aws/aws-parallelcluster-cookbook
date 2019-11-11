@@ -93,9 +93,14 @@ default['openssh']['server']['password_authentication'] = 'no'
 default['openssh']['server']['gssapi_authentication'] = 'yes'
 default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
-default['openssh']['server']['ciphers'] = 'aes256-gcm@openssh.com,aes256-ctr,aes256-cbc'
-default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
+if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr'
+  default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512,hmac-sha2-256'
+else
+  default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
+  default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
+end
 
 # ulimit settings
 default['cfncluster']['filehandle_limit'] = 10000
