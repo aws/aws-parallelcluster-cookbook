@@ -46,11 +46,15 @@ _fail() {
   exit 1
 }
 
-_check_if_empty() {
-  variable=$1
+_validate_json() {
+  json_param=$1
   message=$2
-  if [[ -z "${variable}" ]]; then
-      _fail "${message}"
+
+  if [[ -z "${json_param}" ]]; then
+      _fail "${message}. Empty JSON."
+  fi
+  if ! $(jq -e . >/dev/null 2>&1 <<<"${json_param}"); then
+      _fail "${message}. Wrong JSON."
   fi
 }
 
@@ -69,18 +73,17 @@ _atomic_touch() {
 _log() {
     text=$1
 
-    log_time=$(date "+%Y-%m-%d %H:%M:%S")
-
-    file_size=$(du -b ${LOG_FILE_PATH} | awk '{print $1}')
-
     [[ -f "${LOG_FILE_PATH}" ]] || _atomic_touch "${LOG_FILE_PATH}"
 
+    # create a backup of the file if the size exceeds the LOG_FILE_MAX_SIZE
+    file_size=$(du -b ${LOG_FILE_PATH} | awk '{print $1}')
     if [[ ${file_size} -gt ${LOG_FILE_MAX_SIZE} ]]; then
         mv "${LOG_FILE_PATH}" "${LOG_FILE_PATH}.1"
-        echo "[${log_time}]: ${text}" > "${LOG_FILE_PATH}"
-    else
-        echo "[${log_time}]: ${text}" >> "${LOG_FILE_PATH}"
     fi
+
+    # append log
+    log_time=$(date "+%Y-%m-%d %H:%M:%S")
+    echo "[${log_time}]: ${text}" >> "${LOG_FILE_PATH}"
 }
 
 _create_dcv_session() {
@@ -142,7 +145,7 @@ main() {
     # Retrieve Request Token and Access File name
     _log "Retrieving Request Token and Access File name.."
     user_token_request=$(curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=requestToken -d authUser="${user}" -d sessionID="${sessionid}")
-    _check_if_empty "${user_token_request}" "Unable to obtain the Request Token from the NICE DCV external authenticator."
+    _validate_json "${user_token_request}" "Unable to obtain the Request Token from the NICE DCV external authenticator."
     request_token=$(echo "${user_token_request}" | jq -r .requestToken)
     access_file=$(echo "${user_token_request}" | jq -r .accessFile)
     _log "Request Token and Access File name obtained successfully."
@@ -157,7 +160,7 @@ main() {
     # Retrieve Session Token
     _log "Retrieving Session Token.."
     session_token_request=$(curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=sessionToken -d requestToken="${request_token}")
-    _check_if_empty "${session_token_request}" "Unable to obtain the Session Token from the NICE DCV external authenticator."
+    _validate_json "${session_token_request}" "Unable to obtain the Session Token from the NICE DCV external authenticator."
     session_token=$(echo "${session_token_request}" | jq -r .sessionToken)
     _log "Session Token obtained successfully."
 
