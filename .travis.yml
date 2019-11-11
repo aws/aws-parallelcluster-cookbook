@@ -1,8 +1,36 @@
-language: ruby
-rvm:
-  - 2.4.0
-before_install:
-  - wget https://releases.hashicorp.com/vagrant/2.0.0/vagrant_2.0.0_x86_64.deb
-  - sudo dpkg -i vagrant_2.0.0_x86_64.deb
-install: bundle install --without aws
-script: bundle exec rake
+matrix:
+  include:
+    - language: ruby
+      rvm:
+        - 2.4.0
+      before_install:
+        - wget https://releases.hashicorp.com/vagrant/2.0.0/vagrant_2.0.0_x86_64.deb
+        - sudo dpkg -i vagrant_2.0.0_x86_64.deb
+      install: bundle install --without aws
+      script: bundle exec rake
+
+    - language: python
+      sudo: required
+      dist: xenial
+      python: "3.6"
+      install:
+        - pip install tox-travis
+      script: tox
+
+    - language: python
+      sudo: required
+      dist: xenial
+      python: "3.7"
+      install:
+        - pip install tox-travis
+      script: tox
+
+    - language: python
+      sudo: required
+      dist: xenial
+      python: "3.7"
+      name: Python Code Checks
+      env: TOXENV=code-linters
+      install:
+        - pip install tox-travis
+      script: tox
