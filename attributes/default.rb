@@ -67,6 +67,8 @@ default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.0.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
 default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
+# Libnuma
+default['cfncluster']['libnuma']['url'] = 'https://github.com/numactl/numactl/releases/download/v2.0.13/numactl-2.0.13.tar.gz'
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2019.1-7644'

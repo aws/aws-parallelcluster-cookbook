@@ -15,6 +15,17 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+libnuma = "/usr/lib64/libnuma.tar.gz"
+
+# Install libnuma
+# libnuma source must be installed with intel parallel studio
+remote_file libnuma do
+  source node['cfncluster']['libnuma']['url']
+  owner 'root'
+  group 'root'
+  mode 0755
+end
+
 # This rpm installs a file /etc/intel-hpc-platform-release that contains the INTEL_HPC_PLATFORM_VERSION
 bash "install intel hpc platform" do
   cwd node['cfncluster']['sources_dir']
