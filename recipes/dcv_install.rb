@@ -98,7 +98,7 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && !File.e
 
     # Install server and xdcv packages
     dcv_packages = %W[#{node['cfncluster']['dcv']['server']} #{node['cfncluster']['dcv']['xdcv']}]
-    dcv_packages_path = "#{Chef::Config[:file_cache_path]}/nice-dcv-#{node['cfncluster']['dcv']['version']}-el7/"
+    dcv_packages_path = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/"
     # Rewrite dcv_packages object by cycling each package file name and appending the path to them
     dcv_packages.map! { |package| dcv_packages_path + package }
     install_rpm_packages(dcv_packages)
