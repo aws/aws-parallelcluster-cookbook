@@ -34,7 +34,7 @@ def allow_gpu_acceleration
   end
 
   # dcvgl package must be installed after NVIDIA and before starting up X
-  dcv_gl = "#{Chef::Config[:file_cache_path]}/#{node['cfncluster']['dcv']['package']}/#{node['cfncluster']['dcv']['gl']}"
+  dcv_gl = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/#{node['cfncluster']['dcv']['gl']}"
   package dcv_gl do
     action :install
     source dcv_gl

@@ -91,7 +91,7 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && !File.e
       end
 
       bash 'extract dcv packages' do
-        cwd Chef::Config[:file_cache_path]
+        cwd node['cfncluster']['sources_dir']
         code "tar -xvzf #{dcv_tarball}"
       end
     end
