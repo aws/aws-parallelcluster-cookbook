@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _master_slurm_config
@@ -36,6 +38,20 @@ end
 
 template '/opt/slurm/etc/slurm_parallelcluster_nodes.conf' do
   source 'slurm_parallelcluster_nodes.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+template '/opt/slurm/etc/gres.conf' do
+  source 'gres.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+template '/opt/slurm/etc/slurm_parallelcluster_gres.conf' do
+  source 'slurm_parallelcluster_gres.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'

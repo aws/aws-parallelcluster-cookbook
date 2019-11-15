@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _master_base_config
@@ -42,7 +44,8 @@ vol_array.each_with_index do |vol, index|
 end
 
 # Mount each volume
-dev_path = []
+dev_path = [] # device labels
+dev_uuids = [] # device uuids
 
 vol_array.each_with_index do |volumeid, index|
   dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
@@ -65,8 +68,20 @@ vol_array.each_with_index do |volumeid, index|
   # Setup disk, will be formatted xfs if empty
   ruby_block "setup_disk_#{index}" do
     block do
-      fs_type = setup_disk(dev_path[index])
+      pt_type = get_pt_type(dev_path[index])
+      if pt_type.nil?
+        Chef::Log.info("device #{dev_path[index]} not partitioned, mounting directly")
+        fs_type = setup_disk(dev_path[index])
+      else
+        # Partitioned device, mount 1st partition
+        Chef::Log.info("device #{dev_path[index]} partitioned, mounting first partition")
+        partition_dev = get_1st_partition(dev_path[index])
+        Chef::Log.info("First partition for device #{dev_path[index]} is: #{partition_dev}")
+        fs_type = get_fs_type(partition_dev)
+        dev_path[index] = partition_dev
+      end
       node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
+      dev_uuids[index] = get_uuid(dev_path[index])
     end
     action :nothing
     subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
@@ -83,8 +98,9 @@ vol_array.each_with_index do |volumeid, index|
 
   # Add volume to /etc/fstab
   mount shared_dir_array[index] do
-    device dev_path[index]
+    device(DelayedEvaluator.new { dev_uuids[index] })
     fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
+    device_type :uuid
     options "_netdev"
     pass 0
     action %i[mount enable]
@@ -110,6 +126,14 @@ nfs_export "/home" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
   writeable true
   options ['no_root_squash']
+end
+
+# Export /opt/intel if it exists
+nfs_export "/opt/intel" do
+  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+  writeable true
+  options ['no_root_squash']
+  only_if { ::File.directory?("/opt/intel") }
 end
 
 # Setup RAID array on master node
@@ -142,7 +166,7 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
   end
 
   service node['cfncluster']['ganglia']['httpd_service'] do
-    supports restart: true
+    supports restart: true, reload: true
     action %i[enable start]
   end
 end
@@ -150,7 +174,7 @@ end
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
   manage_home true
-  comment 'cfncluster user'
+  comment 'AWS ParallelCluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'
 end
@@ -167,9 +191,9 @@ end
 bash "copy_and_perms" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
   code <<-PERMS
-    su - #{node['cfncluster']['cfn_cluster_user']} -c \"cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys2 && chmod 0600 ~/.ssh/authorized_keys2\"
+    su - #{node['cfncluster']['cfn_cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
   PERMS
-  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys2") }
+  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys_cluster") }
 end
 
 bash "ssh-keyscan" do
@@ -194,4 +218,9 @@ template '/etc/sqswatcher.cfg' do
   owner 'root'
   group 'root'
   mode '0644'
+end
+
+if node['cfncluster']['dcv_enabled'] == "master"
+  # Activate DCV on master Node
+  include_recipe 'aws-parallelcluster::dcv_config'
 end

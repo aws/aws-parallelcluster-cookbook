@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: slurm_install
@@ -36,6 +38,7 @@ when 'MasterServer', nil
     group 'root'
     cwd Chef::Config[:file_cache_path]
     code <<-SLURM
+      set -e
       tar xf #{slurm_tarball}
       cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm

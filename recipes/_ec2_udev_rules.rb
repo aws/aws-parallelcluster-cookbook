@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _ec2_udev_rules
@@ -47,6 +49,25 @@ cookbook_file 'attachVolume.py' do
   user 'root'
   group 'root'
   mode '0755'
+end
+
+if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
+  # allow Ubuntu 18 udev to do network call
+  execute 'udev-daemon-reload' do
+    command 'udevadm control --reload'
+    action :nothing
+  end
+
+  directory '/etc/systemd/system/systemd-udevd.service.d'
+
+  # Disable udev network sandbox and notify udev to reload configuration
+  cookbook_file 'udev-override.conf' do
+    path '/etc/systemd/system/systemd-udevd.service.d/override.conf'
+    user 'root'
+    group 'root'
+    mode '0644'
+    notifies :run, "execute[udev-daemon-reload]", :immediately
+  end
 end
 
 service "ec2blkdev" do

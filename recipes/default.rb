@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: default
@@ -16,3 +18,7 @@
 include_recipe 'aws-parallelcluster::sge_install'
 include_recipe 'aws-parallelcluster::torque_install'
 include_recipe 'aws-parallelcluster::slurm_install'
+
+# DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
+# used to build the schedulers packages
+include_recipe "aws-parallelcluster::dcv_install"

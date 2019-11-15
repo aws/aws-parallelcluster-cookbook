@@ -1,0 +1,136 @@
+# frozen_string_literal: true
+#
+# Cookbook Name:: aws-parallelcluster
+# Recipe:: dcv_install
+#
+# Copyright 2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License. A copy of the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "LICENSE.txt" file accompanying this file.
+# This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
+# See the License for the specific language governing permissions and limitations under the License.
+
+# Utility function to install a list of rpm packages
+def install_rpm_packages(packages)
+  packages.each do |package_name|
+    package package_name do
+      action :install
+      source package_name
+    end
+  end
+end
+
+# Function to install and activate a Python virtual env to run the the External authenticator daemon
+def install_ext_auth_virtual_env
+  return if File.exist?("#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate")
+
+  install_pyenv node['cfncluster']['dcv']['authenticator']['user'] do
+    python_version node['cfncluster']['python-version']
+  end
+
+  activate_virtual_env node['cfncluster']['dcv']['authenticator']['virtualenv'] do
+    pyenv_path node['cfncluster']['dcv']['authenticator']['virtualenv_path']
+    pyenv_user node['cfncluster']['dcv']['authenticator']['user']
+    python_version node['cfncluster']['python-version']
+  end
+end
+
+
+# Function to disable lock screen since default EC2 users don't have a password
+def disable_lock_screen
+  # Override default GSettings to disable lock screen for all the users
+  cookbook_file "/usr/share/glib-2.0/schemas/10_org.gnome.desktop.screensaver.gschema.override" do
+    source 'dcv/10_org.gnome.desktop.screensaver.gschema.override'
+    owner 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  # compile gsettings schemas
+  execute 'Compile gsettings schema' do
+    command "glib-compile-schemas /usr/share/glib-2.0/schemas/"
+  end
+end
+
+
+# Install pcluster_dcv_connect.sh script in all the OSes to use it for error handling
+cookbook_file "#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
+  source 'dcv/pcluster_dcv_connect.sh'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  not_if { ::File.exist?("#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh") }
+end
+
+
+if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && !File.exist?("/etc/dcv/dcv.conf")
+  case node['cfncluster']['cfn_node_type']
+  when 'MasterServer', nil
+    dcv_tarball = "#{node['cfncluster']['sources_dir']}/dcv-#{node['cfncluster']['dcv']['version']}.tgz"
+
+    # Install the desktop environment and the desktop manager packages
+    execute 'Install gnome desktop' do
+      command 'yum -y install @gnome'
+    end
+    disable_lock_screen
+
+    # Install X Window System (required when using GPU acceleration)
+    package "xorg-x11-server-Xorg"
+
+    # Extract DCV packages
+    unless File.exist?(dcv_tarball)
+      remote_file dcv_tarball do
+        source node['cfncluster']['dcv']['url']
+        mode '0644'
+        retries 3
+        retry_delay 5
+      end
+
+      bash 'extract dcv packages' do
+        cwd node['cfncluster']['sources_dir']
+        code "tar -xvzf #{dcv_tarball}"
+      end
+    end
+
+    # Install server and xdcv packages
+    dcv_packages = %W[#{node['cfncluster']['dcv']['server']} #{node['cfncluster']['dcv']['xdcv']}]
+    dcv_packages_path = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/"
+    # Rewrite dcv_packages object by cycling each package file name and appending the path to them
+    dcv_packages.map! { |package| dcv_packages_path + package }
+    install_rpm_packages(dcv_packages)
+
+    # Create user and Python virtual env for the external authenticator
+    user node['cfncluster']['dcv']['authenticator']['user'] do
+      manage_home true
+      home node['cfncluster']['dcv']['authenticator']['user_home']
+      comment 'NICE DCV External Authenticator user'
+      system true
+      shell '/bin/bash'
+    end
+    install_ext_auth_virtual_env
+
+  when 'ComputeFleet'
+    user node['cfncluster']['dcv']['authenticator']['user'] do
+      manage_home false
+      home node['cfncluster']['dcv']['authenticator']['user_home']
+      comment 'NICE DCV External Authenticator user'
+      system true
+      shell '/bin/bash'
+    end
+  end
+
+  # stop firewall
+  service "firewalld" do
+    action %i[disable stop]
+  end
+
+  # Disable selinux
+  selinux_state "SELinux Disabled" do
+    action :disabled
+    only_if 'which getenforce'
+  end
+end

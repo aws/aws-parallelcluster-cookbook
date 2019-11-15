@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: setup_raid_on_master
@@ -78,26 +80,10 @@ if raid_shared_dir != "NONE"
   end
 
   # Create a configuration file to contain the RAID info, so the RAID array is reassembled automatically on boot
-  if node['cfncluster']['cfn_base_os'] != "ubuntu1404"
-    execute "create_raid_config" do
-      command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf"
-      action :nothing
-      subscribes :run, "execute[setup_raid_disk]", :immediately
-    end
-
-  else
-    # Put config file in /etc/mdadm/mdadm.conf, Ubuntu1404 specific
-    execute "create_raid_config" do
-      command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm/mdadm.conf"
-      action :nothing
-      subscribes :run, "execute[setup_raid_disk]", :immediately
-    end
-    # Update initramfs to contain mdadm.conf settings, Ubuntu1404 specific
-    execute "update_raid_config" do
-      command "sudo update-initramfs -u"
-      action :nothing
-      subscribes :run, "execute[setup_raid_disk]", :immediately
-    end
+  execute "create_raid_config" do
+    command "sudo mdadm --detail --scan | sudo tee -a /etc/mdadm.conf"
+    action :nothing
+    subscribes :run, "execute[setup_raid_disk]", :immediately
   end
 
   # Create the shared directory

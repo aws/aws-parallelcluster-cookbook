@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: fsx_mount
@@ -29,13 +31,19 @@ if fsx_shared_dir != "NONE"
     action :create
   end
 
+  mount_options = %w[defaults _netdev flock user_xattr noatime]
+
+  if node['init_package'] == 'systemd'
+    mount_options.push(%w[noauto x-systemd.automount x-systemd.requires=lnet.service])
+  end
+
   # Mount FSx over NFS
   mount fsx_shared_dir do
     device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com@tcp:/fsx"
     fstype 'lustre'
     dump 0
     pass 0
-    options %w[defaults _netdev]
+    options mount_options
     action %i[mount enable]
   end
 

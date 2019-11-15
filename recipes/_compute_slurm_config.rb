@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _compute_slurm_config
@@ -20,6 +22,13 @@ mount '/opt/slurm' do
   fstype "nfs"
   options 'hard,intr,noatime,vers=3,_netdev'
   action %i[mount enable]
+end
+
+# Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU
+if graphic_instance?
+  execute "run_nvidiasmi" do
+    command 'nvidia-smi'
+  end
 end
 
 cookbook_file '/etc/systemd/system/slurmd.service' do

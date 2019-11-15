@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _compute_base_config
@@ -47,6 +49,15 @@ mount '/home' do
   action %i[mount enable]
 end
 
+# Mount /opt/intel over NFS
+mount '/opt/intel' do
+  device "#{nfs_master}:/opt/intel"
+  fstype 'nfs'
+  options 'hard,intr,noatime,vers=3,_netdev'
+  action %i[mount enable]
+  only_if { ::File.directory?("/opt/intel") }
+end
+
 # Configure Ganglia
 if node['cfncluster']['ganglia_enabled'] == "yes"
   template '/etc/ganglia/gmond.conf' do
@@ -65,35 +76,37 @@ end
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
   manage_home false
-  comment 'cfncluster user'
+  comment 'AWS ParallelCluster user'
   home "/home/#{node['cfncluster']['cfn_cluster_user']}"
   shell '/bin/bash'
 end
 
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
-shared_dir_array.each_with_index do |dir, index|
-  shared_dir_array[index] = dir.strip
-  shared_dir_array[index] = "/" + shared_dir_array[index] unless shared_dir_array[index].start_with?("/")
-end
 
 # Mount each volume with NFS
-shared_dir_array.each do |dirname|
-  # Created shared mount point
-  directory dirname do
-    mode '1777'
-    owner 'root'
-    group 'root'
-    recursive true
-    action :create
-  end
+shared_dir_array.each do |dir|
+  dirname = dir.strip
 
-  # Mount shared volume over NFS
-  mount dirname do
-    device "#{nfs_master}:#{dirname}"
-    fstype 'nfs'
-    options 'hard,intr,noatime,vers=3,_netdev'
-    action %i[mount enable]
+  unless dirname == "NONE"
+    dirname = "/" + dirname unless dirname.start_with?("/")
+
+    # Created shared mount point
+    directory dirname do
+      mode '1777'
+      owner 'root'
+      group 'root'
+      recursive true
+      action :create
+    end
+
+    # Mount shared volume over NFS
+    mount dirname do
+      device "#{nfs_master}:#{dirname}"
+      fstype 'nfs'
+      options 'hard,intr,noatime,vers=3,_netdev'
+      action %i[mount enable]
+    end
   end
 end
 

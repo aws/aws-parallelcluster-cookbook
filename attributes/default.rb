@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Attributes:: default
@@ -28,13 +30,16 @@ default['cfncluster']['node_virtualenv'] = 'node_virtualenv'
 default['cfncluster']['cookbook_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['cookbook_virtualenv']}"
 # Node Virtualenv Path
 default['cfncluster']['node_virtualenv_path'] = "/root/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
-# Intel MPI
-default['cfncluster']['intelmpi']['url'] = "http://registrationcenter-download.intel.com/akdlm/irc_nas/tec/15553/aws_impi.sh"
-default['cfncluster']['intelmpi']['version'] = '2019.4.243'
-default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
+# Intel Packages
+default['cfncluster']['intelmpi']['installer_version'] = '1.0'
+default['cfncluster']['intelmpi']['s3_path'] = "scripts/intelmpi/aws_impi.#{node['cfncluster']['intelmpi']['installer_version']}.sh"
+default['cfncluster']['intelmpi']['version'] = '2019.5'
+default['cfncluster']['psxe']['version'] = '2019.5'
+default['cfncluster']['intelhpc']['version'] = '2018.0-1.el7'
+default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/latest/modulefiles/mpi"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.4.1'
-default['cfncluster']['cfncluster-node-version'] = '2.4.1'
+default['cfncluster']['cfncluster-version'] = '2.5.0'
+default['cfncluster']['cfncluster-node-version'] = '2.5.0'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
@@ -43,11 +48,11 @@ default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/relea
 default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '18-08-6-2'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-18-08-6-2.tar.gz'
+default['cfncluster']['slurm']['version'] = '19-05-3-2'
+default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-19-05-3-2.tar.gz'
 # Munge
-default['cfncluster']['munge']['munge_version'] = '0.5.12'
-default['cfncluster']['munge']['munge_url'] = 'https://github.com/dun/munge/archive/munge-0.5.12.tar.gz'
+default['cfncluster']['munge']['munge_version'] = '0.5.13'
+default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
 default['cfncluster']['ganglia']['version'] = '3.7.2'
@@ -56,10 +61,28 @@ default['cfncluster']['ganglia']['web_version'] = '3.7.2'
 default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_url'] = 'http://download.nvidia.com/XFree86/Linux-x86_64/418.56/NVIDIA-Linux-x86_64-418.56.run'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.nvidia.com/compute/cuda/10.0/Prod/local_installers/cuda_10.0.130_410.48_linux'
+# domain has dynamic DNS resolution, will resolve to a server in Tokyo when called from China
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/418.87/NVIDIA-Linux-x86_64-418.87.01.run'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run'
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-latest.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.0.tar.gz'
+# ENV2 - tool to capture environment and create modulefiles
+default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
+# NICE DCV
+default['cfncluster']['dcv']['installed'] = 'yes'
+default['cfncluster']['dcv']['version'] = '2019.1-7644'
+default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
+default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
+default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm"  # NICE DCV server package
+default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm"  # required to create virtual sessions
+default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm"  # required to enable GPU sharing
+# DCV external authenticator configuration
+default['cfncluster']['dcv']['authenticator']['user'] = "dcvextauth"
+default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfncluster']['dcv']['authenticator']['user']}"
+default['cfncluster']['dcv']['authenticator']['certificate'] = "/etc/parallelcluster/ext-auth-certificate.pem"
+default['cfncluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
+default['cfncluster']['dcv']['authenticator']['virtualenv'] = "dcv_authenticator_virtualenv"
+default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cfncluster']['dcv']['authenticator']['user_home']}/.pyenv/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['dcv']['authenticator']['virtualenv']}"
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
@@ -71,9 +94,15 @@ default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
 default['openssh']['server']['password_authentication'] = 'no'
 default['openssh']['server']['gssapi_authentication'] = 'yes'
 default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
-default['openssh']['server']['x11_forwarding'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
+if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr'
+  default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512,hmac-sha2-256'
+else
+  default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
+  default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
+end
 
 # ulimit settings
 default['cfncluster']['filehandle_limit'] = 10000
@@ -107,7 +136,8 @@ when 'rhel', 'amazon'
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip]
+                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
+                                                  libssh2-devel]
       if node['platform_version'].split('.')[1] == '6'
         # Lustre Drivers for Centos 7.6
         default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -147,9 +177,12 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
-  if node['platform_version'] == '14.04'
-    default['cfncluster']['base_packages'].push('libopenmpi-dev')
+  if node['platform_version'] == '18.04'
+    default['cfncluster']['base_packages'].delete('libatlas-dev')
+    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libgcrypt20-dev', 'libssl1.0-dev')
+    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
   end
+
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"

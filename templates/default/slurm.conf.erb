@@ -55,25 +55,19 @@ ReturnToService=1
 #
 # TIMERS
 SlurmctldTimeout=300
-SlurmdTimeout=120
+SlurmdTimeout=180
+UnkillableStepTimeout=180
 InactiveLimit=0
 MinJobAge=300
 KillWait=30
 Waittime=0
 #
 # SCHEDULING
+EnforcePartLimits=ALL
 SchedulerType=sched/backfill
 #SchedulerAuth=
 #SchedulerPort=
 #SchedulerRootFilter=
-SelectType=select/cons_res
-SelectTypeParameters=CR_CPU
-
-# Disable fastscheduling to fall back on resource
-# metrics reported by compute nodes, slower scheduling
-# but more flexible if using different ec2 instance types
-FastSchedule=0
-
 #PriorityType=priority/multifactor
 #PriorityDecayHalfLife=14-0
 #PriorityUsageResetPeriod=14-0
@@ -82,6 +76,11 @@ FastSchedule=0
 #PriorityWeightPartition=10000
 #PriorityWeightJobSize=1000
 #PriorityMaxAge=1-0
+#
+# TRES AND GPU CONFIG OPTIONS
+GresTypes=gpu
+SelectType=select/cons_tres
+SelectTypeParameters=CR_CPU
 #
 # LOGGING
 SlurmctldDebug=3

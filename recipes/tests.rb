@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: tests
@@ -38,7 +40,7 @@ end
 
 unless node['cfncluster']['os'].end_with?("-custom")
   bash 'test soft ulimit nofile' do
-    code "if (($(ulimit -Sn) < 10000)); then exit 1; fi"
+    code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
     user node['cfncluster']['cfn_cluster_user']
   end
 end
@@ -111,6 +113,13 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
+if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['os'] == 'centos7' and node['cfncluster']['dcv']['installed'] == 'yes'
+  execute 'check dcv installed' do
+    command 'dcv version'
+  end
+end
+
+
 unless node['cfncluster']['cfn_region'].start_with?("cn-")
   case node['cfncluster']['os']
   when 'alinux', 'centos7'
@@ -118,7 +127,7 @@ unless node['cfncluster']['cfn_region'].start_with?("cn-")
       command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
       user node['cfncluster']['cfn_cluster_user']
     end
-  when 'ubuntu1604'
+  when 'ubuntu1604', 'ubuntu1804'
     execute 'check efa rpm installed' do
       command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
       user node['cfncluster']['cfn_cluster_user']
@@ -136,5 +145,71 @@ unless node['cfncluster']['os'].end_with?("-custom")
       echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
       jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster' || exit 1
     JQMERGE
+  end
+end
+
+# only test on GPU instances
+if node['cfncluster']['nvidia']['enabled'] == 'yes'
+  # extract driver and CUDA version from url
+  url_driver_ver = node['cfncluster']['nvidia']['driver_url'][/(\d+.\d+)/, 0]
+  url_cuda_ver = node['cfncluster']['nvidia']['cuda_url'][/(\d+.\d+)/, 0]
+
+  bash 'test nvidia driver install' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TESTNVIDIA
+      has_gpu=$(lspci | grep -o "NVIDIA")
+      if [ -z "$has_gpu" ]; then
+        echo "No GPU detected, no test needed."
+        exit 0
+      fi
+
+      set -e
+      driver_ver="#{url_driver_ver}"
+      export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
+
+      # Test NVIDIA Driver installation
+      echo "Testing NVIDIA driver install..."
+      # grep driver version from nvidia-smi output. If driver is not installed nvidia-smi command will fail
+      driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9]+.[0-9]+")
+      if [ "$driver_output" != "Driver Version: $driver_ver" ]; then
+        echo "NVIDIA driver installed incorrectly! Installed $driver_output but expected version $driver_ver"
+        exit 1
+      else
+        echo "Correctly installed NVIDIA $driver_output"
+      fi
+    TESTNVIDIA
+  end
+
+  bash 'test CUDA install' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TESTCUDA
+      has_gpu=$(lspci | grep -o "NVIDIA")
+      if [ -z "$has_gpu" ]; then
+        echo "No GPU detected, no test needed."
+        exit 0
+      fi
+
+      set -e
+      cuda_ver="#{url_cuda_ver}"
+      # Test CUDA installation
+      echo "Testing CUDA install with nvcc..."
+      export PATH=/usr/local/cuda-$cuda_ver/bin:$PATH
+      export LD_LIBRARY_PATH=/usr/local/cuda-$cuda_ver/lib64:$LD_LIBRARY_PATH
+      # grep CUDA version from nvcc output. If CUDA is not installed nvcc command will fail
+      cuda_output=$(nvcc -V | grep -E -o "release [0-9]+.[0-9]+")
+      if [ "$cuda_output" != "release $cuda_ver" ]; then
+        echo "CUDA installed incorrectly! Installed $cuda_output but expected $cuda_ver"
+        exit 1
+      else
+        echo "CUDA nvcc test passed, $cuda_output"
+      fi
+
+      # Test deviceQuery
+      echo "Testing CUDA install with deviceQuery..."
+      sudo make --directory=/usr/local/cuda-$cuda_ver/samples/1_Utilities/deviceQuery/
+      exec /usr/local/cuda-$cuda_ver/samples/1_Utilities/deviceQuery/deviceQuery | grep -o "Device [0-9]+: .*"
+      echo "CUDA deviceQuery test passed"
+      echo "Correctly installed CUDA $cuda_output"
+    TESTCUDA
   end
 end

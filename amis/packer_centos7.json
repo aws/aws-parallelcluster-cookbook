@@ -10,9 +10,12 @@
     "build_date" : "{{env `BUILD_DATE`}}",
     "vendor_path" : "{{env `VENDOR_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
+    "dcv_installed": "{{env `DCV_INSTALLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
+    "security_group_id" : "{{env `AWS_SECURITY_GROUP_ID`}}",
     "vpc_id" : "{{env `AWS_VPC_ID`}}",
+    "associate_public_ip" : "{{env `ASSOCIATE_PUBLIC_IP`}}",
     "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
     "region" : "{{env `AWS_REGION`}}",
     "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}",
@@ -42,9 +45,10 @@
       "ssh_pty" : true,
       "ami_name" : "{{user `ami_name_prefix` | clean_ami_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-centos7-hvm-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
+      "security_group_id" : "{{user `security_group_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
-      "associate_public_ip_address" : true,
+      "associate_public_ip_address" : "{{user `associate_public_ip`}}",
       "sriov_support" : true,
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
@@ -65,7 +69,7 @@
       "launch_block_device_mappings" : [
         {
           "device_name" : "/dev/sda1",
-          "volume_size" : "17",
+          "volume_size" : "25",
           "volume_type" : "gp2",
           "delete_on_termination" : true
         },
@@ -103,7 +107,7 @@
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
-      "associate_public_ip_address" : true,
+      "associate_public_ip_address" : "{{user `associate_public_ip`}}",
       "sriov_support" : true,
       "ena_support" : true,
       "tags" : {
@@ -190,7 +194,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}}"
+        "sudo /opt/chef/embedded/bin/gem install --no-rdoc --no-ri ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}} ffi-libarchive"
       ]
     },
     {
@@ -227,6 +231,9 @@
           "cfn_region": "{{user `region`}}",
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
+          },
+          "dcv": {
+            "installed" : "{{user `dcv_installed`}}"
           },
           "custom_node_package" : "{{user `custom_node_package`}}"
         }

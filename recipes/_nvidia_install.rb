@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: _nvidia_install
@@ -18,12 +20,20 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
   case node['platform_family']
   when 'rhel', 'amazon'
-    yum_package node['cfncluster']['kernel_devel_pkg']['name']
+    yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
+      retries 3
+      retry_delay 5
+    end
   when 'debian'
     # Needed for new kernel version
-    apt_package node['cfncluster']['kernel_generic_pkg']
+    apt_package node['cfncluster']['kernel_generic_pkg'] do
+      retries 3
+      retry_delay 5
+    end
     # Needed for old kernel version
     apt_package node['cfncluster']['kernel_extra_pkg'] do
+      retries 3
+      retry_delay 5
       ignore_failure true
     end
   end
@@ -45,6 +55,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     cwd '/tmp'
     code <<-NVIDIA
     ./nvidia.run --silent --no-network --dkms
+    rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
   end
@@ -66,6 +77,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     cwd '/tmp'
     code <<-CUDA
     ./cuda.run --silent --toolkit
+    rm -f /tmp/cuda.run
     CUDA
     creates '/usr/local/cuda-10.0'
   end

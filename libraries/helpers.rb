@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'chef/mixin/shell_out'
 require 'net/http'
 require 'timeout'
@@ -41,15 +43,55 @@ def setup_disk(path)
 end
 
 #
+# Checks if device is partitioned; if yes returns pt type
+#
+def get_pt_type(device)
+  fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
+  fs_check.run_command
+  match = fs_check.stdout.match(/\sPTTYPE=\"(.*?)\"/)
+  match = '' if match.nil?
+
+  Chef::Log.info("Partition type for device #{device}: #{match[1]}")
+  match[1]
+end
+
+#
 # Check if block device has a fileystem
 #
 def get_fs_type(device)
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/TYPE=\"(.*)\"/)
+  match = fs_check.stdout.match(/\sTYPE=\"(.*?)\"/)
   match = '' if match.nil?
 
+  Chef::Log.info("File system type for device #{device}: #{match[1]}")
   match[1]
+end
+
+#
+# Gets the uuid of a device
+#
+def get_uuid(device)
+  Chef::Log.info("Getting uuid for device: #{device}")
+  fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
+  fs_check.run_command
+  match = fs_check.stdout.match(/\sUUID=\"(.*?)\"/)
+  match = '' if match.nil?
+  Chef::Log.info("uuid for device: #{device} is #{match[1]}")
+  match[1]
+end
+
+#
+# Returns the first partition of a device, provided via sym link
+#
+def get_1st_partition(device)
+  # Resolves the real device name (ex. /dev/sdg)
+  Chef::Log.info("Getting 1st partition for device: #{device}")
+  fs_check = Mixlib::ShellOut.new("lsblk -ln -o Name #{device}|awk 'NR==2'")
+  fs_check.run_command
+  partition = "/dev/" + fs_check.stdout.strip
+  Chef::Log.info("1st partition for device: #{device} is: #{partition}")
+  partition
 end
 
 #
@@ -61,6 +103,14 @@ def get_vpc_ipv4_cidr_block(eth0_mac)
   vpc_ipv4_cidr_block = res.body if res.code == '200'
 
   vpc_ipv4_cidr_block
+end
+
+def get_instance_type()
+  uri = URI("http://169.254.169.254/latest/meta-data/instance-type")
+  res = Net::HTTP.get_response(uri)
+  master_instance_type = res.body if res.code == '200'
+
+  master_instance_type
 end
 
 def pip_install_package(package, version)
@@ -76,4 +126,14 @@ def ignore_failure(lookup)
     Chef::Log.info("Ignore failure for resource: #{lookup}")
     resource.ignore_failure(true)
   end
+end
+
+#
+# Check if the instance has a GPU
+#
+def graphic_instance?
+  has_gpu = `lspci | grep -i -o 'NVIDIA'`
+  is_graphic_instance = !has_gpu.strip.empty?
+
+  is_graphic_instance
 end

@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: lustre_install
+# Recipe:: _lustre_install
 #
 # Copyright 2013-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -45,8 +47,51 @@ if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split(
   yum_package 'lustre_client' do
     source lustre_client_rpm
   end
+
+  kernel_module 'lnet'
+elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_i == 7
+
+  # Install build dependencies
+  package %w[libselinux-devel libyaml-devel rpm-build gcc git make] do
+    retries 3
+    retry_delay 5
+  end
+
+  # grab lustre source
+  bash "clone github repo" do
+    cwd node['cfncluster']['sources_dir']
+    code <<-LUSTRECLONE
+      set -e
+      git clone git://git.whamcloud.com/fs/lustre-release.git --depth 2 -b 2.10.8
+    LUSTRECLONE
+    not_if { ::Dir.exist?("#{node['cfncluster']['sources_dir']}/lustre-release") }
+  end
+
+  # Make RPMS
+  bash "make rpms" do
+    cwd "#{node['cfncluster']['sources_dir']}/lustre-release"
+    code <<-LUSTREBUILD
+      set -e
+      sh ./autogen.sh
+      ./configure --disable-server --with-o2ib=no
+      make rpms
+    LUSTREBUILD
+    not_if { ::File.exist?("#{node['cfncluster']['sources_dir']}/lustre-release/kmod-lustre-client-2.10.8-1.el7.x86_64.rpm") }
+  end
+
+  # Install lustre mount drivers
+  yum_package 'lustre_kmod' do
+    source "#{node['cfncluster']['sources_dir']}/lustre-release/kmod-lustre-client-2.10.8-1.el7.x86_64.rpm"
+  end
+
+  # Install lustre mount drivers
+  yum_package 'lustre_client' do
+    source "#{node['cfncluster']['sources_dir']}/lustre-release/lustre-client-2.10.8-1.el7.x86_64.rpm"
+  end
+
+  kernel_module 'lnet'
 elsif node['platform'] == 'centos'
-  Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are 7.6 and 7.5")
+  Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are 7.5, 7.6 and 7.7")
 elsif node['platform'] == 'amazon'
 
   # Install lustre client module
@@ -55,4 +100,5 @@ elsif node['platform'] == 'amazon'
     retry_delay 5
   end
 
+  kernel_module 'lnet'
 end

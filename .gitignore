@@ -18,3 +18,5 @@ bin/*
 
 build.log
 build-*.log
+
+.tox/
