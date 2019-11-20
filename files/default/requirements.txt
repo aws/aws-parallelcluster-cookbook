@@ -2,3 +2,4 @@ awscli
 boto3
 supervisor
 requests
+python-gnupg
