@@ -150,7 +150,6 @@
       "file_path": "/var/log/nodewatcher",
       "log_stream_name": "nodewatcher",
       "schedulers": [
-        "awsbatch",
         "sge",
         "slurm",
         "torque"
@@ -169,7 +168,6 @@
       "file_path": "/var/log/jobwatcher",
       "log_stream_name": "jobwatcher",
       "schedulers": [
-        "awsbatch",
         "sge",
         "slurm",
         "torque"
@@ -188,7 +186,6 @@
       "file_path": "/var/log/sqswatcher",
       "log_stream_name": "sqswatcher",
       "schedulers": [
-        "awsbatch",
         "sge",
         "slurm",
         "torque"
