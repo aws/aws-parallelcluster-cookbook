@@ -2,6 +2,7 @@
   "timestamp_formats": {
     "month_first": "%b %-d %H:%M:%S",
     "default": "%Y-%m-%d %H:%M:%S,%f",
+    "bracket_default": "[%Y-%m-%d %H:%M:%S]",
     "slurm": "%Y-%m-%dT%H:%M:%S.%f",
     "sge": "%m/%d/%Y %H:%M:%S",
     "torque_compute": "%Y-%m-%d %H:%M:%S.%f",
@@ -25,7 +26,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "month_first",
@@ -43,7 +45,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -63,7 +66,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -83,7 +87,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -103,7 +108,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "month_first",
@@ -123,7 +129,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -143,7 +150,8 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -161,7 +169,8 @@
       ],
       "node_roles": [
         "ComputeFleet"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -179,7 +188,8 @@
       ],
       "node_roles": [
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
@@ -197,7 +207,8 @@
       ],
       "node_roles": [
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "slurm",
@@ -213,7 +224,8 @@
       ],
       "node_roles": [
         "ComputeFleet"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "slurm",
@@ -229,7 +241,8 @@
       ],
       "node_roles": [
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "sge",
@@ -245,7 +258,8 @@
       ],
       "node_roles": [
         "ComputeFleet"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "sge",
@@ -261,7 +275,8 @@
       ],
       "node_roles": [
         "MasterServer"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "torque_compute",
@@ -277,7 +292,8 @@
       ],
       "node_roles": [
         "ComputeFleet"
-      ]
+      ],
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "torque_master",
@@ -293,6 +309,175 @@
       ],
       "node_roles": [
         "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/pcluster_dcv_authenticator.log",
+      "log_stream_name": "dcv-authenticator",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "bracket_default",
+      "file_path": "/var/log/parallelcluster/pcluster_dcv_connect.log",
+      "log_stream_name": "dcv-ext-authenticator",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/server.log",
+      "log_stream_name": "dcv-server",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/sessionlauncher.log",
+      "log_stream_name": "dcv-session-launcher",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/agent.*.log",
+      "log_stream_name": "dcv-agent",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/dcv-xsession.*.log",
+      "log_stream_name": "dcv-xsession",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/Xdcv.*.log",
+      "log_stream_name": "Xdcv",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["master"]
+        }
       ]
     }
   ]

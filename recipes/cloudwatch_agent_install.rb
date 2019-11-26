@@ -68,6 +68,7 @@ end
 # Verify that cloudwatch agent's public key has expected fingerprint
 cookbook_file 'verify_cloudwatch_agent_public_key_fingerprint.py' do
   not_if { ::File.exist?('/usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py') }
+  source 'cloudwatch_logs/verify_cloudwatch_agent_public_key_fingerprint.py'
   path '/usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py'
   user 'root'
   group 'root'
