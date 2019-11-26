@@ -17,6 +17,7 @@
 config_script_path = '/usr/local/bin/write_cloudwatch_agent_json.py'
 cookbook_file 'write_cloudwatch_agent_json.py' do
   not_if { ::File.exist?(config_script_path) }
+  source 'cloudwatch_logs/write_cloudwatch_agent_json.py'
   path config_script_path
   user 'root'
   group 'root'
@@ -26,10 +27,40 @@ end
 config_data_path = '/usr/local/etc/cloudwatch_log_files.json'
 cookbook_file 'cloudwatch_log_files.json' do
   not_if { ::File.exist?(config_data_path) }
+  source 'cloudwatch_logs/cloudwatch_log_files.json'
   path config_data_path
   user 'root'
   group 'root'
   mode '0644'
+end
+
+config_schema_path = '/usr/local/etc/cloudwatch_log_files_schema.json'
+cookbook_file 'cloudwatch_log_files_schema.json' do
+  not_if { ::File.exist?(config_schema_path) }
+  source 'cloudwatch_logs/cloudwatch_log_files_schema.json'
+  path config_schema_path
+  user 'root'
+  group 'root'
+  mode '0644'
+end
+
+validator_script_path = '/usr/local/bin/cloudwatch_log_configs_util.py'
+cookbook_file 'cloudwatch_log_configs_util.py' do
+  not_if { ::File.exist?(validator_script_path) }
+  source 'cloudwatch_logs/cloudwatch_log_configs_util.py'
+  path validator_script_path
+  user 'root'
+  group 'root'
+  mode '0644'
+end
+
+execute "cloudwatch-config-validation" do
+  user 'root'
+  environment(
+    'CW_LOGS_SCHEMA_PATH' => config_schema_path,
+    'CW_LOGS_CONFIGS_PATH' => config_data_path
+  )
+  command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python #{validator_script_path}"
 end
 
 execute "cloudwatch-config-creation" do
