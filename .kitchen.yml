@@ -92,6 +92,8 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
   - name: torque_config_MasterServer
     run_list:
@@ -114,6 +116,8 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
   - name: slurm_config_MasterServer
     run_list:
@@ -136,6 +140,8 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
   - name: sge_config_ComputeFleet
     run_list:
@@ -158,6 +164,8 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
   - name: torque_config_ComputeFleet
     run_list:
@@ -180,6 +188,8 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
   - name: slurm_config_ComputeFleet
     run_list:
@@ -202,3 +212,5 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
