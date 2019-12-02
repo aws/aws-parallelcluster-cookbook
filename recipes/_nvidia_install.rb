@@ -54,6 +54,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     group 'root'
     cwd '/tmp'
     code <<-NVIDIA
+    set -e
     ./nvidia.run --silent --no-network --dkms
     rm -f /tmp/nvidia.run
     NVIDIA
@@ -76,6 +77,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     group 'root'
     cwd '/tmp'
     code <<-CUDA
+    set -e
     ./cuda.run --silent --toolkit
     rm -f /tmp/cuda.run
     CUDA
