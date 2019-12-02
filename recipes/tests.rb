@@ -150,9 +150,6 @@ end
 
 # only test on GPU instances
 if node['cfncluster']['nvidia']['enabled'] == 'yes'
-  # extract driver and CUDA version from url
-  url_driver_ver = node['cfncluster']['nvidia']['driver_url'][/(\d+.\d+)/, 0]
-  url_cuda_ver = node['cfncluster']['nvidia']['cuda_url'][/(\d+.\d+)/, 0]
 
   bash 'test nvidia driver install' do
     cwd Chef::Config[:file_cache_path]
@@ -164,7 +161,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
       fi
 
       set -e
-      driver_ver="#{url_driver_ver}"
+      driver_ver="#{node['cfncluster']['nvidia']['driver_version']}"
       export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
 
       # Test NVIDIA Driver installation
@@ -190,7 +187,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
       fi
 
       set -e
-      cuda_ver="#{url_cuda_ver}"
+      cuda_ver="#{node['cfncluster']['nvidia']['cuda_version']}"
       # Test CUDA installation
       echo "Testing CUDA install with nvcc..."
       export PATH=/usr/local/cuda-$cuda_ver/bin:$PATH
