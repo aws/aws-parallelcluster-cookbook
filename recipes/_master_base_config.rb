@@ -48,6 +48,10 @@ dev_path = [] # device labels
 dev_uuids = [] # device uuids
 
 vol_array.each_with_index do |volumeid, index|
+
+  # Skips volume if shared_dir is /NONE
+  next if shared_dir_array[index] == "/NONE"
+
   dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
 
   # Attach EBS volume
