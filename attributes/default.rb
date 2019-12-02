@@ -62,7 +62,9 @@ default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/gangli
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
 # domain has dynamic DNS resolution, will resolve to a server in Tokyo when called from China
+default['cfncluster']['nvidia']['driver_version'] = '418.87.01'
 default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/418.87/NVIDIA-Linux-x86_64-418.87.01.run'
+default['cfncluster']['nvidia']['cuda_version'] = '10.1'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run'
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.0.tar.gz'
