@@ -45,7 +45,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     mode '0755'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?(nvidia_tmp_runfile) }
+    not_if { ::File.exist?('/usr/bin/nvidia-smi') }
   end
 
   # Install NVIDIA driver
@@ -54,8 +54,9 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     group 'root'
     cwd '/tmp'
     code <<-NVIDIA
-    ./nvidia.run --silent --no-network --dkms
-    rm -f /tmp/nvidia.run
+      set -e
+      ./nvidia.run --silent --dkms
+      rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
   end
@@ -67,7 +68,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     mode '0755'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?(cuda_tmp_runfile) }
+    not_if { ::File.exist?("/usr/local/cuda-#{node['cfncluster']['nvidia']['cuda_version']}") }
   end
 
   # Install CUDA driver
@@ -76,10 +77,11 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     group 'root'
     cwd '/tmp'
     code <<-CUDA
-    ./cuda.run --silent --toolkit
-    rm -f /tmp/cuda.run
+      set -e
+      ./cuda.run --silent --toolkit
+      rm -f /tmp/cuda.run
     CUDA
-    creates '/usr/local/cuda-10.0'
+    creates "/usr/local/cuda-#{node['cfncluster']['nvidia']['cuda_version']}"
   end
 
   cookbook_file 'blacklist-nouveau.conf' do
