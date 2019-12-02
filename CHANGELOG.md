@@ -3,6 +3,16 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.5.1
+-----
+
+**CHANGES**
+- Upgrade NVIDIA driver to Tesla version 440.33.01.
+- Upgrade CUDA library to version 10.2.
+
+**BUG FIXES**
+- Correctly install NVIDIA drivers on Ubuntu 18.
+
 2.5.0
 -----
 
