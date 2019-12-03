@@ -18,6 +18,7 @@
 # Run torque.setup
 bash "run-torque-setup" do
   code <<-SETUPTORQUE
+    set -e
     . /etc/profile.d/torque.sh
     ./torque.setup root
   SETUPTORQUE
