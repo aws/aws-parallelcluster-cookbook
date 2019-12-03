@@ -17,7 +17,7 @@
 
 # Export /opt/sge
 nfs_export "/opt/sge" do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
 end
