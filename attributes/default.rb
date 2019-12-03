@@ -65,7 +65,11 @@ default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_version'] = '440.33.01'
 default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.33.01/NVIDIA-Linux-x86_64-440.33.01.run'
 default['cfncluster']['nvidia']['cuda_version'] = '10.2'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
+if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
+else
+  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
+end
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.0.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
