@@ -28,7 +28,7 @@ execute "add_configure-pat" do
 end
 
 # Get VPC CIDR
-node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block'] = get_vpc_ipv4_cidr_block(node['macaddress'])
+node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_ipv4_cidr_blocks(node['macaddress'])
 
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
@@ -119,7 +119,7 @@ vol_array.each_with_index do |volumeid, index|
 
   # Export shared dir
   nfs_export shared_dir_array[index] do
-    network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+    network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
     writeable true
     options ['no_root_squash']
   end
@@ -127,14 +127,14 @@ end
 
 # Export /home
 nfs_export "/home" do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
 end
 
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-block']
+  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
   only_if { ::File.directory?("/opt/intel") }
