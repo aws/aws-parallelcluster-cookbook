@@ -8,6 +8,7 @@ on the scheduler to be used, the platform (OS family) in use and the instance's 
 
 import argparse
 import json
+import os
 import socket
 
 
@@ -91,9 +92,13 @@ def select_configs_for_platform(configs, platform):
 
 
 def get_node_info():
-    """Return the information encoded in the JSON file at /tmp/dna.json."""
-    with open("/tmp/dna.json") as node_info_file:
-        return json.load(node_info_file).get("cfncluster")
+    """Return the information encoded in the JSON file at /etc/chef/dna.json."""
+    node_info = {}
+    dna_path = "/etc/chef/dna.json"
+    if os.path.isfile(dna_path):
+        with open(dna_path) as node_info_file:
+            node_info = json.load(node_info_file).get("cfncluster")
+    return node_info
 
 
 def select_configs_for_feature(configs):
