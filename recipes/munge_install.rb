@@ -39,6 +39,7 @@ bash 'make install' do
   group 'root'
   cwd Chef::Config[:file_cache_path]
   code <<-MUNGE
+    set -e
     tar xf #{munge_tarball}
     cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
     ./bootstrap

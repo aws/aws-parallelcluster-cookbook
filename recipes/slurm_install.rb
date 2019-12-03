@@ -68,6 +68,7 @@ when 'MasterServer', nil
     group 'root'
     cwd Chef::Config[:file_cache_path]
     code <<-SLURMLICENSE
+      set -e
       cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
       cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
       cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
