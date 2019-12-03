@@ -11,7 +11,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 10.2.
 
 **BUG FIXES**
-- Correctly install NVIDIA drivers on Ubuntu 18.
+- Fix installation of NVIDIA drivers on Ubuntu 18.
+- Fix installation of CUDA toolkit on Centos 6.
+- Increase default root volume size in Centos 6 AMI to 25GB.
 
 2.5.0
 -----
