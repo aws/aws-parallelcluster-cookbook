@@ -3,6 +3,18 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.5.1
+-----
+
+**CHANGES**
+- Upgrade NVIDIA driver to Tesla version 440.33.01.
+- Upgrade CUDA library to version 10.2.
+
+**BUG FIXES**
+- Fix installation of NVIDIA drivers on Ubuntu 18.
+- Fix installation of CUDA toolkit on Centos 6.
+- Increase default root volume size in Centos 6 AMI to 25GB.
+
 2.5.0
 -----
 

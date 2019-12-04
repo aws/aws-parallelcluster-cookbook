@@ -90,11 +90,33 @@ def select_configs_for_platform(configs, platform):
     return [config for config in configs if platform in config['platforms']]
 
 
+def get_node_info():
+    """Return the information encoded in the JSON file at /tmp/dna.json."""
+    with open("/tmp/dna.json") as node_info_file:
+        return json.load(node_info_file).get("cfncluster")
+
+
+def select_configs_for_feature(configs):
+    """Filter out from configs those entries whose 'feature_conditions' list contains an unsatisfied entry."""
+    selected_configs = []
+    node_info = get_node_info()
+    for config in configs:
+        conditions = config.get("feature_conditions", [])
+        for condition in conditions:
+            node_info_key = condition.get("dna_key")
+            if node_info.get(node_info_key) not in condition.get("satisfying_values"):
+                break
+        else:
+            selected_configs.append(config)
+    return selected_configs
+
+
 def select_logs(configs, args):
     """Select the appropriate set of log configs."""
     selected_configs = select_configs_for_scheduler(configs, args.scheduler)
     selected_configs = select_configs_for_node_role(selected_configs, args.node_role)
     selected_configs = select_configs_for_platform(selected_configs, args.platform)
+    selected_configs = select_configs_for_feature(selected_configs)
     return selected_configs
 
 

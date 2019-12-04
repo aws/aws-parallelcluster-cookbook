@@ -62,8 +62,14 @@ default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/gangli
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
 # domain has dynamic DNS resolution, will resolve to a server in Tokyo when called from China
-default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/418.87/NVIDIA-Linux-x86_64-418.87.01.run'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run'
+default['cfncluster']['nvidia']['driver_version'] = '440.33.01'
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.33.01/NVIDIA-Linux-x86_64-440.33.01.run'
+default['cfncluster']['nvidia']['cuda_version'] = '10.2'
+if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
+else
+  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
+end
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.0.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
@@ -182,7 +188,7 @@ when 'debian'
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
-    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libgcrypt20-dev', 'libssl1.0-dev')
+    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libgcrypt20-dev', 'libssl1.0-dev', 'libglvnd-dev')
     default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
   end
 
