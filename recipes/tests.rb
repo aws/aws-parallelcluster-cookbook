@@ -166,7 +166,7 @@ bash 'test nvidia driver install' do
     # Test NVIDIA Driver installation
     echo "Testing NVIDIA driver install..."
     # grep driver version from nvidia-smi output. If driver is not installed nvidia-smi command will fail
-    driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9]+.[0-9]+")
+    driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9.]+")
     if [ "$driver_output" != "Driver Version: $driver_ver" ]; then
       echo "NVIDIA driver installed incorrectly! Installed $driver_output but expected version $driver_ver"
       exit 1
@@ -202,8 +202,7 @@ bash 'test CUDA install' do
 
     # Test deviceQuery
     echo "Testing CUDA install with deviceQuery..."
-    sudo make --directory=/usr/local/cuda-$cuda_ver/samples/1_Utilities/deviceQuery/
-    exec /usr/local/cuda-$cuda_ver/samples/1_Utilities/deviceQuery/deviceQuery | grep -o "Device [0-9]+: .*"
+    /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
     echo "CUDA deviceQuery test passed"
     echo "Correctly installed CUDA $cuda_output"
   TESTCUDA
