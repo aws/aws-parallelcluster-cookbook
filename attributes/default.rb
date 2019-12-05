@@ -133,7 +133,8 @@ when 'rhel', 'amazon'
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
-                                                libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip]
+                                                libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip
+                                                libgcrypt-devel]
 
     # Lustre Drivers for Centos 6
     default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -146,7 +147,7 @@ when 'rhel', 'amazon'
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
-                                                  libssh2-devel]
+                                                  libssh2-devel libgcrypt-devel]
       if node['platform_version'].split('.')[1] == '6'
         # Lustre Drivers for Centos 7.6
         default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -168,7 +169,7 @@ when 'rhel', 'amazon'
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
-                                                sendmail cmake byacc libglvnd-devel mdadm]
+                                                sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel]
   end
 
   default['cfncluster']['ganglia']['apache_user'] = 'apache'
@@ -185,10 +186,11 @@ when 'debian'
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
-                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm]
+                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
+                                              libgcrypt20-dev]
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
-    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libgcrypt20-dev', 'libssl1.0-dev', 'libglvnd-dev')
+    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl1.0-dev', 'libglvnd-dev')
     default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
   end
 
