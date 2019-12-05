@@ -117,6 +117,7 @@ end
 if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['os'] == 'centos7' and node['cfncluster']['dcv']['installed'] == 'yes'
   execute 'check dcv installed' do
     command 'dcv version'
+    user node['cfncluster']['cfn_cluster_user']
   end
 end
 
