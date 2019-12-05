@@ -48,6 +48,10 @@ dev_path = [] # device labels
 dev_uuids = [] # device uuids
 
 vol_array.each_with_index do |volumeid, index|
+
+  # Skips volume if shared_dir is /NONE
+  next if shared_dir_array[index] == "/NONE"
+
   dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
 
   # Attach EBS volume
@@ -183,6 +187,7 @@ end
 bash "ssh-keygen" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
   code <<-KEYGEN
+    set -e
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
   KEYGEN
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
@@ -191,6 +196,7 @@ end
 bash "copy_and_perms" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
   code <<-PERMS
+    set -e
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
   PERMS
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys_cluster") }
@@ -199,6 +205,7 @@ end
 bash "ssh-keyscan" do
   cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
   code <<-KEYSCAN
+    set -e
     su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
   KEYSCAN
   not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }

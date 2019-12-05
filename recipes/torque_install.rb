@@ -110,6 +110,7 @@ bash 'copy license stuff' do
   group 'root'
   cwd Chef::Config[:file_cache_path]
   code <<-TORQUEINSTALL
+    set -e
     cd torque-#{node['cfncluster']['torque']['version']}
     cp -v PBS_License.txt #{node['cfncluster']['license_dir']}/torque/PBS_License.txt
     cp -v LICENSE #{node['cfncluster']['license_dir']}/torque/LICENSE

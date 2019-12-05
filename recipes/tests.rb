@@ -29,11 +29,12 @@ end
 bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
+    set -e
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
     regions=($(#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
-      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
+      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1
     done
   AWSREGIONS
 end
@@ -116,6 +117,7 @@ end
 if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['os'] == 'centos7' and node['cfncluster']['dcv']['installed'] == 'yes'
   execute 'check dcv installed' do
     command 'dcv version'
+    user node['cfncluster']['cfn_cluster_user']
   end
 end
 
@@ -139,11 +141,12 @@ unless node['cfncluster']['os'].end_with?("-custom")
   bash 'execute jq' do
     cwd Chef::Config[:file_cache_path]
     code <<-JQMERGE
+      set -e
       # Set PATH as in the UserData script of the CloudFormation template
       export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
       echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::sge_config]"}' > /tmp/dna.json
       echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
-      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster' || exit 1
+      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster'
     JQMERGE
   end
 end
@@ -164,7 +167,7 @@ bash 'test nvidia driver install' do
     # Test NVIDIA Driver installation
     echo "Testing NVIDIA driver install..."
     # grep driver version from nvidia-smi output. If driver is not installed nvidia-smi command will fail
-    driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9]+.[0-9]+")
+    driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9.]+")
     if [ "$driver_output" != "Driver Version: $driver_ver" ]; then
       echo "NVIDIA driver installed incorrectly! Installed $driver_output but expected version $driver_ver"
       exit 1
@@ -200,8 +203,7 @@ bash 'test CUDA install' do
 
     # Test deviceQuery
     echo "Testing CUDA install with deviceQuery..."
-    sudo make --directory=/usr/local/cuda-$cuda_ver/samples/1_Utilities/deviceQuery/
-    exec /usr/local/cuda-$cuda_ver/samples/1_Utilities/deviceQuery/deviceQuery | grep -o "Device [0-9]+: .*"
+    /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
     echo "CUDA deviceQuery test passed"
     echo "Correctly installed CUDA $cuda_output"
   TESTCUDA
