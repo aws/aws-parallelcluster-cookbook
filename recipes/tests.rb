@@ -46,6 +46,13 @@ unless node['cfncluster']['os'].end_with?("-custom")
   end
 end
 
+if node['cfncluster']['cfn_scheduler'] == 'torque' or node['cfncluster']['cfn_scheduler'] == 'slurm'
+  execute 'check munge installed' do
+    command 'munge --version'
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
 if node['cfncluster']['cfn_scheduler'] == 'sge'
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
