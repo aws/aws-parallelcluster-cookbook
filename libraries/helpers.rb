@@ -95,14 +95,15 @@ def get_1st_partition(device)
 end
 
 #
-# Get vpc-ipv4-cidr-block
+# Get vpc-ipv4-cidr-blocks
 #
-def get_vpc_ipv4_cidr_block(eth0_mac)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{eth0_mac.downcase}/vpc-ipv4-cidr-block")
+def get_vpc_ipv4_cidr_blocks(eth0_mac)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{eth0_mac.downcase}/vpc-ipv4-cidr-blocks")
   res = Net::HTTP.get_response(uri)
-  vpc_ipv4_cidr_block = res.body if res.code == '200'
-
-  vpc_ipv4_cidr_block
+  vpc_ipv4_cidr_blocks = res.body if res.code == '200'
+  # Parse into array
+  vpc_ipv4_cidr_blocks = vpc_ipv4_cidr_blocks.split("\n")
+  vpc_ipv4_cidr_blocks
 end
 
 def get_instance_type()
