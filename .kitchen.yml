@@ -146,6 +146,31 @@ suites:
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
+  - name: awsbatch_config_MasterServer
+    run_list:
+      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::awsbatch_config]
+      - recipe[aws-parallelcluster::finalize]
+      - recipe[aws-parallelcluster::tests]
+    attributes:
+      cfncluster:
+        cfn_node_type: 'MasterServer'
+        cfn_scheduler: 'awsbatch'
+        stack_name: <%= ENV['AWS_STACK_NAME'] %>
+        cfn_volume: <%= ENV['CFN_VOLUME'] %>
+        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
+        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
+        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
+        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        os: <%= ENV['OS'] %>
+        ganglia_enabled: 'yes'
+        nvidia:
+          enabled: <%= ENV['NVIDIA_ENABLED'] %>
+
   - name: sge_config_ComputeFleet
     run_list:
       - recipe[aws-parallelcluster::_prep_env]
