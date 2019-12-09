@@ -92,7 +92,7 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        ganglia_enabled: <%= ENV['GANGLIA_ENABLED'] %>
+        ganglia_enabled: 'yes'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -117,7 +117,7 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        ganglia_enabled: <%= ENV['GANGLIA_ENABLED'] %>
+        ganglia_enabled: 'yes'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -142,7 +142,7 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        ganglia_enabled: <%= ENV['GANGLIA_ENABLED'] %>
+        ganglia_enabled: 'yes'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -167,7 +167,7 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        ganglia_enabled: <%= ENV['GANGLIA_ENABLED'] %>
+        ganglia_enabled: 'yes'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -192,7 +192,7 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        ganglia_enabled: <%= ENV['GANGLIA_ENABLED'] %>
+        ganglia_enabled: 'yes'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -217,6 +217,6 @@ suites:
         cfn_master: <%= ENV['CFN_MASTER'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
-        ganglia_enabled: <%= ENV['GANGLIA_ENABLED'] %>
+        ganglia_enabled: 'yes'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
