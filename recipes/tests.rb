@@ -216,17 +216,8 @@ bash 'test CUDA install' do
   TESTCUDA
 end
 
-# Verify that the CloudWatch agent is running or not depending on
-# whether or not the feature is enabled.
-case node['cfncluster']['cfn_cluster_cw_logging_enabled']
-when 'true'
-  execute 'cloudwatch-agent-status-running' do
-    user 'root'
-    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running || exit 1"
-  end
-else
-  execute 'cloudwatch-agent-status-not-running' do
-    user 'root'
-    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped || exit 1"
-  end
+# Verify that the CloudWatch agent's status can be queried. It should always be stopped during kitchen tests.
+execute 'cloudwatch-agent-status' do
+  user 'root'
+  command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped"
 end
