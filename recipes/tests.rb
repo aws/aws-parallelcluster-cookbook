@@ -30,7 +30,7 @@ bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region us-east-1 --query "Regions[].{Name:RegionName}" --output text))
+    regions=($(#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cfncluster']['cfn_region']} --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
       #{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}" >/dev/null 2>&1 || exit 1
