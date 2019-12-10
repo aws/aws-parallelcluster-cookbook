@@ -44,7 +44,6 @@ def allow_gpu_acceleration
   bash 'Launch X' do
     user 'root'
     code <<-SETUPX
-      set -e
       systemctl set-default graphical.target
       systemctl isolate graphical.target &
     SETUPX

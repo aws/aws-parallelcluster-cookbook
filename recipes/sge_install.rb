@@ -120,7 +120,6 @@ when 'MasterServer', nil
     group 'root'
     cwd Chef::Config[:file_cache_path]
     code <<-SGELICENSE
-      set -e
       cd sge-#{node['cfncluster']['sge']['version']}/LICENCES
       cp -v SISSL #{node['cfncluster']['license_dir']}/sge/SISSL
     SGELICENSE
