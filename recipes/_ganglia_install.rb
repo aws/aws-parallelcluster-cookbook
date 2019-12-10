@@ -42,7 +42,6 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
       group 'root'
       cwd Chef::Config[:file_cache_path]
       code <<-GANGLIA
-        set -e
         tar xf #{ganglia_tarball}
         cd monitor-core-#{node['cfncluster']['ganglia']['version']}
         ./bootstrap
@@ -98,7 +97,6 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
       group 'root'
       cwd Chef::Config[:file_cache_path]
       code <<-GANGLIAWEB
-        set -e
         tar xf #{ganglia_web_tarball}
         cd ganglia-web-#{node['cfncluster']['ganglia']['web_version']}
         make install APACHE_USER=#{node['cfncluster']['ganglia']['apache_user']}
@@ -130,7 +128,6 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
       group 'root'
       cwd Chef::Config[:file_cache_path]
       code <<-GANGLIALICENSE
-        set -e
         cd monitor-core-#{node['cfncluster']['ganglia']['version']}
         cp -v COPYING #{node['cfncluster']['license_dir']}/ganglia/COPYING
       GANGLIALICENSE

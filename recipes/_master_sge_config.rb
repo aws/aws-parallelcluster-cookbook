@@ -52,7 +52,6 @@ end
 
 bash "add_host_as_master" do
   code <<-ADDHOST
-    set -e
     . /opt/sge/default/common/settings.sh
     qconf -as #{node['hostname']}
   ADDHOST
@@ -60,7 +59,6 @@ end
 
 bash "set_accounting_summary" do
   code <<-SETAS
-    set -e
     . /opt/sge/default/common/settings.sh
     TMPFILE=/tmp/pe.txt
     qconf -sp mpi | grep -v 'accounting_summary' > $TMPFILE
@@ -73,7 +71,6 @@ end
 # Enable non-admin users to force delete a job
 bash "enable_forced_qdel" do
   code <<-ENABLEFORCEDQDEL
-    set -e
     . /opt/sge/default/common/settings.sh
     /opt/sge/util/qconf_add_list_value -mconf qmaster_params ENABLE_FORCED_QDEL global
   ENABLEFORCEDQDEL
