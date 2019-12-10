@@ -13,8 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix installation of NVIDIA drivers on Ubuntu 18.
 - Fix installation of CUDA toolkit on Centos 6.
-- Fix installation of Munge on all but Ubuntu 18.
-- Avoid mounting EBS volumes when not configured.
+- Fix installation of Munge on Amazon Linux, Centos 6, Centos 7 and Ubuntu 16.
 - Export shared directories to all CIDR blocks in a VPC rather than just the first one.
 
 2.5.0
