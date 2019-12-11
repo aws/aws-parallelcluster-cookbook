@@ -9,6 +9,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade NVIDIA driver to Tesla version 440.33.01.
 - Upgrade CUDA library to version 10.2.
+- Upgrade EFA installer to version 1.7.1:
+  - Kernel module: efa-1.4.1
+  - RDMA core: rdma-core-25.0
+  - Libfabric: libfabric-aws-1.8.1amzn1.3
+  - Open MPI: openmpi40-aws-4.0.2
 
 **BUG FIXES**
 - Fix installation of NVIDIA drivers on Ubuntu 18.
