@@ -49,8 +49,8 @@ if fsx_shared_dir != "NONE"
 
   # Make sure permission is correct
   directory fsx_shared_dir do
-    owner 'root'
-    group 'root'
+    owner node['cfncluster']['cfn_cluster_user']
+    group node['cfncluster']['cfn_cluster_user']
     mode '1777'
   end
 end
