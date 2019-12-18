@@ -94,6 +94,7 @@ suites:
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
+        enable_intel_hpc_platform: 'true'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -120,6 +121,7 @@ suites:
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
+        enable_intel_hpc_platform: 'true'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -146,6 +148,7 @@ suites:
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
+        enable_intel_hpc_platform: 'true'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
