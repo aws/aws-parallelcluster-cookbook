@@ -93,6 +93,9 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
+        enable_intel_hpc_platform: 'true'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -118,6 +121,9 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
+        enable_intel_hpc_platform: 'true'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -143,6 +149,9 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
+        enable_intel_hpc_platform: 'true'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -168,6 +177,8 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -193,6 +204,8 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -218,5 +231,7 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
