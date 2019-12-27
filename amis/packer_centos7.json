@@ -110,6 +110,7 @@
       "associate_public_ip_address" : "{{user `associate_public_ip`}}",
       "sriov_support" : true,
       "ena_support" : true,
+      "shutdown_behavior" : "terminate",
       "tags" : {
         "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}"
