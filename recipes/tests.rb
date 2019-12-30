@@ -234,3 +234,13 @@ if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
     command "rpm -q intelpython3 | grep #{node['cfncluster']['intelpython3']['version']}"
   end
 end
+
+execute 'check-slurm-accounting-mysql-plugins' do
+  user 'root'
+  command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+end
+
+execute 'check-slurm-jobcomp-mysql-plugins' do
+  user 'root'
+  command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+end
