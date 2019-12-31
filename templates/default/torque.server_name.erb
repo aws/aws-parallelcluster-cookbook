@@ -1,5 +1,5 @@
 <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
-<%= node['hostname'] %>
+<%= node['ec2']['local_hostname'] %>
 <% end -%>
 <% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
 <%= node['cfncluster']['cfn_master'] %>
