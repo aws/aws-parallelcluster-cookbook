@@ -70,6 +70,13 @@ echo set server managers += "${USER}@${HOSTNAME}" | qmgr
 qmgr -c 'set server scheduling = true'
 qmgr -c 'set server keep_completed = 300'
 qmgr -c 'set server mom_job_sync = true'
+# resources_max.nodect enforces the max size of the cluster
+qmgr -c 'set server resources_max.nodect = <%= node['cfncluster']['cfn_max_queue_size'] %>'
+# resources_available.nodect enforces the max number of usable slots. Setting this to max_queue_size causes
+# torque not to use all slots available to the cluster and the scheduler erroneously limits the number of concurrent
+# running jobs so that the total number of required nodes is equal to max_queue_size. This is not correct because a node
+# can be shared across multiple jobs if free slots are available.
+# This value is updated by sqswatcher to be equal to max_queue_size*node_slots
 qmgr -c 'set server resources_available.nodect = <%= node['cfncluster']['cfn_max_queue_size'] %>'
 qmgr -c 'set server node_check_rate = 120'
 qmgr -c 'set server node_ping_rate = 60'
@@ -84,6 +91,7 @@ qmgr -c 'set queue batch started = true'
 qmgr -c 'set queue batch enabled = true'
 qmgr -c 'set queue batch resources_default.walltime = 1:00:00'
 qmgr -c 'set queue batch resources_default.nodes = 1'
+qmgr -c 'set queue batch resources_max.nodect = <%= node['cfncluster']['cfn_max_queue_size'] %>'
 qmgr -c 'set queue batch resources_available.nodect = <%= node['cfncluster']['cfn_max_queue_size'] %>'
 
 qmgr -c 'set server default_queue = batch'
