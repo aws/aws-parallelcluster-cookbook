@@ -112,7 +112,7 @@ main() {
     os=$(< /etc/chef/dna.json jq -r .cfncluster.cfn_base_os)
     _log "Input parameters: user: ${user}, OS: ${os}, shared_folder_path: ${shared_folder_path}."
 
-    if [[ ${os} != "centos7" ]]; then
+    if [[ ${os} != "centos7" ]] && [[ ${os} != "ubuntu1804" ]]; then
         _fail "OS not supported."
     fi
 

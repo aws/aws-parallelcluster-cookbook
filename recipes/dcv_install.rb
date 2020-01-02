@@ -14,12 +14,19 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-# Utility function to install a list of rpm packages
-def install_rpm_packages(packages)
+# Utility function to install a list of packages
+def install_package_list(packages)
   packages.each do |package_name|
-    package package_name do
-      action :install
-      source package_name
+    case node['platform']
+    when 'centos'
+      package package_name do
+        action :install
+        source package_name
+      end
+    when 'ubuntu'
+      execute 'apt install dcv package' do
+        command "apt -y install #{package_name}"
+      end
     end
   end
 end
@@ -66,20 +73,38 @@ cookbook_file "#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
   not_if { ::File.exist?("#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh") }
 end
 
-
-if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && !File.exist?("/etc/dcv/dcv.conf")
+if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") && !File.exist?("/etc/dcv/dcv.conf")
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer', nil
     dcv_tarball = "#{node['cfncluster']['sources_dir']}/dcv-#{node['cfncluster']['dcv']['version']}.tgz"
 
-    # Install the desktop environment and the desktop manager packages
-    execute 'Install gnome desktop' do
-      command 'yum -y install @gnome'
+    # Install DCV pre-requisite packages
+    case node['platform']
+    when 'centos'
+      # Install the desktop environment and the desktop manager packages
+      execute 'Install gnome desktop' do
+        command 'yum -y install @gnome'
+      end
+      # Install X Window System (required when using GPU acceleration)
+      package "xorg-x11-server-Xorg"
+
+    when 'ubuntu'
+      # Install the desktop environment and the desktop manager packages
+      # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
+      bash 'install pre-req' do
+        cwd Chef::Config[:file_cache_path]
+        code <<-PREREQ
+          set -e
+          apt -y install ubuntu-desktop
+          apt -y purge ifupdown
+          DEBIAN_FRONTEND=noninteractive apt -y install lightdm
+          apt -y install mesa-utils
+          wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
+          gpg --import NICE-GPG-KEY
+        PREREQ
+      end
     end
     disable_lock_screen
-
-    # Install X Window System (required when using GPU acceleration)
-    package "xorg-x11-server-Xorg"
 
     # Extract DCV packages
     unless File.exist?(dcv_tarball)
@@ -101,7 +126,7 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && !File.e
     dcv_packages_path = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/"
     # Rewrite dcv_packages object by cycling each package file name and appending the path to them
     dcv_packages.map! { |package| dcv_packages_path + package }
-    install_rpm_packages(dcv_packages)
+    install_package_list(dcv_packages)
 
     # Create user and Python virtual env for the external authenticator
     user node['cfncluster']['dcv']['authenticator']['user'] do
@@ -123,14 +148,18 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && !File.e
     end
   end
 
-  # stop firewall
-  service "firewalld" do
-    action %i[disable stop]
-  end
+  # Post-installation action
+  case node['platform']
+  when 'centos'
+    # stop firewall
+    service "firewalld" do
+      action %i[disable stop]
+    end
 
-  # Disable selinux
-  selinux_state "SELinux Disabled" do
-    action :disabled
-    only_if 'which getenforce'
+    # Disable selinux
+    selinux_state "SELinux Disabled" do
+      action :disabled
+      only_if 'which getenforce'
+    end
   end
 end

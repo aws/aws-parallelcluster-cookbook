@@ -376,14 +376,14 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         """Check if there is a dcvagent process running for the given user and for the given session_id."""
         # row example:
         # centos 63 0.0 0.0 4348844 3108   ??  Ss   23Jul19   2:32.46  /usr/libexec/dcv/dcvagent --session-id mysession
+        # ubuntu 2949 0.3 0.4 860568 34328 ? Sl 20:10 0:18 /usr/lib/x86_64-linux-gnu/dcv/dcvagent --session-id mysession
         fields = row.split()
         command_index = 10
         session_name_index = 12
         user_index = 0
-        dcv_agent_path = "/usr/libexec/dcv/dcvagent"
 
         return (
-            fields[command_index] == dcv_agent_path
+            fields[command_index].endswith("/dcv/dcvagent")
             and fields[user_index] == user
             and fields[session_name_index] == session_id
         )
