@@ -79,11 +79,24 @@ default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/fi
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2019.1-7644'
-default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
+default['cfncluster']['dcv']['supported_os'] = ['centos7', 'ubuntu18']
+case node['platform']
+when 'centos'
+  if node['platform_version'].to_i == 7
+    default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
+    default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm"  # NICE DCV server package
+    default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm"  # required to create virtual sessions
+    default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm"  # required to enable GPU sharing
+  end
+when 'ubuntu'
+  if node['platform_version'] == '18.04'
+    default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804"
+    default['cfncluster']['dcv']['server'] = "nice-dcv-server_2019.1.7644-1_amd64.ubuntu1804.deb"  # NICE DCV server package
+    default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2019.1.226-1_amd64.ubuntu1804.deb"  # required to create virtual sessions
+    default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2019.1.544-1_amd64.ubuntu1804.deb"  # required to enable GPU sharing
+  end
+end
 default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
-default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm"  # NICE DCV server package
-default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm"  # required to create virtual sessions
-default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm"  # required to enable GPU sharing
 # DCV external authenticator configuration
 default['cfncluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfncluster']['dcv']['authenticator']['user']}"

@@ -95,6 +95,9 @@ def test_sha_generator():
         ("user1", "/usr/libexec/dcv/dcvagent2", "mysession", False),
         ("wrong", "/usr/libexec/dcv/dcvagent", "mysession", False),
         ("user1", "/usr/libexec/dcv/dcvagent", "wrong", False),
+        ("user1", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "mysession", True),
+        ("wrong", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "mysession", False),
+        ("user1", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "wrong", False),
     ],
 )
 def test_is_process_valid(user, command, session_id, result):

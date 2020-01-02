@@ -34,11 +34,20 @@ def allow_gpu_acceleration
   end
 
   # dcvgl package must be installed after NVIDIA and before starting up X
+  # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
   dcv_gl = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/#{node['cfncluster']['dcv']['gl']}"
-  package dcv_gl do
-    action :install
-    source dcv_gl
+  case node['platform']
+  when 'centos'
+    package dcv_gl do
+      action :install
+      source dcv_gl
+    end
+  when 'ubuntu'
+    execute 'apt install dcv-gl' do
+      command "apt -y install #{dcv_gl}"
+    end
   end
+
 
   # Configure the X server to start automatically when the Linux server boots and start the X server in background
   bash 'Launch X' do
@@ -59,7 +68,7 @@ def allow_gpu_acceleration
   end
 end
 
-if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && node['cfncluster']['cfn_node_type'] == "MasterServer"
+if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") && node['cfncluster']['cfn_node_type'] == "MasterServer"
 
   # be sure to have DCV packages installed
   include_recipe "aws-parallelcluster::dcv_install"
@@ -69,6 +78,16 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 7 && node['c
   if node.default['cfncluster']['dcv']['is_graphic_instance']
     # Enable graphic acceleration in dcv conf file for graphic instances.
     allow_gpu_acceleration
+  end
+
+  case node['platform']
+  when 'ubuntu'
+    # Disable RNDFILE from openssl to avoid error during certificate generation
+    # See https://github.com/openssl/openssl/issues/7754#issuecomment-444063355
+    execute 'No RND' do
+      user 'root'
+      command "sed --in-place '/RANDFILE/d' /etc/ssl/openssl.cnf"
+    end
   end
 
   # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one
