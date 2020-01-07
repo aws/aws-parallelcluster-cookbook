@@ -37,6 +37,8 @@ default['cfncluster']['intelmpi']['version'] = '2019.5'
 default['cfncluster']['psxe']['version'] = '2019.5'
 default['cfncluster']['intelhpc']['version'] = '2018.0-1.el7'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/latest/modulefiles/mpi"
+default['cfncluster']['intelpython2']['version'] = '2019.4'
+default['cfncluster']['intelpython3']['version'] = '2019.4'
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.5.1'
 default['cfncluster']['cfncluster-node-version'] = '2.5.1'
@@ -71,7 +73,7 @@ else
   default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
 end
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.0.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.7.1.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
 default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
 # NICE DCV
@@ -187,7 +189,7 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
-                                              libgcrypt20-dev]
+                                              libgcrypt20-dev libmysqlclient-dev]
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl1.0-dev', 'libglvnd-dev')

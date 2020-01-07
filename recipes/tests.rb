@@ -216,17 +216,31 @@ bash 'test CUDA install' do
   TESTCUDA
 end
 
-# Verify that the CloudWatch agent is running or not depending on
-# whether or not the feature is enabled.
-case node['cfncluster']['cfn_cluster_cw_logging_enabled']
-when 'true'
-  execute 'cloudwatch-agent-status-running' do
-    user 'root'
-    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running || exit 1"
+# Verify that the CloudWatch agent's status can be queried. It should always be stopped during kitchen tests.
+execute 'cloudwatch-agent-status' do
+  user 'root'
+  command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped"
+end
+
+# Intel Python Libraries
+if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
+  && (node['cfncluster']['enable_intel_hpc_platform'] == 'true')
+  execute "check-intel-python2" do
+    # Output code will be 1 if version is different
+    command "rpm -q intelpython2 | grep #{node['cfncluster']['intelpython2']['version']}"
   end
-else
-  execute 'cloudwatch-agent-status-not-running' do
-    user 'root'
-    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped || exit 1"
+  execute "check-intel-python3" do
+    # Output code will be 1 if version is different
+    command "rpm -q intelpython3 | grep #{node['cfncluster']['intelpython3']['version']}"
   end
+end
+
+execute 'check-slurm-accounting-mysql-plugins' do
+  user 'root'
+  command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+end
+
+execute 'check-slurm-jobcomp-mysql-plugins' do
+  user 'root'
+  command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
 end
