@@ -51,7 +51,7 @@ when 'MasterServer'
       set -e
       yum-config-manager --add-repo https://yum.repos.intel.com/intelpython/setup/intelpython.repo
       yum-config-manager --save --setopt=intelpython.skip_if_unavailable=true
-      yum -y install intelpython2 intelpython3
+      yum -y install intelpython2-#{node['cfncluster']['intelpython2']['version']} intelpython3-#{node['cfncluster']['intelpython3']['version']}
     INTEL
     creates '/opt/intel/intelpython2'
   end

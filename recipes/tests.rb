@@ -221,3 +221,26 @@ execute 'cloudwatch-agent-status' do
   user 'root'
   command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped"
 end
+
+# Intel Python Libraries
+if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
+  && (node['cfncluster']['enable_intel_hpc_platform'] == 'true')
+  execute "check-intel-python2" do
+    # Output code will be 1 if version is different
+    command "rpm -q intelpython2 | grep #{node['cfncluster']['intelpython2']['version']}"
+  end
+  execute "check-intel-python3" do
+    # Output code will be 1 if version is different
+    command "rpm -q intelpython3 | grep #{node['cfncluster']['intelpython3']['version']}"
+  end
+end
+
+execute 'check-slurm-accounting-mysql-plugins' do
+  user 'root'
+  command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+end
+
+execute 'check-slurm-jobcomp-mysql-plugins' do
+  user 'root'
+  command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+end

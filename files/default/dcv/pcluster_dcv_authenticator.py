@@ -369,7 +369,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
 
     @staticmethod
     def _verify_session_existence(user, session_id):
-        retry(DCVAuthenticator._is_session_valid, func_args=[user, session_id], attempts=5, wait=1)
+        retry(DCVAuthenticator._is_session_valid, func_args=[user, session_id], attempts=20, wait=1)
 
     @staticmethod
     def check_dcv_process(row, user, session_id):
