@@ -3,6 +3,16 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+X.X.X
+-----
+
+**Changes**
+- Upgrade EFA installer to version 1.8.0:
+  - Kernel module: efa-1.5.0 (updated from efa-1.4.1)
+  - RDMA core: rdma-core-27.0 (distributed only) (updated from rdma-core-25.0)
+  - Libfabric: libfabric-aws-1.9.0amzn1.0 (updated from libfabric-aws-1.8.1amzn1.3)
+  - Open MPI: openmpi40-aws-4.0.2 (no change)
+
 2.5.1
 -----
 
