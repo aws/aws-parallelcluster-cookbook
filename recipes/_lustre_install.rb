@@ -51,42 +51,18 @@ if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split(
   kernel_module 'lnet'
 elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_i == 7
 
-  # Install build dependencies
-  package %w[libselinux-devel libyaml-devel rpm-build gcc git make] do
+  # add fsx lustre repository
+  yum_repository "aws-fsx" do
+    description "AWS FSx Packages  - $basearch"
+    baseurl node['cfncluster']['lustre']['base_url']
+    gpgkey node['cfncluster']['lustre']['public_key']
     retries 3
     retry_delay 5
   end
 
-  # grab lustre source
-  bash "clone github repo" do
-    cwd node['cfncluster']['sources_dir']
-    code <<-LUSTRECLONE
-      set -e
-      git clone git://git.whamcloud.com/fs/lustre-release.git --depth 2 -b 2.10.8
-    LUSTRECLONE
-    not_if { ::Dir.exist?("#{node['cfncluster']['sources_dir']}/lustre-release") }
-  end
-
-  # Make RPMS
-  bash "make rpms" do
-    cwd "#{node['cfncluster']['sources_dir']}/lustre-release"
-    code <<-LUSTREBUILD
-      set -e
-      sh ./autogen.sh
-      ./configure --disable-server --with-o2ib=no
-      make rpms
-    LUSTREBUILD
-    not_if { ::File.exist?("#{node['cfncluster']['sources_dir']}/lustre-release/kmod-lustre-client-2.10.8-1.el7.x86_64.rpm") }
-  end
-
-  # Install lustre mount drivers
-  yum_package 'lustre_kmod' do
-    source "#{node['cfncluster']['sources_dir']}/lustre-release/kmod-lustre-client-2.10.8-1.el7.x86_64.rpm"
-  end
-
-  # Install lustre mount drivers
-  yum_package 'lustre_client' do
-    source "#{node['cfncluster']['sources_dir']}/lustre-release/lustre-client-2.10.8-1.el7.x86_64.rpm"
+  yum_package %w(kmod-lustre-client lustre-client) do
+    retries 3
+    retry_delay 5
   end
 
   kernel_module 'lnet'
