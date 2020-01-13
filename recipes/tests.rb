@@ -197,7 +197,7 @@ end
 # EFA - Intel MPI
 ###################
 case node['cfncluster']['os']
-when 'alinux', 'centos7'
+when 'alinux', 'centos7', 'alinux2'
   execute 'check efa rpm installed' do
     command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
     user node['cfncluster']['cfn_cluster_user']
