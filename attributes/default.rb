@@ -87,6 +87,7 @@ when 'centos'
     default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm"  # NICE DCV server package
     default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm"  # required to create virtual sessions
     default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm"  # required to enable GPU sharing
+    default['cfncluster']['dcv']['sha256sum'] = "ab50323c92b3584ac88f697fd45e68b98da0b1b334a3e1f7eef6343df3aa4d91"
   end
 when 'ubuntu'
   if node['platform_version'] == '18.04'
@@ -94,6 +95,7 @@ when 'ubuntu'
     default['cfncluster']['dcv']['server'] = "nice-dcv-server_2019.1.7644-1_amd64.ubuntu1804.deb"  # NICE DCV server package
     default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2019.1.226-1_amd64.ubuntu1804.deb"  # required to create virtual sessions
     default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2019.1.544-1_amd64.ubuntu1804.deb"  # required to enable GPU sharing
+    default['cfncluster']['dcv']['sha256sum'] = "41a0b4112c435b3a57de3ae46cfe8cdf90c33a216f488e3bfab944f034f6067f"
   end
 end
 default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
