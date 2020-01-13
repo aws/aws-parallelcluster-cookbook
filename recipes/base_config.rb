@@ -17,11 +17,17 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
-# Setup hostnames to be short
-node.default['set_fqdn'] = node['ec2']['local_hostname']
-node.default['hostname_cookbook']['hostsfile_ip'] = node['ec2']['local_ipv4']
-include_recipe 'hostname::default'
-ignore_failure 'service[network]' if node['platform_family'] == 'rhel'
+if node['platform_family'] == 'amazon' and node['platform_version'] == '2'
+  # NOTE: temporary workaround for amazon linux 2 while alternative solutions are evaluated
+  execute "hostnamectl set-hostname #{node['ec2']['local_hostname']}"
+  short_hostname = node['ec2']['local_hostname'].split('.')[0]
+  execute "hostname #{short_hostname}"
+else
+  node.default['set_fqdn'] = node['ec2']['local_hostname']
+  node.default['hostname_cookbook']['hostsfile_ip'] = node['ec2']['local_ipv4']
+  include_recipe 'hostname::default'
+  ignore_failure 'service[network]' if node['platform_family'] == 'rhel'
+end
 
 # Setup ephemeral drives
 execute 'setup ephemeral' do
