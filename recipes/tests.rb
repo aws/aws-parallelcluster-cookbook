@@ -235,6 +235,20 @@ if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
   end
 end
 
+# Verify Lustre Install
+case node['platform']
+when 'amazon', 'centos'
+  execute 'check for lustre libraries' do
+    command "rpm -qa | grep lustre-client"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+when 'ubuntu'
+  execute 'check for lustre libraries' do
+    command "dpkg -l | grep lustre"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
 if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['cfn_scheduler'] == 'slurm'
   execute 'check-slurm-accounting-mysql-plugins' do
     user 'root'
