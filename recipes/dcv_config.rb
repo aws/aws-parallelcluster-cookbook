@@ -36,7 +36,7 @@ def allow_gpu_acceleration
   # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
   dcv_gl = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/#{node['cfncluster']['dcv']['gl']}"
   case node['platform']
-  when 'centos'
+  when 'centos', 'amazon'
     package dcv_gl do
       action :install
       source dcv_gl
@@ -95,6 +95,12 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
     mode '0700'
   end
   execute "certificate generation" do
+    # args to the script represent:
+    # * path to certificate
+    # * path to private key
+    # * user to make owner of the two files
+    # * group to make owner of the two files
+    # NOTE: the last arg is hardcoded to be 'dcv' so that the dcvserver can read the files when authenticating
     command "/etc/parallelcluster/generate_certificate.sh \"#{node['cfncluster']['dcv']['authenticator']['certificate']}\" \"#{node['cfncluster']['dcv']['authenticator']['private_key']}\" #{node['cfncluster']['dcv']['authenticator']['user']} dcv"
     user 'root'
   end

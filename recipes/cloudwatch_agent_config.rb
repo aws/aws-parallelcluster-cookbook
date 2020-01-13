@@ -57,7 +57,7 @@ end
 execute "cloudwatch-config-validation" do
   user 'root'
   environment(
-    'CW_LOGS_SCHEMA_PATH' => config_schema_path,
+    'CW_LOGS_CONFIGS_SCHEMA_PATH' => config_schema_path,
     'CW_LOGS_CONFIGS_PATH' => config_data_path
   )
   command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python #{validator_script_path}"

@@ -52,6 +52,12 @@ if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
   end
 end
 
+if node['platform'] == 'amazon' && node['platform_version'].to_i == 2
+  cxx_flags = "-std=c++03"
+  c_flags = "-fpermissive"
+  configure_flags = "--disable-gcc-warnings"
+end
+
 # Install Torque
 bash 'make install' do
   user 'root'
