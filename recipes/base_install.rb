@@ -18,7 +18,12 @@
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
-  include_recipe "yum-epel" if node['platform_version'].to_i < 7
+  if node['platform_family'] == 'amazon' and node['platform_version'].to_i == 2
+    alinux_extras_topic 'epel'
+  else
+    include_recipe "yum-epel" if node['platform_version'].to_i < 7
+  end
+
 
   unless node['platform_version'].to_i < 7
     execute 'yum-config-manager_skip_if_unavail' do
