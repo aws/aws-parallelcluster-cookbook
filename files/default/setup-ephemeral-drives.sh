@@ -36,7 +36,7 @@ function setup_ephemeral_drives () {
   chmod 1777 ${cfn_ephemeral_dir} || RC=1
   if ls /dev/nvme* >& /dev/null; then
     IS_NVME=1
-    MAPPING=$(realpath --relative-to=/dev/ -P  /dev/disk/by-id/nvme*Instance_Storage*)
+    MAPPING=$(realpath --relative-to=/dev/ -P  /dev/disk/by-id/nvme*Instance_Storage* | uniq)
   else
     IS_NVME=0
     MAPPING=$(/usr/bin/ec2-metadata -b | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')

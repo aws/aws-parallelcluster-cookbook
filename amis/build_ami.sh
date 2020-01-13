@@ -101,7 +101,7 @@ parse_options() {
 check_options() {
     set -e
 
-    available_os="centos6 centos7 alinux ubuntu1604 ubuntu1804"
+    available_os="centos6 centos7 alinux ubuntu1604 ubuntu1804 alinux2"
     cwd="$(dirname $0)"
     tmp_dir=$(mktemp -d)
     export VENDOR_PATH="${tmp_dir}/vendor/cookbooks"
@@ -171,7 +171,7 @@ do_command() {
           RC=$?
         done
         ;;
-      centos6|centos7|alinux|ubuntu1604|ubuntu1804)
+      centos6|centos7|alinux|ubuntu1604|ubuntu1804|alinux2)
         packer build -color=false -var-file="${cwd}/packer_variables.json" -only=${only} "${cwd}/packer_${_os}.json"
         RC=$?
         ;;

@@ -324,7 +324,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
@@ -348,7 +349,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
@@ -372,7 +374,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
@@ -396,7 +399,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
@@ -420,7 +424,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
@@ -444,7 +449,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
@@ -468,7 +474,8 @@
       ],
       "platforms": [
         "centos",
-        "ubuntu"
+        "ubuntu",
+        "amazon"
       ],
       "node_roles": [
         "MasterServer"
