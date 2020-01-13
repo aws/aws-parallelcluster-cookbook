@@ -235,12 +235,14 @@ if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
   end
 end
 
-execute 'check-slurm-accounting-mysql-plugins' do
-  user 'root'
-  command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
-end
+if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['cfn_scheduler'] == 'slurm'
+  execute 'check-slurm-accounting-mysql-plugins' do
+    user 'root'
+    command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+  end
 
-execute 'check-slurm-jobcomp-mysql-plugins' do
-  user 'root'
-  command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+  execute 'check-slurm-jobcomp-mysql-plugins' do
+    user 'root'
+    command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+  end
 end
