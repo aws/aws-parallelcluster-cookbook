@@ -92,6 +92,28 @@ elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_
   kernel_module 'lnet'
 elsif node['platform'] == 'centos'
   Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are 7.5, 7.6 and 7.7")
+elsif node['platform'] == 'ubuntu'
+
+  apt_repository 'fsxlustreclientrepo' do
+    uri          node['cfncluster']['lustre']['apt_uri']
+    components   ['main']
+    distribution node['cfncluster']['ubuntu']['version']
+    key          node['cfncluster']['lustre']['public_key']
+    retries 3
+    retry_delay 5
+  end
+
+  require 'chef/mixin/shell_out'
+  kernel_version = shell_out("uname -r").stdout.strip
+
+  apt_update
+
+  apt_package "lustre-client-modules-#{kernel_version}" do
+    retries 3
+    retry_delay 5
+  end
+
+  kernel_module 'lnet'
 elsif node['platform'] == 'amazon'
 
   # Install lustre client module
