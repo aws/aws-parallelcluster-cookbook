@@ -18,6 +18,13 @@ install_pyenv "root" do
   python_version node['cfncluster']['python-version']
 end
 
+if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  # CentOS 6 - install a newer version of Python using pyenv and make it globally available
+  pyenv_system_install node['cfncluster']['python-version-centos6']
+  pyenv_python node['cfncluster']['python-version-centos6']
+  pyenv_global node['cfncluster']['python-version-centos6']
+end
+
 activate_virtual_env node['cfncluster']['cookbook_virtualenv'] do
   pyenv_path node['cfncluster']['cookbook_virtualenv_path']
   pyenv_user "root"
