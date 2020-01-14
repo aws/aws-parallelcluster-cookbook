@@ -115,6 +115,17 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
         retry_delay 5
       end
 
+      # Verify checksum of dcv package
+      ruby_block "verify dcv checksum" do
+        block do
+          require 'digest'
+          checksum = Digest::SHA256.file(dcv_tarball).hexdigest
+          if checksum != node['cfncluster']['dcv']['sha256sum']
+              raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cfncluster']['dcv']['package']['sha256sum']}"
+          end
+        end
+      end
+
       bash 'extract dcv packages' do
         cwd node['cfncluster']['sources_dir']
         code "tar -xvzf #{dcv_tarball}"
