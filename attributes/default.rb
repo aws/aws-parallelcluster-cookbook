@@ -50,8 +50,9 @@ default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/relea
 default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '19-05-3-2'
-default['cfncluster']['slurm']['url'] = 'https://github.com/SchedMD/slurm/archive/slurm-19-05-3-2.tar.gz'
+default['cfncluster']['slurm']['version'] = '19.05.5'
+default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-19.05.5.tar.bz2'
+default['cfncluster']['slurm']['sha1'] = '055adca91e555cc124b1ecac5f3c45e66c17a8ba'
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.13'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
@@ -73,7 +74,7 @@ else
   default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
 end
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.0.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.1.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
 default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
 # NICE DCV
