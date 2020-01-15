@@ -10,10 +10,10 @@ X.X.X
 - Install NICE DCV on Ubuntu 18.04 (this includes ubuntu-desktop, lightdm, mesa-util packages).
 
 **Changes**
-- Upgrade EFA installer to version 1.8.0:
+- Upgrade EFA installer to version 1.8.1:
   - Kernel module: efa-1.5.0 (updated from efa-1.4.1)
   - RDMA core: rdma-core-27.0 (distributed only) (updated from rdma-core-25.0)
-  - Libfabric: libfabric-aws-1.9.0amzn1.0 (updated from libfabric-aws-1.8.1amzn1.3)
+  - Libfabric: libfabric-aws-1.9.0amzn1.1 (updated from libfabric-aws-1.8.1amzn1.3)
   - Open MPI: openmpi40-aws-4.0.2 (no change)
 - Add SHA256 checksum verification to verify integrity of NICE DCV packages
 - Upgrade Slurm to version 19.05.5
