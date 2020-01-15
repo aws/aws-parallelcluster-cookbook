@@ -17,6 +17,7 @@ X.X.X
   - Open MPI: openmpi40-aws-4.0.2 (no change)
 - Add SHA256 checksum verification to verify integrity of NICE DCV packages
 - Upgrade Slurm to version 19.05.5
+- Install Python 2.7.17 on CentOS 6 and set it as default through pyenv
 
 2.5.1
 -----

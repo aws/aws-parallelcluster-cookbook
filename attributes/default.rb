@@ -22,6 +22,7 @@ default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/script
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'
+default['cfncluster']['python-version-centos6'] = '2.7.17'
 # Virtualenv Cookbook Name
 default['cfncluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 # Virtualenv Node Name
