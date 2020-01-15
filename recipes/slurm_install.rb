@@ -28,8 +28,18 @@ when 'MasterServer', nil
     mode '0644'
     retries 3
     retry_delay 5
-    # TODO: Add version or checksum checks
     not_if { ::File.exist?(slurm_tarball) }
+  end
+
+  # Validate the authenticity of the downloaded archive based on the checksum published by SchedMD
+  ruby_block "Validate Slurm Tarball Checksum" do
+    block do
+      require 'digest'
+      checksum = Digest::SHA1.file(slurm_tarball).hexdigest
+      if checksum != node['cfncluster']['slurm']['sha1']
+        raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}"
+      end
+    end
   end
 
   # Install Slurm
@@ -40,7 +50,7 @@ when 'MasterServer', nil
     code <<-SLURM
       set -e
       tar xf #{slurm_tarball}
-      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-#{node['cfncluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
@@ -69,7 +79,7 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     code <<-SLURMLICENSE
       set -e
-      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-#{node['cfncluster']['slurm']['version']}
       cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
       cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
       cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL

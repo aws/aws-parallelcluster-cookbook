@@ -16,6 +16,7 @@ X.X.X
   - Libfabric: libfabric-aws-1.9.0amzn1.0 (updated from libfabric-aws-1.8.1amzn1.3)
   - Open MPI: openmpi40-aws-4.0.2 (no change)
 - Add SHA256 checksum verification to verify integrity of NICE DCV packages
+- Upgrade Slurm to version 19.05.5
 
 2.5.1
 -----
