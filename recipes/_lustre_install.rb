@@ -79,12 +79,9 @@ elsif node['platform'] == 'ubuntu'
     retry_delay 5
   end
 
-  require 'chef/mixin/shell_out'
-  kernel_version = shell_out("uname -r").stdout.strip
-
   apt_update
 
-  apt_package "lustre-client-modules-#{kernel_version}" do
+  apt_package "lustre-client-modules-#{node['kernel']['release']}" do
     retries 3
     retry_delay 5
   end
