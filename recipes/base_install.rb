@@ -53,6 +53,20 @@ node['cfncluster']['base_packages'].each do |p|
   end
 end
 
+case node['platform_family']
+when 'rhel', 'amazon'
+  yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
+    version node['cfncluster']['kernel_devel_pkg']['version']
+    retries 3
+    retry_delay 5
+  end
+when 'debian'
+  apt_package node['cfncluster']['kernel_generic_pkg'] do
+    retries 3
+    retry_delay 5
+  end
+end
+
 bash "install awscli" do
   cwd Chef::Config[:file_cache_path]
   code <<-CLI

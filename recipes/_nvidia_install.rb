@@ -18,26 +18,6 @@
 # Only run if node['cfncluster']['nvidia']['enabled'] = 'yes'
 if node['cfncluster']['nvidia']['enabled'] == 'yes'
 
-  case node['platform_family']
-  when 'rhel', 'amazon'
-    yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
-      retries 3
-      retry_delay 5
-    end
-  when 'debian'
-    # Needed for new kernel version
-    apt_package node['cfncluster']['kernel_generic_pkg'] do
-      retries 3
-      retry_delay 5
-    end
-    # Needed for old kernel version
-    apt_package node['cfncluster']['kernel_extra_pkg'] do
-      retries 3
-      retry_delay 5
-      ignore_failure true
-    end
-  end
-
   # Get NVIDIA run file
   nvidia_tmp_runfile = "/tmp/nvidia.run"
   remote_file nvidia_tmp_runfile do

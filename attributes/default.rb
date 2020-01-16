@@ -226,7 +226,6 @@ when 'debian'
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
-  default['cfncluster']['kernel_extra_pkg'] = "linux-image-extra-#{node['kernel']['release']}"
   default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
