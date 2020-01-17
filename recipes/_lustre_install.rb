@@ -73,7 +73,7 @@ elsif node['platform'] == 'ubuntu'
   apt_repository 'fsxlustreclientrepo' do
     uri          node['cfncluster']['lustre']['repository_uri']
     components   ['main']
-    distribution node['cfncluster']['ubuntu']['version']
+    distribution node['lsb']['codename']
     key          node['cfncluster']['lustre']['public_key']
     retries 3
     retry_delay 5
