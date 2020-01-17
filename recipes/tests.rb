@@ -121,7 +121,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
-if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['os'] == 'centos7' and node['cfncluster']['dcv']['installed'] == 'yes'
+if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") and node['cfncluster']['dcv']['installed'] == 'yes'
   execute 'check dcv installed' do
     command 'dcv version'
     user node['cfncluster']['cfn_cluster_user']
