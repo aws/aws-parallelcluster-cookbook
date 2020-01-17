@@ -212,10 +212,7 @@ when 'debian'
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
                                               libgcrypt20-dev libmysqlclient-dev]
-  if node['platform_version'] == '16.04'
-    default['cfncluster']['ubuntu']['version'] = 'xenial'
-  elsif node['platform_version'] == '18.04'
-    default['cfncluster']['ubuntu']['version'] = 'bionic'
+  if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl1.0-dev', 'libglvnd-dev')
     default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
