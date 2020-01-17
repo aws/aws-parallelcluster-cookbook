@@ -71,7 +71,7 @@ elsif node['platform'] == 'centos'
 elsif node['platform'] == 'ubuntu'
 
   apt_repository 'fsxlustreclientrepo' do
-    uri          node['cfncluster']['lustre']['apt_uri']
+    uri          node['cfncluster']['lustre']['repository_uri']
     components   ['main']
     distribution node['cfncluster']['ubuntu']['version']
     key          node['cfncluster']['lustre']['public_key']
