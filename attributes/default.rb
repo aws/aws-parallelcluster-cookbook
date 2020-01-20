@@ -76,7 +76,7 @@ else
   default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
 end
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.1.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.2.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
 default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
 # NICE DCV
