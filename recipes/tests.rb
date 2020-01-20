@@ -151,8 +151,15 @@ when 'ubuntu1604', 'ubuntu1804'
 end
 
 unless node['cfncluster']['os'] == 'centos6'
-  execute 'check intel mpi version' do
-    command "module load intelmpi && mpirun --help | grep 'Version 2019 Update 6'"
+  bash 'check intel mpi version' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-INTELMPI
+      set -e
+      # Initialize module
+      # Must execute this in a bash script because source is a bash built-in function
+      source /etc/profile.d/modules.sh
+      module load intelmpi && mpirun --help | grep 'Version 2019 Update 6'
+    INTELMPI
     user node['cfncluster']['cfn_cluster_user']
   end
 end
