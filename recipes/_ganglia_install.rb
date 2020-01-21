@@ -17,7 +17,7 @@
 
 if node['cfncluster']['ganglia_enabled'] == 'yes'
   case node['platform']
-  when "redhat", "centos", "amazon", "scientific" # ~FC024
+  when "redhat", "centos", "scientific" # ~FC024
 
     package %w[httpd apr-devel libconfuse-devel expat-devel rrdtool-devel pcre-devel php php-gd] do
       retries 3
@@ -138,6 +138,26 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
       creates "#{node['cfncluster']['license_dir']}/ganglia/COPYING"
     end
 
+  when  "amazon"
+    package %w[ganglia ganglia-gmond ganglia-gmetad ganglia-web php php-gd rrdtool] do
+      retries 3
+      retry_delay 5
+    end
+
+    cookbook_file 'ganglia.conf' do
+      path '/etc/httpd/conf.d/ganglia.conf'
+      user 'root'
+      group 'root'
+      mode '0644'
+    end
+
+    directory '/var/lib/ganglia/rrds' do
+      owner 'nobody'
+      group 'nobody'
+      mode 0755
+      recursive true
+      action :create
+    end
   when "ubuntu"
 
     package %w[ganglia-monitor rrdtool gmetad ganglia-webfrontend] do
