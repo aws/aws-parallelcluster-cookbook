@@ -18,6 +18,7 @@ X.X.X
 - Add SHA256 checksum verification to verify integrity of NICE DCV packages
 - Upgrade Slurm to version 19.05.5
 - Install Python 2.7.17 on CentOS 6 and set it as default through pyenv
+- Install Ganglia from repository on Amazon Linux
 
 2.5.1
 -----
