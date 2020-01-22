@@ -174,6 +174,14 @@ when 'ComputeFleet'
 end
 
 ###################
+# Amazon Time Sync
+###################
+execute 'check chrony' do
+  command "chronyc tracking | grep -i reference | grep 169.254.169.123"
+  user node['cfncluster']['cfn_cluster_user']
+end
+
+###################
 # DCV
 ###################
 if node['cfncluster']['cfn_node_type'] == "MasterServer" &&

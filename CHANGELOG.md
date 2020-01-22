@@ -8,6 +8,7 @@ X.X.X
 
 **ENHANCEMENTS**
 - Install NICE DCV on Ubuntu 18.04 (this includes ubuntu-desktop, lightdm, mesa-util packages).
+- Install and setup Amazon Time Sync on Amazon Linux, Centos 6, Centos 7, Ubuntu 16 and Ubuntu 18
 
 **Changes**
 - Upgrade EFA installer to version 1.8.2:

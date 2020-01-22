@@ -194,6 +194,8 @@ when 'rhel', 'amazon'
 
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
   default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
+  default['cfncluster']['chrony']['service'] = "chronyd"
+  default['cfncluster']['chrony']['conf'] = "/etc/chrony.conf"
   default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/trqauthd'
   default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/pbs_mom'
   default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/pbs_sched'
@@ -220,6 +222,8 @@ when 'debian'
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
+  default['cfncluster']['chrony']['service'] = "chrony"
+  default['cfncluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
   default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/debian.trqauthd'
   default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
   default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'

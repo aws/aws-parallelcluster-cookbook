@@ -212,3 +212,6 @@ end
 
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster::cloudwatch_agent_install"
+
+# Install Amazon Time Sync
+include_recipe "aws-parallelcluster::chrony_install"
