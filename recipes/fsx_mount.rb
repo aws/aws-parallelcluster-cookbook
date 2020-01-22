@@ -31,13 +31,16 @@ if fsx_shared_dir != "NONE"
     action :create
   end
 
+  require 'chef/mixin/shell_out'
+  mountname = shell_out("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx --region #{node['cfncluster']['cfn_region']} describe-file-systems --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']} --query 'FileSystems[0].LustreConfiguration.MountName' --output text", :user=>'root').stdout.strip
+
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
   mount_options.push(%w[noauto x-systemd.automount x-systemd.requires=lnet.service]) if node['init_package'] == 'systemd'
 
   # Mount FSx over NFS
   mount fsx_shared_dir do
-    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com@tcp:/fsx"
+    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com@tcp:/#{mountname}"
     fstype 'lustre'
     dump 0
     pass 0
