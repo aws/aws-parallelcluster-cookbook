@@ -29,6 +29,9 @@ execute 'setup ephemeral' do
   creates '/scratch'
 end
 
+# Amazon Time Sync
+include_recipe 'aws-parallelcluster::chrony_config'
+
 # Write cloudwatch log config and start it.
 include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 
