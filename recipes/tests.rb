@@ -15,6 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+###################
+# AWS Cli
+###################
 execute 'execute awscli as user' do
   command "aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
@@ -39,6 +42,9 @@ bash 'check awscli regions' do
   AWSREGIONS
 end
 
+###################
+# ulimit
+###################
 unless node['cfncluster']['os'].end_with?("-custom")
   bash 'test soft ulimit nofile' do
     code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
@@ -46,6 +52,9 @@ unless node['cfncluster']['os'].end_with?("-custom")
   end
 end
 
+###################
+# munge
+###################
 if node['cfncluster']['cfn_scheduler'] == 'torque' || node['cfncluster']['cfn_scheduler'] == 'slurm'
   execute 'check munge installed' do
     command 'munge --version'
@@ -53,6 +62,9 @@ if node['cfncluster']['cfn_scheduler'] == 'torque' || node['cfncluster']['cfn_sc
   end
 end
 
+###################
+# SGE
+###################
 if node['cfncluster']['cfn_scheduler'] == 'sge'
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
@@ -83,6 +95,9 @@ if node['cfncluster']['cfn_scheduler'] == 'sge'
   end
 end
 
+###################
+# Torque
+###################
 if node['cfncluster']['cfn_scheduler'] == 'torque'
   execute 'execute qstat' do
     command "qstat --version"
@@ -97,6 +112,9 @@ if node['cfncluster']['cfn_scheduler'] == 'torque'
   end
 end
 
+###################
+# Slurm
+###################
 if node['cfncluster']['cfn_scheduler'] == 'slurm'
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
@@ -111,6 +129,14 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
       environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
       user node['cfncluster']['cfn_cluster_user']
     end
+
+    execute 'check-slurm-accounting-mysql-plugins' do
+      command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+    end
+
+    execute 'check-slurm-jobcomp-mysql-plugins' do
+      command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+    end
   when 'ComputeFleet'
     execute 'ls slurm root' do
       command "ls /opt/slurm"
@@ -121,6 +147,35 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
+###################
+# Ganglia
+###################
+if node['init_package'] == 'init'
+  gmond_check_command = "service #{node['cfncluster']['ganglia']['gmond_service']} status | grep -i running"
+  gmetad_check_command = "service gmetad status | grep -i running"
+elsif node['init_package'] == 'systemd'
+  gmond_check_command = "systemctl status #{node['cfncluster']['ganglia']['gmond_service']} | grep -i running"
+  gmetad_check_command = "systemctl status gmetad | grep -i running"
+end
+
+case node['cfncluster']['cfn_node_type']
+when 'MasterServer'
+  execute 'check gmond running' do
+    command gmond_check_command
+  end
+
+  execute 'check gmetad running' do
+    command gmetad_check_command
+  end
+when 'ComputeFleet'
+  execute 'check gmond running' do
+    command gmond_check_command
+  end
+end
+
+###################
+# DCV
+###################
 if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
    node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") &&
    node['cfncluster']['dcv']['installed'] == 'yes'
@@ -130,6 +185,9 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
   end
 end
 
+###################
+# EFA - Intel MPI
+###################
 case node['cfncluster']['os']
 when 'alinux', 'centos7'
   execute 'check efa rpm installed' do
@@ -165,6 +223,9 @@ unless node['cfncluster']['os'] == 'centos6'
   end
 end
 
+###################
+# jq
+###################
 unless node['cfncluster']['os'].end_with?("-custom")
   bash 'execute jq' do
     cwd Chef::Config[:file_cache_path]
@@ -179,6 +240,9 @@ unless node['cfncluster']['os'].end_with?("-custom")
   end
 end
 
+###################
+# NVIDIA - CUDA
+###################
 bash 'test nvidia driver install' do
   cwd Chef::Config[:file_cache_path]
   code <<-TESTNVIDIA
@@ -237,12 +301,18 @@ bash 'test CUDA install' do
   TESTCUDA
 end
 
+###################
+# CloudWatch
+###################
 # Verify that the CloudWatch agent's status can be queried. It should always be stopped during kitchen tests.
 execute 'cloudwatch-agent-status' do
   user 'root'
   command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped"
 end
 
+###################
+# Intel Python
+###################
 # Intel Python Libraries
 if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
   && (node['cfncluster']['enable_intel_hpc_platform'] == 'true')
@@ -256,7 +326,9 @@ if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
   end
 end
 
-# Verify Lustre Install
+###################
+# FSx Lustre
+###################
 case node['platform']
 when 'amazon', 'centos'
   execute 'check for lustre libraries' do
@@ -267,17 +339,5 @@ when 'ubuntu'
   execute 'check for lustre libraries' do
     command "dpkg -l | grep lustre"
     user node['cfncluster']['cfn_cluster_user']
-  end
-end
-
-if node['cfncluster']['cfn_node_type'] == "MasterServer" && node['cfncluster']['cfn_scheduler'] == 'slurm'
-  execute 'check-slurm-accounting-mysql-plugins' do
-    user 'root'
-    command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
-  end
-
-  execute 'check-slurm-jobcomp-mysql-plugins' do
-    user 'root'
-    command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
   end
 end

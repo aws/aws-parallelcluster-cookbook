@@ -3,7 +3,7 @@
 globals {
   daemonize = yes
   setuid = yes
-  user = nobody
+  user = ganglia
   debug_level = 0
   max_udp_msg_len = 1472
   mute = no
@@ -13,7 +13,13 @@ globals {
   host_tmax = 20 /*secs */
   cleanup_threshold = 300 /*secs */
   gexec = no
+  # By default gmond will use reverse DNS resolution when displaying your hostname
+  # Uncommeting following value will override that value.
+  # override_hostname = "mywebserver.domain.com"
+  # If you are not using multicast this value should be set to something other than 0.
+  # Otherwise if you restart aggregator gmond you will get empty graphs. 60 seconds is reasonable
   send_metadata_interval = 0 /*secs */
+
 }
 
 /*
@@ -33,11 +39,11 @@ host {
    used to only support having a single channel */
 udp_send_channel {
   bind_hostname = yes # Highly recommended, soon to be default.
-                       # This option tells gmond to use a source address
-                       # that resolves to the machine's hostname.  Without
-                       # this, the metrics may appear to come from any
-                       # interface and the DNS names associated with
-                       # those IPs will be used to create the RRDs.
+                      # This option tells gmond to use a source address
+                      # that resolves to the machine's hostname.  Without
+                      # this, the metrics may appear to come from any
+                      # interface and the DNS names associated with
+                      # those IPs will be used to create the RRDs.
 <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
   host = <%= node['hostname'] %>
 <% end -%>
@@ -50,13 +56,21 @@ udp_send_channel {
 
 /* You can specify as many udp_recv_channels as you like as well. */
 udp_recv_channel {
+  # mcast_join = 239.2.11.71
   port = 8649
+  # bind = 239.2.11.71
+  # retry_bind = true
+  # Size of the UDP buffer. If you are handling lots of metrics you really
+  # should bump it up to e.g. 10MB or even higher.
+  # buffer = 10485760
 }
 
 /* You can specify as many tcp_accept_channels as you like to share
    an xml description of the state of the cluster */
 tcp_accept_channel {
   port = 8649
+  # If you want to gzip XML output
+  gzip_output = no
 }
 
 /* Channel to receive sFlow datagrams */
@@ -149,7 +163,6 @@ collection_group {
     name = "mem_total"
     title = "Memory Total"
   }
-  /* Should this be here? Swap can be added/removed between reboots. */
   metric {
     name = "swap_total"
     title = "Swap Space Total"
@@ -225,6 +238,11 @@ collection_group {
     name = "cpu_wio"
     value_threshold = "1.0"
     title = "CPU wio"
+  }
+  metric {
+    name = "cpu_steal"
+    value_threshold = "1.0"
+    title = "CPU steal"
   }
   /* The next two metrics are optional if you want more detail...
      ... since they are accounted for in cpu_system.

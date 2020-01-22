@@ -3,7 +3,6 @@ AWS ParallelCluster is licensed under the Apache License 2.0 (http://aws.amazon.
 AWS ParallelCluster AMIs ship with the following independent packages, which are offered
 under separate terms.
 
-ganglia
 sge
 slurm
 torque
