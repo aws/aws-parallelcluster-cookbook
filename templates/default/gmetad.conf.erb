@@ -4,27 +4,27 @@
 #
 #-------------------------------------------------------------------------------
 # Setting the debug_level to 1 will keep daemon in the forground and
-# show only error messages. Setting this value higher than 1 will make 
+# show only error messages. Setting this value higher than 1 will make
 # gmetad output debugging information and stay in the foreground.
 # default: 0
 # debug_level 10
 #
 #-------------------------------------------------------------------------------
-# What to monitor. The most important section of this file. 
+# What to monitor. The most important section of this file.
 #
 # The data_source tag specifies either a cluster or a grid to
 # monitor. If we detect the source is a cluster, we will maintain a complete
-# set of RRD databases for it, which can be used to create historical 
+# set of RRD databases for it, which can be used to create historical
 # graphs of the metrics. If the source is a grid (it comes from another gmetad),
 # we will only maintain summary RRDs for it.
 #
-# Format: 
+# Format:
 # data_source "my cluster" [polling interval] address1:port addreses2:port ...
-# 
+#
 # The keyword 'data_source' must immediately be followed by a unique
-# string which identifies the source, then an optional polling interval in 
-# seconds. The source will be polled at this interval on average. 
-# If the polling interval is omitted, 15sec is asssumed. 
+# string which identifies the source, then an optional polling interval in
+# seconds. The source will be polled at this interval on average.
+# If the polling interval is omitted, 15sec is asssumed.
 #
 # If you choose to set the polling interval to something other than the default,
 # note that the web frontend determines a host as down if its TN value is less
@@ -32,7 +32,7 @@
 # to something around or greater than 80sec, this will cause the frontend to
 # incorrectly display hosts as down even though they are not.
 #
-# A list of machines which service the data source follows, in the 
+# A list of machines which service the data source follows, in the
 # format ip:port, or name:port. If a port is not specified then 8649
 # (the default gmond port) is assumed.
 # default: There is no default value
@@ -69,7 +69,7 @@ data_source "<%= node['cfncluster']['stack_name'] %>" localhost
 # The name of this Grid. All the data sources above will be wrapped in a GRID
 # tag with this name.
 # default: unspecified
-#gridname ""
+# gridname "MyGrid"
 #
 #-------------------------------------------------------------------------------
 # The authority URL for this grid. Used by other gmetads to locate graphs
@@ -81,7 +81,7 @@ data_source "<%= node['cfncluster']['stack_name'] %>" localhost
 #
 #-------------------------------------------------------------------------------
 # List of machines this gmetad will share XML with. Localhost
-# is always trusted. 
+# is always trusted.
 # default: There is no default value
 # trusted_hosts 127.0.0.1 169.229.50.165 my.gmetad.org
 #
@@ -99,7 +99,7 @@ data_source "<%= node['cfncluster']['stack_name'] %>" localhost
 #-------------------------------------------------------------------------------
 # User gmetad will setuid to (defaults to "nobody")
 # default: "nobody"
-# setuid_username "nobody"
+setuid_username ganglia
 #
 #-------------------------------------------------------------------------------
 # Umask to apply to created rrd files and grid directory structure
@@ -133,6 +133,11 @@ data_source "<%= node['cfncluster']['stack_name'] %>" localhost
 # unsummarized_metrics diskstat CPU
 #
 #-------------------------------------------------------------------------------
+# Prevent gmetad from generating summaries for sFlow VM metrics
+# default: off
+# unsummarized_sflow_vm_metrics on
+#
+#-------------------------------------------------------------------------------
 # In earlier versions of gmetad, hostnames were handled in a case
 # sensitive manner
 # If your hostname directories have been renamed to lower case,
@@ -144,23 +149,91 @@ case_sensitive_hostnames 0
 
 #-------------------------------------------------------------------------------
 # It is now possible to export all the metrics collected by gmetad directly to
-# graphite by setting the following attributes. 
+# graphite by setting the following attributes.
 #
 # The hostname or IP address of the Graphite server
 # default: unspecified
 # carbon_server "my.graphite.box"
 #
-# The port on which Graphite is listening
+# The port and protocol on which Graphite is listening
 # default: 2003
 # carbon_port 2003
 #
-# A prefix to prepend to the metric names exported by gmetad. Graphite uses dot-
-# separated paths to organize and refer to metrics. 
+# default: tcp
+# carbon_protocol udp
+#
+# **Deprecated in favor of graphite_path** A prefix to prepend to the
+# metric names exported by gmetad. Graphite uses dot-
+# separated paths to organize and refer to metrics.
 # default: unspecified
 # graphite_prefix "datacenter1.gmetad"
 #
-# Number of milliseconds gmetad will wait for a response from the graphite server 
+# A user-definable graphite path. Graphite uses dot-
+# separated paths to organize and refer to metrics.
+# For reverse compatibility graphite_prefix will be prepended to this
+# path, but this behavior should be considered deprecated.
+# This path may include 3 variables that will be replaced accordingly:
+# %s -> source (cluster name)
+# %h -> host (host name)
+# %m -> metric (metric name)
+# default: graphite_prefix.%s.%h.%m
+# graphite_path "datacenter1.gmetad.%s.%h.%m
+
+# Number of milliseconds gmetad will wait for a response from the graphite server
 # default: 500
 # carbon_timeout 500
-#
 
+#-------------------------------------------------------------------------------
+# Memcached configuration (if it has been compiled in)
+# Format documentation at http://docs.libmemcached.org/libmemcached_configuration.html
+# default: ""
+# memcached_parameters "--SERVER=127.0.0.1 --POOL-MIN=10 --POOL-MAX=32"
+#
+# Metrics will be stored in memcached as follows HOST/METRIC_NAME. If you
+# want to include cluster name e.g. CLUSTER/HOST/METRIC_NAME set below value
+# to 1
+# default: 0
+# memcached_include_cluster_in_key 0
+
+#-------------------------------------------------------------------------------
+# Riemann configuration (if enabled during build)
+# Metrics can be forwarded to a Riemann event stream processor for real-time
+# thresholding and alerting. See http://riemann.io/
+#
+# +-------------------+----------------+
+# |  Ganglia          |  Riemann       |
+# |-------------------|----------------|
+# |  grid             |  grid          |
+# |  cluster          |  cluster       |
+# |  host             |  host*         |
+# |  ip               |  ip            |
+# |  metric           |  service*      |
+# |  value(int,float) |  metric*       |
+# |  type             |  (internal)    |
+# |  units            |  description*  |
+# |  value(string)    |  state*        |
+# |  reported         |  time*         |
+# |  tags(comma-sep)  |  tags*         |
+# |  location         |  location      |
+# |  tmax             |  ttl*          |
+# +-------------------+----------------+
+#
+# Note: attributes with a star (*) are standard Riemann fields
+#
+# The hostname or IP address of the Riemann server
+# default: unspecified
+# riemann_server "my.riemann.box"
+#
+# The port and protocol on which Riemann is listening
+# default: 5555
+# riemann_port 5555
+#
+# default: udp
+# riemann_protocol tcp
+#
+# List of arbitrary key-value pairs to be used as event attributes in
+# addition to those listed above.
+#
+# default: undefined
+# riemann_attributes "key=val[,...]"
+# riemann_attributes "customer=Acme Corp,environment=PROD"

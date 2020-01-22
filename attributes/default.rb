@@ -60,10 +60,6 @@ default['cfncluster']['munge']['munge_version'] = '0.5.13'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
-default['cfncluster']['ganglia']['version'] = '3.7.2'
-default['cfncluster']['ganglia']['url'] = 'https://github.com/ganglia/monitor-core/archive/3.7.2.tar.gz'
-default['cfncluster']['ganglia']['web_version'] = '3.7.2'
-default['cfncluster']['ganglia']['web_url'] = 'https://github.com/ganglia/ganglia-web/archive/3.7.2.tar.gz'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
 # domain has dynamic DNS resolution, will resolve to a server in Tokyo when called from China
@@ -196,7 +192,6 @@ when 'rhel', 'amazon'
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel]
   end
 
-  default['cfncluster']['ganglia']['apache_user'] = 'apache'
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
   default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
   default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/trqauthd'
@@ -223,7 +218,6 @@ when 'debian'
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
-  default['cfncluster']['ganglia']['apache_user'] = 'www-data'
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
   default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/debian.trqauthd'

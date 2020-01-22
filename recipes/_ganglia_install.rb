@@ -17,152 +17,43 @@
 
 if node['cfncluster']['ganglia_enabled'] == 'yes'
   case node['platform']
-  when "redhat", "centos", "scientific" # ~FC024
-
-    package %w[httpd apr-devel libconfuse-devel expat-devel rrdtool-devel pcre-devel php php-gd] do
+  when "redhat", "centos", "amazon", "scientific" # ~FC024
+    package %w[ganglia ganglia-gmond ganglia-gmetad ganglia-web httpd php php-gd rrdtool] do
       retries 3
       retry_delay 5
-    end
-
-    # Get Ganglia tarball
-    ganglia_tarball = "#{node['cfncluster']['sources_dir']}/monitor-core-#{node['cfncluster']['ganglia']['version']}.tar.gz"
-    remote_file ganglia_tarball do
-      source node['cfncluster']['ganglia']['url']
-      mode '0644'
-      retries 3
-      retry_delay 5
-      # TODO: Add version or checksum checks
-      not_if { ::File.exist?(ganglia_tarball) }
-    end
-
-    ##
-    # Install Ganglia
-    bash 'make install' do
-      user 'root'
-      group 'root'
-      cwd Chef::Config[:file_cache_path]
-      code <<-GANGLIA
-        set -e
-        tar xf #{ganglia_tarball}
-        cd monitor-core-#{node['cfncluster']['ganglia']['version']}
-        ./bootstrap
-        ./configure --build=x86_64-redhat-linux-gnu --host=x86_64-redhat-linux-gnu --program-prefix= --disable-dependency-tracking \
-        --prefix=/usr --exec-prefix=/usr --bindir=/usr/bin --sbindir=/usr/sbin --sysconfdir=/etc --datadir=/usr/share --includedir=/usr/include \
-        --libdir=/usr/lib64 --libexecdir=/usr/libexec --localstatedir=/var --sharedstatedir=/var/lib --mandir=/usr/share/man \
-        --infodir=/usr/share/info --with-gmetad --enable-status --sysconfdir=/etc/ganglia
-        CORES=$(grep processor /proc/cpuinfo | wc -l)
-        make -j $CORES
-        make install
-      GANGLIA
-      # TODO: Fix, so it works for upgrade
-      creates '/usr/sbin/gmetad'
-    end
-
-    if node['init_package'] == 'init'
-      # Setup init.d scripts if not systemd
-      execute "copy gmetad init script" do
-        command "cp " \
-          "#{Chef::Config[:file_cache_path]}/monitor-core-#{node['cfncluster']['ganglia']['version']}/gmetad/gmetad.init " \
-          "/etc/init.d/gmetad"
-        not_if "test -f /etc/init.d/gmetad"
-      end
-      execute "copy gmmond init script" do
-        command "cp " \
-          "#{Chef::Config[:file_cache_path]}/monitor-core-#{node['cfncluster']['ganglia']['version']}/gmond/gmond.init " \
-          "/etc/init.d/gmond"
-        not_if "test -f /etc/init.d/gmond"
-      end
-    end
-
-    # Reload systemd
-    execute 'systemctl-daemon-reload' do
-      command '/bin/systemctl --system daemon-reload'
-      only_if "test -f /bin/systemctl"
-    end
-
-    # Get Ganglia Web tarball
-    ganglia_web_tarball = "#{node['cfncluster']['sources_dir']}/ganglia-web-#{node['cfncluster']['ganglia']['web_version']}.tar.gz"
-    remote_file ganglia_web_tarball do
-      source node['cfncluster']['ganglia']['web_url']
-      mode '0644'
-      retries 3
-      retry_delay 5
-      # TODO: Add version or checksum checks
-      not_if { ::File.exist?(ganglia_web_tarball) }
-    end
-
-    ##
-    # Install Ganglia Web
-    bash 'make install' do
-      user 'root'
-      group 'root'
-      cwd Chef::Config[:file_cache_path]
-      code <<-GANGLIAWEB
-        set -e
-        tar xf #{ganglia_web_tarball}
-        cd ganglia-web-#{node['cfncluster']['ganglia']['web_version']}
-        make install APACHE_USER=#{node['cfncluster']['ganglia']['apache_user']}
-      GANGLIAWEB
-      # TODO: Fix, so it works for upgrade
-      creates '/usr/share/ganglia-webfrontend/index.php'
     end
 
     cookbook_file 'ganglia-webfrontend.conf' do
-      path '/etc/httpd/conf.d/ganglia-webfrontend.conf'
-      user 'root'
-      group 'root'
-      mode '0644'
-    end
-
-    directory '/var/lib/ganglia/rrds' do
-      owner 'nobody'
-      group 'nobody'
-      mode 0755
-      recursive true
-      action :create
-    end
-
-    # Copy required licensing files
-    directory "#{node['cfncluster']['license_dir']}/ganglia"
-
-    bash 'copy license stuff' do
-      user 'root'
-      group 'root'
-      cwd Chef::Config[:file_cache_path]
-      code <<-GANGLIALICENSE
-        set -e
-        cd monitor-core-#{node['cfncluster']['ganglia']['version']}
-        cp -v COPYING #{node['cfncluster']['license_dir']}/ganglia/COPYING
-      GANGLIALICENSE
-      # TODO: Fix, so it works for upgrade
-      creates "#{node['cfncluster']['license_dir']}/ganglia/COPYING"
-    end
-
-  when  "amazon"
-    package %w[ganglia ganglia-gmond ganglia-gmetad ganglia-web php php-gd rrdtool] do
-      retries 3
-      retry_delay 5
-    end
-
-    cookbook_file 'ganglia.conf' do
       path '/etc/httpd/conf.d/ganglia.conf'
       user 'root'
       group 'root'
       mode '0644'
     end
 
-    directory '/var/lib/ganglia/rrds' do
-      owner 'nobody'
-      group 'nobody'
-      mode 0755
-      recursive true
-      action :create
+    if node['platform'] == 'centos' && node['platform_version'].to_i == 7
+      # Fix circular dependency multi-user.target -> cloud-init-> gmond -> multi-user.target
+      # gmond is started by chef during cloud-init, but gmond service is configured to start after multi-user.target
+      # which doesn't start until cloud-init run is finished. So gmond service is stuck into starting, which keep
+      # hanging chef until the 600s timeout.
+      replace_or_add "change gmond service dependency" do
+        path "/usr/lib/systemd/system/gmond.service"
+        pattern "After=multi-user.target"
+        line "After=network.target"
+        replace_only true
+      end
     end
   when "ubuntu"
-
     package %w[ganglia-monitor rrdtool gmetad ganglia-webfrontend] do
       retries 3
       retry_delay 5
+    end
+
+    directory '/var/lib/ganglia/rrds' do
+      owner 'ganglia'
+      group 'ganglia'
+      mode 0755
+      recursive true
+      action :create
     end
 
     # Setup ganglia-web.conf apache config
@@ -170,6 +61,5 @@ if node['cfncluster']['ganglia_enabled'] == 'yes'
       command "cp /etc/ganglia-webfrontend/apache.conf /etc/apache2/sites-enabled/ganglia.conf"
       not_if "test -f /etc/apache2/sites-enabled/ganglia.conf"
     end
-
   end
 end
