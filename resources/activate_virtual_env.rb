@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 resource_name :activate_virtual_env
 provides :activate_virtual_env
 

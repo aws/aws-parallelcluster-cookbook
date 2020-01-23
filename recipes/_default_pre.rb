@@ -17,7 +17,7 @@
 
 # Calling user_ulimit will override every existing limit
 user_ulimit "*" do
-  filehandle_limit "#{node['cfncluster']['filehandle_limit']}"
+  filehandle_limit node['cfncluster']['filehandle_limit']
 end
 
 include_recipe 'aws-parallelcluster::_update_packages'

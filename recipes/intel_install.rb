@@ -87,11 +87,11 @@ end
 # intel optimized math kernel library
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelmkl" do
   source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
-  modulefile "#{node['cfncluster']['psxe']['version']}"
+  modulefile node['cfncluster']['psxe']['version']
 end
 
 # intel psxe
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelpsxe" do
   source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
-  modulefile "#{node['cfncluster']['psxe']['version']}"
+  modulefile node['cfncluster']['psxe']['version']
 end

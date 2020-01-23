@@ -60,7 +60,7 @@ elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_
     retry_delay 5
   end
 
-  yum_package %w(kmod-lustre-client lustre-client) do
+  yum_package %w[kmod-lustre-client lustre-client] do
     retries 3
     retry_delay 5
   end

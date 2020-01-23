@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: dcv_install
@@ -45,7 +46,6 @@ def install_ext_auth_virtual_env
     python_version node['cfncluster']['python-version']
   end
 end
-
 
 # Function to disable lock screen since default EC2 users don't have a password
 def disable_lock_screen
@@ -121,7 +121,7 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
           require 'digest'
           checksum = Digest::SHA256.file(dcv_tarball).hexdigest
           if checksum != node['cfncluster']['dcv']['sha256sum']
-              raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cfncluster']['dcv']['package']['sha256sum']}"
+            raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cfncluster']['dcv']['package']['sha256sum']}"
           end
         end
       end

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: dcv_config
@@ -17,10 +18,8 @@
 # This recipe install the prerequisites required to use NICE DCV on a Linux server
 # Source: https://docs.aws.amazon.com/en_us/dcv/latest/adminguide/setting-up-installing-linux-prereq.html
 
-
 # Configure the system to enable NICE DCV to have direct access to the Linux server's GPU and enable GPU sharing.
 def allow_gpu_acceleration
-
   # Turn off X
   execute "Turn off X" do
     command "systemctl set-default multi-user.target"
@@ -47,7 +46,6 @@ def allow_gpu_acceleration
       command "apt -y install #{dcv_gl}"
     end
   end
-
 
   # Configure the X server to start automatically when the Linux server boots and start the X server in background
   bash 'Launch X' do
@@ -126,6 +124,6 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
 
   # Start NICE DCV server
   service "dcvserver" do
-    action [:start, :enable]
+    action %i[enable start]
   end
 end
