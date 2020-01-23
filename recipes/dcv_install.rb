@@ -63,7 +63,6 @@ def disable_lock_screen
   end
 end
 
-
 # Install pcluster_dcv_connect.sh script in all the OSes to use it for error handling
 cookbook_file "#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
   source 'dcv/pcluster_dcv_connect.sh'

@@ -134,7 +134,7 @@ else
 end
 
 # ulimit settings
-default['cfncluster']['filehandle_limit'] = 10000
+default['cfncluster']['filehandle_limit'] = 10_000
 default['cfncluster']['memory_limit'] = 'unlimited'
 
 # Platform defaults
