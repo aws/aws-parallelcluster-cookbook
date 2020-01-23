@@ -33,9 +33,7 @@ if fsx_shared_dir != "NONE"
 
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
-  if node['init_package'] == 'systemd'
-    mount_options.push(%w[noauto x-systemd.automount x-systemd.requires=lnet.service])
-  end
+  mount_options.push(%w[noauto x-systemd.automount x-systemd.requires=lnet.service]) if node['init_package'] == 'systemd'
 
   # Mount FSx over NFS
   mount fsx_shared_dir do

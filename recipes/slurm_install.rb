@@ -36,9 +36,7 @@ when 'MasterServer', nil
     block do
       require 'digest'
       checksum = Digest::SHA1.file(slurm_tarball).hexdigest
-      if checksum != node['cfncluster']['slurm']['sha1']
-        raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}"
-      end
+      raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}" if checksum != node['cfncluster']['slurm']['sha1']
     end
   end
 
