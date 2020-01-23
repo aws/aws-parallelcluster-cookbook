@@ -46,7 +46,7 @@ unless node['cfncluster']['os'].end_with?("-custom")
   end
 end
 
-if node['cfncluster']['cfn_scheduler'] == 'torque' or node['cfncluster']['cfn_scheduler'] == 'slurm'
+if node['cfncluster']['cfn_scheduler'] == 'torque' || node['cfncluster']['cfn_scheduler'] == 'slurm'
   execute 'check munge installed' do
     command 'munge --version'
     user node['cfncluster']['cfn_cluster_user']
@@ -121,13 +121,12 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   end
 end
 
-if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") and node['cfncluster']['dcv']['installed'] == 'yes'
+if node['cfncluster']['cfn_node_type'] == "MasterServer" && node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") && node['cfncluster']['dcv']['installed'] == 'yes'
   execute 'check dcv installed' do
     command 'dcv version'
     user node['cfncluster']['cfn_cluster_user']
   end
 end
-
 
 case node['cfncluster']['os']
 when 'alinux', 'centos7'
@@ -269,7 +268,7 @@ when 'ubuntu'
   end
 end
 
-if node['cfncluster']['cfn_node_type'] == "MasterServer" and node['cfncluster']['cfn_scheduler'] == 'slurm'
+if node['cfncluster']['cfn_node_type'] == "MasterServer" && node['cfncluster']['cfn_scheduler'] == 'slurm'
   execute 'check-slurm-accounting-mysql-plugins' do
     user 'root'
     command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"

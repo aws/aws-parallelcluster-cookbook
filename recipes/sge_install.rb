@@ -34,9 +34,9 @@ when 'MasterServer', nil
     group 'root'
     cwd "/tmp"
     environment(
-      'VERSION' => "#{node['cfncluster']['sge']['version']}",
+      'VERSION' => node['cfncluster']['sge']['version'],
       'TARBALL_ROOT_DIR' => "sge-#{node['cfncluster']['sge']['version']}",
-      'TARBALL_PATH' => "#{sge_tarball}",
+      'TARBALL_PATH' => sge_tarball,
       'TARBALL_URL' => node['cfncluster']['sge']['url']
     )
 

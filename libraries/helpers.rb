@@ -106,7 +106,7 @@ def get_vpc_ipv4_cidr_blocks(eth0_mac)
   vpc_ipv4_cidr_blocks
 end
 
-def get_instance_type()
+def get_instance_type
   uri = URI("http://169.254.169.254/latest/meta-data/instance-type")
   res = Net::HTTP.get_response(uri)
   master_instance_type = res.body if res.code == '200'

@@ -70,11 +70,11 @@ default['cfncluster']['nvidia']['enabled'] = 'no'
 default['cfncluster']['nvidia']['driver_version'] = '440.33.01'
 default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.33.01/NVIDIA-Linux-x86_64-440.33.01.run'
 default['cfncluster']['nvidia']['cuda_version'] = '10.2'
-if node['platform'] == 'centos' && node['platform_version'].to_i < 7
-  default['cfncluster']['nvidia']['cuda_url'] = 'http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
-else
-  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
-end
+default['cfncluster']['nvidia']['cuda_url'] = if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+                                                'http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
+                                              else
+                                                'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
+                                              end
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.2.tar.gz'
 # ENV2 - tool to capture environment and create modulefiles
@@ -82,20 +82,20 @@ default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/fi
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2019.1-7644'
-default['cfncluster']['dcv']['supported_os'] = ['centos7', 'ubuntu18']
+default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18]
 case node['platform']
 when 'centos'
   if node['platform_version'].to_i == 7
     default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
-    default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm"  # NICE DCV server package
-    default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm"  # required to create virtual sessions
-    default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm"  # required to enable GPU sharing
+    default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm" # NICE DCV server package
+    default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm" # required to create virtual sessions
+    default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm" # required to enable GPU sharing
     default['cfncluster']['dcv']['sha256sum'] = "ab50323c92b3584ac88f697fd45e68b98da0b1b334a3e1f7eef6343df3aa4d91"
   end
 when 'ubuntu'
   if node['platform_version'] == '18.04'
     default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804"
-    default['cfncluster']['dcv']['server'] = "nice-dcv-server_2019.1.7644-1_amd64.ubuntu1804.deb"  # NICE DCV server package
+    default['cfncluster']['dcv']['server'] = "nice-dcv-server_2019.1.7644-1_amd64.ubuntu1804.deb" # NICE DCV server package
     default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2019.1.226-1_amd64.ubuntu1804.deb"  # required to create virtual sessions
     default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2019.1.544-1_amd64.ubuntu1804.deb"  # required to enable GPU sharing
     default['cfncluster']['dcv']['sha256sum'] = "41a0b4112c435b3a57de3ae46cfe8cdf90c33a216f488e3bfab944f034f6067f"

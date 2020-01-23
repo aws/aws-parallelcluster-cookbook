@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 resource_name :install_pyenv
 provides :install_pyenv
 
@@ -9,7 +11,6 @@ property :python_version, String, required: true
 default_action :run
 
 action :run do
-
   pyenv_user_install new_resource.pyenv_user
 
   pyenv_python new_resource.python_version do
