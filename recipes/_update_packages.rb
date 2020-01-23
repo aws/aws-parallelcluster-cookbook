@@ -26,11 +26,12 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
     execute 'apt-update' do
       command "apt-get update"
     end
-    execute 'linux-aws' do
-      command "apt install -y linux-aws"
-    end
     execute 'apt-upgrade' do
       command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove -y"
+    end
+    package 'linux-aws' do
+      retries 3
+      retry_delay 5
     end
   end
 end
