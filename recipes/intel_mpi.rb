@@ -36,6 +36,9 @@ bash "install intel mpi" do
     tar -xf l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz
     cd l_mpi_#{node['cfncluster']['intelmpi']['version']}/
     ./install.sh -s silent.cfg --accept_eula
+    mv rpm/EULA.txt /opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}
+    cd ..
+    rm -rf l_mpi_#{node['cfncluster']['intelmpi']['version']}*
   INTELMPI
   creates "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}"
 end
