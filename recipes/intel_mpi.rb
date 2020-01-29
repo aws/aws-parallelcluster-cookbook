@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return unless node['conditions']['intel_mpi_supported']
+
 intelmpi_modulefile = "#{node['cfncluster']['modulefile_dir']}/intelmpi/#{node['cfncluster']['intelmpi']['version']}"
 intelmpi_installer = "#{node['cfncluster']['sources_dir']}/l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
 

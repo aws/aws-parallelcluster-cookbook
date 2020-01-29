@@ -35,6 +35,9 @@ include_recipe 'aws-parallelcluster::chrony_config'
 # Write cloudwatch log config and start it.
 include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 
+# EFA runtime configuration
+include_recipe "aws-parallelcluster::_efa_config"
+
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'

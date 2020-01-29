@@ -203,12 +203,8 @@ include_recipe "aws-parallelcluster::_nvidia_install"
 include_recipe "aws-parallelcluster::_lustre_install"
 
 # Install EFA & Intel MPI
-if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
-  || node['platform'] == 'amazon' \
-  || (node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04)
-  include_recipe "aws-parallelcluster::_efa_install"
-  include_recipe "aws-parallelcluster::intel_mpi"
-end
+include_recipe "aws-parallelcluster::_efa_install"
+include_recipe "aws-parallelcluster::intel_mpi"
 
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster::cloudwatch_agent_install"
