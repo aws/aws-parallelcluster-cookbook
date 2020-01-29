@@ -96,6 +96,7 @@ suites:
         dcv_enabled: 'master'
         dcv_port: '8443'
         enable_intel_hpc_platform: 'true'
+        enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -124,6 +125,7 @@ suites:
         dcv_enabled: 'master'
         dcv_port: '8443'
         enable_intel_hpc_platform: 'true'
+        enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -152,6 +154,7 @@ suites:
         dcv_enabled: 'master'
         dcv_port: '8443'
         enable_intel_hpc_platform: 'true'
+        enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -204,6 +207,7 @@ suites:
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
         dcv_port: '8443'
+        enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -231,6 +235,7 @@ suites:
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
         dcv_port: '8443'
+        enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
@@ -258,5 +263,6 @@ suites:
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
         dcv_port: '8443'
+        enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>

@@ -207,6 +207,18 @@ when 'alinux', 'centos7'
     user node['cfncluster']['cfn_cluster_user']
   end
 when 'ubuntu1604', 'ubuntu1804'
+  case node['cfncluster']['cfn_node_type']
+  when 'MasterServer'
+    execute 'check ptrace protection enabled' do
+      command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 1'"
+      user node['cfncluster']['cfn_cluster_user']
+    end
+  when 'ComputeFleet'
+    execute 'check ptrace protection disabled' do
+      command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 0'"
+      user node['cfncluster']['cfn_cluster_user']
+    end
+  end
   execute 'check efa rpm installed' do
     command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
     user node['cfncluster']['cfn_cluster_user']
