@@ -94,6 +94,7 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
         cwd Chef::Config[:file_cache_path]
         code <<-PREREQ
           set -e
+          apt -y install whoopsie
           apt -y install ubuntu-desktop
           apt -y purge ifupdown
           DEBIAN_FRONTEND=noninteractive apt -y install lightdm
