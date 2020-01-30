@@ -217,17 +217,21 @@ when 'ubuntu1604', 'ubuntu1804'
   end
 end
 
-unless node['cfncluster']['os'] == 'centos6'
-  bash 'check intel mpi version' do
-    cwd Chef::Config[:file_cache_path]
-    code <<-INTELMPI
-      set -e
-      # Initialize module
-      # Must execute this in a bash script because source is a bash built-in function
-      source /etc/profile.d/modules.sh
-      module load intelmpi && mpirun --help | grep 'Version 2019 Update 6'
-    INTELMPI
-    user node['cfncluster']['cfn_cluster_user']
+# Test only on MasterServer since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
+# overrides intel binaries.
+if node['cfncluster']['cfn_node_type'] == 'MasterServer'
+  unless node['cfncluster']['os'] == 'centos6'
+    bash 'check intel mpi version' do
+      cwd Chef::Config[:file_cache_path]
+      code <<-INTELMPI
+        set -e
+        # Initialize module
+        # Must execute this in a bash script because source is a bash built-in function
+        source /etc/profile.d/modules.sh
+        module load intelmpi && mpirun --help | grep 'Version 2019 Update 6'
+      INTELMPI
+      user node['cfncluster']['cfn_cluster_user']
+    end
   end
 end
 
