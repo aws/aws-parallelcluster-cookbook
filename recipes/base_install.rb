@@ -20,6 +20,15 @@ when 'rhel', 'amazon'
   include_recipe 'yum'
   if node['platform_family'] == 'amazon' and node['platform_version'].to_i == 2
     alinux_extras_topic 'epel'
+    # The following is required on alinux2 because there is currently no
+    # mpich-devel package in any of the amzn2 or epel repos.
+    # TODO: remove this when mpich-devel is added to a default repo
+    yum_repository 'centos7-base' do
+      baseurl 'http://mirror.centos.org/centos/7/os/$basearch/'
+      gpgcheck true
+      gpgkey 'https://www.centos.org/keys/RPM-GPG-KEY-CentOS-7'
+      mirrorlist 'http://mirrorlist.centos.org/?release=7&arch=$basearch&repo=os&infra=$infra'
+    end
   else
     include_recipe "yum-epel" if node['platform_version'].to_i < 7
   end

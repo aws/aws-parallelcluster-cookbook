@@ -187,13 +187,12 @@ when 'rhel', 'amazon'
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel]
     if node['platform_version'].to_i == 2
-      # mpich-devel not available on alinux
-      default['cfncluster']['base_packages'].delete('mpich-devel')
       # Swap out some packages for their alinux2 equivalents
       [%w[db4-devel libdb-devel], %w[redhat-lsb system-lsb]].each do |al1, al2equiv|
         default['cfncluster']['base_packages'].delete(al1)
         default['cfncluster']['base_packages'].push(al2equiv)
       end
+
       # Add additional base packages, most of which would be installed as part of `yum groupinstall development`
       default['cfncluster']['base_packages'].concat(%w[libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
                                                        rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
