@@ -3,14 +3,14 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-X.X.X
+2.6.0
 -----
 
 **ENHANCEMENTS**
 - Install NICE DCV on Ubuntu 18.04 (this includes ubuntu-desktop, lightdm, mesa-util packages).
 - Install and setup Amazon Time Sync on Amazon Linux, Centos 6, Centos 7, Ubuntu 16 and Ubuntu 18
 
-**Changes**
+**CHANGES**
 - Upgrade EFA installer to version 1.8.2:
   - Kernel module: efa-1.5.0 (updated from efa-1.4.1)
   - RDMA core: rdma-core-25.0 (distributed only) (no change)
@@ -20,6 +20,9 @@ X.X.X
 - Upgrade Slurm to version 19.05.5
 - Install Python 2.7.17 on CentOS 6 and set it as default through pyenv
 - Install Ganglia from repository on Amazon Linux, Centos 6 and Centos 7
+
+**BUG FIXES**
+- Fix issue with slurmd daemon not being restarted correctly when a compute node is rebooted
 
 2.5.1
 -----
