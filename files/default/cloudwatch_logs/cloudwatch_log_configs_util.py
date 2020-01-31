@@ -22,7 +22,7 @@ import jsonschema
 
 
 DEFAULT_SCHEMA_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_log_files_schema.json"))
-SCHEMA_PATH = os.environ.get("CW_LOGS_CONFIGS_PATH", DEFAULT_SCHEMA_PATH)
+SCHEMA_PATH = os.environ.get("CW_LOGS_CONFIGS_SCHEMA_PATH", DEFAULT_SCHEMA_PATH)
 DEFAULT_LOG_CONFIGS_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_log_files.json"))
 LOG_CONFIGS_PATH = os.environ.get("CW_LOGS_CONFIGS_PATH", DEFAULT_LOG_CONFIGS_PATH)
 LOG_CONFIGS_BAK_PATH = "{}.bak".format(LOG_CONFIGS_PATH)
