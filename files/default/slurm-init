@@ -5,10 +5,10 @@
 #              manages exclusive access to a set of compute \
 #              resources and distributes work to those resources.
 #
-# processname: @sbindir@/slurmd
+# processname: /opt/slurm/sbin/slurmd
 # pidfile: /var/run/slurmd.pid
 #
-# processname: @sbindir@/slurmctld
+# processname: /opt/slurm/sbin/slurmctld
 # pidfile: /var/run/slurmctld.pid
 #
 # config: /etc/sysconfig/slurm
@@ -29,10 +29,6 @@ BINDIR="/opt/slurm/bin"
 CONFDIR="/opt/slurm/etc"
 LIBDIR="/opt/slurm/lib"
 SBINDIR="/opt/slurm/sbin"
-
-# On a bluegene system this will be set to '#'.
-# Yes, FALSE is the correct variable to look at in the .in script.
-HAVE_BG="FALSE"
 
 # Source function library.
 if [ -f /etc/rc.status ]; then
@@ -97,14 +93,6 @@ start() {
     shift
     echo -n "starting $prog: "
     unset HOME MAIL USER USERNAME
-
-
-    if [[ $HAVE_BG == "#" ]] && [[ $prog == slurmctld ]]
-    then
-	    # On bluegene systems this need to be set of DB2 can unexpectedly
-	    # crash when the slurmctld is exiting. (Bug 1597)
-	    export DB2NOEXITLIST=ON
-    fi
 
     $STARTPROC $SBINDIR/$prog $*
     rc_status -v
