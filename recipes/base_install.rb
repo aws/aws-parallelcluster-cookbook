@@ -203,7 +203,7 @@ include_recipe "aws-parallelcluster::_nvidia_install"
 include_recipe "aws-parallelcluster::_lustre_install"
 
 # Install EFA & Intel MPI
-include_recipe "aws-parallelcluster::_efa_install"
+include_recipe "aws-parallelcluster::efa_install"
 include_recipe "aws-parallelcluster::intel_mpi"
 
 # Install the AWS cloudwatch agent
