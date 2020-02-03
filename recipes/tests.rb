@@ -341,13 +341,13 @@ end
 ###################
 # FSx Lustre
 ###################
-case node['platform']
-when 'amazon', 'centos'
+case node['cfncluster']['os']
+when 'alinux', 'centos7'
   execute 'check for lustre libraries' do
     command "rpm -qa | grep lustre-client"
     user node['cfncluster']['cfn_cluster_user']
   end
-when 'ubuntu'
+when 'ubuntu1604', 'ubuntu1804'
   execute 'check for lustre libraries' do
     command "dpkg -l | grep lustre"
     user node['cfncluster']['cfn_cluster_user']
