@@ -23,10 +23,6 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
       command "yum -y update && package-cleanup -y --oldkernels --count=1"
     end
   when 'debian'
-    # FIXME: blacklist new Kernel version until Lustre client package version is not aligned with latest
-    cookbook_file 'linux-aws.pref' do
-      path '/etc/apt/preferences.d/linux-aws.pref'
-    end
     execute 'apt-update' do
       command "apt-get update"
     end
