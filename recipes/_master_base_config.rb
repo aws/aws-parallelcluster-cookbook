@@ -90,6 +90,15 @@ vol_array.each_with_index do |volumeid, index|
     subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
   end
 
+  # If an update is performed by re-running all recipes, the mount shared_dir_array
+  # block will fail because dev_uuids does not get set.
+  ruby_block "get_uuids_#{index}" do
+    block do
+      dev_uuids[index] = get_uuid(dev_path[index])
+    end
+    action :run
+  end
+
   # Create the shared directories
   directory shared_dir_array[index] do
     owner 'root'
