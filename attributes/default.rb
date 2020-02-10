@@ -78,24 +78,20 @@ default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/fi
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2019.1-7644'
-default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18]
-case node['platform']
-when 'centos'
-  if node['platform_version'].to_i == 7
-    default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
-    default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm" # NICE DCV server package
-    default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm" # required to create virtual sessions
-    default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm" # required to enable GPU sharing
-    default['cfncluster']['dcv']['sha256sum'] = "ab50323c92b3584ac88f697fd45e68b98da0b1b334a3e1f7eef6343df3aa4d91"
-  end
-when 'ubuntu'
-  if node['platform_version'] == '18.04'
-    default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804"
-    default['cfncluster']['dcv']['server'] = "nice-dcv-server_2019.1.7644-1_amd64.ubuntu1804.deb" # NICE DCV server package
-    default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2019.1.226-1_amd64.ubuntu1804.deb"  # required to create virtual sessions
-    default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2019.1.544-1_amd64.ubuntu1804.deb"  # required to enable GPU sharing
-    default['cfncluster']['dcv']['sha256sum'] = "41a0b4112c435b3a57de3ae46cfe8cdf90c33a216f488e3bfab944f034f6067f"
-  end
+default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
+case "#{node['platform']}#{node['platform_version'].to_i}"
+when 'centos7', 'amazon2'
+  default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
+  default['cfncluster']['dcv']['server'] = "nice-dcv-server-2019.1.7644-1.el7.x86_64.rpm" # NICE DCV server package
+  default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2019.1.226-1.el7.x86_64.rpm" # required to create virtual sessions
+  default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2019.1.544-1.el7.x86_64.rpm" # required to enable GPU sharing
+  default['cfncluster']['dcv']['sha256sum'] = "ab50323c92b3584ac88f697fd45e68b98da0b1b334a3e1f7eef6343df3aa4d91"
+when 'ubuntu18'
+  default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804"
+  default['cfncluster']['dcv']['server'] = "nice-dcv-server_2019.1.7644-1_amd64.ubuntu1804.deb" # NICE DCV server package
+  default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2019.1.226-1_amd64.ubuntu1804.deb"  # required to create virtual sessions
+  default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2019.1.544-1_amd64.ubuntu1804.deb"  # required to enable GPU sharing
+  default['cfncluster']['dcv']['sha256sum'] = "41a0b4112c435b3a57de3ae46cfe8cdf90c33a216f488e3bfab944f034f6067f"
 end
 default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2019.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
@@ -196,6 +192,24 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel]
+    if node['platform_version'].to_i == 2
+      # mpich-devel not available on alinux
+      default['cfncluster']['base_packages'].delete('mpich-devel')
+      # Swap out some packages for their alinux2 equivalents
+      [%w[db4-devel libdb-devel], %w[redhat-lsb system-lsb]].each do |al1, al2equiv|
+        default['cfncluster']['base_packages'].delete(al1)
+        default['cfncluster']['base_packages'].push(al2equiv)
+      end
+      # Add additional base packages, most of which would be installed as part of `yum groupinstall development`
+      default['cfncluster']['base_packages'].concat(%w[libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
+                                                       rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
+                                                       gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
+                                                       jq wget python-pip])
+      # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
+      # because it contains fixes for known build issues
+      default['cfncluster']['sge']['url'] = 'http://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
+      default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
+    end
   end
 
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
