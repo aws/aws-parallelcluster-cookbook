@@ -116,7 +116,6 @@ default['openssh']['server']['password_authentication'] = 'no'
 default['openssh']['server']['gssapi_authentication'] = 'yes'
 default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
-default['openssh']['client']['gssapi_authentication'] = 'yes'
 if node['platform'] == 'centos' && node['platform_version'].to_i < 7
   default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr'
   default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512,hmac-sha2-256'
@@ -124,6 +123,13 @@ else
   default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
   default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
 end
+default['openssh']['client']['gssapi_authentication'] = 'yes'
+default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
+# Disable StrictHostKeyChecking for target host in the cluster VPC
+default['openssh']['client']['  _strict_host_key_checking'] = 'no'
+# Do not store server key in the know hosts file to avoid scaling clashing
+# that is when an new host gets the same IP of a previously terminated host
+default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
 
 # ulimit settings
 default['cfncluster']['filehandle_limit'] = 10_000

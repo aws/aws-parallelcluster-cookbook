@@ -223,10 +223,6 @@ when 'ubuntu1604', 'ubuntu1804'
     command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
     user node['cfncluster']['cfn_cluster_user']
   end
-  execute 'check intel mpi installed' do
-    command "dpkg -l | grep intel-mpi"
-    user node['cfncluster']['cfn_cluster_user']
-  end
 end
 
 # Test only on MasterServer since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
