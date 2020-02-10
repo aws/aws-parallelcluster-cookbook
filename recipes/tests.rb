@@ -53,6 +53,19 @@ unless node['cfncluster']['os'].end_with?("-custom")
 end
 
 ###################
+# SSH client conf
+###################
+execute 'grep ssh_config' do
+  command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
+end
+
+execute 'ssh localhost as user' do
+  command "ssh localhost hostname"
+  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
+  user node['cfncluster']['cfn_cluster_user']
+end
+
+###################
 # munge
 ###################
 if node['cfncluster']['cfn_scheduler'] == 'torque' || node['cfncluster']['cfn_scheduler'] == 'slurm'
