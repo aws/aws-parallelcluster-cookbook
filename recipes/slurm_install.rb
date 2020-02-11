@@ -47,18 +47,6 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     code <<-SLURM
       set -e
-
-      NEW_PATH=""
-      _OLD_IFS=${IFS}
-      IFS=':'
-      for p in ${PATH}
-      do
-        [[ ! ${p} =~ \.pyenv ]] && NEW_PATH="${p}:${NEW_PATH}"
-      done
-      IFS=${_OLD_IFS}
-      export PATH=${NEW_PATH}
-
-      env
       tar xf #{slurm_tarball}
       cd slurm-#{node['cfncluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm
