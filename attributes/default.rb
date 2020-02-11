@@ -124,12 +124,14 @@ else
   default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
 end
 default['openssh']['client']['gssapi_authentication'] = 'yes'
-default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
-# Disable StrictHostKeyChecking for target host in the cluster VPC
-default['openssh']['client']['  _strict_host_key_checking'] = 'no'
-# Do not store server key in the know hosts file to avoid scaling clashing
-# that is when an new host gets the same IP of a previously terminated host
-default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
+unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
+  # Disable StrictHostKeyChecking for target host in the cluster VPC
+  default['openssh']['client']['  _strict_host_key_checking'] = 'no'
+  # Do not store server key in the know hosts file to avoid scaling clashing
+  # that is when an new host gets the same IP of a previously terminated host
+  default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
+end
 
 # ulimit settings
 default['cfncluster']['filehandle_limit'] = 10_000
