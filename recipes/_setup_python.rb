@@ -25,17 +25,17 @@ if node['platform'] == 'centos' && node['platform_version'].to_i < 7
   pyenv_global node['cfncluster']['python-version-centos6']
 end
 
-activate_virtual_env node['cfncluster']['cookbook_virtualenv'] do
-  pyenv_path node['cfncluster']['cookbook_virtualenv_path']
-  pyenv_user "root"
+create_virtualenv node['cfncluster']['cookbook_virtualenv'] do
+  virtualenv_path node['cfncluster']['cookbook_virtualenv_path']
+  user "root"
   python_version node['cfncluster']['python-version']
   requirements_path "requirements.txt"
   not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
 end
 
-activate_virtual_env node['cfncluster']['node_virtualenv'] do
-  pyenv_path node['cfncluster']['node_virtualenv_path']
-  pyenv_user "root"
+create_virtualenv node['cfncluster']['node_virtualenv'] do
+  virtualenv_path node['cfncluster']['node_virtualenv_path']
+  user "root"
   python_version node['cfncluster']['python-version']
   not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
 end

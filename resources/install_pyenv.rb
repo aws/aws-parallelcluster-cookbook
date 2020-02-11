@@ -5,20 +5,41 @@ provides :install_pyenv
 
 # Resource to create a Python virtual environment for a given user
 
-property :pyenv_user, String, name_property: true
+property :user, String, name_property: true
 property :python_version, String, required: true
 
 default_action :run
 
 action :run do
-  pyenv_user_install new_resource.pyenv_user
+  home_dir = ::File.expand_path("~#{new_resource.user}")
+  user_prefix = ::File.join(home_dir, '.pyenv')
 
-  pyenv_python new_resource.python_version do
-    user new_resource.pyenv_user
-  end
+  unless ::File.directory?(::File.join(user_prefix, 'versions', new_resource.python_version))
+    # Install required packages
+    package node['cfncluster']['pyenv_packages']
 
-  pyenv_plugin 'virtualenv' do
-    git_url 'https://github.com/pyenv/pyenv-virtualenv'
-    user new_resource.pyenv_user
+    # Install pyenv
+    git user_prefix do
+      repository 'https://github.com/pyenv/pyenv.git'
+      reference  'master'
+      user       new_resource.user
+      group      new_resource.user
+      action     :checkout
+    end
+
+    # Install pyenv's virtualenv plugin
+    git ::File.join(user_prefix, 'plugins', 'virtualenv') do
+      repository  'https://github.com/pyenv/pyenv-virtualenv'
+      reference   'master'
+      user        new_resource.user
+      group       new_resource.user
+      action      :checkout
+    end
+
+    # Install desired version of python
+    pyenv_command "install #{new_resource.python_version}" do
+      user new_resource.user
+      pyenv_path user_prefix
+    end
   end
 end

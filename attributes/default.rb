@@ -141,6 +141,10 @@ default['cfncluster']['memory_limit'] = 'unlimited'
 case node['platform_family']
 when 'rhel', 'amazon'
 
+  # Packages required to install pyenv, the virtualenv plugin, and the desired versions of python
+  default['cfncluster']['pyenv_packages'] = %w[git zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel
+                                               openssl-devel xz xz-devel libffi-devel findutils]
+
   default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
   default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
 
@@ -231,6 +235,9 @@ when 'debian'
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
                                               libgcrypt20-dev libmysqlclient-dev]
+  default['cfncluster']['pyenv_packages'] = %w[make libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm
+                                               libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
+                                               git]
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl1.0-dev', 'libglvnd-dev')
