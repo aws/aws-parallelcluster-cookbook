@@ -62,7 +62,7 @@ unless node['cfncluster']['os'] == 'centos6'
 
   execute 'ssh localhost as user' do
     command "ssh localhost hostname"
-    environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
+    environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
     user node['cfncluster']['cfn_cluster_user']
   end
 end
