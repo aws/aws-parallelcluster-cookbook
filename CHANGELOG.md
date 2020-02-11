@@ -19,8 +19,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add SHA256 checksum verification to verify integrity of NICE DCV packages
 - Upgrade Slurm to version 19.05.5
 - Install Python 2.7.17 on CentOS 6 and set it as default through pyenv
-- Install Ganglia from repository on Amazon Linux, Centos 6 and Centos 7
-- Disable StrictHostKeyChecking for SSH client when target host is inside cluster VPC 
+- Install Ganglia from repository on Amazon Linux, CentOS 6 and CentOS 7
+- Disable StrictHostKeyChecking for SSH client when target host is inside cluster VPC for all OSs except CentOS 6 
 
 **BUG FIXES**
 - Fix issue with slurmd daemon not being restarted correctly when a compute node is rebooted
