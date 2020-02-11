@@ -189,7 +189,17 @@ end
 ###################
 # Amazon Time Sync
 ###################
-execute 'check chrony' do
+if node['init_package'] == 'init'
+  chrony_check_command = "service #{node['cfncluster']['chrony']['service']} status | grep -i running"
+elsif node['init_package'] == 'systemd'
+  chrony_check_command = "systemctl status #{node['cfncluster']['chrony']['service']} | grep -i running"
+end
+
+execute 'check chrony running' do
+  command chrony_check_command
+end
+
+execute 'check chrony conf' do
   command "chronyc tracking | grep -i reference | grep 169.254.169.123"
   user node['cfncluster']['cfn_cluster_user']
 end
