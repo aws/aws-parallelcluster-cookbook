@@ -60,10 +60,13 @@ unless node['cfncluster']['os'] == 'centos6'
     command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
   end
 
-  execute 'ssh localhost as user' do
-    command "ssh localhost hostname"
-    environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
-    user node['cfncluster']['cfn_cluster_user']
+  # Test only on MasterServer since on ComputeFleet an empty /home is mounted for the Kitchen tests run
+  if node['cfncluster']['cfn_node_type'] == 'MasterServer'
+    execute 'ssh localhost as user' do
+      command "ssh localhost hostname"
+      environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
+      user node['cfncluster']['cfn_cluster_user']
+    end
   end
 end
 
