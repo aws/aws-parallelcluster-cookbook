@@ -206,7 +206,7 @@ execute 'check chrony running' do
 end
 
 execute 'check chrony conf' do
-  command "chronyc tracking | grep -i reference | grep 169.254.169.123"
+  command "chronyc waitsync 30; chronyc tracking | grep -i reference | grep 169.254.169.123"
   user node['cfncluster']['cfn_cluster_user']
 end
 
