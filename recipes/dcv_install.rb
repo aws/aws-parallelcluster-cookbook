@@ -108,11 +108,9 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
                            xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
                            gnome-terminal gnu-free-fonts-common gnu-free-mono-fonts
                            gnu-free-sans-fonts gnu-free-serif-fonts glx-utils]
-      prereq_packages.each do |p|
-        package p do
-          retries 3
-          retry_delay 5
-        end
+      package prereq_packages do
+        retries 10
+        retry_delay 5
       end
     end
     disable_lock_screen
