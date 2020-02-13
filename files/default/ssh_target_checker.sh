@@ -60,7 +60,7 @@ if [[ -z "${target_host}" ]]; then
    exit 1
 fi
 
-if ! resolved_ip=$(getent ahosts "${target_host}"  | grep -v : | head -1 | cut -d' ' -f1); then
+if ! resolved_ip=$(getent ahosts "${target_host}" | grep -v : | head -1 | cut -d' ' -f1); then
    log "Cannot resolve target Host ${target_host}"
    exit 1
 fi
