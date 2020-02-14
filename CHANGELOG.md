@@ -11,8 +11,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install and setup Amazon Time Sync on Amazon Linux, Centos 6, Centos 7, Ubuntu 16 and Ubuntu 18
 
 **CHANGES**
-- Upgrade EFA installer to version 1.8.2:
-  - Kernel module: efa-1.5.0 (updated from efa-1.4.1)
+- Upgrade EFA installer to version 1.8.3:
+  - Kernel module: efa-1.5.1 (updated from efa-1.4.1)
   - RDMA core: rdma-core-25.0 (distributed only) (no change)
   - Libfabric: libfabric-aws-1.9.0amzn1.1 (updated from libfabric-aws-1.8.1amzn1.3)
   - Open MPI: openmpi40-aws-4.0.2 (no change)
