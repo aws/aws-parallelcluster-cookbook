@@ -22,7 +22,7 @@
 def allow_gpu_acceleration
   # Turn off X
   execute "Turn off X" do
-    command "systemctl set-default multi-user.target"
+    command "systemctl isolate multi-user.target"
   end
 
   # Update the xorg.conf to set up NVIDIA drivers.

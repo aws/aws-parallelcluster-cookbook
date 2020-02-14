@@ -220,6 +220,11 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
     command 'dcv version'
     user node['cfncluster']['cfn_cluster_user']
   end
+  if graphic_instance?
+    execute "Ensure local users can access X server" do
+      command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
+    end
+  end
 end
 
 ###################
