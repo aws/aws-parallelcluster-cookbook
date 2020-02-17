@@ -51,11 +51,9 @@ build_essential
 include_recipe "aws-parallelcluster::_setup_python"
 
 # Install lots of packages
-node['cfncluster']['base_packages'].each do |p|
-  package p do
-    retries 3
-    retry_delay 5
-  end
+package node['cfncluster']['base_packages'] do
+  retries 10
+  retry_delay 5
 end
 
 case node['platform_family']
