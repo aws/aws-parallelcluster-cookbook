@@ -29,6 +29,12 @@ execute 'execute awscli as root' do
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
 end
 
+[node['cfncluster']['cookbook_virtualenv_path'], node['cfncluster']['node_virtualenv_path']].each do |venv_path|
+  execute "check #{venv_path} python version" do
+    command %(#{venv_path}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
+  end
+end
+
 bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
@@ -69,7 +75,6 @@ unless node['cfncluster']['os'] == 'centos6'
     end
   end
 end
-
 
 ###################
 # munge
@@ -224,6 +229,9 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
     execute "Ensure local users can access X server" do
       command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
     end
+  end
+  execute 'check DCV external authenticator python version' do
+    command %(default['cfncluster']['dcv']['authenticator']['virtualenv_path']/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
   end
 end
 
