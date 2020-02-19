@@ -7,8 +7,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 -----
 
 **ENHANCEMENTS**
-- Install NICE DCV on Ubuntu 18.04 (this includes ubuntu-desktop, lightdm, mesa-util packages).
-- Install and setup Amazon Time Sync on Amazon Linux, Centos 6, Centos 7, Ubuntu 16 and Ubuntu 18
+- Add support for Amazon Linux 2
+- Install NICE DCV on Ubuntu 18.04 (this includes ubuntu-desktop, lightdm, mesa-util packages)
+- Install and setup Amazon Time Sync on all OSs
+- Compile Slurm with mysql accounting plugin on Ubuntu 18.04 and Ubuntu 16.04
+- Enable FSx Lustre on Ubuntu 18.04 and Ubuntu 16.04
 
 **CHANGES**
 - Upgrade EFA installer to version 1.8.3:
@@ -19,11 +22,16 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add SHA256 checksum verification to verify integrity of NICE DCV packages
 - Upgrade Slurm to version 19.05.5
 - Install Python 2.7.17 on CentOS 6 and set it as default through pyenv
-- Install Ganglia from repository on Amazon Linux, CentOS 6 and CentOS 7
-- Disable StrictHostKeyChecking for SSH client when target host is inside cluster VPC for all OSs except CentOS 6 
+- Install Ganglia from repository on Amazon Linux, Amazon Linux 2, CentOS 6 and CentOS 7
+- Disable StrictHostKeyChecking for SSH client when target host is inside cluster VPC for all OSs except CentOS 6
+- Pin Intel Python 2 and Intel Python 3 to version 2019.4  
+- Automatically disable ptrace protection on Ubuntu 18.04 and Ubuntu 16.04 compute nodes when EFA is enabled
+- Packer version >= 1.4.0 is required for AMI creation
 
 **BUG FIXES**
 - Fix issue with slurmd daemon not being restarted correctly when a compute node is rebooted
+- Fix errors causing Torque not able to locate jobs, setting server_name to fqdn on master node
+- Fix Torque issue that was limiting the max number of running jobs to the max size of the cluster
 
 2.5.1
 -----
