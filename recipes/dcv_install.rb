@@ -88,21 +88,31 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
       package "xorg-x11-server-Xorg"
 
     when 'ubuntu'
+      apt_update
+      # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
+      package 'whoopsie' do
+        retries 3
+        retry_delay 5
+      end
       # Install the desktop environment and the desktop manager packages
+      prereq_packages = %W[ubuntu-desktop lightdm mesa-utils]
+      package prereq_packages do
+        retries 10
+        retry_delay 5
+      end
       # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
-      bash 'install pre-req' do
+      package 'ifupdown' do
+        action :purge
+      end
+      bash 'setup pre-req' do
         cwd Chef::Config[:file_cache_path]
         code <<-PREREQ
           set -e
-          apt -y install whoopsie
-          apt -y install ubuntu-desktop
-          apt -y purge ifupdown
-          DEBIAN_FRONTEND=noninteractive apt -y install lightdm
-          apt -y install mesa-utils
           wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
           gpg --import NICE-GPG-KEY
         PREREQ
       end
+
     when 'amazon'
       prereq_packages = %W[gdm gnome-session gnome-classic-session gnome-session-xsession
                            xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
