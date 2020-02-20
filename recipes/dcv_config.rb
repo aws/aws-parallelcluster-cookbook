@@ -20,9 +20,15 @@
 
 # Configure the system to enable NICE DCV to have direct access to the Linux server's GPU and enable GPU sharing.
 def allow_gpu_acceleration
-  # Turn off X
-  execute "Turn off X" do
-    command "systemctl isolate multi-user.target"
+
+  # On CentOS 7 fix circular dependency multi-user.target -> cloud-init-> isolate multi-user.target.
+  # multi-user.target doesn't start until cloud-init run is finished. So isolate multi-user.target
+  # is stuck into starting, which keep hanging chef until the 3600s timeout.
+  unless node['platform'] == 'centos' && node['platform_version'].to_i == 7
+    # Turn off X
+    execute "Turn off X" do
+      command "systemctl isolate multi-user.target"
+    end
   end
 
   # Update the xorg.conf to set up NVIDIA drivers.
