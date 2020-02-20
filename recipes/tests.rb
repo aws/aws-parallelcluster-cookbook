@@ -231,7 +231,7 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
     end
   end
   execute 'check DCV external authenticator python version' do
-    command %(#{default['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
+    command %(#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
   end
 end
 
