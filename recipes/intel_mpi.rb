@@ -26,7 +26,7 @@ remote_file intelmpi_installer do
   mode '0744'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(intelmpi_installer) }
+  not_if { ::File.exist?("/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}") }
 end
 
 directory "#{node['cfncluster']['modulefile_dir']}/intelmpi"
