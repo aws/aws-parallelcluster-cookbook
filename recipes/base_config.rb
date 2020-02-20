@@ -17,6 +17,9 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
+# Write cloudwatch log config and start it.
+include_recipe "aws-parallelcluster::cloudwatch_agent_config"
+
 if node['platform_family'] == 'amazon' && node['platform_version'] == '2'
   # NOTE: temporary workaround for amazon linux 2 while alternative solutions are evaluated
   execute "hostnamectl set-hostname #{node['ec2']['local_hostname']}"
@@ -37,9 +40,6 @@ end
 
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster::chrony_config'
-
-# Write cloudwatch log config and start it.
-include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
