@@ -86,7 +86,7 @@ include_recipe "openssh"
 
 # Install SSH target checker
 cookbook_file 'ssh_target_checker.sh' do
-  path "/usr/local/bin/ssh_target_checker.sh"
+  path "/usr/bin/ssh_target_checker.sh"
   owner "root"
   group "root"
   mode "0755"
