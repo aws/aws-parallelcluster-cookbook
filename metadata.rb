@@ -28,5 +28,6 @@ depends 'apt', '~> 7.0.0'
 depends 'hostname', '~> 0.4.2'
 depends 'line', '~> 2.4.1'
 depends 'ulimit', '~> 1.0.0'
+# when changing pyenv version, check if pyenv.sh.rb template is still valid
 depends 'pyenv', '~> 3.1.0'
 depends 'kernel_module', '~> 1.1.2'
