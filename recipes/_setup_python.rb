@@ -23,6 +23,13 @@ if node['platform'] == 'centos' && node['platform_version'].to_i < 7
   pyenv_global node['cfncluster']['python-version-centos6']
 end
 
+template "/etc/profile.d/pyenv.sh" do
+  source 'pyenv.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
 activate_virtual_env node['cfncluster']['cookbook_virtualenv'] do
   pyenv_path node['cfncluster']['cookbook_virtualenv_path']
   python_version node['cfncluster']['python-version']
