@@ -17,7 +17,7 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
-if node['platform_family'] == 'amazon' and node['platform_version'] == '2'
+if node['platform_family'] == 'amazon' && node['platform_version'] == '2'
   # NOTE: temporary workaround for amazon linux 2 while alternative solutions are evaluated
   execute "hostnamectl set-hostname #{node['ec2']['local_hostname']}"
   short_hostname = node['ec2']['local_hostname'].split('.')[0]

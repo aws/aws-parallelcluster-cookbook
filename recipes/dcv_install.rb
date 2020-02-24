@@ -91,7 +91,7 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
         retry_delay 5
       end
       # Install the desktop environment and the desktop manager packages
-      prereq_packages = %W[ubuntu-desktop lightdm mesa-utils]
+      prereq_packages = %w[ubuntu-desktop lightdm mesa-utils]
       package prereq_packages do
         retries 10
         retry_delay 5
@@ -110,7 +110,7 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
       end
 
     when 'amazon'
-      prereq_packages = %W[gdm gnome-session gnome-classic-session gnome-session-xsession
+      prereq_packages = %w[gdm gnome-session gnome-classic-session gnome-session-xsession
                            xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
                            gnome-terminal gnu-free-fonts-common gnu-free-mono-fonts
                            gnu-free-sans-fonts gnu-free-serif-fonts glx-utils]

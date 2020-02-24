@@ -18,10 +18,10 @@
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
-  if node['platform_family'] == 'amazon' and node['platform_version'].to_i == 2
+  if node['platform_family'] == 'amazon' && node['platform_version'].to_i == 2
     alinux_extras_topic 'epel'
-  else
-    include_recipe "yum-epel" if node['platform_version'].to_i < 7
+  elsif node['platform_version'].to_i < 7
+    include_recipe "yum-epel"
   end
 
 
