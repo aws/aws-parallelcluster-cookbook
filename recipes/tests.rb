@@ -191,6 +191,10 @@ when 'MasterServer'
   execute 'check gmetad running' do
     command gmetad_check_command
   end
+
+  execute 'check ganglia webpage' do
+    command 'curl --silent -L http://localhost/ganglia | grep "<title>Ganglia"'
+  end
 when 'ComputeFleet'
   execute 'check gmond running' do
     command gmond_check_command
