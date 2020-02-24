@@ -29,6 +29,13 @@ directory '/opt/slurm/etc' do
   mode '0755'
 end
 
+# Create directory configured as StateSaveLocation
+directory '/var/spool/slurm.state' do
+  user 'slurm'
+  group 'slurm'
+  mode '0700'
+end
+
 template '/opt/slurm/etc/slurm.conf' do
   source 'slurm.conf.erb'
   owner 'root'

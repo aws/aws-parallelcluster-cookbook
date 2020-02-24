@@ -32,6 +32,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix issue with slurmd daemon not being restarted correctly when a compute node is rebooted
 - Fix errors causing Torque not able to locate jobs, setting server_name to fqdn on master node
 - Fix Torque issue that was limiting the max number of running jobs to the max size of the cluster
+- Slurm: configured StateSaveLocation and SlurmdSpoolDir directories to be writable only to slurm user
 
 2.5.1
 -----
