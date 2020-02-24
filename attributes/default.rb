@@ -44,8 +44,8 @@ default['cfncluster']['intelmpi']['url'] = "http://registrationcenter-download.i
 default['cfncluster']['intelmpi']['version'] = '2019.6.166'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.5.1'
-default['cfncluster']['cfncluster-node-version'] = '2.5.1'
+default['cfncluster']['cfncluster-version'] = '2.6.0'
+default['cfncluster']['cfncluster-node-version'] = '2.6.0'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
