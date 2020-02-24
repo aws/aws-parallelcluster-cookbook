@@ -15,6 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Create directory configured as SlurmdSpoolDir
+directory '/var/spool/slurmd' do
+  user 'slurm'
+  group 'slurm'
+  mode '0700'
+end
+
 # Mount /opt/slurm over NFS
 nfs_master = node['cfncluster']['cfn_master']
 mount '/opt/slurm' do
