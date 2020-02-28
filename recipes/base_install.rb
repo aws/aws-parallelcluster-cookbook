@@ -151,10 +151,6 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       set -e
       [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
       echo "PATH is $PATH"
-      PROXY_FILE=/tmp/proxy.sh
-      if [ -f "$PROXY_FILE" ]; then
-              source $PROXY_FILE
-      fi
       source #{node['cfncluster']['node_virtualenv_path']}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
       curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
