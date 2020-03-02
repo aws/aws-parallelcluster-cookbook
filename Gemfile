@@ -5,16 +5,16 @@ source 'https://rubygems.org'
 gem 'berkshelf'
 
 group :style do
-  gem 'foodcritic', '~> 6.0.1'
-  gem 'rake', '~> 11.1.1'
-  gem 'rubocop', '~> 0.49'
+  gem 'foodcritic', '~> 16.2.0'
+  gem 'rake', '~> 13.0.1'
+  gem 'rubocop', '~> 0.80.1'
 end
 
 group :test do
-  gem 'chefspec', '~> 4.0'
-  gem 'kitchen-vagrant', '~> 1.1.0'
+  gem 'chefspec', '~> 9.1.0'
+  gem 'kitchen-vagrant', '~> 1.6.1'
   gem 'safe_yaml', '~> 1.0.5'
-  gem 'test-kitchen', '~> 1.13.2'
+  gem 'test-kitchen', '~> 2.3.4'
 end
 
 group :aws do
