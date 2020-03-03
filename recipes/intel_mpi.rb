@@ -53,10 +53,3 @@ bash "create modulefile" do
   MODULEFILE
   creates intelmpi_modulefile
 end
-
-if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
-  || node['platform'] == 'amazon'
-  execute 'yum-config-manager_skip_if_unavail_intel_mpi' do
-    command "yum-config-manager --save --setopt=intel-mpi.skip_if_unavailable=true"
-  end
-end
