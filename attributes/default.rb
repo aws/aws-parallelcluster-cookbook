@@ -292,3 +292,4 @@ default['cfncluster']['custom_node_package'] = nil
 default['cfncluster']['custom_awsbatchcli_package'] = nil
 default['cfncluster']['cfn_raid_parameters'] = 'NONE'
 default['cfncluster']['cfn_raid_vol_ids'] = nil
+default['cfncluster']['skip_install_recipes'] = 'yes'
