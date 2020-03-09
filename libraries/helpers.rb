@@ -138,3 +138,18 @@ def graphic_instance?
 
   is_graphic_instance
 end
+
+#
+# Check if the AMI is bootstrapped
+#
+def ami_bootstrapped?
+  version = ''
+  bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
+
+  if ::File.exist?(bootstrapped_file)
+    version = IO.read(bootstrapped_file).chomp
+    Chef::Log.info("Detected bootstrap file #{version}")
+  end
+
+  'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
+end
