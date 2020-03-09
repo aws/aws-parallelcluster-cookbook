@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster::base_install'
+include_recipe 'aws-parallelcluster::base_install' unless bootstrapped?
 
 if node['platform_family'] == 'amazon' && node['platform_version'] == '2'
   # NOTE: temporary workaround for amazon linux 2 while alternative solutions are evaluated

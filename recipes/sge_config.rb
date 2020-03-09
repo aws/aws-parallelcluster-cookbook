@@ -16,7 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::sge_install'
+include_recipe 'aws-parallelcluster::sge_install' unless bootstrapped?
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'

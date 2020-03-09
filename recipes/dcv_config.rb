@@ -78,7 +78,7 @@ end
 if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") && node['cfncluster']['cfn_node_type'] == "MasterServer"
 
   # be sure to have DCV packages installed
-  include_recipe "aws-parallelcluster::dcv_install"
+  include_recipe "aws-parallelcluster::dcv_install" unless bootstrapped?
 
   node.default['cfncluster']['dcv']['is_graphic_instance'] = graphic_instance?
 

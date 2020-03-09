@@ -17,7 +17,7 @@
 
 # Use these recipes to add a custom scheduler
 include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::base_install'
+include_recipe 'aws-parallelcluster::base_install' unless bootstrapped?
 
 # Install aws-parallelcluster-awsbatch-cli.cfg
 awsbatch_cli_config_dir = "/home/#{node['cfncluster']['cfn_cluster_user']}/.parallelcluster/"

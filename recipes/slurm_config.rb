@@ -16,7 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::slurm_install'
+include_recipe 'aws-parallelcluster::slurm_install' unless bootstrapped?
 
 # Create the munge key from template
 template "/etc/munge/munge.key" do

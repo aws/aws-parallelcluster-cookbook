@@ -16,7 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::torque_install'
+include_recipe 'aws-parallelcluster::torque_install' unless bootstrapped?
 
 # Update ld.conf
 append_if_no_line "add torque libs to ld.so.conf" do
