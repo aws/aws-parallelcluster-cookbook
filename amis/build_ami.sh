@@ -20,9 +20,15 @@
 #   build-date: timestamp to append to the AMIs names (optional)
 
 requirements_check() {
+    currentver="$(packer --version)"
+    requiredver="1.4.0"
     packer build --help >/dev/null 2>&1
     if [ $? -ne 0 ] ; then
       echo "packer command not found. Is Packer installed?"
+      echo "Please visit https://www.packer.io/downloads.html for instruction on how to download and install"
+      exit 1
+    elif ! [ "$(printf '%s\n' "$requiredver" "$currentver" | sort -V | head -n1)" = "$requiredver" ]; then
+      echo "Packer version == $currentver but must be >= 1.4.0. Is the latest Packer installed?"
       echo "Please visit https://www.packer.io/downloads.html for instruction on how to download and install"
       exit 1
     fi
