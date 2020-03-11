@@ -17,4 +17,11 @@ action :run do
   pyenv_plugin 'virtualenv' do
     git_url 'https://github.com/pyenv/pyenv-virtualenv'
   end
+
+  template "/etc/profile.d/pyenv.sh" do
+    source 'pyenv.sh.erb'
+    owner 'root'
+    group 'root'
+    mode '0755'
+  end
 end
