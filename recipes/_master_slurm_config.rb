@@ -64,6 +64,15 @@ template '/opt/slurm/etc/slurm_parallelcluster_gres.conf' do
   mode '0644'
 end
 
+# alinux1 and centos6 use an old cgroup directory: /cgroup
+# all other OSs use /sys/fs/cgroup, which is the default
+template '/opt/slurm/etc/cgroup.conf' do
+  source 'cgroup.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 cookbook_file '/opt/slurm/etc/slurm.sh' do
   source 'slurm.sh'
   owner 'root'
