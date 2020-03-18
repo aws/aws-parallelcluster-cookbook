@@ -15,6 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Modified torque.setup
+template 'torque.setup' do
+  source 'torque.setup.erb'
+  path '/opt/torque/bin/torque.setup'
+  user 'root'
+  group 'root'
+  mode '0755'
+end
+
 # Run torque.setup
 bash "run-torque-setup" do
   code <<-SETUPTORQUE

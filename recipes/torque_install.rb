@@ -101,15 +101,6 @@ directory '/var/spool/torque' do
   recursive true
 end
 
-# Modified torque.setup
-template 'torque.setup' do
-  source 'torque.setup.erb'
-  path '/opt/torque/bin/torque.setup'
-  user 'root'
-  group 'root'
-  mode '0755'
-end
-
 # Copy required licensing files
 directory "#{node['cfncluster']['license_dir']}/torque"
 
