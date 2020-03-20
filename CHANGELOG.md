@@ -3,6 +3,17 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+x.x.x
+-----
+**ENHANCEMENTS**
+- Skip execution of *_install recipes if AMI is already bootstrapped with same ParallelCluster version.
+  The old behaviour can be restored setting the property "skip_install_recipes" to "no" through extra_json. The old 
+  behaviour is required in case a custom_node_package is specified and could be needed in case custom_cookbook is used
+  (depending or not if the custom cookbook contains changes into any *_install recipes)
+
+**CHANGES**
+- Remove /tmp/proxy.sh file. Proxy configuration is now written into /etc/profile.d/proxy.sh
+
 2.6.0
 -----
 
