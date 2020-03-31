@@ -28,6 +28,13 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     not_if { ::File.exist?('/usr/bin/nvidia-smi') }
   end
 
+
+  nvidia_install_command = "./nvidia.run --silent --dkms"
+  if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
+    # temporary workaround to install Nvidia drier using dkms until this
+    # https://bugs.launchpad.net/ubuntu/+source/gcc-defaults/+bug/1868169 get fixed
+    nvidia_install_command = "#{nvidia_install_command} --no-cc-version-check"
+  end
   # Install NVIDIA driver
   bash 'nvidia.run advanced' do
     user 'root'
@@ -35,7 +42,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes'
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      ./nvidia.run --silent --dkms
+      #{nvidia_install_command}
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
