@@ -32,14 +32,17 @@ when 'MasterServer'
   end
 
   # parallel studio is intel's optimized libraries, this is the runtime (free) version
+  # installing version which is not the latest, requires to use yum version 4, see
+  # https://software.intel.com/en-us/articles/installing-intel-parallel-studio-xe-runtime-2019-using-yum-repository
   bash "install intel psxe" do
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
       rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
       yum -y install https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
-      yum-config-manager --save --setopt=intel-psxe-runtime-2019.skip_if_unavailable=true
-      yum -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
+      yum-config-manager --save --setopt=intel-psxe-runtime-2019.skip_if_unavailable=true 
+      yum -y install nextgen-yum4
+      yum4 -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
     INTEL
     creates '/opt/intel/psxe_runtime'
   end
