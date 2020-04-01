@@ -46,9 +46,8 @@ if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
     code <<-TORQUE
       set -e
       # Headers needed for compilation
-      wget http://security.ubuntu.com/ubuntu/pool/main/i/icu/libicu-dev_55.1-7ubuntu0.4_amd64.deb
-      dpkg -x libicu-dev_55.1-7ubuntu0.4_amd64.deb extra_libs
-
+      wget -r -np -nd http://security.ubuntu.com/ubuntu/pool/main/i/icu/ -A 'libicu-dev_55.1-7ubuntu*amd64.deb'
+      dpkg -x libicu-dev_55.1-7ubuntu*amd64.deb extra_libs
     TORQUE
     not_if { ::Dir.exist?("/opt/torque/bin") }
   end
