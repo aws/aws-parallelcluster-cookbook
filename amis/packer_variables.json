@@ -1,6 +1,6 @@
 {
-  "parallelcluster_version": "2.6.0",
-  "parallelcluster_cookbook_version": "2.6.0",
+  "parallelcluster_version": "2.6.1",
+  "parallelcluster_cookbook_version": "2.6.1",
   "chef_version": "14.2.0",
   "ridley_version": "5.1.1",
   "berkshelf_version": "7.0.4"
