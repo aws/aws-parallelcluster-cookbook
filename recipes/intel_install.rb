@@ -18,20 +18,25 @@
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
 
+  # Install yum4 needed to handle Intel Packages
+  package 'nextgen-yum4' do
+    retries 3
+    retry_delay 5
+  end
+
   # Downloads the intel-hpc-platform rpms
   bash "install intel hpc platform" do
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
       yum-config-manager --add-repo http://yum.repos.intel.com/hpc-platform/el7/setup/intel-hpc-platform.repo
-      yum-config-manager --save --setopt=intel-hpc-platform.skip_if_unavailable=true
       rpm --import http://yum.repos.intel.com/hpc-platform/el7/setup/PUBLIC_KEY.PUB
       yum -y install --downloadonly --downloaddir=/opt/intel/rpms intel-hpc-platform-*-#{node['cfncluster']['intelhpc']['version']}
     INTEL
     creates '/opt/intel/rpms'
   end
 
-  # parallel studio is intel's optimized libraries, this is the runtime (free) version
+  # Parallel Studio is Intel's optimized libraries, this is the runtime (free) version
   # installing version which is not the latest, requires to use yum version 4, see
   # https://software.intel.com/en-us/articles/installing-intel-parallel-studio-xe-runtime-2019-using-yum-repository
   bash "install intel psxe" do
@@ -39,24 +44,30 @@ when 'MasterServer'
     code <<-INTEL
       set -e
       rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
-      yum -y install https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
-      yum-config-manager --save --setopt=intel-psxe-runtime-2019.skip_if_unavailable=true 
-      yum -y install nextgen-yum4
+      yum4 -y install https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
       yum4 -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
     INTEL
     creates '/opt/intel/psxe_runtime'
   end
 
-  # intel optimized versions of python
+  # Intel optimized versions of python
   bash "install intel python" do
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
       yum-config-manager --add-repo https://yum.repos.intel.com/intelpython/setup/intelpython.repo
-      yum-config-manager --save --setopt=intelpython.skip_if_unavailable=true
       yum -y install intelpython2-#{node['cfncluster']['intelpython2']['version']} intelpython3-#{node['cfncluster']['intelpython3']['version']}
     INTEL
     creates '/opt/intel/intelpython2'
+  end
+
+  bash "set skip_if_unavailable on Intel repo" do
+    code <<-SKIP_UNAVAIL
+      set -e
+      yum-config-manager --save --setopt=intel-hpc-platform.skip_if_unavailable=True
+      yum-config-manager --save --setopt=intel-psxe-runtime-2019.skip_if_unavailable=True 
+      yum-config-manager --save --setopt=intelpython.skip_if_unavailable=True
+    SKIP_UNAVAIL
   end
 end
 
@@ -87,13 +98,13 @@ cookbook_file 'intelpython3_modulefile' do
   mode '0755'
 end
 
-# intel optimized math kernel library
+# Intel optimized math kernel library
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelmkl" do
   source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
   modulefile node['cfncluster']['psxe']['version']
 end
 
-# intel psxe
+# Intel psxe
 create_modulefile "#{node['cfncluster']['modulefile_dir']}/intelpsxe" do
   source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
   modulefile node['cfncluster']['psxe']['version']
