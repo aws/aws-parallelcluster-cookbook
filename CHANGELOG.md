@@ -3,6 +3,32 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.6.1
+-----
+
+**ENHANCEMENTS**
+- Change ProctrackType from proctrack/gpid to proctrack/cgroup in slurm.conf in order to better handle termination of
+  stray processes when running MPI applications. This also includes the creation of a cgroup Slurm configuration in
+  in order to enable the cgroup plugin.
+- Skip execution, at node bootstrap time, of all those install recipes that are already applied at AMI creation time.
+  The old behaviour can be restored setting the property "skip_install_recipes" to "no" through extra_json. The old 
+  behaviour is required in case a custom_node_package is specified and could be needed in case custom_cookbook is used
+  (depending or not if the custom cookbook contains changes into any *_install recipes)
+- Start CloudWatch agent earlier in the node bootstrapping phase so that cookbook execution failures are correctly
+  uploaded and are available for troubleshooting.
+
+**CHANGES**
+- FSx Lustre: remove `x-systemd.requires=lnet.service` from mount options in order to rely on default lnet setup
+  provided by Lustre.
+- Enforce Packer version to be >= 1.4.0 when building an AMI. This is also required for customers using `pcluster 
+  createami` command.
+- Remove /tmp/proxy.sh file. Proxy configuration is now written into /etc/profile.d/proxy.sh
+
+**BUG FIXES**
+- Fix installation of Intel Parallel Studio XE Runtime that requires yum4 since version 2019.5.
+- Fix compilation of Torque scheduler on Ubuntu 18.04.
+
+
 2.6.0
 -----
 
