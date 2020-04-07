@@ -59,19 +59,7 @@ mount '/opt/intel' do
 end
 
 # Configure Ganglia
-if node['cfncluster']['ganglia_enabled'] == "yes"
-  template '/etc/ganglia/gmond.conf' do
-    source 'gmond.conf.erb'
-    owner 'root'
-    group 'root'
-    mode '0644'
-  end
-
-  service node['cfncluster']['ganglia']['gmond_service'] do
-    supports restart: true
-    action %i[enable restart]
-  end
-end
+include_recipe 'aws-parallelcluster::ganglia_config'
 
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
