@@ -50,50 +50,8 @@
     },
     {
       "timestamp_format_key": "default",
-      "file_path": "/var/log/cfn-init-cmd.log",
-      "log_stream_name": "cfn-init-cmd",
-      "schedulers": [
-        "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "ComputeFleet",
-        "MasterServer"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "default",
       "file_path": "/var/log/cfn-init.log",
       "log_stream_name": "cfn-init",
-      "schedulers": [
-        "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "ComputeFleet",
-        "MasterServer"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "default",
-      "file_path": "/var/log/cfn-wire.log",
-      "log_stream_name": "cfn-wire",
       "schedulers": [
         "awsbatch",
         "sge",
