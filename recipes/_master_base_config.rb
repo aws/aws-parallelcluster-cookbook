@@ -142,37 +142,8 @@ end
 # Setup RAID array on master node
 include_recipe 'aws-parallelcluster::setup_raid_on_master'
 
-# Configure Ganglia on the Master
-if node['cfncluster']['ganglia_enabled'] == 'yes'
-  template '/etc/ganglia/gmetad.conf' do
-    source 'gmetad.conf.erb'
-    owner 'root'
-    group 'root'
-    mode '0644'
-  end
-
-  template '/etc/ganglia/gmond.conf' do
-    source 'gmond.conf.erb'
-    owner 'root'
-    group 'root'
-    mode '0644'
-  end
-
-  service "gmetad" do
-    supports restart: true
-    action %i[enable restart]
-  end
-
-  service node['cfncluster']['ganglia']['gmond_service'] do
-    supports restart: true
-    action %i[enable restart]
-  end
-
-  service node['cfncluster']['ganglia']['httpd_service'] do
-    supports restart: true, reload: true
-    action %i[enable restart]
-  end
-end
+# Configure Ganglia
+include_recipe 'aws-parallelcluster::ganglia_config'
 
 # Setup cluster user
 user node['cfncluster']['cfn_cluster_user'] do
