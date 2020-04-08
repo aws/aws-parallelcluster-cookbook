@@ -23,6 +23,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Enforce Packer version to be >= 1.4.0 when building an AMI. This is also required for customers using `pcluster 
   createami` command.
 - Remove /tmp/proxy.sh file. Proxy configuration is now written into /etc/profile.d/proxy.sh
+- Omit cfn-init-cmd and cfn-wire from the files stored in CloudWatch logs.
 
 **BUG FIXES**
 - Fix installation of Intel Parallel Studio XE Runtime that requires yum4 since version 2019.5.
