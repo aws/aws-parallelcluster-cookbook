@@ -56,9 +56,9 @@ default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/relea
 default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '19.05.5'
-default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-19.05.5.tar.bz2'
-default['cfncluster']['slurm']['sha1'] = '055adca91e555cc124b1ecac5f3c45e66c17a8ba'
+default['cfncluster']['slurm']['version'] = '20.02.1'
+default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.02.1.tar.bz2'
+default['cfncluster']['slurm']['sha1'] = '91704d8c73bf1a6eab64ccde3f3d03b85188672a'
 # PMIx software
 default['cfncluster']['pmix']['version'] = '3.1.5'
 default['cfncluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cfncluster']['pmix']['version']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"

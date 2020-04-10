@@ -61,6 +61,9 @@ when 'MasterServer', nil
       IFS=${_OLD_IFS}
       export PATH=${NEW_PATH}
 
+      # python3 is required to build slurm >= 20.02
+      source #{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate
+
       env
       tar xf #{slurm_tarball}
       cd slurm-#{node['cfncluster']['slurm']['version']}
@@ -69,6 +72,7 @@ when 'MasterServer', nil
       make -j $CORES
       make install
       make install-contrib
+      deactivate
     SLURM
     # TODO: Fix, so it works for upgrade
     creates '/opt/slurm/bin/srun'
