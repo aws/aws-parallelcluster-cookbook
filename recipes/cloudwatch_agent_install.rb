@@ -30,18 +30,17 @@ s3_domain = "#{s3_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("c
 
 # Set URLs used to download the package and expected signature based on platform
 package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cfncluster']['cfn_region']}"
-case node['platform']
-when 'ubuntu'
-  package_url = "#{package_url_prefix}/#{node['platform']}/amd64/latest/amazon-cloudwatch-agent.deb"
-  package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.deb"
-when 'amazon'
-  # NOTE: the URL used to get amazon linux's package does not use node['platform']
-  package_url = "#{package_url_prefix}/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm"
-  package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.rpm"
-when 'centos'
-  package_url = "#{package_url_prefix}/#{node['platform']}/amd64/latest/amazon-cloudwatch-agent.rpm"
-  package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.rpm"
-end
+arch_url_component = arm_instance? ? 'arm64' : 'amd64'
+platform_url_component = node['platform'] == 'amazon' ? 'amazon_linux' : node['platform']
+package_extension = node['platform'] == 'ubuntu' ? 'deb' : 'rpm'
+package_url = [
+  package_url_prefix,
+  platform_url_component,
+  arch_url_component,
+  "latest",
+  "amazon-cloudwatch-agent.#{package_extension}"
+].join('/')
+package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
 signature_url = "#{package_url}.sig"
 signature_path = "#{package_path}.sig"
 

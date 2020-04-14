@@ -153,3 +153,10 @@ def ami_bootstrapped?
 
   'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
 end
+
+#
+# Check if this is an ARM instance
+#
+def arm_instance?
+  node['kernel']['machine'] == 'aarch64'
+end
