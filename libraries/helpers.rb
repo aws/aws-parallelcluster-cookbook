@@ -160,3 +160,19 @@ end
 def arm_instance?
   node['kernel']['machine'] == 'aarch64'
 end
+
+#
+# Check if this is an OS on which EFA is supported
+#
+def platform_supports_efa?
+  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
+   node['platform'] == 'amazon',
+   node['platform'] == 'ubuntu'].any?
+end
+
+#
+# Check if this is an architecture on which EFA is supported
+#
+def arch_supports_efa?
+  !arm_instance?
+end
