@@ -185,3 +185,10 @@ end
 def platform_supports_intel_hpc_platform?
   node['platform'] == 'centos' && node['platform_version'].to_i >= 7
 end
+
+#
+# Check if DCV is supported on this OS
+#
+def platform_supports_dcv?
+  node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
+end
