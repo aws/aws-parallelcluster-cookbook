@@ -75,8 +75,7 @@ def allow_gpu_acceleration
   end
 end
 
-if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") && node['cfncluster']['cfn_node_type'] == "MasterServer"
-
+if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] == "MasterServer"
   # be sure to have DCV packages installed
   include_recipe "aws-parallelcluster::dcv_install"
 
