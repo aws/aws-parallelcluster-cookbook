@@ -15,7 +15,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-return if node['conditions']['ami_bootstrapped']
+return if node['conditions']['ami_bootstrapped'] || File.exist?("/etc/dcv/dcv.conf")
 
 # Utility function to install a list of packages
 def install_package_list(packages)
@@ -70,7 +70,7 @@ cookbook_file "#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
   not_if { ::File.exist?("#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh") }
 end
 
-if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") && !File.exist?("/etc/dcv/dcv.conf")
+if node['conditions']['dcv_supported']
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer', nil
     dcv_tarball = "#{node['cfncluster']['sources_dir']}/dcv-#{node['cfncluster']['dcv']['version']}.tgz"
