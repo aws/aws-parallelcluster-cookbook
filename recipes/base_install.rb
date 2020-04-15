@@ -58,6 +58,13 @@ package node['cfncluster']['base_packages'] do
   retry_delay 5
 end
 
+# In the case of AL2, there are more packages to install via extras
+if node['cfncluster']['alinux_extras']
+  node['cfncluster']['alinux_extras'].each do |topic|
+    alinux_extras_topic topic
+  end
+end
+
 case node['platform_family']
 when 'rhel', 'amazon'
   yum_package node['cfncluster']['kernel_devel_pkg']['name'] do

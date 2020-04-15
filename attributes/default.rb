@@ -201,6 +201,9 @@ when 'rhel', 'amazon'
     if node['platform_version'].to_i == 2
       # mpich-devel not available on alinux
       default['cfncluster']['base_packages'].delete('mpich-devel')
+      # Install R via amazon linux extras instead
+      default['cfncluster']['base_packages'].delete('R')
+      default['cfncluster']['alinux_extras'] = ['R3.4']
       # Swap out some packages for their alinux2 equivalents
       [%w[db4-devel libdb-devel], %w[redhat-lsb system-lsb]].each do |al1, al2equiv|
         default['cfncluster']['base_packages'].delete(al1)
