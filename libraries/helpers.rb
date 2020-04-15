@@ -171,8 +171,17 @@ def platform_supports_efa?
 end
 
 #
-# Check if this is an architecture on which EFA is supported
+# Check if the platform supports intel MPI
 #
-def arch_supports_efa?
-  !arm_instance?
+def platform_supports_impi?
+  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
+   node['platform'] == 'amazon',
+   node['platform'] == 'ubuntu'].any?
+end
+
+#
+# Check if this platform supports intel's HPC platform
+#
+def platform_supports_intel_hpc_platform?
+  node['platform'] == 'centos' && node['platform_version'].to_i >= 7
 end

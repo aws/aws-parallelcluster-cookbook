@@ -77,7 +77,4 @@ include_recipe 'aws-parallelcluster::efs_mount'
 include_recipe 'aws-parallelcluster::fsx_mount'
 
 # Intel Runtime Libraries
-if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
-  && (node['cfncluster']['enable_intel_hpc_platform'] == 'true')
-  include_recipe "aws-parallelcluster::intel_install"
-end
+include_recipe "aws-parallelcluster::intel_install"
