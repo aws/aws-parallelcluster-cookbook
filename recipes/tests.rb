@@ -223,7 +223,7 @@ end
 # DCV
 ###################
 if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
-   node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") &&
+   node['conditions']['dcv_supported'] &&
    node['cfncluster']['dcv']['installed'] == 'yes'
   execute 'check dcv installed' do
     command 'dcv version'
