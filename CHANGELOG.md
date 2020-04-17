@@ -9,6 +9,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 
 **CHANGES**
+- Upgrade Intel MPI to version 2019 U7.
+
 - Upgrade EFA installer to version 1.8.4
   - Kernel module: efa-1.5.1 (no change)
   - RDMA core: rdma-core-25.0 (distributed only) (no change)
