@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return unless node['conditions']['lustre_supported']
+
 # Install only on Centos 7.6 and 7.5
 if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split('.')[1].to_i)
   lustre_kmod_rpm = "#{node['cfncluster']['sources_dir']}/kmod-lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
