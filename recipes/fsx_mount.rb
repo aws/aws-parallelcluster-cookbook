@@ -32,7 +32,8 @@ if fsx_shared_dir != "NONE"
   end
 
   require 'chef/mixin/shell_out'
-  mountname = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx --region #{node['cfncluster']['cfn_region']} describe-file-systems --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']} --query 'FileSystems[0].LustreConfiguration.MountName' --output text", :user=>'root').stdout.strip
+  proxy_prefix = node['cfncluster']['cfn_proxy'] != 'NONE'? "export HTTP_PROXY=#{node['cfncluster']['cfn_proxy']} && export HTTPS_PROXY=#{node['cfncluster']['cfn_proxy']} && " : ""
+  mountname = shell_out!("#{proxy_prefix}#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx --region #{node['cfncluster']['cfn_region']} describe-file-systems --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']} --query 'FileSystems[0].LustreConfiguration.MountName' --output text", :user=>'root').stdout.strip
 
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
