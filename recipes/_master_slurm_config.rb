@@ -37,37 +37,42 @@ directory '/var/spool/slurm.state' do
 end
 
 template '/opt/slurm/etc/slurm.conf' do
-  source 'slurm.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
-
-template '/opt/slurm/etc/slurm_parallelcluster_nodes.conf' do
-  source 'slurm_parallelcluster_nodes.conf.erb'
+  source 'slurm/slurm.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
 template '/opt/slurm/etc/gres.conf' do
-  source 'gres.conf.erb'
+  source 'slurm/gres.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
-template '/opt/slurm/etc/slurm_parallelcluster_gres.conf' do
-  source 'slurm_parallelcluster_gres.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
+# Copy pcluster config generator and templates
+remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
+  source 'slurm'
+  mode '0700'
+  action :create
+  recursive true
+end
+
+# Copy queue config file from S3 URI
+proxy_prefix = node['cfncluster']['cfn_proxy'] != 'NONE'? "export HTTP_PROXY=#{node['cfncluster']['cfn_proxy']} && export HTTPS_PROXY=#{node['cfncluster']['cfn_proxy']} && " : ""
+execute "copy_queue_config_from_s3" do
+  command "#{proxy_prefix}#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['slurm']['queue_config_s3_uri']} #{node['cfncluster']['slurm']['queue_config_path']} --region #{node['cfncluster']['cfn_region']}"
+end
+
+# Generate pcluster specific configs
+execute "generate_pcluster_slurm_configs" do
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['slurm']['queue_config_path']}"
 end
 
 # alinux1 and centos6 use an old cgroup directory: /cgroup
 # all other OSs use /sys/fs/cgroup, which is the default
 template '/opt/slurm/etc/cgroup.conf' do
-  source 'cgroup.conf.erb'
+  source 'slurm/cgroup.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
@@ -85,6 +90,20 @@ cookbook_file '/opt/slurm/etc/slurm.csh' do
   owner 'root'
   group 'root'
   mode '0755'
+end
+
+template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_resume" do
+  source 'slurm/resume_program.erb'
+  owner 'slurm'
+  group 'slurm'
+  mode '0700'
+end
+
+template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_suspend" do
+  source 'slurm/suspend_program.erb'
+  owner 'slurm'
+  group 'slurm'
+  mode '0700'
 end
 
 cookbook_file '/etc/systemd/system/slurmctld.service' do

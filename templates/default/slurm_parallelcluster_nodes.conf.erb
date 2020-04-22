@@ -1,8 +1,0 @@
-<%
-  def append_dummy
-    if node['cfncluster']['cfn_max_queue_size'].to_i > 0
-        "dummy-compute[1-" + node['cfncluster']['cfn_max_queue_size'] + "]"
-    end
-  end
-%>
-NodeName=<%= append_dummy %> CPUs=2048 State=FUTURE
