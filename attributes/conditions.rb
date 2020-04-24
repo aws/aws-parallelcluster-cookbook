@@ -21,4 +21,7 @@ default['conditions']['efa_supported'] = (node['platform'] == 'centos' && node['
 default['conditions']['intel_mpi_supported'] = (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
   || node['platform'] == 'amazon' || node['platform'] == 'ubuntu'
 
+default['conditions']['lustre_supported'] = (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
+  || node['platform'] == 'amazon' || node['platform'] == 'ubuntu'
+
 default['conditions']['ami_bootstrapped'] = ami_bootstrapped?

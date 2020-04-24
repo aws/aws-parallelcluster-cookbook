@@ -78,7 +78,7 @@ http_404_error() {
   echo "   - We do not support $platform"
   echo "   - We do not have an artifact for $version"
   echo ""
-  echo "This is often the latter case due to running a prerelease or RC version of chef"
+  echo "This is often the latter case due to running a prerelease or RC version of Chef"
   echo "or a gem version which was only pushed to rubygems and not omnitruck."
   echo ""
   echo "You may be able to set your knife[:bootstrap_version] to the most recent stable"
@@ -115,7 +115,7 @@ capture_tmp_stderr() {
 # do_wget URL FILENAME
 do_wget() {
   echo "trying wget..."
-  wget --user-agent="User-Agent: mixlib-install/3.11.5" -O "$2" "$1" 2>$tmp_dir/stderr
+  wget --user-agent="User-Agent: mixlib-install/3.12.1" -O "$2" "$1" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "ERROR 404" $tmp_dir/stderr 2>&1 >/dev/null
@@ -136,7 +136,7 @@ do_wget() {
 # do_curl URL FILENAME
 do_curl() {
   echo "trying curl..."
-  curl -A "User-Agent: mixlib-install/3.11.5" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
+  curl -A "User-Agent: mixlib-install/3.12.1" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
   rc=$?
   # check for 404
   grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null
@@ -157,7 +157,7 @@ do_curl() {
 # do_fetch URL FILENAME
 do_fetch() {
   echo "trying fetch..."
-  fetch --user-agent="User-Agent: mixlib-install/3.11.5" -o "$2" "$1" 2>$tmp_dir/stderr
+  fetch --user-agent="User-Agent: mixlib-install/3.12.1" -o "$2" "$1" 2>$tmp_dir/stderr
   # check for bad return status
   test $? -ne 0 && return 1
   return 0
@@ -187,7 +187,7 @@ do_perl() {
 # do_python URL FILENAME
 do_python() {
   echo "trying python..."
-  python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.11.5' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
+  python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.12.1' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "HTTP Error 404" $tmp_dir/stderr 2>&1 >/dev/null
@@ -329,7 +329,7 @@ if test "x$TMPDIR" = "x"; then
 else
   tmp=$TMPDIR
 fi
-# secure-ish temp dir creation without having mktemp available (DDoS-able but not expliotable)
+# secure-ish temp dir creation without having mktemp available (DDoS-able but not exploitable)
 tmp_dir="$tmp/install.sh.$$"
 (umask 077 && mkdir $tmp_dir) || exit 1
 
@@ -358,12 +358,13 @@ tmp_dir="$tmp/install.sh.$$"
 channel="stable"
 project="chef"
 
-while getopts pnv:c:f:P:d:s:l:a opt
+while getopts pnv:b:c:f:P:d:s:l:a opt
 do
   case "$opt" in
 
     v)  version="$OPTARG";;
     c)  channel="$OPTARG";;
+    b)  build="$OPTARG";;
     p)  channel="current";; # compat for prerelease option
     n)  channel="current";; # compat for nightlies option
     f)  cmdline_filename="$OPTARG";;
@@ -374,7 +375,7 @@ do
     a)  checksum="$OPTARG";;
     \?)   # unknown flag
       echo >&2 \
-      "usage: $0 [-P project] [-c release_channel] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum]"
+      "usage: $0 [-P project] [-c release_channel] [-v version] [-b build] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum]"
       exit 1;;
   esac
 done
@@ -404,9 +405,9 @@ fi
 #
 # Platform and Platform Version detection
 #
-# NOTE: This should now match ohai platform and platform_version matching.
-# do not invented new platform and platform_version schemas, just make this behave
-# like what ohai returns as platform and platform_version for the server.
+# NOTE: This logic should match ohai platform and platform_version matching.
+# do not invent new platform and platform_version schemas, just make this behave
+# like what ohai returns as platform and platform_version for the system.
 #
 # ALSO NOTE: Do not mangle platform or platform_version here.  It is less error
 # prone and more future-proof to do that in the server, and then all omnitruck clients
@@ -417,7 +418,7 @@ fi
 machine=`uname -m`
 os=`uname -s`
 
-if test -f "/etc/lsb-release" && grep -q DISTRIB_ID /etc/lsb-release && ! grep -q wrlinux /etc/lsb-release; then
+if test -f "/etc/lsb-release" && grep DISTRIB_ID /etc/lsb-release >/dev/null && ! grep wrlinux /etc/lsb-release >/dev/null; then
   platform=`grep DISTRIB_ID /etc/lsb-release | cut -d "=" -f 2 | tr '[A-Z]' '[a-z]'`
   platform_version=`grep DISTRIB_RELEASE /etc/lsb-release | cut -d "=" -f 2`
 
@@ -463,7 +464,7 @@ elif test -f "/etc/system-release"; then
     fi
   esac
 
-# Apple OS X
+# Apple macOS
 elif test -f "/usr/bin/sw_vers"; then
   platform="mac_os_x"
   # Matching the tab-space with sed is error-prone
@@ -476,7 +477,7 @@ elif test -f "/usr/bin/sw_vers"; then
   fi
 elif test -f "/etc/release"; then
   machine=`/usr/bin/uname -p`
-  if grep -q SmartOS /etc/release; then
+  if grep SmartOS /etc/release >/dev/null; then
     platform="smartos"
     platform_version=`grep ^Image /etc/product | awk '{ print $3 }'`
   else
@@ -484,12 +485,12 @@ elif test -f "/etc/release"; then
     platform_version=`/usr/bin/uname -r`
   fi
 elif test -f "/etc/SuSE-release"; then
-  if grep -q 'Enterprise' /etc/SuSE-release;
+  if grep 'Enterprise' /etc/SuSE-release >/dev/null;
   then
       platform="sles"
       platform_version=`awk '/^VERSION/ {V = $3}; /^PATCHLEVEL/ {P = $3}; END {print V "." P}' /etc/SuSE-release`
-  else
-      platform="suse"
+  else # opensuse 43 only. 15 ships with /etc/os-release only
+      platform="opensuseleap"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
   fi
 elif test "x$os" = "xFreeBSD"; then
@@ -506,7 +507,14 @@ elif test -f "/etc/os-release"; then
   fi
 
   platform=$ID
-  platform_version=$VERSION
+
+  # VERSION_ID is always the preferred variable to use, but not
+  # every distro has it so fallback to VERSION
+  if test "x$VERSION_ID" != "x"; then
+    platform_version=$VERSION_ID
+  else
+    platform_version=$VERSION
+  fi
 fi
 
 if test "x$platform" = "x"; then
@@ -516,7 +524,7 @@ if test "x$platform" = "x"; then
 fi
 
 #
-# NOTE: platform manging in the install.sh is DEPRECATED
+# NOTE: platform mangling in the install.sh is DEPRECATED
 #
 # - install.sh should be true to ohai and should not remap
 #   platform or platform versions.
@@ -548,23 +556,25 @@ case $platform in
   "sles")
     platform_version=$major_version
     ;;
-  "suse")
+  "opensuseleap")
     platform_version=$major_version
     ;;
 esac
 
 # normalize the architecture we detected
-case $machine in
-  "x86_64"|"amd64"|"x64")
-    machine="x86_64"
-    ;;
-  "i386"|"i86pc"|"x86"|"i686")
-    machine="i386"
-    ;;
-  "sparc"|"sun4u"|"sun4v")
-    machine="sparc"
-    ;;
-esac
+if test "$platform" = "ubuntu"; then
+  case $machine in
+    "arm64"|"aarch64")
+      machine="arm64"
+      ;;
+    "x86_64"|"amd64"|"x64")
+      machine="amd64"
+      ;;
+    "i386"|"i86pc"|"x86"|"i686")
+      machine="i386"
+      ;;
+  esac
+fi
 
 if test "x$platform_version" = "x"; then
   echo "Unable to determine platform version!"
@@ -578,7 +588,20 @@ if test "x$platform" = "xsolaris2"; then
   export PATH
 fi
 
-echo "$platform $platform_version $machine"
+# Region detection
+tmp_file=$tmp_dir/instance_metadata
+do_download "http://169.254.169.254/latest/dynamic/instance-identity/document" $tmp_file
+region=`cat ${tmp_file} | awk '$1 =="\"region\"" {print $3}' | sed 's/"//g; s/,//g'`
+
+# Download domain detection
+if [[ ${region} =~ ^cn- ]]
+then
+  download_domain="amazonaws.com.cn"
+else
+  download_domain="amazonaws.com"
+fi
+
+echo "$platform $platform_version $machine $region"
 
 ############
 # end of platform_detection.sh
@@ -592,33 +615,40 @@ echo "$platform $platform_version $machine"
 
 if test "x$https_proxy" != "x"; then
   echo "setting https_proxy: $https_proxy"
-  export HTTPS_PROXY=$https_proxy
-  export https_proxy=$https_proxy
+  HTTPS_PROXY=$https_proxy
+  https_proxy=$https_proxy
+  export HTTPS_PROXY
+  export https_proxy
 fi
 
 if test "x$http_proxy" != "x"; then
   echo "setting http_proxy: $http_proxy"
-  export HTTP_PROXY=$http_proxy
-  export http_proxy=$http_proxy
+  HTTP_PROXY=$http_proxy
+  http_proxy=$http_proxy
+  export HTTP_PROXY
+  export http_proxy
 fi
 
 if test "x$ftp_proxy" != "x"; then
   echo "setting ftp_proxy: $ftp_proxy"
-  export FTP_PROXY=$ftp_proxy
-  export ftp_proxy=$ftp_proxy
+  FTP_PROXY=$ftp_proxy
+  ftp_proxy=$ftp_proxy
+  export FTP_PROXY
+  export ftp_proxy
 fi
 
 if test "x$no_proxy" != "x"; then
   echo "setting no_proxy: $no_proxy"
-  export NO_PROXY=$no_proxy
-  export no_proxy=$no_proxy
+  NO_PROXY=$no_proxy
+  no_proxy=$no_proxy
+  export NO_PROXY
+  export no_proxy
 fi
 
 
-# fetch_metadata.sh
+# create_download_url.sh
 ############
-# This section calls omnitruck to get the information about the build to be
-#   installed.
+# This section creates the url of the package to download.
 #
 # Inputs:
 # $channel:
@@ -630,34 +660,32 @@ fi
 # $tmp_dir:
 #
 # Outputs:
-# $download_url:
-# $sha256:
+# $download_url: Url of the package to download
+# $sha256: SHA256 checksum of the file to download
 ############
+bucket_url="https://${region}-aws-parallelcluster.s3.${region}.${download_domain}/packages/${project}/"
+if test "x$build" = "x"; then
+  # Build version set to 1 by default if not specified
+  build=1
+fi
 
 if test "x$download_url_override" = "x"; then
-  echo "Getting information for $project $channel $version for $platform..."
+  case "$platform" in
+  "debian"|"ubuntu")
+    package_file="${project}_${version}-${build}_${machine}.deb"
+    ;;
+  *)
+    package_file="$project-$version-$build.$platform$platform_version.$machine.rpm"
+    ;;
+  esac
 
-  metadata_filename="$tmp_dir/metadata.txt"
-  metadata_url="https://www.chef.io/$channel/$project/metadata?v=$version&p=$platform&pv=$platform_version&m=$machine"
+  download_url=$bucket_url$package_file
+  checksum_url="$download_url.sha256"
 
-  do_download "$metadata_url"  "$metadata_filename"
-
-  cat "$metadata_filename"
-
-  echo ""
-  # check that all the mandatory fields in the downloaded metadata are there
-  if grep '^url' $metadata_filename > /dev/null && grep '^sha256' $metadata_filename > /dev/null; then
-    echo "downloaded metadata file looks valid..."
-  else
-    echo "downloaded metadata file is corrupted or an uncaught error was encountered in downloading the file..."
-    # this generally means one of the download methods downloaded a 404 or something like that and then reported a successful exit code,
-    # and this should be fixed in the function that was doing the download.
-    report_bug
-    exit 1
-  fi
-
-  download_url=`awk '$1 == "url" { print $2 }' "$metadata_filename"`
-  sha256=`awk '$1 == "sha256" { print $2 }' "$metadata_filename"`
+  # Extracting sha256 checksum
+  tmp_file=$tmp_dir/$package_file.sha256
+  do_download "$checksum_url" $tmp_file
+  sha256=`awk '{print $1}' $tmp_file`
 else
   download_url=$download_url_override
   # Set sha256 to empty string if checksum not set
@@ -665,13 +693,13 @@ else
 fi
 
 ############
-# end of fetch_metadata.sh
+# end of create_download_url.sh
 ############
 
 
 # fetch_package.sh
 ############
-# This section fetchs a package from $download_url and verifies its metadata.
+# This section fetches a package from $download_url and verifies its metadata.
 #
 # Inputs:
 # $download_url:
@@ -697,7 +725,7 @@ else
   download_filename="$tmp_dir/$filename"
 fi
 
-# ensure the parent directory where to download the installer always exists
+# ensure the parent directory where we download the installer always exists
 download_dir=`dirname $download_filename`
 (umask 077 && mkdir -p $download_dir) || exit 1
 
@@ -772,7 +800,7 @@ if test "x$version" = "x" -a "x$CI" != "xtrue"; then
   echo
   echo "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING"
   echo
-  echo "You are installing an omnibus package without a version pin.  If you are installing"
+  echo "You are installing a package without a version pin.  If you are installing"
   echo "on production servers via an automated process this is DANGEROUS and you will"
   echo "be upgraded without warning on new releases, even to new major releases."
   echo "Letting the version float is only appropriate in desktop, test, development or"
@@ -791,3 +819,4 @@ fi
 ############
 # end of install_package.sh
 ############
+

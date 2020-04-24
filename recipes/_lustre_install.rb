@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return unless node['conditions']['lustre_supported']
+
 # Install only on Centos 7.6 and 7.5
 if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split('.')[1].to_i)
   lustre_kmod_rpm = "#{node['cfncluster']['sources_dir']}/kmod-lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
@@ -49,7 +51,7 @@ if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split(
   end
 
   kernel_module 'lnet'
-elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_i == 7
+elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_i >= 7
 
   # add fsx lustre repository
   yum_repository "aws-fsx" do
@@ -67,7 +69,7 @@ elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_
 
   kernel_module 'lnet'
 elsif node['platform'] == 'centos'
-  Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are 7.5, 7.6 and 7.7")
+  Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are >= 7.5")
 elsif node['platform'] == 'ubuntu'
 
   apt_repository 'fsxlustreclientrepo' do
