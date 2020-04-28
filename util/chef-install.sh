@@ -665,7 +665,7 @@ fi
 # $download_url: Url of the package to download
 # $sha256: SHA256 checksum of the file to download
 ############
-bucket_url="https://${region}-aws-parallelcluster.s3.${region}.${download_domain}/packages/${project}/"
+bucket_url="https://${region}-aws-parallelcluster.s3.${region}.${download_domain}/archives/${project}/"
 if test "x$build" = "x"; then
   # Build version set to 1 by default if not specified
   build=1
