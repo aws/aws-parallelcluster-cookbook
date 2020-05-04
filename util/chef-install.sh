@@ -665,24 +665,24 @@ fi
 # $download_url: Url of the package to download
 # $sha256: SHA256 checksum of the file to download
 ############
-bucket_url="https://${region}-aws-parallelcluster.s3.${region}.${download_domain}/packages/${project}/"
+bucket_url="https://${region}-aws-parallelcluster.s3.${region}.${download_domain}/archives/${project}/"
 if test "x$build" = "x"; then
   # Build version set to 1 by default if not specified
   build=1
 fi
 
-if test "x$download_url_override" = "x"; then
-  case "$platform" in
+if test "x${download_url_override}" = "x"; then
+  case "${platform}" in
   "debian"|"ubuntu")
-    package_file="${project}_${version}-${build}_${machine}.deb"
+    package_file="${project}_${version}-${build}_${platform}${platform_version}_${machine}.deb"
     ;;
   *)
-    package_file="$project-$version-$build.$platform$platform_version.$machine.rpm"
+    package_file="${project}-${version}-${build}.${platform}${platform_version}.${machine}.rpm"
     ;;
   esac
 
-  download_url=$bucket_url$package_file
-  checksum_url="$download_url.sha256"
+  download_url=${bucket_url}${package_file}
+  checksum_url="${download_url}.sha256"
 
   # Extracting sha256 checksum
   tmp_file=$tmp_dir/$package_file.sha256
