@@ -21,7 +21,8 @@ default['conditions']['efa_supported'] = (node['platform'] == 'centos' && node['
 default['conditions']['intel_mpi_supported'] = (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
   || node['platform'] == 'amazon' || node['platform'] == 'ubuntu'
 
+# Fsx Lustre temporarily disabled in Ubuntu 18.04 because client is not yet available for new kernel
 default['conditions']['lustre_supported'] = (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
-  || node['platform'] == 'amazon' || node['platform'] == 'ubuntu'
+  || node['platform'] == 'amazon' || node['platform'] == 'ubuntu' && node['platform_version'].to_f < 18.04
 
 default['conditions']['ami_bootstrapped'] = ami_bootstrapped?

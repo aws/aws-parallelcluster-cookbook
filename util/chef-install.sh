@@ -671,18 +671,18 @@ if test "x$build" = "x"; then
   build=1
 fi
 
-if test "x${download_url_override}" = "x"; then
-  case "${platform}" in
+if test "x$download_url_override" = "x"; then
+  case "$platform" in
   "debian"|"ubuntu")
-    package_file="${project}_${version}-${build}_${platform}${platform_version}_${machine}.deb"
+    package_file="${project}_${version}-${build}_${machine}.deb"
     ;;
   *)
-    package_file="${project}-${version}-${build}.${platform}${platform_version}.${machine}.rpm"
+    package_file="$project-$version-$build.$platform$platform_version.$machine.rpm"
     ;;
   esac
 
-  download_url=${bucket_url}${package_file}
-  checksum_url="${download_url}.sha256"
+  download_url=$bucket_url$package_file
+  checksum_url="$download_url.sha256"
 
   # Extracting sha256 checksum
   tmp_file=$tmp_dir/$package_file.sha256
