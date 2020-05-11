@@ -173,7 +173,8 @@
     {
       "type" : "shell",
       "inline" : [
-        "curl --retry 3 -L https://www.chef.io/chef/install.sh | sudo bash -s -- -v {{user `chef_version`}}"
+        "region=\"{{user `region`}}\"",
+        "curl --retry 3 -L https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\")/archives/chef/chef-install.sh | sudo bash -s -- -v {{user `chef_version`}}"
       ]
     },
     {
