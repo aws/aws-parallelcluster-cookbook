@@ -64,8 +64,8 @@ default['cfncluster']['ganglia_enabled'] = 'no'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
 # domain has dynamic DNS resolution, will resolve to a server in Tokyo when called from China
-default['cfncluster']['nvidia']['driver_version'] = '440.33.01'
-default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.33.01/NVIDIA-Linux-x86_64-440.33.01.run'
+default['cfncluster']['nvidia']['driver_version'] = '440.64.00'
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.64.00/NVIDIA-Linux-x86_64-440.64.00.run'
 default['cfncluster']['nvidia']['cuda_version'] = '10.2'
 default['cfncluster']['nvidia']['cuda_url'] = if node['platform'] == 'centos' && node['platform_version'].to_i < 7
                                                 'http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
