@@ -3,6 +3,27 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.7.0
+-----
+
+**CHANGES**
+
+- Upgrade NICE DCV to version 2020.0-8428.
+- Upgrade Intel MPI to version U7.
+- Upgrade NVIDIA driver to version 440.64.00.
+- Upgrade EFA installer to version 1.8.4:
+  - Kernel module: ``efa-1.5.1`` (no change)
+  - RDMA core: ``rdma-core-25.0`` (no change)
+  - Libfabric: ``libfabric-aws-1.9.0amzn1.1`` (no change)
+  - Open MPI: openmpi40-aws-4.0.3 (updated from openmpi40-aws-4.0.2)
+- Upgrade CentOS 7 AMI to version 7.8
+
+**BUG FIXES**
+
+- Fix recipes installation at runtime by adding the bootstrapped file at the end of the last chef run.
+- Fix installation of Lustre client on Centos 7
+- FSx Lustre: Exit with error when failing to retrieve FSx mountpoint.
+
 2.6.2
 -----
 
