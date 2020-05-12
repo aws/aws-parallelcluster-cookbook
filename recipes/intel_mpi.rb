@@ -17,7 +17,7 @@
 
 return unless node['conditions']['intel_mpi_supported']
 
-intelmpi_modulefile = "#{node['cfncluster']['modulefile_dir']}/intelmpi/#{node['cfncluster']['intelmpi']['version']}"
+intelmpi_modulefile = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/intelmpi"
 intelmpi_installer = "#{node['cfncluster']['sources_dir']}/l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
 
 # fetch intelmpi installer script
@@ -28,8 +28,6 @@ remote_file intelmpi_installer do
   retry_delay 5
   not_if { ::File.exist?("/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}") }
 end
-
-directory "#{node['cfncluster']['modulefile_dir']}/intelmpi"
 
 bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
@@ -45,11 +43,12 @@ bash "install intel mpi" do
   creates "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}"
 end
 
-bash "create modulefile" do
-  cwd node['cfncluster']['modulefile_dir']
-  code <<-MODULEFILE
-    set -e
-    cp #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}
-  MODULEFILE
-  creates intelmpi_modulefile
+append_if_no_line "append intel modules file dir to modules conf" do
+  path "#{ENV['MODULESHOME']}/init/.modulespath"
+  line "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/"
+end
+
+execute "rename intel mpi modules file name" do
+  command "mv #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}"
+  creates "#{intelmpi_modulefile}"
 end
