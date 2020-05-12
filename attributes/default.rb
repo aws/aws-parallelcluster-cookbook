@@ -147,6 +147,8 @@ when 'rhel', 'amazon'
 
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
+  # MODULESHOME
+  default['cfncluster']['moduleshome'] = "/usr/share/Modules"
 
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
@@ -242,6 +244,8 @@ when 'debian'
   default['cfncluster']['lustre']['repository_uri'] = 'https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu'
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
+  # MODULESHOME
+  default['cfncluster']['moduleshome'] = "/usr/share/modules"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
