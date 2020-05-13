@@ -44,7 +44,7 @@ bash "install intel mpi" do
 end
 
 append_if_no_line "append intel modules file dir to modules conf" do
-  path "#{ENV['MODULESHOME']}/init/.modulespath"
+  path "#{node['cfncluster']['moduleshome']}/init/.modulespath"
   line "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/"
 end
 
