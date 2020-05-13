@@ -120,6 +120,16 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
         retries 10
         retry_delay 5
       end
+
+      # Use Gnome in place of Gnome-classic
+      file "Setup Gnome standard" do
+        content "PREFERRED=/usr/bin/gnome-session"
+        owner "root"
+        group "root"
+        mode "0755"
+        path "/etc/sysconfig/desktop"
+      end
+
     end
     disable_lock_screen
 
