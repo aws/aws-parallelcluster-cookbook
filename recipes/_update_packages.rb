@@ -23,7 +23,17 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
       command "yum -y update && package-cleanup -y --oldkernels --count=1"
     end
   when 'debian'
+    # FIXME: pin Kernel version until Lustre client package version is not aligned with latest
+    cookbook_file 'linux-aws.pref' do
+      path '/etc/apt/preferences.d/linux-aws.pref'
+    end
     apt_update
+    if !node['cfncluster']['kernel']['package'].nil? && !node['cfncluster']['kernel']['package'].empty?
+      package node['cfncluster']['kernel']['package'] do
+        retries 3
+        retry_delay 5
+      end
+    end
     execute 'apt-upgrade' do
       command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove -y"
       retries 3
