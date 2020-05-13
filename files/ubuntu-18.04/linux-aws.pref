@@ -1,3 +1,11 @@
 Package: linux-aws
-Pin: version 4.15*
-Pin-Priority: 1001
+Pin: version 5*
+Pin-Priority: -1
+
+Package: linux-image-aws
+Pin: version 5*
+Pin-Priority: -1
+
+Package: linux-headers-aws
+Pin: version 5*
+Pin-Priority: -1

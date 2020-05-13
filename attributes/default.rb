@@ -238,6 +238,7 @@ when 'debian'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
     default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
+    default['cfncluster']['kernel']['package'] = 'linux-image-4.15.0-1066-aws'
   end
 
   default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-ubuntu-public-key.asc'
