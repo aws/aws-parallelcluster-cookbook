@@ -160,6 +160,8 @@
         "sudo sed -i 's/APT::Periodic::Update-Package-Lists \"1\"/APT::Periodic::Update-Package-Lists \"0\"/' /etc/apt/apt.conf.d/20auto-upgrades",
         "sudo sed -i 's/APT::Periodic::Update-Package-Lists \"1\"/APT::Periodic::Update-Package-Lists \"0\"/' /etc/apt/apt.conf.d/10periodic",
         "sudo sed -i 's/APT::Periodic::Unattended-Upgrade \"1\"/APT::Periodic::Unattended-Upgrade \"0\"/' /etc/apt/apt.conf.d/20auto-upgrades",
+        "sudo dpkg --purge --pending",
+        "sudo DEBIAN_FRONTEND=noninteractive apt-get -fy install",
         "sudo apt-cache search build-essential",
         "sudo apt-get clean",
         "sudo apt-get update"
