@@ -80,6 +80,10 @@ default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/fi
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2020.0-8428'
 default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
+# Kernel packages
+default['cfncluster']['kernel']['package'] = nil
+default['cfncluster']['kernel']['headers'] = nil
+
 case "#{node['platform']}#{node['platform_version'].to_i}"
 when 'centos7', 'amazon2'
   default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
@@ -239,6 +243,7 @@ when 'debian'
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
     default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
     default['cfncluster']['kernel']['package'] = 'linux-image-4.15.0-1066-aws'
+    default['cfncluster']['kernel']['headers'] = 'linux-headers-4.15.0-1066-aws'
   end
 
   default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-ubuntu-public-key.asc'
