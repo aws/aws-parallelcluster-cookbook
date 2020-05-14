@@ -39,7 +39,8 @@ when 'MasterServer', nil
       'VERSION' => node['cfncluster']['sge']['version'],
       'TARBALL_ROOT_DIR' => "sge-#{node['cfncluster']['sge']['version']}",
       'TARBALL_PATH' => sge_tarball,
-      'TARBALL_URL' => node['cfncluster']['sge']['url']
+      'TARBALL_URL' => node['cfncluster']['sge']['url'],
+      'REGION' => node['cfncluster']['cfn_region']
     )
 
     command 'sh /tmp/sge_preinstall.sh'
