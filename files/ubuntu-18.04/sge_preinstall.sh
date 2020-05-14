@@ -6,7 +6,13 @@ pkg_version="$VERSION"
 
 #adds eon source packages
 src_bionic=`sed -n '/#\s*deb-src .* bionic universe/p' /etc/apt/sources.list`
-src_eoan=`echo $src_bionic|sed -e 's/#//' -e 's/bionic/eoan/'`
+
+# FIXME: if China region use US repository
+if [ "${REGION}" != "${REGION#cn-*}" ]; then
+  src_eoan="deb-src http://us-east-1.ec2.archive.ubuntu.com/ubuntu/ eoan universe"
+else
+  src_eoan=`echo "${src_bionic}" | sed -e 's/#//' -e 's/bionic/eoan/'`
+fi
 echo $src_eoan >> /etc/apt/sources.list
 apt update
 
