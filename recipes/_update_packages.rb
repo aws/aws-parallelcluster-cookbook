@@ -33,6 +33,10 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
         retries 3
         retry_delay 5
       end
+      package node['cfncluster']['kernel']['headers'] do
+        retries 3
+        retry_delay 5
+      end
     end
     execute 'apt-upgrade' do
       command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove -y"
