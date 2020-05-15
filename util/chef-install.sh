@@ -275,12 +275,8 @@ install_file() {
       ;;
     "deb")
       echo "installing with dpkg..."
-      next_wait=0
-      until dpkg -i "$2" || [ ${next_wait} -ge 10 ] ; do
-        echo "Retrying dpkg -i $2 ..."
-        sleep $((next_wait=next_wait+1))
-      done
-      [ ${next_wait} -lt 10 ]
+      flock $(apt-config shell StateDir Dir::State/d | sed -r "s/.*'(.*)'$/\1/")daily_lock systemctl stop apt-daily.timer apt-daily.service
+      dpkg -i "$2"
       ;;
     "bff")
       echo "installing with installp..."
