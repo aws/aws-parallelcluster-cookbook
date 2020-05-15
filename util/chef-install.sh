@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # WARNING: REQUIRES /bin/sh
 #
 # - must run on /bin/sh on solaris 9
@@ -596,7 +596,7 @@ do_download "http://169.254.169.254/latest/dynamic/instance-identity/document" $
 region=`cat ${tmp_file} | awk '$1 =="\"region\"" {print $3}' | sed 's/"//g; s/,//g'`
 
 # Download domain detection
-if [[ ${region} =~ ^cn- ]]
+if [ "${region}" != "${region#cn-*}" ]
 then
   download_domain="amazonaws.com.cn"
 else
