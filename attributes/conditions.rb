@@ -15,8 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-default['conditions']['lustre_supported'] = (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
-  || node['platform'] == 'amazon' || node['platform'] == 'ubuntu'
+default['conditions']['lustre_supported'] = !arm_instance? && platform_supports_lustre?
 default['conditions']['efa_supported'] = !arm_instance? && platform_supports_efa?
 default['conditions']['intel_mpi_supported'] = !arm_instance? && platform_supports_impi?
 default['conditions']['intel_hpc_platform_supported'] = !arm_instance? && platform_supports_intel_hpc_platform?
