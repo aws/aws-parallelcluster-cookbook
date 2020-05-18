@@ -222,6 +222,10 @@ include_recipe "aws-parallelcluster::_lustre_install"
 include_recipe "aws-parallelcluster::efa_install"
 include_recipe "aws-parallelcluster::intel_mpi"
 
+# On ARM instances, install openmpi. This is done because no MPI implementation is provided via EFA
+# or Intel MPI, as is the case on an x86_64 instance.
+include_recipe 'aws-parallelcluster::arm_openmpi_install'
+
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster::cloudwatch_agent_install"
 
