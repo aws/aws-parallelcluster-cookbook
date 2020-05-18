@@ -22,7 +22,8 @@
     "custom_node_package" : "{{env `PARALLELCLUSTER_NODE_URL`}}",
     "parallelcluster_ref" : "{{env `PARALLELCLUSTER_REF`}}",
     "parallelcluster_cookbook_ref" : "{{env `PARALLELCLUSTER_COOKBOOK_REF`}}",
-    "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}"
+    "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}",
+    "ami_arch" : "{{env `AMI_ARCH`}}"
   },
   "builders" : [
     {
@@ -32,8 +33,9 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*",
-          "root-device-type": "ebs"
+          "name": "ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-*-server-*",
+          "root-device-type": "ebs",
+          "architecture": "{{user `ami_arch`}}"
         },
         "owners": ["099720109477", "513442679011", "837727238323"],
         "most_recent": true
@@ -43,7 +45,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1804-lts-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1804-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "security_group_id" : "{{user `security_group_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
@@ -103,7 +105,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1804-lts-hvm-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1804-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
