@@ -8,16 +8,22 @@
 # AWS_SUBNET_ID=<us-east-1-subnet-id>
 # NVIDIA_ENABLED=<no|yes>
 #
+# The following variables can be exported in order to configure packer variables, but the CLI args takes precedent:
+# AMI_ARCH=<arch>
+#
 # NOTE: The VPC and the Subnet must be in the us-east-1 region, because the packer templates refer to
 # AMI IDs from this region. Moreover, the CentOs AMIs are private to the AWS ParallelCluster account.
 #
-# Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom] [--build-date <build-date>]
+# Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom]
+#                     [--build-date <build-date>] [--arch <arch>]
 #   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1604)
 #   partition: partition to build in (supported values: commercial|govcloud|china)
 #   region: region to copy ami too (supported values: all|us-east-1|us-gov-west-1|...)
 #   custom: specifies to create the AMI from a custom AMI-id, which must be specified by variable CUSTOM_AMI_ID in the environment (optional)
 #   public: specifies AMIs visibility (optional, default is private)
 #   build-date: timestamp to append to the AMIs names (optional)
+#   arch: Architecture to filter for when selecting AMI to build on, corresponds to AMI_ARCH environment variable
+#         (supported values: x86_64|arm64)
 
 requirements_check() {
     currentver="$(packer --version)"
@@ -49,6 +55,7 @@ parse_options() {
     _custom=false
     _public=false
     _build_date=''
+    _arch=''
 
     if [ $# -eq 0 ]; then
         syntax
@@ -91,6 +98,13 @@ parse_options() {
             --build-date=*)
                 _build_date="${1#*=}"
             ;;
+            --arch)
+                _arch="${2}"
+                shift
+            ;;
+            --arch=*)
+                _arch="${1#*=}"
+            ;;
             -h|--help|help)
                 syntax
                 exit 0
@@ -107,7 +121,8 @@ parse_options() {
 check_options() {
     set -e
 
-    available_os="centos6 centos7 alinux ubuntu1604 ubuntu1804 alinux2"
+    available_arm_os="ubuntu1604 ubuntu1804 alinux2"  # subset of supported OSes for which ARM AMIs are available
+    available_os="centos6 centos7 alinux ${available_arm_os}"
     cwd="$(dirname $0)"
     tmp_dir=$(mktemp -d)
     export VENDOR_PATH="${tmp_dir}/vendor/cookbooks"
@@ -152,6 +167,39 @@ check_options() {
       export BUILD_FOR=${available_regions}
     else
       export BUILD_FOR=${_region}
+    fi
+
+    # Ensure architecture to build for is known
+    if [ -z "${_arch}" ] && [ -z "${AMI_ARCH}" ]; then
+      echo "Must specify the architecture to build an AMI for via either --arch or by setting AMI_ARCH"
+      exit 1
+    elif [ -z "${_arch}" ]; then
+      _arch="${AMI_ARCH}"
+    fi
+
+    # Ensure architecture is valid
+    available_archs="x86_64 arm64"
+    case ${_arch} in
+      x86_64|arm64)
+        export AMI_ARCH="${_arch}"
+        ;;
+      *)
+        echo "Invalid architecture: ${_arch}"
+        echo "Must be one of the following: ${available_archs}"
+        exit 1
+        ;;
+    esac
+
+    # Ensure the specified architecture-OS combination is valid
+    if [ "${_arch}" == "arm64" ] && [[ "${_os}" =~ ^centos[0-9]+ ]]; then
+      echo "Currently there are no CentOS arm64 AMIs available."
+      exit 1
+    elif [ "${_arch}" == "arm64" ] && [ "${_os}" == "alinux" ]; then
+      echo "Currently there are no alinux (AL1) arm64 AMIs available."
+      exit 1
+    elif [ "${_arch}" == "arm64" ] && [ "${_os}" == "all" ]; then
+      echo "Not building for any CentOS versions or alinux (AL1) because there are no arm64 AMIs available."
+      available_os="${available_arm_os}"
     fi
 }
 
