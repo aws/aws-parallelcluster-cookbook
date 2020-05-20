@@ -3,6 +3,15 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+
+X.X.X
+-----
+
+**CHANGES**
+
+- Disable libvirtd service on Centos 7. Virtual bridge interfaces are incorrectly detected by Open MPI and
+  cause MPI applications to hang, see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details 
+
 2.7.0
 -----
 

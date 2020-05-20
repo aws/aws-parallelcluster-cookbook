@@ -409,3 +409,18 @@ when 'ubuntu1604', 'ubuntu1804'
     user node['cfncluster']['cfn_cluster_user']
   end
 end
+
+###################
+# Bridge Network Interface
+###################
+if node['platform'] == 'centos' && node['platform_version'].to_i >= 7
+  bash 'test bridge network interface presence' do
+    code <<-TESTBRIDGE
+      set -e
+      # brctl show
+      # bridge name bridge id STP enabled interfaces
+      # virbr0 8000.525400e6e4f9 yes virbr0-nic
+      [ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0
+    TESTBRIDGE
+  end
+end
