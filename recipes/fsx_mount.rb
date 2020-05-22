@@ -46,6 +46,8 @@ if fsx_shared_dir != "NONE"
     pass 0
     options mount_options
     action %i[mount enable]
+    retries 3
+    retry_delay 5
   end
 
   # Make sure permission is correct
