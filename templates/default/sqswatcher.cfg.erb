@@ -7,3 +7,4 @@ scheduler = <%= node['cfncluster']['cfn_scheduler'] %>
 cluster_user = <%= node['cfncluster']['cfn_cluster_user'] %>
 proxy = <%= node['cfncluster']['cfn_proxy'] %>
 stack_name = <%= node['cfncluster']['stack_name'] %>
+<%= if node['cfncluster']['cfn_health_sqs_queue'].nil? || node['cfncluster']['cfn_health_sqs_queue'].empty? then "disable_health_check = True" end %>
