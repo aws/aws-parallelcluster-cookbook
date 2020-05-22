@@ -40,6 +40,8 @@ if efs_shared_dir != "NONE"
     dump 0
     pass 0
     action %i[mount enable]
+    retries 3
+    retry_delay 5
   end
 
   # Make sure EFS shared directory permissions are correct
