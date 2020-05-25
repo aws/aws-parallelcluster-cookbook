@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-nfs_master = node['cfncluster']['cfn_master']
+nfs_master = node['cfncluster']['cfn_master_privateip']
 
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]

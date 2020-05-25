@@ -17,6 +17,7 @@ cfn_cluster_user=<%= node['cfncluster']['cfn_cluster_user'] %>
 cfn_sqs_queue=<%= node['cfncluster']['cfn_sqs_queue'] %>
 cfn_health_sqs_queue=<%= node['cfncluster']['cfn_health_sqs_queue'] %>
 cfn_master=<%= node['cfncluster']['cfn_master'] %>
+cfn_master_privateip=<%= node['cfncluster']['cfn_master_privateip'] %>
 <% end -%>
 <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
 cfn_volume=<%= node['cfncluster']['cfn_volume'] %>

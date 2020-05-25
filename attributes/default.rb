@@ -290,6 +290,7 @@ default['cfncluster']['cfn_shared_dir'] = '/shared'
 default['cfncluster']['cfn_efs_shared_dir'] = 'NONE'
 default['cfncluster']['cfn_efs'] = nil
 default['cfncluster']['cfn_master'] = nil
+default['cfncluster']['cfn_master_privateip'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
 default['cfncluster']['cfn_fsx_options'] = 'NONE'
 default['cfncluster']['cfn_fsx_fs_id'] = nil

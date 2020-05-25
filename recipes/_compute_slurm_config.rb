@@ -23,7 +23,7 @@ directory '/var/spool/slurmd' do
 end
 
 # Mount /opt/slurm over NFS
-nfs_master = node['cfncluster']['cfn_master']
+nfs_master = node['cfncluster']['cfn_master_privateip']
 mount '/opt/slurm' do
   device "#{nfs_master}:/opt/slurm"
   fstype "nfs"

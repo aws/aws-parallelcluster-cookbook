@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # Mount /opt/sge over NFS
-nfs_master = node['cfncluster']['cfn_master']
+nfs_master = node['cfncluster']['cfn_master_privateip']
 mount '/opt/sge' do
   device "#{nfs_master}:/opt/sge"
   fstype "nfs"

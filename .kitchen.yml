@@ -202,6 +202,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_privateip: <%= ENV['CFN_MASTER_PRIVATEIP'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
@@ -230,6 +231,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_privateip: <%= ENV['CFN_MASTER_PRIVATEIP'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
@@ -258,6 +260,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_privateip: <%= ENV['CFN_MASTER_PRIVATEIP'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
