@@ -51,20 +51,9 @@ when 'MasterServer', nil
     code <<-SLURM
       set -e
 
-      NEW_PATH=""
-      _OLD_IFS=${IFS}
-      IFS=':'
-      for p in ${PATH}
-      do
-        [[ ! ${p} =~ \.pyenv ]] && NEW_PATH="${p}:${NEW_PATH}"
-      done
-      IFS=${_OLD_IFS}
-      export PATH=${NEW_PATH}
-
       # python3 is required to build slurm >= 20.02
       source #{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate
 
-      env
       tar xf #{slurm_tarball}
       cd slurm-#{node['cfncluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
