@@ -29,7 +29,13 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
       retries 3
       retry_delay 5
     end
-    package 'linux-aws' do
+    # For some reason, the package name is different on Ubuntu 16.04 ARM AMIs
+    kernel_package_name = if arm_instance? && node['platform_version'] == "16.04"
+                            'linux-aws-hwe'
+                          else
+                            'linux-aws'
+                          end
+    package kernel_package_name do
       retries 3
       retry_delay 5
     end
