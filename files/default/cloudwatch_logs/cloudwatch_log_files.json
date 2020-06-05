@@ -91,6 +91,25 @@
       "feature_conditions": []
     },
     {
+      "timestamp_format_key": "month_first",
+      "file_path": "/var/log/cloud-init-output.log",
+      "log_stream_name": "cloud-init-output",
+      "schedulers": [
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
       "timestamp_format_key": "default",
       "file_path": "/var/log/supervisord.log",
       "log_stream_name": "supervisord",
