@@ -21,8 +21,14 @@ service "supervisord" do
   action %i[enable start]
 end
 
-execute "compute_ready" do
-  command "/opt/parallelcluster/scripts/compute_ready"
-  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
-  only_if { node['cfncluster']['cfn_node_type'] == 'ComputeFleet' }
+return unless node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+
+case node['cfncluster']['cfn_scheduler']
+when 'slurm'
+  include_recipe 'aws-parallelcluster::_compute_slurm_finalize'
+else
+  execute "compute_ready" do
+    command "/opt/parallelcluster/scripts/compute_ready"
+    environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
+  end
 end
