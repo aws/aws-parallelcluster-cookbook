@@ -1,0 +1,3 @@
+#%Module
+exec sudo update-alternatives --set mpi /usr/lib/aarch64-linux-gnu/openmpi/include
+exec sudo update-alternatives --set mpirun /usr/bin/mpirun.openmpi
