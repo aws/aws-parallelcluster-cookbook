@@ -63,6 +63,15 @@ execute "copy_cluster_config_from_s3" do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['cluster_config_s3_uri']} #{node['cfncluster']['cluster_config_path']} --region #{node['cfncluster']['cfn_region']}"
 end
 
+# Ensure slurm config directory is in place
+directory "#{node['cfncluster']['configs_dir']}/slurm" do
+  user 'slurm'
+  group 'slurm'
+  mode '0755'
+  action :create
+  recursive true
+end
+
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
@@ -95,14 +104,33 @@ template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_resume" do
   source 'slurm/resume_program.erb'
   owner 'slurm'
   group 'slurm'
-  mode '0700'
+  mode '0744'
+end
+
+file "/var/log/parallelcluster/slurm_resume.log" do
+  owner 'slurm'
+  group 'slurm'
+  mode '0644'
 end
 
 template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_suspend" do
   source 'slurm/suspend_program.erb'
   owner 'slurm'
   group 'slurm'
-  mode '0700'
+  mode '0744'
+end
+
+file "/var/log/parallelcluster/slurm_suspend.log" do
+  owner 'slurm'
+  group 'slurm'
+  mode '0644'
+end
+
+template "#{node['cfncluster']['configs_dir']}/parallelcluster_slurm_cloudbursting.conf" do
+  source 'slurm/parallelcluster_slurm_cloudbursting.conf.erb'
+  owner 'slurm'
+  group 'slurm'
+  mode '0644'
 end
 
 cookbook_file '/etc/systemd/system/slurmctld.service' do
