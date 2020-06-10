@@ -85,6 +85,16 @@ if node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node
       # Install X Window System (required when using GPU acceleration)
       package "xorg-x11-server-Xorg"
 
+      # libvirtd service creates virtual bridge interfaces.
+      # It's provided by libvirt-daemon, installed as requirement for gnome-boxes, included in @gnome.
+      # Open MPI does not ignore other local-only devices other than loopback:
+      # if virtual bridge interface is up, Open MPI assumes that that network is usable for MPI communications.
+      # This is incorrect and it led to MPI applications hanging when they tried to send or receive MPI messages
+      # see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
+      service 'libvirtd' do
+        action %i[disable stop]
+      end
+
     when 'ubuntu'
       apt_update
       # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
