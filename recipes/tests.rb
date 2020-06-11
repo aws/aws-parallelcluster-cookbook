@@ -242,51 +242,53 @@ end
 ###################
 # EFA - Intel MPI
 ###################
-case node['cfncluster']['os']
-when 'alinux', 'centos7', 'alinux2'
-  execute 'check efa rpm installed' do
-    command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
-    user node['cfncluster']['cfn_cluster_user']
-  end
-  execute 'check intel mpi installed' do
-    command "rpm -qa | grep intel-mpi"
-    user node['cfncluster']['cfn_cluster_user']
-  end
-when 'ubuntu1604', 'ubuntu1804'
-  case node['cfncluster']['cfn_node_type']
-  when 'MasterServer'
-    execute 'check ptrace protection enabled' do
-      command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 1'"
+if node['conditions']['efa_supported'] && node['conditions']['intel_mpi_supported']
+  case node['cfncluster']['os']
+  when 'alinux', 'centos7', 'alinux2'
+    execute 'check efa rpm installed' do
+      command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
       user node['cfncluster']['cfn_cluster_user']
     end
-  when 'ComputeFleet'
-    execute 'check ptrace protection disabled' do
-      command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 0'"
+    execute 'check intel mpi installed' do
+      command "rpm -qa | grep intel-mpi"
+      user node['cfncluster']['cfn_cluster_user']
+    end
+  when 'ubuntu1604', 'ubuntu1804'
+    case node['cfncluster']['cfn_node_type']
+    when 'MasterServer'
+      execute 'check ptrace protection enabled' do
+        command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 1'"
+        user node['cfncluster']['cfn_cluster_user']
+      end
+    when 'ComputeFleet'
+      execute 'check ptrace protection disabled' do
+        command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 0'"
+        user node['cfncluster']['cfn_cluster_user']
+      end
+    end
+    execute 'check efa rpm installed' do
+      command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
       user node['cfncluster']['cfn_cluster_user']
     end
   end
-  execute 'check efa rpm installed' do
-    command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
-    user node['cfncluster']['cfn_cluster_user']
-  end
-end
 
-# Test only on MasterServer since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
-# overrides intel binaries.
-if node['cfncluster']['cfn_node_type'] == 'MasterServer'
-  unless node['cfncluster']['os'] == 'centos6'
-    bash 'check intel mpi version' do
-      cwd Chef::Config[:file_cache_path]
-      code <<-INTELMPI
-        set -e
-        # Initialize module
-        # Unset MODULEPATH to force search path reinitialization when loading profile 
-        unset MODULEPATH  
-        # Must execute this in a bash script because source is a bash built-in function
-        source /etc/profile.d/modules.sh
-        module load intelmpi && mpirun --help | grep 'Version 2019 Update 7'
-      INTELMPI
-      user node['cfncluster']['cfn_cluster_user']
+  # Test only on MasterServer since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
+  # overrides intel binaries.
+  if node['cfncluster']['cfn_node_type'] == 'MasterServer'
+    unless node['cfncluster']['os'] == 'centos6'
+      bash 'check intel mpi version' do
+        cwd Chef::Config[:file_cache_path]
+        code <<-INTELMPI
+          set -e
+          # Initialize module
+          # Unset MODULEPATH to force search path reinitialization when loading profile
+          unset MODULEPATH
+          # Must execute this in a bash script because source is a bash built-in function
+          source /etc/profile.d/modules.sh
+          module load intelmpi && mpirun --help | grep 'Version 2019 Update 7'
+        INTELMPI
+        user node['cfncluster']['cfn_cluster_user']
+      end
     end
   end
 end
@@ -311,62 +313,64 @@ end
 ###################
 # NVIDIA - CUDA
 ###################
-bash 'test nvidia driver install' do
-  cwd Chef::Config[:file_cache_path]
-  code <<-TESTNVIDIA
-    has_gpu=$(lspci | grep -o "NVIDIA")
-    if [ -z "$has_gpu" ]; then
-      echo "No GPU detected, no test needed."
-      exit 0
-    fi
+if node['cfncluster']['nvidia']['enabled'] == 'yes'
+  bash 'test nvidia driver install' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TESTNVIDIA
+      has_gpu=$(lspci | grep -o "NVIDIA")
+      if [ -z "$has_gpu" ]; then
+        echo "No GPU detected, no test needed."
+        exit 0
+      fi
 
-    set -e
-    driver_ver="#{node['cfncluster']['nvidia']['driver_version']}"
-    export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
+      set -e
+      driver_ver="#{node['cfncluster']['nvidia']['driver_version']}"
+      export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
 
-    # Test NVIDIA Driver installation
-    echo "Testing NVIDIA driver install..."
-    # grep driver version from nvidia-smi output. If driver is not installed nvidia-smi command will fail
-    driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9.]+")
-    if [ "$driver_output" != "Driver Version: $driver_ver" ]; then
-      echo "NVIDIA driver installed incorrectly! Installed $driver_output but expected version $driver_ver"
-      exit 1
-    else
-      echo "Correctly installed NVIDIA $driver_output"
-    fi
-  TESTNVIDIA
-end
+      # Test NVIDIA Driver installation
+      echo "Testing NVIDIA driver install..."
+      # grep driver version from nvidia-smi output. If driver is not installed nvidia-smi command will fail
+      driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9.]+")
+      if [ "$driver_output" != "Driver Version: $driver_ver" ]; then
+        echo "NVIDIA driver installed incorrectly! Installed $driver_output but expected version $driver_ver"
+        exit 1
+      else
+        echo "Correctly installed NVIDIA $driver_output"
+      fi
+    TESTNVIDIA
+  end
 
-bash 'test CUDA install' do
-  cwd Chef::Config[:file_cache_path]
-  code <<-TESTCUDA
-    has_gpu=$(lspci | grep -o "NVIDIA")
-    if [ -z "$has_gpu" ]; then
-      echo "No GPU detected, no test needed."
-      exit 0
-    fi
+  bash 'test CUDA install' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TESTCUDA
+      has_gpu=$(lspci | grep -o "NVIDIA")
+      if [ -z "$has_gpu" ]; then
+        echo "No GPU detected, no test needed."
+        exit 0
+      fi
 
-    set -e
-    cuda_ver="#{node['cfncluster']['nvidia']['cuda_version']}"
-    # Test CUDA installation
-    echo "Testing CUDA install with nvcc..."
-    export PATH=/usr/local/cuda-$cuda_ver/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/cuda-$cuda_ver/lib64:$LD_LIBRARY_PATH
-    # grep CUDA version from nvcc output. If CUDA is not installed nvcc command will fail
-    cuda_output=$(nvcc -V | grep -E -o "release [0-9]+.[0-9]+")
-    if [ "$cuda_output" != "release $cuda_ver" ]; then
-      echo "CUDA installed incorrectly! Installed $cuda_output but expected $cuda_ver"
-      exit 1
-    else
-      echo "CUDA nvcc test passed, $cuda_output"
-    fi
+      set -e
+      cuda_ver="#{node['cfncluster']['nvidia']['cuda_version']}"
+      # Test CUDA installation
+      echo "Testing CUDA install with nvcc..."
+      export PATH=/usr/local/cuda-$cuda_ver/bin:$PATH
+      export LD_LIBRARY_PATH=/usr/local/cuda-$cuda_ver/lib64:$LD_LIBRARY_PATH
+      # grep CUDA version from nvcc output. If CUDA is not installed nvcc command will fail
+      cuda_output=$(nvcc -V | grep -E -o "release [0-9]+.[0-9]+")
+      if [ "$cuda_output" != "release $cuda_ver" ]; then
+        echo "CUDA installed incorrectly! Installed $cuda_output but expected $cuda_ver"
+        exit 1
+      else
+        echo "CUDA nvcc test passed, $cuda_output"
+      fi
 
-    # Test deviceQuery
-    echo "Testing CUDA install with deviceQuery..."
-    /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
-    echo "CUDA deviceQuery test passed"
-    echo "Correctly installed CUDA $cuda_output"
-  TESTCUDA
+      # Test deviceQuery
+      echo "Testing CUDA install with deviceQuery..."
+      /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
+      echo "CUDA deviceQuery test passed"
+      echo "Correctly installed CUDA $cuda_output"
+    TESTCUDA
+  end
 end
 
 ###################
@@ -382,8 +386,7 @@ end
 # Intel Python
 ###################
 # Intel Python Libraries
-if (node['platform'] == 'centos' && node['platform_version'].to_i >= 7) \
-  && (node['cfncluster']['enable_intel_hpc_platform'] == 'true')
+if node['conditions']['intel_hpc_platform_supported'] && node['cfncluster']['enable_intel_hpc_platform'] == 'true'
   execute "check-intel-python2" do
     # Output code will be 1 if version is different
     command "rpm -q intelpython2 | grep #{node['cfncluster']['intelpython2']['version']}"
@@ -397,16 +400,18 @@ end
 ###################
 # FSx Lustre
 ###################
-case node['cfncluster']['os']
-when 'alinux', 'centos7'
-  execute 'check for lustre libraries' do
-    command "rpm -qa | grep lustre-client"
-    user node['cfncluster']['cfn_cluster_user']
-  end
-when 'ubuntu1604', 'ubuntu1804'
-  execute 'check for lustre libraries' do
-    command "dpkg -l | grep lustre"
-    user node['cfncluster']['cfn_cluster_user']
+if node['conditions']['lustre_supported']
+  case node['cfncluster']['os']
+  when 'alinux', 'centos7'
+    execute 'check for lustre libraries' do
+      command "rpm -qa | grep lustre-client"
+      user node['cfncluster']['cfn_cluster_user']
+    end
+  when 'ubuntu1604', 'ubuntu1804'
+    execute 'check for lustre libraries' do
+      command "dpkg -l | grep lustre"
+      user node['cfncluster']['cfn_cluster_user']
+    end
   end
 end
 
