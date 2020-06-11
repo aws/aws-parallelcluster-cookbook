@@ -53,7 +53,7 @@ end
 # Copy pcluster config generator and templates
 remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
   source 'slurm'
-  mode '0700'
+  mode '0755'
   action :create
   recursive true
 end
