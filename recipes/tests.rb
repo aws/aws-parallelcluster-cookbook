@@ -90,23 +90,29 @@ end
 # SGE
 ###################
 if node['cfncluster']['cfn_scheduler'] == 'sge'
+  sge_bin_suffix = if arm_instance?
+                     "arm64"
+                   else
+                     "amd64"
+                   end
+  sge_bin_paths = "/opt/sge/bin:/opt/sge/bin/lx-#{sge_bin_suffix}"
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
     execute 'execute qhost' do
       command "qhost -help"
-      environment('PATH' => '/opt/sge/bin:/opt/sge/bin/lx-amd64:/bin:/usr/bin:$PATH', 'SGE_ROOT' => '/opt/sge')
+      environment('PATH' => "#{sge_bin_paths}:/bin:/usr/bin:$PATH", 'SGE_ROOT' => '/opt/sge')
       user node['cfncluster']['cfn_cluster_user']
     end
 
     execute 'execute qstat' do
       command "qstat -help"
-      environment('PATH' => '/opt/sge/bin:/opt/sge/bin/lx-amd64:/bin:/usr/bin:$PATH', 'SGE_ROOT' => '/opt/sge')
+      environment('PATH' => "#{sge_bin_paths}:/bin:/usr/bin:$PATH", 'SGE_ROOT' => '/opt/sge')
       user node['cfncluster']['cfn_cluster_user']
     end
 
     execute 'execute qsub' do
       command "qsub -help"
-      environment('PATH' => '/opt/sge/bin:/opt/sge/bin/lx-amd64:/bin:/usr/bin:$PATH', 'SGE_ROOT' => '/opt/sge')
+      environment('PATH' => "#{sge_bin_paths}:/bin:/usr/bin:$PATH", 'SGE_ROOT' => '/opt/sge')
       user node['cfncluster']['cfn_cluster_user']
     end
   when 'ComputeFleet'
