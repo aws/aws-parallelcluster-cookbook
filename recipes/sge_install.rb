@@ -48,6 +48,12 @@ when 'MasterServer', nil
   end
 
   # Install SGE
+  architecture_id = if arm_instance?
+                      "arm64"
+                    else
+                      "amd64"
+                    end
+  qmaster_bin_dir = "/opt/sge/bin/lx-#{architecture_id}/sge_qmaster"
   bash 'make install' do
     user 'root'
     group 'root'
@@ -67,7 +73,7 @@ when 'MasterServer', nil
       echo 'y'| scripts/distinst -local -allall ${gearch}
     SGE
     # TODO: Fix, so it works for upgrade
-    creates '/opt/sge/bin/lx-amd64/sge_qmaster'
+    creates qmaster_bin_dir
   end
 
   # Copy qconf utils (Downloaded from http://arc.liv.ac.uk/SGE/downloads/qconf_scripts.tar.gz)
