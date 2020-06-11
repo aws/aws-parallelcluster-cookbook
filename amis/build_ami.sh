@@ -35,8 +35,8 @@ requirements_check() {
 
     berks vendor --help >/dev/null 2>&1
     if [ $? -ne 0 ] ; then
-      echo "berks command not found. Is ChefDK installed?"
-      echo "Please visit https://downloads.chef.io/chefdk/ for instruction on how to download and install"
+      echo "berks command not found. Is berkshelf installed?"
+      echo "Please visit https://github.com/berkshelf/berkshelf for instruction on how to download and install"
       exit 1
     fi
 }
