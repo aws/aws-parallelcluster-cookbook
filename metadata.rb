@@ -8,7 +8,7 @@ description 'Installs/Configures AWS ParallelCluster'
 long_description 'Installs/Configures AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
-chef_version '14.2.0'
+chef_version '15.11.8'
 version '2.7.0'
 
 supports 'amazon'
@@ -30,4 +30,3 @@ depends 'line', '~> 2.4.1'
 depends 'ulimit', '~> 1.0.0'
 # when changing pyenv version, check if pyenv.sh.rb template is still valid
 depends 'pyenv', '~> 3.1.0'
-depends 'kernel_module', '~> 1.1.2'
