@@ -15,15 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['conditions']['ami_bootstrapped'] || !arm_instance?
-
 openmpi_modules_dir = "#{node['cfncluster']['moduleshome']}/modulefiles/openmpi"
 
 case node['platform_family']
 when 'amazon'
   if node['platform_version'].to_i == 2
     package 'openmpi-devel' do
-      retries 10
+      retries 3
       retry_delay 5
     end
     # The above package creates the modulefile in /etc/modulefiles/mpi/openmpi-aarch64.
@@ -44,7 +42,7 @@ when 'amazon'
   end
 when 'debian'
   package %w[environment-modules libopenmpi-dev openmpi-bin openmpi-doc] do
-    retries 10
+    retries 3
     retry_delay 5
   end
   # Create a dummy modulefile
