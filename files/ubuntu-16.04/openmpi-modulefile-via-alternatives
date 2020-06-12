@@ -1,3 +1,7 @@
 #%Module
+
+# Call update-alternatives when this module is loaded to ensure that the
+# system is configured to use open MPI binaries and libraries by default
+
 exec sudo update-alternatives --set mpi /usr/lib/openmpi/include
 exec sudo update-alternatives --set mpirun /usr/bin/mpirun.openmpi

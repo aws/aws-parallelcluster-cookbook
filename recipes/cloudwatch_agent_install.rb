@@ -30,17 +30,17 @@ s3_domain = "#{s3_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("c
 
 # Set URLs used to download the package and expected signature based on platform
 package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cfncluster']['cfn_region']}"
-arch_url_component = arm_instance? ? 'arm64' : 'amd64' # TODO: helper function for detecting ARM
+arch_url_component = arm_instance? ? 'arm64' : 'amd64'
 platform_url_component = node['platform'] == 'amazon' ? 'amazon_linux' : node['platform']
-package_suffix = node['platform'] == 'ubuntu' ? 'deb' : 'rpm'
+package_extension = node['platform'] == 'ubuntu' ? 'deb' : 'rpm'
 package_url = [
   package_url_prefix,
   platform_url_component,
   arch_url_component,
   "latest",
-  "amazon-cloudwatch-agent.#{package_suffix}"
+  "amazon-cloudwatch-agent.#{package_extension}"
 ].join('/')
-package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_suffix}"
+package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
 signature_url = "#{package_url}.sig"
 signature_path = "#{package_path}.sig"
 
