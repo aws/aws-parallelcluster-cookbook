@@ -23,9 +23,8 @@ directory '/var/spool/slurmd' do
 end
 
 # Mount /opt/slurm over NFS
-nfs_master = node['cfncluster']['cfn_master']
 mount '/opt/slurm' do
-  device "#{nfs_master}:/opt/slurm"
+  device(lazy { "#{node['cfncluster']['cfn_master']}:/opt/slurm" })
   fstype "nfs"
   options 'hard,intr,noatime,vers=3,_netdev'
   action %i[mount enable]
