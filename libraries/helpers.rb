@@ -153,3 +153,20 @@ def ami_bootstrapped?
 
   'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
 end
+
+def master_address(region, stack_name)
+  require 'chef/mixin/shell_out'
+
+  output = shell_out!("aws ec2 describe-instances --filters '[{\"Name\":\"tag:Application\", \"Values\": " \
+                      "[\"#{stack_name}\"]},{\"Name\":\"tag:aws-parallelcluster-node-type\", \"Values\": [\"Master\"]},{\"Name\": " \
+                      "\"instance-state-name\", \"Values\": [\"running\"]}]' --region #{region} --query " \
+                      "\"Reservations[0].Instances[0].[PrivateIpAddress,PrivateDnsName]\" --output text").stdout.strip
+
+  raise "Failed when retrieving Master server address: unable to describe EC2 instance" if output == "None"
+
+  master_private_ip, master_private_dns = output.split(/\s+/)
+  Chef::Log.info("Retrieved master private ip: #{master_private_ip}")
+  Chef::Log.info("Retrieved master private dns: #{master_private_dns}")
+
+  [master_private_ip, master_private_dns]
+end

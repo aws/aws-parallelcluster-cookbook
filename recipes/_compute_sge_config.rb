@@ -16,9 +16,8 @@
 # limitations under the License.
 
 # Mount /opt/sge over NFS
-nfs_master = node['cfncluster']['cfn_master']
 mount '/opt/sge' do
-  device "#{nfs_master}:/opt/sge"
+  device(lazy { "#{node['cfncluster']['cfn_master']}:/opt/sge" })
   fstype "nfs"
   options 'hard,intr,noatime,vers=3,_netdev'
   action %i[mount enable]
