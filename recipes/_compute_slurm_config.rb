@@ -24,7 +24,7 @@ end
 
 # Mount /opt/slurm over NFS
 mount '/opt/slurm' do
-  device(lazy { "#{node['cfncluster']['cfn_master']}:/opt/slurm" })
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/slurm" })
   fstype "nfs"
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
