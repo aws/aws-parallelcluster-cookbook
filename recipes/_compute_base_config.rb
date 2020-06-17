@@ -16,11 +16,12 @@
 # limitations under the License.
 
 # Retrieve master node ip if not set already
-unless node['cfncluster']['cfn_master']
+unless node['cfncluster']['cfn_master'] && node['cfncluster']['cfn_master_private_ip']
   ruby_block "retrieve master ip" do
     block do
-      _, master_private_dns = master_address(node['cfncluster']['cfn_region'], node['cfncluster']['stack_name'])
+      master_private_ip, master_private_dns = master_address(node['cfncluster']['cfn_region'], node['cfncluster']['stack_name'])
       node.force_default['cfncluster']['cfn_master'] = master_private_dns
+      node.force_default['cfncluster']['cfn_master_private_ip'] = master_private_ip
     end
     retries 5
     retry_delay 3
@@ -44,7 +45,7 @@ if raid_shared_dir != "NONE"
 
   # Mount RAID directory over NFS
   mount raid_shared_dir do
-    device(lazy { "#{node['cfncluster']['cfn_master']}:#{raid_shared_dir}" })
+    device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options 'hard,intr,noatime,vers=3,_netdev'
     action %i[mount enable]
@@ -53,7 +54,7 @@ end
 
 # Mount /home over NFS
 mount '/home' do
-  device(lazy { "#{node['cfncluster']['cfn_master']}:/home" })
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/home" })
   fstype 'nfs'
   options 'hard,intr,noatime,vers=3,_netdev'
   action %i[mount enable]
@@ -61,7 +62,7 @@ end
 
 # Mount /opt/intel over NFS
 mount '/opt/intel' do
-  device(lazy { "#{node['cfncluster']['cfn_master']}:/opt/intel" })
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/intel" })
   fstype 'nfs'
   options 'hard,intr,noatime,vers=3,_netdev'
   action %i[mount enable]
@@ -100,7 +101,7 @@ shared_dir_array.each do |dir|
 
     # Mount shared volume over NFS
     mount dirname do
-      device(lazy { "#{node['cfncluster']['cfn_master']}:#{dirname}" })
+      device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{dirname}" })
       fstype 'nfs'
       options 'hard,intr,noatime,vers=3,_netdev'
       action %i[mount enable]
