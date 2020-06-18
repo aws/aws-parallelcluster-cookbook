@@ -42,7 +42,7 @@ udp_send_channel {
   host = <%= node['hostname'] %>
 <% end -%>
 <% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
-  host = <%= node['cfncluster']['cfn_master'] %>
+  host = <%= node['cfncluster']['cfn_master_private_ip'] %>
 <% end -%>
   port = 8649
   ttl = 1
