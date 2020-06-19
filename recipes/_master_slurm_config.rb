@@ -58,15 +58,14 @@ remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
   recursive true
 end
 
-# Copy queue config file from S3 URI
-proxy_prefix = node['cfncluster']['cfn_proxy'] != 'NONE'? "export HTTP_PROXY=#{node['cfncluster']['cfn_proxy']} && export HTTPS_PROXY=#{node['cfncluster']['cfn_proxy']} && " : ""
-execute "copy_queue_config_from_s3" do
-  command "#{proxy_prefix}#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['slurm']['queue_config_s3_uri']} #{node['cfncluster']['slurm']['queue_config_path']} --region #{node['cfncluster']['cfn_region']}"
+# Copy cluster config file from S3 URI
+execute "copy_cluster_config_from_s3" do
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['cluster_config_s3_uri']} #{node['cfncluster']['cluster_config_path']} --region #{node['cfncluster']['cfn_region']}"
 end
 
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['slurm']['queue_config_path']}"
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
 end
 
 # alinux1 and centos6 use an old cgroup directory: /cgroup

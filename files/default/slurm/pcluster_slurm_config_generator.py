@@ -18,7 +18,7 @@ import argparse
 from jinja2 import Environment, FileSystemLoader
 
 
-def generate_slurm_config_files(args):
+def generate_slurm_config_files(output_directory, template_directory, input_file, dryrun):
     """
     Generate Slurm configuration files.
 
@@ -31,70 +31,76 @@ def generate_slurm_config_files(args):
     slurm_parallelcluster.conf is included in main slurm.conf
     and slurm_parallelcluster_gres.conf is included in gres.conf.
     """
-    queues_info = _load_queues_info(args.input_file)
-
     # Make output directories
-    args.output_directory = path.abspath(args.output_directory)
-    pcluster_subdirectory = path.join(args.output_directory, "pcluster")
+    output_directory = path.abspath(output_directory)
+    pcluster_subdirectory = path.join(output_directory, "pcluster")
     makedirs(pcluster_subdirectory, exist_ok=True)
-    env = _get_jinja_env(args.template_directory)
+    env = _get_jinja_env(template_directory)
+
+    cluster_config = _load_cluster_config(input_file)
+    master_config = _get_master_config()
+    queue_settings = cluster_config["cluster"]["queue_settings"]
 
     # Generate slurm_parallelcluster_{QueueName}_partitions.conf and slurm_parallelcluster_{QueueName}_gres.conf
-    for queue in queues_info["queues_config"]:
+    for queue_name, queue_config in queue_settings.items():
+        is_default_queue = cluster_config["cluster"]["default_queue"] == queue_name
         for file_type in ["partition", "gres"]:
-            print(f"Generating slurm_parallelcluster_{queue}_{file_type}.conf")
-            rendered_template = _render_queue_configs(queues_info, queue, file_type, env, pcluster_subdirectory)
-            if not args.dryrun:
-                filename = queues_info["queues_config"][queue][f"queue_{file_type}_filename"]
-                _write_rendered_template_to_file(rendered_template, filename)
+            _generate_queue_config(
+                queue_name, queue_config, is_default_queue, file_type, env, pcluster_subdirectory, dryrun
+            )
 
     # Generate slurm_parallelcluster.conf and slurm_parallelcluster_gres.conf
     for template_name in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
-        print(f"Generating {template_name}")
-        rendered_template = _render_slurm_parallelcluster_configs(queues_info, template_name, env)
-        if not args.dryrun:
-            filename = f"{args.output_directory}/{template_name}"
-            _write_rendered_template_to_file(rendered_template, filename)
+        _generate_slurm_parallelcluster_configs(
+            queue_settings,
+            master_config,
+            cluster_config["cluster"]["scaling"],
+            template_name,
+            env,
+            output_directory,
+            dryrun,
+        )
 
     print("Finished.")
 
 
-def _load_queues_info(input_file_path):
+def _load_cluster_config(input_file_path):
     """
     Load queues_info and add information used to render templates.
 
     :return: queues_info containing id for first queue, master_hostname and queue_name
     """
     with open(input_file_path) as input_file:
-        queues_info = json.load(input_file)
-        queues_info["master_hostname"] = gethostname()
-        queues_info["master_ip"] = getfqdn()
-        for queue in queues_info["queues_config"]:
-            queues_info["queues_config"][queue]["queue_name"] = queue
-        return queues_info
+        return json.load(input_file)
 
 
-def _render_queue_configs(queues_info, queue, file_type, env, pcluster_subdirectory):
-    """
-    Render queue-specific config based on queues_info, and sets queue filename in queues_info.
+def _get_master_config():
+    return {
+        "master_hostname": gethostname(),
+        "master_ip": getfqdn(),
+    }
 
-    :return: rendered queue-specific templates
-    """
-    queues_info["queues_config"][queue][f"queue_{file_type}_filename"] = path.join(
-        pcluster_subdirectory, f"slurm_parallelcluster_{queue}_{file_type}.conf"
+
+def _generate_queue_config(queue_name, queue_config, is_default_queue, file_type, jinja_env, output_dir, dryrun):
+    print(f"Generating slurm_parallelcluster_{queue_name}_{file_type}.conf")
+    rendered_template = jinja_env.get_template(f"slurm_parallelcluster_queue_{file_type}.conf").render(
+        queue_name=queue_name, queue_config=queue_config, is_default_queue=is_default_queue
     )
-    return env.get_template(f"slurm_parallelcluster_queue_{file_type}.conf").render(
-        queue=queues_info["queues_config"][queue]
+    if not dryrun:
+        filename = path.join(output_dir, f"slurm_parallelcluster_{queue_name}_{file_type}.conf")
+        _write_rendered_template_to_file(rendered_template, filename)
+
+
+def _generate_slurm_parallelcluster_configs(
+    queues_config, master_config, scaling_config, template_name, jinja_env, output_dir, dryrun
+):
+    print(f"Generating {template_name}")
+    rendered_template = jinja_env.get_template(f"{template_name}").render(
+        queues_config=queues_config, master_config=master_config, scaling_config=scaling_config, output_dir=output_dir
     )
-
-
-def _render_slurm_parallelcluster_configs(queues_info, template_name, env):
-    """
-    Render slurm_parallelcluster config based on queues_info.
-
-    :return: rendered slurm_parallelcluster templates
-    """
-    return env.get_template(f"{template_name}").render(queues_info)
+    if not dryrun:
+        filename = f"{output_dir}/{template_name}"
+        _write_rendered_template_to_file(rendered_template, filename)
 
 
 def _get_jinja_env(template_directory):
@@ -128,7 +134,7 @@ def main():
         "--dryrun", action="store_true", help="dryrun", required=False, default=False,
     )
     args = parser.parse_args()
-    generate_slurm_config_files(args)
+    generate_slurm_config_files(args.output_directory, args.template_directory, args.input_file, args.dryrun)
 
 
 if __name__ == "__main__":
