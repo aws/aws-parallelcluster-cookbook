@@ -3,95 +3,92 @@ import os
 
 from assertpy import assert_that
 from jsonschema import validate
-from slurm.pcluster_slurm_config_generator import (
-    _get_jinja_env,
-    _load_queues_info,
-    _render_queue_configs,
-    _render_slurm_parallelcluster_configs,
-)
+from slurm.pcluster_slurm_config_generator import generate_slurm_config_files
 
 INPUT_SCHEMA = {
     "type": "object",
     "properties": {
-        "queues_config": {
+        "cluster": {
             "type": "object",
-            "patternProperties": {
-                "^[a-zA-Z0-9-]+$": {
+            "properties": {
+                "queue_settings": {
                     "type": "object",
-                    "properties": {
-                        "instances": {
+                    "patternProperties": {
+                        "^[a-zA-Z0-9-_]+$": {
                             "type": "object",
-                            "patternProperties": {
-                                "^[a-z0-9.]+$": {
+                            "properties": {
+                                "compute_resource_settings": {
                                     "type": "object",
-                                    "properties": {
-                                        "static_size": {"type": "integer"},
-                                        "dynamic_size": {"type": "integer"},
-                                        "vcpus": {"type": "integer"},
-                                        "gpus": {"type": "integer"},
-                                        "spot_price": {"type": "number"},
+                                    "patternProperties": {
+                                        "^[a-zA-Z0-9-]+$": {
+                                            "type": "object",
+                                            "properties": {
+                                                "instance_type": {"type": "string"},
+                                                "min_count": {"type": "integer"},
+                                                "max_count": {"type": "integer"},
+                                                "vcpus": {"type": "integer"},
+                                                "gpus": {"type": "integer"},
+                                                "spot_price": {"type": "number"},
+                                                "enable_efa": {"type": "boolean"},
+                                            },
+                                            "additionalProperties": False,
+                                            "required": ["instance_type", "min_count", "max_count", "vcpus", "gpus"],
+                                        }
                                     },
-                                    "additionalProperties": False,
-                                    "required": ["static_size", "dynamic_size", "vcpus", "gpus"],
-                                }
+                                },
+                                "placement_group": {"type": ["string", "null"]},
+                                "enable_efa": {"type": "boolean"},
+                                "disable_hyperthreading": {"type": "boolean"},
+                                "compute_type": {"type": "string"},
                             },
-                        },
-                        "placement_group": {"type": "string"},
-                        "enable_efa": {"type": "boolean"},
-                        "disable_hyperthreading": {"type": "boolean"},
-                        "compute_type": {"type": "string"},
-                        "is_default": {"type": "boolean"},
+                            "additionalProperties": False,
+                            "required": ["compute_resource_settings"],
+                        }
                     },
                     "additionalProperties": False,
-                    "required": ["instances"],
-                }
+                },
+                "scaling": {
+                    "type": "object",
+                    "properties": {"scaledown_idletime": {"type": "integer"}},
+                    "required": ["scaledown_idletime"],
+                },
+                "default_queue": {"type": "string"},
+                "label": {"type": "string"},
             },
             "additionalProperties": False,
-        },
-        "scaling_config": {
-            "type": "object",
-            "properties": {"scaledown_idletime": {"type": "integer"}},
-            "required": ["scaledown_idletime"],
-        },
+            "required": ["queue_settings", "scaling", "default_queue", "label"],
+        }
     },
     "additionalProperties": False,
-    "required": ["queues_config", "scaling_config"],
+    "required": ["cluster"],
 }
 
 
-def test_input_file_format():
-    queues_info = _get_default_input(load_raw=True)
-    validate(instance=queues_info, schema=INPUT_SCHEMA)
+def _test_input_file_format(input_file):
+    cluster_config = json.load(open(input_file))
+    validate(instance=cluster_config, schema=INPUT_SCHEMA)
 
 
-def test_default_input(mocker, test_datadir):
+def test_generate_slurm_config_files(mocker, test_datadir, tmpdir):
+    input_file = str(test_datadir / "sample_input.json")
+    _test_input_file_format(input_file)
+
     mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
     mocker.patch("slurm.pcluster_slurm_config_generator.getfqdn", return_value="ip.1.0.0.0", autospec=True)
-    env = _get_jinja_env(os.path.abspath("files/default/slurm/templates"))
-    queues_info = _get_default_input()
-    _test_generate_queue_configs(queues_info, env, os.path.join(test_datadir, "expected_outputs"))
-    _test_generate_slurm_pcluster_configs(queues_info, env, os.path.join(test_datadir, "expected_outputs"))
+    template_directory = os.path.abspath("files/default/slurm/templates")
+    generate_slurm_config_files(tmpdir, template_directory, input_file, dryrun=False)
 
-
-def _get_default_input(load_raw=False):
-    filepath = os.path.abspath("test/unit/slurm/test_slurm_config_generator/sample_input.json")
-    return json.load(open(filepath)) if load_raw else _load_queues_info(filepath)
-
-
-def _test_generate_queue_configs(queues_info, env, datadir):
-    for queue in queues_info["queues_config"]:
+    for queue in ["efa", "gpu", "multiple_spot"]:
         for file_type in ["partition", "gres"]:
-            rendered_template = _render_queue_configs(queues_info, queue, file_type, env, "test_outputs/pcluster")
-            with open(
-                os.path.join(datadir, "pcluster", "slurm_parallelcluster_{}_{}.conf".format(queue, file_type)), "r"
-            ) as expected_file:
-                expected = expected_file.read()
-            assert_that(rendered_template).is_equal_to(expected)
+            file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
+            _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / file_name)
+
+    for file in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
+        _assert_files_are_equal(tmpdir / file, test_datadir / "expected_outputs" / file)
 
 
-def _test_generate_slurm_pcluster_configs(queues_info, env, datadir):
-    for template_name in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
-        rendered_template = _render_slurm_parallelcluster_configs(queues_info, template_name, env)
-        with open(os.path.join(datadir, template_name), "r") as expected_file:
-            expected = expected_file.read()
-        assert_that(rendered_template).is_equal_to(expected)
+def _assert_files_are_equal(file, expected_file):
+    with open(file, "r") as f, open(expected_file, "r") as exp_f:
+        expected_file_content = exp_f.read()
+        expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
+        assert_that(f.read()).is_equal_to(expected_file_content)
