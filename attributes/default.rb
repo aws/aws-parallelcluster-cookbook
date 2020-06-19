@@ -21,6 +21,9 @@ default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/source
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 default['cfncluster']['configs_dir'] = "#{node['cfncluster']['base_dir']}/configs"
+# Cluster config
+default['cfncluster']['cluster_config_s3_uri'] = nil
+default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster_config.json"
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'
 default['cfncluster']['python-version-centos6'] = '2.7.17'
@@ -57,9 +60,6 @@ default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/t
 default['cfncluster']['slurm']['version'] = '20.02.1'
 default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.02.1.tar.bz2'
 default['cfncluster']['slurm']['sha1'] = '91704d8c73bf1a6eab64ccde3f3d03b85188672a'
-# ParallelCluster slurm variables
-default['cfncluster']['slurm']['queue_config_s3_uri'] = nil
-default['cfncluster']['slurm']['queue_config_path'] = "#{node['cfncluster']['configs_dir']}/queues_config.json"
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.13'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
