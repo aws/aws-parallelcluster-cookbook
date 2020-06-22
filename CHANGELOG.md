@@ -7,6 +7,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 X.X.X
 -----
 
+**ENHANCEMENTS**
+
+- Enable support for ARM instances on Ubuntu 18.04 and Amazon Linux 2.
+
 **CHANGES**
 
 - Disable libvirtd service on Centos 7. Virtual bridge interfaces are incorrectly detected by Open MPI and
