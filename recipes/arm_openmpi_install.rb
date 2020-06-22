@@ -43,30 +43,28 @@ when 'amazon'
     Chef::Log.Info("ARM instances are currently only supported for Amazon Linux 2")
   end
 when 'debian'
-  package %w[environment-modules libopenmpi-dev openmpi-bin openmpi-doc] do
-    retries 3
-    retry_delay 5
-  end
-  # Create a dummy modulefile
-
-  openmpi_version = if node['platform_version'] == "18.04"
-                      "2.1.1"
-                    else
-                      "1.10.2"
-                    end
-  directory openmpi_modules_dir do
-    mode '755'
-    owner 'root'
-    group 'root'
-    action :create
-  end
-  cookbook_file "#{openmpi_modules_dir}/#{openmpi_version}" do
-    source 'openmpi-modulefile-via-alternatives'
-    owner 'root'
-    group 'root'
-    mode '0644'
-    action :create
+  if node['platform_version'] == "18.04"
+    package %w[environment-modules libopenmpi-dev openmpi-bin openmpi-doc] do
+      retries 3
+      retry_delay 5
+    end
+    # Create a dummy modulefile
+    directory openmpi_modules_dir do
+      mode '755'
+      owner 'root'
+      group 'root'
+      action :create
+    end
+    cookbook_file "#{openmpi_modules_dir}/2.1.1" do
+      source 'openmpi-modulefile-via-alternatives'
+      owner 'root'
+      group 'root'
+      mode '0644'
+      action :create
+    end
+  else
+    Chef::Log.Info("ARM instances are currently only supported for Ubuntu1804")
   end
 else
-  Chef::Log.Info("ARM instances are currently only supported for Amazon Linux 2, Ubuntu1604, and Ubuntu1804")
+  Chef::Log.Info("ARM instances are currently only supported for Amazon Linux 2 and Ubuntu1804")
 end
