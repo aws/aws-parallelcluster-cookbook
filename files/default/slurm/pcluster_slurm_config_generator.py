@@ -10,12 +10,16 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 import json
+import logging
+import subprocess
 from os import makedirs, path
-from socket import getfqdn, gethostname
+from socket import gethostname
 
 import argparse
 
 from jinja2 import Environment, FileSystemLoader
+
+log = logging.getLogger()
 
 
 def generate_slurm_config_files(output_directory, template_directory, input_file, dryrun):
@@ -61,7 +65,7 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
             dryrun,
         )
 
-    print("Finished.")
+    log.info("Finished.")
 
 
 def _load_cluster_config(input_file_path):
@@ -77,12 +81,29 @@ def _load_cluster_config(input_file_path):
 def _get_master_config():
     return {
         "master_hostname": gethostname(),
-        "master_ip": getfqdn(),
+        "master_ip": _get_master_private_ip(),
     }
 
 
+def _get_master_private_ip():
+    """Get master private ip from EC2 metadata."""
+    try:
+        private_ip = subprocess.run(
+            "curl --retry 3 http://169.254.169.254/latest/meta-data/local-ipv4",
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=True,
+            encoding="utf-8",
+            shell=True,
+        ).stdout
+        return private_ip
+    except Exception:
+        log.error("Encountered exception when retrieving master node private IP.")
+        raise
+
+
 def _generate_queue_config(queue_name, queue_config, is_default_queue, file_type, jinja_env, output_dir, dryrun):
-    print(f"Generating slurm_parallelcluster_{queue_name}_{file_type}.conf")
+    log.info("Generating slurm_parallelcluster_%s_%s.conf", queue_name, file_type)
     rendered_template = jinja_env.get_template(f"slurm_parallelcluster_queue_{file_type}.conf").render(
         queue_name=queue_name, queue_config=queue_config, is_default_queue=is_default_queue
     )
@@ -94,7 +115,7 @@ def _generate_queue_config(queue_name, queue_config, is_default_queue, file_type
 def _generate_slurm_parallelcluster_configs(
     queues_config, master_config, scaling_config, template_name, jinja_env, output_dir, dryrun
 ):
-    print(f"Generating {template_name}")
+    log.info("Generating %s", template_name)
     rendered_template = jinja_env.get_template(f"{template_name}").render(
         queues_config=queues_config, master_config=master_config, scaling_config=scaling_config, output_dir=output_dir
     )
@@ -110,31 +131,42 @@ def _get_jinja_env(template_directory):
 
 
 def _write_rendered_template_to_file(rendered_template, filename):
-    print(f"Writing contents of {filename}")
+    log.info("Writing contents of %s", filename)
     with open(filename, "w") as output_file:
         output_file.write(rendered_template)
 
 
+def _setup_logger():
+    logging.basicConfig(
+        level=logging.INFO, format="%(asctime)s - [%(name)s:%(funcName)s] - %(levelname)s - %(message)s"
+    )
+
+
 def main():
-    print("Running ParallelCluster Slurm Config Generator")
-    parser = argparse.ArgumentParser(description="Take in slurm configuration generator related parameters")
-    parser.add_argument(
-        "--output-directory", type=str, help="The output directory for generated slurm configs", required=True
-    )
-    parser.add_argument(
-        "--template-directory", type=str, help="The directory storing slurm config templates", required=True
-    )
-    parser.add_argument(
-        "--input-file",
-        type=str,
-        default="/opt/parallelcluster/slurm_config.json",
-        help="JSON file containing info about queues",
-    )
-    parser.add_argument(
-        "--dryrun", action="store_true", help="dryrun", required=False, default=False,
-    )
-    args = parser.parse_args()
-    generate_slurm_config_files(args.output_directory, args.template_directory, args.input_file, args.dryrun)
+    try:
+        _setup_logger()
+        log.info("Running ParallelCluster Slurm Config Generator")
+        parser = argparse.ArgumentParser(description="Take in slurm configuration generator related parameters")
+        parser.add_argument(
+            "--output-directory", type=str, help="The output directory for generated slurm configs", required=True
+        )
+        parser.add_argument(
+            "--template-directory", type=str, help="The directory storing slurm config templates", required=True
+        )
+        parser.add_argument(
+            "--input-file",
+            type=str,
+            default="/opt/parallelcluster/slurm_config.json",
+            help="JSON file containing info about queues",
+        )
+        parser.add_argument(
+            "--dryrun", action="store_true", help="dryrun", required=False, default=False,
+        )
+        args = parser.parse_args()
+        generate_slurm_config_files(args.output_directory, args.template_directory, args.input_file, args.dryrun)
+    except Exception as e:
+        log.exception("Failed to generate slurm configurations, exception: %s", e)
+        raise
 
 
 if __name__ == "__main__":
