@@ -70,7 +70,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "month_first",
+      "timestamp_format_key": "default",
       "file_path": "/var/log/cloud-init.log",
       "log_stream_name": "cloud-init",
       "schedulers": [
@@ -91,7 +91,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "month_first",
+      "timestamp_format_key": "default",
       "file_path": "/var/log/cloud-init-output.log",
       "log_stream_name": "cloud-init-output",
       "schedulers": [
