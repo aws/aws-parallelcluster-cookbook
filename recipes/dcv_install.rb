@@ -38,7 +38,9 @@ end
 def install_ext_auth_virtual_env
   return if File.exist?("#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate")
 
-  install_pyenv node['cfncluster']['python-version']
+  install_pyenv node['cfncluster']['python-version'] do
+    prefix node['cfncluster']['system_pyenv_root']
+  end
   activate_virtual_env node['cfncluster']['dcv']['authenticator']['virtualenv'] do
     pyenv_path node['cfncluster']['dcv']['authenticator']['virtualenv_path']
     python_version node['cfncluster']['python-version']

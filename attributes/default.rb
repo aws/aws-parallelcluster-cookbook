@@ -23,8 +23,11 @@ default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licens
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'
 default['cfncluster']['python-version-centos6'] = '2.7.17'
-# pyenv system installation root
-default['cfncluster']['system_pyenv_root'] = '/usr/local/pyenv'
+# pyenv system installation root for centos6 to work around default system python
+# note that its kept separate from the pcluster-specific pyenv installation root
+default['cfncluster']['system_pyenv_root_centos6'] = "/usr/local/pyenv"
+# plcuster-specific pyenv system installation root
+default['cfncluster']['system_pyenv_root'] = "#{node['cfncluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
 default['cfncluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 # Virtualenv Node Name
