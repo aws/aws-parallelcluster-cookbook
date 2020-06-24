@@ -42,9 +42,10 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
     cwd Chef::Config[:file_cache_path]
     code <<-CLI
       set -e
-      curl --retry 3 -v -L -o aws-parallelcluster.tgz #{node['cfncluster']['custom_awsbatchcli_package']}
-      tar -xzf aws-parallelcluster.tgz
-      cd *aws-parallelcluster-*
+      curl --retry 3 -L -o aws-parallelcluster.tgz #{node['cfncluster']['custom_awsbatchcli_package']}
+      mkdir aws-parallelcluster-custom-cli
+      tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-custom-cli
+      cd aws-parallelcluster-custom-cli/*aws-parallelcluster-*
       pip install cli/
     CLI
   end

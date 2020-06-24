@@ -153,9 +153,10 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       echo "PATH is $PATH"
       source #{node['cfncluster']['node_virtualenv_path']}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
-      curl --retry 3 -v -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
-      tar -xzf aws-parallelcluster-node.tgz
-      cd *aws-parallelcluster-node-*
+      curl --retry 3 -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
+      mkdir aws-parallelcluster-custom-node
+      tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
+      cd aws-parallelcluster-custom-node/*aws-parallelcluster-node-*
       pip install .
       deactivate
     NODE
