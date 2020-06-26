@@ -58,6 +58,13 @@ package node['cfncluster']['base_packages'] do
   retry_delay 5
 end
 
+# In the case of AL2, there are more packages to install via extras
+if node['cfncluster']['alinux_extras']
+  node['cfncluster']['alinux_extras'].each do |topic|
+    alinux_extras_topic topic
+  end
+end
+
 case node['platform_family']
 when 'rhel', 'amazon'
   yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
@@ -215,6 +222,10 @@ include_recipe "aws-parallelcluster::_lustre_install"
 # Install EFA & Intel MPI
 include_recipe "aws-parallelcluster::efa_install"
 include_recipe "aws-parallelcluster::intel_mpi"
+
+# On ARM instances, install openmpi. This is done because no MPI implementation is provided via EFA
+# or Intel MPI, as is the case on an x86_64 instance.
+include_recipe 'aws-parallelcluster::arm_openmpi_install'
 
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster::cloudwatch_agent_install"

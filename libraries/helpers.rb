@@ -153,3 +153,51 @@ def ami_bootstrapped?
 
   'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
 end
+
+#
+# Check if this is an ARM instance
+#
+def arm_instance?
+  node['kernel']['machine'] == 'aarch64'
+end
+
+#
+# Check if this is an OS on which EFA is supported
+#
+def platform_supports_efa?
+  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
+   node['platform'] == 'amazon',
+   node['platform'] == 'ubuntu'].any?
+end
+
+#
+# Check if the platform supports intel MPI
+#
+def platform_supports_impi?
+  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
+   node['platform'] == 'amazon',
+   node['platform'] == 'ubuntu'].any?
+end
+
+#
+# Check if this platform supports intel's HPC platform
+#
+def platform_supports_intel_hpc_platform?
+  node['platform'] == 'centos' && node['platform_version'].to_i >= 7
+end
+
+#
+# Check if DCV is supported on this OS
+#
+def platform_supports_dcv?
+  node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
+end
+
+#
+# Check if Lustre is supported on this OS
+#
+def platform_supports_lustre?
+  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
+   node['platform'] == 'amazon',
+   node['platform'] == 'ubuntu'].any?
+end

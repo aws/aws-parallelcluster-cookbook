@@ -15,7 +15,7 @@ redirect_stderr = true
 stdout_logfile = /var/log/jobwatcher
 <% end -%>
 
-<% if node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}") -%>
+<% if node['cfncluster']['dcv_enabled'] == "master" && node['conditions']['dcv_supported'] -%>
 [program:pcluster_dcv_authenticator]
 command = <%= node['cfncluster']['dcv']['authenticator']['virtualenv_path'] %>/bin/python <%= node['cfncluster']['dcv']['authenticator']['user_home'] %>/pcluster_dcv_authenticator.py
       --port <%= Integer(node['cfncluster']['dcv_port']) + 1 %>
