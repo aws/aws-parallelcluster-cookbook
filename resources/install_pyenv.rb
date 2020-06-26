@@ -15,6 +15,13 @@ action :run do
     global_prefix new_resource.prefix
   end
 
+  # Remove the profile.d script that the pyenv cookbook writes.
+  # This is done in order to avoid exposing the ParallelCluster pyenv installation to customers
+  # on login.
+  file '/etc/profile.d/pyenv.sh' do
+    action :delete
+  end
+
   pyenv_python new_resource.python_version
 
   pyenv_plugin 'virtualenv' do
