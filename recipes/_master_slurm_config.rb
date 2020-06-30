@@ -113,6 +113,13 @@ file "/var/log/parallelcluster/slurm_resume.log" do
   mode '0644'
 end
 
+template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_slurm_resume.conf" do
+  source 'slurm/parallelcluster_slurm_resume.conf.erb'
+  owner 'slurm'
+  group 'slurm'
+  mode '0644'
+end
+
 template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_suspend" do
   source 'slurm/suspend_program.erb'
   owner 'slurm'
@@ -126,8 +133,8 @@ file "/var/log/parallelcluster/slurm_suspend.log" do
   mode '0644'
 end
 
-template "#{node['cfncluster']['configs_dir']}/parallelcluster_slurm_cloudbursting.conf" do
-  source 'slurm/parallelcluster_slurm_cloudbursting.conf.erb'
+template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_slurm_suspend.conf" do
+  source 'slurm/parallelcluster_slurm_suspend.conf.erb'
   owner 'slurm'
   group 'slurm'
   mode '0644'
