@@ -274,6 +274,9 @@ end
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
 
+# AWS domain
+default['cfncluster']['aws_domain'] = aws_domain
+
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cfncluster']['cfn_region'] = 'us-east-1'
 default['cfncluster']['stack_name'] = nil
