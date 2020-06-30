@@ -25,8 +25,7 @@ remote_file node['cfncluster']['cloudwatch']['public_key_local_path'] do
 end
 
 # Set the s3 domain name to use for all download URLs
-s3_domain = "https://s3.#{node['cfncluster']['cfn_region']}.amazonaws.com"
-s3_domain = "#{s3_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
+s3_domain = "https://s3.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']['aws_domain']}"
 
 # Set URLs used to download the package and expected signature based on platform
 package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cfncluster']['cfn_region']}"

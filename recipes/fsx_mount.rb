@@ -40,7 +40,7 @@ if fsx_shared_dir != "NONE"
 
   # Mount FSx over NFS
   mount fsx_shared_dir do
-    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.com@tcp:/#{mountname}"
+    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']['aws_domain']}@tcp:/#{mountname}"
     fstype 'lustre'
     dump 0
     pass 0
