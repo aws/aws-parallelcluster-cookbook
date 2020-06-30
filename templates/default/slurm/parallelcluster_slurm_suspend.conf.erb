@@ -1,8 +1,3 @@
-[slurm_resume]
-cluster_name = <%= node['cfncluster']['stack_name'].sub("parallelcluster-", "") %>
-region = <%= node['cfncluster']['cfn_region'] %>
-proxy = <%= node['cfncluster']['cfn_proxy'] %>
-
 [slurm_suspend]
 cluster_name = <%= node['cfncluster']['stack_name'].sub("parallelcluster-", "") %>
 region = <%= node['cfncluster']['cfn_region'] %>
