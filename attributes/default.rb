@@ -81,8 +81,6 @@ default['cfncluster']['nvidia']['cuda_url'] = if node['platform'] == 'centos' &&
                                               end
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.4.tar.gz'
-# ENV2 - tool to capture environment and create modulefiles
-default['cfncluster']['env2']['url'] = 'https://sourceforge.net/projects/env2/files/env2/download'
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2020.0-8428'
