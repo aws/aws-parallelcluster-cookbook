@@ -19,6 +19,7 @@ return if node['conditions']['ami_bootstrapped']
 
 include_recipe 'aws-parallelcluster::base_install'
 include_recipe 'aws-parallelcluster::munge_install'
+include_recipe 'aws-parallelcluster::pmix_install'
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer', nil
