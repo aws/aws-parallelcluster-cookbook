@@ -194,12 +194,28 @@ def platform_supports_dcv?
 end
 
 #
-# Check if Lustre is supported on this OS
+# Check if Lustre is supported on this OS-architecture combination
 #
-def platform_supports_lustre?
+def platform_supports_lustre_for_architecture?
+  [arm_instance? && platform_supports_lustre_on_arm?,
+   !arm_instance? && platform_supports_lustre_on_x86_64?].any?
+end
+
+#
+# Check if Lustre is supported for x86_64 instances on this OS
+#
+def platform_supports_lustre_on_x86_64?
   [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
    node['platform'] == 'amazon',
    node['platform'] == 'ubuntu'].any?
+end
+
+#
+# Check if Lustre is supported for ARM instances on this OS
+#
+def platform_supports_lustre_on_arm?
+  [node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18,
+   node['platform'] == 'amazon' && node['platform_version'].to_i == 2].any?
 end
 
 def aws_domain
