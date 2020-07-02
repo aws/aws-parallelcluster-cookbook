@@ -34,7 +34,7 @@ if efs_shared_dir != "NONE"
 
   # Mount EFS over NFS
   mount efs_shared_dir do
-    device "#{node['cfncluster']['cfn_efs']}.efs.#{node['cfncluster']['cfn_region']}.amazonaws.com:/"
+    device "#{node['cfncluster']['cfn_efs']}.efs.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']['aws_domain']}:/"
     fstype 'nfs4'
     options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
     dump 0
