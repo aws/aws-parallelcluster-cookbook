@@ -60,9 +60,19 @@ default['cfncluster']['slurm']['version'] = '19.05.5'
 default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-19.05.5.tar.bz2'
 default['cfncluster']['slurm']['sha1'] = '055adca91e555cc124b1ecac5f3c45e66c17a8ba'
 # PMIx software
+default['cfncluster']['pmix']['dependencies_dir'] = "#{node['cfncluster']['sources_dir']}/pmix_dependencies"
 default['cfncluster']['pmix']['version'] = '3.1.5'
 default['cfncluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cfncluster']['pmix']['version']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
 default['cfncluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03ec'
+default['cfncluster']['pmix']['autoconf']['version'] = '2.69'
+default['cfncluster']['pmix']['autoconf']['tarball-url'] = "https://ftp.gnu.org/gnu/autoconf/autoconf-#{node['cfncluster']['pmix']['autoconf']['version']}.tar.xz"
+default['cfncluster']['pmix']['autoconf']['signature-url'] = "#{node['cfncluster']['pmix']['autoconf']['tarball-url']}.sig"
+default['cfncluster']['pmix']['automake']['version'] = '1.16.1'
+default['cfncluster']['pmix']['automake']['tarball-url'] = "https://ftp.gnu.org/gnu/automake/automake-#{node['cfncluster']['pmix']['automake']['version']}.tar.xz"
+default['cfncluster']['pmix']['automake']['signature-url'] = "#{node['cfncluster']['pmix']['automake']['tarball-url']}.sig"
+default['cfncluster']['pmix']['libtool']['version'] = '2.4.6'
+default['cfncluster']['pmix']['libtool']['tarball-url'] = "https://ftp.gnu.org/gnu/libtool/libtool-#{node['cfncluster']['pmix']['libtool']['version']}.tar.xz"
+default['cfncluster']['pmix']['libtool']['signature-url'] = "#{node['cfncluster']['pmix']['libtool']['tarball-url']}.sig"
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.13'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"

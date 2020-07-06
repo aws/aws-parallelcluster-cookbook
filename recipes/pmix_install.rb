@@ -17,6 +17,75 @@
 
 return if node['conditions']['ami_bootstrapped']
 
+# The versions of autoconf, automake, and libtool installable on CentOS 6
+# via yum are too old to meet PMIx's requirements. Update them via the
+# included recipe.
+if node['platform'] == 'centos' && node['platform_version'].to_i == 6
+
+  # Make directory for PMIx dependencies
+  directory node['cfncluster']['pmix']['dependencies_dir'] do
+    user 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  # Import GNU public key so the individual package signatures can be verified
+  gnu_public_key_path = "#{node['cfncluster']['sources_dir']}/gnu-keyring.gpg"
+  remote_file gnu_public_key_path do
+    source 'https://ftp.gnu.org/gnu/gnu-keyring.gpg'
+    mode '0644'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(gnu_public_key_path) }
+  end
+  execute "gpg --import #{gnu_public_key_path}" do
+    user 'root'
+  end
+
+  %w[autoconf automake libtool].each do |package_name|
+    # Download the newer version of the package
+    package_tarball = "#{node['cfncluster']['sources_dir']}/#{package_name}-#{node['cfncluster']['pmix'][package_name]['version']}.tar.xz"
+    remote_file package_tarball do
+      source node['cfncluster']['pmix'][package_name]['tarball-url']
+      mode '0644'
+      retries 3
+      retry_delay 5
+      not_if { ::File.exist?(package_tarball) }
+    end
+
+    # Downloaded the corresponding signature file
+    signature_file = "#{package_tarball}.sig"
+    remote_file signature_file do
+      source node['cfncluster']['pmix'][package_name]['signature-url']
+      mode '0644'
+      retries 3
+      retry_delay 5
+      not_if { ::File.exist?(signature_file) }
+    end
+
+    # Make sure the signature matches one of the identities in the GNU keyring
+    execute "gpg --verify #{signature_file} #{package_tarball}" do
+      user 'root'
+    end
+
+    # Build and install the software
+    bash "Install #{package_name}" do
+      user 'root'
+      group 'root'
+      cwd Chef::Config[:file_cache_path]
+      code <<-PMIX
+        set -e
+        tar xf #{package_tarball}
+        cd #{package_name}-#{node['cfncluster']['pmix'][package_name]['version']}
+        export PATH=#{node['cfncluster']['pmix']['dependencies_dir']}/bin:$PATH
+        ./configure --prefix=#{node['cfncluster']['pmix']['dependencies_dir']}
+        make
+        make install
+      PMIX
+    end
+  end
+end
+
 pmix_tarball = "#{node['cfncluster']['sources_dir']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
 
 remote_file pmix_tarball do
@@ -43,6 +112,8 @@ bash 'Install PMIx' do
     set -e
     tar xf #{pmix_tarball}
     cd pmix-#{node['cfncluster']['pmix']['version']}
+    # Set path such that updated autoconf, automake, and libtool are used
+    export PATH=#{node['cfncluster']['pmix']['dependencies_dir']}/bin:$PATH
     ./autogen.pl
     ./configure --prefix=/usr
     make
