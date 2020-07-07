@@ -84,6 +84,59 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 6
       PMIX
     end
   end
+
+  # The version of libevent-devel installable on CentOS 6 via yum is too old to
+  # meet PMIx's requirements. Install it from source.
+  libevent_tarball = "#{node['cfncluster']['sources_dir']}/libevent-#{node['cfncluster']['pmix']['libevent']['version']}.tar.gz"
+  remote_file libevent_tarball do
+    source node['cfncluster']['pmix']['libevent']['tarball-url']
+    mode '0644'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(libevent_tarball) }
+  end
+
+  # Download signature file
+  signature_file = "#{libevent_tarball}.sig"
+  remote_file signature_file do
+    source node['cfncluster']['pmix']['libevent']['signature-url']
+    mode '0644'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(signature_file) }
+  end
+
+  # Import public key ID expected in signature file just downloaded.
+  execute 'gpg --recv-keys 8EF8686D' do
+    user 'root'
+  end
+
+  # Verify tarball signature.
+  execute "gpg --verify #{signature_file} #{libevent_tarball}" do
+    user 'root'
+  end
+
+  # Build and install libevent
+  bash "Install libevent" do
+    user 'root'
+    group 'root'
+    cwd Chef::Config[:file_cache_path]
+    code <<-PMIX
+      set -e
+      tar xf #{libevent_tarball}
+      cd libevent-#{node['cfncluster']['pmix']['libevent']['version']}-stable
+      # Set path such that updated autoconf, automake, and libtool are used
+      export PATH=#{node['cfncluster']['pmix']['dependencies_dir']}/bin:$PATH
+      ./configure --prefix=#{node['cfncluster']['pmix']['dependencies_dir']}
+      make
+      make install
+    PMIX
+  end
+
+  # Set variable passed to configure when building PMIx in order to tell it where libevent is
+  pmix_config_flags = "--with-libevent=#{node['cfncluster']['pmix']['dependencies_dir']}"
+else
+  pmix_config_flags = ''
 end
 
 pmix_tarball = "#{node['cfncluster']['sources_dir']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
@@ -115,7 +168,7 @@ bash 'Install PMIx' do
     # Set path such that updated autoconf, automake, and libtool are used
     export PATH=#{node['cfncluster']['pmix']['dependencies_dir']}/bin:$PATH
     ./autogen.pl
-    ./configure --prefix=/usr
+    ./configure #{pmix_config_flags} --prefix=/usr
     make
     make install
   PMIX

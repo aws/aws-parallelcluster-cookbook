@@ -73,6 +73,9 @@ default['cfncluster']['pmix']['automake']['signature-url'] = "#{node['cfncluster
 default['cfncluster']['pmix']['libtool']['version'] = '2.4.6'
 default['cfncluster']['pmix']['libtool']['tarball-url'] = "https://ftp.gnu.org/gnu/libtool/libtool-#{node['cfncluster']['pmix']['libtool']['version']}.tar.xz"
 default['cfncluster']['pmix']['libtool']['signature-url'] = "#{node['cfncluster']['pmix']['libtool']['tarball-url']}.sig"
+default['cfncluster']['pmix']['libevent']['version'] = '2.1.12'
+default['cfncluster']['pmix']['libevent']['tarball-url'] = "https://github.com/libevent/libevent/releases/download/release-#{node['cfncluster']['pmix']['libevent']['version']}-stable/libevent-#{node['cfncluster']['pmix']['libevent']['version']}-stable.tar.gz"
+default['cfncluster']['pmix']['libevent']['signature-url'] = "#{node['cfncluster']['pmix']['libevent']['tarball-url']}.asc"
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.13'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
@@ -175,7 +178,7 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip
-                                                libgcrypt-devel libevent-devel]
+                                                libgcrypt-devel]
 
     # Lustre Drivers for Centos 6
     default['cfncluster']['lustre']['version'] = '2.10.6'
