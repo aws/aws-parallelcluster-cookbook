@@ -49,18 +49,11 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
       pip install cli/
     CLI
   end
-# Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
-elsif node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7
-  # For CentOS 6 use shell_out function in order to have a correct PATH needed to compile aws-parallelcluster dependencies
+else
+  # Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
   ruby_block "pip_install_parallelcluster" do
     block do
       pip_install_package('aws-parallelcluster', node['cfncluster']['cfncluster-version'])
     end
-  end
-else
-  python_package "aws-parallelcluster" do
-    version node['cfncluster']['cfncluster-version']
-    retries 3
-    retry_delay 5
   end
 end
