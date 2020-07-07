@@ -15,7 +15,6 @@ import time
 from datetime import datetime
 
 import pytest
-
 from assertpy import assert_that
 from pcluster_dcv_authenticator import (
     DCVAuthenticator,

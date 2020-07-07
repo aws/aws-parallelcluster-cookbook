@@ -17,12 +17,9 @@ default_action :run
 action :run do
   # Install env2
   env2 = "#{node['cfncluster']['scripts_dir']}/env2"
-  remote_file env2 do
-    source node['cfncluster']['env2']['url']
+  cookbook_file 'env2' do
+    path env2
     mode '0755'
-    retries 3
-    retry_delay 5
-    not_if { ::File.exist?(env2) }
   end
 
   directory new_resource.modulefile_dir
