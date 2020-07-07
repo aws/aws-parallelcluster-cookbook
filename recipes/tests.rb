@@ -167,6 +167,10 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
     execute 'check-slurm-jobcomp-mysql-plugins' do
       command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
     end
+
+    execute 'check-slurm-pmix-plugins' do
+      command 'ls /opt/slurm/lib/slurm/ | grep pmix'
+    end
   when 'ComputeFleet'
     execute 'ls slurm root' do
       command "ls /opt/slurm"
