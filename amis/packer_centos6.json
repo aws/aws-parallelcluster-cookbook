@@ -8,7 +8,7 @@
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}",
-    "vendor_path" : "{{env `VENDOR_PATH`}}",
+    "cookbook_path" : "{{env `COOKBOOK_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
@@ -163,21 +163,9 @@
       ]
     },
     {
-      "type" : "shell",
-      "inline" : [
-        "sudo mkdir -p /etc/chef && sudo chown -R root:root /etc/chef"
-      ]
-    },
-    {
       "type" : "file",
-      "source" : "{{user `vendor_path`}}",
-      "destination" : "/tmp/cookbooks"
-    },
-    {
-      "type" : "shell",
-      "inline" : [
-        "sudo cp -pr /tmp/cookbooks /etc/chef && sudo chown -R root:root /etc/chef"
-      ]
+      "source" : "{{user `cookbook_path`}}",
+      "destination" : "/tmp/cookbook"
     },
     {
       "type" : "shell",
@@ -193,6 +181,14 @@
       "type" : "shell",
       "inline" : [
         "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}} ffi-libarchive"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "set -x",
+        "sudo /opt/cinc/embedded/bin/berks vendor /etc/chef/cookbooks --berksfile /tmp/cookbook/Berksfile",
+        "sudo chown -R root:root /etc/chef"
       ]
     },
     {
