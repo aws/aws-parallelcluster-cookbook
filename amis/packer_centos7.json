@@ -33,11 +33,11 @@
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "CentOS Linux 7 * HVM EBS ENA *",
+          "name": "CentOS 7.* *",
           "root-device-type": "ebs",
           "architecture": "{{user `ami_arch`}}"
         },
-        "owners": ["410186602215"],
+        "owners": ["125523088429"],
         "most_recent": true
       },
       "ami_regions" : "{{user `build_for`}}",
