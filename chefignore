@@ -93,3 +93,6 @@ Vagrantfile
 # Travis #
 ##########
 .travis.yml
+
+# Kitchen #
+.kitchen
