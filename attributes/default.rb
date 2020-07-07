@@ -163,7 +163,7 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip
-                                                libgcrypt-devel]
+                                                libgcrypt-devel glibc-static]
 
     # Lustre Drivers for Centos 6
     default['cfncluster']['lustre']['version'] = '2.10.6'
@@ -176,7 +176,7 @@ when 'rhel', 'amazon'
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
-                                                  libssh2-devel libgcrypt-devel libevent-devel]
+                                                  libssh2-devel libgcrypt-devel libevent-devel glibc-static]
       if node['platform_version'].split('.')[1] >= '7'
         # Lustre Client for Centos >= 7.7
         default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc'
@@ -202,7 +202,8 @@ when 'rhel', 'amazon'
                                                 libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
-                                                sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel]
+                                                sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
+                                                glibc-static]
     if node['platform_version'].to_i == 2
       # mpich-devel not available on alinux
       default['cfncluster']['base_packages'].delete('mpich-devel')
