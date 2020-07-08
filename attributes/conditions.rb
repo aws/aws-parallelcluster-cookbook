@@ -21,3 +21,4 @@ default['conditions']['intel_mpi_supported'] = !arm_instance? && platform_suppor
 default['conditions']['intel_hpc_platform_supported'] = !arm_instance? && platform_supports_intel_hpc_platform?
 default['conditions']['dcv_supported'] = !arm_instance? && platform_supports_dcv?
 default['conditions']['ami_bootstrapped'] = ami_bootstrapped?
+default['conditions']['pmix_supported'] = platform_supports_pmix?
