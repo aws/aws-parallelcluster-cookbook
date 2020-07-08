@@ -4,7 +4,6 @@
     "parallelcluster_cookbook_version" : "",
     "chef_version" : "",
     "chef_custom_install_url" : "{{env `CHEF_CUSTOM_INSTALL_URL`}}",
-    "ridley_version" : "",
     "berkshelf_version" : "",
     "build_for" : "{{env `BUILD_FOR`}}",
     "ami_perms" : "{{env `AMI_PERMS`}}",
@@ -193,7 +192,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo /opt/cinc/embedded/bin/gem install --no-document ridley:{{user `ridley_version`}} berkshelf:{{user `berkshelf_version`}} ffi-libarchive"
+        "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}} ffi-libarchive"
       ]
     },
     {
