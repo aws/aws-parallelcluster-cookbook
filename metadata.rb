@@ -16,7 +16,6 @@ supports 'centos', '>= 6'
 supports 'ubuntu', '>= 16.04'
 
 depends 'apt', '~> 7.3.0'
-depends 'hostname', '~> 0.4.2'
 depends 'nfs', '~> 2.6.4'
 depends 'line', '~> 2.9.0'
 depends 'openssh', '~> 2.8.1'
