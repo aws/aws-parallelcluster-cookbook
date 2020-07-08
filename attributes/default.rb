@@ -163,7 +163,7 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip
-                                                libgcrypt-devel libevent-devel]
+                                                libgcrypt-devel]
 
     # Lustre Drivers for Centos 6
     default['cfncluster']['lustre']['version'] = '2.10.6'

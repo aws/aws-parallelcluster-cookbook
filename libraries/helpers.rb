@@ -224,3 +224,13 @@ def aws_domain
   aws_domain = "#{aws_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
   aws_domain
 end
+
+#
+# Chedk if PMIx is supported on this OS. It's not built on CentOS 6
+# because doing so would require installing newer versions of automake,
+# autoconf, libtool, and libevent. This was deemed more effort than it
+# was worth for an OS that will reach EOL soon.
+#
+def platform_supports_pmix?
+  node['platform'] != 'centos' || node['platform_version'].to_i > 6
+end
