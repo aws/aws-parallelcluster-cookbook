@@ -20,16 +20,17 @@ include_recipe 'aws-parallelcluster::base_install'
 # Write cloudwatch log config and start it.
 include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 
-if node['platform_family'] == 'amazon' && node['platform_version'] == '2'
-  # NOTE: temporary workaround for amazon linux 2 while alternative solutions are evaluated
-  execute "hostnamectl set-hostname #{node['ec2']['local_hostname']}"
-  short_hostname = node['ec2']['local_hostname'].split('.')[0]
-  execute "hostname #{short_hostname}"
+hostname node['ec2']['local_hostname']
+if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7 || node['platform'] == 'amazon' && node['platform_version'].to_i != 2
+  # hostnamectl not present in alinux1 and centos6
+  replace_or_add "set hostname in /etc/sysconfig/network" do
+    path "/etc/sysconfig/network"
+    pattern "HOSTNAME=*"
+    line "HOSTNAME=#{node['ec2']['local_hostname'].split('.')[0]}"
+  end
+  execute "hostname #{node['ec2']['local_hostname'].split('.')[0]}"
 else
-  node.default['set_fqdn'] = node['ec2']['local_hostname']
-  node.default['hostname_cookbook']['hostsfile_ip'] = node['ec2']['local_ipv4']
-  include_recipe 'hostname::default'
-  ignore_failure 'service[network]' if node['platform_family'] == 'rhel'
+  execute "hostnamectl set-hostname #{node['ec2']['local_hostname'].split('.')[0]}"
 end
 
 # Setup ephemeral drives
