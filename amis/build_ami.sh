@@ -38,13 +38,6 @@ requirements_check() {
       echo "Please visit https://www.packer.io/downloads.html for instruction on how to download and install"
       exit 1
     fi
-
-    berks vendor --help >/dev/null 2>&1
-    if [ $? -ne 0 ] ; then
-      echo "berks command not found. Is berkshelf installed?"
-      echo "Please visit https://github.com/berkshelf/berkshelf for instruction on how to download and install"
-      exit 1
-    fi
 }
 
 
@@ -125,7 +118,7 @@ check_options() {
     available_os="centos6 centos7 alinux ubuntu1604 ${available_arm_os}"
     cwd="$(dirname $0)"
     tmp_dir=$(mktemp -d)
-    export VENDOR_PATH="${tmp_dir}/vendor/cookbooks"
+    export COOKBOOK_PATH="${tmp_dir}/cookbook"
 
     if [ "${_custom}" == "true" ]; then
         only=custom-${_os}
@@ -210,8 +203,8 @@ check_options() {
 do_command() {
     RC=0
 
-    rm -rf "${VENDOR_PATH}" || RC=1
-    berks vendor "${VENDOR_PATH}" --berksfile "${cwd}/../Berksfile" || RC=1
+    mkdir -p "${COOKBOOK_PATH}"
+    cp -R ${cwd}/../* "${COOKBOOK_PATH}"
     if [ "x${_build_date}" == "x" ]; then
       export BUILD_DATE=$(date +%Y%m%d%H%M)
     else
