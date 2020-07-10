@@ -82,7 +82,7 @@ else
   default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
 end
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.4.tar.gz'
+default['cfncluster']['efa']['installer_url'] = 'https://efa-installer.amazonaws.com/aws-efa-installer-1.9.4.tar.gz'
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2020.0-8428'
