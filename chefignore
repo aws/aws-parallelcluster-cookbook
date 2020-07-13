@@ -95,4 +95,4 @@ Vagrantfile
 .travis.yml
 
 # Kitchen #
-.kitchen
+.kitchen/*
