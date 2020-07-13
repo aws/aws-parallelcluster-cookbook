@@ -70,15 +70,17 @@ default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/arch
 default['cfncluster']['ganglia_enabled'] = 'no'
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-# domain has dynamic DNS resolution, will resolve to a server in Tokyo when called from China
-default['cfncluster']['nvidia']['driver_version'] = '440.64.00'
-default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.64.00/NVIDIA-Linux-x86_64-440.64.00.run'
-default['cfncluster']['nvidia']['cuda_version'] = '10.2'
-default['cfncluster']['nvidia']['cuda_url'] = if node['platform'] == 'centos' && node['platform_version'].to_i < 7
-                                                'http://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
-                                              else
-                                                'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_linux.run'
-                                              end
+if node['platform'] == 'centos' && node['platform_version'].to_i < 7
+  default['cfncluster']['nvidia']['driver_version'] = '440.95.01'
+  default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.95.01/NVIDIA-Linux-x86_64-440.95.01.run'
+  default['cfncluster']['nvidia']['cuda_version'] = '10.2'
+  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
+else
+  default['cfncluster']['nvidia']['driver_version'] = '450.51.05'
+  default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/450.51.05/NVIDIA-Linux-x86_64-450.51.05.run'
+  default['cfncluster']['nvidia']['cuda_version'] = '11.0'
+  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
+end
 # EFA
 default['cfncluster']['efa']['installer_url'] = 'https://s3-us-west-2.amazonaws.com/aws-efa-installer/aws-efa-installer-1.8.4.tar.gz'
 # NICE DCV
