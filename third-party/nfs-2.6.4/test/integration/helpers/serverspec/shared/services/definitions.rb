@@ -1,0 +1,6 @@
+require_relative 'portmap.rb'
+require_relative 'statd.rb'
+require_relative 'mountd.rb'
+require_relative 'lockd.rb'
+require_relative 'nfs-client.rb'
+require_relative 'nfs-server.rb'
