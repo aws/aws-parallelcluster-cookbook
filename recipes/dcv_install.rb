@@ -126,8 +126,16 @@ if node['conditions']['dcv_supported']
     when 'amazon'
       prereq_packages = %w[gdm gnome-session gnome-classic-session gnome-session-xsession
                            xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
-                           gnome-terminal gnu-free-fonts-common gnu-free-mono-fonts
-                           gnu-free-sans-fonts gnu-free-serif-fonts glx-utils]
+                           gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
+                           gnu-free-serif-fonts glx-utils]
+      # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
+      # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
+      #       which is done in base_install.
+      if node['platform_version'].to_i == 2 && arm_instance?
+        prereq_packages.push('mate-terminal')
+      else
+        prereq_packages.push('gnome-terminal')
+      end
       package prereq_packages do
         retries 10
         retry_delay 5
