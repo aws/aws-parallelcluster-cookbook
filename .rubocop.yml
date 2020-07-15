@@ -12,3 +12,7 @@ StringLiterals:
 
 Style/NumericLiteralPrefix:
     EnforcedOctalStyle: zero_only
+
+AllCops:
+  Exclude:
+    - 'third-party/**/*'

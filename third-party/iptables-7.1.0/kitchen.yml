@@ -1,0 +1,81 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  deprecations_as_errors: false
+  chef_license: accept-no-persist
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: amazonlinux
+    driver_config:
+      box: mvbcoding/awslinux
+  - name: amazonlinux-2
+  - name: centos-6
+  - name: centos-7
+  - name: centos-8
+  - name: debian-9
+  - name: debian-10
+  - name: fedora-latest
+  - name: ubuntu-16.04
+  - name: ubuntu-18.04
+
+suites:
+  # - name: default
+  #   run_list:
+  #     - recipe[test::default]
+  #   attributes:
+  #     iptables:
+  #       iptables_sysconfig:
+  #         IPTABLES_STATUS_VERBOSE: 'yes'
+  #       ip6tables_sysconfig:
+  #         IPTABLES_STATUS_VERBOSE: 'yes'
+
+
+  # - name: disabled
+  #   run_list:
+  #     - recipe[iptables::disabled]
+
+  # - name: no_template
+  #   run_list:
+  #     - recipe[test::no_template]
+  #   attributes:
+  #     iptables:
+  #       iptables_sysconfig:
+  #         IPTABLES_STATUS_VERBOSE: 'yes'
+  #       ip6tables_sysconfig:
+  #         IPTABLES_STATUS_VERBOSE: 'yes'
+
+  # - name: nested
+  #   run_list:
+  #     - recipe[test::nested]
+  #   attributes:
+  #     iptables:
+  #       iptables_sysconfig:
+  #         IPTABLES_STATUS_VERBOSE: 'yes'
+  #       ip6tables_sysconfig:
+  #         IPTABLES_STATUS_VERBOSE: 'yes'
+
+  - name: all-tables
+    run_list:
+      - recipe[test::all-tables]
+
+  - name: install-and-remove
+    run_list:
+      - recipe[test::install-and-remove]
+
+  - name: rules
+    run_list:
+      - recipe[test::rules]
+
+  - name: rule-line
+    run_list:
+      - recipe[test::rule-line]
+
+  - name: rule-line-number
+    run_list:
+      - recipe[test::rule-line-number]
