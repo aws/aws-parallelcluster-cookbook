@@ -1,0 +1,35 @@
+[General]
+
+Verbosity = 0
+Pipefs-Directory = <%= node['nfs']['idmap']['pipefs_directory'] %>
+
+# The following should be set to the local NFSv4 domain name
+# The default is the host's DNS domain name.
+Domain = <%= node['nfs']['idmap']['domain'] %>
+
+# The following is a comma-separated list of Kerberos realm
+# names that should be considered to be equivalent to the
+# local realm, such that <user>@REALM.A can be assumed to
+# be the same user as <user>@REALM.B
+# If not specified, the default local realm is the domain name,
+# which defaults to the host's DNS domain name,
+# translated to upper-case.
+# Note that if this value is specified, the local realm name
+# must be included in the list!
+#Local-Realms = 
+
+[Mapping]
+
+Nobody-User = <%= node['nfs']['idmap']['user'] %>
+Nobody-Group = <%= node['nfs']['idmap']['group'] %>
+
+[Translation]
+
+# Translation Method is an comma-separated, ordered list of
+# translation methods that can be used.  Distributed methods
+# include "nsswitch", "umich_ldap", and "static".  Each method
+# is a dynamically loadable plugin library.
+# New methods may be defined and inserted in the list.
+# The default is "nsswitch".
+Method = nsswitch
+

@@ -1,0 +1,78 @@
+---
+driver:
+  name: ec2
+  region: us-west-2
+  availability_zone: #FILL
+  require_chef_omnibus: true
+  instance_type: t1.micro
+  shared_credentials_profile: default
+  aws_ssh_key_id: #FILL
+  security_group_ids: ["#FILL"]
+  tags:
+    created-by: test-kitchen
+    Name: cookbook-nfs-<%= ENV['USER'] %>
+
+transport:
+  ssh_key: #FILL 
+  connection_timeout: 20
+  retries: 6
+  username: ec2-user
+
+provisioner:
+  name: chef_zero
+
+platforms:
+# EC2 Classic AMI IDs, for t1.micro, PV
+  - name: amazon-2015-03
+    driver:
+      image_id: ami-ff527ecf 
+  - name: amazon-2014-09
+    driver:
+      image_id: ami-55a7ea65
+  - name: amazon-2014-03
+    driver:
+      image_id: ami-043a5034
+  - name: amazon-2013-09
+    driver:
+      image_id: ami-4c1c847c
+  - name: amazon-2013-03
+    driver:
+      image_id: ami-0358ce33
+  - name: amazon-2012-09
+    driver:
+      image_id: ami-2231bf12
+  - name: amazon-2012-03
+    driver:
+      image_id: ami-38c64a08
+# VPC AMI IDs, for t2.micro, HVM
+#  - name: amazon-2015-03
+#    driver:
+#      image_id: ami-e7527ed7
+#  - name: amazon-2014-09
+#    driver:
+#      image_id: ami-8586c6b5 
+#  - name: amazon-2014-03
+#    driver:
+#      image_id: ami-383a5008 
+#  - name: amazon-2013-09
+#    driver:
+#      image_id: ami-5a20b86a
+#  - name: amazon-2013-03
+#    driver:
+#      image_id: ami-d75bcde7
+#  - name: amazon-2012-09
+#    driver:
+#      image_id: ami-1627ad26
+#  - name: amazon-2012-03
+#    driver:
+#      image_id: ami-44da5574
+
+suites:
+- name: default
+  run_list: 
+  - recipe[nfs::default]
+- name: server
+  run_list:
+  - recipe[nfs::server]
+  - recipe[nfs_test::server]
+  - recipe[nfs_test::issue46]
