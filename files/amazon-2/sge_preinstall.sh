@@ -31,7 +31,7 @@ curl --retry 3 --retry-delay 5 -o afif.key "https://db.debian.org/fetchkey.cgi?f
 gpg --no-default-keyring --keyring trustedkeys.gpg --import afif.key
 
 # Following is the URL under which are stored the sources and binaries
-DEB_SGE_URL_BASE=http://deb.debian.org/debian/pool/main/g/gridengine
+DEB_SGE_URL_BASE=https://deb.debian.org/debian/pool/main/g/gridengine
 
 # Download source archive
 SRC_ARCHIVE_OUTFILE=`url_base_file $TARBALL_URL`
