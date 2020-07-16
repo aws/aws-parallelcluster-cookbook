@@ -76,7 +76,7 @@ when 'MasterServer', nil
     creates qmaster_bin_dir
   end
 
-  # Copy qconf utils (Downloaded from http://arc.liv.ac.uk/SGE/downloads/qconf_scripts.tar.gz)
+  # Copy qconf utils (Downloaded from https://arc.liv.ac.uk/SGE/downloads/qconf_scripts.tar.gz)
   cookbook_file 'qconf_scripts.tar.gz' do
     path '/opt/sge/util/qconf_scripts.tar.gz'
     user 'root'

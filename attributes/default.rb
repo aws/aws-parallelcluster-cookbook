@@ -224,7 +224,7 @@ when 'rhel', 'amazon'
                                                        jq wget python-pip])
       # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
       # because it contains fixes for known build issues
-      default['cfncluster']['sge']['url'] = 'http://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
+      default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
       default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
     end
   end

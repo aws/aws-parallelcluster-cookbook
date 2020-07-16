@@ -31,8 +31,8 @@ when 'MasterServer'
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
-      yum-config-manager --add-repo http://yum.repos.intel.com/hpc-platform/el7/setup/intel-hpc-platform.repo
-      rpm --import http://yum.repos.intel.com/hpc-platform/el7/setup/PUBLIC_KEY.PUB
+      yum-config-manager --add-repo https://yum.repos.intel.com/hpc-platform/el7/setup/intel-hpc-platform.repo
+      rpm --import https://yum.repos.intel.com/hpc-platform/el7/setup/PUBLIC_KEY.PUB
       yum -y install --downloadonly --downloaddir=/opt/intel/rpms intel-hpc-platform-*-#{node['cfncluster']['intelhpc']['version']}
     INTEL
     creates '/opt/intel/rpms'
