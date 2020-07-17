@@ -49,3 +49,15 @@ bash 'Install PMIx' do
     make install
   PMIX
 end
+
+# Ensure directory containing PMIx shared library is part of the runtime
+# loader's search path.
+cookbook_file '/etc/ld.so.conf.d/pmix.conf' do
+  source 'pmix/ld.so.conf.d/pmix.conf'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+execute 'ldconfig' do
+  user 'root'
+end
