@@ -173,7 +173,7 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}} ffi-libarchive"
+        "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}}"
       ]
     },
     {
