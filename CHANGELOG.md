@@ -4,17 +4,44 @@ aws-parallelcluster-cookbook CHANGELOG
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
 
-X.X.X
+2.8.0
 -----
 
 **ENHANCEMENTS**
 
 - Enable support for ARM instances on Ubuntu 18.04 and Amazon Linux 2.
+- Install  PMIx v3.1.5 and provide slurm support for it on all supported operating systems except for
+  CentOS 6.
+- Install glibc-static, which is required to support certain options for the Intel MPI compiler.
 
 **CHANGES**
 
 - Disable libvirtd service on Centos 7. Virtual bridge interfaces are incorrectly detected by Open MPI and
   cause MPI applications to hang, see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details 
+- Use CINC instead of Chef for provisioning instances. See https://cinc.sh/about/ for details.
+- Retry when mounting an NFS mount fails.
+- Install the `pyenv` virtual environments used by ParallelCluster cookbook and node daemon code under
+  /opt/parallelcluster instead of under /usr/local.
+- Avoid downloading the source for `env2` at installation time.
+- Drop dependency on the gems ridley and ffi-libarchive.
+- Vendor cookbooks as part of instance provisioning, rather than doing so before copying the cookbook into an
+  instance. Users no longer need to have `berks` installed locally.
+- Drop the dependencies on the poise-python, tar and hostname third-party cookbooks.
+- Use the new official CentOS 7 AMI as the base images for ParallelCluster AMI.
+- Upgrade NVIDIA driver to Tesla version 440.95.01 on CentOS 6 and version 450.51.05 on all other distros.
+- Upgrade CUDA library to version 11.0 on all distros besides CentOS 6.
+- Install third-party cookbook dependencies via local source, rather than using the Chef supermarket.
+- Use https wherever possible in download URLs.
+- Upgrade EFA installer to version 1.9.4:
+  - Kernel module: ``efa-1.6.0`` (from efa-1.5.1)
+  - RDMA core: ``rdma-core-28.amzn0`` (from rdma-core-25.0)
+  - Libfabric: ``libfabric-1.10.1amazon1.1`` (updated from libfabric-aws-1.9.0amzn1.1) 
+  - Open MPI: openmpi40-aws-4.0.3 (no change)
+
+**BUG FIXES**
+- Fix issue that was preventing concurrent use of custom node and pcluster CLI packages.
+- Use the correct domain name when contacting AWS services from the China partition.
+- Avoid pinning to a specific release of the Intel HPC platform.
 
 2.7.0
 -----
