@@ -252,6 +252,12 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
   execute 'check DCV external authenticator python version' do
     command %(#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
   end
+  execute 'check screensaver screen lock disabled' do
+    command 'gsettings get org.gnome.desktop.screensaver lock-enabled | grep false'
+  end
+  execute 'check non-screensaver screen lock disabled' do
+    command 'gsettings get org.gnome.desktop.lockdown disable-lock-screen | grep true'
+  end
 end
 
 ###################
