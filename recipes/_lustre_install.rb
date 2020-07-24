@@ -83,7 +83,7 @@ elsif node['platform'] == 'ubuntu'
 
   apt_update
 
-  apt_package "lustre-client-modules-#{node['kernel']['release']}" do
+  apt_package "lustre-client-modules-#{node['kernel']['release']} lustre-client-modules-aws" do
     retries 3
     retry_delay 5
   end
