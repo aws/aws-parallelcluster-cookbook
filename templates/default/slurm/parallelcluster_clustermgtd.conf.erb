@@ -1,0 +1,5 @@
+[clustermgtd]
+cluster_name = <%= node['cfncluster']['stack_name'].sub("parallelcluster-", "") %>
+region = <%= node['cfncluster']['cfn_region'] %>
+proxy = <%= node['cfncluster']['cfn_proxy'] %>
+heartbeat_file_path = /home/<%= node['cfncluster']['cfn_cluster_user'] %>/.parallelcluster/.slurm_plugin/clustermgtd_heartbeat
