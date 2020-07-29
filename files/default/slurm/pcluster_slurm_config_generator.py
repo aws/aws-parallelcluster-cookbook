@@ -16,7 +16,6 @@ from os import makedirs, path
 from socket import gethostname
 
 import argparse
-
 from jinja2 import Environment, FileSystemLoader
 
 log = logging.getLogger()
