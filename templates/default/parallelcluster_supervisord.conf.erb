@@ -3,7 +3,13 @@
 <% case node['cfncluster']['cfn_node_type'] -%>
 <%# MasterServer -%>
 <% when 'MasterServer' -%>
-<% unless node['cfncluster']['cfn_scheduler'] == 'awsbatch' -%>
+<% if node['cfncluster']['cfn_scheduler'] == 'slurm' -%>
+[program:clustermgtd]
+command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/clustermgtd
+redirect_stderr = true
+stdout_logfile = /var/log/parallelcluster/clustermgtd
+
+<% elsif node['cfncluster']['cfn_scheduler'] != 'awsbatch' -%>
 [program:sqswatcher]
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/sqswatcher
 redirect_stderr = true
@@ -24,10 +30,14 @@ command = <%= node['cfncluster']['dcv']['authenticator']['virtualenv_path'] %>/b
 user = <%= node['cfncluster']['dcv']['authenticator']['user'] %>
 environment = HOME="<%= node['cfncluster']['dcv']['authenticator']['user_home'] %>",USER="<%= node['cfncluster']['dcv']['authenticator']['user'] %>"
 <% end -%>
+
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
+<% if node['cfncluster']['cfn_scheduler'] != 'slurm' -%>
 [program:nodewatcher]
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/nodewatcher
 redirect_stderr = true
 stdout_logfile = /var/log/nodewatcher
+<% end -%>
+
 <% end -%>

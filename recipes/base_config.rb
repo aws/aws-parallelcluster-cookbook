@@ -63,14 +63,13 @@ template '/etc/sudoers.d/99-parallelcluster-user-tty' do
   mode '0600'
 end
 
-unless node['cfncluster']['cfn_scheduler'] == 'slurm'
-  # Install parallelcluster specific supervisord config
-  template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
-    source 'parallelcluster_supervisord.conf.erb'
-    owner 'root'
-    group 'root'
-    mode '0644'
-  end
+
+# Install parallelcluster specific supervisord config
+template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
+  source 'parallelcluster_supervisord.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
 end
 
 # Mount EFS directory with efs_mount recipe
