@@ -140,6 +140,22 @@ template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_slurm_suspe
   mode '0644'
 end
 
+template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_clustermgtd.conf" do
+  source 'slurm/parallelcluster_clustermgtd.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+# Create directory used to store clustermgtd heartbeat
+directory "/home/#{node['cfncluster']['cfn_cluster_user']}/.parallelcluster/.slurm_plugin" do
+  user 'root'
+  group 'root'
+  mode '0644'
+  action :create
+  recursive true
+end
+
 cookbook_file '/etc/systemd/system/slurmctld.service' do
   source 'slurmctld.service'
   owner 'root'

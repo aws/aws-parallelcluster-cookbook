@@ -58,3 +58,10 @@ else
     action %i[enable start]
   end
 end
+
+execute 'resume_node' do
+  # Always try to resume the node on start up
+  # Command will fail if node is already in IDLE, ignoring failure
+  command(lazy { "/opt/slurm/bin/scontrol update nodename=#{node.run_state['slurm_compute_nodename']} state=resume reason='Node start up'" })
+  ignore_failure true
+end
