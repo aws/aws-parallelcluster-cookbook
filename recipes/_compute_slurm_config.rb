@@ -23,6 +23,7 @@ directory '/var/spool/slurmd' do
 end
 
 # Mount /opt/slurm over NFS
+# Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
 mount '/opt/slurm' do
   device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/slurm" })
   fstype "nfs"
@@ -30,6 +31,15 @@ mount '/opt/slurm' do
   action %i[mount enable]
   retries 3
   retry_delay 5
+end
+
+# Ensure slurm config directory is in place, directory will contain slurm_nodename file used to identify current compute node in computemgtd
+directory "#{node['cfncluster']['configs_dir']}/slurm" do
+  user 'slurm'
+  group 'slurm'
+  mode '0755'
+  action :create
+  recursive true
 end
 
 # Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU
