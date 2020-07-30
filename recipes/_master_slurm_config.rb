@@ -147,13 +147,21 @@ template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_clustermgtd
   mode '0644'
 end
 
-# Create directory used to store clustermgtd heartbeat
-directory "/home/#{node['cfncluster']['cfn_cluster_user']}/.parallelcluster/.slurm_plugin" do
+# Create shared directory used to store clustermgtd heartbeat and computemgtd config
+directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
   user 'root'
   group 'root'
   mode '0644'
   action :create
   recursive true
+end
+
+# Put computemgtd config under /opt/slurm/etc/pcluster/.slurm_plugin so all compute nodes share a config
+template "/opt/slurm/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf" do
+  source 'slurm/parallelcluster_computemgtd.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
 end
 
 cookbook_file '/etc/systemd/system/slurmctld.service' do
