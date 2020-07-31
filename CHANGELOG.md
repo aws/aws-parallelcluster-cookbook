@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.8.1
+-----
+
+**CHANGES**
+
+- Disable screen lock for DCV desktop sessions to prevent users from being locked out.
 
 2.8.0
 -----
