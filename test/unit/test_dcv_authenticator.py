@@ -104,7 +104,7 @@ def test_is_process_valid(user, command, session_id, result):
     expected_user = "user1"
 
     ps_aux_output = (
-        "{USER}                63   0.0  0.0  4348844   3108   ??  Ss   23Jul19   2:32.46 {COMMAND} "
+        "{USER}                63   0.0  0.0  4348844   3108   ??  Ss   23Jul19   2:32.46 {COMMAND} --mode full "
         "--session-id {SESSION}".format(USER=user, COMMAND=command, SESSION=session_id)
     )
 
