@@ -36,7 +36,7 @@ if raid_shared_dir != "NONE"
   mount raid_shared_dir do
     device "#{nfs_master}:#{raid_shared_dir}"
     fstype 'nfs'
-    options 'hard,intr,noatime,vers=3,_netdev'
+    options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
     retries 3
     retry_delay 5
@@ -47,7 +47,7 @@ end
 mount '/home' do
   device "#{nfs_master}:/home"
   fstype 'nfs'
-  options 'hard,intr,noatime,vers=3,_netdev'
+  options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
   retries 3
   retry_delay 5
@@ -57,7 +57,7 @@ end
 mount '/opt/intel' do
   device "#{nfs_master}:/opt/intel"
   fstype 'nfs'
-  options 'hard,intr,noatime,vers=3,_netdev'
+  options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
   retries 3
   retry_delay 5
@@ -98,7 +98,7 @@ shared_dir_array.each do |dir|
     mount dirname do
       device "#{nfs_master}:#{dirname}"
       fstype 'nfs'
-      options 'hard,intr,noatime,vers=3,_netdev'
+      options 'hard,intr,noatime,_netdev'
       action %i[mount enable]
       retries 3
       retry_delay 5
