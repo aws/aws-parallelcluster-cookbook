@@ -64,7 +64,7 @@ when 'MasterServer', nil
       env
       tar xf #{slurm_tarball}
       cd slurm-#{node['cfncluster']['slurm']['version']}
-      ./configure --prefix=/opt/slurm
+      ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
       make install
