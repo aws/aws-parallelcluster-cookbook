@@ -547,6 +547,74 @@
           "satisfying_values": ["master"]
         }
       ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_resume.log",
+      "log_stream_name": "slurm_resume_program_log",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_suspend.log",
+      "log_stream_name": "slurm_suspend_program_log",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/clustermgtd",
+      "log_stream_name": "clustermgtd_log",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/computemgtd",
+      "log_stream_name": "computemgtd_log",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
     }
   ]
 }
