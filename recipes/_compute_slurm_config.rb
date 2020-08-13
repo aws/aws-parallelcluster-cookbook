@@ -33,8 +33,8 @@ mount '/opt/slurm' do
   retry_delay 5
 end
 
-# Ensure slurm config directory is in place, directory will contain slurm_nodename file used to identify current compute node in computemgtd
-directory "#{node['cfncluster']['configs_dir']}/slurm" do
+# Ensure slurm plugin directory is in place, directory will contain slurm_nodename file used to identify current compute node in computemgtd
+directory "#{node['cfncluster']['slurm_plugin_dir']}" do
   user 'slurm'
   group 'slurm'
   mode '0755'

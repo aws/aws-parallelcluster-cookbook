@@ -30,7 +30,7 @@ end
 
 # Create local file containing slurm nodename of compute node
 # Computemgtd need to use this info to retrieve the compute node's own state
-file "#{node['cfncluster']['configs_dir']}/slurm/slurm_nodename" do
+file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do
   content(lazy { node.run_state['slurm_compute_nodename'].to_s })
   mode '0644'
   owner 'root'
@@ -70,8 +70,10 @@ else
 end
 
 execute 'resume_node' do
-  # Always try to resume the node on start up
+  # Always try to resume a static node on start up
   # Command will fail if node is already in IDLE, ignoring failure
   command(lazy { "/opt/slurm/bin/scontrol update nodename=#{node.run_state['slurm_compute_nodename']} state=resume reason='Node start up'" })
   ignore_failure true
+  # Only resume static nodes
+  only_if { "#{node.run_state['slurm_compute_nodename']}".include? "-static-" }
 end

@@ -64,8 +64,8 @@ execute "copy_cluster_config_from_s3" do
           " --region #{node['cfncluster']['cfn_region']}"
 end
 
-# Ensure slurm config directory is in place
-directory "#{node['cfncluster']['configs_dir']}/slurm" do
+# Ensure slurm plugin directory is in place
+directory "#{node['cfncluster']['slurm_plugin_dir']}" do
   user 'slurm'
   group 'slurm'
   mode '0755'
@@ -115,7 +115,7 @@ file "/var/log/parallelcluster/slurm_resume.log" do
   mode '0644'
 end
 
-template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_slurm_resume.conf" do
+template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.conf" do
   source 'slurm/parallelcluster_slurm_resume.conf.erb'
   owner 'slurm'
   group 'slurm'
@@ -135,14 +135,14 @@ file "/var/log/parallelcluster/slurm_suspend.log" do
   mode '0644'
 end
 
-template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_slurm_suspend.conf" do
+template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_slurm_suspend.conf" do
   source 'slurm/parallelcluster_slurm_suspend.conf.erb'
   owner 'slurm'
   group 'slurm'
   mode '0644'
 end
 
-template "#{node['cfncluster']['configs_dir']}/slurm/parallelcluster_clustermgtd.conf" do
+template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_clustermgtd.conf" do
   source 'slurm/parallelcluster_clustermgtd.conf.erb'
   owner 'root'
   group 'root'
@@ -164,6 +164,11 @@ template "/opt/slurm/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf
   owner 'root'
   group 'root'
   mode '0644'
+end
+
+# Increase somaxconn to 1024 for large scale setting
+execute "increase_somaxconn" do
+  command "echo '1024' > /proc/sys/net/core/somaxconn"
 end
 
 cookbook_file '/etc/systemd/system/slurmctld.service' do
