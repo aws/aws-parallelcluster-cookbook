@@ -27,7 +27,7 @@ nfs_master = node['cfncluster']['cfn_master']
 mount '/opt/slurm' do
   device "#{nfs_master}:/opt/slurm"
   fstype "nfs"
-  options 'hard,intr,noatime,vers=3,_netdev'
+  options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
   retries 3
   retry_delay 5
