@@ -459,7 +459,7 @@ if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
   end
 elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
   execute 'check for nfs server protocol' do
-    command "rpcinfo -p localhost | awk '{print $2","$5}' | grep 4,nfs"
+    command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
     user node['cfncluster']['cfn_cluster_user']
   end
 end
