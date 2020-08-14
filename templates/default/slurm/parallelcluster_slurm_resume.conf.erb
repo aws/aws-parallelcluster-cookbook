@@ -2,3 +2,6 @@
 cluster_name = <%= node['cfncluster']['stack_name'].sub("parallelcluster-", "") %>
 region = <%= node['cfncluster']['cfn_region'] %>
 proxy = <%= node['cfncluster']['cfn_proxy'] %>
+dynamodb_table = <%= node['cfncluster']['cfn_ddb_table'] %>
+hosted_zone = <%= node['cfncluster']['cfn_hosted_zone'] %>
+dns_domain = <%= node['cfncluster']['cfn_dns_domain'] %>

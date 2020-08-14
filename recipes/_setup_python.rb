@@ -14,6 +14,8 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+return if node['conditions']['ami_bootstrapped']
+
 install_pyenv node['cfncluster']['python-version'] do
   prefix node['cfncluster']['system_pyenv_root']
 end
