@@ -24,9 +24,14 @@ node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_sc
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
 
+# Setup directories
 directory '/etc/parallelcluster'
 directory '/opt/parallelcluster'
 directory '/opt/parallelcluster/scripts'
+directory node['cfncluster']['base_dir']
+directory node['cfncluster']['sources_dir']
+directory node['cfncluster']['scripts_dir']
+directory node['cfncluster']['license_dir']
 
 # Create ParallelCluster log folder
 directory '/var/log/parallelcluster/' do
@@ -57,3 +62,11 @@ template '/opt/parallelcluster/scripts/compute_ready' do
   group "root"
   mode "0755"
 end
+
+include_recipe "aws-parallelcluster::_setup_python"
+
+# Install cloudwatch, write configuration and start it.
+include_recipe "aws-parallelcluster::cloudwatch_agent_config"
+
+# Configure hostname and DNS
+include_recipe "aws-parallelcluster::dns_config"
