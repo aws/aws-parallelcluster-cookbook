@@ -171,6 +171,43 @@ def master_address(region, stack_name)
   [master_private_ip, master_private_dns]
 end
 
+def compute_hostname
+  require 'chef/mixin/shell_out'
+
+  assigned_hostname = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
+    "--region #{node['cfncluster']['cfn_region']} query --table-name #{node['cfncluster']['cfn_ddb_table']} " \
+    "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
+    "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
+    "--output text --query 'Items[0].Id.S'", user: 'root').stdout.strip
+
+  raise "Failed when retrieving Compute hostname from DynamoDB" if assigned_hostname == "None"
+
+  Chef::Log.info("Assigned_hostname is: #{assigned_hostname}")
+  assigned_hostname
+end
+
+# Utility method to restart network service according to the OS.
+def restart_network_service
+  network_service_name = value_for_platform(
+    ['centos'] => {
+      '<7.0' => 'network'
+    },
+    ['amazon'] => {
+      '>=2013' => 'network' # Alinux1
+    },
+    %w[ubuntu debian] => {
+      '16.04' => 'networking',
+      '>=18.04' => 'systemd-resolved'
+    },
+    'default' => 'NetworkManager'
+  )
+  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
+  service network_service_name.to_s do
+    action %i[restart]
+    ignore_failure true
+  end
+end
+
 #
 # Check if this is an ARM instance
 #

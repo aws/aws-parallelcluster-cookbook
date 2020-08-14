@@ -206,7 +206,7 @@ when 'rhel', 'amazon'
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
-                                                  libssh2-devel libgcrypt-devel libevent-devel glibc-static]
+                                                  libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
       if node['platform_version'].split('.')[1] >= '7'
         # Lustre Client for Centos >= 7.7
         default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc'
@@ -337,6 +337,8 @@ default['cfncluster']['custom_node_package'] = nil
 default['cfncluster']['custom_awsbatchcli_package'] = nil
 default['cfncluster']['cfn_raid_parameters'] = 'NONE'
 default['cfncluster']['cfn_raid_vol_ids'] = nil
+default['cfncluster']['cfn_dns_domain'] = nil
+default['cfncluster']['use_private_hostname'] = 'false'
 default['cfncluster']['skip_install_recipes'] = 'yes'
 
 # AWS domain

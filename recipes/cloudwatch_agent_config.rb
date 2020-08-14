@@ -14,6 +14,10 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Be sure to have AWS cloudwatch agent installed
+include_recipe "aws-parallelcluster::cloudwatch_agent_install"
+
 config_script_path = '/usr/local/bin/write_cloudwatch_agent_json.py'
 cookbook_file 'write_cloudwatch_agent_json.py' do
   not_if { ::File.exist?(config_script_path) }
