@@ -448,3 +448,18 @@ if node['platform'] == 'centos' && node['platform_version'].to_i >= 7
     TESTBRIDGE
   end
 end
+
+###################
+# NFS
+###################
+if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+  execute 'check for nfs client protocol' do
+    command "nfsstat -m | grep vers=4"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
+  execute 'check for nfs server protocol' do
+    command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
