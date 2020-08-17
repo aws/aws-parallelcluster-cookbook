@@ -19,9 +19,10 @@ ruby_block 'get_compute_nodename' do
   block do
     # Retrieve private ip from Metadata V2
     require 'mixlib/shellout'
-    node.run_state['compute_ip'] = shell_out!('curl -s http://169.254.169.254/latest/meta-data/local-ipv4', :user => 'root').stdout.strip
+    node.run_state['compute_ip'] = shell_out!('curl -s http://169.254.169.254/latest/meta-data/local-ipv4', user: 'root').stdout.strip
     # Retrieve NodeName from scontrol
-    node.run_state['slurm_compute_nodename'] = shell_out!("/opt/slurm/bin/scontrol show nodes | awk \"/\\y#{node.run_state['compute_ip']}\\y/\" RS= | grep -oP '^NodeName=\\K(\\S+)'", :user => 'root').stdout.strip
+    node.run_state['slurm_compute_nodename'] = shell_out!("/opt/slurm/bin/scontrol show nodes | awk \"/\\y#{node.run_state['compute_ip']}\\y/\" RS="\
+                                                          " | grep -oP '^NodeName=\\K(\\S+)'", user: 'root').stdout.strip
   end
   retries 3
   retry_delay 5
@@ -30,7 +31,7 @@ end
 # Create local file containing slurm nodename of compute node
 # Computemgtd need to use this info to retrieve the compute node's own state
 file "#{node['cfncluster']['configs_dir']}/slurm/slurm_nodename" do
-  content(lazy { "#{node.run_state['slurm_compute_nodename']}" })
+  content(lazy { node.run_state['slurm_compute_nodename'].to_s })
   mode '0644'
   owner 'root'
   group 'root'
