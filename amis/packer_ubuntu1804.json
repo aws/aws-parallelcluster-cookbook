@@ -159,7 +159,7 @@
     {
       "type": "shell",
       "inline": [
-        "sudo flock $(apt-config shell StateDir Dir::State/d | sed -r \"s/.*'(.*)\\/?'$/\\1/\")/daily_lock systemctl stop apt-daily.timer apt-daily.service"
+        "sudo flock $(apt-config shell StateDir Dir::State/d | sed -r \"s/.*'(.*)\\/?'$/\\1/\")/daily_lock systemctl stop apt-daily.timer apt-daily.service apt-daily-upgrade.timer apt-daily-upgrade.service"
       ]
     },
     {
