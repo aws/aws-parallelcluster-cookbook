@@ -173,7 +173,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
         command 'ls /opt/slurm/lib/slurm/ | grep pmix'
       end
       execute 'ensure-pmix-shared-library-can-be-found' do
-        command '/usr/bin/pmix_info'
+        command '/opt/pmix/bin/pmix_info'
       end
     end
   when 'ComputeFleet'
