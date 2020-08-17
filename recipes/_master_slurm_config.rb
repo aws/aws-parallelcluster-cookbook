@@ -60,7 +60,8 @@ end
 
 # Copy cluster config file from S3 URI
 execute "copy_cluster_config_from_s3" do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['cluster_config_s3_uri']} #{node['cfncluster']['cluster_config_path']} --region #{node['cfncluster']['cfn_region']}"
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['cluster_config_s3_uri']} #{node['cfncluster']['cluster_config_path']}"\
+          " --region #{node['cfncluster']['cfn_region']}"
 end
 
 # Ensure slurm config directory is in place
@@ -74,7 +75,8 @@ end
 
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
+          " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
 end
 
 # alinux1 and centos6 use an old cgroup directory: /cgroup
