@@ -44,7 +44,7 @@ bash 'Install PMIx' do
     tar xf #{pmix_tarball}
     cd pmix-#{node['cfncluster']['pmix']['version']}
     ./autogen.pl
-    ./configure --prefix=/usr
+    ./configure --prefix=/opt/pmix
     make
     make install
   PMIX

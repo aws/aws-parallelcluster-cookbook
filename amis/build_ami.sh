@@ -16,7 +16,7 @@
 #
 # Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom]
 #                     [--build-date <build-date>] [--arch <arch>]
-#   os: the os to build (supported values: all|centos6|centos7|alinux|ubuntu1604)
+#   os: the os to build (supported values: all|centos6|centos7|alinux|alinux2|ubuntu1604|ubuntu1804)
 #   partition: partition to build in (supported values: commercial|govcloud|china)
 #   region: region to copy ami too (supported values: all|us-east-1|us-gov-west-1|...)
 #   custom: specifies to create the AMI from a custom AMI-id, which must be specified by variable CUSTOM_AMI_ID in the environment (optional)

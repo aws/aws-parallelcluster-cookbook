@@ -173,7 +173,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
         command 'ls /opt/slurm/lib/slurm/ | grep pmix'
       end
       execute 'ensure-pmix-shared-library-can-be-found' do
-        command '/usr/bin/pmix_info'
+        command '/opt/pmix/bin/pmix_info'
       end
     end
   when 'ComputeFleet'
@@ -446,5 +446,20 @@ if node['platform'] == 'centos' && node['platform_version'].to_i >= 7
       # virbr0 8000.525400e6e4f9 yes virbr0-nic
       [ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0
     TESTBRIDGE
+  end
+end
+
+###################
+# NFS
+###################
+if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+  execute 'check for nfs client protocol' do
+    command "nfsstat -m | grep vers=4"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
+  execute 'check for nfs server protocol' do
+    command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
+    user node['cfncluster']['cfn_cluster_user']
   end
 end
