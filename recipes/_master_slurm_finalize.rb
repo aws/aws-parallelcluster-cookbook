@@ -22,3 +22,22 @@ execute 'initialize compute fleet status' do
   retries 3
   retry_delay 5
 end
+
+ruby_block "wait for static fleet capacity" do
+  block do
+    require 'chef/mixin/shell_out'
+
+    # Example output for sinfo
+    # $ /opt/slurm/bin/sinfo -N -h -o '%N %t'
+    # ondemand-dynamic-c5.2xlarge-1 idle~
+    # ondemand-dynamic-c5.2xlarge-2 idle~
+    # spot-dynamic-c5.xlarge-1 idle~
+    # spot-static-t2.large-1 down
+    # spot-static-t2.large-2 idle
+    until shell_out!("set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep '\\-static\\-' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }").stdout.strip.empty?
+      Chef::Log.info("Waiting for static fleet capacity provisioning")
+      sleep(15)
+    end
+    Chef::Log.info("Static fleet capacity is ready")
+  end
+end
