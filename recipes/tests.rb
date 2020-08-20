@@ -173,7 +173,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
         command 'ls /opt/slurm/lib/slurm/ | grep pmix'
       end
       execute 'ensure-pmix-shared-library-can-be-found' do
-        command '/usr/bin/pmix_info'
+        command '/opt/pmix/bin/pmix_info'
       end
     end
   when 'ComputeFleet'
@@ -459,7 +459,7 @@ if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
   end
 elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
   execute 'check for nfs server protocol' do
-    command "rpcinfo -p localhost | awk '{print $2","$5}' | grep 4,nfs"
+    command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
     user node['cfncluster']['cfn_cluster_user']
   end
 end

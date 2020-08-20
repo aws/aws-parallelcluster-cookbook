@@ -85,24 +85,47 @@ end
 default['cfncluster']['efa']['installer_url'] = 'https://efa-installer.amazonaws.com/aws-efa-installer-1.9.4.tar.gz'
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
-default['cfncluster']['dcv']['version'] = '2020.0-8428'
-default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
-
+default['cfncluster']['dcv']['version'] = '2020.1-8942'
+default['cfncluster']['dcv']['supported_os'] = if arm_instance?
+                                                 %w[ubuntu18 amazon2]
+                                               else
+                                                 %w[centos7 ubuntu18 amazon2]
+                                               end
+default['cfncluster']['dcv']['url_architecture_id'] = if arm_instance?
+                                                        'aarch64'
+                                                      else
+                                                        'x86_64'
+                                                      end
 case "#{node['platform']}#{node['platform_version'].to_i}"
 when 'centos7', 'amazon2'
-  default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7"
-  default['cfncluster']['dcv']['server'] = "nice-dcv-server-2020.0.8428-1.el7.x86_64.rpm" # NICE DCV server package
-  default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2020.0.296-1.el7.x86_64.rpm" # required to create virtual sessions
-  default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2020.0.759-1.el7.x86_64.rpm" # required to enable GPU sharing
-  default['cfncluster']['dcv']['sha256sum'] = "540a4839dc858f44a95e5a2edeabd9bc2f0b19589a22ca4e801b6ca5c2ae9e11"
+  default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}"
+  default['cfncluster']['dcv']['server'] = "nice-dcv-server-2020.1.8942-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # NICE DCV server package
+  default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2020.1.338-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # required to create virtual sessions
+  default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2020.1.840-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # required to enable GPU sharing
+  default['cfncluster']['dcv']['sha256sum'] = if arm_instance?
+                                                "ef6e987520f62552a775e0ffdcc4e1aab9d3b843457d9a2bddba3d9e4ff90f67"
+                                              else
+                                                "83916301e1283a3ecb3c620d66ca4b0420a5f5c88316061ea31b8b3261c76b2e"
+                                              end
+
 when 'ubuntu18'
-  default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804"
-  default['cfncluster']['dcv']['server'] = "nice-dcv-server_2020.0.8428-1_amd64.ubuntu1804.deb" # NICE DCV server package
-  default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2020.0.296-1_amd64.ubuntu1804.deb"  # required to create virtual sessions
-  default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2020.0.759-1_amd64.ubuntu1804.deb"  # required to enable GPU sharing
-  default['cfncluster']['dcv']['sha256sum'] = "1b88b93aa21d460a3947423532d25478d71e7c40ca576e30a82fc57a74e664c9"
+  # Unlike the other supported OSs, the DCV package names for Ubuntu 18.04 use different architecture abbreviations than those used in the download URLs.
+  default['cfncluster']['dcv']['package_architecture_id'] = if arm_instance?
+                                                              'arm64'
+                                                            else
+                                                              'amd64'
+                                                            end
+  default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804-#{node['cfncluster']['dcv']['url_architecture_id']}"
+  default['cfncluster']['dcv']['server'] = "nice-dcv-server_2020.1.8942-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" # NICE DCV server package
+  default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2020.1.338-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb"  # required to create virtual sessions
+  default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2020.1.840-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb"  # required to enable GPU sharing
+  default['cfncluster']['dcv']['sha256sum'] = if arm_instance?
+                                                "998eebe170a6adce656e9608a8c8919af01b67b4d8051f6d9d9c3f09ca115212"
+                                              else
+                                                "c82706c98f8ec6c6886c12a56da49a6da873f6b7ab70cce2b12a1cdad485aba9"
+                                              end
 end
-default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2020.0/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
+default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2020.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cfncluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfncluster']['dcv']['authenticator']['user']}"
