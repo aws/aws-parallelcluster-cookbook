@@ -10,6 +10,7 @@ driver_config:
   subnet_id: <%= ENV['AWS_SUBNET_ID'] %>
   security_group_ids:  [ <%= ENV['AWS_SECURITY_GROUP_ID'] %> ]
   iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
+  user_data: <%= ENV['USER_DATA_SCRIPT'] %>
   tags:
     created-by: test-kitchen
     Name: test-kitchen-parallelcluster
