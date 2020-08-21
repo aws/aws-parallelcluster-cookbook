@@ -71,6 +71,26 @@
     },
     {
       "timestamp_format_key": "default",
+      "file_path": "/var/log/chef-client.log",
+      "log_stream_name": "chef-client",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
       "file_path": "/var/log/cloud-init.log",
       "log_stream_name": "cloud-init",
       "schedulers": [
