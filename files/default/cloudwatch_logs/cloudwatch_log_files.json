@@ -64,7 +64,6 @@
         "ubuntu"
       ],
       "node_roles": [
-        "ComputeFleet",
         "MasterServer"
       ],
       "feature_conditions": []
