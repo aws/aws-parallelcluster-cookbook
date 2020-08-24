@@ -101,6 +101,20 @@ when 'MasterServer', nil
     # TODO: Fix, so it works for upgrade
     creates "#{node['cfncluster']['license_dir']}/slurm/README.rst"
   end
+
+  # Install PerlSwitch
+  if node['platform'] == 'ubuntu'
+    package 'libswitch-perl' do
+      retries 3
+      retry_delay 5
+    end
+  elsif node['platform'] == 'centos' && node['platform_version'].to_i >= 7 || node['platform'] == 'amazon'
+    package 'perl-Switch' do
+      retries 3
+      retry_delay 5
+    end
+  end
+
 when 'ComputeFleet'
   # Created Slurm shared mount point
   directory "/opt/slurm" do
