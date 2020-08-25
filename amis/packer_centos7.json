@@ -23,7 +23,9 @@
     "parallelcluster_ref" : "{{env `PARALLELCLUSTER_REF`}}",
     "parallelcluster_cookbook_ref" : "{{env `PARALLELCLUSTER_COOKBOOK_REF`}}",
     "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}",
-    "ami_arch" : "{{env `AMI_ARCH`}}"
+    "ami_arch" : "{{env `AMI_ARCH`}}",
+    "user_data_file" : "{{env `USER_DATA_SCRIPT`}}",
+    "iam_instance_profile" : "{{env `AWS_IAM_PROFILE`}}"
   },
   "builders" : [
     {
@@ -54,6 +56,8 @@
       "sriov_support" : true,
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
+      "user_data_file" : "{{user `user_data_file`}}",
+      "iam_instance_profile" : "{{user `iam_instance_profile`}}",
       "tags" : {
         "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}",
@@ -113,6 +117,8 @@
       "sriov_support" : true,
       "ena_support" : true,
       "shutdown_behavior" : "terminate",
+      "user_data_file" : "{{user `user_data_file`}}",
+      "iam_instance_profile" : "{{user `iam_instance_profile`}}",
       "tags" : {
         "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
         "build_date" : "{{user `build_date`}}"
