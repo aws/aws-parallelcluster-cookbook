@@ -338,6 +338,7 @@ default['cfncluster']['custom_awsbatchcli_package'] = nil
 default['cfncluster']['cfn_raid_parameters'] = 'NONE'
 default['cfncluster']['cfn_raid_vol_ids'] = nil
 default['cfncluster']['skip_install_recipes'] = 'yes'
+default['cfncluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cfncluster']['aws_domain'] = aws_domain
