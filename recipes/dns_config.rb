@@ -16,17 +16,12 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
+# It is possible to restore the SIT behaviour by setting the use_private_hostname = true as extra_json parameter
+if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_private_hostname'] == 'false'
   # Heterogeneous Instance Type
-  if node['cfncluster']['cfn_dns_domain'].nil? || node['cfncluster']['cfn_dns_domain'] == "NONE"
-    Chef::Log.info("Cluster DNS domain not configured, using private hostname.")
 
-    node.force_default['cfncluster']['assigned_hostname'] = node['ec2']['local_hostname']
-    node.force_default['cfncluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
-  else
-
-    # Configure custom dns domain
-    # Function to extend DNS resolver configuration by appending the Route53 domain created within the cluster
+  if !node['cfncluster']['cfn_dns_domain'].nil? && !node['cfncluster']['cfn_dns_domain'].empty?
+    # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
     # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
     if platform?('ubuntu') && node['platform_version'] == "18.04"
 
@@ -61,26 +56,34 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
       end
     end
     restart_network_service
+  end
 
-    if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
-      # For compute node retrieve assigned hostname from DynamoDB and configure it
-      # - hostname: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1]
-      # - fqdn: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
-      ruby_block "retrieve assigned hostname" do
-        block do
-          assigned_hostname = compute_hostname
+  if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+    # For compute node retrieve assigned hostname from DynamoDB and configure it
+    # - hostname: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1]
+    # - fqdn: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
+    ruby_block "retrieve assigned hostname" do
+      block do
+        assigned_hostname = compute_hostname
+        node.force_default['cfncluster']['assigned_short_hostname'] = assigned_hostname.to_s
+
+        if node['cfncluster']['cfn_dns_domain'].nil? || node['cfncluster']['cfn_dns_domain'].empty?
+          # Use domain from DHCP
+          dhcp_domain = node['ec2']['local_hostname'].split('.', 2).last
+          node.force_default['cfncluster']['assigned_hostname'] = "#{assigned_hostname}.#{dhcp_domain}"
+        else
+          # Use cluster domain
           node.force_default['cfncluster']['assigned_hostname'] = "#{assigned_hostname}.#{node['cfncluster']['cfn_dns_domain']}"
-          node.force_default['cfncluster']['assigned_short_hostname'] = assigned_hostname.split('.')[0].to_s
         end
-        retries 5
-        retry_delay 3
       end
-
-    else
-      # Head node
-      node.force_default['cfncluster']['assigned_hostname'] = node['ec2']['local_hostname']
-      node.force_default['cfncluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+      retries 5
+      retry_delay 3
     end
+
+  else
+    # Head node
+    node.force_default['cfncluster']['assigned_hostname'] = node['ec2']['local_hostname']
+    node.force_default['cfncluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
   end
 
 else
