@@ -35,6 +35,7 @@ ruby_block "submit dynamic fleet initialization jobs" do
         required_dynamic = instance_config.fetch("initial_count", 0) - instance_config.fetch("min_count", 0)
         if required_dynamic.positive?
           # Submitting a job for each instance type that requires an initial_count > min_count
+          Chef::Log.info("Submitting job to run dynamic capacity for queue #{queue_name} and instance #{instance_config['instance_type']}")
           submit_job_command = Shellwords.escape("/opt/slurm/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster "\
                                                  "--constraint='[(dynamic&#{instance_config['instance_type']})*#{required_dynamic}]' --partition=#{queue_name}")
           shell_out!("/bin/bash -c #{submit_job_command}")
@@ -70,15 +71,15 @@ ruby_block "wait for dynamic fleet capacity" do
     require 'chef/mixin/shell_out'
     require 'shellwords'
 
-    # $ /opt/slurm/bin/squeue --name='init-cluster' -O state -h
+    # $ /opt/slurm/bin/squeue --name='parallelcluster-init-cluster' -O state -h
     # CONFIGURING
     # RUNNING
-    are_jobs_running_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/squeue --name='init-cluster' -O state -h | { grep -v 'RUNNING' || true; }")
+    are_jobs_running_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/squeue --name='parallelcluster-init-cluster' -O state -h | { grep -v 'RUNNING' || true; }")
     until shell_out!("/bin/bash -c #{are_jobs_running_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for dynamic fleet capacity provisioning")
       sleep(15)
     end
-    Chef::Log.info("Dynamic fleet capacity is ready")
+    Chef::Log.info("Dynamic fleet capacity is ready. Terminating provisioning jobs.")
     shell_out!("/opt/slurm/bin/scancel --jobname=parallelcluster-init-cluster")
   end
 end
