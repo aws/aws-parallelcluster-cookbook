@@ -166,11 +166,6 @@ template "/opt/slurm/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf
   mode '0644'
 end
 
-# Increase somaxconn to 1024 for large scale setting
-execute "increase_somaxconn" do
-  command "echo '1024' > /proc/sys/net/core/somaxconn"
-end
-
 cookbook_file '/etc/systemd/system/slurmctld.service' do
   source 'slurmctld.service'
   owner 'root'

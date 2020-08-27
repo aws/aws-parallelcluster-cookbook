@@ -23,6 +23,11 @@ execute 'setup ephemeral' do
   creates '/scratch'
 end
 
+# Increase somaxconn to 1024 for large scale setting
+execute "increase_somaxconn" do
+  command "echo '1024' > /proc/sys/net/core/somaxconn"
+end
+
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster::chrony_config'
 
