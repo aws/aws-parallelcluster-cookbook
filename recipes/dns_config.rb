@@ -92,28 +92,23 @@ else
   node.force_default['cfncluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
 end
 
-# Configure fqdn and /etc/hosts
-hostname "set fqdn hostname and /etc/hosts" do
-  compile_time false
-  hostname(lazy { node['cfncluster']['assigned_hostname'].to_s })
-end
-
 # Configure short hostname
-if platform_family?('rhel') && node['platform_version'].to_i < 7 ||
-   platform_family?('amazon') && node['platform_version'].to_i != 2
-
-  # hostnamectl not present in alinux1 and centos6
-  replace_or_add "set hostname in /etc/sysconfig/network" do
-    path "/etc/sysconfig/network"
-    pattern "HOSTNAME=*"
-    line(lazy { "HOSTNAME=#{node['cfncluster']['assigned_short_hostname']}" })
-  end
-  execute "execute hostname set command" do
-    command(lazy { "hostname #{node['cfncluster']['assigned_short_hostname']}" })
-  end
-
-else
-  execute "execute hostnamamectl set command" do
-    command(lazy { "hostnamectl set-hostname #{node['cfncluster']['assigned_short_hostname']}" })
-  end
+hostname "set short hostname" do
+  compile_time false
+  hostname(lazy { node['cfncluster']['assigned_short_hostname'] })
 end
+
+# Resource to be called to reload ohai attributes after /etc/hosts update
+ohai 'reload_hostname' do
+  plugin 'hostname'
+  action :nothing
+end
+
+# Configure fqdn in /etc/hosts
+replace_or_add "set fqdn in the /etc/hosts" do
+  path "/etc/hosts"
+  pattern "^#{node['ec2']['local_ipv4']}\s+"
+  line(lazy { "#{node['ec2']['local_ipv4']} #{node['cfncluster']['assigned_hostname']} #{node['cfncluster']['assigned_short_hostname']}" })
+  notifies :reload, "ohai[reload_hostname]"
+end
+
