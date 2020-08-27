@@ -60,8 +60,8 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_pri
 
   if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
     # For compute node retrieve assigned hostname from DynamoDB and configure it
-    # - hostname: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1]
-    # - fqdn: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
+    # - hostname: $QUEUE-st-$INSTANCE_TYPE_1-[1-$MIN1]
+    # - fqdn: $QUEUE-st-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
     ruby_block "retrieve assigned hostname" do
       block do
         assigned_hostname = hit_slurm_nodename
