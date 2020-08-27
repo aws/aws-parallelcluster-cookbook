@@ -52,12 +52,12 @@ ruby_block "wait for static fleet capacity" do
 
     # Example output for sinfo
     # $ /opt/slurm/bin/sinfo -N -h -o '%N %t'
-    # ondemand-dynamic-c5.2xlarge-1 idle~
-    # ondemand-dynamic-c5.2xlarge-2 idle~
-    # spot-dynamic-c5.xlarge-1 idle~
-    # spot-static-t2.large-1 down
-    # spot-static-t2.large-2 idle
-    is_fleet_ready_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep '\\-static\\-' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }")
+    # ondemand-dy-c5.2xlarge-1 idle~
+    # ondemand-dy-c5.2xlarge-2 idle~
+    # spot-dy-c5.xlarge-1 idle~
+    # spot-st-t2.large-1 down
+    # spot-st-t2.large-2 idle
+    is_fleet_ready_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep '\\-st\\-' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }")
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for static fleet capacity provisioning")
       sleep(15)
