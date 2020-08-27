@@ -15,11 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Retrieve master node ip if not set already
-unless node['cfncluster']['cfn_master'] && node['cfncluster']['cfn_master_private_ip']
+# Retrieve master node info
+if node['cfncluster']['cfn_scheduler'] == 'slurm'
   ruby_block "retrieve master ip" do
     block do
-      master_private_ip, master_private_dns = master_address(node['cfncluster']['cfn_region'], node['cfncluster']['stack_name'])
+      master_private_ip, master_private_dns = hit_master_info
       node.force_default['cfncluster']['cfn_master'] = master_private_dns
       node.force_default['cfncluster']['cfn_master_private_ip'] = master_private_ip
     end
