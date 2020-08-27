@@ -64,7 +64,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_pri
     # - fqdn: $QUEUE-static-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
     ruby_block "retrieve assigned hostname" do
       block do
-        assigned_hostname = compute_hostname
+        assigned_hostname = hit_slurm_nodename
         node.force_default['cfncluster']['assigned_short_hostname'] = assigned_hostname.to_s
 
         if node['cfncluster']['cfn_dns_domain'].nil? || node['cfncluster']['cfn_dns_domain'].empty?
