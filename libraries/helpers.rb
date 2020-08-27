@@ -190,16 +190,13 @@ end
 def restart_network_service
   network_service_name = value_for_platform(
     ['centos'] => {
-      '<7.0' => 'network'
-    },
-    ['amazon'] => {
-      '>=2013' => 'network' # Alinux1
+      '>=7.0' => 'NetworkManager'
     },
     %w[ubuntu debian] => {
       '16.04' => 'networking',
       '>=18.04' => 'systemd-resolved'
     },
-    'default' => 'NetworkManager'
+    'default' => 'network'
   )
   Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
   service network_service_name.to_s do
