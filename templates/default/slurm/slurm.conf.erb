@@ -23,13 +23,17 @@ CacheGroups=0
 #
 # CLOUD CONFIGS OPTIONS
 SlurmctldParameters=idle_on_node_suspend
+<% if node['cfncluster']['use_private_hostname'] == 'true' or node['cfncluster']['cfn_dns_domain'].nil? or node['cfncluster']['cfn_dns_domain'].empty? -%>
 CommunicationParameters=NoAddrCache
+TreeWidth=65533
+<% else -%>
+CommunicationParameters=NoAddrCache,cloud_dns
+<% end -%>
 SuspendProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
 ResumeProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_resume
 ResumeFailProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
 SuspendTimeout=1200
 ResumeTimeout=600
-TreeWidth=65533
 PrivateData=cloud
 ResumeRate=0
 SuspendRate=0
