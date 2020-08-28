@@ -22,7 +22,9 @@ default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/script
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
 default['cfncluster']['configs_dir'] = "#{node['cfncluster']['base_dir']}/configs"
 # Cluster config
-default['cfncluster']['cluster_config_s3_uri'] = nil
+default['cfncluster']['cluster_s3_bucket'] = nil
+default['cfncluster']['cluster_config_s3_key'] = nil
+default['cfncluster']['cluster_config_version'] = nil
 default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster_config.json"
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'

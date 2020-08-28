@@ -48,6 +48,7 @@ directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
 directory node['cfncluster']['license_dir']
+directory node['cfncluster']['configs_dir']
 
 build_essential
 include_recipe "aws-parallelcluster::_setup_python"

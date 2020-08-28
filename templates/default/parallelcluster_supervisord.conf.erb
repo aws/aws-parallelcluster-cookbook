@@ -4,6 +4,9 @@
 <%# MasterServer -%>
 <% when 'MasterServer' -%>
 <% if node['cfncluster']['cfn_scheduler'] == 'slurm' -%>
+[program:cfn-hup]
+command = cfn-hup
+
 [program:clustermgtd]
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/clustermgtd
 redirect_stderr = true

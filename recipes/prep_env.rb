@@ -32,6 +32,7 @@ directory node['cfncluster']['base_dir']
 directory node['cfncluster']['sources_dir']
 directory node['cfncluster']['scripts_dir']
 directory node['cfncluster']['license_dir']
+directory node['cfncluster']['configs_dir']
 
 # Create ParallelCluster log folder
 directory '/var/log/parallelcluster/' do
