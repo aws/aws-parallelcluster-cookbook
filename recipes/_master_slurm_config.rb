@@ -59,9 +59,21 @@ remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
 end
 
 # Copy cluster config file from S3 URI
+fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cfncluster']['cluster_s3_bucket']} --key #{node['cfncluster']['cluster_config_s3_key']}"\
+                       " --region #{node['cfncluster']['cfn_region']} #{node['cfncluster']['cluster_config_path']}"
+fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
 execute "copy_cluster_config_from_s3" do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3 cp #{node['cfncluster']['cluster_config_s3_uri']} #{node['cfncluster']['cluster_config_path']}"\
-          " --region #{node['cfncluster']['cfn_region']}"
+  command fetch_config_command
+  retries 3
+  retry_delay 5
+end
+
+execute 'initialize cluster config hash in DynamoDB' do
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
+          " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cfncluster']['cluster_config_version']}\"}}' --region #{node['cfncluster']['cfn_region']}"
+  retries 3
+  retry_delay 5
+  not_if { node['cfncluster']['cluster_config_version'].nil? }
 end
 
 # Generate pcluster specific configs
