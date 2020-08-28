@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 import json
 import logging
+import re
 import subprocess
 from os import makedirs, path
 from socket import gethostname
@@ -63,6 +64,8 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
             output_directory,
             dryrun,
         )
+
+    generate_instance_type_mapping_file(output_directory, queue_settings)
 
     log.info("Finished.")
 
@@ -126,7 +129,10 @@ def _generate_slurm_parallelcluster_configs(
 def _get_jinja_env(template_directory):
     """Return jinja environment with trim_blocks/lstrip_blocks set to True."""
     file_loader = FileSystemLoader(template_directory)
-    return Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
+    env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
+    env.filters["sanify_instance_type"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
+
+    return env
 
 
 def _write_rendered_template_to_file(rendered_template, filename):
@@ -139,6 +145,33 @@ def _setup_logger():
     logging.basicConfig(
         level=logging.INFO, format="%(asctime)s - [%(name)s:%(funcName)s] - %(levelname)s - %(message)s"
     )
+
+
+def _generate_instance_type_mapping_file(output_dir, mapping):
+    instancetype_mapping_file = "instance_name_type_mappings.json"
+    filename = f"{output_dir}/{instancetype_mapping_file}"
+
+    log.info("Generating %s", filename)
+    with open(filename, "w") as output_file:
+        output_file.write(json.dumps(mapping, indent=4))
+
+
+def generate_instance_type_mapping_file(output_dir, queue_settings):
+    """Generate a mapping file to retrieve the Instance Type related to the instance key used in the slurm nodename."""
+    instance_name_type_mapping = {}
+    for _, queue_config in queue_settings.items():
+        compute_resource_settings = queue_config["compute_resource_settings"]
+        hostname_regex = re.compile("[^A-Za-z0-9]")
+        for _, compute_resource_config in compute_resource_settings.items():
+            instance_type = compute_resource_config.get("instance_type")
+            # Remove all characters excepts letters and numbers
+            sanitized_instance_type = re.sub(hostname_regex, "", instance_type)
+            instance_name_type_mapping[sanitized_instance_type] = instance_type
+
+    filename = f"{output_dir}/instance_name_type_mappings.json"
+    log.info("Generating %s", filename)
+    with open(filename, "w") as output_file:
+        output_file.write(json.dumps(instance_name_type_mapping, indent=4))
 
 
 def main():
