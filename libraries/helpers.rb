@@ -154,6 +154,9 @@ def ami_bootstrapped?
   'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
 end
 
+#
+# Retrieve master ip and dns from file (HIT only)
+#
 def hit_master_info
   master_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
   master_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
@@ -161,12 +164,18 @@ def hit_master_info
   [IO.read(master_private_ip_file).chomp, IO.read(master_private_dns_file).chomp]
 end
 
+#
+# Retrieve compute nodename from file (HIT only)
+#
 def hit_slurm_nodename
   slurm_nodename_file = "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename"
 
   IO.read(slurm_nodename_file).chomp
 end
 
+#
+# Retrieve compute and master node info from dynamo db (HIT only)
+#
 def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
@@ -187,7 +196,19 @@ def hit_dynamodb_info
   [slurm_nodename, master_private_ip, master_private_dns]
 end
 
-# Utility method to restart network service according to the OS.
+#
+# Verify if a given node name is a static node or a dynamic one (HIT only)
+#
+def hit_is_static_node?(nodename)
+  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9-]+-[a-z0-9-]+)-\d+$/)
+  raise "Failed when parsing Compute nodename: #{nodename}" if match.nil?
+
+  match[2] == "st"
+end
+
+#
+# Restart network service according to the OS.
+#
 def restart_network_service
   network_service_name = value_for_platform(
     ['centos'] => {
