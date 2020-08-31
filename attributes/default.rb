@@ -320,6 +320,7 @@ default['cfncluster']['cfn_postinstall'] = 'NONE'
 default['cfncluster']['cfn_postinstall_args'] = 'NONE'
 default['cfncluster']['cfn_scheduler'] = 'sge'
 default['cfncluster']['cfn_scheduler_slots'] = 'vcpus'
+default['cfncluster']['cfn_disable_hyperthreading_manually'] = 'false'
 default['cfncluster']['cfn_instance_slots'] = '1'
 default['cfncluster']['cfn_volume'] = nil
 default['cfncluster']['cfn_volume_fs_type'] = 'ext4'
