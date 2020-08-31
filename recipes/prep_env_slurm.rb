@@ -37,6 +37,7 @@ if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
     end
     retries 5
     retry_delay 3
+    not_if node.run_state['slurm_nodename'] && node.run_state['cfn_master'] && node.run_state['cfn_master_private_ip']
   end
 
   file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do
