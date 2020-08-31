@@ -64,15 +64,6 @@ execute "copy_cluster_config_from_s3" do
           " --region #{node['cfncluster']['cfn_region']}"
 end
 
-# Ensure slurm plugin directory is in place
-directory "#{node['cfncluster']['slurm_plugin_dir']}" do
-  user 'slurm'
-  group 'slurm'
-  mode '0755'
-  action :create
-  recursive true
-end
-
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
