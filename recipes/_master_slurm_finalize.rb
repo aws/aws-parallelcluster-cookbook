@@ -57,7 +57,7 @@ ruby_block "wait for static fleet capacity" do
     # spot-dy-c5.xlarge-1 idle~
     # spot-st-t2.large-1 down
     # spot-st-t2.large-2 idle
-    is_fleet_ready_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }")
+    is_fleet_ready_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }")
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for static fleet capacity provisioning")
       sleep(15)
