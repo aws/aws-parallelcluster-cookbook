@@ -147,15 +147,6 @@ def _setup_logger():
     )
 
 
-def _generate_instance_type_mapping_file(output_dir, mapping):
-    instancetype_mapping_file = "instance_name_type_mappings.json"
-    filename = f"{output_dir}/{instancetype_mapping_file}"
-
-    log.info("Generating %s", filename)
-    with open(filename, "w") as output_file:
-        output_file.write(json.dumps(mapping, indent=4))
-
-
 def generate_instance_type_mapping_file(output_dir, queue_settings):
     """Generate a mapping file to retrieve the Instance Type related to the instance key used in the slurm nodename."""
     instance_name_type_mapping = {}
