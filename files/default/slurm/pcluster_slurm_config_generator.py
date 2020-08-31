@@ -65,7 +65,7 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
             dryrun,
         )
 
-    generate_instance_type_mapping_file(output_directory, queue_settings)
+    generate_instance_type_mapping_file(pcluster_subdirectory, queue_settings)
 
     log.info("Finished.")
 
@@ -183,11 +183,7 @@ def main():
             help="JSON file containing info about queues",
         )
         parser.add_argument(
-            "--dryrun",
-            action="store_true",
-            help="dryrun",
-            required=False,
-            default=False,
+            "--dryrun", action="store_true", help="dryrun", required=False, default=False,
         )
         args = parser.parse_args()
         generate_slurm_config_files(args.output_directory, args.template_directory, args.input_file, args.dryrun)
