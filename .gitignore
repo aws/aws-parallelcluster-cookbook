@@ -20,3 +20,6 @@ build.log
 build-*.log
 
 .tox/
+
+assets/
+report.html
