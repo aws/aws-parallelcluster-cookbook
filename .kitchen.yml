@@ -259,6 +259,9 @@ suites:
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
+        cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
+        slurm_nodename: 'fake-compute'
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'

@@ -16,6 +16,7 @@ cfn_cluster_user=<%= node['cfncluster']['cfn_cluster_user'] %>
 <% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
 cfn_sqs_queue=<%= node['cfncluster']['cfn_sqs_queue'] %>
 cfn_master=<%= node['cfncluster']['cfn_master'] %>
+cfn_master_private_ip=<%= node['cfncluster']['cfn_master_private_ip'] %>
 cfn_scheduler_queue_name=<%= node['cfncluster']['scheduler_queue_name'] %>
 <% end -%>
 <% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
