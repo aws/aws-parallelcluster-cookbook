@@ -33,15 +33,6 @@ mount '/opt/slurm' do
   retry_delay 5
 end
 
-# Ensure slurm plugin directory is in place, directory will contain slurm_nodename file used to identify current compute node in computemgtd
-directory "#{node['cfncluster']['slurm_plugin_dir']}" do
-  user 'slurm'
-  group 'slurm'
-  mode '0755'
-  action :create
-  recursive true
-end
-
 # Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU
 if graphic_instance?
   execute "run_nvidiasmi" do
