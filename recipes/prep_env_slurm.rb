@@ -31,31 +31,33 @@ if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
   ruby_block "retrieve compute node info" do
     block do
       slurm_nodename, master_private_ip, master_private_dns = hit_dynamodb_info
-      node.run_state['slurm_nodename'] = slurm_nodename
-      node.run_state['cfn_master'] = master_private_dns
-      node.run_state['cfn_master_private_ip'] = master_private_ip
+      node.force_default['cfncluster']['slurm_nodename'] = slurm_nodename
+      node.force_default['cfncluster']['cfn_master'] = master_private_dns
+      node.force_default['cfncluster']['cfn_master_private_ip'] = master_private_ip
     end
     retries 5
     retry_delay 3
-    not_if node.run_state['slurm_nodename'] && node.run_state['cfn_master'] && node.run_state['cfn_master_private_ip']
+    not_if { !node['cfncluster']['slurm_nodename'].nil? && !node['cfncluster']['slurm_nodename'].empty? &&
+             !node['cfncluster']['cfn_master'].nil? && !node['cfncluster']['cfn_master'].empty? &&
+             !node['cfncluster']['cfn_master_private_ip'].nil? && !node['cfncluster']['cfn_master_private_ip'].empty? }
   end
 
   file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do
-    content(lazy { node.run_state['slurm_nodename'] })
+    content(lazy { node['cfncluster']['slurm_nodename'] })
     mode '0644'
     owner 'root'
     group 'root'
   end
 
   file "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns" do
-    content(lazy { node.run_state['cfn_master'] })
+    content(lazy { node['cfncluster']['cfn_master'] })
     mode '0644'
     owner 'root'
     group 'root'
   end
 
   file "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip" do
-    content(lazy { node.run_state['cfn_master_private_ip'] })
+    content(lazy { node['cfncluster']['cfn_master_private_ip'] })
     mode '0644'
     owner 'root'
     group 'root'
