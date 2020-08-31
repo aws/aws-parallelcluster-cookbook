@@ -23,6 +23,10 @@ node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_sc
                                                    else
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
+# NOTE: this recipe must be included after cfn_instance_slot because it may alter the values of
+#       node['cpu']['total'], which would break the expected behavior when setting cfn_scheduler_slots
+#       to one of the constants looked for in the above conditionals
+include_recipe "aws-parallelcluster::disable_hyperthreading"
 
 # Setup directories
 directory '/etc/parallelcluster'
