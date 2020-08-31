@@ -15,17 +15,18 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Ensure slurm plugin directory is in place
+# Directory will contain slurm_nodename file used to identify current compute node in computemgtd
+directory "#{node['cfncluster']['slurm_plugin_dir']}" do
+  user 'root'
+  group 'root'
+  mode '0755'
+  action :create
+  recursive true
+end
+
 # Retrieve compute and master node info from dynamodb and save into files
 if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
-  # Ensure slurm plugin directory is in place
-  # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
-  directory "#{node['cfncluster']['slurm_plugin_dir']}" do
-    user 'root'
-    group 'root'
-    mode '0755'
-    action :create
-    recursive true
-  end
 
   ruby_block "retrieve compute node info" do
     block do
