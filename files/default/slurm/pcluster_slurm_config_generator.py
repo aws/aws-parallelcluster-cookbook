@@ -183,7 +183,11 @@ def main():
             help="JSON file containing info about queues",
         )
         parser.add_argument(
-            "--dryrun", action="store_true", help="dryrun", required=False, default=False,
+            "--dryrun",
+            action="store_true",
+            help="dryrun",
+            required=False,
+            default=False,
         )
         args = parser.parse_args()
         generate_slurm_config_files(args.output_directory, args.template_directory, args.input_file, args.dryrun)
