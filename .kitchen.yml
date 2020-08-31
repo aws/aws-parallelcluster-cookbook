@@ -55,7 +55,7 @@ suites:
 
   - name: base_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::base_config]
     attributes:
       cfncluster:
@@ -72,7 +72,7 @@ suites:
 
   - name: sge_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::sge_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -101,7 +101,7 @@ suites:
 
   - name: torque_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::torque_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -130,7 +130,7 @@ suites:
 
   - name: slurm_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -159,7 +159,7 @@ suites:
 
   - name: awsbatch_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::awsbatch_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -185,7 +185,7 @@ suites:
 
   - name: sge_config_ComputeFleet
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::sge_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -214,7 +214,7 @@ suites:
 
   - name: torque_config_ComputeFleet
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::torque_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -243,7 +243,7 @@ suites:
 
   - name: slurm_config_ComputeFleet
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
