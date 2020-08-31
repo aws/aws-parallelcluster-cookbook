@@ -85,8 +85,13 @@ def test_generate_slurm_config_files(mocker, test_datadir, tmpdir):
             file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
             _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / file_name)
 
-    for file in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf", "instance_name_type_mappings.json"]:
+    for file in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
         _assert_files_are_equal(tmpdir / file, test_datadir / "expected_outputs" / file)
+
+    _assert_files_are_equal(
+        tmpdir / "pcluster/instance_name_type_mappings.json",
+        test_datadir / "expected_outputs/pcluster/instance_name_type_mappings.json",
+    )
 
 
 def _assert_files_are_equal(file, expected_file):
