@@ -151,7 +151,7 @@ def ami_bootstrapped?
     Chef::Log.info("Detected bootstrap file #{version}")
   end
 
-  'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
+  'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && ( node['cfncluster']['skip_install_recipes'] == 'yes' || node['cfncluster']['skip_install_recipes'] == true )
 end
 
 #

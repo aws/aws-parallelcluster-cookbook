@@ -15,8 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Only run if node['cfncluster']['nvidia']['enabled'] = 'yes'
-if node['cfncluster']['nvidia']['enabled'] == 'yes'
+if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidia']['enabled'] == true
 
   # Get NVIDIA run file
   nvidia_tmp_runfile = "/tmp/nvidia.run"
