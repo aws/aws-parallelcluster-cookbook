@@ -22,14 +22,18 @@ SlurmdPidFile=/var/run/slurmd.pid
 CacheGroups=0
 #
 # CLOUD CONFIGS OPTIONS
+<% if node['cfncluster']['use_private_hostname'] == 'true' or node['cfncluster']['cfn_dns_domain'].nil? or node['cfncluster']['cfn_dns_domain'].empty? -%>
 SlurmctldParameters=idle_on_node_suspend
+TreeWidth=65533
+<% else -%>
+SlurmctldParameters=idle_on_node_suspend,cloud_dns
+<% end -%>
 CommunicationParameters=NoAddrCache
 SuspendProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
 ResumeProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_resume
 ResumeFailProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
-SuspendTimeout=1200
-ResumeTimeout=600
-TreeWidth=65533
+SuspendTimeout=120
+ResumeTimeout=3600
 PrivateData=cloud
 ResumeRate=0
 SuspendRate=0
@@ -42,6 +46,7 @@ InactiveLimit=0
 MinJobAge=300
 KillWait=30
 Waittime=0
+MessageTimeout=60
 #
 # SCHEDULING, JOB, AND NODE SETTINGS
 EnforcePartLimits=ALL
@@ -49,6 +54,7 @@ SchedulerType=sched/backfill
 ProctrackType=proctrack/cgroup
 MpiDefault=none
 ReturnToService=1
+TaskPlugin=task/affinity,task/cgroup
 #
 # TRES AND GPU CONFIG OPTIONS
 GresTypes=gpu
