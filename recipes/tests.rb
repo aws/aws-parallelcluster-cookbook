@@ -49,16 +49,6 @@ bash 'check awscli regions' do
 end
 
 ###################
-# ulimit
-###################
-unless node['cfncluster']['os'].end_with?("-custom")
-  bash 'test soft ulimit nofile' do
-    code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
-    user node['cfncluster']['cfn_cluster_user']
-  end
-end
-
-###################
 # SSH client conf
 ###################
 unless node['cfncluster']['os'] == 'centos6'
@@ -460,6 +450,16 @@ if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
 elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
   execute 'check for nfs server protocol' do
     command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
+###################
+# ulimit
+###################
+unless node['cfncluster']['os'].end_with?("-custom")
+  bash 'test soft ulimit nofile' do
+    code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
     user node['cfncluster']['cfn_cluster_user']
   end
 end
