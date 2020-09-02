@@ -15,7 +15,18 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-nfs_master = node['cfncluster']['cfn_master']
+# Retrieve master node info
+if node['cfncluster']['cfn_scheduler'] == 'slurm'
+  ruby_block "retrieve master ip" do
+    block do
+      master_private_ip, master_private_dns = hit_master_info
+      node.force_default['cfncluster']['cfn_master'] = master_private_dns
+      node.force_default['cfncluster']['cfn_master_private_ip'] = master_private_ip
+    end
+    retries 5
+    retry_delay 3
+  end
+end
 
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
@@ -34,7 +45,7 @@ if raid_shared_dir != "NONE"
 
   # Mount RAID directory over NFS
   mount raid_shared_dir do
-    device "#{nfs_master}:#{raid_shared_dir}"
+    device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
@@ -45,7 +56,7 @@ end
 
 # Mount /home over NFS
 mount '/home' do
-  device "#{nfs_master}:/home"
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/home" })
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
@@ -55,7 +66,7 @@ end
 
 # Mount /opt/intel over NFS
 mount '/opt/intel' do
-  device "#{nfs_master}:/opt/intel"
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/intel" })
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
@@ -96,7 +107,7 @@ shared_dir_array.each do |dir|
 
     # Mount shared volume over NFS
     mount dirname do
-      device "#{nfs_master}:#{dirname}"
+      device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{dirname}" })
       fstype 'nfs'
       options 'hard,intr,noatime,_netdev'
       action %i[mount enable]

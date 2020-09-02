@@ -17,26 +17,15 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
-# Write cloudwatch log config and start it.
-include_recipe "aws-parallelcluster::cloudwatch_agent_config"
-
-hostname node['ec2']['local_hostname']
-if node['platform_family'] == 'rhel' && node['platform_version'].to_i < 7 || node['platform'] == 'amazon' && node['platform_version'].to_i != 2
-  # hostnamectl not present in alinux1 and centos6
-  replace_or_add "set hostname in /etc/sysconfig/network" do
-    path "/etc/sysconfig/network"
-    pattern "HOSTNAME=*"
-    line "HOSTNAME=#{node['ec2']['local_hostname'].split('.')[0]}"
-  end
-  execute "hostname #{node['ec2']['local_hostname'].split('.')[0]}"
-else
-  execute "hostnamectl set-hostname #{node['ec2']['local_hostname'].split('.')[0]}"
-end
-
 # Setup ephemeral drives
 execute 'setup ephemeral' do
   command '/usr/local/sbin/setup-ephemeral-drives.sh'
   creates '/scratch'
+end
+
+# Increase somaxconn to 1024 for large scale setting
+execute "increase_somaxconn" do
+  command "echo '1024' > /proc/sys/net/core/somaxconn"
 end
 
 # Amazon Time Sync
@@ -62,6 +51,7 @@ template '/etc/sudoers.d/99-parallelcluster-user-tty' do
   group 'root'
   mode '0600'
 end
+
 
 # Install parallelcluster specific supervisord config
 template '/etc/parallelcluster/parallelcluster_supervisord.conf' do

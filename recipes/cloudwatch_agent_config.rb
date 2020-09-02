@@ -14,6 +14,10 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Be sure to have AWS cloudwatch agent installed
+include_recipe "aws-parallelcluster::cloudwatch_agent_install"
+
 config_script_path = '/usr/local/bin/write_cloudwatch_agent_json.py'
 cookbook_file 'write_cloudwatch_agent_json.py' do
   not_if { ::File.exist?(config_script_path) }
@@ -81,7 +85,7 @@ execute "cloudwatch-agent-start" do
   user 'root'
   command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
   not_if do
-    system("[ $(/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | jq --raw-output .status) = running ]") ||
-      node['cfncluster']['cfn_cluster_cw_logging_enabled'] != 'true'
+    system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") ||
+    node['cfncluster']['cfn_cluster_cw_logging_enabled'] != 'true'
   end
 end

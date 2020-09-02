@@ -23,9 +23,9 @@ directory '/var/spool/slurmd' do
 end
 
 # Mount /opt/slurm over NFS
-nfs_master = node['cfncluster']['cfn_master']
+# Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
 mount '/opt/slurm' do
-  device "#{nfs_master}:/opt/slurm"
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/slurm" })
   fstype "nfs"
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]

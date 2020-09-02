@@ -64,13 +64,32 @@
         "ubuntu"
       ],
       "node_roles": [
-        "ComputeFleet",
         "MasterServer"
       ],
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "month_first",
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/chef-client.log",
+      "log_stream_name": "chef-client",
+      "schedulers": [
+        "awsbatch",
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
       "file_path": "/var/log/cloud-init.log",
       "log_stream_name": "cloud-init",
       "schedulers": [
@@ -87,6 +106,25 @@
       "node_roles": [
         "ComputeFleet",
         "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cloud-init-output.log",
+      "log_stream_name": "cloud-init-output",
+      "schedulers": [
+        "sge",
+        "slurm",
+        "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
       ],
       "feature_conditions": []
     },
@@ -117,7 +155,6 @@
       "log_stream_name": "nodewatcher",
       "schedulers": [
         "sge",
-        "slurm",
         "torque"
       ],
       "platforms": [
@@ -136,7 +173,6 @@
       "log_stream_name": "jobwatcher",
       "schedulers": [
         "sge",
-        "slurm",
         "torque"
       ],
       "platforms": [
@@ -155,8 +191,75 @@
       "log_stream_name": "sqswatcher",
       "schedulers": [
         "sge",
-        "slurm",
         "torque"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/clustermgtd",
+      "log_stream_name": "clustermgtd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/computemgtd",
+      "log_stream_name": "computemgtd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_resume.log",
+      "log_stream_name": "slurm_resume",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "MasterServer"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_suspend.log",
+      "log_stream_name": "slurm_suspend",
+      "schedulers": [
+        "slurm"
       ],
       "platforms": [
         "amazon",

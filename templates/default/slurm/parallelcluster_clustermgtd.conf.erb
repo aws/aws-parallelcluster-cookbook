@@ -1,0 +1,11 @@
+[clustermgtd]
+cluster_name = <%= node['cfncluster']['stack_name'].sub("parallelcluster-", "") %>
+region = <%= node['cfncluster']['cfn_region'] %>
+proxy = <%= node['cfncluster']['cfn_proxy'] %>
+heartbeat_file_path = /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat
+dynamodb_table = <%= node['cfncluster']['cfn_ddb_table'] %>
+hosted_zone = <%= node['cfncluster']['cfn_hosted_zone'] %>
+dns_domain = <%= node['cfncluster']['cfn_dns_domain'] %>
+use_private_hostname = <%= node['cfncluster']['use_private_hostname'] %>
+master_private_ip = <%= node['ec2']['local_ipv4'] %>
+master_hostname = <%= node['ec2']['local_hostname'] %>

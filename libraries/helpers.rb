@@ -151,7 +151,80 @@ def ami_bootstrapped?
     Chef::Log.info("Detected bootstrap file #{version}")
   end
 
-  'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && node['cfncluster']['skip_install_recipes'] == 'yes'
+  'aws-parallelcluster-' + node['cfncluster']['cfncluster-version'] == version && ( node['cfncluster']['skip_install_recipes'] == 'yes' || node['cfncluster']['skip_install_recipes'] == true )
+end
+
+#
+# Retrieve master ip and dns from file (HIT only)
+#
+def hit_master_info
+  master_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
+  master_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
+
+  [IO.read(master_private_ip_file).chomp, IO.read(master_private_dns_file).chomp]
+end
+
+#
+# Retrieve compute nodename from file (HIT only)
+#
+def hit_slurm_nodename
+  slurm_nodename_file = "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename"
+
+  IO.read(slurm_nodename_file).chomp
+end
+
+#
+# Retrieve compute and master node info from dynamo db (HIT only)
+#
+def hit_dynamodb_info
+  require 'chef/mixin/shell_out'
+
+  output = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
+    "--region #{node['cfncluster']['cfn_region']} query --table-name #{node['cfncluster']['cfn_ddb_table']} " \
+    "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
+    "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
+    "--projection-expression 'Id,MasterPrivateIp,MasterHostname' " \
+    "--output text --query 'Items[0].[Id.S,MasterPrivateIp.S,MasterHostname.S]'", user: 'root').stdout.strip
+
+  raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
+  slurm_nodename, master_private_ip, master_private_dns = output.split(/\s+/)
+
+  Chef::Log.info("Retrieved Slurm nodename is: #{slurm_nodename}")
+  Chef::Log.info("Retrieved master private ip: #{master_private_ip}")
+  Chef::Log.info("Retrieved master private dns: #{master_private_dns}")
+
+  [slurm_nodename, master_private_ip, master_private_dns]
+end
+
+#
+# Verify if a given node name is a static node or a dynamic one (HIT only)
+#
+def hit_is_static_node?(nodename)
+  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9]+)-\d+$/)
+  raise "Failed when parsing Compute nodename: #{nodename}" if match.nil?
+
+  match[2] == "st"
+end
+
+#
+# Restart network service according to the OS.
+#
+def restart_network_service
+  network_service_name = value_for_platform(
+    ['centos'] => {
+      '>=7.0' => 'NetworkManager'
+    },
+    %w[ubuntu debian] => {
+      '16.04' => 'networking',
+      '>=18.04' => 'systemd-resolved'
+    },
+    'default' => 'network'
+  )
+  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
+  service network_service_name.to_s do
+    action %i[restart]
+    ignore_failure true
+  end
 end
 
 #

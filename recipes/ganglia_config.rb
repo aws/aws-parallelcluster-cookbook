@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['cfncluster']['ganglia_enabled'] == 'yes'
+if node['cfncluster']['ganglia_enabled'] == 'yes' || node['cfncluster']['ganglia_enabled'] == true
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
     case node['platform']

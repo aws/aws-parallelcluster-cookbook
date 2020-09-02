@@ -55,7 +55,7 @@ suites:
 
   - name: base_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::base_config]
     attributes:
       cfncluster:
@@ -72,7 +72,7 @@ suites:
 
   - name: sge_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::sge_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -101,7 +101,7 @@ suites:
 
   - name: torque_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::torque_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -130,7 +130,7 @@ suites:
 
   - name: slurm_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -148,6 +148,7 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        cluster_config_s3_uri: <%= ENV['CLUSTER_CONFIG_S3_URI'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
@@ -159,7 +160,7 @@ suites:
 
   - name: awsbatch_config_MasterServer
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::awsbatch_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -185,7 +186,7 @@ suites:
 
   - name: sge_config_ComputeFleet
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::sge_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -202,6 +203,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
@@ -213,7 +215,7 @@ suites:
 
   - name: torque_config_ComputeFleet
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::torque_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -230,6 +232,7 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
@@ -241,7 +244,7 @@ suites:
 
   - name: slurm_config_ComputeFleet
     run_list:
-      - recipe[aws-parallelcluster::_prep_env]
+      - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -258,6 +261,8 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
+        cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
+        slurm_nodename: 'fake-compute'
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'

@@ -20,6 +20,10 @@ default['cfncluster']['base_dir'] = '/opt/parallelcluster'
 default['cfncluster']['sources_dir'] = "#{node['cfncluster']['base_dir']}/sources"
 default['cfncluster']['scripts_dir'] = "#{node['cfncluster']['base_dir']}/scripts"
 default['cfncluster']['license_dir'] = "#{node['cfncluster']['base_dir']}/licenses"
+default['cfncluster']['configs_dir'] = "#{node['cfncluster']['base_dir']}/configs"
+# Cluster config
+default['cfncluster']['cluster_config_s3_uri'] = nil
+default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster_config.json"
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'
 default['cfncluster']['python-version-centos6'] = '2.7.17'
@@ -56,9 +60,10 @@ default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/relea
 default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
-default['cfncluster']['slurm']['version'] = '19.05.5'
-default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-19.05.5.tar.bz2'
-default['cfncluster']['slurm']['sha1'] = '055adca91e555cc124b1ecac5f3c45e66c17a8ba'
+default['cfncluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
+default['cfncluster']['slurm']['version'] = '20.02.4'
+default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.02.4.tar.bz2'
+default['cfncluster']['slurm']['sha1'] = '294de3a2e1410945eb516c40eff5f92087501893'
 # PMIx software
 default['cfncluster']['pmix']['version'] = '3.1.5'
 default['cfncluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cfncluster']['pmix']['version']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
@@ -85,7 +90,7 @@ end
 default['cfncluster']['efa']['installer_url'] = 'https://efa-installer.amazonaws.com/aws-efa-installer-1.9.4.tar.gz'
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
-default['cfncluster']['dcv']['version'] = '2020.1-8942'
+default['cfncluster']['dcv']['version'] = '2020.1-9012'
 default['cfncluster']['dcv']['supported_os'] = if arm_instance?
                                                  %w[ubuntu18 amazon2]
                                                else
@@ -99,13 +104,13 @@ default['cfncluster']['dcv']['url_architecture_id'] = if arm_instance?
 case "#{node['platform']}#{node['platform_version'].to_i}"
 when 'centos7', 'amazon2'
   default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}"
-  default['cfncluster']['dcv']['server'] = "nice-dcv-server-2020.1.8942-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # NICE DCV server package
+  default['cfncluster']['dcv']['server'] = "nice-dcv-server-2020.1.9012-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # NICE DCV server package
   default['cfncluster']['dcv']['xdcv'] = "nice-xdcv-2020.1.338-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # required to create virtual sessions
   default['cfncluster']['dcv']['gl'] = "nice-dcv-gl-2020.1.840-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" # required to enable GPU sharing
   default['cfncluster']['dcv']['sha256sum'] = if arm_instance?
-                                                "ef6e987520f62552a775e0ffdcc4e1aab9d3b843457d9a2bddba3d9e4ff90f67"
+                                                "d590d81360b0e96652cd1ef3a74fff5cb9381f57ff55685a8ddde48d494968e4"
                                               else
-                                                "83916301e1283a3ecb3c620d66ca4b0420a5f5c88316061ea31b8b3261c76b2e"
+                                                "c36020cce52ba371a796c041352db6c5d6d55d35acbbfbadafd834e1265aa5bf"
                                               end
 
 when 'ubuntu18'
@@ -116,13 +121,13 @@ when 'ubuntu18'
                                                               'amd64'
                                                             end
   default['cfncluster']['dcv']['package'] = "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804-#{node['cfncluster']['dcv']['url_architecture_id']}"
-  default['cfncluster']['dcv']['server'] = "nice-dcv-server_2020.1.8942-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" # NICE DCV server package
+  default['cfncluster']['dcv']['server'] = "nice-dcv-server_2020.1.9012-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" # NICE DCV server package
   default['cfncluster']['dcv']['xdcv'] = "nice-xdcv_2020.1.338-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb"  # required to create virtual sessions
   default['cfncluster']['dcv']['gl'] = "nice-dcv-gl_2020.1.840-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb"  # required to enable GPU sharing
   default['cfncluster']['dcv']['sha256sum'] = if arm_instance?
-                                                "998eebe170a6adce656e9608a8c8919af01b67b4d8051f6d9d9c3f09ca115212"
+                                                "0cd0512d57808cee0c48d0817a515825f9c512cb9d70e5672fecbb7450b729b3"
                                               else
-                                                "c82706c98f8ec6c6886c12a56da49a6da873f6b7ab70cce2b12a1cdad485aba9"
+                                                "7569c95465743b512f1ab191e58ea09777353b401c1ec130ee8ea344e00f8900"
                                               end
 end
 default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2020.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
@@ -201,7 +206,7 @@ when 'rhel', 'amazon'
                                                   httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
-                                                  libssh2-devel libgcrypt-devel libevent-devel glibc-static]
+                                                  libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
       if node['platform_version'].split('.')[1] >= '7'
         # Lustre Client for Centos >= 7.7
         default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc'
@@ -310,6 +315,7 @@ default['cfncluster']['cfn_ddb_table'] = nil
 default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_preinstall'] = 'NONE'
 default['cfncluster']['cfn_preinstall_args'] = 'NONE'
+default['cfncluster']['cfn_proxy'] = 'NONE'
 default['cfncluster']['cfn_postinstall'] = 'NONE'
 default['cfncluster']['cfn_postinstall_args'] = 'NONE'
 default['cfncluster']['cfn_scheduler'] = 'sge'
@@ -323,6 +329,7 @@ default['cfncluster']['cfn_shared_dir'] = '/shared'
 default['cfncluster']['cfn_efs_shared_dir'] = 'NONE'
 default['cfncluster']['cfn_efs'] = nil
 default['cfncluster']['cfn_master'] = nil
+default['cfncluster']['cfn_master_private_ip'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
 default['cfncluster']['cfn_fsx_options'] = 'NONE'
 default['cfncluster']['cfn_fsx_fs_id'] = nil
@@ -330,7 +337,10 @@ default['cfncluster']['custom_node_package'] = nil
 default['cfncluster']['custom_awsbatchcli_package'] = nil
 default['cfncluster']['cfn_raid_parameters'] = 'NONE'
 default['cfncluster']['cfn_raid_vol_ids'] = nil
+default['cfncluster']['cfn_dns_domain'] = nil
+default['cfncluster']['use_private_hostname'] = 'false'
 default['cfncluster']['skip_install_recipes'] = 'yes'
+default['cfncluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cfncluster']['aws_domain'] = aws_domain
