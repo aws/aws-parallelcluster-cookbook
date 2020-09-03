@@ -28,29 +28,22 @@ directory '/etc/sysconfig' do
 end
 
 if node['init_package'] == 'systemd'
-  file '/etc/sysconfig/slurmd' do
-    content(lazy { "SLURMD_OPTIONS='-N #{node.run_state['slurm_compute_nodename']}'" })
-    mode '0644'
-    owner 'root'
-    group 'root'
-  end
-
-  service "slurmd" do
-    supports restart: false
-    action %i[enable start]
-  end
+  slurm_service_binary = "slurmd"
 else
-  file '/etc/sysconfig/slurm' do
-    content(lazy { "SLURMD_OPTIONS='-N #{node.run_state['slurm_compute_nodename']}'" })
-    mode '0644'
-    owner 'root'
-    group 'root'
-  end
+  slurm_service_binary = "slurm"
+end
 
-  service "slurm" do
-    supports restart: false
-    action %i[enable start]
-  end
+file "/etc/sysconfig/#{slurm_service_binary}" do
+  content(lazy { "SLURMD_OPTIONS='-N #{node.run_state['slurm_compute_nodename']}'" })
+  mode '0644'
+  owner 'root'
+  group 'root'
+end
+
+service slurm_service_binary do
+  supports restart: false
+  action %i[enable start]
+  not_if { node['kitchen'] }
 end
 
 execute 'resume_node' do
