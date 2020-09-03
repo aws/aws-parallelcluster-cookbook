@@ -262,7 +262,7 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
         cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
-        slurm_nodename: 'fake-compute'
+        slurm_nodename: 'fake-dy-compute-1'
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
