@@ -77,6 +77,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'MasterServer'
         cfn_scheduler: 'sge'
@@ -106,6 +107,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'MasterServer'
         cfn_scheduler: 'torque'
@@ -135,6 +137,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'MasterServer'
         cfn_scheduler: 'slurm'
@@ -165,6 +168,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'MasterServer'
         cfn_scheduler: 'awsbatch'
@@ -191,6 +195,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'ComputeFleet'
         cfn_scheduler: 'sge'
@@ -220,6 +225,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'ComputeFleet'
         cfn_scheduler: 'torque'
@@ -249,6 +255,7 @@ suites:
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes:
+      kitchen: true
       cfncluster:
         cfn_node_type: 'ComputeFleet'
         cfn_scheduler: 'slurm'
