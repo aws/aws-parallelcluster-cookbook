@@ -151,7 +151,8 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
-        cluster_config_s3_uri: <%= ENV['CLUSTER_CONFIG_S3_URI'] %>
+        cluster_s3_bucket: <%= ENV['CLUSTER_CONFIG_S3_BUCKET'] %>
+        cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_URI'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
