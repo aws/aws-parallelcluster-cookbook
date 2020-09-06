@@ -152,7 +152,7 @@ suites:
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         cluster_s3_bucket: <%= ENV['CLUSTER_CONFIG_S3_BUCKET'] %>
-        cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_URI'] %>
+        cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
