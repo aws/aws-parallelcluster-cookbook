@@ -5,7 +5,11 @@
 <% when 'MasterServer' -%>
 <% if node['cfncluster']['cfn_scheduler'] == 'slurm' -%>
 [program:cfn-hup]
-command = cfn-hup
+command = <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/cfn-hup
+# The following are needed because cfn-hup starts as a daemon
+exitcodes = 0
+autorestart = unexpected
+startsecs = 0
 
 [program:clustermgtd]
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/clustermgtd

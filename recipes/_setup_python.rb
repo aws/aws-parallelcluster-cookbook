@@ -48,3 +48,18 @@ if node['platform'] == 'centos' && node['platform_version'].to_i < 7
 
   pyenv_global node['cfncluster']['python-version-centos6']
 end
+
+bash 'install CloudFormation helpers' do
+  user 'root'
+  group 'root'
+  cwd Chef::Config[:file_cache_path]
+  code <<-CFNTOOLS
+      set -e
+      region="#{node['cfncluster']['cfn_region']}"
+      bucket="s3.amazonaws.com"
+      [[ ${region} =~ ^cn- ]] && bucket="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
+      curl --retry 3 -L -o aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
+      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/pip install aws-cfn-bootstrap-py3-latest.tar.gz
+  CFNTOOLS
+  creates "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/cfn-hup"
+end
