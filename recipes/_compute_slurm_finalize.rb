@@ -33,11 +33,11 @@ else
   slurm_service_binary = "slurm"
 end
 
-file "/etc/sysconfig/#{slurm_service_binary}" do
-  content(lazy { "SLURMD_OPTIONS='-N #{node.run_state['slurm_compute_nodename']}'" })
-  mode '0644'
-  owner 'root'
+template "/etc/sysconfig/#{slurm_service_binary}" do
+  source 'slurm/slurm.sysconfig.erb'
+  user 'root'
   group 'root'
+  mode '0644'
 end
 
 service slurm_service_binary do
