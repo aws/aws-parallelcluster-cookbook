@@ -11,7 +11,7 @@
 # CLUSTER SETTINGS
 ClusterName=parallelcluster
 SlurmUser=slurm
-SlurmctldPort=6817
+SlurmctldPort=6817-6827
 SlurmdPort=6818
 AuthType=auth/munge
 StateSaveLocation=/var/spool/slurm.state
@@ -20,6 +20,7 @@ SwitchType=switch/none
 SlurmctldPidFile=/var/run/slurmctld.pid
 SlurmdPidFile=/var/run/slurmd.pid
 CacheGroups=0
+ReconfigFlags=KeepPartState
 #
 # CLOUD CONFIGS OPTIONS
 <% if node['cfncluster']['use_private_hostname'] == 'true' or node['cfncluster']['cfn_dns_domain'].nil? or node['cfncluster']['cfn_dns_domain'].empty? -%>
