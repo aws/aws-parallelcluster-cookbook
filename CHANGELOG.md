@@ -3,6 +3,41 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.9.0
+-----
+
+**ENHANCEMENTS**
+
+- Add support for multiple queues and multiple instance types feature with the Slurm scheduler.
+- Extend NICE DCV support to ARM instances.
+- Extend support to disable hyperthreading on instances (like \*.metal) that don't support CpuOptions in
+  LaunchTemplate.
+- Enable support for NFS 4 for the filesystems shared from the head node.
+- Add script wrapper to support Torque-like commands with the Slurm scheduler.
+
+**CHANGES**
+
+- A Route53 private hosted zone is now created together with the cluster and used in DNS resolution inside cluster nodes
+    when using Slurm scheduler.
+- Upgrade EFA installer to version 1.9.5:
+  - EFA configuration: ``efa-config-1.4`` (from efa-config-1.3)
+  - EFA profile: ``efa-profile-1.0.0``
+  - EFA kernel module: ``efa-1.6.0`` (no change)
+  - RDMA core: ``rdma-core-28.amzn0`` (no change)
+  - Libfabric: ``libfabric-1.10.1amazon1.1`` (no change)
+  - Open MPI: ``openmpi40-aws-4.0.3`` (no change)
+- Upgrade Slurm to version 20.02.4.
+- Upgrade NICE DCV to version 2020.1-9012.
+- Use private ip instead of master node hostname when mounting shared NFS drives.
+- Add new log streams to CloudWatch: chef-client, clustermgtd, computemgtd, slurm_resume, slurm_suspend.
+- Remove dependency on cfn-init in compute nodes bootstrap.
+- Add support for queue names in pre/post install scripts.
+
+
+**BUG FIXES**
+
+- Solve dpkg lock issue with Ubuntu that prevented custom AMI creation in some cases.
+
 2.8.1
 -----
 
