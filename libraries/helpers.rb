@@ -307,3 +307,19 @@ end
 def platform_supports_pmix?
   node['platform'] != 'centos' || node['platform_version'].to_i > 6
 end
+
+#
+# Retrieve RHEL kernel minor version from running kernel
+# The minor version is retrieved from the patch version of the running kernel
+# following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
+# Method works for minor version >=7
+#
+def get_rhel_kernel_minor_version
+  # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
+  kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)[1]
+  kernel_minor_version = '7'
+  if kernel_patch_version >= '1127'
+    kernel_minor_version = '8'
+  end
+  kernel_minor_version
+end
