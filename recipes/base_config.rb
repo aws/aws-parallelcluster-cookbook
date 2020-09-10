@@ -25,11 +25,11 @@ end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting
 execute "increase somaxconn" do
-  command "echo '131072' > /proc/sys/net/core/somaxconn"
+  command "echo '65535' > /proc/sys/net/core/somaxconn"
 end
 
 execute "increase tcp_max_syn_backlog" do
-  command "echo '131072' > /proc/sys/net/ipv4/tcp_max_syn_backlog"
+  command "echo '65535' > /proc/sys/net/ipv4/tcp_max_syn_backlog"
 end
 
 # Amazon Time Sync
