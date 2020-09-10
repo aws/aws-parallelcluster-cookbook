@@ -24,12 +24,12 @@ execute 'setup ephemeral' do
 end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting
-execute "increase somaxconn" do
-  command "echo '65535' > /proc/sys/net/core/somaxconn"
+sysctl 'net.core.somaxconn' do
+  value 65535
 end
 
-execute "increase tcp_max_syn_backlog" do
-  command "echo '65535' > /proc/sys/net/ipv4/tcp_max_syn_backlog"
+sysctl 'net.ipv4.tcp_max_syn_backlog' do
+  value 65535
 end
 
 # Amazon Time Sync
