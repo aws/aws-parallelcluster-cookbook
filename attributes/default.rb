@@ -344,6 +344,7 @@ default['cfncluster']['cfn_dns_domain'] = nil
 default['cfncluster']['use_private_hostname'] = 'false'
 default['cfncluster']['skip_install_recipes'] = 'yes'
 default['cfncluster']['scheduler_queue_name'] = nil
+default['cfncluster']['nfs_server_threads'] = [node['cpu']['cores'], 8].max
 
 # AWS domain
 default['cfncluster']['aws_domain'] = aws_domain

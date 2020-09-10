@@ -116,6 +116,7 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
+node.default['nfs']['threads'] = node['cfncluster']['nfs_server_threads'].to_i
 if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
   # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
   include_recipe "nfs::server"
