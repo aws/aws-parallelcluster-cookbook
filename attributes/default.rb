@@ -212,7 +212,7 @@ when 'rhel', 'amazon'
       if node['platform_version'].split('.')[1] >= '7'
         # Lustre Client for Centos >= 7.7
         default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc'
-        default['cfncluster']['lustre']['base_url'] = "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{node['platform_version'].split('.')[1]}/x86_64/"
+        default['cfncluster']['lustre']['base_url'] = "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel_kernel_minor_version}/x86_64/"
       elsif node['platform_version'].split('.')[1] == '6'
         # Lustre Drivers for Centos 7.6
         default['cfncluster']['lustre']['version'] = '2.10.6'
