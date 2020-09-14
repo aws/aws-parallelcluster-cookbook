@@ -3,6 +3,13 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.9.1
+-----
+
+**CHANGES**
+
+- There were no notable changes for this version.
+
 2.9.0
 -----
 
@@ -32,7 +39,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add new log streams to CloudWatch: chef-client, clustermgtd, computemgtd, slurm_resume, slurm_suspend.
 - Remove dependency on cfn-init in compute nodes bootstrap.
 - Add support for queue names in pre/post install scripts.
-
 
 **BUG FIXES**
 
