@@ -9,6 +9,7 @@
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}",
     "cookbook_path" : "{{env `COOKBOOK_PATH`}}",
+    "script_path": "{{env `SCRIPT_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "dcv_installed": "{{env `DCV_INSTALLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
@@ -183,6 +184,11 @@
       "destination" : "/tmp/cookbook"
     },
     {
+      "type": "file",
+      "source": "{{user `script_path`}}",
+      "destination": "/tmp/createami_scripts"
+    },
+    {
       "type" : "shell",
       "inline" : [
         "set -x",
@@ -283,6 +289,14 @@
         "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
         "which pip2",
         "if [ $? -eq 0 ]; then sudo pip2 install /tmp/aws-cfn-bootstrap-latest.tar.gz; else sudo pip install /tmp/aws-cfn-bootstrap-latest.tar.gz; fi"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "set -x",
+        "script_name=$(ls /tmp/createami_scripts)",
+        "[[ -n ${script_name} ]] && (sudo chmod +x /tmp/createami_scripts/${script_name} && sudo /tmp/createami_scripts/${script_name} && sudo mkdir -p /opt/parallelcluster/createami_scripts && sudo mv /tmp/createami_scripts/${script_name} /opt/parallelcluster/createami_scripts) || echo 'No post install script'"
       ]
     },
     {
