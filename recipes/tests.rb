@@ -183,8 +183,10 @@ if node['init_package'] == 'init'
   gmond_check_command = "service #{node['cfncluster']['ganglia']['gmond_service']} status | grep -i running"
   gmetad_check_command = "service gmetad status | grep -i running"
 elsif node['init_package'] == 'systemd'
-  gmond_check_command = "systemctl status #{node['cfncluster']['ganglia']['gmond_service']} | grep -i running"
-  gmetad_check_command = "systemctl status gmetad | grep -i running"
+  # $ systemctl show -p SubState <service>
+  # SubState=Running
+  gmond_check_command = "systemctl show -p SubState #{node['cfncluster']['ganglia']['gmond_service']} | grep -i running"
+  gmetad_check_command = "systemctl show -p SubState gmetad | grep -i running"
 end
 
 case node['cfncluster']['cfn_node_type']
@@ -212,7 +214,9 @@ end
 if node['init_package'] == 'init'
   chrony_check_command = "service #{node['cfncluster']['chrony']['service']} status | grep -i running"
 elsif node['init_package'] == 'systemd'
-  chrony_check_command = "systemctl status #{node['cfncluster']['chrony']['service']} | grep -i running"
+  # $ systemctl show -p SubState <service>
+  # SubState=Running
+  chrony_check_command = "systemctl show -p SubState #{node['cfncluster']['chrony']['service']} | grep -i running"
 end
 
 execute 'check chrony running' do
