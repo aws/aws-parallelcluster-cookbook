@@ -24,9 +24,11 @@ function error_exit () {
 function exec_command() {
   _command_output=$($@ 2>&1)
   _exit_code=$?
+  echo "${_command_output}" | grep -vi "you should reboot now" >& /dev/null
+  _grep_exit_code=$?
 
   # Do not set RC=1 if error says that changes have been written but a reboot is required to inform the kernel
-  [[ $_exit_code -ne 0 && $(echo "${_command_output}" | grep -i "you should reboot now") ]] && RC=1
+  [[ ${_exit_code} -ne 0 && ${_grep_exit_code} -eq 0 ]] && RC=1
 }
 
 # LVM stripe, format, mount ephemeral drives
