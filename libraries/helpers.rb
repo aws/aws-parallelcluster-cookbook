@@ -161,6 +161,39 @@ def ami_bootstrapped?
 end
 
 #
+# Check if OS type specified by the user is the same as the OS identified by Ohai
+#
+def validate_os_type
+  case node['platform']
+  when 'ubuntu'
+    current_os = 'ubuntu'+ node['platform_version'].tr('.','')
+    if node['cfncluster']['cfn_base_os'] != current_os
+      raise_os_not_match(current_os, node['cfncluster']['cfn_base_os'])
+    end
+  when 'amazon'
+    if node['platform_version'].to_i > 2010 && node['cfncluster']['cfn_base_os'] != 'alinux'
+      raise_os_not_match("alinux", node['cfncluster']['cfn_base_os'])
+    elsif node['platform_version'].to_i == 2 && node['cfncluster']['cfn_base_os'] != 'alinux2'
+      raise_os_not_match("alinux2", node['cfncluster']['cfn_base_os'])
+    end
+  when 'centos'
+    current_os = 'centos'+ (node['platform_version'].to_i).to_s
+    if node['cfncluster']['cfn_base_os'] != current_os
+      raise_os_not_match(current_os, node['cfncluster']['cfn_base_os'])
+    end
+  end
+end
+
+#
+# Raise error if OS types do not match
+#
+def raise_os_not_match(current_os, specified_os)
+  raise "The custom AMI you have provided uses the " + current_os + " OS. However, the base_os specified in your" +
+            " config file is " + specified_os +". Please either use an AMI with the " + specified_os +
+            " OS or update the base_os setting in your configuration file to " + current_os + "."
+end
+
+#
 # Retrieve master ip and dns from file (HIT only)
 #
 def hit_master_info
