@@ -15,8 +15,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+if node['init_package'] == 'init'
+  chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
+elsif node['init_package'] == 'systemd'
+  chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
+end
+
 service node['cfncluster']['chrony']['service'] do
   # chrony service supports restart but is not correctly checking if the process is stopped before starting the new one
   supports restart: false
-  action %i[enable restart]
+  supports reload: true
+  reload_command chrony_reload_command
+  action %i[enable reload]
 end
