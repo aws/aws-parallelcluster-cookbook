@@ -300,7 +300,7 @@ if node['conditions']['efa_supported'] && node['conditions']['intel_mpi_supporte
           unset MODULEPATH
           # Must execute this in a bash script because source is a bash built-in function
           source /etc/profile.d/modules.sh
-          module load intelmpi && mpirun --help | grep 'Version 2019 Update 7'
+          module load intelmpi && mpirun --help | grep 'Version 2019 Update 8'
         INTELMPI
         user node['cfncluster']['cfn_cluster_user']
       end
