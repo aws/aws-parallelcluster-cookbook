@@ -3,6 +3,13 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.10.0
+------
+
+**CHANGES**
+
+- Upgrade Intel MPI to version U8.
+
 2.9.1
 -----
 
