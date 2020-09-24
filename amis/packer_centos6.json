@@ -234,7 +234,8 @@
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
-          "custom_node_package" : "{{user `custom_node_package`}}"
+          "custom_node_package" : "{{user `custom_node_package`}}",
+          "cfn_base_os" : "centos6"
         }
       },
       "remote_cookbook_paths" : [
@@ -252,6 +253,11 @@
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
+      "json" : {
+        "cfncluster" : {
+          "cfn_base_os" : "centos6"
+        }
+      },
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [

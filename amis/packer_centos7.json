@@ -244,7 +244,8 @@
           "dcv": {
             "installed" : "{{user `dcv_installed`}}"
           },
-          "custom_node_package" : "{{user `custom_node_package`}}"
+          "custom_node_package" : "{{user `custom_node_package`}}",
+          "cfn_base_os" : "centos7"
         }
       },
       "remote_cookbook_paths" : [
@@ -262,6 +263,11 @@
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
+      "json" : {
+        "cfncluster" : {
+          "cfn_base_os" : "centos7"
+        }
+      },
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [

@@ -15,6 +15,8 @@ suites:
       - recipe[aws-parallelcluster::_default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
+      cfncluster:
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
 
   - name: default_gpu
     run_list:
@@ -22,6 +24,7 @@ suites:
       - recipe[aws-parallelcluster::default]
     attributes:
       cfncluster:
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         nvidia:
           enabled: 'yes'
 
@@ -67,7 +70,10 @@ suites:
         cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
 
   - name: sge_config_MasterServer
@@ -90,7 +96,10 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
@@ -120,7 +129,10 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
@@ -150,9 +162,12 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         cluster_s3_bucket: <%= ENV['CLUSTER_CONFIG_S3_BUCKET'] %>
         cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
@@ -182,7 +197,10 @@ suites:
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
@@ -210,7 +228,10 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
         cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
@@ -240,7 +261,10 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
         cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster. i.e. centos7
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
@@ -270,8 +294,11 @@ suites:
         cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
         cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
+        # cfn_base_os is one of the base OSs supported by pcluster
+        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
         slurm_nodename: 'fake-dy-compute-1'
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+        # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
         dcv_enabled: 'master'
