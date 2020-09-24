@@ -31,12 +31,6 @@ append_if_no_line "add configuration to chrony.conf" do
   notifies :reload, "service[#{node['cfncluster']['chrony']['service']}]", :immediately
 end
 
-if node['init_package'] == 'init'
-  chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
-elsif node['init_package'] == 'systemd'
-  chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
-end
-
 service node['cfncluster']['chrony']['service'] do
   reload_command chrony_reload_command
   action :nothing

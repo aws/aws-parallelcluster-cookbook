@@ -362,3 +362,14 @@ def get_rhel_kernel_minor_version
   end
   kernel_minor_version
 end
+
+# Return chrony service reload command
+# Chrony doesn't support reload but only force-reload command
+def chrony_reload_command
+  if node['init_package'] == 'init'
+    chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
+  elsif node['init_package'] == 'systemd'
+    chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
+  end
+  chrony_reload_command
+end
