@@ -21,6 +21,10 @@ include_recipe 'aws-parallelcluster::base_install'
 include_recipe 'aws-parallelcluster::munge_install'
 include_recipe 'aws-parallelcluster::pmix_install'
 
+package %w[slurm* libslurm*] do
+  action :purge
+end
+
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer', nil
   slurm_tarball = "#{node['cfncluster']['sources_dir']}/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"

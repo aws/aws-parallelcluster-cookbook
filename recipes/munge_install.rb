@@ -19,6 +19,10 @@ return if node['conditions']['ami_bootstrapped']
 
 include_recipe 'aws-parallelcluster::base_install'
 
+package %w[munge* libmunge*] do
+  action :purge
+end
+
 munge_tarball = "#{node['cfncluster']['sources_dir']}/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 
 # Get munge tarball
