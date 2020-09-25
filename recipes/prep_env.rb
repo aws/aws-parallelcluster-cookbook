@@ -15,6 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Validate OS type specified by the user is the same as the OS identified by Ohai
+validate_os_type
+
 # Determine cfn_scheduler_slots settings and update cfn_instance_slots appropriately
 node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
                                                      node['cpu']['total']

@@ -18,5 +18,6 @@
 service node['cfncluster']['chrony']['service'] do
   # chrony service supports restart but is not correctly checking if the process is stopped before starting the new one
   supports restart: false
-  action %i[enable restart]
+  reload_command chrony_reload_command
+  action %i[enable start]
 end

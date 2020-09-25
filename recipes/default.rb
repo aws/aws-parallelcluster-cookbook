@@ -15,6 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Validate OS type specified by the user is the same as the OS identified by Ohai
+validate_os_type
+
 include_recipe 'aws-parallelcluster::sge_install'
 include_recipe 'aws-parallelcluster::torque_install'
 include_recipe 'aws-parallelcluster::slurm_install'

@@ -19,6 +19,10 @@ return if node['conditions']['ami_bootstrapped']
 
 include_recipe 'aws-parallelcluster::base_install'
 
+package %w[munge* libmunge*] do
+  action :purge
+end
+
 munge_tarball = "#{node['cfncluster']['sources_dir']}/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 
 # Get munge tarball
@@ -50,9 +54,7 @@ bash 'make install' do
     make -j $CORES
     make install
   MUNGE
-  # TODO: Fix, so it works for upgrade
-  creates '/usr/bin/munge'
-  not_if "/usr/sbin/munged --version | grep -q munge-#{node['cfncluster']['munge']['munge_version']}"
+  not_if "/usr/sbin/munged --version | grep -q munge-#{node['cfncluster']['munge']['munge_version']} && ls #{munge_libdir}/libmunge*"
 end
 
 # Updated munge init script for Amazon Linux
