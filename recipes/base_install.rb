@@ -26,10 +26,14 @@ when 'rhel', 'amazon'
     include_recipe "yum-epel"
   end
 
-
-  unless node['platform_version'].to_i < 7
+  if node['platform_version'].to_i == 7
     execute 'yum-config-manager_skip_if_unavail' do
       command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
+    end
+  elsif node['platform_version'].to_i == 8
+    # Enable PowerTools Repo so *-devel packages can be installed with DNF
+    execute 'dnf enable powertools' do
+      command "dnf config-manager --set-enabled PowerTools"
     end
   end
 
@@ -66,18 +70,18 @@ if node['cfncluster']['alinux_extras']
   end
 end
 
-case node['platform_family']
-when 'rhel', 'amazon'
-  yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
-    version node['cfncluster']['kernel_devel_pkg']['version']
-    retries 3
-    retry_delay 5
+package "install kernel packages" do
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    package_name node['cfncluster']['kernel_devel_pkg']['name']
+    if node['platform_version'].to_i < 8
+      version node['cfncluster']['kernel_devel_pkg']['version']
+    end
+  when 'debian'
+    package_name node['cfncluster']['kernel_generic_pkg']
   end
-when 'debian'
-  apt_package node['cfncluster']['kernel_generic_pkg'] do
-    retries 3
-    retry_delay 5
-  end
+  retries 3
+  retry_delay 5
 end
 
 bash "install awscli" do
@@ -86,7 +90,7 @@ bash "install awscli" do
     set -e
     curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     unzip awscli-bundle.zip
-    ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    #{node['cfncluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
   CLI
   not_if { ::File.exist?("/usr/local/bin/aws") }
 end
@@ -116,11 +120,12 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
-if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
-  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
+if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/116
   include_recipe "nfs::server"
+else
+  include_recipe "nfs::server4"
 end
-include_recipe "nfs::server4"
 
 # Put configure-pat.sh onto the host
 cookbook_file 'configure-pat.sh' do
@@ -214,18 +219,23 @@ end
 # Install Ganglia
 include_recipe "aws-parallelcluster::ganglia_install"
 
-# Install NVIDIA and CUDA
-include_recipe "aws-parallelcluster::_nvidia_install"
+# FIXME:
+# # Install NVIDIA and CUDA
+# include_recipe "aws-parallelcluster::_nvidia_install"
 
-# Install FSx options
-include_recipe "aws-parallelcluster::_lustre_install"
+# FIXME:
+# # Install FSx options
+# include_recipe "aws-parallelcluster::_lustre_install"
 
-# Install EFA & Intel MPI
-include_recipe "aws-parallelcluster::efa_install"
-include_recipe "aws-parallelcluster::intel_mpi"
+# FIXME:
+# # Install EFA & Intel MPI
+# include_recipe "aws-parallelcluster::efa_install"
+# include_recipe "aws-parallelcluster::intel_mpi"
 
-# Install the AWS cloudwatch agent
-include_recipe "aws-parallelcluster::cloudwatch_agent_install"
+# FIXME:
+# # Install the AWS cloudwatch agent
+# include_recipe "aws-parallelcluster::cloudwatch_agent_install"
 
-# Install Amazon Time Sync
-include_recipe "aws-parallelcluster::chrony_install"
+# FIXME:
+# # Install Amazon Time Sync
+# include_recipe "aws-parallelcluster::chrony_install"
