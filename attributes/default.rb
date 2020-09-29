@@ -53,6 +53,7 @@ default['cfncluster']['intelmpi']['version'] = '2019.7.217'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.9.1'
+default['cfncluster']['cfncluster-cookbook-version'] = '2.9.1'
 default['cfncluster']['cfncluster-node-version'] = '2.9.1'
 # URLs to software packages used during install recipes
 # Gridengine software
