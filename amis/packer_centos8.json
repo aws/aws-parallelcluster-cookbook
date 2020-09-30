@@ -280,9 +280,9 @@
         "region=\"{{user `region`}}\"",
         "bucket=\"s3.amazonaws.com\"",
         "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster\"",
-        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
-        "which pip2",
-        "if [ $? -eq 0 ]; then sudo pip2 install /tmp/aws-cfn-bootstrap-latest.tar.gz; else sudo pip install /tmp/aws-cfn-bootstrap-latest.tar.gz; fi"
+        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz",
+        "sudo dnf install -y python3-pip",
+        "sudo pip3 install /tmp/aws-cfn-bootstrap-py3-latest.tar.gz"
       ]
     },
     {

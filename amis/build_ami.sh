@@ -184,8 +184,8 @@ check_options() {
     esac
 
     # Ensure the specified architecture-OS combination is valid
-    if [ "${_arch}" == "arm64" ] && [[ "${_os}" =~ ^centos[0-9]+ ]]; then
-      echo "Currently there are no CentOS arm64 AMIs available."
+    if [ "${_arch}" == "arm64" ] && [[ "${_os}" =~ ^centos[6-7]$ ]]; then
+      echo "Currently there are no arm64 AMIs available for ${_os}."
       exit 1
     elif [ "${_arch}" == "arm64" ] && [ "${_os}" == "alinux" ]; then
       echo "Currently there are no alinux (AL1) arm64 AMIs available."
