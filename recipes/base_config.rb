@@ -35,6 +35,9 @@ end
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster::chrony_config'
 
+# NVIDIA services (fabric manager)
+include_recipe "aws-parallelcluster::_nvidia_config"
+
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
 

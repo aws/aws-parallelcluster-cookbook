@@ -90,14 +90,31 @@ default['cfncluster']['ganglia_enabled'] = 'no'
 
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_version'] = '450.51.05'
-default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/450.51.05/NVIDIA-Linux-x86_64-450.51.05.run'
+default['cfncluster']['nvidia']['driver_version'] = '450.80.02'
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/450.80.02/NVIDIA-Linux-x86_64-450.80.02.run'
 default['cfncluster']['nvidia']['cuda_version'] = '11.0'
 default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
+
+# NVIDIA fabric-manager
+default['cfncluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager-450"
+default['cfncluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
+default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
+  'default' => node['cfncluster']['nvidia']['driver_version'],
+  # with apt a star is needed to match the package version
+  'ubuntu' => { 'default' => "#{node['cfncluster']['nvidia']['driver_version']}*" }
+)
+default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
+  'default' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64",
+  'centos' => {
+    '~>8' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64",
+  },
+  'ubuntu' => { 'default' => "https://developer.download.nvidia.com/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
+)
 
 # EFA
 default['cfncluster']['efa']['installer_version'] = '1.10.1'
 default['cfncluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cfncluster']['efa']['installer_version']}.tar.gz"
+default['cfncluster']['enable_efa_gdr'] = "no"
 
 # NICE DCV
 default['cfncluster']['dcv_port'] = 8443
@@ -219,7 +236,8 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
-                                                mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
+                                                mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
+                                                iproute NetworkManager-config-routing-rules]
     if node['platform_version'].to_i >= 8
       # Install python3 instead of unversioned python
       default['cfncluster']['base_packages'].delete('python')
@@ -240,7 +258,7 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
-                                                glibc-static]
+                                                glibc-static iproute]
     if node['platform_version'].to_i == 2
       # mpich-devel not available on alinux
       default['cfncluster']['base_packages'].delete('mpich-devel')
@@ -256,7 +274,7 @@ when 'rhel', 'amazon'
       default['cfncluster']['base_packages'].concat(%w[libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
                                                        rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                                        gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                                       jq wget python-pip])
+                                                       jq wget python-pip NetworkManager-config-routing-rules])
       # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
       # because it contains fixes for known build issues
       default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
@@ -280,7 +298,7 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
-                                              libgcrypt20-dev libmysqlclient-dev libevent-dev]
+                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2]
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
