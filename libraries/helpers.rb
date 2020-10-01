@@ -240,7 +240,7 @@ end
 def restart_network_service
   network_service_name = value_for_platform(
     ['centos'] => {
-      '>=7.0' => 'NetworkManager'
+      '>=8.0' => 'NetworkManager'
     },
     %w[ubuntu debian] => {
       '16.04' => 'networking',
@@ -252,6 +252,17 @@ def restart_network_service
   service network_service_name.to_s do
     action %i[restart]
     ignore_failure true
+  end
+end
+
+#
+# Reload the network configuration according to the OS.
+#
+def reload_network_config
+  if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18
+    Mixlib::ShellOut.new("netplan apply").run_command
+  else
+    restart_network_service
   end
 end
 
@@ -332,4 +343,62 @@ def chrony_reload_command
   end
 
   chrony_reload_command
+end
+
+# Add an external package repository to the OS's package manager
+def add_package_repository(repo_name, baseurl, gpgkey, distribution)
+  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+    yum_repository repo_name do
+      baseurl baseurl
+      gpgkey gpgkey
+      retries 3
+      retry_delay 5
+    end
+  elsif node['platform_family'] == 'debian'
+    apt_repository repo_name do
+      uri          baseurl
+      key          gpgkey
+      distribution distribution
+      retries 3
+      retry_delay 5
+    end
+    apt_update
+  else
+    raise "platform not supported: #{node['platform_family']}"
+  end
+end
+
+# Remove an external package repository from the OS's package manager
+def remove_package_repository(repo_name)
+  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+    yum_repository repo_name do
+      action :remove
+    end
+  elsif node['platform_family'] == 'debian'
+    apt_repository repo_name do
+      action :remove
+    end
+    apt_update
+  else
+    raise "platform not supported: #{node['platform_family']}"
+  end
+end
+
+# Get number of nv switches
+def get_nvswitches
+  # NVSwitch device id is 10de:1af1
+  nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
+  nvswitch_check.run_command
+  nvswitch_check.stdout.strip.to_i
+end
+
+# Check if EFA GDR is enabled (and supported) on this instance
+def efa_gdr_enabled?
+  config_value = node['cfncluster']['enable_efa_gdr']
+  if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+    enabling_value = "compute"
+  else
+    enabling_value = "master"
+  end
+  (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end

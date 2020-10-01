@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 - Add support for CentOS 8 in all Commercial and GovCloud regions.
 - Enable FSx Lustre on China regions.
+- Add support for instance types with multiple network cards like P4d
 
 **CHANGES**
 
@@ -24,11 +25,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Introduces ``-g/--enable-gdr`` switch to install packages with GPUDirect RDMA support
   - Updates to OMPI collectives decision file packaging, migrated from efa-config to efa-profile
   - Introduces CentOS 8 support
+  
 - CentOS 6 is no longer supported.
 - Install python3 version of ``aws-cfn-bootstrap`` scripts
 - Upgrade Intel Parallel Studio XE Runtime to version 2020.2.
 - Do not force compute fleet into STOPPED state when performing a cluster update. This allows to update the queue
   size without forcing a termination of the existing instances.
+- Upgrade NVIDIA driver to version 450.80.02
+- Install NVIDIA Fabric manager to enable NVIDIA NVSwitch on supported platforms
 - Retrieve FSx Lustre DNS name dynamically.
 
 2.9.1

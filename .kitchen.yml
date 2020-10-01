@@ -105,6 +105,7 @@ suites:
         dcv_port: '8443'
         enable_intel_hpc_platform: 'true'
         enable_efa: 'compute'
+        efa_gdr_enabled: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 

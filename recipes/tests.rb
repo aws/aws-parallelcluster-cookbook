@@ -304,6 +304,16 @@ if node['conditions']['intel_mpi_supported']
 end
 
 ###################
+# EFA - GDR (GPUDirect RDMA)
+###################
+if node['conditions']['efa_supported'] && efa_gdr_enabled?
+  execute 'check efa gdr installed' do
+    command "modinfo efa | grep 'gdr:\ *Y'"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
+###################
 # jq
 ###################
 unless node['cfncluster']['os'].end_with?("-custom")
@@ -379,6 +389,22 @@ bash 'test CUDA install' do
     echo "CUDA deviceQuery test passed"
     echo "Correctly installed CUDA $cuda_output"
   TESTCUDA
+end
+
+###################
+# FabricManager
+###################
+unless node['cfncluster']['cfn_base_os'] == 'alinux'
+  if get_nvswitches > 1
+    bash 'test fabric-manager daemon' do
+      cwd Chef::Config[:file_cache_path]
+      code <<-TESTFM
+        set -e
+        systemctl show -p SubState nvidia-fabricmanager | grep -i running
+        echo "NVIDIA Fabric Manager service correctly started"
+      TESTFM
+    end
+  end
 end
 
 ###################

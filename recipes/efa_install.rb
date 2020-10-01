@@ -42,10 +42,11 @@ when 'debian'
 end
 
 installer_options = "-y"
-if arm_instance?
-  # efa-kmod currently unavailable for ARM instances
-  installer_options += " -k"
-end
+# efa-kmod currently unavailable for ARM instances
+installer_options += " -k" if arm_instance?
+# enable gpudirect support
+installer_options += " -g" if efa_gdr_enabled?
+
 bash "install efa" do
   cwd node['cfncluster']['sources_dir']
   code <<-EFAINSTALL
@@ -54,5 +55,5 @@ bash "install efa" do
     cd aws-efa-installer
     ./efa_installer.sh #{installer_options}
   EFAINSTALL
-  not_if { ::Dir.exist?('/opt/amazon/efa') }
+  not_if { ::Dir.exist?('/opt/amazon/efa') && !efa_gdr_enabled?}
 end
