@@ -62,7 +62,7 @@ if node['cfncluster']['ganglia_enabled'] == 'yes' || node['cfncluster']['ganglia
 
   # For ComputeFleet and MasterServer
 
-  if node['platform_family'] == 'rhel' && node['platform_version'].to_i == 7 || node['platform'] == 'amazon' && node['platform_version'].to_i == 2
+  if node['platform'] == 'centos' && node['platform_version'].to_i >= 7 || node['platform'] == 'amazon' && node['platform_version'].to_i == 2
     # Fix circular dependency multi-user.target -> cloud-init-> gmond -> multi-user.target
     # gmond is started by chef during cloud-init, but gmond service is configured to start after multi-user.target
     # which doesn't start until cloud-init run is finished. So gmond service is stuck into starting, which keep

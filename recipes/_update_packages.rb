@@ -19,8 +19,14 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
   # not CentOS6
   case node['platform_family']
   when 'rhel', 'amazon'
-    execute 'yum-update' do
-      command "yum -y update && package-cleanup -y --oldkernels --count=1"
+    if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+      execute 'dnf-update' do
+        command "dnf -y update"
+      end
+    else
+      execute 'yum-update' do
+        command "yum -y update && package-cleanup -y --oldkernels --count=1"
+      end
     end
   when 'debian'
     apt_update

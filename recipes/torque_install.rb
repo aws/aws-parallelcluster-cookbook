@@ -20,12 +20,8 @@ return if node['conditions']['ami_bootstrapped']
 include_recipe 'aws-parallelcluster::base_install'
 include_recipe 'aws-parallelcluster::munge_install'
 
-torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster']['torque']['version']}.tar.gz"
-cxx_flags = "" # No make options by default
-c_flags = ""
-configure_flags = ""
-
 # Get Torque tarball
+torque_tarball = "#{node['cfncluster']['sources_dir']}/torque-#{node['cfncluster']['torque']['version']}.tar.gz"
 remote_file torque_tarball do
   source node['cfncluster']['torque']['url']
   mode '0644'
@@ -35,10 +31,27 @@ remote_file torque_tarball do
   not_if { ::File.exist?(torque_tarball) }
 end
 
+# Define make parameters according to the OS
+cxx_flags = value_for_platform(
+  'amazon' => { '2' => "-std=c++03" },
+  'centos' => { '>=8' => "-std=c++03" },
+  'ubuntu' => { '18.04' => "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/" },
+  'default' => ""
+)
+c_flags = value_for_platform(
+  'amazon' => { '2' => "-fpermissive" },
+  'centos' => { '>=8' => "-fpermissive" },
+  'ubuntu' => { '18.04' => "-fpermissive" },
+  'default' => ""
+)
+configure_flags = value_for_platform(
+  'amazon' => { '2' => "--disable-gcc-warnings" },
+  'centos' => { '>=8' => "--disable-gcc-warnings" },
+  'ubuntu' => { '18.04' => "--disable-gcc-warnings" },
+  'default' => ""
+)
+
 if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
-  cxx_flags = "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/"
-  c_flags = "-fpermissive"
-  configure_flags = "--disable-gcc-warnings"
   bash 'prepare_ubuntu_18' do
     user 'root'
     group 'root'
@@ -56,13 +69,7 @@ if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
   end
 end
 
-if node['platform'] == 'amazon' && node['platform_version'].to_i == 2
-  cxx_flags = "-std=c++03"
-  c_flags = "-fpermissive"
-  configure_flags = "--disable-gcc-warnings"
-end
-
-# Install Torque
+# Compile and install Torque
 bash 'make install' do
   user 'root'
   group 'root'

@@ -32,7 +32,13 @@ s3_domain = "https://s3.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']
 # Set URLs used to download the package and expected signature based on platform
 package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cfncluster']['cfn_region']}"
 arch_url_component = arm_instance? ? 'arm64' : 'amd64'
-platform_url_component = node['platform'] == 'amazon' ? 'amazon_linux' : node['platform']
+platform_url_component = value_for_platform(
+  # No CW Agent for CentOS 8 ARM, using RHEL package
+  'centos' => { '>=8.0' => arm_instance? ? 'redhat' : node['platform'] },
+  'amazon' => { 'default' => 'amazon_linux' },
+  'default' => node['platform']
+)
+Chef::Log.info("Platform for cloudwatch is #{platform_url_component}")
 package_extension = node['platform'] == 'ubuntu' ? 'deb' : 'rpm'
 package_url = [
   package_url_prefix,

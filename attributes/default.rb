@@ -233,6 +233,20 @@ when 'rhel', 'amazon'
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
                                                   libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
     end
+    if node['platform_version'].to_i == 8
+      # Install python3 instead of unversioned python
+      default['cfncluster']['base_packages'].delete('python')
+      default['cfncluster']['base_packages'].delete('python-pip')
+      # Install iptables used in configure-pat.sh
+      # Install nvme-cli package used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
+      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli])
+    end
+    if node['platform_version'].to_i >= 8
+      # gdisk required for FSx
+      # environment-modules required for IntelMPI
+      default['cfncluster']['base_packages'].push('gdisk', 'environment-modules')
+    end
+
     default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
@@ -319,7 +333,9 @@ default['cfncluster']['lustre']['public_key'] = value_for_platform(
 )
 default['cfncluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
-    '>=7.7' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel7_kernel_minor_version}/x86_64/"
+    # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
+    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/#{node['kernel']['machine']}/",
+    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel7_kernel_minor_version}/x86_64/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
 )

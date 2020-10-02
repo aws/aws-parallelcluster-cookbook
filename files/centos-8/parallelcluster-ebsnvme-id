@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# Copyright (C) 2020 Amazon.com, Inc. or its affiliates.
+# All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the License.
+# A copy of the License is located at
+#
+#    http://aws.amazon.com/apache2.0/
+#
+# or in the "license" file accompanying this file. This file is
+# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+# OF ANY KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations under the
+# License.
+
+# Usage:
+# Read EBS device information using nvme-cli and provide information about the volume.
+display_help() {
+    echo "Usage: $0 [options] {device_name}" >&2
+    echo
+    echo "   -v, --volume                   Return volume-id"
+    echo "   -b, --block-dev                Return block device mapping"
+    echo "   -u, --udev                     Output data in format suitable for udev rules, i.e. /dev/sdb -> sdb"
+    echo "   -h, --help                     Print usage info"
+    echo
+}
+
+print_all=1
+print_volume=0
+print_block_device_mapping=0
+print_udev_format=0
+
+# Parse arguments
+for i in "$@"
+do
+    case $i in
+        -h|--help)
+        display_help
+        exit 0
+        ;;
+        -v|--volume)
+        print_volume=1
+        print_all=0
+        shift
+        ;;
+        -b|--block-dev)
+        print_block_device_mapping=1
+        print_all=0
+        shift
+        ;;
+        -u|--udev)
+        print_udev_format=1
+        print_all=0
+        shift
+        ;;
+        *)
+        ;;
+    esac
+done
+
+# Check if device argument is provided
+if [[ "$#" -ne 1 ]]; then
+    display_help
+    exit 1
+fi
+
+if [[ $print_all -eq 1 || $print_volume -eq 1 ]]; then
+    # Sample volume info from nvme-cli:
+    # sn      : vol01234567890abcdef
+    # See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
+    # Insert '-' after 'vol' so that output looks like vol-067f083a4f6xxxxx
+    vol_id=$(sudo nvme id-ctrl -v ${1} | grep -oP "sn\s+:\s\K(.+)" | sed 's/^vol/&-/')
+    echo "Volume ID: ${vol_id}"
+fi
+
+if [[ $print_all -eq 1 || $print_block_device_mapping -eq 1 || $print_udev_format -eq 1 ]]; then
+    # Sample device name info from nvme-cli:
+    # 0000: 2f 64 65 76 2f 73 64 6a 20 20 20 20 20 20 20 20 "/dev/sdf..."
+    # See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
+    if [[ $print_udev_format -eq 1 ]]; then
+        # Strip /dev/ prefix if -u option is specified
+        device_name=$(sudo nvme id-ctrl -v ${1} | grep -oP '^0000:.+"\K([\/\w]+)(?=\.*"$)' | sed "s/^\/dev\///")
+    else
+        device_name=$(sudo nvme id-ctrl -v ${1} | grep -oP '^0000:.+"\K([\/\w]+)(?=\.*"$)')
+    fi
+
+    echo "${device_name}"
+fi
