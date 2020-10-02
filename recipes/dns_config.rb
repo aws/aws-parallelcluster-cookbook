@@ -54,6 +54,18 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_pri
           line "append domain-name \" #{node['cfncluster']['cfn_dns_domain']}\";"
         end
       end
+
+      if platform?('centos') && node['platform_version'].to_i == 8
+        # On CentOS8 dhclient is not enabled by default
+        # Put pcluster version of NetworkManager.conf in place
+        # dhcp = dhclient needs to be added under [main] section to enable dhclient
+        cookbook_file 'NetworkManager.conf' do
+          path '/etc/NetworkManager/NetworkManager.conf'
+          user 'root'
+          group 'root'
+          mode '0644'
+        end
+      end
     end
     restart_network_service
   end

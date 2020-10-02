@@ -26,10 +26,16 @@ when 'rhel', 'amazon'
     include_recipe "yum-epel"
   end
 
-
   unless node['platform_version'].to_i < 7
     execute 'yum-config-manager_skip_if_unavail' do
       command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
+    end
+  end
+  if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+    # Enable PowerTools Repo so *-devel packages can be installed with DNF
+    # Enable EPEL repos
+    execute 'dnf enable powertools and EPEL repos' do
+      command "dnf config-manager --set-enabled PowerTools && dnf install -y epel-release"
     end
   end
 
@@ -66,18 +72,19 @@ if node['cfncluster']['alinux_extras']
   end
 end
 
-case node['platform_family']
-when 'rhel', 'amazon'
-  yum_package node['cfncluster']['kernel_devel_pkg']['name'] do
-    version node['cfncluster']['kernel_devel_pkg']['version']
-    retries 3
-    retry_delay 5
+package "install kernel packages" do
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    package_name node['cfncluster']['kernel_devel_pkg']['name']
+    if node['platform'] == 'centos' && node['platform_version'].to_i < 8
+      # Do not enforce kernel_devel version on CentOS8 because kernel_devel package with same version as kernel release version cannot be found
+      version node['cfncluster']['kernel_devel_pkg']['version']
+    end
+  when 'debian'
+    package_name node['cfncluster']['kernel_generic_pkg']
   end
-when 'debian'
-  apt_package node['cfncluster']['kernel_generic_pkg'] do
-    retries 3
-    retry_delay 5
-  end
+  retries 3
+  retry_delay 5
 end
 
 bash "install awscli" do
@@ -86,7 +93,7 @@ bash "install awscli" do
     set -e
     curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     unzip awscli-bundle.zip
-    ./awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    #{node['cfncluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
   CLI
   not_if { ::File.exist?("/usr/local/bin/aws") }
 end
@@ -119,6 +126,10 @@ end
 if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
   # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
   include_recipe "nfs::server"
+end
+if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+  # Workaround for issue: https://github.com/atomic-penguin/cookbook-nfs/issues/116
+  node.force_override['nfs']['service']['idmap'] = 'nfs-idmapd'
 end
 include_recipe "nfs::server4"
 

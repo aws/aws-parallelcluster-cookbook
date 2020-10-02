@@ -259,6 +259,7 @@ end
 ###################
 if node['conditions']['efa_supported'] && node['conditions']['intel_mpi_supported']
   case node['cfncluster']['os']
+  # TODO add centos8 once EFA package is available
   when 'alinux', 'centos7', 'alinux2'
     execute 'check efa rpm installed' do
       command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
