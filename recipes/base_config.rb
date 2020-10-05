@@ -38,7 +38,6 @@ include_recipe 'aws-parallelcluster::chrony_config'
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
 
-# case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
   include_recipe 'aws-parallelcluster::_master_base_config'

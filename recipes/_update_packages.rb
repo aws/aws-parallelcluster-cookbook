@@ -19,7 +19,7 @@ unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
   # not CentOS6
   case node['platform_family']
   when 'rhel', 'amazon'
-    if node['platform_version'].to_i == 8
+    if node['platform'] == 'centos' && node['platform_version'].to_i == 8
       execute 'dnf-update' do
         command "dnf -y update"
       end
