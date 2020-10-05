@@ -26,14 +26,16 @@ when 'rhel', 'amazon'
     include_recipe "yum-epel"
   end
 
-  if node['platform_version'].to_i == 7
+  unless node['platform_version'].to_i < 7
     execute 'yum-config-manager_skip_if_unavail' do
       command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
     end
-  elsif node['platform_version'].to_i == 8
+  end
+  if node['platform'] == 'centos' && node['platform_version'].to_i == 8
     # Enable PowerTools Repo so *-devel packages can be installed with DNF
-    execute 'dnf enable powertools' do
-      command "dnf config-manager --set-enabled PowerTools"
+    # Enable EPEL repos
+    execute 'dnf enable powertools and EPEL repos' do
+      command "dnf config-manager --set-enabled PowerTools && dnf install -y epel-release"
     end
   end
 
@@ -74,7 +76,8 @@ package "install kernel packages" do
   case node['platform_family']
   when 'rhel', 'amazon'
     package_name node['cfncluster']['kernel_devel_pkg']['name']
-    if node['platform_version'].to_i < 8
+    if node['platform'] == 'centos' && node['platform_version'].to_i < 8
+      # Do not enforce kernel_devel version on CentOS8 because kernel_devel package with same version as kernel release version cannot be found
       version node['cfncluster']['kernel_devel_pkg']['version']
     end
   when 'debian'
@@ -120,6 +123,10 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
+if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
+  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
+  include_recipe "nfs::server"
+end
 if node['platform'] == 'centos' && node['platform_version'].to_i == 8
   # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/116
   include_recipe "nfs::server"
@@ -219,23 +226,18 @@ end
 # Install Ganglia
 include_recipe "aws-parallelcluster::ganglia_install"
 
-# FIXME:
-# # Install NVIDIA and CUDA
-# include_recipe "aws-parallelcluster::_nvidia_install"
+# Install NVIDIA and CUDA
+include_recipe "aws-parallelcluster::_nvidia_install"
 
-# FIXME:
-# # Install FSx options
-# include_recipe "aws-parallelcluster::_lustre_install"
+# Install FSx options
+include_recipe "aws-parallelcluster::_lustre_install"
 
-# FIXME:
-# # Install EFA & Intel MPI
-# include_recipe "aws-parallelcluster::efa_install"
-# include_recipe "aws-parallelcluster::intel_mpi"
+# Install EFA & Intel MPI
+include_recipe "aws-parallelcluster::efa_install"
+include_recipe "aws-parallelcluster::intel_mpi"
 
-# FIXME:
-# # Install the AWS cloudwatch agent
-# include_recipe "aws-parallelcluster::cloudwatch_agent_install"
+# Install the AWS cloudwatch agent
+include_recipe "aws-parallelcluster::cloudwatch_agent_install"
 
-# FIXME:
-# # Install Amazon Time Sync
-# include_recipe "aws-parallelcluster::chrony_install"
+# Install Amazon Time Sync
+include_recipe "aws-parallelcluster::chrony_install"

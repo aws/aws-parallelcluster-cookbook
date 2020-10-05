@@ -204,6 +204,14 @@ when 'rhel', 'amazon'
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
                                                   libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
     end
+    if node['platform_version'].to_i == 8
+      # Install python3 instead of unversioned python
+      default['cfncluster']['base_packages'].delete('python')
+      default['cfncluster']['base_packages'].delete('python-pip')
+      # Install firewalld for iptables used in configure-pat.sh
+      # Install nvme-cli package used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
+      default['cfncluster']['base_packages'].push(%w[python3 python3-pip firewalld nvme-cli])
+    end
     if node['platform_version'].to_i >= 8
       # gdisk required for FSx
       # environment-modules required for IntelMPI
