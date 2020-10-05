@@ -17,8 +17,9 @@
 
 return unless node['conditions']['lustre_supported']
 
-# Install only on Centos 7.6 and 7.5
-if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split('.')[1].to_i)
+if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version'].to_f)
+  # Centos 7.6 and 7.5
+
   lustre_kmod_rpm = "#{node['cfncluster']['sources_dir']}/kmod-lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
   lustre_client_rpm = "#{node['cfncluster']['sources_dir']}/lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
 
@@ -41,28 +42,30 @@ if node['platform'] == 'centos' && (5..6).cover?(node['platform_version'].split(
   end
 
   # Install lustre mount drivers
-  yum_package 'lustre_kmod' do
+  package 'lustre_kmod' do
     source lustre_kmod_rpm
   end
 
   # Install lustre mount drivers
-  yum_package 'lustre_client' do
+  package 'lustre_client' do
     source lustre_client_rpm
   end
 
   kernel_module 'lnet'
-elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_i >= 7
+
+elsif node['platform'] == 'centos' && node['platform_version'].to_f >= 7.7
+  # Centos 8 and >= 7.7
 
   # add fsx lustre repository
   yum_repository "aws-fsx" do
-    description "AWS FSx Packages  - $basearch"
+    description "AWS FSx Packages - $basearch"
     baseurl node['cfncluster']['lustre']['base_url']
     gpgkey node['cfncluster']['lustre']['public_key']
     retries 3
     retry_delay 5
   end
 
-  yum_package %w[kmod-lustre-client lustre-client] do
+  package %w[kmod-lustre-client lustre-client] do
     retries 3
     retry_delay 5
   end
@@ -86,12 +89,12 @@ elsif node['platform'] == 'ubuntu'
 
   apt_update
 
-  apt_package "lustre-client-modules-#{node['kernel']['release']}" do
+  package "lustre-client-modules-#{node['kernel']['release']}" do
     retries 3
     retry_delay 5
   end
 
-  apt_package "lustre-client-modules-aws" do
+  package "lustre-client-modules-aws" do
     retries 3
     retry_delay 5
   end
