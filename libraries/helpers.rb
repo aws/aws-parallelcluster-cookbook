@@ -353,13 +353,18 @@ end
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
 # Method works for minor version >=7
 #
-def get_rhel_kernel_minor_version
-  # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
-  kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)[1]
+def get_rhel7_kernel_minor_version
   kernel_minor_version = '7'
-  if kernel_patch_version >= '1127'
-    kernel_minor_version = '8'
+
+  if node['platform'] == 'centos'
+    # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
+    kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
+    unless kernel_patch_version
+      raise "Unable to retrieve the kernel minor version from #{node['kernel']['release']}."
+    end
+    kernel_minor_version = '8' if kernel_patch_version[1] >= '1127'
   end
+
   kernel_minor_version
 end
 
@@ -370,6 +375,9 @@ def chrony_reload_command
     chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
   elsif node['init_package'] == 'systemd'
     chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
+  else
+    raise "Init package #{node['init_package']} not supported."
   end
+
   chrony_reload_command
 end
