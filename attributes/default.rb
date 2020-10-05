@@ -197,12 +197,6 @@ when 'rhel', 'amazon'
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip
                                                 libgcrypt-devel glibc-static]
-
-    # Lustre Drivers for Centos 6
-    default['cfncluster']['lustre']['version'] = '2.10.6'
-    default['cfncluster']['lustre']['kmod_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el6/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el6.x86_64.rpm'
-    default['cfncluster']['lustre']['client_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el6/client/RPMS/x86_64/lustre-client-2.10.6-1.el6.x86_64.rpm'
-
     if node['platform_version'].to_i >= 7
       default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                                   libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
@@ -210,21 +204,6 @@ when 'rhel', 'amazon'
                                                   blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
                                                   libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
-      if node['platform_version'].split('.')[1] >= '7'
-        # Lustre Client for Centos >= 7.7
-        default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc'
-        default['cfncluster']['lustre']['base_url'] = "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel_kernel_minor_version}/x86_64/"
-      elsif node['platform_version'].split('.')[1] == '6'
-        # Lustre Drivers for Centos 7.6
-        default['cfncluster']['lustre']['version'] = '2.10.6'
-        default['cfncluster']['lustre']['kmod_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el7.x86_64.rpm'
-        default['cfncluster']['lustre']['client_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/lustre-client-2.10.6-1.el7.x86_64.rpm'
-      elsif node['platform_version'].split('.')[1] == '5'
-        # Lustre Drivers for Centos 7.5
-        default['cfncluster']['lustre']['version'] = '2.10.5'
-        default['cfncluster']['lustre']['kmod_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/kmod-lustre-client-2.10.5-1.el7.x86_64.rpm'
-        default['cfncluster']['lustre']['client_url'] = 'https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm'
-      end
     end
     default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
@@ -283,8 +262,6 @@ when 'debian'
     default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
   end
 
-  default['cfncluster']['lustre']['public_key'] = 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-ubuntu-public-key.asc'
-  default['cfncluster']['lustre']['repository_uri'] = 'https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu'
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   # MODULESHOME
@@ -306,6 +283,37 @@ when 'debian'
     default['nfs']['service']['idmap'] = 'nfs-idmapd'
   end
 end
+
+# Lustre defaults (for CentOS >=7.7 and Ubuntu)
+default['cfncluster']['lustre']['public_key'] = value_for_platform(
+  'centos' => { '>=7.7' => "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc" },
+  'ubuntu' => { 'default' => "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-ubuntu-public-key.asc" }
+)
+default['cfncluster']['lustre']['base_url'] = value_for_platform(
+  'centos' => {
+    '>=7.7' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel7_kernel_minor_version}/x86_64/"
+  },
+  'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
+)
+# Lustre defaults (for CentOS 7.6 and 7.5 only)
+default['cfncluster']['lustre']['version'] = value_for_platform(
+  'centos' => {
+    '7.6' => "2.10.6",
+    '7.5' => "2.10.5"
+  }
+)
+default['cfncluster']['lustre']['kmod_url'] = value_for_platform(
+  'centos' => {
+    '7.6' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el7.x86_64.rpm",
+    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/kmod-lustre-client-2.10.5-1.el7.x86_64.rpm"
+  }
+)
+default['cfncluster']['lustre']['client_url'] = value_for_platform(
+  'centos' => {
+    '7.6' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/lustre-client-2.10.6-1.el7.x86_64.rpm",
+    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm",
+  }
+)
 
 # Munge key
 default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
