@@ -353,7 +353,7 @@ end
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
 # Method works for minor version >=7
 #
-def get_rhel_kernel_minor_version
+def get_rhel7_kernel_minor_version
   # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
   kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)[1]
   kernel_minor_version = '7'
