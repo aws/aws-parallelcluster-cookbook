@@ -68,12 +68,15 @@ elsif node['platform'] == 'centos' && node['platform_version'].split('.')[1].to_
   end
 
   kernel_module 'lnet'
+
 elsif node['platform'] == 'centos'
+  # Centos 6
   Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are >= 7.5")
+
 elsif node['platform'] == 'ubuntu'
 
   apt_repository 'fsxlustreclientrepo' do
-    uri          node['cfncluster']['lustre']['repository_uri']
+    uri          node['cfncluster']['lustre']['base_url']
     components   ['main']
     distribution node['lsb']['codename']
     key          node['cfncluster']['lustre']['public_key']
@@ -94,8 +97,11 @@ elsif node['platform'] == 'ubuntu'
   end
 
   kernel_module 'lnet'
+
 elsif node['platform'] == 'amazon' && node['platform_version'].to_i == 2
+
   alinux_extras_topic 'lustre2.10'
+
 elsif node['platform'] == 'amazon' # Amazon Linux 1
 
   # Install lustre client module
