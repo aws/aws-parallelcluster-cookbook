@@ -205,6 +205,11 @@ when 'rhel', 'amazon'
                                                   libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
                                                   libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
     end
+    if node['platform_version'].to_i >= 8
+      # gdisk required for FSx
+      default['cfncluster']['base_packages'].push('gdisk')
+    end
+
     default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
@@ -291,7 +296,8 @@ default['cfncluster']['lustre']['public_key'] = value_for_platform(
 )
 default['cfncluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
-    '>=7.7' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel7_kernel_minor_version}/x86_64/"
+    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/x86_64/",
+    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel7_kernel_minor_version}/x86_64/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
 )
