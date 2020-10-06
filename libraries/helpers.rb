@@ -145,7 +145,7 @@ end
 def ami_bootstrapped?
   version = ''
   bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
-  current_version = 'aws-parallelcluster-' + node['cfncluster']['cfncluster-version']
+  current_version = 'aws-parallelcluster-cookbook-' + node['cfncluster']['cfncluster-cookbook-version']
 
   if ::File.exist?(bootstrapped_file)
     version = IO.read(bootstrapped_file).chomp
