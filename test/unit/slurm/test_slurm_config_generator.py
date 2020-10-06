@@ -1,6 +1,7 @@
 import json
 import os
 
+import slurm
 from assertpy import assert_that
 from jsonschema import validate
 from slurm.pcluster_slurm_config_generator import generate_slurm_config_files
@@ -77,7 +78,7 @@ def test_generate_slurm_config_files(mocker, test_datadir, tmpdir):
     mocker.patch(
         "slurm.pcluster_slurm_config_generator._get_master_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    template_directory = os.path.abspath("files/default/slurm/templates")
+    template_directory = os.path.dirname(slurm.__file__) + "/templates"
     generate_slurm_config_files(tmpdir, template_directory, input_file, dryrun=False)
 
     for queue in ["efa", "gpu", "multiple_spot"]:
