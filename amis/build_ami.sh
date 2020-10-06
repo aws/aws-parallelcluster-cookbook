@@ -117,8 +117,8 @@ check_options() {
     available_arm_os="ubuntu1804 alinux2"  # subset of supported OSes for which ARM AMIs are available
     available_os="centos6 centos7 alinux ubuntu1604 ${available_arm_os}"
     cwd="$(dirname $0)"
-    tmp_dir=$(mktemp -d)
-    export COOKBOOK_PATH="${tmp_dir}/cookbook"
+    export COOKBOOK_PATH="$(cd ${cwd}/..; pwd)"
+    export SCRIPT_PATH="${cwd}/../../script"
 
     if [ "${_custom}" == "true" ]; then
         only=custom-${_os}
@@ -203,8 +203,8 @@ check_options() {
 do_command() {
     RC=0
 
-    mkdir -p "${COOKBOOK_PATH}"
-    cp -R ${cwd}/../* "${COOKBOOK_PATH}"
+    mkdir -p "${SCRIPT_PATH}"
+
     if [ "x${_build_date}" == "x" ]; then
       export BUILD_DATE=$(date +%Y%m%d%H%M)
     else
