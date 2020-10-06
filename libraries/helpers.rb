@@ -145,15 +145,17 @@ end
 def ami_bootstrapped?
   version = ''
   bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
-  current_version = 'aws-parallelcluster-cookbook-' + node['cfncluster']['cfncluster-cookbook-version']
+  current_version = node['cfncluster']['cfncluster-cookbook-version']
 
   if ::File.exist?(bootstrapped_file)
-    version = IO.read(bootstrapped_file).chomp
+    # bootstrapped_file content is aws-parallelcluster-cookbook-<Version>, we want to only compare the <Version>
+    version_string = IO.read(bootstrapped_file).chomp
+    version = version_string.split('-')[-1]
     Chef::Log.info("Detected bootstrap file #{version}")
     if version != current_version
-      raise "This AMI was created with " + version + ", but is trying to be used with " +  current_version +
-                ". Please either use an AMI created with " + current_version + " or change your ParallelCluster to "+
-                version
+      raise "This AMI was created with parallelcluster " + version + ", but is trying to be used with " +
+                "parallelcluster " + current_version + ". Please either use an AMI created with " +
+                "parallelcluster " + current_version + " or change your ParallelCluster to "+ version
     end
   end
 
