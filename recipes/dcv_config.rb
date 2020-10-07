@@ -33,9 +33,7 @@ def allow_gpu_acceleration
   # Update the xorg.conf to set up NVIDIA drivers.
   # NOTE: --enable-all-gpus parameter is needed to support servers with more than one NVIDIA GPU.
   nvidia_xconfig_command = "nvidia-xconfig --preserve-busid --enable-all-gpus"
-  if node['ec2']['instance_type'].start_with?("g2.")
-    nvidia_xconfig_command = nvidia_xconfig_command + " --use-display-device=none"
-  end
+  nvidia_xconfig_command += " --use-display-device=none" if node['ec2']['instance_type'].start_with?("g2.")
   execute "Set up Nvidia drivers for X configuration" do
     user 'root'
     command nvidia_xconfig_command
