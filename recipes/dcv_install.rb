@@ -85,7 +85,10 @@ if node['conditions']['dcv_supported']
         command 'yum -y install @gnome'
       end
       # Install X Window System (required when using GPU acceleration)
-      package "xorg-x11-server-Xorg"
+      package "xorg-x11-server-Xorg" do
+        retries 3
+        retry_delay 5
+      end
 
       # libvirtd service creates virtual bridge interfaces.
       # It's provided by libvirt-daemon, installed as requirement for gnome-boxes, included in @gnome.
