@@ -20,10 +20,10 @@
 
 # Configure the system to enable NICE DCV to have direct access to the Linux server's GPU and enable GPU sharing.
 def allow_gpu_acceleration
-  # On CentOS 7 fix circular dependency multi-user.target -> cloud-init-> isolate multi-user.target.
+  # On CentOS >=7 fix circular dependency multi-user.target -> cloud-init-> isolate multi-user.target.
   # multi-user.target doesn't start until cloud-init run is finished. So isolate multi-user.target
   # is stuck into starting, which keep hanging chef until the 3600s timeout.
-  unless node['platform'] == 'centos' && node['platform_version'].to_i == 7
+  unless node['platform'] == 'centos' && node['platform_version'].to_i >= 7
     # Turn off X
     execute "Turn off X" do
       command "systemctl isolate multi-user.target"
@@ -91,6 +91,17 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
     execute 'No RND' do
       user 'root'
       command "sed --in-place '/RANDFILE/d' /etc/ssl/openssl.cnf"
+    end
+  when 'centos'
+    if node['platform_version'].to_i >= 8
+      # Wayland, the default GNOME Display Manager for CentOS 8, is not supported by DCV
+      Chef::Log.info("Disabling Wayland and force login screen to use Xorg")
+      replace_or_add "Disable Wayland in /etc/gdm/custom.conf" do
+        path "/etc/gdm/custom.conf"
+        pattern ".*WaylandEnable.*"
+        line "WaylandEnable=false"
+        replace_only true
+      end
     end
   end
 
