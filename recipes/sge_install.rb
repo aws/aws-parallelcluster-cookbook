@@ -15,7 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['conditions']['ami_bootstrapped']
+# FIXME add support for CentOS 8
+return if node['conditions']['ami_bootstrapped'] || ( node['platform'] == 'centos' && node['platform_version'].to_i == 8 )
 
 include_recipe 'aws-parallelcluster::base_install'
 
