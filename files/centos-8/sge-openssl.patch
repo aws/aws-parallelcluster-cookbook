@@ -1,0 +1,223 @@
+patch 845d213472a32d1f3e6a55b2e7f108ae6f2e871a
+Author: marco.schmidt@gmail.com
+Date:   Fri Nov  3 10:40:04 GMT 2017
+  * Fix 1618: openssl 1.1 ciphers
+diff -rN -u old-sge-release/source/libs/comm/cl_ssl_framework.c new-sge-release/source/libs/comm/cl_ssl_framework.c
+--- old-sge-release/source/libs/comm/cl_ssl_framework.c	2018-05-19 17:29:24.000000000 +0100
++++ new-sge-release/source/libs/comm/cl_ssl_framework.c	2018-05-19 17:29:24.000000000 +0100
+@@ -355,9 +355,11 @@
+
+    /*
+     * see: http://www.openssl.org/docs/apps/ciphers.html#
+-    * test this cipher string with openssl ciphers -v "RC4-MD5:NULL-MD5" command
++    * test this cipher string with openssl ciphers -v "AES256-SHA256:NULL-SHA256" command
+     */
+-   const char* commlib_ciphers_string = "RC4-MD5:NULL-MD5"; /* "RC4-MD5:NULL-MD5"; */ /* or "DEFAULT" */
++   /* new cipher for openssl 1.1 (works with 1.0) */
++   /* @TODO: make this configurable at compiletime or via bootstrap */
++   const char* commlib_ciphers_string = "AES256-SHA256:NULL-SHA256";
+
+    if (ctx != NULL) {
+       CL_LOG(CL_LOG_INFO,"setting CTX object defaults");
+patch 3e341faef92047c0d2a3012f513ef3a1d0948533
+Author: Dave Love <fx@gnu.org>
+Date:   Sat Jan  7 12:58:39 GMT 2017
+  * Fix 1572: Support openssl 1.1.0 (from Afif Elghraoui)
+diff -rN -u old-sge-release/source/libs/comm/cl_ssl_framework.c new-sge-release/source/libs/comm/cl_ssl_framework.c
+--- old-sge-release/source/libs/comm/cl_ssl_framework.c	2018-05-19 17:29:51.000000000 +0100
++++ new-sge-release/source/libs/comm/cl_ssl_framework.c	2018-05-19 17:29:51.000000000 +0100
+@@ -476,7 +476,7 @@
+ static int ssl_callback_SSLVerify_CRL(int ok, X509_STORE_CTX *ctx, cl_com_ssl_private_t* private) {
+    X509 *cert = NULL;
+    X509_LOOKUP *lookup = NULL;
+-   X509_STORE_CTX verify_ctx;
++   X509_STORE_CTX *verify_ctx = NULL;
+    int err;
+    int is_ok = true;
+    SGE_STRUCT_STAT stat_buffer;
+@@ -491,6 +491,8 @@
+       return true;
+    }
+
++   verify_ctx = X509_STORE_CTX_new();
++
+    /* create the cert store and set the verify callback */
+    if (private->ssl_crl_data->store == NULL || stat_buffer.st_mtime != private->ssl_crl_data->last_modified) {
+        CL_LOG(CL_LOG_WARNING, "creating new crl store context");
+@@ -537,20 +539,20 @@
+    cert = X509_STORE_CTX_get_current_cert(ctx);
+    if (is_ok == true && cert != NULL) {
+        /* X509_STORE_CTX_init did not return an error condition in prior versions */
+-       if (X509_STORE_CTX_init(&verify_ctx, private->ssl_crl_data->store, cert, NULL) != 1) {
++       if (X509_STORE_CTX_init(verify_ctx, private->ssl_crl_data->store, cert, NULL) != 1) {
+           CL_LOG(CL_LOG_ERROR, "Error initializing verification context");
+           is_ok = false;
+        } else {
+           /* verify the certificate */
+-          if (X509_verify_cert(&verify_ctx) != 1) {
++          if (X509_verify_cert(verify_ctx) != 1) {
+              is_ok = false;
+           }
+        }
+        if (is_ok == false) {
+-           err = X509_STORE_CTX_get_error(&verify_ctx);
++           err = X509_STORE_CTX_get_error(verify_ctx);
+            X509_STORE_CTX_set_error(ctx, err);
+        }
+-       X509_STORE_CTX_cleanup(&verify_ctx);
++       X509_STORE_CTX_cleanup(verify_ctx);
+    } else {
+       if (is_ok == false) {
+          CL_LOG(CL_LOG_ERROR,"X509 store is not valid");
+@@ -561,6 +563,8 @@
+       is_ok = false;
+    }
+
++   X509_STORE_CTX_free(verify_ctx);
++
+    return is_ok;
+ }
+
+diff -rN -u old-sge-release/source/utilbin/sge_passwd.c new-sge-release/source/utilbin/sge_passwd.c
+--- old-sge-release/source/utilbin/sge_passwd.c	2018-05-19 17:29:51.000000000 +0100
++++ new-sge-release/source/utilbin/sge_passwd.c	2018-05-19 17:29:51.000000000 +0100
+@@ -280,7 +280,7 @@
+                size_t *buffer_out_length)
+ {
+    unsigned int ebuflen;
+-   EVP_CIPHER_CTX ectx;
++   EVP_CIPHER_CTX *ectx = NULL;
+    unsigned char iv[EVP_MAX_IV_LENGTH];
+    unsigned char *ekey[1];
+    int ekeylen=0, net_ekeylen=0;
+@@ -315,6 +315,8 @@
+    ret = sge_ssl_rand_load_file(rand_file, sizeof(rand_file));
+
+    if(ret <= 0) {
++      sge_free(&(ekey[0]));
++      EVP_PKEY_free(pubKey[0]);
+       snprintf(err_str, MAX_STRING_SIZE, MSG_PWD_CANTLOADRANDFILE_SSS,
+               "sgepasswd", rand_file, MSG_PWD_NO_SSL_ERR);
+
+@@ -325,11 +327,22 @@
+       return;
+    }
+
++   /* Initialise cipher context */
++   ectx = EVP_CIPHER_CTX_new();
++   if (!ectx) {
++      sge_free(&(ekey[0]));
++      EVP_PKEY_free(pubKey[0]);
++      fprintf(stderr, MSG_PWD_MALLOC_SS, SGE_PASSWD_PROG_NAME, MSG_PWD_NO_SSL_ERR);
++      fprintf(stderr, "\n");
++      DEXIT;
++      exit(1);
++   }
++
+    memset(iv, '\0', sizeof(iv));
+ #if 0
+-   ret = EVP_SealInit(&ectx, EVP_des_ede3_cbc(), ekey, &ekeylen, iv, pubKey, 1);
++   ret = EVP_SealInit(ectx, EVP_des_ede3_cbc(), ekey, &ekeylen, iv, pubKey, 1);
+ #else
+-   ret = EVP_SealInit(&ectx, EVP_rc4(), ekey, &ekeylen, iv, pubKey, 1);
++   ret = EVP_SealInit(ectx, EVP_rc4(), ekey, &ekeylen, iv, pubKey, 1);
+ #endif
+    if(ret == 0) {
+       printf("---> EVP_SealInit\n");
+@@ -352,7 +365,7 @@
+    buffer_append(buffer_out, buffer_out_size, buffer_out_length,
+                  (char*)iv, sizeof(iv));
+
+-   EVP_SealUpdate(&ectx, (unsigned char*)ebuf,
++   EVP_SealUpdate(ectx, (unsigned char*)ebuf,
+                                    (int*)&ebuflen,
+                                    (const unsigned char *) buffer_in,
+                                    buffer_in_length);
+@@ -360,11 +373,12 @@
+    buffer_append(buffer_out, buffer_out_size, buffer_out_length,
+                  ebuf, ebuflen);
+
+-   EVP_SealFinal(&ectx, (unsigned char *)ebuf, (int*)&ebuflen);
++   EVP_SealFinal(ectx, (unsigned char *)ebuf, (int*)&ebuflen);
+
+    buffer_append(buffer_out, buffer_out_size, buffer_out_length,
+                  ebuf, ebuflen);
+
++   EVP_CIPHER_CTX_free(ectx);
+    EVP_PKEY_free(pubKey[0]);
+    sge_free(&(ekey[0]));
+    DEXIT;
+@@ -379,7 +393,7 @@
+    char buf[520];
+    char ebuf[512];
+    unsigned int buflen;
+-   EVP_CIPHER_CTX ectx;
++   EVP_CIPHER_CTX *ectx = NULL;
+    unsigned char iv[EVP_MAX_IV_LENGTH];
+    unsigned char *encryptKey;
+    unsigned int ekeylen;
+@@ -455,6 +469,16 @@
+       return 1;
+    }
+
++   /* Initialise cipher context */
++   ectx = EVP_CIPHER_CTX_new();
++   if (!ectx) {
++      sge_free(&encryptKey);
++      fprintf(stderr, MSG_PWD_MALLOC_SS, SGE_PASSWD_PROG_NAME, MSG_PWD_NO_SSL_ERR);
++      fprintf(stderr, "\n");
++      DEXIT;
++      exit(1);
++   }
++
+    memcpy(encryptKey, curr_ptr, ekeylen);
+    curr_ptr += ekeylen;
+    buffer_in_length -= ekeylen;
+@@ -462,9 +486,9 @@
+    curr_ptr += sizeof(iv);
+    buffer_in_length -= sizeof(iv);
+ #if 0
+-   ret = EVP_OpenInit(&ectx, EVP_des_ede3_cbc(), encryptKey, ekeylen, iv, privateKey);
++   ret = EVP_OpenInit(ectx, EVP_des_ede3_cbc(), encryptKey, ekeylen, iv, privateKey);
+ #else
+-   ret = EVP_OpenInit(&ectx, EVP_rc4(), encryptKey, ekeylen, iv, privateKey);
++   ret = EVP_OpenInit(ectx, EVP_rc4(), encryptKey, ekeylen, iv, privateKey);
+ #endif
+    if(ret == 0) {
+       printf("----> EVP_OpenInit\n");
+@@ -484,12 +508,13 @@
+          readlen = sizeof(ebuf);
+       }
+
+-      ret = EVP_OpenUpdate(&ectx, (unsigned char *)buf,
++      ret = EVP_OpenUpdate(ectx, (unsigned char *)buf,
+                (int*)&buflen,
+                (const unsigned char *)ebuf, readlen);
+       if (ret == 0) {
+          error_code = ERR_get_error();
+          ERR_error_string(error_code, err_msg);
++         EVP_CIPHER_CTX_free(ectx);
+          snprintf(err_str, lstr, MSG_PWD_SSL_ERR_MSG_SS, SGE_PASSWD_PROG_NAME, err_msg);
+ #ifdef DEFINE_SGE_PASSWD_MAIN
+          fprintf(stderr, "%s\n", err_str);
+@@ -502,10 +527,11 @@
+          buf, buflen);
+    }
+
+-   ret = EVP_OpenFinal(&ectx, (unsigned char *)buf, (int*)&buflen);
++   ret = EVP_OpenFinal(ectx, (unsigned char *)buf, (int*)&buflen);
+    if (ret == 0) {
+       error_code = ERR_get_error();
+       ERR_error_string(error_code, err_msg);
++      EVP_CIPHER_CTX_free(ectx);
+       snprintf(err_str, lstr, MSG_PWD_SSL_ERR_MSG_SS, SGE_PASSWD_PROG_NAME, err_msg);
+ #ifdef DEFINE_SGE_PASSWD_MAIN
+       fprintf(stderr, "%s\n", err_str);
+@@ -516,6 +542,7 @@
+    buffer_append(buffer_out, buffer_out_size, buffer_out_length,
+                  buf, buflen);
+
++   EVP_CIPHER_CTX_free(ectx);
+    EVP_PKEY_free(privateKey);
+    sge_free(&encryptKey);
+    error_code = ERR_get_error();

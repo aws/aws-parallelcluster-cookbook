@@ -31,6 +31,19 @@ when 'MasterServer', nil
     mode '0644'
   end
 
+  if node['platform'] == 'centos' && node['platform_version'].to_i >= 8
+    # Additional patch files required for CentOS 8
+    cookbook_file 'sge-openssl.patch' do
+      path '/tmp/sge-openssl.patch'
+    end
+    cookbook_file 'sge-tcsh.patch' do
+      path '/tmp/sge-tcsh.patch'
+    end
+    cookbook_file 'sge-qmake.patch' do
+      path '/tmp/sge-qmake.patch'
+    end
+  end
+
   execute 'sge_preinstall' do
     user 'root'
     group 'root'
@@ -42,23 +55,33 @@ when 'MasterServer', nil
       'TARBALL_URL' => node['cfncluster']['sge']['url'],
       'REGION' => node['cfncluster']['cfn_region']
     )
-
     command 'sh /tmp/sge_preinstall.sh'
     not_if { ::File.exist?(sge_tarball) }
   end
 
+  # Additional aimk flags required for Centos8 because tirpc library is
+  # in /usr/include instead of /usr/local/include
+  c_flags = value_for_platform(
+      'centos' => { '>=8' => "-I/usr/include/tirpc" },
+      'default' => ""
+  )
+  ld_flags = value_for_platform(
+      'centos' => { '>=8' => "-ltirpc" },
+      'default' => ""
+  )
+
   # Install SGE
-  architecture_id = if arm_instance?
-                      "arm64"
-                    else
-                      "amd64"
-                    end
+  architecture_id = arm_instance? ? "arm64" : "amd64"
   qmaster_bin_dir = "/opt/sge/bin/lx-#{architecture_id}/sge_qmaster"
   bash 'make install' do
     user 'root'
     group 'root'
     cwd Chef::Config[:file_cache_path]
-    environment 'SGE_ROOT' => '/opt/sge'
+    environment(
+      'SGE_ROOT' => '/opt/sge',
+      'SGE_INPUT_CFLAGS' => "#{c_flags}",
+      'SGE_INPUT_LDFLAGS' => "#{ld_flags}"
+    )
     code <<-SGE
       set -e
       tar xf #{sge_tarball}

@@ -1,0 +1,20 @@
+patch e91cde95c7e32f6ff6d8bdad463189c1da296cf4
+Author: Dave Love <d.love@liverpool.ac.uk>
+Date:   Fri Apr 15 14:24:02 BST 2016
+  * Remove union wait
+  Being removed from glibc and apparently long obsolete in BSD
+diff -rN -u -u old-sge-release/source/3rdparty/qtcsh/sh.proc.c new-sge-release/source/3rdparty/qtcsh/sh.proc.c
+--- old-sge-release/source/3rdparty/qtcsh/sh.proc.c	2018-05-20 00:01:34.000000000 +0100
++++ new-sge-release/source/3rdparty/qtcsh/sh.proc.c	2018-05-20 00:01:34.000000000 +0100
+@@ -47,9 +47,9 @@
+ # define HZ 16
+ #endif /* aiws */
+
+-#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++#if (defined(IRIS4D) && __STDC__) || defined(__lucid)
+ # define BSDWAIT
+-#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || glibc */
++#endif /* (IRIS4D && __STDC__) || __lucid  */
+ #ifndef WTERMSIG
+ # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
+ # ifndef BSDWAIT
