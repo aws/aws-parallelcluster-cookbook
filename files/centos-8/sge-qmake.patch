@@ -1,0 +1,32 @@
+patch 5195b116dd53aaddee997bc7dbacb21631abda5a
+Author: Dave Love <dave.love@manchester.ac.uk>
+Date:   Sat May 19 22:34:19 BST 2018
+  * Fix glob in gmake to build on Fedora 28
+diff -rN -u -u old-sge-release/source/3rdparty/qmake/glob/glob.c new-sge-release/source/3rdparty/qmake/glob/glob.c
+--- old-sge-release/source/3rdparty/qmake/glob/glob.c	2018-05-19 22:57:06.000000000 +0100
++++ new-sge-release/source/3rdparty/qmake/glob/glob.c	2018-05-19 22:57:06.000000000 +0100
+@@ -208,7 +208,7 @@
+ #endif /* __GNU_LIBRARY__ || __DJGPP__ */
+
+
+-#if !defined __alloca && !defined __GNU_LIBRARY__
++#if !defined __alloca
+
+ # ifdef	__GNUC__
+ #  undef alloca
+@@ -231,7 +231,6 @@
+
+ #endif
+
+-#ifndef __GNU_LIBRARY__
+ # define __stat stat
+ # ifdef STAT_MACROS_BROKEN
+ #  undef S_ISDIR
+@@ -239,7 +238,6 @@
+ # ifndef S_ISDIR
+ #  define S_ISDIR(mode) (((mode) & S_IFMT) == S_IFDIR)
+ # endif
+-#endif
+
+ #ifdef _LIBC
+ # undef strdup
