@@ -184,11 +184,6 @@
       "destination" : "/tmp/cookbook"
     },
     {
-      "type": "file",
-      "source": "{{user `script_path`}}",
-      "destination": "/tmp/createami_scripts"
-    },
-    {
       "type" : "shell",
       "inline" : [
         "set -x",
@@ -292,11 +287,16 @@
       ]
     },
     {
+      "type": "file",
+      "source": "{{user `script_path`}}",
+      "destination": "/tmp/createami_scripts"
+    },
+    {
       "type": "shell",
       "inline": [
         "set -x",
         "[[ -d \"/tmp/createami_scripts\" ]] && script_name=$(ls /tmp/createami_scripts)",
-        "[[ -n ${script_name} ]] && (sudo chmod +x /tmp/createami_scripts/${script_name} && sudo /tmp/createami_scripts/${script_name} && sudo mkdir -p /opt/parallelcluster/createami_scripts && sudo mv /tmp/createami_scripts/${script_name} /opt/parallelcluster/createami_scripts) || echo 'No post install script'"
+        "[[ -n ${script_name} ]] && (sudo chmod +x /tmp/createami_scripts/${script_name} && sudo /tmp/createami_scripts/${script_name} && sudo mkdir -p /opt/parallelcluster/createami_scripts && sudo mv /tmp/createami_scripts/${script_name} /opt/parallelcluster/createami_scripts && sudo chmod 700 /opt/parallelcluster/createami_scripts) || echo 'No post install script'"
       ]
     },
     {
