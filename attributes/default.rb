@@ -243,9 +243,9 @@ when 'rhel', 'amazon'
       # Install python3 instead of unversioned python
       default['cfncluster']['base_packages'].delete('python')
       default['cfncluster']['base_packages'].delete('python-pip')
-      # Install firewalld for iptables used in configure-pat.sh
+      # Install iptables used in configure-pat.sh
       # Install nvme-cli package used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
-      default['cfncluster']['base_packages'].push(%w[python3 python3-pip firewalld nvme-cli])
+      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli])
     end
     if node['platform_version'].to_i >= 8
       # gdisk required for FSx
