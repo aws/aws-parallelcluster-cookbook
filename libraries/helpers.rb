@@ -375,6 +375,9 @@ def chrony_reload_command
     chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
   elsif node['init_package'] == 'systemd'
     chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
+  else
+    raise "Init package #{node['init_package']} not supported."
   end
+
   chrony_reload_command
 end
