@@ -37,9 +37,8 @@ if not File.exist?(node['cfncluster']['cluster_config_path']) or not FileUtils.i
     action :restart
   end
 
-  execute 'force compute fleet status to STOPPED' do
-    command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
-          " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"STOPPED\"}}' --region #{node['cfncluster']['cfn_region']}"
+  execute 'reload config for running nodes' do
+    command "/opt/slurm/bin/scontrol reconfigure && sleep 15"
     retries 3
     retry_delay 5
   end
