@@ -46,7 +46,7 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
       mkdir aws-parallelcluster-custom-cli
       tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-custom-cli
       cd aws-parallelcluster-custom-cli/*aws-parallelcluster-*
-      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/pip install cli/
+      pip install cli/
     CLI
   end
 else
