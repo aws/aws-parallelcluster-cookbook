@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 
 - Upgrade Intel MPI to version U8.
+- Upgrade Intel Parallel Studio XE Runtime to version 2020.2.
 
 2.9.1
 -----

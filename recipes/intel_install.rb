@@ -45,8 +45,8 @@ when 'MasterServer'
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
-      rpm --import https://yum.repos.intel.com/2019/setup/RPM-GPG-KEY-intel-psxe-runtime-2019
-      yum4 -y install https://yum.repos.intel.com/2019/setup/intel-psxe-runtime-2019-reposetup-1-0.noarch.rpm
+      rpm --import https://yum.repos.intel.com/2020/setup/RPM-GPG-KEY-intel-psxe-runtime-2020
+      yum4 -y install https://yum.repos.intel.com/2020/setup/intel-psxe-runtime-2020-reposetup-1-0.noarch.rpm
       yum4 -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
     INTEL
     creates '/opt/intel/psxe_runtime'
@@ -67,7 +67,7 @@ when 'MasterServer'
     code <<-SKIP_UNAVAIL
       set -e
       yum-config-manager --save --setopt=intel-hpc-platform.skip_if_unavailable=True
-      yum-config-manager --save --setopt=intel-psxe-runtime-2019.skip_if_unavailable=True 
+      yum-config-manager --save --setopt=intel-psxe-runtime-2020.skip_if_unavailable=True 
       yum-config-manager --save --setopt=intelpython.skip_if_unavailable=True
     SKIP_UNAVAIL
   end
