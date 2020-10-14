@@ -64,15 +64,15 @@ default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
 default['cfncluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cfncluster']['slurm']['version'] = '20.02.5'
-default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.02.5.tar.bz2'
-default['cfncluster']['slurm']['sha1'] = '62d9f66c86e17cbc541328e5f36a1213eaf7789a'
+default['cfncluster']['slurm']['version'] = '20.02.4'
+default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.02.4.tar.bz2'
+default['cfncluster']['slurm']['sha1'] = '294de3a2e1410945eb516c40eff5f92087501893'
 # PMIx software
 default['cfncluster']['pmix']['version'] = '3.1.5'
 default['cfncluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cfncluster']['pmix']['version']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
 default['cfncluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03ec'
 # Munge
-default['cfncluster']['munge']['munge_version'] = '0.5.13'
+default['cfncluster']['munge']['munge_version'] = '0.5.14'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
