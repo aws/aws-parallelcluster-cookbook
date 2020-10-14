@@ -26,6 +26,16 @@ node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_sc
                                                    else
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
+
+# Set cfn_scheduler_slots_type to vcpus/cores based on disable_hyperthreading = false/true
+# Set cfn_scheduler_slots_type to vcpus/cores/integer based on extra json {'cfn_scheduler_slots' = 'vcpus'/'cores'/integer}
+node.default['cfncluster']['cfn_scheduler_slots_type'] = if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
+                                                           'vcpus'
+                                                         elsif node['cfncluster']['cfn_scheduler_slots'] == 'cores' || node['cfncluster']['cfn_scheduler_slots'].to_i == node['cpu']['cores']
+                                                           'cores'
+                                                         else
+                                                           node['cfncluster']['cfn_scheduler_slots']
+                                                         end
 # NOTE: this recipe must be included after cfn_instance_slot because it may alter the values of
 #       node['cpu']['total'], which would break the expected behavior when setting cfn_scheduler_slots
 #       to one of the constants looked for in the above conditionals
