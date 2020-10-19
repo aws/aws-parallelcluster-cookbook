@@ -128,11 +128,10 @@ if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
   include_recipe "nfs::server"
 end
 if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/116
-  include_recipe "nfs::server"
-else
-  include_recipe "nfs::server4"
+  # Workaround for issue: https://github.com/atomic-penguin/cookbook-nfs/issues/116
+  node.force_override['nfs']['service']['idmap'] = 'nfs-idmapd'
 end
+include_recipe "nfs::server4"
 
 # Put configure-pat.sh onto the host
 cookbook_file 'configure-pat.sh' do
