@@ -45,7 +45,7 @@ default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_py
 # Intel Packages
 default['cfncluster']['psxe']['version'] = '2020.2'
 default['cfncluster']['intelhpc']['version'] = '2018.0-*.el7'
-default['cfncluster']['intelpython2']['version'] = '2019.4'
+default['cfncluster']['intelpython2']['version'] = '2019.5'
 default['cfncluster']['intelpython3']['version'] = '2020.2'
 # Intel MPI
 default['cfncluster']['intelmpi']['url'] = "https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16814/l_mpi_2019.8.254.tgz"
