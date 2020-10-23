@@ -295,7 +295,7 @@ end
 # Check if this platform supports intel's HPC platform
 #
 def platform_supports_intel_hpc_platform?
-  node['platform'] == 'centos' && node['platform_version'].to_i >= 7
+  node['platform'] == 'centos'
 end
 
 #
