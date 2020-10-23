@@ -46,8 +46,14 @@ default['cfncluster']['cookbook_virtualenv_path'] = "#{node['cfncluster']['syste
 default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 
 # Intel Packages
-default['cfncluster']['psxe']['version'] = '2019.5'
-default['cfncluster']['intelhpc']['version'] = '2018.0-*.el7'
+default['cfncluster']['psxe']['version'] = '2020.4'
+default['cfncluster']['intelhpc']['platform_name'] = value_for_platform(
+  'centos' => {
+    '~>8' => 'el8',
+    '~>7' => 'el7'
+  }
+)
+default['cfncluster']['intelhpc']['version'] = "2018.0-*.#{node['cfncluster']['intelhpc']['platform_name']}"
 default['cfncluster']['intelpython2']['version'] = '2019.4'
 default['cfncluster']['intelpython3']['version'] = '2019.4'
 
