@@ -21,15 +21,21 @@ case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
 
   # Download intel-hpc-platform rpms to shared /opt/intel/rpms to avoid repetitive download from all nodes
+  # DNF will clear cache files after any successful installation, by default
+  # Copy cached packages to /opt/intel/rpms manually so they are not removed
   bash "download intel hpc platform" do
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
       yum-config-manager --add-repo https://yum.repos.intel.com/hpc-platform/#{node['cfncluster']['intelhpc']['platform_name']}/setup/intel-hpc-platform.repo
       rpm --import https://yum.repos.intel.com/hpc-platform/#{node['cfncluster']['intelhpc']['platform_name']}/setup/PUBLIC_KEY.PUB
-      yum -y install --downloadonly --downloaddir=/opt/intel/rpms intel-hpc-platform-*-#{node['cfncluster']['intelhpc']['version']}
+      yum -y install --downloadonly --downloaddir=/tmp/intel_rpms intel-hpc-platform-*-#{node['cfncluster']['intelhpc']['version']}
+      mkdir /opt/intel/rpms
+      cp -r /tmp/intel_rpms/* /opt/intel/rpms
     INTEL
     creates '/opt/intel/rpms'
+    retries 3
+    retry_delay 5
   end
 
   # Parallel Studio is Intel's optimized libraries, this is the runtime (free) version
@@ -44,6 +50,8 @@ when 'MasterServer'
       yum -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
     INTEL
     creates '/opt/intel/psxe_runtime'
+    retries 3
+    retry_delay 5
   end
 
   # Intel optimized versions of python
@@ -55,6 +63,8 @@ when 'MasterServer'
       yum -y install intelpython2-#{node['cfncluster']['intelpython2']['version']} intelpython3-#{node['cfncluster']['intelpython3']['version']}
     INTEL
     creates '/opt/intel/intelpython2'
+    retries 3
+    retry_delay 5
   end
 
   bash "set skip_if_unavailable on Intel repo" do
@@ -67,13 +77,14 @@ when 'MasterServer'
   end
 end
 
-# Installs intel-hpc-platform rpms
+# Install from /opt/intel/rpms, with -C option
+# If -C is not specified, cached packages in /opt/intel/rpms will be removed
 # This rpm installs a file /etc/intel-hpc-platform-release that contains the INTEL_HPC_PLATFORM_VERSION
 bash "install intel hpc platform" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum install -y /opt/intel/rpms/*
+    yum install -C -y /opt/intel/rpms/*
   INTEL
   creates '/etc/intel-hpc-platform-release'
 end
