@@ -255,7 +255,8 @@ when 'rhel', 'amazon'
     if node['platform_version'].to_i >= 8
       # gdisk required for FSx
       # environment-modules required for IntelMPI
-      default['cfncluster']['base_packages'].push('gdisk', 'environment-modules')
+      # libtirpc and libtirpc-devel required for SGE
+      default['cfncluster']['base_packages'].push('gdisk', 'environment-modules', 'libtirpc', 'libtirpc-devel')
     end
 
     default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
