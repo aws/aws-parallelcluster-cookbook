@@ -46,8 +46,14 @@ default['cfncluster']['cookbook_virtualenv_path'] = "#{node['cfncluster']['syste
 default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 
 # Intel Packages
-default['cfncluster']['psxe']['version'] = '2019.5'
-default['cfncluster']['intelhpc']['version'] = '2018.0-*.el7'
+default['cfncluster']['psxe']['version'] = '2020.4'
+default['cfncluster']['intelhpc']['platform_name'] = value_for_platform(
+  'centos' => {
+    '~>8' => 'el8',
+    '~>7' => 'el7'
+  }
+)
+default['cfncluster']['intelhpc']['version'] = "2018.0-*.#{node['cfncluster']['intelhpc']['platform_name']}"
 default['cfncluster']['intelpython2']['version'] = '2019.4'
 default['cfncluster']['intelpython3']['version'] = '2019.4'
 
@@ -338,7 +344,8 @@ default['cfncluster']['lustre']['public_key'] = value_for_platform(
 )
 default['cfncluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
-    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/x86_64/",
+    # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
+    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/#{node['kernel']['machine']}/",
     'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{get_rhel7_kernel_minor_version}/x86_64/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
