@@ -22,7 +22,7 @@ validate_os_type
 node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
                                                      node['cpu']['total']
                                                    elsif node['cfncluster']['cfn_scheduler_slots'] == 'cores'
-                                                     node['cpu']['total'].fdiv(2).ceil
+                                                     node['cpu']['cores']
                                                    else
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
