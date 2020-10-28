@@ -79,5 +79,6 @@ dirs.each do |dir|
   directory dir do
     action :create
     owner "munge"
+    group "munge"
   end
 end
