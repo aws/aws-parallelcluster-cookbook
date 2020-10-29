@@ -11,7 +11,7 @@ from botocore.config import Config
 def convert_dev(dev):
     # Translate the device name as provided by the OS to the one used by EC2
     # FIXME This approach could be broken in some OS variants, see
-    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/device_naming.html
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
     if '/nvme' in dev:
         return '/dev/' + os.popen('sudo /usr/local/sbin/parallelcluster-ebsnvme-id -u -b ' + dev).read().strip()
     elif '/hd' in dev:
