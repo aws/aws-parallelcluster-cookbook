@@ -45,7 +45,7 @@ default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_py
 # Intel Packages
 default['cfncluster']['psxe']['version'] = '2020.2'
 default['cfncluster']['intelhpc']['version'] = '2018.0-*.el7'
-default['cfncluster']['intelpython2']['version'] = '2019.5'
+default['cfncluster']['intelpython2']['version'] = '2019.4'
 default['cfncluster']['intelpython3']['version'] = '2020.2'
 # Intel MPI
 default['cfncluster']['intelmpi']['url'] = "https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16814/l_mpi_2019.8.254.tgz"
@@ -90,7 +90,8 @@ else
   default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
 end
 # EFA
-default['cfncluster']['efa']['installer_url'] = 'https://efa-installer.amazonaws.com/aws-efa-installer-1.9.5.tar.gz'
+default['cfncluster']['efa']['installer_version'] = '1.10.0'
+default['cfncluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cfncluster']['efa']['installer_version']}.tar.gz"
 # NICE DCV
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2020.1-9012'

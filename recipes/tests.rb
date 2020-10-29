@@ -400,13 +400,15 @@ end
 ###################
 # Intel Python Libraries
 if node['conditions']['intel_hpc_platform_supported'] && node['cfncluster']['enable_intel_hpc_platform'] == 'true'
-  execute "check-intel-python2" do
-    # Output code will be 1 if version is different
-    command "rpm -q intelpython2 | grep #{node['cfncluster']['intelpython2']['version']}"
-  end
-  execute "check-intel-python3" do
-    # Output code will be 1 if version is different
-    command "rpm -q intelpython3 | grep #{node['cfncluster']['intelpython3']['version']}"
+  %w[2 3].each do |python_version|
+    intel_package_version = node['cfncluster']["intelpython#{python_version}"]['version']
+    execute "check-intel-python#{python_version}-rpm" do
+      # Output code will be 1 if version is different
+      command "rpm -q intelpython#{python_version} | grep #{intel_package_version}"
+    end
+    execute "check-intel-python#{python_version}-executable" do
+      command "/opt/intel/intelpython#{python_version}/bin/python -V"
+    end
   end
 end
 
