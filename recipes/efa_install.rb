@@ -43,13 +43,18 @@ when 'debian'
   end
 end
 
+installer_options = "-y"
+if arm_instance?
+  # efa-kmod currently unavailable for ARM instances
+  installer_options += " -k"
+end
 bash "install efa" do
   cwd node['cfncluster']['sources_dir']
   code <<-EFAINSTALL
     set -e
     tar -xzf #{efa_tarball}
     cd aws-efa-installer
-    ./efa_installer.sh -y
+    ./efa_installer.sh #{installer_options}
   EFAINSTALL
   not_if { ::Dir.exist?('/opt/amazon/efa') }
 end

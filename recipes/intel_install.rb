@@ -58,7 +58,8 @@ when 'MasterServer'
     code <<-INTEL
       set -e
       yum-config-manager --add-repo https://yum.repos.intel.com/intelpython/setup/intelpython.repo
-      yum -y install intelpython2-#{node['cfncluster']['intelpython2']['version']} intelpython3-#{node['cfncluster']['intelpython3']['version']}
+      yum -y install intelpython2-#{node['cfncluster']['intelpython2']['version']}
+      yum -y install intelpython3-#{node['cfncluster']['intelpython3']['version']}
     INTEL
     creates '/opt/intel/intelpython2'
   end
