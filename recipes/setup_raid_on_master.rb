@@ -57,9 +57,14 @@ if raid_shared_dir != "NONE"
   raid_dev = "/dev/md0"
 
   # Create RAID device with mdadm
+  raid_superblock_version = value_for_platform(
+    'centos' => { '>=8' => '1.2' },
+    'default' => '0.90'
+  )
   mdadm "MY_RAID" do
     raid_device raid_dev
     level raid_type
+    metadata raid_superblock_version
     devices raid_dev_path
   end
 
