@@ -62,12 +62,12 @@ when 'MasterServer', nil
   # Additional aimk flags required for Centos8 because tirpc library is
   # in /usr/include instead of /usr/local/include
   c_flags = value_for_platform(
-      'centos' => { '>=8' => "-I/usr/include/tirpc" },
-      'default' => ""
+    'centos' => { '>=8' => "-I/usr/include/tirpc" },
+    'default' => ""
   )
   ld_flags = value_for_platform(
-      'centos' => { '>=8' => "-ltirpc" },
-      'default' => ""
+    'centos' => { '>=8' => "-ltirpc" },
+    'default' => ""
   )
 
   # Install SGE
@@ -79,8 +79,8 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     environment(
       'SGE_ROOT' => '/opt/sge',
-      'SGE_INPUT_CFLAGS' => "#{c_flags}",
-      'SGE_INPUT_LDFLAGS' => "#{ld_flags}"
+      'SGE_INPUT_CFLAGS' => c_flags.to_s,
+      'SGE_INPUT_LDFLAGS' => ld_flags.to_s
     )
     code <<-SGE
       set -e

@@ -25,11 +25,11 @@ end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting
 sysctl 'net.core.somaxconn' do
-  value 65535
+  value 65_535
 end
 
 sysctl 'net.ipv4.tcp_max_syn_backlog' do
-  value 65535
+  value 65_535
 end
 
 # Amazon Time Sync
@@ -54,7 +54,6 @@ template '/etc/sudoers.d/99-parallelcluster-user-tty' do
   group 'root'
   mode '0600'
 end
-
 
 # Install parallelcluster specific supervisord config
 template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
