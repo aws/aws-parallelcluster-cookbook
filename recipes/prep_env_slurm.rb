@@ -37,9 +37,11 @@ if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
     end
     retries 5
     retry_delay 3
-    not_if { !node['cfncluster']['slurm_nodename'].nil? && !node['cfncluster']['slurm_nodename'].empty? &&
-             !node['cfncluster']['cfn_master'].nil? && !node['cfncluster']['cfn_master'].empty? &&
-             !node['cfncluster']['cfn_master_private_ip'].nil? && !node['cfncluster']['cfn_master_private_ip'].empty? }
+    not_if do
+      !node['cfncluster']['slurm_nodename'].nil? && !node['cfncluster']['slurm_nodename'].empty? &&
+        !node['cfncluster']['cfn_master'].nil? && !node['cfncluster']['cfn_master'].empty? &&
+        !node['cfncluster']['cfn_master_private_ip'].nil? && !node['cfncluster']['cfn_master_private_ip'].empty?
+    end
   end
 
   file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do

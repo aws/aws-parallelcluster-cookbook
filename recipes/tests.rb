@@ -229,7 +229,7 @@ end
 ###################
 if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
    node['conditions']['dcv_supported'] &&
-   ( node['cfncluster']['dcv']['installed'] == 'yes' || node['cfncluster']['dcv']['installed'] == true )
+   (node['cfncluster']['dcv']['installed'] == 'yes' || node['cfncluster']['dcv']['installed'] == true)
   execute 'check dcv installed' do
     command 'dcv version'
     user node['cfncluster']['cfn_cluster_user']

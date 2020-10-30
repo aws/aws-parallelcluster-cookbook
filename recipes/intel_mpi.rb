@@ -50,5 +50,5 @@ end
 
 execute "rename intel mpi modules file name" do
   command "mv #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}"
-  creates "#{intelmpi_modulefile}"
+  creates intelmpi_modulefile.to_s
 end
