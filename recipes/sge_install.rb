@@ -126,7 +126,7 @@ when 'MasterServer', nil
   end
 
   # Only on CentOS/RHEL7 update the initd
-  if node['platform_family'] == 'rhel' && node['platform_version'].to_i >= 7 && node['platform'] != 'amazon'
+  if node['platform_family'] == 'rhel' && node['platform'] != 'amazon'
     execute 'sed' do
       command 'sed -i s/remote_fs/local_fs/g /opt/sge/util/rctemplates/sgemaster_template'
     end

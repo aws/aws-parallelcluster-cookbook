@@ -277,16 +277,7 @@ end
 # Check if this is an OS on which EFA is supported
 #
 def platform_supports_efa?
-  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7 && node['platform_version'].to_i < 8,
-   node['platform'] == 'amazon',
-   node['platform'] == 'ubuntu'].any?
-end
-
-#
-# Check if the platform supports intel MPI
-#
-def platform_supports_impi?
-  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
+  [node['platform'] == 'centos' && node['platform_version'].to_i < 8,
    node['platform'] == 'amazon',
    node['platform'] == 'ubuntu'].any?
 end
@@ -309,17 +300,7 @@ end
 # Check if Lustre is supported on this OS-architecture combination
 #
 def platform_supports_lustre_for_architecture?
-  [arm_instance? && platform_supports_lustre_on_arm?,
-   !arm_instance? && platform_supports_lustre_on_x86_64?].any?
-end
-
-#
-# Check if Lustre is supported for x86_64 instances on this OS
-#
-def platform_supports_lustre_on_x86_64?
-  [node['platform'] == 'centos' && node['platform_version'].to_i >= 7,
-   node['platform'] == 'amazon',
-   node['platform'] == 'ubuntu'].any?
+  (arm_instance? && platform_supports_lustre_on_arm?) || !arm_instance?
 end
 
 #
@@ -336,16 +317,6 @@ def aws_domain
   aws_domain = "amazonaws.com"
   aws_domain = "#{aws_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
   aws_domain
-end
-
-#
-# Chedk if PMIx is supported on this OS. It's not built on CentOS 6
-# because doing so would require installing newer versions of automake,
-# autoconf, libtool, and libevent. This was deemed more effort than it
-# was worth for an OS that will reach EOL soon.
-#
-def platform_supports_pmix?
-  node['platform'] != 'centos' || node['platform_version'].to_i > 6
 end
 
 #

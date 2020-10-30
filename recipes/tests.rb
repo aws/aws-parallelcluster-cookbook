@@ -51,18 +51,16 @@ end
 ###################
 # SSH client conf
 ###################
-unless node['cfncluster']['os'] == 'centos6'
-  execute 'grep ssh_config' do
-    command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
-  end
+execute 'grep ssh_config' do
+  command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
+end
 
-  # Test only on MasterServer since on ComputeFleet an empty /home is mounted for the Kitchen tests run
-  if node['cfncluster']['cfn_node_type'] == 'MasterServer'
-    execute 'ssh localhost as user' do
-      command "ssh localhost hostname"
-      environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
-      user node['cfncluster']['cfn_cluster_user']
-    end
+# Test only on MasterServer since on ComputeFleet an empty /home is mounted for the Kitchen tests run
+if node['cfncluster']['cfn_node_type'] == 'MasterServer'
+  execute 'ssh localhost as user' do
+    command "ssh localhost hostname"
+    environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
+    user node['cfncluster']['cfn_cluster_user']
   end
 end
 
@@ -158,13 +156,11 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
       command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
     end
 
-    if node['conditions']['pmix_supported']
-      execute 'check-slurm-pmix-plugins' do
-        command 'ls /opt/slurm/lib/slurm/ | grep pmix'
-      end
-      execute 'ensure-pmix-shared-library-can-be-found' do
-        command '/opt/pmix/bin/pmix_info'
-      end
+    execute 'check-slurm-pmix-plugins' do
+      command 'ls /opt/slurm/lib/slurm/ | grep pmix'
+    end
+    execute 'ensure-pmix-shared-library-can-be-found' do
+      command '/opt/pmix/bin/pmix_info'
     end
   when 'ComputeFleet'
     execute 'ls slurm root' do
@@ -291,20 +287,18 @@ if node['conditions']['efa_supported'] && node['conditions']['intel_mpi_supporte
   # Test only on MasterServer since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
   if node['cfncluster']['cfn_node_type'] == 'MasterServer'
-    unless node['cfncluster']['os'] == 'centos6'
-      bash 'check intel mpi version' do
-        cwd Chef::Config[:file_cache_path]
-        code <<-INTELMPI
-          set -e
-          # Initialize module
-          # Unset MODULEPATH to force search path reinitialization when loading profile
-          unset MODULEPATH
-          # Must execute this in a bash script because source is a bash built-in function
-          source /etc/profile.d/modules.sh
-          module load intelmpi && mpirun --help | grep 'Version 2019 Update 8'
-        INTELMPI
-        user node['cfncluster']['cfn_cluster_user']
-      end
+    bash 'check intel mpi version' do
+      cwd Chef::Config[:file_cache_path]
+      code <<-INTELMPI
+        set -e
+        # Initialize module
+        # Unset MODULEPATH to force search path reinitialization when loading profile
+        unset MODULEPATH
+        # Must execute this in a bash script because source is a bash built-in function
+        source /etc/profile.d/modules.sh
+        module load intelmpi && mpirun --help | grep 'Version 2019 Update 8'
+      INTELMPI
+      user node['cfncluster']['cfn_cluster_user']
     end
   end
 end
@@ -434,7 +428,7 @@ end
 ###################
 # Bridge Network Interface
 ###################
-if node['platform'] == 'centos' && node['platform_version'].to_i >= 7
+if node['platform'] == 'centos'
   bash 'test bridge network interface presence' do
     code <<-TESTBRIDGE
       set -e
