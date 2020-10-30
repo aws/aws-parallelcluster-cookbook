@@ -1,4 +1,0 @@
-SLURMD_OPTIONS='-N <%= node.run_state['slurm_compute_nodename'] %>'
-ulimit -SHn 131072  # the maximum number of open file descriptors
-ulimit -SHl unlimited  # the maximum size a process may lock into memory
-ulimit -SHs unlimited  # the maximum stack size
