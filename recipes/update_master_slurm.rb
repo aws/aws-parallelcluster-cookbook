@@ -21,11 +21,11 @@ fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aw
                        " --region #{node['cfncluster']['cfn_region']} #{updated_cluster_config_path}"
 fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
 shell_out!(fetch_config_command)
-if not File.exist?(node['cfncluster']['cluster_config_path']) or not FileUtils.identical?(updated_cluster_config_path, node['cfncluster']['cluster_config_path'])
+if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identical?(updated_cluster_config_path, node['cfncluster']['cluster_config_path'])
   # Generate pcluster specific configs
   execute "generate_pcluster_slurm_configs" do
-    command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-          " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{updated_cluster_config_path}"
+    command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
+            " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{updated_cluster_config_path}"
   end
 
   execute 'stop clustermgtd' do

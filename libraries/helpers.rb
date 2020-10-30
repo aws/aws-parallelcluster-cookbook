@@ -106,14 +106,6 @@ def get_vpc_ipv4_cidr_blocks(eth0_mac)
   vpc_ipv4_cidr_blocks
 end
 
-def get_instance_type
-  uri = URI("http://169.254.169.254/latest/meta-data/instance-type")
-  res = Net::HTTP.get_response(uri)
-  master_instance_type = res.body if res.code == '200'
-
-  master_instance_type
-end
-
 def pip_install_package(package, version)
   command = Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
   Chef::Application.fatal!("Failed to install package #{package} #{version}", command.exitstatus) unless command.exitstatus.zero?
@@ -151,13 +143,12 @@ def ami_bootstrapped?
     version = IO.read(bootstrapped_file).chomp
     Chef::Log.info("Detected bootstrap file #{version}")
     if version != current_version
-      raise "This AMI was created with " + version + ", but is trying to be used with " +  current_version +
-                ". Please either use an AMI created with " + current_version + " or change your ParallelCluster to "+
-                version
+      raise "This AMI was created with " + version + ", but is trying to be used with " + current_version + ". " \
+            "Please either use an AMI created with " + current_version + " or change your ParallelCluster to " + version
     end
   end
 
-  version != '' && ( node['cfncluster']['skip_install_recipes'] == 'yes' || node['cfncluster']['skip_install_recipes'] == true )
+  version != '' && (node['cfncluster']['skip_install_recipes'] == 'yes' || node['cfncluster']['skip_install_recipes'] == true)
 end
 
 #
@@ -166,10 +157,8 @@ end
 def validate_os_type
   case node['platform']
   when 'ubuntu'
-    current_os = 'ubuntu'+ node['platform_version'].tr('.','')
-    if node['cfncluster']['cfn_base_os'] != current_os
-      raise_os_not_match(current_os, node['cfncluster']['cfn_base_os'])
-    end
+    current_os = 'ubuntu' + node['platform_version'].tr('.', '')
+    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   when 'amazon'
     if node['platform_version'].to_i > 2010 && node['cfncluster']['cfn_base_os'] != 'alinux'
       raise_os_not_match("alinux", node['cfncluster']['cfn_base_os'])
@@ -177,10 +166,8 @@ def validate_os_type
       raise_os_not_match("alinux2", node['cfncluster']['cfn_base_os'])
     end
   when 'centos'
-    current_os = 'centos'+ (node['platform_version'].to_i).to_s
-    if node['cfncluster']['cfn_base_os'] != current_os
-      raise_os_not_match(current_os, node['cfncluster']['cfn_base_os'])
-    end
+    current_os = 'centos' + node['platform_version'].to_i.to_s
+    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   end
 end
 
@@ -188,9 +175,10 @@ end
 # Raise error if OS types do not match
 #
 def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the " + current_os + " OS. However, the base_os specified in your" +
-            " config file is " + specified_os +". Please either use an AMI with the " + specified_os +
-            " OS or update the base_os setting in your configuration file to " + current_os + "."
+  raise "The custom AMI you have provided uses the " + current_os + " OS." \
+        "However, the base_os specified in your config file is " + specified_os + ". " \
+        "Please either use an AMI with the " + specified_os + " OS or update the base_os " \
+        "setting in your configuration file to " + current_os + "."
 end
 
 #
@@ -226,6 +214,7 @@ def hit_dynamodb_info
     "--output text --query 'Items[0].[Id.S,MasterPrivateIp.S,MasterHostname.S]'", user: 'root').stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
+
   slurm_nodename, master_private_ip, master_private_dns = output.split(/\s+/)
 
   Chef::Log.info("Retrieved Slurm nodename is: #{slurm_nodename}")
@@ -325,15 +314,14 @@ end
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
 # Method works for minor version >=7
 #
-def get_rhel7_kernel_minor_version
+def find_rhel7_kernel_minor_version
   kernel_minor_version = '7'
 
   if node['platform'] == 'centos'
     # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    unless kernel_patch_version
-      raise "Unable to retrieve the kernel minor version from #{node['kernel']['release']}."
-    end
+    raise "Unable to retrieve the kernel minor version from #{node['kernel']['release']}." unless kernel_patch_version
+
     kernel_minor_version = '8' if kernel_patch_version[1] >= '1127'
   end
 
@@ -349,6 +337,7 @@ def chrony_reload_command
     chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
   else
     raise "Init package #{node['init_package']} not supported."
+
   end
 
   chrony_reload_command
