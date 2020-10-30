@@ -15,29 +15,26 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
-  # not CentOS6
-  case node['platform_family']
-  when 'rhel', 'amazon'
-    if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-      execute 'dnf-update' do
-        command "dnf -y update"
-      end
-    else
-      execute 'yum-update' do
-        command "yum -y update && package-cleanup -y --oldkernels --count=1"
-      end
+case node['platform_family']
+when 'rhel', 'amazon'
+  if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+    execute 'dnf-update' do
+      command "dnf -y update"
     end
-  when 'debian'
-    apt_update
-    execute 'apt-upgrade' do
-      command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove -y"
-      retries 3
-      retry_delay 5
+  else
+    execute 'yum-update' do
+      command "yum -y update && package-cleanup -y --oldkernels --count=1"
     end
-    package 'linux-aws' do
-      retries 3
-      retry_delay 5
-    end
+  end
+when 'debian'
+  apt_update
+  execute 'apt-upgrade' do
+    command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove -y"
+    retries 3
+    retry_delay 5
+  end
+  package 'linux-aws' do
+    retries 3
+    retry_delay 5
   end
 end

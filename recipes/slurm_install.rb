@@ -105,7 +105,7 @@ when 'MasterServer', nil
       retries 3
       retry_delay 5
     end
-  elsif node['platform'] == 'centos' && node['platform_version'].to_i >= 7 || node['platform'] == 'amazon'
+  elsif node['platform'] == 'centos' || node['platform'] == 'amazon'
     package 'perl-Switch' do
       retries 3
       retry_delay 5

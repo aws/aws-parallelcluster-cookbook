@@ -12,7 +12,7 @@ chef_version '15.11.8'
 version '2.9.1'
 
 supports 'amazon', '>= 1'
-supports 'centos', '>= 6'
+supports 'centos', '>= 7'
 supports 'ubuntu', '>= 16.04'
 
 depends 'apt', '~> 7.3.0'

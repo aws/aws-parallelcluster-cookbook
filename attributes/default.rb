@@ -30,10 +30,6 @@ default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_di
 
 # Python Version
 default['cfncluster']['python-version'] = '3.6.9'
-default['cfncluster']['python-version-centos6'] = '2.7.17'
-# pyenv system installation root for centos6 to work around default system python
-# note that its kept separate from the pcluster-specific pyenv installation root
-default['cfncluster']['system_pyenv_root_centos6'] = "/usr/local/pyenv"
 # plcuster-specific pyenv system installation root
 default['cfncluster']['system_pyenv_root'] = "#{node['cfncluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
@@ -94,17 +90,10 @@ default['cfncluster']['ganglia_enabled'] = 'no'
 
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-if node['platform'] == 'centos' && node['platform_version'].to_i < 7
-  default['cfncluster']['nvidia']['driver_version'] = '440.95.01'
-  default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/440.95.01/NVIDIA-Linux-x86_64-440.95.01.run'
-  default['cfncluster']['nvidia']['cuda_version'] = '10.2'
-  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/10.2/Prod/local_installers/cuda_10.2.89_440.33.01_rhel6.run'
-else
-  default['cfncluster']['nvidia']['driver_version'] = '450.51.05'
-  default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/450.51.05/NVIDIA-Linux-x86_64-450.51.05.run'
-  default['cfncluster']['nvidia']['cuda_version'] = '11.0'
-  default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
-end
+default['cfncluster']['nvidia']['driver_version'] = '450.51.05'
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/450.51.05/NVIDIA-Linux-x86_64-450.51.05.run'
+default['cfncluster']['nvidia']['cuda_version'] = '11.0'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
 
 # EFA
 default['cfncluster']['efa']['installer_version'] = '1.10.0'
@@ -197,22 +186,15 @@ default['openssh']['server']['password_authentication'] = 'no'
 default['openssh']['server']['gssapi_authentication'] = 'yes'
 default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
 default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
-if node['platform'] == 'centos' && node['platform_version'].to_i < 7
-  default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr'
-  default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512,hmac-sha2-256'
-else
-  default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
-  default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
-end
+default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
+default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
-unless node['platform'] == 'centos' && node['platform_version'].to_i < 7
-  default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
-  # Disable StrictHostKeyChecking for target host in the cluster VPC
-  default['openssh']['client']['  _strict_host_key_checking'] = 'no'
-  # Do not store server key in the know hosts file to avoid scaling clashing
-  # that is when an new host gets the same IP of a previously terminated host
-  default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
-end
+default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
+# Disable StrictHostKeyChecking for target host in the cluster VPC
+default['openssh']['client']['  _strict_host_key_checking'] = 'no'
+# Do not store server key in the know hosts file to avoid scaling clashing
+# that is when an new host gets the same IP of a previously terminated host
+default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
 
 # ulimit settings
 default['cfncluster']['filehandle_limit'] = 10_000
@@ -233,37 +215,24 @@ when 'rhel', 'amazon'
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate mpich-devel openmpi-devel R atlas-devel
-                                                blas-devel fftw-devel libffi-devel openssl-devel dkms mysql-devel libedit-devel
-                                                libical-devel postgresql-devel postgresql-server sendmail mdadm python python-pip
-                                                libgcrypt-devel glibc-static]
-    if node['platform_version'].to_i >= 7
-      default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                  libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                                  httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
-                                                  blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                  libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel mdadm python python-pip
-                                                  libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
-    end
-    if node['platform_version'].to_i == 8
+                                                libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
+                                                blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                                libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
+                                                mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils]
+    if node['platform_version'].to_i >= 8
       # Install python3 instead of unversioned python
       default['cfncluster']['base_packages'].delete('python')
       default['cfncluster']['base_packages'].delete('python-pip')
-      # Install iptables used in configure-pat.sh
-      # Install nvme-cli package used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
-      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli])
-    end
-    if node['platform_version'].to_i >= 8
+      # iptables used in configure-pat.sh
+      # nvme-cli used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
       # gdisk required for FSx
       # environment-modules required for IntelMPI
       # libtirpc and libtirpc-devel required for SGE
-      default['cfncluster']['base_packages'].push('gdisk', 'environment-modules', 'libtirpc', 'libtirpc-devel')
+      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli gdisk environment-modules libtirpc libtirpc-devel])
     end
 
-    default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-lt-devel" if node['platform'] == 'centos' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
-    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-releases-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 6 && node['platform_version'].to_i < 7
-    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional' if node['platform'] == 'redhat' && node['platform_version'].to_i >= 7
+    default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel

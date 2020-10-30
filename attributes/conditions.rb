@@ -17,8 +17,7 @@
 
 default['conditions']['lustre_supported'] = platform_supports_lustre_for_architecture?
 default['conditions']['efa_supported'] = platform_supports_efa?
-default['conditions']['intel_mpi_supported'] = !arm_instance? && platform_supports_impi?
+default['conditions']['intel_mpi_supported'] = !arm_instance?
 default['conditions']['intel_hpc_platform_supported'] = !arm_instance? && platform_supports_intel_hpc_platform?
 default['conditions']['dcv_supported'] = platform_supports_dcv?
 default['conditions']['ami_bootstrapped'] = ami_bootstrapped?
-default['conditions']['pmix_supported'] = platform_supports_pmix?

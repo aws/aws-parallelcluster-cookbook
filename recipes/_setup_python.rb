@@ -33,22 +33,6 @@ activate_virtual_env node['cfncluster']['node_virtualenv'] do
   not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
 end
 
-if node['platform'] == 'centos' && node['platform_version'].to_i < 7
-  # CentOS 6 - install a newer version of Python using pyenv and make it globally available
-  install_pyenv node['cfncluster']['python-version-centos6'] do
-    prefix node['cfncluster']['system_pyenv_root_centos6']
-  end
-
-  template "/etc/profile.d/pyenv.sh" do
-    source 'pyenv.sh.erb'
-    owner 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  pyenv_global node['cfncluster']['python-version-centos6']
-end
-
 bash 'install CloudFormation helpers' do
   user 'root'
   group 'root'

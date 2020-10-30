@@ -1,7 +1,0 @@
-# Prefer a user pyenv over a system wide install
-if [ -s "<%= node['cfncluster']['system_pyenv_root_centos6'] %>" ]; then
-    pyenv_root="<%= node['cfncluster']['system_pyenv_root_centos6'] %>"
-    export PYENV_ROOT=${pyenv_root}
-    export PATH="${pyenv_root}/bin:$PATH"
-    eval "$(pyenv init - --no-rehash)"
-fi
