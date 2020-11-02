@@ -8,10 +8,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 
+- Add support for CentOS 8 in all Commercial and GovCloud regions.
 - Enable FSx Lustre on China regions.
 
 **CHANGES**
 
+- CentOS 6 is no longer supported.
 - Upgrade Intel MPI to version U8.
 - Upgrade Intel Parallel Studio XE Runtime to version 2020.2.
 - Do not force compute fleet into STOPPED state when performing a cluster update. This allows to update the queue
