@@ -17,6 +17,11 @@ action :run do
     code "pyenv virtualenv #{new_resource.python_version} #{new_resource.pyenv_name}"
   end
 
+  pyenv_pip "pip" do
+    virtualenv new_resource.pyenv_path
+    options "--upgrade"
+  end
+
   unless new_resource.requirements_path.empty?
     # Copy requirements file
     cookbook_file "#{new_resource.pyenv_path}/requirements.txt" do
