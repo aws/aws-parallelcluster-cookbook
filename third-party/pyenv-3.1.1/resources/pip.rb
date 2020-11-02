@@ -98,8 +98,10 @@ action_class do
     end
 
     unless new_resource.version
-      Chef::Log.debug("already installed: #{new_resource.package_name} #{current_version}")
-      return false
+      unless new_resource.options.split(/\s+/).include? '--upgrade'
+        Chef::Log.debug("already installed: #{new_resource.package_name} #{current_version}")
+        return false
+      end
     end
 
     if current_version != new_resource.version
