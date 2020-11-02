@@ -6,6 +6,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.10.0
 ------
 
+**ENHANCEMENTS**
+
+- Enable FSx Lustre on China regions.
+
 **CHANGES**
 
 - Upgrade Intel MPI to version U8.
@@ -13,6 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Do not force compute fleet into STOPPED state when performing a cluster update. This allows to update the queue
   size without forcing a termination of the existing instances.
 - Upgrade EFA installer to 1.10.0
+- Retrieve FSx Lustre DNS name dynamically.
 
 2.9.1
 -----
