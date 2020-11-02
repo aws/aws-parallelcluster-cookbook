@@ -39,7 +39,7 @@
           "root-device-type": "ebs",
           "architecture": "{{user `ami_arch`}}"
         },
-        "owners": ["125523088429"],
+        "owners": ["125523088429", "247102896272"],
         "most_recent": true
       },
       "ami_regions" : "{{user `build_for`}}",
