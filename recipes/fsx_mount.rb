@@ -32,15 +32,15 @@ if fsx_shared_dir != "NONE"
   end
 
   require 'chef/mixin/shell_out'
-  mountname = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx --region #{node['cfncluster']['cfn_region']} describe-file-systems --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']} --query 'FileSystems[0].LustreConfiguration.MountName' --output text", :user=>'root').stdout.strip
-
+  fsx_describe = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx --region #{node['cfncluster']['cfn_region']} describe-file-systems --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']} --query 'FileSystems[0].[DNSName,LustreConfiguration.MountName]' --output text", :user=>'root').stdout.strip
+  dns_name, mountname = fsx_describe.split(/\s+/)
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
   mount_options.push(%w[noauto x-systemd.automount]) if node['init_package'] == 'systemd'
 
   # Mount FSx over NFS
   mount fsx_shared_dir do
-    device "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']['aws_domain']}@tcp:/#{mountname}"
+    device "#{dns_name}@tcp:/#{mountname}"
     fstype 'lustre'
     dump 0
     pass 0
