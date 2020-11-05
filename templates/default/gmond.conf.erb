@@ -9,7 +9,7 @@ globals {
   mute = no
   deaf = no
   allow_extra_data = yes
-  host_dmax = 3600 /*secs. Expires (removes from web interface) hosts in 1 hour */
+  host_dmax = 86400 /*secs. Expires (removes from web interface) hosts in 1 day */
   host_tmax = 20 /*secs */
   cleanup_threshold = 300 /*secs */
   gexec = no
@@ -28,6 +28,9 @@ globals {
  */
 cluster {
   name = "<%= node['cfncluster']['stack_name'] %>"
+  # owner = "unspecified"
+  # latlong = "unspecified"
+  # url = "unspecified"
 }
 
 /* The host section describes attributes of the host, like the location */
@@ -50,6 +53,7 @@ udp_send_channel {
 <% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
   host = <%= node['cfncluster']['cfn_master_private_ip'] %>
 <% end -%>
+  # mcast_join = 239.2.11.71
   port = 8649
   ttl = 1
 }
@@ -144,13 +148,10 @@ collection_group {
   }
 }
 
-/* This collection group will send general info about this host every
-   1200 secs.
-   This information doesn't change between reboots and is only collected
-   once. */
+/* This collection group will send general info about this host*/
 collection_group {
-  collect_once = yes
-  time_threshold = 1200
+  collect_every = 60
+  time_threshold = 60
   metric {
     name = "cpu_num"
     title = "CPU Count"
@@ -170,10 +171,6 @@ collection_group {
   metric {
     name = "boottime"
     title = "Last Boot Time"
-  }
-  metric {
-    name = "machine_type"
-    title = "Machine Type"
   }
   metric {
     name = "os_name"
