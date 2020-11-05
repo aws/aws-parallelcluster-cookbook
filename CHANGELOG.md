@@ -13,12 +13,23 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 
+- Upgrade EFA installer to version 1.10.1
+  - EFA configuration: ``efa-config-1.5`` (from efa-config-1.4)
+  - EFA profile: ``efa-profile-1.1`` (from efa-profile-1.0.0)
+  - EFA kernel module: ``efa-1.10.2`` (from efa-1.6.0)
+  - RDMA core: ``rdma-core-31.amzn0`` (from rdma-core-28.amzn0)
+  - Libfabric: ``libfabric-1.11.1amazon1.1`` (from libfabric-1.10.1amazon1.1)
+  - Open MPI: ``openmpi40-aws-4.0.5`` (from openmpi40-aws-4.0.3)
+  - Unifies installer runtime options across x86 and aarch64
+  - Introduces ``-g/--enable-gdr`` switch to install packages with GPUDirect RDMA support
+  - Updates to OMPI collectives decision file packaging, migrated from efa-config to efa-profile
+  - Introduces CentOS 8 support
 - CentOS 6 is no longer supported.
+- Install python3 version of ``aws-cfn-bootstrap`` scripts
 - Upgrade Intel MPI to version U8.
 - Upgrade Intel Parallel Studio XE Runtime to version 2020.2.
 - Do not force compute fleet into STOPPED state when performing a cluster update. This allows to update the queue
   size without forcing a termination of the existing instances.
-- Upgrade EFA installer to 1.10.0
 - Retrieve FSx Lustre DNS name dynamically.
 
 2.9.1

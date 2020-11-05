@@ -253,7 +253,7 @@ end
 ###################
 # EFA - Intel MPI
 ###################
-if node['conditions']['efa_supported'] && node['conditions']['intel_mpi_supported']
+if node['conditions']['intel_mpi_supported']
   case node['cfncluster']['os']
   # TODO add centos8 once EFA package is available
   when 'alinux', 'centos7', 'alinux2'
