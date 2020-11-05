@@ -19,7 +19,7 @@ case node['cfncluster']['cfn_node_type']
 when 'MasterServer', nil
   case node['platform']
   when "redhat", "centos", "amazon", "scientific" # ~FC024
-    package %w[ganglia ganglia-gmond ganglia-gmetad ganglia-web httpd php php-gd rrdtool] do
+    package %w[ganglia ganglia-gmond ganglia-gmetad ganglia-web httpd php php-gd php-xml rrdtool] do
       retries 3
       retry_delay 5
     end
