@@ -17,6 +17,8 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
+include_recipe 'aws-parallelcluster::nfs_config'
+
 # Setup ephemeral drives
 execute 'setup ephemeral' do
   command '/usr/local/sbin/setup-ephemeral-drives.sh'
