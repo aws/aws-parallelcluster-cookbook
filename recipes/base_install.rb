@@ -123,15 +123,8 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
-if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
-  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
-  include_recipe "nfs::server"
-end
-if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  # Workaround for issue: https://github.com/atomic-penguin/cookbook-nfs/issues/116
-  node.force_override['nfs']['service']['idmap'] = 'nfs-idmapd'
-end
-include_recipe "nfs::server4"
+# Install NFS packages
+include_recipe "nfs::server"
 
 # Put configure-pat.sh onto the host
 cookbook_file 'configure-pat.sh' do
