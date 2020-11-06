@@ -421,3 +421,13 @@ def efa_gdr_enabled?
   end
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
+
+# CentOS8 and alinux OSs currently not correctly supported by NFS cookbook
+# Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
+# When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
+def overwrite_nfs_template?
+  [
+    node['platform'] == 'amazon',
+    node['platform'] == 'centos' && node['platform_version'].to_i == 8
+  ].any?
+end
