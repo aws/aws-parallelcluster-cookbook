@@ -471,15 +471,20 @@ end
 require 'chef/mixin/shell_out'
 
 virtual_envs = ["#{node['cfncluster']['node_virtualenv_path']}", "#{node['cfncluster']['cookbook_virtualenv_path']}"]
+
 for virtual_env in virtual_envs
-  pip_version = nil
-  pip_show = shell_out!("#{virtual_env}/bin/pip show pip").stdout.strip
-  pip_show.split(/\n+/).each do |line|
-    pip_version = line.split(/\s+/)[1] if line.start_with?('Version:')
-  end
-  Chef::Log.debug("pip version in virtualenv #{virtual_env} is #{pip_version}")
-  if !pip_version || pip_version.to_f < 19.3
-    # pip versions >= 19.3 is required to enable installation of python wheel binaries on Graviton
-    raise "pip version in virtualenv #{virtual_env} must be greater than 19.3"
+  ruby_block 'check pip version' do
+    block do
+      pip_version = nil
+      pip_show = shell_out!("#{virtual_env}/bin/pip show pip").stdout.strip
+      pip_show.split(/\n+/).each do |line|
+        pip_version = line.split(/\s+/)[1] if line.start_with?('Version:')
+      end
+      Chef::Log.debug("pip version in virtualenv #{virtual_env} is #{pip_version}")
+      if !pip_version || pip_version.to_f < 19.3
+        # pip versions >= 19.3 is required to enable installation of python wheel binaries on Graviton
+        raise "pip version in virtualenv #{virtual_env} must be greater than 19.3"
+      end
+    end
   end
 end
