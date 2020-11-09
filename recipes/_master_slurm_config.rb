@@ -76,6 +76,14 @@ execute 'initialize cluster config hash in DynamoDB' do
   not_if { node['cfncluster']['cluster_config_version'].nil? }
 end
 
+execute 'initialize compute fleet status in DynamoDB' do
+  # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
+          " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}}' --region #{node['cfncluster']['cfn_region']}"
+  retries 3
+  retry_delay 5
+end
+
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
