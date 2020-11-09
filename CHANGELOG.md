@@ -26,7 +26,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Introduces CentOS 8 support
 - CentOS 6 is no longer supported.
 - Install python3 version of ``aws-cfn-bootstrap`` scripts
-- Upgrade Intel MPI to version U8.
 - Upgrade Intel Parallel Studio XE Runtime to version 2020.2.
 - Do not force compute fleet into STOPPED state when performing a cluster update. This allows to update the queue
   size without forcing a termination of the existing instances.
