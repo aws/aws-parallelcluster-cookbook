@@ -113,9 +113,11 @@ if node['conditions']['dcv_supported']
         retries 10
         retry_delay 5
       end
-      # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
-      package 'ifupdown' do
-        action :purge
+      # Package ifupdown breaks network configuration by cloud-init
+      # https://bugs.launchpad.net/cloud-init/+bug/1867029
+      append_if_no_line "append source of network interfaces" do
+        path "/etc/network/interfaces"
+        line "source /etc/network/interfaces.d/*.cfg"
       end
       bash 'setup pre-req' do
         cwd Chef::Config[:file_cache_path]
