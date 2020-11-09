@@ -124,6 +124,8 @@ if node['conditions']['dcv_supported']
           wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
           gpg --import NICE-GPG-KEY
         PREREQ
+        retries 3
+        retry_delay 5
       end
 
     when 'amazon'
