@@ -54,8 +54,8 @@ default['cfncluster']['intelpython2']['version'] = '2019.4'
 default['cfncluster']['intelpython3']['version'] = '2020.2'
 
 # Intel MPI
-default['cfncluster']['intelmpi']['url'] = "https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16814/l_mpi_2019.8.254.tgz"
-default['cfncluster']['intelmpi']['version'] = '2019.8.254'
+default['cfncluster']['intelmpi']['url'] = "https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16546/l_mpi_2019.7.217.tgz"
+default['cfncluster']['intelmpi']['version'] = '2019.7.217'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 
 # Python packages

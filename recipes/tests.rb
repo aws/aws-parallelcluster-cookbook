@@ -296,7 +296,7 @@ if node['conditions']['intel_mpi_supported']
         unset MODULEPATH
         # Must execute this in a bash script because source is a bash built-in function
         source /etc/profile.d/modules.sh
-        module load intelmpi && mpirun --help | grep 'Version 2019 Update 8'
+        module load intelmpi && mpirun --help | grep 'Version 2019 Update 7'
       INTELMPI
       user node['cfncluster']['cfn_cluster_user']
     end
