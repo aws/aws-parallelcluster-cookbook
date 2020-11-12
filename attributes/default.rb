@@ -274,7 +274,7 @@ when 'rhel', 'amazon'
       default['cfncluster']['base_packages'].concat(%w[libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
                                                        rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                                        gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                                       jq wget python-pip NetworkManager-config-routing-rules])
+                                                       jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils librdmacm-utils])
       # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
       # because it contains fixes for known build issues
       default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
