@@ -254,7 +254,7 @@ when 'rhel', 'amazon'
 
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
+                                                libXmu-devel db4-devel tcl-devel automake autoconf pyparted libtool
                                                 httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel

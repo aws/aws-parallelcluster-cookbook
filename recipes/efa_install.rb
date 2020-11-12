@@ -57,3 +57,12 @@ bash "install efa" do
   EFAINSTALL
   not_if { ::Dir.exist?('/opt/amazon/efa') && !efa_gdr_enabled?}
 end
+
+if node['platform'] == 'amazon'
+  # FIXME libibverbs and librdmacm are dependencies of hwloc-devel and EFA
+  # the version on the OS repo conflicts against the one provided by EFA installer
+  package 'hwloc-devel' do
+    retries 3
+    retry_delay 5
+  end
+end
