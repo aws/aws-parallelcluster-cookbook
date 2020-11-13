@@ -236,6 +236,7 @@ end
 
 #
 # Restart network service according to the OS.
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
 #
 def restart_network_service
   network_service_name = value_for_platform(
@@ -257,6 +258,7 @@ end
 
 #
 # Reload the network configuration according to the OS.
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
 #
 def reload_network_config
   if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18
@@ -361,6 +363,7 @@ def chrony_reload_command
 end
 
 # Add an external package repository to the OS's package manager
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def add_package_repository(repo_name, baseurl, gpgkey, distribution)
   if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
     yum_repository repo_name do
@@ -384,6 +387,7 @@ def add_package_repository(repo_name, baseurl, gpgkey, distribution)
 end
 
 # Remove an external package repository from the OS's package manager
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def remove_package_repository(repo_name)
   if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
     yum_repository repo_name do
