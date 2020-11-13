@@ -260,7 +260,11 @@ end
 #
 def reload_network_config
   if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18
-    Mixlib::ShellOut.new("netplan apply").run_command
+    ruby_block "apply network configuration" do
+      block do
+        Mixlib::ShellOut.new("netplan apply").run_command
+      end
+    end
   else
     restart_network_service
   end
