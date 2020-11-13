@@ -325,6 +325,7 @@ def find_rhel7_kernel_minor_version
     raise "Unable to retrieve the kernel minor version from #{node['kernel']['release']}." unless kernel_patch_version
 
     kernel_minor_version = '8' if kernel_patch_version[1] >= '1127'
+    kernel_minor_version = '9' if kernel_patch_version[1] >= '1160'
   end
 
   kernel_minor_version
