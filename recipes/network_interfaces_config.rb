@@ -95,7 +95,6 @@ if macs.length > 1
     end
   end
 
-
   # Apply configuration
   reload_network_config
 end
