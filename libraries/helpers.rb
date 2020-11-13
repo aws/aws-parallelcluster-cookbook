@@ -317,23 +317,34 @@ def aws_domain
 end
 
 #
-# Retrieve RHEL kernel minor version from running kernel
-# The minor version is retrieved from the patch version of the running kernel
+# Retrieve RHEL OS minor version from running kernel version
+# The OS minor version is retrieved from the patch version of the running kernel
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for minor version >=7
+# Method works for CentOS8 minor version >=2 and CentOS7 minor version >=7
 #
-def find_rhel7_kernel_minor_version
-  kernel_minor_version = '7'
+def find_rhel_minor_version
+  os_minor_version = ''
 
   if node['platform'] == 'centos'
     # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    raise "Unable to retrieve the kernel minor version from #{node['kernel']['release']}." unless kernel_patch_version
+    raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
 
-    kernel_minor_version = '8' if kernel_patch_version[1] >= '1127'
+    # Lustre repo string will be built following the official doc
+    # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
+    if node['platform_version'].to_i == 7
+      os_minor_version = '.7' if kernel_patch_version[1] >= '1062'
+      os_minor_version = '.8' if kernel_patch_version[1] >= '1127'
+      os_minor_version = '.9' if kernel_patch_version[1] >= '1160'
+    elsif node['platform_version'].to_i == 8
+      os_minor_version = '.2' if kernel_patch_version[1] >= '193'
+      os_minor_version = '.3' if kernel_patch_version[1] >= '240'
+    else
+      raise "CentOS version #{node['platform_version']} not supported."
+    end
   end
 
-  kernel_minor_version
+  os_minor_version
 end
 
 # Return chrony service reload command
