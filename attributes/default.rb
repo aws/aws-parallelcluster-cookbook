@@ -335,8 +335,8 @@ default['cfncluster']['lustre']['public_key'] = value_for_platform(
 default['cfncluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
     # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
-    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/#{node['kernel']['machine']}/",
-    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{find_rhel7_kernel_minor_version}/x86_64/"
+    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8#{find_rhel_minor_version}/#{node['kernel']['machine']}/",
+    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7#{find_rhel_minor_version}/x86_64/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
 )
