@@ -266,6 +266,7 @@
       ],
       "json" : {
         "cfncluster" : {
+          "custom_node_package" : "{{user `custom_node_package`}}",
           "cfn_base_os" : "centos7"
         }
       },
