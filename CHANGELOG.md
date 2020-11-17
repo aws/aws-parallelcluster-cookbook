@@ -3,6 +3,18 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.10.1
+------
+
+**ENHANCEMENTS**
+- 
+
+**CHANGES**
+- 
+
+**BUG FIXES**
+- Fix installation of Intel PSXE package on CentOS 7 by using yum4.
+
 2.10.0
 ------
 
