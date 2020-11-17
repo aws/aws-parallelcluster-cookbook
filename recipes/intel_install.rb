@@ -43,19 +43,35 @@ when 'MasterServer'
     retry_delay 5
   end
 
-  # Parallel Studio is Intel's optimized libraries, installing 2020 version, see
+  # Install Intel Parallel Studio XE Runtime, see
   # https://software.intel.com/content/www/us/en/develop/articles/installing-intel-parallel-studio-xe-runtime-2020-using-yum-repository.html
-  bash "install intel psxe" do
+  bash "setup intel psxe repository" do
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
+      yum-config-manager --add-repo https://yum.repos.intel.com/2020/setup/intel-psxe-runtime-2020.repo
       rpm --import https://yum.repos.intel.com/2020/setup/RPM-GPG-KEY-intel-psxe-runtime-2020
-      rpm -Uhv https://yum.repos.intel.com/2020/setup/intel-psxe-runtime-2020-reposetup-1-0.noarch.rpm
-      yum -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
     INTEL
-    creates '/opt/intel/psxe_runtime'
-    retries 3
-    retry_delay 5
+    creates '/etc/yum.repos.d/intel-psxe-runtime-2020.repo'
+  end
+  if node['platform'] == 'centos' && node['platform_version'].to_i == 7
+    # Install yum4 because by using yum 3.x or older we may have failures when
+    # trying to install specific versions of Intel products, as mentioned in official doc.
+    bash 'install intel psxe' do
+      cwd node['cfncluster']['sources_dir']
+      code <<-INTEL
+        set -e
+        yum -y install nextgen-yum4
+        yum4 -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
+      INTEL
+      retries 3
+      retry_delay 5
+    end
+  else
+    package "intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}" do
+      retries 3
+      retry_delay 5
+    end
   end
 
   # Intel optimized versions of python
