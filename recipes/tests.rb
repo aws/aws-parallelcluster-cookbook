@@ -255,8 +255,7 @@ end
 ###################
 if node['conditions']['intel_mpi_supported']
   case node['cfncluster']['os']
-  # TODO add centos8 once EFA package is available
-  when 'alinux', 'centos7', 'alinux2'
+  when 'alinux', 'alinux2', 'centos7', 'centos8'
     execute 'check efa rpm installed' do
       command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
       user node['cfncluster']['cfn_cluster_user']
@@ -300,6 +299,16 @@ if node['conditions']['intel_mpi_supported']
       INTELMPI
       user node['cfncluster']['cfn_cluster_user']
     end
+  end
+end
+
+###################
+# EFA - GDR (GPUDirect RDMA)
+###################
+if node['conditions']['efa_supported'] && efa_gdr_enabled?
+  execute 'check efa gdr installed' do
+    command "modinfo efa | grep 'gdr:\ *Y'"
+    user node['cfncluster']['cfn_cluster_user']
   end
 end
 
@@ -379,6 +388,22 @@ bash 'test CUDA install' do
     echo "CUDA deviceQuery test passed"
     echo "Correctly installed CUDA $cuda_output"
   TESTCUDA
+end
+
+###################
+# FabricManager
+###################
+unless node['cfncluster']['cfn_base_os'] == 'alinux'
+  if get_nvswitches > 1
+    bash 'test fabric-manager daemon' do
+      cwd Chef::Config[:file_cache_path]
+      code <<-TESTFM
+        set -e
+        systemctl show -p SubState nvidia-fabricmanager | grep -i running
+        echo "NVIDIA Fabric Manager service correctly started"
+      TESTFM
+    end
+  end
 end
 
 ###################

@@ -236,11 +236,12 @@ end
 
 #
 # Restart network service according to the OS.
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
 #
 def restart_network_service
   network_service_name = value_for_platform(
     ['centos'] => {
-      '>=7.0' => 'NetworkManager'
+      '>=8.0' => 'NetworkManager'
     },
     %w[ubuntu debian] => {
       '16.04' => 'networking',
@@ -252,6 +253,22 @@ def restart_network_service
   service network_service_name.to_s do
     action %i[restart]
     ignore_failure true
+  end
+end
+
+#
+# Reload the network configuration according to the OS.
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
+#
+def reload_network_config
+  if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18
+    ruby_block "apply network configuration" do
+      block do
+        Mixlib::ShellOut.new("netplan apply").run_command
+      end
+    end
+  else
+    restart_network_service
   end
 end
 
@@ -300,23 +317,34 @@ def aws_domain
 end
 
 #
-# Retrieve RHEL kernel minor version from running kernel
-# The minor version is retrieved from the patch version of the running kernel
+# Retrieve RHEL OS minor version from running kernel version
+# The OS minor version is retrieved from the patch version of the running kernel
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for minor version >=7
+# Method works for CentOS8 minor version >=2 and CentOS7 minor version >=7
 #
-def find_rhel7_kernel_minor_version
-  kernel_minor_version = '7'
+def find_rhel_minor_version
+  os_minor_version = ''
 
   if node['platform'] == 'centos'
     # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    raise "Unable to retrieve the kernel minor version from #{node['kernel']['release']}." unless kernel_patch_version
+    raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
 
-    kernel_minor_version = '8' if kernel_patch_version[1] >= '1127'
+    # Lustre repo string will be built following the official doc
+    # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
+    if node['platform_version'].to_i == 7
+      os_minor_version = '.7' if kernel_patch_version[1] >= '1062'
+      os_minor_version = '.8' if kernel_patch_version[1] >= '1127'
+      os_minor_version = '.9' if kernel_patch_version[1] >= '1160'
+    elsif node['platform_version'].to_i == 8
+      os_minor_version = '.2' if kernel_patch_version[1] >= '193'
+      os_minor_version = '.3' if kernel_patch_version[1] >= '240'
+    else
+      raise "CentOS version #{node['platform_version']} not supported."
+    end
   end
 
-  kernel_minor_version
+  os_minor_version
 end
 
 # Return chrony service reload command
@@ -332,4 +360,64 @@ def chrony_reload_command
   end
 
   chrony_reload_command
+end
+
+# Add an external package repository to the OS's package manager
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
+def add_package_repository(repo_name, baseurl, gpgkey, distribution)
+  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+    yum_repository repo_name do
+      baseurl baseurl
+      gpgkey gpgkey
+      retries 3
+      retry_delay 5
+    end
+  elsif node['platform_family'] == 'debian'
+    apt_repository repo_name do
+      uri          baseurl
+      key          gpgkey
+      distribution distribution
+      retries 3
+      retry_delay 5
+    end
+    apt_update
+  else
+    raise "platform not supported: #{node['platform_family']}"
+  end
+end
+
+# Remove an external package repository from the OS's package manager
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
+def remove_package_repository(repo_name)
+  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+    yum_repository repo_name do
+      action :remove
+    end
+  elsif node['platform_family'] == 'debian'
+    apt_repository repo_name do
+      action :remove
+    end
+    apt_update
+  else
+    raise "platform not supported: #{node['platform_family']}"
+  end
+end
+
+# Get number of nv switches
+def get_nvswitches
+  # NVSwitch device id is 10de:1af1
+  nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
+  nvswitch_check.run_command
+  nvswitch_check.stdout.strip.to_i
+end
+
+# Check if EFA GDR is enabled (and supported) on this instance
+def efa_gdr_enabled?
+  config_value = node['cfncluster']['enable_efa_gdr']
+  if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+    enabling_value = "compute"
+  else
+    enabling_value = "master"
+  end
+  (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end

@@ -3,33 +3,55 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.10.1
+------
+
+**BUG FIXES**
+- Fix installation of Intel PSXE package on CentOS 7 by using yum4.
+
 2.10.0
 ------
 
 **ENHANCEMENTS**
 
-- Add support for CentOS 8 in all Commercial and GovCloud regions.
-- Enable FSx Lustre on China regions.
+- Add support for CentOS 8.
+- Add support for instance types with multiple network cards (e.g. `p4d.24xlarge`).
+- Enable FSx Lustre in China regions.
+- Add validation step for AMI creation process to fail when using a base AMI created by a different version of
+  ParallelCluster.
+- Add validation step for AMI creation process to fail if the selected OS and the base AMI OS are not consistent.
+- Add possibility to use a post installation script when building an AMI.
+- Install NVIDIA Fabric manager to enable NVIDIA NVSwitch on supported platforms.
 
 **CHANGES**
-
 - Upgrade EFA installer to version 1.10.1
   - EFA configuration: ``efa-config-1.5`` (from efa-config-1.4)
   - EFA profile: ``efa-profile-1.1`` (from efa-profile-1.0.0)
   - EFA kernel module: ``efa-1.10.2`` (from efa-1.6.0)
   - RDMA core: ``rdma-core-31.amzn0`` (from rdma-core-28.amzn0)
-  - Libfabric: ``libfabric-1.11.1amazon1.1`` (from libfabric-1.10.1amazon1.1)
+  - Libfabric: ``libfabric-1.11.1amzn1.1`` (from libfabric-1.10.1amzn1.1)
   - Open MPI: ``openmpi40-aws-4.0.5`` (from openmpi40-aws-4.0.3)
   - Unifies installer runtime options across x86 and aarch64
   - Introduces ``-g/--enable-gdr`` switch to install packages with GPUDirect RDMA support
   - Updates to OMPI collectives decision file packaging, migrated from efa-config to efa-profile
   - Introduces CentOS 8 support
 - CentOS 6 is no longer supported.
-- Install python3 version of ``aws-cfn-bootstrap`` scripts
+- Upgrade NVIDIA driver to version 450.80.02.
 - Upgrade Intel Parallel Studio XE Runtime to version 2020.2.
-- Do not force compute fleet into STOPPED state when performing a cluster update. This allows to update the queue
-  size without forcing a termination of the existing instances.
+- Upgrade Munge to version 0.5.14.
 - Retrieve FSx Lustre DNS name dynamically.
+- Slurm: change `SlurmctldPort` to 6820-6829 to not overlap with default `slurmdbd` port (6819).
+- Slurm: add `compute_resource` name and `efa` as node features.
+- Improve Slurm and Munge installation process by cleaning up existing installations from OS repositories.
+- Install Python 3 version of ``aws-cfn-bootstrap`` scripts.
+- Do not force compute fleet into `STOPPED` state when performing a cluster update. This allows to update the queue
+  size without forcing a termination of the existing instances.
+
+**BUG FIXES**
+- Fix ephemeral drives setup to avoid failures when partition changes require a reboot.
+- Fix Chrony service management.
+- Retrieve the right number of compute instance slots when instance type is updated.
+- Fix compute fleet status initialization to be configured before daemons are started by `supervisord`.
 
 2.9.1
 -----
@@ -59,7 +81,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - EFA profile: ``efa-profile-1.0.0``
   - EFA kernel module: ``efa-1.6.0`` (no change)
   - RDMA core: ``rdma-core-28.amzn0`` (no change)
-  - Libfabric: ``libfabric-1.10.1amazon1.1`` (no change)
+  - Libfabric: ``libfabric-1.10.1amzn1.1`` (no change)
   - Open MPI: ``openmpi40-aws-4.0.3`` (no change)
 - Upgrade Slurm to version 20.02.4.
 - Upgrade NICE DCV to version 2020.1-9012.
@@ -110,7 +132,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade EFA installer to version 1.9.4:
   - Kernel module: ``efa-1.6.0`` (from efa-1.5.1)
   - RDMA core: ``rdma-core-28.amzn0`` (from rdma-core-25.0)
-  - Libfabric: ``libfabric-1.10.1amazon1.1`` (updated from libfabric-aws-1.9.0amzn1.1) 
+  - Libfabric: ``libfabric-1.10.1amzn1.1`` (updated from libfabric-aws-1.9.0amzn1.1) 
   - Open MPI: openmpi40-aws-4.0.3 (no change)
 
 **BUG FIXES**

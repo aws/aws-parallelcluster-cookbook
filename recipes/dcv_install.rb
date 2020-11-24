@@ -83,6 +83,8 @@ if node['conditions']['dcv_supported']
       # Install the desktop environment and the desktop manager packages
       execute 'Install gnome desktop' do
         command 'yum -y install @gnome'
+        retries 3
+        retry_delay 5
       end
       # Install X Window System (required when using GPU acceleration)
       package "xorg-x11-server-Xorg" do
