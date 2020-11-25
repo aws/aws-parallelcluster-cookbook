@@ -57,7 +57,7 @@ directory node['cfncluster']['license_dir']
 directory node['cfncluster']['configs_dir']
 
 build_essential
-include_recipe "aws-parallelcluster::_setup_python"
+include_recipe "aws-parallelcluster::setup_python"
 
 # Install lots of packages
 package node['cfncluster']['base_packages'] do
@@ -149,7 +149,7 @@ cookbook_file 'setup-ephemeral-drives.sh' do
   mode '0744'
 end
 
-include_recipe 'aws-parallelcluster::_ec2_udev_rules'
+include_recipe 'aws-parallelcluster::ec2_udev_rules'
 
 # Install ec2-metadata script
 remote_file '/usr/bin/ec2-metadata' do
@@ -216,10 +216,10 @@ end
 include_recipe "aws-parallelcluster::ganglia_install"
 
 # Install NVIDIA and CUDA
-include_recipe "aws-parallelcluster::_nvidia_install"
+include_recipe "aws-parallelcluster::nvidia_install"
 
 # Install FSx options
-include_recipe "aws-parallelcluster::_lustre_install"
+include_recipe "aws-parallelcluster::lustre_install"
 
 # Install EFA & Intel MPI
 include_recipe "aws-parallelcluster::efa_install"

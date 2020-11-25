@@ -36,16 +36,16 @@ end
 include_recipe 'aws-parallelcluster::chrony_config'
 
 # NVIDIA services (fabric manager)
-include_recipe "aws-parallelcluster::_nvidia_config"
+include_recipe "aws-parallelcluster::nvidia_config"
 
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::_master_base_config'
+  include_recipe 'aws-parallelcluster::master_base_config'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster::_compute_base_config'
+  include_recipe 'aws-parallelcluster::compute_base_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end
