@@ -205,7 +205,7 @@
         }
       },
       "run_list" : [
-        "aws-parallelcluster::_default_pre"
+        "aws-parallelcluster::default_pre"
       ]
     },
     {

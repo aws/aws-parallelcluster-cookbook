@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _default_pre
+# Recipe:: default_pre
 #
 # Copyright 2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -20,7 +20,7 @@ user_ulimit "*" do
   filehandle_limit node['cfncluster']['filehandle_limit']
 end
 
-include_recipe 'aws-parallelcluster::_update_packages'
+include_recipe 'aws-parallelcluster::update_packages'
 
 # Reboot after preliminary configuration steps
 if !tagged?('rebooted') && node['cfncluster']['default_pre_reboot'] == 'true'

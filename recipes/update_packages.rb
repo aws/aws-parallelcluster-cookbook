@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _update_packages
+# Recipe:: update_packages
 #
 # Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
