@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _lustre_install
+# Recipe:: lustre_install
 #
 # Copyright 2013-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

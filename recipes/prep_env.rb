@@ -71,7 +71,7 @@ template '/opt/parallelcluster/scripts/compute_ready' do
   mode "0755"
 end
 
-include_recipe "aws-parallelcluster::_setup_python"
+include_recipe "aws-parallelcluster::setup_python"
 
 # Install cloudwatch, write configuration and start it.
 include_recipe "aws-parallelcluster::cloudwatch_agent_config"
