@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.10.1
 ------
 
+**CHANGES**
+- Upgrade NICE DCV to version 2020.2-9508
+
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.
 
