@@ -86,9 +86,9 @@ end
 # case node['cfncluster']['cfn_node_type']
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::_master_torque_config'
+  include_recipe 'aws-parallelcluster::master_torque_config'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster::_compute_torque_config'
+  include_recipe 'aws-parallelcluster::compute_torque_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

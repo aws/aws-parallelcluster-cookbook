@@ -11,7 +11,7 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[aws-parallelcluster::_default_pre]
+      - recipe[aws-parallelcluster::default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
       cfncluster:
@@ -19,7 +19,7 @@ suites:
 
   - name: default_gpu
     run_list:
-      - recipe[aws-parallelcluster::_default_pre]
+      - recipe[aws-parallelcluster::default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
       cfncluster:
