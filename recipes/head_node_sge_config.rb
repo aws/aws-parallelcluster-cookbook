@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: master_sge_config
+# Recipe:: head_node_sge_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

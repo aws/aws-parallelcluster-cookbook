@@ -182,13 +182,13 @@ def raise_os_not_match(current_os, specified_os)
 end
 
 #
-# Retrieve master ip and dns from file (HIT only)
+# Retrieve head node ip and dns from file (HIT only)
 #
-def hit_master_info
-  master_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
-  master_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
+def hit_head_node_info
+  head_node_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
+  head_node_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
 
-  [IO.read(master_private_ip_file).chomp, IO.read(master_private_dns_file).chomp]
+  [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
 end
 
 #
@@ -215,13 +215,13 @@ def hit_dynamodb_info
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
-  slurm_nodename, master_private_ip, master_private_dns = output.split(/\s+/)
+  slurm_nodename, head_node_private_ip, head_node_private_dns = output.split(/\s+/)
 
   Chef::Log.info("Retrieved Slurm nodename is: #{slurm_nodename}")
-  Chef::Log.info("Retrieved master private ip: #{master_private_ip}")
-  Chef::Log.info("Retrieved master private dns: #{master_private_dns}")
+  Chef::Log.info("Retrieved head node private ip: #{head_node_private_ip}")
+  Chef::Log.info("Retrieved head node private dns: #{head_node_private_dns}")
 
-  [slurm_nodename, master_private_ip, master_private_dns]
+  [slurm_nodename, head_node_private_ip, head_node_private_dns]
 end
 
 #

@@ -43,7 +43,7 @@ include_recipe "aws-parallelcluster::efa_config"
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::master_base_config'
+  include_recipe 'aws-parallelcluster::head_node_base_config'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster::compute_base_config'
 else
