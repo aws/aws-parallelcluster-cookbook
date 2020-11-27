@@ -23,7 +23,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_pri
   if !node['cfncluster']['cfn_dns_domain'].nil? && !node['cfncluster']['cfn_dns_domain'].empty?
     # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
     # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
-    if platform?('ubuntu') && node['platform_version'] == "18.04"
+    if platform?('ubuntu')
 
       Chef::Log.info("Appending search domain '#{node['cfncluster']['cfn_dns_domain']}' to /etc/systemd/resolved.conf")
       # Configure resolved to automatically append Route53 search domain in resolv.conf.
@@ -38,7 +38,6 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_pri
       Chef::Log.info("Appending search domain '#{node['cfncluster']['cfn_dns_domain']}' to /etc/dhcp/dhclient.conf")
       # Configure dhclient to automatically append Route53 search domain in resolv.conf
       # - on CentOS7, Alinux and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
-      # - on Ubuntu16 by networking + dhclient
       # - on CentOS8 by NetworkManager (but dhclient is not enabled by default)
       replace_or_add "append Route53 search domain in /etc/dhcp/dhclient.conf" do
         path "/etc/dhcp/dhclient.conf"
