@@ -37,7 +37,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm' && node['cfncluster']['use_pri
 
       Chef::Log.info("Appending search domain '#{node['cfncluster']['cfn_dns_domain']}' to /etc/dhcp/dhclient.conf")
       # Configure dhclient to automatically append Route53 search domain in resolv.conf
-      # - on CentOS7, Alinux and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
+      # - on CentOS7 and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
       # - on CentOS8 by NetworkManager (but dhclient is not enabled by default)
       replace_or_add "append Route53 search domain in /etc/dhcp/dhclient.conf" do
         path "/etc/dhcp/dhclient.conf"

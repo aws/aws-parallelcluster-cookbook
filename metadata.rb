@@ -11,7 +11,7 @@ source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '15.11.8'
 version '2.10.3'
 
-supports 'amazon', '>= 1'
+supports 'amazon', '>= 2'
 supports 'centos', '>= 7'
 supports 'ubuntu', '>= 18.04'
 
