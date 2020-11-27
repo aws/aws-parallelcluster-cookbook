@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: custom_config
+# Recipe:: compute_sge_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,27 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Use these recipes to add a custom scheduler
-include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::custom_install'
+# Mount /opt/sge over NFS
+mount '/opt/sge' do
+  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/sge" })
+  fstype "nfs"
+  options 'hard,intr,noatime,_netdev'
+  action %i[mount enable]
+  retries 3
+  retry_delay 5
+end
+
+# Setup SGE
+link '/etc/profile.d/sge.sh' do
+  to '/opt/sge/default/common/settings.sh'
+end
+
+link '/etc/profile.d/sge.csh' do
+  to '/opt/sge/default/common/settings.csh'
+end
+
+directory '/opt/parallelcluster/templates'
+directory '/opt/parallelcluster/templates/sge'
+link '/opt/parallelcluster/templates/sge/sge_inst.conf' do
+  to '/opt/sge/sge_inst.conf'
+end
