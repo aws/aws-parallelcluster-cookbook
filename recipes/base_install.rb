@@ -20,7 +20,7 @@ return if node['conditions']['ami_bootstrapped']
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
-  if node['platform_family'] == 'amazon' && node['platform_version'].to_i == 2
+  if node['platform_family'] == 'amazon'
     alinux_extras_topic 'epel'
   elsif node['platform_version'].to_i < 7
     include_recipe "yum-epel"

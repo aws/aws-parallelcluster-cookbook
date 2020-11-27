@@ -254,32 +254,21 @@ when 'rhel', 'amazon'
 
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
+                                                libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
-                                                glibc-static iproute]
-    if node['platform_version'].to_i == 2
-      # mpich-devel not available on alinux
-      default['cfncluster']['base_packages'].delete('mpich-devel')
-      # Install R via amazon linux extras instead
-      default['cfncluster']['base_packages'].delete('R')
-      default['cfncluster']['alinux_extras'] = ['R3.4']
-      # Swap out some packages for their alinux2 equivalents
-      [%w[db4-devel libdb-devel], %w[redhat-lsb system-lsb]].each do |al1, al2equiv|
-        default['cfncluster']['base_packages'].delete(al1)
-        default['cfncluster']['base_packages'].push(al2equiv)
-      end
-      # Add additional base packages, most of which would be installed as part of `yum groupinstall development`
-      default['cfncluster']['base_packages'].concat(%w[libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
-                                                       rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
-                                                       gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                                       jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils librdmacm-utils])
-      # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
-      # because it contains fixes for known build issues
-      default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-      default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
-    end
+                                                libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
+                                                rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
+                                                gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
+                                                jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils librdmacm-utils]
+
+    # Install R via amazon linux extras
+    default['cfncluster']['alinux_extras'] = ['R3.4']
+    # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
+    # because it contains fixes for known build issues
+    default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
+    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
   end
 
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'

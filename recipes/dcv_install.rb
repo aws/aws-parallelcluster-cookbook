@@ -138,7 +138,7 @@ if node['conditions']['dcv_supported']
       # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
       # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
       #       which is done in base_install.
-      if node['platform_version'].to_i == 2 && arm_instance?
+      if arm_instance?
         prereq_packages.push('mate-terminal')
       else
         prereq_packages.push('gnome-terminal')

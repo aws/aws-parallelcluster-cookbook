@@ -255,7 +255,7 @@ end
 ###################
 if node['conditions']['intel_mpi_supported']
   case node['cfncluster']['os']
-  when 'alinux', 'alinux2', 'centos7', 'centos8'
+  when 'alinux2', 'centos7', 'centos8'
     execute 'check efa rpm installed' do
       command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
       user node['cfncluster']['cfn_cluster_user']
@@ -393,16 +393,14 @@ end
 ###################
 # FabricManager
 ###################
-unless node['cfncluster']['cfn_base_os'] == 'alinux'
-  if get_nvswitches > 1
-    bash 'test fabric-manager daemon' do
-      cwd Chef::Config[:file_cache_path]
-      code <<-TESTFM
-        set -e
-        systemctl show -p SubState nvidia-fabricmanager | grep -i running
-        echo "NVIDIA Fabric Manager service correctly started"
-      TESTFM
-    end
+if get_nvswitches > 1
+  bash 'test fabric-manager daemon' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TESTFM
+      set -e
+      systemctl show -p SubState nvidia-fabricmanager | grep -i running
+      echo "NVIDIA Fabric Manager service correctly started"
+    TESTFM
   end
 end
 
@@ -437,7 +435,7 @@ end
 ###################
 if node['conditions']['lustre_supported']
   case node['cfncluster']['os']
-  when 'alinux', 'centos7'
+  when 'centos7'
     execute 'check for lustre libraries' do
       command "rpm -qa | grep lustre-client"
       user node['cfncluster']['cfn_cluster_user']

@@ -101,17 +101,8 @@ elsif node['platform'] == 'ubuntu'
 
   kernel_module 'lnet'
 
-elsif node['platform'] == 'amazon' && node['platform_version'].to_i == 2
+elsif node['platform'] == 'amazon'
 
   alinux_extras_topic 'lustre2.10'
 
-elsif node['platform'] == 'amazon' # Amazon Linux 1
-
-  # Install lustre client module
-  package 'lustre-client' do
-    retries 3
-    retry_delay 5
-  end
-
-  kernel_module 'lnet'
 end

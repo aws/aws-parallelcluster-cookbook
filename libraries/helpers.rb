@@ -160,11 +160,7 @@ def validate_os_type
     current_os = 'ubuntu' + node['platform_version'].tr('.', '')
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   when 'amazon'
-    if node['platform_version'].to_i > 2010 && node['cfncluster']['cfn_base_os'] != 'alinux'
-      raise_os_not_match("alinux", node['cfncluster']['cfn_base_os'])
-    elsif node['platform_version'].to_i == 2 && node['cfncluster']['cfn_base_os'] != 'alinux2'
-      raise_os_not_match("alinux2", node['cfncluster']['cfn_base_os'])
-    end
+    raise_os_not_match("alinux2", node['cfncluster']['cfn_base_os'])
   when 'centos'
     current_os = 'centos' + node['platform_version'].to_i.to_s
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
@@ -304,7 +300,7 @@ end
 #
 def platform_supports_lustre_on_arm?
   [node['platform'] == 'ubuntu',
-   node['platform'] == 'amazon' && node['platform_version'].to_i == 2,
+   node['platform'] == 'amazon',
    node['platform'] == 'centos' && node['platform_version'].to_i == 8].any?
 end
 
