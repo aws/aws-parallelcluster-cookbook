@@ -16,12 +16,9 @@
 # limitations under the License.
 
 # Start nvidia fabric manager on NVSwitch enabled systems
-# (not available on alinux)
-unless node['cfncluster']['cfn_base_os'] == 'alinux'
-  if get_nvswitches > 1
-    service 'nvidia-fabricmanager' do
-      action [:start, :enable]
-      supports status: true
-    end
+if get_nvswitches > 1
+  service 'nvidia-fabricmanager' do
+    action [:start, :enable]
+    supports status: true
   end
 end

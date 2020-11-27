@@ -92,7 +92,6 @@ execute "generate_pcluster_slurm_configs" do
           " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
 end
 
-# alinux1 uses an old cgroup directory: /cgroup
 # all other OSs use /sys/fs/cgroup, which is the default
 template '/opt/slurm/etc/cgroup.conf' do
   source 'slurm/cgroup.conf.erb'

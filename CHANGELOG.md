@@ -11,6 +11,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
 
 **CHANGES**
+- Ubuntu 16.04 is no longer supported.
+- Amazon Linux is no longer supported.
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
 - Root volume size increased to 35GB on all AMIs.
