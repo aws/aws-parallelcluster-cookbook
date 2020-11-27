@@ -42,7 +42,7 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
     env = _get_jinja_env(template_directory)
 
     cluster_config = _load_cluster_config(input_file)
-    master_config = _get_master_config()
+    head_node_config = _get_head_node_config()
     queue_settings = cluster_config["cluster"]["queue_settings"]
 
     # Generate slurm_parallelcluster_{QueueName}_partitions.conf and slurm_parallelcluster_{QueueName}_gres.conf
@@ -57,7 +57,7 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
     for template_name in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
         _generate_slurm_parallelcluster_configs(
             queue_settings,
-            master_config,
+            head_node_config,
             cluster_config["cluster"]["scaling"],
             template_name,
             env,
@@ -74,21 +74,21 @@ def _load_cluster_config(input_file_path):
     """
     Load queues_info and add information used to render templates.
 
-    :return: queues_info containing id for first queue, master_hostname and queue_name
+    :return: queues_info containing id for first queue, head_node_hostname and queue_name
     """
     with open(input_file_path) as input_file:
         return json.load(input_file)
 
 
-def _get_master_config():
+def _get_head_node_config():
     return {
-        "master_hostname": gethostname(),
-        "master_ip": _get_master_private_ip(),
+        "head_node_hostname": gethostname(),
+        "head_node_ip": _get_head_node_private_ip(),
     }
 
 
-def _get_master_private_ip():
-    """Get master private ip from EC2 metadata."""
+def _get_head_node_private_ip():
+    """Get head node private ip from EC2 metadata."""
     try:
         private_ip = subprocess.run(
             "curl --retry 3 http://169.254.169.254/latest/meta-data/local-ipv4",
@@ -100,7 +100,7 @@ def _get_master_private_ip():
         ).stdout
         return private_ip
     except Exception:
-        log.error("Encountered exception when retrieving master node private IP.")
+        log.error("Encountered exception when retrieving head node private IP.")
         raise
 
 
@@ -115,11 +115,14 @@ def _generate_queue_config(queue_name, queue_config, is_default_queue, file_type
 
 
 def _generate_slurm_parallelcluster_configs(
-    queues_config, master_config, scaling_config, template_name, jinja_env, output_dir, dryrun
+    queues_config, head_node_config, scaling_config, template_name, jinja_env, output_dir, dryrun
 ):
     log.info("Generating %s", template_name)
     rendered_template = jinja_env.get_template(f"{template_name}").render(
-        queues_config=queues_config, master_config=master_config, scaling_config=scaling_config, output_dir=output_dir
+        queues_config=queues_config,
+        head_node_config=head_node_config,
+        scaling_config=scaling_config,
+        output_dir=output_dir,
     )
     if not dryrun:
         filename = f"{output_dir}/{template_name}"
