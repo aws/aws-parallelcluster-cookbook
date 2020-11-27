@@ -23,7 +23,7 @@ end
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::master_slurm_finalize' if node['cfncluster']['cfn_scheduler'] == 'slurm'
+  include_recipe 'aws-parallelcluster::head_node_slurm_finalize' if node['cfncluster']['cfn_scheduler'] == 'slurm'
 when 'ComputeFleet'
   if node['cfncluster']['cfn_scheduler'] == 'slurm'
     include_recipe 'aws-parallelcluster::compute_slurm_finalize'
