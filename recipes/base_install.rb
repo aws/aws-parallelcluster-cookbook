@@ -123,7 +123,7 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
-if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
+if node['platform'] == 'ubuntu'
   # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
   include_recipe "nfs::server"
 end

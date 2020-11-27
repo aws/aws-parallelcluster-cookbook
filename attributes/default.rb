@@ -297,13 +297,9 @@ when 'debian'
                                               tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
-                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
-                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2]
-  if node['platform_version'] == '18.04'
-    default['cfncluster']['base_packages'].delete('libatlas-dev')
-    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
-  end
+                                              r-base libatlas-base-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
+                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 libglvnd-dev]
+  default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
 
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
@@ -318,6 +314,7 @@ when 'debian'
   default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
   default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
+
   if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
     default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
     default['nfs']['service_provider']['portmap'] = Chef::Provider::Service::Systemd

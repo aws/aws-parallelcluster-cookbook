@@ -3,6 +3,14 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+
+3.0.0
+------
+
+**CHANGES**
+- Ubuntu 16.04 is no longer supported.
+
+
 2.10.1
 ------
 

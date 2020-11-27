@@ -244,7 +244,6 @@ def restart_network_service
       '>=8.0' => 'NetworkManager'
     },
     %w[ubuntu debian] => {
-      '16.04' => 'networking',
       '>=18.04' => 'systemd-resolved'
     },
     'default' => 'network'
@@ -261,7 +260,7 @@ end
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 #
 def reload_network_config
-  if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18
+  if node['platform'] == 'ubuntu'
     ruby_block "apply network configuration" do
       block do
         Mixlib::ShellOut.new("netplan apply").run_command
@@ -304,7 +303,7 @@ end
 # Check if Lustre is supported for ARM instances on this OS
 #
 def platform_supports_lustre_on_arm?
-  [node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18,
+  [node['platform'] == 'ubuntu',
    node['platform'] == 'amazon' && node['platform_version'].to_i == 2,
    node['platform'] == 'centos' && node['platform_version'].to_i == 8].any?
 end

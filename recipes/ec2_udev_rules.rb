@@ -51,8 +51,8 @@ cookbook_file 'attachVolume.py' do
   mode '0755'
 end
 
-if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
-  # allow Ubuntu 18 udev to do network call
+if node['platform'] == 'ubuntu'
+  # allow Ubuntu udev to do network call
   execute 'udev-daemon-reload' do
     command 'udevadm control --reload'
     action :nothing

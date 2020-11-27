@@ -51,8 +51,8 @@ configure_flags = value_for_platform(
   'default' => ""
 )
 
-if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
-  bash 'prepare_ubuntu_18' do
+if node['platform'] == 'ubuntu'
+  bash 'prepare_ubuntu' do
     user 'root'
     group 'root'
     cwd Chef::Config[:file_cache_path]
