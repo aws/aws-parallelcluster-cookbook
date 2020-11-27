@@ -299,7 +299,7 @@ if node['conditions']['intel_mpi_supported']
       command "rpm -qa | grep intel-mpi"
       user node['cfncluster']['cfn_cluster_user']
     end
-  when 'ubuntu1604', 'ubuntu1804'
+  when 'ubuntu1804'
     case node['cfncluster']['cfn_node_type']
     when 'MasterServer'
       execute 'check ptrace protection enabled' do
@@ -478,7 +478,7 @@ if node['conditions']['lustre_supported']
       command "rpm -qa | grep lustre-client"
       user node['cfncluster']['cfn_cluster_user']
     end
-  when 'ubuntu1604', 'ubuntu1804'
+  when 'ubuntu1804'
     execute 'check for lustre libraries' do
       command "dpkg -l | grep lustre"
       user node['cfncluster']['cfn_cluster_user']

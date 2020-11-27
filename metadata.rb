@@ -13,7 +13,7 @@ version '2.10.2'
 
 supports 'amazon', '>= 1'
 supports 'centos', '>= 7'
-supports 'ubuntu', '>= 16.04'
+supports 'ubuntu', '>= 18.04'
 
 depends 'apt', '~> 7.3.0'
 depends 'nfs', '~> 2.6.4'
