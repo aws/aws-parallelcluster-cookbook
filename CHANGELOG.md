@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.10.1
 ------
 
+**CHANGES**
+- Use inclusive language in recipe names and internal naming convention.
+
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.
 - Fix routing issues with multiple Network Interfaces on Ubuntu 18.04.

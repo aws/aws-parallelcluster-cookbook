@@ -34,7 +34,7 @@ def parse_args():
                         required=True,
                         choices=['MasterServer', 'ComputeFleet'],
                         help='Role this node plays in the cluster '
-                             '(i.e., is it a compute node or the master?)')
+                             '(i.e., is it a compute node or the head node?)')
     parser.add_argument('--scheduler',
                         required=True,
                         choices=['slurm', 'sge', 'torque', 'awsbatch'],

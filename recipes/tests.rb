@@ -55,7 +55,7 @@ execute 'grep ssh_config' do
   command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
 end
 
-# Test only on MasterServer since on ComputeFleet an empty /home is mounted for the Kitchen tests run
+# Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
 if node['cfncluster']['cfn_node_type'] == 'MasterServer'
   execute 'ssh localhost as user' do
     command "ssh localhost hostname"
@@ -283,7 +283,7 @@ if node['conditions']['intel_mpi_supported']
     end
   end
 
-  # Test only on MasterServer since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
+  # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
   if node['cfncluster']['cfn_node_type'] == 'MasterServer'
     bash 'check intel mpi version' do

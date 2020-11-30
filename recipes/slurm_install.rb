@@ -121,7 +121,7 @@ when 'ComputeFleet'
     action :create
   end
 
-  # Setup slurm user without creating the home (mounted from master)
+  # Setup slurm user without creating the home (mounted from head node)
   user "slurm" do
     manage_home false
     comment 'slurm user'
