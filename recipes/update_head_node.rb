@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: update_master
+# Recipe:: update_head_node
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -17,5 +17,5 @@
 
 
 if node['cfncluster']['cfn_scheduler'] == 'slurm'
-  include_recipe 'aws-parallelcluster::update_master_slurm'
+  include_recipe 'aws-parallelcluster::update_head_node_slurm'
 end

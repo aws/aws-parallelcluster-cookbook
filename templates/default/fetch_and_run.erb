@@ -21,7 +21,7 @@ function download_run (){
       wget -qO- ${url} > $tmpfile || return 1
     fi
     chmod +x $tmpfile || return 1
-    $tmpfile $@ || error_exit "Failed to run boot_as_master $ACTION, $file failed with non 0 return code: $?"
+    $tmpfile $@ || error_exit "Failed to run $ACTION, $file failed with non 0 return code: $?"
 }
 
 function run_preinstall () {
@@ -32,7 +32,7 @@ function run_preinstall () {
     else
         download_run ${cfn_preinstall}
     fi
-  fi || error_exit "Failed to run boot_as_master preinstall"
+  fi || error_exit "Failed to run preinstall"
 }
 
 function run_postinstall () {
@@ -44,7 +44,7 @@ function run_postinstall () {
     else
         download_run ${cfn_postinstall}
     fi
-  fi || error_exit "Failed to run boot_as_master postinstall"
+  fi || error_exit "Failed to run postinstall"
 }
 
 ACTION=${1#?}

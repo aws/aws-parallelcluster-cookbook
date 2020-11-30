@@ -25,7 +25,7 @@ directory "#{node['cfncluster']['slurm_plugin_dir']}" do
   recursive true
 end
 
-# Retrieve compute and master node info from dynamodb and save into files
+# Retrieve compute and head node info from dynamodb and save into files
 if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
