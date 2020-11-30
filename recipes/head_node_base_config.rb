@@ -141,8 +141,8 @@ nfs_export "/opt/intel" do
   only_if { ::File.directory?("/opt/intel") }
 end
 
-# Setup RAID array on master node
-include_recipe 'aws-parallelcluster::setup_raid_on_master'
+# Setup RAID array on head node
+include_recipe 'aws-parallelcluster::setup_raid_on_head_node'
 
 # Configure Ganglia
 include_recipe 'aws-parallelcluster::ganglia_config'
@@ -200,6 +200,6 @@ template '/etc/sqswatcher.cfg' do
 end
 
 if node['cfncluster']['dcv_enabled'] == "master"
-  # Activate DCV on master Node
+  # Activate DCV on head node
   include_recipe 'aws-parallelcluster::dcv_config'
 end
