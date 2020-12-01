@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.
+- Fix routing issues with multiple Network Interfaces on Ubuntu 18.04.
 
 2.10.0
 ------
