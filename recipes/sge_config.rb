@@ -20,7 +20,7 @@ include_recipe 'aws-parallelcluster::sge_install'
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::master_sge_config'
+  include_recipe 'aws-parallelcluster::head_node_sge_config'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster::compute_sge_config'
 else
