@@ -46,10 +46,14 @@ def gateway_address
   cmd.stdout.delete("\n")
 end
 
-def cidr_prefix_length(mac)
+def subnet_cidr_block(mac)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/subnet-ipv4-cidr-block")
   res = Net::HTTP.get_response(uri)
-  res.body.split("/")[1]
+  res.body
+end
+
+def cidr_prefix_length(mac)
+  subnet_cidr_block(mac).split("/")[1]
 end
 
 def cidr_to_netmask(cidr)
@@ -77,6 +81,7 @@ if macs.length > 1
     device_ip_address = device_ip(mac)
     cidr_prefix_length = cidr_prefix_length(mac)
     netmask = cidr_to_netmask(cidr_prefix_length)
+    cidr_block = subnet_cidr_block(mac)
 
     execute 'configure_nw_interface' do
       user 'root'
@@ -88,7 +93,8 @@ if macs.length > 1
         'GW_IP_ADDRESS' => gw_ip_address,
         'DEVICE_IP_ADDRESS' => device_ip_address,
         'CIDR_PREFIX_LENGTH' => cidr_prefix_length,
-        'NETMASK' => netmask
+        'NETMASK' => netmask,
+        'CIDR_BLOCK' => cidr_block
       )
 
       command 'sh /tmp/configure_nw_interface.sh'
