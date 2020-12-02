@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Retrieve master node info
+# Retrieve head node info
 if node['cfncluster']['cfn_scheduler'] == 'slurm'
   ruby_block "retrieve head_node ip" do
     block do
