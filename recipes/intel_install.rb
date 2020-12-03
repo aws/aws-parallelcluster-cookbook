@@ -26,75 +26,99 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 8
   end
 end
 
+def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
+  # S3 key prefix under which all packages to be downloaded reside
+  s3_base_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}"
+  intel_hpc_packages_dir_s3_url = "#{s3_base_url}/archives/IntelHPC/#{node['cfncluster']['intelhpc']['platform_name']}"
+  remote_file dest_path do
+    source "#{intel_hpc_packages_dir_s3_url}/#{pkg_subdir_key}/#{package_basename}"
+    mode '0744'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(dest_path) }
+  end
+end
+
+# Install non-intel dependencies first
+intel_hpc_base_dependencies = value_for_platform(
+  'centos' => {
+    '~>8' => %w[tcsh libnsl nss-pam-ldapd nss_nis nscd],
+    '~>7' => %w[tcsh compat-libstdc++-33 nscd nss-pam-ldapd openssl098e]
+  }
+)
+package intel_hpc_base_dependencies
+intel_hpc_spec_rpms_dir = '/opt/intel/rpms'
+
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
 
-  # Download intel-hpc-platform rpms to shared /opt/intel/rpms to avoid repetitive download from all nodes
-  bash "download intel hpc platform" do
-    cwd node['cfncluster']['sources_dir']
-    code <<-INTEL
-      set -e
-      yum-config-manager --add-repo https://yum.repos.intel.com/hpc-platform/#{node['cfncluster']['intelhpc']['platform_name']}/setup/intel-hpc-platform.repo
-      rpm --import https://yum.repos.intel.com/hpc-platform/#{node['cfncluster']['intelhpc']['platform_name']}/setup/PUBLIC_KEY.PUB
-      yum -y install --downloadonly --downloaddir=/opt/intel/rpms intel-hpc-platform-*-#{node['cfncluster']['intelhpc']['version']}
-    INTEL
-    creates '/opt/intel/rpms'
-    retries 3
-    retry_delay 5
+  # Intel HPC Platform
+  directory intel_hpc_spec_rpms_dir do
+    recursive true
+  end
+  node['cfncluster']['intelhpc']['packages'].each do |package_name|
+    # Download intel-hpc-platform rpms to shared /opt/intel/rpms to avoid repetitive download from all nodes
+    # Packages must be downloaded individually because S3 doesn't permit wget'ing entire directories, nor does
+    # it permit recursive copies of 'directories' (even those containing only public artifacts).
+    # It's installed on every node (as opposed to just the head node) because the resulting RPMs install
+    # software to /etc which is not exported to the computes as /opt/intel is.
+    package_basename = "#{package_name}-#{node['cfncluster']['intelhpc']['version']}.#{node['cfncluster']['intelhpc']['platform_name']}.x86_64.rpm"
+    download_intel_hpc_pkg_from_s3('hpc_platform_spec', package_basename, "#{intel_hpc_spec_rpms_dir}/#{package_basename}")
   end
 
   # Install Intel Parallel Studio XE Runtime, see
   # https://software.intel.com/content/www/us/en/develop/articles/installing-intel-parallel-studio-xe-runtime-2020-using-yum-repository.html
-  bash "setup intel psxe repository" do
+  intel_psxe_rpms_dir = "#{node['cfncluster']['sources_dir']}/intel/psxe"
+  directory intel_psxe_rpms_dir do
+    recursive true
+  end
+
+  # Download non-architecture-specific packages.
+  node['cfncluster']['psxe']['noarch_packages'].each do |psxe_noarch_package|
+    package_basename = "#{psxe_noarch_package}-#{node['cfncluster']['psxe']['version']}.noarch.rpm"
+    download_intel_hpc_pkg_from_s3('psxe', package_basename, "#{intel_psxe_rpms_dir}/#{package_basename}")
+  end
+
+  # Download PSXE runtime packages and dependencies for 32- and 64-bit Intel compatible processors
+  %w[i486 x86_64].each do |intel_architecture|
+    # Download main package
+    package_basename = "intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}.#{intel_architecture}.rpm"
+    download_intel_hpc_pkg_from_s3('psxe', package_basename, "#{intel_psxe_rpms_dir}/#{package_basename}")
+    # Download dependencies
+    node['cfncluster']['psxe']['archful_packages'][intel_architecture].each do |psxe_archful_package|
+      num_bits_for_arch = if intel_architecture == 'i486'
+                            '32'
+                          else
+                            '64'
+                          end
+      package_basename = "#{psxe_archful_package}-#{num_bits_for_arch}bit-#{node['cfncluster']['psxe']['version']}.#{intel_architecture}.rpm"
+      download_intel_hpc_pkg_from_s3('psxe', package_basename, "#{intel_psxe_rpms_dir}/#{package_basename}")
+    end
+  end
+
+  # Install all downloaded PSXE packages
+  bash "install PSXE packages" do
     cwd node['cfncluster']['sources_dir']
     code <<-INTEL
       set -e
-      yum-config-manager --add-repo https://yum.repos.intel.com/2020/setup/intel-psxe-runtime-2020.repo
-      rpm --import https://yum.repos.intel.com/2020/setup/RPM-GPG-KEY-intel-psxe-runtime-2020
+      yum makecache -y && yum install --cacheonly -y #{intel_psxe_rpms_dir}/*
     INTEL
-    creates '/etc/yum.repos.d/intel-psxe-runtime-2020.repo'
-  end
-  if node['platform'] == 'centos' && node['platform_version'].to_i == 7
-    # Install yum4 because by using yum 3.x or older we may have failures when
-    # trying to install specific versions of Intel products, as mentioned in official doc.
-    bash 'install intel psxe' do
-      cwd node['cfncluster']['sources_dir']
-      code <<-INTEL
-        set -e
-        yum -y install nextgen-yum4
-        yum4 -y install intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}
-      INTEL
-      retries 3
-      retry_delay 5
-    end
-  else
-    package "intel-psxe-runtime-#{node['cfncluster']['psxe']['version']}" do
-      retries 3
-      retry_delay 5
-    end
   end
 
   # Intel optimized versions of python
-  bash "install intel python" do
-    cwd node['cfncluster']['sources_dir']
-    code <<-INTEL
-      set -e
-      yum-config-manager --add-repo https://yum.repos.intel.com/intelpython/setup/intelpython.repo
-      yum -y install intelpython2-#{node['cfncluster']['intelpython2']['version']}
-      yum -y install intelpython3-#{node['cfncluster']['intelpython3']['version']}
-    INTEL
-    creates '/opt/intel/intelpython2'
-    retries 3
-    retry_delay 5
-  end
-
-  bash "set skip_if_unavailable on Intel repo" do
-    code <<-SKIP_UNAVAIL
-      set -e
-      yum-config-manager --save --setopt=intel-hpc-platform.skip_if_unavailable=True
-      yum-config-manager --save --setopt=intel-psxe-runtime-2020.skip_if_unavailable=True
-      yum-config-manager --save --setopt=intelpython.skip_if_unavailable=True
-    SKIP_UNAVAIL
+  %w[2 3].each do |python_version|
+    package_version = node['cfncluster']["intelpython#{python_version}"]['version']
+    package_basename = "intelpython#{python_version}-#{package_version}.x86_64.rpm"
+    dest_path = "#{node['cfncluster']['sources_dir']}/#{package_basename}"
+    download_intel_hpc_pkg_from_s3("intelpython#{python_version}", package_basename, dest_path)
+    bash "install intelpython#{python_version}" do
+      cwd node['cfncluster']['sources_dir']
+      code <<-INTEL
+        set -e
+        yum makecache -y && yum install --cacheonly -y #{dest_path}
+      INTEL
+      not_if { ::File.exist?("/opt/intel/intelpython#{python_version}") }
+    end
   end
 end
 
@@ -106,7 +130,7 @@ bash "install intel hpc platform" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum install --cacheonly -y /opt/intel/rpms/*
+    yum makecache -y && yum install --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
   INTEL
   creates '/etc/intel-hpc-platform-release'
 end
