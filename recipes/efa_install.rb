@@ -42,8 +42,8 @@ when 'debian'
 end
 
 installer_options = "-y"
-# efa-kmod currently unavailable for ARM instances
-installer_options += " -k" if arm_instance?
+# skip efa-kmod installation on not supported platforms
+installer_options += " -k" unless node['conditions']['efa_supported']
 # enable gpudirect support
 installer_options += " -g" if efa_gdr_enabled?
 
