@@ -168,7 +168,7 @@ when 'ComputeFleet'
     action :create
   end
 
-  # Setup sgeadmin user without creating the home (mounted from master)
+  # Setup sgeadmin user without creating the home (mounted from head node)
   user "sgeadmin" do
     manage_home false
     comment 'sgeadmin user'

@@ -15,13 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Retrieve master node info
+# Retrieve head node info
 if node['cfncluster']['cfn_scheduler'] == 'slurm'
-  ruby_block "retrieve master ip" do
+  ruby_block "retrieve head_node ip" do
     block do
-      master_private_ip, master_private_dns = hit_master_info
-      node.force_default['cfncluster']['cfn_master'] = master_private_dns
-      node.force_default['cfncluster']['cfn_master_private_ip'] = master_private_ip
+      head_node_private_ip, head_node_private_dns = hit_head_node_info
+      node.force_default['cfncluster']['cfn_master'] = head_node_private_dns
+      node.force_default['cfncluster']['cfn_master_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3

@@ -76,7 +76,7 @@ def test_generate_slurm_config_files(mocker, test_datadir, tmpdir):
 
     mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
     mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_master_private_ip", return_value="ip.1.0.0.0", autospec=True
+        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
     template_directory = os.path.dirname(slurm.__file__) + "/templates"
     generate_slurm_config_files(tmpdir, template_directory, input_file, dryrun=False)

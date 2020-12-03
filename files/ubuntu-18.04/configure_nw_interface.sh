@@ -14,7 +14,8 @@ if
   [ -z "${GW_IP_ADDRESS}" ] ||        # gateway ip address
   [ -z "${DEVICE_IP_ADDRESS}" ] ||    # ip address to assign to the interface
   [ -z "${CIDR_PREFIX_LENGTH}" ] ||   # the prefix length of the device IP cidr block
-  [ -z "${NETMASK}" ]                 # netmask to apply to device ip address
+  [ -z "${NETMASK}" ] ||              # netmask to apply to device ip address
+  [ -z "${CIDR_BLOCK}" ]              # (full) subnet cidr block
 then
   echo 'One or more environment variables missing'
   exit 1
@@ -58,3 +59,21 @@ $STATIC_IP_CONFIG
         - from: ${DEVICE_IP_ADDRESS}
           table: ${ROUTE_TABLE}
 EOF
+
+# Hook to delete automatic routes to subnet automatically created from kernel.
+# This is needed in Ubuntu 18 because they are generated in the reverse order in which the network interfaces are
+# attached and this prevents the primary Network Interface from being selected to communicate in the subnet
+FILE="/etc/networkd-dispatcher/routable.d/cleanup-routes.sh"
+
+if [ ! -f "$FILE" ]; then
+/bin/cat <<EOF >${FILE}
+#!/bin/sh
+
+logger -t parallelcluster "Removing Automatic route for Interface: \${IFACE}"
+ip route del ${CIDR_BLOCK} dev \${IFACE}
+logger -t parallelcluster "Automatic route removed for Interface: \${IFACE}"
+EOF
+
+# The hook script file must be executable and owned by root
+chmod 755 ${FILE}
+fi
