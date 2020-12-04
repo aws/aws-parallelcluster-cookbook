@@ -10,7 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Configure NFS threads to be max(8, num_cores) for performance
 
 **CHANGES**
-- Upgrade NICE DCV to version 2020.2-9508
+- Upgrade NICE DCV to version 2020.2-9662
 - Use inclusive language in recipe names and internal naming convention.
 
 **BUG FIXES**
