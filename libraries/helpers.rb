@@ -330,15 +330,13 @@ def find_rhel_minor_version
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
     raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
 
-    # Lustre repo string will be built following the official doc
-    # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
     if node['platform_version'].to_i == 7
-      os_minor_version = '.7' if kernel_patch_version[1] >= '1062'
-      os_minor_version = '.8' if kernel_patch_version[1] >= '1127'
-      os_minor_version = '.9' if kernel_patch_version[1] >= '1160'
+      os_minor_version = '7' if kernel_patch_version[1] >= '1062'
+      os_minor_version = '8' if kernel_patch_version[1] >= '1127'
+      os_minor_version = '9' if kernel_patch_version[1] >= '1160'
     elsif node['platform_version'].to_i == 8
-      os_minor_version = '.2' if kernel_patch_version[1] >= '193'
-      os_minor_version = '.3' if kernel_patch_version[1] >= '240'
+      os_minor_version = '2' if kernel_patch_version[1] >= '193'
+      os_minor_version = '3' if kernel_patch_version[1] >= '240'
     else
       raise "CentOS version #{node['platform_version']} not supported."
     end
