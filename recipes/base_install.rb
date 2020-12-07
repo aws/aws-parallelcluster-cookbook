@@ -32,10 +32,10 @@ when 'rhel', 'amazon'
     end
   end
   if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-    # Enable PowerTools Repo so *-devel packages can be installed with DNF
-    # Enable EPEL repos
-    execute 'dnf enable powertools and EPEL repos' do
-      command "dnf config-manager --set-enabled PowerTools && dnf install -y epel-release"
+    # Enable powertools repo so *-devel packages can be installed with DNF
+    powertools_repo = find_rhel_minor_version <= '2' ? "PowerTools" : "powertools"
+    execute 'dnf enable powertools' do
+      command "dnf config-manager --set-enabled #{powertools_repo}"
     end
   end
 
