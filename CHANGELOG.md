@@ -7,7 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Configure NFS threads to be max(8, num_cores) for performance
+- Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04 unless the instance is rebooted.
 
 **CHANGES**
 - Upgrade NICE DCV to version 2020.2-9662
