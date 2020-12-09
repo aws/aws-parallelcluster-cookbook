@@ -1,0 +1,47 @@
+#%Module1.0
+
+## Required internal variables
+set category arm
+set name     armpl
+set version  <%= node['cfncluster']['armpl']['version'] %>
+set gcc_version <%= node['cfncluster']['armpl']['gcc']['major_minor_version'] %>
+set root     /opt/$category/$name/$version
+
+## Set resource definition
+set fullname "Arm Performance Libraries"
+set externalurl https://developer.arm.com
+
+## Required for "module help ..."
+
+proc ModulesHelp { } {
+puts stderr "Use ARMpl with GCC like this:"
+puts stderr "At compile time add '-I<armpl_include>' and at link time"
+  puts stderr "add  '-l<armpl_library> -lgfortran -lamath -lm -lastring'"
+  puts stderr ""
+  puts stderr "Description                     <armpl_include>             <armpl_library>"
+  puts stderr "32-bit integers                 ARMPL_INCLUDES              armpl_lp64"
+  puts stderr "64-bit integers                 ARMPL_INCLUDES_ILP64        armpl_ilp64"
+  puts stderr "single-threaded library         ARMPL_INCLUDES              armpl_lp64"
+  puts stderr "OpenMP multi-threaded library  ARMPL_INCLUDES_LP64_MP       armpl_lp64_mp"
+  puts stderr "64-bit integers & OpenMP       ARMPL_INCLUDES_ILP64_MP      armpl_ilp64_mp"
+  }
+
+  # Add license path
+  setenv ARM_LICENSE_DIR $root/arm-performance-libraries_${version}_gcc-${gcc_version}/license_terms
+
+  # Load the pre-installed gcc module
+  module load $root/modulefiles/armpl/gcc-${gcc_version}
+
+  # Get full version
+  set full_version ${version}
+  if {[llength [split ${version} .]] < 3} {
+    set full_version ${version}.0
+  }
+
+  # Load the pre-installed armpl module
+  module load $root/modulefiles/armpl/${full_version}_gcc-${gcc_version}
+
+  # EULA
+  if [ module-info mode load ] {
+    puts stderr "Use of the free of charge version of Arm Performance Libraries is subject to the terms and conditions of the Arm Performance Libraries (free version) -  End User License Agreement (EULA). A copy of the EULA can be found in the '$root/arm-performance-libraries_${version}_gcc-${gcc_version}/license_terms' folder"
+  }

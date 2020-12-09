@@ -68,6 +68,23 @@ default['cfncluster']['intelmpi']['version'] = '2019.7.217'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
 default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 7'
 
+# Arm Performance Library
+default['cfncluster']['armpl']['version'] = '20.2.1'
+default['cfncluster']['armpl']['gcc']['major_minor_version'] = '9.3'
+default['cfncluster']['armpl']['gcc']['patch_version'] = '0'
+default['cfncluster']['armpl']['gcc']['url'] = "https://ftp.gnu.org/gnu/gcc/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+default['cfncluster']['armpl']['platform'] = value_for_platform(
+    'centos' => { '~>8' => 'RHEL-8' },
+    'amazon' => { '2' => 'RHEL-8' },
+    'ubuntu' => { '18.04' => 'Ubuntu-16.04' }
+)
+
+default['cfncluster']['armpl']['url'] = value_for_platform(
+    'centos' => { '~>8' => "https://aws-parallelcluster-dev-commercial-dev.s3.amazonaws.com/archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
+    'amazon' => { '2' => "https://aws-parallelcluster-dev-commercial-dev.s3.amazonaws.com/archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
+    'ubuntu' => { '18.04' => "https://aws-parallelcluster-dev-commercial-dev.s3.amazonaws.com/archives/armpl/Ubuntu-16.04/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" }
+)
+
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.10.1'
 default['cfncluster']['cfncluster-cookbook-version'] = '2.10.1'

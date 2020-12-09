@@ -21,3 +21,4 @@ default['conditions']['intel_hpc_platform_supported'] = !arm_instance? && platfo
 default['conditions']['dcv_supported'] = platform_supports_dcv?
 default['conditions']['ami_bootstrapped'] = ami_bootstrapped?
 default['conditions']['overwrite_nfs_template'] = overwrite_nfs_template?
+default['conditions']['arm_pl_supported'] = arm_instance?
