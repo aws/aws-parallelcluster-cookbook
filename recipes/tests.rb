@@ -527,3 +527,24 @@ for virtual_env in virtual_envs
     end
   end
 end
+
+###################
+# ARM - PL
+###################
+if node['conditions']['arm_pl_supported']
+  bash 'check gcc version and module loaded' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-ARMPL
+      set -e
+      # Initialize module
+      unset MODULEPATH
+      source /etc/profile.d/modules.sh
+      (module avail)2>&1 | grep armpl/#{node['cfncluster']['armpl']['version']}
+      module load armpl/#{node['cfncluster']['armpl']['version']}
+      gcc --version | grep #{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+      (module list)2>&1 | grep armpl/#{node['cfncluster']['armpl']['version']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+      (module list)2>&1 | grep armpl/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+    ARMPL
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
