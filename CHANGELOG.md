@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NICE DCV to version 2020.2-9662
 - Use inclusive language in recipe names and internal naming convention.
 - Download Intel MPI and HPC packages from S3 rather than Intel yum repos.
+- Install Arm Performance Library 20.2.1 on ARM AMI(CentOS8, Alinux2, Ubuntu1804)
 
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.
