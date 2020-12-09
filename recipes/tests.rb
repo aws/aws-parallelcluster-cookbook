@@ -480,13 +480,16 @@ elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
   end
 end
 
-ruby_block 'check nfs threads' do
-  block do
-    nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
-    Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
-    expected_threads = [node['cpu']['cores'].to_i, 8].max
-    if nfs_threads != expected_threads
-      raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}"
+# Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
+unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
+  ruby_block 'check nfs threads' do
+    block do
+      nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
+      Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
+      expected_threads = [node['cpu']['cores'].to_i, 8].max
+      if nfs_threads != expected_threads
+        raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}"
+      end
     end
   end
 end
