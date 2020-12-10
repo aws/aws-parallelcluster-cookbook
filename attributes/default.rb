@@ -302,7 +302,7 @@ when 'debian'
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build1'
+    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build2'
   end
 
   # Modulefile Directory
