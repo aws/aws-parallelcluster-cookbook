@@ -378,7 +378,10 @@ def add_package_repository(repo_name, baseurl, gpgkey, distribution)
       retries 3
       retry_delay 5
     end
-    apt_update
+    apt_update 'update' do
+      retries 3
+      retry_delay 5
+    end
   else
     raise "platform not supported: #{node['platform_family']}"
   end
