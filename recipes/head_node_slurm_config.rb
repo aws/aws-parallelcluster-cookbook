@@ -164,7 +164,7 @@ end
 directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
   user 'root'
   group 'root'
-  mode '0644'
+  mode '0755'
   action :create
   recursive true
 end
