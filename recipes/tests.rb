@@ -250,6 +250,20 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
   end
 end
 
+if node['cfncluster']['dcv_enabled'] == "false" || node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+  execute 'check gdm service is disabled' do
+    command "systemctl status gdm.service | grep inactive"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
+if node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer" && (node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2")
+  execute 'check gdm service is enabled' do
+    command "systemctl status gdm.service | grep running"
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
 ###################
 # EFA - Intel MPI
 ###################
