@@ -302,7 +302,8 @@ when 'debian'
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9build2'
+    default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
+    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
   end
 
   # Modulefile Directory
