@@ -64,9 +64,9 @@ default['cfncluster']['intelpython2']['version'] = '2019.4-088'
 default['cfncluster']['intelpython3']['version'] = '2020.2-902'
 
 # Intel MPI
-default['cfncluster']['intelmpi']['version'] = '2019.7.217'
+default['cfncluster']['intelmpi']['version'] = '2019.8.254'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
-default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 7'
+default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 8'
 
 # Arm Performance Library
 default['cfncluster']['armpl']['version'] = '20.2.1'
