@@ -252,7 +252,7 @@ end
 
 if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer"
   execute 'check systemd default runlevel' do
-    command "systemctl get-default | grep -i grephical.target"
+    command "systemctl get-default | grep -i graphical.target"
   end
   if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
     execute 'check gdm service is running' do
