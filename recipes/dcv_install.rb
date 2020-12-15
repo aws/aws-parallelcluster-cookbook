@@ -227,11 +227,11 @@ if node['conditions']['dcv_supported']
       only_if 'which getenforce'
     end
   end
+end
 
-  # Switch runlevel to multi-user.target
-  if node['init_package'] == 'systemd'
-    execute "set default systemd runlevel to multi-user.target" do
-      command "systemctl set-default multi-user.target"
-    end
+# Switch runlevel to multi-user.target
+if node['init_package'] == 'systemd'
+  execute "set default systemd runlevel to multi-user.target" do
+    command "systemctl set-default multi-user.target"
   end
 end
