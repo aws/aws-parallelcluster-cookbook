@@ -18,10 +18,11 @@
 return unless node['conditions']['arm_pl_supported']
 
 armpl_installer = "#{node['cfncluster']['sources_dir']}/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar"
+armpl_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/#{node['cfncluster']['armpl']['url']}"
 
 # fetch armpl installer script
 remote_file armpl_installer do
-  source node['cfncluster']['armpl']['url']
+  source armpl_url
   mode '0644'
   retries 3
   retry_delay 5
