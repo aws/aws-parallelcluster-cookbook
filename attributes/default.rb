@@ -42,21 +42,47 @@ default['cfncluster']['cookbook_virtualenv_path'] = "#{node['cfncluster']['syste
 default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
 
 # Intel Packages
-default['cfncluster']['psxe']['version'] = '2020.4'
+default['cfncluster']['psxe']['version'] = '2020.4-17'
+default['cfncluster']['psxe']['noarch_packages'] = %w[intel-tbb-common-runtime intel-mkl-common-runtime intel-psxe-common-runtime
+                                                      intel-ipp-common-runtime intel-ifort-common-runtime intel-icc-common-runtime
+                                                      intel-daal-common-runtime intel-comp-common-runtime]
+default['cfncluster']['psxe']['archful_packages']['i486'] = %w[intel-tbb-runtime intel-tbb-libs-runtime intel-comp-runtime
+                                                               intel-daal-runtime intel-icc-runtime intel-ifort-runtime
+                                                               intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime]
+default['cfncluster']['psxe']['archful_packages']['x86_64'] = node['cfncluster']['psxe']['archful_packages']['i486'] + %w[intel-mpi-runtime]
 default['cfncluster']['intelhpc']['platform_name'] = value_for_platform(
   'centos' => {
     '~>8' => 'el8',
     '~>7' => 'el7'
   }
 )
-default['cfncluster']['intelhpc']['version'] = "2018.0-*.#{node['cfncluster']['intelhpc']['platform_name']}"
-default['cfncluster']['intelpython2']['version'] = '2019.4'
-default['cfncluster']['intelpython3']['version'] = '2020.2'
+default['cfncluster']['intelhpc']['packages'] = %w[intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
+                                                   intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
+                                                   intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime]
+default['cfncluster']['intelhpc']['version'] = '2018.0-7'
+default['cfncluster']['intelpython2']['version'] = '2019.4-088'
+default['cfncluster']['intelpython3']['version'] = '2020.2-902'
 
 # Intel MPI
-default['cfncluster']['intelmpi']['url'] = "https://registrationcenter-download.intel.com/akdlm/irc_nas/tec/16546/l_mpi_2019.7.217.tgz"
 default['cfncluster']['intelmpi']['version'] = '2019.7.217'
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
+default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 7'
+
+# Arm Performance Library
+default['cfncluster']['armpl']['version'] = '20.2.1'
+default['cfncluster']['armpl']['gcc']['major_minor_version'] = '9.3'
+default['cfncluster']['armpl']['gcc']['patch_version'] = '0'
+default['cfncluster']['armpl']['gcc']['url'] = "https://ftp.gnu.org/gnu/gcc/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+default['cfncluster']['armpl']['platform'] = value_for_platform(
+    'centos' => { '~>8' => 'RHEL-8' },
+    'amazon' => { '2' => 'RHEL-8' },
+    'ubuntu' => { '18.04' => 'Ubuntu-16.04' }
+)
+default['cfncluster']['armpl']['url'] = value_for_platform(
+    'centos' => { '~>8' => "archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
+    'amazon' => { '2' => "archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
+    'ubuntu' => { '18.04' => "archives/armpl/Ubuntu-16.04/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" }
+)
 
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.10.1'

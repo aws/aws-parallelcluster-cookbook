@@ -223,3 +223,6 @@ include_recipe "aws-parallelcluster::cloudwatch_agent_install"
 
 # Install Amazon Time Sync
 include_recipe "aws-parallelcluster::chrony_install"
+
+# Install ARM Performance Library
+include_recipe "aws-parallelcluster::arm_pl_install"

@@ -1,0 +1,44 @@
+#%Module1.0
+
+## Required internal variables
+set name     gcc
+set version  <%= node['cfncluster']['armpl']['gcc']['major_minor_version'] %>.<%= node['cfncluster']['armpl']['gcc']['patch_version'] %>
+set category arm
+set library armpl
+set root     /opt/$category/$library/$name/$version
+
+
+## Set resource definition
+set fullname "GNU compiler collection"
+set externalurl http://www.gcc.gnu.org
+set description "GNU compiler collection"
+
+## Required for "module help ..."
+
+proc ModulesHelp { } {
+global description externalurl
+puts stderr "Description - $description"
+puts stderr "Other Docs  - $externalurl"
+}
+
+## Required for "module display ..." and SWDB
+
+module-whatis                   "$description"
+
+## Software-specific settings exported to user environment
+
+if { [ file readable $root/lib ] }  {
+prepend-path    LD_LIBRARY_PATH $root/lib
+}
+if { [ file readable $root/lib64 ] }  {
+prepend-path    LD_LIBRARY_PATH $root/lib64
+}
+if { [ file readable $root/share/man ] }  {
+prepend-path    MANPATH         $root/share/man
+}
+if { [ file readable $root/bin ] }  {
+prepend-path    PATH            $root/bin
+}
+if { [ file readable $root/include ] }  {
+prepend-path    INCLUDE            $root/include
+}

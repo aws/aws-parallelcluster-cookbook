@@ -18,11 +18,13 @@
 return unless node['conditions']['intel_mpi_supported']
 
 intelmpi_modulefile = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/intelmpi"
-intelmpi_installer = "#{node['cfncluster']['sources_dir']}/l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
+intelmpi_installer_archive = "l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
+intelmpi_installer_path = "#{node['cfncluster']['sources_dir']}/#{intelmpi_installer_archive}"
+intelmpi_installer_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/archives/impi/#{intelmpi_installer_archive}"
 
 # fetch intelmpi installer script
-remote_file intelmpi_installer do
-  source node['cfncluster']['intelmpi']['url']
+remote_file intelmpi_installer_path do
+  source intelmpi_installer_url
   mode '0744'
   retries 3
   retry_delay 5
@@ -33,7 +35,7 @@ bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTELMPI
     set -e
-    tar -xf l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz
+    tar -xf #{intelmpi_installer_archive}
     cd l_mpi_#{node['cfncluster']['intelmpi']['version']}/
     ./install.sh -s silent.cfg --accept_eula
     mv rpm/EULA.txt /opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}

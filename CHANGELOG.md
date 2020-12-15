@@ -7,11 +7,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Configure NFS threads to be max(8, num_cores) for performance
+- Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04 unless the instance is rebooted.
 
 **CHANGES**
 - Upgrade NICE DCV to version 2020.2-9662
 - Use inclusive language in recipe names and internal naming convention.
+- Download Intel MPI and HPC packages from S3 rather than Intel yum repos.
+- Install Arm Performance Library 20.2.1 on ARM AMI(CentOS8, Alinux2, Ubuntu1804)
 
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.

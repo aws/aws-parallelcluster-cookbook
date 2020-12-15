@@ -15,7 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# For performance, set NFS threads to max(num_cores, 8); note cores, not vcpus
+# For performance, set NFS threads to max(num_cores, 8)
+# This change will not be effective on Ubuntu1604 unless instance is restarted
+# Changing thread in /etc/default/nfs-kernel-server and restarting NFS server will not change nfsd settings for Ubuntu1604
+# See: https://ubuntuforums.org/showthread.php?t=2345636
+# NFS threads enhancement is omitted for Ubuntu1604
 node.force_override['nfs']['threads'] = [node['cpu']['cores'].to_i, 8].max
 
 if node['platform'] == 'centos' && node['platform_version'].to_i == 8
@@ -36,4 +40,9 @@ if node['conditions']['overwrite_nfs_template']
     source 'nfs.conf.erb'
     cookbook 'aws-parallelcluster'
   end
+end
+
+# Explicitly restart NFS server for thread setting to take effect
+service node['nfs']['service']['server'] do
+  action :restart
 end
