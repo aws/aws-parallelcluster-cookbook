@@ -250,17 +250,23 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
   end
 end
 
-if node['cfncluster']['dcv_enabled'] == "false" || node['cfncluster']['cfn_node_type'] == "ComputeFleet"
-  execute 'check gdm service is disabled' do
-    command "systemctl status gdm.service | grep inactive"
-    user node['cfncluster']['cfn_cluster_user']
+if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer"
+  execute 'check systemd default runlevel' do
+    command "systemctl get-default | grep -i grephical.target"
   end
-end
-
-if node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer" && (node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2")
-  execute 'check gdm service is enabled' do
-    command "systemctl status gdm.service | grep running"
-    user node['cfncluster']['cfn_cluster_user']
+  if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
+    execute 'check gdm service is running' do
+      command "systemctl show -p SubState gdm | grep -i running"
+    end
+  end
+else
+  execute 'check systemd default runlevel' do
+    command "systemctl get-default | grep -i multi-user.target"
+  end
+  if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
+    execute 'check gdm service is stopped' do
+      command "systemctl show -p SubState gdm | grep -i dead"
+    end
   end
 end
 
