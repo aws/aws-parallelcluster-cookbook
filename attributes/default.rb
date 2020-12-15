@@ -254,6 +254,14 @@ when 'rhel', 'amazon'
   default['cfncluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
   # MODULESHOME
   default['cfncluster']['moduleshome'] = "/usr/share/Modules"
+  # Config file used to set default MODULEPATH list
+  default['cfncluster']['modulepath_config_file'] = value_for_platform(
+    'centos' => {
+      '~>8' => '/etc/environment-modules/modulespath',
+      '~>7' => "#{node['cfncluster']['moduleshome']}/init/.modulespath"
+    },
+    'amazon' => { 'default' => "#{node['cfncluster']['moduleshome']}/init/.modulespath" }
+  )
 
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
@@ -336,6 +344,8 @@ when 'debian'
   default['cfncluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
   # MODULESHOME
   default['cfncluster']['moduleshome'] = "/usr/share/modules"
+  # Config file used to set default MODULEPATH list
+  default['cfncluster']['modulepath_config_file'] = "#{node['cfncluster']['moduleshome']}/init/.modulespath"
   default['cfncluster']['kernel_generic_pkg'] = "linux-generic"
   default['cfncluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
