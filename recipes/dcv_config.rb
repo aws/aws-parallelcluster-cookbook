@@ -20,16 +20,6 @@
 
 # Configure the system to enable NICE DCV to have direct access to the Linux server's GPU and enable GPU sharing.
 def allow_gpu_acceleration
-  # On CentOS fix circular dependency multi-user.target -> cloud-init-> isolate multi-user.target.
-  # multi-user.target doesn't start until cloud-init run is finished. So isolate multi-user.target
-  # is stuck into starting, which keep hanging chef until the 3600s timeout.
-  unless node['platform'] == 'centos'
-    # Turn off X
-    execute "Turn off X" do
-      command "systemctl isolate multi-user.target"
-    end
-  end
-
   # Update the xorg.conf to set up NVIDIA drivers.
   # NOTE: --enable-all-gpus parameter is needed to support servers with more than one NVIDIA GPU.
   nvidia_xconfig_command = "nvidia-xconfig --preserve-busid --enable-all-gpus"
@@ -82,6 +72,15 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
   if node.default['cfncluster']['dcv']['is_graphic_instance']
     # Enable graphic acceleration in dcv conf file for graphic instances.
     allow_gpu_acceleration
+  else
+    bash 'set default systemd runlevel to graphical.target' do
+      user 'root'
+      code <<-SETUPX
+        set -e
+        systemctl set-default graphical.target
+        systemctl isolate graphical.target &
+      SETUPX
+    end
   end
 
   case node['platform']
