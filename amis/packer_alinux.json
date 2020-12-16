@@ -226,6 +226,7 @@
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
+          "is_official_ami": "true",
           "custom_node_package" : "{{user `custom_node_package`}}",
           "cfn_base_os" : "alinux"
         }
