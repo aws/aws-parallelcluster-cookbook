@@ -437,3 +437,6 @@ default['cfncluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cfncluster']['aws_domain'] = aws_domain
+
+# Official ami build
+default['cfncluster']['is_official_ami_build'] = false

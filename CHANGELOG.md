@@ -9,7 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04 unless the instance is rebooted.
 - EFA kernel module now installed also on ARM instances with `alinux2` and `ubuntu1804`
-- Set default systemd runlevel to multi-user.target on all OSes during ami creation. The runlevel is set to graphical.target only when DCV is enabled.
+- Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation. The runlevel is set to graphical.target on head node only when DCV is enabled.
 
 **CHANGES**
 - Upgrade EFA installer to version 1.11.0
