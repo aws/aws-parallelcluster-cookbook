@@ -241,7 +241,7 @@
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
-          "is_official_ami": "true",
+          "is_official_ami_build": "true",
           "dcv": {
             "installed" : "{{user `dcv_installed`}}"
           },
