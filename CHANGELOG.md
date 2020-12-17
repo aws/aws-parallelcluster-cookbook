@@ -24,6 +24,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Download Intel MPI and HPC packages from S3 rather than Intel yum repos.
 - Install Arm Performance Library 20.2.1 on ARM AMI(CentOS8, Alinux2, Ubuntu1804)
 - Upgrade Intel MPI to version U8.
+- Upgrade NVIDIA CUDA to version 11.2.0
 
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.
