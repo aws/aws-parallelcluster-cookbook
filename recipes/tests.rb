@@ -502,7 +502,7 @@ end
 
 # Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
 unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
-  ruby_block 'check nfs threads' do
+  ruby_block 'check_nfs_threads' do
     block do
       nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
       Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
@@ -511,6 +511,15 @@ unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
         raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}"
       end
     end
+    action :nothing
+  end
+
+  # Execute thread check at the end of chef run
+  ruby_block 'delay thread check' do
+    block do
+      true
+    end
+    notifies :run, "ruby_block[check_nfs_threads]", :delayed
   end
 end
 
