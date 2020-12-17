@@ -45,4 +45,5 @@ end
 # Explicitly restart NFS server for thread setting to take effect
 service node['nfs']['service']['server'] do
   action :restart
+  supports restart: true
 end
