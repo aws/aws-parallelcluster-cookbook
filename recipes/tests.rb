@@ -259,7 +259,7 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "
       command "systemctl show -p SubState gdm | grep -i running"
     end
   end
-elsif node['init_package'] == 'systemd'
+elsif node['init_package'] == 'systemd' && node['conditions']['ami_bootstrapped']
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i multi-user.target"
   end
