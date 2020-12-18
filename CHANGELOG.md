@@ -6,9 +6,24 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.10.1
 ------
 
+**ENHANCEMENTS**
+- Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04 unless the instance is rebooted.
+- EFA kernel module now installed also on ARM instances with `alinux2` and `ubuntu1804`
+- Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation. The runlevel is set to graphical.target on head node only when DCV is enabled.
+
 **CHANGES**
+- Upgrade EFA installer to version 1.11.0
+  - EFA configuration: ``efa-config-1.5`` (from efa-config-1.4)
+  - EFA profile: ``efa-profile-1.1`` (from efa-profile-1.0.0)
+  - EFA kernel module: ``efa-1.10.2`` (from efa-1.6.0)
+  - RDMA core: ``rdma-core-31.2amzn`` (from rdma-core-31.amzn0)
+  - Libfabric: ``libfabric-1.11.1amzn1.1`` (from libfabric-1.10.1amzn1.1)
+  - Open MPI: ``openmpi40-aws-4.0.5`` (from openmpi40-aws-4.0.3)
 - Upgrade NICE DCV to version 2020.2-9662
 - Use inclusive language in recipe names and internal naming convention.
+- Download Intel MPI and HPC packages from S3 rather than Intel yum repos.
+- Install Arm Performance Library 20.2.1 on ARM AMI(CentOS8, Alinux2, Ubuntu1804)
+- Upgrade Intel MPI to version U8.
 
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.

@@ -250,6 +250,26 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
   end
 end
 
+if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer"
+  execute 'check systemd default runlevel' do
+    command "systemctl get-default | grep -i graphical.target"
+  end
+  if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
+    execute 'check gdm service is running' do
+      command "systemctl show -p SubState gdm | grep -i running"
+    end
+  end
+elsif node['init_package'] == 'systemd' && node['conditions']['ami_bootstrapped']
+  execute 'check systemd default runlevel' do
+    command "systemctl get-default | grep -i multi-user.target"
+  end
+  if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
+    execute 'check gdm service is stopped' do
+      command "systemctl show -p SubState gdm | grep -i dead"
+    end
+  end
+end
+
 ###################
 # EFA - Intel MPI
 ###################
@@ -295,7 +315,7 @@ if node['conditions']['intel_mpi_supported']
         unset MODULEPATH
         # Must execute this in a bash script because source is a bash built-in function
         source /etc/profile.d/modules.sh
-        module load intelmpi && mpirun --help | grep 'Version 2019 Update 7'
+        module load intelmpi && mpirun --help | grep '#{node['cfncluster']['intelmpi']['kitchen_test_string']}'
       INTELMPI
       user node['cfncluster']['cfn_cluster_user']
     end
@@ -480,6 +500,20 @@ elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
   end
 end
 
+# Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
+unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
+  ruby_block 'check nfs threads' do
+    block do
+      nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
+      Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
+      expected_threads = [node['cpu']['cores'].to_i, 8].max
+      if nfs_threads != expected_threads
+        raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}"
+      end
+    end
+  end
+end
+
 ###################
 # ulimit
 ###################
@@ -511,5 +545,26 @@ for virtual_env in virtual_envs
         raise "pip version in virtualenv #{virtual_env} must be greater than 19.3"
       end
     end
+  end
+end
+
+###################
+# ARM - PL
+###################
+if node['conditions']['arm_pl_supported']
+  bash 'check gcc version and module loaded' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-ARMPL
+      set -e
+      # Initialize module
+      unset MODULEPATH
+      source /etc/profile.d/modules.sh
+      (module avail)2>&1 | grep armpl/#{node['cfncluster']['armpl']['version']}
+      module load armpl/#{node['cfncluster']['armpl']['version']}
+      gcc --version | grep #{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+      (module list)2>&1 | grep armpl/#{node['cfncluster']['armpl']['version']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+      (module list)2>&1 | grep armpl/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+    ARMPL
+    user node['cfncluster']['cfn_cluster_user']
   end
 end

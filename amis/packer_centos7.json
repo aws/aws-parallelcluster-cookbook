@@ -245,6 +245,7 @@
           "dcv": {
             "installed" : "{{user `dcv_installed`}}"
           },
+          "is_official_ami_build": "true",
           "custom_node_package" : "{{user `custom_node_package`}}",
           "cfn_base_os" : "centos7"
         }

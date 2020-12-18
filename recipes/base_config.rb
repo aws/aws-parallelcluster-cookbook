@@ -17,6 +17,18 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
+# Restart sshd.service to make sure the service is running
+# This is a workaround for Centos 8 where the sshd.service fails at first start since it does not properly
+# wait for cloud-init.service to start. There is something wrong in Centos 8 systemd dependency chain.
+if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+  service "sshd" do
+    supports restart: true
+    action %i[enable restart]
+  end
+end
+
+include_recipe 'aws-parallelcluster::nfs_config'
+
 # Setup ephemeral drives
 execute 'setup ephemeral' do
   command '/usr/local/sbin/setup-ephemeral-drives.sh'

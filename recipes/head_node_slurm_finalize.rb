@@ -15,6 +15,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+execute "check if clustermgtd heartbeat is available" do
+  command "cat /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
+  retries 30
+  retry_delay 10
+end
+
 ruby_block "submit dynamic fleet initialization jobs" do
   block do
     require 'json'
