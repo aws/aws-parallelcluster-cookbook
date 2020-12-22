@@ -32,10 +32,10 @@ when 'rhel', 'amazon'
     end
   end
   if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-    # Enable PowerTools Repo so *-devel packages can be installed with DNF
-    # Enable EPEL repos
-    execute 'dnf enable powertools and EPEL repos' do
-      command "dnf config-manager --set-enabled PowerTools && dnf install -y epel-release"
+    # Enable powertools repo so *-devel packages can be installed with DNF
+    powertools_repo = find_rhel_minor_version <= '2' ? "PowerTools" : "powertools"
+    execute 'dnf enable powertools' do
+      command "dnf config-manager --set-enabled #{powertools_repo}"
     end
   end
 
@@ -57,7 +57,7 @@ directory node['cfncluster']['license_dir']
 directory node['cfncluster']['configs_dir']
 
 build_essential
-include_recipe "aws-parallelcluster::_setup_python"
+include_recipe "aws-parallelcluster::setup_python"
 
 # Install lots of packages
 package node['cfncluster']['base_packages'] do
@@ -123,15 +123,8 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
-if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
-  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
-  include_recipe "nfs::server"
-end
-if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  # Workaround for issue: https://github.com/atomic-penguin/cookbook-nfs/issues/116
-  node.force_override['nfs']['service']['idmap'] = 'nfs-idmapd'
-end
-include_recipe "nfs::server4"
+# Install NFS packages
+include_recipe "nfs::server"
 
 # Put configure-pat.sh onto the host
 cookbook_file 'configure-pat.sh' do
@@ -149,7 +142,7 @@ cookbook_file 'setup-ephemeral-drives.sh' do
   mode '0744'
 end
 
-include_recipe 'aws-parallelcluster::_ec2_udev_rules'
+include_recipe 'aws-parallelcluster::ec2_udev_rules'
 
 # Install ec2-metadata script
 remote_file '/usr/bin/ec2-metadata' do
@@ -216,10 +209,10 @@ end
 include_recipe "aws-parallelcluster::ganglia_install"
 
 # Install NVIDIA and CUDA
-include_recipe "aws-parallelcluster::_nvidia_install"
+include_recipe "aws-parallelcluster::nvidia_install"
 
 # Install FSx options
-include_recipe "aws-parallelcluster::_lustre_install"
+include_recipe "aws-parallelcluster::lustre_install"
 
 # Install EFA & Intel MPI
 include_recipe "aws-parallelcluster::efa_install"
@@ -230,3 +223,6 @@ include_recipe "aws-parallelcluster::cloudwatch_agent_install"
 
 # Install Amazon Time Sync
 include_recipe "aws-parallelcluster::chrony_install"
+
+# Install ARM Performance Library
+include_recipe "aws-parallelcluster::arm_pl_install"

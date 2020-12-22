@@ -8,3 +8,4 @@ dns_domain = <%= node['cfncluster']['cfn_dns_domain'] %>
 use_private_hostname = <%= node['cfncluster']['use_private_hostname'] %>
 master_private_ip = <%= node['ec2']['local_ipv4'] %>
 master_hostname = <%= node['ec2']['local_hostname'] %>
+clustermgtd_heartbeat_file_path = /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat

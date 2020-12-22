@@ -2,9 +2,9 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _compute_custom_config
+# Recipe:: nvidia_config
 #
-# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,4 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Use these recipes to add a custom scheduler _master_custom_config.rb custom_config.rb custom_install.rb
+# Start nvidia fabric manager on NVSwitch enabled systems
+# (not available on alinux)
+unless node['cfncluster']['cfn_base_os'] == 'alinux'
+  if get_nvswitches > 1
+    service 'nvidia-fabricmanager' do
+      action [:start, :enable]
+      supports status: true
+    end
+  end
+end

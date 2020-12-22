@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _master_slurm_finalize
+# Recipe:: head_node_slurm_finalize
 #
 # Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -14,6 +14,12 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+
+execute "check if clustermgtd heartbeat is available" do
+  command "cat /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
+  retries 30
+  retry_delay 10
+end
 
 ruby_block "submit dynamic fleet initialization jobs" do
   block do

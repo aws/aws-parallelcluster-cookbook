@@ -220,7 +220,7 @@
         }
       },
       "run_list" : [
-        "aws-parallelcluster::_default_pre"
+        "aws-parallelcluster::default_pre"
       ]
     },
     {
@@ -241,6 +241,7 @@
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
+          "is_official_ami_build": "true",
           "dcv": {
             "installed" : "{{user `dcv_installed`}}"
           },
@@ -265,6 +266,7 @@
       ],
       "json" : {
         "cfncluster" : {
+          "custom_node_package" : "{{user `custom_node_package`}}",
           "cfn_base_os" : "centos8"
         }
       },

@@ -182,13 +182,13 @@ def raise_os_not_match(current_os, specified_os)
 end
 
 #
-# Retrieve master ip and dns from file (HIT only)
+# Retrieve head node ip and dns from file (HIT only)
 #
-def hit_master_info
-  master_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
-  master_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
+def hit_head_node_info
+  head_node_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
+  head_node_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
 
-  [IO.read(master_private_ip_file).chomp, IO.read(master_private_dns_file).chomp]
+  [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
 end
 
 #
@@ -215,13 +215,13 @@ def hit_dynamodb_info
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
-  slurm_nodename, master_private_ip, master_private_dns = output.split(/\s+/)
+  slurm_nodename, head_node_private_ip, head_node_private_dns = output.split(/\s+/)
 
   Chef::Log.info("Retrieved Slurm nodename is: #{slurm_nodename}")
-  Chef::Log.info("Retrieved master private ip: #{master_private_ip}")
-  Chef::Log.info("Retrieved master private dns: #{master_private_dns}")
+  Chef::Log.info("Retrieved head node private ip: #{head_node_private_ip}")
+  Chef::Log.info("Retrieved head node private dns: #{head_node_private_dns}")
 
-  [slurm_nodename, master_private_ip, master_private_dns]
+  [slurm_nodename, head_node_private_ip, head_node_private_dns]
 end
 
 #
@@ -330,15 +330,13 @@ def find_rhel_minor_version
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
     raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
 
-    # Lustre repo string will be built following the official doc
-    # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
     if node['platform_version'].to_i == 7
-      os_minor_version = '.7' if kernel_patch_version[1] >= '1062'
-      os_minor_version = '.8' if kernel_patch_version[1] >= '1127'
-      os_minor_version = '.9' if kernel_patch_version[1] >= '1160'
+      os_minor_version = '7' if kernel_patch_version[1] >= '1062'
+      os_minor_version = '8' if kernel_patch_version[1] >= '1127'
+      os_minor_version = '9' if kernel_patch_version[1] >= '1160'
     elsif node['platform_version'].to_i == 8
-      os_minor_version = '.2' if kernel_patch_version[1] >= '193'
-      os_minor_version = '.3' if kernel_patch_version[1] >= '240'
+      os_minor_version = '2' if kernel_patch_version[1] >= '193'
+      os_minor_version = '3' if kernel_patch_version[1] >= '240'
     else
       raise "CentOS version #{node['platform_version']} not supported."
     end
@@ -380,7 +378,10 @@ def add_package_repository(repo_name, baseurl, gpgkey, distribution)
       retries 3
       retry_delay 5
     end
-    apt_update
+    apt_update 'update' do
+      retries 3
+      retry_delay 5
+    end
   else
     raise "platform not supported: #{node['platform_family']}"
   end
@@ -420,4 +421,14 @@ def efa_gdr_enabled?
     enabling_value = "master"
   end
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
+end
+
+# CentOS8 and alinux OSs currently not correctly supported by NFS cookbook
+# Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
+# When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
+def overwrite_nfs_template?
+  [
+    node['platform'] == 'amazon',
+    node['platform'] == 'centos' && node['platform_version'].to_i == 8
+  ].any?
 end

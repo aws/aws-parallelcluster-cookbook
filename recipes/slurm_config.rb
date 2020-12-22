@@ -41,9 +41,9 @@ end
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::_master_slurm_config'
+  include_recipe 'aws-parallelcluster::head_node_slurm_config'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster::_compute_slurm_config'
+  include_recipe 'aws-parallelcluster::compute_slurm_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

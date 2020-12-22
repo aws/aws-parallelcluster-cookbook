@@ -25,15 +25,15 @@ directory "#{node['cfncluster']['slurm_plugin_dir']}" do
   recursive true
 end
 
-# Retrieve compute and master node info from dynamodb and save into files
+# Retrieve compute and head node info from dynamodb and save into files
 if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
     block do
-      slurm_nodename, master_private_ip, master_private_dns = hit_dynamodb_info
+      slurm_nodename, head_node_private_ip, head_node_private_dns = hit_dynamodb_info
       node.force_default['cfncluster']['slurm_nodename'] = slurm_nodename
-      node.force_default['cfncluster']['cfn_master'] = master_private_dns
-      node.force_default['cfncluster']['cfn_master_private_ip'] = master_private_ip
+      node.force_default['cfncluster']['cfn_master'] = head_node_private_dns
+      node.force_default['cfncluster']['cfn_master_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3

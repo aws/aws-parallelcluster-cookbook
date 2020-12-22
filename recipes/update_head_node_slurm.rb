@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: update_master_slurm
+# Recipe:: update_head_node_slurm
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

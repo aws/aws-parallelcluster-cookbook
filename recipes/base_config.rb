@@ -17,6 +17,18 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
+# Restart sshd.service to make sure the service is running
+# This is a workaround for Centos 8 where the sshd.service fails at first start since it does not properly
+# wait for cloud-init.service to start. There is something wrong in Centos 8 systemd dependency chain.
+if node['platform'] == 'centos' && node['platform_version'].to_i == 8
+  service "sshd" do
+    supports restart: true
+    action %i[enable restart]
+  end
+end
+
+include_recipe 'aws-parallelcluster::nfs_config'
+
 # Setup ephemeral drives
 execute 'setup ephemeral' do
   command '/usr/local/sbin/setup-ephemeral-drives.sh'
@@ -36,16 +48,16 @@ end
 include_recipe 'aws-parallelcluster::chrony_config'
 
 # NVIDIA services (fabric manager)
-include_recipe "aws-parallelcluster::_nvidia_config"
+include_recipe "aws-parallelcluster::nvidia_config"
 
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
 
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::_master_base_config'
+  include_recipe 'aws-parallelcluster::head_node_base_config'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster::_compute_base_config'
+  include_recipe 'aws-parallelcluster::compute_base_config'
 else
   raise "cfn_node_type must be MasterServer or ComputeFleet"
 end

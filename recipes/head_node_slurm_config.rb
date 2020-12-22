@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: _master_slurm_config
+# Recipe:: head_node_slurm_config
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -164,7 +164,7 @@ end
 directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
   user 'root'
   group 'root'
-  mode '0644'
+  mode '0755'
   action :create
   recursive true
 end
