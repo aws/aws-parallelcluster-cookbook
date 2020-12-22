@@ -12,13 +12,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04.
 
 **CHANGES**
-- Upgrade EFA installer to version 1.11.0.
-  - EFA configuration: ``efa-config-1.5`` (from efa-config-1.4)
-  - EFA profile: ``efa-profile-1.1`` (from efa-profile-1.0.0)
-  - EFA kernel module: ``efa-1.10.2`` (from efa-1.6.0)
+- Upgrade EFA installer to version 1.11.1.
+  - EFA configuration: ``efa-config-1.7`` (from efa-config-1.5)
+  - EFA profile: ``efa-profile-1.3`` (from efa-profile-1.1)
+  - EFA kernel module: ``efa-1.10.2`` (no change)
   - RDMA core: ``rdma-core-31.2amzn`` (from rdma-core-31.amzn0)
-  - Libfabric: ``libfabric-1.11.1amzn1.1`` (from libfabric-1.10.1amzn1.1)
-  - Open MPI: ``openmpi40-aws-4.0.5`` (from openmpi40-aws-4.0.3)
+  - Libfabric: ``libfabric-1.11.1amzn1.0`` (from libfabric-1.11.1amzn1.1)
+  - Open MPI: ``openmpi40-aws-4.1.0`` (from openmpi40-aws-4.0.5)
 - Upgrade Intel MPI to version U8.
 - Upgrade NICE DCV to version 2020.2-9662.
 - Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation.
