@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.x.x
+-----
+
+**CHANGES**
+- Increase timeout when attaching EBS volumes from 3 to 5 minutes.
+
 2.10.1
 ------
 
