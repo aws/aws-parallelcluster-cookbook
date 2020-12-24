@@ -81,8 +81,8 @@ def main():
     state = response.get("State")
     x = 0
     while state != "attached":
-        if x == 36:
-            print("Volume %s failed to mount in 180 seconds." % volumeId)
+        if x == 60:
+            print("Volume %s failed to mount in 300 seconds." % volumeId)
             exit(1)
         if state in ["busy" or "detached"]:
             print("Volume %s in bad state %s" % (volumeId, state))
