@@ -181,7 +181,8 @@
       "type" : "shell",
       "inline" : [
         "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}}"
-      ]
+      ],
+      "max_retries": 3
     },
     {
       "type" : "shell",

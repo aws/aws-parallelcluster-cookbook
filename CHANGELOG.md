@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
+- Retry `berkshelf` installation up to 3 times.
 
 2.10.1
 ------
