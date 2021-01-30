@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
+  
+**BUG FIXES**
+- Fix `encrypted_ephemeral = true` when using Alinux2
 
 2.10.1
 ------
