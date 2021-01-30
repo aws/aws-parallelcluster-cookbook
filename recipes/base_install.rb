@@ -122,6 +122,14 @@ cookbook_file 'setup-ephemeral-drives.sh' do
   mode '0744'
 end
 
+cookbook_file 'setup-ephemeral.service' do
+  path '/etc/systemd/system/setup-ephemeral.service'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  only_if { node['init_package'] == 'systemd' }
+end
+
 include_recipe 'aws-parallelcluster::ec2_udev_rules'
 
 # Check whether install a custom aws-parallelcluster-node package or the standard one

@@ -28,10 +28,9 @@ end
 
 include_recipe 'aws-parallelcluster::nfs_config'
 
-# Setup ephemeral drives
-execute 'setup ephemeral' do
-  command '/usr/local/sbin/setup-ephemeral-drives.sh'
-  creates '/scratch'
+service "setup-ephemeral" do
+  supports restart: false
+  action %i[enable start]
 end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting
