@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
 #
@@ -13,124 +11,184 @@ set -x
 
 . /etc/parallelcluster/cfnconfig
 
-# Error exit function
-function error_exit () {
-  script=`basename $0`
-  echo "parallelcluster: $script - $1"
-  logger -t parallelcluster "$script - $1"
+LVM_VG_NAME="vg.01"
+LVM_NAME="lv_ephemeral"
+LVM_PATH="/dev/${LVM_VG_NAME}/${LVM_NAME}"
+LVM_ACTIVE_STATE="a"
+FS_TYPE="ext4"
+MOUNT_OPTIONS="noatime,nodiratime"
+# ephemeral_dir is set by cfnconfig
+INPUT_MOUNTPOINT="${ephemeral_dir}"
+
+function log {
+  SCRIPT=$(basename "$0")
+  MESSAGE="$1"
+  echo "ParallelCluster - ${MESSAGE}"
+}
+
+function error_exit {
+  log "[ERROR] $1"
   exit 1
 }
 
-function exec_command() {
-  _command_output=$($@ 2>&1)
-  _exit_code=$?
-  echo "${_command_output}" | grep -vi "you should reboot now" >& /dev/null
-  _grep_exit_code=$?
-
-  # Do not set RC=1 if error says that changes have been written but a reboot is required to inform the kernel
-  [[ ${_exit_code} -ne 0 && ${_grep_exit_code} -eq 0 ]] && RC=1
+function exit_noop {
+  log "[INFO] $1"
+  exit 0
 }
 
-function set_imds_token(){
-  if [ -z "${IMDS_TOKEN}" ];then
+function parameter_check {
+  if [[ -n "${INPUT_MOUNTPOINT}" ]]; then
+    exit_noop "Mount point not specified"
+  fi
+}
+
+function set_imds_token {
+  if [[ -z "${IMDS_TOKEN}" ]];then
     IMDS_TOKEN=$(curl --retry 3 --retry-delay 0 --fail -s -f -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 900" http://169.254.169.254/latest/api/token)
-    if [ "${?}" -gt 0 ] || [ -z "${IMDS_TOKEN}" ]; then
-      echo '[ERROR] Could not get IMDSv2 token. Instance Metadata might have been disabled or this is not an EC2 instance.'
-      exit 1
+    if [[ "$?" -gt 0 ]] || [[ -z "${IMDS_TOKEN}" ]]; then
+      error_exit "Could not get IMDSv2 token. Instance Metadata might have been disabled or this is not an EC2 instance"
     fi
   fi
 }
 
-# param1 = query
-function get_meta() {
-    local imds_out=$(curl --retry 3 --retry-delay 0 --fail -s -q -H "X-aws-ec2-metadata-token:${IMDS_TOKEN}" -f http://169.254.169.254/latest/${1})
-    echo -n "${imds_out}"
+function get_metadata {
+    QUERY=$1
+    local IMDS_OUTPUT
+    IMDS_OUTPUT=$(curl --retry 3 --retry-delay 0 --fail -s -q -H "X-aws-ec2-metadata-token:${IMDS_TOKEN}" -f "http://169.254.169.254/latest/${QUERY}")
+    echo -n "${IMDS_OUTPUT}"
 }
 
-#print block-device-mapping
-function print_block-device-mapping(){
+function print_block_device_mapping {
   echo 'block-device-mapping: '
-  x=$(get_meta meta-data/block-device-mapping/)
-  if [ -n "${x}" ]; then
-    for i in $x; do
-      echo -e '\t' $i: $(get_meta meta-data/block-device-mapping/$i)
+  DEVICE_MAPPING_LIST=$(get_metadata meta-data/block-device-mapping/)
+  if [[ -n "${DEVICE_MAPPING_LIST}" ]]; then
+    for DEVICE_MAPPING in ${DEVICE_MAPPING_LIST}; do
+      echo -e '\t' "${DEVICE_MAPPING}: $(get_metadata meta-data/block-device-mapping/"${DEVICE_MAPPING}")"
     done
   else
-    echo not available
+    echo "NOT AVAILABLE"
   fi
 }
 
-# LVM stripe, format, mount ephemeral drives
-function setup_ephemeral_drives () {
-  RC=0
-  mkdir -p ${ephemeral_dir} || RC=1
-  chmod 1777 ${ephemeral_dir} || RC=1
+function check_instance_store {
   if ls /dev/nvme* >& /dev/null; then
     IS_NVME=1
-    MAPPING=$(realpath --relative-to=/dev/ -P  /dev/disk/by-id/nvme*Instance_Storage* | uniq)
+    MAPPINGS=$(realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "*Instance_Storage*" | uniq)
   else
     IS_NVME=0
     set_imds_token
-    MAPPING=$(print_block-device-mapping | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
+    MAPPINGS=$(print_block_device_mapping | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
   fi
-  NUM_DEVS=0
-  for m in $MAPPING; do
-    umount /dev/${m} >/dev/null 2>&1
-    stat -t /dev/${m} >/dev/null 2>&1
-    check=$?
-    if [ ${check} -eq 0 ]; then
-      DEVS="${m} $DEVS"
-      let NUM_DEVS++
+
+  NUM_DEVICES=0
+  for MAPPING in ${MAPPINGS}; do
+    umount "/dev/${MAPPING}" &>/dev/null
+    STAT_COMMAND="stat -t /dev/${MAPPING}"
+    if ${STAT_COMMAND} &>/dev/null; then
+      DEVICES+=("/dev/${MAPPING}")
+      NUM_DEVICES=$((NUM_DEVICES + 1))
     fi
   done
-  if [ $NUM_DEVS -gt 0 ]; then
-    for d in $DEVS; do
-      d=/dev/${d}
-      dd if=/dev/zero of=${d} bs=32k count=1 || RC=1
-      exec_command "parted -s ${d} mklabel gpt"
-      exec_command "parted -s ${d}"
-      exec_command "parted -s -a optimal ${d} mkpart primary 1MB 100%"
-      partprobe ${d}
-      exec_command "parted -s ${d} set 1 lvm on"
-      if [ $IS_NVME -eq 1 ]; then
-        PARTITIONS="${d}p1 $PARTITIONS"
-      else
-        PARTITIONS="${d}1 $PARTITIONS"
-      fi
-    done
-    if [ $RC -ne 0 ]; then
-      error_exit "Failed to detect and/or partition ephemeral devices."
-    fi
 
-    # sleep 10 seconds to let partitions settle (bug?)
-    sleep 10
-
-    # Setup LVM
-    RC=0
-    pvcreate -y $PARTITIONS || RC=1
-    vgcreate vg.01 $PARTITIONS || RC=1
-    lvcreate -i $NUM_DEVS -I 64 -l 100%FREE -n lv_ephemeral vg.01 || RC=1
-    if [ "${encrypted_ephemeral}" == "true" ]; then
-      modprobe brd || RC=1
-      mkfs -q /dev/ram1 1024 || RC=1
-      mkdir -p /root/keystore || RC=1
-      mount /dev/ram1 /root/keystore || RC=1
-      dd if=/dev/urandom of=/root/keystore/keyfile bs=1024 count=4 || RC=1
-      chmod 0400 /root/keystore/keyfile || RC=1
-      cryptsetup -q luksFormat /dev/vg.01/lv_ephemeral /root/keystore/keyfile || RC=1
-      cryptsetup -d /root/keystore/keyfile luksOpen /dev/vg.01/lv_ephemeral ephemeral_luks || RC=1
-      mkfs.ext4 /dev/mapper/ephemeral_luks || RC=1
-      mount -v -t ext4 -o noatime,nodiratime /dev/mapper/ephemeral_luks ${ephemeral_dir} || RC=1
-    else
-      mkfs.ext4 /dev/vg.01/lv_ephemeral || RC=1
-      echo "/dev/vg.01/lv_ephemeral ${ephemeral_dir} ext4 noatime,nodiratime 0 0" >> /etc/fstab || RC=1
-      mount -v ${ephemeral_dir} || RC=1
-    fi
+  if [[ "${NUM_DEVICES}" -gt 0 ]]; then
+    log "This instance type has (${NUM_DEVICES}) device(s) for instance store: (${DEVICES[*]})"
+  else
+    exit_noop "This instance type doesn't have instance store"
   fi
-  chmod 1777 ${ephemeral_dir} || RC=1
-  if [ $RC -ne 0 ]; then
-    error_exit "Failed to create LVM stripe and/or format ephemeral volume."
+
+  if [[ "${IS_NVME}" -eq 0 ]]; then
+    log "This instance store may suffer first-write penalty unless initialized: please have a look at https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/disk-performance.html"
+    # Initialization can take long time, even hours
+    # for DEVICE in "${DEVICES[@]}"; do
+    #  dd if=/dev/zero of="${DEVICE}" bs=1M
+    # done
   fi
 }
 
-setup_ephemeral_drives
+function create_lvm {
+  log "Creating LVM (${LVM_PATH})"
+  pvcreate -y "${DEVICES[@]}"
+  vgcreate -y "${LVM_VG_NAME}" "${DEVICES[@]}"
+  LVM_CREATE_COMMAND="lvcreate -y -i ${NUM_DEVICES} -I 64 -l 100%FREE -n ${LVM_NAME} ${LVM_VG_NAME}"
+  if ! ${LVM_CREATE_COMMAND}; then
+    error_exit "Failed to create LVM"
+  else
+    log "LVM (${LVM_PATH}) created successfully"
+  fi
+}
+
+function check_lvm_exist {
+  LVM_EXIST_COMMAND="lvs ${LVM_PATH} --nosuffix --noheadings -q"
+
+  if ! ${LVM_EXIST_COMMAND} &>/dev/null; then
+    log "LVM (${LVM_PATH}) does not exist"
+    create_lvm
+  else
+    log "LVM (${LVM_PATH}) already exists"
+  fi
+}
+
+function activate_lvm {
+  LVM_STATE=$(lvs "${LVM_PATH}" --nosuffix --noheadings -o lv_attr | xargs | cut -c5)
+  log "Found LVM (${LVM_PATH}) in state (${LVM_STATE})"
+
+  if [[ "${LVM_STATE}" != "${LVM_ACTIVE_STATE}" ]]; then
+    log "Activating LVM (${LVM_PATH})"
+    LVM_ACTIVATE_COMMAND="lvchange -ay ${LVM_PATH}"
+    if ! ${LVM_ACTIVATE_COMMAND}; then
+      error_exit "Failed to activate LVM"
+    else
+      log "LVM (${LVM_PATH}) activated successfully"
+    fi
+  fi
+}
+
+function format_lvm {
+  LVM_FS_TYPE=$(lsblk "${LVM_PATH}" --noheadings -o FSTYPE | xargs)
+  log "Found LVM (${LVM_PATH}) FS type (${LVM_FS_TYPE})"
+
+  if [[ "${LVM_FS_TYPE}" != "${FS_TYPE}" ]]; then
+    log "Formatting LVM (${LVM_PATH}) with FS type (${FS_TYPE})"
+    LVM_FORMAT_COMMAND="mkfs -t ${FS_TYPE} ${LVM_PATH}"
+    if ! ${LVM_FORMAT_COMMAND}; then
+      error_exit "Failed to format LVM"
+    else
+      log "LVM (${LVM_PATH}) formatted successfully"
+    fi
+    sync
+    sleep 1
+  else
+    log "LVM (${LVM_PATH}) already formatted with FS type (${LVM_FS_TYPE})"
+  fi
+}
+
+function mount_lvm {
+  LVM_MOUNTPOINT=$(lsblk "${LVM_PATH}" -o MOUNTPOINT --noheadings | xargs)
+
+  if [[ -z ${LVM_MOUNTPOINT} ]]; then
+    log "LVM (${LVM_PATH}) not mounted, mounting on (${INPUT_MOUNTPOINT})"
+    # create mount
+    chmod 1777 "${INPUT_MOUNTPOINT}"
+    LVM_MOUNT_COMMAND="mount -v -t ${FS_TYPE} -o ${MOUNT_OPTIONS} ${LVM_PATH} ${INPUT_MOUNTPOINT}"
+    if ! ${LVM_MOUNT_COMMAND}; then
+      error_exit "Failed to mount LVM"
+    else
+      log "LVM (${LVM_PATH}) mounted successfully"
+    fi
+    # set mount permission
+    chmod 1777 "${INPUT_MOUNTPOINT}"
+  else
+    log "LVM (${LVM_PATH}) already mounted on (${LVM_MOUNTPOINT})"
+  fi
+}
+
+function main {
+  parameter_check
+  check_instance_store
+  check_lvm_exist
+  activate_lvm
+  format_lvm
+  mount_lvm
+}
+
+main
