@@ -281,7 +281,8 @@ when 'rhel', 'amazon'
       # gdisk required for FSx
       # environment-modules required for IntelMPI
       # libtirpc and libtirpc-devel required for SGE
-      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli gdisk environment-modules libtirpc libtirpc-devel])
+      # cryptsetup used for ephemeral drive encryption
+      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
     end
 
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'

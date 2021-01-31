@@ -11,7 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Retry `berkshelf` installation up to 3 times.
   
 **BUG FIXES**
-- Fix `encrypted_ephemeral = true` when using Alinux2
+- Fix `encrypted_ephemeral = true` when using Alinux2 or CentOS8
 
 2.10.1
 ------
