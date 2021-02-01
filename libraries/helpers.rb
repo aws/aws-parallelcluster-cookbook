@@ -432,3 +432,13 @@ def overwrite_nfs_template?
     node['platform'] == 'centos' && node['platform_version'].to_i == 8
   ].any?
 end
+
+def parallelcluster_accound_id
+  if node['cfncluster']['cfn_region'].start_with?("cn-")
+    "036028979999"
+  elsif node['cfncluster']['cfn_region'].start_with?("us-gov-")
+    "124026578433"
+  else
+    "247102896272"
+  end
+end

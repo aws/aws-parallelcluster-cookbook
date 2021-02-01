@@ -143,10 +143,13 @@ check_options() {
 
     if [ "${_partition}" == "commercial" ]; then
       export AWS_REGION="${AWS_REGION-us-east-1}"
+      export PARALLELCLUSTER_ACCOUNT_ID="247102896272"
     elif [ "${_partition}" == "govcloud" ]; then
       export AWS_REGION="${AWS_REGION-us-gov-west-1}"
+      export PARALLELCLUSTER_ACCOUNT_ID="124026578433"
     elif [ "${_partition}" == "china" ]; then
       export AWS_REGION="${AWS_REGION-cn-north-1}"
+      export PARALLELCLUSTER_ACCOUNT_ID="036028979999"
     elif [ "${_partition}" == "region" ]; then
       export AWS_REGION="${_region}"
     else

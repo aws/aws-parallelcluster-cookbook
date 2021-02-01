@@ -3,12 +3,16 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-2.x.x
+2.10.2
 -----
 
 **CHANGES**
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
+
+**ENHANCEMENTS**
+
+- Check bucket owner when accessing public ParallelCluster artifacts to prevent S3 buckets sniping
 
 2.10.1
 ------

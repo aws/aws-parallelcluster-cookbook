@@ -28,6 +28,7 @@ remote_file intelmpi_installer_path do
   mode '0744'
   retries 3
   retry_delay 5
+  headers("x-amz-expected-bucket-owner" => parallelcluster_accound_id)
   not_if { ::File.exist?("/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}") }
 end
 

@@ -26,6 +26,7 @@ remote_file armpl_installer do
   mode '0644'
   retries 3
   retry_delay 5
+  headers("x-amz-expected-bucket-owner" => parallelcluster_accound_id)
   not_if { ::File.exist?("/opt/arm/armpl/#{node['cfncluster']['armpl']['version']}") }
 end
 

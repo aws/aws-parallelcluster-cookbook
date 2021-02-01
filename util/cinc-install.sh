@@ -115,7 +115,7 @@ capture_tmp_stderr() {
 # do_wget URL FILENAME
 do_wget() {
   echo "trying wget..."
-  wget --user-agent="User-Agent: mixlib-install/3.11.27" -O "$2" "$1" 2>$tmp_dir/stderr
+  wget -E --header x-amz-expected-bucket-owner:${PARALLELCLUSTER_ACCOUNT_ID} --user-agent="User-Agent: mixlib-install/3.11.27" -O "$2" "$1" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "ERROR 404" $tmp_dir/stderr 2>&1 >/dev/null
@@ -136,7 +136,7 @@ do_wget() {
 # do_curl URL FILENAME
 do_curl() {
   echo "trying curl..."
-  curl -A "User-Agent: mixlib-install/3.11.27" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
+  curl -H x-amz-expected-bucket-owner:${PARALLELCLUSTER_ACCOUNT_ID} -A "User-Agent: mixlib-install/3.11.27" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
   rc=$?
   # check for 404
   grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null

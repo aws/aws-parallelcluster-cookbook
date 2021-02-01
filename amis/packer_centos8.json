@@ -25,7 +25,8 @@
     "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}",
     "ami_arch" : "{{env `AMI_ARCH`}}",
     "user_data_file" : "{{env `USER_DATA_SCRIPT`}}",
-    "iam_instance_profile" : "{{env `AWS_IAM_PROFILE`}}"
+    "iam_instance_profile" : "{{env `AWS_IAM_PROFILE`}}",
+    "parallelcluster_account_id" : "{{env `PARALLELCLUSTER_ACCOUNT_ID`}}"
   },
   "builders" : [
     {
@@ -189,7 +190,7 @@
         "region=\"{{user `region`}}\"",
         "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
         "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
-        "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
+        "curl --retry 3 -L ${chef_install_url} -H x-amz-expected-bucket-owner:{{user `parallelcluster_account_id`}} | sudo bash -s -- -v {{user `chef_version`}}"
       ]
     },
     {

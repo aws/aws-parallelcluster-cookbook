@@ -35,6 +35,7 @@ def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
     mode '0744'
     retries 3
     retry_delay 5
+    headers("x-amz-expected-bucket-owner" => parallelcluster_accound_id)
     not_if { ::File.exist?(dest_path) }
   end
 end
