@@ -208,11 +208,26 @@ end
 # Amazon Time Sync
 ###################
 if node['init_package'] == 'init'
-  chrony_check_command = "service #{node['cfncluster']['chrony']['service']} status | grep -i running"
+  get_chrony_status_command = "service #{node['cfncluster']['chrony']['service']} status"
 elsif node['init_package'] == 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
-  chrony_check_command = "systemctl show -p SubState #{node['cfncluster']['chrony']['service']} | grep -i running"
+  get_chrony_status_command = "systemctl show -p SubState #{node['cfncluster']['chrony']['service']}"
+end
+chrony_check_command = get_chrony_status_command + " | grep -i running"
+
+ruby_block 'log_chrony_status' do
+  block do
+    if node['init_package'] == 'init'
+      get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cfncluster']['chrony']['service']}'"
+    elsif node['init_package'] == 'systemd'
+      get_chrony_service_log_command = "journalctl -u #{node['cfncluster']['chrony']['service']}"
+    end
+    chrony_log = shell_out!(get_chrony_service_log_command).stdout
+    Chef::Log.debug("chrony service log: #{chrony_log}")
+    chrony_status = shell_out!(get_chrony_status_command).stdout
+    Chef::Log.debug("chrony status is #{chrony_status}")
+  end
 end
 
 execute 'check chrony running' do
