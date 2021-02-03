@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.x.x
 -----
 
+**ENHANCEMENTS**
+- Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
+
 **CHANGES**
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
