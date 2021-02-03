@@ -48,15 +48,3 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   action :create
   only_if { node['init_package'] == 'systemd' }
 end
-
-if node['init_package'] == 'systemd'
-  service "slurmd" do
-    supports restart: false
-    action %i[enable]
-  end
-else
-  service "slurm" do
-    supports restart: false
-    action %i[enable]
-  end
-end
