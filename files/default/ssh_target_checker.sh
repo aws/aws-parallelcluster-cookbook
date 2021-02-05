@@ -24,7 +24,9 @@ retrieve_vpc_cidr_list() {
     fi
 
     vpc_cidr_uri="http://169.254.169.254/latest/meta-data/network/interfaces/macs/${mac}/vpc-ipv4-cidr-blocks"
-    if ! mapfile -t vpc_cidr_list < <(curl --retry 3 --retry-delay 0 --silent --fail "${vpc_cidr_uri}"); then
+    vpc_cidr_list=($(curl --retry 3 --retry-delay 0 --silent --fail "${vpc_cidr_uri}"))
+
+    if ! (( ${#vpc_cidr_list[@]} )); then
        log "Unable to retrieve VPC CIDR list from EC2 meta-data"
        exit 1
     fi
