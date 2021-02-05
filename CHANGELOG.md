@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
+- Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
 
 **CHANGES**
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
