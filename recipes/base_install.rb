@@ -92,7 +92,7 @@ bash "install awscli" do
   code <<-CLI
     set -e
     curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    unzip awscli-bundle.zip
+    unzip -o awscli-bundle.zip
     #{node['cfncluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
   CLI
   not_if { ::File.exist?("/usr/local/bin/aws") }
