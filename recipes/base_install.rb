@@ -93,6 +93,11 @@ bash "install awscli" do
     set -e
     curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     unzip awscli-bundle.zip
+    tar -zxvf awscli-bundle/packages/rsa-4.5.tar.gz -C awscli-bundle/packages
+    rm awscli-bundle/packages/rsa-4.5/README.md
+    touch awscli-bundle/packages/rsa-4.5/README.md
+    tar -czf awscli-bundle/packages/rsa-4.5.tar.gz awscli-bundle/packages/rsa-4.5
+    rm -rf awscli-bundle/packages/rsa-4.5
     #{node['cfncluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
   CLI
   not_if { ::File.exist?("/usr/local/bin/aws") }
