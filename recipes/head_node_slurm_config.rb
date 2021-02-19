@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+setup_munge_head_node()
+
 # Export /opt/slurm
 nfs_export "/opt/slurm" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']

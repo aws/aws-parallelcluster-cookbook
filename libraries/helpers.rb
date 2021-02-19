@@ -432,3 +432,46 @@ def overwrite_nfs_template?
     node['platform'] == 'centos' && node['platform_version'].to_i == 8
   ].any?
 end
+
+def enable_munge_service
+  service "munge" do
+    supports restart: true
+    action %i[enable start]
+  end
+end
+
+def setup_munge_head_node
+  # Generate munge key
+  bash 'generate_munge_key' do
+    user 'munge'
+    group 'munge'
+    cwd '/tmp'
+    code <<-HEAD_MUNGE_KEY
+      set -e
+      # Generates munge key in /etc/munge/munge.key
+      /usr/sbin/mungekey --verbose
+      # Enforce correct permission on the key
+      chmod 0600 /etc/munge/munge.key
+      # Copy key to shared dir
+      cp -p /etc/munge/munge.key /home/munge/.munge.key
+    HEAD_MUNGE_KEY
+  end
+
+  enable_munge_service()
+end
+
+def setup_munge_compute_node
+  # Get munge key
+  bash 'get_munge_key' do
+    user 'munge'
+    group 'munge'
+    cwd '/tmp'
+    code <<-COMPUTE_MUNGE_KEY
+      set -e
+      # Copy munge key from shared dir
+      cp -p /home/munge/.munge.key /etc/munge/munge.key
+    COMPUTE_MUNGE_KEY
+  end
+
+  enable_munge_service()
+end
