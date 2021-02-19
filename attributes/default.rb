@@ -108,8 +108,6 @@ default['cfncluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03e
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.14'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
-# Munge key
-default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
 
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
