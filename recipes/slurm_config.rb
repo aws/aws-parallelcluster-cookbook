@@ -18,19 +18,6 @@
 include_recipe 'aws-parallelcluster::base_config'
 include_recipe 'aws-parallelcluster::slurm_install'
 
-# Create the munge key from template
-template "/etc/munge/munge.key" do
-  source "munge.key.erb"
-  owner "munge"
-  mode "0600"
-end
-
-# Enable munge service
-service "munge" do
-  supports restart: true
-  action %i[enable start]
-end
-
 cookbook_file '/etc/init.d/slurm' do
   source 'slurm-init'
   owner 'root'
