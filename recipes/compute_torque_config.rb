@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+setup_munge_compute_node()
+
 # pbs_mom config
 template '/var/spool/torque/mom_priv/config' do
   source 'torque.config.erb'
