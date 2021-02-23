@@ -137,7 +137,7 @@ def _get_jinja_env(template_directory):
     # The contents of the default templates are known and the input configuration data is
     # validated by the CLI.
     env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)  # nosec nosemgrep
-    env.filters["sanify_instance_type"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
+    env.filters["sanify_name"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
     env.filters["gpus"] = lambda instance_type: _gpu_count(instance_type)
     env.filters["gpu_type"] = lambda instance_type: _gpu_type(instance_type)
     env.filters["vcpus"] = lambda compute_resource: _vcpus(compute_resource)
@@ -207,8 +207,8 @@ def generate_instance_type_mapping_file(output_dir, queues):
         for compute_resource in compute_resources:
             instance_type = compute_resource.get("InstanceType")
             # Remove all characters excepts letters and numbers
-            sanitized_instance_type = re.sub(hostname_regex, "", instance_type)
-            instance_name_type_mapping[sanitized_instance_type] = instance_type
+            sanitized_compute_name = re.sub(hostname_regex, "", compute_resource.get("Name"))
+            instance_name_type_mapping[sanitized_compute_name] = instance_type
 
     filename = f"{output_dir}/instance_name_type_mappings.json"
     log.info("Generating %s", filename)
