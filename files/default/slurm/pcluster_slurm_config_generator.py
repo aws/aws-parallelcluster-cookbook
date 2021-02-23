@@ -156,11 +156,11 @@ def generate_instance_type_mapping_file(output_dir, queue_settings):
     for _, queue_config in queue_settings.items():
         compute_resource_settings = queue_config["compute_resource_settings"]
         hostname_regex = re.compile("[^A-Za-z0-9]")
-        for _, compute_resource_config in compute_resource_settings.items():
+        for compute_resource_name, compute_resource_config in compute_resource_settings.items():
             instance_type = compute_resource_config.get("instance_type")
             # Remove all characters excepts letters and numbers
-            sanitized_instance_type = re.sub(hostname_regex, "", instance_type)
-            instance_name_type_mapping[sanitized_instance_type] = instance_type
+            sanitized_compute_name = re.sub(hostname_regex, "", compute_resource_name)
+            instance_name_type_mapping[sanitized_compute_name] = instance_type
 
     filename = f"{output_dir}/instance_name_type_mappings.json"
     log.info("Generating %s", filename)
