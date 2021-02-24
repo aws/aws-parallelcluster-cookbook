@@ -58,7 +58,7 @@
                         "spot_price": null,
                         "vcpus": 16,
                         "gpus": 2,
-                        "gpu_type": "M60",
+                        "gpu_type": "m60",
                         "enable_efa": false
                     },
                     "gpu_p3dn.24xlarge": {
@@ -68,7 +68,7 @@
                         "spot_price": null,
                         "vcpus": 48,
                         "gpus": 8,
-                        "gpu_type": "V100",
+                        "gpu_type": "v100",
                         "enable_efa": false
                     }
                 },
