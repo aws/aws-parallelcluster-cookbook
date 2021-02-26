@@ -463,13 +463,17 @@ end
 def setup_munge_compute_node
   # Get munge key
   bash 'get_munge_key' do
-    user 'munge'
-    group 'munge'
+    user 'root'
+    group 'root'
     cwd '/tmp'
     code <<-COMPUTE_MUNGE_KEY
       set -e
-      # Copy munge key from shared dir
+      # Copy munge key from shared dir as root
       cp -p /home/munge/.munge.key /etc/munge/munge.key
+      # Set ownership on the key
+      chown munge:munge /etc/munge/munge.key
+      # Enforce correct permission on the key
+      chmod 0600 /etc/munge/munge.key
     COMPUTE_MUNGE_KEY
   end
 
