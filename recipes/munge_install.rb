@@ -67,11 +67,10 @@ end
 
 # Make sure the munge user exists
 user 'munge' do
-  manage_home true
+  manage_home false
   comment 'munge user'
-  home "/home/munge"
   system true
-  shell '/usr/sbin/nologin'
+  shell '/sbin/nologin'
 end
 
 # Create required directories for munge
