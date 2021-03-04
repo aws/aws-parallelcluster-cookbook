@@ -29,6 +29,7 @@ if efs_shared_dir != "NONE"
     owner 'root'
     group 'root'
     mode '1777'
+    recursive true
     action :create
   end
 
