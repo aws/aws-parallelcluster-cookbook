@@ -33,6 +33,13 @@ activate_virtual_env node['cfncluster']['node_virtualenv'] do
   not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
 end
 
+# Install awsbatch virtualenv
+activate_virtual_env node['cfncluster']['awsbatch_virtualenv'] do
+  pyenv_path node['cfncluster']['awsbatch_virtualenv_path']
+  python_version node['cfncluster']['python-version']
+  not_if { ::File.exist?("#{node['cfncluster']['awsbatch_virtualenv_path']}/bin/activate") }
+end
+
 bash 'install CloudFormation helpers' do
   user 'root'
   group 'root'
