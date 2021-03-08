@@ -1,0 +1,8 @@
+#
+# pcluster_awsbatchcli.sh:
+#   Setup ParallelCluster AWSBatch CLI environment variables
+#
+
+PATH=$PATH:<%= node['cfncluster']['awsbatch_virtualenv_path'] %>/bin
+
+export PATH
