@@ -1,3 +1,5 @@
+require: rubocop-gitlab-security
+
 ParameterAlignment:
   Enabled: false
 

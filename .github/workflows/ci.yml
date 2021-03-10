@@ -1,0 +1,26 @@
+name: ParallelCluster Cookbook CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        name:
+          - Setup Ruby
+        include:
+          - name: Setup Ruby
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+      - name: Install dependencies
+        run: bundle install --with style
+      - name: Run Rubocop
+        run: rubocop --only GitlabSecurity
