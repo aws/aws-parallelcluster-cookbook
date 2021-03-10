@@ -72,8 +72,12 @@ bash 'make install' do
   code <<-GCC
       set -e
 
+      # Remove dir if it exists. This happens in case of retries.
+      rm -rf gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}
       tar -xf #{gcc_tarball}
       cd gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}
+      # Patch the download_prerequisites script to download over https and not ftp. This works better in China regions.
+      sed -i "s#ftp://gcc\.gnu\.org#https://gcc.gnu.org#g" ./contrib/download_prerequisites
       ./contrib/download_prerequisites
       mkdir build && cd build
       ../configure --prefix=/opt/arm/armpl/gcc/#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
@@ -81,6 +85,8 @@ bash 'make install' do
       make -j $CORES
       make install
   GCC
+  retries 3
+  retry_delay 5
   creates '/opt/arm/armpl/gcc'
 end
 
