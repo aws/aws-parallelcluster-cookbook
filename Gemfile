@@ -8,6 +8,7 @@ group :style do
   gem 'foodcritic', '~> 16.2.0'
   gem 'rake', '~> 13.0.1'
   gem 'rubocop', '~> 0.80.1'
+  gem 'rubocop-gitlab-security'
 end
 
 group :test do
