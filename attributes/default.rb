@@ -443,3 +443,6 @@ default['cfncluster']['aws_domain'] = aws_domain
 
 # Official ami build
 default['cfncluster']['is_official_ami_build'] = false
+
+# Additional instance types data
+default['instance_types_data'] = nil
