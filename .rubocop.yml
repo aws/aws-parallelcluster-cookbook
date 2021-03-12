@@ -1,19 +1,50 @@
 require: rubocop-gitlab-security
 
-ParameterAlignment:
-  Enabled: false
-
-Encoding:
-  Enabled: false
-
-LineLength:
+Layout/LineLength:
   Max: 200
 
-StringLiterals:
+Layout/ParameterAlignment:
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/BlockLength:
+  Max: 60
+
+Metrics/BlockNesting:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/MethodLength:
+  Max: 60
+
+Metrics/PerceivedComplexity:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
+Style/Encoding:
   Enabled: false
 
 Style/NumericLiteralPrefix:
     EnforcedOctalStyle: zero_only
+
+Style/StringLiterals:
+  Enabled: false
+
+# These three cop configurations are here to supress warnings when running rubocop
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
 
 AllCops:
   Exclude:

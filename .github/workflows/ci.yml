@@ -23,4 +23,4 @@ jobs:
       - name: Install dependencies
         run: bundle install --with style
       - name: Run Rubocop
-        run: rubocop --only GitlabSecurity
+        run: rubocop

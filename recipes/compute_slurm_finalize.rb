@@ -27,11 +27,11 @@ directory '/etc/sysconfig' do
   mode '0644'
 end
 
-if node['init_package'] == 'systemd'
-  slurm_service_binary = "slurmd"
-else
-  slurm_service_binary = "slurm"
-end
+slurm_service_binary = if node['init_package'] == 'systemd'
+                         "slurmd"
+                       else
+                         "slurm"
+                       end
 
 template "/etc/sysconfig/#{slurm_service_binary}" do
   source 'slurm/slurm.sysconfig.erb'

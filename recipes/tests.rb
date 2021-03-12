@@ -402,7 +402,7 @@ unless node['cfncluster']['cfn_base_os'] == 'alinux' && get_nvswitches > 1
         echo "No GPU detected, no test needed."
         exit 0
       fi
-  
+
       set -e
       cuda_ver="#{node['cfncluster']['nvidia']['cuda_version']}"
       # Test CUDA installation
@@ -417,7 +417,7 @@ unless node['cfncluster']['cfn_base_os'] == 'alinux' && get_nvswitches > 1
       else
         echo "CUDA nvcc test passed, $cuda_output"
       fi
-  
+
       # Test deviceQuery
       echo "Testing CUDA install with deviceQuery..."
       /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
@@ -521,9 +521,7 @@ unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
       nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
       Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
       expected_threads = [node['cpu']['cores'].to_i, 8].max
-      if nfs_threads != expected_threads
-        raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}"
-      end
+      raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}" if nfs_threads != expected_threads
     end
     action :nothing
   end
@@ -552,9 +550,9 @@ end
 ###################
 require 'chef/mixin/shell_out'
 
-virtual_envs = ["#{node['cfncluster']['node_virtualenv_path']}", "#{node['cfncluster']['cookbook_virtualenv_path']}"]
+virtual_envs = [node['cfncluster']['node_virtualenv_path'], node['cfncluster']['cookbook_virtualenv_path']]
 
-for virtual_env in virtual_envs
+virtual_envs.each do |virtual_env|
   ruby_block 'check pip version' do
     block do
       pip_version = nil
@@ -595,9 +593,9 @@ end
 ###################
 # Pcluster AWSBatch CLI
 ###################
-if node['cfncluster']['cfn_scheduler'] == 'awsbatch' and node['cfncluster']['cfn_node_type'] == 'MasterServer'
+if node['cfncluster']['cfn_scheduler'] == 'awsbatch' && node['cfncluster']['cfn_node_type'] == 'MasterServer'
   # Test that batch commands can be accessed without absolute path
-  batch_cli_commands = ["awsbkill", "awsbqueues", "awsbsub", "awsbhosts", "awsbout", "awsbstat"]
+  batch_cli_commands = %w[awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat]
   batch_cli_commands.each do |cli_commmand|
     bash "test_#{cli_commmand}" do
       cwd Chef::Config[:file_cache_path]
