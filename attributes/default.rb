@@ -36,10 +36,14 @@ default['cfncluster']['system_pyenv_root'] = "#{node['cfncluster']['base_dir']}/
 default['cfncluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 # Virtualenv Node Name
 default['cfncluster']['node_virtualenv'] = 'node_virtualenv'
+# Virtualenv AWSBatch Name
+default['cfncluster']['awsbatch_virtualenv'] = 'awsbatch_virtualenv'
 # Cookbook Virtualenv Path
 default['cfncluster']['cookbook_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['cookbook_virtualenv']}"
 # Node Virtualenv Path
 default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
+# AWSBatch Virtualenv Path
+default['cfncluster']['awsbatch_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['awsbatch_virtualenv']}"
 
 # Intel Packages
 default['cfncluster']['psxe']['version'] = '2020.4-17'
@@ -85,9 +89,9 @@ default['cfncluster']['armpl']['url'] = value_for_platform(
 )
 
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.10.2'
-default['cfncluster']['cfncluster-cookbook-version'] = '2.10.2'
-default['cfncluster']['cfncluster-node-version'] = '2.10.2'
+default['cfncluster']['cfncluster-version'] = '2.10.3'
+default['cfncluster']['cfncluster-cookbook-version'] = '2.10.3'
+default['cfncluster']['cfncluster-node-version'] = '2.10.3'
 
 # URLs to software packages used during install recipes
 # Gridengine software
@@ -136,7 +140,7 @@ default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_p
 )
 
 # EFA
-default['cfncluster']['efa']['installer_version'] = '1.11.1'
+default['cfncluster']['efa']['installer_version'] = '1.11.2'
 default['cfncluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cfncluster']['efa']['installer_version']}.tar.gz"
 default['cfncluster']['enable_efa_gdr'] = "no"
 
