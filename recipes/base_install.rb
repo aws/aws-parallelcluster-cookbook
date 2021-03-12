@@ -66,10 +66,8 @@ package node['cfncluster']['base_packages'] do
 end
 
 # In the case of AL2, there are more packages to install via extras
-if node['cfncluster']['alinux_extras']
-  node['cfncluster']['alinux_extras'].each do |topic|
-    alinux_extras_topic topic
-  end
+node['cfncluster']['alinux_extras']&.each do |topic|
+  alinux_extras_topic topic
 end
 
 package "install kernel packages" do

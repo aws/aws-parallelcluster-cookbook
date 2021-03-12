@@ -93,27 +93,27 @@ shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
 shared_dir_array.each do |dir|
   dirname = dir.strip
 
-  unless dirname == "NONE"
-    dirname = "/" + dirname unless dirname.start_with?("/")
+  next if dirname == "NONE"
 
-    # Created shared mount point
-    directory dirname do
-      mode '1777'
-      owner 'root'
-      group 'root'
-      recursive true
-      action :create
-    end
+  dirname = "/" + dirname unless dirname.start_with?("/")
 
-    # Mount shared volume over NFS
-    mount dirname do
-      device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{dirname}" })
-      fstype 'nfs'
-      options 'hard,intr,noatime,_netdev'
-      action %i[mount enable]
-      retries 3
-      retry_delay 5
-    end
+  # Created shared mount point
+  directory dirname do
+    mode '1777'
+    owner 'root'
+    group 'root'
+    recursive true
+    action :create
+  end
+
+  # Mount shared volume over NFS
+  mount dirname do
+    device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{dirname}" })
+    fstype 'nfs'
+    options 'hard,intr,noatime,_netdev'
+    action %i[mount enable]
+    retries 3
+    retry_delay 5
   end
 end
 
