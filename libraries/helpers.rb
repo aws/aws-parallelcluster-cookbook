@@ -415,11 +415,11 @@ end
 # Check if EFA GDR is enabled (and supported) on this instance
 def efa_gdr_enabled?
   config_value = node['cfncluster']['enable_efa_gdr']
-  if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
-    enabling_value = "compute"
-  else
-    enabling_value = "master"
-  end
+  enabling_value = if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+                     "compute"
+                   else
+                     "master"
+                   end
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
 
@@ -455,8 +455,8 @@ def setup_munge_head_node
     HEAD_CREATE_MUNGE_KEY
   end
 
-  enable_munge_service()
-  share_munge_head_node()
+  enable_munge_service
+  share_munge_head_node
 end
 
 def share_munge_head_node
@@ -483,11 +483,11 @@ def setup_munge_compute_node
       # Copy munge key from shared dir
       cp /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key /etc/munge/munge.key
       # Set ownership on the key
-      chown munge:munge /etc/munge/munge.key      
+      chown munge:munge /etc/munge/munge.key
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     COMPUTE_MUNGE_KEY
   end
 
-  enable_munge_service()
+  enable_munge_service
 end

@@ -55,7 +55,7 @@ bash "install efa" do
     cd aws-efa-installer
     ./efa_installer.sh #{installer_options}
   EFAINSTALL
-  not_if { ::Dir.exist?('/opt/amazon/efa') && !efa_gdr_enabled?}
+  not_if { ::Dir.exist?('/opt/amazon/efa') && !efa_gdr_enabled? }
 end
 
 # EFA installer v1.11.0 removes libibverbs-core, which contains hwloc-devel during install

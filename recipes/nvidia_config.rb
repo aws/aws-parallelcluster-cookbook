@@ -20,7 +20,7 @@
 unless node['cfncluster']['cfn_base_os'] == 'alinux'
   if get_nvswitches > 1
     service 'nvidia-fabricmanager' do
-      action [:start, :enable]
+      action %i[start enable]
       supports status: true
     end
   end

@@ -31,13 +31,13 @@ ruby_block "submit dynamic fleet initialization jobs" do
     cluster_config["cluster"]["queue_settings"].each do |queue_name, queue_config|
       queue_config["compute_resource_settings"].each_value do |instance_config|
         required_dynamic = instance_config.fetch("initial_count", 0) - instance_config.fetch("min_count", 0)
-        if required_dynamic.positive?
-          # Submitting a job for each instance type that requires an initial_count > min_count
-          Chef::Log.info("Submitting job to run dynamic capacity for queue #{queue_name} and instance #{instance_config['instance_type']}")
-          submit_job_command = Shellwords.escape("/opt/slurm/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster "\
-                                                 "--constraint='[(dynamic&#{instance_config['instance_type']})*#{required_dynamic}]' --partition=#{queue_name}")
-          shell_out!("/bin/bash -c #{submit_job_command}")
-        end
+        next unless required_dynamic.positive?
+
+        # Submitting a job for each instance type that requires an initial_count > min_count
+        Chef::Log.info("Submitting job to run dynamic capacity for queue #{queue_name} and instance #{instance_config['instance_type']}")
+        submit_job_command = Shellwords.escape("/opt/slurm/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster "\
+                                               "--constraint='[(dynamic&#{instance_config['instance_type']})*#{required_dynamic}]' --partition=#{queue_name}")
+        shell_out!("/bin/bash -c #{submit_job_command}")
       end
     end
   end
@@ -55,7 +55,9 @@ ruby_block "wait for static fleet capacity" do
     # spot-dy-c5.xlarge-1 idle~
     # spot-st-t2.large-1 down
     # spot-st-t2.large-2 idle
-    is_fleet_ready_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }")
+    is_fleet_ready_command = Shellwords.escape(
+      "set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
+    )
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for static fleet capacity provisioning")
       sleep(15)

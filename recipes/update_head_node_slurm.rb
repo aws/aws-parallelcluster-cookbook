@@ -15,9 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 updated_cluster_config_path = "/tmp/cluster-config.updated.json"
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cfncluster']['cluster_s3_bucket']} --key #{node['cfncluster']['cluster_config_s3_key']}"\
+fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
+                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cfncluster']['cluster_config_s3_key']}"\
                        " --region #{node['cfncluster']['cfn_region']} #{updated_cluster_config_path}"
 fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
 shell_out!(fetch_config_command)

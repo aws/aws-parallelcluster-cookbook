@@ -79,9 +79,7 @@ include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster::network_interfaces_config"
 
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
-  include_recipe "aws-parallelcluster::prep_env_slurm"
-end
+include_recipe "aws-parallelcluster::prep_env_slurm" if node['cfncluster']['cfn_scheduler'] == 'slurm'
 
 # Configure hostname and DNS
 include_recipe "aws-parallelcluster::dns_config"

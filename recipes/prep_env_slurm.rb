@@ -17,7 +17,7 @@
 
 # Ensure slurm plugin directory is in place
 # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
-directory "#{node['cfncluster']['slurm_plugin_dir']}" do
+directory node['cfncluster']['slurm_plugin_dir'] do
   user 'root'
   group 'root'
   mode '0755'

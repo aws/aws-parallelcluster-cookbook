@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-setup_munge_head_node()
+setup_munge_head_node
 
 # Modified torque.setup
 template 'torque.setup' do

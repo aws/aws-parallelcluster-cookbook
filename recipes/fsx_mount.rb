@@ -33,7 +33,12 @@ if fsx_shared_dir != "NONE"
   end
 
   require 'chef/mixin/shell_out'
-  fsx_describe = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx --region #{node['cfncluster']['cfn_region']} describe-file-systems --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']} --query 'FileSystems[0].[DNSName,LustreConfiguration.MountName]' --output text", :user=>'root').stdout.strip
+  cmd = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx"\
+        " --region #{node['cfncluster']['cfn_region']}"\
+        " describe-file-systems"\
+        " --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']}"\
+        " --query 'FileSystems[0].[DNSName,LustreConfiguration.MountName]' --output text"
+  fsx_describe = shell_out!(cmd, user: 'root').stdout.strip
   dns_name, mountname = fsx_describe.split(/\s+/)
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 

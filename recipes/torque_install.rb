@@ -60,7 +60,7 @@ if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
       set -e
       # Headers needed for compilation
       # Download all packages matching the pattern 'libicu-dev_55.1-7ubuntu*amd64.deb'
-      # recursively (-r), avoiding to ascend to the parent dir (-np) 
+      # recursively (-r), avoiding to ascend to the parent dir (-np)
       # and without creating the hierarchy of directories (-nd)
       wget -r -np -nd http://security.ubuntu.com/ubuntu/pool/main/i/icu/ -A 'libicu-dev_55.1-7ubuntu*amd64.deb'
       dpkg -x libicu-dev_55.1-7ubuntu*amd64.deb extra_libs

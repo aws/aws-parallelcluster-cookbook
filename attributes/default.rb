@@ -76,17 +76,21 @@ default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 
 default['cfncluster']['armpl']['version'] = '20.2.1'
 default['cfncluster']['armpl']['gcc']['major_minor_version'] = '9.3'
 default['cfncluster']['armpl']['gcc']['patch_version'] = '0'
-default['cfncluster']['armpl']['gcc']['url'] = "https://ftp.gnu.org/gnu/gcc/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+default['cfncluster']['armpl']['gcc']['url'] = [
+  'https://ftp.gnu.org/gnu/gcc',
+  "gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}",
+  "gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+].join('/')
 default['cfncluster']['armpl']['platform'] = value_for_platform(
-    'centos' => { '~>8' => 'RHEL-8' },
-    'amazon' => { '2' => 'RHEL-8' },
-    'ubuntu' => { '18.04' => 'Ubuntu-16.04' }
+  'centos' => { '~>8' => 'RHEL-8' },
+  'amazon' => { '2' => 'RHEL-8' },
+  'ubuntu' => { '18.04' => 'Ubuntu-16.04' }
 )
-default['cfncluster']['armpl']['url'] = value_for_platform(
-    'centos' => { '~>8' => "archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
-    'amazon' => { '2' => "archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
-    'ubuntu' => { '18.04' => "archives/armpl/Ubuntu-16.04/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" }
-)
+default['cfncluster']['armpl']['url'] = [
+  'archives/armpl',
+  node['cfncluster']['armpl']['platform'],
+  "arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar"
+].join('/')
 
 # Python packages
 default['cfncluster']['cfncluster-version'] = '2.10.3'
@@ -134,7 +138,7 @@ default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform
 default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
   'default' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64",
   'centos' => {
-    '~>8' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64",
+    '~>8' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64"
   },
   'ubuntu' => { 'default' => "https://developer.download.nvidia.com/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
 )
@@ -214,7 +218,13 @@ default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfnc
 default['cfncluster']['dcv']['authenticator']['certificate'] = "/etc/parallelcluster/ext-auth-certificate.pem"
 default['cfncluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
 default['cfncluster']['dcv']['authenticator']['virtualenv'] = "dcv_authenticator_virtualenv"
-default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['dcv']['authenticator']['virtualenv']}"
+default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = [
+  node['cfncluster']['system_pyenv_root'],
+  versions,
+  node['cfncluster']['python-version'],
+  envs,
+  node['cfncluster']['dcv']['authenticator']['virtualenv']
+].join('/')
 
 # CloudWatch Agent
 default['cfncluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
