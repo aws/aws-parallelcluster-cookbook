@@ -72,6 +72,15 @@ execute "copy_cluster_config_from_s3" do
   retry_delay 5
 end
 
+# Copy instance type infos file from S3 URI
+fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cfncluster']['instance_types_data_s3_key']} --region #{node['cfncluster']['cfn_region']} #{node['cfncluster']['instance_types_data_path']}"
+execute "copy_cluster_config_from_s3" do
+  command fetch_config_command
+  retries 3
+  retry_delay 5
+end
+
 execute 'initialize cluster config hash in DynamoDB' do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
           " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cfncluster']['cluster_config_version']}\"}}' --region #{node['cfncluster']['cfn_region']}"
@@ -91,7 +100,8 @@ end
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-          " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
+          " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/"\
+          " --input-file #{node['cfncluster']['cluster_config_path']}  --instance-types-data #{node['cfncluster']['instance_types_data_path']}"
 end
 
 # all other OSs use /sys/fs/cgroup, which is the default

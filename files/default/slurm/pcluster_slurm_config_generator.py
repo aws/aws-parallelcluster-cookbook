@@ -17,12 +17,14 @@ import subprocess
 from os import makedirs, path
 from socket import gethostname
 
+import yaml
 from jinja2 import Environment, FileSystemLoader
 
 log = logging.getLogger()
+instance_types_data = {}
 
 
-def generate_slurm_config_files(output_directory, template_directory, input_file, dryrun):
+def generate_slurm_config_files(output_directory, template_directory, input_file, instance_types_data_path, dryrun):
     """
     Generate Slurm configuration files.
 
@@ -43,29 +45,34 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
 
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
-    queue_settings = cluster_config["cluster"]["queue_settings"]
+    queues = cluster_config["Scheduling"]["Queues"]
+
+    global instance_types_data
+    with open(instance_types_data_path) as input_file:
+        instance_types_data = json.load(input_file)
 
     # Generate slurm_parallelcluster_{QueueName}_partitions.conf and slurm_parallelcluster_{QueueName}_gres.conf
-    for queue_name, queue_config in queue_settings.items():
-        is_default_queue = cluster_config["cluster"]["default_queue"] == queue_name
+    is_default_queue = True  # The first queue in the queues list is the default queue
+    for queue in queues:
         for file_type in ["partition", "gres"]:
             _generate_queue_config(
-                queue_name, queue_config, is_default_queue, file_type, env, pcluster_subdirectory, dryrun
+                queue["Name"], queue, is_default_queue, file_type, env, pcluster_subdirectory, dryrun
             )
+        is_default_queue = False
 
     # Generate slurm_parallelcluster.conf and slurm_parallelcluster_gres.conf
     for template_name in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
         _generate_slurm_parallelcluster_configs(
-            queue_settings,
+            queues,
             head_node_config,
-            cluster_config["cluster"]["scaling"],
+            cluster_config["Scheduling"]["SlurmSettings"],
             template_name,
             env,
             output_directory,
             dryrun,
         )
 
-    generate_instance_type_mapping_file(pcluster_subdirectory, queue_settings)
+    generate_instance_type_mapping_file(pcluster_subdirectory, queues)
 
     log.info("Finished.")
 
@@ -77,7 +84,7 @@ def _load_cluster_config(input_file_path):
     :return: queues_info containing id for first queue, head_node_hostname and queue_name
     """
     with open(input_file_path) as input_file:
-        return json.load(input_file)
+        return yaml.load(input_file, Loader=yaml.SafeLoader)
 
 
 def _get_head_node_config():
@@ -115,11 +122,11 @@ def _generate_queue_config(queue_name, queue_config, is_default_queue, file_type
 
 
 def _generate_slurm_parallelcluster_configs(
-    queues_config, head_node_config, scaling_config, template_name, jinja_env, output_dir, dryrun
+    queues, head_node_config, scaling_config, template_name, jinja_env, output_dir, dryrun
 ):
     log.info("Generating %s", template_name)
     rendered_template = jinja_env.get_template(f"{template_name}").render(
-        queues_config=queues_config,
+        queues=queues,
         head_node_config=head_node_config,
         scaling_config=scaling_config,
         output_dir=output_dir,
@@ -137,8 +144,52 @@ def _get_jinja_env(template_directory):
     # validated by the CLI.
     env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)  # nosec nosemgrep
     env.filters["sanify_instance_type"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
+    env.filters["gpus"] = lambda instance_type: _gpu_count(instance_type)
+    env.filters["gpu_type"] = lambda instance_type: _gpu_type(instance_type)
+    env.filters["vcpus"] = lambda compute_resource: _vcpus(compute_resource)
 
     return env
+
+
+def _gpu_count(instance_type):
+    """Return the number of GPUs for the instance."""
+    gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
+
+    gpu_count = 0
+    if gpu_info:
+        for gpus in gpu_info.get("Gpus", []):
+            gpu_manufacturer = gpus.get("Manufacturer", "")
+            if gpu_manufacturer.upper() == "NVIDIA":
+                gpu_count += gpus.get("Count", 0)
+            else:
+                log.info(
+                    f"ParallelCluster currently does not offer native support for '{gpu_manufacturer}' GPUs. "
+                    "Please make sure to use a custom AMI with the appropriate drivers in order to leverage "
+                    "GPUs functionalities"
+                )
+
+    return gpu_count
+
+
+def _gpu_type(instance_type):
+    """Return name or type of the GPU for the instance."""
+    gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
+    # Remove space and change to all lowercase for name
+    return "no_gpu_type" if not gpu_info else gpu_info.get("Gpus")[0].get("Name").replace(" ", "").lower()
+
+
+def _vcpus(compute_resource) -> int:
+    """Get the number of vcpus for the instance according to disable_hyperthreading and instance features."""
+    instance_type = compute_resource["InstanceType"]
+    disable_simultaneous_multithreading = compute_resource["DisableSimultaneousMultithreading"]
+    instance_type_info = instance_types_data[instance_type]
+    vcpus_info = instance_type_info.get("VCpuInfo", {})
+    vcpus_count = vcpus_info.get("DefaultVCpus")
+    threads_per_core = vcpus_info.get("DefaultThreadsPerCore")
+    if threads_per_core is None:
+        supported_architectures = instance_type_info.get("ProcessorInfo", {}).get("SupportedArchitectures", [])
+        threads_per_core = 2 if "x86_64" in supported_architectures else 1
+    return vcpus_count if not disable_simultaneous_multithreading else (vcpus_count // threads_per_core)
 
 
 def _write_rendered_template_to_file(rendered_template, filename):
@@ -153,14 +204,14 @@ def _setup_logger():
     )
 
 
-def generate_instance_type_mapping_file(output_dir, queue_settings):
+def generate_instance_type_mapping_file(output_dir, queues):
     """Generate a mapping file to retrieve the Instance Type related to the instance key used in the slurm nodename."""
     instance_name_type_mapping = {}
-    for _, queue_config in queue_settings.items():
-        compute_resource_settings = queue_config["compute_resource_settings"]
+    for queue in queues:
+        compute_resources = queue["ComputeResources"]
         hostname_regex = re.compile("[^A-Za-z0-9]")
-        for _, compute_resource_config in compute_resource_settings.items():
-            instance_type = compute_resource_config.get("instance_type")
+        for compute_resource in compute_resources:
+            instance_type = compute_resource.get("InstanceType")
             # Remove all characters excepts letters and numbers
             sanitized_instance_type = re.sub(hostname_regex, "", instance_type)
             instance_name_type_mapping[sanitized_instance_type] = instance_type
@@ -185,8 +236,14 @@ def main():
         parser.add_argument(
             "--input-file",
             type=str,
+            # Todo: is the default necessary?
             default="/opt/parallelcluster/slurm_config.json",
-            help="JSON file containing info about queues",
+            help="Yaml file containing pcluster configuration file",
+        )
+        parser.add_argument(
+            "--instance-types-data",
+            type=str,
+            help="JSON file containing info about instance types",
         )
         parser.add_argument(
             "--dryrun",
@@ -196,7 +253,9 @@ def main():
             default=False,
         )
         args = parser.parse_args()
-        generate_slurm_config_files(args.output_directory, args.template_directory, args.input_file, args.dryrun)
+        generate_slurm_config_files(
+            args.output_directory, args.template_directory, args.input_file, args.instance_types_data, args.dryrun
+        )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)
         raise

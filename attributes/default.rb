@@ -26,7 +26,9 @@ default['cfncluster']['configs_dir'] = "#{node['cfncluster']['base_dir']}/config
 default['cfncluster']['cluster_s3_bucket'] = nil
 default['cfncluster']['cluster_config_s3_key'] = nil
 default['cfncluster']['cluster_config_version'] = nil
-default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster_config.json"
+default['cfncluster']['instance_types_data_s3_key'] = nil
+default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster-config.yaml"
+default['cfncluster']['instance_types_data_path'] = "#{node['cfncluster']['configs_dir']}/instance-types-data.json"
 
 # Python Version
 default['cfncluster']['python-version'] = '3.6.13'

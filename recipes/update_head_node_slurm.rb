@@ -26,7 +26,8 @@ if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identic
   # Generate pcluster specific configs
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
-            " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{updated_cluster_config_path}"
+            " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/"\
+            " --input-file #{updated_cluster_config_path} --instance-types-data #{node['cfncluster']['instance_types_data_path']}"
   end
 
   execute 'stop clustermgtd' do
