@@ -441,4 +441,4 @@ default['cfncluster']['aws_domain'] = aws_domain
 default['cfncluster']['is_official_ami_build'] = false
 
 # Additional instance types data
-default['instance_types_data'] = nil
+default['cfncluster']['instance_types_data'] = nil
