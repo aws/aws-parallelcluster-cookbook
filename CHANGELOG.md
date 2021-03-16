@@ -11,13 +11,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
 
 **CHANGES**
-- Upgrade EFA installer to version 1.11.2
-  - EFA configuration: ``efa-config-1.7`` (no change)
-  - EFA profile: ``efa-profile-1.4`` (from ``efa-profile-1.3``)
-  - EFA kernel module: ``efa-1.10.2`` (no change)
-  - RDMA core: ``rdma-core-31.2amzn`` (no change)
-  - Libfabric: ``libfabric-1.11.1amzn1.1`` (no change)
-  - Open MPI: ``openmpi40-aws-4.1.0`` (no change)
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
 - Root volume size increased to 35GB on all AMIs.
@@ -28,8 +21,17 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Specify instance GPU model as GRES GPU Type in gres.conf
 - Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
 
-**BUG FIXES**
-- Fix `encrypted_ephemeral = true` when using Alinux2 or CentOS8
+2.10.3
+-----
+
+**CHANGES**
+- Upgrade EFA installer to version 1.11.2
+  - EFA configuration: ``efa-config-1.7`` (no change)
+  - EFA profile: ``efa-profile-1.4`` (from ``efa-profile-1.3``)
+  - EFA kernel module: ``efa-1.10.2`` (no change)
+  - RDMA core: ``rdma-core-31.2amzn`` (no change)
+  - Libfabric: ``libfabric-1.11.1amzn1.0`` (no change)
+  - Open MPI: ``openmpi40-aws-4.1.0`` (no change)
 
 2.10.2
 -----
@@ -42,6 +44,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Use non interactive `apt update` command when building custom Ubuntu AMIs.
+- Fix `encrypted_ephemeral = true` when using Alinux2 or CentOS8
 
 2.10.1
 ------
