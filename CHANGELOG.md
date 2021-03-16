@@ -13,7 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - EFA profile: ``efa-profile-1.4`` (from ``efa-profile-1.3``)
   - EFA kernel module: ``efa-1.10.2`` (no change)
   - RDMA core: ``rdma-core-31.2amzn`` (no change)
-  - Libfabric: ``libfabric-1.11.1amzn1.1`` (no change)
+  - Libfabric: ``libfabric-1.11.1amzn1.0`` (no change)
   - Open MPI: ``openmpi40-aws-4.1.0`` (no change)
 
 2.10.2
