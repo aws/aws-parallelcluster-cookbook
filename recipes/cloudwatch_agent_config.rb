@@ -85,7 +85,7 @@ execute "cloudwatch-agent-start" do
   user 'root'
   command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
   not_if do
-    system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") ||
+    system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") || # ~FC048
       node['cfncluster']['cfn_cluster_cw_logging_enabled'] != 'true'
   end
 end

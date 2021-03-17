@@ -44,7 +44,7 @@ if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
     end
   end
 
-  file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do
+  file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do # ~FC005
     content(lazy { node['cfncluster']['slurm_nodename'] })
     mode '0644'
     owner 'root'

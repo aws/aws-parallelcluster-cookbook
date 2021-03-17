@@ -43,7 +43,7 @@ ruby_block "submit dynamic fleet initialization jobs" do
   end
 end
 
-ruby_block "wait for static fleet capacity" do
+ruby_block "wait for static fleet capacity" do # ~FC014
   block do
     require 'chef/mixin/shell_out'
     require 'shellwords'

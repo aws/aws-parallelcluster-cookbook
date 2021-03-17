@@ -125,8 +125,9 @@ end
 # Check if the instance has a GPU
 #
 def graphic_instance?
-  has_gpu = `lspci | grep -i -o 'NVIDIA'`
-  is_graphic_instance = !has_gpu.strip.empty?
+  has_gpu = Mixlib::ShellOut.new("lspci | grep -i -o 'NVIDIA'")
+  has_gpu.run_command
+  is_graphic_instance = !has_gpu.stdout.strip.empty?
 
   is_graphic_instance
 end
