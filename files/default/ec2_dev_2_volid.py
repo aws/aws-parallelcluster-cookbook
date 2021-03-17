@@ -18,10 +18,19 @@ def main():
         syslog.syslog(syslog.LOG_ERR, "Provide block device i.e. xvdf")
 
     # Convert dev to mapping format
-    if 'nvme' in dev:
+    if "nvme" in dev:
         # For newer instances which expose EBS volumes as NVMe devices, translate the
         # device name so boto can discover it.
-        output = os.popen('sudo /usr/local/sbin/parallelcluster-ebsnvme-id -v /dev/' + dev).read().split(":")[1].strip()
+        #
+        # A nosec comment is appended to the following line in order to disable the B605 check.
+        # The only current use of this script in the repo sets the `dev` arg to the value of the
+        # %k format string in a udev rule, (name given by kernel to device).
+        output = (
+            os.popen("sudo /usr/local/sbin/parallelcluster-ebsnvme-id -v /dev/" + dev)  # nosec nosemgrep
+            .read()
+            .split(":")[1]
+            .strip()
+        )
         print(output)
         sys.exit(0)
     else:

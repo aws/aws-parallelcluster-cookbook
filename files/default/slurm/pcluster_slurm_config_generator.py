@@ -90,7 +90,7 @@ def _get_head_node_config():
 def _get_head_node_private_ip():
     """Get head node private ip from EC2 metadata."""
     try:
-        private_ip = subprocess.run(
+        private_ip = subprocess.run(  # nosec
             "curl --retry 3 http://169.254.169.254/latest/meta-data/local-ipv4",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -132,7 +132,7 @@ def _generate_slurm_parallelcluster_configs(
 def _get_jinja_env(template_directory):
     """Return jinja environment with trim_blocks/lstrip_blocks set to True."""
     file_loader = FileSystemLoader(template_directory)
-    env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)
+    env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True, autoescape=True)
     env.filters["sanify_instance_type"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
 
     return env

@@ -12,12 +12,19 @@ def convert_dev(dev):
     # Translate the device name as provided by the OS to the one used by EC2
     # FIXME This approach could be broken in some OS variants, see
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
-    if '/nvme' in dev:
-        return '/dev/' + os.popen('sudo /usr/local/sbin/parallelcluster-ebsnvme-id -u -b ' + dev).read().strip()
-    elif '/hd' in dev:
-        return dev.replace('hd', 'sd')
-    elif '/xvd' in dev:
-        return dev.replace('xvd', 'sd')
+    #
+    # A nosec comment is appended to the following line in order to disable the B605 check.
+    # The only current use of this script in the repo sets the `dev` arg to the value of a device name
+    # obtained via the OS.
+    if "/nvme" in dev:
+        return (
+            "/dev/"
+            + os.popen("sudo /usr/local/sbin/parallelcluster-ebsnvme-id -u -b " + dev).read().strip()  # nosemgrep
+        )
+    elif "/hd" in dev:
+        return dev.replace("hd", "sd")
+    elif "/xvd" in dev:
+        return dev.replace("xvd", "sd")
     else:
         return dev
 
@@ -28,7 +35,11 @@ def get_all_devices():
     command = ["/bin/lsblk", "-d", "-n"]
 
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, universal_newlines=True).split("\n")
+        # fmt: off
+        output = subprocess.check_output(  # nosec
+            command, stderr=subprocess.STDOUT, universal_newlines=True
+        ).split("\n")
+        # fmt: on
         return ["/dev/{}".format(line.split()[0]) for line in output if len(line.split()) > 0]
     except subprocess.CalledProcessError as e:
         print("Failed to get devices with lsblk -d -n")
