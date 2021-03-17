@@ -358,7 +358,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         """
         logger.info("Verifying NICE DCV session validity..")
         # Remove the first and the last because they are the heading and empty, respectively
-        processes = subprocess.check_output(["ps", "aux"]).decode("utf-8").split("\n")[1:-1]
+        processes = subprocess.check_output(["ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec
 
         # Check the filter is empty
         if not next(
@@ -410,9 +410,9 @@ def _run_server(port, certificate=None, key=None):
 
     if certificate:
         if key:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, keyfile=key, server_side=True)
+            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, keyfile=key, server_side=True)  # nosec
         else:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)
+            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)  # nosec
     print(
         "Starting DCV external authenticator {PROTOCOL} server on port {PORT}, use <Ctrl-C> to stop".format(
             PROTOCOL="HTTPS" if certificate else "HTTP", PORT=port
