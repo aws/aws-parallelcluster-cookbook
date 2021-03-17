@@ -439,7 +439,7 @@ default['cfncluster']['skip_install_recipes'] = 'yes'
 default['cfncluster']['scheduler_queue_name'] = nil
 
 # AWS domain
-default['cfncluster']['aws_domain'] = aws_domain
+default['cfncluster']['aws_domain'] = aws_domain # ~FC044
 
 # Official ami build
 default['cfncluster']['is_official_ami_build'] = false
