@@ -195,7 +195,7 @@ when 'MasterServer'
     command gmetad_check_command
   end
 
-  execute 'check ganglia webpage' do
+  execute 'check ganglia webpage' do # ~FC041
     command 'curl --silent -L http://localhost/ganglia | grep "<title>Ganglia"'
   end
 when 'ComputeFleet'
