@@ -59,6 +59,7 @@ if raid_shared_dir != "NONE"
   # Create RAID device with mdadm
   raid_superblock_version = value_for_platform(
     'centos' => { '>=8' => '1.2' },
+    'ubuntu' => { '>=20.04' => '1.2' },
     'default' => '0.90'
   )
   mdadm "MY_RAID" do

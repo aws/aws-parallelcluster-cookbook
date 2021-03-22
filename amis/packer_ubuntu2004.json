@@ -1,0 +1,326 @@
+{
+  "variables" : {
+    "parallelcluster_version" : "",
+    "parallelcluster_cookbook_version" : "",
+    "chef_version" : "",
+    "chef_custom_install_url" : "{{env `CHEF_CUSTOM_INSTALL_URL`}}",
+    "berkshelf_version" : "",
+    "build_for" : "{{env `BUILD_FOR`}}",
+    "ami_perms" : "{{env `AMI_PERMS`}}",
+    "build_date" : "{{env `BUILD_DATE`}}",
+    "cookbook_path" : "{{env `COOKBOOK_PATH`}}",
+    "script_path": "{{env `SCRIPT_PATH`}}",
+    "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
+    "dcv_installed": "{{env `DCV_INSTALLED`}}",
+    "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
+    "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
+    "security_group_id" : "{{env `AWS_SECURITY_GROUP_ID`}}",
+    "vpc_id" : "{{env `AWS_VPC_ID`}}",
+    "associate_public_ip" : "{{env `ASSOCIATE_PUBLIC_IP`}}",
+    "ami_name_prefix" : "{{env `AMI_NAME_PREFIX`}}",
+    "region" : "{{env `AWS_REGION`}}",
+    "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}",
+    "custom_node_package" : "{{env `PARALLELCLUSTER_NODE_URL`}}",
+    "parallelcluster_ref" : "{{env `PARALLELCLUSTER_REF`}}",
+    "parallelcluster_cookbook_ref" : "{{env `PARALLELCLUSTER_COOKBOOK_REF`}}",
+    "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}",
+    "ami_arch" : "{{env `AMI_ARCH`}}",
+    "user_data_file" : "{{env `USER_DATA_SCRIPT`}}",
+    "iam_instance_profile" : "{{env `AWS_IAM_PROFILE`}}"
+  },
+  "builders" : [
+    {
+      "name" : "ubuntu2004",
+      "type" : "amazon-ebs",
+      "region" : "{{user `region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "virtualization-type": "hvm",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-*-server-*",
+          "root-device-type": "ebs",
+          "architecture": "{{user `ami_arch`}}"
+        },
+        "owners": ["099720109477", "513442679011", "837727238323"],
+        "most_recent": true
+      },
+      "ami_regions" : "{{user `build_for`}}",
+      "ami_groups" : "{{user `ami_perms`}}",
+      "instance_type" : "{{user `instance_type`}}",
+      "ssh_username" : "ubuntu",
+      "ssh_pty" : true,
+      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-2004-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
+      "subnet_id" : "{{user `subnet_id`}}",
+      "security_group_id" : "{{user `security_group_id`}}",
+      "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
+      "associate_public_ip_address" : "{{user `associate_public_ip`}}",
+      "sriov_support" : true,
+      "ena_support" : true,
+      "shutdown_behavior" : "terminate",
+      "user_data_file" : "{{user `user_data_file`}}",
+      "iam_instance_profile" : "{{user `iam_instance_profile`}}",
+      "tags" : {
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
+        "build_date" : "{{user `build_date`}}",
+        "parallelcluster_ref" : "{{user `parallelcluster_ref`}}",
+        "parallelcluster_cookbook_ref" : "{{user `parallelcluster_cookbook_ref`}}",
+        "parallelcluster_node_ref" : "{{user `parallelcluster_node_ref`}}"
+      },
+      "run_tags" : {
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
+        "build_date" : "{{user `build_date`}}",
+        "parallelcluster_ref" : "{{user `parallelcluster_ref`}}",
+        "parallelcluster_cookbook_ref" : "{{user `parallelcluster_cookbook_ref`}}",
+        "parallelcluster_node_ref" : "{{user `parallelcluster_node_ref`}}"
+      },
+      "launch_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sda1",
+          "volume_size" : "35",
+          "volume_type" : "gp2",
+          "delete_on_termination" : true
+        },
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ],
+      "ami_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ]
+    },
+    {
+      "name" : "custom-ubuntu2004",
+      "type" : "amazon-ebs",
+      "region" : "{{user `region`}}",
+      "source_ami": "{{user `custom_ami_id`}}",
+      "ami_regions" : "{{user `build_for`}}",
+      "ami_groups" : "{{user `ami_perms`}}",
+      "instance_type" : "{{user `instance_type`}}",
+      "ssh_username" : "ubuntu",
+      "ssh_pty" : true,
+      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-2004-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
+      "subnet_id" : "{{user `subnet_id`}}",
+      "vpc_id" : "{{user `vpc_id`}}",
+      "skip_region_validation" : true,
+      "associate_public_ip_address" : "{{user `associate_public_ip`}}",
+      "sriov_support" : true,
+      "ena_support" : true,
+      "shutdown_behavior" : "terminate",
+      "user_data_file" : "{{user `user_data_file`}}",
+      "iam_instance_profile" : "{{user `iam_instance_profile`}}",
+      "tags" : {
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
+        "build_date" : "{{user `build_date`}}"
+      },
+      "run_tags" : {
+        "Name": "Packer Builder {{user `custom_ami_id`}}",
+        "parallelcluster_version" : "aws-parallelcluster-{{user `parallelcluster_version`}}",
+        "build_date" : "{{user `build_date`}}"
+      },
+      "launch_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sda1",
+          "volume_type" : "gp2",
+          "delete_on_termination" : true
+        },
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ],
+      "ami_block_device_mappings" : [
+        {
+          "device_name" : "/dev/sdb",
+          "no_device" : true
+        },
+        {
+          "device_name" : "/dev/sdc",
+          "no_device" : true
+        }
+      ]
+    }
+  ],
+  "provisioners" : [
+    {
+      "type": "shell",
+      "inline": [
+        "while [ ! -f /var/lib/cloud/instance/boot-finished ]; do echo 'Waiting for cloud-init...'; sleep 1; done"
+      ]
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo flock $(apt-config shell StateDir Dir::State/d | sed -r \"s/.*'(.*)\\/?'$/\\1/\")/daily_lock systemctl stop apt-daily.timer apt-daily.service apt-daily-upgrade.timer apt-daily-upgrade.service"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo apt-cache search build-essential",
+        "sudo apt-get clean",
+        "sudo apt update -y"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo apt-get -y install build-essential curl wget jq"
+      ]
+    },
+    {
+      "type" : "file",
+      "source" : "{{user `cookbook_path`}}",
+      "destination" : "/tmp/cookbook"
+    },
+    {
+      "type" : "shell",
+      "inline_shebang": "/bin/bash -e",
+      "inline" : [
+        "set -x",
+        "region=\"{{user `region`}}\"",
+        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
+        "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
+        "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}}"
+      ],
+      "max_retries": 3
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "set -x",
+        "sudo /opt/cinc/embedded/bin/berks vendor /etc/chef/cookbooks --berksfile /tmp/cookbook/Berksfile",
+        "sudo chown -R root:root /etc/chef"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "only": ["ubuntu2004"],
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "json" : {
+        "cfncluster" : {
+          "default_pre_reboot" : "false"
+        }
+      },
+      "run_list" : [
+        "aws-parallelcluster::default_pre"
+      ]
+    },
+    {
+      "type" : "shell",
+      "only": ["ubuntu2004"],
+      "expect_disconnect" : "true",
+      "inline" : [
+        "sudo reboot"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "only": ["ubuntu2004"],
+      "pause_before": "2m",
+      "json" : {
+        "cfncluster" : {
+          "cfn_region": "{{user `region`}}",
+          "nvidia" : {
+            "enabled" : "{{user `nvidia_enabled`}}"
+          },
+          "dcv": {
+            "installed" : "{{user `dcv_installed`}}"
+          },
+          "is_official_ami_build": "true",
+          "custom_node_package" : "{{user `custom_node_package`}}",
+          "cfn_base_os" : "ubuntu2004"
+        }
+      },
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "run_list" : [
+        "aws-parallelcluster::default"
+      ]
+    },
+    {
+      "type" : "chef-solo",
+      "only": ["custom-ubuntu2004"],
+      "remote_cookbook_paths" : [
+        "/etc/chef/cookbooks"
+      ],
+      "json" : {
+        "cfncluster" : {
+          "custom_node_package" : "{{user `custom_node_package`}}",
+          "cfn_base_os" : "ubuntu2004"
+        }
+      },
+      "skip_install" : "true",
+      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "run_list" : [
+        "aws-parallelcluster::default"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline_shebang" : "/bin/bash -e",
+      "inline" : [
+        "region=\"{{user `region`}}\"",
+        "bucket=\"s3.amazonaws.com\"",
+        "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster\"",
+        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz",
+        "sudo pip3 install /tmp/aws-cfn-bootstrap-py3-latest.tar.gz"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `script_path`}}",
+      "destination": "/tmp/createami_scripts"
+    },
+    {
+      "type": "shell",
+      "inline_shebang" : "/bin/bash -e",
+      "inline": [
+        "set -x",
+        "[[ -d \"/tmp/createami_scripts\" ]] && script_name=$(ls /tmp/createami_scripts)",
+        "[[ -n ${script_name} ]] && (sudo chmod +x /tmp/createami_scripts/${script_name} && sudo /tmp/createami_scripts/${script_name} && sudo mkdir -p /opt/parallelcluster/createami_scripts && sudo mv /tmp/createami_scripts/${script_name} /opt/parallelcluster/createami_scripts && sudo chmod 700 /opt/parallelcluster/createami_scripts) || echo 'No post install script'"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo rm -rf /tmp/* /var/tmp/* && sudo rm -f /root/.ssh/authorized_keys && rm -f ~/.ssh/authorized_keys",
+        "echo aws-parallelcluster-cookbook-{{user `parallelcluster_cookbook_version`}} | sudo tee /opt/parallelcluster/.bootstrapped"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo /usr/local/sbin/ami_cleanup.sh"
+      ]
+    }
+  ]
+}
