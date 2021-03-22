@@ -19,6 +19,14 @@
 include_recipe 'aws-parallelcluster::base_config'
 include_recipe 'aws-parallelcluster::base_install'
 
+# Add awsbatch virtualenv to default path
+template "/etc/profile.d/pcluster_awsbatchcli.sh" do
+  source "pcluster_awsbatchcli.sh.erb"
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 # Install aws-parallelcluster-awsbatch-cli.cfg
 awsbatch_cli_config_dir = "/home/#{node['cfncluster']['cfn_cluster_user']}/.parallelcluster/"
 
@@ -36,6 +44,7 @@ template "#{awsbatch_cli_config_dir}/awsbatch-cli.cfg" do
 end
 
 # Check whether install a custom aws-parallelcluster package (for aws-parallelcluster-awsbatchcli) or the standard one
+# Install awsbatch cli into awsbatch virtual env
 if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']['custom_awsbatchcli_package'].empty?
   # Install custom aws-parallelcluster package
   bash "install aws-parallelcluster-awsbatch-cli" do
@@ -46,14 +55,12 @@ if !node['cfncluster']['custom_awsbatchcli_package'].nil? && !node['cfncluster']
       mkdir aws-parallelcluster-custom-cli
       tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-custom-cli
       cd aws-parallelcluster-custom-cli/*aws-parallelcluster-*
-      pip install cli/
+      #{node['cfncluster']['awsbatch_virtualenv_path']}/bin/pip install cli/
     CLI
   end
 else
   # Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
-  ruby_block "pip_install_parallelcluster" do
-    block do
-      pip_install_package('aws-parallelcluster', node['cfncluster']['cfncluster-version'])
-    end
+  execute "pip_install_parallelcluster" do
+    command "#{node['cfncluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster==#{node['cfncluster']['cfncluster-version']}"
   end
 end

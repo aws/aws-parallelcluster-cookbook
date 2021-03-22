@@ -21,9 +21,19 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
   - Specify instance GPU model as GRES GPU Type in gres.conf
-  
-**BUG FIXES**
-- Fix `encrypted_ephemeral = true` when using Alinux2 or CentOS8
+- Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
+
+2.10.3
+-----
+
+**CHANGES**
+- Upgrade EFA installer to version 1.11.2
+  - EFA configuration: ``efa-config-1.7`` (no change)
+  - EFA profile: ``efa-profile-1.4`` (from ``efa-profile-1.3``)
+  - EFA kernel module: ``efa-1.10.2`` (no change)
+  - RDMA core: ``rdma-core-31.2amzn`` (no change)
+  - Libfabric: ``libfabric-1.11.1amzn1.0`` (no change)
+  - Open MPI: ``openmpi40-aws-4.1.0`` (no change)
 
 2.10.2
 -----
@@ -36,6 +46,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Use non interactive `apt update` command when building custom Ubuntu AMIs.
+- Fix `encrypted_ephemeral = true` when using Alinux2 or CentOS8
 
 2.10.1
 ------
@@ -140,6 +151,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric: ``libfabric-1.10.1amzn1.1`` (no change)
   - Open MPI: ``openmpi40-aws-4.0.3`` (no change)
 - Upgrade Slurm to version 20.02.4.
+- Apply the following changes to Slurm configuration:
+  - Assign a range of 10 ports to Slurmctld in order to better perform with large cluster settings
+  - Configure cloud scheduling logic
+  - Set `ReconfigFlags=KeepPartState`
+  - Set `MessageTimeout=60`
+  - Set `TaskPlugin=task/affinity,task/cgroup` together with `TaskAffinity=no` and `ConstrainCores=yes` in cgroup.conf
 - Upgrade NICE DCV to version 2020.1-9012.
 - Use private ip instead of master node hostname when mounting shared NFS drives.
 - Add new log streams to CloudWatch: chef-client, clustermgtd, computemgtd, slurm_resume, slurm_suspend.

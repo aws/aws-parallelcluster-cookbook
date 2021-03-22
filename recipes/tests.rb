@@ -591,3 +591,22 @@ if node['conditions']['arm_pl_supported']
     user node['cfncluster']['cfn_cluster_user']
   end
 end
+
+###################
+# Pcluster AWSBatch CLI
+###################
+if node['cfncluster']['cfn_scheduler'] == 'awsbatch' and node['cfncluster']['cfn_node_type'] == 'MasterServer'
+  # Test that batch commands can be accessed without absolute path
+  batch_cli_commands = ["awsbkill", "awsbqueues", "awsbsub", "awsbhosts", "awsbout", "awsbstat"]
+  batch_cli_commands.each do |cli_commmand|
+    bash "test_#{cli_commmand}" do
+      cwd Chef::Config[:file_cache_path]
+      code <<-BATCHCLI
+        set -e
+        source ~/.bash_profile
+        #{cli_commmand} -h
+      BATCHCLI
+      user node['cfncluster']['cfn_cluster_user']
+    end
+  end
+end
