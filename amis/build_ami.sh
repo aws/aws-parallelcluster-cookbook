@@ -16,7 +16,7 @@
 #
 # Usage: build_ami.sh --os <os> --region <region> --partition <partition> [--public] [--custom]
 #                     [--build-date <build-date>] [--arch <arch>]
-#   os: the os to build (supported values: all|centos7|centos8|alinux2|ubuntu1804)
+#   os: the os to build (supported values: all|centos7|centos8|alinux2|ubuntu1804|ubuntu2004)
 #   partition: partition to build in (supported values: commercial|govcloud|china|region)
 #   region: region to copy ami too (supported values: all|us-east-1|us-gov-west-1|...)
 #   custom: specifies to create the AMI from a custom AMI-id, which must be specified by variable CUSTOM_AMI_ID in the environment (optional)
@@ -114,7 +114,7 @@ parse_options() {
 check_options() {
     set -e
 
-    available_arm_os="ubuntu1804 alinux2 centos8"  # subset of supported OSes for which ARM AMIs are available
+    available_arm_os="ubuntu1804 ubuntu2004 alinux2 centos8"  # subset of supported OSes for which ARM AMIs are available
     available_os="centos7 ${available_arm_os}"
     cwd="$(dirname $0)"
     export COOKBOOK_PATH="$(cd ${cwd}/..; pwd)"
@@ -215,7 +215,7 @@ do_command() {
           RC=$?
         done
         ;;
-      centos7|centos8|ubuntu1804|alinux2)
+      centos7|centos8|ubuntu1804|ubuntu2004|alinux2)
         packer build -color=false -var-file="${cwd}/packer_variables.json" -only=${only} "${cwd}/packer_${_os}.json"
         RC=$?
         ;;

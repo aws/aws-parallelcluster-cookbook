@@ -273,3 +273,64 @@ platforms:
     transport:
       username: ubuntu
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
+  - name: ubuntu-20-04-lts
+    driver_plugin: ec2
+    driver_config:
+      image_id: <%= ENV['UBUNTU2004_IMAGE_ID'] %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <%= ENV['VOLUME_SIZE'] || 35 %>
+            volume_type: gp2
+            delete_on_termination: true
+        - device_name: /dev/xvdba
+          virtual_name: ephemeral0
+        - device_name: /dev/xvdbb
+          virtual_name: ephemeral1
+        - device_name: /dev/xvdbc
+          virtual_name: ephemeral2
+        - device_name: /dev/xvdbd
+          virtual_name: ephemeral3
+        - device_name: /dev/xvdbe
+          virtual_name: ephemeral4
+        - device_name: /dev/xvdbf
+          virtual_name: ephemeral5
+        - device_name: /dev/xvdbg
+          virtual_name: ephemeral6
+        - device_name: /dev/xvdbh
+          virtual_name: ephemeral7
+        - device_name: /dev/xvdbi
+          virtual_name: ephemeral8
+        - device_name: /dev/xvdbj
+          virtual_name: ephemeral9
+        - device_name: /dev/xvdbk
+          virtual_name: ephemeral10
+        - device_name: /dev/xvdbl
+          virtual_name: ephemeral11
+        - device_name: /dev/xvdbm
+          virtual_name: ephemeral12
+        - device_name: /dev/xvdbn
+          virtual_name: ephemeral13
+        - device_name: /dev/xvdbo
+          virtual_name: ephemeral14
+        - device_name: /dev/xvdbp
+          virtual_name: ephemeral15
+        - device_name: /dev/xvdbq
+          virtual_name: ephemeral16
+        - device_name: /dev/xvdbr
+          virtual_name: ephemeral17
+        - device_name: /dev/xvdbs
+          virtual_name: ephemeral18
+        - device_name: /dev/xvdbt
+          virtual_name: ephemeral19
+        - device_name: /dev/xvdbu
+          virtual_name: ephemeral20
+        - device_name: /dev/xvdbv
+          virtual_name: ephemeral21
+        - device_name: /dev/xvdbw
+          virtual_name: ephemeral22
+        - device_name: /dev/xvdbx
+          virtual_name: ephemeral23
+    transport:
+      username: ubuntu
+      ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>

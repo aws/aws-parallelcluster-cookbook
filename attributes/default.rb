@@ -84,7 +84,7 @@ default['cfncluster']['armpl']['gcc']['url'] = [
 default['cfncluster']['armpl']['platform'] = value_for_platform(
   'centos' => { '~>8' => 'RHEL-8' },
   'amazon' => { '2' => 'RHEL-8' },
-  'ubuntu' => { '18.04' => 'Ubuntu-16.04' }
+  'ubuntu' => { '>=18.04' => 'Ubuntu-16.04' }
 )
 default['cfncluster']['armpl']['url'] = [
   'archives/armpl',
@@ -164,7 +164,7 @@ if arm_instance?
     'ubuntu' => { '18.04' => "e435110902065df8cba95f31990b735aaf8d46cbad64607168891f8af96ebf84" }
   )
 else
-  default['cfncluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 amazon2]
+  default['cfncluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 ubuntu20 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
@@ -172,11 +172,14 @@ else
       '~>7' => "4a473225ec9afa8357e00a0f5b942373b952e612ce83a49c76ddc864cb2e00f0"
     },
     'amazon' => { '2' => "4a473225ec9afa8357e00a0f5b942373b952e612ce83a49c76ddc864cb2e00f0" },
-    'ubuntu' => { '18.04' => "5328ff75251eddfbf40be6f0073afe9a6919be6004372f1a52391ba8490d71cb" }
+    'ubuntu' => {
+      '18.04' => "5328ff75251eddfbf40be6f0073afe9a6919be6004372f1a52391ba8490d71cb",
+      '20.04' => "8c5258a582771f8167790def14db95c333d760986be9395e094ecf17e1b7c149"
+    }
   )
 end
-if "#{node['platform']}#{node['platform_version'].to_i}" == 'ubuntu18'
-  # Unlike the other supported OSs, the DCV package names for Ubuntu 18.04 use different architecture abbreviations than those used in the download URLs.
+if node['platform'].to_s == 'ubuntu'
+  # Unlike the other supported OSs, the DCV package names for Ubuntu use different architecture abbreviations than those used in the download URLs.
   default['cfncluster']['dcv']['package_architecture_id'] = arm_instance? ? 'arm64' : 'amd64'
 end
 default['cfncluster']['dcv']['package'] = value_for_platform(
@@ -185,7 +188,9 @@ default['cfncluster']['dcv']['package'] = value_for_platform(
     '~>7' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}"
   },
   'amazon' => { '2' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}" },
-  'ubuntu' => { '18.04' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804-#{node['cfncluster']['dcv']['url_architecture_id']}" }
+  'ubuntu' => {
+    'default' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-#{node['cfncluster']['cfn_base_os']}-#{node['cfncluster']['dcv']['url_architecture_id']}"
+  }
 )
 default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
@@ -193,7 +198,9 @@ default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server p
     '~>7' => "nice-dcv-server-2020.2.9662-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
   },
   'amazon' => { '2' => "nice-dcv-server-2020.2.9662-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => { '18.04' => "nice-dcv-server_2020.2.9662-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" }
+  'ubuntu' => {
+    'default' => "nice-dcv-server_2020.2.9662-1_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
 )
 default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
@@ -201,7 +208,9 @@ default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create 
     '~>7' => "nice-xdcv-2020.2.359-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
   },
   'amazon' => { '2' => "nice-xdcv-2020.2.359-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => { '18.04' => "nice-xdcv_2020.2.359-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" }
+  'ubuntu' => {
+    'default' => "nice-xdcv_2020.2.359-1_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
 )
 default['cfncluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
@@ -209,7 +218,9 @@ default['cfncluster']['dcv']['gl'] = value_for_platform( # required to enable GP
     '~>7' => "nice-dcv-gl-2020.2.881-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
   },
   'amazon' => { '2' => "nice-dcv-gl-2020.2.881-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => { '18.04' => "nice-dcv-gl_2020.2.881-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" }
+  'ubuntu' => {
+    'default' => "nice-dcv-gl_2020.2.881-1_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
 )
 default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2020.2/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
@@ -330,16 +341,20 @@ when 'rhel', 'amazon'
 when 'debian'
   default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
   default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
-                                              tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
-                                              apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
-                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
-                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip]
-  if node['platform_version'] == '18.04'
-    default['cfncluster']['base_packages'].delete('libatlas-dev')
-    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
-    default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
+                                              tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
+                                              apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
+                                              r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
+                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
+                                              libatlas-base-dev libglvnd-dev]
+  default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
+  default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
+
+  case node['platform_version']
+  when '18.04'
+    default['cfncluster']['base_packages'].push('python-pip', 'python-parted')
+  when '20.04'
+    default['cfncluster']['base_packages'].push('python3-parted')
   end
 
   # Modulefile Directory
