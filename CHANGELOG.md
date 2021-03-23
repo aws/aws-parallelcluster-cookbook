@@ -16,7 +16,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
 - Root volume size increased to 35GB on all AMIs.
-- Upgrade Slurm to version 20.11.4.
+- Upgrade Slurm to version 20.11.5.
   - Update slurmctld and slurmd systemd unit files according to latest provided by slurm
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
