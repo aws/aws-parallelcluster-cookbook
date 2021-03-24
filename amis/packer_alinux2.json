@@ -112,6 +112,7 @@
       "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-amzn2-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
+      "security_group_id" : "{{user `security_group_id`}}",
       "skip_region_validation" : true,
       "associate_public_ip_address" : "{{user `associate_public_ip`}}",
       "sriov_support" : true,
