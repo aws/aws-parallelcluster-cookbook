@@ -273,18 +273,17 @@ when 'rhel', 'amazon'
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                                 mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                                iproute NetworkManager-config-routing-rules]
+                                                iproute NetworkManager-config-routing-rules python3 python3-pip]
     if node['platform_version'].to_i >= 8
-      # Install python3 instead of unversioned python
+      # Do not install unversioned python
       default['cfncluster']['base_packages'].delete('python')
       default['cfncluster']['base_packages'].delete('python-pip')
       # iptables used in configure-pat.sh
-      # nvme-cli used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
       # gdisk required for FSx
       # environment-modules required for IntelMPI
       # libtirpc and libtirpc-devel required for SGE
       # cryptsetup used for ephemeral drive encryption
-      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
+      default['cfncluster']['base_packages'].push(%w[iptables gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
     end
 
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
@@ -298,7 +297,8 @@ when 'rhel', 'amazon'
                                                 libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
                                                 rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                                 gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                                jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils librdmacm-utils]
+                                                jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
+                                                librdmacm-utils python3 python3-pip]
 
     # Install R via amazon linux extras
     default['cfncluster']['alinux_extras'] = ['R3.4']
@@ -324,7 +324,7 @@ when 'debian'
                                               apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
                                               r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
-                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2]
+                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip]
   if node['platform_version'] == '18.04'
     default['cfncluster']['base_packages'].delete('libatlas-dev')
     default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')

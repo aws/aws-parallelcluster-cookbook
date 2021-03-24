@@ -1,19 +1,13 @@
-#!/usr/bin/env python
+#!<%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/python
 
-# Copyright (C) 2017 Amazon.com, Inc. or its affiliates.
-# All Rights Reserved.
+# Copyright Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
-# Licensed under the Apache License, Version 2.0 (the "License").
-# You may not use this file except in compliance with the License.
-# A copy of the License is located at
+# Licensed under the MIT License. See the LICENSE accompanying this file
+# for the specific language governing permissions and limitations under
+# the License.
 #
-#    http://aws.amazon.com/apache2.0/
-#
-# or in the "license" file accompanying this file. This file is
-# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
-# OF ANY KIND, either express or implied. See the License for the
-# specific language governing permissions and limitations under the
-# License.
+# Script is taken from /sbin/ebsnvme-id that is distributed with alinux2,
+# see https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
 
 """
 Usage:
@@ -21,8 +15,10 @@ Read EBS device information and provide information about
 the volume.
 """
 
+from __future__ import print_function
 import argparse
-from ctypes import *
+from ctypes import Structure, c_uint8, c_uint16, \
+        c_uint32, c_uint64, c_char, addressof, sizeof
 from fcntl import ioctl
 import sys
 
@@ -30,6 +26,7 @@ NVME_ADMIN_IDENTIFY = 0x06
 NVME_IOCTL_ADMIN_CMD = 0xC0484E41
 AMZN_NVME_VID = 0x1D0F
 AMZN_NVME_EBS_MN = "Amazon Elastic Block Store"
+
 
 class nvme_admin_command(Structure):
     _pack_ = 1
@@ -50,10 +47,12 @@ class nvme_admin_command(Structure):
                 ("cdw15", c_uint32),
                 ("reserved1", c_uint64)]
 
+
 class nvme_identify_controller_amzn_vs(Structure):
     _pack_ = 1
     _fields_ = [("bdev", c_char * 32),  # block device name
                 ("reserved0", c_char * (1024 - 32))]
+
 
 class nvme_identify_controller_psd(Structure):
     _pack_ = 1
@@ -66,6 +65,7 @@ class nvme_identify_controller_psd(Structure):
                 ("rwt", c_uint8),       # relative write throughput
                 ("rwl", c_uint8),       # relative write latency
                 ("reserved1", c_char * 16)]
+
 
 class nvme_identify_controller(Structure):
     _pack_ = 1
@@ -86,7 +86,7 @@ class nvme_identify_controller(Structure):
                 ("lpa", c_uint8),           # Log Page Attributes
                 ("elpe", c_uint8),          # Error Log Page Entries
                 ("npss", c_uint8),          # Number of Power States Support
-                ("avscc", c_uint8),         # Admin Vendor Specific Command Configuration
+                ("avscc", c_uint8),         # Admin Vendor Specific Command Configuration # noqa
                 ("reserved1", c_uint8 * (512 - 265)),
                 ("sqes", c_uint8),          # Submission Queue Entry Size
                 ("cqes", c_uint8),          # Completion Queue Entry Size
@@ -98,11 +98,12 @@ class nvme_identify_controller(Structure):
                 ("vwc", c_uint8),           # Volatile Write Cache
                 ("awun", c_uint16),         # Atomic Write Unit Normal
                 ("awupf", c_uint16),        # Atomic Write Unit Power Fail
-                ("nvscc", c_uint8),         # NVM Vendor Specific Command Configuration
+                ("nvscc", c_uint8),         # NVM Vendor Specific Command Configuration # noqa
                 ("reserved3", c_uint8 * (704 - 531)),
                 ("reserved4", c_uint8 * (2048 - 704)),
-                ("psd", nvme_identify_controller_psd * 32),     # Power State Descriptor
+                ("psd", nvme_identify_controller_psd * 32),  # Power State Descriptor # noqa
                 ("vs", nvme_identify_controller_amzn_vs)]  # Vendor Specific
+
 
 class ebs_nvme_device:
     def __init__(self, device):
@@ -110,23 +111,24 @@ class ebs_nvme_device:
         self.ctrl_identify()
 
     def _nvme_ioctl(self, id_response, id_len):
-        admin_cmd = nvme_admin_command(opcode = NVME_ADMIN_IDENTIFY,
-                                       addr = id_response,
-                                       alen = id_len,
-                                       cdw10 = 1)
+        admin_cmd = nvme_admin_command(opcode=NVME_ADMIN_IDENTIFY,
+                                       addr=id_response,
+                                       alen=id_len,
+                                       cdw10=1)
 
-        with open(self.device, "rw") as nvme:
+        with open(self.device, "r+") as nvme:
             ioctl(nvme, NVME_IOCTL_ADMIN_CMD, admin_cmd)
 
     def ctrl_identify(self):
         self.id_ctrl = nvme_identify_controller()
         self._nvme_ioctl(addressof(self.id_ctrl), sizeof(self.id_ctrl))
 
-        if self.id_ctrl.vid != AMZN_NVME_VID or self.id_ctrl.mn.strip() != AMZN_NVME_EBS_MN:
-            raise TypeError("[ERROR] Not an EBS device: '{0}'".format(self.device))
+        if self.id_ctrl.vid != AMZN_NVME_VID \
+                or self.id_ctrl.mn.decode().strip() != AMZN_NVME_EBS_MN:
+            raise TypeError("[ERROR] Not an EBS device: '{0}'".format(self.device)) # noqa
 
     def get_volume_id(self):
-        vol = self.id_ctrl.sn
+        vol = self.id_ctrl.sn.decode()
 
         if vol.startswith("vol") and vol[3] != "-":
             vol = "vol-" + vol[3:]
@@ -134,24 +136,26 @@ class ebs_nvme_device:
         return vol
 
     def get_block_device(self, stripped=False):
-        dev = self.id_ctrl.vs.bdev
+        dev = self.id_ctrl.vs.bdev.decode().strip()
 
         if stripped and dev.startswith("/dev/"):
             dev = dev[5:]
 
         return dev
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Reads EBS information from NVMe devices.")
+    parser = \
+        argparse.ArgumentParser(description="Reads EBS information from NVMe devices.") # noqa
     parser.add_argument("device", nargs=1, help="Device to query")
 
     display = parser.add_argument_group("Display Options")
     display.add_argument("-v", "--volume", action="store_true",
-            help="Return volume-id")
+                         help="Return volume-id")
     display.add_argument("-b", "--block-dev", action="store_true",
-            help="Return block device mapping")
+                         help="Return block device mapping")
     display.add_argument("-u", "--udev", action="store_true",
-            help="Output data in format suitable for udev rules")
+                         help="Output data in format suitable for udev rules")
 
     if len(sys.argv) < 2:
         parser.print_help()
@@ -164,10 +168,10 @@ if __name__ == "__main__":
     try:
         dev = ebs_nvme_device(args.device[0])
     except (IOError, TypeError) as err:
-        print >> sys.stderr, err
+        print(err, file=sys.stderr)
         sys.exit(1)
 
     if get_all or args.volume:
-        print "Volume ID: {0}".format(dev.get_volume_id())
+        print("Volume ID: {0}".format(dev.get_volume_id()))
     if get_all or args.block_dev or args.udev:
-        print dev.get_block_device(args.udev)
+        print(dev.get_block_device(args.udev))

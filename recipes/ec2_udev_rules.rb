@@ -23,7 +23,8 @@ template 'ec2-volid.rules' do
   mode '0644'
 end
 
-cookbook_file 'parallelcluster-ebsnvme-id' do
+template 'parallelcluster-ebsnvme-id' do
+  source 'parallelcluster-ebsnvme-id.erb'
   path '/usr/local/sbin/parallelcluster-ebsnvme-id'
   user 'root'
   group 'root'

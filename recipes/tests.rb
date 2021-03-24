@@ -610,3 +610,11 @@ if node['cfncluster']['cfn_scheduler'] == 'awsbatch' and node['cfncluster']['cfn
     end
   end
 end
+
+###################
+# Python
+###################
+execute 'check python3 installed' do
+  command "which python3"
+  user node['cfncluster']['cfn_cluster_user']
+end
