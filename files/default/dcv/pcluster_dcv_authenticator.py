@@ -9,6 +9,7 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+import argparse
 import errno
 import hashlib
 import json
@@ -27,8 +28,6 @@ from logging.handlers import RotatingFileHandler
 from pwd import getpwuid
 from socketserver import ThreadingMixIn
 from urllib.parse import parse_qsl, urlparse
-
-import argparse
 
 AUTHORIZATION_FILE_DIR = "/var/spool/parallelcluster/pcluster_dcv_authenticator"
 LOG_FILE_PATH = "/var/log/parallelcluster/pcluster_dcv_authenticator.log"
