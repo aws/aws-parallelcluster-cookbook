@@ -429,6 +429,7 @@ default['cfncluster']['cfn_region'] = 'us-east-1'
 default['cfncluster']['stack_name'] = nil
 default['cfncluster']['cfn_sqs_queue'] = nil
 default['cfncluster']['cfn_ddb_table'] = nil
+default['cfncluster']['cfn_log_group_name'] = "NONE"
 default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_preinstall'] = 'NONE'
 default['cfncluster']['cfn_preinstall_args'] = 'NONE'
