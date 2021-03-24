@@ -70,7 +70,7 @@ end
 execute "cloudwatch-config-creation" do
   user 'root'
   environment(
-    'LOG_GROUP_NAME' => "/aws/parallelcluster/#{node['cfncluster']['stack_name'].split(/^parallelcluster-/)[1]}",
+    'LOG_GROUP_NAME' => node['cfncluster']['cfn_log_group_name'],
     'SCHEDULER' => node['cfncluster']['cfn_scheduler'],
     'NODE_ROLE' => node['cfncluster']['cfn_node_type'],
     'CONFIG_DATA_PATH' => config_data_path
