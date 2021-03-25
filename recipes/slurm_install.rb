@@ -42,7 +42,7 @@ when 'MasterServer', nil
   ruby_block "Validate Slurm Tarball Checksum" do
     block do
       require 'digest'
-      checksum = Digest::SHA1.file(slurm_tarball).hexdigest
+      checksum = Digest::SHA1.file(slurm_tarball).hexdigest # nosemgrep
       raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}" if checksum != node['cfncluster']['slurm']['sha1']
     end
   end

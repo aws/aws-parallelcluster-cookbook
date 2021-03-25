@@ -90,7 +90,7 @@ def _get_head_node_config():
 def _get_head_node_private_ip():
     """Get head node private ip from EC2 metadata."""
     try:
-        private_ip = subprocess.run(  # nosec
+        private_ip = subprocess.run(  # nosec nosemgrep
             "curl --retry 3 http://169.254.169.254/latest/meta-data/local-ipv4",
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
