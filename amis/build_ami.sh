@@ -114,7 +114,7 @@ parse_options() {
 check_options() {
     set -e
 
-    available_arm_os="ubuntu1804 ubuntu2004 alinux2 centos8"  # subset of supported OSes for which ARM AMIs are available
+    available_arm_os="ubuntu1804 ubuntu2004 alinux2 centos7 centos8"  # subset of supported OSes for which ARM AMIs are available
     available_os="centos7 ${available_arm_os}"
     cwd="$(dirname $0)"
     export COOKBOOK_PATH="$(cd ${cwd}/..; pwd)"
@@ -184,10 +184,7 @@ check_options() {
     esac
 
     # Ensure the specified architecture-OS combination is valid
-    if [ "${_arch}" == "arm64" ] && [[ "${_os}" == "centos7" ]]; then
-      echo "Currently there are no arm64 AMIs available for ${_os}."
-      exit 1
-    elif [ "${_arch}" == "arm64" ] && [ "${_os}" == "all" ]; then
+    if [ "${_arch}" == "arm64" ] && [ "${_os}" == "all" ]; then
       echo "Building ARM AMIs for the following OSes: ${available_arm_os}. There are no arm64 AMIs for the other."
       available_os="${available_arm_os}"
     fi
