@@ -1,10 +1,11 @@
-import requests
-import sys
+import configparser
 import os
+import sys
 import syslog
 import time
+
 import boto3
-import configparser
+import requests
 from botocore.config import Config
 
 
@@ -34,11 +35,11 @@ def main():
         print(output)
         sys.exit(0)
     else:
-        dev = dev.replace('xvd', 'sd')
-        dev = '/dev/' + dev
+        dev = dev.replace("xvd", "sd")
+        dev = "/dev/" + dev
 
     # Get instance ID
-    instanceId = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
+    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
 
     # Get region
     region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone").text
@@ -46,19 +47,21 @@ def main():
 
     # Parse configuration file to read proxy settings
     config = configparser.RawConfigParser()
-    config.read('/etc/boto.cfg')
+    config.read("/etc/boto.cfg")
     proxy_config = Config()
-    if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
-        proxy = config.get('Boto', 'proxy')
-        proxy_port = config.get('Boto', 'proxy_port')
-        proxy_config = Config(proxies={'https': "{0}:{1}".format(proxy, proxy_port)})
+    if config.has_option("Boto", "proxy") and config.has_option("Boto", "proxy_port"):
+        proxy = config.get("Boto", "proxy")
+        proxy_port = config.get("Boto", "proxy_port")
+        proxy_config = Config(proxies={"https": "{0}:{1}".format(proxy, proxy_port)})
 
     # Connect to AWS using boto
-    ec2 = boto3.client('ec2', region_name=region, config=proxy_config)
+    ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
 
     # Poll for blockdevicemapping
-    devices = ec2.describe_instance_attribute(InstanceId=instanceId, Attribute='blockDeviceMapping').get('BlockDeviceMappings')
-    devmap = dict((d.get('DeviceName'), d) for d in devices)
+    devices = ec2.describe_instance_attribute(InstanceId=instance_id, Attribute="blockDeviceMapping").get(
+        "BlockDeviceMappings"
+    )
+    devmap = dict((d.get("DeviceName"), d) for d in devices)
     x = 0
     while dev not in devmap:
         if x == 36:
@@ -66,14 +69,16 @@ def main():
             sys.exit(1)
         syslog.syslog("Looking for dev %s in devmap %s" % (dev, devmap))
         time.sleep(5)
-        devices = ec2.describe_instance_attribute(InstanceId=instanceId, Attribute='blockDeviceMapping').get('BlockDeviceMappings')
-        devmap = dict((d.get('DeviceName'), d) for d in devices)
+        devices = ec2.describe_instance_attribute(InstanceId=instance_id, Attribute="blockDeviceMapping").get(
+            "BlockDeviceMappings"
+        )
+        devmap = dict((d.get("DeviceName"), d) for d in devices)
         x += 1
 
-    # Return volumeId
-    volumeId = devmap.get(dev).get('Ebs').get('VolumeId')
-    print(volumeId)
+    # Return volume ID
+    volume_id = devmap.get(dev).get("Ebs").get("VolumeId")
+    print(volume_id)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

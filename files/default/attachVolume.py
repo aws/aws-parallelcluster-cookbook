@@ -1,10 +1,11 @@
-import sys
-import subprocess
-import os
-import requests
-import boto3
-import time
 import configparser
+import os
+import subprocess
+import sys
+import time
+
+import boto3
+import requests
 from botocore.config import Config
 
 
@@ -28,6 +29,7 @@ def convert_dev(dev):
     else:
         return dev
 
+
 def get_all_devices():
     # lsblk -d -n
     # xvda 202:0    0  17G  0 disk
@@ -45,16 +47,17 @@ def get_all_devices():
         print("Failed to get devices with lsblk -d -n")
         raise e
 
+
 def main():
     # Get EBS volume Id
     try:
-        volumeId = str(sys.argv[1])
+        volume_id = str(sys.argv[1])
     except IndexError:
         print("Provide an EBS volume ID to attach i.e. vol-cc789ea5")
         sys.exit(1)
 
     # Get instance ID
-    instanceId = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
+    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
 
     # Get region
     region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone").text
@@ -64,48 +67,71 @@ def main():
     paths = [convert_dev(device) for device in get_all_devices()]
 
     # List of possible block devices
-    blockDevices = ['/dev/sdb', '/dev/sdc', '/dev/sdd', '/dev/sde', '/dev/sdf', '/dev/sdg', '/dev/sdh',
-                    '/dev/sdi','/dev/sdj', '/dev/sdk', '/dev/sdl', '/dev/sdm', '/dev/sdn', '/dev/sdo',
-                    '/dev/sdp', '/dev/sdq', '/dev/sdr', '/dev/sds', '/dev/sdt', '/dev/sdu', '/dev/sdv',
-                    '/dev/sdw', '/dev/sdx', '/dev/sdy', '/dev/sdz']
+    block_devices = [
+        "/dev/sdb",
+        "/dev/sdc",
+        "/dev/sdd",
+        "/dev/sde",
+        "/dev/sdf",
+        "/dev/sdg",
+        "/dev/sdh",
+        "/dev/sdi",
+        "/dev/sdj",
+        "/dev/sdk",
+        "/dev/sdl",
+        "/dev/sdm",
+        "/dev/sdn",
+        "/dev/sdo",
+        "/dev/sdp",
+        "/dev/sdq",
+        "/dev/sdr",
+        "/dev/sds",
+        "/dev/sdt",
+        "/dev/sdu",
+        "/dev/sdv",
+        "/dev/sdw",
+        "/dev/sdx",
+        "/dev/sdy",
+        "/dev/sdz",
+    ]
 
     # List of available block devices after removing currently used block devices
-    availableDevices = [a for a in blockDevices if a not in paths]
+    available_devices = [a for a in block_devices if a not in paths]
 
     # Parse configuration file to read proxy settings
     config = configparser.RawConfigParser()
-    config.read('/etc/boto.cfg')
+    config.read("/etc/boto.cfg")
     proxy_config = Config()
-    if config.has_option('Boto', 'proxy') and config.has_option('Boto', 'proxy_port'):
-        proxy = config.get('Boto', 'proxy')
-        proxy_port = config.get('Boto', 'proxy_port')
-        proxy_config = Config(proxies={'https': "{0}:{1}".format(proxy, proxy_port)})
+    if config.has_option("Boto", "proxy") and config.has_option("Boto", "proxy_port"):
+        proxy = config.get("Boto", "proxy")
+        proxy_port = config.get("Boto", "proxy_port")
+        proxy_config = Config(proxies={"https": "{0}:{1}".format(proxy, proxy_port)})
 
     # Connect to AWS using boto
-    ec2 = boto3.client('ec2', region_name=region, config=proxy_config)
+    ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
 
     # Attach the volume
-    dev = availableDevices[0]
-    response = ec2.attach_volume(VolumeId=volumeId, InstanceId=instanceId, Device=dev)
+    dev = available_devices[0]
+    response = ec2.attach_volume(VolumeId=volume_id, InstanceId=instance_id, Device=dev)
 
     # Poll for volume to attach
     state = response.get("State")
     x = 0
     while state != "attached":
         if x == 60:
-            print("Volume %s failed to mount in 300 seconds." % volumeId)
+            print("Volume %s failed to mount in 300 seconds." % volume_id)
             exit(1)
         if state in ["busy" or "detached"]:
-            print("Volume %s in bad state %s" % (volumeId, state))
+            print("Volume %s in bad state %s" % (volume_id, state))
             exit(1)
-        print("Volume %s in state %s ... waiting to be 'attached'" % (volumeId, state))
+        print("Volume %s in state %s ... waiting to be 'attached'" % (volume_id, state))
         time.sleep(5)
         x += 1
         try:
-            state = ec2.describe_volumes(VolumeIds=[volumeId]).get('Volumes')[0].get('Attachments')[0].get('State')
-        except IndexError as e:
+            state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("Attachments")[0].get("State")
+        except IndexError:
             continue
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

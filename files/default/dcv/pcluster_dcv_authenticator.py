@@ -409,9 +409,11 @@ def _run_server(port, certificate=None, key=None):
 
     if certificate:
         if key:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, keyfile=key, server_side=True)  # nosec
+            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep
+                httpd.socket, certfile=certificate, keyfile=key, server_side=True
+            )
         else:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)  # nosec
+            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)  # nosec nosemgrep
     print(
         "Starting DCV external authenticator {PROTOCOL} server on port {PORT}, use <Ctrl-C> to stop".format(
             PROTOCOL="HTTPS" if certificate else "HTTP", PORT=port
