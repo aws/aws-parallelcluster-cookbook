@@ -41,4 +41,4 @@ repos:
     rev: 1.7.0
     hooks:
       - id: bandit
-        args: ['-r', '--skip', 'B105,B404', '--exclude', 'test', '--exit-zero']
+        args: ['-r', '--exclude', 'test', '--exit-zero']
