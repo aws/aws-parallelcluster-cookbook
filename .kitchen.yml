@@ -203,6 +203,8 @@ suites:
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
+        dcv_enabled: 'master'
+        dcv_port: '8443'
         custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
