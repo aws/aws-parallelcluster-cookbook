@@ -12,7 +12,7 @@ group :style do
 end
 
 group :test do
-  gem 'chefspec', '~> 9.1.0'
+  gem 'chefspec', '~> 9.2.1'
   gem 'kitchen-vagrant', '~> 1.6.1'
   gem 'safe_yaml', '~> 1.0.5'
   gem 'test-kitchen', '~> 2.3.4'
