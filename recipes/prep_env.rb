@@ -19,13 +19,15 @@
 validate_os_type
 
 # Determine cfn_scheduler_slots settings and update cfn_instance_slots appropriately
-node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
+node.default['cfncluster']['cfn_instance_slots'] = case node['cfncluster']['cfn_scheduler_slots']
+                                                   when 'vcpus'
                                                      node['cpu']['total']
-                                                   elsif node['cfncluster']['cfn_scheduler_slots'] == 'cores'
+                                                   when 'cores'
                                                      node['cpu']['cores']
                                                    else
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
+
 # NOTE: this recipe must be included after cfn_instance_slot because it may alter the values of
 #       node['cpu']['total'], which would break the expected behavior when setting cfn_scheduler_slots
 #       to one of the constants looked for in the above conditionals

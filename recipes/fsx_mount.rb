@@ -21,7 +21,7 @@ fsx_shared_dir = node['cfncluster']['cfn_fsx_options'].split(',')[0]
 if fsx_shared_dir != "NONE"
 
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  fsx_shared_dir = "/" + fsx_shared_dir unless fsx_shared_dir.start_with?("/")
+  fsx_shared_dir = "/#{fsx_shared_dir unless fsx_shared_dir.start_with?('/')}"
 
   # Create the shared directories
   directory fsx_shared_dir do
