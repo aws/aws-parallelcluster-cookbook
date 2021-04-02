@@ -32,14 +32,21 @@ if fsx_shared_dir != "NONE"
     action :create
   end
 
-  require 'chef/mixin/shell_out'
-  cmd = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws fsx"\
-        " --region #{node['cfncluster']['cfn_region']}"\
-        " describe-file-systems"\
-        " --file-system-ids #{node['cfncluster']['cfn_fsx_fs_id']}"\
-        " --query 'FileSystems[0].[DNSName,LustreConfiguration.MountName]' --output text"
-  fsx_describe = shell_out!(cmd, user: 'root').stdout.strip
-  dns_name, mountname = fsx_describe.split(/\s+/)
+  dns_domain = if node['cfncluster']['cfn_region'].include? 'cn'
+                 'com.cn'
+               else
+                 'com'
+               end
+
+  dns_name = if node['cfncluster']['cfn_fsx_dns_name'] && !node['cfncluster']['cfn_fsx_dns_name'].empty?
+               node['cfncluster']['cfn_fsx_dns_name']
+             else
+               # Hardcoded DNSname only valid for filesystem created after Mar-1 2021
+               # For older filesystems, DNSname needs to be retrieved from FSx API
+               "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.#{dns_domain}"
+             end
+
+  mountname = node['cfncluster']['cfn_fsx_mount_name']
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
   mount_options.push(%w[noauto x-systemd.automount]) if node['init_package'] == 'systemd'
