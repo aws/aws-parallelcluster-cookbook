@@ -7,7 +7,7 @@ gem 'berkshelf'
 group :style do
   gem 'foodcritic', '~> 16.2.0'
   gem 'rake', '~> 13.0.1'
-  gem 'rubocop', '~> 0.80.1'
+  gem 'rubocop', '~> 1.12.0'
   gem 'rubocop-gitlab-security', '~> 0.1.1'
 end
 
