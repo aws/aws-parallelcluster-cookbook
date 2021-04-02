@@ -18,8 +18,7 @@
 def network_interface_macs
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
   res = Net::HTTP.get_response(uri)
-  macs = res.body.delete("/").split("\n")
-  macs
+  res.body.delete("/").split("\n")
 end
 
 def device_name(mac)

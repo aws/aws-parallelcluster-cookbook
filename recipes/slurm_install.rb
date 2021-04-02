@@ -100,12 +100,13 @@ when 'MasterServer', nil
   end
 
   # Install PerlSwitch
-  if node['platform'] == 'ubuntu'
+  case node['platform']
+  when 'ubuntu'
     package 'libswitch-perl' do
       retries 3
       retry_delay 5
     end
-  elsif node['platform'] == 'centos' || node['platform'] == 'amazon'
+  when 'centos', 'amazon'
     package 'perl-Switch' do
       retries 3
       retry_delay 5

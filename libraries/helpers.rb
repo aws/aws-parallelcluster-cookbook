@@ -48,7 +48,7 @@ end
 def get_pt_type(device)
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/\sPTTYPE=\"(.*?)\"/)
+  match = fs_check.stdout.match(/\sPTTYPE="(.*?)"/)
   match = '' if match.nil?
 
   Chef::Log.info("Partition type for device #{device}: #{match[1]}")
@@ -61,7 +61,7 @@ end
 def get_fs_type(device)
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/\sTYPE=\"(.*?)\"/)
+  match = fs_check.stdout.match(/\sTYPE="(.*?)"/)
   match = '' if match.nil?
 
   Chef::Log.info("File system type for device #{device}: #{match[1]}")
@@ -75,7 +75,7 @@ def get_uuid(device)
   Chef::Log.info("Getting uuid for device: #{device}")
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/\sUUID=\"(.*?)\"/)
+  match = fs_check.stdout.match(/\sUUID="(.*?)"/)
   match = '' if match.nil?
   Chef::Log.info("uuid for device: #{device} is #{match[1]}")
   match[1]
@@ -89,7 +89,7 @@ def get_1st_partition(device)
   Chef::Log.info("Getting 1st partition for device: #{device}")
   fs_check = Mixlib::ShellOut.new("lsblk -ln -o Name #{device}|awk 'NR==2'")
   fs_check.run_command
-  partition = "/dev/" + fs_check.stdout.strip
+  partition = "/dev/#{fs_check.stdout.strip}"
   Chef::Log.info("1st partition for device: #{device} is: #{partition}")
   partition
 end
@@ -102,8 +102,8 @@ def get_vpc_ipv4_cidr_blocks(eth0_mac)
   res = Net::HTTP.get_response(uri)
   vpc_ipv4_cidr_blocks = res.body if res.code == '200'
   # Parse into array
-  vpc_ipv4_cidr_blocks = vpc_ipv4_cidr_blocks.split("\n")
-  vpc_ipv4_cidr_blocks
+
+  vpc_ipv4_cidr_blocks.split("\n")
 end
 
 def pip_install_package(package, version)
@@ -127,9 +127,8 @@ end
 def graphic_instance?
   has_gpu = Mixlib::ShellOut.new("lspci | grep -i -o 'NVIDIA'")
   has_gpu.run_command
-  is_graphic_instance = !has_gpu.stdout.strip.empty?
 
-  is_graphic_instance
+  !has_gpu.stdout.strip.empty?
 end
 
 #
@@ -138,14 +137,14 @@ end
 def ami_bootstrapped?
   version = ''
   bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
-  current_version = 'aws-parallelcluster-cookbook-' + node['cfncluster']['cfncluster-cookbook-version']
+  current_version = "aws-parallelcluster-cookbook-#{node['cfncluster']['cfncluster-cookbook-version']}"
 
   if ::File.exist?(bootstrapped_file)
     version = IO.read(bootstrapped_file).chomp
     Chef::Log.info("Detected bootstrap file #{version}")
     if version != current_version
-      raise "This AMI was created with " + version + ", but is trying to be used with " + current_version + ". " \
-            "Please either use an AMI created with " + current_version + " or change your ParallelCluster to " + version
+      raise "This AMI was created with #{version}, but is trying to be used with #{current_version}. " \
+            "Please either use an AMI created with #{current_version} or change your ParallelCluster to #{version}"
     end
   end
 
@@ -158,13 +157,13 @@ end
 def validate_os_type
   case node['platform']
   when 'ubuntu'
-    current_os = 'ubuntu' + node['platform_version'].tr('.', '')
+    current_os = "ubuntu#{node['platform_version'].tr('.', '')}"
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   when 'amazon'
-    current_os = 'alinux' + node['platform_version'].to_i.to_s
+    current_os = "alinux#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   when 'centos'
-    current_os = 'centos' + node['platform_version'].to_i.to_s
+    current_os = "centos#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   end
 end
@@ -173,10 +172,10 @@ end
 # Raise error if OS types do not match
 #
 def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the " + current_os + " OS." \
-        "However, the base_os specified in your config file is " + specified_os + ". " \
-        "Please either use an AMI with the " + specified_os + " OS or update the base_os " \
-        "setting in your configuration file to " + current_os + "."
+  raise "The custom AMI you have provided uses the #{current_os} OS." \
+        "However, the base_os specified in your config file is #{specified_os}. " \
+        "Please either use an AMI with the #{specified_os} OS or update the base_os " \
+        "setting in your configuration file to #{current_os}."
 end
 
 #
@@ -327,11 +326,12 @@ def find_rhel_minor_version
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
     raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
 
-    if node['platform_version'].to_i == 7
+    case node['platform_version'].to_i
+    when 7
       os_minor_version = '7' if kernel_patch_version[1] >= '1062'
       os_minor_version = '8' if kernel_patch_version[1] >= '1127'
       os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    elsif node['platform_version'].to_i == 8
+    when 8
       os_minor_version = '2' if kernel_patch_version[1] >= '193'
       os_minor_version = '3' if kernel_patch_version[1] >= '240'
     else
@@ -345,9 +345,10 @@ end
 # Return chrony service reload command
 # Chrony doesn't support reload but only force-reload command
 def chrony_reload_command
-  if node['init_package'] == 'init'
+  case node['init_package']
+  when 'init'
     chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
-  elsif node['init_package'] == 'systemd'
+  when 'systemd'
     chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
   else
     raise "Init package #{node['init_package']} not supported."
@@ -360,14 +361,15 @@ end
 # Add an external package repository to the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def add_package_repository(repo_name, baseurl, gpgkey, distribution)
-  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+  case node['platform_family']
+  when 'rhel', 'amazon'
     yum_repository repo_name do
       baseurl baseurl
       gpgkey gpgkey
       retries 3
       retry_delay 5
     end
-  elsif node['platform_family'] == 'debian'
+  when 'debian'
     apt_repository repo_name do
       uri          baseurl
       key          gpgkey
@@ -387,11 +389,12 @@ end
 # Remove an external package repository from the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def remove_package_repository(repo_name)
-  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+  case node['platform_family']
+  when 'rhel', 'amazon'
     yum_repository repo_name do
       action :remove
     end
-  elsif node['platform_family'] == 'debian'
+  when 'debian'
     apt_repository repo_name do
       action :remove
     end
