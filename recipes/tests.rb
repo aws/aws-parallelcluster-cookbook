@@ -520,6 +520,7 @@ when 'MasterServer'
 end
 
 # Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
+require 'bigdecimal/util'
 unless node['platform'] == 'ubuntu' && node['platform_version'].to_d == 16.04.to_d
   ruby_block 'check_nfs_threads' do
     block do
