@@ -142,14 +142,13 @@ end
 
 include_recipe 'aws-parallelcluster::ec2_udev_rules'
 
-# Install ec2-metadata script
-remote_file '/usr/bin/ec2-metadata' do
-  source 'http://s3.amazonaws.com/ec2metadata/ec2-metadata'
+# Install ec2-metadata script for OSs don't have it
+cookbook_file 'ec2-metadata' do
+  path '/usr/bin/ec2-metadata'
   user 'root'
   group 'root'
   mode '0755'
-  retries 3
-  retry_delay 5
+  not_if { ::File.exist?("/usr/bin/ec2-metadata") }
 end
 
 # Check whether install a custom aws-parallelcluster-node package or the standard one

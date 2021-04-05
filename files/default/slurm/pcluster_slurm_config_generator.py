@@ -13,13 +13,19 @@ import argparse
 import json
 import logging
 import re
-import subprocess
 from os import makedirs, path
 from socket import gethostname
 
+import requests
 from jinja2 import Environment, FileSystemLoader
 
 log = logging.getLogger()
+
+
+class CriticalError(Exception):
+    """Critical error for the daemon."""
+
+    pass
 
 
 def generate_slurm_config_files(output_directory, template_directory, input_file, dryrun):
@@ -89,19 +95,7 @@ def _get_head_node_config():
 
 def _get_head_node_private_ip():
     """Get head node private ip from EC2 metadata."""
-    try:
-        private_ip = subprocess.run(  # nosec nosemgrep
-            "curl --retry 3 http://169.254.169.254/latest/meta-data/local-ipv4",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            check=True,
-            encoding="utf-8",
-            shell=True,
-        ).stdout
-        return private_ip
-    except Exception:
-        log.error("Encountered exception when retrieving head node private IP.")
-        raise
+    return _get_metadata("local-ipv4")
 
 
 def _generate_queue_config(queue_name, queue_config, is_default_queue, file_type, jinja_env, output_dir, dryrun):
@@ -169,6 +163,31 @@ def generate_instance_type_mapping_file(output_dir, queue_settings):
     log.info("Generating %s", filename)
     with open(filename, "w") as output_file:
         output_file.write(json.dumps(instance_name_type_mapping, indent=4))
+
+
+def _get_metadata(metadata_path):
+    """
+    Get EC2 instance metadata.
+
+    :param metadata_path: the metadata relative path
+    :return the metadata value.
+    """
+    try:
+        token = requests.put(
+            "http://169.254.169.254/latest/api/token", headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+        )
+        headers = {}
+        if token.status_code == requests.codes.ok:
+            headers["X-aws-ec2-metadata-token"] = token.content
+        metadata_url = "http://169.254.169.254/latest/meta-data/{0}".format(metadata_path)
+        metadata_value = requests.get(metadata_url, headers=headers).text
+    except Exception as e:
+        error_msg = "Unable to get {0} metadata. Failed with exception: {1}".format(metadata_path, e)
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+
+    log.debug("%s=%s", metadata_path, metadata_value)
+    return metadata_value
 
 
 def main():

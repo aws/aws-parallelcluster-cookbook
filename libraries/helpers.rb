@@ -98,9 +98,9 @@ end
 # Get vpc-ipv4-cidr-blocks
 #
 def get_vpc_ipv4_cidr_blocks(eth0_mac)
+  token = get_metadata_token
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{eth0_mac.downcase}/vpc-ipv4-cidr-blocks")
-  res = Net::HTTP.get_response(uri)
-  vpc_ipv4_cidr_blocks = res.body if res.code == '200'
+  vpc_ipv4_cidr_blocks = get_metadata_with_token(token, uri)
   # Parse into array
 
   vpc_ipv4_cidr_blocks.split("\n")
@@ -490,4 +490,22 @@ def setup_munge_compute_node
   end
 
   enable_munge_service
+end
+
+def get_metadata_token
+  # generate the token for retrieving IMDSv2 metadata
+  token_uri = URI("http://169.254.169.254/latest/api/token")
+  token_request = Net::HTTP::Put.new(token_uri)
+  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
+  res = Net::HTTP.new("169.254.169.254").request(token_request)
+  res.body
+end
+
+def get_metadata_with_token(token, uri)
+  # get IMDSv2 metadata with token
+  request = Net::HTTP::Get.new(uri)
+  request["X-aws-ec2-metadata-token"] = token
+  res = Net::HTTP.new("169.254.169.254").request(request)
+  metadata = res.body if res.code == '200'
+  metadata
 end

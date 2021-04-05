@@ -39,10 +39,18 @@ def main():
         dev = "/dev/" + dev
 
     # Get instance ID
-    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id").text
+    token = requests.put(
+        "http://169.254.169.254/latest/api/token",
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+    )
+
+    headers = {}
+    if token.status_code == requests.codes.ok:
+        headers["X-aws-ec2-metadata-token"] = token.content
+    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=headers).text
 
     # Get region
-    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone").text
+    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=headers).text
     region = region[:-1]
 
     # Parse configuration file to read proxy settings
