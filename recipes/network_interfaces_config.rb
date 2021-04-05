@@ -15,10 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-def network_interface_macs
+def network_interface_macs(token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
-  res = Net::HTTP.get_response(uri)
-  res.body.delete("/").split("\n")
+  res = get_metadata_with_token(token, uri)
+  res.delete("/").split("\n")
 end
 
 def device_name(mac)
@@ -27,16 +27,14 @@ def device_name(mac)
   cmd.stdout.delete("\n")
 end
 
-def device_number(mac)
+def device_number(mac, token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
-  res = Net::HTTP.get_response(uri)
-  res.body
+  get_metadata_with_token(token, uri)
 end
 
-def device_ip(mac)
+def device_ip(mac, token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/local-ipv4s")
-  res = Net::HTTP.get_response(uri)
-  res.body
+  get_metadata_with_token(token, uri)
 end
 
 def gateway_address
@@ -45,14 +43,13 @@ def gateway_address
   cmd.stdout.delete("\n")
 end
 
-def subnet_cidr_block(mac)
+def subnet_cidr_block(mac, token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/subnet-ipv4-cidr-block")
-  res = Net::HTTP.get_response(uri)
-  res.body
+  get_metadata_with_token(token, uri)
 end
 
-def cidr_prefix_length(mac)
-  subnet_cidr_block(mac).split("/")[1]
+def cidr_prefix_length(mac, token)
+  subnet_cidr_block(mac, token).split("/")[1]
 end
 
 def cidr_to_netmask(cidr)
@@ -60,7 +57,9 @@ def cidr_to_netmask(cidr)
   IPAddr.new('255.255.255.255').mask(cidr).to_s
 end
 
-macs = network_interface_macs
+# generate the token for retrieving IMDSv2 metadata
+token = get_metadata_token
+macs = network_interface_macs(token)
 log "macs: #{macs}"
 
 if macs.length > 1
@@ -75,12 +74,12 @@ if macs.length > 1
   # Configure nw interfaces
   macs.each do |mac|
     device_name = device_name(mac)
-    device_number = device_number(mac)
+    device_number = device_number(mac, token)
     gw_ip_address = gateway_address
-    device_ip_address = device_ip(mac)
-    cidr_prefix_length = cidr_prefix_length(mac)
+    device_ip_address = device_ip(mac, token)
+    cidr_prefix_length = cidr_prefix_length(mac, token)
     netmask = cidr_to_netmask(cidr_prefix_length)
-    cidr_block = subnet_cidr_block(mac)
+    cidr_block = subnet_cidr_block(mac, token)
 
     execute 'configure_nw_interface' do
       user 'root'

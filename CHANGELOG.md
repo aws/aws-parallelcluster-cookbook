@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
 - Add possibility to use a post installation script when building Centos 8 AMI.
 - Install SSM agent on CentOS 7 and 8
+- Transition from IMDSv1 to IMDSv2.
 
 **CHANGES**
 - Ubuntu 16.04 is no longer supported.
