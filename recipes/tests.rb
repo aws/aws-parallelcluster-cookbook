@@ -175,10 +175,11 @@ end
 ###################
 # Ganglia
 ###################
-if node['init_package'] == 'init'
+case node['init_package']
+when 'init'
   gmond_check_command = "service #{node['cfncluster']['ganglia']['gmond_service']} status | grep -i running"
   gmetad_check_command = "service gmetad status | grep -i running"
-elsif node['init_package'] == 'systemd'
+when 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
   gmond_check_command = "systemctl show -p SubState #{node['cfncluster']['ganglia']['gmond_service']} | grep -i running"
@@ -207,20 +208,22 @@ end
 ###################
 # Amazon Time Sync
 ###################
-if node['init_package'] == 'init'
+case node['init_package']
+when 'init'
   get_chrony_status_command = "service #{node['cfncluster']['chrony']['service']} status"
-elsif node['init_package'] == 'systemd'
+when 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
   get_chrony_status_command = "systemctl show -p SubState #{node['cfncluster']['chrony']['service']}"
 end
-chrony_check_command = get_chrony_status_command + " | grep -i running"
+chrony_check_command = "#{get_chrony_status_command} | grep -i running"
 
 ruby_block 'log_chrony_status' do
   block do
-    if node['init_package'] == 'init'
+    case node['init_package']
+    when 'init'
       get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cfncluster']['chrony']['service']}'"
-    elsif node['init_package'] == 'systemd'
+    when 'systemd'
       get_chrony_service_log_command = "journalctl -u #{node['cfncluster']['chrony']['service']}"
     end
     chrony_log = shell_out!(get_chrony_service_log_command).stdout
@@ -502,12 +505,14 @@ end
 ###################
 # NFS
 ###################
-if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+
+case node['cfncluster']['cfn_node_type']
+when 'ComputeFleet'
   execute 'check for nfs client protocol' do
     command "nfsstat -m | grep vers=4"
     user node['cfncluster']['cfn_cluster_user']
   end
-elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
+when 'MasterServer'
   execute 'check for nfs server protocol' do
     command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
     user node['cfncluster']['cfn_cluster_user']
@@ -515,7 +520,8 @@ elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
 end
 
 # Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
-unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
+require 'bigdecimal/util'
+unless node['platform'] == 'ubuntu' && node['platform_version'].to_d == 16.04.to_d
   ruby_block 'check_nfs_threads' do
     block do
       nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
