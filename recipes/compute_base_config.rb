@@ -33,7 +33,7 @@ raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  raid_shared_dir = "/#{raid_shared_dir unless raid_shared_dir.start_with?('/')}"
+  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
 
   # Created RAID shared mount point
   directory raid_shared_dir do
@@ -95,7 +95,7 @@ shared_dir_array.each do |dir|
 
   next if dirname == "NONE"
 
-  dirname = "/#{dirname unless dirname.start_with?('/')}"
+  dirname = "/#{dirname}" unless dirname.start_with?('/')
 
   # Created shared mount point
   directory dirname do
