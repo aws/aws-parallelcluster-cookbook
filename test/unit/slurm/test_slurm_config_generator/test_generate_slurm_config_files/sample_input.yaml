@@ -1,0 +1,77 @@
+Scheduling:
+    Queues:
+        - CapacityType: SPOT
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: c4.xlarge
+                MaxCount: 10
+                MinCount: 5
+                Name: multiple_spot_c4.xlarge
+                SpotPrice: null
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: c5.2xlarge
+                MaxCount: 5
+                MinCount: 5
+                Name: multiple_spot_c5.2xlarge
+                SpotPrice: 1.5
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: multiple_spot
+        - CapacityType: ONDEMAND
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: true
+                    GdrSupport: false
+                InstanceType: c5n.18xlarge
+                MaxCount: 5
+                MinCount: 1
+                Name: efa_c5n.18xlarge
+                SpotPrice: null
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: efa
+        - CapacityType: ONDEMAND
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: g3.8xlarge
+                MaxCount: 5
+                MinCount: 1
+                Name: gpu_g3.8xlarge
+                SpotPrice: null
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: p3dn.24xlarge
+                MaxCount: 10
+                MinCount: 0
+                Name: gpu_p3dn.24xlarge
+                SpotPrice: null
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: gpu
+    Scheduler: slurm
+    SlurmSettings:
+        ScaledownIdletime: 10
