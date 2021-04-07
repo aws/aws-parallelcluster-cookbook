@@ -35,19 +35,19 @@ end
 cxx_flags = value_for_platform(
   'amazon' => { '2' => "-std=c++03" },
   'centos' => { '>=8' => "-std=c++03" },
-  'ubuntu' => { '18.04' => "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/" },
+  'ubuntu' => { '>=18.04' => "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/" },
   'default' => ""
 )
 c_flags = value_for_platform(
   'amazon' => { '2' => "-fpermissive" },
   'centos' => { '>=8' => "-fpermissive" },
-  'ubuntu' => { '18.04' => "-fpermissive" },
+  'ubuntu' => { '>=18.04' => "-fpermissive" },
   'default' => ""
 )
 configure_flags = value_for_platform(
   'amazon' => { '2' => "--disable-gcc-warnings" },
   'centos' => { '>=8' => "--disable-gcc-warnings" },
-  'ubuntu' => { '18.04' => "--disable-gcc-warnings" },
+  'ubuntu' => { '>=18.04' => "--disable-gcc-warnings" },
   'default' => ""
 )
 

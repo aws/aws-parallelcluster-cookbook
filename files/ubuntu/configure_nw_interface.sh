@@ -28,9 +28,12 @@ STATIC_IP_CONFIG=$(cat<<END
 END
 )
 
+# NOTE: In Ubuntu 20.04 all network interfaces are already configured in 50-cloud-init.yaml with dhcp4 enabled.
+# However, the specific configuration files created below (in the same way of Ubuntu 18) will override these initial
+# settings, as can be verified with the command `netplan get`
 if [ "${DEVICE_NUMBER}" = "0" ]
   then
-    echo "Device 0 is dhcp managed in Ubuntu 18.04"
+    echo "Device 0 is dhcp managed in current plaform"
     STATIC_IP_CONFIG=""
 fi
 
@@ -62,7 +65,10 @@ EOF
 
 # Hook to delete automatic routes to subnet automatically created from kernel.
 # This is needed in Ubuntu 18 because they are generated in the reverse order in which the network interfaces are
-# attached and this prevents the primary Network Interface from being selected to communicate in the subnet
+# attached and this prevents the primary Network Interface from being selected to communicate in the subnet.
+# In Ubuntu 20 this hook is needed as well for a slightly different reason. Automatic routes here are
+# already present due to cloud-init initialization and we need to remove them to make sure that the primary Network
+# Interface is selected when opening connections to the subnet
 FILE="/etc/networkd-dispatcher/routable.d/cleanup-routes.sh"
 
 if [ ! -f "$FILE" ]; then
