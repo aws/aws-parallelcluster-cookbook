@@ -25,7 +25,5 @@ case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_slurm_finalize' if node['cluster']['scheduler'] == 'slurm'
 when 'ComputeFleet'
-  if node['cluster']['scheduler'] == 'slurm'
-    include_recipe 'aws-parallelcluster::compute_slurm_finalize'
-  end
+  include_recipe 'aws-parallelcluster::compute_slurm_finalize' if node['cluster']['scheduler'] == 'slurm'
 end

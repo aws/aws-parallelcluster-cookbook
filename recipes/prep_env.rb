@@ -20,13 +20,13 @@ validate_os_type
 
 # Determine scheduler_slots settings and update instance_slots appropriately
 node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slots']
-                                                   when 'vcpus'
-                                                     node['cpu']['total']
-                                                   when 'cores'
-                                                     node['cpu']['cores']
-                                                   else
-                                                     node['cluster']['scheduler_slots']
-                                                   end
+                                            when 'vcpus'
+                                              node['cpu']['total']
+                                            when 'cores'
+                                              node['cpu']['cores']
+                                            else
+                                              node['cluster']['scheduler_slots']
+                                            end
 
 # NOTE: this recipe must be included after instance_slot because it may alter the values of
 #       node['cpu']['total'], which would break the expected behavior when setting scheduler_slots
