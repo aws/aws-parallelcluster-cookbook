@@ -174,9 +174,7 @@ if node['conditions']['dcv_supported']
         block do
           require 'digest'
           checksum = Digest::SHA256.file(dcv_tarball).hexdigest
-          if checksum != node['cluster']['dcv']['sha256sum']
-            raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cluster']['dcv']['package']['sha256sum']}"
-          end
+          raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cluster']['dcv']['package']['sha256sum']}" if checksum != node['cluster']['dcv']['sha256sum']
         end
       end
 
