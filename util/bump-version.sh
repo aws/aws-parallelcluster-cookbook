@@ -11,7 +11,7 @@ NEW_VERSION=$1
 CURRENT_VERSION=$(sed -ne "s/^version '\(.*\)'/\1/p" metadata.rb)
 
 sed -i -e "s/\(.*parallelcluster.*version.*\)$CURRENT_VERSION.*\(\".*\)/\1$NEW_VERSION\2/g" amis/packer_variables.json
-sed -i "s/default\['cluster'\]\['cfncluster-version'\] = '$CURRENT_VERSION'/default['cluster']['cfncluster-version'] = '$NEW_VERSION'/g" attributes/default.rb
-sed -i "s/default\['cluster'\]\['cfncluster-cookbook-version'\] = '$CURRENT_VERSION'/default['cluster']['cfncluster-cookbook-version'] = '$NEW_VERSION'/g" attributes/default.rb
-sed -i "s/default\['cluster'\]\['cfncluster-node-version'\] = '$CURRENT_VERSION'/default['cluster']['cfncluster-node-version'] = '$NEW_VERSION'/g" attributes/default.rb
+sed -i "s/default\['cluster'\]\['parallelcluster-version'\] = '$CURRENT_VERSION'/default['cluster']['parallelcluster-version'] = '$NEW_VERSION'/g" attributes/default.rb
+sed -i "s/default\['cluster'\]\['parallelcluster-cookbook-version'\] = '$CURRENT_VERSION'/default['cluster']['parallelcluster-cookbook-version'] = '$NEW_VERSION'/g" attributes/default.rb
+sed -i "s/default\['cluster'\]\['parallelcluster-node-version'\] = '$CURRENT_VERSION'/default['cluster']['parallelcluster-node-version'] = '$NEW_VERSION'/g" attributes/default.rb
 sed -i "s/version '$CURRENT_VERSION'/version '$NEW_VERSION'/g" metadata.rb

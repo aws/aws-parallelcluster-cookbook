@@ -101,9 +101,9 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # Python packages
-default['cluster']['cfncluster-version'] = '2.10.3'
-default['cluster']['cfncluster-cookbook-version'] = '2.10.3'
-default['cluster']['cfncluster-node-version'] = '2.10.3'
+default['cluster']['parallelcluster-version'] = '2.10.3'
+default['cluster']['parallelcluster-cookbook-version'] = '2.10.3'
+default['cluster']['parallelcluster-node-version'] = '2.10.3'
 
 # URLs to software packages used during install recipes
 # Slurm software

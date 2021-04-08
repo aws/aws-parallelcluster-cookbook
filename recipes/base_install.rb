@@ -172,7 +172,7 @@ if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node
   end
 else
   pyenv_pip 'aws-parallelcluster-node' do
-    version node['cluster']['cfncluster-node-version']
+    version node['cluster']['parallelcluster-node-version']
     virtualenv node['cluster']['node_virtualenv_path']
   end
 end
