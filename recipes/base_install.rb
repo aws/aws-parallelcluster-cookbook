@@ -22,7 +22,7 @@ when 'rhel', 'amazon'
   include_recipe 'yum'
   if node['platform_family'] == 'amazon'
     alinux_extras_topic 'epel'
-  elsif node['platform_version'].to_i < 7
+  elsif node['platform'] == 'centos'
     include_recipe "yum-epel"
   end
 
