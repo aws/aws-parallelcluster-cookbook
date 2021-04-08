@@ -100,12 +100,6 @@ default['cfncluster']['cfncluster-cookbook-version'] = '2.10.3'
 default['cfncluster']['cfncluster-node-version'] = '2.10.3'
 
 # URLs to software packages used during install recipes
-# Gridengine software
-default['cfncluster']['sge']['version'] = '8.1.9'
-default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
-# Torque software
-default['cfncluster']['torque']['version'] = '6.1.2'
-default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
 default['cfncluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cfncluster']['slurm']['version'] = '20.11.5'
@@ -304,9 +298,8 @@ when 'rhel', 'amazon'
       # iptables used in configure-pat.sh
       # gdisk required for FSx
       # environment-modules required for IntelMPI
-      # libtirpc and libtirpc-devel required for SGE
       # cryptsetup used for ephemeral drive encryption
-      default['cfncluster']['base_packages'].push(%w[iptables gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
+      default['cfncluster']['base_packages'].push(%w[iptables gdisk environment-modules cryptsetup])
     end
 
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
@@ -325,20 +318,12 @@ when 'rhel', 'amazon'
 
     # Install R via amazon linux extras
     default['cfncluster']['alinux_extras'] = ['R3.4']
-    # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
-    # because it contains fixes for known build issues
-    default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
   end
 
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
   default['cfncluster']['ganglia']['httpd_service'] = 'httpd'
   default['cfncluster']['chrony']['service'] = "chronyd"
   default['cfncluster']['chrony']['conf'] = "/etc/chrony.conf"
-  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/trqauthd'
-  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/pbs_mom'
-  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/pbs_sched'
-  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/pbs_server'
 
 when 'debian'
   default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
@@ -349,8 +334,6 @@ when 'debian'
                                               r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
                                               libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
                                               libatlas-base-dev libglvnd-dev]
-  default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-  default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
 
   case node['platform_version']
   when '18.04'
@@ -370,10 +353,6 @@ when 'debian'
   default['cfncluster']['ganglia']['httpd_service'] = 'apache2'
   default['cfncluster']['chrony']['service'] = "chrony"
   default['cfncluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
-  default['cfncluster']['torque']['trqauthd_source'] = 'file:///opt/torque/contrib/init.d/debian.trqauthd'
-  default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
-  default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
-  default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
 
   if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
     default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
@@ -431,7 +410,7 @@ default['cfncluster']['cfn_preinstall_args'] = 'NONE'
 default['cfncluster']['cfn_proxy'] = 'NONE'
 default['cfncluster']['cfn_postinstall'] = 'NONE'
 default['cfncluster']['cfn_postinstall_args'] = 'NONE'
-default['cfncluster']['cfn_scheduler'] = 'sge'
+default['cfncluster']['cfn_scheduler'] = 'slurm'
 default['cfncluster']['cfn_scheduler_slots'] = 'vcpus'
 default['cfncluster']['cfn_disable_hyperthreading_manually'] = 'false'
 default['cfncluster']['cfn_instance_slots'] = '1'

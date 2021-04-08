@@ -67,65 +67,9 @@ end
 ###################
 # munge
 ###################
-if node['cfncluster']['cfn_scheduler'] == 'torque' || node['cfncluster']['cfn_scheduler'] == 'slurm'
+if node['cfncluster']['cfn_scheduler'] == 'slurm'
   execute 'check munge installed' do
     command 'munge --version'
-    user node['cfncluster']['cfn_cluster_user']
-  end
-end
-
-###################
-# SGE
-###################
-if node['cfncluster']['cfn_scheduler'] == 'sge'
-  sge_bin_suffix = if arm_instance?
-                     "arm64"
-                   else
-                     "amd64"
-                   end
-  sge_bin_paths = "/opt/sge/bin:/opt/sge/bin/lx-#{sge_bin_suffix}"
-  case node['cfncluster']['cfn_node_type']
-  when 'MasterServer'
-    execute 'execute qhost' do
-      command "qhost -help"
-      environment('PATH' => "#{sge_bin_paths}:/bin:/usr/bin:$PATH", 'SGE_ROOT' => '/opt/sge')
-      user node['cfncluster']['cfn_cluster_user']
-    end
-
-    execute 'execute qstat' do
-      command "qstat -help"
-      environment('PATH' => "#{sge_bin_paths}:/bin:/usr/bin:$PATH", 'SGE_ROOT' => '/opt/sge')
-      user node['cfncluster']['cfn_cluster_user']
-    end
-
-    execute 'execute qsub' do
-      command "qsub -help"
-      environment('PATH' => "#{sge_bin_paths}:/bin:/usr/bin:$PATH", 'SGE_ROOT' => '/opt/sge')
-      user node['cfncluster']['cfn_cluster_user']
-    end
-  when 'ComputeFleet'
-    execute 'ls sge root' do
-      command "ls /opt/sge"
-      user node['cfncluster']['cfn_cluster_user']
-    end
-  else
-    raise "cfn_node_type must be MasterServer or ComputeFleet"
-  end
-end
-
-###################
-# Torque
-###################
-if node['cfncluster']['cfn_scheduler'] == 'torque'
-  execute 'execute qstat' do
-    command "qstat --version"
-    environment('PATH' => '/opt/torque/bin:/opt/torque/sbin:$PATH')
-    user node['cfncluster']['cfn_cluster_user']
-  end
-
-  execute 'execute qsub' do
-    command "qsub --version"
-    environment('PATH' => '/opt/torque/bin:/opt/torque/sbin:$PATH')
     user node['cfncluster']['cfn_cluster_user']
   end
 end
@@ -360,7 +304,7 @@ unless node['cfncluster']['os'].end_with?("-custom")
       set -e
       # Set PATH as in the UserData script of the CloudFormation template
       export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
-      echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::sge_config]"}' > /tmp/dna.json
+      echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::slurm_config]"}' > /tmp/dna.json
       echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
       jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster'
     JQMERGE
