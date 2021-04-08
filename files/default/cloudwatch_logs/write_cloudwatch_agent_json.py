@@ -32,7 +32,7 @@ def parse_args():
                         required=True)
     parser.add_argument('--node-role',
                         required=True,
-                        choices=['MasterServer', 'ComputeFleet'],
+                        choices=['HeadNode', 'ComputeFleet'],
                         help='Role this node plays in the cluster '
                              '(i.e., is it a compute node or the head node?)')
     parser.add_argument('--scheduler',

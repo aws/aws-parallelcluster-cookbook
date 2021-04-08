@@ -20,8 +20,8 @@ if node['cluster']['scheduler'] == 'slurm'
   ruby_block "retrieve head_node ip" do
     block do
       head_node_private_ip, head_node_private_dns = hit_head_node_info
-      node.force_default['cluster']['master'] = head_node_private_dns
-      node.force_default['cluster']['master_private_ip'] = head_node_private_ip
+      node.force_default['cluster']['head_node'] = head_node_private_dns
+      node.force_default['cluster']['head_node_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3
@@ -45,7 +45,7 @@ if raid_shared_dir != "NONE"
 
   # Mount RAID directory over NFS
   mount raid_shared_dir do
-    device(lazy { "#{node['cluster']['master_private_ip']}:#{raid_shared_dir}" })
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
@@ -56,7 +56,7 @@ end
 
 # Mount /home over NFS
 mount '/home' do
-  device(lazy { "#{node['cluster']['master_private_ip']}:/home" })
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
@@ -66,7 +66,7 @@ end
 
 # Mount /opt/intel over NFS
 mount '/opt/intel' do
-  device(lazy { "#{node['cluster']['master_private_ip']}:/opt/intel" })
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/intel" })
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
@@ -108,7 +108,7 @@ shared_dir_array.each do |dir|
 
   # Mount shared volume over NFS
   mount dirname do
-    device(lazy { "#{node['cluster']['master_private_ip']}:#{dirname}" })
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{dirname}" })
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]

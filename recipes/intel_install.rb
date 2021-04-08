@@ -50,7 +50,7 @@ package intel_hpc_base_dependencies
 intel_hpc_spec_rpms_dir = '/opt/intel/rpms'
 
 case node['cluster']['node_type']
-when 'MasterServer'
+when 'HeadNode'
 
   # Intel HPC Platform
   directory intel_hpc_spec_rpms_dir do

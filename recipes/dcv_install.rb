@@ -74,7 +74,7 @@ end
 
 if node['conditions']['dcv_supported']
   case node['cluster']['node_type']
-  when 'MasterServer', nil
+  when 'HeadNode', nil
     dcv_tarball = "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
 
     # Install DCV pre-requisite packages

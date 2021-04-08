@@ -27,12 +27,12 @@ cookbook_file '/etc/init.d/slurm' do
 end
 
 case node['cluster']['node_type']
-when 'MasterServer'
+when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_slurm_config'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster::compute_slurm_config'
 else
-  raise "node_type must be MasterServer or ComputeFleet"
+  raise "node_type must be HeadNode or ComputeFleet"
 end
 
 link '/etc/profile.d/slurm.sh' do

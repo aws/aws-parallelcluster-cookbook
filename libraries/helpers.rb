@@ -182,8 +182,8 @@ end
 # Retrieve head node ip and dns from file (HIT only)
 #
 def hit_head_node_info
-  head_node_private_ip_file = "#{node['cluster']['slurm_plugin_dir']}/master_private_ip"
-  head_node_private_dns_file = "#{node['cluster']['slurm_plugin_dir']}/master_private_dns"
+  head_node_private_ip_file = "#{node['cluster']['slurm_plugin_dir']}/head_node_private_ip"
+  head_node_private_dns_file = "#{node['cluster']['slurm_plugin_dir']}/head_node_private_dns"
 
   [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
 end
@@ -198,7 +198,7 @@ def hit_slurm_nodename
 end
 
 #
-# Retrieve compute and master node info from dynamo db (HIT only)
+# Retrieve compute and head node info from dynamo db (Slurm only)
 #
 def hit_dynamodb_info
   require 'chef/mixin/shell_out'
@@ -207,8 +207,8 @@ def hit_dynamodb_info
     "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
     "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
     "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
-    "--projection-expression 'Id,MasterPrivateIp,MasterHostname' " \
-    "--output text --query 'Items[0].[Id.S,MasterPrivateIp.S,MasterHostname.S]'", user: 'root').stdout.strip
+    "--projection-expression 'Id,HeadNodePrivateIp,HeadNodeHostname' " \
+    "--output text --query 'Items[0].[Id.S,HeadNodePrivateIp.S,HeadNodeHostname.S]'", user: 'root').stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
@@ -418,7 +418,7 @@ def efa_gdr_enabled?
   enabling_value = if node['cluster']['node_type'] == "ComputeFleet"
                      "compute"
                    else
-                     "master"
+                     "head_node"
                    end
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
