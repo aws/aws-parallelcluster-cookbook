@@ -124,14 +124,6 @@ end
 # Install NFS packages
 include_recipe "nfs::server"
 
-# Put configure-pat.sh onto the host
-cookbook_file 'configure-pat.sh' do
-  path '/usr/local/sbin/configure-pat.sh'
-  user 'root'
-  group 'root'
-  mode '0744'
-end
-
 # Put setup-ephemeral-drives.sh onto the host
 cookbook_file 'setup-ephemeral-drives.sh' do
   path '/usr/local/sbin/setup-ephemeral-drives.sh'
