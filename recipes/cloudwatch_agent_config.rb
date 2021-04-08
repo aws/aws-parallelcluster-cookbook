@@ -64,19 +64,19 @@ execute "cloudwatch-config-validation" do
     'CW_LOGS_CONFIGS_SCHEMA_PATH' => config_schema_path,
     'CW_LOGS_CONFIGS_PATH' => config_data_path
   )
-  command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python #{validator_script_path}"
+  command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python #{validator_script_path}"
 end
 
 execute "cloudwatch-config-creation" do
   user 'root'
   environment(
-    'LOG_GROUP_NAME' => node['cfncluster']['cfn_log_group_name'],
-    'SCHEDULER' => node['cfncluster']['cfn_scheduler'],
-    'NODE_ROLE' => node['cfncluster']['cfn_node_type'],
+    'LOG_GROUP_NAME' => node['cluster']['log_group_name'],
+    'SCHEDULER' => node['cluster']['scheduler'],
+    'NODE_ROLE' => node['cluster']['node_type'],
     'CONFIG_DATA_PATH' => config_data_path
   )
   not_if { ::File.exist?('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json') }
-  command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python #{config_script_path} "\
+  command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python #{config_script_path} "\
           "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
           "--scheduler $SCHEDULER --node-role $NODE_ROLE"
 end
@@ -86,6 +86,6 @@ execute "cloudwatch-agent-start" do
   command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
   not_if do
     system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") || # ~FC048
-      node['cfncluster']['cfn_cluster_cw_logging_enabled'] != 'true'
+      node['cluster']['cluster_cw_logging_enabled'] != 'true'
   end
 end

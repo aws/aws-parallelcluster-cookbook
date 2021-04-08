@@ -19,7 +19,7 @@ setup_munge_head_node
 
 # Export /opt/slurm
 nfs_export "/opt/slurm" do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
 end
@@ -53,7 +53,7 @@ template '/opt/slurm/etc/gres.conf' do
 end
 
 # Copy pcluster config generator and templates
-remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
+remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
   source 'slurm'
   mode '0755'
   action :create
@@ -61,11 +61,11 @@ remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
 end
 
 # Copy cluster config file from S3 URI
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
-                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
-                       " --key #{node['cfncluster']['cluster_config_s3_key']}"\
-                       " --region #{node['cfncluster']['cfn_region']} #{node['cfncluster']['cluster_config_path']}"
-fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
+fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
+                       " --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cluster']['cluster_config_s3_key']}"\
+                       " --region #{node['cluster']['region']} #{node['cluster']['cluster_config_path']}"
+fetch_config_command += " --version-id #{node['cluster']['cluster_config_version']}" unless node['cluster']['cluster_config_version'].nil?
 execute "copy_cluster_config_from_s3" do
   command fetch_config_command
   retries 3
@@ -73,8 +73,8 @@ execute "copy_cluster_config_from_s3" do
 end
 
 # Copy instance type infos file from S3 URI
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
-                       " --key #{node['cfncluster']['instance_types_data_s3_key']} --region #{node['cfncluster']['cfn_region']} #{node['cfncluster']['instance_types_data_path']}"
+fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
 execute "copy_cluster_config_from_s3" do
   command fetch_config_command
   retries 3
@@ -82,26 +82,26 @@ execute "copy_cluster_config_from_s3" do
 end
 
 execute 'initialize cluster config hash in DynamoDB' do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
-          " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cfncluster']['cluster_config_version']}\"}}' --region #{node['cfncluster']['cfn_region']}"
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+          " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cluster']['cluster_config_version']}\"}}' --region #{node['cluster']['region']}"
   retries 3
   retry_delay 5
-  not_if { node['cfncluster']['cluster_config_version'].nil? }
+  not_if { node['cluster']['cluster_config_version'].nil? }
 end
 
 execute 'initialize compute fleet status in DynamoDB' do
   # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
-          " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}}' --region #{node['cfncluster']['cfn_region']}"
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+          " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}}' --region #{node['cluster']['region']}"
   retries 3
   retry_delay 5
 end
 
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-          " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/"\
-          " --input-file #{node['cfncluster']['cluster_config_path']}  --instance-types-data #{node['cfncluster']['instance_types_data_path']}"
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
+          " --output-directory /opt/slurm/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
+          " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"
 end
 
 # all other OSs use /sys/fs/cgroup, which is the default
@@ -126,7 +126,7 @@ cookbook_file '/opt/slurm/etc/slurm.csh' do
   mode '0755'
 end
 
-template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_resume" do
+template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do
   source 'slurm/resume_program.erb'
   owner 'slurm'
   group 'slurm'
@@ -139,14 +139,14 @@ file "/var/log/parallelcluster/slurm_resume.log" do
   mode '0644'
 end
 
-template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.conf" do
+template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.conf" do
   source 'slurm/parallelcluster_slurm_resume.conf.erb'
   owner 'slurm'
   group 'slurm'
   mode '0644'
 end
 
-template "#{node['cfncluster']['scripts_dir']}/slurm/slurm_suspend" do
+template "#{node['cluster']['scripts_dir']}/slurm/slurm_suspend" do
   source 'slurm/suspend_program.erb'
   owner 'slurm'
   group 'slurm'
@@ -159,14 +159,14 @@ file "/var/log/parallelcluster/slurm_suspend.log" do
   mode '0644'
 end
 
-template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_slurm_suspend.conf" do
+template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_suspend.conf" do
   source 'slurm/parallelcluster_slurm_suspend.conf.erb'
   owner 'slurm'
   group 'slurm'
   mode '0644'
 end
 
-template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_clustermgtd.conf" do
+template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_clustermgtd.conf" do
   source 'slurm/parallelcluster_clustermgtd.conf.erb'
   owner 'root'
   group 'root'

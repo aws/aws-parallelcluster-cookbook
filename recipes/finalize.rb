@@ -21,11 +21,11 @@ service "supervisord" do
   action %i[enable start]
 end
 
-case node['cfncluster']['cfn_node_type']
+case node['cluster']['node_type']
 when 'MasterServer'
-  include_recipe 'aws-parallelcluster::head_node_slurm_finalize' if node['cfncluster']['cfn_scheduler'] == 'slurm'
+  include_recipe 'aws-parallelcluster::head_node_slurm_finalize' if node['cluster']['scheduler'] == 'slurm'
 when 'ComputeFleet'
-  if node['cfncluster']['cfn_scheduler'] == 'slurm'
+  if node['cluster']['scheduler'] == 'slurm'
     include_recipe 'aws-parallelcluster::compute_slurm_finalize'
   else
     execute "compute_ready" do

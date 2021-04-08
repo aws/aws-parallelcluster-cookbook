@@ -17,10 +17,10 @@
 
 return unless node['conditions']['intel_mpi_supported']
 
-intelmpi_modulefile = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/intelmpi"
-intelmpi_installer_archive = "l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
-intelmpi_installer_path = "#{node['cfncluster']['sources_dir']}/#{intelmpi_installer_archive}"
-intelmpi_installer_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/archives/impi/#{intelmpi_installer_archive}"
+intelmpi_modulefile = "/opt/intel/impi/#{node['cluster']['intelmpi']['version']}/intel64/modulefiles/intelmpi"
+intelmpi_installer_archive = "l_mpi_#{node['cluster']['intelmpi']['version']}.tgz"
+intelmpi_installer_path = "#{node['cluster']['sources_dir']}/#{intelmpi_installer_archive}"
+intelmpi_installer_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/archives/impi/#{intelmpi_installer_archive}"
 
 # fetch intelmpi installer script
 remote_file intelmpi_installer_path do
@@ -28,29 +28,29 @@ remote_file intelmpi_installer_path do
   mode '0744'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?("/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}") }
+  not_if { ::File.exist?("/opt/intel/impi/#{node['cluster']['intelmpi']['version']}") }
 end
 
 bash "install intel mpi" do
-  cwd node['cfncluster']['sources_dir']
+  cwd node['cluster']['sources_dir']
   code <<-INTELMPI
     set -e
     tar -xf #{intelmpi_installer_archive}
-    cd l_mpi_#{node['cfncluster']['intelmpi']['version']}/
+    cd l_mpi_#{node['cluster']['intelmpi']['version']}/
     ./install.sh -s silent.cfg --accept_eula
-    mv rpm/EULA.txt /opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}
+    mv rpm/EULA.txt /opt/intel/impi/#{node['cluster']['intelmpi']['version']}
     cd ..
-    rm -rf l_mpi_#{node['cfncluster']['intelmpi']['version']}*
+    rm -rf l_mpi_#{node['cluster']['intelmpi']['version']}*
   INTELMPI
-  creates "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}"
+  creates "/opt/intel/impi/#{node['cluster']['intelmpi']['version']}"
 end
 
 append_if_no_line "append intel modules file dir to modules conf" do
-  path node['cfncluster']['modulepath_config_file']
-  line "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/"
+  path node['cluster']['modulepath_config_file']
+  line "/opt/intel/impi/#{node['cluster']['intelmpi']['version']}/intel64/modulefiles/"
 end
 
 execute "rename intel mpi modules file name" do
-  command "mv #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}"
+  command "mv #{node['cluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}"
   creates intelmpi_modulefile.to_s
 end

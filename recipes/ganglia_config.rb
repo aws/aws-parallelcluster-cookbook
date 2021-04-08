@@ -15,8 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['cfncluster']['ganglia_enabled'] == 'yes' || node['cfncluster']['ganglia_enabled'] == true
-  case node['cfncluster']['cfn_node_type']
+if node['cluster']['ganglia_enabled'] == 'yes' || node['cluster']['ganglia_enabled'] == true
+  case node['cluster']['node_type']
   when 'MasterServer'
     case node['platform']
     when "redhat", "centos", "amazon", "scientific" # ~FC024
@@ -54,7 +54,7 @@ if node['cfncluster']['ganglia_enabled'] == 'yes' || node['cfncluster']['ganglia
       action %i[enable restart]
     end
 
-    service node['cfncluster']['ganglia']['httpd_service'] do
+    service node['cluster']['ganglia']['httpd_service'] do
       supports restart: true, reload: true
       action %i[enable restart]
     end
@@ -82,7 +82,7 @@ if node['cfncluster']['ganglia_enabled'] == 'yes' || node['cfncluster']['ganglia
     mode '0644'
   end
 
-  service node['cfncluster']['ganglia']['gmond_service'] do
+  service node['cluster']['ganglia']['gmond_service'] do
     supports restart: true
     action %i[enable restart]
   end

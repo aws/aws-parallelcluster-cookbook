@@ -16,7 +16,7 @@ function download_run (){
     tmpfile=$(mktemp)
     trap "/bin/rm $tmpfile" RETURN
     if [ "${scheme}" == "s3" ]; then
-      <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
+      <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${region} s3 cp ${url} - > $tmpfile || return 1
     else
       wget -qO- ${url} > $tmpfile || return 1
     fi
@@ -25,24 +25,24 @@ function download_run (){
 }
 
 function run_preinstall () {
-  if [ "${cfn_preinstall}" != "NONE" ]; then
-    file="${cfn_preinstall}"
-    if [ "${cfn_preinstall_args}" != "NONE" ]; then
-        download_run ${cfn_preinstall} ${cfn_preinstall_args}
+  if [ "${preinstall}" != "NONE" ]; then
+    file="${preinstall}"
+    if [ "${preinstall_args}" != "NONE" ]; then
+        download_run ${preinstall} ${preinstall_args}
     else
-        download_run ${cfn_preinstall}
+        download_run ${preinstall}
     fi
   fi || error_exit "Failed to run preinstall"
 }
 
 function run_postinstall () {
   RC=0
-  if [ "${cfn_postinstall}" != "NONE" ]; then
-    file="${cfn_postinstall}"
-    if [ "${cfn_postinstall_args}" != "NONE" ]; then
-        download_run ${cfn_postinstall} ${cfn_postinstall_args}
+  if [ "${postinstall}" != "NONE" ]; then
+    file="${postinstall}"
+    if [ "${postinstall_args}" != "NONE" ]; then
+        download_run ${postinstall} ${postinstall_args}
     else
-        download_run ${cfn_postinstall}
+        download_run ${postinstall}
     fi
   fi || error_exit "Failed to run postinstall"
 }

@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['cfncluster']['cfn_node_type']
+case node['cluster']['node_type']
 when 'MasterServer', nil
   case node['platform']
   when "redhat", "centos", "amazon", "scientific" # ~FC024

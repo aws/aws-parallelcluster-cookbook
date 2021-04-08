@@ -217,7 +217,7 @@
       "skip_install" : "true",
       "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "json" : {
-        "cfncluster" : {
+        "cluster" : {
           "default_pre_reboot" : "false"
         }
       },
@@ -238,8 +238,8 @@
       "only": ["centos7"],
       "pause_before": "2m",
       "json" : {
-        "cfncluster" : {
-          "cfn_region": "{{user `region`}}",
+        "cluster" : {
+          "region": "{{user `region`}}",
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
@@ -248,7 +248,7 @@
           },
           "is_official_ami_build": "true",
           "custom_node_package" : "{{user `custom_node_package`}}",
-          "cfn_base_os" : "centos7"
+          "base_os" : "centos7"
         }
       },
       "remote_cookbook_paths" : [
@@ -267,9 +267,9 @@
         "/etc/chef/cookbooks"
       ],
       "json" : {
-        "cfncluster" : {
+        "cluster" : {
           "custom_node_package" : "{{user `custom_node_package`}}",
-          "cfn_base_os" : "centos7"
+          "base_os" : "centos7"
         }
       },
       "skip_install" : "true",

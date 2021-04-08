@@ -109,7 +109,7 @@ main() {
 
     shared_folder_path="$1"
     user=$(whoami)
-    os=$(< /etc/chef/dna.json jq -r .cfncluster.cfn_base_os)
+    os=$(< /etc/chef/dna.json jq -r .cluster.base_os)
     _log "Input parameters: user: ${user}, OS: ${os}, shared_folder_path: ${shared_folder_path}."
 
     if ! [[ "${os}" =~ ^(alinux2|ubuntu1804|ubuntu2004|centos[7-8])$ ]]; then

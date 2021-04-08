@@ -26,13 +26,13 @@ package %w[chrony] do
 end
 
 append_if_no_line "add configuration to chrony.conf" do
-  path node['cfncluster']['chrony']['conf']
+  path node['cluster']['chrony']['conf']
   line "server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4"
-  notifies :stop, "service[#{node['cfncluster']['chrony']['service']}]", :immediately
-  notifies :reload, "service[#{node['cfncluster']['chrony']['service']}]", :delayed
+  notifies :stop, "service[#{node['cluster']['chrony']['service']}]", :immediately
+  notifies :reload, "service[#{node['cluster']['chrony']['service']}]", :delayed
 end
 
-service node['cfncluster']['chrony']['service'] do
+service node['cluster']['chrony']['service'] do
   reload_command chrony_reload_command
   action :nothing
 end

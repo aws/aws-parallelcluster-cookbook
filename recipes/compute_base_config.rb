@@ -16,12 +16,12 @@
 # limitations under the License.
 
 # Retrieve head node info
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
+if node['cluster']['scheduler'] == 'slurm'
   ruby_block "retrieve head_node ip" do
     block do
       head_node_private_ip, head_node_private_dns = hit_head_node_info
-      node.force_default['cfncluster']['cfn_master'] = head_node_private_dns
-      node.force_default['cfncluster']['cfn_master_private_ip'] = head_node_private_ip
+      node.force_default['cluster']['master'] = head_node_private_dns
+      node.force_default['cluster']['master_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3
@@ -29,7 +29,7 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
 end
 
 # Parse and get RAID shared directory info and turn into an array
-raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
+raid_shared_dir = node['cluster']['raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
@@ -45,7 +45,7 @@ if raid_shared_dir != "NONE"
 
   # Mount RAID directory over NFS
   mount raid_shared_dir do
-    device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{raid_shared_dir}" })
+    device(lazy { "#{node['cluster']['master_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
@@ -56,7 +56,7 @@ end
 
 # Mount /home over NFS
 mount '/home' do
-  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/home" })
+  device(lazy { "#{node['cluster']['master_private_ip']}:/home" })
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
@@ -66,7 +66,7 @@ end
 
 # Mount /opt/intel over NFS
 mount '/opt/intel' do
-  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/intel" })
+  device(lazy { "#{node['cluster']['master_private_ip']}:/opt/intel" })
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
@@ -79,15 +79,15 @@ end
 include_recipe 'aws-parallelcluster::ganglia_config'
 
 # Setup cluster user
-user node['cfncluster']['cfn_cluster_user'] do
+user node['cluster']['cluster_user'] do
   manage_home false
   comment 'AWS ParallelCluster user'
-  home "/home/#{node['cfncluster']['cfn_cluster_user']}"
+  home "/home/#{node['cluster']['cluster_user']}"
   shell '/bin/bash'
 end
 
 # Parse shared directory info and turn into an array
-shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
+shared_dir_array = node['cluster']['shared_dir'].split(',')
 
 # Mount each volume with NFS
 shared_dir_array.each do |dir|
@@ -108,7 +108,7 @@ shared_dir_array.each do |dir|
 
   # Mount shared volume over NFS
   mount dirname do
-    device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{dirname}" })
+    device(lazy { "#{node['cluster']['master_private_ip']}:#{dirname}" })
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
