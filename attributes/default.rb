@@ -50,11 +50,11 @@ default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyen
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
 default['cluster']['psxe']['noarch_packages'] = %w[intel-tbb-common-runtime intel-mkl-common-runtime intel-psxe-common-runtime
-                                                      intel-ipp-common-runtime intel-ifort-common-runtime intel-icc-common-runtime
-                                                      intel-daal-common-runtime intel-comp-common-runtime]
+                                                   intel-ipp-common-runtime intel-ifort-common-runtime intel-icc-common-runtime
+                                                   intel-daal-common-runtime intel-comp-common-runtime]
 default['cluster']['psxe']['archful_packages']['i486'] = %w[intel-tbb-runtime intel-tbb-libs-runtime intel-comp-runtime
-                                                               intel-daal-runtime intel-icc-runtime intel-ifort-runtime
-                                                               intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime]
+                                                            intel-daal-runtime intel-icc-runtime intel-ifort-runtime
+                                                            intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime]
 default['cluster']['psxe']['archful_packages']['x86_64'] = node['cluster']['psxe']['archful_packages']['i486'] + %w[intel-mpi-runtime]
 default['cluster']['intelhpc']['platform_name'] = value_for_platform(
   'centos' => {
@@ -63,8 +63,8 @@ default['cluster']['intelhpc']['platform_name'] = value_for_platform(
   }
 )
 default['cluster']['intelhpc']['packages'] = %w[intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
-                                                   intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
-                                                   intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime]
+                                                intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
+                                                intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime]
 default['cluster']['intelhpc']['version'] = '2018.0-7'
 default['cluster']['intelpython2']['version'] = '2019.4-088'
 default['cluster']['intelpython3']['version'] = '2020.2-902'
@@ -282,12 +282,12 @@ when 'rhel', 'amazon'
   case node['platform']
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
-                                                blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                                libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
-                                                mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                                iproute NetworkManager-config-routing-rules python3 python3-pip]
+                                             libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                             httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
+                                             blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                             libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
+                                             mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
+                                             iproute NetworkManager-config-routing-rules python3 python3-pip]
     if node['platform_version'].to_i >= 8
       # Do not install unversioned python
       default['cluster']['base_packages'].delete('python')
@@ -302,15 +302,15 @@ when 'rhel', 'amazon'
 
   when 'amazon'
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
-                                                libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
-                                                sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
-                                                libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
-                                                rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
-                                                gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                                jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                                librdmacm-utils python3 python3-pip]
+                                             libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                             httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
+                                             libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
+                                             sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
+                                             libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
+                                             rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
+                                             gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
+                                             jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
+                                             librdmacm-utils python3 python3-pip]
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']
@@ -322,12 +322,12 @@ when 'rhel', 'amazon'
 when 'debian'
   default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
   default['cluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
-                                              tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
-                                              apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
-                                              r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
-                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                              libatlas-base-dev libglvnd-dev]
+                                           tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
+                                           apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
+                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
+                                           r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
+                                           libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
+                                           libatlas-base-dev libglvnd-dev]
 
   case node['platform_version']
   when '18.04'
