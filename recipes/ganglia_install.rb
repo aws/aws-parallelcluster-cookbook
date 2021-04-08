@@ -16,7 +16,7 @@
 # limitations under the License.
 
 case node['cluster']['node_type']
-when 'MasterServer', nil
+when 'HeadNode', nil
   case node['platform']
   when "redhat", "centos", "amazon", "scientific" # ~FC024
     package %w[ganglia ganglia-gmond ganglia-gmetad ganglia-web httpd php php-gd php-xml rrdtool] do

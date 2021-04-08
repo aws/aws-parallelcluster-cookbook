@@ -17,7 +17,7 @@
 
 if node['cluster']['ganglia_enabled'] == 'yes' || node['cluster']['ganglia_enabled'] == true
   case node['cluster']['node_type']
-  when 'MasterServer'
+  when 'HeadNode'
     case node['platform']
     when "redhat", "centos", "amazon", "scientific" # ~FC024
       cookbook_file 'ganglia-webfrontend.conf' do
@@ -60,7 +60,7 @@ if node['cluster']['ganglia_enabled'] == 'yes' || node['cluster']['ganglia_enabl
     end
   end
 
-  # For ComputeFleet and MasterServer
+  # For ComputeFleet and HeadNode
 
   if node['platform'] == 'centos' && node['platform_version'].to_i >= 7 || node['platform'] == 'amazon'
     # Fix circular dependency multi-user.target -> cloud-init-> gmond -> multi-user.target

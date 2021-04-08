@@ -56,7 +56,7 @@ execute 'grep ssh_config' do
 end
 
 # Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
-if node['cluster']['node_type'] == 'MasterServer'
+if node['cluster']['node_type'] == 'HeadNode'
   execute 'ssh localhost as user' do
     command "ssh localhost hostname"
     environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
@@ -79,7 +79,7 @@ end
 ###################
 if node['cluster']['scheduler'] == 'slurm'
   case node['cluster']['node_type']
-  when 'MasterServer'
+  when 'HeadNode'
     execute 'execute sinfo' do
       command "sinfo --help"
       environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
@@ -112,7 +112,7 @@ if node['cluster']['scheduler'] == 'slurm'
       user node['cluster']['cluster_user']
     end
   else
-    raise "node_type must be MasterServer or ComputeFleet"
+    raise "node_type must be HeadNode or ComputeFleet"
   end
 end
 
@@ -131,7 +131,7 @@ when 'systemd'
 end
 
 case node['cluster']['node_type']
-when 'MasterServer'
+when 'HeadNode'
   execute 'check gmond running' do
     command gmond_check_command
   end
@@ -189,7 +189,7 @@ end
 ###################
 # DCV
 ###################
-if node['cluster']['node_type'] == "MasterServer" &&
+if node['cluster']['node_type'] == "HeadNode" &&
    node['conditions']['dcv_supported'] &&
    (node['cluster']['dcv']['installed'] == 'yes' || node['cluster']['dcv']['installed'] == true)
   execute 'check dcv installed' do
@@ -207,7 +207,7 @@ if node['cluster']['node_type'] == "MasterServer" &&
   end
 end
 
-if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "MasterServer"
+if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "HeadNode"
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
@@ -248,7 +248,7 @@ if node['conditions']['intel_mpi_supported']
     end
   when 'ubuntu1804'
     case node['cluster']['node_type']
-    when 'MasterServer'
+    when 'HeadNode'
       execute 'check ptrace protection enabled' do
         command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 1'"
         user node['cluster']['cluster_user']
@@ -267,7 +267,7 @@ if node['conditions']['intel_mpi_supported']
 
   # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
-  if node['cluster']['node_type'] == 'MasterServer'
+  if node['cluster']['node_type'] == 'HeadNode'
     bash 'check intel mpi version' do
       cwd Chef::Config[:file_cache_path]
       code <<-INTELMPI
@@ -456,7 +456,7 @@ when 'ComputeFleet'
     command "nfsstat -m | grep vers=4"
     user node['cluster']['cluster_user']
   end
-when 'MasterServer'
+when 'HeadNode'
   execute 'check for nfs server protocol' do
     command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
     user node['cluster']['cluster_user']
@@ -543,7 +543,7 @@ end
 ###################
 # Pcluster AWSBatch CLI
 ###################
-if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'MasterServer'
+if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'HeadNode'
   # Test that batch commands can be accessed without absolute path
   batch_cli_commands = %w[awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat]
   batch_cli_commands.each do |cli_commmand|

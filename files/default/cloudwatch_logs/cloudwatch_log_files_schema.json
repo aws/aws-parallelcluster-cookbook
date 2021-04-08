@@ -20,7 +20,7 @@
           },
           "node_roles": {
             "type": "array",
-            "items": {"type": "string", "enum": ["MasterServer", "ComputeFleet"]}
+            "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet"]}
           },
           "feature_conditions": {
             "type": "array",

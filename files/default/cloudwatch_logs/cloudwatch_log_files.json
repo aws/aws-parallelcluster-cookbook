@@ -20,7 +20,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -37,7 +37,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -55,7 +55,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -73,7 +73,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -92,7 +92,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -128,7 +128,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -145,7 +145,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -179,7 +179,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -196,7 +196,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -230,7 +230,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -248,7 +248,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
@@ -271,7 +271,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
@@ -294,7 +294,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
@@ -317,7 +317,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
@@ -340,7 +340,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
@@ -363,7 +363,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
@@ -386,7 +386,7 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {

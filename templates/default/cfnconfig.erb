@@ -14,10 +14,10 @@ proxy=<%= node['cluster']['proxy'] %>
 node_type=<%= node['cluster']['node_type'] %>
 cluster_user=<%= node['cluster']['cluster_user'] %>
 <% if node['cluster']['node_type'] == 'ComputeFleet' -%>
-master=<%= node['cluster']['master'] %>
-master_private_ip=<%= node['cluster']['master_private_ip'] %>
+head_node=<%= node['cluster']['head_node'] %>
+head_node_private_ip=<%= node['cluster']['head_node_private_ip'] %>
 scheduler_queue_name=<%= node['cluster']['scheduler_queue_name'] %>
 <% end -%>
-<% if node['cluster']['node_type'] == 'MasterServer' -%>
+<% if node['cluster']['node_type'] == 'HeadNode' -%>
 volume=<%= node['cluster']['volume'] %>
 <% end -%>

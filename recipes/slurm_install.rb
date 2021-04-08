@@ -26,7 +26,7 @@ package %w[slurm* libslurm*] do
 end
 
 case node['cluster']['node_type']
-when 'MasterServer', nil
+when 'HeadNode', nil
   slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 
   # Get slurm tarball
