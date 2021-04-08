@@ -45,13 +45,13 @@ suites:
       - recipe[aws-parallelcluster::slurm_install]
     attributes:
 
-  - name: base_config_MasterServer
+  - name: base_config_HeadNode
     run_list:
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::base_config]
     attributes:
       cluster:
-        node_type: 'MasterServer'
+        node_type: 'HeadNode'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -65,7 +65,7 @@ suites:
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
 
-  - name: slurm_config_MasterServer
+  - name: slurm_config_HeadNode
     run_list:
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
@@ -74,7 +74,7 @@ suites:
     attributes:
       kitchen: true
       cluster:
-        node_type: 'MasterServer'
+        node_type: 'HeadNode'
         scheduler: 'slurm'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
@@ -99,7 +99,7 @@ suites:
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
-  - name: awsbatch_config_MasterServer
+  - name: awsbatch_config_HeadNode
     run_list:
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::awsbatch_config]
@@ -108,7 +108,7 @@ suites:
     attributes:
       kitchen: true
       cluster:
-        node_type: 'MasterServer'
+        node_type: 'HeadNode'
         scheduler: 'awsbatch'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
@@ -148,8 +148,8 @@ suites:
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
         ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
-        master: <%= ENV['MASTER'] %>
-        master_private_ip: <%= ENV['MASTER_PRIVATE_IP'] %>
+        head_node: <%= ENV['HEAD_NODE'] %>
+        head_node_private_ip: <%= ENV['HEAD_NODE_PRIVATE_IP'] %>
         # base_os is one of the base OSs supported by pcluster
         base_os: <%= ENV['BASE_OS'] %>
         slurm_nodename: 'fake-dy-compute-1'

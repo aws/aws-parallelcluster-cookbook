@@ -27,7 +27,7 @@ HOST_NAME     MXJ JL/U   r1m    pg    ls     tmp  DISPATCH_WINDOW  # Keywords
 #host0        1    1   3.5/4.5  15/   12/15  0      ()		   # Example
 #host1       ()   2     3.5  15/18   12/    0/  (5:19:00-1:8:30 20:00-8:30)
 #host2        ()   ()   3.5/5   18    15     ()     ()		   # Example
-<% if node['cluster']['node_type'] == 'MasterServer' -%>
+<% if node['cluster']['node_type'] == 'HeadNode' -%>
 <%= node['hostname'] %>     1024   ()     ()    ()    ()     ()     ()
 <% end -%>
 default       !   ()     ()    ()    ()     ()     ()		   # Example

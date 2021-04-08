@@ -6,6 +6,6 @@ dynamodb_table = <%= node['cluster']['ddb_table'] %>
 hosted_zone = <%= node['cluster']['hosted_zone'] %>
 dns_domain = <%= node['cluster']['dns_domain'] %>
 use_private_hostname = <%= node['cluster']['use_private_hostname'] %>
-master_private_ip = <%= node['ec2']['local_ipv4'] %>
-master_hostname = <%= node['ec2']['local_hostname'] %>
+head_node_private_ip = <%= node['ec2']['local_ipv4'] %>
+head_node_hostname = <%= node['ec2']['local_hostname'] %>
 clustermgtd_heartbeat_file_path = /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat

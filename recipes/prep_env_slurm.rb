@@ -32,15 +32,15 @@ if node['cluster']['node_type'] == "ComputeFleet"
     block do
       slurm_nodename, head_node_private_ip, head_node_private_dns = hit_dynamodb_info
       node.force_default['cluster']['slurm_nodename'] = slurm_nodename
-      node.force_default['cluster']['master'] = head_node_private_dns
-      node.force_default['cluster']['master_private_ip'] = head_node_private_ip
+      node.force_default['cluster']['head_node'] = head_node_private_dns
+      node.force_default['cluster']['head_node_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3
     not_if do
       !node['cluster']['slurm_nodename'].nil? && !node['cluster']['slurm_nodename'].empty? &&
-        !node['cluster']['master'].nil? && !node['cluster']['master'].empty? &&
-        !node['cluster']['master_private_ip'].nil? && !node['cluster']['master_private_ip'].empty?
+        !node['cluster']['head_node'].nil? && !node['cluster']['head_node'].empty? &&
+        !node['cluster']['head_node_private_ip'].nil? && !node['cluster']['head_node_private_ip'].empty?
     end
   end
 
@@ -51,15 +51,15 @@ if node['cluster']['node_type'] == "ComputeFleet"
     group 'root'
   end
 
-  file "#{node['cluster']['slurm_plugin_dir']}/master_private_dns" do
-    content(lazy { node['cluster']['master'] })
+  file "#{node['cluster']['slurm_plugin_dir']}/head_node_private_dns" do
+    content(lazy { node['cluster']['head_node'] })
     mode '0644'
     owner 'root'
     group 'root'
   end
 
-  file "#{node['cluster']['slurm_plugin_dir']}/master_private_ip" do
-    content(lazy { node['cluster']['master_private_ip'] })
+  file "#{node['cluster']['slurm_plugin_dir']}/head_node_private_ip" do
+    content(lazy { node['cluster']['head_node_private_ip'] })
     mode '0644'
     owner 'root'
     group 'root'

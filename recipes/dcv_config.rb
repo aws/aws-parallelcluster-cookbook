@@ -63,7 +63,7 @@ def allow_gpu_acceleration
   end
 end
 
-if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "MasterServer"
+if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadNode"
   # be sure to have DCV packages installed
   include_recipe "aws-parallelcluster::dcv_install"
 

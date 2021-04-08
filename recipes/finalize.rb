@@ -22,7 +22,7 @@ service "supervisord" do
 end
 
 case node['cluster']['node_type']
-when 'MasterServer'
+when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_slurm_finalize' if node['cluster']['scheduler'] == 'slurm'
 when 'ComputeFleet'
   if node['cluster']['scheduler'] == 'slurm'
