@@ -301,11 +301,10 @@ when 'rhel', 'amazon'
       # Do not install unversioned python
       default['cluster']['base_packages'].delete('python')
       default['cluster']['base_packages'].delete('python-pip')
-      # iptables used in configure-pat.sh
       # gdisk required for FSx
       # environment-modules required for IntelMPI
       # cryptsetup used for ephemeral drive encryption
-      default['cluster']['base_packages'].push(%w[iptables gdisk environment-modules cryptsetup])
+      default['cluster']['base_packages'].push(%w[gdisk environment-modules cryptsetup])
     end
 
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'

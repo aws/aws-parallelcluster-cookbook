@@ -15,18 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Run configure-pat and add to rc.local
-execute "run_configure-pat" do
-  command '/usr/local/sbin/configure-pat.sh'
-  # no not_if as script is idempotent
-end
-
-# Add configure-pat to /etc/rc.local
-execute "add_configure-pat" do
-  command 'echo -e "\n# Enable PAT\n/usr/local/sbin/configure-pat.sh\n\n" >> /etc/rc.local'
-  not_if 'grep -qx /usr/local/sbin/configure-pat.sh /etc/rc.local'
-end
-
 # Get VPC CIDR
 node.default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_ipv4_cidr_blocks(node['macaddress'])
 
