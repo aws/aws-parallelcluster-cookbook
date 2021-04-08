@@ -28,7 +28,6 @@ if node['platform'] == 'centos' && node['platform_version'].to_i == 8
 end
 
 # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
-# This is especially needed for sge install recipes
 if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 20
   sysctl 'fs.protected_regular' do
     value 0

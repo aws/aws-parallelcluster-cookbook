@@ -15,17 +15,6 @@ startsecs = 0
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/clustermgtd
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clustermgtd
-
-<% elsif node['cfncluster']['cfn_scheduler'] != 'awsbatch' -%>
-[program:sqswatcher]
-command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/sqswatcher
-redirect_stderr = true
-stdout_logfile = /var/log/sqswatcher
-
-[program:jobwatcher]
-command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/jobwatcher
-redirect_stderr = true
-stdout_logfile = /var/log/jobwatcher
 <% end -%>
 
 <% if node['cfncluster']['dcv_enabled'] == "master" && node['conditions']['dcv_supported'] -%>
@@ -45,11 +34,6 @@ environment = HOME="<%= node['cfncluster']['dcv']['authenticator']['user_home'] 
 command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/computemgtd
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/computemgtd
-<% else -%>
-[program:nodewatcher]
-command = <%= node['cfncluster']['node_virtualenv_path'] %>/bin/nodewatcher
-redirect_stderr = true
-stdout_logfile = /var/log/nodewatcher
 <% end -%>
 
 <% end -%>

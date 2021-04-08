@@ -3,6 +3,16 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+
+3.0.0
+------
+
+**CHANGES**
+
+- Drop support for SGE and Torque schedulers.
+- Remove nodewatcher, sqswatcher, jobwatcher related code.
+
+
 2.x.x
 -----
 
