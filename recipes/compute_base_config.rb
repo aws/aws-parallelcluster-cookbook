@@ -87,7 +87,7 @@ user node['cluster']['cluster_user'] do
 end
 
 # Parse shared directory info and turn into an array
-shared_dir_array = node['cluster']['shared_dir'].split(',')
+shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
 
 # Mount each volume with NFS
 shared_dir_array.each do |dir|
