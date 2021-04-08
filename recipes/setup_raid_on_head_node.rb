@@ -17,17 +17,17 @@
 
 # RAID RELATED
 # Parse and get RAID shared directory info and turn into an array
-raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
+raid_shared_dir = node['cluster']['raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
 
   # Parse and determine RAID type (cast into integer)
-  raid_type = node['cfncluster']['cfn_raid_parameters'].split(',')[1].strip.to_i
+  raid_type = node['cluster']['raid_parameters'].split(',')[1].strip.to_i
 
   # Parse volume info into an array
-  raid_vol_array = node['cfncluster']['cfn_raid_vol_ids'].split(',')
+  raid_vol_array = node['cluster']['raid_vol_ids'].split(',')
   raid_vol_array.each_with_index do |vol, index|
     raid_vol_array[index] = vol.strip
   end
@@ -39,7 +39,7 @@ if raid_shared_dir != "NONE"
 
     # Attach RAID EBS volume
     execute "attach_raid_volume_#{index}" do
-      command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
+      command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
       creates raid_dev_path[index]
     end
 
@@ -120,7 +120,7 @@ if raid_shared_dir != "NONE"
 
   # Export RAID directory via nfs
   nfs_export raid_shared_dir do
-    network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+    network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
     writeable true
     options ['no_root_squash']
   end

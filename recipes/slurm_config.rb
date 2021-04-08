@@ -26,13 +26,13 @@ cookbook_file '/etc/init.d/slurm' do
   only_if { node['init_package'] != 'systemd' }
 end
 
-case node['cfncluster']['cfn_node_type']
+case node['cluster']['node_type']
 when 'MasterServer'
   include_recipe 'aws-parallelcluster::head_node_slurm_config'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster::compute_slurm_config'
 else
-  raise "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "node_type must be MasterServer or ComputeFleet"
 end
 
 link '/etc/profile.d/slurm.sh' do

@@ -97,7 +97,7 @@ def get_node_info():
     dna_path = "/etc/chef/dna.json"
     if os.path.isfile(dna_path):
         with open(dna_path) as node_info_file:
-            node_info = json.load(node_info_file).get("cfncluster")
+            node_info = json.load(node_info_file).get("cluster")
     return node_info
 
 

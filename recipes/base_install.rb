@@ -41,7 +41,7 @@ when 'rhel', 'amazon'
 
   if node['platform'] == 'redhat'
     execute 'yum-config-manager-rhel' do
-      command "yum-config-manager --enable #{node['cfncluster']['rhel']['extra_repo']}"
+      command "yum-config-manager --enable #{node['cluster']['rhel']['extra_repo']}"
     end
   end
 when 'debian'
@@ -50,36 +50,36 @@ end
 
 # Setup directories
 directory '/etc/parallelcluster'
-directory node['cfncluster']['base_dir']
-directory node['cfncluster']['sources_dir']
-directory node['cfncluster']['scripts_dir']
-directory node['cfncluster']['license_dir']
-directory node['cfncluster']['configs_dir']
+directory node['cluster']['base_dir']
+directory node['cluster']['sources_dir']
+directory node['cluster']['scripts_dir']
+directory node['cluster']['license_dir']
+directory node['cluster']['configs_dir']
 
 build_essential
 include_recipe "aws-parallelcluster::setup_python"
 
 # Install lots of packages
-package node['cfncluster']['base_packages'] do
+package node['cluster']['base_packages'] do
   retries 10
   retry_delay 5
 end
 
 # In the case of AL2, there are more packages to install via extras
-node['cfncluster']['alinux_extras']&.each do |topic|
+node['cluster']['alinux_extras']&.each do |topic|
   alinux_extras_topic topic
 end
 
 package "install kernel packages" do
   case node['platform_family']
   when 'rhel', 'amazon'
-    package_name node['cfncluster']['kernel_devel_pkg']['name']
+    package_name node['cluster']['kernel_devel_pkg']['name']
     if node['platform'] == 'centos' && node['platform_version'].to_i < 8
       # Do not enforce kernel_devel version on CentOS8 because kernel_devel package with same version as kernel release version cannot be found
-      version node['cfncluster']['kernel_devel_pkg']['version']
+      version node['cluster']['kernel_devel_pkg']['version']
     end
   when 'debian'
-    package_name node['cfncluster']['kernel_generic_pkg']
+    package_name node['cluster']['kernel_generic_pkg']
   end
   retries 3
   retry_delay 5
@@ -91,7 +91,7 @@ bash "install awscli" do
     set -e
     curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
     unzip awscli-bundle.zip
-    #{node['cfncluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
+    #{node['cluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
   CLI
   not_if { ::File.exist?("/usr/local/bin/aws") }
 end
@@ -115,7 +115,7 @@ end
 
 # Install LICENSE README
 cookbook_file 'AWS-ParallelCluster-License-README.txt' do
-  path "#{node['cfncluster']['license_dir']}/AWS-ParallelCluster-License-README.txt"
+  path "#{node['cluster']['license_dir']}/AWS-ParallelCluster-License-README.txt"
   user 'root'
   group 'root'
   mode '0644'
@@ -152,7 +152,7 @@ cookbook_file 'ec2-metadata' do
 end
 
 # Check whether install a custom aws-parallelcluster-node package or the standard one
-if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custom_node_package'].empty?
+if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
   # Install custom aws-parallelcluster-node package
   bash "install aws-parallelcluster-node" do
     cwd Chef::Config[:file_cache_path]
@@ -160,9 +160,9 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
       set -e
       [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
       echo "PATH is $PATH"
-      source #{node['cfncluster']['node_virtualenv_path']}/bin/activate
+      source #{node['cluster']['node_virtualenv_path']}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
-      curl --retry 3 -L -o aws-parallelcluster-node.tgz #{node['cfncluster']['custom_node_package']}
+      curl --retry 3 -L -o aws-parallelcluster-node.tgz #{node['cluster']['custom_node_package']}
       mkdir aws-parallelcluster-custom-node
       tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
       cd aws-parallelcluster-custom-node/*aws-parallelcluster-node-*
@@ -172,8 +172,8 @@ if !node['cfncluster']['custom_node_package'].nil? && !node['cfncluster']['custo
   end
 else
   pyenv_pip 'aws-parallelcluster-node' do
-    version node['cfncluster']['cfncluster-node-version']
-    virtualenv node['cfncluster']['node_virtualenv_path']
+    version node['cluster']['cfncluster-node-version']
+    virtualenv node['cluster']['node_virtualenv_path']
   end
 end
 

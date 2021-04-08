@@ -14,16 +14,16 @@ suites:
       - recipe[aws-parallelcluster::default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
-      cfncluster:
-        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
+      cluster:
+        base_os: <%= ENV['BASE_OS'] %>
 
   - name: default_gpu
     run_list:
       - recipe[aws-parallelcluster::default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
-      cfncluster:
-        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
+      cluster:
+        base_os: <%= ENV['BASE_OS'] %>
         nvidia:
           enabled: 'yes'
 
@@ -36,7 +36,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster::base_install]
     attributes:
-      cfncluster:
+      cluster:
         nvidia:
           enabled: 'yes'
 
@@ -50,17 +50,17 @@ suites:
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::base_config]
     attributes:
-      cfncluster:
-        cfn_node_type: 'MasterServer'
+      cluster:
+        node_type: 'MasterServer'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
-        cfn_volume: <%= ENV['CFN_VOLUME'] %>
-        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
-        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
-        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
-        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        # cfn_base_os is one of the base OSs supported by pcluster
-        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
+        volume: <%= ENV['VOLUME'] %>
+        region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
+        ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
+        shared_dir: <%= ENV['SHARED_DIR'] %>
+        cluster_user: <%= ENV['CLUSTER_USER'] %>
+        # base_os is one of the base OSs supported by pcluster
+        base_os: <%= ENV['BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
@@ -73,20 +73,19 @@ suites:
       - recipe[aws-parallelcluster::tests]
     attributes:
       kitchen: true
-      cfncluster:
-        cfn_node_type: 'MasterServer'
-        cfn_scheduler: 'slurm'
+      cluster:
+        node_type: 'MasterServer'
+        scheduler: 'slurm'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
-        cfn_volume: <%= ENV['CFN_VOLUME'] %>
-        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
-        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
-        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
-        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
-        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
-        # cfn_base_os is one of the base OSs supported by pcluster
-        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
+        volume: <%= ENV['VOLUME'] %>
+        region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
+        ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
+        shared_dir: <%= ENV['SHARED_DIR'] %>
+        cluster_user: <%= ENV['CLUSTER_USER'] %>
+        ddb_table: <%= ENV['DDB_TABLE'] %>
+        # base_os is one of the base OSs supported by pcluster
+        base_os: <%= ENV['BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         cluster_s3_bucket: <%= ENV['CLUSTER_CONFIG_S3_BUCKET'] %>
         cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
@@ -108,20 +107,19 @@ suites:
       - recipe[aws-parallelcluster::tests]
     attributes:
       kitchen: true
-      cfncluster:
-        cfn_node_type: 'MasterServer'
-        cfn_scheduler: 'awsbatch'
+      cluster:
+        node_type: 'MasterServer'
+        scheduler: 'awsbatch'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
-        cfn_volume: <%= ENV['CFN_VOLUME'] %>
-        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
-        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
-        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
-        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
-        cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
-        # cfn_base_os is one of the base OSs supported by pcluster
-        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
+        volume: <%= ENV['VOLUME'] %>
+        region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
+        ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
+        shared_dir: <%= ENV['SHARED_DIR'] %>
+        cluster_user: <%= ENV['CLUSTER_USER'] %>
+        ddb_table: <%= ENV['DDB_TABLE'] %>
+        # base_os is one of the base OSs supported by pcluster
+        base_os: <%= ENV['BASE_OS'] %>
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
@@ -140,21 +138,20 @@ suites:
       - recipe[aws-parallelcluster::tests]
     attributes:
       kitchen: true
-      cfncluster:
-        cfn_node_type: 'ComputeFleet'
-        cfn_scheduler: 'slurm'
+      cluster:
+        node_type: 'ComputeFleet'
+        scheduler: 'slurm'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
-        cfn_volume: <%= ENV['CFN_VOLUME'] %>
-        cfn_region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        cfn_encrypted_ephemeral: <%= ENV['CFN_ENCRYPTED_VOLUME'] %>
-        cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
-        cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
-        cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
-        cfn_master: <%= ENV['CFN_MASTER'] %>
-        cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
-        # cfn_base_os is one of the base OSs supported by pcluster
-        cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
+        volume: <%= ENV['VOLUME'] %>
+        region: <%= ENV['AWS_DEFAULT_REGION'] %>
+        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
+        ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
+        shared_dir: <%= ENV['SHARED_DIR'] %>
+        cluster_user: <%= ENV['CLUSTER_USER'] %>
+        master: <%= ENV['MASTER'] %>
+        master_private_ip: <%= ENV['MASTER_PRIVATE_IP'] %>
+        # base_os is one of the base OSs supported by pcluster
+        base_os: <%= ENV['BASE_OS'] %>
         slurm_nodename: 'fake-dy-compute-1'
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom

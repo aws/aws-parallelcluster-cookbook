@@ -18,9 +18,9 @@
 # This recipe should only be run when disabling hyperthreading is
 # desired and the instance type doesn't support doing so via CPU
 # options (e.g., *.metal instances).
-return unless node['cfncluster']['cfn_disable_hyperthreading_manually'] == 'true'
+return unless node['cluster']['disable_hyperthreading_manually'] == 'true'
 
-script_path = "#{node['cfncluster']['scripts_dir']}/disable_hyperthreading_manually.sh"
+script_path = "#{node['cluster']['scripts_dir']}/disable_hyperthreading_manually.sh"
 cookbook_file 'disable_hyperthreading_manually.sh' do
   path script_path
   owner 'root'

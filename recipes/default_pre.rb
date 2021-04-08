@@ -17,13 +17,13 @@
 
 # Calling user_ulimit will override every existing limit
 user_ulimit "*" do
-  filehandle_limit node['cfncluster']['filehandle_limit']
+  filehandle_limit node['cluster']['filehandle_limit']
 end
 
 include_recipe 'aws-parallelcluster::update_packages'
 
 # Reboot after preliminary configuration steps
-if !tagged?('rebooted') && node['cfncluster']['default_pre_reboot'] == 'true'
+if !tagged?('rebooted') && node['cluster']['default_pre_reboot'] == 'true'
   tag('rebooted')
   reboot 'now' do
     action :reboot_now

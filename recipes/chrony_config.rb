@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-service node['cfncluster']['chrony']['service'] do
+service node['cluster']['chrony']['service'] do
   # chrony service supports restart but is not correctly checking if the process is stopped before starting the new one
   supports restart: false
   reload_command chrony_reload_command

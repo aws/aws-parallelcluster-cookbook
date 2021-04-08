@@ -137,7 +137,7 @@ end
 def ami_bootstrapped?
   version = ''
   bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
-  current_version = "aws-parallelcluster-cookbook-#{node['cfncluster']['cfncluster-cookbook-version']}"
+  current_version = "aws-parallelcluster-cookbook-#{node['cluster']['cfncluster-cookbook-version']}"
 
   if ::File.exist?(bootstrapped_file)
     version = IO.read(bootstrapped_file).chomp
@@ -148,7 +148,7 @@ def ami_bootstrapped?
     end
   end
 
-  version != '' && (node['cfncluster']['skip_install_recipes'] == 'yes' || node['cfncluster']['skip_install_recipes'] == true)
+  version != '' && (node['cluster']['skip_install_recipes'] == 'yes' || node['cluster']['skip_install_recipes'] == true)
 end
 
 #
@@ -158,13 +158,13 @@ def validate_os_type
   case node['platform']
   when 'ubuntu'
     current_os = "ubuntu#{node['platform_version'].tr('.', '')}"
-    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   when 'amazon'
     current_os = "alinux#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   when 'centos'
     current_os = "centos#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   end
 end
 
@@ -182,8 +182,8 @@ end
 # Retrieve head node ip and dns from file (HIT only)
 #
 def hit_head_node_info
-  head_node_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
-  head_node_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
+  head_node_private_ip_file = "#{node['cluster']['slurm_plugin_dir']}/master_private_ip"
+  head_node_private_dns_file = "#{node['cluster']['slurm_plugin_dir']}/master_private_dns"
 
   [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
 end
@@ -192,7 +192,7 @@ end
 # Retrieve compute nodename from file (HIT only)
 #
 def hit_slurm_nodename
-  slurm_nodename_file = "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename"
+  slurm_nodename_file = "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename"
 
   IO.read(slurm_nodename_file).chomp
 end
@@ -203,8 +203,8 @@ end
 def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
-  output = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-    "--region #{node['cfncluster']['cfn_region']} query --table-name #{node['cfncluster']['cfn_ddb_table']} " \
+  output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
+    "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
     "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
     "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
     "--projection-expression 'Id,MasterPrivateIp,MasterHostname' " \
@@ -286,7 +286,7 @@ end
 # Check if DCV is supported on this OS
 #
 def platform_supports_dcv?
-  node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
+  node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
 
 #
@@ -308,7 +308,7 @@ end
 def aws_domain
   # Set the aws domain name
   aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
+  aws_domain = "#{aws_domain}.cn" if node['cluster']['region'].start_with?("cn-")
   aws_domain
 end
 
@@ -347,9 +347,9 @@ end
 def chrony_reload_command
   case node['init_package']
   when 'init'
-    chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
+    chrony_reload_command = "service #{node['cluster']['chrony']['service']} force-reload"
   when 'systemd'
-    chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
+    chrony_reload_command = "systemctl force-reload #{node['cluster']['chrony']['service']}"
   else
     raise "Init package #{node['init_package']} not supported."
 
@@ -414,8 +414,8 @@ end
 
 # Check if EFA GDR is enabled (and supported) on this instance
 def efa_gdr_enabled?
-  config_value = node['cfncluster']['enable_efa_gdr']
-  enabling_value = if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+  config_value = node['cluster']['enable_efa_gdr']
+  enabling_value = if node['cluster']['node_type'] == "ComputeFleet"
                      "compute"
                    else
                      "master"
@@ -466,9 +466,9 @@ def share_munge_head_node
     group 'root'
     code <<-HEAD_SHARE_MUNGE_KEY
       set -e
-      mkdir /home/#{node['cfncluster']['cfn_cluster_user']}/.munge
+      mkdir /home/#{node['cluster']['cluster_user']}/.munge
       # Copy key to shared dir
-      cp /etc/munge/munge.key /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key
+      cp /etc/munge/munge.key /home/#{node['cluster']['cluster_user']}/.munge/.munge.key
     HEAD_SHARE_MUNGE_KEY
   end
 end
@@ -481,7 +481,7 @@ def setup_munge_compute_node
     code <<-COMPUTE_MUNGE_KEY
       set -e
       # Copy munge key from shared dir
-      cp /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key /etc/munge/munge.key
+      cp /home/#{node['cluster']['cluster_user']}/.munge/.munge.key /etc/munge/munge.key
       # Set ownership on the key
       chown munge:munge /etc/munge/munge.key
       # Enforce correct permission on the key

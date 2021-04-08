@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-fsx_shared_dir = node['cfncluster']['cfn_fsx_options'].split(',')[0]
+fsx_shared_dir = node['cluster']['fsx_options'].split(',')[0]
 
 # Check to see if FSx is created
 if fsx_shared_dir != "NONE"
@@ -32,21 +32,21 @@ if fsx_shared_dir != "NONE"
     action :create
   end
 
-  dns_domain = if node['cfncluster']['cfn_region'].include? 'cn'
+  dns_domain = if node['cluster']['region'].include? 'cn'
                  'com.cn'
                else
                  'com'
                end
 
-  dns_name = if node['cfncluster']['cfn_fsx_dns_name'] && !node['cfncluster']['cfn_fsx_dns_name'].empty?
-               node['cfncluster']['cfn_fsx_dns_name']
+  dns_name = if node['cluster']['fsx_dns_name'] && !node['cluster']['fsx_dns_name'].empty?
+               node['cluster']['fsx_dns_name']
              else
                # Hardcoded DNSname only valid for filesystem created after Mar-1 2021
                # For older filesystems, DNSname needs to be retrieved from FSx API
-               "#{node['cfncluster']['cfn_fsx_fs_id']}.fsx.#{node['cfncluster']['cfn_region']}.amazonaws.#{dns_domain}"
+               "#{node['cluster']['fsx_fs_id']}.fsx.#{node['cluster']['region']}.amazonaws.#{dns_domain}"
              end
 
-  mountname = node['cfncluster']['cfn_fsx_mount_name']
+  mountname = node['cluster']['fsx_mount_name']
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
   mount_options.concat(%w[noauto x-systemd.automount]) if node['init_package'] == 'systemd'

@@ -17,10 +17,10 @@
 
 return if node['conditions']['ami_bootstrapped']
 
-pmix_tarball = "#{node['cfncluster']['sources_dir']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
+pmix_tarball = "#{node['cluster']['sources_dir']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
 
 remote_file pmix_tarball do
-  source node['cfncluster']['pmix']['url']
+  source node['cluster']['pmix']['url']
   mode '0644'
   retries 3
   retry_delay 5
@@ -31,7 +31,7 @@ ruby_block "Validate PMIx Tarball Checksum" do
   block do
     require 'digest'
     checksum = Digest::SHA1.file(pmix_tarball).hexdigest # nosemgrep
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['pmix']['sha1']}" if checksum != node['cfncluster']['pmix']['sha1']
+    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['pmix']['sha1']}" if checksum != node['cluster']['pmix']['sha1']
   end
 end
 
@@ -42,7 +42,7 @@ bash 'Install PMIx' do
   code <<-PMIX
     set -e
     tar xf #{pmix_tarball}
-    cd pmix-#{node['cfncluster']['pmix']['version']}
+    cd pmix-#{node['cluster']['pmix']['version']}
     ./autogen.pl
     ./configure --prefix=/opt/pmix
     make
