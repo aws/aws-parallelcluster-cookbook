@@ -27,10 +27,5 @@ when 'MasterServer'
 when 'ComputeFleet'
   if node['cluster']['scheduler'] == 'slurm'
     include_recipe 'aws-parallelcluster::compute_slurm_finalize'
-  else
-    execute "compute_ready" do
-      command "/opt/parallelcluster/scripts/compute_ready"
-      environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
-    end
   end
 end
