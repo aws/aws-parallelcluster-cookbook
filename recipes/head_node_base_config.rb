@@ -144,9 +144,6 @@ end
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster::setup_raid_on_head_node'
 
-# Configure Ganglia
-include_recipe 'aws-parallelcluster::ganglia_config'
-
 # Setup cluster user
 user node['cluster']['cluster_user'] do
   manage_home true

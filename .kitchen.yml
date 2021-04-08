@@ -91,7 +91,6 @@ suites:
         cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
-        ganglia_enabled: 'yes'
         dcv_enabled: 'head_node'
         dcv_port: '8443'
         enable_intel_hpc_platform: 'true'
@@ -123,7 +122,6 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
-        ganglia_enabled: 'yes'
         dcv_enabled: 'head_node'
         dcv_port: '8443'
         custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
@@ -156,7 +154,6 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
-        ganglia_enabled: 'yes'
         dcv_enabled: 'head_node'
         dcv_port: '8443'
         enable_efa: 'compute'

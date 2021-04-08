@@ -75,9 +75,6 @@ mount '/opt/intel' do
   only_if { ::File.directory?("/opt/intel") }
 end
 
-# Configure Ganglia
-include_recipe 'aws-parallelcluster::ganglia_config'
-
 # Setup cluster user
 user node['cluster']['cluster_user'] do
   manage_home false
