@@ -27,7 +27,7 @@ globals {
  * tag that will wrap all hosts collected by this instance.
  */
 cluster {
-  name = "<%= node['cfncluster']['stack_name'] %>"
+  name = "<%= node['cluster']['stack_name'] %>"
   # owner = "unspecified"
   # latlong = "unspecified"
   # url = "unspecified"
@@ -47,11 +47,11 @@ udp_send_channel {
                       # this, the metrics may appear to come from any
                       # interface and the DNS names associated with
                       # those IPs will be used to create the RRDs.
-<% if node['cfncluster']['cfn_node_type'] == 'MasterServer' -%>
+<% if node['cluster']['node_type'] == 'MasterServer' -%>
   host = <%= node['hostname'] %>
 <% end -%>
-<% if node['cfncluster']['cfn_node_type'] == 'ComputeFleet' -%>
-  host = <%= node['cfncluster']['cfn_master_private_ip'] %>
+<% if node['cluster']['node_type'] == 'ComputeFleet' -%>
+  host = <%= node['cluster']['master_private_ip'] %>
 <% end -%>
   # mcast_join = 239.2.11.71
   port = 8649

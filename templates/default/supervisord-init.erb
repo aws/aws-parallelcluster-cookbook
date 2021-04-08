@@ -25,8 +25,8 @@
 PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:${PATH}"
 set -a
 
-SUPERVISORD="<%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/supervisord"
-SUPERVISORCTL="<%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/supervisorctl"
+SUPERVISORD="<%= node['cluster']['cookbook_virtualenv_path'] %>/bin/supervisord"
+SUPERVISORCTL="<%= node['cluster']['cookbook_virtualenv_path'] %>/bin/supervisorctl"
 
 PIDFILE=/var/run/supervisord.pid
 LOCKFILE=/var/lock/subsys/supervisord

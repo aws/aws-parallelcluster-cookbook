@@ -41,7 +41,7 @@
 # data_source "my grid" 50 1.3.4.7:8655 grid.org:8651 grid-backup.org:8651
 # data_source "another source" 1.3.4.7:8655  1.3.4.8
 
-data_source "<%= node['cfncluster']['stack_name'] %>" localhost
+data_source "<%= node['cluster']['stack_name'] %>" localhost
 
 #
 # Round-Robin Archives

@@ -15,11 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer.tar.gz"
+efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
 
 # Get EFA Installer
 remote_file efa_tarball do
-  source node['cfncluster']['efa']['installer_url']
+  source node['cluster']['efa']['installer_url']
   mode '0644'
   retries 3
   retry_delay 5
@@ -48,7 +48,7 @@ installer_options += " -k" unless node['conditions']['efa_supported']
 installer_options += " -g" if efa_gdr_enabled?
 
 bash "install efa" do
-  cwd node['cfncluster']['sources_dir']
+  cwd node['cluster']['sources_dir']
   code <<-EFAINSTALL
     set -e
     tar -xzf #{efa_tarball}

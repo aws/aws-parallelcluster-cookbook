@@ -16,28 +16,28 @@
 # limitations under the License.
 return if node['conditions']['ami_bootstrapped']
 
-install_pyenv node['cfncluster']['python-version'] do
-  prefix node['cfncluster']['system_pyenv_root']
+install_pyenv node['cluster']['python-version'] do
+  prefix node['cluster']['system_pyenv_root']
 end
 
-activate_virtual_env node['cfncluster']['cookbook_virtualenv'] do
-  pyenv_path node['cfncluster']['cookbook_virtualenv_path']
-  python_version node['cfncluster']['python-version']
+activate_virtual_env node['cluster']['cookbook_virtualenv'] do
+  pyenv_path node['cluster']['cookbook_virtualenv_path']
+  python_version node['cluster']['python-version']
   requirements_path "requirements.txt"
-  not_if { ::File.exist?("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate") }
+  not_if { ::File.exist?("#{node['cluster']['cookbook_virtualenv_path']}/bin/activate") }
 end
 
-activate_virtual_env node['cfncluster']['node_virtualenv'] do
-  pyenv_path node['cfncluster']['node_virtualenv_path']
-  python_version node['cfncluster']['python-version']
-  not_if { ::File.exist?("#{node['cfncluster']['node_virtualenv_path']}/bin/activate") }
+activate_virtual_env node['cluster']['node_virtualenv'] do
+  pyenv_path node['cluster']['node_virtualenv_path']
+  python_version node['cluster']['python-version']
+  not_if { ::File.exist?("#{node['cluster']['node_virtualenv_path']}/bin/activate") }
 end
 
 # Install awsbatch virtualenv
-activate_virtual_env node['cfncluster']['awsbatch_virtualenv'] do
-  pyenv_path node['cfncluster']['awsbatch_virtualenv_path']
-  python_version node['cfncluster']['python-version']
-  not_if { ::File.exist?("#{node['cfncluster']['awsbatch_virtualenv_path']}/bin/activate") }
+activate_virtual_env node['cluster']['awsbatch_virtualenv'] do
+  pyenv_path node['cluster']['awsbatch_virtualenv_path']
+  python_version node['cluster']['python-version']
+  not_if { ::File.exist?("#{node['cluster']['awsbatch_virtualenv_path']}/bin/activate") }
 end
 
 bash 'install CloudFormation helpers' do
@@ -46,11 +46,11 @@ bash 'install CloudFormation helpers' do
   cwd Chef::Config[:file_cache_path]
   code <<-CFNTOOLS
       set -e
-      region="#{node['cfncluster']['cfn_region']}"
+      region="#{node['cluster']['region']}"
       bucket="s3.amazonaws.com"
       [[ ${region} =~ ^cn- ]] && bucket="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
       curl --retry 3 -L -o aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
-      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/pip install aws-cfn-bootstrap-py3-latest.tar.gz
+      #{node['cluster']['cookbook_virtualenv_path']}/bin/pip install aws-cfn-bootstrap-py3-latest.tar.gz
   CFNTOOLS
-  creates "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/cfn-hup"
+  creates "#{node['cluster']['cookbook_virtualenv_path']}/bin/cfn-hup"
 end

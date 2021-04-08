@@ -28,17 +28,17 @@ execute "add_configure-pat" do
 end
 
 # Get VPC CIDR
-node.default['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_ipv4_cidr_blocks(node['macaddress'])
+node.default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_ipv4_cidr_blocks(node['macaddress'])
 
 # Parse shared directory info and turn into an array
-shared_dir_array = node['cfncluster']['cfn_shared_dir'].split(',')
+shared_dir_array = node['cluster']['shared_dir'].split(',')
 shared_dir_array.each_with_index do |dir, index|
   shared_dir_array[index] = dir.strip
   shared_dir_array[index] = "/#{shared_dir_array[index]}" unless shared_dir_array[index].start_with?('/')
 end
 
 # Parse volume info into an arary
-vol_array = node['cfncluster']['cfn_volume'].split(',')
+vol_array = node['cluster']['volume'].split(',')
 vol_array.each_with_index do |vol, index|
   vol_array[index] = vol.strip
 end
@@ -55,7 +55,7 @@ vol_array.each_with_index do |volumeid, index|
 
   # Attach EBS volume
   execute "attach_volume_#{index}" do
-    command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
+    command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
     creates dev_path[index]
   end
 
@@ -83,7 +83,7 @@ vol_array.each_with_index do |volumeid, index|
         fs_type = get_fs_type(partition_dev)
         dev_path[index] = partition_dev
       end
-      node.default['cfncluster']['cfn_volume_fs_type'] = fs_type
+      node.default['cluster']['volume_fs_type'] = fs_type
       dev_uuids[index] = get_uuid(dev_path[index])
     end
     action :nothing
@@ -102,7 +102,7 @@ vol_array.each_with_index do |volumeid, index|
   # Add volume to /etc/fstab
   mount shared_dir_array[index] do
     device(DelayedEvaluator.new { dev_uuids[index] })
-    fstype(DelayedEvaluator.new { node['cfncluster']['cfn_volume_fs_type'] })
+    fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
     device_type :uuid
     options "_netdev"
     pass 0
@@ -120,7 +120,7 @@ vol_array.each_with_index do |volumeid, index|
 
   # Export shared dir
   nfs_export shared_dir_array[index] do
-    network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+    network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
     writeable true
     options ['no_root_squash']
   end
@@ -128,14 +128,14 @@ end
 
 # Export /home
 nfs_export "/home" do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
 end
 
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
-  network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
   only_if { ::File.directory?("/opt/intel") }
@@ -148,42 +148,42 @@ include_recipe 'aws-parallelcluster::setup_raid_on_head_node'
 include_recipe 'aws-parallelcluster::ganglia_config'
 
 # Setup cluster user
-user node['cfncluster']['cfn_cluster_user'] do
+user node['cluster']['cluster_user'] do
   manage_home true
   comment 'AWS ParallelCluster user'
-  home "/home/#{node['cfncluster']['cfn_cluster_user']}"
+  home "/home/#{node['cluster']['cluster_user']}"
   shell '/bin/bash'
 end
 
 # Setup SSH auth for cluster user
 bash "ssh-keygen" do
-  cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
+  cwd "/home/#{node['cluster']['cluster_user']}"
   code <<-KEYGEN
     set -e
-    su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
+    su - #{node['cluster']['cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
   KEYGEN
-  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/id_rsa") }
+  not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/id_rsa") }
 end
 
 bash "copy_and_perms" do
-  cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
+  cwd "/home/#{node['cluster']['cluster_user']}"
   code <<-PERMS
     set -e
-    su - #{node['cfncluster']['cfn_cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
+    su - #{node['cluster']['cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
   PERMS
-  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/authorized_keys_cluster") }
+  not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/authorized_keys_cluster") }
 end
 
 bash "ssh-keyscan" do
-  cwd "/home/#{node['cfncluster']['cfn_cluster_user']}"
+  cwd "/home/#{node['cluster']['cluster_user']}"
   code <<-KEYSCAN
     set -e
-    su - #{node['cfncluster']['cfn_cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
+    su - #{node['cluster']['cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
   KEYSCAN
-  not_if { ::File.exist?("/home/#{node['cfncluster']['cfn_cluster_user']}/.ssh/known_hosts") }
+  not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/known_hosts") }
 end
 
-if node['cfncluster']['dcv_enabled'] == "master"
+if node['cluster']['dcv_enabled'] == "master"
   # Activate DCV on head node
   include_recipe 'aws-parallelcluster::dcv_config'
 end

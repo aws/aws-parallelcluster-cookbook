@@ -16,7 +16,7 @@ default_action :run
 
 action :run do
   # Install env2
-  env2 = "#{node['cfncluster']['scripts_dir']}/env2"
+  env2 = "#{node['cluster']['scripts_dir']}/env2"
   cookbook_file 'env2' do
     path env2
     mode '0755'

@@ -18,18 +18,18 @@
 # Validate OS type specified by the user is the same as the OS identified by Ohai
 validate_os_type
 
-# Determine cfn_scheduler_slots settings and update cfn_instance_slots appropriately
-node.default['cfncluster']['cfn_instance_slots'] = case node['cfncluster']['cfn_scheduler_slots']
+# Determine scheduler_slots settings and update instance_slots appropriately
+node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slots']
                                                    when 'vcpus'
                                                      node['cpu']['total']
                                                    when 'cores'
                                                      node['cpu']['cores']
                                                    else
-                                                     node['cfncluster']['cfn_scheduler_slots']
+                                                     node['cluster']['scheduler_slots']
                                                    end
 
-# NOTE: this recipe must be included after cfn_instance_slot because it may alter the values of
-#       node['cpu']['total'], which would break the expected behavior when setting cfn_scheduler_slots
+# NOTE: this recipe must be included after instance_slot because it may alter the values of
+#       node['cpu']['total'], which would break the expected behavior when setting scheduler_slots
 #       to one of the constants looked for in the above conditionals
 include_recipe "aws-parallelcluster::disable_hyperthreading"
 
@@ -37,11 +37,11 @@ include_recipe "aws-parallelcluster::disable_hyperthreading"
 directory '/etc/parallelcluster'
 directory '/opt/parallelcluster'
 directory '/opt/parallelcluster/scripts'
-directory node['cfncluster']['base_dir']
-directory node['cfncluster']['sources_dir']
-directory node['cfncluster']['scripts_dir']
-directory node['cfncluster']['license_dir']
-directory node['cfncluster']['configs_dir']
+directory node['cluster']['base_dir']
+directory node['cluster']['sources_dir']
+directory node['cluster']['scripts_dir']
+directory node['cluster']['license_dir']
+directory node['cluster']['configs_dir']
 
 # Create ParallelCluster log folder
 directory '/var/log/parallelcluster/' do
@@ -66,13 +66,6 @@ template "/opt/parallelcluster/scripts/fetch_and_run" do
   mode "0755"
 end
 
-template '/opt/parallelcluster/scripts/compute_ready' do
-  source 'compute_ready.erb'
-  owner "root"
-  group "root"
-  mode "0755"
-end
-
 include_recipe "aws-parallelcluster::setup_python"
 
 # Install cloudwatch, write configuration and start it.
@@ -81,7 +74,7 @@ include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster::network_interfaces_config"
 
-include_recipe "aws-parallelcluster::prep_env_slurm" if node['cfncluster']['cfn_scheduler'] == 'slurm'
+include_recipe "aws-parallelcluster::prep_env_slurm" if node['cluster']['scheduler'] == 'slurm'
 
 # Configure hostname and DNS
 include_recipe "aws-parallelcluster::dns_config"

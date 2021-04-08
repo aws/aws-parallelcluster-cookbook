@@ -34,8 +34,8 @@ function exec_command() {
 # LVM stripe, format, mount ephemeral drives
 function setup_ephemeral_drives () {
   RC=0
-  mkdir -p ${cfn_ephemeral_dir} || RC=1
-  chmod 1777 ${cfn_ephemeral_dir} || RC=1
+  mkdir -p ${ephemeral_dir} || RC=1
+  chmod 1777 ${ephemeral_dir} || RC=1
   if ls /dev/nvme* >& /dev/null; then
     IS_NVME=1
     MAPPING=$(realpath --relative-to=/dev/ -P  /dev/disk/by-id/nvme*Instance_Storage* | uniq)
@@ -80,7 +80,7 @@ function setup_ephemeral_drives () {
     pvcreate -y $PARTITIONS || RC=1
     vgcreate vg.01 $PARTITIONS || RC=1
     lvcreate -i $NUM_DEVS -I 64 -l 100%FREE -n lv_ephemeral vg.01 || RC=1
-    if [ "$cfn_encrypted_ephemeral" == "true" ]; then
+    if [ "${encrypted_ephemeral}" == "true" ]; then
       modprobe brd || RC=1
       mkfs -q /dev/ram1 1024 || RC=1
       mkdir -p /root/keystore || RC=1
@@ -90,14 +90,14 @@ function setup_ephemeral_drives () {
       cryptsetup -q luksFormat /dev/vg.01/lv_ephemeral /root/keystore/keyfile || RC=1
       cryptsetup -d /root/keystore/keyfile luksOpen /dev/vg.01/lv_ephemeral ephemeral_luks || RC=1
       mkfs.ext4 /dev/mapper/ephemeral_luks || RC=1
-      mount -v -t ext4 -o noatime,nodiratime /dev/mapper/ephemeral_luks ${cfn_ephemeral_dir} || RC=1
+      mount -v -t ext4 -o noatime,nodiratime /dev/mapper/ephemeral_luks ${ephemeral_dir} || RC=1
     else
       mkfs.ext4 /dev/vg.01/lv_ephemeral || RC=1
-      echo "/dev/vg.01/lv_ephemeral ${cfn_ephemeral_dir} ext4 noatime,nodiratime 0 0" >> /etc/fstab || RC=1
-      mount -v ${cfn_ephemeral_dir} || RC=1
+      echo "/dev/vg.01/lv_ephemeral ${ephemeral_dir} ext4 noatime,nodiratime 0 0" >> /etc/fstab || RC=1
+      mount -v ${ephemeral_dir} || RC=1
     fi
   fi
-  chmod 1777 ${cfn_ephemeral_dir} || RC=1
+  chmod 1777 ${ephemeral_dir} || RC=1
   if [ $RC -ne 0 ]; then
     error_exit "Failed to create LVM stripe and/or format ephemeral volume."
   fi

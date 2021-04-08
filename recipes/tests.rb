@@ -21,17 +21,17 @@
 execute 'execute awscli as user' do
   command "aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
-  user node['cfncluster']['cfn_cluster_user']
+  user node['cluster']['cluster_user']
 end
 
 execute 'execute awscli as root' do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws --version"
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws --version"
   environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
 end
 
-[node['cfncluster']['cookbook_virtualenv_path'], node['cfncluster']['node_virtualenv_path']].each do |venv_path|
+[node['cluster']['cookbook_virtualenv_path'], node['cluster']['node_virtualenv_path']].each do |venv_path|
   execute "check #{venv_path} python version" do
-    command %(#{venv_path}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
+    command %(#{venv_path}/bin/python -V | grep "Python #{node['cluster']['python-version']}")
   end
 end
 
@@ -40,10 +40,10 @@ bash 'check awscli regions' do
   code <<-AWSREGIONS
     set -e
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cfncluster']['cfn_region']} --query "Regions[].{Name:RegionName}" --output text))
+    regions=($(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
-      #{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}"
+      #{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}"
     done
   AWSREGIONS
 end
@@ -56,40 +56,40 @@ execute 'grep ssh_config' do
 end
 
 # Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
-if node['cfncluster']['cfn_node_type'] == 'MasterServer'
+if node['cluster']['node_type'] == 'MasterServer'
   execute 'ssh localhost as user' do
     command "ssh localhost hostname"
     environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
 ###################
 # munge
 ###################
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
+if node['cluster']['scheduler'] == 'slurm'
   execute 'check munge installed' do
     command 'munge --version'
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
 ###################
 # Slurm
 ###################
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
-  case node['cfncluster']['cfn_node_type']
+if node['cluster']['scheduler'] == 'slurm'
+  case node['cluster']['node_type']
   when 'MasterServer'
     execute 'execute sinfo' do
       command "sinfo --help"
       environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
 
     execute 'execute scontrol' do
       command "scontrol --help"
       environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
 
     execute 'check-slurm-accounting-mysql-plugins' do
@@ -109,10 +109,10 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
   when 'ComputeFleet'
     execute 'ls slurm root' do
       command "ls /opt/slurm"
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   else
-    raise "cfn_node_type must be MasterServer or ComputeFleet"
+    raise "node_type must be MasterServer or ComputeFleet"
   end
 end
 
@@ -121,16 +121,16 @@ end
 ###################
 case node['init_package']
 when 'init'
-  gmond_check_command = "service #{node['cfncluster']['ganglia']['gmond_service']} status | grep -i running"
+  gmond_check_command = "service #{node['cluster']['ganglia']['gmond_service']} status | grep -i running"
   gmetad_check_command = "service gmetad status | grep -i running"
 when 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
-  gmond_check_command = "systemctl show -p SubState #{node['cfncluster']['ganglia']['gmond_service']} | grep -i running"
+  gmond_check_command = "systemctl show -p SubState #{node['cluster']['ganglia']['gmond_service']} | grep -i running"
   gmetad_check_command = "systemctl show -p SubState gmetad | grep -i running"
 end
 
-case node['cfncluster']['cfn_node_type']
+case node['cluster']['node_type']
 when 'MasterServer'
   execute 'check gmond running' do
     command gmond_check_command
@@ -154,11 +154,11 @@ end
 ###################
 case node['init_package']
 when 'init'
-  get_chrony_status_command = "service #{node['cfncluster']['chrony']['service']} status"
+  get_chrony_status_command = "service #{node['cluster']['chrony']['service']} status"
 when 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
-  get_chrony_status_command = "systemctl show -p SubState #{node['cfncluster']['chrony']['service']}"
+  get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
 end
 chrony_check_command = "#{get_chrony_status_command} | grep -i running"
 
@@ -166,9 +166,9 @@ ruby_block 'log_chrony_status' do
   block do
     case node['init_package']
     when 'init'
-      get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cfncluster']['chrony']['service']}'"
+      get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cluster']['chrony']['service']}'"
     when 'systemd'
-      get_chrony_service_log_command = "journalctl -u #{node['cfncluster']['chrony']['service']}"
+      get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
     end
     chrony_log = shell_out!(get_chrony_service_log_command).stdout
     Chef::Log.debug("chrony service log: #{chrony_log}")
@@ -183,21 +183,21 @@ end
 
 execute 'check chrony conf' do
   command "chronyc waitsync 30; chronyc tracking | grep -i reference | grep 169.254.169.123"
-  user node['cfncluster']['cfn_cluster_user']
+  user node['cluster']['cluster_user']
 end
 
 ###################
 # DCV
 ###################
-if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
+if node['cluster']['node_type'] == "MasterServer" &&
    node['conditions']['dcv_supported'] &&
-   (node['cfncluster']['dcv']['installed'] == 'yes' || node['cfncluster']['dcv']['installed'] == true)
+   (node['cluster']['dcv']['installed'] == 'yes' || node['cluster']['dcv']['installed'] == true)
   execute 'check dcv installed' do
     command 'dcv version'
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
   execute 'check DCV external authenticator python version' do
-    command %(#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
+    command %(#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cluster']['python-version']}")
   end
   execute 'check screensaver screen lock disabled' do
     command 'gsettings get org.gnome.desktop.screensaver lock-enabled | grep false'
@@ -207,7 +207,7 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
   end
 end
 
-if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer"
+if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "master" && node['cluster']['node_type'] == "MasterServer"
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
@@ -216,7 +216,7 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "
       command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
     end
   end
-  if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
+  if node['cluster']['os'] == "ubuntu1804" || node['cluster']['os'] == "alinux2"
     execute 'check gdm service is running' do
       command "systemctl show -p SubState gdm | grep -i running"
     end
@@ -225,7 +225,7 @@ elsif node['init_package'] == 'systemd' && node['conditions']['ami_bootstrapped'
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i multi-user.target"
   end
-  if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
+  if node['cluster']['os'] == "ubuntu1804" || node['cluster']['os'] == "alinux2"
     execute 'check gdm service is stopped' do
       command "systemctl show -p SubState gdm | grep -i dead"
     end
@@ -236,38 +236,38 @@ end
 # EFA - Intel MPI
 ###################
 if node['conditions']['intel_mpi_supported']
-  case node['cfncluster']['os']
+  case node['cluster']['os']
   when 'alinux2', 'centos7', 'centos8'
     execute 'check efa rpm installed' do
       command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
     execute 'check intel mpi installed' do
       command "rpm -qa | grep intel-mpi"
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   when 'ubuntu1804'
-    case node['cfncluster']['cfn_node_type']
+    case node['cluster']['node_type']
     when 'MasterServer'
       execute 'check ptrace protection enabled' do
         command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 1'"
-        user node['cfncluster']['cfn_cluster_user']
+        user node['cluster']['cluster_user']
       end
     when 'ComputeFleet'
       execute 'check ptrace protection disabled' do
         command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 0'"
-        user node['cfncluster']['cfn_cluster_user']
+        user node['cluster']['cluster_user']
       end
     end
     execute 'check efa rpm installed' do
       command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   end
 
   # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
-  if node['cfncluster']['cfn_node_type'] == 'MasterServer'
+  if node['cluster']['node_type'] == 'MasterServer'
     bash 'check intel mpi version' do
       cwd Chef::Config[:file_cache_path]
       code <<-INTELMPI
@@ -277,9 +277,9 @@ if node['conditions']['intel_mpi_supported']
         unset MODULEPATH
         # Must execute this in a bash script because source is a bash built-in function
         source /etc/profile.d/modules.sh
-        module load intelmpi && mpirun --help | grep '#{node['cfncluster']['intelmpi']['kitchen_test_string']}'
+        module load intelmpi && mpirun --help | grep '#{node['cluster']['intelmpi']['kitchen_test_string']}'
       INTELMPI
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   end
 end
@@ -290,23 +290,23 @@ end
 if node['conditions']['efa_supported'] && efa_gdr_enabled?
   execute 'check efa gdr installed' do
     command "modinfo efa | grep 'gdr:\ *Y'"
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
 ###################
 # jq
 ###################
-unless node['cfncluster']['os'].end_with?("-custom")
+unless node['cluster']['os'].end_with?("-custom")
   bash 'execute jq' do
     cwd Chef::Config[:file_cache_path]
     code <<-JQMERGE
       set -e
       # Set PATH as in the UserData script of the CloudFormation template
       export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
-      echo '{"cfncluster": {"cfn_region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::slurm_config]"}' > /tmp/dna.json
-      echo '{ "cfncluster" : { "ganglia_enabled" : "yes" } }' > /tmp/extra.json
-      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cfncluster = $f1.cfncluster + $f2.cfncluster'
+      echo '{"cluster": {"region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::slurm_config]"}' > /tmp/dna.json
+      echo '{ "cluster" : { "dcv_enabled" : "head_node" } }' > /tmp/extra.json
+      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster'
     JQMERGE
   end
 end
@@ -324,7 +324,7 @@ bash 'test nvidia driver install' do
     fi
 
     set -e
-    driver_ver="#{node['cfncluster']['nvidia']['driver_version']}"
+    driver_ver="#{node['cluster']['nvidia']['driver_version']}"
     export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
 
     # Test NVIDIA Driver installation
@@ -340,7 +340,7 @@ bash 'test nvidia driver install' do
   TESTNVIDIA
 end
 
-unless node['cfncluster']['cfn_base_os'] == 'alinux' && get_nvswitches > 1
+unless node['cluster']['base_os'] == 'alinux' && get_nvswitches > 1
   bash 'test CUDA install' do
     cwd Chef::Config[:file_cache_path]
     code <<-TESTCUDA
@@ -351,7 +351,7 @@ unless node['cfncluster']['cfn_base_os'] == 'alinux' && get_nvswitches > 1
       fi
 
       set -e
-      cuda_ver="#{node['cfncluster']['nvidia']['cuda_version']}"
+      cuda_ver="#{node['cluster']['nvidia']['cuda_version']}"
       # Test CUDA installation
       echo "Testing CUDA install with nvcc..."
       export PATH=/usr/local/cuda-$cuda_ver/bin:$PATH
@@ -400,9 +400,9 @@ end
 # Intel Python
 ###################
 # Intel Python Libraries
-if node['conditions']['intel_hpc_platform_supported'] && node['cfncluster']['enable_intel_hpc_platform'] == 'true'
+if node['conditions']['intel_hpc_platform_supported'] && node['cluster']['enable_intel_hpc_platform'] == 'true'
   %w[2 3].each do |python_version|
-    intel_package_version = node['cfncluster']["intelpython#{python_version}"]['version']
+    intel_package_version = node['cluster']["intelpython#{python_version}"]['version']
     execute "check-intel-python#{python_version}-rpm" do
       # Output code will be 1 if version is different
       command "rpm -q intelpython#{python_version} | grep #{intel_package_version}"
@@ -417,16 +417,16 @@ end
 # FSx Lustre
 ###################
 if node['conditions']['lustre_supported']
-  case node['cfncluster']['os']
+  case node['cluster']['os']
   when 'centos7'
     execute 'check for lustre libraries' do
       command "rpm -qa | grep lustre-client"
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   when 'ubuntu1804'
     execute 'check for lustre libraries' do
       command "dpkg -l | grep lustre"
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   end
 end
@@ -450,16 +450,16 @@ end
 # NFS
 ###################
 
-case node['cfncluster']['cfn_node_type']
+case node['cluster']['node_type']
 when 'ComputeFleet'
   execute 'check for nfs client protocol' do
     command "nfsstat -m | grep vers=4"
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 when 'MasterServer'
   execute 'check for nfs server protocol' do
     command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
@@ -488,10 +488,10 @@ end
 ###################
 # ulimit
 ###################
-unless node['cfncluster']['os'].end_with?("-custom")
+unless node['cluster']['os'].end_with?("-custom")
   bash 'test soft ulimit nofile' do
     code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
@@ -500,7 +500,7 @@ end
 ###################
 require 'chef/mixin/shell_out'
 
-virtual_envs = [node['cfncluster']['node_virtualenv_path'], node['cfncluster']['cookbook_virtualenv_path']]
+virtual_envs = [node['cluster']['node_virtualenv_path'], node['cluster']['cookbook_virtualenv_path']]
 
 virtual_envs.each do |virtual_env|
   ruby_block 'check pip version' do
@@ -530,20 +530,20 @@ if node['conditions']['arm_pl_supported']
       # Initialize module
       unset MODULEPATH
       source /etc/profile.d/modules.sh
-      (module avail)2>&1 | grep armpl/#{node['cfncluster']['armpl']['version']}
-      module load armpl/#{node['cfncluster']['armpl']['version']}
-      gcc --version | grep #{node['cfncluster']['armpl']['gcc']['major_minor_version']}
-      (module list)2>&1 | grep armpl/#{node['cfncluster']['armpl']['version']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}
-      (module list)2>&1 | grep armpl/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}
+      (module avail)2>&1 | grep armpl/#{node['cluster']['armpl']['version']}
+      module load armpl/#{node['cluster']['armpl']['version']}
+      gcc --version | grep #{node['cluster']['armpl']['gcc']['major_minor_version']}
+      (module list)2>&1 | grep armpl/#{node['cluster']['armpl']['version']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}
+      (module list)2>&1 | grep armpl/gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}
     ARMPL
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
 ###################
 # Pcluster AWSBatch CLI
 ###################
-if node['cfncluster']['cfn_scheduler'] == 'awsbatch' && node['cfncluster']['cfn_node_type'] == 'MasterServer'
+if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'MasterServer'
   # Test that batch commands can be accessed without absolute path
   batch_cli_commands = %w[awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat]
   batch_cli_commands.each do |cli_commmand|
@@ -554,7 +554,7 @@ if node['cfncluster']['cfn_scheduler'] == 'awsbatch' && node['cfncluster']['cfn_
         source ~/.bash_profile
         #{cli_commmand} -h
       BATCHCLI
-      user node['cfncluster']['cfn_cluster_user']
+      user node['cluster']['cluster_user']
     end
   end
 end
@@ -564,5 +564,5 @@ end
 ###################
 execute 'check python3 installed' do
   command "which python3"
-  user node['cfncluster']['cfn_cluster_user']
+  user node['cluster']['cluster_user']
 end

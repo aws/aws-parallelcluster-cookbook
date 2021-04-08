@@ -92,7 +92,7 @@
 # second that are sent to the client. A higher value consumes more bandwidth
 # and resources. By default it is set to 25. Set to 0 for no limit
 #target-fps = 30
-<% unless node['cfncluster']['dcv']['is_graphic_instance'] %>
+<% unless node['cluster']['dcv']['is_graphic_instance'] %>
 display-encoders=['turbojpeg', 'lz4', 'ffmpeg']
 <% end %>
 
@@ -109,7 +109,7 @@ display-encoders=['turbojpeg', 'lz4', 'ffmpeg']
 # listen for connection requests to serve HTTP(S) pages and WebSocket
 # connections
 # If not specified, DCV will use port 8443
-web-port=<%= node['cfncluster']['dcv_port'] %>
+web-port=<%= node['cluster']['dcv_port'] %>
 
 # Property "web-url-path" specifies a URL path for the embedded web server.
 # The path must start with /. For instance setting it to "/test/foo" means the
@@ -148,8 +148,8 @@ web-port=<%= node['cfncluster']['dcv_port'] %>
 # Property "auth-token-verifier" specifies an endpoint (URL) for an external
 # the authentication token verifier. If empty or not specified, the internal
 # authentication token verifier is used
-auth-token-verifier="https://localhost:<%= Integer(node['cfncluster']['dcv_port']) + 1 %>"
+auth-token-verifier="https://localhost:<%= Integer(node['cluster']['dcv_port']) + 1 %>"
 
 # Property "ca-file" specifies the file containing the certificate authorities (CAs)
 # trusted by the DCV server.
-ca-file="<%= node['cfncluster']['dcv']['authenticator']['certificate'] %>"
+ca-file="<%= node['cluster']['dcv']['authenticator']['certificate'] %>"

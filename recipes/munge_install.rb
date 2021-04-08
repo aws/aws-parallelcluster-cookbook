@@ -23,11 +23,11 @@ package %w[munge* libmunge*] do
   action :purge
 end
 
-munge_tarball = "#{node['cfncluster']['sources_dir']}/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
+munge_tarball = "#{node['cluster']['sources_dir']}/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"
 
 # Get munge tarball
 remote_file munge_tarball do
-  source node['cfncluster']['munge']['munge_url']
+  source node['cluster']['munge']['munge_url']
   mode '0644'
   retries 3
   retry_delay 5
@@ -47,14 +47,14 @@ bash 'make install' do
   code <<-MUNGE
     set -e
     tar xf #{munge_tarball}
-    cd munge-munge-#{node['cfncluster']['munge']['munge_version']}
+    cd munge-munge-#{node['cluster']['munge']['munge_version']}
     ./bootstrap
     ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=#{munge_libdir}
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
   MUNGE
-  not_if "/usr/sbin/munged --version | grep -q munge-#{node['cfncluster']['munge']['munge_version']} && ls #{munge_libdir}/libmunge*"
+  not_if "/usr/sbin/munged --version | grep -q munge-#{node['cluster']['munge']['munge_version']} && ls #{munge_libdir}/libmunge*"
 end
 
 # Updated munge init script for Amazon Linux

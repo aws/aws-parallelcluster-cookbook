@@ -25,13 +25,13 @@ package %w[slurm* libslurm*] do
   action :purge
 end
 
-case node['cfncluster']['cfn_node_type']
+case node['cluster']['node_type']
 when 'MasterServer', nil
-  slurm_tarball = "#{node['cfncluster']['sources_dir']}/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
+  slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 
   # Get slurm tarball
   remote_file slurm_tarball do
-    source node['cfncluster']['slurm']['url']
+    source node['cluster']['slurm']['url']
     mode '0644'
     retries 3
     retry_delay 5
@@ -43,7 +43,7 @@ when 'MasterServer', nil
     block do
       require 'digest'
       checksum = Digest::SHA1.file(slurm_tarball).hexdigest # nosemgrep
-      raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}" if checksum != node['cfncluster']['slurm']['sha1']
+      raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['slurm']['sha1']}" if checksum != node['cluster']['slurm']['sha1']
     end
   end
 
@@ -56,10 +56,10 @@ when 'MasterServer', nil
       set -e
 
       # python3 is required to build slurm >= 20.02
-      source #{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate
+      source #{node['cluster']['cookbook_virtualenv_path']}/bin/activate
 
       tar xf #{slurm_tarball}
-      cd slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-#{node['cluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
@@ -81,7 +81,7 @@ when 'MasterServer', nil
   end
 
   # Copy required licensing files
-  directory "#{node['cfncluster']['license_dir']}/slurm"
+  directory "#{node['cluster']['license_dir']}/slurm"
 
   bash 'copy license stuff' do
     user 'root'
@@ -89,14 +89,14 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     code <<-SLURMLICENSE
       set -e
-      cd slurm-#{node['cfncluster']['slurm']['version']}
-      cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
-      cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
-      cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
-      cp -v README.rst #{node['cfncluster']['license_dir']}/slurm/README.rst
+      cd slurm-#{node['cluster']['slurm']['version']}
+      cp -v COPYING #{node['cluster']['license_dir']}/slurm/COPYING
+      cp -v DISCLAIMER #{node['cluster']['license_dir']}/slurm/DISCLAIMER
+      cp -v LICENSE.OpenSSL #{node['cluster']['license_dir']}/slurm/LICENSE.OpenSSL
+      cp -v README.rst #{node['cluster']['license_dir']}/slurm/README.rst
     SLURMLICENSE
     # TODO: Fix, so it works for upgrade
-    creates "#{node['cfncluster']['license_dir']}/slurm/README.rst"
+    creates "#{node['cluster']['license_dir']}/slurm/README.rst"
   end
 
   # Install PerlSwitch

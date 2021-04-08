@@ -3,8 +3,8 @@
 ## Required internal variables
 set category arm
 set name     armpl
-set version  <%= node['cfncluster']['armpl']['version'] %>
-set gcc_version <%= node['cfncluster']['armpl']['gcc']['major_minor_version'] %>
+set version  <%= node['cluster']['armpl']['version'] %>
+set gcc_version <%= node['cluster']['armpl']['gcc']['major_minor_version'] %>
 set root     /opt/$category/$name/$version
 
 ## Set resource definition
