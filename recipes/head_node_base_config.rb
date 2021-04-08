@@ -31,7 +31,7 @@ end
 node.default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_ipv4_cidr_blocks(node['macaddress'])
 
 # Parse shared directory info and turn into an array
-shared_dir_array = node['cluster']['shared_dir'].split(',')
+shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
 shared_dir_array.each_with_index do |dir, index|
   shared_dir_array[index] = dir.strip
   shared_dir_array[index] = "/#{shared_dir_array[index]}" unless shared_dir_array[index].start_with?('/')
@@ -183,7 +183,7 @@ bash "ssh-keyscan" do
   not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/known_hosts") }
 end
 
-if node['cluster']['dcv_enabled'] == "master"
+if node['cluster']['dcv_enabled'] == "head_node"
   # Activate DCV on head node
   include_recipe 'aws-parallelcluster::dcv_config'
 end

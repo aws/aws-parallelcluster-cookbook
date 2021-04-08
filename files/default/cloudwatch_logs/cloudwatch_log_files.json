@@ -253,7 +253,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -276,7 +276,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -299,7 +299,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -322,7 +322,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -345,7 +345,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -368,7 +368,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -391,7 +391,7 @@
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     }

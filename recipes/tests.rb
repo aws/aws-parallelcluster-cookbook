@@ -207,7 +207,7 @@ if node['cluster']['node_type'] == "MasterServer" &&
   end
 end
 
-if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "master" && node['cluster']['node_type'] == "MasterServer"
+if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "MasterServer"
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end

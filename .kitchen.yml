@@ -57,7 +57,7 @@ suites:
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
         encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
-        shared_dir: <%= ENV['SHARED_DIR'] %>
+        ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
         # base_os is one of the base OSs supported by pcluster
         base_os: <%= ENV['BASE_OS'] %>
@@ -81,7 +81,7 @@ suites:
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
         encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
-        shared_dir: <%= ENV['SHARED_DIR'] %>
+        ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
         ddb_table: <%= ENV['DDB_TABLE'] %>
         # base_os is one of the base OSs supported by pcluster
@@ -92,7 +92,7 @@ suites:
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
-        dcv_enabled: 'master'
+        dcv_enabled: 'head_node'
         dcv_port: '8443'
         enable_intel_hpc_platform: 'true'
         enable_efa: 'compute'
@@ -115,7 +115,7 @@ suites:
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
         encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
-        shared_dir: <%= ENV['SHARED_DIR'] %>
+        ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
         ddb_table: <%= ENV['DDB_TABLE'] %>
         # base_os is one of the base OSs supported by pcluster
@@ -124,7 +124,7 @@ suites:
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
-        dcv_enabled: 'master'
+        dcv_enabled: 'head_node'
         dcv_port: '8443'
         custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
         nvidia:
@@ -146,7 +146,7 @@ suites:
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
         encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
-        shared_dir: <%= ENV['SHARED_DIR'] %>
+        ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
         master: <%= ENV['MASTER'] %>
         master_private_ip: <%= ENV['MASTER_PRIVATE_IP'] %>
@@ -157,7 +157,7 @@ suites:
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         ganglia_enabled: 'yes'
-        dcv_enabled: 'master'
+        dcv_enabled: 'head_node'
         dcv_port: '8443'
         enable_efa: 'compute'
         nvidia:
