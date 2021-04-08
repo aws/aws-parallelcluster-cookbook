@@ -18,8 +18,6 @@
 # Validate OS type specified by the user is the same as the OS identified by Ohai
 validate_os_type
 
-include_recipe 'aws-parallelcluster::sge_install'
-include_recipe 'aws-parallelcluster::torque_install'
 include_recipe 'aws-parallelcluster::slurm_install'
 
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
