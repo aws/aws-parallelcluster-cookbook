@@ -7,6 +7,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 -----
 
 **CHANGES**
+- Drop support for SGE and Torque schedulers.
+- Remove nodewatcher, sqswatcher, jobwatcher related code.
 - Disable log4j-cve-2021-44228-hotpatch service on Amazon Linux to avoid incurring in potential performance degradation.
 - Upgrade NVIDIA driver to version 470.103.01.
 - Upgrade CUDA library to version 11.4.4.
