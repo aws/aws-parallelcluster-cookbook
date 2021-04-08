@@ -116,11 +116,3 @@ shared_dir_array.each do |dir|
     retry_delay 6
   end
 end
-
-# Install nodewatcher.cfg
-template '/etc/nodewatcher.cfg' do
-  source 'nodewatcher.cfg.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end

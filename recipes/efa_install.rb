@@ -62,15 +62,3 @@ bash "install efa" do
   EFAINSTALL
   not_if { efa_installed }
 end
-
-# EFA installer v1.11.0 removes libibverbs-core, which contains hwloc-devel during install
-# hwloc-devel is needed to compile SGE
-# Reinstall hwloc-devel by itself explicitly
-package "install hwloc-devel explicitly" do
-  package_name value_for_platform(
-    'default' => "hwloc-devel",
-    'ubuntu' => { 'default' => "libhwloc-dev" }
-  )
-  retries 3
-  retry_delay 5
-end

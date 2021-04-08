@@ -21,8 +21,6 @@ validate_os_type
 # Update certificates
 include_recipe "aws-parallelcluster::update_certificates"
 
-include_recipe 'aws-parallelcluster::sge_install'
-include_recipe 'aws-parallelcluster::torque_install'
 include_recipe 'aws-parallelcluster::slurm_install'
 
 # TODO: remove from code if not using efa installer v1.12.x
