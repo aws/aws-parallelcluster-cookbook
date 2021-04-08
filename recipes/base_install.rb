@@ -203,9 +203,6 @@ cookbook_file "ami_cleanup.sh" do
   mode "0755"
 end
 
-# Install Ganglia
-include_recipe "aws-parallelcluster::ganglia_install"
-
 # Install NVIDIA and CUDA
 include_recipe "aws-parallelcluster::nvidia_install"
 

@@ -117,39 +117,6 @@ if node['cluster']['scheduler'] == 'slurm'
 end
 
 ###################
-# Ganglia
-###################
-case node['init_package']
-when 'init'
-  gmond_check_command = "service #{node['cluster']['ganglia']['gmond_service']} status | grep -i running"
-  gmetad_check_command = "service gmetad status | grep -i running"
-when 'systemd'
-  # $ systemctl show -p SubState <service>
-  # SubState=Running
-  gmond_check_command = "systemctl show -p SubState #{node['cluster']['ganglia']['gmond_service']} | grep -i running"
-  gmetad_check_command = "systemctl show -p SubState gmetad | grep -i running"
-end
-
-case node['cluster']['node_type']
-when 'HeadNode'
-  execute 'check gmond running' do
-    command gmond_check_command
-  end
-
-  execute 'check gmetad running' do
-    command gmetad_check_command
-  end
-
-  execute 'check ganglia webpage' do # ~FC041
-    command 'curl --silent -L http://localhost/ganglia | grep "<title>Ganglia"'
-  end
-when 'ComputeFleet'
-  execute 'check gmond running' do
-    command gmond_check_command
-  end
-end
-
-###################
 # Amazon Time Sync
 ###################
 case node['init_package']

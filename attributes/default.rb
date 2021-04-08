@@ -113,9 +113,6 @@ default['cluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03ec'
 default['cluster']['munge']['munge_version'] = '0.5.14'
 default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"
 
-# Ganglia
-default['cluster']['ganglia_enabled'] = 'no'
-
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '450.80.02'
@@ -320,8 +317,6 @@ when 'rhel', 'amazon'
     default['cluster']['alinux_extras'] = ['R3.4']
   end
 
-  default['cluster']['ganglia']['gmond_service'] = 'gmond'
-  default['cluster']['ganglia']['httpd_service'] = 'httpd'
   default['cluster']['chrony']['service'] = "chronyd"
   default['cluster']['chrony']['conf'] = "/etc/chrony.conf"
 
@@ -349,8 +344,6 @@ when 'debian'
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
   default['cluster']['kernel_generic_pkg'] = "linux-generic"
-  default['cluster']['ganglia']['gmond_service'] = 'ganglia-monitor'
-  default['cluster']['ganglia']['httpd_service'] = 'apache2'
   default['cluster']['chrony']['service'] = "chrony"
   default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
 
