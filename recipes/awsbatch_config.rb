@@ -61,6 +61,6 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
 else
   # Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
   execute "pip_install_parallelcluster" do
-    command "#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster==#{node['cluster']['cfncluster-version']}"
+    command "#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster==#{node['cluster']['parallelcluster-version']}"
   end
 end
