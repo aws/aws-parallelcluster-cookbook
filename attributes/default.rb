@@ -136,11 +136,11 @@ default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform
   'ubuntu' => { 'default' => "#{node['cfncluster']['nvidia']['driver_version']}*" }
 )
 default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
-  'default' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64",
+  'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel7/x86_64",
   'centos' => {
-    '~>8' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64"
+    '~>8' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel8/x86_64"
   },
-  'ubuntu' => { 'default' => "https://developer.download.nvidia.com/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
+  'ubuntu' => { 'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
 )
 
 # EFA
