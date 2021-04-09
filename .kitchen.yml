@@ -89,6 +89,7 @@ suites:
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         cluster_s3_bucket: <%= ENV['CLUSTER_CONFIG_S3_BUCKET'] %>
         cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
+        instance_types_data_s3_key: <%= ENV['INSTANCE_TYPES_DATA_S3_KEY'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
         dcv_enabled: 'head_node'
