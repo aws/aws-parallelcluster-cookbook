@@ -75,7 +75,7 @@ end
 # Copy instance type infos file from S3 URI
 fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
                        " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
-execute "copy_cluster_config_from_s3" do
+execute "copy_instance_type_data_from_s3" do
   command fetch_config_command
   retries 3
   retry_delay 5
