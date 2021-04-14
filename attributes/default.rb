@@ -346,7 +346,7 @@ when 'debian'
                                               libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
                                               r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
                                               libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                              libatlas-base-dev libglvnd-dev]
+                                              libatlas-base-dev libglvnd-dev linux-headers-aws]
   default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
   default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
 
