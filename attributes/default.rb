@@ -73,7 +73,10 @@ default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncl
 default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 8'
 
 # Arm Performance Library
-default['cfncluster']['armpl']['version'] = '20.2.1'
+default['cfncluster']['armpl']['major_minor_version'] = '21.0'
+default['cfncluster']['armpl']['patch_version'] = '0'
+default['cfncluster']['armpl']['version'] = "#{node['cfncluster']['armpl']['major_minor_version']}.#{node['cfncluster']['armpl']['patch_version']}"
+
 default['cfncluster']['armpl']['gcc']['major_minor_version'] = '9.3'
 default['cfncluster']['armpl']['gcc']['patch_version'] = '0'
 default['cfncluster']['armpl']['gcc']['url'] = [
@@ -84,7 +87,10 @@ default['cfncluster']['armpl']['gcc']['url'] = [
 default['cfncluster']['armpl']['platform'] = value_for_platform(
   'centos' => { '~>8' => 'RHEL-8' },
   'amazon' => { '2' => 'RHEL-8' },
-  'ubuntu' => { '>=18.04' => 'Ubuntu-16.04' }
+  'ubuntu' => {
+    '18.04' => 'Ubuntu-18.04',
+    '20.04' => 'Ubuntu-20.04'
+  }
 )
 default['cfncluster']['armpl']['url'] = [
   'archives/armpl',

@@ -26,6 +26,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
   - Specify instance GPU model as GRES GPU Type in gres.conf
+- Upgrade Arm Performance Libraries (APL) to version 21.0.0
 - Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
 
 2.10.3
