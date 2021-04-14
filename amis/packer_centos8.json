@@ -160,6 +160,7 @@
     {
       "type" : "shell",
       "inline" : [
+        "sudo yum -y install epel-release",
         "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
       ]
     },
