@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for using FSx Lustre in subnet with no internet access.
 - Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
+- Add possibility to use a post installation script when building Centos 8 AMI.
 
 **CHANGES**
 - Ubuntu 16.04 is no longer supported.
