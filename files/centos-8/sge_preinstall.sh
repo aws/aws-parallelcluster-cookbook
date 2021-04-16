@@ -23,7 +23,7 @@ cd ${SRC_ARCHIVE_OUTFILE%.tar*}/source
 # Apply changes to source code to support OpenSSL 1.1
 patch --ignore-whitespace -p2 < /tmp/sge-openssl.patch
 # Apply changes to TCSH 3rd party library included on SGE
-# to support newer versions of glibc
+# to support newer versions of glibc and remove union wait
 patch --ignore-whitespace -p2 < /tmp/sge-tcsh.patch
 # Apply changes to gmake 3rd code to build with newer versions of automake
 patch --ignore-whitespace -p2 < /tmp/sge-qmake.patch

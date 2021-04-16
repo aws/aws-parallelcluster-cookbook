@@ -622,3 +622,19 @@ execute 'check python3 installed' do
   command "which python3"
   user node['cfncluster']['cfn_cluster_user']
 end
+
+##################
+# dpkg
+###################
+if node['platform_family'] != 'debian'
+  bash 'check dpkg is not installed on non-debian OS' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-DPKG
+      if command -v dpkg &> /dev/null; then
+        echo "ERROR: dpkg found on non-Debian system"
+        exit 1
+      fi
+    DPKG
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
