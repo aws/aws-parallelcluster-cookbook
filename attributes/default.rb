@@ -315,7 +315,7 @@ when 'rhel', 'amazon'
                                                 httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
-                                                libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
+                                                libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
                                                 rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                                 gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                                 jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
@@ -323,10 +323,6 @@ when 'rhel', 'amazon'
 
     # Install R via amazon linux extras
     default['cfncluster']['alinux_extras'] = ['R3.4']
-    # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
-    # because it contains fixes for known build issues
-    default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
   end
 
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
