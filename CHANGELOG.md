@@ -27,6 +27,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
   - Specify instance GPU model as GRES GPU Type in gres.conf
 - Upgrade Arm Performance Libraries (APL) to version 21.0.0
+- Upgrade NICE DCV to version 2021.0-10242.
 - Upgrade NVIDIA driver to version 460.73.01.
 - Upgrade CUDA library to version 11.3.0.
 - Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-460`.
