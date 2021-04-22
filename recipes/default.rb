@@ -19,6 +19,7 @@
 validate_os_type
 
 include_recipe 'aws-parallelcluster::slurm_install'
+include_recipe 'aws-parallelcluster::awsbatch_install'
 
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
 # used to build the schedulers packages

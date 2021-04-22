@@ -43,7 +43,10 @@ suites:
   - name: slurm_install
     run_list:
       - recipe[aws-parallelcluster::slurm_install]
-    attributes:
+
+  - name: awsbatch_install
+    run_list:
+      - recipe[aws-parallelcluster::awsbatch_install]
 
   - name: base_config_HeadNode
     run_list:
