@@ -21,6 +21,7 @@
     "region" : "{{env `AWS_REGION`}}",
     "custom_ami_id" : "{{env `CUSTOM_AMI_ID`}}",
     "custom_node_package" : "{{env `PARALLELCLUSTER_NODE_URL`}}",
+    "custom_awsbatchcli_package" : "{{env `PARALLELCLUSTER_URL`}}",
     "parallelcluster_ref" : "{{env `PARALLELCLUSTER_REF`}}",
     "parallelcluster_cookbook_ref" : "{{env `PARALLELCLUSTER_COOKBOOK_REF`}}",
     "parallelcluster_node_ref" : "{{env `PARALLELCLUSTER_NODE_REF`}}",
@@ -260,6 +261,7 @@
             "installed" : "{{user `dcv_installed`}}"
           },
           "custom_node_package" : "{{user `custom_node_package`}}",
+          "custom_awsbatchcli_package" : "{{user `custom_awsbatchcli_package`}}",
           "base_os" : "centos8"
         }
       },
@@ -281,6 +283,7 @@
       "json" : {
         "cluster" : {
           "custom_node_package" : "{{user `custom_node_package`}}",
+          "custom_awsbatchcli_package" : "{{user `custom_awsbatchcli_package`}}",
           "base_os" : "centos8"
         }
       },
