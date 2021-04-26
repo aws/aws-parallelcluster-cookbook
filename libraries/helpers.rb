@@ -302,7 +302,7 @@ end
 def platform_supports_lustre_on_arm?
   [node['platform'] == 'ubuntu',
    node['platform'] == 'amazon',
-   node['platform'] == 'centos' && node['platform_version'].to_i == 8].any?
+   node['platform'] == 'centos']
 end
 
 def aws_domain
