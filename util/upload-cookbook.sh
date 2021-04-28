@@ -92,10 +92,11 @@ main() {
     md5sum aws-parallelcluster-cookbook-${_version}.tgz > aws-parallelcluster-cookbook-${_version}.md5
 
     # upload packages
-    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.tgz s3://${_bucket}/cookbooks/aws-parallelcluster-cookbook-${_version}.tgz || _error_exit 'Failed to push cookbook to S3'
-    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.md5 s3://${_bucket}/cookbooks/aws-parallelcluster-cookbook-${_version}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
-    aws ${_profile} --region "${_region}" s3api head-object --bucket ${_bucket} --key cookbooks/aws-parallelcluster-cookbook-${_version}.tgz --output text --query LastModified > aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to fetch LastModified date'
-    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.tgz.date s3://${_bucket}/cookbooks/aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to push cookbook date'
+    _key_path="parallelcluster/${_version}/cookbooks"
+    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.tgz s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz || _error_exit 'Failed to push cookbook to S3'
+    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.md5 s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
+    aws ${_profile} --region "${_region}" s3api head-object --bucket ${_bucket} --key ${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz --output text --query LastModified > aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to fetch LastModified date'
+    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.tgz.date s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to push cookbook date'
 
     _bucket_region=$(aws ${_profile} s3api get-bucket-location --bucket ${_bucket} --output text)
     if [ ${_bucket_region} = "None" ]; then
@@ -105,8 +106,11 @@ main() {
     fi
 
     echo ""
-    echo "Done. Add the following variable to the pcluster config file, under the [cluster ...] section"
-    echo "custom_chef_cookbook = https://s3${_bucket_region}.amazonaws.com/${_bucket}/cookbooks/aws-parallelcluster-cookbook-${_version}.tgz"
+    echo "Done. Add the following configuration to the pcluster create config file:"
+    echo ""
+    echo "DevSettings:"
+    echo "  Cookbook:"
+    echo "    ChefCookbook: s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz"
 }
 
 main "$@"
