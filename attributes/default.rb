@@ -160,7 +160,7 @@ default['cfncluster']['dcv_port'] = 8443
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2021.0-10242'
 if arm_instance?
-  default['cfncluster']['dcv']['supported_os'] = %w[centos8 ubuntu18 amazon2]
+  default['cfncluster']['dcv']['supported_os'] = %w[centos7 centos8 ubuntu18 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
