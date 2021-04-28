@@ -85,7 +85,10 @@ default['cfncluster']['armpl']['gcc']['url'] = [
   "gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
 ].join('/')
 default['cfncluster']['armpl']['platform'] = value_for_platform(
-  'centos' => { '~>8' => 'RHEL-8' },
+  'centos' => {
+    '~>7' => 'RHEL-7',
+    '~>8' => 'RHEL-8'
+  },
   'amazon' => { '2' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
