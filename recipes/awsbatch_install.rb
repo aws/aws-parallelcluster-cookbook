@@ -35,7 +35,12 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
     cwd Chef::Config[:file_cache_path]
     code <<-CLI
       set -e
-      curl --retry 3 -L -o aws-parallelcluster.tgz #{node['cluster']['custom_awsbatchcli_package']}
+      if [[ "#{node['cluster']['custom_awsbatchcli_package']}" =~ ^s3:// ]]; then
+        custom_package_url=$(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 presign #{node['cluster']['custom_awsbatchcli_package']} --region #{node['cluster']['region']})
+      else
+        custom_package_url=#{node['cluster']['custom_awsbatchcli_package']}
+      fi
+      curl --retry 3 -L -o aws-parallelcluster.tgz ${custom_package_url}
       mkdir aws-parallelcluster-custom-cli
       tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-custom-cli
       cd aws-parallelcluster-custom-cli/*aws-parallelcluster-*
