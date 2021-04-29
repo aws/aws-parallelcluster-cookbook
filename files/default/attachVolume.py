@@ -48,6 +48,18 @@ def get_all_devices():
         raise e
 
 
+def get_imdsv2_token():
+    # Try with getting IMDSv2 token, fall back to IMDSv1 if can not get the token
+    token = requests.put(
+        "http://169.254.169.254/latest/api/token",
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+    )
+    headers = {}
+    if token.status_code == requests.codes.ok:
+        headers["X-aws-ec2-metadata-token"] = token.content
+    return headers
+
+
 def main():
     # Get EBS volume Id
     try:
@@ -56,18 +68,14 @@ def main():
         print("Provide an EBS volume ID to attach i.e. vol-cc789ea5")
         sys.exit(1)
 
+    # Get IMDSv2 token
+    token = get_imdsv2_token()
+
     # Get instance ID
-    token = requests.put(
-        "http://169.254.169.254/latest/api/token",
-        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
-    )
-    headers = {}
-    if token.status_code == requests.codes.ok:
-        headers["X-aws-ec2-metadata-token"] = token.content
-    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=headers).text
+    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=token).text
 
     # Get region
-    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=headers).text
+    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=token).text
     region = region[:-1]
 
     # Generate a list of system paths minus the root path
