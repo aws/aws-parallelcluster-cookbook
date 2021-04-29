@@ -9,6 +9,18 @@ import requests
 from botocore.config import Config
 
 
+def get_imdsv2_token():
+    # Try with getting IMDSv2 token, fall back to IMDSv1 if can not get the token
+    token = requests.put(
+        "http://169.254.169.254/latest/api/token",
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+    )
+    headers = {}
+    if token.status_code == requests.codes.ok:
+        headers["X-aws-ec2-metadata-token"] = token.content
+    return headers
+
+
 def main():
     syslog.syslog("Starting ec2_dev_2_volid.py script")
     # Get dev
@@ -38,19 +50,14 @@ def main():
         dev = dev.replace("xvd", "sd")
         dev = "/dev/" + dev
 
-    # Get instance ID
-    token = requests.put(
-        "http://169.254.169.254/latest/api/token",
-        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
-    )
+    # Get IMDSv2 token
+    token = get_imdsv2_token()
 
-    headers = {}
-    if token.status_code == requests.codes.ok:
-        headers["X-aws-ec2-metadata-token"] = token.content
-    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=headers).text
+    # Get instance ID
+    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=token).text
 
     # Get region
-    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=headers).text
+    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=token).text
     region = region[:-1]
 
     # Parse configuration file to read proxy settings
