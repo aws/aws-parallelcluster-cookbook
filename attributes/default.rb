@@ -31,7 +31,7 @@ default['cluster']['cluster_config_path'] = "#{node['cluster']['configs_dir']}/c
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['configs_dir']}/instance-types-data.json"
 
 # Python Version
-default['cluster']['python-version'] = '3.9.4'
+default['cluster']['python-version'] = '3.7.10'
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
