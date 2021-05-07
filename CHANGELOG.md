@@ -32,7 +32,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 11.3.0.
 - Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-460`.
 - Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
-- Upgrade Python version used in ParallelCluster virtualenvs from version 3.6.13 to version 3.9.4.
+- Upgrade Python version used in ParallelCluster virtualenvs from version 3.6.13 to version 3.7.10.
 
 2.10.3
 -----

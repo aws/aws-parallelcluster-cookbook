@@ -29,7 +29,7 @@ default['cfncluster']['cluster_config_version'] = nil
 default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster_config.json"
 
 # Python Version
-default['cfncluster']['python-version'] = '3.9.4'
+default['cfncluster']['python-version'] = '3.7.10'
 # plcuster-specific pyenv system installation root
 default['cfncluster']['system_pyenv_root'] = "#{node['cfncluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
