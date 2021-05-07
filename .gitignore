@@ -1,4 +1,5 @@
 .idea
+*.iml
 .vagrant
 Berksfile.lock
 *~
