@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-updated_cluster_config_path = "/tmp/cluster-config.updated.json"
+updated_cluster_config_path = "/tmp/cluster-config.updated.yaml"
 fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
                        " --bucket #{node['cluster']['cluster_s3_bucket']}"\
                        " --key #{node['cluster']['cluster_config_s3_key']}"\
@@ -23,6 +23,14 @@ fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s
 fetch_config_command += " --version-id #{node['cluster']['cluster_config_version']}" unless node['cluster']['cluster_config_version'].nil?
 shell_out!(fetch_config_command)
 if !File.exist?(node['cluster']['cluster_config_path']) || !FileUtils.identical?(updated_cluster_config_path, node['cluster']['cluster_config_path'])
+  # Copy instance type infos file from S3 URI
+  fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
+  execute "copy_instance_type_data_from_s3" do
+    command fetch_config_command
+    retries 3
+    retry_delay 5
+  end
   # Generate pcluster specific configs
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
