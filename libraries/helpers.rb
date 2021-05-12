@@ -509,3 +509,100 @@ def get_metadata_with_token(token, uri)
   metadata = res.body if res.code == '200'
   metadata
 end
+
+def check_process_running_as_user(process, user)
+  bash "check #{process} running as #{user}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      pgrep -x #{process} 1>/dev/null
+      if [[ $? != 0 ]]; then
+        >&2 echo "Expected #{process} to be running"
+        exit 1
+      fi
+
+      pgrep -x #{process} -u #{user} 1>/dev/null
+      if [[ $? != 0 ]]; then
+        >&2 echo "Expected #{process} to be running as #{user}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_user_definition(user, uid, gid, description)
+  bash "check user definition for user #{user}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+    expected_passwd_line="#{user}:x:#{uid}:#{gid}:#{description}:/home/#{user}:/bin/bash"
+    actual_passwd_line=$(grep #{user} /etc/passwd)
+    if [[ "$actual_passwd_line" != "$expected_passwd_line" ]]; then
+      >&2 echo "Expected cluster admin user #{user} in /etc/passwd: $expected_passwd_line"
+      >&2 echo "Actual cluster admin user #{user} in /etc/passwd: $actual_passwd_line"
+      exit 1
+    fi
+    TEST
+  end
+end
+
+def check_group_definition(group, gid)
+  bash "check group definition for group #{group}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+    expected_group_line="#{group}:x:#{gid}:"
+    actual_group_line=$(grep #{group} /etc/group)
+    if [[ "$actual_group_line" != "$expected_group_line" ]]; then
+      >&2 echo "Expected cluster admin group #{group} in /etc/group: $expected_passwd_line"
+      >&2 echo "Actual cluster admin group #{group} in /etc/group: $actual_passwd_line"
+      exit 1
+    fi
+    TEST
+  end
+end
+
+def check_path_permissions(path, user, group, permissions)
+  bash "check permissions on path #{path}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      if [[ ! -d "#{path}" ]]; then
+        >&2 echo "Expected path does not exist: #{path}"
+        exit 1
+      fi
+
+      expected_permissions="#{permissions} #{user} #{group}"
+      actual_permissions=$(stat "#{path}" -c "%A %U %G")
+      if [[ "$actual_permissions" != "$expected_permissions" ]]; then
+        >&2 echo "Expected permissions on path #{path}: $expected_permissions"
+        >&2 echo "Actual permissions on path #{path}: $actual_permissions"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_sudoers_permissions(sudoers_file, user, run_as, command_alias, *commands)
+  bash "check user #{user} can sudo as user #{run_as} on commands #{commands.join(',')}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      if [[ ! -f "#{sudoers_file}" ]]; then
+        >&2 echo "Expected sudoers file does not exist: #{sudoers_file}"
+        exit 1
+      fi
+
+      expected_user_line="#{user} ALL = (#{run_as}) NOPASSWD: #{command_alias}"
+      actual_user_line=$(grep ^#{user} "#{sudoers_file}")
+      if [[ "$actual_user_line" != "$expected_user_line" ]]; then
+        >&2 echo "Expected user line in #{sudoers_file}: $expected_user_line"
+        >&2 echo "Actual user line in #{sudoers_file}: $actual_user_line"
+        exit 1
+      fi
+
+      expected_commands_line="Cmnd_Alias #{command_alias} = #{commands.join(',')}"
+      actual_commands_line=$(grep "Cmnd_Alias #{command_alias}" "#{sudoers_file}")
+      if [[ "$actual_commands_line" != "$expected_commands_line" ]]; then
+        >&2 echo "Expected commands line in #{sudoers_file}: $expected_commands_line"
+        >&2 echo "Actual commands line in #{sudoers_file}: $actual_commands_line"
+        exit 1
+      fi
+    TEST
+  end
+end
