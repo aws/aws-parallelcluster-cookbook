@@ -59,7 +59,7 @@ when 'HeadNode', nil
       source #{node['cluster']['cookbook_virtualenv_path']}/bin/activate
 
       tar xf #{slurm_tarball}
-      cd slurm-#{node['cluster']['slurm']['version']}
+      cd slurm-slurm-#{node['cluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
@@ -89,7 +89,7 @@ when 'HeadNode', nil
     cwd Chef::Config[:file_cache_path]
     code <<-SLURMLICENSE
       set -e
-      cd slurm-#{node['cluster']['slurm']['version']}
+      cd slurm-slurm-#{node['cluster']['slurm']['version']}
       cp -v COPYING #{node['cluster']['license_dir']}/slurm/COPYING
       cp -v DISCLAIMER #{node['cluster']['license_dir']}/slurm/DISCLAIMER
       cp -v LICENSE.OpenSSL #{node['cluster']['license_dir']}/slurm/LICENSE.OpenSSL
