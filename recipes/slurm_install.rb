@@ -59,7 +59,7 @@ when 'MasterServer', nil
       source #{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate
 
       tar xf #{slurm_tarball}
-      cd slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
@@ -89,7 +89,7 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     code <<-SLURMLICENSE
       set -e
-      cd slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
       cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
       cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
       cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
