@@ -108,9 +108,9 @@ default['cluster']['parallelcluster-node-version'] = '3.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '20.11.5'
-default['cluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.11.5.tar.bz2'
-default['cluster']['slurm']['sha1'] = '201a28afe6f02a717fb348542878900cad4ccf13'
+default['cluster']['slurm']['version'] = '20-11-7-1'
+default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
+default['cluster']['slurm']['sha1'] = 'ce927fbf2f7d5f908ed87c5d521abc696b9a2508'
 # PMIx software
 default['cluster']['pmix']['version'] = '3.1.5'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
