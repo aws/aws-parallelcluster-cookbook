@@ -29,17 +29,21 @@ default['cfncluster']['cluster_config_version'] = nil
 default['cfncluster']['cluster_config_path'] = "#{node['cfncluster']['configs_dir']}/cluster_config.json"
 
 # Python Version
-default['cfncluster']['python-version'] = '3.6.9'
+default['cfncluster']['python-version'] = '3.7.10'
 # plcuster-specific pyenv system installation root
 default['cfncluster']['system_pyenv_root'] = "#{node['cfncluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
 default['cfncluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 # Virtualenv Node Name
 default['cfncluster']['node_virtualenv'] = 'node_virtualenv'
+# Virtualenv AWSBatch Name
+default['cfncluster']['awsbatch_virtualenv'] = 'awsbatch_virtualenv'
 # Cookbook Virtualenv Path
 default['cfncluster']['cookbook_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['cookbook_virtualenv']}"
 # Node Virtualenv Path
 default['cfncluster']['node_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['node_virtualenv']}"
+# AWSBatch Virtualenv Path
+default['cfncluster']['awsbatch_virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['awsbatch_virtualenv']}"
 
 # Intel Packages
 default['cfncluster']['psxe']['version'] = '2020.4-17'
@@ -69,25 +73,35 @@ default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cfncl
 default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 8'
 
 # Arm Performance Library
-default['cfncluster']['armpl']['version'] = '20.2.1'
+default['cfncluster']['armpl']['major_minor_version'] = '21.0'
+default['cfncluster']['armpl']['patch_version'] = '0'
+default['cfncluster']['armpl']['version'] = "#{node['cfncluster']['armpl']['major_minor_version']}.#{node['cfncluster']['armpl']['patch_version']}"
+
 default['cfncluster']['armpl']['gcc']['major_minor_version'] = '9.3'
 default['cfncluster']['armpl']['gcc']['patch_version'] = '0'
-default['cfncluster']['armpl']['gcc']['url'] = "https://ftp.gnu.org/gnu/gcc/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+default['cfncluster']['armpl']['gcc']['url'] = [
+  'https://ftp.gnu.org/gnu/gcc',
+  "gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}",
+  "gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+].join('/')
 default['cfncluster']['armpl']['platform'] = value_for_platform(
-    'centos' => { '~>8' => 'RHEL-8' },
-    'amazon' => { '2' => 'RHEL-8' },
-    'ubuntu' => { '18.04' => 'Ubuntu-16.04' }
+  'centos' => { '~>8' => 'RHEL-8' },
+  'amazon' => { '2' => 'RHEL-8' },
+  'ubuntu' => {
+    '18.04' => 'Ubuntu-18.04',
+    '20.04' => 'Ubuntu-20.04'
+  }
 )
-default['cfncluster']['armpl']['url'] = value_for_platform(
-    'centos' => { '~>8' => "archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
-    'amazon' => { '2' => "archives/armpl/RHEL-8/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" },
-    'ubuntu' => { '18.04' => "archives/armpl/Ubuntu-16.04/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar" }
-)
+default['cfncluster']['armpl']['url'] = [
+  'archives/armpl',
+  node['cfncluster']['armpl']['platform'],
+  "arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar"
+].join('/')
 
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.10.1'
-default['cfncluster']['cfncluster-cookbook-version'] = '2.10.1'
-default['cfncluster']['cfncluster-node-version'] = '2.10.1'
+default['cfncluster']['cfncluster-version'] = '2.10.3'
+default['cfncluster']['cfncluster-cookbook-version'] = '2.10.3'
+default['cfncluster']['cfncluster-node-version'] = '2.10.3'
 
 # URLs to software packages used during install recipes
 # Gridengine software
@@ -98,9 +112,9 @@ default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
 # Slurm software
 default['cfncluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cfncluster']['slurm']['version'] = '20.02.4'
-default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.02.4.tar.bz2'
-default['cfncluster']['slurm']['sha1'] = '294de3a2e1410945eb516c40eff5f92087501893'
+default['cfncluster']['slurm']['version'] = '20.11.5'
+default['cfncluster']['slurm']['url'] = 'https://download.schedmd.com/slurm/slurm-20.11.5.tar.bz2'
+default['cfncluster']['slurm']['sha1'] = '201a28afe6f02a717fb348542878900cad4ccf13'
 # PMIx software
 default['cfncluster']['pmix']['version'] = '3.1.5'
 default['cfncluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cfncluster']['pmix']['version']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
@@ -108,21 +122,19 @@ default['cfncluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03e
 # Munge
 default['cfncluster']['munge']['munge_version'] = '0.5.14'
 default['cfncluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cfncluster']['munge']['munge_version']}.tar.gz"
-# Munge key
-default['cfncluster']['munge']['munge_key'] = 'YflQEFLjoxsmEK5vQyKklkLKJ#LkjLKDJF@*(#)ajLKQ@hLKN#()FSU(#@KLJH$@HKSASG)*DUJJDksdN'
 
 # Ganglia
 default['cfncluster']['ganglia_enabled'] = 'no'
 
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_version'] = '450.80.02'
-default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/450.80.02/NVIDIA-Linux-x86_64-450.80.02.run'
-default['cfncluster']['nvidia']['cuda_version'] = '11.0'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.0.2/local_installers/cuda_11.0.2_450.51.05_linux.run'
+default['cfncluster']['nvidia']['driver_version'] = '460.73.01'
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/460.73.01/NVIDIA-Linux-x86_64-460.73.01.run'
+default['cfncluster']['nvidia']['cuda_version'] = '11.3'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.3.0/local_installers/cuda_11.3.0_465.19.01_linux.run'
 
 # NVIDIA fabric-manager
-default['cfncluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager-450"
+default['cfncluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager-460"
 default['cfncluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
 default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cfncluster']['nvidia']['driver_version'],
@@ -130,47 +142,50 @@ default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform
   'ubuntu' => { 'default' => "#{node['cfncluster']['nvidia']['driver_version']}*" }
 )
 default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
-  'default' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64",
+  'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel7/x86_64",
   'centos' => {
-    '~>8' => "https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64",
+    '~>8' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel8/x86_64"
   },
-  'ubuntu' => { 'default' => "https://developer.download.nvidia.com/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
+  'ubuntu' => { 'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
 )
 
 # EFA
-default['cfncluster']['efa']['installer_version'] = '1.11.0'
+default['cfncluster']['efa']['installer_version'] = '1.11.2'
 default['cfncluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cfncluster']['efa']['installer_version']}.tar.gz"
 default['cfncluster']['enable_efa_gdr'] = "no"
 
 # NICE DCV
 default['cfncluster']['dcv_port'] = 8443
 default['cfncluster']['dcv']['installed'] = 'yes'
-default['cfncluster']['dcv']['version'] = '2020.2-9662'
+default['cfncluster']['dcv']['version'] = '2021.0-10242'
 if arm_instance?
   default['cfncluster']['dcv']['supported_os'] = %w[centos8 ubuntu18 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>8' => "b19d4f7472f22722942014c45470fd24423f3de030467e5027d93bbb45b5c582",
-      '~>7' => "dae8bc96e7d5defe7b54a50f91b3ea4c7a9371fd68349ba744bab7ad82fdd66b"
+      '~>8' => "6a8f08b1e44b557ebc627086ec6ec7f259a85e555242a37fc538a76eabaf73a1",
+      '~>7' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071"
     },
-    'amazon' => { '2' => "dae8bc96e7d5defe7b54a50f91b3ea4c7a9371fd68349ba744bab7ad82fdd66b" },
-    'ubuntu' => { '18.04' => "e435110902065df8cba95f31990b735aaf8d46cbad64607168891f8af96ebf84" }
+    'amazon' => { '2' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071" },
+    'ubuntu' => { '18.04' => "8ada2cfa0bcac2285e7cfc65f297ab9322d35261422ced121e8cee78998f5472" }
   )
 else
-  default['cfncluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 amazon2]
+  default['cfncluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 ubuntu20 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>8' => "b39b923110f8f02d1a5d4b512abc5ecac5a34be73af3cd0bb4dd73943df9660f",
-      '~>7' => "4a473225ec9afa8357e00a0f5b942373b952e612ce83a49c76ddc864cb2e00f0"
+      '~>8' => "5c415a8767a9e2a3e6d6c76e2c858335a2dc8ed13efb2a6abc1e9bada6f3b3b9",
+      '~>7' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39"
     },
-    'amazon' => { '2' => "4a473225ec9afa8357e00a0f5b942373b952e612ce83a49c76ddc864cb2e00f0" },
-    'ubuntu' => { '18.04' => "5328ff75251eddfbf40be6f0073afe9a6919be6004372f1a52391ba8490d71cb" }
+    'amazon' => { '2' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39" },
+    'ubuntu' => {
+      '18.04' => "381895bef0f8e8756a33ba0960329130935c0c68cb79fb391bd97015f497568c",
+      '20.04' => "431e977dc936bd347146a57eb09033ff8945fe99ad85da64f5ce74c8de6e655c"
+    }
   )
 end
-if "#{node['platform']}#{node['platform_version'].to_i}" == 'ubuntu18'
-  # Unlike the other supported OSs, the DCV package names for Ubuntu 18.04 use different architecture abbreviations than those used in the download URLs.
+if node['platform'].to_s == 'ubuntu'
+  # Unlike the other supported OSs, the DCV package names for Ubuntu use different architecture abbreviations than those used in the download URLs.
   default['cfncluster']['dcv']['package_architecture_id'] = arm_instance? ? 'arm64' : 'amd64'
 end
 default['cfncluster']['dcv']['package'] = value_for_platform(
@@ -179,40 +194,57 @@ default['cfncluster']['dcv']['package'] = value_for_platform(
     '~>7' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}"
   },
   'amazon' => { '2' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}" },
-  'ubuntu' => { '18.04' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-ubuntu1804-#{node['cfncluster']['dcv']['url_architecture_id']}" }
+  'ubuntu' => {
+    'default' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-#{node['cfncluster']['cfn_base_os']}-#{node['cfncluster']['dcv']['url_architecture_id']}"
+  }
 )
+default['cfncluster']['dcv']['server']['version'] = '2021.0.10242-1'
 default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
-    '~>8' => "nice-dcv-server-2020.2.9662-1.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
-    '~>7' => "nice-dcv-server-2020.2.9662-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
+    '~>8' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
+    '~>7' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
   },
-  'amazon' => { '2' => "nice-dcv-server-2020.2.9662-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => { '18.04' => "nice-dcv-server_2020.2.9662-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" }
+  'amazon' => { '2' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
+  'ubuntu' => {
+    'default' => "nice-dcv-server_#{node['cfncluster']['dcv']['server']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
 )
+default['cfncluster']['dcv']['xdcv']['version'] = '2021.0.380-1'
 default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
-    '~>8' => "nice-xdcv-2020.2.359-1.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
-    '~>7' => "nice-xdcv-2020.2.359-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
+    '~>8' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
+    '~>7' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
   },
-  'amazon' => { '2' => "nice-xdcv-2020.2.359-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => { '18.04' => "nice-xdcv_2020.2.359-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" }
+  'amazon' => { '2' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
+  'ubuntu' => {
+    'default' => "nice-xdcv_#{node['cfncluster']['dcv']['xdcv']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
 )
+default['cfncluster']['dcv']['gl']['version'] = '2021.0.912-1'
 default['cfncluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
-    '~>8' => "nice-dcv-gl-2020.2.881-1.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
-    '~>7' => "nice-dcv-gl-2020.2.881-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
+    '~>8' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
+    '~>7' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
   },
-  'amazon' => { '2' => "nice-dcv-gl-2020.2.881-1.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => { '18.04' => "nice-dcv-gl_2020.2.881-1_#{node['cfncluster']['dcv']['package_architecture_id']}.ubuntu1804.deb" }
+  'amazon' => { '2' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
+  'ubuntu' => {
+    'default' => "nice-dcv-gl_#{node['cfncluster']['dcv']['gl']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
 )
-default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2020.2/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
+default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.0/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cfncluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfncluster']['dcv']['authenticator']['user']}"
 default['cfncluster']['dcv']['authenticator']['certificate'] = "/etc/parallelcluster/ext-auth-certificate.pem"
 default['cfncluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
 default['cfncluster']['dcv']['authenticator']['virtualenv'] = "dcv_authenticator_virtualenv"
-default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cfncluster']['system_pyenv_root']}/versions/#{node['cfncluster']['python-version']}/envs/#{node['cfncluster']['dcv']['authenticator']['virtualenv']}"
+default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = [
+  node['cfncluster']['system_pyenv_root'],
+  'versions',
+  node['cfncluster']['python-version'],
+  'envs',
+  node['cfncluster']['dcv']['authenticator']['virtualenv']
+].join('/')
 
 # CloudWatch Agent
 default['cfncluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
@@ -271,49 +303,35 @@ when 'rhel', 'amazon'
                                                 blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                                 libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                                 mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                                iproute NetworkManager-config-routing-rules]
+                                                iproute NetworkManager-config-routing-rules python3 python3-pip]
     if node['platform_version'].to_i >= 8
-      # Install python3 instead of unversioned python
+      # Do not install unversioned python
       default['cfncluster']['base_packages'].delete('python')
       default['cfncluster']['base_packages'].delete('python-pip')
       # iptables used in configure-pat.sh
-      # nvme-cli used to retrieve info about EBS volumes in parallelcluster-ebsnvme-id
       # gdisk required for FSx
       # environment-modules required for IntelMPI
       # libtirpc and libtirpc-devel required for SGE
-      default['cfncluster']['base_packages'].push(%w[python3 python3-pip iptables nvme-cli gdisk environment-modules libtirpc libtirpc-devel])
+      # cryptsetup used for ephemeral drive encryption
+      default['cfncluster']['base_packages'].push(%w[iptables gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
     end
 
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
   when 'amazon'
     default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                                libXmu-devel hwloc-devel db4-devel tcl-devel automake autoconf pyparted libtool
-                                                httpd boost-devel redhat-lsb mlocate mpich-devel R atlas-devel fftw-devel
+                                                libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
+                                                httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
                                                 libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                                 sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
-                                                glibc-static iproute]
-    if node['platform_version'].to_i == 2
-      # mpich-devel not available on alinux
-      default['cfncluster']['base_packages'].delete('mpich-devel')
-      # Install R via amazon linux extras instead
-      default['cfncluster']['base_packages'].delete('R')
-      default['cfncluster']['alinux_extras'] = ['R3.4']
-      # Swap out some packages for their alinux2 equivalents
-      [%w[db4-devel libdb-devel], %w[redhat-lsb system-lsb]].each do |al1, al2equiv|
-        default['cfncluster']['base_packages'].delete(al1)
-        default['cfncluster']['base_packages'].push(al2equiv)
-      end
-      # Add additional base packages, most of which would be installed as part of `yum groupinstall development`
-      default['cfncluster']['base_packages'].concat(%w[libxml2-devel perl-devel dpkg-dev tar gzip bison flex gcc gcc-c++ patch
-                                                       rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
-                                                       gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                                       jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils librdmacm-utils])
-      # Download from debian repo (https://packages.debian.org/source/buster/gridengine)
-      # because it contains fixes for known build issues
-      default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-      default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
-    end
+                                                libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
+                                                rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
+                                                gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
+                                                jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
+                                                librdmacm-utils python3 python3-pip]
+
+    # Install R via amazon linux extras
+    default['cfncluster']['alinux_extras'] = ['R3.4']
   end
 
   default['cfncluster']['ganglia']['gmond_service'] = 'gmond'
@@ -328,16 +346,20 @@ when 'rhel', 'amazon'
 when 'debian'
   default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
   default['cfncluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
-                                              tcl-dev automake autoconf python-parted libtool librrd-dev libapr1-dev libconfuse-dev
-                                              apache2 libboost-dev libdb-dev tcsh libssl-dev libncurses5-dev libpam0g-dev libxt-dev
-                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python python-pip
-                                              r-base libatlas-dev libblas-dev libfftw3-dev libffi-dev libssl-dev libxml2-dev mdadm
-                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2]
-  if node['platform_version'] == '18.04'
-    default['cfncluster']['base_packages'].delete('libatlas-dev')
-    default['cfncluster']['base_packages'].push('libatlas-base-dev', 'libssl-dev', 'libglvnd-dev')
-    default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
-    default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
+                                              tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
+                                              apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
+                                              libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
+                                              r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
+                                              libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
+                                              libatlas-base-dev libglvnd-dev linux-headers-aws]
+  default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
+  default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
+
+  case node['platform_version']
+  when '18.04'
+    default['cfncluster']['base_packages'].push('python-pip', 'python-parted')
+  when '20.04'
+    default['cfncluster']['base_packages'].push('python3-parted')
   end
 
   # Modulefile Directory
@@ -355,6 +377,7 @@ when 'debian'
   default['cfncluster']['torque']['pbs_mom_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_mom'
   default['cfncluster']['torque']['pbs_sched_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_sched'
   default['cfncluster']['torque']['pbs_server_source'] = 'file:///opt/torque/contrib/init.d/debian.pbs_server'
+
   if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
     default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
     default['nfs']['service_provider']['portmap'] = Chef::Provider::Service::Systemd
@@ -426,6 +449,8 @@ default['cfncluster']['cfn_master_private_ip'] = nil
 default['cfncluster']['cfn_cluster_user'] = 'ec2-user'
 default['cfncluster']['cfn_fsx_options'] = 'NONE'
 default['cfncluster']['cfn_fsx_fs_id'] = nil
+default['cfncluster']['cfn_fsx_dns_name'] = nil
+default['cfncluster']['cfn_fsx_mount_name'] = nil
 default['cfncluster']['custom_node_package'] = nil
 default['cfncluster']['custom_awsbatchcli_package'] = nil
 default['cfncluster']['cfn_raid_parameters'] = 'NONE'
@@ -436,7 +461,10 @@ default['cfncluster']['skip_install_recipes'] = 'yes'
 default['cfncluster']['scheduler_queue_name'] = nil
 
 # AWS domain
-default['cfncluster']['aws_domain'] = aws_domain
+default['cfncluster']['aws_domain'] = aws_domain # ~FC044
 
 # Official ami build
 default['cfncluster']['is_official_ami_build'] = false
+
+# Additional instance types data
+default['cfncluster']['instance_types_data'] = nil

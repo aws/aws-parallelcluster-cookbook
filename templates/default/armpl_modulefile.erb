@@ -4,6 +4,7 @@
 set category arm
 set name     armpl
 set version  <%= node['cfncluster']['armpl']['version'] %>
+set major_minor_version  <%= node['cfncluster']['armpl']['major_minor_version'] %>
 set gcc_version <%= node['cfncluster']['armpl']['gcc']['major_minor_version'] %>
 set root     /opt/$category/$name/$version
 
@@ -27,7 +28,7 @@ puts stderr "At compile time add '-I<armpl_include>' and at link time"
   }
 
   # Add license path
-  setenv ARM_LICENSE_DIR $root/arm-performance-libraries_${version}_gcc-${gcc_version}/license_terms
+  setenv ARM_LICENSE_DIR $root/arm-performance-libraries_${major_minor_version}_gcc-${gcc_version}/license_terms
 
   # Load the pre-installed gcc module
   module load $root/modulefiles/armpl/gcc-${gcc_version}
@@ -43,5 +44,5 @@ puts stderr "At compile time add '-I<armpl_include>' and at link time"
 
   # EULA
   if [ module-info mode load ] {
-    puts stderr "Use of the free of charge version of Arm Performance Libraries is subject to the terms and conditions of the Arm Performance Libraries (free version) -  End User License Agreement (EULA). A copy of the EULA can be found in the '$root/arm-performance-libraries_${version}_gcc-${gcc_version}/license_terms' folder"
+    puts stderr "Use of the free of charge version of Arm Performance Libraries is subject to the terms and conditions of the Arm Performance Libraries (free version) -  End User License Agreement (EULA). A copy of the EULA can be found in the '$root/arm-performance-libraries_${major_minor_version}_gcc-${gcc_version}/license_terms' folder"
   }

@@ -22,13 +22,14 @@ efs_shared_dir =  node['cfncluster']['cfn_efs_shared_dir'].split(',')[0]
 if efs_shared_dir != "NONE"
 
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  efs_shared_dir = "/" + efs_shared_dir unless efs_shared_dir.start_with?("/")
+  efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
 
   # Create the EFS shared directory
   directory efs_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'
+    recursive true
     action :create
   end
 

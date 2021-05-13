@@ -35,24 +35,24 @@ end
 cxx_flags = value_for_platform(
   'amazon' => { '2' => "-std=c++03" },
   'centos' => { '>=8' => "-std=c++03" },
-  'ubuntu' => { '18.04' => "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/" },
+  'ubuntu' => { '>=18.04' => "-std=c++03 -I#{Chef::Config[:file_cache_path]}/extra_libs/usr/include/x86_64-linux-gnu/" },
   'default' => ""
 )
 c_flags = value_for_platform(
   'amazon' => { '2' => "-fpermissive" },
   'centos' => { '>=8' => "-fpermissive" },
-  'ubuntu' => { '18.04' => "-fpermissive" },
+  'ubuntu' => { '>=18.04' => "-fpermissive" },
   'default' => ""
 )
 configure_flags = value_for_platform(
   'amazon' => { '2' => "--disable-gcc-warnings" },
   'centos' => { '>=8' => "--disable-gcc-warnings" },
-  'ubuntu' => { '18.04' => "--disable-gcc-warnings" },
+  'ubuntu' => { '>=18.04' => "--disable-gcc-warnings" },
   'default' => ""
 )
 
-if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
-  bash 'prepare_ubuntu_18' do
+if node['platform'] == 'ubuntu'
+  bash 'prepare_ubuntu' do
     user 'root'
     group 'root'
     cwd Chef::Config[:file_cache_path]
@@ -60,7 +60,7 @@ if node['platform'] == 'ubuntu' && node['platform_version'] == "18.04"
       set -e
       # Headers needed for compilation
       # Download all packages matching the pattern 'libicu-dev_55.1-7ubuntu*amd64.deb'
-      # recursively (-r), avoiding to ascend to the parent dir (-np) 
+      # recursively (-r), avoiding to ascend to the parent dir (-np)
       # and without creating the hierarchy of directories (-nd)
       wget -r -np -nd http://security.ubuntu.com/ubuntu/pool/main/i/icu/ -A 'libicu-dev_55.1-7ubuntu*amd64.deb'
       dpkg -x libicu-dev_55.1-7ubuntu*amd64.deb extra_libs

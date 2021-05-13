@@ -77,20 +77,20 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
     end
   end
 
-  # Install NVIDIA Fabric Manager (not available on alinux)
-  unless node['cfncluster']['cfn_base_os'] == 'alinux'
-    add_package_repository(
-      "nvidia-fm-repo",
-      node['cfncluster']['nvidia']['fabricmanager']['repository_uri'],
-      "#{node['cfncluster']['nvidia']['fabricmanager']['repository_uri']}/#{node['cfncluster']['nvidia']['fabricmanager']['repository_key']}",
-      "/"
-    )
+  # Install NVIDIA Fabric Manager
+  repo_domain = "com"
+  repo_domain = "cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
+  repo_uri = node['cfncluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
+  add_package_repository(
+    "nvidia-fm-repo",
+    repo_uri,
+    "#{repo_uri}/#{node['cfncluster']['nvidia']['fabricmanager']['repository_key']}",
+    "/"
+  )
 
-    package node['cfncluster']['nvidia']['fabricmanager']['package'] do
-      version node['cfncluster']['nvidia']['fabricmanager']['version']
-    end
-
-    remove_package_repository("nvidia-fm-repo")
+  package node['cfncluster']['nvidia']['fabricmanager']['package'] do
+    version node['cfncluster']['nvidia']['fabricmanager']['version']
   end
 
+  remove_package_repository("nvidia-fm-repo")
 end

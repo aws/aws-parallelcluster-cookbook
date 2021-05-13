@@ -76,7 +76,7 @@
       "launch_block_device_mappings" : [
         {
           "device_name" : "/dev/sda1",
-          "volume_size" : "25",
+          "volume_size" : "35",
           "volume_type" : "gp2",
           "delete_on_termination" : true
         },
@@ -160,6 +160,18 @@
     {
       "type" : "shell",
       "inline" : [
+        "region=\"{{user `region`}}\"",
+        "[[ ${region} =~ ^cn- ]] && domain=\".amazonaws.com.cn\" || domain=\".amazonaws.com\"",
+        "[[ {{user `ami_arch`}} == \"arm64\" ]] && arch=\"arm64\" || arch=\"amd64\"",
+        "ssm_agent_url=\"https://s3.${region}${domain}/amazon-ssm-${region}/latest/linux_${arch}/amazon-ssm-agent.rpm\"",
+        "sudo yum install -y ${ssm_agent_url}",
+        "sudo systemctl enable amazon-ssm-agent",
+        "sudo systemctl start amazon-ssm-agent"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
         "sudo yum -y install epel-release",
         "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
       ]
@@ -188,7 +200,7 @@
       "inline" : [
         "set -x",
         "region=\"{{user `region`}}\"",
-        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
+        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install-1.1.0.sh\"",
         "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
         "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
       ]
@@ -197,7 +209,8 @@
       "type" : "shell",
       "inline" : [
         "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}}"
-      ]
+      ],
+      "max_retries": 3
     },
     {
       "type" : "shell",

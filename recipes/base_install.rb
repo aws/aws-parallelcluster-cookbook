@@ -20,9 +20,9 @@ return if node['conditions']['ami_bootstrapped']
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
-  if node['platform_family'] == 'amazon' && node['platform_version'].to_i == 2
+  if node['platform_family'] == 'amazon'
     alinux_extras_topic 'epel'
-  elsif node['platform_version'].to_i < 7
+  elsif node['platform'] == 'centos'
     include_recipe "yum-epel"
   end
 
@@ -66,10 +66,8 @@ package node['cfncluster']['base_packages'] do
 end
 
 # In the case of AL2, there are more packages to install via extras
-if node['cfncluster']['alinux_extras']
-  node['cfncluster']['alinux_extras'].each do |topic|
-    alinux_extras_topic topic
-  end
+node['cfncluster']['alinux_extras']&.each do |topic|
+  alinux_extras_topic topic
 end
 
 package "install kernel packages" do
@@ -144,14 +142,13 @@ end
 
 include_recipe 'aws-parallelcluster::ec2_udev_rules'
 
-# Install ec2-metadata script
-remote_file '/usr/bin/ec2-metadata' do
-  source 'http://s3.amazonaws.com/ec2metadata/ec2-metadata'
+# Install ec2-metadata script for OSs don't have it
+cookbook_file 'ec2-metadata' do
+  path '/usr/bin/ec2-metadata'
   user 'root'
   group 'root'
   mode '0755'
-  retries 3
-  retry_delay 5
+  not_if { ::File.exist?("/usr/bin/ec2-metadata") }
 end
 
 # Check whether install a custom aws-parallelcluster-node package or the standard one

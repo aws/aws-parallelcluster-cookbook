@@ -42,7 +42,7 @@ when 'MasterServer', nil
   ruby_block "Validate Slurm Tarball Checksum" do
     block do
       require 'digest'
-      checksum = Digest::SHA1.file(slurm_tarball).hexdigest
+      checksum = Digest::SHA1.file(slurm_tarball).hexdigest # nosemgrep
       raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}" if checksum != node['cfncluster']['slurm']['sha1']
     end
   end
@@ -100,12 +100,13 @@ when 'MasterServer', nil
   end
 
   # Install PerlSwitch
-  if node['platform'] == 'ubuntu'
+  case node['platform']
+  when 'ubuntu'
     package 'libswitch-perl' do
       retries 3
       retry_delay 5
     end
-  elsif node['platform'] == 'centos' || node['platform'] == 'amazon'
+  when 'centos', 'amazon'
     package 'perl-Switch' do
       retries 3
       retry_delay 5

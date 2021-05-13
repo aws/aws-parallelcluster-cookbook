@@ -19,13 +19,15 @@
 validate_os_type
 
 # Determine cfn_scheduler_slots settings and update cfn_instance_slots appropriately
-node.default['cfncluster']['cfn_instance_slots'] = if node['cfncluster']['cfn_scheduler_slots'] == 'vcpus'
+node.default['cfncluster']['cfn_instance_slots'] = case node['cfncluster']['cfn_scheduler_slots']
+                                                   when 'vcpus'
                                                      node['cpu']['total']
-                                                   elsif node['cfncluster']['cfn_scheduler_slots'] == 'cores'
+                                                   when 'cores'
                                                      node['cpu']['cores']
                                                    else
                                                      node['cfncluster']['cfn_scheduler_slots']
                                                    end
+
 # NOTE: this recipe must be included after cfn_instance_slot because it may alter the values of
 #       node['cpu']['total'], which would break the expected behavior when setting cfn_scheduler_slots
 #       to one of the constants looked for in the above conditionals
@@ -79,9 +81,7 @@ include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster::network_interfaces_config"
 
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
-  include_recipe "aws-parallelcluster::prep_env_slurm"
-end
+include_recipe "aws-parallelcluster::prep_env_slurm" if node['cfncluster']['cfn_scheduler'] == 'slurm'
 
 # Configure hostname and DNS
 include_recipe "aws-parallelcluster::dns_config"

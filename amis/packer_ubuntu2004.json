@@ -11,6 +11,7 @@
     "cookbook_path" : "{{env `COOKBOOK_PATH`}}",
     "script_path": "{{env `SCRIPT_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
+    "dcv_installed": "{{env `DCV_INSTALLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
     "subnet_id" : "{{env `AWS_SUBNET_ID`}}",
     "security_group_id" : "{{env `AWS_SECURITY_GROUP_ID`}}",
@@ -29,13 +30,13 @@
   },
   "builders" : [
     {
-      "name" : "ubuntu1604",
+      "name" : "ubuntu2004",
       "type" : "amazon-ebs",
       "region" : "{{user `region`}}",
       "source_ami_filter": {
         "filters": {
           "virtualization-type": "hvm",
-          "name": "ubuntu/images/hvm-ssd/ubuntu-xenial-16.04-*-server-*",
+          "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-*-server-*",
           "root-device-type": "ebs",
           "architecture": "{{user `ami_arch`}}"
         },
@@ -47,7 +48,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1604-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-2004-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "security_group_id" : "{{user `security_group_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
@@ -75,7 +76,7 @@
       "launch_block_device_mappings" : [
         {
           "device_name" : "/dev/sda1",
-          "volume_size" : "25",
+          "volume_size" : "35",
           "volume_type" : "gp2",
           "delete_on_termination" : true
         },
@@ -100,7 +101,7 @@
       ]
     },
     {
-      "name" : "custom-ubuntu1604",
+      "name" : "custom-ubuntu2004",
       "type" : "amazon-ebs",
       "region" : "{{user `region`}}",
       "source_ami": "{{user `custom_ami_id`}}",
@@ -109,7 +110,7 @@
       "instance_type" : "{{user `instance_type`}}",
       "ssh_username" : "ubuntu",
       "ssh_pty" : true,
-      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-1604-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
+      "ami_name" : "{{user `ami_name_prefix` | clean_resource_name}}aws-parallelcluster-{{user `parallelcluster_version`}}-ubuntu-2004-lts-hvm-{{user `ami_arch`}}-{{user `build_date`}}",
       "subnet_id" : "{{user `subnet_id`}}",
       "vpc_id" : "{{user `vpc_id`}}",
       "skip_region_validation" : true,
@@ -173,7 +174,7 @@
       "inline" : [
         "sudo apt-cache search build-essential",
         "sudo apt-get clean",
-        "sudo apt-get update"
+        "sudo apt update -y"
       ]
     },
     {
@@ -193,7 +194,7 @@
       "inline" : [
         "set -x",
         "region=\"{{user `region`}}\"",
-        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
+        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install-1.1.0.sh\"",
         "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
         "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
       ]
@@ -202,7 +203,8 @@
       "type" : "shell",
       "inline" : [
         "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}}"
-      ]
+      ],
+      "max_retries": 3
     },
     {
       "type" : "shell",
@@ -214,7 +216,7 @@
     },
     {
       "type" : "chef-solo",
-      "only": ["ubuntu1604"],
+      "only": ["ubuntu2004"],
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
@@ -231,7 +233,7 @@
     },
     {
       "type" : "shell",
-      "only": ["ubuntu1604"],
+      "only": ["ubuntu2004"],
       "expect_disconnect" : "true",
       "inline" : [
         "sudo reboot"
@@ -239,7 +241,7 @@
     },
     {
       "type" : "chef-solo",
-      "only": ["ubuntu1604"],
+      "only": ["ubuntu2004"],
       "pause_before": "2m",
       "json" : {
         "cfncluster" : {
@@ -247,9 +249,12 @@
           "nvidia" : {
             "enabled" : "{{user `nvidia_enabled`}}"
           },
+          "dcv": {
+            "installed" : "{{user `dcv_installed`}}"
+          },
           "is_official_ami_build": "true",
           "custom_node_package" : "{{user `custom_node_package`}}",
-          "cfn_base_os" : "ubuntu1604"
+          "cfn_base_os" : "ubuntu2004"
         }
       },
       "remote_cookbook_paths" : [
@@ -263,14 +268,14 @@
     },
     {
       "type" : "chef-solo",
-      "only": ["custom-ubuntu1604"],
+      "only": ["custom-ubuntu2004"],
       "remote_cookbook_paths" : [
         "/etc/chef/cookbooks"
       ],
       "json" : {
         "cfncluster" : {
           "custom_node_package" : "{{user `custom_node_package`}}",
-          "cfn_base_os" : "ubuntu1604"
+          "cfn_base_os" : "ubuntu2004"
         }
       },
       "skip_install" : "true",
@@ -286,8 +291,8 @@
         "region=\"{{user `region`}}\"",
         "bucket=\"s3.amazonaws.com\"",
         "[[ ${region} =~ ^cn- ]] && bucket=\"s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster\"",
-        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz",
-        "sudo pip install /tmp/aws-cfn-bootstrap-latest.tar.gz"
+        "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz",
+        "sudo pip3 install /tmp/aws-cfn-bootstrap-py3-latest.tar.gz"
       ]
     },
     {

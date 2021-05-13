@@ -15,7 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-if node['cfncluster']['cfn_scheduler'] == 'slurm'
-  include_recipe 'aws-parallelcluster::update_head_node_slurm'
-end
+include_recipe 'aws-parallelcluster::update_head_node_slurm' if node['cfncluster']['cfn_scheduler'] == 'slurm'

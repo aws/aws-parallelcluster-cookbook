@@ -140,7 +140,7 @@ if node['conditions']['dcv_supported']
       # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
       # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
       #       which is done in base_install.
-      if node['platform_version'].to_i == 2 && arm_instance?
+      if arm_instance?
         prereq_packages.push('mate-terminal')
       else
         prereq_packages.push('gnome-terminal')
@@ -232,10 +232,8 @@ if node['conditions']['dcv_supported']
 end
 
 # Switch runlevel to multi-user.target for official ami
-if node['cfncluster']['is_official_ami_build']
-  if node['init_package'] == 'systemd'
-    execute "set default systemd runlevel to multi-user.target" do
-      command "systemctl set-default multi-user.target"
-    end
+if node['cfncluster']['is_official_ami_build'] && node['init_package'] == 'systemd'
+  execute "set default systemd runlevel to multi-user.target" do
+    command "systemctl set-default multi-user.target"
   end
 end

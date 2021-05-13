@@ -31,6 +31,35 @@ function exec_command() {
   [[ ${_exit_code} -ne 0 && ${_grep_exit_code} -eq 0 ]] && RC=1
 }
 
+function set_imds_token(){
+  if [ -z "${IMDS_TOKEN}" ];then
+    IMDS_TOKEN=$(curl --retry 3 --retry-delay 0 --fail -s -f -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 900" http://169.254.169.254/latest/api/token)
+    if [ "${?}" -gt 0 ] || [ -z "${IMDS_TOKEN}" ]; then
+      echo '[ERROR] Could not get IMDSv2 token. Instance Metadata might have been disabled or this is not an EC2 instance.'
+      exit 1
+    fi
+  fi
+}
+
+# param1 = query
+function get_meta() {
+    local imds_out=$(curl --retry 3 --retry-delay 0 --fail -s -q -H "X-aws-ec2-metadata-token:${IMDS_TOKEN}" -f http://169.254.169.254/latest/${1})
+    echo -n "${imds_out}"
+}
+
+#print block-device-mapping
+function print_block-device-mapping(){
+  echo 'block-device-mapping: '
+  x=$(get_meta meta-data/block-device-mapping/)
+  if [ -n "${x}" ]; then
+    for i in $x; do
+      echo -e '\t' $i: $(get_meta meta-data/block-device-mapping/$i)
+    done
+  else
+    echo not available
+  fi
+}
+
 # LVM stripe, format, mount ephemeral drives
 function setup_ephemeral_drives () {
   RC=0
@@ -41,7 +70,8 @@ function setup_ephemeral_drives () {
     MAPPING=$(realpath --relative-to=/dev/ -P  /dev/disk/by-id/nvme*Instance_Storage* | uniq)
   else
     IS_NVME=0
-    MAPPING=$(/usr/bin/ec2-metadata -b | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
+    set_imds_token
+    MAPPING=$(print_block-device-mapping | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
   fi
   NUM_DEVS=0
   for m in $MAPPING; do
@@ -81,6 +111,7 @@ function setup_ephemeral_drives () {
     vgcreate vg.01 $PARTITIONS || RC=1
     lvcreate -i $NUM_DEVS -I 64 -l 100%FREE -n lv_ephemeral vg.01 || RC=1
     if [ "$cfn_encrypted_ephemeral" == "true" ]; then
+      modprobe brd || RC=1
       mkfs -q /dev/ram1 1024 || RC=1
       mkdir -p /root/keystore || RC=1
       mount /dev/ram1 /root/keystore || RC=1

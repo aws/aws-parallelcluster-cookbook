@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+setup_munge_head_node
+
 # Export /opt/slurm
 nfs_export "/opt/slurm" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
@@ -59,7 +61,9 @@ remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
 end
 
 # Copy cluster config file from S3 URI
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cfncluster']['cluster_s3_bucket']} --key #{node['cfncluster']['cluster_config_s3_key']}"\
+fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
+                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cfncluster']['cluster_config_s3_key']}"\
                        " --region #{node['cfncluster']['cfn_region']} #{node['cfncluster']['cluster_config_path']}"
 fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
 execute "copy_cluster_config_from_s3" do
@@ -90,7 +94,6 @@ execute "generate_pcluster_slurm_configs" do
           " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
 end
 
-# alinux1 uses an old cgroup directory: /cgroup
 # all other OSs use /sys/fs/cgroup, which is the default
 template '/opt/slurm/etc/cgroup.conf' do
   source 'slurm/cgroup.conf.erb'

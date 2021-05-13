@@ -48,7 +48,7 @@ end
 def get_pt_type(device)
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/\sPTTYPE=\"(.*?)\"/)
+  match = fs_check.stdout.match(/\sPTTYPE="(.*?)"/)
   match = '' if match.nil?
 
   Chef::Log.info("Partition type for device #{device}: #{match[1]}")
@@ -61,7 +61,7 @@ end
 def get_fs_type(device)
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/\sTYPE=\"(.*?)\"/)
+  match = fs_check.stdout.match(/\sTYPE="(.*?)"/)
   match = '' if match.nil?
 
   Chef::Log.info("File system type for device #{device}: #{match[1]}")
@@ -75,7 +75,7 @@ def get_uuid(device)
   Chef::Log.info("Getting uuid for device: #{device}")
   fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
   fs_check.run_command
-  match = fs_check.stdout.match(/\sUUID=\"(.*?)\"/)
+  match = fs_check.stdout.match(/\sUUID="(.*?)"/)
   match = '' if match.nil?
   Chef::Log.info("uuid for device: #{device} is #{match[1]}")
   match[1]
@@ -89,7 +89,7 @@ def get_1st_partition(device)
   Chef::Log.info("Getting 1st partition for device: #{device}")
   fs_check = Mixlib::ShellOut.new("lsblk -ln -o Name #{device}|awk 'NR==2'")
   fs_check.run_command
-  partition = "/dev/" + fs_check.stdout.strip
+  partition = "/dev/#{fs_check.stdout.strip}"
   Chef::Log.info("1st partition for device: #{device} is: #{partition}")
   partition
 end
@@ -98,12 +98,12 @@ end
 # Get vpc-ipv4-cidr-blocks
 #
 def get_vpc_ipv4_cidr_blocks(eth0_mac)
+  token = get_metadata_token
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{eth0_mac.downcase}/vpc-ipv4-cidr-blocks")
-  res = Net::HTTP.get_response(uri)
-  vpc_ipv4_cidr_blocks = res.body if res.code == '200'
+  vpc_ipv4_cidr_blocks = get_metadata_with_token(token, uri)
   # Parse into array
-  vpc_ipv4_cidr_blocks = vpc_ipv4_cidr_blocks.split("\n")
-  vpc_ipv4_cidr_blocks
+
+  vpc_ipv4_cidr_blocks.split("\n")
 end
 
 def pip_install_package(package, version)
@@ -125,10 +125,10 @@ end
 # Check if the instance has a GPU
 #
 def graphic_instance?
-  has_gpu = `lspci | grep -i -o 'NVIDIA'`
-  is_graphic_instance = !has_gpu.strip.empty?
+  has_gpu = Mixlib::ShellOut.new("lspci | grep -i -o 'NVIDIA'")
+  has_gpu.run_command
 
-  is_graphic_instance
+  !has_gpu.stdout.strip.empty?
 end
 
 #
@@ -137,14 +137,14 @@ end
 def ami_bootstrapped?
   version = ''
   bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
-  current_version = 'aws-parallelcluster-cookbook-' + node['cfncluster']['cfncluster-cookbook-version']
+  current_version = "aws-parallelcluster-cookbook-#{node['cfncluster']['cfncluster-cookbook-version']}"
 
   if ::File.exist?(bootstrapped_file)
     version = IO.read(bootstrapped_file).chomp
     Chef::Log.info("Detected bootstrap file #{version}")
     if version != current_version
-      raise "This AMI was created with " + version + ", but is trying to be used with " + current_version + ". " \
-            "Please either use an AMI created with " + current_version + " or change your ParallelCluster to " + version
+      raise "This AMI was created with #{version}, but is trying to be used with #{current_version}. " \
+            "Please either use an AMI created with #{current_version} or change your ParallelCluster to #{version}"
     end
   end
 
@@ -157,16 +157,13 @@ end
 def validate_os_type
   case node['platform']
   when 'ubuntu'
-    current_os = 'ubuntu' + node['platform_version'].tr('.', '')
+    current_os = "ubuntu#{node['platform_version'].tr('.', '')}"
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   when 'amazon'
-    if node['platform_version'].to_i > 2010 && node['cfncluster']['cfn_base_os'] != 'alinux'
-      raise_os_not_match("alinux", node['cfncluster']['cfn_base_os'])
-    elsif node['platform_version'].to_i == 2 && node['cfncluster']['cfn_base_os'] != 'alinux2'
-      raise_os_not_match("alinux2", node['cfncluster']['cfn_base_os'])
-    end
+    current_os = "alinux#{node['platform_version'].to_i}"
+    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   when 'centos'
-    current_os = 'centos' + node['platform_version'].to_i.to_s
+    current_os = "centos#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
   end
 end
@@ -175,10 +172,10 @@ end
 # Raise error if OS types do not match
 #
 def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the " + current_os + " OS." \
-        "However, the base_os specified in your config file is " + specified_os + ". " \
-        "Please either use an AMI with the " + specified_os + " OS or update the base_os " \
-        "setting in your configuration file to " + current_os + "."
+  raise "The custom AMI you have provided uses the #{current_os} OS." \
+        "However, the base_os specified in your config file is #{specified_os}. " \
+        "Please either use an AMI with the #{specified_os} OS or update the base_os " \
+        "setting in your configuration file to #{current_os}."
 end
 
 #
@@ -244,7 +241,6 @@ def restart_network_service
       '>=8.0' => 'NetworkManager'
     },
     %w[ubuntu debian] => {
-      '16.04' => 'networking',
       '>=18.04' => 'systemd-resolved'
     },
     'default' => 'network'
@@ -261,7 +257,7 @@ end
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 #
 def reload_network_config
-  if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18
+  if node['platform'] == 'ubuntu'
     ruby_block "apply network configuration" do
       block do
         Mixlib::ShellOut.new("netplan apply").run_command
@@ -304,8 +300,8 @@ end
 # Check if Lustre is supported for ARM instances on this OS
 #
 def platform_supports_lustre_on_arm?
-  [node['platform'] == 'ubuntu' && node['platform_version'].to_i == 18,
-   node['platform'] == 'amazon' && node['platform_version'].to_i == 2,
+  [node['platform'] == 'ubuntu',
+   node['platform'] == 'amazon',
    node['platform'] == 'centos' && node['platform_version'].to_i == 8].any?
 end
 
@@ -330,11 +326,12 @@ def find_rhel_minor_version
     kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
     raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
 
-    if node['platform_version'].to_i == 7
+    case node['platform_version'].to_i
+    when 7
       os_minor_version = '7' if kernel_patch_version[1] >= '1062'
       os_minor_version = '8' if kernel_patch_version[1] >= '1127'
       os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    elsif node['platform_version'].to_i == 8
+    when 8
       os_minor_version = '2' if kernel_patch_version[1] >= '193'
       os_minor_version = '3' if kernel_patch_version[1] >= '240'
     else
@@ -348,9 +345,10 @@ end
 # Return chrony service reload command
 # Chrony doesn't support reload but only force-reload command
 def chrony_reload_command
-  if node['init_package'] == 'init'
+  case node['init_package']
+  when 'init'
     chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
-  elsif node['init_package'] == 'systemd'
+  when 'systemd'
     chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
   else
     raise "Init package #{node['init_package']} not supported."
@@ -363,14 +361,15 @@ end
 # Add an external package repository to the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def add_package_repository(repo_name, baseurl, gpgkey, distribution)
-  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+  case node['platform_family']
+  when 'rhel', 'amazon'
     yum_repository repo_name do
       baseurl baseurl
       gpgkey gpgkey
       retries 3
       retry_delay 5
     end
-  elsif node['platform_family'] == 'debian'
+  when 'debian'
     apt_repository repo_name do
       uri          baseurl
       key          gpgkey
@@ -390,11 +389,12 @@ end
 # Remove an external package repository from the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def remove_package_repository(repo_name)
-  if node['platform_family'] == 'rhel' || node['platform_family'] == 'amazon'
+  case node['platform_family']
+  when 'rhel', 'amazon'
     yum_repository repo_name do
       action :remove
     end
-  elsif node['platform_family'] == 'debian'
+  when 'debian'
     apt_repository repo_name do
       action :remove
     end
@@ -415,11 +415,11 @@ end
 # Check if EFA GDR is enabled (and supported) on this instance
 def efa_gdr_enabled?
   config_value = node['cfncluster']['enable_efa_gdr']
-  if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
-    enabling_value = "compute"
-  else
-    enabling_value = "master"
-  end
+  enabling_value = if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+                     "compute"
+                   else
+                     "master"
+                   end
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
 
@@ -431,4 +431,81 @@ def overwrite_nfs_template?
     node['platform'] == 'amazon',
     node['platform'] == 'centos' && node['platform_version'].to_i == 8
   ].any?
+end
+
+def enable_munge_service
+  service "munge" do
+    supports restart: true
+    action %i[enable start]
+  end
+end
+
+def setup_munge_head_node
+  # Generate munge key
+  bash 'generate_munge_key' do
+    user 'munge'
+    group 'munge'
+    cwd '/tmp'
+    code <<-HEAD_CREATE_MUNGE_KEY
+      set -e
+      # Generates munge key in /etc/munge/munge.key
+      /usr/sbin/mungekey --verbose
+      # Enforce correct permission on the key
+      chmod 0600 /etc/munge/munge.key
+    HEAD_CREATE_MUNGE_KEY
+  end
+
+  enable_munge_service
+  share_munge_head_node
+end
+
+def share_munge_head_node
+  # Share munge key
+  bash 'share_munge_key' do
+    user 'root'
+    group 'root'
+    code <<-HEAD_SHARE_MUNGE_KEY
+      set -e
+      mkdir /home/#{node['cfncluster']['cfn_cluster_user']}/.munge
+      # Copy key to shared dir
+      cp /etc/munge/munge.key /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key
+    HEAD_SHARE_MUNGE_KEY
+  end
+end
+
+def setup_munge_compute_node
+  # Get munge key
+  bash 'get_munge_key' do
+    user 'root'
+    group 'root'
+    code <<-COMPUTE_MUNGE_KEY
+      set -e
+      # Copy munge key from shared dir
+      cp /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key /etc/munge/munge.key
+      # Set ownership on the key
+      chown munge:munge /etc/munge/munge.key
+      # Enforce correct permission on the key
+      chmod 0600 /etc/munge/munge.key
+    COMPUTE_MUNGE_KEY
+  end
+
+  enable_munge_service
+end
+
+def get_metadata_token
+  # generate the token for retrieving IMDSv2 metadata
+  token_uri = URI("http://169.254.169.254/latest/api/token")
+  token_request = Net::HTTP::Put.new(token_uri)
+  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
+  res = Net::HTTP.new("169.254.169.254").request(token_request)
+  res.body
+end
+
+def get_metadata_with_token(token, uri)
+  # get IMDSv2 metadata with token
+  request = Net::HTTP::Get.new(uri)
+  request["X-aws-ec2-metadata-token"] = token
+  res = Net::HTTP.new("169.254.169.254").request(request)
+  metadata = res.body if res.code == '200'
+  metadata
 end

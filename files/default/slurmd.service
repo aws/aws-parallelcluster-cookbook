@@ -4,11 +4,10 @@ After=munge.service network.target remote-fs.target
 ConditionPathExists=/opt/slurm/etc/slurm.conf
 
 [Service]
-Type=forking
+Type=simple
 EnvironmentFile=-/etc/sysconfig/slurmd
-ExecStart=/opt/slurm/sbin/slurmd $SLURMD_OPTIONS
+ExecStart=/opt/slurm/sbin/slurmd -D $SLURMD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
-PIDFile=/var/run/slurmd.pid
 KillMode=process
 LimitNOFILE=131072
 LimitMEMLOCK=infinity

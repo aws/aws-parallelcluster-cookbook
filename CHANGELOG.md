@@ -3,31 +3,89 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.x.x
+-----
+
+**ENHANCEMENTS**
+- Add support for Ubuntu 20.04.
+- Add support for using FSx Lustre in subnet with no internet access.
+- Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
+- Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
+- Add possibility to use a post installation script when building Centos 8 AMI.
+- Install SSM agent on CentOS 7 and 8
+- Transition from IMDSv1 to IMDSv2.
+
+**CHANGES**
+- Ubuntu 16.04 is no longer supported.
+- Amazon Linux is no longer supported.
+- Increase timeout when attaching EBS volumes from 3 to 5 minutes.
+- Retry `berkshelf` installation up to 3 times.
+- Root volume size increased to 35GB on all AMIs.
+- Upgrade Slurm to version 20.11.5.
+  - Update slurmctld and slurmd systemd unit files according to latest provided by slurm
+  - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
+  - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
+  - Specify instance GPU model as GRES GPU Type in gres.conf
+- Upgrade Arm Performance Libraries (APL) to version 21.0.0
+- Upgrade NICE DCV to version 2021.0-10242.
+- Upgrade NVIDIA driver to version 460.73.01.
+- Upgrade CUDA library to version 11.3.0.
+- Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-460`.
+- Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
+- Upgrade Python version used in ParallelCluster virtualenvs from version 3.6.13 to version 3.7.10.
+
+2.10.3
+-----
+
+**CHANGES**
+- Upgrade EFA installer to version 1.11.2
+  - EFA configuration: ``efa-config-1.7`` (no change)
+  - EFA profile: ``efa-profile-1.4`` (from ``efa-profile-1.3``)
+  - EFA kernel module: ``efa-1.10.2`` (no change)
+  - RDMA core: ``rdma-core-31.2amzn`` (no change)
+  - Libfabric: ``libfabric-1.11.1amzn1.0`` (no change)
+  - Open MPI: ``openmpi40-aws-4.1.0`` (no change)
+
+2.10.2
+-----
+
+**ENHANCEMENTS**
+- Improve configuration procedure for the Munge service.
+
+**CHANGES**
+- Update Python version used in ParallelCluster virtualenvs from version 3.6.9 to version 3.6.13.
+
+**BUG FIXES**
+- Use non interactive `apt update` command when building custom Ubuntu AMIs.
+- Fix `encrypted_ephemeral = true` when using Alinux2 or CentOS8
+
 2.10.1
 ------
 
 **ENHANCEMENTS**
-- Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04 unless the instance is rebooted.
-- EFA kernel module now installed also on ARM instances with `alinux2` and `ubuntu1804`
-- Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation. The runlevel is set to graphical.target on head node only when DCV is enabled.
+- Install Arm Performance Libraries (APL) 20.2.1 on ARM AMIs (CentOS8, Alinux2, Ubuntu1804).
+- Install EFA kernel module on ARM instances with `alinux2` and `ubuntu1804`.
+- Configure NFS threads to be max(8, num_cores) for performance. This enhancement will not take effect on Ubuntu 16.04.
 
 **CHANGES**
-- Upgrade EFA installer to version 1.11.0
-  - EFA configuration: ``efa-config-1.5`` (from efa-config-1.4)
-  - EFA profile: ``efa-profile-1.1`` (from efa-profile-1.0.0)
-  - EFA kernel module: ``efa-1.10.2`` (from efa-1.6.0)
+- Upgrade EFA installer to version 1.11.1.
+  - EFA configuration: ``efa-config-1.7`` (from efa-config-1.5)
+  - EFA profile: ``efa-profile-1.3`` (from efa-profile-1.1)
+  - EFA kernel module: ``efa-1.10.2`` (no change)
   - RDMA core: ``rdma-core-31.2amzn`` (from rdma-core-31.amzn0)
-  - Libfabric: ``libfabric-1.11.1amzn1.1`` (from libfabric-1.10.1amzn1.1)
-  - Open MPI: ``openmpi40-aws-4.0.5`` (from openmpi40-aws-4.0.3)
-- Upgrade NICE DCV to version 2020.2-9662
-- Use inclusive language in recipe names and internal naming convention.
-- Download Intel MPI and HPC packages from S3 rather than Intel yum repos.
-- Install Arm Performance Library 20.2.1 on ARM AMI(CentOS8, Alinux2, Ubuntu1804)
+  - Libfabric: ``libfabric-1.11.1amzn1.0`` (from libfabric-1.11.1amzn1.1)
+  - Open MPI: ``openmpi40-aws-4.1.0`` (from openmpi40-aws-4.0.5)
 - Upgrade Intel MPI to version U8.
+- Upgrade NICE DCV to version 2020.2-9662.
+- Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation.
+  The runlevel is set to graphical.target on head node only when DCV is enabled. This prevents the execution of
+  graphical services, such as x/gdm, when they are not required.
+- Download Intel MPI and HPC packages from S3 rather than Intel yum repos.
 
 **BUG FIXES**
 - Fix installation of Intel PSXE package on CentOS 7 by using yum4.
 - Fix routing issues with multiple Network Interfaces on Ubuntu 18.04.
+- Fix compilation of SGE by downloading sources from Debian repository and not from the EOL Ubuntu 19.10.
 
 2.10.0
 ------
@@ -104,6 +162,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric: ``libfabric-1.10.1amzn1.1`` (no change)
   - Open MPI: ``openmpi40-aws-4.0.3`` (no change)
 - Upgrade Slurm to version 20.02.4.
+- Apply the following changes to Slurm configuration:
+  - Assign a range of 10 ports to Slurmctld in order to better perform with large cluster settings
+  - Configure cloud scheduling logic
+  - Set `ReconfigFlags=KeepPartState`
+  - Set `MessageTimeout=60`
+  - Set `TaskPlugin=task/affinity,task/cgroup` together with `TaskAffinity=no` and `ConstrainCores=yes` in cgroup.conf
 - Upgrade NICE DCV to version 2020.1-9012.
 - Use private ip instead of master node hostname when mounting shared NFS drives.
 - Add new log streams to CloudWatch: chef-client, clustermgtd, computemgtd, slurm_resume, slurm_suspend.

@@ -117,7 +117,10 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
     # * user to make owner of the two files
     # * group to make owner of the two files
     # NOTE: the last arg is hardcoded to be 'dcv' so that the dcvserver can read the files when authenticating
-    command "/etc/parallelcluster/generate_certificate.sh \"#{node['cfncluster']['dcv']['authenticator']['certificate']}\" \"#{node['cfncluster']['dcv']['authenticator']['private_key']}\" #{node['cfncluster']['dcv']['authenticator']['user']} dcv"
+    command "/etc/parallelcluster/generate_certificate.sh"\
+            " \"#{node['cfncluster']['dcv']['authenticator']['certificate']}\""\
+            " \"#{node['cfncluster']['dcv']['authenticator']['private_key']}\""\
+            " #{node['cfncluster']['dcv']['authenticator']['user']} dcv"
     user 'root'
   end
 

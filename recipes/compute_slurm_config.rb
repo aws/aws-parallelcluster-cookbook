@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+setup_munge_compute_node
+
 # Create directory configured as SlurmdSpoolDir
 directory '/var/spool/slurmd' do
   user 'slurm'
@@ -47,16 +49,4 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   mode '0644'
   action :create
   only_if { node['init_package'] == 'systemd' }
-end
-
-if node['init_package'] == 'systemd'
-  service "slurmd" do
-    supports restart: false
-    action %i[enable]
-  end
-else
-  service "slurm" do
-    supports restart: false
-    action %i[enable]
-  end
 end

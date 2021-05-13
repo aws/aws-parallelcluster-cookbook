@@ -1,6 +1,8 @@
 #!/bin/bash
 # WARNING: REQUIRES /bin/bash
 #
+# - cinc-install.sh v1.1.0
+#
 # - must run on /bin/sh on solaris 9
 # - must run on /bin/sh on AIX 6.x
 #
@@ -259,6 +261,26 @@ do_download() {
   unable_to_retrieve_package
 }
 
+# get_region INSTANCE_METADATA_FILE
+# get region from metadata
+get_region() {
+  if exists curl; then
+    echo "Trying curl to get region with IMDSv2 ..."
+    token=$(curl -s --connect-timeout 5 --max-time 5 --retry 3 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+    region=$(curl -s -H "X-aws-ec2-metadata-token: ${token}" http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}')
+  elif exists python; then
+    echo "Trying python to get region with IMDSv2 ..."
+    token=$(python -c "import sys,requests; sys.stdout.write(requests.put('http://169.254.169.254/latest/api/token', headers={'X-aws-ec2-metadata-token-ttl-seconds': '300', 'User-Agent': 'mixlib-install/3.11.27'}).content)")
+    region=$(python -c "import sys,requests,json; sys.stdout.write(json.loads(requests.get('http://169.254.169.254/latest/dynamic/instance-identity/document', headers={ 'X-aws-ec2-metadata-token': '${token}', 'User-Agent': 'mixlib-install/3.11.27' }).content.decode())['region'])")
+  fi
+
+  if test "x$region" = "x"; then
+    echo "Unable to get region with IMDSv2, trying with IMDSv1 ..."
+    do_download "http://169.254.169.254/latest/dynamic/instance-identity/document" $1
+    region=$(cat $1 | awk '$1 =="\"region\"" {print $3}' | sed 's/"//g; s/,//g')
+  fi
+}
+
 # install_file TYPE FILENAME
 # TYPE is "rpm", "deb", "solaris", "sh", etc.
 install_file() {
@@ -355,11 +377,12 @@ tmp_dir="$tmp/install.sh.$$"
 channel="stable"
 project="cinc"
 
-while getopts pnv:c:f:P:d:s:l:a opt
+while getopts pnv:b:c:f:P:d:s:l:a opt
 do
   case "$opt" in
 
     v)  version="$OPTARG";;
+    b)  bucket="$OPTARG";; # bucket name to overide default bucket for downloading CINC client
     c)  channel="$OPTARG";;
     p)  channel="current";; # compat for prerelease option
     n)  channel="current";; # compat for nightlies option
@@ -371,7 +394,7 @@ do
     a)  checksum="$OPTARG";;
     \?)   # unknown flag
       echo >&2 \
-      "usage: $0 [-P project] [-c release_channel] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum]"
+      "usage: $0 [-P project] [-c release_channel] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum] [-b bucket]"
       exit 1;;
   esac
 done
@@ -591,8 +614,7 @@ fi
 
 # Region detection
 instance_metadata_file=$tmp_dir/instance_metadata
-do_download "http://169.254.169.254/latest/dynamic/instance-identity/document" ${instance_metadata_file}
-region=`cat ${instance_metadata_file} | awk '$1 =="\"region\"" {print $3}' | sed 's/"//g; s/,//g'`
+get_region instance_metadata_file
 
 # Download domain detection
 if [ "${region}" != "${region#cn-*}" ]
@@ -665,7 +687,12 @@ fi
 # $sha256:
 ############
 
-bucket_url="https://${region}-aws-parallelcluster.s3.${region}.${download_domain}/archives/${project}/${platform}/${platform_version}/"
+if test "x$bucket" = "x"; then
+  # Use official bucket if not specified
+  bucket="${region}-aws-parallelcluster"
+fi
+
+bucket_url="https://${bucket}.s3.${region}.${download_domain}/archives/${project}/${platform}/${platform_version}/"
 
 if test "x$build" = "x"; then
   # Build version set to 1 by default if not specified

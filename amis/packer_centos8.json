@@ -9,6 +9,7 @@
     "ami_perms" : "{{env `AMI_PERMS`}}",
     "build_date" : "{{env `BUILD_DATE`}}",
     "cookbook_path" : "{{env `COOKBOOK_PATH`}}",
+    "script_path": "{{env `SCRIPT_PATH`}}",
     "nvidia_enabled" : "{{env `NVIDIA_ENABLED`}}",
     "dcv_installed": "{{env `DCV_INSTALLED`}}",
     "instance_type" : "{{env `AWS_FLAVOR_ID`}}",
@@ -75,7 +76,7 @@
       "launch_block_device_mappings" : [
         {
           "device_name" : "/dev/sda1",
-          "volume_size" : "25",
+          "volume_size" : "35",
           "volume_type" : "gp2",
           "delete_on_termination" : true
         },
@@ -159,7 +160,19 @@
     {
       "type" : "shell",
       "inline" : [
-        "sudo dnf -y install epel-release",
+        "region=\"{{user `region`}}\"",
+        "[[ ${region} =~ ^cn- ]] && domain=\".amazonaws.com.cn\" || domain=\".amazonaws.com\"",
+        "[[ {{user `ami_arch`}} == \"arm64\" ]] && arch=\"arm64\" || arch=\"amd64\"",
+        "ssm_agent_url=\"https://s3.${region}${domain}/amazon-ssm-${region}/latest/linux_${arch}/amazon-ssm-agent.rpm\"",
+        "sudo yum install -y ${ssm_agent_url}",
+        "sudo systemctl enable amazon-ssm-agent",
+        "sudo systemctl start amazon-ssm-agent"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
+        "sudo yum -y install epel-release",
         "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
       ]
     },
@@ -187,7 +200,7 @@
       "inline" : [
         "set -x",
         "region=\"{{user `region`}}\"",
-        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
+        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install-1.1.0.sh\"",
         "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
         "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
       ]
@@ -196,7 +209,8 @@
       "type" : "shell",
       "inline" : [
         "sudo /opt/cinc/embedded/bin/gem install --no-document berkshelf:{{user `berkshelf_version`}}"
-      ]
+      ],
+      "max_retries": 3
     },
     {
       "type" : "shell",
@@ -285,6 +299,19 @@
         "curl --retry 3 -L -o /tmp/aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz",
         "sudo dnf install -y python3-pip",
         "sudo pip3 install /tmp/aws-cfn-bootstrap-py3-latest.tar.gz"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "{{user `script_path`}}",
+      "destination": "/tmp/createami_scripts"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "set -x",
+        "[[ -d \"/tmp/createami_scripts\" ]] && script_name=$(ls /tmp/createami_scripts)",
+        "[[ -n ${script_name} ]] && (sudo chmod +x /tmp/createami_scripts/${script_name} && sudo /tmp/createami_scripts/${script_name} && sudo mkdir -p /opt/parallelcluster/createami_scripts && sudo mv /tmp/createami_scripts/${script_name} /opt/parallelcluster/createami_scripts && sudo chmod 700 /opt/parallelcluster/createami_scripts) || echo 'No post install script'"
       ]
     },
     {
