@@ -85,9 +85,9 @@ default['cfncluster']['armpl']['url'] = value_for_platform(
 )
 
 # Python packages
-default['cfncluster']['cfncluster-version'] = '2.10.3'
-default['cfncluster']['cfncluster-cookbook-version'] = '2.10.3'
-default['cfncluster']['cfncluster-node-version'] = '2.10.3'
+default['cfncluster']['cfncluster-version'] = '2.10.4'
+default['cfncluster']['cfncluster-cookbook-version'] = '2.10.4'
+default['cfncluster']['cfncluster-node-version'] = '2.10.4'
 
 # URLs to software packages used during install recipes
 # Gridengine software
