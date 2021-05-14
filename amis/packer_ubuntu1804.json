@@ -220,7 +220,7 @@
         "/etc/chef/cookbooks"
       ],
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "json" : {
         "cfncluster" : {
           "default_pre_reboot" : "false"
@@ -260,7 +260,7 @@
         "/etc/chef/cookbooks"
       ],
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "aws-parallelcluster::default"
       ]
@@ -278,7 +278,7 @@
         }
       },
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "aws-parallelcluster::default"
       ]
