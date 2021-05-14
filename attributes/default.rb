@@ -109,7 +109,7 @@ default['cluster']['parallelcluster-node-version'] = '3.0.0'
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['version'] = '20-11-7-1'
-default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
+default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 default['cluster']['slurm']['sha1'] = 'ce927fbf2f7d5f908ed87c5d521abc696b9a2508'
 # PMIx software
 default['cluster']['pmix']['version'] = '3.1.5'
