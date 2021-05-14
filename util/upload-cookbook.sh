@@ -93,10 +93,10 @@ main() {
 
     # upload packages
     _key_path="parallelcluster/${_version}/cookbooks"
-    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.tgz s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz || _error_exit 'Failed to push cookbook to S3'
-    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.md5 s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
+    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.tgz s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz || _error_exit 'Failed to push cookbook to S3'
+    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.md5 s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
     aws ${_profile} --region "${_region}" s3api head-object --bucket ${_bucket} --key ${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz --output text --query LastModified > aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to fetch LastModified date'
-    aws ${_profile} --region "${_region}" s3 cp --acl public-read aws-parallelcluster-cookbook-${_version}.tgz.date s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to push cookbook date'
+    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.tgz.date s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to push cookbook date'
 
     _bucket_region=$(aws ${_profile} s3api get-bucket-location --bucket ${_bucket} --output text)
     if [ ${_bucket_region} = "None" ]; then
