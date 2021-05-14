@@ -34,6 +34,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
 - Upgrade Python version used in ParallelCluster virtualenvs from version 3.6.13 to version 3.7.10.
 
+2.10.4
+-----
+
+**CHANGES**
+- Upgrade Slurm to version 20.02.7
+
 2.10.3
 -----
 
