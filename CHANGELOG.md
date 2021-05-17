@@ -30,6 +30,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Ubuntu 16.04 is no longer supported.
 - Amazon Linux is no longer supported.
+- Upgrade EFA installer to version 1.12.1
+  - EFA configuration: ``efa-config-1.8`` (from ``efa-config-1.7``)
+  - EFA profile: ``efa-profile-1.5`` (from ``efa-profile-1.4``)
+  - EFA kernel module: ``efa-1.12.1`` (from ``efa-1.10.2``)
+  - RDMA core: ``rdma-core-32.1amzn`` (from ``rdma-core-31.2amzn``)
+  - Libfabric: ``libfabric-1.11.2amzon1.1`` (from ``libfabric-1.11.1amzn1.0``)
+  - Open MPI: ``openmpi40-aws-4.1.1`` (from ``openmpi40-aws-4.1.0``)
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
 - Root volume size increased to 35GB on all AMIs.
