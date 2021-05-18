@@ -21,3 +21,7 @@ build.log
 build-*.log
 
 .tox/
+
+aws-parallelcluster-cookbook-*.tgz
+aws-parallelcluster-cookbook-*.md5
+aws-parallelcluster-cookbook-*.date
