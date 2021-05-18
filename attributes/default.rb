@@ -320,6 +320,11 @@ when 'rhel', 'amazon'
       default['cfncluster']['base_packages'].push(%w[iptables gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
     end
 
+    if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
+      # Do not install bind-utils on centos7+arm due to issue with package checksum
+      default['cfncluster']['base_packages'].delete('bind-utils')
+    end
+
     default['cfncluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
   when 'amazon'
