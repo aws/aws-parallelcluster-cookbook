@@ -15,6 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install ParallelCluster AWS Batch CLI at AMI build time.
 - Run daemons as cluster admin user (not root).
 - Add explicit assignment of names, uids, gids for slurm, munge and dcvextauth users.
+- Remove packer.
 
 
 2.x.x
