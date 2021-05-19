@@ -13,7 +13,6 @@ NEW_AWSBATCH_CLI_VERSION=$2
 
 CURRENT_PCLUSTER_VERSION=$(sed -ne "s/^version '\(.*\)'/\1/p" metadata.rb)
 
-sed -i -e "s/\(.*parallelcluster.*version.*\)${CURRENT_PCLUSTER_VERSION}.*\(\".*\)/\1${NEW_PCLUSTER_VERSION}\2/g" amis/packer_variables.json
 sed -i "s/default\['cluster'\]\['parallelcluster-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-version'] = '${NEW_PCLUSTER_VERSION}'/g" attributes/default.rb
 sed -i "s/default\['cluster'\]\['parallelcluster-cookbook-version'\] = '$CURRENT_PCLUSTER_VERSION'/default['cluster']['parallelcluster-cookbook-version'] = '${NEW_PCLUSTER_VERSION}'/g" attributes/default.rb
 sed -i "s/default\['cluster'\]\['parallelcluster-node-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-node-version'] = '${NEW_PCLUSTER_VERSION}'/g" attributes/default.rb
