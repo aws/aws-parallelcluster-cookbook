@@ -563,7 +563,7 @@ def check_path_permissions(path, user, group, permissions)
   bash "check permissions on path #{path}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      if [[ ! -d "#{path}" ]]; then
+      if [[ ! -d "#{path}" && ! -f "#{path}" ]]; then
         >&2 echo "Expected path does not exist: #{path}"
         exit 1
       fi
