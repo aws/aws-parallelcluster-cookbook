@@ -175,8 +175,8 @@ end
 
 # Create shared directory used to store clustermgtd heartbeat and computemgtd config
 directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
-  user 'root'
-  group 'root'
+  user node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_user']
   mode '0755'
   action :create
   recursive true

@@ -13,6 +13,8 @@ startsecs = 0
 
 [program:clustermgtd]
 command = <%= node['cluster']['node_virtualenv_path'] %>/bin/clustermgtd
+user = <%= node['cluster']['cluster_admin_user'] %>
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clustermgtd
 <% end -%>
@@ -32,6 +34,8 @@ environment = HOME="<%= node['cluster']['dcv']['authenticator']['user_home'] %>"
 <% if node['cluster']['scheduler'] == 'slurm' -%>
 [program:computemgtd]
 command = <%= node['cluster']['node_virtualenv_path'] %>/bin/computemgtd
+user = <%= node['cluster']['cluster_admin_user'] %>
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/computemgtd
 <% end -%>
