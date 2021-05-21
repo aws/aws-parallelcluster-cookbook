@@ -41,6 +41,14 @@ when 'debian'
   end
 end
 
+# remove /usr/lib/libmpi.so symlink to avoid mpicc issue with -L/usr/lib linker flag
+# in efa installer v1.12.x + ubuntu1804
+if node['platform_version'] == '18.04':
+  execute "remove symlink" do
+    command "rm -f /usr/lib/libmpi.so"
+  end
+end
+
 installer_options = "-y"
 # skip efa-kmod installation on not supported platforms
 installer_options += " -k" unless node['conditions']['efa_supported']
