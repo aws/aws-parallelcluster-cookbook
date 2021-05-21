@@ -366,7 +366,9 @@ when 'debian'
 
   case node['platform_version']
   when '18.04'
-    default['cfncluster']['base_packages'].push('python-pip', 'python-parted')
+    # Install libmpich12 and mpich explicitly to preserve existing behavior
+    # libmpich-dev need to be removed after scheduler compilation due to a compatibility issue with efa installer v1.12.x
+    default['cfncluster']['base_packages'].push('python-pip', 'python-parted', 'libmpich12', 'mpich')
   when '20.04'
     default['cfncluster']['base_packages'].push('python3-parted')
   end

@@ -510,3 +510,14 @@ def get_metadata_with_token(token, uri)
   metadata = res.body if res.code == '200'
   metadata
 end
+
+def rm_libmpich
+  # Uninstall libmpich-dev, which configures an /usr/lib/libmpi.so symlink
+  # The symlink causes an mpicc issue with -L/usr/lib linker flag in efa installer v1.12.x + ubuntu1804
+  # Compile slurm with the package to enable mpich binding for slurm, and remove after
+  return unless node['platform_version'] == '18.04'
+
+  package "libmpich-dev" do
+    action :remove
+  end
+end
