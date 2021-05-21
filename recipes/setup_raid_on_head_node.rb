@@ -107,8 +107,8 @@ if raid_shared_dir != "NONE"
     fstype "ext4"
     options "defaults,nofail,_netdev"
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 
   # Make sure shared directory permissions are correct
