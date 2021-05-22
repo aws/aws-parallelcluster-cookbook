@@ -21,3 +21,4 @@ scheduler_queue_name=<%= node['cluster']['scheduler_queue_name'] %>
 <% if node['cluster']['node_type'] == 'HeadNode' -%>
 volume=<%= node['cluster']['volume'] %>
 <% end -%>
+scripts_dir=<%= node['cluster']['scripts_dir'] %>
