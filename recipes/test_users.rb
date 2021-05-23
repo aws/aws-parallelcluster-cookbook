@@ -30,6 +30,13 @@ check_group_definition(
   node['cluster']['cluster_admin_group_id']
 )
 
+check_path_permissions(
+  "/home/#{node['cluster']['cluster_admin_user']}",
+  node['cluster']['cluster_admin_user'],
+  node['cluster']['cluster_admin_group'],
+  "drwx------"
+)
+
 if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] == 'slurm'
   check_path_permissions(
     "/opt/slurm/etc/pcluster/.slurm_plugin",

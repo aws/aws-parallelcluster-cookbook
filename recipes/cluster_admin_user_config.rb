@@ -32,3 +32,11 @@ user node['cluster']['cluster_admin_user'] do
   home "/home/#{node['cluster']['cluster_admin_user']}"
   manage_home false
 end
+
+# Setup cluster admin home
+directory "/home/#{node['cluster']['cluster_admin_user']}" do
+  user node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0700'
+  recursive true
+end

@@ -16,7 +16,6 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::base_install'
-include_recipe "aws-parallelcluster::cluster_admin_user_config"
 
 # Restart sshd.service to make sure the service is running
 # This is a workaround for Centos 8 where the sshd.service fails at first start since it does not properly
@@ -69,6 +68,9 @@ when 'ComputeFleet'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end
+
+# Configure cluster admin user
+include_recipe "aws-parallelcluster::cluster_admin_user_config"
 
 # Ensure cluster user can sudo on SSH
 template '/etc/sudoers.d/99-parallelcluster-user-tty' do
