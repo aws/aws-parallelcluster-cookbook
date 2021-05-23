@@ -66,6 +66,12 @@ template "/opt/parallelcluster/scripts/fetch_and_run" do
   mode "0755"
 end
 
+# Configure cluster admin user
+include_recipe "aws-parallelcluster::cluster_admin_user_config"
+
+# SSM scripts
+include_recipe "aws-parallelcluster::ssm_config"
+
 include_recipe "aws-parallelcluster::setup_python"
 
 # Install cloudwatch, write configuration and start it.

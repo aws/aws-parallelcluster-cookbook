@@ -69,9 +69,6 @@ else
   raise "node_type must be HeadNode or ComputeFleet"
 end
 
-# Configure cluster admin user
-include_recipe "aws-parallelcluster::cluster_admin_user_config"
-
 # Ensure cluster user can sudo on SSH
 template '/etc/sudoers.d/99-parallelcluster-user-tty' do
   source '99-parallelcluster-user-tty.erb'
