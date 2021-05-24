@@ -27,7 +27,7 @@ template "/etc/profile.d/pcluster_awsbatchcli.sh" do
   mode '0644'
 end
 
-# Check whether install a custom aws-parallelcluster package (for aws-parallelcluster-awsbatchcli) or the standard one
+# Check whether install a custom aws-parallelcluster-awsbatch-cli package or the standard one
 # Install awsbatch cli into awsbatch virtual env
 if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['custom_awsbatchcli_package'].empty?
   # Install custom aws-parallelcluster package
@@ -41,15 +41,15 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
         custom_package_url=#{node['cluster']['custom_awsbatchcli_package']}
       fi
       curl --retry 3 -L -o aws-parallelcluster.tgz ${custom_package_url}
-      mkdir aws-parallelcluster-custom-cli
-      tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-custom-cli
-      cd aws-parallelcluster-custom-cli/*aws-parallelcluster-*
-      #{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install cli/
+      mkdir aws-parallelcluster-awsbatch-cli
+      tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-awsbatch-cli
+      cd aws-parallelcluster-awsbatch-cli/*aws-parallelcluster-*
+      #{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install awsbatch-cli/
     CLI
   end
 else
-  # Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
-  execute "pip_install_parallelcluster" do
-    command "#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster==#{node['cluster']['parallelcluster-version']}"
+  # Install aws-parallelcluster-awsbatch-cli package
+  execute "pip_install_parallelcluster_awsbatch_cli" do
+    command "#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster-awsbatch-cli==#{node['cluster']['parallelcluster-awsbatch-cli-version']}"
   end
 end
