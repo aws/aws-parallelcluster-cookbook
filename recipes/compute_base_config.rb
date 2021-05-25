@@ -49,8 +49,8 @@ if raid_shared_dir != "NONE"
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 end
 
@@ -60,8 +60,8 @@ mount '/home' do
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
-  retries 3
-  retry_delay 5
+  retries 10
+  retry_delay 6
 end
 
 # Mount /opt/intel over NFS
@@ -70,8 +70,8 @@ mount '/opt/intel' do
   fstype 'nfs'
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
-  retries 3
-  retry_delay 5
+  retries 10
+  retry_delay 6
   only_if { ::File.directory?("/opt/intel") }
 end
 
@@ -112,8 +112,8 @@ shared_dir_array.each do |dir|
     fstype 'nfs'
     options 'hard,intr,noatime,_netdev'
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 end
 

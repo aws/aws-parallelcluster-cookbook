@@ -31,8 +31,8 @@ mount '/opt/slurm' do
   fstype "nfs"
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
-  retries 3
-  retry_delay 5
+  retries 10
+  retry_delay 6
 end
 
 # Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU
