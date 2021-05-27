@@ -69,8 +69,11 @@ end
 # Configure cluster admin user
 include_recipe "aws-parallelcluster::cluster_admin_user_config"
 
-# SSM scripts
+# SSM scripts (requires: cfnconfig file and cluster admin user)
 include_recipe "aws-parallelcluster::ssm_config"
+
+#TODO Once we convert all the AWS calls from being executed as root to being executed as cluster admin user,
+# we must wait here for SSM providing credentials to the cluster admin user.
 
 include_recipe "aws-parallelcluster::setup_python"
 

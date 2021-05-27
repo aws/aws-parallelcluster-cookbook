@@ -15,6 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+service "amazon-ssm-agent" do
+  supports restart: true
+  action %i[enable start]
+end
+
 ssm_scripts_directory = "#{node['cluster']['scripts_dir']}/ssm"
 
 directory ssm_scripts_directory do
