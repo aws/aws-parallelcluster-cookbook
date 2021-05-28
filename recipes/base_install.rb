@@ -17,6 +17,8 @@
 
 return if node['conditions']['ami_bootstrapped']
 
+include_recipe "aws-parallelcluster::cluster_admin_user_install"
+
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'

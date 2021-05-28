@@ -73,6 +73,25 @@ cookbook_file "#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
 end
 
 if node['conditions']['dcv_supported']
+  # Setup dcv authenticator group
+  group node['cluster']['dcv']['authenticator']['group'] do
+    comment 'NICE DCV External Authenticator group'
+    gid node['cluster']['dcv']['authenticator']['group_id']
+    system true
+  end
+
+  # Setup dcv authenticator user
+  user node['cluster']['dcv']['authenticator']['user'] do
+    comment 'NICE DCV External Authenticator user'
+    uid node['cluster']['dcv']['authenticator']['user_id']
+    gid node['cluster']['dcv']['authenticator']['group_id']
+    # home is mounted from the head node
+    manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
+    home node['cluster']['dcv']['authenticator']['user_home']
+    system true
+    shell '/bin/bash'
+  end
+
   case node['cluster']['node_type']
   when 'HeadNode', nil
     dcv_tarball = "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
@@ -191,24 +210,8 @@ if node['conditions']['dcv_supported']
     dcv_packages.map! { |package| dcv_packages_path + package }
     install_package_list(dcv_packages)
 
-    # Create user and Python virtual env for the external authenticator
-    user node['cluster']['dcv']['authenticator']['user'] do
-      manage_home true
-      home node['cluster']['dcv']['authenticator']['user_home']
-      comment 'NICE DCV External Authenticator user'
-      system true
-      shell '/bin/bash'
-    end
+    # Create Python virtual env for the external authenticator
     install_ext_auth_virtual_env
-
-  when 'ComputeFleet'
-    user node['cluster']['dcv']['authenticator']['user'] do
-      manage_home false
-      home node['cluster']['dcv']['authenticator']['user_home']
-      comment 'NICE DCV External Authenticator user'
-      system true
-      shell '/bin/bash'
-    end
   end
 
   # Post-installation action

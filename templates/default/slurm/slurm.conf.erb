@@ -10,7 +10,7 @@
 #
 # CLUSTER SETTINGS
 ClusterName=parallelcluster
-SlurmUser=slurm
+SlurmUser=<%= node['cluster']['slurm']['user'] %>
 SlurmctldPort=6820-6829
 SlurmdPort=6818
 AuthType=auth/munge

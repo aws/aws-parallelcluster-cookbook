@@ -19,8 +19,8 @@ setup_munge_compute_node
 
 # Create directory configured as SlurmdSpoolDir
 directory '/var/spool/slurmd' do
-  user 'slurm'
-  group 'slurm'
+  user node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0700'
 end
 

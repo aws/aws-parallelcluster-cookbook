@@ -33,8 +33,8 @@ end
 
 # Create directory configured as StateSaveLocation
 directory '/var/spool/slurm.state' do
-  user 'slurm'
-  group 'slurm'
+  user node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0700'
 end
 
@@ -128,41 +128,41 @@ end
 
 template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do
   source 'slurm/resume_program.erb'
-  owner 'slurm'
-  group 'slurm'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0744'
 end
 
 file "/var/log/parallelcluster/slurm_resume.log" do
-  owner 'slurm'
-  group 'slurm'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0644'
 end
 
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.conf" do
   source 'slurm/parallelcluster_slurm_resume.conf.erb'
-  owner 'slurm'
-  group 'slurm'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0644'
 end
 
 template "#{node['cluster']['scripts_dir']}/slurm/slurm_suspend" do
   source 'slurm/suspend_program.erb'
-  owner 'slurm'
-  group 'slurm'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0744'
 end
 
 file "/var/log/parallelcluster/slurm_suspend.log" do
-  owner 'slurm'
-  group 'slurm'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0644'
 end
 
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_suspend.conf" do
   source 'slurm/parallelcluster_slurm_suspend.conf.erb'
-  owner 'slurm'
-  group 'slurm'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0644'
 end
 
