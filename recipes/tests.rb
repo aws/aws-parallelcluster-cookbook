@@ -638,3 +638,24 @@ if node['platform_family'] != 'debian'
     user node['cfncluster']['cfn_cluster_user']
   end
 end
+
+##################
+# Verify enough space on AMIs
+###################
+unless node['cfncluster']['os'].end_with?("-custom")
+  bash 'verify 10 GB of space left on root volume' do
+    cwd Chef::Config[:file_cache_path]
+    # This test assumes the df output is as follows:
+    # $ df --block-size GB --output=avail /
+    # Avail
+    # 42GB
+    code <<-CAPACITY_CHECK
+      free_gigs="$(df --block-size GB --output=avail / | tail -n1 | cut -d G -f1)"
+      if [ $free_gigs -lt 10 ]; then
+        echo "Expected at least 10 GB of free space remaining on the root volume, but only found ${free_gigs}"
+        exit 1
+      fi
+    CAPACITY_CHECK
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
