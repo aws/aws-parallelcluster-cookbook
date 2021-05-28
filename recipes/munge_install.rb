@@ -58,15 +58,24 @@ bash 'make install' do
 end
 
 # Updated munge init script for Amazon Linux
-cookbook_file "munge-init" do
-  path '/etc/init.d/munge'
-  user 'root'
+template '/etc/init.d/munge' do
+  source 'slurm/munge-init.erb'
+  owner 'root'
   group 'root'
   mode '0755'
 end
 
-# Make sure the munge user exists
-user 'munge' do
+# Setup munge group
+group node['cluster']['munge']['group'] do
+  comment 'munge group'
+  gid node['cluster']['munge']['group_id']
+  system true
+end
+
+# Setup munge user
+user node['cluster']['munge']['user'] do
+  uid node['cluster']['munge']['user_id']
+  gid node['cluster']['munge']['group_id']
   manage_home false
   comment 'munge user'
   system true
@@ -78,7 +87,7 @@ dirs = ["/var/log/munge", "/etc/munge", "/var/run/munge"]
 dirs.each do |dir|
   directory dir do
     action :create
-    owner "munge"
-    group "munge"
+    owner node['cluster']['munge']['user']
+    group node['cluster']['munge']['group']
   end
 end

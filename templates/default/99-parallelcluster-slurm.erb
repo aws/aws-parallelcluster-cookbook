@@ -2,4 +2,4 @@ Cmnd_Alias SLURM_COMMANDS = /opt/slurm/bin/scontrol
 
 <%= node['cluster']['cluster_admin_user'] %> ALL = (root) NOPASSWD: SLURM_COMMANDS
 
-slurm ALL = (root) NOPASSWD: SLURM_COMMANDS
+<%= node['cluster']['slurm']['user'] %> ALL = (root) NOPASSWD: SLURM_COMMANDS

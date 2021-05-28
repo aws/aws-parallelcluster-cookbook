@@ -443,8 +443,8 @@ end
 def setup_munge_head_node
   # Generate munge key
   bash 'generate_munge_key' do
-    user 'munge'
-    group 'munge'
+    user node['cluster']['munge']['user']
+    group node['cluster']['munge']['group']
     cwd '/tmp'
     code <<-HEAD_CREATE_MUNGE_KEY
       set -e
@@ -483,7 +483,7 @@ def setup_munge_compute_node
       # Copy munge key from shared dir
       cp /home/#{node['cluster']['cluster_user']}/.munge/.munge.key /etc/munge/munge.key
       # Set ownership on the key
-      chown munge:munge /etc/munge/munge.key
+      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     COMPUTE_MUNGE_KEY
@@ -529,15 +529,15 @@ def check_process_running_as_user(process, user)
   end
 end
 
-def check_user_definition(user, uid, gid, description)
+def check_user_definition(user, uid, gid, description, shell = "/bin/bash")
   bash "check user definition for user #{user}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-    expected_passwd_line="#{user}:x:#{uid}:#{gid}:#{description}:/home/#{user}:/bin/bash"
+    expected_passwd_line="#{user}:x:#{uid}:#{gid}:#{description}:/home/#{user}:#{shell}"
     actual_passwd_line=$(grep #{user} /etc/passwd)
     if [[ "$actual_passwd_line" != "$expected_passwd_line" ]]; then
-      >&2 echo "Expected cluster admin user #{user} in /etc/passwd: $expected_passwd_line"
-      >&2 echo "Actual cluster admin user #{user} in /etc/passwd: $actual_passwd_line"
+      >&2 echo "Expected user #{user} in /etc/passwd: $expected_passwd_line"
+      >&2 echo "Actual user #{user} in /etc/passwd: $actual_passwd_line"
       exit 1
     fi
     TEST
@@ -551,8 +551,8 @@ def check_group_definition(group, gid)
     expected_group_line="#{group}:x:#{gid}:"
     actual_group_line=$(grep #{group} /etc/group)
     if [[ "$actual_group_line" != "$expected_group_line" ]]; then
-      >&2 echo "Expected cluster admin group #{group} in /etc/group: $expected_passwd_line"
-      >&2 echo "Actual cluster admin group #{group} in /etc/group: $actual_passwd_line"
+      >&2 echo "Expected group #{group} in /etc/group: $expected_passwd_line"
+      >&2 echo "Actual group #{group} in /etc/group: $actual_passwd_line"
       exit 1
     fi
     TEST

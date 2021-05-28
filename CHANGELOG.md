@@ -14,6 +14,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Remove Ganglia support.
 - Install ParallelCluster AWS Batch CLI at AMI build time.
 - Run daemons as cluster admin user (not root).
+- Add explicit assignment of names, uids, gids for slurm, munge and dcvextauth users.
 
 
 2.x.x

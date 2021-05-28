@@ -29,6 +29,7 @@ default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['cluster_config_path'] = "#{node['cluster']['configs_dir']}/cluster-config.yaml"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['configs_dir']}/instance-types-data.json"
+default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
 default['cluster']['python-version'] = '3.7.10'
@@ -112,6 +113,10 @@ default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['version'] = '20-11-7-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 default['cluster']['slurm']['sha1'] = 'ce927fbf2f7d5f908ed87c5d521abc696b9a2508'
+default['cluster']['slurm']['user'] = 'slurm'
+default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
+default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
+default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 # PMIx software
 default['cluster']['pmix']['version'] = '3.1.5'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
@@ -119,6 +124,10 @@ default['cluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03ec'
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.14'
 default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"
+default['cluster']['munge']['user'] = 'munge'
+default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
+default['cluster']['munge']['group'] = node['cluster']['munge']['user']
+default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
@@ -228,6 +237,9 @@ default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU s
 default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.0/Servers/#{node['cluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
+default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
+default['cluster']['dcv']['authenticator']['group'] = node['cluster']['dcv']['authenticator']['user']
+default['cluster']['dcv']['authenticator']['group_id'] = node['cluster']['dcv']['authenticator']['user_id']
 default['cluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cluster']['dcv']['authenticator']['user']}"
 default['cluster']['dcv']['authenticator']['certificate'] = "/etc/parallelcluster/ext-auth-certificate.pem"
 default['cluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
@@ -424,7 +436,6 @@ default['cluster']['efs_shared_dir'] = 'NONE'
 default['cluster']['efs_fs_id'] = nil
 default['cluster']['head_node'] = nil
 default['cluster']['head_node_private_ip'] = nil
-default['cluster']['reserved_base_uid'] = 400
 default['cluster']['cluster_admin_user'] = 'pcluster'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']

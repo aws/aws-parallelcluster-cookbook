@@ -38,8 +38,8 @@ DAEMON_EXEC="$sbindir/munged"
 #CONFIG=#_NOT_SUPPORTED_#
 PIDFILE="$localstatedir/run/munge/munged.pid"
 #NICE=
-USER="munge"
-GROUP="munge"
+USER=<%= node['cluster']['munge']['user'] %>
+GROUP=<%= node['cluster']['munge']['group'] %>
 #SIGHUP_RELOAD=#_NOT_SUPPORTED_#
 VARRUNDIR="$localstatedir/run/munge"
 

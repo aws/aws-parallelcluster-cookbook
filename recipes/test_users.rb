@@ -40,10 +40,62 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] ==
 end
 
 ###################
+# Slurm user
+###################
+if node['cluster']['scheduler'] == 'slurm'
+  check_user_definition(
+    node['cluster']['slurm']['user'],
+    node['cluster']['slurm']['user_id'],
+    node['cluster']['slurm']['group_id'],
+    'slurm user'
+  )
+
+  check_group_definition(
+    node['cluster']['slurm']['group'],
+    node['cluster']['slurm']['group_id']
+  )
+end
+
+###################
+# Munge user
+###################
+if node['cluster']['scheduler'] == 'slurm'
+  check_user_definition(
+    node['cluster']['munge']['user'],
+    node['cluster']['munge']['user_id'],
+    node['cluster']['munge']['group_id'],
+    'munge user',
+    '/sbin/nologin'
+  )
+
+  check_group_definition(
+    node['cluster']['munge']['group'],
+    node['cluster']['munge']['group_id']
+  )
+end
+
+###################
+# DCV ExtAuth user
+###################
+if node['conditions']['dcv_supported']
+  check_user_definition(
+    node['cluster']['dcv']['authenticator']['user'],
+    node['cluster']['dcv']['authenticator']['user_id'],
+    node['cluster']['dcv']['authenticator']['group_id'],
+    'NICE DCV External Authenticator user'
+  )
+
+  check_group_definition(
+    node['cluster']['dcv']['authenticator']['group'],
+    node['cluster']['dcv']['authenticator']['group_id']
+  )
+end
+
+###################
 # Slurm sudoers
 ###################
 if node['cluster']['scheduler'] == 'slurm'
-  [node['cluster']['cluster_admin_user'], "slurm"].each do |user|
+  [node['cluster']['cluster_admin_user'], node['cluster']['slurm']['user']].each do |user|
     check_sudoers_permissions(
       "/etc/sudoers.d/99-parallelcluster-slurm",
       user, "root", "SLURM_COMMANDS", "/opt/slurm/bin/scontrol"
