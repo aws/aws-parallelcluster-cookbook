@@ -52,6 +52,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - selinux-3.1.1 (from selinux-2.1.1)
   - ulimit-1.1.1 (from ulimit-1.0.0)
   - yum-6.1.1 (from yum-5.1.0)
+  - yum-epel-4.1.2 (from yum-epel-3.3.0)
 
 2.10.4
 -----
