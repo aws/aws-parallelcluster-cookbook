@@ -2,7 +2,7 @@
 ** iptables cookbook; version 8.0.0 --
 https://github.com/chef-cookbooks/iptables
 ** line cookbook; version 4.0.1 -- https://github.com/sous-chefs/line
-** NFS cookbook; version 2.6.4 --
+** NFS cookbook; version 3.0.0 --
 https://github.com/atomic-penguin/cookbook-nfs
 ** openssh cookbook; version 2.8.1 -- https://github.com/chef-cookbooks/openssh
 ** pyenv cookbook; version 3.1.1 -- https://github.com/sous-chefs/pyenv

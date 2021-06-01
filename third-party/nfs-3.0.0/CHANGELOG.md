@@ -1,3 +1,27 @@
+v3.0.0
+------
+
+This release unifies systemd based NFS systems. Much of the platform branching has been removed dropping support for System V initialized NFS servers.
+
+* **BREAKING**
+  * Added
+    * Debian 10
+    * Ubuntu 18.04
+    * Ubuntu 20.04
+    * CentOS/RHEL 8
+  * Dropped
+    * Debian 8
+    * Debian 9
+    * CentOS/RHEL 5
+    * CentOS/RHEL 6
+    * Ubuntu 14.04
+  * Iffy (not supported)
+    * SUSE
+    * FreeBSD
+
+* @rexcsn - corrected nfs-idmap service name
+* Set default_env so exportfs can be found under Chef 14.2+
+
 v2.6.4
 ------
 

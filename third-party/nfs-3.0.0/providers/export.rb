@@ -42,6 +42,7 @@ action :create do
 
     execute 'exportfs' do
       command 'exportfs -ar'
+      default_env true if respond_to?('default_env')
       action :nothing
     end
 

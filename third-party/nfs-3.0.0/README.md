@@ -1,8 +1,6 @@
 NFS
 ---
 
-[![Build Status](https://secure.travis-ci.org/atomic-penguin/cookbook-nfs.png?branch=master)](http://travis-ci.org/atomic-penguin/cookbook-nfs)
-
 Description
 -----------
 
@@ -11,7 +9,7 @@ Installs and configures NFS client, or server components
 Requirements
 ------------
 
-Should work on any RHEL, Debian, Ubuntu, SUSE, and FreeBSD distributions.
+Should work on any RHEL 7+, Debian 10+, Ubuntu 15.04+ distributions.
 
 This cookbook depends on Sean O'Meara's [line cookbook](https://github.com/someara/line-cookbook)
 
@@ -21,17 +19,11 @@ This cookbook depends on Sean O'Meara's [line cookbook](https://github.com/somea
   - Case switch in attributes to choose NFS client packages dependent on platform.
 
 * `nfs['service']`
-  - `['portmap']` - the portmap or rpcbind service depending on platform
-  - `['lock']` - the statd or nfslock service depending on platform
-  - `['server']` - the server component, nfs or nfs-kernel-server depending on platform
+  - `['config']` - only set on Debian/Ubuntu to work around loose systemd unit file dependencies on this platform family - debian: `nfs-config.service`
+  - `['portmap']` - the rpcbind service - default: `nfs-client.target`
+  - `['lock']` - the rpc-statd service - default: `nfs-client.target`, debian: `rpc-statd.service`
+  - `['server']` - the server component, - default: `nfs-server.service`, debian: `nfs-kernel-server.service`
   - `['idmap']` - the NFSv4 idmap component
-
-* `nfs['service_provider']`
-  - NOTE: This is a hack to set the service provider explicitly to Upstart on Ubuntu platforms.
-  - `['portmap']` - provider for portmap service, chosen by platform
-  - `['lock']` - provider for lock service, chosen by platform
-  - `['server']` - provider for server service, chosen by platform
-  - `['idmap']` - provider for NFSv4 idmap service
 
 * `nfs['config']`
   - `client_templates` - templates to iterate through on client systems, chosen by platform
@@ -52,7 +44,7 @@ This cookbook depends on Sean O'Meara's [line cookbook](https://github.com/somea
   - Defaults to nil, deferring to the default behavior provided by running kernel. 
 
 * `nfs['mountd_flags']` - BSD launch options for mountd.
-  `nfs['server_flags']` - BSD launch options for nfsd.
+* `nfs['server_flags']` - BSD launch options for nfsd.
 
 * `nfs['idmap']`
    - Attributes specific to idmap template and service.
@@ -163,12 +155,13 @@ system like so.
 ## License and Author
 
 Author: Eric G. Wolfe (eric.wolfe@gmail.com) [![endorse](https://api.coderwall.com/atomic-penguin/endorsecount.png)](https://coderwall.com/atomic-penguin)
-Contributors: Riot Games, Sean OMeara
 
-Copyright 2011-2017, Eric G. Wolfe
+Contributors: Riot Games, Sean O'Meara
+
+Copyright 2011-2020, Eric G. Wolfe
 Copyright 2014, Joe Rocklin
 Copyright 2012, Riot Games
-Copyright 2012, Sean OMeara
+Copyright 2012, Sean O'Meara
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
