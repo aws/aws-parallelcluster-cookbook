@@ -45,6 +45,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade third-party cookbook dependencies:
   - apt-7.4.0 (from apt-7.3.0)
   - iptables-8.0.0 (from iptables-7.1.0)
+  - line-4.0.1 (from line-2.9.0)
 
 2.10.4
 -----
