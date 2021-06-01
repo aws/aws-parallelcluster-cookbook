@@ -1,7 +1,7 @@
 # Cookbook:: ulimit
 # Recipe:: default
 #
-# Copyright 2012, Brightcove, Inc
+# Copyright:: 2012, Brightcove, Inc
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,7 @@
 #
 ulimit = node['ulimit']
 
-case node['platform_family']
-when 'debian'
+if platform_family?('debian')
   template '/etc/pam.d/su' do
     cookbook ulimit['pam_su_template_cookbook']
   end
