@@ -7,7 +7,7 @@ source chef_repo: "."
 
 metadata
 
-cookbook "apt", path: "./third-party/apt-7.3.0"
+cookbook "apt", path: "./third-party/apt-7.4.0"
 cookbook "iptables", path: "./third-party/iptables-7.1.0"
 cookbook "line", path: "./third-party/line-2.9.0"
 cookbook "nfs", path: "./third-party/nfs-2.6.4"
