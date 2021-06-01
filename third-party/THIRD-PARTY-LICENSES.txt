@@ -8,7 +8,7 @@ https://github.com/atomic-penguin/cookbook-nfs
 ** pyenv cookbook; version 3.4.2 -- https://github.com/sous-chefs/pyenv
 ** SELinux cookbook; version 3.1.1 -- https://github.com/chef-cookbooks/selinux
 ** ulimit cookbook; version 1.1.1 -- https://github.com/bmhatfield/chef-ulimit
-** yum cookbook; version 5.1.0 -- https://github.com/chef-cookbooks/yum
+** yum cookbook; version 6.1.1 -- https://github.com/chef-cookbooks/yum
 ** yum-epel cookbook; version 3.3.0 --
 https://github.com/chef-cookbooks/yum-epel
 
