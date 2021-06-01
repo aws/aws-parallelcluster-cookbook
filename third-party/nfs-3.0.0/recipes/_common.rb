@@ -36,7 +36,7 @@ node['nfs']['config']['client_templates'].each do |client_template|
   template client_template do
     mode 0o0644
     client_service_list.each do |component|
-      notifies :restart, "service[#{component}]", :immediately
+      notifies :restart, "service[#{component}]", :delayed
     end
   end
 end
