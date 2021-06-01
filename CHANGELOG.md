@@ -49,7 +49,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - nfs-3.0.0 (from nfs-2.6.4)
   - openssh-2.9.1 (from openssh-2.8.1)
   - pyenv-3.4.2 (from pyenv-3.1.1)
-  - selinux-3.1.1 (fron selinux-2.1.1)
+  - selinux-3.1.1 (from selinux-2.1.1)
+  - ulimit-1.1.1 (from ulimit-1.0.0)
 
 2.10.4
 -----

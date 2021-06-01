@@ -2,7 +2,23 @@
 
 This file is used to list changes made in each version of ulimit.
 
-## 1.0.0 
+## 1.1.1 (08-07-2020)
+
+- Resolve compatibility with Chef Infra Client 16+
+- Remove emptylines in the template that caused reconverges if updating the cookbook
+- Use coerce to add .conf to any passed filename
+
+## 1.1.0 (03-13-2020)
+
+- Converted `user_ulimit` resource from a legacy HWRP to a custom resource
+- Added ChefSpec tests fro the `user_ulimit` resource
+- Resolved failures in `ulimit_domain` resource when running on Chef Infra Client 16
+- Switched testing from Travis-CI to GitHub Actions
+- Resolved minor Cookstyle warnings in the metadata.rb file
+- Renamed the kitchen.yml file to not be hidden
+- Added a new `virt_limit` property to the `user_ulimit` resource
+
+## 1.0.0
 
 - Breaking change: This cookbook now requires Chef 12.7 or later
 - LWRPs converted to custom resources with Chef 13 compatibility

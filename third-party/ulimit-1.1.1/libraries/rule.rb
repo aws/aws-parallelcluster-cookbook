@@ -3,6 +3,8 @@ require 'chef/resource'
 class Chef
   class Resource
     class UlimitRule < Chef::Resource
+      provides :ulimit_rule
+
       property :type, [Symbol, String], required: true
       property :item, [Symbol, String], required: true
       property :value, [String, Numeric], required: true
