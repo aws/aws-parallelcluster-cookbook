@@ -1,3 +1,5 @@
+unified_mode true
+
 include Iptables::Cookbook::Helpers
 
 property :ip_version, Symbol,
@@ -41,7 +43,7 @@ action :enable do
   case node['platform_family']
   when 'debian'
     with_run_context :root do
-      edit_resource(:service, 'netfilter-persistent') do
+      edit_resource(:service, 'netfilter-persistent') do |new_resource|
         subscribes :restart, "template[#{new_resource.config_file}]", :delayed
         action :enable
       end
@@ -61,7 +63,7 @@ action :enable do
       )
     end
     with_run_context :root do
-      edit_resource(:service, new_resource.service_name) do
+      edit_resource(:service, new_resource.service_name) do |new_resource|
         subscribes :restart, "template[#{new_resource.config_file}]", :delayed
         action [:enable, :start]
       end

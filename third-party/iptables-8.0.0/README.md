@@ -15,7 +15,7 @@ Installs iptables and provides a custom resource for adding and removing iptable
 
 ### Chef
 
-- Chef 14+
+- Chef 15.3+
 
 ## Resources
 
