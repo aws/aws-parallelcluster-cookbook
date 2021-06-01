@@ -16,6 +16,7 @@ supports 'centos', '>= 7'
 supports 'ubuntu', '>= 18.04'
 
 depends 'apt', '~> 7.4.0'
+depends 'iptables', '~> 8.0.0'
 depends 'nfs', '~> 2.6.4'
 depends 'line', '~> 2.9.0'
 depends 'openssh', '~> 2.8.1'

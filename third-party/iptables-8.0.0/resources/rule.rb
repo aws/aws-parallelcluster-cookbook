@@ -1,3 +1,5 @@
+unified_mode true
+
 include Iptables::Cookbook::Helpers
 
 property :table, [Symbol, String],

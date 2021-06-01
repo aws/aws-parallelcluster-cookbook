@@ -16,7 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-Chef::Recipe.include Iptables::Cookbook::Helpers
+Chef::DSL::Recipe.include Iptables::Cookbook::Helpers
 include_recipe 'iptables::_package'
 
 Chef::Log.warn('The recipes inside iptables will be removed in the next major itteration (8.0.0), please change to resources provided by the iptables cookbook')

@@ -1,5 +1,5 @@
 ** apt Cookbook; version 7.4.0 -- https://github.com/chef-cookbooks/apt
-** iptables cookbook; version 7.1.0 --
+** iptables cookbook; version 8.0.0 --
 https://github.com/chef-cookbooks/iptables
 ** line cookbook; version 2.9.0 -- https://github.com/sous-chefs/line
 ** NFS cookbook; version 2.6.4 --
