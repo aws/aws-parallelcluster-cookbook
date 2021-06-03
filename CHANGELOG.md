@@ -36,7 +36,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Specify instance GPU model as GRES GPU Type in gres.conf
   - Reduce default Slurm ResumeTimeout to from 3600 seconds to 1800 seconds
 - Upgrade Arm Performance Libraries (APL) to version 21.0.0
-- Upgrade NICE DCV to version 2021.0-10242.
+- Upgrade NICE DCV to version 2021.1-10557.
 - Upgrade NVIDIA driver to version 460.73.01.
 - Upgrade CUDA library to version 11.3.0.
 - Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-460`.

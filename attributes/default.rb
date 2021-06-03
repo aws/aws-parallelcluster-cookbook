@@ -161,30 +161,30 @@ default['cfncluster']['efa']['unsupported_aarch64_oses'] = %w[centos7 centos8]
 # NICE DCV
 default['cfncluster']['dcv_port'] = 8443
 default['cfncluster']['dcv']['installed'] = 'yes'
-default['cfncluster']['dcv']['version'] = '2021.0-10242'
+default['cfncluster']['dcv']['version'] = '2021.1-10557'
 if arm_instance?
   default['cfncluster']['dcv']['supported_os'] = %w[centos7 centos8 ubuntu18 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>8' => "6a8f08b1e44b557ebc627086ec6ec7f259a85e555242a37fc538a76eabaf73a1",
-      '~>7' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071"
+      '~>8' => "79b6e256f186c2b5303879e12019ff034637e902cc167c848619a6caaa8001b1",
+      '~>7' => "b3b47d8134800149758da92e4f5b97941245144a1cccf07bf44aa924d2b214a4"
     },
-    'amazon' => { '2' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071" },
-    'ubuntu' => { '18.04' => "8ada2cfa0bcac2285e7cfc65f297ab9322d35261422ced121e8cee78998f5472" }
+    'amazon' => { '2' => "b3b47d8134800149758da92e4f5b97941245144a1cccf07bf44aa924d2b214a4" },
+    'ubuntu' => { '18.04' => "8e910b0de25fb744cb21c1a0a04a01d8a652d03bd836cd1f85d12f313652340e" }
   )
 else
   default['cfncluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 ubuntu20 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>8' => "5c415a8767a9e2a3e6d6c76e2c858335a2dc8ed13efb2a6abc1e9bada6f3b3b9",
-      '~>7' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39"
+      '~>8' => "bce3de696737e01fc9dc933a2d19c8d3cd3303419f07e8dd0e44696368d87a0d",
+      '~>7' => "c0de28f38440c18757ef014e841b3bc79b7555e8b05904e10ddca1ce21d6e47f"
     },
-    'amazon' => { '2' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39" },
+    'amazon' => { '2' => "c0de28f38440c18757ef014e841b3bc79b7555e8b05904e10ddca1ce21d6e47f" },
     'ubuntu' => {
-      '18.04' => "381895bef0f8e8756a33ba0960329130935c0c68cb79fb391bd97015f497568c",
-      '20.04' => "431e977dc936bd347146a57eb09033ff8945fe99ad85da64f5ce74c8de6e655c"
+      '18.04' => "40908548266e7aa4ef2ca954eb25bf898d10ca00fc6b3d7b8b47cb3c9ff00ef9",
+      '20.04' => "f8e9e9b64617066a25d67f4523a0c13f1b7eff22d9cb044aeebac9f97fa57cbf"
     }
   )
 end
@@ -202,7 +202,7 @@ default['cfncluster']['dcv']['package'] = value_for_platform(
     'default' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-#{node['cfncluster']['cfn_base_os']}-#{node['cfncluster']['dcv']['url_architecture_id']}"
   }
 )
-default['cfncluster']['dcv']['server']['version'] = '2021.0.10242-1'
+default['cfncluster']['dcv']['server']['version'] = '2021.1.10557-1'
 default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
     '~>8' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
@@ -213,7 +213,7 @@ default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server p
     'default' => "nice-dcv-server_#{node['cfncluster']['dcv']['server']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
   }
 )
-default['cfncluster']['dcv']['xdcv']['version'] = '2021.0.380-1'
+default['cfncluster']['dcv']['xdcv']['version'] = '2021.1.392-1'
 default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
     '~>8' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
@@ -224,7 +224,7 @@ default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create 
     'default' => "nice-xdcv_#{node['cfncluster']['dcv']['xdcv']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
   }
 )
-default['cfncluster']['dcv']['gl']['version'] = '2021.0.912-1'
+default['cfncluster']['dcv']['gl']['version'] = '2021.1.937-1'
 default['cfncluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
     '~>8' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
@@ -235,7 +235,7 @@ default['cfncluster']['dcv']['gl'] = value_for_platform( # required to enable GP
     'default' => "nice-dcv-gl_#{node['cfncluster']['dcv']['gl']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
   }
 )
-default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.0/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
+default['cfncluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.1/Servers/#{node['cfncluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cfncluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cfncluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cfncluster']['dcv']['authenticator']['user']}"
