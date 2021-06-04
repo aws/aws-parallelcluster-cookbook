@@ -21,23 +21,6 @@ include_recipe 'aws-parallelcluster::test_processes'
 ###################
 # AWS Cli
 ###################
-execute 'execute awscli as user' do
-  command "aws --version"
-  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
-  user node['cluster']['cluster_user']
-end
-
-execute 'execute awscli as root' do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws --version"
-  environment('PATH' => '/usr/local/bin:/usr/bin/:$PATH')
-end
-
-[node['cluster']['cookbook_virtualenv_path'], node['cluster']['node_virtualenv_path']].each do |venv_path|
-  execute "check #{venv_path} python version" do
-    command %(#{venv_path}/bin/python -V | grep "Python #{node['cluster']['python-version']}")
-  end
-end
-
 bash 'check awscli regions' do
   cwd Chef::Config[:file_cache_path]
   code <<-AWSREGIONS
@@ -63,16 +46,6 @@ if node['cluster']['node_type'] == 'HeadNode'
   execute 'ssh localhost as user' do
     command "ssh localhost hostname"
     environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
-    user node['cluster']['cluster_user']
-  end
-end
-
-###################
-# munge
-###################
-if node['cluster']['scheduler'] == 'slurm'
-  execute 'check munge installed' do
-    command 'munge --version'
     user node['cluster']['cluster_user']
   end
 end
@@ -206,17 +179,7 @@ end
 # EFA - Intel MPI
 ###################
 if node['conditions']['intel_mpi_supported']
-  case node['cluster']['os']
-  when 'alinux2', 'centos7', 'centos8'
-    execute 'check efa rpm installed' do
-      command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
-      user node['cluster']['cluster_user']
-    end
-    execute 'check intel mpi installed' do
-      command "rpm -qa | grep intel-mpi"
-      user node['cluster']['cluster_user']
-    end
-  when 'ubuntu1804'
+  if node['cluster']['os'] == 'ubuntu1804'
     case node['cluster']['node_type']
     when 'HeadNode'
       execute 'check ptrace protection enabled' do
@@ -228,10 +191,6 @@ if node['conditions']['intel_mpi_supported']
         command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 0'"
         user node['cluster']['cluster_user']
       end
-    end
-    execute 'check efa rpm installed' do
-      command "dpkg -l | grep libfabric && dpkg -l | grep 'efa '"
-      user node['cluster']['cluster_user']
     end
   end
 
@@ -278,126 +237,6 @@ unless node['cluster']['os'].end_with?("-custom")
       echo '{ "cluster" : { "dcv_enabled" : "head_node" } }' > /tmp/extra.json
       jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster'
     JQMERGE
-  end
-end
-
-###################
-# NVIDIA - CUDA
-###################
-bash 'test nvidia driver install' do
-  cwd Chef::Config[:file_cache_path]
-  code <<-TESTNVIDIA
-    has_gpu=$(lspci | grep -o "NVIDIA")
-    if [ -z "$has_gpu" ]; then
-      echo "No GPU detected, no test needed."
-      exit 0
-    fi
-
-    set -e
-    driver_ver="#{node['cluster']['nvidia']['driver_version']}"
-    export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
-
-    # Test NVIDIA Driver installation
-    echo "Testing NVIDIA driver install..."
-    # grep driver version from nvidia-smi output. If driver is not installed nvidia-smi command will fail
-    driver_output=$(nvidia-smi | grep -E -o "Driver Version: [0-9.]+")
-    if [ "$driver_output" != "Driver Version: $driver_ver" ]; then
-      echo "NVIDIA driver installed incorrectly! Installed $driver_output but expected version $driver_ver"
-      exit 1
-    else
-      echo "Correctly installed NVIDIA $driver_output"
-    fi
-  TESTNVIDIA
-end
-
-unless node['cluster']['base_os'] == 'alinux' && get_nvswitches > 1
-  bash 'test CUDA install' do
-    cwd Chef::Config[:file_cache_path]
-    code <<-TESTCUDA
-      has_gpu=$(lspci | grep -o "NVIDIA")
-      if [ -z "$has_gpu" ]; then
-        echo "No GPU detected, no test needed."
-        exit 0
-      fi
-
-      set -e
-      cuda_ver="#{node['cluster']['nvidia']['cuda_version']}"
-      # Test CUDA installation
-      echo "Testing CUDA install with nvcc..."
-      export PATH=/usr/local/cuda-$cuda_ver/bin:$PATH
-      export LD_LIBRARY_PATH=/usr/local/cuda-$cuda_ver/lib64:$LD_LIBRARY_PATH
-      # grep CUDA version from nvcc output. If CUDA is not installed nvcc command will fail
-      cuda_output=$(nvcc -V | grep -E -o "release [0-9]+.[0-9]+")
-      if [ "$cuda_output" != "release $cuda_ver" ]; then
-        echo "CUDA installed incorrectly! Installed $cuda_output but expected $cuda_ver"
-        exit 1
-      else
-        echo "CUDA nvcc test passed, $cuda_output"
-      fi
-
-      # Test deviceQuery
-      echo "Testing CUDA install with deviceQuery..."
-      /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
-      echo "CUDA deviceQuery test passed"
-      echo "Correctly installed CUDA $cuda_output"
-    TESTCUDA
-  end
-end
-###################
-# FabricManager
-###################
-if get_nvswitches > 1
-  bash 'test fabric-manager daemon' do
-    cwd Chef::Config[:file_cache_path]
-    code <<-TESTFM
-      set -e
-      systemctl show -p SubState nvidia-fabricmanager | grep -i running
-      echo "NVIDIA Fabric Manager service correctly started"
-    TESTFM
-  end
-end
-
-###################
-# CloudWatch
-###################
-# Verify that the CloudWatch agent's status can be queried. It should always be stopped during kitchen tests.
-execute 'cloudwatch-agent-status' do
-  user 'root'
-  command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep stopped"
-end
-
-###################
-# Intel Python
-###################
-# Intel Python Libraries
-if node['conditions']['intel_hpc_platform_supported'] && node['cluster']['enable_intel_hpc_platform'] == 'true'
-  %w[2 3].each do |python_version|
-    intel_package_version = node['cluster']["intelpython#{python_version}"]['version']
-    execute "check-intel-python#{python_version}-rpm" do
-      # Output code will be 1 if version is different
-      command "rpm -q intelpython#{python_version} | grep #{intel_package_version}"
-    end
-    execute "check-intel-python#{python_version}-executable" do
-      command "/opt/intel/intelpython#{python_version}/bin/python -V"
-    end
-  end
-end
-
-###################
-# FSx Lustre
-###################
-if node['conditions']['lustre_supported']
-  case node['cluster']['os']
-  when 'centos7'
-    execute 'check for lustre libraries' do
-      command "rpm -qa | grep lustre-client"
-      user node['cluster']['cluster_user']
-    end
-  when 'ubuntu1804'
-    execute 'check for lustre libraries' do
-      command "dpkg -l | grep lustre"
-      user node['cluster']['cluster_user']
-    end
   end
 end
 
@@ -466,51 +305,6 @@ unless node['cluster']['os'].end_with?("-custom")
 end
 
 ###################
-# PIP
-###################
-require 'chef/mixin/shell_out'
-
-virtual_envs = [node['cluster']['node_virtualenv_path'], node['cluster']['cookbook_virtualenv_path']]
-
-virtual_envs.each do |virtual_env|
-  ruby_block 'check pip version' do
-    block do
-      pip_version = nil
-      pip_show = shell_out!("#{virtual_env}/bin/pip show pip").stdout.strip
-      pip_show.split(/\n+/).each do |line|
-        pip_version = line.split(/\s+/)[1] if line.start_with?('Version:')
-      end
-      Chef::Log.debug("pip version in virtualenv #{virtual_env} is #{pip_version}")
-      if !pip_version || pip_version.to_f < 19.3
-        # pip versions >= 19.3 is required to enable installation of python wheel binaries on Graviton
-        raise "pip version in virtualenv #{virtual_env} must be greater than 19.3"
-      end
-    end
-  end
-end
-
-###################
-# ARM - PL
-###################
-if node['conditions']['arm_pl_supported']
-  bash 'check gcc version and module loaded' do
-    cwd Chef::Config[:file_cache_path]
-    code <<-ARMPL
-      set -e
-      # Initialize module
-      unset MODULEPATH
-      source /etc/profile.d/modules.sh
-      (module avail)2>&1 | grep armpl/#{node['cluster']['armpl']['version']}
-      module load armpl/#{node['cluster']['armpl']['version']}
-      gcc --version | grep #{node['cluster']['armpl']['gcc']['major_minor_version']}
-      (module list)2>&1 | grep armpl/#{node['cluster']['armpl']['version']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}
-      (module list)2>&1 | grep armpl/gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}
-    ARMPL
-    user node['cluster']['cluster_user']
-  end
-end
-
-###################
 # Pcluster AWSBatch CLI
 ###################
 if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'HeadNode'
@@ -526,29 +320,5 @@ if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] ==
       BATCHCLI
       user node['cluster']['cluster_user']
     end
-  end
-end
-
-###################
-# Python
-###################
-execute 'check python3 installed' do
-  command "which python3"
-  user node['cluster']['cluster_user']
-end
-
-##################
-# dpkg
-###################
-if node['platform_family'] != 'debian'
-  bash 'check dpkg is not installed on non-debian OS' do
-    cwd Chef::Config[:file_cache_path]
-    code <<-DPKG
-      if command -v dpkg &> /dev/null; then
-        echo "ERROR: dpkg found on non-Debian system"
-        exit 1
-      fi
-    DPKG
-    user node['cluster']['cfn_cluster_user']
   end
 end
