@@ -29,7 +29,7 @@ provisioner:
     client_fork: false  # Forked instances don't return the real exit code
 
 platforms:
-  - name: amazon-linux-2-latest
+  - name: amzn2
     driver_plugin: ec2
     driver_config:
       image_id: <%= ENV['ALINUX2_IMAGE_ID'] %>
@@ -90,7 +90,7 @@ platforms:
     transport:
       username: ec2-user
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos-7-minimal
+  - name: centos7
     driver_plugin: ec2
     driver_config:
       image_id: <%= ENV['CENTOS7_IMAGE_ID'] %>
@@ -151,14 +151,14 @@ platforms:
     transport:
       username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: centos-8-minimal
+  - name: centos8
     driver_plugin: ec2
     driver_config:
       image_id: <%= ENV['CENTOS8_IMAGE_ID'] %>
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['VOLUME_SIZE'] || 35 %>
+            volume_size: <%= ENV['VOLUME_SIZE'] || 52 %>
             volume_type: gp2
             delete_on_termination: true
         - device_name: /dev/xvdba
@@ -212,7 +212,7 @@ platforms:
     transport:
       username: centos
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: ubuntu-18-04-lts
+  - name: ubuntu-1804-lts
     driver_plugin: ec2
     driver_config:
       image_id: <%= ENV['UBUNTU1804_IMAGE_ID'] %>
@@ -273,7 +273,7 @@ platforms:
     transport:
       username: ubuntu
       ssh_key: <%= ENV['EC2_SSH_KEY_PATH'] %>
-  - name: ubuntu-20-04-lts
+  - name: ubuntu-2004-lts
     driver_plugin: ec2
     driver_config:
       image_id: <%= ENV['UBUNTU2004_IMAGE_ID'] %>
