@@ -42,7 +42,7 @@ when 'MasterServer', nil
   ruby_block "Validate Slurm Tarball Checksum" do
     block do
       require 'digest'
-      checksum = Digest::SHA1.file(slurm_tarball).hexdigest
+      checksum = Digest::SHA1.file(slurm_tarball).hexdigest # nosemgrep
       raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cfncluster']['slurm']['sha1']}" if checksum != node['cfncluster']['slurm']['sha1']
     end
   end
@@ -59,7 +59,7 @@ when 'MasterServer', nil
       source #{node['cfncluster']['cookbook_virtualenv_path']}/bin/activate
 
       tar xf #{slurm_tarball}
-      cd slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
       ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
@@ -89,7 +89,7 @@ when 'MasterServer', nil
     cwd Chef::Config[:file_cache_path]
     code <<-SLURMLICENSE
       set -e
-      cd slurm-#{node['cfncluster']['slurm']['version']}
+      cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
       cp -v COPYING #{node['cfncluster']['license_dir']}/slurm/COPYING
       cp -v DISCLAIMER #{node['cfncluster']['license_dir']}/slurm/DISCLAIMER
       cp -v LICENSE.OpenSSL #{node['cfncluster']['license_dir']}/slurm/LICENSE.OpenSSL
@@ -100,12 +100,13 @@ when 'MasterServer', nil
   end
 
   # Install PerlSwitch
-  if node['platform'] == 'ubuntu'
+  case node['platform']
+  when 'ubuntu'
     package 'libswitch-perl' do
       retries 3
       retry_delay 5
     end
-  elsif node['platform'] == 'centos' || node['platform'] == 'amazon'
+  when 'centos', 'amazon'
     package 'perl-Switch' do
       retries 3
       retry_delay 5

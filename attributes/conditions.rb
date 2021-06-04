@@ -20,6 +20,6 @@ default['conditions']['intel_mpi_supported'] = !arm_instance?
 default['conditions']['intel_hpc_platform_supported'] = !arm_instance? && platform_supports_intel_hpc_platform?
 default['conditions']['dcv_supported'] = platform_supports_dcv?
 default['conditions']['ami_bootstrapped'] = ami_bootstrapped?
-default['conditions']['efa_supported'] = !arm_instance? || (node['cfncluster']['cfn_base_os'] != "centos8")
+default['conditions']['efa_supported'] = !arm_instance? || !default['cfncluster']['efa']['unsupported_aarch64_oses'].include?(node['cfncluster']['cfn_base_os'])
 default['conditions']['overwrite_nfs_template'] = overwrite_nfs_template?
 default['conditions']['arm_pl_supported'] = arm_instance?

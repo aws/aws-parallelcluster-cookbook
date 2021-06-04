@@ -236,7 +236,6 @@ def test_check_auth(mocker):
     assert_that(DCVAuthenticator._check_auth("mysession2", token)).is_none()
 
 
-# py 2.7 compatibility
 def obtain_timestamp(date):
     return (date - datetime(1970, 1, 1)).total_seconds()
 

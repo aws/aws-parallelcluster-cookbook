@@ -78,10 +78,13 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
   end
 
   # Install NVIDIA Fabric Manager
+  repo_domain = "com"
+  repo_domain = "cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
+  repo_uri = node['cfncluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
   add_package_repository(
     "nvidia-fm-repo",
-    node['cfncluster']['nvidia']['fabricmanager']['repository_uri'],
-    "#{node['cfncluster']['nvidia']['fabricmanager']['repository_uri']}/#{node['cfncluster']['nvidia']['fabricmanager']['repository_key']}",
+    repo_uri,
+    "#{repo_uri}/#{node['cfncluster']['nvidia']['fabricmanager']['repository_key']}",
     "/"
   )
 

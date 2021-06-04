@@ -21,7 +21,7 @@ raid_shared_dir = node['cfncluster']['cfn_raid_parameters'].split(',')[0]
 
 if raid_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  raid_shared_dir = "/" + raid_shared_dir unless raid_shared_dir.start_with?("/")
+  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
 
   # Parse and determine RAID type (cast into integer)
   raid_type = node['cfncluster']['cfn_raid_parameters'].split(',')[1].strip.to_i
@@ -59,6 +59,7 @@ if raid_shared_dir != "NONE"
   # Create RAID device with mdadm
   raid_superblock_version = value_for_platform(
     'centos' => { '>=8' => '1.2' },
+    'ubuntu' => { '>=20.04' => '1.2' },
     'default' => '0.90'
   )
   mdadm "MY_RAID" do
@@ -106,8 +107,8 @@ if raid_shared_dir != "NONE"
     fstype "ext4"
     options "defaults,nofail,_netdev"
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 
   # Make sure shared directory permissions are correct

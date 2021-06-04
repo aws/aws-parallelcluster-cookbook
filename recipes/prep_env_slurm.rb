@@ -17,7 +17,7 @@
 
 # Ensure slurm plugin directory is in place
 # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
-directory "#{node['cfncluster']['slurm_plugin_dir']}" do
+directory node['cfncluster']['slurm_plugin_dir'] do
   user 'root'
   group 'root'
   mode '0755'
@@ -44,7 +44,7 @@ if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
     end
   end
 
-  file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do
+  file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do # ~FC005
     content(lazy { node['cfncluster']['slurm_nodename'] })
     mode '0644'
     owner 'root'

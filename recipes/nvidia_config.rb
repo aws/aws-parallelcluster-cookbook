@@ -18,7 +18,7 @@
 # Start nvidia fabric manager on NVSwitch enabled systems
 if get_nvswitches > 1
   service 'nvidia-fabricmanager' do
-    action [:start, :enable]
+    action %i[start enable]
     supports status: true
   end
 end

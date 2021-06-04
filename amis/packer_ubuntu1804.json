@@ -195,7 +195,7 @@
       "inline" : [
         "set -x",
         "region=\"{{user `region`}}\"",
-        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
+        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install-1.1.0.sh\"",
         "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
         "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
       ]
@@ -222,7 +222,7 @@
         "/etc/chef/cookbooks"
       ],
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "json" : {
         "cfncluster" : {
           "default_pre_reboot" : "false"
@@ -262,7 +262,7 @@
         "/etc/chef/cookbooks"
       ],
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "aws-parallelcluster::default"
       ]
@@ -280,7 +280,7 @@
         }
       },
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "aws-parallelcluster::default"
       ]

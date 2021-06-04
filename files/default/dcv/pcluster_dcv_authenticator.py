@@ -9,6 +9,7 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+import argparse
 import errno
 import hashlib
 import json
@@ -27,8 +28,6 @@ from logging.handlers import RotatingFileHandler
 from pwd import getpwuid
 from socketserver import ThreadingMixIn
 from urllib.parse import parse_qsl, urlparse
-
-import argparse
 
 AUTHORIZATION_FILE_DIR = "/var/spool/parallelcluster/pcluster_dcv_authenticator"
 LOG_FILE_PATH = "/var/log/parallelcluster/pcluster_dcv_authenticator.log"
@@ -358,7 +357,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         """
         logger.info("Verifying NICE DCV session validity..")
         # Remove the first and the last because they are the heading and empty, respectively
-        processes = subprocess.check_output(["ps", "aux"]).decode("utf-8").split("\n")[1:-1]
+        processes = subprocess.check_output(["ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec
 
         # Check the filter is empty
         if not next(
@@ -410,9 +409,11 @@ def _run_server(port, certificate=None, key=None):
 
     if certificate:
         if key:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, keyfile=key, server_side=True)
+            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep
+                httpd.socket, certfile=certificate, keyfile=key, server_side=True
+            )
         else:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)
+            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)  # nosec nosemgrep
     print(
         "Starting DCV external authenticator {PROTOCOL} server on port {PORT}, use <Ctrl-C> to stop".format(
             PROTOCOL="HTTPS" if certificate else "HTTP", PORT=port

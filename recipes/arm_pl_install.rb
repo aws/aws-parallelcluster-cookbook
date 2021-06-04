@@ -17,8 +17,14 @@
 
 return unless node['conditions']['arm_pl_supported']
 
-armpl_installer = "#{node['cfncluster']['sources_dir']}/arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar"
+armpl_installer = "#{node['cfncluster']['sources_dir']}/"\
+                  "arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar"
 armpl_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/#{node['cfncluster']['armpl']['url']}"
+
+# binutils v2.30 is required for Centos7 architecture detection
+# these must be installed in this order
+package 'centos-release-scl-rh' if node['cfncluster']['cfn_base_os'] == 'centos7'
+package 'devtoolset-8-binutils' if node['cfncluster']['cfn_base_os'] == 'centos7'
 
 # fetch armpl installer script
 remote_file armpl_installer do

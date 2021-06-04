@@ -175,10 +175,11 @@ end
 ###################
 # Ganglia
 ###################
-if node['init_package'] == 'init'
+case node['init_package']
+when 'init'
   gmond_check_command = "service #{node['cfncluster']['ganglia']['gmond_service']} status | grep -i running"
   gmetad_check_command = "service gmetad status | grep -i running"
-elsif node['init_package'] == 'systemd'
+when 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
   gmond_check_command = "systemctl show -p SubState #{node['cfncluster']['ganglia']['gmond_service']} | grep -i running"
@@ -195,7 +196,7 @@ when 'MasterServer'
     command gmetad_check_command
   end
 
-  execute 'check ganglia webpage' do
+  execute 'check ganglia webpage' do # ~FC041
     command 'curl --silent -L http://localhost/ganglia | grep "<title>Ganglia"'
   end
 when 'ComputeFleet'
@@ -207,20 +208,22 @@ end
 ###################
 # Amazon Time Sync
 ###################
-if node['init_package'] == 'init'
+case node['init_package']
+when 'init'
   get_chrony_status_command = "service #{node['cfncluster']['chrony']['service']} status"
-elsif node['init_package'] == 'systemd'
+when 'systemd'
   # $ systemctl show -p SubState <service>
   # SubState=Running
   get_chrony_status_command = "systemctl show -p SubState #{node['cfncluster']['chrony']['service']}"
 end
-chrony_check_command = get_chrony_status_command + " | grep -i running"
+chrony_check_command = "#{get_chrony_status_command} | grep -i running"
 
 ruby_block 'log_chrony_status' do
   block do
-    if node['init_package'] == 'init'
+    case node['init_package']
+    when 'init'
       get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cfncluster']['chrony']['service']}'"
-    elsif node['init_package'] == 'systemd'
+    when 'systemd'
       get_chrony_service_log_command = "journalctl -u #{node['cfncluster']['chrony']['service']}"
     end
     chrony_log = shell_out!(get_chrony_service_log_command).stdout
@@ -249,11 +252,6 @@ if node['cfncluster']['cfn_node_type'] == "MasterServer" &&
     command 'dcv version'
     user node['cfncluster']['cfn_cluster_user']
   end
-  if graphic_instance?
-    execute "Ensure local users can access X server" do
-      command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
-    end
-  end
   execute 'check DCV external authenticator python version' do
     command %(#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cfncluster']['python-version']}")
   end
@@ -268,6 +266,11 @@ end
 if node['conditions']['dcv_supported'] && node['cfncluster']['dcv_enabled'] == "master" && node['cfncluster']['cfn_node_type'] == "MasterServer"
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
+  end
+  if graphic_instance?
+    execute "Ensure local users can access X server" do
+      command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
+    end
   end
   if node['cfncluster']['os'] == "ubuntu1804" || node['cfncluster']['os'] == "alinux2"
     execute 'check gdm service is running' do
@@ -402,7 +405,7 @@ unless node['cfncluster']['cfn_base_os'] == 'alinux' && get_nvswitches > 1
         echo "No GPU detected, no test needed."
         exit 0
       fi
-  
+
       set -e
       cuda_ver="#{node['cfncluster']['nvidia']['cuda_version']}"
       # Test CUDA installation
@@ -417,7 +420,7 @@ unless node['cfncluster']['cfn_base_os'] == 'alinux' && get_nvswitches > 1
       else
         echo "CUDA nvcc test passed, $cuda_output"
       fi
-  
+
       # Test deviceQuery
       echo "Testing CUDA install with deviceQuery..."
       /usr/local/cuda-$cuda_ver/extras/demo_suite/deviceQuery | grep -o "Result = PASS"
@@ -502,12 +505,14 @@ end
 ###################
 # NFS
 ###################
-if node['cfncluster']['cfn_node_type'] == 'ComputeFleet'
+
+case node['cfncluster']['cfn_node_type']
+when 'ComputeFleet'
   execute 'check for nfs client protocol' do
     command "nfsstat -m | grep vers=4"
     user node['cfncluster']['cfn_cluster_user']
   end
-elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
+when 'MasterServer'
   execute 'check for nfs server protocol' do
     command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
     user node['cfncluster']['cfn_cluster_user']
@@ -515,15 +520,14 @@ elsif node['cfncluster']['cfn_node_type'] == 'MasterServer'
 end
 
 # Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
-unless node['platform'] == 'ubuntu' && node['platform_version'].to_f == 16.04
+require 'bigdecimal/util'
+unless node['platform'] == 'ubuntu' && node['platform_version'].to_d == 16.04.to_d
   ruby_block 'check_nfs_threads' do
     block do
       nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
       Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
       expected_threads = [node['cpu']['cores'].to_i, 8].max
-      if nfs_threads != expected_threads
-        raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}"
-      end
+      raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}" if nfs_threads != expected_threads
     end
     action :nothing
   end
@@ -552,9 +556,9 @@ end
 ###################
 require 'chef/mixin/shell_out'
 
-virtual_envs = ["#{node['cfncluster']['node_virtualenv_path']}", "#{node['cfncluster']['cookbook_virtualenv_path']}"]
+virtual_envs = [node['cfncluster']['node_virtualenv_path'], node['cfncluster']['cookbook_virtualenv_path']]
 
-for virtual_env in virtual_envs
+virtual_envs.each do |virtual_env|
   ruby_block 'check pip version' do
     block do
       pip_version = nil
@@ -595,9 +599,9 @@ end
 ###################
 # Pcluster AWSBatch CLI
 ###################
-if node['cfncluster']['cfn_scheduler'] == 'awsbatch' and node['cfncluster']['cfn_node_type'] == 'MasterServer'
+if node['cfncluster']['cfn_scheduler'] == 'awsbatch' && node['cfncluster']['cfn_node_type'] == 'MasterServer'
   # Test that batch commands can be accessed without absolute path
-  batch_cli_commands = ["awsbkill", "awsbqueues", "awsbsub", "awsbhosts", "awsbout", "awsbstat"]
+  batch_cli_commands = %w[awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat]
   batch_cli_commands.each do |cli_commmand|
     bash "test_#{cli_commmand}" do
       cwd Chef::Config[:file_cache_path]
@@ -608,5 +612,29 @@ if node['cfncluster']['cfn_scheduler'] == 'awsbatch' and node['cfncluster']['cfn
       BATCHCLI
       user node['cfncluster']['cfn_cluster_user']
     end
+  end
+end
+
+###################
+# Python
+###################
+execute 'check python3 installed' do
+  command "which python3"
+  user node['cfncluster']['cfn_cluster_user']
+end
+
+##################
+# dpkg
+###################
+if node['platform_family'] != 'debian'
+  bash 'check dpkg is not installed on non-debian OS' do
+    cwd Chef::Config[:file_cache_path]
+    code <<-DPKG
+      if command -v dpkg &> /dev/null; then
+        echo "ERROR: dpkg found on non-Debian system"
+        exit 1
+      fi
+    DPKG
+    user node['cfncluster']['cfn_cluster_user']
   end
 end

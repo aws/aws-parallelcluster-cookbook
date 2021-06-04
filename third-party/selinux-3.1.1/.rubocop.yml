@@ -1,0 +1,7 @@
+Lint/UselessAssignment:
+  Exclude:
+    - 'resources/module.rb'
+
+Style/RegexpLiteral:
+  Exclude:
+    - 'resources/module.rb'

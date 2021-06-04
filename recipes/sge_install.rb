@@ -31,7 +31,12 @@ when 'MasterServer', nil
     mode '0644'
   end
 
-  if node['platform'] == 'centos' && node['platform_version'].to_i >= 8
+  if node['platform'] == 'amazon'
+    # Additional patch files required for alinux2
+    cookbook_file 'sge-tcsh.patch' do
+      path '/tmp/sge-tcsh.patch'
+    end
+  elsif node['platform'] == 'centos' && node['platform_version'].to_i >= 8
     # Additional patch files required for CentOS 8
     cookbook_file 'sge-openssl.patch' do
       path '/tmp/sge-openssl.patch'

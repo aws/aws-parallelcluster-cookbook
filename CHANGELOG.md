@@ -7,22 +7,58 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 -----
 
 **ENHANCEMENTS**
+- Add support for Ubuntu 20.04.
+- Add support for using FSx Lustre in subnet with no internet access.
+- Add support for Centos 7 ARM.
 - Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
-- Add support for `security_group_id` to custom builders.
+- Add support for `security_group_id` in custom builders
+- Add possibility to use a post installation script when building Centos 8 AMI.
+- Install SSM agent on CentOS 7 and 8
+- Transition from IMDSv1 to IMDSv2.
 
 **CHANGES**
 - Ubuntu 16.04 is no longer supported.
 - Amazon Linux is no longer supported.
+- Upgrade EFA installer to version 1.12.1
+  - EFA configuration: ``efa-config-1.8`` (from ``efa-config-1.7``)
+  - EFA profile: ``efa-profile-1.5`` (from ``efa-profile-1.4``)
+  - EFA kernel module: ``efa-1.12.1`` (from ``efa-1.10.2``)
+  - RDMA core: ``rdma-core-32.1amzn`` (from ``rdma-core-31.2amzn``)
+  - Libfabric: ``libfabric-1.11.2amzon1.1`` (from ``libfabric-1.11.1amzn1.0``)
+  - Open MPI: ``openmpi40-aws-4.1.1`` (from ``openmpi40-aws-4.1.0``)
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
 - Root volume size increased to 35GB on all AMIs.
-- Upgrade Slurm to version 20.11.4.
+- Upgrade Slurm to version 20.11.7.
   - Update slurmctld and slurmd systemd unit files according to latest provided by slurm
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
   - Specify instance GPU model as GRES GPU Type in gres.conf
+  - Reduce default Slurm ResumeTimeout to from 3600 seconds to 1800 seconds
+- Upgrade Arm Performance Libraries (APL) to version 21.0.0
+- Upgrade NICE DCV to version 2021.0-10242.
+- Upgrade NVIDIA driver to version 460.73.01.
+- Upgrade CUDA library to version 11.3.0.
+- Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-460`.
 - Install ParallelCluster AWSBatch CLI in dedicated python3 virtual env.
+- Upgrade Python version used in ParallelCluster virtualenvs from version 3.6.13 to version 3.7.10.
+- Upgrade third-party cookbook dependencies:
+  - apt-7.4.0 (from apt-7.3.0)
+  - iptables-8.0.0 (from iptables-7.1.0)
+  - line-4.0.1 (from line-2.9.0)
+  - openssh-2.9.1 (from openssh-2.8.1)
+  - pyenv-3.4.2 (from pyenv-3.1.1)
+  - selinux-3.1.1 (from selinux-2.1.1)
+  - ulimit-1.1.1 (from ulimit-1.0.0)
+  - yum-6.1.1 (from yum-5.1.0)
+  - yum-epel-4.1.2 (from yum-epel-3.3.0)
+
+2.10.4
+-----
+
+**CHANGES**
+- Upgrade Slurm to version 20.02.7
 
 2.10.3
 -----

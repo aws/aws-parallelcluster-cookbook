@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-setup_munge_compute_node()
+setup_munge_compute_node
 
 # Create directory configured as SlurmdSpoolDir
 directory '/var/spool/slurmd' do
@@ -31,8 +31,8 @@ mount '/opt/slurm' do
   fstype "nfs"
   options 'hard,intr,noatime,_netdev'
   action %i[mount enable]
-  retries 3
-  retry_delay 5
+  retries 10
+  retry_delay 6
 end
 
 # Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU

@@ -19,7 +19,7 @@ action :run do
 
   pyenv_pip "pip" do
     virtualenv new_resource.pyenv_path
-    options "--upgrade"
+    action :upgrade
   end
 
   unless new_resource.requirements_path.empty?

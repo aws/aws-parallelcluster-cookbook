@@ -161,6 +161,18 @@
     {
       "type" : "shell",
       "inline" : [
+        "region=\"{{user `region`}}\"",
+        "[[ ${region} =~ ^cn- ]] && domain=\".amazonaws.com.cn\" || domain=\".amazonaws.com\"",
+        "[[ {{user `ami_arch`}} == \"arm64\" ]] && arch=\"arm64\" || arch=\"amd64\"",
+        "ssm_agent_url=\"https://s3.${region}${domain}/amazon-ssm-${region}/latest/linux_${arch}/amazon-ssm-agent.rpm\"",
+        "sudo yum install -y ${ssm_agent_url}",
+        "sudo systemctl enable amazon-ssm-agent",
+        "sudo systemctl start amazon-ssm-agent"
+      ]
+    },
+    {
+      "type" : "shell",
+      "inline" : [
         "sudo yum -y install epel-release",
         "sudo /bin/sed -r -i -e 's/SELINUX=enforcing/SELINUX=permissive/' /etc/selinux/config"
       ]
@@ -189,7 +201,7 @@
       "inline" : [
         "set -x",
         "region=\"{{user `region`}}\"",
-        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install.sh\"",
+        "chef_install_url=\"https://${region}-aws-parallelcluster.s3.${region}.amazonaws.com$([ \"${region}\" != \"${region#cn-*}\" ] && echo \".cn\" || exit 0)/archives/cinc/cinc-install-1.1.0.sh\"",
         "[ -n  \"{{user `chef_custom_install_url`}}\" ] && chef_install_url=\"{{user `chef_custom_install_url`}}\"",
         "curl --retry 3 -L ${chef_install_url} | sudo bash -s -- -v {{user `chef_version`}}"
       ]
@@ -216,7 +228,7 @@
         "/etc/chef/cookbooks"
       ],
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "json" : {
         "cfncluster" : {
           "default_pre_reboot" : "false"
@@ -256,7 +268,7 @@
         "/etc/chef/cookbooks"
       ],
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "aws-parallelcluster::default"
       ]
@@ -274,7 +286,7 @@
         }
       },
       "skip_install" : "true",
-      "execute_command" : "sudo chef-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
+      "execute_command" : "sudo cinc-client -z --no-color -c {{.ConfigPath}} -j {{.JsonPath}}",
       "run_list" : [
         "aws-parallelcluster::default"
       ]
