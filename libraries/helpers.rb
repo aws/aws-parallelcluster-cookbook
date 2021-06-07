@@ -617,3 +617,23 @@ def check_sudoers_permissions(sudoers_file, user, run_as, command_alias, *comman
     TEST
   end
 end
+
+def check_imds_access(user, is_allowed)
+  bash "check IMDS access for user #{user}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      sudo -u #{user} curl 169.254.169.254/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS: #{user}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def get_system_users
+  cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
+  cmd.run_command
+  cmd.stdout.split(/\n+/)
+end
