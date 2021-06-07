@@ -306,7 +306,7 @@ when 'rhel', 'amazon'
                                              blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                             iproute NetworkManager-config-routing-rules python3 python3-pip]
+                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables]
     if node['platform_version'].to_i >= 8
       # Do not install unversioned python
       default['cluster']['base_packages'].delete('python')
@@ -329,7 +329,7 @@ when 'rhel', 'amazon'
                                              rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                              gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                              jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                             librdmacm-utils python3 python3-pip]
+                                             librdmacm-utils python3 python3-pip iptables]
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']
@@ -346,7 +346,7 @@ when 'debian'
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
                                            r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev linux-headers-aws]
+                                           libatlas-base-dev libglvnd-dev linux-headers-aws iptables]
 
   case node['platform_version']
   when '18.04'
@@ -461,3 +461,7 @@ default['cluster']['is_official_ami_build'] = false
 
 # Additional instance types data
 default['cluster']['instance_types_data'] = nil
+
+# IMDS
+default['cluster']['head_node_imds_secured'] = 'true'
+default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user']]
