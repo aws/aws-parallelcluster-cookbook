@@ -29,6 +29,8 @@ def install_package_list(packages)
     when 'ubuntu'
       execute 'apt install dcv package' do
         command "apt -y install #{package_name}"
+        retries 3
+        retry_delay 5
       end
     end
   end
@@ -118,6 +120,8 @@ if node['conditions']['dcv_supported']
       # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
       package 'ifupdown' do
         action :purge
+        retries 3
+        retry_delay 5
       end
       bash 'setup pre-req' do
         cwd Chef::Config[:file_cache_path]
