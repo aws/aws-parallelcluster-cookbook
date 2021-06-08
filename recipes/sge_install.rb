@@ -58,7 +58,8 @@ when 'MasterServer', nil
       'TARBALL_ROOT_DIR' => "sge-#{node['cfncluster']['sge']['version']}",
       'TARBALL_PATH' => sge_tarball,
       'TARBALL_URL' => node['cfncluster']['sge']['url'],
-      'REGION' => node['cfncluster']['cfn_region']
+      'REGION' => node['cfncluster']['cfn_region'],
+      'HOME' => '/root'
     )
     command 'sh /tmp/sge_preinstall.sh'
     not_if { ::File.exist?(sge_tarball) }
