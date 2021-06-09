@@ -112,8 +112,10 @@ if node['conditions']['dcv_supported']
         retry_delay 5
       end
       # Install the desktop environment and the desktop manager packages
-      prereq_packages = %w[ubuntu-desktop lightdm mesa-utils]
-      package prereq_packages do
+      prereq_packages = 'ubuntu-desktop lightdm mesa-utils'
+      execute "Install ubuntu desktop etc" do
+        # Use -y/--fix-broken option to prevent `dpkg was interrupted` error
+        command "apt-get install -y -f #{prereq_packages}"
         retries 10
         retry_delay 5
       end
