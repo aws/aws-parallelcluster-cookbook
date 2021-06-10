@@ -103,6 +103,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: ``openmpi40-aws-4.1.0`` (from openmpi40-aws-4.0.5)
 - Upgrade Intel MPI to version U8.
 - Upgrade NICE DCV to version 2020.2-9662.
+- Drop ``lightdm`` install for Ubuntu1804 from dcv_install recipe.
 - Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation.
   The runlevel is set to graphical.target on head node only when DCV is enabled. This prevents the execution of
   graphical services, such as x/gdm, when they are not required.

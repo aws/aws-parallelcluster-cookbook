@@ -112,7 +112,7 @@ if node['conditions']['dcv_supported']
         retry_delay 5
       end
       # Install the desktop environment and the desktop manager packages
-      prereq_packages = %w[ubuntu-desktop lightdm mesa-utils]
+      prereq_packages = %w[ubuntu-desktop mesa-utils]
       package prereq_packages do
         retries 10
         retry_delay 5
