@@ -211,12 +211,12 @@ include_recipe "aws-parallelcluster::ganglia_install"
 # Install NVIDIA and CUDA
 include_recipe "aws-parallelcluster::nvidia_install"
 
-# Install FSx options
-include_recipe "aws-parallelcluster::lustre_install"
-
 # Install EFA & Intel MPI
 include_recipe "aws-parallelcluster::efa_install"
 include_recipe "aws-parallelcluster::intel_mpi"
+
+# Install FSx options
+include_recipe "aws-parallelcluster::lustre_install"
 
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster::cloudwatch_agent_install"
