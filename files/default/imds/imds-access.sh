@@ -9,8 +9,6 @@ set -e
 # --flush                     Restore default IMDS access
 # --help                      Print this help message
 
-IPTABLES=$(whereis -b iptables | cut -d ' ' -f2)
-
 function error() {
   >&2 echo "[ERROR] $1"
   exit 1
@@ -49,7 +47,7 @@ function iptables_delete() {
     rule_args="$chain --destination $destination -j $jump -m owner --uid-owner $user"
   fi
 
-  local iptables_delete_command="$IPTABLES -D $rule_args"
+  local iptables_delete_command="iptables -D $rule_args"
 
   # Remove rules
   local should_remove=true
@@ -81,7 +79,7 @@ function iptables_add() {
     rule_args="$chain --destination $destination -j $jump -m owner --uid-owner $user"
   fi
 
-  local iptables_add_command="$IPTABLES -A $rule_args"
+  local iptables_add_command="iptables -A $rule_args"
 
   # Add rule
   eval $iptables_add_command
@@ -93,7 +91,7 @@ function setup_chain() {
   local source_chain=$2
   local destination=$3
 
-  $IPTABLES --new $chain 2>/dev/null && info "ParallelCluster chain created: $chain" \
+  iptables --new $chain 2>/dev/null && info "ParallelCluster chain created: $chain" \
   || info "ParallelCluster chain exists: $chain"
 
   iptables_add $source_chain $destination $chain
@@ -119,7 +117,7 @@ main() {
   done
 
   # Check required commands
-  command -v $IPTABLES >/dev/null || error "Cannot find required command: $IPTABLES"
+  command -v iptables >/dev/null || error "Cannot find required command: iptables"
 
   # Check arguments and options
   if [[ -z $allow_users && -z $deny_users && -z $unset_users && -z $flush ]]; then
@@ -131,7 +129,7 @@ main() {
 
   # Flush ParallelCluster chain, if required
   if [[ $flush == "true" ]]; then
-    $IPTABLES --flush $PARALLELCLUSTER_CHAIN
+    iptables --flush $PARALLELCLUSTER_CHAIN
     info "ParallelCluster chain flushed"
     exit 0
   fi

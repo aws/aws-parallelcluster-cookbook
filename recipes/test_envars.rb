@@ -2,9 +2,9 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: update_head_node
+# Recipe:: test_envars
 #
-# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,6 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster::setup_envars'
-include_recipe 'aws-parallelcluster::imds_config'
-include_recipe 'aws-parallelcluster::update_head_node_slurm' if node['cluster']['scheduler'] == 'slurm'
+check_directories_in_path(%w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin])
