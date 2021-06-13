@@ -632,6 +632,24 @@ def check_imds_access(user, is_allowed)
   end
 end
 
+def check_directories_in_path(directories)
+  bash "check PATH contains #{directories}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      for directory in #{directories.join(' ')}; do
+        [[ ":$PATH:" == *":$directory:"* ]] || missing_directories="$missing_directories $directory"
+      done
+
+      if [[ ! -z $missing_directories ]]; then
+        >&2 echo "Missing expected directories in PATH: $missing_directories"
+        exit 1
+      fi
+    TEST
+  end
+end
+
 def get_system_users
   cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
   cmd.run_command

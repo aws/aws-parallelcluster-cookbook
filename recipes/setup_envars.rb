@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: update_head_node
+# Recipe:: setup_envars
 #
 # Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster::setup_envars'
-include_recipe 'aws-parallelcluster::imds_config'
-include_recipe 'aws-parallelcluster::update_head_node_slurm' if node['cluster']['scheduler'] == 'slurm'
+ruby_block 'Configure environment variable: PATH' do
+  block do
+    directories = %w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin /opt/aws/bin]
+    directories.each do |directory|
+      ENV['PATH'] = "#{ENV['PATH']}:#{directory}" unless ":#{ENV['PATH']}:".include?(":#{directory}:")
+    end
+  end
+end
