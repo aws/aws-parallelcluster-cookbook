@@ -3,19 +3,19 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-2.x.x
+2.11.0
 -----
 
 **ENHANCEMENTS**
 - Add support for Ubuntu 20.04.
 - Add support for using FSx Lustre in subnet with no internet access.
 - Add support for Centos 7 ARM.
-- Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
+- Make sure slurmd service is only enabled after post-install process, which will prevent user from unintentionally making compute node available during post-install process.
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh.
 - Add possibility to use a post installation script when building Centos 8 AMI.
 - Install SSM agent on CentOS 7 and 8.
 - Transition from IMDSv1 to IMDSv2.
-- Add support for `security_group_id` in packer custom builders.
+- Add support for `security_group_id` in packer custom builders. Customers can export `AWS_SECURITY_GROUP_ID` environment variable to specify security group for custom builders when building custom AMIs.
 
 **CHANGES**
 - Ubuntu 16.04 is no longer supported.
@@ -29,12 +29,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: ``openmpi40-aws-4.1.1`` (from ``openmpi40-aws-4.1.0``)
 - Increase timeout when attaching EBS volumes from 3 to 5 minutes.
 - Retry `berkshelf` installation up to 3 times.
-- Root volume size increased to 35GB on all AMIs.
+- Root volume size increased from 25GB to 35GB on all AMIs. Minimum root volume size is now 35GB.
 - Upgrade Slurm to version 20.11.7.
   - Update slurmctld and slurmd systemd unit files according to latest provided by slurm
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
-  - Specify instance GPU model as GRES GPU Type in gres.conf
+  - Specify instance GPU model as GRES GPU Type in gres.conf, instead of previous hardcoded value ``Type=tesla`` for all GPU
 - Upgrade Arm Performance Libraries (APL) to version 21.0.0
 - Upgrade NICE DCV to version 2021.1-10557.
 - Upgrade NVIDIA driver to version 460.73.01.
@@ -53,6 +53,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - ulimit-1.1.1 (from ulimit-1.0.0)
   - yum-6.1.1 (from yum-5.1.0)
   - yum-epel-4.1.2 (from yum-epel-3.3.0)
+- Drop ``lightdm`` package install from Ubuntu 18.04 DCV installation process.
 
 2.10.4
 -----
@@ -103,7 +104,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: ``openmpi40-aws-4.1.0`` (from openmpi40-aws-4.0.5)
 - Upgrade Intel MPI to version U8.
 - Upgrade NICE DCV to version 2020.2-9662.
-- Drop ``lightdm`` install for Ubuntu1804 from dcv_install recipe.
 - Set default systemd runlevel to multi-user.target on all OSes during ParallelCluster official ami creation.
   The runlevel is set to graphical.target on head node only when DCV is enabled. This prevents the execution of
   graphical services, such as x/gdm, when they are not required.
