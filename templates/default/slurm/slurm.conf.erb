@@ -24,10 +24,10 @@ ReconfigFlags=KeepPartState
 #
 # CLOUD CONFIGS OPTIONS
 <% if node['cfncluster']['use_private_hostname'] == 'true' or node['cfncluster']['cfn_dns_domain'].nil? or node['cfncluster']['cfn_dns_domain'].empty? -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_reg_addrs
+SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30
 TreeWidth=65533
 <% else -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_reg_addrs,cloud_dns
+SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_dns
 <% end -%>
 CommunicationParameters=NoAddrCache
 SuspendProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
