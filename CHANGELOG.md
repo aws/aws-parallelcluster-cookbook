@@ -16,6 +16,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install SSM agent on CentOS 7 and 8.
 - Transition from IMDSv1 to IMDSv2.
 - Add support for `security_group_id` in packer custom builders. Customers can export `AWS_SECURITY_GROUP_ID` environment variable to specify security group for custom builders when building custom AMIs.
+- Configure the following default gc_thresh values for performance at scale.
+  - net.ipv4.neigh.default.gc_thresh1 = 0
+  - net.ipv4.neigh.default.gc_thresh2 = 15360
+  - net.ipv4.neigh.default.gc_thresh3 = 16384
 
 **CHANGES**
 - Ubuntu 16.04 is no longer supported.

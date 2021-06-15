@@ -435,6 +435,11 @@ default['cfncluster']['lustre']['client_url'] = value_for_platform(
   }
 )
 
+# Default gc_thresh values for performance at scale
+default['cfncluster']['sysctl']['ipv4']['gc_thresh1'] = 0
+default['cfncluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
+default['cfncluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
+
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cfncluster']['cfn_region'] = 'us-east-1'
 default['cfncluster']['stack_name'] = nil
