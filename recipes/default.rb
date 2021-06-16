@@ -18,6 +18,11 @@
 # Validate OS type specified by the user is the same as the OS identified by Ohai
 validate_os_type
 
+# Calling user_ulimit will override every existing limit
+user_ulimit "*" do
+  filehandle_limit node['cluster']['filehandle_limit']
+end
+
 include_recipe 'aws-parallelcluster::slurm_install'
 include_recipe 'aws-parallelcluster::awsbatch_install'
 
