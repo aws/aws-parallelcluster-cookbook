@@ -1,5 +1,6 @@
 Cmnd_Alias SLURM_COMMANDS = /opt/slurm/bin/scontrol
+Cmnd_Alias SLURM_HOOKS_COMMANDS = <%= node['cluster']['node_virtualenv_path'] %>/bin/slurm_suspend, <%= node['cluster']['node_virtualenv_path'] %>/bin/slurm_resume
 
 <%= node['cluster']['cluster_admin_user'] %> ALL = (root) NOPASSWD: SLURM_COMMANDS
 
-<%= node['cluster']['slurm']['user'] %> ALL = (root) NOPASSWD: SLURM_COMMANDS
+<%= node['cluster']['slurm']['user'] %> ALL = (<%= node['cluster']['cluster_admin_user'] %>) NOPASSWD: SLURM_HOOKS_COMMANDS
