@@ -134,15 +134,15 @@ template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do
 end
 
 file "/var/log/parallelcluster/slurm_resume.log" do
-  owner node['cluster']['slurm']['user']
-  group node['cluster']['slurm']['group']
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
   mode '0644'
 end
 
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.conf" do
   source 'slurm/parallelcluster_slurm_resume.conf.erb'
-  owner node['cluster']['slurm']['user']
-  group node['cluster']['slurm']['group']
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
   mode '0644'
 end
 
@@ -154,15 +154,15 @@ template "#{node['cluster']['scripts_dir']}/slurm/slurm_suspend" do
 end
 
 file "/var/log/parallelcluster/slurm_suspend.log" do
-  owner node['cluster']['slurm']['user']
-  group node['cluster']['slurm']['group']
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
   mode '0644'
 end
 
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_suspend.conf" do
   source 'slurm/parallelcluster_slurm_suspend.conf.erb'
-  owner node['cluster']['slurm']['user']
-  group node['cluster']['slurm']['group']
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
   mode '0644'
 end
 
@@ -176,7 +176,7 @@ end
 # Create shared directory used to store clustermgtd heartbeat and computemgtd config
 directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
   user node['cluster']['cluster_admin_user']
-  group node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
   mode '0755'
   action :create
   recursive true

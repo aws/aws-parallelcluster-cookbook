@@ -95,10 +95,20 @@ end
 # Slurm sudoers
 ###################
 if node['cluster']['scheduler'] == 'slurm'
-  [node['cluster']['cluster_admin_user'], node['cluster']['slurm']['user']].each do |user|
-    check_sudoers_permissions(
-      "/etc/sudoers.d/99-parallelcluster-slurm",
-      user, "root", "SLURM_COMMANDS", "/opt/slurm/bin/scontrol"
-    )
-  end
+  sudoers_file = "/etc/sudoers.d/99-parallelcluster-slurm"
+  cluster_admin_user = node['cluster']['cluster_admin_user']
+  cluster_slurm_user = node['cluster']['slurm']['user']
+  venv_path = node['cluster']['node_virtualenv_path']
+
+  check_sudoers_permissions(
+    sudoers_file,
+    cluster_admin_user, "root", "SLURM_COMMANDS",
+    "/opt/slurm/bin/scontrol"
+  )
+
+  check_sudoers_permissions(
+    sudoers_file,
+    cluster_slurm_user, cluster_admin_user, "SLURM_HOOKS_COMMANDS",
+    "#{venv_path}/bin/slurm_suspend, #{venv_path}/bin/slurm_resume"
+  )
 end
