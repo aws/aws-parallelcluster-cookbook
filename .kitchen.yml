@@ -11,7 +11,6 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[aws-parallelcluster::default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
       cluster:
@@ -19,7 +18,6 @@ suites:
 
   - name: default_gpu
     run_list:
-      - recipe[aws-parallelcluster::default_pre]
       - recipe[aws-parallelcluster::default]
     attributes:
       cluster:
