@@ -655,6 +655,32 @@ def check_directories_in_path(directories, user = nil)
   end
 end
 
+def check_run_level_script(script_name, levels_on, levels_off)
+  bash "check run level script #{script_name}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      for level in #{levels_on.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^S[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_on="$missing_levels_on $level"
+      done
+
+      for level in #{levels_off.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^K[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_off="$missing_levels_off $level"
+      done
+
+      if [[ ! -z $missing_levels_on || ! -z $missing_levels_off ]]; then
+        >&2 echo "Misconfigured run level script #{script_name}"
+        >&2 echo "Expected levels on are (#{levels_on.join(' ')}). Missing levels on are ($missing_levels_on)"
+        >&2 echo "Expected levels off are (#{levels_off.join(' ')}). Missing levels off are ($missing_levels_off)"
+        exit 1
+      fi
+    TEST
+  end
+end
+
 def check_sudo_command(command, user = nil)
   bash "check sudo command from user #{user}: #{command}" do
     cwd Chef::Config[:file_cache_path]
