@@ -57,6 +57,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - yum-6.1.1 (from yum-5.1.0)
   - yum-epel-4.1.2 (from yum-epel-3.3.0)
 - Drop ``lightdm`` package install from Ubuntu 18.04 DCV installation process.
+- Remove Lustre mount on access options from `fstab`. FSx Lustre will be mounted immediately after reboot.
 
 2.10.4
 -----

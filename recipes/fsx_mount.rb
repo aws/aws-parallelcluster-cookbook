@@ -43,8 +43,6 @@ if fsx_shared_dir != "NONE"
   mountname = node['cfncluster']['cfn_fsx_mount_name']
   mount_options = %w[defaults _netdev flock user_xattr noatime]
 
-  mount_options.concat(%w[noauto x-systemd.automount]) if node['init_package'] == 'systemd'
-
   # Mount FSx over NFS
   mount fsx_shared_dir do
     device "#{dns_name}@tcp:/#{mountname}"
