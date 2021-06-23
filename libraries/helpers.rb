@@ -625,7 +625,14 @@ def check_imds_access(user, is_allowed)
       sudo -u #{user} curl 169.254.169.254/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
       [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
       if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
-        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS: #{user}"
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv4): #{user}"
+        exit 1
+      fi
+
+      sudo -u #{user} curl -g -6 [0:0:0:0:0:FFFF:A9FE:A9FE]/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
         exit 1
       fi
     TEST
