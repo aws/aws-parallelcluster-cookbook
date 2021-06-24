@@ -15,4 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-check_directories_in_path(%w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin])
+directories = %w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin]
+
+# Verifies PATH in the recipe context
+check_directories_in_path(directories)
+
+# Verifies PATH in login shells for notable users
+users = %W[root #{node['cluster']['cluster_admin_user']} #{node['cluster']['slurm']['user']}]
+users.each { |user| check_directories_in_path(directories, user) }

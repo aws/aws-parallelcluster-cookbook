@@ -631,18 +631,24 @@ def check_imds_access(user, is_allowed)
   end
 end
 
-def check_directories_in_path(directories)
-  bash "check PATH contains #{directories}" do
+# Check that PATH includes directories for the given user.
+# If user is specified, PATH is checked in the login shell for that user.
+# Otherwise, PATH is checked in the current recipes context.
+def check_directories_in_path(directories, user = nil)
+  context = user.nil? ? 'recipes context' : "user #{user}"
+  bash "check PATH for #{context} contains #{directories}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
       set -e
+
+      #{user.nil? ? nil : "sudo su - #{user}"}
 
       for directory in #{directories.join(' ')}; do
         [[ ":$PATH:" == *":$directory:"* ]] || missing_directories="$missing_directories $directory"
       done
 
       if [[ ! -z $missing_directories ]]; then
-        >&2 echo "Missing expected directories in PATH: $missing_directories"
+        >&2 echo "Missing expected directories in PATH for #{context}: $missing_directories"
         exit 1
       fi
     TEST
