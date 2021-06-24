@@ -57,6 +57,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - yum-6.1.1 (from yum-5.1.0)
   - yum-epel-4.1.2 (from yum-epel-3.3.0)
 - Drop ``lightdm`` package install from Ubuntu 18.04 DCV installation process.
+- Update default NFS options used by Compute nodes to mount shared filesystem from head node.
+  - Drop ``intr`` option, which is deprecated since kernel 2.6.25
+  - Drop ``noatime`` option, which is not relevant for NFS mount
 
 2.10.4
 -----

@@ -398,6 +398,9 @@ when 'debian'
   end
 end
 
+# Default NFS mount options
+default['cfncluster']['nfs']['hard_mount_options'] = 'hard,_netdev'
+
 # Lustre defaults (for CentOS >=7.7 and Ubuntu)
 default['cfncluster']['lustre']['public_key'] = value_for_platform(
   'centos' => { '>=7.7' => "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc" },
