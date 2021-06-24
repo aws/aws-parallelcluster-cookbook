@@ -19,7 +19,7 @@
 mount '/opt/sge' do
   device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/sge" })
   fstype "nfs"
-  options 'hard,intr,noatime,_netdev'
+  options node['cfncluster']['nfs']['hard_mount_options']
   action %i[mount enable]
   retries 10
   retry_delay 6
