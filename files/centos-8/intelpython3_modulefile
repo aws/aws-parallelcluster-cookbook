@@ -1,2 +1,0 @@
-#%Modulefile
-prepend-path        PATH                  /opt/intel/intelpython3/bin

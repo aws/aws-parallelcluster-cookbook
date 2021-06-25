@@ -22,13 +22,6 @@
 # NFS threads enhancement is omitted for Ubuntu1604
 node.force_override['nfs']['threads'] = [node['cpu']['cores'].to_i, 8].max
 
-if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  # Workaround for issue: https://github.com/atomic-penguin/cookbook-nfs/issues/116
-  node.force_override['nfs']['service']['idmap'] = 'nfs-idmapd'
-  # NFS cookbook server_template attribute is not updated for centos8, provide the correct override
-  node.force_override['nfs']['config']['server_template'] = '/etc/nfs.conf'
-end
-
 if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
   # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
   include_recipe "nfs::server"

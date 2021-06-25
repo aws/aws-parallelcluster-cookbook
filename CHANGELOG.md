@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 
 - Drop support for SGE and Torque schedulers.
+- Drop support for CentOS8.  
 - Remove nodewatcher, sqswatcher, jobwatcher related code.
 - Remove Ganglia support.
 - Install ParallelCluster AWS Batch CLI at AMI build time.
