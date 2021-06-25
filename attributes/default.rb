@@ -59,7 +59,6 @@ default['cluster']['psxe']['archful_packages']['i486'] = %w[intel-tbb-runtime in
 default['cluster']['psxe']['archful_packages']['x86_64'] = node['cluster']['psxe']['archful_packages']['i486'] + %w[intel-mpi-runtime]
 default['cluster']['intelhpc']['platform_name'] = value_for_platform(
   'centos' => {
-    '~>8' => 'el8',
     '~>7' => 'el7'
   }
 )
@@ -88,7 +87,6 @@ default['cluster']['armpl']['gcc']['url'] = [
   "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz"
 ].join('/')
 default['cluster']['armpl']['platform'] = value_for_platform(
-  'centos' => { '~>8' => 'RHEL-8' },
   'amazon' => { '2' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
@@ -146,9 +144,6 @@ default['cluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
 )
 default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
   'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel7/x86_64",
-  'centos' => {
-    '~>8' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel8/x86_64"
-  },
   'ubuntu' => { 'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cluster']['base_os']}/x86_64" }
 )
 
@@ -162,22 +157,20 @@ default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
 default['cluster']['dcv']['version'] = '2021.0-10242'
 if arm_instance?
-  default['cluster']['dcv']['supported_os'] = %w[centos8 ubuntu18 amazon2]
+  default['cluster']['dcv']['supported_os'] = %w[ubuntu18 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>8' => "6a8f08b1e44b557ebc627086ec6ec7f259a85e555242a37fc538a76eabaf73a1",
       '~>7' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071"
     },
     'amazon' => { '2' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071" },
     'ubuntu' => { '18.04' => "8ada2cfa0bcac2285e7cfc65f297ab9322d35261422ced121e8cee78998f5472" }
   )
 else
-  default['cluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 ubuntu20 amazon2]
+  default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 ubuntu20 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>8' => "5c415a8767a9e2a3e6d6c76e2c858335a2dc8ed13efb2a6abc1e9bada6f3b3b9",
       '~>7' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39"
     },
     'amazon' => { '2' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39" },
@@ -193,7 +186,6 @@ if node['platform'].to_s == 'ubuntu'
 end
 default['cluster']['dcv']['package'] = value_for_platform(
   'centos' => {
-    '~>8' => "nice-dcv-#{node['cluster']['dcv']['version']}-el8-#{node['cluster']['dcv']['url_architecture_id']}",
     '~>7' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}"
   },
   'amazon' => { '2' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}" },
@@ -204,7 +196,6 @@ default['cluster']['dcv']['package'] = value_for_platform(
 default['cluster']['dcv']['server']['version'] = '2021.0.10242-1'
 default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
-    '~>8' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el8.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
     '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
   },
   'amazon' => { '2' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
@@ -215,7 +206,6 @@ default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server pack
 default['cluster']['dcv']['xdcv']['version'] = '2021.0.380-1'
 default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
-    '~>8' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el8.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
     '~>7' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
   },
   'amazon' => { '2' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
@@ -226,7 +216,6 @@ default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create vir
 default['cluster']['dcv']['gl']['version'] = '2021.0.912-1'
 default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
-    '~>8' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el8.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
     '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
   },
   'amazon' => { '2' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
@@ -283,7 +272,7 @@ case node['platform_family']
 when 'rhel', 'amazon'
 
   default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
-  default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
+  default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
 
   # Modulefile Directory
   default['cluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
@@ -292,7 +281,6 @@ when 'rhel', 'amazon'
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = value_for_platform(
     'centos' => {
-      '~>8' => '/etc/environment-modules/modulespath',
       '~>7' => "#{node['cluster']['moduleshome']}/init/.modulespath"
     },
     'amazon' => { 'default' => "#{node['cluster']['moduleshome']}/init/.modulespath" }
@@ -307,16 +295,6 @@ when 'rhel', 'amazon'
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables]
-    if node['platform_version'].to_i >= 8
-      # Do not install unversioned python
-      default['cluster']['base_packages'].delete('python')
-      default['cluster']['base_packages'].delete('python-pip')
-      # gdisk required for FSx
-      # environment-modules required for IntelMPI
-      # cryptsetup used for ephemeral drive encryption
-      default['cluster']['base_packages'].push(%w[gdisk environment-modules cryptsetup])
-    end
-
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
   when 'amazon'
@@ -385,8 +363,6 @@ default['cluster']['lustre']['public_key'] = value_for_platform(
 # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
 default['cluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
-    # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
-    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8.#{find_rhel_minor_version}/#{node['kernel']['machine']}/",
     'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{find_rhel_minor_version}/x86_64/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
