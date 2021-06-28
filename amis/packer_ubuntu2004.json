@@ -176,13 +176,15 @@
         "sudo apt-cache search build-essential",
         "sudo apt-get clean",
         "sudo apt update -y"
-      ]
+      ],
+      "max_retries" : 5
     },
     {
       "type" : "shell",
       "inline" : [
         "sudo apt-get -y install build-essential curl wget jq"
-      ]
+      ],
+      "max_retries" : 5
     },
     {
       "type" : "file",

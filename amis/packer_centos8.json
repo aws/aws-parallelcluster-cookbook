@@ -189,7 +189,8 @@
       "type" : "shell",
       "inline" : [
         "sudo dnf -y groupinstall development && sudo dnf -y install curl wget jq"
-      ]
+      ],
+      "max_retries" : 5
     },
     {
       "type" : "file",
