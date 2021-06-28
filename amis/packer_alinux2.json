@@ -161,7 +161,8 @@
       "type" : "shell",
       "inline" : [
         "sudo yum -y groupinstall development && sudo yum -y install curl wget jq"
-      ]
+      ],
+      "max_retries" : 5
     },
     {
       "type" : "file",
