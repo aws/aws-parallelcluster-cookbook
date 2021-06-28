@@ -1,5 +1,5 @@
 Scheduling:
-    Queues:
+    SlurmQueues:
         - CapacityType: SPOT
           ComputeResources:
               - DisableSimultaneousMultithreading: true

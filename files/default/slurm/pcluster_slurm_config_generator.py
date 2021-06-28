@@ -51,7 +51,7 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
 
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
-    queues = cluster_config["Scheduling"]["Queues"]
+    queues = cluster_config["Scheduling"]["SlurmQueues"]
 
     global instance_types_data
     with open(instance_types_data_path) as input_file:
