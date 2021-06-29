@@ -49,3 +49,5 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] ==
     raise "head_node_imds_secured must be 'true' or 'false', but got #{node['cluster']['head_node_imds_secured']}"
   end
 end
+
+include_recipe 'aws-parallelcluster::test_imds'
