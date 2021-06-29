@@ -286,21 +286,6 @@ def platform_supports_dcv?
   node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
 
-#
-# Check if Lustre is supported on this OS-architecture combination
-#
-def platform_supports_lustre_for_architecture?
-  (arm_instance? && platform_supports_lustre_on_arm?) || !arm_instance?
-end
-
-#
-# Check if Lustre is supported for ARM instances on this OS
-#
-def platform_supports_lustre_on_arm?
-  [node['platform'] == 'ubuntu',
-   node['platform'] == 'amazon'].any?
-end
-
 def aws_domain
   # Set the aws domain name
   aws_domain = "amazonaws.com"
