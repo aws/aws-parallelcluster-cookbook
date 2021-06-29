@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-directories = %w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin]
+directories = %w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin /opt/aws/bin]
 
 # Verifies PATH in the recipe context
 check_directories_in_path(directories)
