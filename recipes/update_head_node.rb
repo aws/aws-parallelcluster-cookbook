@@ -16,5 +16,4 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::setup_envars'
-include_recipe 'aws-parallelcluster::imds_config'
 include_recipe 'aws-parallelcluster::update_head_node_slurm' if node['cluster']['scheduler'] == 'slurm'
