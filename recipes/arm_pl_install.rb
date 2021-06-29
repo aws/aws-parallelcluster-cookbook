@@ -21,6 +21,11 @@ armpl_installer = "#{node['cluster']['sources_dir']}/"\
                   "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar"
 armpl_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/#{node['cluster']['armpl']['url']}"
 
+# binutils v2.30 is required for Centos7 architecture detection
+# these must be installed in this order
+package 'centos-release-scl-rh' if node['cluster']['base_os'] == 'centos7'
+package 'devtoolset-8-binutils' if node['cluster']['base_os'] == 'centos7'
+
 # fetch armpl installer script
 remote_file armpl_installer do
   source armpl_url

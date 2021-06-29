@@ -31,6 +31,9 @@ when 'rhel', 'amazon'
     include_recipe "yum-epel"
   end
 
+  # the epel recipe doesn't work on aarch64, needs epel-release package
+  package 'epel-release' if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
+
   unless node['platform_version'].to_i < 7
     execute 'yum-config-manager_skip_if_unavail' do
       command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
