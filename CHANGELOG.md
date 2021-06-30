@@ -9,7 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for Ubuntu 20.04.
 - Add support for using FSx Lustre in subnet with no internet access.
-- Add support for Centos 7 ARM.
+- Add support for building Centos 7 AMIs on ARM.
 - Make sure slurmd service is only enabled after post-install process, which will prevent user from unintentionally making compute node available during post-install process.
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh.
 - Add possibility to use a post installation script when building Centos 8 AMI.
