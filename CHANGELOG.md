@@ -38,6 +38,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Update slurmctld and slurmd systemd unit files according to latest provided by slurm
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Specify instance GPU model as GRES GPU Type in gres.conf, instead of previous hardcoded value ``Type=tesla`` for all GPU
+  - Reduce default Slurm ResumeTimeout to from 3600 seconds to 1800 seconds
 - Upgrade Arm Performance Libraries (APL) to version 21.0.0
 - Upgrade NICE DCV to version 2021.1-10557.
 - Upgrade NVIDIA driver to version 460.73.01.
