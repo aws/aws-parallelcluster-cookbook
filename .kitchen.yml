@@ -56,7 +56,6 @@ suites:
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
         ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
@@ -80,7 +79,6 @@ suites:
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
         ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
@@ -114,7 +112,6 @@ suites:
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
         ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
@@ -144,7 +141,6 @@ suites:
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
-        encrypted_ephemeral: <%= ENV['ENCRYPTED_VOLUME'] %>
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
         ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
