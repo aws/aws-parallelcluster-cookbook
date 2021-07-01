@@ -655,6 +655,17 @@ def check_directories_in_path(directories, user = nil)
   end
 end
 
+def check_sudo_command(command, user = nil)
+  bash "check sudo command from user #{user}: #{command}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+      sudo #{command}
+    TEST
+    user user
+  end
+end
+
 def get_system_users
   cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
   cmd.run_command

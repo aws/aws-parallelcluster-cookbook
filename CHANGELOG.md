@@ -20,6 +20,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Restrict access to IMDS to root and cluster admin users, only.
 - Make PATH include required directories for every user and recipes context.
 - Fail cluster creation when IMDS lockdown is not working correctly.
+- Make sudoers secure_path include the same directories in every platform.
 
 
 2.x.x

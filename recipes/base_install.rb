@@ -16,6 +16,7 @@
 # limitations under the License.
 
 include_recipe "aws-parallelcluster::setup_envars"
+include_recipe "aws-parallelcluster::sudoers_install"
 
 return if node['conditions']['ami_bootstrapped']
 

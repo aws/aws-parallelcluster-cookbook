@@ -19,6 +19,7 @@ include_recipe 'aws-parallelcluster::test_envars'
 include_recipe 'aws-parallelcluster::test_users'
 include_recipe 'aws-parallelcluster::test_processes'
 include_recipe 'aws-parallelcluster::test_imds'
+include_recipe 'aws-parallelcluster::test_sudoers'
 
 ###################
 # AWS Cli
