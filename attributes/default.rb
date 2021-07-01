@@ -427,7 +427,6 @@ default['cluster']['disable_hyperthreading_manually'] = 'false'
 default['cluster']['instance_slots'] = '1'
 default['cluster']['volume'] = nil
 default['cluster']['volume_fs_type'] = 'ext4'
-default['cluster']['encrypted_ephemeral'] = false
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['efs_shared_dir'] = 'NONE'
