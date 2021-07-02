@@ -17,6 +17,7 @@
 
 include_recipe "aws-parallelcluster::setup_envars"
 include_recipe 'aws-parallelcluster::base_install'
+include_recipe 'aws-parallelcluster::openssh_config'
 
 # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
 if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 20
