@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: test_envars
+# Recipe:: sudoers_install
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,11 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-directories = %w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin /opt/aws/bin]
+# secure_path
+# secure_path must include the below set of directories
+secure_path_required_directories = %w[/usr/local/sbin /usr/local/bin /usr/sbin /usr/bin /sbin /bin]
+secure_path_required_directories += %w[/snap/bin] if platform?('ubuntu')
 
-# Verifies PATH in the recipe context
-check_directories_in_path(directories)
-
-# Verifies PATH in login shells for notable users
-users = %W[root #{node['cluster']['cluster_admin_user']} #{node['cluster']['slurm']['user']}]
-users.each { |user| check_directories_in_path(directories, user) }
+template '/etc/sudoers.d/99-parallelcluster-secure-path' do
+  source 'sudoers/99-parallelcluster-secure-path.erb'
+  owner 'root'
+  group 'root'
+  mode '0600'
+  variables(secure_path_required_directories: secure_path_required_directories)
+end

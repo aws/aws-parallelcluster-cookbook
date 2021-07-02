@@ -237,9 +237,6 @@ end
 #
 def restart_network_service
   network_service_name = value_for_platform(
-    ['centos'] => {
-      '>=8.0' => 'NetworkManager'
-    },
     %w[ubuntu debian] => {
       '>=18.04' => 'systemd-resolved'
     },
@@ -301,8 +298,7 @@ end
 #
 def platform_supports_lustre_on_arm?
   [node['platform'] == 'ubuntu',
-   node['platform'] == 'amazon',
-   node['platform'] == 'centos' && node['platform_version'].to_i == 8].any?
+   node['platform'] == 'amazon'].any?
 end
 
 def aws_domain
@@ -316,7 +312,7 @@ end
 # Retrieve RHEL OS minor version from running kernel version
 # The OS minor version is retrieved from the patch version of the running kernel
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for CentOS8 minor version >=2 and CentOS7 minor version >=7
+# Method works for CentOS7 minor version >=7
 #
 def find_rhel_minor_version
   os_minor_version = ''
@@ -331,9 +327,6 @@ def find_rhel_minor_version
       os_minor_version = '7' if kernel_patch_version[1] >= '1062'
       os_minor_version = '8' if kernel_patch_version[1] >= '1127'
       os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    when 8
-      os_minor_version = '2' if kernel_patch_version[1] >= '193'
-      os_minor_version = '3' if kernel_patch_version[1] >= '240'
     else
       raise "CentOS version #{node['platform_version']} not supported."
     end
@@ -423,13 +416,12 @@ def efa_gdr_enabled?
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
 
-# CentOS8 and alinux OSs currently not correctly supported by NFS cookbook
+# Alinux OSs currently not correctly supported by NFS cookbook
 # Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
 def overwrite_nfs_template?
   [
-    node['platform'] == 'amazon',
-    node['platform'] == 'centos' && node['platform_version'].to_i == 8
+    node['platform'] == 'amazon'
   ].any?
 end
 
@@ -625,28 +617,78 @@ def check_imds_access(user, is_allowed)
       sudo -u #{user} curl 169.254.169.254/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
       [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
       if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
-        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS: #{user}"
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv4): #{user}"
+        exit 1
+      fi
+
+      sudo -u #{user} curl -g -6 [0:0:0:0:0:FFFF:A9FE:A9FE]/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
         exit 1
       fi
     TEST
   end
 end
 
-def check_directories_in_path(directories)
-  bash "check PATH contains #{directories}" do
+# Check that PATH includes directories for the given user.
+# If user is specified, PATH is checked in the login shell for that user.
+# Otherwise, PATH is checked in the current recipes context.
+def check_directories_in_path(directories, user = nil)
+  context = user.nil? ? 'recipes context' : "user #{user}"
+  bash "check PATH for #{context} contains #{directories}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
       set -e
+
+      #{user.nil? ? nil : "sudo su - #{user}"}
 
       for directory in #{directories.join(' ')}; do
         [[ ":$PATH:" == *":$directory:"* ]] || missing_directories="$missing_directories $directory"
       done
 
       if [[ ! -z $missing_directories ]]; then
-        >&2 echo "Missing expected directories in PATH: $missing_directories"
+        >&2 echo "Missing expected directories in PATH for #{context}: $missing_directories"
         exit 1
       fi
     TEST
+  end
+end
+
+def check_run_level_script(script_name, levels_on, levels_off)
+  bash "check run level script #{script_name}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      for level in #{levels_on.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^S[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_on="$missing_levels_on $level"
+      done
+
+      for level in #{levels_off.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^K[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_off="$missing_levels_off $level"
+      done
+
+      if [[ ! -z $missing_levels_on || ! -z $missing_levels_off ]]; then
+        >&2 echo "Misconfigured run level script #{script_name}"
+        >&2 echo "Expected levels on are (#{levels_on.join(' ')}). Missing levels on are ($missing_levels_on)"
+        >&2 echo "Expected levels off are (#{levels_off.join(' ')}). Missing levels off are ($missing_levels_off)"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_sudo_command(command, user = nil)
+  bash "check sudo command from user #{user}: #{command}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+      sudo #{command}
+    TEST
+    user user
   end
 end
 

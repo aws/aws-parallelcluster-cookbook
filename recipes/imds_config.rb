@@ -49,3 +49,16 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] ==
     raise "head_node_imds_secured must be 'true' or 'false', but got #{node['cluster']['head_node_imds_secured']}"
   end
 end
+
+cookbook_file '/etc/init.d/parallelcluster-iptables' do
+  source 'init/parallelcluster-iptables'
+  user 'root'
+  group 'root'
+  mode '0744'
+end
+
+service "parallelcluster-iptables" do
+  action %i[enable start]
+end
+
+include_recipe 'aws-parallelcluster::test_imds'

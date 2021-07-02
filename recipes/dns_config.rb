@@ -38,23 +38,10 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
       Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/dhcp/dhclient.conf")
       # Configure dhclient to automatically append Route53 search domain in resolv.conf
       # - on CentOS7 and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
-      # - on CentOS8 by NetworkManager (but dhclient is not enabled by default)
       replace_or_add "append Route53 search domain in /etc/dhcp/dhclient.conf" do
         path "/etc/dhcp/dhclient.conf"
         pattern "append domain-name*"
         line "append domain-name \" #{node['cluster']['dns_domain']}\";"
-      end
-
-      if platform?('centos') && node['platform_version'].to_i == 8
-        # On CentOS8 dhclient is not enabled by default
-        # Put pcluster version of NetworkManager.conf in place
-        # dhcp = dhclient needs to be added under [main] section to enable dhclient
-        cookbook_file 'NetworkManager.conf' do
-          path '/etc/NetworkManager/NetworkManager.conf'
-          user 'root'
-          group 'root'
-          mode '0644'
-        end
       end
     end
     restart_network_service
