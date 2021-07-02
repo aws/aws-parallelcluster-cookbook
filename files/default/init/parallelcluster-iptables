@@ -17,32 +17,33 @@
 
 IPTABLES_RULES_FILE="/etc/parallelcluster/sysconfig/iptables.rules"
 
-function start() {
-  if [[ -f $IPTABLES_RULES_FILE ]]; then
-    iptables-restore < $IPTABLES_RULES_FILE
-    echo "iptables rules restored from file: $IPTABLES_RULES_FILE"
-  else
-    echo "iptables rules left unchanged as file was not found: $IPTABLES_RULES_FILE"
-  fi
-}
-
-function stop() {
+function save() {
   echo "saving iptables rules to file: $IPTABLES_RULES_FILE"
   mkdir -p $(dirname $IPTABLES_RULES_FILE)
   iptables-save > $IPTABLES_RULES_FILE
   echo "iptables rules saved to file: $IPTABLES_RULES_FILE"
 }
 
+function start() {
+  if [[ -f $IPTABLES_RULES_FILE ]]; then
+    iptables-restore < $IPTABLES_RULES_FILE
+    echo "iptables rules restored from file: $IPTABLES_RULES_FILE"
+  else
+    echo "iptables rules left unchanged as file was not found: $IPTABLES_RULES_FILE"
+    save
+  fi
+}
+
+function stop() {
+  save
+}
+
 case "$1" in
 start|stop)
     $1
     ;;
-restart)
-    stop
-    start
-    ;;
 *)
-    echo "Usage: $0 {start|stop|restart}"
+    echo "Usage: $0 {start|stop}"
     exit 2
 esac
 

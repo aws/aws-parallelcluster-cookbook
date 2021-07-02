@@ -58,7 +58,7 @@ cookbook_file '/etc/init.d/parallelcluster-iptables' do
 end
 
 service "parallelcluster-iptables" do
-  action %i[enable restart]
+  action %i[enable start]
 end
 
 include_recipe 'aws-parallelcluster::test_imds'
