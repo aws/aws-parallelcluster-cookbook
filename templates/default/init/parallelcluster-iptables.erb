@@ -15,14 +15,7 @@
 # Description: Backup and restore iptables rules
 ### END INIT INFO
 
-IPTABLES_RULES_FILE="/etc/parallelcluster/sysconfig/iptables.rules"
-
-function save() {
-  echo "saving iptables rules to file: $IPTABLES_RULES_FILE"
-  mkdir -p $(dirname $IPTABLES_RULES_FILE)
-  iptables-save > $IPTABLES_RULES_FILE
-  echo "iptables rules saved to file: $IPTABLES_RULES_FILE"
-}
+IPTABLES_RULES_FILE="<%= @iptables_rules_file %>"
 
 function start() {
   if [[ -f $IPTABLES_RULES_FILE ]]; then
@@ -30,12 +23,14 @@ function start() {
     echo "iptables rules restored from file: $IPTABLES_RULES_FILE"
   else
     echo "iptables rules left unchanged as file was not found: $IPTABLES_RULES_FILE"
-    save
   fi
 }
 
 function stop() {
-  save
+  echo "saving iptables rules to file: $IPTABLES_RULES_FILE"
+  mkdir -p $(dirname $IPTABLES_RULES_FILE)
+  iptables-save > $IPTABLES_RULES_FILE
+  echo "iptables rules saved to file: $IPTABLES_RULES_FILE"
 }
 
 case "$1" in
