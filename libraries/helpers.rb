@@ -631,6 +631,21 @@ def check_imds_access(user, is_allowed)
   end
 end
 
+# Check that the iptables backup file exists
+def check_iptables_rules_file(file)
+  bash "check iptables rules backup file exists: #{file}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      if [[ ! -f #{file} ]]; then
+        >&2 echo "Missing expected iptables rules file: #{file}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
 # Check that PATH includes directories for the given user.
 # If user is specified, PATH is checked in the login shell for that user.
 # Otherwise, PATH is checked in the current recipes context.

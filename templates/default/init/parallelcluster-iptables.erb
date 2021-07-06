@@ -15,7 +15,7 @@
 # Description: Backup and restore iptables rules
 ### END INIT INFO
 
-IPTABLES_RULES_FILE="/etc/parallelcluster/sysconfig/iptables.rules"
+IPTABLES_RULES_FILE="<%= @iptables_rules_file %>"
 
 function start() {
   if [[ -f $IPTABLES_RULES_FILE ]]; then
