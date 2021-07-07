@@ -37,7 +37,7 @@ function exit_noop {
 }
 
 function parameter_check {
-  if [[ -n "${INPUT_MOUNTPOINT}" ]]; then
+  if [[ -z "${INPUT_MOUNTPOINT}" ]]; then
     exit_noop "Mount point not specified"
   fi
 }
