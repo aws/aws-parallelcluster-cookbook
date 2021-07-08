@@ -122,8 +122,8 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     - the authenticator verifies the validity of the authenticationToken and permits the user to access to the session.
     """
 
-    class IncorrectRequestException(Exception):
-        """Class used to generate an exception when an incorrect request arrives to the DCVAuthenticator."""
+    class IncorrectRequestError(Exception):
+        """Class representing an incorrect request to the DCVAuthenticator."""
 
         pass
 
@@ -159,7 +159,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             # validate number of parameters
             parameters = dict(parse_qsl(urlparse(self.path).query))
             if not parameters or len(parameters) > 3:
-                raise DCVAuthenticator.IncorrectRequestException(
+                raise DCVAuthenticator.IncorrectRequestError(
                     "Incorrect number of parameters passed.\nParameters: {0}".format(parameters)
                 )
 
@@ -172,14 +172,12 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
                 request_token = self._extract_parameters_values(parameters, ["requestToken"])[0]
                 result = self._get_session_token(request_token)
             else:
-                raise DCVAuthenticator.IncorrectRequestException(
-                    "The action specified '{0}' is not valid.".format(action)
-                )
+                raise DCVAuthenticator.IncorrectRequestError("The action specified '{0}' is not valid.".format(action))
 
             self._set_headers(400, content="application/json")
             self.wfile.write(result.encode())
 
-        except DCVAuthenticator.IncorrectRequestException as e:
+        except DCVAuthenticator.IncorrectRequestError as e:
             logger.error(e)
             self._return_bad_request(e)
 
@@ -195,7 +193,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             field_data = self.rfile.read(length).decode("utf-8")
             parameters = dict(parse_qsl(field_data))
             if len(parameters) != 3:
-                raise DCVAuthenticator.IncorrectRequestException(
+                raise DCVAuthenticator.IncorrectRequestError(
                     "Incorrect number of parameters passed.\nParameters: {0}".format(parameters)
                 )
             session_token, session_id = self._extract_parameters_values(
@@ -206,9 +204,9 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             if authorized_user:
                 self._return_auth_ok(username=authorized_user)
             else:
-                raise DCVAuthenticator.IncorrectRequestException("The session token is not valid")
+                raise DCVAuthenticator.IncorrectRequestError("The session token is not valid")
 
-        except DCVAuthenticator.IncorrectRequestException as e:
+        except DCVAuthenticator.IncorrectRequestError as e:
             logger.error(e)
             self._return_auth_ko(e)
 
@@ -243,7 +241,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         try:
             return [parameters[key] for key in keys]
         except KeyError:
-            raise DCVAuthenticator.IncorrectRequestException(
+            raise DCVAuthenticator.IncorrectRequestError(
                 "Wrong parameters. Required parameters are {0}".format(", ".join(keys))
             )
 
@@ -303,7 +301,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         logger.info("Validating Request Token..")
         token_info = cls.request_token_manager.get_token_info(request_token)
         if not token_info:
-            raise DCVAuthenticator.IncorrectRequestException("The requestToken parameter is not valid")
+            raise DCVAuthenticator.IncorrectRequestError("The requestToken parameter is not valid")
         user = token_info.user
         session_id = token_info.dcv_session_id
         access_file = token_info.access_file
@@ -312,7 +310,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         # verify token expiration
         logger.info("Verifying Request Token..")
         if datetime.utcnow() - token_info.creation_time > cls.request_token_ttl:
-            raise DCVAuthenticator.IncorrectRequestException("The requestToken is not valid anymore")
+            raise DCVAuthenticator.IncorrectRequestError("The requestToken is not valid anymore")
         logger.info("Request Token is valid.")
 
         # verify user by checking if the access_file is created by the user asking the session token
@@ -321,14 +319,14 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             access_file_path = "{0}/{1}".format(AUTHORIZATION_FILE_DIR, access_file)
             file_details = os.stat(access_file_path)
             if getpwuid(file_details.st_uid).pw_name != user:
-                raise DCVAuthenticator.IncorrectRequestException("The user is not the one that created the access file")
+                raise DCVAuthenticator.IncorrectRequestError("The user is not the one that created the access file")
             if datetime.utcnow() - datetime.utcfromtimestamp(file_details.st_mtime) > cls.request_token_ttl:
-                raise DCVAuthenticator.IncorrectRequestException("The access file has expired")
+                raise DCVAuthenticator.IncorrectRequestError("The access file has expired")
             logger.info("Access File is valid. User identified correctly.")
             os.remove(access_file_path)
             logger.info("Access File removed correctly.")
         except OSError:
-            raise DCVAuthenticator.IncorrectRequestException("The Access File does not exist")
+            raise DCVAuthenticator.IncorrectRequestError("The Access File does not exist")
 
         # create and register internally a session token
         logger.info("Generating new Session Token..")
@@ -344,7 +342,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     @staticmethod
     def _validate_param(string_to_test, regex, resource_name):
         if not re.match(regex, string_to_test):
-            raise DCVAuthenticator.IncorrectRequestException("The {0} parameter is not valid".format(resource_name))
+            raise DCVAuthenticator.IncorrectRequestError("The {0} parameter is not valid".format(resource_name))
 
     @staticmethod
     def _is_session_valid(user, session_id):
@@ -363,7 +361,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         if not next(
             filter(lambda process: DCVAuthenticator.check_dcv_process(process, user, session_id), processes), None
         ):
-            raise DCVAuthenticator.IncorrectRequestException("The given session does not exists")
+            raise DCVAuthenticator.IncorrectRequestError("The given session does not exists")
         logger.info("The NICE DCV session is valid.")
 
     @staticmethod
