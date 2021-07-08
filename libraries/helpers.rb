@@ -286,21 +286,6 @@ def platform_supports_dcv?
   node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
 
-#
-# Check if Lustre is supported on this OS-architecture combination
-#
-def platform_supports_lustre_for_architecture?
-  (arm_instance? && platform_supports_lustre_on_arm?) || !arm_instance?
-end
-
-#
-# Check if Lustre is supported for ARM instances on this OS
-#
-def platform_supports_lustre_on_arm?
-  [node['platform'] == 'ubuntu',
-   node['platform'] == 'amazon'].any?
-end
-
 def aws_domain
   # Set the aws domain name
   aws_domain = "amazonaws.com"
@@ -592,7 +577,7 @@ def check_sudoers_permissions(sudoers_file, user, run_as, command_alias, *comman
       fi
 
       expected_user_line="#{user} ALL = (#{run_as}) NOPASSWD: #{command_alias}"
-      actual_user_line=$(grep ^#{user} "#{sudoers_file}")
+      actual_user_line=$(grep "^#{user} .* #{command_alias}" "#{sudoers_file}")
       if [[ "$actual_user_line" != "$expected_user_line" ]]; then
         >&2 echo "Expected user line in #{sudoers_file}: $expected_user_line"
         >&2 echo "Actual user line in #{sudoers_file}: $actual_user_line"
@@ -631,6 +616,21 @@ def check_imds_access(user, is_allowed)
   end
 end
 
+# Check that the iptables backup file exists
+def check_iptables_rules_file(file)
+  bash "check iptables rules backup file exists: #{file}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      if [[ ! -f #{file} ]]; then
+        >&2 echo "Missing expected iptables rules file: #{file}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
 # Check that PATH includes directories for the given user.
 # If user is specified, PATH is checked in the login shell for that user.
 # Otherwise, PATH is checked in the current recipes context.
@@ -655,6 +655,32 @@ def check_directories_in_path(directories, user = nil)
   end
 end
 
+def check_run_level_script(script_name, levels_on, levels_off)
+  bash "check run level script #{script_name}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      for level in #{levels_on.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^S[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_on="$missing_levels_on $level"
+      done
+
+      for level in #{levels_off.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^K[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_off="$missing_levels_off $level"
+      done
+
+      if [[ ! -z $missing_levels_on || ! -z $missing_levels_off ]]; then
+        >&2 echo "Misconfigured run level script #{script_name}"
+        >&2 echo "Expected levels on are (#{levels_on.join(' ')}). Missing levels on are ($missing_levels_on)"
+        >&2 echo "Expected levels off are (#{levels_off.join(' ')}). Missing levels off are ($missing_levels_off)"
+        exit 1
+      fi
+    TEST
+  end
+end
+
 def check_sudo_command(command, user = nil)
   bash "check sudo command from user #{user}: #{command}" do
     cwd Chef::Config[:file_cache_path]
@@ -670,4 +696,47 @@ def get_system_users
   cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
   cmd.run_command
   cmd.stdout.split(/\n+/)
+end
+
+# Return the VPC CIDR list from IMDS
+def get_vpc_cidr_list
+  imds_ip = '169.254.169.254'
+  curl_options = '--retry 3 --retry-delay 0 --silent --fail'
+
+  token = run_command("curl http://#{imds_ip}/latest/api/token -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 300' #{curl_options}")
+  raise('Unable to retrieve token from EC2 meta-data') if token.empty?
+
+  mac = run_command("curl http://#{imds_ip}/latest/meta-data/mac -H 'X-aws-ec2-metadata-token: #{token}' #{curl_options}")
+  raise('Unable to retrieve MAC address from EC2 meta-data') if mac.empty?
+
+  vpc_cidr_list = run_command("curl http://#{imds_ip}/latest/meta-data/network/interfaces/macs/#{mac}/vpc-ipv4-cidr-blocks -H 'X-aws-ec2-metadata-token: #{token}' #{curl_options}")
+  raise('Unable to retrieve VPC CIDR list from EC2 meta-data') if vpc_cidr_list.empty?
+
+  vpc_cidr_list.split(/\n+/)
+end
+
+def run_command(command)
+  Mixlib::ShellOut.new(command).run_command.stdout.strip
+end
+
+def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_cidr_list)
+  bash "check #{ssh_target_checker_script} contains the correct vpc cidr list: #{expected_cidr_list}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      if [[ ! -f #{ssh_target_checker_script} ]]; then
+        >&2 echo "SSH target checker in #{ssh_target_checker_script} not found"
+        exit 1
+      fi
+
+      actual_value=$(egrep 'VPC_CIDR_LIST[ ]*=[ ]' #{ssh_target_checker_script})
+
+      egrep 'VPC_CIDR_LIST[ ]*=[ ]*\\([ ]*#{expected_cidr_list.join('[ ]*')}[ ]*\\)' #{ssh_target_checker_script}
+      if [[ $? != 0 ]]; then
+        >&2 echo "SSH target checker in #{ssh_target_checker_script} contains wrong VPC CIDR list"
+        >&2 echo "Expected VPC CIDR list: #{expected_cidr_list}"
+        >&2 echo "Actual VPC CIDR list: $actual_value"
+        exit 1
+      fi
+    TEST
+  end
 end

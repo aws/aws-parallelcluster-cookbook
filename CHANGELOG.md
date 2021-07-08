@@ -21,6 +21,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Make PATH include required directories for every user and recipes context.
 - Fail cluster creation when IMDS lockdown is not working correctly.
 - Make sudoers secure_path include the same directories in every platform.
+- Add support for iptables restore on instance reboot.
 
 
 2.x.x
@@ -29,6 +30,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for Ubuntu 20.04.
 - Add support for using FSx Lustre in subnet with no internet access.
+- Add support for building custom Centos 7 AMIs on ARM.
 - Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
 - Add possibility to use a post installation script when building Centos 8 AMI.

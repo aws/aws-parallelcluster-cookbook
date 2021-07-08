@@ -87,6 +87,7 @@ default['cluster']['armpl']['gcc']['url'] = [
   "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz"
 ].join('/')
 default['cluster']['armpl']['platform'] = value_for_platform(
+  'centos' => { '~>7' => 'RHEL-7' },
   'amazon' => { '2' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
@@ -151,13 +152,14 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 default['cluster']['efa']['installer_version'] = '1.12.1'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
+default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
 
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
 default['cluster']['dcv']['version'] = '2021.0-10242'
 if arm_instance?
-  default['cluster']['dcv']['supported_os'] = %w[ubuntu18 amazon2]
+  default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
@@ -297,6 +299,11 @@ when 'rhel', 'amazon'
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables]
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
+    if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
+      # Do not install bind-utils on centos7+arm due to issue with package checksum
+      default['cluster']['base_packages'].delete('bind-utils')
+    end
+
   when 'amazon'
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
@@ -361,9 +368,12 @@ default['cluster']['lustre']['public_key'] = value_for_platform(
 )
 # Lustre repo string is built following the official doc
 # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
+# 'centos' is used for arm and 'el' for x86_64
+default['cluster']['lustre']['centos7']['base_url_prefix'] = arm_instance? ? 'centos' : 'el'
 default['cluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
-    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.#{find_rhel_minor_version}/x86_64/"
+    # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
+    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_rhel_minor_version}/#{node['kernel']['machine']}/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
 )
