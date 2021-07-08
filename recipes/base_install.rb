@@ -97,14 +97,6 @@ end
 # Manage SSH via Chef
 include_recipe "openssh"
 
-# Install SSH target checker
-cookbook_file 'ssh_target_checker.sh' do
-  path "/usr/bin/ssh_target_checker.sh"
-  owner "root"
-  group "root"
-  mode "0755"
-end
-
 # Disable selinux
 selinux_state "SELinux Disabled" do
   action :disabled

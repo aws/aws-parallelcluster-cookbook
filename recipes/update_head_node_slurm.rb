@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_recipe 'aws-parallelcluster::openssh_config'
+
 updated_cluster_config_path = "/tmp/cluster-config.updated.yaml"
 fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
                        " --bucket #{node['cluster']['cluster_s3_bucket']}"\
