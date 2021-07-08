@@ -592,7 +592,7 @@ def check_sudoers_permissions(sudoers_file, user, run_as, command_alias, *comman
       fi
 
       expected_user_line="#{user} ALL = (#{run_as}) NOPASSWD: #{command_alias}"
-      actual_user_line=$(grep ^#{user} "#{sudoers_file}")
+      actual_user_line=$(grep "^#{user} .* #{command_alias}" "#{sudoers_file}")
       if [[ "$actual_user_line" != "$expected_user_line" ]]; then
         >&2 echo "Expected user line in #{sudoers_file}: $expected_user_line"
         >&2 echo "Actual user line in #{sudoers_file}: $actual_user_line"
