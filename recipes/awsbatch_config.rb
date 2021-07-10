@@ -62,5 +62,7 @@ else
   # Install aws-parallelcluster package (for aws-parallelcluster-awsbatchcli)
   execute "pip_install_parallelcluster" do
     command "#{node['cfncluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster==#{node['cfncluster']['cfncluster-version']}"
+    retries 3
+    retry_delay 5
   end
 end

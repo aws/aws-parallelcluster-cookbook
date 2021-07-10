@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.11.1
+-----
+
+**ENHANCEMENTS**
+- Retry failed installations of aws-parallelcluster package on head node of clusters using AWS Batch as the scheduler.
+
 2.11.0
 -----
 
