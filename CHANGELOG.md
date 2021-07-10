@@ -237,7 +237,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 
 - Disable libvirtd service on Centos 7. Virtual bridge interfaces are incorrectly detected by Open MPI and
-  cause MPI applications to hang, see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details 
+  cause MPI applications to hang, see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
 - Use CINC instead of Chef for provisioning instances. See https://cinc.sh/about/ for details.
 - Retry when mounting an NFS mount fails.
 - Install the `pyenv` virtual environments used by ParallelCluster cookbook and node daemon code under
@@ -255,7 +255,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade EFA installer to version 1.9.4:
   - Kernel module: ``efa-1.6.0`` (from efa-1.5.1)
   - RDMA core: ``rdma-core-28.amzn0`` (from rdma-core-25.0)
-  - Libfabric: ``libfabric-1.10.1amzn1.1`` (updated from libfabric-aws-1.9.0amzn1.1) 
+  - Libfabric: ``libfabric-1.10.1amzn1.1`` (updated from libfabric-aws-1.9.0amzn1.1)
   - Open MPI: openmpi40-aws-4.0.3 (no change)
 
 **BUG FIXES**
@@ -312,7 +312,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   stray processes when running MPI applications. This also includes the creation of a cgroup Slurm configuration in
   in order to enable the cgroup plugin.
 - Skip execution, at node bootstrap time, of all those install recipes that are already applied at AMI creation time.
-  The old behaviour can be restored setting the property "skip_install_recipes" to "no" through extra_json. The old 
+  The old behaviour can be restored setting the property "skip_install_recipes" to "no" through extra_json. The old
   behaviour is required in case a custom_node_package is specified and could be needed in case custom_cookbook is used
   (depending or not if the custom cookbook contains changes into any *_install recipes)
 - Start CloudWatch agent earlier in the node bootstrapping phase so that cookbook execution failures are correctly
@@ -321,7 +321,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - FSx Lustre: remove `x-systemd.requires=lnet.service` from mount options in order to rely on default lnet setup
   provided by Lustre.
-- Enforce Packer version to be >= 1.4.0 when building an AMI. This is also required for customers using `pcluster 
+- Enforce Packer version to be >= 1.4.0 when building an AMI. This is also required for customers using `pcluster
   createami` command.
 - Remove /tmp/proxy.sh file. Proxy configuration is now written into /etc/profile.d/proxy.sh
 - Omit cfn-init-cmd and cfn-wire from the files stored in CloudWatch logs.
@@ -352,7 +352,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install Python 2.7.17 on CentOS 6 and set it as default through pyenv
 - Install Ganglia from repository on Amazon Linux, Amazon Linux 2, CentOS 6 and CentOS 7
 - Disable StrictHostKeyChecking for SSH client when target host is inside cluster VPC for all OSs except CentOS 6
-- Pin Intel Python 2 and Intel Python 3 to version 2019.4  
+- Pin Intel Python 2 and Intel Python 3 to version 2019.4
 - Automatically disable ptrace protection on Ubuntu 18.04 and Ubuntu 16.04 compute nodes when EFA is enabled
 - Packer version >= 1.4.0 is required for AMI creation
 
@@ -405,13 +405,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Echo compute instance type and memory information in COMPUTE_READY message
 - Changes to sshd config:
   - Disable X11Forwarding by default
-  - Limit SSH Ciphers to 
+  - Limit SSH Ciphers to
     `aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com`
   - Limit SSH MACs to `hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256`
 - Increase default root volume to 25GB.
 - Enable `flock user_xattr noatime` Lustre options by default everywhere and
   `x-systemd.automount x-systemd.requires=lnet.service` for systemd based systems.
-- Install EFA in China AMIs. 
+- Install EFA in China AMIs.
 
 **BUG FIXES**
 - Fix Ganglia not starting on Ubuntu 16
