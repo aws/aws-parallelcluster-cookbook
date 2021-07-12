@@ -49,3 +49,23 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] ==
     raise "head_node_imds_secured must be 'true' or 'false', but got #{node['cluster']['head_node_imds_secured']}"
   end
 end
+
+iptables_rules_file = '/etc/parallelcluster/sysconfig/iptables.rules'
+
+execute "Save iptables rules" do
+  command "mkdir -p $(dirname #{iptables_rules_file}) && iptables-save > #{iptables_rules_file}"
+end
+
+template '/etc/init.d/parallelcluster-iptables' do
+  source 'init/parallelcluster-iptables.erb'
+  user 'root'
+  group 'root'
+  mode '0744'
+  variables(iptables_rules_file: iptables_rules_file)
+end
+
+service "parallelcluster-iptables" do
+  action %i[enable start]
+end
+
+include_recipe 'aws-parallelcluster::test_imds'

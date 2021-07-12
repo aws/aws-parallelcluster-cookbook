@@ -16,6 +16,7 @@
 # limitations under the License.
 
 include_recipe "aws-parallelcluster::setup_envars"
+include_recipe "aws-parallelcluster::sudoers_install"
 
 return if node['conditions']['ami_bootstrapped']
 
@@ -30,16 +31,12 @@ when 'rhel', 'amazon'
     include_recipe "yum-epel"
   end
 
+  # the epel recipe doesn't work on aarch64, needs epel-release package
+  package 'epel-release' if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
+
   unless node['platform_version'].to_i < 7
     execute 'yum-config-manager_skip_if_unavail' do
       command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
-    end
-  end
-  if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-    # Enable powertools repo so *-devel packages can be installed with DNF
-    powertools_repo = find_rhel_minor_version <= '2' ? "PowerTools" : "powertools"
-    execute 'dnf enable powertools' do
-      command "dnf config-manager --set-enabled #{powertools_repo}"
     end
   end
 
@@ -78,10 +75,7 @@ package "install kernel packages" do
   case node['platform_family']
   when 'rhel', 'amazon'
     package_name node['cluster']['kernel_devel_pkg']['name']
-    if node['platform'] == 'centos' && node['platform_version'].to_i < 8
-      # Do not enforce kernel_devel version on CentOS8 because kernel_devel package with same version as kernel release version cannot be found
-      version node['cluster']['kernel_devel_pkg']['version']
-    end
+    version node['cluster']['kernel_devel_pkg']['version']
   when 'debian'
     package_name node['cluster']['kernel_generic_pkg']
   end
@@ -102,14 +96,6 @@ end
 
 # Manage SSH via Chef
 include_recipe "openssh"
-
-# Install SSH target checker
-cookbook_file 'ssh_target_checker.sh' do
-  path "/usr/bin/ssh_target_checker.sh"
-  owner "root"
-  group "root"
-  mode "0755"
-end
 
 # Disable selinux
 selinux_state "SELinux Disabled" do

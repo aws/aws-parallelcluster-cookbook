@@ -15,8 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['conditions']['lustre_supported']
-
 if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version'].to_f)
   # Centos 7.6 and 7.5
 
@@ -54,7 +52,7 @@ if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version']
   kernel_module 'lnet'
 
 elsif node['platform'] == 'centos' && node['platform_version'].to_f >= 7.7
-  # Centos 8 and >= 7.7
+  # Centos >= 7.7
 
   # add fsx lustre repository
   yum_repository "aws-fsx" do

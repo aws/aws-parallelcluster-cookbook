@@ -33,8 +33,8 @@ s3_domain = "https://s3.#{node['cluster']['region']}.#{node['cluster']['aws_doma
 package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cluster']['region']}"
 arch_url_component = arm_instance? ? 'arm64' : 'amd64'
 platform_url_component = value_for_platform(
-  # No CW Agent for CentOS 8 ARM, using RHEL package
-  'centos' => { '>=8.0' => arm_instance? ? 'redhat' : node['platform'] },
+  # No CW Agent for CentOS ARM, using RHEL package
+  'centos' => { 'default' => arm_instance? ? 'redhat' : node['platform'] },
   'amazon' => { 'default' => 'amazon_linux' },
   'default' => node['platform']
 )

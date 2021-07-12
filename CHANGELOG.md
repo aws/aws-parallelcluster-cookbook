@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 
 - Drop support for SGE and Torque schedulers.
+- Drop support for CentOS8.
 - Remove nodewatcher, sqswatcher, jobwatcher related code.
 - Remove Ganglia support.
 - Install ParallelCluster AWS Batch CLI at AMI build time.
@@ -17,6 +18,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add explicit assignment of names, uids, gids for slurm, munge and dcvextauth users.
 - Remove packer.
 - Restrict access to IMDS to root and cluster admin users, only.
+- Make PATH include required directories for every user and recipes context.
+- Fail cluster creation when IMDS lockdown is not working correctly.
+- Make sudoers secure_path include the same directories in every platform.
+- Add support for iptables restore on instance reboot.
 
 
 2.x.x
@@ -25,6 +30,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for Ubuntu 20.04.
 - Add support for using FSx Lustre in subnet with no internet access.
+- Add support for building custom Centos 7 AMIs on ARM.
 - Make sure slurmd service is not enabled before finalize stage, which will prevent user from unintentionally making compute node available in post-install process.
 - Change to ssh_target_checker.sh syntax that makes the script compatible with pdsh
 - Add possibility to use a post installation script when building Centos 8 AMI.
@@ -49,6 +55,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Add new SlurmctldParameters, power_save_min_interval=30, so power actions will be processed every 30 seconds
   - Add new SlurmctldParameters, cloud_reg_addrs, which will reset a node's NodeAddr automatically on power_down
   - Specify instance GPU model as GRES GPU Type in gres.conf
+  - Reduce default Slurm ResumeTimeout to from 3600 seconds to 1800 seconds
 - Upgrade Arm Performance Libraries (APL) to version 21.0.0
 - Upgrade NICE DCV to version 2021.0-10242.
 - Upgrade NVIDIA driver to version 460.73.01.

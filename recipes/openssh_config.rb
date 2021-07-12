@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: test_envars
+# Recipe:: openssh_config
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,11 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-directories = %w[/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin /opt/aws/bin]
-
-# Verifies PATH in the recipe context
-check_directories_in_path(directories)
-
-# Verifies PATH in login shells for notable users
-users = %W[root #{node['cluster']['cluster_admin_user']} #{node['cluster']['slurm']['user']}]
-users.each { |user| check_directories_in_path(directories, user) }
+# Install SSH target checker
+template '/usr/bin/ssh_target_checker.sh' do
+  source 'openssh/ssh_target_checker.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  variables(vpc_cidr_list: get_vpc_cidr_list)
+end

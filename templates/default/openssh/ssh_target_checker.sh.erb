@@ -13,6 +13,8 @@
 
 set -o pipefail
 
+VPC_CIDR_LIST=(<%= @vpc_cidr_list.join(' ') %>)
+
 log() {
     echo "$@" | logger -t "pcluster_ssh_target_checker"
 }
@@ -74,9 +76,7 @@ if [[ "${resolved_ip}" == "127.0.0.1" ]]; then
    exit 0
 fi
 
-IFS=" " read -r -a vpc_cidr_list <<< "$(retrieve_vpc_cidr_list)"
-
-for vpc_cidr in "${vpc_cidr_list[@]}"
+for vpc_cidr in "${VPC_CIDR_LIST[@]}"
 do
   check_ip_in_cidr "${resolved_ip}" "${vpc_cidr}"
   if check_ip_in_cidr "${resolved_ip}" "${vpc_cidr}"; then
