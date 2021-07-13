@@ -149,7 +149,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.12.1'
+default['cluster']['efa']['installer_version'] = '1.12.2'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
@@ -157,28 +157,28 @@ default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
-default['cluster']['dcv']['version'] = '2021.0-10242'
+default['cluster']['dcv']['version'] = '2021.1-10557'
 if arm_instance?
   default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071"
+      '~>7' => "b3b47d8134800149758da92e4f5b97941245144a1cccf07bf44aa924d2b214a4"
     },
-    'amazon' => { '2' => "7070fd974997ff53925f5f6e6a93e325d41eff197528b226a146ef99e9239071" },
-    'ubuntu' => { '18.04' => "8ada2cfa0bcac2285e7cfc65f297ab9322d35261422ced121e8cee78998f5472" }
+    'amazon' => { '2' => "b3b47d8134800149758da92e4f5b97941245144a1cccf07bf44aa924d2b214a4" },
+    'ubuntu' => { '18.04' => "8e910b0de25fb744cb21c1a0a04a01d8a652d03bd836cd1f85d12f313652340e" }
   )
 else
   default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 ubuntu20 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39"
+      '~>7' => "c0de28f38440c18757ef014e841b3bc79b7555e8b05904e10ddca1ce21d6e47f"
     },
-    'amazon' => { '2' => "9273ff2b21a8fc4798a2286e5fe9f69cc84851c47009b7c8549f5a333d0d5b39" },
+    'amazon' => { '2' => "c0de28f38440c18757ef014e841b3bc79b7555e8b05904e10ddca1ce21d6e47f" },
     'ubuntu' => {
-      '18.04' => "381895bef0f8e8756a33ba0960329130935c0c68cb79fb391bd97015f497568c",
-      '20.04' => "431e977dc936bd347146a57eb09033ff8945fe99ad85da64f5ce74c8de6e655c"
+      '18.04' => "40908548266e7aa4ef2ca954eb25bf898d10ca00fc6b3d7b8b47cb3c9ff00ef9",
+      '20.04' => "f8e9e9b64617066a25d67f4523a0c13f1b7eff22d9cb044aeebac9f97fa57cbf"
     }
   )
 end
@@ -195,7 +195,7 @@ default['cluster']['dcv']['package'] = value_for_platform(
     'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}"
   }
 )
-default['cluster']['dcv']['server']['version'] = '2021.0.10242-1'
+default['cluster']['dcv']['server']['version'] = '2021.1.10557-1'
 default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
     '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
@@ -205,7 +205,7 @@ default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server pack
     'default' => "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
   }
 )
-default['cluster']['dcv']['xdcv']['version'] = '2021.0.380-1'
+default['cluster']['dcv']['xdcv']['version'] = '2021.1.392-1'
 default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
     '~>7' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
@@ -215,7 +215,7 @@ default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create vir
     'default' => "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
   }
 )
-default['cluster']['dcv']['gl']['version'] = '2021.0.912-1'
+default['cluster']['dcv']['gl']['version'] = '2021.1.937-1'
 default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
     '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
@@ -225,7 +225,7 @@ default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU s
     'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
   }
 )
-default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.0/Servers/#{node['cluster']['dcv']['package']}.tgz"
+default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.1/Servers/#{node['cluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
@@ -361,6 +361,9 @@ when 'debian'
   end
 end
 
+# Default NFS mount options
+default['cfncluster']['nfs']['hard_mount_options'] = 'hard,_netdev'
+
 # Lustre defaults (for CentOS >=7.7 and Ubuntu)
 default['cluster']['lustre']['public_key'] = value_for_platform(
   'centos' => { '>=7.7' => "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc" },
@@ -396,6 +399,11 @@ default['cluster']['lustre']['client_url'] = value_for_platform(
     '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm"
   }
 )
+
+# Default gc_thresh values for performance at scale
+default['cfncluster']['sysctl']['ipv4']['gc_thresh1'] = 0
+default['cfncluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
+default['cfncluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'

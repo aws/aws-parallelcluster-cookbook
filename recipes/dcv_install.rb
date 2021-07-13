@@ -29,6 +29,8 @@ def install_package_list(packages)
     when 'ubuntu'
       execute 'apt install dcv package' do
         command "apt -y install #{package_name}"
+        retries 3
+        retry_delay 5
       end
     end
   end
@@ -123,29 +125,22 @@ if node['conditions']['dcv_supported']
 
     when 'ubuntu'
       apt_update
-      # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
-      package 'whoopsie' do
-        retries 3
-        retry_delay 5
-      end
-      # Install the desktop environment and the desktop manager packages
-      prereq_packages = %w[ubuntu-desktop lightdm mesa-utils]
-      package prereq_packages do
-        retries 10
-        retry_delay 5
-      end
-      # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
-      package 'ifupdown' do
-        action :purge
-      end
-      bash 'setup pre-req' do
+
+      bash 'install pre-req' do
         cwd Chef::Config[:file_cache_path]
+        # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
+        # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
+        # Run dpkg --configure -a if there is a `dpkg interrupted` issue when installing ubuntu-desktop
         code <<-PREREQ
           set -e
+          DEBIAN_FRONTEND=noninteractive
+          apt -y install whoopsie
+          apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)
+          apt -y purge ifupdown
           wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
           gpg --import NICE-GPG-KEY
         PREREQ
-        retries 3
+        retries 10
         retry_delay 5
       end
 

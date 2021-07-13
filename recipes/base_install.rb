@@ -155,6 +155,9 @@ else
   end
 end
 
+# Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
+configure_gc_thresh_values
+
 # Put supervisord config in place
 cookbook_file "supervisord.conf" do
   path "/etc/supervisord.conf"

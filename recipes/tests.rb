@@ -326,3 +326,50 @@ if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] ==
     end
   end
 end
+
+##################
+# Verify enough space on AMIs
+###################
+unless node['cfncluster']['os'].end_with?("-custom")
+  bash 'verify 10 GB of space left on root volume' do
+    cwd Chef::Config[:file_cache_path]
+    # This test assumes the df output is as follows:
+    # $ df --block-size GB --output=avail /
+    # Avail
+    # 42GB
+    code <<-CAPACITY_CHECK
+      free_gigs="$(df --block-size GB --output=avail / | tail -n1 | cut -d G -f1)"
+      if [ $free_gigs -lt 10 ]; then
+        echo "Expected at least 10 GB of free space remaining on the root volume, but only found ${free_gigs}"
+        exit 1
+      fi
+    CAPACITY_CHECK
+    user node['cfncluster']['cfn_cluster_user']
+  end
+end
+
+##################
+# ipv4 gc_thresh
+###################
+expected_gc_settings = []
+(1..3).each do |i|
+  expected_gc_settings.append(node['cfncluster']['sysctl']['ipv4']["gc_thresh#{i}"])
+end
+expected_gc_settings = expected_gc_settings.join(',').to_s
+bash 'check ipv4 gc_thresh is correctly configured' do
+  cwd Chef::Config[:file_cache_path]
+  code <<-GC
+    set -e
+
+    for i in {1..3}; do
+      declare "actual_gc_thresh${i}=`cat /proc/sys/net/ipv4/neigh/default/gc_thresh${i}`"
+    done
+    actual_settings="${actual_gc_thresh1},${actual_gc_thresh2},${actual_gc_thresh3}"
+    if [ "${actual_settings}" != "#{expected_gc_settings}" ]; then
+            echo "ERROR: Incorrect gc_thresh settings!"
+            echo "Expected "#{expected_gc_settings}" but actual is ${actual_settings}"
+            exit 1
+    fi
+  GC
+  user 'root'
+end

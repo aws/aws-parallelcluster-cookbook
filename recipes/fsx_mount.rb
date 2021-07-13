@@ -32,18 +32,12 @@ if fsx_shared_dir != "NONE"
     action :create
   end
 
-  dns_domain = if node['cluster']['region'].include? 'cn'
-                 'com.cn'
-               else
-                 'com'
-               end
-
   dns_name = if node['cluster']['fsx_dns_name'] && !node['cluster']['fsx_dns_name'].empty?
                node['cluster']['fsx_dns_name']
              else
                # Hardcoded DNSname only valid for filesystem created after Mar-1 2021
                # For older filesystems, DNSname needs to be retrieved from FSx API
-               "#{node['cluster']['fsx_fs_id']}.fsx.#{node['cluster']['region']}.amazonaws.#{dns_domain}"
+               "#{node['cluster']['fsx_fs_id']}.fsx.#{node['cluster']['region']}.amazonaws.com"
              end
 
   mountname = node['cluster']['fsx_mount_name']
@@ -59,8 +53,8 @@ if fsx_shared_dir != "NONE"
     pass 0
     options mount_options
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 
   # Make sure permission is correct

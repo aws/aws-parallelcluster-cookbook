@@ -47,10 +47,10 @@ if raid_shared_dir != "NONE"
   mount raid_shared_dir do
     device(lazy { "#{node['cluster']['head_node_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
-    options 'hard,intr,noatime,_netdev'
+    options node['cfncluster']['nfs']['hard_mount_options']
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 end
 
@@ -58,20 +58,20 @@ end
 mount '/home' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
   fstype 'nfs'
-  options 'hard,intr,noatime,_netdev'
+  options node['cfncluster']['nfs']['hard_mount_options']
   action %i[mount enable]
-  retries 3
-  retry_delay 5
+  retries 10
+  retry_delay 6
 end
 
 # Mount /opt/intel over NFS
 mount '/opt/intel' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/intel" })
   fstype 'nfs'
-  options 'hard,intr,noatime,_netdev'
+  options node['cfncluster']['nfs']['hard_mount_options']
   action %i[mount enable]
-  retries 3
-  retry_delay 5
+  retries 10
+  retry_delay 6
   only_if { ::File.directory?("/opt/intel") }
 end
 
@@ -107,10 +107,10 @@ shared_dir_array.each do |dir|
   mount dirname do
     device(lazy { "#{node['cluster']['head_node_private_ip']}:#{dirname}" })
     fstype 'nfs'
-    options 'hard,intr,noatime,_netdev'
+    options node['cfncluster']['nfs']['hard_mount_options']
     action %i[mount enable]
-    retries 3
-    retry_delay 5
+    retries 10
+    retry_delay 6
   end
 end
 

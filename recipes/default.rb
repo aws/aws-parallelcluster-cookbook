@@ -29,6 +29,9 @@ include_recipe 'aws-parallelcluster::awsbatch_install'
 # TODO: remove from code if not using efa installer v1.12.x
 rm_libmpich
 
+# TODO: remove from code if not using efa installer v1.12.x
+rm_libmpich
+
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
 # used to build the schedulers packages
 include_recipe "aws-parallelcluster::dcv_install"

@@ -498,6 +498,16 @@ def rm_libmpich
   end
 end
 
+def configure_gc_thresh_values
+  (1..3).each do |i|
+    # Configure gc_thresh values to be consistent with alinux2 default values
+    sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
+      value node['cfncluster']['sysctl']['ipv4']["gc_thresh#{i}"]
+      action :apply
+    end
+  end
+end
+
 def check_process_running_as_user(process, user)
   bash "check #{process} running as #{user}" do
     cwd Chef::Config[:file_cache_path]
