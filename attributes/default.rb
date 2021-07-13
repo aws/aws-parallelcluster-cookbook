@@ -253,6 +253,7 @@ default['cfncluster']['dcv']['authenticator']['virtualenv_path'] = [
 # CloudWatch Agent
 default['cfncluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
 default['cfncluster']['cloudwatch']['public_key_local_path'] = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
+default['cfncluster']['cloudwatch']['agent_version'] = '1.247347.6b250880'
 
 # Reboot after default_pre recipe
 default['cfncluster']['default_pre_reboot'] = 'true'
