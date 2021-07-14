@@ -23,15 +23,6 @@ if fsx_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
 
-  # Create the shared directories
-  directory fsx_shared_dir do
-    owner 'root'
-    group 'root'
-    mode '1777'
-    recursive true
-    action :create
-  end
-
   dns_name = if node['cluster']['fsx_dns_name'] && !node['cluster']['fsx_dns_name'].empty?
                node['cluster']['fsx_dns_name']
              else
@@ -40,27 +31,38 @@ if fsx_shared_dir != "NONE"
                "#{node['cluster']['fsx_fs_id']}.fsx.#{node['cluster']['region']}.amazonaws.com"
              end
 
-  mountname = node['cluster']['fsx_mount_name']
-  mount_options = %w[defaults _netdev flock user_xattr noatime]
+  fsx_device = "#{dns_name}@tcp:/#{node['cluster']['fsx_mount_name']}"
 
+  fs_type = 'lustre'
+
+  mount_options = %w[defaults _netdev flock user_xattr noatime]
   mount_options.concat(%w[noauto x-systemd.automount]) if node['init_package'] == 'systemd'
 
-  # Mount FSx over NFS
-  mount fsx_shared_dir do
-    device "#{dns_name}@tcp:/#{mountname}"
-    fstype 'lustre'
-    dump 0
-    pass 0
-    options mount_options
-    action %i[mount enable]
-    retries 10
-    retry_delay 6
+  # Directories are shared from the head node towards the compute nodes.
+  # So, the head node must copy the content of existing directories to the device before sharing them.
+  if node['cluster']['node_type'] == 'HeadNode' && File.directory?(fsx_shared_dir)
+    copy_to_device(fsx_shared_dir, fsx_device, fs_type, mount_options)
   end
 
-  # Make sure permission is correct
+  # Create the FSx shared directory, if it does not exist
   directory fsx_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'
+    recursive true
+    action :create
+    not_if { ::File.directory?(fsx_shared_dir) }
+  end
+
+  # Mount FSx over NFS
+  mount fsx_shared_dir do
+    device fsx_device
+    fstype fs_type
+    dump 0
+    pass 0
+    options mount_options.join(',')
+    action %i[mount enable]
+    retries 10
+    retry_delay 6
   end
 end

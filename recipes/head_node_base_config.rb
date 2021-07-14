@@ -25,7 +25,7 @@ shared_dir_array.each_with_index do |dir, index|
   shared_dir_array[index] = "/#{shared_dir_array[index]}" unless shared_dir_array[index].start_with?('/')
 end
 
-# Parse volume info into an arary
+# Parse volume info into an array
 vol_array = node['cluster']['volume'].split(',')
 vol_array.each_with_index do |vol, index|
   vol_array[index] = vol.strip
@@ -39,6 +39,7 @@ vol_array.each_with_index do |volumeid, index|
   # Skips volume if shared_dir is /NONE
   next if shared_dir_array[index] == "/NONE"
 
+  ebs_shared_dir = shared_dir_array[index]
   dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
 
   # Attach EBS volume
@@ -78,55 +79,51 @@ vol_array.each_with_index do |volumeid, index|
     subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
   end
 
-  # Create the shared directories
-  directory shared_dir_array[index] do
+  fs_type = node['cluster']['volume_fs_type']
+
+  mount_options = %w[_netdev]
+
+  # Directories are shared from the head node towards the compute nodes.
+  # So, the head node must copy the content of existing directories to the device before sharing them.
+  if File.directory?(ebs_shared_dir)
+    copy_to_device(ebs_shared_dir, dev_path[index], fs_type, mount_options)
+  end
+
+  # Create the EBS shared directories, if they do not exist
+  directory ebs_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'
     recursive true
     action :create
+    not_if { ::File.directory?(ebs_shared_dir) }
   end
 
   # Add volume to /etc/fstab
-  mount shared_dir_array[index] do
+  mount ebs_shared_dir do
     device(DelayedEvaluator.new { dev_uuids[index] })
-    fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
+    fstype fs_type
     device_type :uuid
-    options "_netdev"
+    options mount_options.join(',')
     pass 0
     action %i[mount enable]
     retries 10
     retry_delay 6
   end
+end
 
-  # Make sure shared directory permissions are correct
-  directory shared_dir_array[index] do
-    owner 'root'
-    group 'root'
-    mode '1777'
-  end
-
-  # Export shared dir
-  nfs_export shared_dir_array[index] do
+# NFS mounting for directories that must be shared by default.
+# Only directories that are not EFS/FSx mounted require this.
+directories_shared_by_default = %w[/home /opt/intel]
+directories_shared_via_nfs = directories_shared_by_default.select{ |directory|
+  ::File.directory?(directory) && !efs_mounted?(directory) && !fsx_mounted?(directory)
+}
+directories_shared_via_nfs.each do |directory|
+  nfs_export directory do
     network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
     writeable true
     options ['no_root_squash']
   end
-end
-
-# Export /home
-nfs_export "/home" do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
-  writeable true
-  options ['no_root_squash']
-end
-
-# Export /opt/intel if it exists
-nfs_export "/opt/intel" do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
-  writeable true
-  options ['no_root_squash']
-  only_if { ::File.directory?("/opt/intel") }
 end
 
 # Setup RAID array on head node

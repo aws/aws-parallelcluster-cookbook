@@ -750,3 +750,46 @@ def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_c
     TEST
   end
 end
+
+def copy_to_device(directory, device_name, fs_type, mount_options)
+  bash "copy content of #{directory} to device #{device_name} with fstype #{fs_type} and mount options #{mount_options}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-CODE
+    set -e
+
+    DIRECTORY=#{directory}
+    DEVICE=#{device_name}
+    TMP_DIRECTORY=$(mktemp -d /tmp/pcluster.XXXXXXXXXX)
+
+    echo "Mounting $DEVICE to $TMP_DIRECTORY"
+    mount -t #{fs_type} -o #{mount_options.join(',')} $DEVICE $TMP_DIRECTORY
+
+    LOST_FOUND_DIRECTORY="$TMP_DIRECTORY/lost+found"
+    if [[ -d $LOST_FOUND_DIRECTORY ]]; then
+      if [[ -z $(ls $LOST_FOUND_DIRECTORY ) ]]; then
+        echo "Removing empty directory $LOST_FOUND_DIRECTORY"
+        rm -rf $LOST_FOUND_DIRECTORY
+      else
+        echo "Cannot remove directory $LOST_FOUND_DIRECTORY because it is not empty, even if it is expected to be"
+      fi
+    fi
+
+    echo "Copying content from $DIRECTORY to $TMP_DIRECTORY"
+    /bin/cp -aR $DIRECTORY/* $TMP_DIRECTORY
+
+    echo "Unmounting $DEVICE from $TMP_DIRECTORY"
+    umount $TMP_DIRECTORY
+
+    echo "Removing $TMP_DIRECTORY"
+    rm -rf $TMP_DIRECTORY
+    CODE
+  end
+end
+
+def efs_mounted?(directory)
+  [node['cluster']['efs_shared_dir'].split(',')[0]].include?(directory)
+end
+
+def fsx_mounted?(directory)
+  [node['cluster']['fsx_options'].split(',')[0]].include?(directory)
+end

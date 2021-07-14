@@ -91,30 +91,33 @@ if raid_shared_dir != "NONE"
     subscribes :run, "execute[setup_raid_disk]", :immediately
   end
 
-  # Create the shared directory
+  fs_type = 'ext4'
+  mount_options = %w[defaults nofail _netdev]
+
+  # Directories are shared from the head node towards the compute nodes.
+  # So, the head node must copy the content of existing directories to the device before sharing them.
+  if File.directory?(raid_shared_dir)
+    copy_to_device(raid_shared_dir, raid_dev, fs_type, mount_options)
+  end
+
+  # Create the EBS (RAID) shared directories, if they do not exist
   directory raid_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'
     recursive true
     action :create
+    not_if { ::File.directory?(raid_shared_dir) }
   end
 
   # Add volume to /etc/fstab
   mount raid_shared_dir do
-    device "/dev/md0"
-    fstype "ext4"
-    options "defaults,nofail,_netdev"
+    device raid_dev
+    fstype fs_type
+    options mount_options.join(',')
     action %i[mount enable]
     retries 10
     retry_delay 6
-  end
-
-  # Make sure shared directory permissions are correct
-  directory raid_shared_dir do
-    owner 'root'
-    group 'root'
-    mode '1777'
   end
 
   # Export RAID directory via nfs

@@ -52,6 +52,12 @@ include_recipe "aws-parallelcluster::nvidia_config"
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
 
+# Mount EFS directory with efs_mount recipe
+include_recipe 'aws-parallelcluster::efs_mount'
+
+# Mount FSx directory with fsx_mount recipe
+include_recipe 'aws-parallelcluster::fsx_mount'
+
 case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_base_config'
@@ -76,12 +82,6 @@ template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   group 'root'
   mode '0644'
 end
-
-# Mount EFS directory with efs_mount recipe
-include_recipe 'aws-parallelcluster::efs_mount'
-
-# Mount FSx directory with fsx_mount recipe
-include_recipe 'aws-parallelcluster::fsx_mount'
 
 # Intel Runtime Libraries
 include_recipe "aws-parallelcluster::intel_install"

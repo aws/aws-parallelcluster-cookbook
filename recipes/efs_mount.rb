@@ -24,31 +24,37 @@ if efs_shared_dir != "NONE"
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
 
-  # Create the EFS shared directory
+  efs_device = "#{node['cluster']['efs_fs_id']}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
+
+  fs_type = 'nfs4'
+
+  mount_options = %w[nfsvers=4.1 rsize=1048576 wsize=1048576 hard timeo=30 retrans=2 noresvport _netdev]
+
+  # Directories are shared from the head node towards the compute nodes.
+  # So, the head node must copy the content of existing directories to the device before sharing them.
+  if node['cluster']['node_type'] == 'HeadNode' && File.directory?(efs_shared_dir)
+    copy_to_device(efs_shared_dir, efs_device, fs_type, mount_options)
+  end
+
+  # Create the EFS shared directory, if it does not exist
   directory efs_shared_dir do
     owner 'root'
     group 'root'
     mode '1777'
     recursive true
     action :create
+    not_if { ::File.directory?(efs_shared_dir) }
   end
 
   # Mount EFS over NFS
   mount efs_shared_dir do
-    device "#{node['cluster']['efs_fs_id']}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
-    fstype 'nfs4'
-    options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
+    device efs_device
+    fstype fs_type
+    options mount_options.join(',')
     dump 0
     pass 0
     action %i[mount enable]
     retries 10
     retry_delay 6
-  end
-
-  # Make sure EFS shared directory permissions are correct
-  directory efs_shared_dir do
-    owner 'root'
-    group 'root'
-    mode '1777'
   end
 end

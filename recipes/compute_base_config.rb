@@ -41,6 +41,7 @@ if raid_shared_dir != "NONE"
     owner 'root'
     group 'root'
     action :create
+    not_if { ::File.directory?(raid_shared_dir) }
   end
 
   # Mount RAID directory over NFS
@@ -54,25 +55,21 @@ if raid_shared_dir != "NONE"
   end
 end
 
-# Mount /home over NFS
-mount '/home' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
-  retries 10
-  retry_delay 6
-end
-
-# Mount /opt/intel over NFS
-mount '/opt/intel' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/intel" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
-  retries 10
-  retry_delay 6
-  only_if { ::File.directory?("/opt/intel") }
+# NFS mounting for directories that must be shared by default.
+# Only directories that are not EFS/FSx mounted require this.
+directories_shared_by_default = %w[/home /opt/intel]
+directories_shared_via_nfs = directories_shared_by_default.select{ |directory|
+  ::File.directory?(directory) && !efs_mounted?(directory) && !fsx_mounted?(directory)
+}
+directories_shared_via_nfs.each do |directory|
+  mount directory do
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{directory}" })
+    fstype 'nfs'
+    options node['cluster']['nfs']['hard_mount_options']
+    action %i[mount enable]
+    retries 10
+    retry_delay 6
+  end
 end
 
 # Setup cluster user
@@ -94,13 +91,14 @@ shared_dir_array.each do |dir|
 
   dirname = "/#{dirname}" unless dirname.start_with?('/')
 
-  # Created shared mount point
+  # Created shared mount point, if it does not exist
   directory dirname do
     mode '1777'
     owner 'root'
     group 'root'
     recursive true
     action :create
+    not_if { ::File.directory?(dirname) }
   end
 
   # Mount shared volume over NFS
