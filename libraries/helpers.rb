@@ -430,6 +430,7 @@ def setup_munge_head_node
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     HEAD_CREATE_MUNGE_KEY
+    creates '/etc/munge/munge.key'
   end
 
   enable_munge_service
@@ -447,6 +448,7 @@ def share_munge_head_node
       # Copy key to shared dir
       cp /etc/munge/munge.key /home/#{node['cluster']['cluster_user']}/.munge/.munge.key
     HEAD_SHARE_MUNGE_KEY
+    creates "/home/#{node['cluster']['cluster_user']}/.munge/.munge.key"
   end
 end
 
@@ -464,6 +466,7 @@ def setup_munge_compute_node
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     COMPUTE_MUNGE_KEY
+    creates '/etc/munge/munge.key'
   end
 
   enable_munge_service
