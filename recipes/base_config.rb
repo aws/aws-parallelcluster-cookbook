@@ -15,20 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_recipe "aws-parallelcluster::setup_envars"
 include_recipe 'aws-parallelcluster::base_install'
-
-# Restart sshd.service to make sure the service is running
-# This is a workaround for Centos 8 where the sshd.service fails at first start since it does not properly
-# wait for cloud-init.service to start. There is something wrong in Centos 8 systemd dependency chain.
-if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  service "sshd" do
-    supports restart: true
-    action %i[enable restart]
-  end
-end
+include_recipe 'aws-parallelcluster::openssh_config'
 
 # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
-# This is especially needed for sge install recipes
 if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 20
   sysctl 'fs.protected_regular' do
     value 0
@@ -61,13 +52,13 @@ include_recipe "aws-parallelcluster::nvidia_config"
 # EFA runtime configuration
 include_recipe "aws-parallelcluster::efa_config"
 
-case node['cfncluster']['cfn_node_type']
-when 'MasterServer'
+case node['cluster']['node_type']
+when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_base_config'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster::compute_base_config'
 else
-  raise "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "node_type must be HeadNode or ComputeFleet"
 end
 
 # Ensure cluster user can sudo on SSH

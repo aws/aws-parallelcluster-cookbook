@@ -15,22 +15,33 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-updated_cluster_config_path = "/tmp/cluster-config.updated.json"
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
-                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
-                       " --key #{node['cfncluster']['cluster_config_s3_key']}"\
-                       " --region #{node['cfncluster']['cfn_region']} #{updated_cluster_config_path}"
-fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
+include_recipe 'aws-parallelcluster::openssh_config'
+
+updated_cluster_config_path = "/tmp/cluster-config.updated.yaml"
+fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
+                       " --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cluster']['cluster_config_s3_key']}"\
+                       " --region #{node['cluster']['region']} #{updated_cluster_config_path}"
+fetch_config_command += " --version-id #{node['cluster']['cluster_config_version']}" unless node['cluster']['cluster_config_version'].nil?
 shell_out!(fetch_config_command)
-if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identical?(updated_cluster_config_path, node['cfncluster']['cluster_config_path'])
+if !File.exist?(node['cluster']['cluster_config_path']) || !FileUtils.identical?(updated_cluster_config_path, node['cluster']['cluster_config_path'])
+  # Copy instance type infos file from S3 URI
+  fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
+  execute "copy_instance_type_data_from_s3" do
+    command fetch_config_command
+    retries 3
+    retry_delay 5
+  end
   # Generate pcluster specific configs
   execute "generate_pcluster_slurm_configs" do
-    command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
-            " --output-directory /opt/slurm/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{updated_cluster_config_path}"
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
+            " --output-directory /opt/slurm/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
+            " --input-file #{updated_cluster_config_path} --instance-types-data #{node['cluster']['instance_types_data_path']}"
   end
 
   execute 'stop clustermgtd' do
-    command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
   end
 
   slurmctld_service = node['init_package'] == 'systemd' ? "slurmctld" : "slurm"
@@ -45,18 +56,18 @@ if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identic
   end
 
   execute 'start clustermgtd' do
-    command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
   end
 
   execute "copy new config" do
-    command "cp #{updated_cluster_config_path} #{node['cfncluster']['cluster_config_path']}"
+    command "cp #{updated_cluster_config_path} #{node['cluster']['cluster_config_path']}"
   end
 end
 
 execute 'update cluster config hash in DynamoDB' do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
-          " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cfncluster']['cluster_config_version']}\"}}' --region #{node['cfncluster']['cfn_region']}"
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+          " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG_WITH_IMPLIED_VALUES\"}, \"Version\": {\"S\": \"#{node['cluster']['cluster_config_version']}\"}}' --region #{node['cluster']['region']}"
   retries 3
   retry_delay 5
-  not_if { node['cfncluster']['cluster_config_version'].nil? }
+  not_if { node['cluster']['cluster_config_version'].nil? }
 end

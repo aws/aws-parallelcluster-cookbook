@@ -120,7 +120,7 @@ def mock_generate_random_token(mocker, value):
 def mock_verify_session_existence(mocker, exists):
     def _return_value(user, sessionid):
         if not exists:
-            raise DCVAuthenticator.IncorrectRequestException("The given session for the user does not exists")
+            raise DCVAuthenticator.IncorrectRequestError("The given session for the user does not exists")
 
     mocker.patch(AUTH_CLASS_MOCK_PATH + "_verify_session_existence", side_effect=_return_value)
 
@@ -144,9 +144,9 @@ def mock_os(mocker, user, timestamp):
 @pytest.mark.parametrize(
     "parameters, keys, result",
     [
-        ({"a": "5", "b": "2"}, ["authUser", "sessionID"], DCVAuthenticator.IncorrectRequestException),
-        ({"authUser": "5", "b": "2"}, ["authUser", "sessionID"], DCVAuthenticator.IncorrectRequestException),
-        ({"a": "5", "sessionID": "2"}, ["authUser", "sessionID"], DCVAuthenticator.IncorrectRequestException),
+        ({"a": "5", "b": "2"}, ["authUser", "sessionID"], DCVAuthenticator.IncorrectRequestError),
+        ({"authUser": "5", "b": "2"}, ["authUser", "sessionID"], DCVAuthenticator.IncorrectRequestError),
+        ({"a": "5", "sessionID": "2"}, ["authUser", "sessionID"], DCVAuthenticator.IncorrectRequestError),
         ({"authUser": "user1", "sessionID": "1234"}, ["authUser", "sessionID"], ["user1", "1234"]),
         ({"requestToken": "token1"}, ["requestToken"], ["token1"]),
     ],
@@ -176,7 +176,7 @@ def test_get_request_token(mocker):
 
     # session does not exists
     mock_verify_session_existence(mocker, exists=False)
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_request_token(user, session_id)
 
 
@@ -194,13 +194,13 @@ def test_get_request_token(mocker):
     ],
 )
 def test_get_request_token_regex(user, session_id):
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_request_token(user, session_id)
 
 
 @pytest.mark.parametrize("token", ["assvbsd", "?" + "".join(("c" for _ in range(255)))])
 def test_get_session_token_regex(token):
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_session_token(token)
 
 
@@ -249,7 +249,7 @@ def test_get_session_token(mocker):
     mock_verify_session_existence(mocker, exists=True)
 
     # empty
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_session_token(request_token)
 
     # expired
@@ -259,14 +259,14 @@ def test_get_session_token(mocker):
             user, session_id, datetime.utcnow() - DCVAuthenticator.request_token_ttl, access_file
         ),
     )
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_session_token(request_token)
 
     # file does not exist
     DCVAuthenticator.request_token_manager.add_token(
         request_token, DCVAuthenticator.RequestTokenInfo(user, session_id, datetime.utcnow(), access_file)
     )
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_session_token(request_token)
 
     # user is different
@@ -274,7 +274,7 @@ def test_get_session_token(mocker):
     DCVAuthenticator.request_token_manager.add_token(
         request_token, DCVAuthenticator.RequestTokenInfo(user, session_id, datetime.utcnow(), access_file)
     )
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_session_token(request_token)
 
     # file is expired
@@ -282,7 +282,7 @@ def test_get_session_token(mocker):
     DCVAuthenticator.request_token_manager.add_token(
         request_token, DCVAuthenticator.RequestTokenInfo(user, session_id, datetime.utcnow(), access_file)
     )
-    with pytest.raises(DCVAuthenticator.IncorrectRequestException):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_session_token(request_token)
 
     # working

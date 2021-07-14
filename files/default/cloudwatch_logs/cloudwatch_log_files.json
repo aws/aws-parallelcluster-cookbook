@@ -3,10 +3,7 @@
     "month_first": "%b %-d %H:%M:%S",
     "default": "%Y-%m-%d %H:%M:%S,%f",
     "bracket_default": "[%Y-%m-%d %H:%M:%S]",
-    "slurm": "%Y-%m-%dT%H:%M:%S.%f",
-    "sge": "%m/%d/%Y %H:%M:%S",
-    "torque_compute": "%Y-%m-%d %H:%M:%S.%f",
-    "torque_master": "%m/%d/%Y %H:%M:%S.%f"
+    "slurm": "%Y-%m-%dT%H:%M:%S.%f"
   },
   "log_configs": [
     {
@@ -15,9 +12,7 @@
       "log_stream_name": "system-messages",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "amazon",
@@ -25,7 +20,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -35,16 +30,14 @@
       "log_stream_name": "syslog",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "ubuntu"
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -54,9 +47,7 @@
       "log_stream_name": "cfn-init",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "amazon",
@@ -64,7 +55,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -74,9 +65,7 @@
       "log_stream_name": "chef-client",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "amazon",
@@ -84,7 +73,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -94,9 +83,7 @@
       "log_stream_name": "cloud-init",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "amazon",
@@ -105,7 +92,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -114,9 +101,7 @@
       "file_path": "/var/log/cloud-init-output.log",
       "log_stream_name": "cloud-init-output",
       "schedulers": [
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "amazon",
@@ -134,9 +119,7 @@
       "log_stream_name": "supervisord",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "amazon",
@@ -145,61 +128,7 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "MasterServer"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "default",
-      "file_path": "/var/log/nodewatcher",
-      "log_stream_name": "nodewatcher",
-      "schedulers": [
-        "sge",
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "ComputeFleet"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "default",
-      "file_path": "/var/log/jobwatcher",
-      "log_stream_name": "jobwatcher",
-      "schedulers": [
-        "sge",
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "MasterServer"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "default",
-      "file_path": "/var/log/sqswatcher",
-      "log_stream_name": "sqswatcher",
-      "schedulers": [
-        "sge",
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -216,7 +145,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -250,7 +179,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -267,7 +196,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -301,75 +230,7 @@
         "ubuntu"
       ],
       "node_roles": [
-        "MasterServer"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "sge",
-      "file_path": "/var/spool/sge/*/messages",
-      "log_stream_name": "sge-exec-daemon",
-      "schedulers": [
-        "sge"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "ComputeFleet"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "sge",
-      "file_path": "/opt/sge/default/spool/qmaster/messages",
-      "log_stream_name": "sge-qmaster",
-      "schedulers": [
-        "sge"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "MasterServer"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "torque_compute",
-      "file_path": "/var/spool/torque/client_logs/*",
-      "log_stream_name": "torque-client",
-      "schedulers": [
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "ComputeFleet"
-      ],
-      "feature_conditions": []
-    },
-    {
-      "timestamp_format_key": "torque_master",
-      "file_path": "/var/spool/torque/server_logs/*",
-      "log_stream_name": "torque-server",
-      "schedulers": [
-        "torque"
-      ],
-      "platforms": [
-        "amazon",
-        "centos",
-        "ubuntu"
-      ],
-      "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": []
     },
@@ -379,9 +240,7 @@
       "log_stream_name": "dcv-authenticator",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -389,12 +248,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -404,9 +263,7 @@
       "log_stream_name": "dcv-ext-authenticator",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -414,12 +271,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -429,9 +286,7 @@
       "log_stream_name": "dcv-server",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -439,12 +294,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -454,9 +309,7 @@
       "log_stream_name": "dcv-session-launcher",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -464,12 +317,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -479,9 +332,7 @@
       "log_stream_name": "dcv-agent",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -489,12 +340,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -504,9 +355,7 @@
       "log_stream_name": "dcv-xsession",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -514,12 +363,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     },
@@ -529,9 +378,7 @@
       "log_stream_name": "Xdcv",
       "schedulers": [
         "awsbatch",
-        "sge",
-        "slurm",
-        "torque"
+        "slurm"
       ],
       "platforms": [
         "centos",
@@ -539,12 +386,12 @@
         "amazon"
       ],
       "node_roles": [
-        "MasterServer"
+        "HeadNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["master"]
+          "satisfying_values": ["head_node"]
         }
       ]
     }

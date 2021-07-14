@@ -38,14 +38,14 @@ end
 
 # Function to install and activate a Python virtual env to run the the External authenticator daemon
 def install_ext_auth_virtual_env
-  return if File.exist?("#{node['cfncluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate")
+  return if File.exist?("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate")
 
-  install_pyenv node['cfncluster']['python-version'] do
-    prefix node['cfncluster']['system_pyenv_root']
+  install_pyenv node['cluster']['python-version'] do
+    prefix node['cluster']['system_pyenv_root']
   end
-  activate_virtual_env node['cfncluster']['dcv']['authenticator']['virtualenv'] do
-    pyenv_path node['cfncluster']['dcv']['authenticator']['virtualenv_path']
-    python_version node['cfncluster']['python-version']
+  activate_virtual_env node['cluster']['dcv']['authenticator']['virtualenv'] do
+    pyenv_path node['cluster']['dcv']['authenticator']['virtualenv_path']
+    python_version node['cluster']['python-version']
   end
 end
 
@@ -66,18 +66,37 @@ def disable_lock_screen
 end
 
 # Install pcluster_dcv_connect.sh script in all the OSes to use it for error handling
-cookbook_file "#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
+cookbook_file "#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
   source 'dcv/pcluster_dcv_connect.sh'
   owner 'root'
   group 'root'
   mode '0755'
-  not_if { ::File.exist?("#{node['cfncluster']['scripts_dir']}/pcluster_dcv_connect.sh") }
+  not_if { ::File.exist?("#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh") }
 end
 
 if node['conditions']['dcv_supported']
-  case node['cfncluster']['cfn_node_type']
-  when 'MasterServer', nil
-    dcv_tarball = "#{node['cfncluster']['sources_dir']}/dcv-#{node['cfncluster']['dcv']['version']}.tgz"
+  # Setup dcv authenticator group
+  group node['cluster']['dcv']['authenticator']['group'] do
+    comment 'NICE DCV External Authenticator group'
+    gid node['cluster']['dcv']['authenticator']['group_id']
+    system true
+  end
+
+  # Setup dcv authenticator user
+  user node['cluster']['dcv']['authenticator']['user'] do
+    comment 'NICE DCV External Authenticator user'
+    uid node['cluster']['dcv']['authenticator']['user_id']
+    gid node['cluster']['dcv']['authenticator']['group_id']
+    # home is mounted from the head node
+    manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
+    home node['cluster']['dcv']['authenticator']['user_home']
+    system true
+    shell '/bin/bash'
+  end
+
+  case node['cluster']['node_type']
+  when 'HeadNode', nil
+    dcv_tarball = "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
 
     # Install DCV pre-requisite packages
     case node['platform']
@@ -158,7 +177,7 @@ if node['conditions']['dcv_supported']
     # Extract DCV packages
     unless File.exist?(dcv_tarball)
       remote_file dcv_tarball do
-        source node['cfncluster']['dcv']['url']
+        source node['cluster']['dcv']['url']
         mode '0644'
         retries 3
         retry_delay 5
@@ -169,43 +188,25 @@ if node['conditions']['dcv_supported']
         block do
           require 'digest'
           checksum = Digest::SHA256.file(dcv_tarball).hexdigest
-          if checksum != node['cfncluster']['dcv']['sha256sum']
-            raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cfncluster']['dcv']['package']['sha256sum']}"
-          end
+          raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cluster']['dcv']['package']['sha256sum']}" if checksum != node['cluster']['dcv']['sha256sum']
         end
       end
 
       bash 'extract dcv packages' do
-        cwd node['cfncluster']['sources_dir']
+        cwd node['cluster']['sources_dir']
         code "tar -xvzf #{dcv_tarball}"
       end
     end
 
     # Install server and xdcv packages
-    dcv_packages = %W[#{node['cfncluster']['dcv']['server']} #{node['cfncluster']['dcv']['xdcv']}]
-    dcv_packages_path = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/"
+    dcv_packages = %W[#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']}]
+    dcv_packages_path = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/"
     # Rewrite dcv_packages object by cycling each package file name and appending the path to them
     dcv_packages.map! { |package| dcv_packages_path + package }
     install_package_list(dcv_packages)
 
-    # Create user and Python virtual env for the external authenticator
-    user node['cfncluster']['dcv']['authenticator']['user'] do
-      manage_home true
-      home node['cfncluster']['dcv']['authenticator']['user_home']
-      comment 'NICE DCV External Authenticator user'
-      system true
-      shell '/bin/bash'
-    end
+    # Create Python virtual env for the external authenticator
     install_ext_auth_virtual_env
-
-  when 'ComputeFleet'
-    user node['cfncluster']['dcv']['authenticator']['user'] do
-      manage_home false
-      home node['cfncluster']['dcv']['authenticator']['user_home']
-      comment 'NICE DCV External Authenticator user'
-      system true
-      shell '/bin/bash'
-    end
   end
 
   # Post-installation action
@@ -225,7 +226,7 @@ if node['conditions']['dcv_supported']
 end
 
 # Switch runlevel to multi-user.target for official ami
-if node['cfncluster']['is_official_ami_build'] && node['init_package'] == 'systemd'
+if node['cluster']['is_official_ami_build'] && node['init_package'] == 'systemd'
   execute "set default systemd runlevel to multi-user.target" do
     command "systemctl set-default multi-user.target"
   end

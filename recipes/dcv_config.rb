@@ -31,7 +31,7 @@ def allow_gpu_acceleration
 
   # dcvgl package must be installed after NVIDIA and before starting up X
   # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
-  dcv_gl = "#{node['cfncluster']['sources_dir']}/#{node['cfncluster']['dcv']['package']}/#{node['cfncluster']['dcv']['gl']}"
+  dcv_gl = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/#{node['cluster']['dcv']['gl']}"
   case node['platform']
   when 'centos', 'amazon'
     package dcv_gl do
@@ -63,13 +63,13 @@ def allow_gpu_acceleration
   end
 end
 
-if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] == "MasterServer"
+if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadNode"
   # be sure to have DCV packages installed
   include_recipe "aws-parallelcluster::dcv_install"
 
-  node.default['cfncluster']['dcv']['is_graphic_instance'] = graphic_instance?
+  node.default['cluster']['dcv']['is_graphic_instance'] = graphic_instance?
 
-  if node.default['cfncluster']['dcv']['is_graphic_instance']
+  if node.default['cluster']['dcv']['is_graphic_instance']
     # Enable graphic acceleration in dcv conf file for graphic instances.
     allow_gpu_acceleration
   else
@@ -91,17 +91,6 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
       user 'root'
       command "sed --in-place '/RANDFILE/d' /etc/ssl/openssl.cnf"
     end
-  when 'centos'
-    if node['platform_version'].to_i >= 8
-      # Wayland, the default GNOME Display Manager for CentOS 8, is not supported by DCV
-      Chef::Log.info("Disabling Wayland and force login screen to use Xorg")
-      replace_or_add "Disable Wayland in /etc/gdm/custom.conf" do
-        path "/etc/gdm/custom.conf"
-        pattern ".*WaylandEnable.*"
-        line "WaylandEnable=false"
-        replace_only true
-      end
-    end
   end
 
   # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one
@@ -118,9 +107,9 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
     # * group to make owner of the two files
     # NOTE: the last arg is hardcoded to be 'dcv' so that the dcvserver can read the files when authenticating
     command "/etc/parallelcluster/generate_certificate.sh"\
-            " \"#{node['cfncluster']['dcv']['authenticator']['certificate']}\""\
-            " \"#{node['cfncluster']['dcv']['authenticator']['private_key']}\""\
-            " #{node['cfncluster']['dcv']['authenticator']['user']} dcv"
+            " \"#{node['cluster']['dcv']['authenticator']['certificate']}\""\
+            " \"#{node['cluster']['dcv']['authenticator']['private_key']}\""\
+            " #{node['cluster']['dcv']['authenticator']['user']} dcv"
     user 'root'
   end
 
@@ -135,15 +124,15 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
 
   # Create directory for the external authenticator to store access file created by the users
   directory '/var/spool/parallelcluster/pcluster_dcv_authenticator' do
-    owner node['cfncluster']['dcv']['authenticator']['user']
+    owner node['cluster']['dcv']['authenticator']['user']
     mode '1733'
     recursive true
   end
 
   # Install DCV external authenticator
-  cookbook_file "#{node['cfncluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py" do
+  cookbook_file "#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py" do
     source 'dcv/pcluster_dcv_authenticator.py'
-    owner node['cfncluster']['dcv']['authenticator']['user']
+    owner node['cluster']['dcv']['authenticator']['user']
     mode '0700'
   end
 

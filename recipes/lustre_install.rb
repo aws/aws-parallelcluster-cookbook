@@ -15,17 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['conditions']['lustre_supported']
-
 if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version'].to_f)
   # Centos 7.6 and 7.5
 
-  lustre_kmod_rpm = "#{node['cfncluster']['sources_dir']}/kmod-lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
-  lustre_client_rpm = "#{node['cfncluster']['sources_dir']}/lustre-client-#{node['cfncluster']['lustre']['version']}.x86_64.rpm"
+  lustre_kmod_rpm = "#{node['cluster']['sources_dir']}/kmod-lustre-client-#{node['cluster']['lustre']['version']}.x86_64.rpm"
+  lustre_client_rpm = "#{node['cluster']['sources_dir']}/lustre-client-#{node['cluster']['lustre']['version']}.x86_64.rpm"
 
   # Get Lustre Kernel Module RPM
   remote_file lustre_kmod_rpm do
-    source node['cfncluster']['lustre']['kmod_url']
+    source node['cluster']['lustre']['kmod_url']
     mode '0644'
     retries 3
     retry_delay 5
@@ -34,7 +32,7 @@ if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version']
 
   # Get Lustre Client RPM
   remote_file lustre_client_rpm do
-    source node['cfncluster']['lustre']['client_url']
+    source node['cluster']['lustre']['client_url']
     mode '0644'
     retries 3
     retry_delay 5
@@ -54,13 +52,13 @@ if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version']
   kernel_module 'lnet'
 
 elsif node['platform'] == 'centos' && node['platform_version'].to_f >= 7.7
-  # Centos 8 and >= 7.7
+  # Centos >= 7.7
 
   # add fsx lustre repository
   yum_repository "aws-fsx" do
     description "AWS FSx Packages - $basearch"
-    baseurl node['cfncluster']['lustre']['base_url']
-    gpgkey node['cfncluster']['lustre']['public_key']
+    baseurl node['cluster']['lustre']['base_url']
+    gpgkey node['cluster']['lustre']['public_key']
     retries 3
     retry_delay 5
   end
@@ -79,10 +77,10 @@ elsif node['platform'] == 'centos'
 elsif node['platform'] == 'ubuntu'
 
   apt_repository 'fsxlustreclientrepo' do
-    uri          node['cfncluster']['lustre']['base_url']
+    uri          node['cluster']['lustre']['base_url']
     components   ['main']
     distribution node['lsb']['codename']
-    key          node['cfncluster']['lustre']['public_key']
+    key          node['cluster']['lustre']['public_key']
     retries 3
     retry_delay 5
   end

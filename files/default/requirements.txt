@@ -6,3 +6,4 @@ python-gnupg
 jsonschema
 jinja2
 requests
+PyYAML

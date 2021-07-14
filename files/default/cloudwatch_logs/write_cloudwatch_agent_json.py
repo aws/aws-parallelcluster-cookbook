@@ -32,12 +32,12 @@ def parse_args():
                         required=True)
     parser.add_argument('--node-role',
                         required=True,
-                        choices=['MasterServer', 'ComputeFleet'],
+                        choices=['HeadNode', 'ComputeFleet'],
                         help='Role this node plays in the cluster '
                              '(i.e., is it a compute node or the head node?)')
     parser.add_argument('--scheduler',
                         required=True,
-                        choices=['slurm', 'sge', 'torque', 'awsbatch'],
+                        choices=['slurm', 'awsbatch'],
                         help='Scheduler')
     return parser.parse_args()
 
@@ -97,7 +97,7 @@ def get_node_info():
     dna_path = "/etc/chef/dna.json"
     if os.path.isfile(dna_path):
         with open(dna_path) as node_info_file:
-            node_info = json.load(node_info_file).get("cfncluster")
+            node_info = json.load(node_info_file).get("cluster")
     return node_info
 
 

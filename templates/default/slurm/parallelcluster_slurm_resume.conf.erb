@@ -1,11 +1,11 @@
 [slurm_resume]
-cluster_name = <%= node['cfncluster']['stack_name'].sub("parallelcluster-", "") %>
-region = <%= node['cfncluster']['cfn_region'] %>
-proxy = <%= node['cfncluster']['cfn_proxy'] %>
-dynamodb_table = <%= node['cfncluster']['cfn_ddb_table'] %>
-hosted_zone = <%= node['cfncluster']['cfn_hosted_zone'] %>
-dns_domain = <%= node['cfncluster']['cfn_dns_domain'] %>
-use_private_hostname = <%= node['cfncluster']['use_private_hostname'] %>
-master_private_ip = <%= node['ec2']['local_ipv4'] %>
-master_hostname = <%= node['ec2']['local_hostname'] %>
+cluster_name = <%= node['cluster']['stack_name'].sub("parallelcluster-", "") %>
+region = <%= node['cluster']['region'] %>
+proxy = <%= node['cluster']['proxy'] %>
+dynamodb_table = <%= node['cluster']['ddb_table'] %>
+hosted_zone = <%= node['cluster']['hosted_zone'] %>
+dns_domain = <%= node['cluster']['dns_domain'] %>
+use_private_hostname = <%= node['cluster']['use_private_hostname'] %>
+head_node_private_ip = <%= node['ec2']['local_ipv4'] %>
+head_node_hostname = <%= node['ec2']['local_hostname'] %>
 clustermgtd_heartbeat_file_path = /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat

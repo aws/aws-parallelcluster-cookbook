@@ -137,7 +137,7 @@ end
 def ami_bootstrapped?
   version = ''
   bootstrapped_file = '/opt/parallelcluster/.bootstrapped'
-  current_version = "aws-parallelcluster-cookbook-#{node['cfncluster']['cfncluster-cookbook-version']}"
+  current_version = "aws-parallelcluster-cookbook-#{node['cluster']['parallelcluster-cookbook-version']}"
 
   if ::File.exist?(bootstrapped_file)
     version = IO.read(bootstrapped_file).chomp
@@ -148,7 +148,7 @@ def ami_bootstrapped?
     end
   end
 
-  version != '' && (node['cfncluster']['skip_install_recipes'] == 'yes' || node['cfncluster']['skip_install_recipes'] == true)
+  version != '' && (node['cluster']['skip_install_recipes'] == 'yes' || node['cluster']['skip_install_recipes'] == true)
 end
 
 #
@@ -158,13 +158,13 @@ def validate_os_type
   case node['platform']
   when 'ubuntu'
     current_os = "ubuntu#{node['platform_version'].tr('.', '')}"
-    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   when 'amazon'
     current_os = "alinux#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   when 'centos'
     current_os = "centos#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cfncluster']['cfn_base_os']) if node['cfncluster']['cfn_base_os'] != current_os
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   end
 end
 
@@ -182,8 +182,8 @@ end
 # Retrieve head node ip and dns from file (HIT only)
 #
 def hit_head_node_info
-  head_node_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
-  head_node_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
+  head_node_private_ip_file = "#{node['cluster']['slurm_plugin_dir']}/head_node_private_ip"
+  head_node_private_dns_file = "#{node['cluster']['slurm_plugin_dir']}/head_node_private_dns"
 
   [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
 end
@@ -192,23 +192,23 @@ end
 # Retrieve compute nodename from file (HIT only)
 #
 def hit_slurm_nodename
-  slurm_nodename_file = "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename"
+  slurm_nodename_file = "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename"
 
   IO.read(slurm_nodename_file).chomp
 end
 
 #
-# Retrieve compute and master node info from dynamo db (HIT only)
+# Retrieve compute and head node info from dynamo db (Slurm only)
 #
 def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
-  output = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-    "--region #{node['cfncluster']['cfn_region']} query --table-name #{node['cfncluster']['cfn_ddb_table']} " \
+  output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
+    "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
     "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
     "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
-    "--projection-expression 'Id,MasterPrivateIp,MasterHostname' " \
-    "--output text --query 'Items[0].[Id.S,MasterPrivateIp.S,MasterHostname.S]'", user: 'root').stdout.strip
+    "--projection-expression 'Id,HeadNodePrivateIp,HeadNodeHostname' " \
+    "--output text --query 'Items[0].[Id.S,HeadNodePrivateIp.S,HeadNodeHostname.S]'", user: 'root').stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
@@ -237,9 +237,6 @@ end
 #
 def restart_network_service
   network_service_name = value_for_platform(
-    ['centos'] => {
-      '>=8.0' => 'NetworkManager'
-    },
     %w[ubuntu debian] => {
       '>=18.04' => 'systemd-resolved'
     },
@@ -286,29 +283,13 @@ end
 # Check if DCV is supported on this OS
 #
 def platform_supports_dcv?
-  node['cfncluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
-end
-
-#
-# Check if Lustre is supported on this OS-architecture combination
-#
-def platform_supports_lustre_for_architecture?
-  (arm_instance? && platform_supports_lustre_on_arm?) || !arm_instance?
-end
-
-#
-# Check if Lustre is supported for ARM instances on this OS
-#
-def platform_supports_lustre_on_arm?
-  [node['platform'] == 'ubuntu',
-   node['platform'] == 'amazon',
-   node['platform'] == 'centos']
+  node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
 
 def aws_domain
   # Set the aws domain name
   aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
+  aws_domain = "#{aws_domain}.cn" if node['cluster']['region'].start_with?("cn-")
   aws_domain
 end
 
@@ -316,7 +297,7 @@ end
 # Retrieve RHEL OS minor version from running kernel version
 # The OS minor version is retrieved from the patch version of the running kernel
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for CentOS8 minor version >=2 and CentOS7 minor version >=7
+# Method works for CentOS7 minor version >=7
 #
 def find_rhel_minor_version
   os_minor_version = ''
@@ -331,10 +312,6 @@ def find_rhel_minor_version
       os_minor_version = '7' if kernel_patch_version[1] >= '1062'
       os_minor_version = '8' if kernel_patch_version[1] >= '1127'
       os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    when 8
-      os_minor_version = '2' if kernel_patch_version[1] >= '193'
-      os_minor_version = '3' if kernel_patch_version[1] >= '240'
-      os_minor_version = '4' if kernel_patch_version[1] >= '305'
     else
       raise "CentOS version #{node['platform_version']} not supported."
     end
@@ -348,9 +325,9 @@ end
 def chrony_reload_command
   case node['init_package']
   when 'init'
-    chrony_reload_command = "service #{node['cfncluster']['chrony']['service']} force-reload"
+    chrony_reload_command = "service #{node['cluster']['chrony']['service']} force-reload"
   when 'systemd'
-    chrony_reload_command = "systemctl force-reload #{node['cfncluster']['chrony']['service']}"
+    chrony_reload_command = "systemctl force-reload #{node['cluster']['chrony']['service']}"
   else
     raise "Init package #{node['init_package']} not supported."
 
@@ -415,22 +392,21 @@ end
 
 # Check if EFA GDR is enabled (and supported) on this instance
 def efa_gdr_enabled?
-  config_value = node['cfncluster']['enable_efa_gdr']
-  enabling_value = if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+  config_value = node['cluster']['enable_efa_gdr']
+  enabling_value = if node['cluster']['node_type'] == "ComputeFleet"
                      "compute"
                    else
-                     "master"
+                     "head_node"
                    end
   (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
 
-# CentOS8 and alinux OSs currently not correctly supported by NFS cookbook
+# Alinux OSs currently not correctly supported by NFS cookbook
 # Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
 def overwrite_nfs_template?
   [
-    node['platform'] == 'amazon',
-    node['platform'] == 'centos' && node['platform_version'].to_i == 8
+    node['platform'] == 'amazon'
   ].any?
 end
 
@@ -444,8 +420,8 @@ end
 def setup_munge_head_node
   # Generate munge key
   bash 'generate_munge_key' do
-    user 'munge'
-    group 'munge'
+    user node['cluster']['munge']['user']
+    group node['cluster']['munge']['group']
     cwd '/tmp'
     code <<-HEAD_CREATE_MUNGE_KEY
       set -e
@@ -467,9 +443,9 @@ def share_munge_head_node
     group 'root'
     code <<-HEAD_SHARE_MUNGE_KEY
       set -e
-      mkdir /home/#{node['cfncluster']['cfn_cluster_user']}/.munge
+      mkdir /home/#{node['cluster']['cluster_user']}/.munge
       # Copy key to shared dir
-      cp /etc/munge/munge.key /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key
+      cp /etc/munge/munge.key /home/#{node['cluster']['cluster_user']}/.munge/.munge.key
     HEAD_SHARE_MUNGE_KEY
   end
 end
@@ -482,9 +458,9 @@ def setup_munge_compute_node
     code <<-COMPUTE_MUNGE_KEY
       set -e
       # Copy munge key from shared dir
-      cp /home/#{node['cfncluster']['cfn_cluster_user']}/.munge/.munge.key /etc/munge/munge.key
+      cp /home/#{node['cluster']['cluster_user']}/.munge/.munge.key /etc/munge/munge.key
       # Set ownership on the key
-      chown munge:munge /etc/munge/munge.key
+      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     COMPUTE_MUNGE_KEY
@@ -529,5 +505,248 @@ def configure_gc_thresh_values
       value node['cfncluster']['sysctl']['ipv4']["gc_thresh#{i}"]
       action :apply
     end
+  end
+end
+
+def check_process_running_as_user(process, user)
+  bash "check #{process} running as #{user}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      pgrep -x #{process} 1>/dev/null
+      if [[ $? != 0 ]]; then
+        >&2 echo "Expected #{process} to be running"
+        exit 1
+      fi
+
+      pgrep -x #{process} -u #{user} 1>/dev/null
+      if [[ $? != 0 ]]; then
+        >&2 echo "Expected #{process} to be running as #{user}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_user_definition(user, uid, gid, description, shell = "/bin/bash")
+  bash "check user definition for user #{user}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+    expected_passwd_line="#{user}:x:#{uid}:#{gid}:#{description}:/home/#{user}:#{shell}"
+    actual_passwd_line=$(grep #{user} /etc/passwd)
+    if [[ "$actual_passwd_line" != "$expected_passwd_line" ]]; then
+      >&2 echo "Expected user #{user} in /etc/passwd: $expected_passwd_line"
+      >&2 echo "Actual user #{user} in /etc/passwd: $actual_passwd_line"
+      exit 1
+    fi
+    TEST
+  end
+end
+
+def check_group_definition(group, gid)
+  bash "check group definition for group #{group}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+    expected_group_line="#{group}:x:#{gid}:"
+    actual_group_line=$(grep #{group} /etc/group)
+    if [[ "$actual_group_line" != "$expected_group_line" ]]; then
+      >&2 echo "Expected group #{group} in /etc/group: $expected_passwd_line"
+      >&2 echo "Actual group #{group} in /etc/group: $actual_passwd_line"
+      exit 1
+    fi
+    TEST
+  end
+end
+
+def check_path_permissions(path, user, group, permissions)
+  bash "check permissions on path #{path}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      if [[ ! -d "#{path}" ]]; then
+        >&2 echo "Expected path does not exist: #{path}"
+        exit 1
+      fi
+
+      expected_permissions="#{permissions} #{user} #{group}"
+      actual_permissions=$(stat "#{path}" -c "%A %U %G")
+      if [[ "$actual_permissions" != "$expected_permissions" ]]; then
+        >&2 echo "Expected permissions on path #{path}: $expected_permissions"
+        >&2 echo "Actual permissions on path #{path}: $actual_permissions"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_sudoers_permissions(sudoers_file, user, run_as, command_alias, *commands)
+  bash "check user #{user} can sudo as user #{run_as} on commands #{commands.join(',')}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      if [[ ! -f "#{sudoers_file}" ]]; then
+        >&2 echo "Expected sudoers file does not exist: #{sudoers_file}"
+        exit 1
+      fi
+
+      expected_user_line="#{user} ALL = (#{run_as}) NOPASSWD: #{command_alias}"
+      actual_user_line=$(grep "^#{user} .* #{command_alias}" "#{sudoers_file}")
+      if [[ "$actual_user_line" != "$expected_user_line" ]]; then
+        >&2 echo "Expected user line in #{sudoers_file}: $expected_user_line"
+        >&2 echo "Actual user line in #{sudoers_file}: $actual_user_line"
+        exit 1
+      fi
+
+      expected_commands_line="Cmnd_Alias #{command_alias} = #{commands.join(',')}"
+      actual_commands_line=$(grep "Cmnd_Alias #{command_alias}" "#{sudoers_file}")
+      if [[ "$actual_commands_line" != "$expected_commands_line" ]]; then
+        >&2 echo "Expected commands line in #{sudoers_file}: $expected_commands_line"
+        >&2 echo "Actual commands line in #{sudoers_file}: $actual_commands_line"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_imds_access(user, is_allowed)
+  bash "check IMDS access for user #{user}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      sudo -u #{user} curl 169.254.169.254/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv4): #{user}"
+        exit 1
+      fi
+
+      sudo -u #{user} curl -g -6 [0:0:0:0:0:FFFF:A9FE:A9FE]/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+# Check that the iptables backup file exists
+def check_iptables_rules_file(file)
+  bash "check iptables rules backup file exists: #{file}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      if [[ ! -f #{file} ]]; then
+        >&2 echo "Missing expected iptables rules file: #{file}"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+# Check that PATH includes directories for the given user.
+# If user is specified, PATH is checked in the login shell for that user.
+# Otherwise, PATH is checked in the current recipes context.
+def check_directories_in_path(directories, user = nil)
+  context = user.nil? ? 'recipes context' : "user #{user}"
+  bash "check PATH for #{context} contains #{directories}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      #{user.nil? ? nil : "sudo su - #{user}"}
+
+      for directory in #{directories.join(' ')}; do
+        [[ ":$PATH:" == *":$directory:"* ]] || missing_directories="$missing_directories $directory"
+      done
+
+      if [[ ! -z $missing_directories ]]; then
+        >&2 echo "Missing expected directories in PATH for #{context}: $missing_directories"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_run_level_script(script_name, levels_on, levels_off)
+  bash "check run level script #{script_name}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+
+      for level in #{levels_on.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^S[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_on="$missing_levels_on $level"
+      done
+
+      for level in #{levels_off.join(' ')}; do
+        ls /etc/rc$level.d/ | egrep '^K[0-9]+#{script_name}$' > /dev/null
+        [[ $? == 0 ]] || missing_levels_off="$missing_levels_off $level"
+      done
+
+      if [[ ! -z $missing_levels_on || ! -z $missing_levels_off ]]; then
+        >&2 echo "Misconfigured run level script #{script_name}"
+        >&2 echo "Expected levels on are (#{levels_on.join(' ')}). Missing levels on are ($missing_levels_on)"
+        >&2 echo "Expected levels off are (#{levels_off.join(' ')}). Missing levels off are ($missing_levels_off)"
+        exit 1
+      fi
+    TEST
+  end
+end
+
+def check_sudo_command(command, user = nil)
+  bash "check sudo command from user #{user}: #{command}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      set -e
+      sudo #{command}
+    TEST
+    user user
+  end
+end
+
+def get_system_users
+  cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
+  cmd.run_command
+  cmd.stdout.split(/\n+/)
+end
+
+# Return the VPC CIDR list from IMDS
+def get_vpc_cidr_list
+  imds_ip = '169.254.169.254'
+  curl_options = '--retry 3 --retry-delay 0 --silent --fail'
+
+  token = run_command("curl http://#{imds_ip}/latest/api/token -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 300' #{curl_options}")
+  raise('Unable to retrieve token from EC2 meta-data') if token.empty?
+
+  mac = run_command("curl http://#{imds_ip}/latest/meta-data/mac -H 'X-aws-ec2-metadata-token: #{token}' #{curl_options}")
+  raise('Unable to retrieve MAC address from EC2 meta-data') if mac.empty?
+
+  vpc_cidr_list = run_command("curl http://#{imds_ip}/latest/meta-data/network/interfaces/macs/#{mac}/vpc-ipv4-cidr-blocks -H 'X-aws-ec2-metadata-token: #{token}' #{curl_options}")
+  raise('Unable to retrieve VPC CIDR list from EC2 meta-data') if vpc_cidr_list.empty?
+
+  vpc_cidr_list.split(/\n+/)
+end
+
+def run_command(command)
+  Mixlib::ShellOut.new(command).run_command.stdout.strip
+end
+
+def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_cidr_list)
+  bash "check #{ssh_target_checker_script} contains the correct vpc cidr list: #{expected_cidr_list}" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      if [[ ! -f #{ssh_target_checker_script} ]]; then
+        >&2 echo "SSH target checker in #{ssh_target_checker_script} not found"
+        exit 1
+      fi
+
+      actual_value=$(egrep 'VPC_CIDR_LIST[ ]*=[ ]' #{ssh_target_checker_script})
+
+      egrep 'VPC_CIDR_LIST[ ]*=[ ]*\\([ ]*#{expected_cidr_list.join('[ ]*')}[ ]*\\)' #{ssh_target_checker_script}
+      if [[ $? != 0 ]]; then
+        >&2 echo "SSH target checker in #{ssh_target_checker_script} contains wrong VPC CIDR list"
+        >&2 echo "Expected VPC CIDR list: #{expected_cidr_list}"
+        >&2 echo "Actual VPC CIDR list: $actual_value"
+        exit 1
+      fi
+    TEST
   end
 end

@@ -18,9 +18,16 @@
 # Validate OS type specified by the user is the same as the OS identified by Ohai
 validate_os_type
 
-include_recipe 'aws-parallelcluster::sge_install'
-include_recipe 'aws-parallelcluster::torque_install'
+# Calling user_ulimit will override every existing limit
+user_ulimit "*" do
+  filehandle_limit node['cluster']['filehandle_limit']
+end
+
 include_recipe 'aws-parallelcluster::slurm_install'
+include_recipe 'aws-parallelcluster::awsbatch_install'
+
+# TODO: remove from code if not using efa installer v1.12.x
+rm_libmpich
 
 # TODO: remove from code if not using efa installer v1.12.x
 rm_libmpich

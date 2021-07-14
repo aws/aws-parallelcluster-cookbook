@@ -17,9 +17,14 @@
 
 return unless node['conditions']['arm_pl_supported']
 
-armpl_installer = "#{node['cfncluster']['sources_dir']}/"\
-                  "arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar"
-armpl_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/#{node['cfncluster']['armpl']['url']}"
+armpl_installer = "#{node['cluster']['sources_dir']}/"\
+                  "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar"
+armpl_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/#{node['cluster']['armpl']['url']}"
+
+# binutils v2.30 is required for Centos7 architecture detection
+# these must be installed in this order
+package 'centos-release-scl-rh' if node['cluster']['base_os'] == 'centos7'
+package 'devtoolset-8-binutils' if node['cluster']['base_os'] == 'centos7'
 
 # binutils v2.30 is required for Centos7 architecture detection
 # these must be installed in this order
@@ -32,38 +37,38 @@ remote_file armpl_installer do
   mode '0644'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?("/opt/arm/armpl/#{node['cfncluster']['armpl']['version']}") }
+  not_if { ::File.exist?("/opt/arm/armpl/#{node['cluster']['armpl']['version']}") }
 end
 
 bash "install arm performance library" do
-  cwd node['cfncluster']['sources_dir']
+  cwd node['cluster']['sources_dir']
   code <<-ARMPL
     set -e
-    tar -xf arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}_gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.tar
-    cd arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}/
-    ./arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}.sh --accept --install-to /opt/arm/armpl/#{node['cfncluster']['armpl']['version']}
+    tar -xf arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar
+    cd arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}/
+    ./arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}.sh --accept --install-to /opt/arm/armpl/#{node['cluster']['armpl']['version']}
     cd ..
-    rm -rf arm-performance-libraries_#{node['cfncluster']['armpl']['version']}_#{node['cfncluster']['armpl']['platform']}*
+    rm -rf arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}*
   ARMPL
-  creates "/opt/arm/armpl/#{node['cfncluster']['armpl']['version']}"
+  creates "/opt/arm/armpl/#{node['cluster']['armpl']['version']}"
 end
 
 # create armpl module directory
-directory "#{node['cfncluster']['modulefile_dir']}/armpl"
+directory "#{node['cluster']['modulefile_dir']}/armpl"
 
 # arm performance library modulefile configuration
-template "#{node['cfncluster']['modulefile_dir']}/armpl/#{node['cfncluster']['armpl']['version']}" do
+template "#{node['cluster']['modulefile_dir']}/armpl/#{node['cluster']['armpl']['version']}" do
   source 'armpl_modulefile.erb'
   user 'root'
   group 'root'
   mode '0755'
 end
 
-gcc_tarball = "#{node['cfncluster']['sources_dir']}/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
+gcc_tarball = "#{node['cluster']['sources_dir']}/gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz"
 
 # Get gcc tarball
 remote_file gcc_tarball do
-  source node['cfncluster']['armpl']['gcc']['url']
+  source node['cluster']['armpl']['gcc']['url']
   mode '0644'
   retries 3
   retry_delay 5
@@ -74,19 +79,19 @@ end
 bash 'make install' do
   user 'root'
   group 'root'
-  cwd node['cfncluster']['sources_dir']
+  cwd node['cluster']['sources_dir']
   code <<-GCC
       set -e
 
       # Remove dir if it exists. This happens in case of retries.
-      rm -rf gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}
+      rm -rf gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}
       tar -xf #{gcc_tarball}
-      cd gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}
+      cd gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}
       # Patch the download_prerequisites script to download over https and not ftp. This works better in China regions.
       sed -i "s#ftp://gcc\.gnu\.org#https://gcc.gnu.org#g" ./contrib/download_prerequisites
       ./contrib/download_prerequisites
       mkdir build && cd build
-      ../configure --prefix=/opt/arm/armpl/gcc/#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
+      ../configure --prefix=/opt/arm/armpl/gcc/#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
       make install
@@ -96,7 +101,7 @@ bash 'make install' do
   creates '/opt/arm/armpl/gcc'
 end
 
-gcc_modulefile = "/opt/arm/armpl/#{node['cfncluster']['armpl']['version']}/modulefiles/armpl/gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}"
+gcc_modulefile = "/opt/arm/armpl/#{node['cluster']['armpl']['version']}/modulefiles/armpl/gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}"
 
 # gcc modulefile configuration
 template gcc_modulefile do

@@ -19,15 +19,15 @@ setup_munge_compute_node
 
 # Create directory configured as SlurmdSpoolDir
 directory '/var/spool/slurmd' do
-  user 'slurm'
-  group 'slurm'
+  user node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
   mode '0700'
 end
 
 # Mount /opt/slurm over NFS
 # Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
 mount '/opt/slurm' do
-  device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:/opt/slurm" })
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/slurm" })
   fstype "nfs"
   options node['cfncluster']['nfs']['hard_mount_options']
   action %i[mount enable]

@@ -7,4 +7,5 @@ pytest-mock
 assertpy
 jsonschema
 jinja2
+PyYAML
 requests

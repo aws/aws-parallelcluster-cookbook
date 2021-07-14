@@ -26,13 +26,13 @@ cookbook_file '/etc/init.d/slurm' do
   only_if { node['init_package'] != 'systemd' }
 end
 
-case node['cfncluster']['cfn_node_type']
-when 'MasterServer'
+case node['cluster']['node_type']
+when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_slurm_config'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster::compute_slurm_config'
 else
-  raise "cfn_node_type must be MasterServer or ComputeFleet"
+  raise "node_type must be HeadNode or ComputeFleet"
 end
 
 link '/etc/profile.d/slurm.sh' do
@@ -41,4 +41,15 @@ end
 
 link '/etc/profile.d/slurm.csh' do
   to '/opt/slurm/etc/slurm.csh'
+end
+
+# Ensure cluster admin user and slurm user can sudo on slurm commands.
+# This permission is necessary for the cluster admin user, but it is not for the slurm user
+# because the latter can run slurm commands without being root.
+# We introduced it for sake of consistency because daemons and slurm suspend/resume scripts share the same code.
+template '/etc/sudoers.d/99-parallelcluster-slurm' do
+  source '99-parallelcluster-slurm.erb'
+  owner 'root'
+  group 'root'
+  mode '0600'
 end

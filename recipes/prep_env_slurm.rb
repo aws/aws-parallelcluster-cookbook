@@ -17,7 +17,7 @@
 
 # Ensure slurm plugin directory is in place
 # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
-directory node['cfncluster']['slurm_plugin_dir'] do
+directory node['cluster']['slurm_plugin_dir'] do
   user 'root'
   group 'root'
   mode '0755'
@@ -26,40 +26,40 @@ directory node['cfncluster']['slurm_plugin_dir'] do
 end
 
 # Retrieve compute and head node info from dynamodb and save into files
-if node['cfncluster']['cfn_node_type'] == "ComputeFleet"
+if node['cluster']['node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
     block do
       slurm_nodename, head_node_private_ip, head_node_private_dns = hit_dynamodb_info
-      node.force_default['cfncluster']['slurm_nodename'] = slurm_nodename
-      node.force_default['cfncluster']['cfn_master'] = head_node_private_dns
-      node.force_default['cfncluster']['cfn_master_private_ip'] = head_node_private_ip
+      node.force_default['cluster']['slurm_nodename'] = slurm_nodename
+      node.force_default['cluster']['head_node'] = head_node_private_dns
+      node.force_default['cluster']['head_node_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3
     not_if do
-      !node['cfncluster']['slurm_nodename'].nil? && !node['cfncluster']['slurm_nodename'].empty? &&
-        !node['cfncluster']['cfn_master'].nil? && !node['cfncluster']['cfn_master'].empty? &&
-        !node['cfncluster']['cfn_master_private_ip'].nil? && !node['cfncluster']['cfn_master_private_ip'].empty?
+      !node['cluster']['slurm_nodename'].nil? && !node['cluster']['slurm_nodename'].empty? &&
+        !node['cluster']['head_node'].nil? && !node['cluster']['head_node'].empty? &&
+        !node['cluster']['head_node_private_ip'].nil? && !node['cluster']['head_node_private_ip'].empty?
     end
   end
 
-  file "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename" do # ~FC005
-    content(lazy { node['cfncluster']['slurm_nodename'] })
+  file "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename" do # ~FC005
+    content(lazy { node['cluster']['slurm_nodename'] })
     mode '0644'
     owner 'root'
     group 'root'
   end
 
-  file "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns" do
-    content(lazy { node['cfncluster']['cfn_master'] })
+  file "#{node['cluster']['slurm_plugin_dir']}/head_node_private_dns" do
+    content(lazy { node['cluster']['head_node'] })
     mode '0644'
     owner 'root'
     group 'root'
   end
 
-  file "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip" do
-    content(lazy { node['cfncluster']['cfn_master_private_ip'] })
+  file "#{node['cluster']['slurm_plugin_dir']}/head_node_private_ip" do
+    content(lazy { node['cluster']['head_node_private_ip'] })
     mode '0644'
     owner 'root'
     group 'root'

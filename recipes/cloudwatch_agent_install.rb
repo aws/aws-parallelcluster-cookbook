@@ -19,18 +19,18 @@ return if node['conditions']['ami_bootstrapped']
 
 # Download the cloudwatch agent's public key. Note that the domain used to get
 # the public key must NOT be regionalized.
-remote_file node['cfncluster']['cloudwatch']['public_key_local_path'] do
-  source node['cfncluster']['cloudwatch']['public_key_url']
+remote_file node['cluster']['cloudwatch']['public_key_local_path'] do
+  source node['cluster']['cloudwatch']['public_key_url']
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(node['cfncluster']['cloudwatch']['public_key_local_path']) }
+  not_if { ::File.exist?(node['cluster']['cloudwatch']['public_key_local_path']) }
 end
 
 # Set the s3 domain name to use for all download URLs
-s3_domain = "https://s3.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']['aws_domain']}"
+s3_domain = "https://s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}"
 
 # Set URLs used to download the package and expected signature based on platform
-package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cfncluster']['cfn_region']}"
+package_url_prefix = "#{s3_domain}/amazoncloudwatch-agent-#{node['cluster']['region']}"
 arch_url_component = arm_instance? ? 'arm64' : 'amd64'
 platform_url_component = value_for_platform(
   # No CW Agent for CentOS ARM, using RHEL package
@@ -47,7 +47,7 @@ package_url = [
   "latest",
   "amazon-cloudwatch-agent.#{package_extension}"
 ].join('/')
-package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
+package_path = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
 signature_url = "#{package_url}.sig"
 signature_path = "#{package_path}.sig"
 
@@ -67,7 +67,7 @@ end
 
 # Import cloudwatch agent's public key to the keyring
 execute "import-cloudwatch-agent-key" do
-  command "gpg --import #{node['cfncluster']['cloudwatch']['public_key_local_path']}"
+  command "gpg --import #{node['cluster']['cloudwatch']['public_key_local_path']}"
   user 'root'
 end
 
@@ -81,7 +81,7 @@ cookbook_file 'verify_cloudwatch_agent_public_key_fingerprint.py' do
   mode '0755'
 end
 execute "verify-cloudwatch-agent-public-key-fingerprint" do
-  command "#{node.default['cfncluster']['cookbook_virtualenv_path']}/bin/python /usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py"
+  command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py"
   user 'root'
 end
 

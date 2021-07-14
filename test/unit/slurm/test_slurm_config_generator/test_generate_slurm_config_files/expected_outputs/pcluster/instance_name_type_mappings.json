@@ -1,7 +1,7 @@
 {
-    "c4xlarge": "c4.xlarge",
-    "c52xlarge": "c5.2xlarge",
-    "c5n18xlarge": "c5n.18xlarge",
-    "g38xlarge": "g3.8xlarge",
-    "p3dn24xlarge": "p3dn.24xlarge"
+    "multiplespot1": "c4.xlarge",
+    "multiplespot2": "c5.2xlarge",
+    "efac5n": "c5n.18xlarge",
+    "gpug38xlarge": "g3.8xlarge",
+    "gpup3dn24xlarge": "p3dn.24xlarge"
 }

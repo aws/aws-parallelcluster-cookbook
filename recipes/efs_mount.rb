@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # Get shared_dir path and mount EFS filesystem
-efs_shared_dir =  node['cfncluster']['cfn_efs_shared_dir'].split(',')[0]
+efs_shared_dir =  node['cluster']['efs_shared_dir'].split(',')[0]
 
 # Check to see if EFS is created
 if efs_shared_dir != "NONE"
@@ -35,7 +35,7 @@ if efs_shared_dir != "NONE"
 
   # Mount EFS over NFS
   mount efs_shared_dir do
-    device "#{node['cfncluster']['cfn_efs']}.efs.#{node['cfncluster']['cfn_region']}.#{node['cfncluster']['aws_domain']}:/"
+    device "#{node['cluster']['efs_fs_id']}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
     fstype 'nfs4'
     options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
     dump 0

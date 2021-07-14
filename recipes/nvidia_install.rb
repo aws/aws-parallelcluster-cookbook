@@ -15,12 +15,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidia']['enabled'] == true
+if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
 
   # Get NVIDIA run file
   nvidia_tmp_runfile = "/tmp/nvidia.run"
   remote_file nvidia_tmp_runfile do
-    source node['cfncluster']['nvidia']['driver_url']
+    source node['cluster']['nvidia']['driver_url']
     mode '0755'
     retries 3
     retry_delay 5
@@ -43,11 +43,11 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
   # Get CUDA run file
   cuda_tmp_runfile = "/tmp/cuda.run"
   remote_file cuda_tmp_runfile do
-    source node['cfncluster']['nvidia']['cuda_url']
+    source node['cluster']['nvidia']['cuda_url']
     mode '0755'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?("/usr/local/cuda-#{node['cfncluster']['nvidia']['cuda_version']}") }
+    not_if { ::File.exist?("/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}") }
   end
 
   # Install CUDA driver
@@ -60,7 +60,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
       ./cuda.run --silent --toolkit
       rm -f /tmp/cuda.run
     CUDA
-    creates "/usr/local/cuda-#{node['cfncluster']['nvidia']['cuda_version']}"
+    creates "/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}"
   end
 
   cookbook_file 'blacklist-nouveau.conf' do
@@ -79,17 +79,17 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
 
   # Install NVIDIA Fabric Manager
   repo_domain = "com"
-  repo_domain = "cn" if node['cfncluster']['cfn_region'].start_with?("cn-")
-  repo_uri = node['cfncluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
+  repo_domain = "cn" if node['cluster']['region'].start_with?("cn-")
+  repo_uri = node['cluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
   add_package_repository(
     "nvidia-fm-repo",
     repo_uri,
-    "#{repo_uri}/#{node['cfncluster']['nvidia']['fabricmanager']['repository_key']}",
+    "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}",
     "/"
   )
 
-  package node['cfncluster']['nvidia']['fabricmanager']['package'] do
-    version node['cfncluster']['nvidia']['fabricmanager']['version']
+  package node['cluster']['nvidia']['fabricmanager']['package'] do
+    version node['cluster']['nvidia']['fabricmanager']['version']
   end
 
   remove_package_repository("nvidia-fm-repo")
