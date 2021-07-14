@@ -13,7 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem
 
 **BUG FIXES**
-- Pin to version 1.247347.6b250880 of the CloudWatch agent due to performance impact of current latest version.
+- Pin to version 1.247347 of the CloudWatch agent due to performance impact of latest CW agent version 1.247348.
 
 2.11.0
 -----
