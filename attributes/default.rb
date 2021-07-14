@@ -362,7 +362,7 @@ when 'debian'
 end
 
 # Default NFS mount options
-default['cfncluster']['nfs']['hard_mount_options'] = 'hard,_netdev'
+default['cfncluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
 
 # Lustre defaults (for CentOS >=7.7 and Ubuntu)
 default['cluster']['lustre']['public_key'] = value_for_platform(
