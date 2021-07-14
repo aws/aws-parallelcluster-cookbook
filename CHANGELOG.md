@@ -10,7 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Retry failed installations of aws-parallelcluster package on head node of clusters using AWS Batch as the scheduler.
 
 **BUG FIXES**
-- Pin to version 1.247347.6b250880 of the CloudWatch agent due to performance impact of current latest version.
+- Pin to version 1.247347.6b250880 of the CloudWatch agent due to performance impact of latest CW agent version 1.247348.0b251302 on some applications.
 
 2.11.0
 -----
