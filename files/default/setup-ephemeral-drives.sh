@@ -108,8 +108,8 @@ function setup_ephemeral_drives () {
     # Setup LVM
     RC=0
     pvcreate -y $PARTITIONS || RC=1
-    vgcreate vg.01 $PARTITIONS || RC=1
-    lvcreate -i $NUM_DEVS -I 64 -l 100%FREE -n lv_ephemeral vg.01 || RC=1
+    vgcreate -y vg.01 $PARTITIONS || RC=1
+    lvcreate -y -i $NUM_DEVS -I 64 -l 100%FREE -n lv_ephemeral vg.01 || RC=1
     if [ "$cfn_encrypted_ephemeral" == "true" ]; then
       modprobe brd || RC=1
       mkfs -q /dev/ram1 1024 || RC=1
