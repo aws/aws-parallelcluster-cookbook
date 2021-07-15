@@ -88,9 +88,19 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
     "/"
   )
 
-  package node['cfncluster']['nvidia']['fabricmanager']['package'] do
-    version node['cfncluster']['nvidia']['fabricmanager']['version']
-    action %i[install lock]
+  if node['platform'] == 'ubuntu'
+    # For ubuntu, CINC17 apt-package resources need full versions for `version`
+    execute "install_fabricmanager_for_ubuntu" do
+      command "apt -y install #{node['cfncluster']['nvidia']['fabricmanager']['package']}=#{node['cfncluster']['nvidia']['fabricmanager']['version']} "\
+              "&& apt-mark hold #{node['cfncluster']['nvidia']['fabricmanager']['package']}"
+      retries 3
+      retry_delay 5
+    end
+  else
+    package node['cfncluster']['nvidia']['fabricmanager']['package'] do
+      version node['cfncluster']['nvidia']['fabricmanager']['version']
+      action %i[install lock]
+    end
   end
 
   remove_package_repository("nvidia-fm-repo")
