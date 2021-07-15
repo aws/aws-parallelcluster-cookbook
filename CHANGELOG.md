@@ -7,7 +7,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 -----
 
 **CHANGES**
-- Upgrade Slurm to version 20.11.8
+- Upgrade Slurm to version 20.11.8.
+- Upgrade Cinc Client to version 17.2.29.
 
 2.11.3
 -----
