@@ -22,6 +22,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fail cluster creation when IMDS lockdown is not working correctly.
 - Make sudoers secure_path include the same directories in every platform.
 - Add support for iptables restore on instance reboot.
+- Allow IMDS access for dcv user when dcv is enabled.
 
 2.11.0
 -----
