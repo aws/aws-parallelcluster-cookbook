@@ -1,0 +1,19 @@
+Description: Fix FTBFS on armhf due to OpenJDK VM changes
+Author: Adam Barratt <adam@adam-barratt.org.uk>
+Bug-Debian: https://bugs.debian.org/903406
+Forwarded: no
+Last-Update: 2018-07-09
+--- a/source/aimk.orig	2018-07-09 14:23:01.642562774 +0000
++++ b/source/aimk	2018-07-09 14:25:39.495856441 +0000
+@@ -2002,7 +2002,10 @@
+              set JAVA_LIB_ARCH = ""
+              echo "WARNING: no JAVA_LIB_ARCH for architecture $buildarch"
+       endsw
+-      if ( "$JAVA_LIB_ARCH" != "") then
++      if ( "$buildarch" == "lx-armhf") then
++        # Debian/armhf doesn't ship a "server" VM
++        set JAVA_LFLAGS="-L$JAVA_HOME/jre/lib/$JAVA_LIB_ARCH/client"
++      else if ( "$JAVA_LIB_ARCH" != "") then
+         set JAVA_LFLAGS="-L$JAVA_HOME/jre/lib/$JAVA_LIB_ARCH/server"
+       else
+         set JAVA_LFLAGS=""

@@ -1,0 +1,82 @@
+From 538640ffe09a44a14d9f0047708f9c87d90c29ac Mon Sep 17 00:00:00 2001
+From: Dave Love <d.love@liverpool.ac.uk>
+Date: Fri, 15 Apr 2016 13:24:02 +0000
+Subject: [PATCH] Remove union wait Being removed from glibc and apparently long obsolete in BSD
+Bug-Debian: http://bugs.debian.org/833995
+---
+ source/3rdparty/qtcsh/sh.proc.c | 4 ++--
+ source/clients/qevent/qevent.c  | 8 --------
+ source/daemons/common/mail.c    | 8 --------
+ 3 files changed, 2 insertions(+), 18 deletions(-)
+
+--- pkg-gridengine.orig/source/3rdparty/qtcsh/sh.proc.c
++++ pkg-gridengine/source/3rdparty/qtcsh/sh.proc.c
+@@ -47,9 +47,9 @@
+ # define HZ 16
+ #endif /* aiws */
+ 
+-#if defined(_BSD) || (defined(IRIS4D) && __STDC__) || defined(__lucid) || defined(linux) || defined(__GNU__) || defined(__GLIBC__)
++#if (defined(IRIS4D) && __STDC__) || defined(__lucid)
+ # define BSDWAIT
+-#endif /* _BSD || (IRIS4D && __STDC__) || __lucid || glibc */
++#endif /* (IRIS4D && __STDC__) || __lucid  */
+ #ifndef WTERMSIG
+ # define WTERMSIG(w)	(((union wait *) &(w))->w_termsig)
+ # ifndef BSDWAIT
+--- pkg-gridengine.orig/source/clients/qevent/qevent.c
++++ pkg-gridengine/source/clients/qevent/qevent.c
+@@ -299,26 +299,15 @@
+ 
+    if (pid > 0) {
+       int exit_status;
++      int status;
+ 
+ #if !defined(INTERIX)
+       struct rusage rusage;
+-#endif
+-
+-#if defined(SVR3) || defined(_BSD)
+-      union wait status;
++      wait3(&status, 0, &rusage);
+ #else
+-      int status;
+-#endif
+-#if defined(INTERIX)
+       waitpid(pid, &status, 0);
+-#else
+-      wait3(&status, 0, &rusage);
+ #endif
+-#if defined(SVR3) || defined(_BSD)
+-      exit_status = status.w_retcode;
+-#else
+       exit_status = status;
+-#endif
+ 
+       if ( WEXITSTATUS(exit_status) == 0 ) {
+          INFO((SGE_EVENT,"exit status of script: "sge_U32CFormat"\n", sge_u32c(WEXITSTATUS(exit_status))));
+--- pkg-gridengine.orig/source/daemons/common/mail.c
++++ pkg-gridengine/source/daemons/common/mail.c
+@@ -138,11 +138,7 @@
+    struct rusage rusage;
+ #endif
+ 
+-#if defined(SVR3) || defined(_BSD)
+-   union wait status;
+-#else
+    int status;
+-#endif
+ 
+    DENTER(TOP_LAYER, "sge_send_mail");
+ 
+@@ -277,11 +273,7 @@
+          exit(1);
+       }
+ 
+-#if defined(SVR3) || defined(_BSD)
+-      exit_status = status.w_retcode;
+-#else
+       exit_status = status;
+-#endif
+       DPRINTF(("mailer exited with exit status %d\n", exit_status));
+       exit(exit_status);
+    }

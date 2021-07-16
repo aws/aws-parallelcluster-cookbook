@@ -32,9 +32,14 @@ when 'MasterServer', nil
   end
 
   if node['platform'] == 'amazon'
-    # Additional patch files required for alinux2
-    cookbook_file 'sge-tcsh.patch' do
-      path '/tmp/sge-tcsh.patch'
+    al2_patches = %w[sge-armhf-java.patch sge-compiler-flags.patch sge-java-paths.patch
+                     sge-m32_m64.patch sge-openssl-1.1.patch sge-qmake-glob-glibc227.patch
+                     sge-skip-jgdi-with-recent-java.patch sge-source-dependencies.patch
+                     sge-union-wait.patch sge-x32.patch]
+    al2_patches.each do |patch|
+      cookbook_file patch do
+        path "/tmp/#{patch}"
+      end
     end
   elsif node['platform'] == 'centos' && node['platform_version'].to_i >= 8
     # Additional patch files required for CentOS 8

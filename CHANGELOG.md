@@ -14,6 +14,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Pin to version 1.247347 of the CloudWatch agent due to performance impact of latest CW agent version 1.247348.
+- Apply patches from Debian's SGE source repo when building SGE on AL2.
 
 2.11.0
 -----

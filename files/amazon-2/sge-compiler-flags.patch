@@ -1,0 +1,136 @@
+Description: Pass environment compiler/linker flags to shared library calls
+ aimk takes environment variables to supplement CFLAGS and LDFLAGS, but
+ it does not apply them to compilation of shared libraries.
+Author: Afif Elghraoui <afif@debian.org>
+Forwarded: no
+Last-Update: 2016-05-22
+--- pkg-gridengine.orig/source/aimk
++++ pkg-gridengine/source/aimk
+@@ -341,8 +341,8 @@
+ set SHAREDLIBS       = 0
+ set SHAREDEXT        = ".so"
+ set SHAREDLD         = ""
+-set SHARED_CFLAGS    = ""
+-set SHARED_LFLAGS    = ""
++set SHARED_CFLAGS    = "$INP_CFLAGS"
++set SHARED_LFLAGS    = "$INP_LFLAGS"
+ 
+ # linker flag for -ldrmaa name and version
+ set SONAME_LFLAG_DRMAA10 = ""
+@@ -972,9 +972,9 @@
+       else
+          set OFLAG    = ""
+       endif
+-      set LFLAGS = "-Wl,-brtl -Wl,-bbigtoc -L."
++      set LFLAGS = "$INP_LFLAGS -Wl,-brtl -Wl,-bbigtoc -L."
+       set XCFLAGS  = ""
+-      set SHARED_CFLAGS = "-fPIC"
++      set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+       set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared -Wl,-G"
+       set SHAREDLD = "gcc"
+    else
+@@ -991,8 +991,8 @@
+       set CFLAGS = "$CFLAGS -bnoquiet"
+       set XCFLAGS  = "-bnodelcsect"
+       set LFLAGS   = "-brtl -bmaxdata:0x80000000 $LFLAGS"
+-      set SHARED_CFLAGS = ""
+-      set SHARED_LFLAGS = "-brtl -bhalt:4 -bM:SRE -bE:lib.exp -H512 -T512 -bnoentry"
++      set SHARED_CFLAGS = "$INP_CFLAGS"
++      set SHARED_LFLAGS = "$INP_LFLAGS -brtl -bhalt:4 -bM:SRE -bE:lib.exp -H512 -T512 -bnoentry"
+       set SHAREDLD = "$SOURCE/scripts/ldAix"
+    endif
+ 
+@@ -1039,7 +1039,7 @@
+    set DEPEND_FLAGS = "$CFLAGS $XMTINCD"
+ 
+    set SHAREDLD      = $CC
+-   set SHARED_CFLAGS = ""
++   set SHARED_CFLAGS = "$INP_CFLAGS"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared -pthread"
+ 
+    set LFLAGS   = "-pthread $DEBUG_FLAG $LFLAGS"
+@@ -1106,7 +1106,7 @@
+    set LFLAGS   = "$DEBUG_FLAG $LFLAGS"
+ 
+    set SHAREDLD = "$CC -dynamiclib -flat_namespace -undefined warning"
+-   set SHARED_CFLAGS = "-dynamic -fno-common"
++   set SHARED_CFLAGS = "$INP_CFLAGS -dynamic -fno-common"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L."
+ 
+    set SHAREDEXT = ".dylib"
+@@ -1173,7 +1173,7 @@
+    set LFLAGS   = "$DEBUG_FLAG $LFLAGS -export-dynamic"
+    set LIBS     = "$LIBS -lkvm"
+    set SHAREDLD = $CC
+-   set SHARED_CFLAGS = "-fPIC"
++   set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared -export-dynamic"
+    set AUTHLIBS = "-lcrypt -lpam"
+  
+@@ -1204,7 +1204,7 @@
+    set LFLAGS   = "$DEBUG_FLAG $LFLAGS -export-dynamic"
+    set LIBS     = "$LIBS -lkvm"
+    set SHAREDLD = $CC
+-   set SHARED_CFLAGS = "-fPIC"
++   set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared -export-dynamic"
+    set AUTHLIBS = "-lcrypt -lpam"
+ 
+@@ -1238,7 +1238,7 @@
+    set LFLAGS   = "$DEBUG_FLAG $LFLAGS -export-dynamic"
+    set LIBS     = "$LIBS -lkvm"
+    set SHAREDLD = $CC
+-   set SHARED_CFLAGS = "-fPIC"
++   set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared -export-dynamic"
+    set AUTHLIBS = ""
+ 
+@@ -1288,7 +1288,7 @@
+    # set SONAME_LFLAG_DRMAA10 = "-W l,-soname,libdrmaa.so.1.0"
+ 
+    set SHAREDLD = ld
+-   set SHARED_CFLAGS = "-KPIC"
++   set SHARED_CFLAGS = "$INP_CFLAGS -KPIC"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared"
+    set JAVA_ARCH = "irix"
+    breaksw
+@@ -1340,10 +1340,10 @@
+ 
+    set SHAREDLD = ld
+    if ( $CC == gcc ) then
+-      set SHARED_CFLAGS = "-fPIC"
++      set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+       set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared"
+    else
+-      set SHARED_CFLAGS = "+Z"
++      set SHARED_CFLAGS = "$INP_CFLAGS +Z"
+       set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -b +s"
+    endif
+ 
+@@ -1455,7 +1455,7 @@
+    set LFLAGS   = "$DEBUG_FLAG $LFLAGS"
+ 
+    set SHAREDLD = $CC
+-   set SHARED_CFLAGS = "-fPIC"
++   set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+    set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared"
+ 
+    set SONAME_LFLAG_DRMAA10 = "-Wl,-soname,libdrmaa.so.1.0 -Wl,--version-script=drmaa.lds"
+@@ -1776,7 +1776,7 @@
+       if ( $USE_INSURE == 0 ) then
+          set CFLAGS = "$CFLAGS $ERR_WARN_ALL"
+       endif
+-      set SHARED_CFLAGS = "-KPIC"
++      set SHARED_CFLAGS = "$INP_CFLAGS -KPIC"
+ 
+       # need the compiler version for building the compiler flags
+       set compversion = `cc -V | & head -1 | sed 's/[a-zA-Z :]*\([0-9].[0-9]*\).*$/\1/'`
+@@ -1815,7 +1815,7 @@
+    else if ( $CC == gcc) then
+       #set CFLAGS = "-Wall -Werror -Wstrict-prototypes $CFLAGS"
+       set CFLAGS = "-Wall -Wstrict-prototypes $CFLAGS $OFLAG"
+-      set SHARED_CFLAGS = "-fPIC"
++      set SHARED_CFLAGS = "$INP_CFLAGS -fPIC"
+       set SHARED_LFLAGS = "$SHARED_LFLAGS -L. -shared"
+       # always get warnings
+       set ERR_WARN_NONE = ""

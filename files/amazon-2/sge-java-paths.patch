@@ -1,0 +1,38 @@
+Description: Fix JAVA_LIB_ARCH paths for certain architectures
+ Some architectures have unconventional (or just undefined, in the case of
+ alpha) paths to Java libraries. See Debian #828873. This patch works
+ arounds those inconsistencies to fix the package building on mips64el,
+ sparc64, and arm64. The build for alpha should also be working now.
+Author: Afif Elghraoui <afif@debian.org>
+Forwarded: no
+Last-Update: 2016-08-28
+--- pkg-gridengine.orig/source/aimk
++++ pkg-gridengine/source/aimk
+@@ -1957,8 +1957,9 @@
+          case lx-mips:
+          case lx-mipsel:
+          case lx-ppc:
+-         case lx-sparc: # debian squeeze; no openjdk in wheezy, but has gcj
+          case lx-ppc64le:       # Fedora                                     
++	 case ulx-alpha:
++	 case lx-alpha:
+              set JAVA_LIB_ARCH = `expr substr $buildarch 4 9`
+              breaksw
+          case lx-ppc64:
+@@ -1972,9 +1973,15 @@
+              if ($FORCE_32BIT == 1) then
+                 set JAVA_LIB_ARCH = arm
+              else
+-                set JAVA_LIB_ARCH = arm64
++                set JAVA_LIB_ARCH = aarch64
+              endif
+              breaksw
++	 case lx-mips64:
++	      set JAVA_LIB_ARCH = mips64el
++	      breaksw
++	 case lx-sparc:
++	      set JAVA_LIB_ARCH = sparcv9
++	      breaksw
+          case hp11:
+              set JAVA_LIB_ARCH = PA_RISC
+              breaksw

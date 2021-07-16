@@ -1,0 +1,47 @@
+Description: Add support for x32
+ Used information from https://wiki.debian.org/X32Port
+Author: Afif Elghraoui <afif@debian.org>
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=828884
+Forwarded: no
+Last-Update: 2016-08-29
+--- pkg-gridengine.orig/source/dist/util/arch
++++ pkg-gridengine/source/dist/util/arch
+@@ -200,7 +200,11 @@
+       lxmachine=sparc
+       ;;
+    x86_64)
+-      lxmachine=amd64
++      if /usr/bin/cpp -dM </dev/null | grep -q __ILP32__; then
++	  lxmachine=x32
++      else
++	  lxmachine=amd64
++      fi
+       ;;
+    mips)
+       lxmachine=mips
+--- pkg-gridengine.orig/source/aimk
++++ pkg-gridengine/source/aimk
+@@ -1960,6 +1960,7 @@
+          case lx-ppc64le:       # Fedora                                     
+ 	 case ulx-alpha:
+ 	 case lx-alpha:
++	 case lx-x32:
+              set JAVA_LIB_ARCH = `expr substr $buildarch 4 9`
+              breaksw
+          case lx-ppc64:
+--- pkg-gridengine.orig/source/scripts/compilearch
++++ pkg-gridengine/source/scripts/compilearch
+@@ -173,6 +173,13 @@
+       COMPILE_ARCH=LINUXAMD64
+       TARGET_BITS=TARGET_64BIT
+       ;;
++   lx-x32)
++      BUILDARCH=LINUXX32
++      COMPILE_ARCH=LINUXX32
++      # not sure what to call this, but this macro needs to defined
++      # in order to avoid a compiler error (passing -D with nothing after it)
++      TARGET_BITS=TARGET_X32
++      ;;
+    lx-ia64)
+       BUILDARCH=LINUXIA64
+       COMPILE_ARCH=LINUXIA64

@@ -1,0 +1,23 @@
+Description: skip building jgdi with recent Java versions
+ JGDI does not build successfully with Java 9+, and it's not a critical
+ part of the package, so I don't want it holding it back.
+Author: Afif Elghraoui <afif@debian.org>
+Bug: https://arc.liv.ac.uk/trac/SGE/ticket/1613
+Bug-Debian: https://bugs.debian.org/875404
+Forwarded: not-needed
+Last-Update: 2019-02-05
+--- gridengine.orig/source/libs/jgdi/build.xml
++++ gridengine/source/libs/jgdi/build.xml
+@@ -101,9 +101,11 @@
+             <or>
+                 <equals arg1="${ant.java.version}" arg2="1.5"/>
+                 <equals arg1="${ant.java.version}" arg2="1.6"/>
++                <equals arg1="${ant.java.version}" arg2="7"/>
++                <equals arg1="${ant.java.version}" arg2="8"/>
+             </or>
+         </condition>
+-        <!--fail unless="supported.jdk" message="jdk version ${ant.java.version} less than 1.5 => no jgdi" status="0"/-->
++        <fail unless="supported.jdk" message="jdk version ${ant.java.version} less than 1.5 => no jgdi" status="0"/>
+         
+         <property name="sge.srcdir" location="../.."/>
+         <property file="${sge.srcdir}/build_testsuite.properties"/>    

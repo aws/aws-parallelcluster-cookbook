@@ -20,9 +20,18 @@ curl --retry 3 --retry-delay 5 -o ${SRC_ARCHIVE_OUTFILE} ${TARBALL_URL}
 # Extract source code to apply required patches
 tar xf ${SRC_ARCHIVE_OUTFILE}
 cd ${SRC_ARCHIVE_OUTFILE%.tar*}/source
-# Apply changes to TCSH 3rd party library included on SGE
-# to support newer versions of glibc and remove union wait
-patch --ignore-whitespace -p2 < /tmp/sge-tcsh.patch
+
+# See patch files for descriptions of the changes.
+patch --ignore-whitespace -p2 < /tmp/sge-armhf-java.patch
+patch --ignore-whitespace -p2 < /tmp/sge-compiler-flags.patch
+patch --ignore-whitespace -p2 < /tmp/sge-java-paths.patch
+patch --ignore-whitespace -p2 < /tmp/sge-m32_m64.patch
+patch --ignore-whitespace -p2 < /tmp/sge-openssl-1.1.patch
+patch --ignore-whitespace -p2 < /tmp/sge-qmake-glob-glibc227.patch
+patch --ignore-whitespace -p2 < /tmp/sge-skip-jgdi-with-recent-java.patch
+patch --ignore-whitespace -p2 < /tmp/sge-source-dependencies.patch
+patch --ignore-whitespace -p2 < /tmp/sge-union-wait.patch
+patch --ignore-whitespace -p2 < /tmp/sge-x32.patch
 
 # Re-create the archive in the right folder
 cd ../..
