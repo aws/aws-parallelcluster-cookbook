@@ -330,7 +330,7 @@ end
 ##################
 # Verify enough space on AMIs
 ###################
-unless node['cfncluster']['os'].end_with?("-custom")
+unless node['cluster']['os'].end_with?("-custom")
   bash 'verify 10 GB of space left on root volume' do
     cwd Chef::Config[:file_cache_path]
     # This test assumes the df output is as follows:
@@ -344,7 +344,7 @@ unless node['cfncluster']['os'].end_with?("-custom")
         exit 1
       fi
     CAPACITY_CHECK
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
@@ -353,7 +353,7 @@ end
 ###################
 expected_gc_settings = []
 (1..3).each do |i|
-  expected_gc_settings.append(node['cfncluster']['sysctl']['ipv4']["gc_thresh#{i}"])
+  expected_gc_settings.append(node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"])
 end
 expected_gc_settings = expected_gc_settings.join(',').to_s
 bash 'check ipv4 gc_thresh is correctly configured' do
