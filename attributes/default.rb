@@ -362,7 +362,7 @@ when 'debian'
 end
 
 # Default NFS mount options
-default['cfncluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
+default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
 
 # Lustre defaults (for CentOS >=7.7 and Ubuntu)
 default['cluster']['lustre']['public_key'] = value_for_platform(
@@ -401,9 +401,9 @@ default['cluster']['lustre']['client_url'] = value_for_platform(
 )
 
 # Default gc_thresh values for performance at scale
-default['cfncluster']['sysctl']['ipv4']['gc_thresh1'] = 0
-default['cfncluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
-default['cfncluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
+default['cluster']['sysctl']['ipv4']['gc_thresh1'] = 0
+default['cluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
+default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
