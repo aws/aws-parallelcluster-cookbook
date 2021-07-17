@@ -93,6 +93,10 @@ when 'MasterServer', nil
       tar xf #{sge_tarball}
       cd sge-#{node['cfncluster']['sge']['version']}/source
       CORES=$(grep processor /proc/cpuinfo | wc -l)
+      if which yum &>/dev/null || which dnf &>/dev/null && [[ ${CORES} -ge 32 ]]; then
+        # for yum/dnf OS avoid failures when using high parallelism
+        CORES=31
+      fi
       sh scripts/bootstrap.sh -no-java -no-jni -no-herd
       ./aimk -pam -no-remote -no-java -no-jni -no-herd -parallel $CORES
       ./aimk -man -no-java -no-jni -no-herd -parallel $CORES
