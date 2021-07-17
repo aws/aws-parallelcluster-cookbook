@@ -7,7 +7,6 @@ https://github.com/atomic-penguin/cookbook-nfs
 ** openssh cookbook; version 2.9.1 -- https://github.com/chef-cookbooks/openssh
 ** pyenv cookbook; version 3.4.2 -- https://github.com/sous-chefs/pyenv
 ** SELinux cookbook; version 3.1.1 -- https://github.com/chef-cookbooks/selinux
-** ulimit cookbook; version 1.1.1 -- https://github.com/bmhatfield/chef-ulimit
 ** yum cookbook; version 6.1.1 -- https://github.com/chef-cookbooks/yum
 ** yum-epel cookbook; version 4.1.2 --
 https://github.com/chef-cookbooks/yum-epel
@@ -226,8 +225,6 @@ limitations under the License.
     Copyright: 2017-2018, Darwin D. Wu
 * For SELinux cookbook see also this required NOTICE:
     Copyright: 2008-2018, Chef Software, Inc.
-* For ulimit cookbook see also this required NOTICE:
-    Copyright: 2012, Brightcove, Inc
 * For yum cookbook see also this required NOTICE:
     Copyright:: 2011 Eric G. Wolfe
     Copyright:: 2013-2017 Chef Software, Inc.
