@@ -17,7 +17,7 @@ driver_config:
 
 provisioner:
   name: chef_zero
-  require_chef_omnibus: 16.13.16
+  require_chef_omnibus: 17.2.29
   chef_omnibus_url: https://raw.githubusercontent.com/aws/aws-parallelcluster-cookbook/develop/util/cinc-install.sh
   chef_omnibus_root: /opt/cinc
   retry_on_exit_code:
