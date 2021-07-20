@@ -149,7 +149,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.12.2'
+default['cluster']['efa']['installer_version'] = '1.12.3'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
