@@ -24,6 +24,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for iptables restore on instance reboot.
 - Allow IMDS access for dcv user when dcv is enabled.
 - Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem
+- Upgrade NICE DCV to version 2021.1-10598.
 
 2.11.0
 -----
