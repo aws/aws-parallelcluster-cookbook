@@ -25,6 +25,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Allow IMDS access for dcv user when dcv is enabled.
 - Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem
 - Upgrade NICE DCV to version 2021.1-10598.
+- Upgrade Slurm to version 20.11.8
 
 2.11.0
 -----
