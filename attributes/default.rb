@@ -130,13 +130,18 @@ default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '460.73.01'
-default['cluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/460.73.01/NVIDIA-Linux-x86_64-460.73.01.run'
-default['cluster']['nvidia']['cuda_version'] = '11.3'
-default['cluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.3.0/local_installers/cuda_11.3.0_465.19.01_linux.run'
+default['cluster']['nvidia']['driver_version'] = '470.57.02'
+default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-x86_64-#{node['cluster']['nvidia']['driver_version']}.run"
+default['cluster']['nvidia']['cuda_version'] = '11.4'
+default['cluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.4.0/local_installers/cuda_11.4.0_470.42.01_linux.run'
 
 # NVIDIA fabric-manager
-default['cluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager-460"
+# The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
+# For ubuntu, it is nvidia-fabricmanager-470_version
+default['cluster']['nvidia']['fabricmanager']['package'] = value_for_platform(
+  'default' => "nvidia-fabric-manager",
+  'ubuntu' => { 'default' => "nvidia-fabricmanager-470" }
+)
 default['cluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
 default['cluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cluster']['nvidia']['driver_version'],
