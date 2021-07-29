@@ -15,17 +15,28 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# We are going to test all system users only during kitchen tests because it takes ~1.5 minutes.
+# During cluster creation we are going to test only a sample of relevant system users,
+# that are those who could be privileged plus three more users.
 all_users = get_system_users
+users_under_test =
+  if kitchen_test?
+    all_users
+  else
+    node['cluster']['head_node_imds_allowed_users'] +
+      (all_users - node['cluster']['head_node_imds_allowed_users'])[0, 3]
+  end
+
 allowed_users =
   if node['cluster']['node_type'] == 'HeadNode' &&
      node['cluster']['scheduler'] == 'slurm' &&
      node['cluster']['head_node_imds_secured'] == 'true'
     node['cluster']['head_node_imds_allowed_users']
   else
-    all_users
+    users_under_test
   end
 
-denied_users = all_users - allowed_users
+denied_users = users_under_test - allowed_users
 
 allowed_users.each { |allowed_user| check_imds_access(allowed_user, true) }
 

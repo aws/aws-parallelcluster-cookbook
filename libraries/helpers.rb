@@ -750,3 +750,8 @@ def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_c
     TEST
   end
 end
+
+# Check if recipes are executed during kitchen tests.
+def kitchen_test?
+  node['kitchen'] == 'true'
+end
