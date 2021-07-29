@@ -122,7 +122,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     - the authenticator verifies the validity of the authenticationToken and permits the user to access to the session.
     """
 
-    class IncorrectRequestException(Exception):
+    class IncorrectRequestException(Exception):  # noqa N818
         """Class used to generate an exception when an incorrect request arrives to the DCVAuthenticator."""
 
         pass

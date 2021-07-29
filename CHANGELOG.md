@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.11.2
+-----
+
+**BUG FIXES**
+- Lock version of `nvidia-fabricmanager` package to prevent updates and misalignments with NVIDIA drivers
+
 2.11.1
 -----
 
