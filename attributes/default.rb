@@ -301,7 +301,7 @@ when 'rhel', 'amazon'
                                              blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel]
+                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
@@ -319,7 +319,7 @@ when 'rhel', 'amazon'
                                              rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                              gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                              jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                             librdmacm-utils python3 python3-pip iptables libcurl-devel]
+                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']

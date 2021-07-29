@@ -3,7 +3,6 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-
 3.0.0
 ------
 
@@ -32,6 +31,28 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Slurm to version 20.11.8
 - Upgrade NVIDIA driver to version 470.57.02.
 - Upgrade CUDA library to version 11.4.0.
+
+2.11.2
+-----
+
+**BUG FIXES**
+- Lock version of `nvidia-fabricmanager` package to prevent updates and misalignments with NVIDIA drivers
+
+2.11.1
+-----
+
+**ENHANCEMENTS**
+- Retry failed installations of aws-parallelcluster package on head node of clusters using AWS Batch as the scheduler.
+
+**CHANGES**
+- Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem.
+- Upgrade EFA installer to version 1.12.3
+  - EFA configuration: ``efa-config-1.9`` (from ``efa-config-1.8-1``)
+  - EFA kernel module: ``efa-1.13.0`` (from ``efa-1.12.3``)
+
+**BUG FIXES**
+- Pin to version 1.247347 of the CloudWatch agent due to performance impact of latest CW agent version 1.247348.
+- Avoid failures when building SGE using instance type with vCPU >=32.
 
 2.11.0
 -----
