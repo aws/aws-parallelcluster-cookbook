@@ -7,8 +7,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.0.0
 ------
 
-**CHANGES**
+**ENHANCEMENTS**
+- Support restart/reboot for instance type with instance store (ephemeral drives).
 
+**CHANGES**
 - Drop support for SGE and Torque schedulers.
 - Drop support for CentOS8.
 - Remove nodewatcher, sqswatcher, jobwatcher related code.
@@ -21,8 +23,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Make PATH include required directories for every user and recipes context.
 - Fail cluster creation when IMDS lockdown is not working correctly.
 - Make sudoers secure_path include the same directories in every platform.
+- Remove option for instance store software encryption (encrypted_ephemeral).  
 - Add support for iptables restore on instance reboot.
 - Allow IMDS access for dcv user when dcv is enabled.
+- Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem
+- Upgrade NICE DCV to version 2021.1-10598.
+- Upgrade Slurm to version 20.11.8
+- Upgrade NVIDIA driver to version 470.57.02.
+- Upgrade CUDA library to version 11.4.0.
 
 2.11.0
 -----

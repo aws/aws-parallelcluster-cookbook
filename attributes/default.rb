@@ -109,9 +109,9 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '20-11-7-1'
+default['cluster']['slurm']['version'] = '20-11-8-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = 'ce927fbf2f7d5f908ed87c5d521abc696b9a2508'
+default['cluster']['slurm']['sha1'] = 'bc91a25355400f85ece1a204121591e6a2424617'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -130,13 +130,18 @@ default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '460.73.01'
-default['cluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/460.73.01/NVIDIA-Linux-x86_64-460.73.01.run'
-default['cluster']['nvidia']['cuda_version'] = '11.3'
-default['cluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.3.0/local_installers/cuda_11.3.0_465.19.01_linux.run'
+default['cluster']['nvidia']['driver_version'] = '470.57.02'
+default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-x86_64-#{node['cluster']['nvidia']['driver_version']}.run"
+default['cluster']['nvidia']['cuda_version'] = '11.4'
+default['cluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.4.0/local_installers/cuda_11.4.0_470.42.01_linux.run'
 
 # NVIDIA fabric-manager
-default['cluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager-460"
+# The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
+# For ubuntu, it is nvidia-fabricmanager-470_version
+default['cluster']['nvidia']['fabricmanager']['package'] = value_for_platform(
+  'default' => "nvidia-fabric-manager",
+  'ubuntu' => { 'default' => "nvidia-fabricmanager-470" }
+)
 default['cluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
 default['cluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cluster']['nvidia']['driver_version'],
@@ -149,7 +154,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.12.2'
+default['cluster']['efa']['installer_version'] = '1.12.3'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
@@ -157,28 +162,28 @@ default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
-default['cluster']['dcv']['version'] = '2021.1-10557'
+default['cluster']['dcv']['version'] = '2021.1-10598'
 if arm_instance?
   default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "b3b47d8134800149758da92e4f5b97941245144a1cccf07bf44aa924d2b214a4"
+      '~>7' => "ff4dc78b76043b8137c3ff89a0ecdfe81247fd4684ce1de0424088e7981ef7bc"
     },
-    'amazon' => { '2' => "b3b47d8134800149758da92e4f5b97941245144a1cccf07bf44aa924d2b214a4" },
-    'ubuntu' => { '18.04' => "8e910b0de25fb744cb21c1a0a04a01d8a652d03bd836cd1f85d12f313652340e" }
+    'amazon' => { '2' => "ff4dc78b76043b8137c3ff89a0ecdfe81247fd4684ce1de0424088e7981ef7bc" },
+    'ubuntu' => { '18.04' => "0a4d42793f6b0c98f77ac39606ef6f18b9397fcdc4977232310d3d12928918b4" }
   )
 else
   default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 ubuntu20 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "c0de28f38440c18757ef014e841b3bc79b7555e8b05904e10ddca1ce21d6e47f"
+      '~>7' => "a84331bc8ac31a0cdfe0d274d8520fffe01dc16c2d51824a87902ce2f764fe2f"
     },
-    'amazon' => { '2' => "c0de28f38440c18757ef014e841b3bc79b7555e8b05904e10ddca1ce21d6e47f" },
+    'amazon' => { '2' => "a84331bc8ac31a0cdfe0d274d8520fffe01dc16c2d51824a87902ce2f764fe2f" },
     'ubuntu' => {
-      '18.04' => "40908548266e7aa4ef2ca954eb25bf898d10ca00fc6b3d7b8b47cb3c9ff00ef9",
-      '20.04' => "f8e9e9b64617066a25d67f4523a0c13f1b7eff22d9cb044aeebac9f97fa57cbf"
+      '18.04' => "173b54c4bbec1c5658e60340d1b0aa40b488bf31be6ce2360116631bfdaa1f5f",
+      '20.04' => "97fae50ab3d27f302e5d935d646b853173bf654ba1034fa8d0508ae4e76050e2"
     }
   )
 end
@@ -195,7 +200,7 @@ default['cluster']['dcv']['package'] = value_for_platform(
     'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}"
   }
 )
-default['cluster']['dcv']['server']['version'] = '2021.1.10557-1'
+default['cluster']['dcv']['server']['version'] = '2021.1.10598-1'
 default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
     '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
@@ -362,7 +367,7 @@ when 'debian'
 end
 
 # Default NFS mount options
-default['cfncluster']['nfs']['hard_mount_options'] = 'hard,_netdev'
+default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
 
 # Lustre defaults (for CentOS >=7.7 and Ubuntu)
 default['cluster']['lustre']['public_key'] = value_for_platform(
@@ -401,9 +406,9 @@ default['cluster']['lustre']['client_url'] = value_for_platform(
 )
 
 # Default gc_thresh values for performance at scale
-default['cfncluster']['sysctl']['ipv4']['gc_thresh1'] = 0
-default['cfncluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
-default['cfncluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
+default['cluster']['sysctl']['ipv4']['gc_thresh1'] = 0
+default['cluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
+default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
@@ -422,7 +427,6 @@ default['cluster']['disable_hyperthreading_manually'] = 'false'
 default['cluster']['instance_slots'] = '1'
 default['cluster']['volume'] = nil
 default['cluster']['volume_fs_type'] = 'ext4'
-default['cluster']['encrypted_ephemeral'] = false
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['efs_shared_dir'] = 'NONE'
@@ -458,5 +462,5 @@ default['cluster']['instance_types_data'] = nil
 
 # IMDS
 default['cluster']['head_node_imds_secured'] = 'true'
-default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user']]
+default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node'
