@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Support restart/reboot for instance type with instance store (ephemeral drives).
+- Compile Slurm with jobcomp/elasticsearch support.
 
 **CHANGES**
 - Drop support for SGE and Torque schedulers.
