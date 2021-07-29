@@ -90,6 +90,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
 
   package node['cluster']['nvidia']['fabricmanager']['package'] do
     version node['cluster']['nvidia']['fabricmanager']['version']
+    action %i[install lock]
   end
 
   remove_package_repository("nvidia-fm-repo")
