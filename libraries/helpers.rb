@@ -502,7 +502,7 @@ def configure_gc_thresh_values
   (1..3).each do |i|
     # Configure gc_thresh values to be consistent with alinux2 default values
     sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
-      value node['cfncluster']['sysctl']['ipv4']["gc_thresh#{i}"]
+      value node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"]
       action :apply
     end
   end

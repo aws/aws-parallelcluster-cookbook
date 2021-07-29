@@ -309,6 +309,68 @@ unless node['cluster']['os'].end_with?("-custom")
 end
 
 ###################
+# instance store
+###################
+bash 'test instance store' do
+  cwd Chef::Config[:file_cache_path]
+  code <<-EPHEMERAL
+      set -xe
+      EPHEMERAL_DIR="#{node['cluster']['ephemeral_dir']}"
+
+      function set_imds_token(){
+        if [ -z "${IMDS_TOKEN}" ];then
+          IMDS_TOKEN=$(sudo curl --retry 3 --retry-delay 0 --fail -s -f -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 900" http://169.254.169.254/latest/api/token)
+          if [ "${?}" -gt 0 ] || [ -z "${IMDS_TOKEN}" ]; then
+            echo '[ERROR] Could not get IMDSv2 token. Instance Metadata might have been disabled or this is not an EC2 instance.'
+            exit 1
+          fi
+        fi
+      }
+      function get_meta() {
+          local IMDS_OUT=$(sudo curl --retry 3 --retry-delay 0 --fail -s -q -H "X-aws-ec2-metadata-token:${IMDS_TOKEN}" -f http://169.254.169.254/latest/${1})
+          echo -n "${IMDS_OUT}"
+      }
+      function print_block_device_mapping(){
+        echo 'block-device-mapping: '
+        DEVICES=$(get_meta meta-data/block-device-mapping/)
+        if [ -n "${DEVICES}" ]; then
+          for DEVICE in ${DEVICES}; do
+            echo -e '\t' ${DEVICE}: $(get_meta meta-data/block-device-mapping/${DEVICE})
+          done
+        else
+          echo "NOT AVAILABLE"
+        fi
+      }
+
+      # Check if instance has instance store
+      if ls /dev/nvme* &>/dev/null; then
+        # Ephemeral devices for NVME
+        EPHEMERAL_DEVS=$(realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "*Instance_Storage*" | uniq)
+      else
+        # Ephemeral devices for not-NVME
+        set_imds_token
+        EPHEMERAL_DEVS=$(print_block_device_mapping | grep ephemeral | awk '{print $2}' | sed 's/sd/xvd/')
+      fi
+
+      NUM_DEVS=0
+      set +e
+      for EPHEMERAL_DEV in ${EPHEMERAL_DEVS}; do
+        STAT_COMMAND="stat -t /dev/${EPHEMERAL_DEV}"
+        if ${STAT_COMMAND} &>/dev/null; then
+          let NUM_DEVS++
+        fi
+      done
+      set -e
+
+      if [ $NUM_DEVS -gt 0 ]; then
+        mkdir -p ${EPHEMERAL_DIR}/test_dir
+        touch ${EPHEMERAL_DIR}/test_dir/test_file
+      fi
+  EPHEMERAL
+  user node['cluster']['cluster_user']
+end
+
+###################
 # Pcluster AWSBatch CLI
 ###################
 if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'HeadNode'
@@ -330,7 +392,7 @@ end
 ##################
 # Verify enough space on AMIs
 ###################
-unless node['cfncluster']['os'].end_with?("-custom")
+unless node['cluster']['os'].end_with?("-custom")
   bash 'verify 10 GB of space left on root volume' do
     cwd Chef::Config[:file_cache_path]
     # This test assumes the df output is as follows:
@@ -344,7 +406,7 @@ unless node['cfncluster']['os'].end_with?("-custom")
         exit 1
       fi
     CAPACITY_CHECK
-    user node['cfncluster']['cfn_cluster_user']
+    user node['cluster']['cluster_user']
   end
 end
 
@@ -353,7 +415,7 @@ end
 ###################
 expected_gc_settings = []
 (1..3).each do |i|
-  expected_gc_settings.append(node['cfncluster']['sysctl']['ipv4']["gc_thresh#{i}"])
+  expected_gc_settings.append(node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"])
 end
 expected_gc_settings = expected_gc_settings.join(',').to_s
 bash 'check ipv4 gc_thresh is correctly configured' do
