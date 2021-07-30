@@ -36,6 +36,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade EFA installer to version 1.13.0
   - Update rdma-core to v35.0.
   - Update libfabric to v1.13.0amzn1.0.
+- Upgrade Intel MPI to version 2019.10.317.
 
 **BUG FIXES**
 - Fix cluster update when using proxy setup
