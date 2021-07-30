@@ -443,6 +443,32 @@ if get_nvswitches > 1
   end
 end
 
+# Verify FabricManager version is aligned with Nvidia drivers
+case node['platform_family']
+when 'rhel', 'amazon'
+  bash 'check for FabricManager' do
+    code <<-TESTFM
+      set -ex
+      # Verify version of fabric manager is the same as Nvidia drivers
+      nvidia_driver_version=$(modinfo -F version nvidia)
+      yum list installed | grep nvidia-fabricmanager | grep ${nvidia_driver_version}
+      # Check that the nvidia-fabricmanager is locked
+      yum versionlock list | grep nvidia-fabricmanager
+    TESTFM
+  end
+when 'debian'
+  bash 'check for FabricManager' do
+    code <<-TESTFM
+      set -ex
+      # Verify version of fabric manager is the same as Nvidia drivers
+      nvidia_driver_version=$(modinfo -F version nvidia)
+      apt list --installed | grep nvidia-fabricmanager | grep ${nvidia_driver_version}
+      # Check that the nvidia-fabricmanager is locked
+      apt-mark showhold | grep nvidia-fabricmanager
+    TESTFM
+  end
+end
+
 ###################
 # CloudWatch
 ###################
