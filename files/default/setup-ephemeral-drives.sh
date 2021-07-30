@@ -168,7 +168,7 @@ function mount_lvm {
   if [[ -z ${LVM_MOUNTPOINT} ]]; then
     log "LVM (${LVM_PATH}) not mounted, mounting on (${INPUT_MOUNTPOINT})"
     # create mount
-    chmod 1777 "${INPUT_MOUNTPOINT}"
+    mkdir -p "${INPUT_MOUNTPOINT}"
     LVM_MOUNT_COMMAND="mount -v -t ${FS_TYPE} -o ${MOUNT_OPTIONS} ${LVM_PATH} ${INPUT_MOUNTPOINT}"
     if ! ${LVM_MOUNT_COMMAND}; then
       error_exit "Failed to mount LVM"
