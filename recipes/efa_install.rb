@@ -16,6 +16,12 @@
 # limitations under the License.
 
 efa_tarball = "#{node['cfncluster']['sources_dir']}/aws-efa-installer.tar.gz"
+efa_installed = efa_installed?
+
+if efa_installed && !::File.exist?(efa_tarball)
+  Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration. enable_gdr option will be ignored.")
+  return
+end
 
 # Get EFA Installer
 remote_file efa_tarball do
@@ -32,12 +38,12 @@ case node['platform_family']
 when 'rhel', 'amazon'
   package %w[openmpi-devel openmpi] do
     action :remove
-    not_if { ::Dir.exist?('/opt/amazon/efa') }
+    not_if { efa_installed }
   end
 when 'debian'
   package "libopenmpi-dev" do
     action :remove
-    not_if { ::Dir.exist?('/opt/amazon/efa') }
+    not_if { efa_installed }
   end
 end
 
@@ -54,8 +60,9 @@ bash "install efa" do
     tar -xzf #{efa_tarball}
     cd aws-efa-installer
     ./efa_installer.sh #{installer_options}
+    rm -rf #{node['cfncluster']['sources_dir']}/aws-efa-installer
   EFAINSTALL
-  not_if { ::Dir.exist?('/opt/amazon/efa') && !efa_gdr_enabled? }
+  not_if { efa_installed && !efa_gdr_enabled? }
 end
 
 # EFA installer v1.11.0 removes libibverbs-core, which contains hwloc-devel during install

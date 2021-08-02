@@ -6,6 +6,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.11.2
 -----
 
+**CHANGES**
+- Do not re-install EFA with GDR enabled at node bootstrap time in case EFA was already installed in the base AMI
+  during the createami process.
+
 **BUG FIXES**
 - Lock version of `nvidia-fabricmanager` package to prevent updates and misalignments with NVIDIA drivers
 
