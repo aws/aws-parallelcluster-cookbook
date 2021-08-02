@@ -451,9 +451,9 @@ when 'rhel', 'amazon'
       set -ex
       # Verify version of fabric manager is the same as Nvidia drivers
       nvidia_driver_version=$(modinfo -F version nvidia)
-      yum list installed | grep nvidia-fabricmanager | grep ${nvidia_driver_version}
+      yum list installed | grep "nvidia-fabric.*manager" | grep ${nvidia_driver_version}
       # Check that the nvidia-fabricmanager is locked
-      yum versionlock list | grep nvidia-fabricmanager
+      yum versionlock list | grep "nvidia-fabric.*manager"
     TESTFM
   end
 when 'debian'
@@ -462,9 +462,9 @@ when 'debian'
       set -ex
       # Verify version of fabric manager is the same as Nvidia drivers
       nvidia_driver_version=$(modinfo -F version nvidia)
-      apt list --installed | grep nvidia-fabricmanager | grep ${nvidia_driver_version}
+      apt list --installed | grep "nvidia-fabric.*manager" | grep ${nvidia_driver_version}
       # Check that the nvidia-fabricmanager is locked
-      apt-mark showhold | grep nvidia-fabricmanager
+      apt-mark showhold | grep "nvidia-fabric.*manager"
     TESTFM
   end
 end
