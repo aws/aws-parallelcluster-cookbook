@@ -443,29 +443,31 @@ if get_nvswitches > 1
   end
 end
 
-# Verify FabricManager version is aligned with Nvidia drivers
-case node['platform_family']
-when 'rhel', 'amazon'
-  bash 'check for FabricManager' do
-    code <<-TESTFM
-      set -ex
-      # Verify version of fabric manager is the same as Nvidia drivers
-      nvidia_driver_version=$(modinfo -F version nvidia)
-      yum list installed | grep "nvidia-fabric.*manager" | grep ${nvidia_driver_version}
-      # Check that the nvidia-fabricmanager is locked
-      yum versionlock list | grep "nvidia-fabric.*manager"
-    TESTFM
-  end
-when 'debian'
-  bash 'check for FabricManager' do
-    code <<-TESTFM
-      set -ex
-      # Verify version of fabric manager is the same as Nvidia drivers
-      nvidia_driver_version=$(modinfo -F version nvidia)
-      apt list --installed | grep "nvidia-fabric.*manager" | grep ${nvidia_driver_version}
-      # Check that the nvidia-fabricmanager is locked
-      apt-mark showhold | grep "nvidia-fabric.*manager"
-    TESTFM
+unless arm_instance?
+  # Verify FabricManager version is aligned with Nvidia drivers (Nvidia drivers are only installed on x86)
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    bash 'check for FabricManager' do
+      code <<-TESTFM
+        set -ex
+        # Verify version of fabric manager is the same as Nvidia drivers
+        nvidia_driver_version=$(modinfo -F version nvidia)
+        yum list installed | grep "nvidia-fabric.*manager" | grep ${nvidia_driver_version}
+        # Check that the nvidia-fabricmanager is locked
+        yum versionlock list | grep "nvidia-fabric.*manager"
+      TESTFM
+    end
+  when 'debian'
+    bash 'check for FabricManager' do
+      code <<-TESTFM
+        set -ex
+        # Verify version of fabric manager is the same as Nvidia drivers
+        nvidia_driver_version=$(modinfo -F version nvidia)
+        apt list --installed | grep "nvidia-fabric.*manager" | grep ${nvidia_driver_version}
+        # Check that the nvidia-fabricmanager is locked
+        apt-mark showhold | grep "nvidia-fabric.*manager"
+      TESTFM
+    end
   end
 end
 
