@@ -465,8 +465,9 @@ if get_nvswitches > 1
   end
 end
 
-unless arm_instance?
-  # Verify FabricManager version is aligned with Nvidia drivers (Nvidia drivers are only installed on x86)
+unless arm_instance? || node['cfncluster']['os'].end_with?("-custom")
+  # Verify FabricManager version is aligned with Nvidia drivers
+  # (Nvidia drivers are only installed on x86, Nvidia recipe is not executed for custom build.)
   case node['platform_family']
   when 'rhel', 'amazon'
     bash 'check for FabricManager' do
