@@ -285,7 +285,7 @@ case node['platform_family']
 when 'rhel', 'amazon'
 
   default['cfncluster']['kernel_devel_pkg']['name'] = "kernel-devel"
-  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64')
+  default['cfncluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
 
   # Modulefile Directory
   default['cfncluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
