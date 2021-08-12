@@ -38,7 +38,7 @@ end
 # Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU
 if graphic_instance?
   execute "run_nvidiasmi" do
-    command 'nvidia-smi'
+    command 'if which nvidia-smi &>/dev/null; then nvidia-smi; else echo "GPU instance but no Nvidia drivers found"; fi'
   end
 end
 
