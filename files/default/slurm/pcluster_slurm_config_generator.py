@@ -202,13 +202,14 @@ def generate_instance_type_mapping_file(output_dir, queues):
     """Generate a mapping file to retrieve the Instance Type related to the instance key used in the slurm nodename."""
     instance_name_type_mapping = {}
     for queue in queues:
+        instance_name_type_mapping[queue["Name"]] = {}
         compute_resources = queue["ComputeResources"]
         hostname_regex = re.compile("[^A-Za-z0-9]")
         for compute_resource in compute_resources:
             instance_type = compute_resource.get("InstanceType")
             # Remove all characters excepts letters and numbers
             sanitized_compute_name = re.sub(hostname_regex, "", compute_resource.get("Name"))
-            instance_name_type_mapping[sanitized_compute_name] = instance_type
+            instance_name_type_mapping[queue["Name"]][sanitized_compute_name] = instance_type
 
     filename = f"{output_dir}/instance_name_type_mappings.json"
     log.info("Generating %s", filename)
