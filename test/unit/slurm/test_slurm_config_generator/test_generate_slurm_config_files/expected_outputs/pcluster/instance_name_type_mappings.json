@@ -1,7 +1,13 @@
 {
-    "multiplespot1": "c4.xlarge",
-    "multiplespot2": "c5.2xlarge",
-    "efac5n": "c5n.18xlarge",
-    "gpug38xlarge": "g3.8xlarge",
-    "gpup3dn24xlarge": "p3dn.24xlarge"
+    "multiple_spot": {
+        "multiplespot1": "c4.xlarge",
+        "multiplespot2": "c5.2xlarge"
+    },
+    "efa": {
+        "efac5n": "c5n.18xlarge"
+    },
+    "gpu": {
+        "gpug38xlarge": "g3.8xlarge",
+        "gpup3dn24xlarge": "p3dn.24xlarge"
+    }
 }
