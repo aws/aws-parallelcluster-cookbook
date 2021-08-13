@@ -298,7 +298,7 @@ when 'rhel', 'amazon'
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                              httpd boost-devel redhat-lsb mlocate lvm2 R atlas-devel
-                                             blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                             blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
@@ -312,7 +312,7 @@ when 'rhel', 'amazon'
   when 'amazon'
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
+                                             httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
                                              libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                              sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
                                              libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
@@ -334,7 +334,7 @@ when 'debian'
                                            tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                            apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
-                                           r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
+                                           r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
                                            libatlas-base-dev libglvnd-dev linux-headers-aws iptables libcurl4-openssl-dev]
 
