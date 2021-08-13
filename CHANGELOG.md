@@ -32,6 +32,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Cinc Client to version 17.2.29.
 - Upgrade NVIDIA driver to version 470.57.02.
 - Upgrade CUDA library to version 11.4.0.
+- Avoid installing MPICH packages.
 
 2.11.2
 -----

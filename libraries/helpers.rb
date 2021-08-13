@@ -487,17 +487,6 @@ def get_metadata_with_token(token, uri)
   metadata
 end
 
-def rm_libmpich
-  # Uninstall libmpich-dev, which configures an /usr/lib/libmpi.so symlink
-  # The symlink causes an mpicc issue with -L/usr/lib linker flag in efa installer v1.12.x + ubuntu1804
-  # Compile slurm with the package to enable mpich binding for slurm, and remove after
-  return unless node['platform_version'] == '18.04'
-
-  package "libmpich-dev" do
-    action :remove
-  end
-end
-
 def configure_gc_thresh_values
   (1..3).each do |i|
     # Configure gc_thresh values to be consistent with alinux2 default values

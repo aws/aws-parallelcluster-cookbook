@@ -435,3 +435,14 @@ bash 'check ipv4 gc_thresh is correctly configured' do
   GC
   user 'root'
 end
+
+##################
+# Verify no MPICH packages
+###################
+bash 'verify no MPICH packages' do
+  code <<-NOMPICH
+    lib64_mpich_libs="$(ls 2>/dev/null /usr/lib64/mpich*)"
+    lib_mpich_libs="$(ls 2>/dev/null /usr/lib/mpich*)"
+    [ -z "${lib64_mpich_libs}" ] && [ -z "${lib_mpich_libs}" ]
+  NOMPICH
+end

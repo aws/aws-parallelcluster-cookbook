@@ -297,7 +297,7 @@ when 'rhel', 'amazon'
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
+                                             httpd boost-devel redhat-lsb mlocate lvm2 R atlas-devel
                                              blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
@@ -333,16 +333,14 @@ when 'debian'
   default['cluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                            tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                            apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
-                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
+                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
                                            r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
                                            libatlas-base-dev libglvnd-dev linux-headers-aws iptables libcurl4-openssl-dev]
 
   case node['platform_version']
   when '18.04'
-    # Install libmpich12 and mpich explicitly to preserve existing behavior
-    # libmpich-dev need to be removed after scheduler compilation due to a compatibility issue with efa installer v1.12.x
-    default['cluster']['base_packages'].push('python-pip', 'python-parted', 'libmpich12', 'mpich')
+    default['cluster']['base_packages'].push('python-pip', 'python-parted')
   when '20.04'
     default['cluster']['base_packages'].push('python3-parted')
   end
