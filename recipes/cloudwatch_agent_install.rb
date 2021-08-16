@@ -44,7 +44,7 @@ package_url = [
   package_url_prefix,
   platform_url_component,
   arch_url_component,
-  node['cfncluster']['cloudwatch']['agent_version'],
+  "latest",
   "amazon-cloudwatch-agent.#{package_extension}"
 ].join('/')
 package_path = "#{node['cfncluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
