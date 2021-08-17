@@ -37,6 +37,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.11.2
 -----
 
+**CHANGES**
+When using a custom AMI with a preinstalled EFA package, no actions are taken at node bootstrap time in case GPUDirect RDMA is enabled. The original EFA package deployment is preserved as during the Image build process.
+
 **BUG FIXES**
 - Lock version of `nvidia-fabricmanager` package to prevent updates and misalignments with NVIDIA drivers
 
