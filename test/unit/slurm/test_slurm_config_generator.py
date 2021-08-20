@@ -14,7 +14,7 @@ def test_generate_slurm_config_files(mocker, test_datadir, tmpdir):
         "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
     template_directory = os.path.dirname(slurm.__file__) + "/templates"
-    generate_slurm_config_files(tmpdir, template_directory, input_file, instance_types_data, dryrun=False)
+    generate_slurm_config_files(tmpdir, template_directory, input_file, instance_types_data, dryrun=False, no_gpu=False)
 
     for queue in ["efa", "gpu", "multiple_spot"]:
         for file_type in ["partition", "gres"]:
