@@ -47,6 +47,13 @@ when 'debian'
   end
 end
 
+# Remove certain dependencies before runtime installation to work
+# around an issue with the EFA installer.
+package 'efa-runtime-deps-to-remove' do
+  action :nothing # only runs when notified by resource that runs EFA installer
+  package_name %w[rdma-core]
+end
+
 installer_options = "-y"
 # skip efa-kmod installation on not supported platforms
 installer_options += " -k" unless node['conditions']['efa_supported']
@@ -63,6 +70,7 @@ bash "install efa" do
     rm -rf #{node['cfncluster']['sources_dir']}/aws-efa-installer
   EFAINSTALL
   not_if { efa_installed && !efa_gdr_enabled? }
+  notifies :remove, 'package[efa-runtime-deps-to-remove]', :before
 end
 
 # EFA installer v1.11.0 removes libibverbs-core, which contains hwloc-devel during install
