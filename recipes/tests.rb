@@ -450,10 +450,12 @@ end
 ##################
 # Verify no FFTW packages
 ###################
-bash 'verify no FFTW packages' do
-  code <<-NOFFTW
-    lib64_fftw_libs="$(ls 2>/dev/null /usr/lib64/libfftw*)"
-    lib_fftw_libs="$(ls 2>/dev/null /usr/lib/libfftw*)"
-    [ -z "${lib64_fftw_libs}" ] && [ -z "${lib_fftw_libs}" ]
-  NOFFTW
+unless node['cluster']['base_os'] == 'centos7'
+  bash 'verify no FFTW packages' do
+    code <<-NOFFTW
+      lib64_fftw_libs="$(ls 2>/dev/null /usr/lib64/libfftw*)"
+      lib_fftw_libs="$(ls 2>/dev/null /usr/lib/libfftw*)"
+      [ -z "${lib64_fftw_libs}" ] && [ -z "${lib_fftw_libs}" ]
+    NOFFTW
+  end
 end
