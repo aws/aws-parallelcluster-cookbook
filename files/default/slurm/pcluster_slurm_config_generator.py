@@ -30,7 +30,9 @@ class CriticalError(Exception):
     pass
 
 
-def generate_slurm_config_files(output_directory, template_directory, input_file, instance_types_data_path, dryrun):
+def generate_slurm_config_files(
+    output_directory, template_directory, input_file, instance_types_data_path, dryrun, no_gpu
+):
     """
     Generate Slurm configuration files.
 
@@ -61,6 +63,8 @@ def generate_slurm_config_files(output_directory, template_directory, input_file
     is_default_queue = True  # The first queue in the queues list is the default queue
     for queue in queues:
         for file_type in ["partition", "gres"]:
+            if file_type == "gres" and no_gpu:
+                continue
             _generate_queue_config(
                 queue["Name"], queue, is_default_queue, file_type, env, pcluster_subdirectory, dryrun
             )
@@ -272,9 +276,21 @@ def main():
             required=False,
             default=False,
         )
+        parser.add_argument(
+            "--no-gpu",
+            action="store_true",
+            help="no gpu configuration",
+            required=False,
+            default=False,
+        )
         args = parser.parse_args()
         generate_slurm_config_files(
-            args.output_directory, args.template_directory, args.input_file, args.instance_types_data, args.dryrun
+            args.output_directory,
+            args.template_directory,
+            args.input_file,
+            args.instance_types_data,
+            args.dryrun,
+            args.no_gpu,
         )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)
