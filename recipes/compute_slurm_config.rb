@@ -35,10 +35,14 @@ mount '/opt/slurm' do
   retry_delay 6
 end
 
-# Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU
+# Check to see if there is GPU on the instance, only execute run_nvidiasmi if there is GPU and nvidia installed
 if graphic_instance?
-  execute "run_nvidiasmi" do
-    command 'nvidia-smi'
+  if nvidia_installed?
+    execute "run_nvidiasmi" do
+      command 'nvidia-smi'
+    end
+  else
+    Chef::Log.warn("GPU instance but no Nvidia drivers found")
   end
 end
 
