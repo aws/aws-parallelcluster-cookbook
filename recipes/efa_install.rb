@@ -47,11 +47,13 @@ when 'debian'
   end
 end
 
-# Remove certain dependencies before runtime installation to work
-# around an issue with the EFA installer.
-package 'efa-runtime-deps-to-remove' do
-  action :nothing # only runs when notified by resource that runs EFA installer
+# Remove certain dependencies before installation to
+# work around an issue with the EFA installer.
+# Without the removal, runtime re-installation of EFA would fail on alinux2.
+package 'uninstall efa deps before installing efa' do
+  action :remove
   package_name %w[rdma-core]
+  only_if { !efa_installed || efa_gdr_enabled? && node['platform_family'] == 'amazon' }
 end
 
 installer_options = "-y"
@@ -69,8 +71,7 @@ bash "install efa" do
     ./efa_installer.sh #{installer_options}
     rm -rf #{node['cfncluster']['sources_dir']}/aws-efa-installer
   EFAINSTALL
-  not_if { efa_installed && !efa_gdr_enabled? }
-  notifies :remove, 'package[efa-runtime-deps-to-remove]', :before
+  only_if { !efa_installed || efa_gdr_enabled? }
 end
 
 # EFA installer v1.11.0 removes libibverbs-core, which contains hwloc-devel during install

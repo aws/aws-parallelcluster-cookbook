@@ -11,7 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Lock the version of ``nvidia-fabricmanager`` package to the installed NVIDIA drivers to prevent updates and misalignments.
-- Workaround EFA installer issue by uninstalling rdma-core before runtime installation.
+- Workaround EFA installer issue by uninstalling rdma-core before installing EFA on alinux2.
 
 2.11.1
 -----
