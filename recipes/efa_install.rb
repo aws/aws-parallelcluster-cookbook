@@ -53,7 +53,7 @@ end
 package 'uninstall efa deps before installing efa' do
   action :remove
   package_name %w[rdma-core]
-  only_if { !efa_installed || efa_gdr_enabled? && node['platform_family'] == 'amazon' }
+  only_if { (!efa_installed || efa_gdr_enabled?) && node['platform_family'] == 'amazon' }
 end
 
 installer_options = "-y"
