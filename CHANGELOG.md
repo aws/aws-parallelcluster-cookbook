@@ -33,6 +33,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA driver to version 470.57.02.
 - Upgrade CUDA library to version 11.4.0.
 - Avoid installing MPICH and FFTW packages.
+- Upgrade EFA installer to version 1.13.0
+  - Update rdma-core to v35.0.
+  - Update libfabric to v1.13.0amzn1.0.
 
 2.11.2
 -----
