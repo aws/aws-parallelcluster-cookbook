@@ -11,7 +11,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade EFA installer to version 1.13.0
   - Update rdma-core to v35.0.
   - Update libfabric to v1.13.0amzn1.0.
-  - Add EFA support for CentOS/RHEL 8 on Gravition2 platform.
 
 **BUG FIXES**
 - Lock the version of ``nvidia-fabricmanager`` package to the installed NVIDIA drivers to prevent updates and misalignments.
