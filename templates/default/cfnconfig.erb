@@ -1,8 +1,8 @@
 stack_name=<%= node['cluster']['stack_name'] %>
 preinstall=<%= node['cluster']['preinstall'] %>
-preinstall_args=<%= node['cluster']['preinstall_args'] %>
+preinstall_args=<%= if node['cluster']['preinstall_args'] == 'NONE' then 'NONE' else '(' + node['cluster']['preinstall_args'] + ')'%>
 postinstall=<%= node['cluster']['postinstall'] %>
-postinstall_args=<%= node['cluster']['postinstall_args'] %>
+postinstall_args=<%= if node['cluster']['postinstall_args'] == 'NONE' then 'NONE' else '(' + node['cluster']['postinstall_args'] + ')'%>
 region=<%= node['cluster']['region'] %>
 scheduler=<%= node['cluster']['scheduler'] %>
 scheduler_slots=<%= node['cluster']['scheduler_slots'] %>
