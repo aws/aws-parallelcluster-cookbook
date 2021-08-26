@@ -5,7 +5,7 @@
 <% when 'MasterServer' -%>
 <% if node['cfncluster']['cfn_scheduler'] == 'slurm' -%>
 [program:cfn-hup]
-command = <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/cfn-hup
+command = bash -c "[ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh; <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cfncluster']['cookbook_virtualenv_path'] %>/bin/cfn-hup"
 # The following are needed because cfn-hup starts as a daemon
 exitcodes = 0
 autorestart = unexpected

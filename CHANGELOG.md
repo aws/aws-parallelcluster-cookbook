@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.11.x
+-----
+
+**BUG FIXES**
+- Fix cluster update when using proxy setup.
+
 2.11.2
 -----
 
