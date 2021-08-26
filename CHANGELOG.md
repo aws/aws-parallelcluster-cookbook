@@ -33,12 +33,18 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA driver to version 470.57.02.
 - Upgrade CUDA library to version 11.4.0.
 - Avoid installing MPICH and FFTW packages.
+- Upgrade EFA installer to version 1.13.0
+  - Update rdma-core to v35.0.
+  - Update libfabric to v1.13.0amzn1.0.
 
 **BUG FIXES**
 - Fix cluster update when using proxy setup
 
 2.11.2
 -----
+
+**CHANGES**
+When using a custom AMI with a preinstalled EFA package, no actions are taken at node bootstrap time in case GPUDirect RDMA is enabled. The original EFA package deployment is preserved as during the Image build process.
 
 **BUG FIXES**
 - Lock version of `nvidia-fabricmanager` package to prevent updates and misalignments with NVIDIA drivers
