@@ -12,23 +12,24 @@ function error_exit () {
 
 function download_run (){
     url=$1
+    shift
     scheme=$(echo "${url}"| cut -d: -f1)
     tmpfile=$(mktemp)
-    trap "/bin/rm $tmpfile" RETURN
+    trap "/bin/rm -f $tmpfile" RETURN
     if [ "${scheme}" == "s3" ]; then
       <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${region} s3 cp ${url} - > $tmpfile || return 1
     else
       wget -qO- ${url} > $tmpfile || return 1
     fi
     chmod +x $tmpfile || return 1
-    $tmpfile $@ || error_exit "Failed to run $ACTION, $file failed with non 0 return code: $?"
+    $tmpfile "$@" || error_exit "Failed to run $ACTION, $file failed with non 0 return code: $?"
 }
 
 function run_preinstall () {
   if [ "${preinstall}" != "NONE" ]; then
     file="${preinstall}"
     if [ "${preinstall_args}" != "NONE" ]; then
-        download_run ${preinstall} ${preinstall_args}
+        download_run ${preinstall} "${preinstall_args[@]}"
     else
         download_run ${preinstall}
     fi
@@ -40,7 +41,7 @@ function run_postinstall () {
   if [ "${postinstall}" != "NONE" ]; then
     file="${postinstall}"
     if [ "${postinstall_args}" != "NONE" ]; then
-        download_run ${postinstall} ${postinstall_args}
+        download_run ${postinstall} "${postinstall_args[@]}"
     else
         download_run ${postinstall}
     fi

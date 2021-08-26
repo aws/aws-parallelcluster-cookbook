@@ -37,6 +37,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Update rdma-core to v35.0.
   - Update libfabric to v1.13.0amzn1.0.
 
+**BUG FIXES**
+- Fix cluster update when using proxy setup
+
 2.11.2
 -----
 
