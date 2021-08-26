@@ -34,6 +34,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 11.4.0.
 - Avoid installing MPICH and FFTW packages.
 
+**BUG FIXES**
+- Fix cluster update when using proxy setup
+
 2.11.2
 -----
 
