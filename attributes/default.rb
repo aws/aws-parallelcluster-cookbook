@@ -411,31 +411,34 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
 default['cluster']['stack_name'] = nil
-default['cluster']['ddb_table'] = nil
-default['cluster']['log_group_name'] = "NONE"
-default['cluster']['node_type'] = nil
 default['cluster']['preinstall'] = 'NONE'
 default['cluster']['preinstall_args'] = 'NONE'
-default['cluster']['proxy'] = 'NONE'
 default['cluster']['postinstall'] = 'NONE'
 default['cluster']['postinstall_args'] = 'NONE'
 default['cluster']['scheduler'] = 'slurm'
 default['cluster']['scheduler_slots'] = 'vcpus'
-default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
-default['cluster']['volume'] = nil
-default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['ebs_shared_dirs'] = '/shared'
-default['cluster']['efs_shared_dir'] = 'NONE'
-default['cluster']['efs_fs_id'] = nil
+default['cluster']['proxy'] = 'NONE'
+default['cluster']['node_type'] = nil
+default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node'] = nil
 default['cluster']['head_node_private_ip'] = nil
+default['cluster']['volume'] = nil
+
+# Other ParallelCluster internal variables
+default['cluster']['ddb_table'] = nil
+default['cluster']['log_group_name'] = "NONE"
+default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['volume_fs_type'] = 'ext4'
+default['cluster']['efs_shared_dir'] = 'NONE'
+default['cluster']['efs_fs_id'] = nil
 default['cluster']['cluster_admin_user'] = 'pcluster-admin'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
 default['cluster']['cluster_admin_group_id'] = node['cluster']['cluster_admin_user_id']
-default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['fsx_options'] = 'NONE'
 default['cluster']['fsx_fs_id'] = nil
 default['cluster']['fsx_dns_name'] = nil
@@ -447,7 +450,6 @@ default['cluster']['raid_vol_ids'] = nil
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
-default['cluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain # ~FC044
