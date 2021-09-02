@@ -1,4 +1,4 @@
-cfn_stack_name=<%= node['cluster']['stack_name'] %>
+stack_name=<%= node['cluster']['stack_name'] %>
 cfn_preinstall=<%= node['cluster']['preinstall'] %>
 cfn_preinstall_args=(<%= node['cluster']['preinstall_args'] %>)
 cfn_postinstall=<%= node['cluster']['postinstall'] %>
@@ -13,10 +13,10 @@ cfn_proxy=<%= node['cluster']['proxy'] %>
 cfn_node_type=<%= node['cluster']['node_type'] %>
 cfn_cluster_user=<%= node['cluster']['cluster_user'] %>
 <% if node['cluster']['node_type'] == 'ComputeFleet' -%>
-  cfn_head_node=<%= node['cluster']['head_node'] %>
-  cfn_head_node_private_ip=<%= node['cluster']['head_node_private_ip'] %>
-  cfn_scheduler_queue_name=<%= node['cluster']['scheduler_queue_name'] %>
+cfn_head_node=<%= node['cluster']['head_node'] %>
+cfn_head_node_private_ip=<%= node['cluster']['head_node_private_ip'] %>
+cfn_scheduler_queue_name=<%= node['cluster']['scheduler_queue_name'] %>
 <% end -%>
 <% if node['cluster']['node_type'] == 'HeadNode' -%>
-  cfn_volume=<%= node['cluster']['volume'] %>
+cfn_volume=<%= node['cluster']['volume'] %>
 <% end -%>
