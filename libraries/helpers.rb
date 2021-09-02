@@ -132,15 +132,12 @@ def graphic_instance?
 end
 
 #
-# Check if the nvidia drive is installed
+# Check if Nvidia driver is installed
 #
 def nvidia_installed?
-  nvidia_installed = Mixlib::ShellOut.new("which nvidia-smi")
-  nvidia_installed.run_command
-
-  Chef::Log.info("Nvidia drive is not installed") if nvidia_installed.stdout.strip.empty?
-
-  !nvidia_installed.stdout.strip.empty?
+  nvidia_installed = ::File.exist?('/usr/bin/nvidia-smi')
+  Chef::Log.warn("Nvidia driver is not installed") unless nvidia_installed
+  nvidia_installed
 end
 
 #

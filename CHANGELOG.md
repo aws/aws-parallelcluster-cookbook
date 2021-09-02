@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.x.x
+------
+
+**CHANGES**
+- Do not configure GPUs in Slurm when Nvidia driver is not installed.
+
 3.0.0
 ------
 
