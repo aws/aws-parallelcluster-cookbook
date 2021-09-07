@@ -1,65 +1,72 @@
 #!/bin/bash
 
-. /etc/parallelcluster/cfnconfig
+cfnconfig_file="/etc/parallelcluster/cfnconfig"
+. ${cfnconfig_file}
+
+# Check expected variables from cfnconfig file
+function check_params () {
+  if [ -z "${cfn_region}" ] || [ -z "${cfn_preinstall}" ] || [ -z "${cfn_preinstall_args}" ] || [ -z "${cfn_postinstall}" ] || [ -z "${cfn_postinstall_args}" ]; then
+    error_exit "One or more required variables from ${cfnconfig_file} file are undefined"
+  fi
+}
 
 # Error exit function
 function error_exit () {
   script=`basename $0`
-  echo "parallelcluster: $script - $1"
-  logger -t parallelcluster "$script - $1"
+  echo "parallelcluster: ${script} - $1"
+  logger -t parallelcluster "${script} - $1"
   exit 1
 }
 
 function download_run (){
     url=$1
+    shift
     scheme=$(echo "${url}"| cut -d: -f1)
     tmpfile=$(mktemp)
-    trap "/bin/rm $tmpfile" RETURN
+    trap "/bin/rm -f $tmpfile" RETURN
     if [ "${scheme}" == "s3" ]; then
-      <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${region} s3 cp ${url} - > $tmpfile || return 1
+      <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
     else
       wget -qO- ${url} > $tmpfile || return 1
     fi
     chmod +x $tmpfile || return 1
-    $tmpfile $@ || error_exit "Failed to run $ACTION, $file failed with non 0 return code: $?"
+    $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${file} failed with non 0 return code: $?"
 }
 
 function run_preinstall () {
-  if [ "${preinstall}" != "NONE" ]; then
-    file="${preinstall}"
-    if [ "${preinstall_args}" != "NONE" ]; then
-        download_run ${preinstall} ${preinstall_args}
+  if [ "${cfn_preinstall}" != "NONE" ]; then
+    file="${cfn_preinstall}"
+    if [ "${cfn_preinstall_args}" != "NONE" ]; then
+        download_run ${cfn_preinstall} "${cfn_preinstall_args[@]}"
     else
-        download_run ${preinstall}
+        download_run ${cfn_preinstall}
     fi
   fi || error_exit "Failed to run preinstall"
 }
 
 function run_postinstall () {
   RC=0
-  if [ "${postinstall}" != "NONE" ]; then
-    file="${postinstall}"
-    if [ "${postinstall_args}" != "NONE" ]; then
-        download_run ${postinstall} ${postinstall_args}
+  if [ "${cfn_postinstall}" != "NONE" ]; then
+    file="${cfn_postinstall}"
+    if [ "${cfn_postinstall_args}" != "NONE" ]; then
+        download_run ${cfn_postinstall} "${cfn_postinstall_args[@]}"
     else
-        download_run ${postinstall}
+        download_run ${cfn_postinstall}
     fi
   fi || error_exit "Failed to run postinstall"
 }
 
-ACTION=${1#?}
+check_params
 
-case $ACTION in
+ACTION=${1#?}
+case ${ACTION} in
   preinstall)
     run_preinstall
     ;;
-
   postinstall)
     run_postinstall
     ;;
-
   *)
     echo "Unknown action. Exit gracefully"
     exit 0
-
 esac
