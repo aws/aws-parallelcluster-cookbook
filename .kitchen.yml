@@ -93,7 +93,7 @@ suites:
         os: <%= ENV['OS'] %>
         dcv_enabled: 'head_node'
         dcv_port: '8443'
-        enable_intel_hpc_platform: 'true'
+        enable_intel_hpc_platform: <%= ENV['ENABLE_INTEL_HPC_PLATFORM'] %>
         enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
