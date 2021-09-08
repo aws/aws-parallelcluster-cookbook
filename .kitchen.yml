@@ -65,13 +65,13 @@ suites:
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
 
-  - name: slurm_config_HeadNode
-    run_list:
+  - name: slurm_config_HeadNode_x86_64
+    run_list: &run_lists_slurm_config_HeadNode
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
-    attributes:
+    attributes: &attributes_slurm_config_HeadNode
       kitchen: true
       cluster:
         node_type: 'HeadNode'
@@ -98,13 +98,17 @@ suites:
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
-  - name: awsbatch_config_HeadNode
-    run_list:
+  - name: slurm_config_HeadNode_arm64
+    run_list: *run_lists_slurm_config_HeadNode
+    attributes: *attributes_slurm_config_HeadNode
+
+  - name: awsbatch_config_HeadNode_x86_64
+    run_list: &run_lists_awsbatch_config_HeadNode
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::awsbatch_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
-    attributes:
+    attributes: &attributes_awsbatch_config_HeadNode
       kitchen: true
       cluster:
         node_type: 'HeadNode'
@@ -127,13 +131,17 @@ suites:
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
-  - name: slurm_config_ComputeFleet
-    run_list:
+  - name: awsbatch_config_HeadNode_arm64
+    run_list: *run_lists_awsbatch_config_HeadNode
+    attributes: *attributes_awsbatch_config_HeadNode
+
+  - name: slurm_config_ComputeFleet_x86_64
+    run_list: &run_lists_slurm_config_ComputeFleet
       - recipe[aws-parallelcluster::prep_env]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
-    attributes:
+    attributes: &attributes_slurm_config_ComputeFleet
       kitchen: true
       cluster:
         node_type: 'ComputeFleet'
@@ -157,3 +165,7 @@ suites:
         enable_efa: 'compute'
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
+
+  - name: slurm_config_ComputeFleet_arm64
+    run_list: *run_lists_slurm_config_ComputeFleet
+    attributes: *attributes_slurm_config_ComputeFleet
