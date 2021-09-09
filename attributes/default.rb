@@ -351,7 +351,8 @@ when 'debian'
   default['cluster']['moduleshome'] = "/usr/share/modules"
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
-  default['cluster']['kernel_generic_pkg'] = "linux-generic"
+  default['cluster']['kernel_headers_pkg'] = "linux-headers"
+  default['cluster']['kernel_headers_pkg']['version'] = node['kernel']['release']
   default['cluster']['chrony']['service'] = "chrony"
   default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
 
