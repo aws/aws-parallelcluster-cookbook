@@ -17,8 +17,8 @@ LVM_PATH="/dev/${LVM_VG_NAME}/${LVM_NAME}"
 LVM_ACTIVE_STATE="a"
 FS_TYPE="ext4"
 MOUNT_OPTIONS="noatime,nodiratime"
-# ephemeral_dir is set by cfnconfig
-INPUT_MOUNTPOINT="${ephemeral_dir}"
+# cfn_ephemeral_dir is set in the environment by cfnconfig sourcing
+INPUT_MOUNTPOINT="${cfn_ephemeral_dir}"
 
 function log {
   SCRIPT=$(basename "$0")

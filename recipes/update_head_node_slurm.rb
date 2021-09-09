@@ -63,11 +63,3 @@ if !File.exist?(node['cluster']['cluster_config_path']) || !FileUtils.identical?
     command "cp #{updated_cluster_config_path} #{node['cluster']['cluster_config_path']}"
   end
 end
-
-execute 'update cluster config hash in DynamoDB' do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
-          " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG_WITH_IMPLIED_VALUES\"}, \"Version\": {\"S\": \"#{node['cluster']['cluster_config_version']}\"}}' --region #{node['cluster']['region']}"
-  retries 3
-  retry_delay 5
-  not_if { node['cluster']['cluster_config_version'].nil? }
-end
