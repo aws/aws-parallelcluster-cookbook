@@ -336,7 +336,7 @@ when 'debian'
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
                                            r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev linux-headers-aws iptables libcurl4-openssl-dev]
+                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev]
 
   case node['platform_version']
   when '18.04'
@@ -351,8 +351,7 @@ when 'debian'
   default['cluster']['moduleshome'] = "/usr/share/modules"
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
-  default['cluster']['kernel_headers_pkg']['name'] = "linux-headers"
-  default['cluster']['kernel_headers_pkg']['version'] = node['kernel']['release']
+  default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
   default['cluster']['chrony']['service'] = "chrony"
   default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
 
