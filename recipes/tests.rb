@@ -435,3 +435,27 @@ bash 'check ipv4 gc_thresh is correctly configured' do
   GC
   user 'root'
 end
+
+##################
+# Verify no MPICH packages
+###################
+bash 'verify no MPICH packages' do
+  code <<-NOMPICH
+    lib64_mpich_libs="$(ls 2>/dev/null /usr/lib64/mpich*)"
+    lib_mpich_libs="$(ls 2>/dev/null /usr/lib/mpich*)"
+    [ -z "${lib64_mpich_libs}" ] && [ -z "${lib_mpich_libs}" ]
+  NOMPICH
+end
+
+##################
+# Verify no FFTW packages
+###################
+unless node['cluster']['base_os'] == 'centos7'
+  bash 'verify no FFTW packages' do
+    code <<-NOFFTW
+      lib64_fftw_libs="$(ls 2>/dev/null /usr/lib64/libfftw*)"
+      lib_fftw_libs="$(ls 2>/dev/null /usr/lib/libfftw*)"
+      [ -z "${lib64_fftw_libs}" ] && [ -z "${lib_fftw_libs}" ]
+    NOFFTW
+  end
+end

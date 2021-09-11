@@ -154,7 +154,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.12.3'
+default['cluster']['efa']['installer_version'] = '1.13.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
@@ -297,8 +297,8 @@ when 'rhel', 'amazon'
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
-                                             blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                             httpd boost-devel redhat-lsb mlocate lvm2 R atlas-devel
+                                             blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
@@ -312,7 +312,7 @@ when 'rhel', 'amazon'
   when 'amazon'
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
+                                             httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
                                              libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                              sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
                                              libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
@@ -333,16 +333,14 @@ when 'debian'
   default['cluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                            tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                            apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
-                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
-                                           r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
+                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
+                                           r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev linux-headers-aws iptables libcurl4-openssl-dev]
+                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev]
 
   case node['platform_version']
   when '18.04'
-    # Install libmpich12 and mpich explicitly to preserve existing behavior
-    # libmpich-dev need to be removed after scheduler compilation due to a compatibility issue with efa installer v1.12.x
-    default['cluster']['base_packages'].push('python-pip', 'python-parted', 'libmpich12', 'mpich')
+    default['cluster']['base_packages'].push('python-pip', 'python-parted')
   when '20.04'
     default['cluster']['base_packages'].push('python3-parted')
   end
@@ -353,7 +351,7 @@ when 'debian'
   default['cluster']['moduleshome'] = "/usr/share/modules"
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
-  default['cluster']['kernel_generic_pkg'] = "linux-generic"
+  default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
   default['cluster']['chrony']['service'] = "chrony"
   default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
 
@@ -413,31 +411,34 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
 default['cluster']['stack_name'] = nil
-default['cluster']['ddb_table'] = nil
-default['cluster']['log_group_name'] = "NONE"
-default['cluster']['node_type'] = nil
 default['cluster']['preinstall'] = 'NONE'
 default['cluster']['preinstall_args'] = 'NONE'
-default['cluster']['proxy'] = 'NONE'
 default['cluster']['postinstall'] = 'NONE'
 default['cluster']['postinstall_args'] = 'NONE'
 default['cluster']['scheduler'] = 'slurm'
 default['cluster']['scheduler_slots'] = 'vcpus'
-default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
-default['cluster']['volume'] = nil
-default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['ebs_shared_dirs'] = '/shared'
-default['cluster']['efs_shared_dir'] = 'NONE'
-default['cluster']['efs_fs_id'] = nil
+default['cluster']['proxy'] = 'NONE'
+default['cluster']['node_type'] = nil
+default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node'] = nil
 default['cluster']['head_node_private_ip'] = nil
+default['cluster']['volume'] = nil
+
+# Other ParallelCluster internal variables
+default['cluster']['ddb_table'] = nil
+default['cluster']['log_group_name'] = "NONE"
+default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['volume_fs_type'] = 'ext4'
+default['cluster']['efs_shared_dir'] = 'NONE'
+default['cluster']['efs_fs_id'] = nil
 default['cluster']['cluster_admin_user'] = 'pcluster-admin'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
 default['cluster']['cluster_admin_group_id'] = node['cluster']['cluster_admin_user_id']
-default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['fsx_options'] = 'NONE'
 default['cluster']['fsx_fs_id'] = nil
 default['cluster']['fsx_dns_name'] = nil
@@ -449,7 +450,6 @@ default['cluster']['raid_vol_ids'] = nil
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
-default['cluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain # ~FC044

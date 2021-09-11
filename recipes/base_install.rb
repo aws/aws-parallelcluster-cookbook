@@ -77,7 +77,7 @@ package "install kernel packages" do
     package_name node['cluster']['kernel_devel_pkg']['name']
     version node['cluster']['kernel_devel_pkg']['version']
   when 'debian'
-    package_name node['cluster']['kernel_generic_pkg']
+    package_name node['cluster']['kernel_headers_pkg']
   end
   retries 3
   retry_delay 5

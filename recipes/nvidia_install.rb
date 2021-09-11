@@ -27,6 +27,11 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     not_if { ::File.exist?('/usr/bin/nvidia-smi') }
   end
 
+  # Make sure nouveau kernel module is unloaded, otherwise installation of NVIDIA driver fails
+  kernel_module 'nouveau' do
+    action :uninstall
+  end
+
   # Install NVIDIA driver
   bash 'nvidia.run advanced' do
     user 'root'
@@ -34,7 +39,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      ./nvidia.run --silent --dkms
+      ./nvidia.run --silent --dkms --disable-nouveau
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
