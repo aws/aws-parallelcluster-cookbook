@@ -27,6 +27,11 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     not_if { ::File.exist?('/usr/bin/nvidia-smi') }
   end
 
+  # Make sure nouveau kernel module is unloaded, otherwise installation of NVIDIA driver fails
+  kernel_module 'nouveau' do
+    action :uninstall
+  end
+
   # Install NVIDIA driver
   bash 'nvidia.run advanced' do
     user 'root'
@@ -34,7 +39,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      ./nvidia.run --silent --dkms
+      ./nvidia.run --silent --dkms --disable-nouveau
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
@@ -88,8 +93,19 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     "/"
   )
 
-  package node['cluster']['nvidia']['fabricmanager']['package'] do
-    version node['cluster']['nvidia']['fabricmanager']['version']
+  if node['platform'] == 'ubuntu'
+    # For ubuntu, CINC17 apt-package resources need full versions for `version`
+    execute "install_fabricmanager_for_ubuntu" do
+      command "apt -y install #{node['cluster']['nvidia']['fabricmanager']['package']}=#{node['cluster']['nvidia']['fabricmanager']['version']} "\
+              "&& apt-mark hold #{node['cluster']['nvidia']['fabricmanager']['package']}"
+      retries 3
+      retry_delay 5
+    end
+  else
+    package node['cluster']['nvidia']['fabricmanager']['package'] do
+      version node['cluster']['nvidia']['fabricmanager']['version']
+      action %i[install lock]
+    end
   end
 
   remove_package_repository("nvidia-fm-repo")

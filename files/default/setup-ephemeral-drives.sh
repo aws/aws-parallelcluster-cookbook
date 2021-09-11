@@ -17,8 +17,8 @@ LVM_PATH="/dev/${LVM_VG_NAME}/${LVM_NAME}"
 LVM_ACTIVE_STATE="a"
 FS_TYPE="ext4"
 MOUNT_OPTIONS="noatime,nodiratime"
-# ephemeral_dir is set by cfnconfig
-INPUT_MOUNTPOINT="${ephemeral_dir}"
+# cfn_ephemeral_dir is set in the environment by cfnconfig sourcing
+INPUT_MOUNTPOINT="${cfn_ephemeral_dir}"
 
 function log {
   SCRIPT=$(basename "$0")
@@ -168,7 +168,7 @@ function mount_lvm {
   if [[ -z ${LVM_MOUNTPOINT} ]]; then
     log "LVM (${LVM_PATH}) not mounted, mounting on (${INPUT_MOUNTPOINT})"
     # create mount
-    chmod 1777 "${INPUT_MOUNTPOINT}"
+    mkdir -p "${INPUT_MOUNTPOINT}"
     LVM_MOUNT_COMMAND="mount -v -t ${FS_TYPE} -o ${MOUNT_OPTIONS} ${LVM_PATH} ${INPUT_MOUNTPOINT}"
     if ! ${LVM_MOUNT_COMMAND}; then
       error_exit "Failed to mount LVM"

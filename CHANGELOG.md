@@ -3,12 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-
 3.0.0
 ------
 
 **ENHANCEMENTS**
 - Support restart/reboot for instance type with instance store (ephemeral drives).
+- Compile Slurm with jobcomp/elasticsearch support.
 
 **CHANGES**
 - Drop support for SGE and Torque schedulers.
@@ -27,10 +27,43 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for iptables restore on instance reboot.
 - Allow IMDS access for dcv user when dcv is enabled.
 - Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem
-- Upgrade NICE DCV to version 2021.1-10598.
+- Upgrade NICE DCV to version 2021.1-10851.
 - Upgrade Slurm to version 20.11.8
+- Upgrade Cinc Client to version 17.2.29.
 - Upgrade NVIDIA driver to version 470.57.02.
 - Upgrade CUDA library to version 11.4.0.
+- Avoid installing MPICH and FFTW packages.
+- Upgrade EFA installer to version 1.13.0
+  - Update rdma-core to v35.0.
+  - Update libfabric to v1.13.0amzn1.0.
+
+**BUG FIXES**
+- Fix cluster update when using proxy setup
+
+2.11.2
+-----
+
+**CHANGES**
+When using a custom AMI with a preinstalled EFA package, no actions are taken at node bootstrap time in case GPUDirect RDMA is enabled. The original EFA package deployment is preserved as during the Image build process.
+
+**BUG FIXES**
+- Lock version of `nvidia-fabricmanager` package to prevent updates and misalignments with NVIDIA drivers
+
+2.11.1
+-----
+
+**ENHANCEMENTS**
+- Retry failed installations of aws-parallelcluster package on head node of clusters using AWS Batch as the scheduler.
+
+**CHANGES**
+- Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem.
+- Upgrade EFA installer to version 1.12.3
+  - EFA configuration: ``efa-config-1.9`` (from ``efa-config-1.8-1``)
+  - EFA kernel module: ``efa-1.13.0`` (from ``efa-1.12.3``)
+
+**BUG FIXES**
+- Pin to version 1.247347 of the CloudWatch agent due to performance impact of latest CW agent version 1.247348.
+- Avoid failures when building SGE using instance type with vCPU >=32.
 
 2.11.0
 -----

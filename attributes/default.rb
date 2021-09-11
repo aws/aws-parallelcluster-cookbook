@@ -154,7 +154,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.12.3'
+default['cluster']['efa']['installer_version'] = '1.13.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
@@ -162,28 +162,28 @@ default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
-default['cluster']['dcv']['version'] = '2021.1-10598'
+default['cluster']['dcv']['version'] = '2021.1-10851'
 if arm_instance?
   default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "ff4dc78b76043b8137c3ff89a0ecdfe81247fd4684ce1de0424088e7981ef7bc"
+      '~>7' => "41713fc864e260a5ad6c4ffd53a1a497fb3c3fe316b74a947ad2eac8f2c1b330"
     },
-    'amazon' => { '2' => "ff4dc78b76043b8137c3ff89a0ecdfe81247fd4684ce1de0424088e7981ef7bc" },
-    'ubuntu' => { '18.04' => "0a4d42793f6b0c98f77ac39606ef6f18b9397fcdc4977232310d3d12928918b4" }
+    'amazon' => { '2' => "41713fc864e260a5ad6c4ffd53a1a497fb3c3fe316b74a947ad2eac8f2c1b330" },
+    'ubuntu' => { '18.04' => "06e55124769ae2a5314b0c5e6335cb53b3d9ae95d18776eb5cc9cb6debe512a1" }
   )
 else
   default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 ubuntu20 amazon2]
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "a84331bc8ac31a0cdfe0d274d8520fffe01dc16c2d51824a87902ce2f764fe2f"
+      '~>7' => "509ed64c248ac0c09c3f4b0b67231fbda9e27bc902539cca7d0be0dca465ad8a"
     },
-    'amazon' => { '2' => "a84331bc8ac31a0cdfe0d274d8520fffe01dc16c2d51824a87902ce2f764fe2f" },
+    'amazon' => { '2' => "509ed64c248ac0c09c3f4b0b67231fbda9e27bc902539cca7d0be0dca465ad8a" },
     'ubuntu' => {
-      '18.04' => "173b54c4bbec1c5658e60340d1b0aa40b488bf31be6ce2360116631bfdaa1f5f",
-      '20.04' => "97fae50ab3d27f302e5d935d646b853173bf654ba1034fa8d0508ae4e76050e2"
+      '18.04' => "8015f5c55f0e763b1dda7749761149e181a751dc1ea5e8f519a9b500e3f0893d",
+      '20.04' => "767a15a5f9923e988ef2b000ad546af5a1648142636dc1df79adc0fd795151f2"
     }
   )
 end
@@ -200,7 +200,7 @@ default['cluster']['dcv']['package'] = value_for_platform(
     'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}"
   }
 )
-default['cluster']['dcv']['server']['version'] = '2021.1.10598-1'
+default['cluster']['dcv']['server']['version'] = '2021.1.10851-1'
 default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
     '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
@@ -297,11 +297,11 @@ when 'rhel', 'amazon'
   when 'centos', 'redhat', 'scientific' # ~FC024
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel redhat-lsb mlocate lvm2 mpich-devel R atlas-devel
-                                             blas-devel fftw-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
+                                             httpd boost-devel redhat-lsb mlocate lvm2 R atlas-devel
+                                             blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables]
+                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
@@ -312,14 +312,14 @@ when 'rhel', 'amazon'
   when 'amazon'
     default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel system-lsb mlocate atlas-devel fftw-devel glibc-static iproute
+                                             httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
                                              libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
                                              sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
                                              libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
                                              rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                              gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                              jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                             librdmacm-utils python3 python3-pip iptables]
+                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']
@@ -333,16 +333,14 @@ when 'debian'
   default['cluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                            tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                            apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
-                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 libmpich-dev python
-                                           r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
+                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
+                                           r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev linux-headers-aws iptables]
+                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev]
 
   case node['platform_version']
   when '18.04'
-    # Install libmpich12 and mpich explicitly to preserve existing behavior
-    # libmpich-dev need to be removed after scheduler compilation due to a compatibility issue with efa installer v1.12.x
-    default['cluster']['base_packages'].push('python-pip', 'python-parted', 'libmpich12', 'mpich')
+    default['cluster']['base_packages'].push('python-pip', 'python-parted')
   when '20.04'
     default['cluster']['base_packages'].push('python3-parted')
   end
@@ -353,7 +351,7 @@ when 'debian'
   default['cluster']['moduleshome'] = "/usr/share/modules"
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
-  default['cluster']['kernel_generic_pkg'] = "linux-generic"
+  default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
   default['cluster']['chrony']['service'] = "chrony"
   default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
 
@@ -413,31 +411,34 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
 default['cluster']['stack_name'] = nil
-default['cluster']['ddb_table'] = nil
-default['cluster']['log_group_name'] = "NONE"
-default['cluster']['node_type'] = nil
 default['cluster']['preinstall'] = 'NONE'
 default['cluster']['preinstall_args'] = 'NONE'
-default['cluster']['proxy'] = 'NONE'
 default['cluster']['postinstall'] = 'NONE'
 default['cluster']['postinstall_args'] = 'NONE'
 default['cluster']['scheduler'] = 'slurm'
 default['cluster']['scheduler_slots'] = 'vcpus'
-default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
-default['cluster']['volume'] = nil
-default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['ebs_shared_dirs'] = '/shared'
-default['cluster']['efs_shared_dir'] = 'NONE'
-default['cluster']['efs_fs_id'] = nil
+default['cluster']['proxy'] = 'NONE'
+default['cluster']['node_type'] = nil
+default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node'] = nil
 default['cluster']['head_node_private_ip'] = nil
+default['cluster']['volume'] = nil
+
+# Other ParallelCluster internal variables
+default['cluster']['ddb_table'] = nil
+default['cluster']['log_group_name'] = "NONE"
+default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['volume_fs_type'] = 'ext4'
+default['cluster']['efs_shared_dir'] = 'NONE'
+default['cluster']['efs_fs_id'] = nil
 default['cluster']['cluster_admin_user'] = 'pcluster-admin'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
 default['cluster']['cluster_admin_group_id'] = node['cluster']['cluster_admin_user_id']
-default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['fsx_options'] = 'NONE'
 default['cluster']['fsx_fs_id'] = nil
 default['cluster']['fsx_dns_name'] = nil
@@ -449,7 +450,6 @@ default['cluster']['raid_vol_ids'] = nil
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
-default['cluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain # ~FC044
@@ -463,4 +463,4 @@ default['cluster']['instance_types_data'] = nil
 # IMDS
 default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
-default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node'
+default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
