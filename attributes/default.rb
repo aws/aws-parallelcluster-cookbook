@@ -101,10 +101,10 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # Python packages
-default['cluster']['parallelcluster-version'] = '3.0.0b1'
-default['cluster']['parallelcluster-cookbook-version'] = '3.0.0b1'
-default['cluster']['parallelcluster-node-version'] = '3.0.0b1'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0b1'
+default['cluster']['parallelcluster-version'] = '3.0.0'
+default['cluster']['parallelcluster-cookbook-version'] = '3.0.0'
+default['cluster']['parallelcluster-node-version'] = '3.0.0'
+default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 
 # URLs to software packages used during install recipes
 # Slurm software
@@ -336,7 +336,7 @@ when 'debian'
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
                                            r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev linux-headers-aws iptables libcurl4-openssl-dev]
+                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev]
 
   case node['platform_version']
   when '18.04'
@@ -351,7 +351,7 @@ when 'debian'
   default['cluster']['moduleshome'] = "/usr/share/modules"
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
-  default['cluster']['kernel_generic_pkg'] = "linux-generic"
+  default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
   default['cluster']['chrony']['service'] = "chrony"
   default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
 
@@ -411,31 +411,34 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
 default['cluster']['stack_name'] = nil
-default['cluster']['ddb_table'] = nil
-default['cluster']['log_group_name'] = "NONE"
-default['cluster']['node_type'] = nil
 default['cluster']['preinstall'] = 'NONE'
 default['cluster']['preinstall_args'] = 'NONE'
-default['cluster']['proxy'] = 'NONE'
 default['cluster']['postinstall'] = 'NONE'
 default['cluster']['postinstall_args'] = 'NONE'
 default['cluster']['scheduler'] = 'slurm'
 default['cluster']['scheduler_slots'] = 'vcpus'
-default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
-default['cluster']['volume'] = nil
-default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['ebs_shared_dirs'] = '/shared'
-default['cluster']['efs_shared_dir'] = 'NONE'
-default['cluster']['efs_fs_id'] = nil
+default['cluster']['proxy'] = 'NONE'
+default['cluster']['node_type'] = nil
+default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node'] = nil
 default['cluster']['head_node_private_ip'] = nil
+default['cluster']['volume'] = nil
+
+# Other ParallelCluster internal variables
+default['cluster']['ddb_table'] = nil
+default['cluster']['log_group_name'] = "NONE"
+default['cluster']['disable_hyperthreading_manually'] = 'false'
+default['cluster']['volume_fs_type'] = 'ext4'
+default['cluster']['efs_shared_dir'] = 'NONE'
+default['cluster']['efs_fs_id'] = nil
 default['cluster']['cluster_admin_user'] = 'pcluster-admin'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
 default['cluster']['cluster_admin_group_id'] = node['cluster']['cluster_admin_user_id']
-default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['fsx_options'] = 'NONE'
 default['cluster']['fsx_fs_id'] = nil
 default['cluster']['fsx_dns_name'] = nil
@@ -447,7 +450,6 @@ default['cluster']['raid_vol_ids'] = nil
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
-default['cluster']['scheduler_queue_name'] = nil
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain # ~FC044
