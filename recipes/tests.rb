@@ -58,6 +58,9 @@ end
 # Slurm
 ###################
 if node['cluster']['scheduler'] == 'slurm'
+  execute 'check munge service is enabled' do
+    command "systemctl is-enabled munge"
+  end
   case node['cluster']['node_type']
   when 'HeadNode'
     execute 'execute sinfo' do
@@ -85,6 +88,9 @@ if node['cluster']['scheduler'] == 'slurm'
     end
     execute 'ensure-pmix-shared-library-can-be-found' do
       command '/opt/pmix/bin/pmix_info'
+    end
+    execute 'check slurmctld service is enabled' do
+      command "systemctl is-enabled slurmctld"
     end
   when 'ComputeFleet'
     execute 'ls slurm root' do
@@ -128,6 +134,10 @@ execute 'check chrony running' do
   command chrony_check_command
 end
 
+execute 'check chrony service is enabled' do
+  command "systemctl is-enabled #{node['cluster']['chrony']['service']}"
+end
+
 execute 'check chrony conf' do
   command "chronyc waitsync 30; chronyc tracking | grep -i reference | grep 169.254.169.123"
   user node['cluster']['cluster_user']
@@ -155,6 +165,9 @@ if node['cluster']['node_type'] == "HeadNode" &&
 end
 
 if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "HeadNode"
+  execute 'check dcvserver service is enabled' do
+    command "systemctl is-enabled dcvserver"
+  end
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
@@ -369,6 +382,9 @@ bash 'test instance store' do
   EPHEMERAL
   user node['cluster']['cluster_user']
 end
+execute 'check setup-ephemeral service is enabled' do
+  command "systemctl is-enabled setup-ephemeral"
+end
 
 ###################
 # Pcluster AWSBatch CLI
@@ -458,4 +474,19 @@ unless node['cluster']['base_os'] == 'centos7'
       [ -z "${lib64_fftw_libs}" ] && [ -z "${lib_fftw_libs}" ]
     NOFFTW
   end
+end
+
+###################
+# Verify required service are enabled
+###################
+if node['cluster']['node_type'] == 'HeadNode'
+  execute 'check parallelcluster-iptables service is enabled' do
+    command "systemctl is-enabled parallelcluster-iptables"
+  end
+end
+execute 'check supervisord service is enabled' do
+  command "systemctl is-enabled supervisord"
+end
+execute 'check ec2blkdev service is enabled' do
+  command "systemctl is-enabled ec2blkdev"
 end

@@ -174,13 +174,14 @@ cookbook_file "supervisord.conf" do
   mode "0644"
 end
 
-# Put init script in place
-template "supervisord-init" do
-  source 'supervisord-init.erb'
-  path "/etc/init.d/supervisord"
+# Put supervisord service in place
+template "supervisord-service" do
+  source 'supervisord-service.erb'
+  path "/etc/systemd/system/supervisord.service"
   owner "root"
   group "root"
-  mode "0755"
+  mode "0644"
+  only_if { node['init_package'] == 'systemd' }
 end
 
 # AMI cleanup script
