@@ -8,16 +8,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Change supervisord service script from SysVinit to Systemd.
+- Drop support for SysVinit. Only Systemd is supported.
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
 - 
 **BUG FIXES**
 - Fix supervisord service not enabled on Ubuntu.
-
-3.x.x
-------
-
-**CHANGES**
-- Do not configure GPUs in Slurm when Nvidia driver is not installed.
 
 3.0.0
 ------

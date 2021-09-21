@@ -105,24 +105,15 @@ end
 ###################
 # Amazon Time Sync
 ###################
-case node['init_package']
-when 'init'
-  get_chrony_status_command = "service #{node['cluster']['chrony']['service']} status"
-when 'systemd'
-  # $ systemctl show -p SubState <service>
-  # SubState=Running
-  get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
-end
+get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
+# $ systemctl show -p SubState <service>
+# SubState=Running
+
 chrony_check_command = "#{get_chrony_status_command} | grep -i running"
 
 ruby_block 'log_chrony_status' do
   block do
-    case node['init_package']
-    when 'init'
-      get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cluster']['chrony']['service']}'"
-    when 'systemd'
-      get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
-    end
+    get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
     chrony_log = shell_out!(get_chrony_service_log_command).stdout
     Chef::Log.debug("chrony service log: #{chrony_log}")
     chrony_status = shell_out!(get_chrony_status_command).stdout
@@ -181,7 +172,7 @@ if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "hea
       command "systemctl show -p SubState gdm | grep -i running"
     end
   end
-elsif node['init_package'] == 'systemd' && node['conditions']['ami_bootstrapped']
+elsif node['conditions']['ami_bootstrapped']
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i multi-user.target"
   end
