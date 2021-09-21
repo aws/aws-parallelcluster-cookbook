@@ -127,7 +127,6 @@ cookbook_file 'setup-ephemeral.service' do
   owner 'root'
   group 'root'
   mode '0644'
-  only_if { node['init_package'] == 'systemd' }
 end
 
 include_recipe 'aws-parallelcluster::ec2_udev_rules'
@@ -181,7 +180,6 @@ template "supervisord-service" do
   owner "root"
   group "root"
   mode "0644"
-  only_if { node['init_package'] == 'systemd' }
 end
 
 # AMI cleanup script

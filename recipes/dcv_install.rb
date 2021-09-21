@@ -226,7 +226,7 @@ if node['conditions']['dcv_supported']
 end
 
 # Switch runlevel to multi-user.target for official ami
-if node['cluster']['is_official_ami_build'] && node['init_package'] == 'systemd'
+if node['cluster']['is_official_ami_build']
   execute "set default systemd runlevel to multi-user.target" do
     command "systemctl set-default multi-user.target"
   end
