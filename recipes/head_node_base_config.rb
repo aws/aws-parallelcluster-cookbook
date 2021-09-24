@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # Get VPC CIDR
-node.default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_ipv4_cidr_blocks(node['macaddress'])
+node.default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_cidr_list
 
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
@@ -174,4 +174,4 @@ if node['cluster']['dcv_enabled'] == "head_node"
 end
 
 # IMDS
-include_recipe 'aws-parallelcluster::imds_config'
+include_recipe 'aws-parallelcluster::imds_config' if not virtualized?

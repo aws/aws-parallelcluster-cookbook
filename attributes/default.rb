@@ -275,6 +275,8 @@ default['cluster']['filehandle_limit'] = 10_000
 default['cluster']['memory_limit'] = 'unlimited'
 
 # Platform defaults
+#
+default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
 case node['platform_family']
 when 'rhel', 'amazon'
 

@@ -98,11 +98,7 @@ end
 # Get vpc-ipv4-cidr-blocks
 #
 def get_vpc_ipv4_cidr_blocks(eth0_mac)
-  token = get_metadata_token
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{eth0_mac.downcase}/vpc-ipv4-cidr-blocks")
-  vpc_ipv4_cidr_blocks = get_metadata_with_token(token, uri)
-  # Parse into array
-
+  vpc_ipv4_cidr_blocks = node['ec2']['network_interfaces_macs'][eth0_mac.downcase]['vpc_ipv4_cidr_blocks']
   vpc_ipv4_cidr_blocks.split("\n")
 end
 
@@ -279,6 +275,13 @@ end
 #
 def arm_instance?
   node['kernel']['machine'] == 'aarch64'
+end
+
+#
+# Check if we are running in a virtualized environment
+#
+def virtualized?
+  node.include?('virtualized') and node['virtualized']
 end
 
 #
@@ -696,20 +699,10 @@ def get_system_users
   cmd.stdout.split(/\n+/)
 end
 
-# Return the VPC CIDR list from IMDS
+# Return the VPC CIDR list from node info
 def get_vpc_cidr_list
-  imds_ip = '169.254.169.254'
-  curl_options = '--retry 3 --retry-delay 0 --silent --fail'
-
-  token = run_command("curl http://#{imds_ip}/latest/api/token -X PUT -H 'X-aws-ec2-metadata-token-ttl-seconds: 300' #{curl_options}")
-  raise('Unable to retrieve token from EC2 meta-data') if token.empty?
-
-  mac = run_command("curl http://#{imds_ip}/latest/meta-data/mac -H 'X-aws-ec2-metadata-token: #{token}' #{curl_options}")
-  raise('Unable to retrieve MAC address from EC2 meta-data') if mac.empty?
-
-  vpc_cidr_list = run_command("curl http://#{imds_ip}/latest/meta-data/network/interfaces/macs/#{mac}/vpc-ipv4-cidr-blocks -H 'X-aws-ec2-metadata-token: #{token}' #{curl_options}")
-  raise('Unable to retrieve VPC CIDR list from EC2 meta-data') if vpc_cidr_list.empty?
-
+  mac = node['ec2']['mac']
+  vpc_cidr_list = node['ec2']['network_interfaces_macs'][mac]['vpc_ipv4_cidr_blocks']
   vpc_cidr_list.split(/\n+/)
 end
 

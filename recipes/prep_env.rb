@@ -75,7 +75,7 @@ include_recipe "aws-parallelcluster::setup_python"
 include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 
 # Configure additional Networking Interfaces (if present)
-include_recipe "aws-parallelcluster::network_interfaces_config"
+include_recipe "aws-parallelcluster::network_interfaces_config" if not virtualized?
 
 include_recipe "aws-parallelcluster::prep_env_slurm" if node['cluster']['scheduler'] == 'slurm'
 
