@@ -1,0 +1,35 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND noninteractive
+
+# prep env so that required packages are cached
+RUN apt-get -y update && apt upgrade -y && \
+    apt-get -y install sudo build-essential curl wget jq nfs-common nfs-kernel-server udev
+
+# get packages that will be installed during bootstrapping
+RUN apt-get -y install vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools \
+               libhwloc-dev dkms tcl-dev automake autoconf libtool librrd-dev       \
+               libapr1-dev libconfuse-dev apache2 libboost-dev libdb-dev tcsh       \
+               libncurses5-dev libpam0g-dev libxt-dev libmotif-dev libxmu-dev       \
+               libxft-dev libhwloc-dev man-db lvm2 python r-base libblas-dev        \
+               libffi-dev libxml2-dev mdadm libgcrypt20-dev libmysqlclient-dev      \
+               libevent-dev iproute2 python3 python3-pip libatlas-base-dev          \
+               libglvnd-dev linux-headers-aws iptables libcurl4-openssl-dev         \
+               python3-parted
+
+# required for DCV
+RUN apt-get -y install whoopsie
+RUN apt-get -y install ubuntu-desktop mesa-utils
+
+WORKDIR build
+
+COPY system_tests/install_cinc.sh install_cinc.sh
+RUN ./install_cinc.sh
+
+COPY . /tmp/cookbooks
+COPY system_tests/image_dna.json /etc/parallelcluster/image_dna.json
+
+COPY system_tests/test_attributes.rb test_attributes.rb
+
+COPY system_tests/bootstrap.sh bootstrap.sh
+RUN ./bootstrap.sh

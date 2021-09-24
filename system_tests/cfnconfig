@@ -1,0 +1,15 @@
+stack_name=pc3ubuntu
+cfn_preinstall=NONE
+cfn_preinstall_args=(NONE)
+cfn_postinstall=NONE
+cfn_postinstall_args=(NONE)
+cfn_region=us-east-2
+cfn_scheduler=slurm
+cfn_scheduler_slots=vcpus
+cfn_instance_slots=2
+cfn_ephemeral_dir=/scratch
+cfn_ebs_shared_dirs=NONE,NONE,NONE,NONE,NONE
+cfn_proxy=NONE
+cfn_node_type=HeadNode
+cfn_cluster_user=ubuntu
+cfn_volume=NONE
