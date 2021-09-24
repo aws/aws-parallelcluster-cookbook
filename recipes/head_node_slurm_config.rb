@@ -85,7 +85,6 @@ if not virtualized?
   end
 end
 
-<<<<<<< Updated upstream
 if not virtualized?
 execute 'initialize compute fleet status in DynamoDB' do
   # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
@@ -98,7 +97,6 @@ end
 
 
 # Generate pcluster specific configs
-<<<<<<< Updated upstream
 if not virtualized?
 no_gpu = nvidia_installed? ? "" : "--no-gpu"
 execute "generate_pcluster_slurm_configs" do
