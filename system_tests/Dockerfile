@@ -34,8 +34,6 @@ RUN ./install_cinc.sh
 
 # customization for build for docker environment
 COPY . /tmp/cookbooks
-COPY system_tests/image_dna.json /etc/parallelcluster/image_dna.json
-COPY system_tests/test_attributes.rb test_attributes.rb
 
 COPY system_tests/bootstrap.sh bootstrap.sh
 RUN ./bootstrap.sh

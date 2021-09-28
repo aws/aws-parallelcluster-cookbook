@@ -18,15 +18,19 @@ function mock(){
 
 function unmock(){
     path=$1
-    if [ -e $path.bak ]; then
-        mv ${path}.bak ${path}
-    else
-        rm ${path}
-    fi
+    for path in "${mock_list[@]}"; do
+        if [ -e $path.bak ]; then
+            mv ${path}.bak ${path}
+        else
+            rm ${path}
+        fi
+    done
 }
 
 cd /tmp/cookbooks
-cp /build/test_attributes.rb /tmp/cookbooks/attributes
+cp system_tests/test_attributes.rb ./attributes
+mkdir -p /etc/parallelcluster
+cp system_tests/image_dna.json /etc/parallelcluster/image_dna.json
 LANG=en_US.UTF-8 /opt/cinc/embedded/bin/berks vendor /etc/chef/cookbooks --delete || (echo 'Vendoring cookbook failed.' && exit 1)
 
 # Mock aspects of the system so that recipes run and complete cleanly
@@ -40,9 +44,6 @@ for mock_path in "${mocks[@]}"; do
     mock $mock_path
 done
 
-premock /usr/bin/systemctl
-cp /build/system_tests/systemctl /usr/bin/systemctl
-
 echo "cookbook_path [\"/etc/chef/cookbooks\"]" > /etc/chef/client.rb
 
 mkdir -p /lib/modules/`uname -r`
@@ -50,5 +51,5 @@ apt install linux-modules-`uname -r`
 
 chef-client --local-mode --config /etc/chef/client.rb --log_level info --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/parallelcluster/image_dna.json --override-runlist aws-parallelcluster::default
 
+# disabling unmocking for configuration run
 # unmock
-#rm /usr/local/sbin/modprobe /usr/local/sbin/sysctl /usr/local/sbin/udevadm
