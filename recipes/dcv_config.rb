@@ -64,9 +64,6 @@ def allow_gpu_acceleration
 end
 
 if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadNode"
-  # be sure to have DCV packages installed
-  include_recipe "aws-parallelcluster::dcv_install"
-
   node.default['cluster']['dcv']['is_graphic_instance'] = graphic_instance?
 
   if node.default['cluster']['dcv']['is_graphic_instance']

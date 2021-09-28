@@ -69,8 +69,6 @@ template "/opt/parallelcluster/scripts/fetch_and_run" do
   mode "0755"
 end
 
-include_recipe "aws-parallelcluster::setup_python"
-
 # Install cloudwatch, write configuration and start it.
 include_recipe "aws-parallelcluster::cloudwatch_agent_config"
 

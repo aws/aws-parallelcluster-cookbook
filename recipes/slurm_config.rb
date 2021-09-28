@@ -16,7 +16,6 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::slurm_install'
 
 case node['cluster']['node_type']
 when 'HeadNode'

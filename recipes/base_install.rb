@@ -18,8 +18,6 @@
 include_recipe "aws-parallelcluster::setup_envars"
 include_recipe "aws-parallelcluster::sudoers_install"
 
-return if node['conditions']['ami_bootstrapped']
-
 include_recipe "aws-parallelcluster::cluster_admin_user_install"
 
 case node['platform_family']
@@ -58,7 +56,7 @@ directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
 
 build_essential
-include_recipe "aws-parallelcluster::setup_python"
+include_recipe "aws-parallelcluster::python_install"
 
 # Install lots of packages
 package node['cluster']['base_packages'] do

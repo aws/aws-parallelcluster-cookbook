@@ -16,7 +16,6 @@
 # limitations under the License.
 
 include_recipe "aws-parallelcluster::setup_envars"
-include_recipe 'aws-parallelcluster::base_install'
 include_recipe 'aws-parallelcluster::openssh_config'
 
 # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
@@ -26,7 +25,7 @@ if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 20
   end
 end
 
-include_recipe 'aws-parallelcluster::nfs_config'
+include_recipe 'aws-parallelcluster::nfs_config' unless virtualized?
 
 service "setup-ephemeral" do
   supports restart: false
@@ -83,4 +82,4 @@ include_recipe 'aws-parallelcluster::efs_mount'
 include_recipe 'aws-parallelcluster::fsx_mount'
 
 # Intel Runtime Libraries
-include_recipe "aws-parallelcluster::intel_install"
+include_recipe "aws-parallelcluster::intel_config"
