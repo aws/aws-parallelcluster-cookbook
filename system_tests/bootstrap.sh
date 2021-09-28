@@ -40,6 +40,9 @@ for mock_path in "${mocks[@]}"; do
     mock $mock_path
 done
 
+premock /usr/bin/systemctl
+cp /build/system_tests/systemctl /usr/bin/systemctl
+
 echo "cookbook_path [\"/etc/chef/cookbooks\"]" > /etc/chef/client.rb
 
 mkdir -p /lib/modules/`uname -r`

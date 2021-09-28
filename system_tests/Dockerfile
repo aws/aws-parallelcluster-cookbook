@@ -1,6 +1,7 @@
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND noninteractive
+ENV KERNEL_RELEASE 5.11.0-1017-aws
 
 # prep env so that required packages are cached
 RUN apt-get -y update && apt upgrade -y && \
@@ -21,14 +22,19 @@ RUN apt-get -y install vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-to
 RUN apt-get -y install whoopsie
 RUN apt-get -y install ubuntu-desktop mesa-utils
 
+# install kernel modules / image for EFA installation
+RUN mkdir -p /lib/modules/`uname -r` && apt-get install -y linux-modules-`uname -r`
+RUN apt-get -y install linux-image-${KERNEL_RELEASE}
+
 WORKDIR build
 
+# install CINC
 COPY system_tests/install_cinc.sh install_cinc.sh
 RUN ./install_cinc.sh
 
+# customization for build for docker environment
 COPY . /tmp/cookbooks
 COPY system_tests/image_dna.json /etc/parallelcluster/image_dna.json
-
 COPY system_tests/test_attributes.rb test_attributes.rb
 
 COPY system_tests/bootstrap.sh bootstrap.sh
