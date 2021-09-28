@@ -86,23 +86,24 @@ if not virtualized?
 end
 
 if not virtualized?
-execute 'initialize compute fleet status in DynamoDB' do
-  # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
-          " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}, \"LastUpdatedTime\": {\"S\": \"#{Time.now.utc}\"}}'"\
-          " --region #{node['cluster']['region']}"
-  retries 3
-  retry_delay 5
+  execute 'initialize compute fleet status in DynamoDB' do
+    # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+            " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}, \"LastUpdatedTime\": {\"S\": \"#{Time.now.utc}\"}}'"\
+            " --region #{node['cluster']['region']}"
+    retries 3
+    retry_delay 5
+  end
 end
 
 
 # Generate pcluster specific configs
 if not virtualized?
-no_gpu = nvidia_installed? ? "" : "--no-gpu"
-execute "generate_pcluster_slurm_configs" do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-          " --output-directory /opt/slurm/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
-          " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']} #{no_gpu}"
+  no_gpu = nvidia_installed? ? "" : "--no-gpu"
+  execute "generate_pcluster_slurm_configs" do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
+            " --output-directory /opt/slurm/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
+            " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']} #{no_gpu}"
   end
 end
 
