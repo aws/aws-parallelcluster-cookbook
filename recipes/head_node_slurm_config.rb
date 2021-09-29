@@ -60,8 +60,8 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
   recursive true
 end
 
-# Copy cluster config file from S3 URI
 if not virtualized?
+  # Copy cluster config file from S3 URI
   fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
                          " --bucket #{node['cluster']['cluster_s3_bucket']}"\
                          " --key #{node['cluster']['cluster_config_s3_key']}"\
@@ -72,10 +72,8 @@ if not virtualized?
     retries 3
     retry_delay 5
   end
-end
 
-# Copy instance type infos file from S3 URI
-if not virtualized?
+  # Copy instance type infos file from S3 URI
   fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
                          " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
   execute "copy_instance_type_data_from_s3" do
@@ -83,9 +81,7 @@ if not virtualized?
     retries 3
     retry_delay 5
   end
-end
 
-if not virtualized?
   execute 'initialize compute fleet status in DynamoDB' do
     # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
@@ -94,11 +90,9 @@ if not virtualized?
     retries 3
     retry_delay 5
   end
-end
 
 
-# Generate pcluster specific configs
-if not virtualized?
+  # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
