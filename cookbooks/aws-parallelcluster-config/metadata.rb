@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-name 'aws-parallelcluster'
+name 'aws-parallelcluster-config'
 maintainer 'Amazon Web Services'
 maintainer_email ''
 license 'Apache-2.0'
@@ -24,5 +24,3 @@ depends 'pyenv', '~> 3.4.2'
 depends 'selinux', '~> 3.1.1'
 depends 'yum', '~> 6.1.1'
 depends 'yum-epel', '~> 4.1.2'
-depends 'aws-parallelcluster-install', '~> 3.0.0'
-depends 'aws-parallelcluster-config', '~> 3.0.0'
