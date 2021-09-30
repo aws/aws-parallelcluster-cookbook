@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: byos_headnode_finalize
+# Recipe:: byos
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute_event_handler 'HeadFinalize' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadFinalize, :ExecuteCommand, :Command) })
+include_recipe 'aws-parallelcluster-config::base'
+
+case node['cluster']['node_type']
+when 'HeadNode'
+  include_recipe 'aws-parallelcluster-config::head_node_byos'
+when 'ComputeFleet'
+  include_recipe 'aws-parallelcluster-config::compute_byos'
+else
+  raise "node_type must be HeadNode or ComputeFleet"
 end

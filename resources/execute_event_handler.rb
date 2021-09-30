@@ -174,6 +174,7 @@ action_class do # rubocop:disable Metrics/BlockLength
   def build_hash_from_node(name, raise_if_not_found, *path_in_node)
     var = node.dig(*path_in_node)
     raise "Unable to find node attribute #{path_in_node}" if (!var || var.empty?) && raise_if_not_found
+
     var && !var.empty? ? { name => var } : {}
   end
 

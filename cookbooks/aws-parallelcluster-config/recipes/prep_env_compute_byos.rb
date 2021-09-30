@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: byos_headnode_config
+# Recipe:: prep_env_compute_byos
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute_event_handler 'HeadConfigure' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadConfigure, :ExecuteCommand, :Command) })
+execute_event_handler 'ComputeInitEnvironment' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeInitEnvironment, :ExecuteCommand, :Command) })
 end
