@@ -2,9 +2,9 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: awsbatch_config
+# Recipe:: openssh
 #
-# Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,4 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-config::finalize"
+# Install SSH target checker
+template '/usr/bin/ssh_target_checker.sh' do
+  source 'openssh/ssh_target_checker.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  variables(vpc_cidr_list: get_vpc_cidr_list)
+end

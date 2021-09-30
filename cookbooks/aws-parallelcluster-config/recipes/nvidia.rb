@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: awsbatch_config
+# Recipe:: nvidia
 #
 # Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,4 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-config::finalize"
+# Start nvidia fabric manager on NVSwitch enabled systems
+if get_nvswitches > 1
+  service 'nvidia-fabricmanager' do
+    action %i[start enable]
+    supports status: true
+  end
+end
