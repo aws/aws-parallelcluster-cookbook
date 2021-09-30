@@ -301,7 +301,8 @@ when 'rhel', 'amazon'
                                              blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
+                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
+                                             coreutils moreutils]
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
@@ -319,7 +320,8 @@ when 'rhel', 'amazon'
                                              rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                              gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                              jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
+                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
+                                             coreutils moreutils]
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']
@@ -336,7 +338,8 @@ when 'debian'
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
                                            r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev]
+                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
+                                           coreutils moreutils]
 
   case node['platform_version']
   when '18.04'
