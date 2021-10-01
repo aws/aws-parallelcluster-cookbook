@@ -21,6 +21,7 @@ default['cluster']['sources_dir'] = "#{node['cluster']['base_dir']}/sources"
 default['cluster']['scripts_dir'] = "#{node['cluster']['base_dir']}/scripts"
 default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
+default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
@@ -467,3 +468,11 @@ default['cluster']['instance_types_data'] = nil
 default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
+
+# BYOS event handler
+default['cluster']['byos']['user'] = 'byos'
+default['cluster']['byos']['home'] = '/home/byos/'
+default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster/'
+default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
+default['cluster']['byos']['shared_dir'] = '/opt/parallelcluster/shared/byos/'
+default['cluster']['byos']['local_dir'] = '/opt/parallelcluster/byos/'
