@@ -16,12 +16,12 @@ action :run do
     return
   end
 
-  event_log = '/var/log/parallelcluster/byos-plugin.log'
-  event_cwd = '/home/byos'
-  event_user = 'byos'
+  event_log = node['cluster']['byos']['handler_log']
+  event_cwd = node['cluster']['byos']['home']
+  event_user = node['cluster']['byos']['user']
   event_env = build_env
-  event_log_prefix_error = "[%Y-%m-%d %H:%M:%S] ERROR [#{new_resource.event_name}]"
-  event_log_prefix_info = "[%Y-%m-%d %H:%M:%S] INFO [#{new_resource.event_name}]"
+  event_log_prefix_error = "[%Y-%m-%dT%H:%M:%S%z] [#{new_resource.event_name}] ERROR: "
+  event_log_prefix_info = "[%Y-%m-%dT%H:%M:%S%z] [#{new_resource.event_name}] INFO:"
   Chef::Log.info("Executing Event #{new_resource.event_name}, with user (#{event_user}), cwd (#{event_cwd}), command (#{new_resource.event_command}), log (#{event_log})")
   # shellout https://github.com/chef/mixlib-shellout
   # switch stderr/stdout with (2>&1 1>&3-), process error (now on stdout), switch back stdout/stderr with (3>&1 1>&2) and then process output
@@ -30,66 +30,146 @@ action :run do
   cmd.run_command
 
   if cmd.error?
-    raise "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}, but received '#{cmd.exitstatus}', complete log in #{event_log}\n #{format_for_exception(cmd)}"
+    raise "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}," \
+      " but received '#{cmd.exitstatus}', complete log in #{event_log}\n #{format_stderr(cmd)}"
   end
 end
 
-action_class do
-  def format_for_exception(cmd)
+action_class do # rubocop:disable Metrics/BlockLength
+  def format_stderr(cmd)
     "---- STDERR for #{new_resource.event_name} Event ----\n" \
     "#{cmd.stderr.strip}\n" \
     "---- End STDERR for #{new_resource.event_name} Event ----\n"
   end
 
   def build_env
+    # TODO: move create dir where setting up user/byos/scheduler
+    FileUtils.mkdir_p(node['cluster']['byos']['handler_dir'])
+    FileUtils.mkdir_p(node['cluster']['byos']['shared_dir'])
+
+    source_cluster_config = node.dig(:cluster, :cluster_config_path)
+    target_cluster_config = "#{node['cluster']['byos']['handler_dir']}cluster-config.yaml"
+    raise "Expected cluster configuration file not found in (#{source_cluster_config})" unless ::File.exist?(source_cluster_config)
+
+    FileUtils.cp(source_cluster_config, target_cluster_config)
+
+    source_launch_templates = "#{node['cluster']['byos']['shared_dir']}launch_templates.json"
+    target_launch_templates = "#{node['cluster']['byos']['handler_dir']}launch_templates.json"
+    FileUtils.cp(source_launch_templates, target_launch_templates) if ::File.exist?(source_launch_templates)
+
+    source_byos_substack_outputs = "#{node['cluster']['byos']['shared_dir']}byos_substack_outputs.json"
+    target_byos_substack_outputs = "#{node['cluster']['byos']['handler_dir']}byos_substack_outputs.json"
+    byos_substack_arn = node.dig(:cluster, :byos_substack_arn)
+    if byos_substack_arn && !byos_substack_arn.empty?
+      Chef::Log.info("Found byos substack (#{byos_substack_arn})")
+      unless ::File.exist?(source_byos_substack_outputs)
+        byos_substack_outputs = {}
+        Chef::Log.info("Executing describe-stack on byos substack (#{byos_substack_arn})")
+        cmd = Mixlib::ShellOut.new("aws ec2 describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{byos_substack_arn}", user: 'root')
+        cmd.run_command
+        if cmd.stdout && !cmd.stdout.empty?
+          Chef::Log.debug("Output of describe-stacks on substack (#{byos_substack_arn}): (#{cmd.stdout})")
+          substack_describe = JSON.parse(cmd.stdout)
+          substack_outputs = substack_describe['Stacks'][0]['Outputs']
+          substack_outputs.each do |substack_output|
+            byos_substack_outputs.merge!({ 'Outputs' => { substack_output['Key'] => substack_output['Value'] } })
+          end
+          ::File.write(source_byos_substack_outputs, byos_substack_outputs.to_json(:only))
+        end
+      end
+      FileUtils.cp(source_byos_substack_outputs, target_byos_substack_outputs)
+    end
+
+    source_handler_env = "#{node['cluster']['byos']['shared_dir']}handler_env.json"
+    if ::File.exist?(source_handler_env)
+      Chef::Log.info("Found handler environment file (#{source_handler_env})")
+      env = JSON.load_file(source_handler_env)
+      Chef::Log.debug("Loaded handler environment #{env}")
+    else
+      Chef::Log.info("No handler environment file found, building it")
+      env = build_static_env(target_cluster_config, target_launch_templates, target_byos_substack_outputs)
+
+      Chef::Log.info("Dumping handler environment to file (#{source_handler_env})")
+      ::File.write(source_handler_env, env.to_json(:only))
+    end
+
+    env.merge!(build_dynamic_env)
+    env
+  end
+
+  def build_dynamic_env
+    Chef::Log.info("Building dynamic handler environment")
+    env = {}
+
+    # PCLUSTER_EC2_INSTANCE_TYPE
+    env.merge!(build_hash_from_node('PCLUSTER_EC2_INSTANCE_TYPE', :ec2, :instance_type))
+
+    case node['cluster']['node_type']
+    when 'ComputeFleet'
+      # PCLUSTER_QUEUE_NAME
+      env.merge!(build_hash_from_node('PCLUSTER_QUEUE_NAME', :cluster, :scheduler_queue_name))
+
+      # PCLUSTER_COMPUTE_RESOURCE_NAME
+      env.merge!(build_hash_from_node('PCLUSTER_COMPUTE_RESOURCE_NAME', :cluster, :scheduler_compute_resource_name))
+    end
+
+    env
+  end
+
+  def build_static_env(target_cluster_config, target_launch_templates, target_byos_substack_outputs)
+    Chef::Log.info("Building static handler environment")
     env = {}
 
     # PCLUSTER_CLUSTER_CONFIG
-    cluster_config = node.dig(:cluster, :cluster_config_path)
-    env['PCLUSTER_CLUSTER_CONFIG'] = cluster_config if cluster_config && !cluster_config.empty?
+    env.merge!({ 'PCLUSTER_CLUSTER_CONFIG' => target_cluster_config }) if ::File.exist?(target_cluster_config)
 
-    # TODO
     # PCLUSTER_LAUNCH_TEMPLATES
-    # PCLUSTER_DYNAMODB_TABLE
+    env.merge!({ 'PCLUSTER_LAUNCH_TEMPLATES' => target_launch_templates }) if ::File.exist?(target_launch_templates)
+
     # PCLUSTER_CLUSTER_NAME
+    env.merge!(build_hash_from_node('PCLUSTER_CLUSTER_NAME', :cluster, :stack_name))
+
     # PCLUSTER_CFN_STACK_ARN
+    env.merge!(build_hash_from_node('PCLUSTER_CFN_STACK_ARN', :cluster, :stack_arn))
+
     # PCLUSTER_BYOS_CFN_SUBSTACK_ARN
+    env.merge!(build_hash_from_node('PCLUSTER_BYOS_CFN_SUBSTACK_ARN', :cluster, :byos_substack_arn))
+
     # PCLUSTER_BYOS_CFN_SUBSTACK_OUTPUTS
-    # PCLUSTER_SHARED_PACKAGES_DIR
-    # PCLUSTER_CFN_STACK_ARN
+    env.merge!({ 'PCLUSTER_BYOS_CFN_SUBSTACK_OUTPUTS' => target_byos_substack_outputs }) if ::File.exist?(target_byos_substack_outputs)
+
+    # PCLUSTER_SHARED_SCHEDULER_DIR
+    env.merge!(build_hash_from_node('PCLUSTER_SHARED_SCHEDULER_DIR', :byos, :shared_dir))
+
+    # PCLUSTER_LOCAL_SCHEDULER_DIR
+    env.merge!(build_hash_from_node('PCLUSTER_LOCAL_SCHEDULER_DIR', :byos, :local_dir))
 
     # PCLUSTER_AWS_REGION
-    aws_region = node.dig(:ec2, :region)
-    env['PCLUSTER_AWS_REGION'] = aws_region if aws_region && !aws_region.empty?
-
-    # PCLUSTER_EC2_INSTANCE_TYPE
-    ec2_instance_type = node.dig(:ec2, :instance_type)
-    env['PCLUSTER_EC2_INSTANCE_TYPE'] = ec2_instance_type if ec2_instance_type && !ec2_instance_type.empty?
+    env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', :ec2, :region))
 
     # PCLUSTER_OS
-    os = node.dig(:cluster, :config, :Image, :Os)
-    env['PCLUSTER_OS'] = os if os && !os.empty?
+    env.merge!(build_hash_from_node('PCLUSTER_OS', :cluster, :config, :Image, :Os))
 
     # PCLUSTER_ARCH
-    arch = node.dig(:cpu, :architecture)
-    env['PCLUSTER_ARCH'] = arch if arch && !arch.empty?
+    env.merge!(build_hash_from_node('PCLUSTER_ARCH', :cpu, :architecture))
 
     # PCLUSTER_VERSION
+    env.merge!(build_hash_from_node('PCLUSTER_VERSION', %i[cluster parallelcluster-version]))
 
-    case node['cluster']['node_type']
-    when 'HeadNode'
-      # PCLUSTER_HEADNODE_PRIVATE_IP
+    # PCLUSTER_HEADNODE_PRIVATE_IP
+    env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_PRIVATE_IP', :ec2, :local_ipv4))
 
-      # PCLUSTER_HEADNODE_HOSTNAME
-      headnode_hostname = node.dig(:ec2, :hostname)
-      env['PCLUSTER_HEADNODE_HOSTNAME'] = headnode_hostname if headnode_hostname && !headnode_hostname.empty?
-    when 'ComputeFleet'
-      # PCLUSTER_QUEUE_NAME
-      # PCLUSTER_COMPUTE_RESOURCE_NAME
-    end
+    # PCLUSTER_HEADNODE_HOSTNAME
+    env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_HOSTNAME', :ec2, :hostname))
 
     # PCLUSTER_CLUSTER_CONFIG_OLD
+    # TODO: to be implemented
 
     env
+  end
+
+  def build_hash_from_node(name, *path_in_node)
+    var = node.dig(*path_in_node)
+    var && !var.empty? ? { name => var } : {}
   end
 end
