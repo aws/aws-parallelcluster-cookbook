@@ -45,6 +45,7 @@ directory node['cluster']['sources_dir']
 directory node['cluster']['scripts_dir']
 directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
+directory node['cluster']['shared_dir']
 
 # Create ParallelCluster log folder
 directory '/var/log/parallelcluster/' do
