@@ -57,12 +57,12 @@ default['ec2'] = {
     info: {
       Code: 'Success',
       LastUpdated: '2021-09-23T18:38:46Z',
-      InstanceProfileArn: 'arn:aws:iam::000000000000:instance-profile/parallelcluster/cluster/cluster-InstanceProfileHeadNode-AAAAAAAAAAAAA',
+      InstanceProfileArn: 'arn:aws:iam::z000000000000:instance-profile/parallelcluster/cluster/cluster-InstanceProfileHeadNode-AAAAAAAAAAAAA',
       InstanceProfileId: 'AIAAAAAAAAAAAAAAAAAAA'
     },
     role_name: 'cluster_RoleHeadNode_AAAAAAAAAAAA'
   },
-  identity_credentials_ec2_info: '{\n  \'Code\' : \'Success\',\n  \'LastUpdated\' : \'2021-09-23T18:38:43Z\',\n  \'AccountId\' : \'000000000000\'\n}',
+  identity_credentials_ec2_info: '{\n  \'Code\' : \'Success\',\n  \'LastUpdated\' : \'2021-09-23T18:38:43Z\',\n  \'AccountId\' : \'z000000000000\'\n}',
   instance_action: 'none',
   instance_id: 'i-00000000000000000',
   instance_life_cycle: 'on-demand',
@@ -107,7 +107,7 @@ default['ec2'] = {
   services_domain: 'amazonaws.com',
   services_partition: 'aws',
   userdata: '',
-  account_id: '000000000000',
+  account_id: 'z000000000000',
   availability_zone: 'us-east-1b',
   region: 'us-east-1'
 }
