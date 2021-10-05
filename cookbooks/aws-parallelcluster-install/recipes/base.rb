@@ -18,6 +18,8 @@
 include_recipe "aws-parallelcluster::setup_envars"
 include_recipe "aws-parallelcluster-install::sudoers"
 
+return if node['conditions']['ami_bootstrapped']
+
 include_recipe "aws-parallelcluster-install::cluster_admin_user"
 
 case node['platform_family']
