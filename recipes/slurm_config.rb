@@ -4,7 +4,7 @@
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: slurm_config
 #
-# Copyright 2013-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,33 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster::base_config'
-include_recipe 'aws-parallelcluster::slurm_install'
-
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster::head_node_slurm_config'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster::compute_slurm_config'
-else
-  raise "node_type must be HeadNode or ComputeFleet"
-end
-
-link '/etc/profile.d/slurm.sh' do
-  to '/opt/slurm/etc/slurm.sh'
-end
-
-link '/etc/profile.d/slurm.csh' do
-  to '/opt/slurm/etc/slurm.csh'
-end
-
-# Ensure cluster admin user and slurm user can sudo on slurm commands.
-# This permission is necessary for the cluster admin user, but it is not for the slurm user
-# because the latter can run slurm commands without being root.
-# We introduced it for sake of consistency because daemons and slurm suspend/resume scripts share the same code.
-template '/etc/sudoers.d/99-parallelcluster-slurm' do
-  source '99-parallelcluster-slurm.erb'
-  owner 'root'
-  group 'root'
-  mode '0600'
-end
+include_recipe "aws-parallelcluster-config::slurm"

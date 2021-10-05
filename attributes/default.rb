@@ -4,7 +4,7 @@
 # Cookbook Name:: aws-parallelcluster
 # Attributes:: default
 #
-# Copyright 2013-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -275,6 +275,8 @@ default['cluster']['filehandle_limit'] = 10_000
 default['cluster']['memory_limit'] = 'unlimited'
 
 # Platform defaults
+#
+default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
 case node['platform_family']
 when 'rhel', 'amazon'
 
