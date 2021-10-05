@@ -149,9 +149,9 @@ def _get_jinja_env(template_directory):
     # validated by the CLI.
     env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)  # nosec nosemgrep
     env.filters["sanify_name"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
-    env.filters["gpus"] = lambda instance_type: _gpu_count(instance_type)
-    env.filters["gpu_type"] = lambda instance_type: _gpu_type(instance_type)
-    env.filters["vcpus"] = lambda compute_resource: _vcpus(compute_resource)
+    env.filters["gpus"] = _gpu_count
+    env.filters["gpu_type"] = _gpu_type
+    env.filters["vcpus"] = _vcpus
 
     return env
 
