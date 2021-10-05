@@ -36,10 +36,7 @@ mkdir -p /opt/parallelcluster
 echo "aws-parallelcluster-cookbook-3.0.0" > /opt/parallelcluster/.bootstrapped
 
 mkdir -p /opt/parallelcluster/scripts
-cp /build/system_tests/fetch_and_run /opt/parallelcluster/scripts
-
 mkdir -p /etc/parallelcluster
-cp /build/system_tests/cfnconfig /etc/parallelcluster/cfnconfig
 
 # re-vendor in case modifications have been made to any of the recipes that have
 # been mapped in via a volume.
