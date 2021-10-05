@@ -10,7 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Change supervisord service script from SysVinit to Systemd.
 - Drop support for SysVinit. Only Systemd is supported.
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
-- 
+- Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
 **BUG FIXES**
 - Fix supervisord service not enabled on Ubuntu.
 
