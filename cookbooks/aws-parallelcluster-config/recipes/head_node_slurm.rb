@@ -60,7 +60,7 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
   recursive true
 end
 
-if not virtualized?
+unless virtualized?
   # Copy cluster config file from S3 URI
   fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
                          " --bucket #{node['cluster']['cluster_s3_bucket']}"\
@@ -90,7 +90,6 @@ if not virtualized?
     retries 3
     retry_delay 5
   end
-
 
   # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"

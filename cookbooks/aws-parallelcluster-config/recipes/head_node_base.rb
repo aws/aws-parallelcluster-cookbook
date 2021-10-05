@@ -174,4 +174,4 @@ if node['cluster']['dcv_enabled'] == "head_node"
 end
 
 # IMDS
-include_recipe 'aws-parallelcluster-config::imds' if not virtualized?
+include_recipe 'aws-parallelcluster-config::imds' unless virtualized?

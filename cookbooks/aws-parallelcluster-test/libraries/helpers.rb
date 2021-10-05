@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -128,7 +129,6 @@ def check_imds_access(user, is_allowed)
     TEST
   end
 end
-
 
 # Check that the iptables backup file exists
 def check_iptables_rules_file(file)

@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -220,11 +221,11 @@ def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
   output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-    "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
-    "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
-    "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
-    "--projection-expression 'Id,HeadNodePrivateIp,HeadNodeHostname' " \
-    "--output text --query 'Items[0].[Id.S,HeadNodePrivateIp.S,HeadNodeHostname.S]'", user: 'root').stdout.strip
+                      "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
+                      "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
+                      "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
+                      "--projection-expression 'Id,HeadNodePrivateIp,HeadNodeHostname' " \
+                      "--output text --query 'Items[0].[Id.S,HeadNodePrivateIp.S,HeadNodeHostname.S]'", user: 'root').stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
