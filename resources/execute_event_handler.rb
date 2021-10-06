@@ -48,12 +48,14 @@ action_class do # rubocop:disable Metrics/BlockLength
     FileUtils.mkdir_p(node['cluster']['byos']['shared_dir'])
 
     source_cluster_config = node.dig(:cluster, :cluster_config_path)
-    target_cluster_config = "#{node['cluster']['byos']['handler_dir']}cluster-config.yaml"
     raise "Expected cluster configuration file not found in (#{source_cluster_config})" unless ::File.exist?(source_cluster_config)
 
+    target_cluster_config = "#{node['cluster']['byos']['handler_dir']}cluster-config.yaml"
     FileUtils.cp(source_cluster_config, target_cluster_config)
 
     source_launch_templates = "#{node['cluster']['byos']['shared_dir']}launch_templates.json"
+    raise "Expected launch templates file not found in (#{source_launch_templates})" unless ::File.exist?(source_launch_templates)
+
     target_launch_templates = "#{node['cluster']['byos']['handler_dir']}launch_templates.json"
     FileUtils.cp(source_launch_templates, target_launch_templates) if ::File.exist?(source_launch_templates)
 
@@ -132,10 +134,10 @@ action_class do # rubocop:disable Metrics/BlockLength
     env = {}
 
     # PCLUSTER_CLUSTER_CONFIG
-    env.merge!({ 'PCLUSTER_CLUSTER_CONFIG' => target_cluster_config }) if ::File.exist?(target_cluster_config)
+    env.merge!({ 'PCLUSTER_CLUSTER_CONFIG' => target_cluster_config })
 
     # PCLUSTER_LAUNCH_TEMPLATES
-    env.merge!({ 'PCLUSTER_LAUNCH_TEMPLATES' => target_launch_templates }) if ::File.exist?(target_launch_templates)
+    env.merge!({ 'PCLUSTER_LAUNCH_TEMPLATES' => target_launch_templates })
 
     # PCLUSTER_CLUSTER_NAME
     env.merge!(build_hash_from_node('PCLUSTER_CLUSTER_NAME', :cluster, :stack_name))
