@@ -67,17 +67,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       unless ::File.exist?(source_byos_substack_outputs)
         byos_substack_outputs = { 'Outputs' => {} }
         Chef::Log.info("Executing describe-stack on byos substack (#{byos_substack_arn})")
-        retries = 0
-        cmd = Mixlib::ShellOut.new("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{byos_substack_arn}", user: 'root')
-        begin
-          cmd.run_command
-          raise if cmd.error?
-        rescue StandardError
-          if (retries += 1) <= 3
-            sleep(retries)
-            retry
-          end
-        end
+        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{byos_substack_arn}", 3, 'root', nil, nil)
         raise "Unable to execute describe-stack on byos substack (#{byos_substack_arn})\n #{format_stderr(cmd)}" if cmd.error?
 
         if cmd.stdout && !cmd.stdout.empty?
@@ -184,5 +174,21 @@ action_class do # rubocop:disable Metrics/BlockLength
   def build_hash_from_node(name, *path_in_node)
     var = node.dig(*path_in_node)
     var && !var.empty? ? { name => var } : {}
+  end
+
+  def command_with_retries(command, retries, user, cwd, env)
+    retries_count = 0
+    cmd = Mixlib::ShellOut.new(command, user: user, cwd: cwd, env: env)
+    begin
+      cmd.run_command
+      raise if cmd.error?
+    rescue StandardError
+      if (retries_count += 1) <= retries
+        sleep(retries_count)
+        retry
+      end
+    end
+
+    cmd
   end
 end
