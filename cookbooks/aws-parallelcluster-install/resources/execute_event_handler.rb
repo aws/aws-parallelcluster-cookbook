@@ -21,7 +21,7 @@ action :run do
   event_user = node['cluster']['byos']['user']
   event_env = build_env
   event_log_prefix_error = "[%Y-%m-%dT%H:%M:%S%z] [#{new_resource.event_name}] ERROR: "
-  event_log_prefix_info = "[%Y-%m-%dT%H:%M:%S%z] [#{new_resource.event_name}] INFO:"
+  event_log_prefix_info = "[%Y-%m-%dT%H:%M:%S%z] [#{new_resource.event_name}] INFO: "
   Chef::Log.info("Executing Event #{new_resource.event_name}, with user (#{event_user}), cwd (#{event_cwd}), command (#{new_resource.event_command}), log (#{event_log})")
   # shellout https://github.com/chef/mixlib-shellout
   # switch stderr/stdout with (2>&1 1>&3-), process error (now on stdout), switch back stdout/stderr with (3>&1 1>&2) and then process output
