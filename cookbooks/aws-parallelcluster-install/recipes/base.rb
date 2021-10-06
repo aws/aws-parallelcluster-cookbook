@@ -199,7 +199,7 @@ end
 include_recipe "aws-parallelcluster-install::nvidia"
 
 # Install EFA & Intel MPI
-include_recipe "aws-parallelcluster-install::efa"
+include_recipe "aws-parallelcluster-install::efa" unless virtualized?
 include_recipe "aws-parallelcluster-install::intel_mpi"
 
 # Install FSx options
