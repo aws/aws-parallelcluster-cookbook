@@ -116,6 +116,17 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
+
+# Custom Scheduler Configuration
+default['cluster']['scheduler']['name'] = 'byos'
+default['cluster']['scheduler']['user'] = default['cluster']['scheduler']['name']
+default['cluster']['scheduler']['user_id'] = node['cluster']['reserved_base_uid'] + 4
+default['cluster']['scheduler']['group'] = node['cluster']['scheduler']['user']
+default['cluster']['scheduler']['group_id'] = node['cluster']['scheduler']['user_id']
+default['cluster']['scheduler']['opt_path'] = "/opt/parallelcluster/"
+default['cluster']['scheduler']['opt_shared_path'] = '/opt/parallelcluster/shared/'
+
+
 # PMIx software
 default['cluster']['pmix']['version'] = '3.1.5'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
@@ -466,3 +477,4 @@ default['cluster']['instance_types_data'] = nil
 default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
+default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['scheduler']['user']) if node['cluster']['scheduler'] == node['cluster']['scheduler']['name']
