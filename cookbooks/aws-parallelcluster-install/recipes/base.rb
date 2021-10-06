@@ -23,12 +23,6 @@ return if node['conditions']['ami_bootstrapped']
 
 include_recipe "aws-parallelcluster-install::cluster_admin_user"
 
-# Prevent Chef from using outdated/distrusted CA certificates
-# https://github.com/chef/chef/issues/12126
-link '/opt/chef/embedded/ssl/certs/cacert.pem' do
-  to '/etc/ssl/certs/ca-certificates.crt'
-end
-
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
