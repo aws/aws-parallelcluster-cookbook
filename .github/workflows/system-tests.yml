@@ -21,3 +21,7 @@ jobs:
           push: false
           cache-from: type=gha
           cache-to: type=gha,mode=max
+      - uses: addnab/docker-run-action@v3
+        with:
+          options: -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json
+          run: /build/system_tests/systemd
