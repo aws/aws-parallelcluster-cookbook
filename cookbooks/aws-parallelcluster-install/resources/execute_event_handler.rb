@@ -63,16 +63,27 @@ action_class do # rubocop:disable Metrics/BlockLength
     if byos_substack_arn && !byos_substack_arn.empty?
       Chef::Log.info("Found byos substack (#{byos_substack_arn})")
       unless ::File.exist?(source_byos_substack_outputs)
-        byos_substack_outputs = {}
+        byos_substack_outputs = { 'Outputs' => {} }
         Chef::Log.info("Executing describe-stack on byos substack (#{byos_substack_arn})")
-        cmd = Mixlib::ShellOut.new("aws ec2 describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{byos_substack_arn}", user: 'root')
-        cmd.run_command
+        retries = 0
+        cmd = Mixlib::ShellOut.new("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{byos_substack_arn}", user: 'root')
+        begin
+          cmd.run_command
+          raise if cmd.error?
+        rescue StandardError
+          if (retries += 1) <= 3
+            sleep(retries)
+            retry
+          end
+        end
+        raise "Unable to execute describe-stack on byos substack (#{byos_substack_arn})\n #{format_stderr(cmd)}" if cmd.error?
+
         if cmd.stdout && !cmd.stdout.empty?
           Chef::Log.debug("Output of describe-stacks on substack (#{byos_substack_arn}): (#{cmd.stdout})")
           substack_describe = JSON.parse(cmd.stdout)
           substack_outputs = substack_describe['Stacks'][0]['Outputs']
           substack_outputs.each do |substack_output|
-            byos_substack_outputs.merge!({ 'Outputs' => { substack_output['Key'] => substack_output['Value'] } })
+            byos_substack_outputs['Outputs'].merge!({ substack_output['OutputKey'] => substack_output['OutputValue'] })
           end
           ::File.write(source_byos_substack_outputs, byos_substack_outputs.to_json(:only))
         end
