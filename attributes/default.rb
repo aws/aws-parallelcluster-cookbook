@@ -472,9 +472,8 @@ default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['c
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
 
 # BYOS event handler
-default['cluster']['byos']['user'] = 'byos'
-default['cluster']['byos']['home'] = '/home/byos/'
-default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster/'
+default['cluster']['byos']['handler_user'] = 'byos'
+default['cluster']['byos']['handler_cwd'] = '/home/byos'
 default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
 default['cluster']['byos']['shared_dir'] = '/opt/parallelcluster/shared/byos/'
 default['cluster']['byos']['local_dir'] = '/opt/parallelcluster/byos/'
