@@ -206,7 +206,7 @@ include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
 include_recipe "aws-parallelcluster-install::lustre" unless virtualized?
 
 # Install the AWS cloudwatch agent
-include_recipe "aws-parallelcluster-install::cloudwatch_agent" unless virtualized?
+include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 
 # Install Amazon Time Sync
 include_recipe "aws-parallelcluster-install::chrony" unless virtualized?
