@@ -30,4 +30,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Configure
-        run: docker run -i -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json localhost:5000/pcluster/chef-base:latest /
+        run: docker run -i -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json localhost:5000/pcluster/chef-base:latest /build/system_tests/systemd
