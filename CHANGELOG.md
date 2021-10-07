@@ -6,6 +6,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.x.x
 ------
 
+**ENHANCEMENTS**
+- Support running of (most) recipes in a virtualized environment and as a part of a GitHub action
 **CHANGES**
 - Change supervisord service script from SysVinit to Systemd.
 - Drop support for SysVinit. Only Systemd is supported.
