@@ -17,10 +17,15 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./
-          tags: chef-base:latest
           file: ./system_tests/Dockerfile
           push: false
+          tags: chef-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Configure
-        run: docker run -i -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json chef-base:latest /build/system_tests/systemd
+        uses: addnab/docker-run-action@v3
+        with:
+          image: chef-base
+          options: -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json
+          run: |
+            /build/system_tests/systemd
