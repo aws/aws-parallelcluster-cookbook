@@ -200,16 +200,16 @@ include_recipe "aws-parallelcluster-install::nvidia"
 
 # Install EFA & Intel MPI
 include_recipe "aws-parallelcluster-install::efa" unless virtualized?
-include_recipe "aws-parallelcluster-install::intel_mpi"
+include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
 
 # Install FSx options
-include_recipe "aws-parallelcluster-install::lustre"
+include_recipe "aws-parallelcluster-install::lustre" unless virtualized?
 
 # Install the AWS cloudwatch agent
-include_recipe "aws-parallelcluster-install::cloudwatch_agent"
+include_recipe "aws-parallelcluster-install::cloudwatch_agent" unless virtualized?
 
 # Install Amazon Time Sync
-include_recipe "aws-parallelcluster-install::chrony"
+include_recipe "aws-parallelcluster-install::chrony" unless virtualized?
 
 # Install ARM Performance Library
-include_recipe "aws-parallelcluster-install::arm_pl"
+include_recipe "aws-parallelcluster-install::arm_pl" unless virtualized?
