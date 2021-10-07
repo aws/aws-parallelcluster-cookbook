@@ -58,7 +58,7 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
 
         if node['cluster']['dns_domain'].nil? || node['cluster']['dns_domain'].empty?
           # Use domain from DHCP
-          dhcp_domain = node['ec2']['local_hostname'].split('.', 2).last
+          dhcp_domain = node['ec2']['local_hostname'].split()[0].split('.', 2).last
           node.force_default['cluster']['assigned_hostname'] = "#{assigned_hostname}.#{dhcp_domain}"
         else
           # Use cluster domain
@@ -71,13 +71,13 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
 
   else
     # Head node
-    node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
+    node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname'].split()[0]
     node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
   end
 
 else
   # Single Instance Type
-  node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
+  node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname'].split()[0]
   node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
 end
 

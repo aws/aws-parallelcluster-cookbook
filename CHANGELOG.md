@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.x.x
+-----
+
+**BUG FIXES**
+* Handle case where domain name in custom DHCP option set contains a space.
+
 3.2.0
 ------
 
