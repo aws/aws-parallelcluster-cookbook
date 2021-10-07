@@ -68,4 +68,4 @@ service "parallelcluster-iptables" do
   action %i[enable start]
 end
 
-include_recipe 'aws-parallelcluster::test_imds'
+include_recipe 'aws-parallelcluster-test::test_imds'
