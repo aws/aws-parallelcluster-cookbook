@@ -126,7 +126,6 @@ default['cluster']['scheduler']['group_id'] = node['cluster']['scheduler']['user
 default['cluster']['scheduler']['opt_path'] = "/opt/parallelcluster/"
 default['cluster']['scheduler']['opt_shared_path'] = '/opt/parallelcluster/shared/'
 
-
 # PMIx software
 default['cluster']['pmix']['version'] = '3.1.5'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
