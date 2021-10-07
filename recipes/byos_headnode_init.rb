@@ -32,7 +32,6 @@ end
 ruby_block "load cluster configuration" do
   block do
     require 'yaml'
-    # config = YAML.load_file('/opt/parallelcluster/configs/cluster_config.yaml')
     config = YAML.load_file(node['cluster']['cluster_config_path'])
     Chef::Log.debug("Config read #{config}")
     node.override['cluster']['config'].merge! config

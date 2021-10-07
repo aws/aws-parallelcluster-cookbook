@@ -474,7 +474,7 @@ default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluste
 # BYOS event handler
 default['cluster']['byos']['user'] = 'byos'
 default['cluster']['byos']['home'] = '/home/byos/'
-default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster/'
+default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
 default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
-default['cluster']['byos']['shared_dir'] = '/opt/parallelcluster/shared/byos/'
-default['cluster']['byos']['local_dir'] = '/opt/parallelcluster/byos/'
+default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
+default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
