@@ -17,6 +17,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./
+          tags: chef-base:latest
           file: ./system_tests/Dockerfile
           push: false
           cache-from: type=gha
