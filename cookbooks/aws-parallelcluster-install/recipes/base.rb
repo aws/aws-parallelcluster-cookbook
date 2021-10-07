@@ -203,13 +203,13 @@ include_recipe "aws-parallelcluster-install::efa" unless virtualized?
 include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
 
 # Install FSx options
-include_recipe "aws-parallelcluster-install::lustre" unless virtualized?
+include_recipe "aws-parallelcluster-install::lustre"
 
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 
 # Install Amazon Time Sync
-include_recipe "aws-parallelcluster-install::chrony" unless virtualized?
+include_recipe "aws-parallelcluster-install::chrony"
 
 # Install ARM Performance Library
-include_recipe "aws-parallelcluster-install::arm_pl" unless virtualized?
+include_recipe "aws-parallelcluster-install::arm_pl"
