@@ -16,8 +16,7 @@
 # limitations under the License.
 
 # slurm and custom schedulers will have imds access on the head node
-imds_schedulers = ['slurm', node['cluster']['scheduler']['name']]
-if node['cluster']['node_type'] == 'HeadNode' && imds_schedulers.include?(node['cluster']['scheduler'])
+if node['cluster']['node_type'] == 'HeadNode' && not node['cluster']['scheduler'] == "batch"
 
   directory "#{node['cluster']['scripts_dir']}/imds" do
     owner 'root'
