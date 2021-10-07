@@ -3,7 +3,7 @@ name: ParallelCluster Cookbook System Test
 on: [push, pull_request]
 
 jobs:
-  systemtest:
+  systemtest-build:
     runs-on: ubuntu-latest
     name: SystemTest
     steps:
@@ -22,8 +22,4 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Configure
-        uses: addnab/docker-run-action@v3
-        with:
-          image: chef-base
-          options: -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json
-          run: /build/system_tests/systemd
+        run: docker run -ti -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json chef-base:latest /build/system_tests/systemd
