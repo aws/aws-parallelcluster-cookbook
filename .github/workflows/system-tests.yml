@@ -27,7 +27,6 @@ jobs:
           file: ./system_tests/Dockerfile
           push: true
           tags: localhost:5000/pcluster/chef-base:latest
-          tags: chef-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Configure
