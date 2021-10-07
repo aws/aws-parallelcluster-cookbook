@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # Use these recipes to add a custom scheduler
-include_recipe 'aws-parallelcluster::base'
+include_recipe 'aws-parallelcluster-config::base'
 
 # Install aws-parallelcluster-awsbatch-cli.cfg
 awsbatch_cli_dir = "/home/#{node['cluster']['cluster_user']}/.parallelcluster/"
