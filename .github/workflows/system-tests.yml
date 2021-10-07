@@ -6,11 +6,18 @@ jobs:
   systemtest-build:
     runs-on: ubuntu-latest
     name: SystemTest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
       - uses: actions/checkout@v2
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
       - name: Install
         id: docker_build
         uses: docker/build-push-action@v2
@@ -18,14 +25,15 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: ./
           file: ./system_tests/Dockerfile
-          push: false
+          push: true
+          tags: localhost:5000/pcluster/chef-base:latest
           tags: chef-base:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Configure
         uses: addnab/docker-run-action@v3
         with:
-          image: chef-base:latest
+          image: localhost:5000/pcluster/chef-base:latest
           options: -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json
           run: |
             /build/system_tests/systemd
