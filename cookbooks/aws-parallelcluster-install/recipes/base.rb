@@ -17,6 +17,7 @@
 
 include_recipe "aws-parallelcluster::setup_envars"
 include_recipe "aws-parallelcluster-install::sudoers"
+include_recipe "aws-parallelcluster-install::update_cinc_certificates"
 
 return if node['conditions']['ami_bootstrapped']
 
