@@ -71,16 +71,18 @@ node['cluster']['alinux_extras']&.each do |topic|
   alinux_extras_topic topic
 end
 
-package "install kernel packages" do
-  case node['platform_family']
-  when 'rhel', 'amazon'
-    package_name node['cluster']['kernel_devel_pkg']['name']
-    version node['cluster']['kernel_devel_pkg']['version']
-  when 'debian'
-    package_name node['cluster']['kernel_headers_pkg']
+unless virtualized?
+  package "install kernel packages" do
+    case node['platform_family']
+    when 'rhel', 'amazon'
+      package_name node['cluster']['kernel_devel_pkg']['name']
+      version node['cluster']['kernel_devel_pkg']['version']
+    when 'debian'
+      package_name node['cluster']['kernel_headers_pkg']
+    end
+    retries 3
+    retry_delay 5
   end
-  retries 3
-  retry_delay 5
 end
 
 bash "install awscli" do

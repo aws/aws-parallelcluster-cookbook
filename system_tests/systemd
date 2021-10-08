@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 mock_list=()
 
 function premock(){
