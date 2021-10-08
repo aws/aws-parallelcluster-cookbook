@@ -53,7 +53,7 @@ directory "#{node['cluster']['modulefile_dir']}/armpl"
 
 # arm performance library modulefile configuration
 template "#{node['cluster']['modulefile_dir']}/armpl/#{node['cluster']['armpl']['version']}" do
-  source 'armpl_modulefile.erb'
+  source 'arm_pl/armpl_modulefile.erb'
   user 'root'
   group 'root'
   mode '0755'
@@ -100,7 +100,7 @@ gcc_modulefile = "/opt/arm/armpl/#{node['cluster']['armpl']['version']}/modulefi
 
 # gcc modulefile configuration
 template gcc_modulefile do
-  source 'gcc_modulefile.erb'
+  source 'arm_pl/gcc_modulefile.erb'
   user 'root'
   group 'root'
   mode '0755'
