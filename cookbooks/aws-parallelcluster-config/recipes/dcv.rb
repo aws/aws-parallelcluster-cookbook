@@ -113,7 +113,7 @@ if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadN
   # Generate dcv.conf starting from template
   template "/etc/dcv/dcv.conf" do
     action :create
-    source 'dcv.conf.erb'
+    source 'dcv/dcv.conf.erb'
     owner 'root'
     group 'root'
     mode '0755'
