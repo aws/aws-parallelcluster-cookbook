@@ -121,8 +121,8 @@ default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 default['cluster']['scheduler']['name'] = 'byos'
 default['cluster']['scheduler']['user'] = default['cluster']['scheduler']['name']
 default['cluster']['scheduler']['user_id'] = node['cluster']['reserved_base_uid'] + 4
-default['cluster']['scheduler']['group'] = node['cluster']['scheduler']['user']
-default['cluster']['scheduler']['group_id'] = node['cluster']['scheduler']['user_id']
+default['cluster']['scheduler']['group'] = default['cluster']['scheduler']['user']
+default['cluster']['scheduler']['group_id'] = default['cluster']['scheduler']['user_id']
 default['cluster']['scheduler']['opt_path'] = "/opt/parallelcluster/"
 default['cluster']['scheduler']['opt_shared_path'] = '/opt/parallelcluster/shared/'
 
