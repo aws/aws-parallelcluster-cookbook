@@ -31,12 +31,14 @@ def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
 end
 
 # Install non-intel dependencies first
-intel_hpc_base_dependencies = value_for_platform(
-  'centos' => {
-    '~>7' => %w[tcsh compat-libstdc++-33 nscd nss-pam-ldapd openssl098e]
-  }
-)
-package intel_hpc_base_dependencies
+bash "install non-intel dependencies" do
+  cwd node['cluster']['sources_dir']
+  code <<-INTEL
+    set -e
+    yum install --cacheonly -y `ls #{node['cluster']['intelhpc']['dependencies'].map { |name| "#{name}*.rpm" }.join(' ')}`
+  INTEL
+end
+
 intel_hpc_spec_rpms_dir = '/opt/intel/rpms'
 
 case node['cluster']['node_type']
@@ -91,7 +93,7 @@ when 'HeadNode'
     cwd node['cluster']['sources_dir']
     code <<-INTEL
       set -e
-      yum makecache -y && yum install --cacheonly -y #{intel_psxe_rpms_dir}/*
+      yum install --cacheonly -y #{intel_psxe_rpms_dir}/*
     INTEL
   end
 
@@ -105,7 +107,7 @@ when 'HeadNode'
       cwd node['cluster']['sources_dir']
       code <<-INTEL
         set -e
-        yum makecache -y && yum install --cacheonly -y #{dest_path}
+        yum install --cacheonly -y #{dest_path}
       INTEL
       not_if { ::File.exist?("/opt/intel/intelpython#{python_version}") }
     end
@@ -120,7 +122,7 @@ bash "install intel hpc platform" do
   cwd node['cluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum makecache -y && yum install --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
+    yum install --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
   INTEL
   creates '/etc/intel-hpc-platform-release'
 end

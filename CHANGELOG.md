@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
 - Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
 - Upgrade PMIx to version 3.2.3
+- Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
 
 **BUG FIXES**
 - Fix supervisord service not enabled on Ubuntu.
