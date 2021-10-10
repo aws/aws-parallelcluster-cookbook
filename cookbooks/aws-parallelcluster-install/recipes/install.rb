@@ -18,6 +18,9 @@
 # Validate OS type specified by the user is the same as the OS identified by Ohai
 validate_os_type
 
+# Update certificates
+include_recipe "aws-parallelcluster-install::update_certificates"
+
 # Calling user_ulimit will override every existing limit
 user_ulimit "*" do
   filehandle_limit node['cluster']['filehandle_limit']
