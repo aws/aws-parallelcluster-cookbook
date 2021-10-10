@@ -117,14 +117,12 @@ default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 
-# Custom Scheduler Configuration
-default['cluster']['scheduler']['name'] = 'byos'
-default['cluster']['scheduler']['user'] = default['cluster']['scheduler']['name']
-default['cluster']['scheduler']['user_id'] = node['cluster']['reserved_base_uid'] + 4
-default['cluster']['scheduler']['group'] = default['cluster']['scheduler']['user']
-default['cluster']['scheduler']['group_id'] = default['cluster']['scheduler']['user_id']
-default['cluster']['scheduler']['opt_path'] = "/opt/parallelcluster/"
-default['cluster']['scheduler']['opt_shared_path'] = '/opt/parallelcluster/shared/'
+# BYOS (Custom Scheduler) Configuration
+default['cluster']['byos']['name'] = 'byos'
+default['cluster']['byos']['user'] = default['cluster']['byos']['name']
+default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
+default['cluster']['byos']['group'] = default['cluster']['byos']['user']
+default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
 
 # PMIx software
 default['cluster']['pmix']['version'] = '3.1.5'

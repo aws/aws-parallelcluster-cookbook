@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: head_node_slurm_config
+# Cookbook Name:: aws-parallelcluster-install
+# Recipe:: byos
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,9 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Export /opt/parallelcluster/shared
-nfs_export node['cluster']['shared_dir'] do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
-  writeable true
-  options ['no_root_squash']
-end
+# Validate OS type specified by the user is the same as the OS identified by Ohai
+
+# setup the user accounts
+include_recipe "aws-parallelcluster-install::user"
+
