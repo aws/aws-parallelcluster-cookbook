@@ -33,21 +33,3 @@ user node['cluster']['byos']['user'] do
   system true
   shell '/bin/bash'
 end
-
-# create e.g. /opt/parallelcluster/byos
-byos_base_path = File.join(node['cluster']['base_dir'], node['cluster']['byos']['name'])
-directory byos_base_path do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
-  mode '0755'
-  action :create
-end
-
-# create e.g. /opt/parallelcluster/shared/byos
-byos_shared_path = File.join(node['cluster']['shared_dir'], node['cluster']['byos']['name'])
-directory byos_shared_path do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
-  mode '0755'
-  action :create
-end

@@ -45,7 +45,6 @@ action_class do # rubocop:disable Metrics/BlockLength
   def build_env
     # TODO: move create dir where setting up user/byos/scheduler
     FileUtils.mkdir_p(node['cluster']['byos']['handler_dir'])
-    FileUtils.mkdir_p(node['cluster']['byos']['shared_dir'])
 
     source_cluster_config = node.dig(:cluster, :cluster_config_path)
     raise "Expected cluster configuration file not found in (#{source_cluster_config})" unless ::File.exist?(source_cluster_config)
