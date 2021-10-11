@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: update_head_node
+# Recipe:: prep_env_byos
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,7 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster::setup_envars'
-include_recipe 'aws-parallelcluster-config::openssh'
-include_recipe 'aws-parallelcluster::update_head_node_slurm' if node['cluster']['scheduler'] == 'slurm'
-include_recipe 'aws-parallelcluster::update_head_node_byos' if node['cluster']['scheduler'] == 'byos'
+case node['cluster']['node_type']
+when 'HeadNode'
+  include_recipe 'aws-parallelcluster-config::prep_env_head_node_byos'
+when 'ComputeFleet'
+  include_recipe 'aws-parallelcluster-config::prep_env_compute_byos'
+else
+  raise "node_type must be HeadNode or ComputeFleet"
+end
