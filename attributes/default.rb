@@ -21,6 +21,7 @@ default['cluster']['sources_dir'] = "#{node['cluster']['base_dir']}/sources"
 default['cluster']['scripts_dir'] = "#{node['cluster']['base_dir']}/scripts"
 default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
+default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
@@ -311,7 +312,8 @@ when 'rhel', 'amazon'
                                              blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
+                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
+                                             coreutils moreutils]
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
@@ -329,7 +331,8 @@ when 'rhel', 'amazon'
                                              rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                              gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                              jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock]
+                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
+                                             coreutils moreutils]
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']
@@ -346,7 +349,8 @@ when 'debian'
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
                                            r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev]
+                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
+                                           coreutils moreutils]
 
   case node['platform_version']
   when '18.04'
@@ -474,4 +478,12 @@ default['cluster']['instance_types_data'] = nil
 default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
-default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['scheduler']['user']) if node['cluster']['scheduler'] == node['cluster']['scheduler']['name']
+default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['byos']['user']) if node['cluster']['scheduler'] == 'byos'
+
+# BYOS event handler
+default['cluster']['byos']['user'] = 'byos'
+default['cluster']['byos']['home'] = '/home/byos/'
+default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
+default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
+default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
+default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
