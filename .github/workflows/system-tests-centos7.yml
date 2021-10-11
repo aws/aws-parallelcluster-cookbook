@@ -3,7 +3,7 @@ name: ParallelCluster Cookbook System Test CentOS 7
 on:
   push:
     branches:
-      - master
+      - develop
   pull_request:
 
 jobs:

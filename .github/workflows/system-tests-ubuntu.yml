@@ -3,7 +3,7 @@ name: ParallelCluster Cookbook System Test Ubuntu
 on:
   push:
     branches:
-      - master
+      - develop
   pull_request:
 
 jobs:
