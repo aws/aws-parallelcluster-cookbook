@@ -487,3 +487,4 @@ default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
 default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
 default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
 default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
+
