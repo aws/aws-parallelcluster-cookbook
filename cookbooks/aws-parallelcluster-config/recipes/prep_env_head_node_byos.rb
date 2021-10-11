@@ -42,3 +42,10 @@ end
 execute_event_handler 'HeadInitEnvironment' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadInitEnvironment, :ExecuteCommand, :Command) })
 end
+
+# Export /opt/parallelcluster/shared
+nfs_export node['cluster']['shared_dir'] do
+  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  writeable true
+  options ['no_root_squash']
+end

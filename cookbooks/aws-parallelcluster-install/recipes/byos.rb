@@ -15,8 +15,5 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Validate OS type specified by the user is the same as the OS identified by Ohai
-
 # setup the user accounts
 include_recipe "aws-parallelcluster-install::user"
-

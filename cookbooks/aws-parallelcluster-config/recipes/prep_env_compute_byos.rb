@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook Name:: aws-parallelcluster-config
 # Recipe:: prep_env_compute_byos
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -17,4 +17,14 @@
 
 execute_event_handler 'ComputeInitEnvironment' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeInitEnvironment, :ExecuteCommand, :Command) })
+end
+
+# Mount /opt/parallelcluster/shared over NFS
+mount node['cluster']['scheduler']['opt_shared_path'] do
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['scheduler']['opt_shared_path']}" })
+  fstype "nfs"
+  options node['cluster']['nfs']['hard_mount_options']
+  action %i[mount enable]
+  retries 10
+  retry_delay 6
 end

@@ -28,7 +28,7 @@ user node['cluster']['byos']['user'] do
   uid node['cluster']['byos']['user_id']
   gid node['cluster']['byos']['group_id']
   # home is mounted from the head node
-  manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
+  manage_home true
   home "/home/#{node['cluster']['byos']['user']}"
   system true
   shell '/bin/bash'
