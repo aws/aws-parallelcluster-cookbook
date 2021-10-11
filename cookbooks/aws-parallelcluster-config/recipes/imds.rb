@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['cluster']['node_type'] == 'HeadNode' && !node['cluster']['scheduler'] == 'awsbatch'
+if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
 
   directory "#{node['cluster']['scripts_dir']}/imds" do
     owner 'root'
