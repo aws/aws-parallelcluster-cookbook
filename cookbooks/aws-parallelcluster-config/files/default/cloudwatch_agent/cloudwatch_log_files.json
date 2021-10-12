@@ -12,7 +12,8 @@
       "log_stream_name": "system-messages",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "amazon",
@@ -30,7 +31,8 @@
       "log_stream_name": "syslog",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "ubuntu"
@@ -47,7 +49,8 @@
       "log_stream_name": "cfn-init",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "amazon",
@@ -65,7 +68,8 @@
       "log_stream_name": "chef-client",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "amazon",
@@ -83,7 +87,8 @@
       "log_stream_name": "cloud-init",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "amazon",
@@ -101,7 +106,8 @@
       "file_path": "/var/log/cloud-init-output.log",
       "log_stream_name": "cloud-init-output",
       "schedulers": [
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "amazon",
@@ -119,7 +125,8 @@
       "log_stream_name": "supervisord",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "amazon",
@@ -240,7 +247,8 @@
       "log_stream_name": "dcv-authenticator",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",
@@ -263,7 +271,8 @@
       "log_stream_name": "dcv-ext-authenticator",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",
@@ -286,7 +295,8 @@
       "log_stream_name": "dcv-server",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",
@@ -309,7 +319,8 @@
       "log_stream_name": "dcv-session-launcher",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",
@@ -332,7 +343,8 @@
       "log_stream_name": "dcv-agent",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",
@@ -355,7 +367,8 @@
       "log_stream_name": "dcv-xsession",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",
@@ -378,7 +391,8 @@
       "log_stream_name": "Xdcv",
       "schedulers": [
         "awsbatch",
-        "slurm"
+        "slurm",
+        "byos"
       ],
       "platforms": [
         "centos",

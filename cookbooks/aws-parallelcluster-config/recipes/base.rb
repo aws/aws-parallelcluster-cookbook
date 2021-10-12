@@ -48,7 +48,7 @@ include_recipe 'aws-parallelcluster-config::chrony'
 include_recipe "aws-parallelcluster-config::nvidia"
 
 # EFA runtime configuration
-include_recipe "aws-parallelcluster-config::efa"
+include_recipe "aws-parallelcluster-config::efa" unless virtualized?
 
 case node['cluster']['node_type']
 when 'HeadNode'

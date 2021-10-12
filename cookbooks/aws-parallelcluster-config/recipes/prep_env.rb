@@ -76,6 +76,7 @@ include_recipe "aws-parallelcluster-config::cloudwatch_agent"
 include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualized?
 
 include_recipe "aws-parallelcluster-config::prep_env_slurm" if node['cluster']['scheduler'] == 'slurm'
+include_recipe "aws-parallelcluster-config::prep_env_byos" if node['cluster']['scheduler'] == 'byos'
 
 # Configure hostname and DNS
 include_recipe "aws-parallelcluster-config::dns"
