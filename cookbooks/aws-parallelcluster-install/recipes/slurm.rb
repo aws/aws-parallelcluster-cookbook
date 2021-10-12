@@ -15,9 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['conditions']['ami_bootstrapped']
-
-include_recipe 'aws-parallelcluster-install::base'
 include_recipe 'aws-parallelcluster-install::munge'
 include_recipe 'aws-parallelcluster-install::pmix'
 include_recipe "aws-parallelcluster-install::intel"

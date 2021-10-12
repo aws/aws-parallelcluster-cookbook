@@ -18,6 +18,8 @@
 # Validate OS type specified by the user is the same as the OS identified by Ohai
 validate_os_type
 
+return if node['conditions']['ami_bootstrapped']
+
 # Update certificates
 include_recipe "aws-parallelcluster-install::update_certificates"
 
@@ -26,6 +28,7 @@ user_ulimit "*" do
   filehandle_limit node['cluster']['filehandle_limit']
 end
 
+include_recipe 'aws-parallelcluster-install::base'
 include_recipe 'aws-parallelcluster-install::slurm'
 include_recipe 'aws-parallelcluster-install::awsbatch'
 include_recipe 'aws-parallelcluster-install::byos'
