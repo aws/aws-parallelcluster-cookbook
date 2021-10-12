@@ -15,6 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Export /opt/parallelcluster/shared
+nfs_export node['cluster']['shared_dir'] do
+  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  writeable true
+  options ['no_root_squash']
+end
+
 # TODO: Move in prep_env
 # Copy cluster config file from S3 URI
 fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
