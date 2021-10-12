@@ -19,8 +19,7 @@
 include_recipe "aws-parallelcluster-install::byos_user"
 
 # create e.g. /opt/parallelcluster/byos
-byos_base_path = File.join(node['cluster']['base_dir'], node['cluster']['byos']['name'])
-directory byos_base_path do
+directory node['cluster']['byos']['local_dir'] do
   owner node['cluster']['byos']['user']
   group node['cluster']['byos']['user']
   mode '0755'
