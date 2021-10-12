@@ -33,3 +33,11 @@ user node['cluster']['byos']['user'] do
   system true
   shell '/bin/bash'
 end
+
+# Ensure byos user has sudoers capability
+template '/etc/sudoers.d/99-parallelcluster-byos' do
+  source 'byos_user/99-parallelcluster-byos.erb'
+  owner 'root'
+  group 'root'
+  mode '0600'
+end
