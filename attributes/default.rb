@@ -126,9 +126,9 @@ default['cluster']['byos']['group'] = default['cluster']['byos']['user']
 default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
 
 # PMIx software
-default['cluster']['pmix']['version'] = '3.1.5'
+default['cluster']['pmix']['version'] = '3.2.3'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
-default['cluster']['pmix']['sha1'] = '36bfb962858879cefa7a04a633c1b6984cea03ec'
+default['cluster']['pmix']['sha1'] = 'ed5c525baf1330d2303afb2b6bd2fd53ab0406a0'
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.14'
 default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"

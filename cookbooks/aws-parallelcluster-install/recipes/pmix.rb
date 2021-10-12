@@ -45,7 +45,8 @@ bash 'Install PMIx' do
     cd pmix-#{node['cluster']['pmix']['version']}
     ./autogen.pl
     ./configure --prefix=/opt/pmix
-    make
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
   PMIX
 end
