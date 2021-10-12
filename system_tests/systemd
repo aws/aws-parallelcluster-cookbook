@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 mock_list=()
 
 function premock(){
@@ -68,7 +70,6 @@ premock /opt/slurm/bin/sinfo
 echo -e "#\! /usr/bin/bash\necho ondemand-dy-c5.2xlarge-1 idle~\n" > /opt/slurm/bin/sinfo
 chmod +x /opt/slurm/bin/sinfo
 
-mkdir /home/ubuntu
 mkdir /etc/parallelcluster/slurm_plugin
 
 # mock clustermtg_heartbeat for head_node_slurm_finalize:

@@ -317,6 +317,10 @@ def aws_domain
   aws_domain
 end
 
+def kernel_release
+  ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
+end
+
 #
 # Retrieve RHEL OS minor version from running kernel version
 # The OS minor version is retrieved from the patch version of the running kernel
@@ -328,8 +332,8 @@ def find_rhel_minor_version
 
   if node['platform'] == 'centos'
     # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
-    kernel_patch_version = node['kernel']['release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    raise "Unable to retrieve the kernel patch version from #{node['kernel']['release']}." unless kernel_patch_version
+    kernel_patch_version = kernel_release.match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
+    raise "Unable to retrieve the kernel patch version from #{kernel_release}." unless kernel_patch_version
 
     case node['platform_version'].to_i
     when 7

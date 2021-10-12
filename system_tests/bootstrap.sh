@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 mock_list=()
 function premock(){
     path=$1
@@ -44,10 +46,22 @@ for mock_path in "${mocks[@]}"; do
     mock $mock_path
 done
 
+premock /sbin/chkconfig
+premock /bin/systemctl
+cp system_tests/chkconfig /sbin/chkconfig
+cp system_tests/systemctl /bin/systemctl
+
 echo "cookbook_path [\"/etc/chef/cookbooks\"]" > /etc/chef/client.rb
 
 mkdir -p /lib/modules/`uname -r`
-apt install linux-modules-`uname -r`
+
+platform=$(cat /etc/*-release | grep ID_LIKE | sed 's/.*=//')
+
+if [ "$platform" == "debian" ]; then
+    apt install -y linux-modules-`uname -r`
+else
+    yum install -y kernel-modules
+fi
 
 chef-client --local-mode --config /etc/chef/client.rb --log_level info --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/parallelcluster/image_dna.json --override-runlist aws-parallelcluster::default
 
