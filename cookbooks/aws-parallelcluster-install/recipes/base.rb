@@ -57,6 +57,7 @@ directory node['cluster']['sources_dir']
 directory node['cluster']['scripts_dir']
 directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
+directory node['cluster']['byos']
 
 build_essential
 include_recipe "aws-parallelcluster-install::python"
