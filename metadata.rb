@@ -9,7 +9,7 @@ long_description 'Installs/Configures AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '17.2.29'
-version '3.0.0'
+version '3.0.1'
 
 supports 'amazon', '>= 2'
 supports 'centos', '>= 7'
