@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.0.1
+------
+
+**BUG FIXES**
+- Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
+
 3.0.0
 ------
 
