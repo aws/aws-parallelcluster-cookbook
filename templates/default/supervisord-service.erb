@@ -1,0 +1,17 @@
+# Downloaded from:
+# https://git.launchpad.net/ubuntu/+source/supervisor/tree/debian/supervisor.service
+[Unit]
+Description=Supervisor process control system for UNIX
+Documentation=http://supervisord.org
+After=network.target
+
+[Service]
+ExecStart=<%= node['cluster']['cookbook_virtualenv_path'] %>/bin/supervisord -n -c /etc/supervisord.conf
+ExecStop=<%= node['cluster']['cookbook_virtualenv_path'] %>/bin/supervisorctl $OPTIONS shutdown
+ExecReload=<%= node['cluster']['cookbook_virtualenv_path'] %>/bin/supervisorctl -c /etc/supervisord.conf $OPTIONS reload
+KillMode=process
+Restart=on-failure
+RestartSec=50s
+
+[Install]
+WantedBy=multi-user.target

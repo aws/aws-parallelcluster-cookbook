@@ -27,20 +27,14 @@ directory '/etc/sysconfig' do
   mode '0644'
 end
 
-slurm_service_binary = if node['init_package'] == 'systemd'
-                         "slurmd"
-                       else
-                         "slurm"
-                       end
-
-template "/etc/sysconfig/#{slurm_service_binary}" do
+template "/etc/sysconfig/slurmd" do
   source 'slurm/slurm.sysconfig.erb'
   user 'root'
   group 'root'
   mode '0644'
 end
 
-service slurm_service_binary do
+service 'slurmd' do
   supports restart: false
   action %i[enable start]
   not_if { node['kitchen'] }

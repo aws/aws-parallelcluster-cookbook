@@ -189,17 +189,9 @@ cookbook_file '/etc/systemd/system/slurmctld.service' do
   group 'root'
   mode '0644'
   action :create
-  only_if { node['init_package'] == 'systemd' }
 end
 
-if node['init_package'] == 'systemd'
-  service "slurmctld" do
-    supports restart: false
-    action %i[enable start]
-  end
-else
-  service "slurm" do
-    supports restart: false
-    action %i[enable start]
-  end
+service "slurmctld" do
+  supports restart: false
+  action %i[enable start]
 end

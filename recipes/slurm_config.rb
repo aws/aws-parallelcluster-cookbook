@@ -18,14 +18,6 @@
 include_recipe 'aws-parallelcluster::base_config'
 include_recipe 'aws-parallelcluster::slurm_install'
 
-cookbook_file '/etc/init.d/slurm' do
-  source 'slurm-init'
-  owner 'root'
-  group 'root'
-  mode '0755'
-  only_if { node['init_package'] != 'systemd' }
-end
-
 case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster::head_node_slurm_config'

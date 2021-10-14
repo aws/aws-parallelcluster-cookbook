@@ -323,17 +323,7 @@ end
 # Return chrony service reload command
 # Chrony doesn't support reload but only force-reload command
 def chrony_reload_command
-  case node['init_package']
-  when 'init'
-    chrony_reload_command = "service #{node['cluster']['chrony']['service']} force-reload"
-  when 'systemd'
-    chrony_reload_command = "systemctl force-reload #{node['cluster']['chrony']['service']}"
-  else
-    raise "Init package #{node['init_package']} not supported."
-
-  end
-
-  chrony_reload_command
+  "systemctl force-reload #{node['cluster']['chrony']['service']}"
 end
 
 # Add an external package repository to the OS's package manager

@@ -58,6 +58,9 @@ end
 # Slurm
 ###################
 if node['cluster']['scheduler'] == 'slurm'
+  execute 'check munge service is enabled' do
+    command "systemctl is-enabled munge"
+  end
   case node['cluster']['node_type']
   when 'HeadNode'
     execute 'execute sinfo' do
@@ -86,6 +89,9 @@ if node['cluster']['scheduler'] == 'slurm'
     execute 'ensure-pmix-shared-library-can-be-found' do
       command '/opt/pmix/bin/pmix_info'
     end
+    execute 'check slurmctld service is enabled' do
+      command "systemctl is-enabled slurmctld"
+    end
   when 'ComputeFleet'
     execute 'ls slurm root' do
       command "ls /opt/slurm"
@@ -99,24 +105,15 @@ end
 ###################
 # Amazon Time Sync
 ###################
-case node['init_package']
-when 'init'
-  get_chrony_status_command = "service #{node['cluster']['chrony']['service']} status"
-when 'systemd'
-  # $ systemctl show -p SubState <service>
-  # SubState=Running
-  get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
-end
+get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
+# $ systemctl show -p SubState <service>
+# SubState=Running
+
 chrony_check_command = "#{get_chrony_status_command} | grep -i running"
 
 ruby_block 'log_chrony_status' do
   block do
-    case node['init_package']
-    when 'init'
-      get_chrony_service_log_command = "cat /var/log/messages | grep -i '#{node['cluster']['chrony']['service']}'"
-    when 'systemd'
-      get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
-    end
+    get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
     chrony_log = shell_out!(get_chrony_service_log_command).stdout
     Chef::Log.debug("chrony service log: #{chrony_log}")
     chrony_status = shell_out!(get_chrony_status_command).stdout
@@ -126,6 +123,10 @@ end
 
 execute 'check chrony running' do
   command chrony_check_command
+end
+
+execute 'check chrony service is enabled' do
+  command "systemctl is-enabled #{node['cluster']['chrony']['service']}"
 end
 
 execute 'check chrony conf' do
@@ -155,6 +156,9 @@ if node['cluster']['node_type'] == "HeadNode" &&
 end
 
 if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "HeadNode"
+  execute 'check dcvserver service is enabled' do
+    command "systemctl is-enabled dcvserver"
+  end
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
@@ -168,7 +172,7 @@ if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "hea
       command "systemctl show -p SubState gdm | grep -i running"
     end
   end
-elsif node['init_package'] == 'systemd' && node['conditions']['ami_bootstrapped']
+elsif node['conditions']['ami_bootstrapped']
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i multi-user.target"
   end
@@ -369,6 +373,9 @@ bash 'test instance store' do
   EPHEMERAL
   user node['cluster']['cluster_user']
 end
+execute 'check setup-ephemeral service is enabled' do
+  command "systemctl is-enabled setup-ephemeral"
+end
 
 ###################
 # Pcluster AWSBatch CLI
@@ -458,4 +465,19 @@ unless node['cluster']['base_os'] == 'centos7'
       [ -z "${lib64_fftw_libs}" ] && [ -z "${lib_fftw_libs}" ]
     NOFFTW
   end
+end
+
+###################
+# Verify required service are enabled
+###################
+if node['cluster']['node_type'] == 'HeadNode'
+  execute 'check parallelcluster-iptables service is enabled' do
+    command "systemctl is-enabled parallelcluster-iptables"
+  end
+end
+execute 'check supervisord service is enabled' do
+  command "systemctl is-enabled supervisord"
+end
+execute 'check ec2blkdev service is enabled' do
+  command "systemctl is-enabled ec2blkdev"
 end
