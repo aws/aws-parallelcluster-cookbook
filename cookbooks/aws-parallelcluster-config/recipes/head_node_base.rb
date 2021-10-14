@@ -15,9 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Get VPC CIDR
-node.default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = get_vpc_cidr_list
-
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
 shared_dir_array.each_with_index do |dir, index|
@@ -108,7 +105,7 @@ vol_array.each_with_index do |volumeid, index|
 
   # Export shared dir
   nfs_export shared_dir_array[index] do
-    network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+    network get_vpc_cidr_list
     writeable true
     options ['no_root_squash']
   end
@@ -116,14 +113,14 @@ end
 
 # Export /home
 nfs_export "/home" do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
 end
 
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
   only_if { ::File.directory?("/opt/intel") }

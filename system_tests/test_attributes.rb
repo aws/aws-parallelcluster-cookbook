@@ -16,7 +16,6 @@
 
 # These are mock values for things that might be read from something external
 # so we provide stubs here so that recipes can run successfully
-default['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks'] = '10.1.1.1/32'
 default['cluster']['kernel_release'] =
   if node['platform'] == 'centos'
     '3.10.0-1160.42.2.el7.x86_64'

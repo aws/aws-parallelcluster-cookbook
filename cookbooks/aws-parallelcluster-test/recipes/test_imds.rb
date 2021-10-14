@@ -29,7 +29,7 @@ users_under_test =
 
 allowed_users =
   if node['cluster']['node_type'] == 'HeadNode' &&
-     node['cluster']['scheduler'] == 'slurm' &&
+     node['cluster']['scheduler'] != 'awsbatch' &&
      node['cluster']['head_node_imds_secured'] == 'true'
     node['cluster']['head_node_imds_allowed_users']
   else
