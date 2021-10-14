@@ -6,7 +6,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.0.1
 ------
 
+**CHANGES**
+- Change supervisord service script from SysVinit to Systemd.
+- Drop support for SysVinit. Only Systemd is supported.
+
 **BUG FIXES**
+- Fix supervisord service not enabled on Ubuntu.
 - Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
 
 3.0.0

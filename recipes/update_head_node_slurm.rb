@@ -44,8 +44,7 @@ if !File.exist?(node['cluster']['cluster_config_path']) || !FileUtils.identical?
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
   end
 
-  slurmctld_service = node['init_package'] == 'systemd' ? "slurmctld" : "slurm"
-  service slurmctld_service do
+  service 'slurmctld' do
     action :restart
   end
 

@@ -48,5 +48,4 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   group 'root'
   mode '0644'
   action :create
-  only_if { node['init_package'] == 'systemd' }
 end
