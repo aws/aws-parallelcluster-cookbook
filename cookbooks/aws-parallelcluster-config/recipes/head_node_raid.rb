@@ -119,7 +119,7 @@ if raid_shared_dir != "NONE"
 
   # Export RAID directory via nfs
   nfs_export raid_shared_dir do
-    network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+    network get_vpc_cidr_list
     writeable true
     options ['no_root_squash']
   end

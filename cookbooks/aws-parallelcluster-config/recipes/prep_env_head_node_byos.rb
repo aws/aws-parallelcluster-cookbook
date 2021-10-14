@@ -17,7 +17,7 @@
 
 # Export /opt/parallelcluster/shared
 nfs_export node['cluster']['shared_dir'] do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
 end

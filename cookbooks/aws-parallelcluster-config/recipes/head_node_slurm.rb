@@ -19,7 +19,7 @@ setup_munge_head_node
 
 # Export /opt/slurm
 nfs_export "/opt/slurm" do
-  network node['cluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
+  network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
 end
