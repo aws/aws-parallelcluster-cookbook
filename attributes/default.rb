@@ -28,8 +28,8 @@ default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
-default['cluster']['cluster_config_path'] = "#{node['cluster']['configs_dir']}/cluster-config.yaml"
-default['cluster']['instance_types_data_path'] = "#{node['cluster']['configs_dir']}/instance-types-data.json"
+default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
+default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
