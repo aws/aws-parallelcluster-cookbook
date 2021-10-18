@@ -54,16 +54,6 @@ if raid_shared_dir != "NONE"
   end
 end
 
-# Mount /home over NFS
-mount '/home' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
-  retries 10
-  retry_delay 6
-end
-
 # Mount /opt/intel over NFS
 mount '/opt/intel' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/intel" })
