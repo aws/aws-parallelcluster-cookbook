@@ -424,7 +424,8 @@
       "node_roles": [
         "ComputeFleet",
         "HeadNode"
-      ]
+      ],
+      "feature_conditions": []
     }
   ]
 }
