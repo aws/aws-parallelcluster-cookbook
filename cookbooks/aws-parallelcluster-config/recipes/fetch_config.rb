@@ -35,4 +35,5 @@ ruby_block "load cluster configuration" do
     Chef::Log.debug("Config read #{config}")
     node.override['cluster']['config'].merge! config
   end
+  only_if { node['cluster']['config'].nil? }
 end
