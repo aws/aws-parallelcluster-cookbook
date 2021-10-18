@@ -408,6 +408,23 @@
           "satisfying_values": ["head_node"]
         }
       ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/byos-plugin.log",
+      "log_stream_name": "byos-plugin",
+      "schedulers": [
+        "byos"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ]
     }
   ]
 }
