@@ -3,19 +3,25 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.x.x
+3.X.X
 ------
 
 **CHANGES**
-- Change supervisord service script from SysVinit to Systemd.
-- Drop support for SysVinit. Only Systemd is supported.
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
 - Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
 - Upgrade PMIx to version 3.2.3
 - Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
 
+3.0.1
+------
+
+**CHANGES**
+- Change supervisord service script from SysVinit to Systemd.
+- Drop support for SysVinit. Only Systemd is supported.
+
 **BUG FIXES**
 - Fix supervisord service not enabled on Ubuntu.
+- Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
 
 3.0.0
 ------
