@@ -3,14 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-2.11.x
------
-
 2.11.3
 -----
 
 **BUG FIXES**
-- Fix cluster update when using proxy setup
+- Fix failure when building AMI, due to SGE sources not available at arc.liv.ac.uk
+- Fix cluster update when using proxy setup.
 - Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
 
 2.11.2

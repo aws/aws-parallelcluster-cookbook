@@ -14,7 +14,7 @@ elif [ -z ${TARBALL_PATH} ]; then
 fi
 
 # Download source archive
-SRC_ARCHIVE_OUTFILE=${TARBALL_URL##*/}
+SRC_ARCHIVE_OUTFILE=${TARBALL_PATH##*/}
 curl --retry 3 --retry-delay 5 -o ${SRC_ARCHIVE_OUTFILE} ${TARBALL_URL}
 
 # Extract source code to apply required patches
