@@ -16,6 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-config::base'
+include_recipe "aws-parallelcluster-config::fetch_config"
 
 case node['cluster']['node_type']
 when 'HeadNode'

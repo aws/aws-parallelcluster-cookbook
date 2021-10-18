@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: prep_env_byos
+# Cookbook Name:: aws-parallelcluster-config
+# Recipe:: byos_finalize
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -19,9 +19,7 @@ include_recipe "aws-parallelcluster-config::fetch_config"
 
 case node['cluster']['node_type']
 when 'HeadNode'
-  include_recipe 'aws-parallelcluster-config::prep_env_head_node_byos'
+  include_recipe 'aws-parallelcluster-config::head_node_byos_finalize'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-config::prep_env_compute_byos'
-else
-  raise "node_type must be HeadNode or ComputeFleet"
+  include_recipe 'aws-parallelcluster-config::compute_byos_finalize'
 end
