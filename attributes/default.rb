@@ -109,7 +109,7 @@ default['cfncluster']['cfncluster-node-version'] = '2.11.2'
 # URLs to software packages used during install recipes
 # Gridengine software
 default['cfncluster']['sge']['version'] = '8.1.9'
-default['cfncluster']['sge']['url'] = 'https://arc.liv.ac.uk/downloads/SGE/releases/8.1.9/sge-8.1.9.tar.gz'
+default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
 # Torque software
 default['cfncluster']['torque']['version'] = '6.1.2'
 default['cfncluster']['torque']['url'] = 'https://github.com/adaptivecomputing/torque/archive/6.1.2.tar.gz'
@@ -362,7 +362,6 @@ when 'debian'
                                               r-base libblas-dev libfftw3-dev libffi-dev libxml2-dev mdadm
                                               libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
                                               libatlas-base-dev libglvnd-dev linux-headers-aws]
-  default['cfncluster']['sge']['url'] = 'https://deb.debian.org/debian/pool/main/g/gridengine/gridengine_8.1.9+dfsg.orig.tar.gz'
   default['cfncluster']['sge']['version'] = '8.1.9+dfsg-9'
 
   case node['platform_version']
