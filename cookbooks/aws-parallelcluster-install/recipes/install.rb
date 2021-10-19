@@ -29,6 +29,7 @@ user_ulimit "*" do
 end
 
 include_recipe 'aws-parallelcluster-install::base'
+include_recipe "aws-parallelcluster-install::intel"
 include_recipe 'aws-parallelcluster-install::slurm'
 include_recipe 'aws-parallelcluster-install::awsbatch'
 include_recipe 'aws-parallelcluster-install::byos'
