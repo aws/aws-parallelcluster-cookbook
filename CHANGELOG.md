@@ -6,8 +6,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.11.x
 -----
 
+2.11.3
+-----
+
 **BUG FIXES**
-- Fix cluster update when using proxy setup.
+- Fix cluster update when using proxy setup
+- Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
 
 2.11.2
 -----
