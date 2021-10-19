@@ -13,6 +13,7 @@ jobs:
         with:
           path: '.'
           format: 'HTML'
+          project: 'aws-parallelcluster-cookbook'
       - name: Upload Test results
         uses: actions/upload-artifact@master
         with:
