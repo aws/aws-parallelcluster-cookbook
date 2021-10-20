@@ -439,7 +439,6 @@ default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['node_type'] = nil
 default['cluster']['cluster_user'] = 'ec2-user'
-default['cluster']['head_node'] = nil
 default['cluster']['head_node_private_ip'] = nil
 default['cluster']['volume'] = nil
 

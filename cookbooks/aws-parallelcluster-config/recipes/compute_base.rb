@@ -15,19 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Retrieve head node info
-if node['cluster']['scheduler'] == 'slurm'
-  ruby_block "retrieve head_node ip" do
-    block do
-      head_node_private_ip, head_node_private_dns = hit_head_node_info
-      node.force_default['cluster']['head_node'] = head_node_private_dns
-      node.force_default['cluster']['head_node_private_ip'] = head_node_private_ip
-    end
-    retries 5
-    retry_delay 3
-  end
-end
-
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cluster']['raid_parameters'].split(',')[0]
 
