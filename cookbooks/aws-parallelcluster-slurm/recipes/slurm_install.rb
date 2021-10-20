@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: slurm
+# Cookbook Name:: aws-parallelcluster-slurm
+# Recipe:: slurm_install
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -14,9 +14,6 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-
-include_recipe 'aws-parallelcluster-install::munge'
-include_recipe 'aws-parallelcluster-install::pmix'
 
 package %w[slurm* libslurm*] do
   action :purge

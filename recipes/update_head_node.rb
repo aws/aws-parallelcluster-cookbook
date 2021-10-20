@@ -17,5 +17,5 @@
 
 include_recipe 'aws-parallelcluster::setup_envars'
 include_recipe 'aws-parallelcluster-config::openssh'
-include_recipe 'aws-parallelcluster::update_head_node_slurm' if node['cluster']['scheduler'] == 'slurm'
+include_recipe 'aws-parallelcluster-slurm::update_head_node' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster::update_head_node_byos' if node['cluster']['scheduler'] == 'byos'

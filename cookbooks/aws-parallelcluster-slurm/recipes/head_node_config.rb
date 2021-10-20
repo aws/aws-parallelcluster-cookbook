@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: head_node_slurm_config
+# Cookbook Name:: aws-parallelcluster-slurm
+# Recipe:: head_node_config
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
