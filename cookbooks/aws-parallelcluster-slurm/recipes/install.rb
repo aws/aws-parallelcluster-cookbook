@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: slurm_config
+# Cookbook Name:: aws-parallelcluster-slurm
+# Recipe:: install
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,5 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-config::base'
-include_recipe "aws-parallelcluster-slurm::config"
+include_recipe 'aws-parallelcluster-slurm::pmix_install'
+include_recipe 'aws-parallelcluster-slurm::munge_install'
+include_recipe 'aws-parallelcluster-slurm::slurm_install'

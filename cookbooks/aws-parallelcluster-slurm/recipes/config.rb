@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: slurm
+# Cookbook Name:: aws-parallelcluster-slurm
+# Recipe:: config
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,13 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-config::base'
-
 case node['cluster']['node_type']
 when 'HeadNode'
-  include_recipe 'aws-parallelcluster-config::head_node_slurm'
+  include_recipe 'aws-parallelcluster-slurm::head_node_config'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-config::compute_slurm'
+  include_recipe 'aws-parallelcluster-slurm::compute_config'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end

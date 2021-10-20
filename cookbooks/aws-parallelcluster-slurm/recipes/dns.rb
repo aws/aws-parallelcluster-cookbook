@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook Name:: aws-parallelcluster-slurm
 # Recipe:: dns
 #
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.

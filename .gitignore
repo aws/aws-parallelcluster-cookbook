@@ -25,3 +25,7 @@ build-*.log
 aws-parallelcluster-cookbook-*.tgz
 aws-parallelcluster-cookbook-*.md5
 aws-parallelcluster-cookbook-*.date
+
+.coverage
+__pycache__
+report.html

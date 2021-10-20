@@ -21,6 +21,7 @@ sed -i "s/default\['cluster'\]\['parallelcluster-node-version'\] = '${CURRENT_PC
 sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
 sed -i "s/depends 'aws-parallelcluster-install', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-install', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
 sed -i "s/depends 'aws-parallelcluster-config', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-config', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
+sed -i "s/depends 'aws-parallelcluster-slurm', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-slurm', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
 sed -i "s/depends 'aws-parallelcluster-test', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-test', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
 sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" cookbooks/aws-parallelcluster-config/metadata.rb
 sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" cookbooks/aws-parallelcluster-install/metadata.rb

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: prep_env_slurm
+# Cookbook Name:: aws-parallelcluster-slurm
+# Recipe:: prep_env
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -47,3 +47,6 @@ if node['cluster']['node_type'] == "ComputeFleet"
     group 'root'
   end
 end
+
+# Configure hostname and DNS
+include_recipe "aws-parallelcluster-slurm::dns"
