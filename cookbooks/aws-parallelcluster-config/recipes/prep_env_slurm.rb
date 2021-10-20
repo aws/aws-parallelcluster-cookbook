@@ -25,41 +25,23 @@ directory node['cluster']['slurm_plugin_dir'] do
   recursive true
 end
 
-# Retrieve compute and head node info from dynamodb and save into files
+# Retrieve compute info from dynamodb and save into file
 if node['cluster']['node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
     block do
-      slurm_nodename, head_node_private_ip, head_node_private_dns = hit_dynamodb_info
+      slurm_nodename = hit_dynamodb_info
       node.force_default['cluster']['slurm_nodename'] = slurm_nodename
-      node.force_default['cluster']['head_node'] = head_node_private_dns
-      node.force_default['cluster']['head_node_private_ip'] = head_node_private_ip
     end
     retries 5
     retry_delay 3
     not_if do
-      !node['cluster']['slurm_nodename'].nil? && !node['cluster']['slurm_nodename'].empty? &&
-        !node['cluster']['head_node'].nil? && !node['cluster']['head_node'].empty? &&
-        !node['cluster']['head_node_private_ip'].nil? && !node['cluster']['head_node_private_ip'].empty?
+      !node['cluster']['slurm_nodename'].nil? && !node['cluster']['slurm_nodename'].empty?
     end
   end
 
   file "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename" do # ~FC005
     content(lazy { node['cluster']['slurm_nodename'] })
-    mode '0644'
-    owner 'root'
-    group 'root'
-  end
-
-  file "#{node['cluster']['slurm_plugin_dir']}/head_node_private_dns" do
-    content(lazy { node['cluster']['head_node'] })
-    mode '0644'
-    owner 'root'
-    group 'root'
-  end
-
-  file "#{node['cluster']['slurm_plugin_dir']}/head_node_private_ip" do
-    content(lazy { node['cluster']['head_node_private_ip'] })
     mode '0644'
     owner 'root'
     group 'root'

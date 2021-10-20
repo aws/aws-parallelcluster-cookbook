@@ -196,16 +196,6 @@ def raise_os_not_match(current_os, specified_os)
 end
 
 #
-# Retrieve head node ip and dns from file (HIT only)
-#
-def hit_head_node_info
-  head_node_private_ip_file = "#{node['cluster']['slurm_plugin_dir']}/head_node_private_ip"
-  head_node_private_dns_file = "#{node['cluster']['slurm_plugin_dir']}/head_node_private_dns"
-
-  [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
-end
-
-#
 # Retrieve compute nodename from file (HIT only)
 #
 def hit_slurm_nodename
@@ -224,18 +214,16 @@ def hit_dynamodb_info
                       "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
                       "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
                       "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
-                      "--projection-expression 'Id,HeadNodePrivateIp,HeadNodeHostname' " \
-                      "--output text --query 'Items[0].[Id.S,HeadNodePrivateIp.S,HeadNodeHostname.S]'", user: 'root').stdout.strip
+                      "--projection-expression 'Id' " \
+                      "--output text --query 'Items[0].[Id.S]'", user: 'root').stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
-  slurm_nodename, head_node_private_ip, head_node_private_dns = output.split(/\s+/)
+  slurm_nodename = output
 
   Chef::Log.info("Retrieved Slurm nodename is: #{slurm_nodename}")
-  Chef::Log.info("Retrieved head node private ip: #{head_node_private_ip}")
-  Chef::Log.info("Retrieved head node private dns: #{head_node_private_dns}")
 
-  [slurm_nodename, head_node_private_ip, head_node_private_dns]
+  slurm_nodename
 end
 
 #
