@@ -3,6 +3,11 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.X.X
+------
+**CHANGES**
+- Do not strip `-` from compute resource name when configuring Slurm nodes.
+
 3.0.2
 ------
 

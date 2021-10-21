@@ -225,7 +225,7 @@ end
 # Verify if a given node name is a static node or a dynamic one (HIT only)
 #
 def hit_is_static_node?(nodename)
-  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9]+)-\d+$/)
+  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9\-]+)-\d+$/)
   raise "Failed when parsing Compute nodename: #{nodename}" if match.nil?
 
   match[2] == "st"
