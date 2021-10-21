@@ -43,21 +43,15 @@ action_class do # rubocop:disable Metrics/BlockLength
   end
 
   def build_env
-    # TODO: move create dir where setting up user/byos/scheduler
-    FileUtils.mkdir_p(node['cluster']['byos']['handler_dir'])
-
-    source_cluster_config = node.dig(:cluster, :cluster_config_path)
-    raise "Expected cluster configuration file not found in (#{source_cluster_config})" unless ::File.exist?(source_cluster_config)
-
+    # copy cluster config
     target_cluster_config = "#{node['cluster']['byos']['handler_dir']}/cluster-config.yaml"
-    FileUtils.cp(source_cluster_config, target_cluster_config)
+    copy_config("cluster configuration", node.dig(:cluster, :cluster_config_path), target_cluster_config)
 
-    source_launch_templates = "#{node['cluster']['shared_dir']}/launch_templates_config.json"
-    raise "Expected launch templates file not found in (#{source_launch_templates})" unless ::File.exist?(source_launch_templates)
-
+    # copy launch templates config
     target_launch_templates = "#{node['cluster']['byos']['handler_dir']}/launch_templates_config.json"
-    FileUtils.cp(source_launch_templates, target_launch_templates) if ::File.exist?(source_launch_templates)
+    copy_config("launch templates", "#{node['cluster']['shared_dir']}/launch_templates_config.json", target_launch_templates)
 
+    # generated substack outputs json
     source_byos_substack_outputs = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
     target_byos_substack_outputs = "#{node['cluster']['byos']['handler_dir']}/byos_substack_outputs.json"
     byos_substack_arn = node.dig(:cluster, :byos_substack_arn)
@@ -73,8 +67,10 @@ action_class do # rubocop:disable Metrics/BlockLength
           Chef::Log.debug("Output of describe-stacks on substack (#{byos_substack_arn}): (#{cmd.stdout})")
           substack_describe = JSON.parse(cmd.stdout)
           substack_outputs = substack_describe['Stacks'][0]['Outputs']
-          substack_outputs.each do |substack_output|
-            byos_substack_outputs['Outputs'].merge!({ substack_output['OutputKey'] => substack_output['OutputValue'] })
+          if substack_outputs && !substack_outputs.empty?
+            substack_outputs.each do |substack_output|
+              byos_substack_outputs['Outputs'].merge!({ substack_output['OutputKey'] => substack_output['OutputValue'] })
+            end
           end
           ::File.write(source_byos_substack_outputs, byos_substack_outputs.to_json(:only))
         end
@@ -82,6 +78,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       FileUtils.cp(source_byos_substack_outputs, target_byos_substack_outputs)
     end
 
+    # Load static env from file or build it if file not found
     source_handler_env = "#{node['cluster']['shared_dir']}/handler_env.json"
     if ::File.exist?(source_handler_env)
       Chef::Log.info("Found handler environment file (#{source_handler_env})")
@@ -95,8 +92,15 @@ action_class do # rubocop:disable Metrics/BlockLength
       ::File.write(source_handler_env, env.to_json(:only))
     end
 
+    # Merge env with dyanmic env
     env.merge!(build_dynamic_env)
     env
+  end
+
+  def copy_config(config_type, source_config, target_config)
+    raise "Expected #{config_type} file not found in (#{source_config})" unless ::File.exist?(source_config)
+
+    FileUtils.cp(source_config, target_config)
   end
 
   def build_dynamic_env
@@ -146,8 +150,9 @@ action_class do # rubocop:disable Metrics/BlockLength
     # PCLUSTER_LOCAL_SCHEDULER_DIR
     env.merge!(build_hash_from_node('PCLUSTER_LOCAL_SCHEDULER_DIR', true, :cluster, :byos, :local_dir))
 
-    # PCLUSTER_AWS_REGION
+    # PCLUSTER_AWS_REGION and AWS_REGION
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))
+    env.merge!(build_hash_from_node('AWS_REGION', true, :ec2, :region))
 
     # PCLUSTER_OS
     env.merge!(build_hash_from_node('PCLUSTER_OS', true, :cluster, :config, :Image, :Os))
