@@ -19,6 +19,7 @@ action :run do
   event_log = node['cluster']['byos']['handler_log']
   event_cwd = node['cluster']['byos']['home']
   event_user = node['cluster']['byos']['user']
+  event_timeout = 3600
   event_env = build_env
   event_log_prefix_error = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - ERROR:"
   event_log_prefix_info = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - INFO:"
@@ -26,7 +27,7 @@ action :run do
   # shellout https://github.com/chef/mixlib-shellout
   # switch stderr/stdout with (2>&1 1>&3-), process error (now on stdout), switch back stdout/stderr with (3>&1 1>&2) and then process output
   cmd = Mixlib::ShellOut.new("set -o pipefail; { (#{new_resource.event_command}) 2>&1 1>&3- | ts '#{event_log_prefix_error}' | tee -a #{event_log}; } " \
-    "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log}", user: event_user, env: event_env, cwd: event_cwd)
+    "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log}", user: event_user, group: event_user, login: true, env: event_env, cwd: event_cwd, timeout: event_timeout)
   cmd.run_command
 
   if cmd.error?
@@ -53,7 +54,7 @@ action_class do # rubocop:disable Metrics/BlockLength
 
     # copy instance type data
     target_instance_types_data = "#{node['cluster']['byos']['handler_dir']}/instance-types-data.json"
-    copy_config("instance types data", "#{node['cluster']['instance_types_data_path']}", target_instance_types_data)
+    copy_config("instance types data", node['cluster']['instance_types_data_path'], target_instance_types_data)
 
     # generated substack outputs json
     source_byos_substack_outputs = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
