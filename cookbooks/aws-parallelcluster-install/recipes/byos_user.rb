@@ -34,6 +34,14 @@ user node['cluster']['byos']['user'] do
   shell '/bin/bash'
 end
 
+# create dir /home/byos/.parallelcluster
+directory node['cluster']['byos']['handler_dir'] do
+  owner node['cluster']['byos']['user']
+  group node['cluster']['byos']['user']
+  mode '0755'
+  action :create
+end
+
 # Ensure byos user has sudoers capability
 template '/etc/sudoers.d/99-parallelcluster-byos' do
   source 'byos_user/99-parallelcluster-byos.erb'
