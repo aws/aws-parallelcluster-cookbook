@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: awsbatch_config
+# Cookbook Name:: aws-parallelcluster-config
+# Recipe:: config
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,4 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-config::awsbatch"
+include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
+
+# TODO: to be moved under aws-parallelcluster-byos
+include_recipe 'aws-parallelcluster-config::byos' if node['cluster']['scheduler'] == 'byos'
+
+# TODO: to be moved under aws-parallelcluster-awsbatch
+include_recipe 'aws-parallelcluster-config::awsbatch' if node['cluster']['scheduler'] == 'awsbatch'
