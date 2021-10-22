@@ -51,6 +51,10 @@ action_class do # rubocop:disable Metrics/BlockLength
     target_launch_templates = "#{node['cluster']['byos']['handler_dir']}/launch_templates_config.json"
     copy_config("launch templates", "#{node['cluster']['shared_dir']}/launch_templates_config.json", target_launch_templates)
 
+    # copy instance type data
+    target_instance_types_data = "#{node['cluster']['byos']['handler_dir']}/instance-types-data.json"
+    copy_config("instance types data", "#{node['cluster']['instance_types_data_path']}", target_instance_types_data)
+
     # generated substack outputs json
     source_byos_substack_outputs = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
     target_byos_substack_outputs = "#{node['cluster']['byos']['handler_dir']}/byos_substack_outputs.json"
@@ -86,7 +90,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       Chef::Log.debug("Loaded handler environment #{env}")
     else
       Chef::Log.info("No handler environment file found, building it")
-      env = build_static_env(target_cluster_config, target_launch_templates, target_byos_substack_outputs)
+      env = build_static_env(target_cluster_config, target_launch_templates, target_instance_types_data, target_byos_substack_outputs)
 
       Chef::Log.info("Dumping handler environment to file (#{source_handler_env})")
       ::File.write(source_handler_env, env.to_json(:only))
@@ -122,7 +126,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     env
   end
 
-  def build_static_env(target_cluster_config, target_launch_templates, target_byos_substack_outputs)
+  def build_static_env(target_cluster_config, target_launch_templates, target_instance_types_data, target_byos_substack_outputs)
     Chef::Log.info("Building static handler environment")
     env = {}
 
@@ -131,6 +135,9 @@ action_class do # rubocop:disable Metrics/BlockLength
 
     # PCLUSTER_LAUNCH_TEMPLATES
     env.merge!({ 'PCLUSTER_LAUNCH_TEMPLATES' => target_launch_templates })
+
+    # PCLUSTER_INSTANCE_TYPES_DATA
+    env.merge!({ 'PCLUSTER_INSTANCE_TYPES_DATA' => target_instance_types_data })
 
     # PCLUSTER_CLUSTER_NAME
     env.merge!(build_hash_from_node('PCLUSTER_CLUSTER_NAME', true, :cluster, :stack_name))
