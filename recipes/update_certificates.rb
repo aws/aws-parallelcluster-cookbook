@@ -19,6 +19,13 @@ package 'ca-certificates' do
   action :upgrade
 end
 
+# centos8 ca certificates file contains DST ROOT CA X3
+if node['cfncluster']['os'] == "centos8"
+  execute 'Remove DST ROOT CA X3' do
+    command 'sed -e ‘/^# DST Root CA X3/,/-----END CERTIFICATE-----/d’ /etc/ssl/certs/ca-bundle.crt'
+  end
+end
+
 # Prevent Chef from using outdated/distrusted CA certificates
 # https://github.com/chef/chef/issues/12126
 if node['platform'] == 'ubuntu'
