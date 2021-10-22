@@ -61,27 +61,6 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
 end
 
 unless virtualized?
-  # Copy cluster config file from S3 URI
-  fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
-                         " --bucket #{node['cluster']['cluster_s3_bucket']}"\
-                         " --key #{node['cluster']['cluster_config_s3_key']}"\
-                         " --region #{node['cluster']['region']} #{node['cluster']['cluster_config_path']}"
-  fetch_config_command += " --version-id #{node['cluster']['cluster_config_version']}" unless node['cluster']['cluster_config_version'].nil?
-  execute "copy_cluster_config_from_s3" do
-    command fetch_config_command
-    retries 3
-    retry_delay 5
-  end
-
-  # Copy instance type infos file from S3 URI
-  fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
-                         " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
-  execute "copy_instance_type_data_from_s3" do
-    command fetch_config_command
-    retries 3
-    retry_delay 5
-  end
-
   execute 'initialize compute fleet status in DynamoDB' do
     # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
