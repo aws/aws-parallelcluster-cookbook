@@ -15,25 +15,36 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Copy cluster config file from S3 URI
-fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
-                       " --bucket #{node['cluster']['cluster_s3_bucket']}"\
-                       " --key #{node['cluster']['cluster_config_s3_key']}"\
-                       " --region #{node['cluster']['region']} #{node['cluster']['cluster_config_path']}"
-fetch_config_command += " --version-id #{node['cluster']['cluster_config_version']}" unless node['cluster']['cluster_config_version'].nil?
-execute "copy_cluster_config_from_s3" do
-  command fetch_config_command
-  retries 3
-  retry_delay 5
-  not_if { ::File.exist?(node['cluster']['cluster_config_path']) }
-end
-
-ruby_block "load cluster configuration" do
-  block do
-    require 'yaml'
-    config = YAML.load_file(node['cluster']['cluster_config_path'])
-    Chef::Log.debug("Config read #{config}")
-    node.override['cluster']['config'].merge! config
+unless virtualized?
+  # Copy cluster config file from S3 URI
+  fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
+                         " --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                         " --key #{node['cluster']['cluster_config_s3_key']}"\
+                         " --region #{node['cluster']['region']} #{node['cluster']['cluster_config_path']}"
+  fetch_config_command += " --version-id #{node['cluster']['cluster_config_version']}" unless node['cluster']['cluster_config_version'].nil?
+  execute "copy_cluster_config_from_s3" do
+    command fetch_config_command
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(node['cluster']['cluster_config_path']) }
   end
-  only_if { node['cluster']['config'].nil? }
+
+  ruby_block "load cluster configuration" do
+    block do
+      require 'yaml'
+      config = YAML.load_file(node['cluster']['cluster_config_path'])
+      Chef::Log.debug("Config read #{config}")
+      node.override['cluster']['config'].merge! config
+    end
+    only_if { node['cluster']['config'].nil? }
+  end
+
+  # Copy instance type infos file from S3 URI
+  fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\
+                           " --key #{node['cluster']['instance_types_data_s3_key']} --region #{node['cluster']['region']} #{node['cluster']['instance_types_data_path']}"
+  execute "copy_instance_type_data_from_s3" do
+    command fetch_config_command
+    retries 3
+    retry_delay 5
+  end
 end

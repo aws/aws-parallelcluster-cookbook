@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: update_head_node
+# Cookbook Name:: aws-parallelcluster-byos
+# Recipe:: prep_env_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,7 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster::setup_envars'
-include_recipe 'aws-parallelcluster-config::openssh'
-include_recipe 'aws-parallelcluster-slurm::update_head_node' if node['cluster']['scheduler'] == 'slurm'
-include_recipe 'aws-parallelcluster-byos::config_update_head_node' if node['cluster']['scheduler'] == 'byos'
+# Export /opt/parallelcluster/shared
+nfs_export node['cluster']['shared_dir'] do
+  network get_vpc_cidr_list
+  writeable true
+  options ['no_root_squash']
+end
+
+execute_event_handler 'HeadInitEnvironment' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadInitEnvironment, :ExecuteCommand, :Command) })
+end
