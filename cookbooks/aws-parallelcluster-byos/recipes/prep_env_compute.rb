@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-config
-# Recipe:: prep_env_compute_byos
+# Cookbook Name:: aws-parallelcluster-byos
+# Recipe:: prep_env_compute
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
