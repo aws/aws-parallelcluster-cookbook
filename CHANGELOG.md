@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
 - Upgrade PMIx to version 3.2.3
 - Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
+- Do not strip `-` from compute resource name when configuring Slurm nodes.
 
 3.0.1
 ------
