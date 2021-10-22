@@ -19,24 +19,6 @@ log() {
     echo "$@" | logger -t "pcluster_ssh_target_checker"
 }
 
-retrieve_vpc_cidr_list() {
-    TOKEN=$(curl --retry 3 --retry-delay 0 --fail -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-    if ! mac=$(curl --retry 3 --retry-delay 0 --silent --fail -H "X-aws-ec2-metadata-token: ${TOKEN}" http://169.254.169.254/latest/meta-data/mac); then
-       log  "Unable to determine MAC address for network interface"
-       exit 1
-    fi
-
-    vpc_cidr_uri="http://169.254.169.254/latest/meta-data/network/interfaces/macs/${mac}/vpc-ipv4-cidr-blocks"
-    vpc_cidr_list=($(curl --retry 3 --retry-delay 0 --silent --fail -H "X-aws-ec2-metadata-token: ${TOKEN}" "${vpc_cidr_uri}"))
-
-    if ! (( ${#vpc_cidr_list[@]} )); then
-       log "Unable to retrieve VPC CIDR list from EC2 meta-data"
-       exit 1
-    fi
-
-    echo "${vpc_cidr_list[@]}"
-}
-
 convert_ip_to_decimal() {
     IFS=./ read -r x y z t mask <<< "${1}"
     echo -n "$((x<<24|y<<16|z<<8|t))"
@@ -78,7 +60,6 @@ fi
 
 for vpc_cidr in "${VPC_CIDR_LIST[@]}"
 do
-  check_ip_in_cidr "${resolved_ip}" "${vpc_cidr}"
   if check_ip_in_cidr "${resolved_ip}" "${vpc_cidr}"; then
     log "Target Host ${target_host} is in VPC CIDR ${vpc_cidr}"
     exit 0
