@@ -16,9 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
-
-# TODO: to be moved under aws-parallelcluster-byos
-include_recipe 'aws-parallelcluster-config::byos' if node['cluster']['scheduler'] == 'byos'
+include_recipe 'aws-parallelcluster-byos::config' if node['cluster']['scheduler'] == 'byos'
 
 # TODO: to be moved under aws-parallelcluster-awsbatch
 include_recipe 'aws-parallelcluster-config::awsbatch' if node['cluster']['scheduler'] == 'awsbatch'

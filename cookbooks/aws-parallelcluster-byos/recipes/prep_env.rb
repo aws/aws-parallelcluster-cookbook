@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
-# Recipe:: computefleet_start_head_node_byos
+# Cookbook Name:: aws-parallelcluster-byos
+# Recipe:: cprep_env
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute_event_handler 'HeadComputeFleetStart' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadComputeFleetStart, :ExecuteCommand, :Command) })
+include_recipe "aws-parallelcluster-config::fetch_config"
+
+case node['cluster']['node_type']
+when 'HeadNode'
+  include_recipe 'aws-parallelcluster-byos::prep_env_head_node'
+when 'ComputeFleet'
+  include_recipe 'aws-parallelcluster-byos::prep_env_compute'
+else
+  raise "node_type must be HeadNode or ComputeFleet"
 end

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-install
-# Recipe:: byos
+# Cookbook Name:: aws-parallelcluster-byos
+# Recipe:: config_computefleet_stop_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,21 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# setup the user accounts
-include_recipe "aws-parallelcluster-install::byos_user"
-
-# create e.g. /opt/parallelcluster/byos
-directory node['cluster']['byos']['local_dir'] do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
-  mode '0755'
-  action :create
-end
-
-# create e.g. /opt/parallelcluster/shared/byos
-directory node['cluster']['byos']['shared_dir'] do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
-  mode '0755'
-  action :create
+execute_event_handler 'HeadComputeFleetStop' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadComputeFleetStop, :ExecuteCommand, :Command) })
 end

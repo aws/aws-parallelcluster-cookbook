@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-config
-# Recipe:: byos_finalize
+# Cookbook Name:: aws-parallelcluster-byos
+# Recipe:: finalize_compute
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,11 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-config::fetch_config"
-
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-config::head_node_byos_finalize'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-config::compute_byos_finalize'
+execute_event_handler 'ComputeFinalize' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeFinalize, :ExecuteCommand, :Command) })
 end
