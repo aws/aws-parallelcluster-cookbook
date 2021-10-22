@@ -14,6 +14,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# These are overrides to force the system-tests to be pinned to a specific version
+# of the packages that we install.
+
+default['cluster']['parallelcluster-version'] = '3.0.0'
+default['cluster']['parallelcluster-cookbook-version'] = '3.0.0'
+default['cluster']['parallelcluster-node-version'] = '3.0.0'
+
 # These are mock values for things that might be read from something external
 # so we provide stubs here so that recipes can run successfully
 default['cluster']['kernel_release'] =
