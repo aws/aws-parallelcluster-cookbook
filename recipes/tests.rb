@@ -367,6 +367,8 @@ bash 'test instance store' do
       set -e
 
       if [ $NUM_DEVS -gt 0 ]; then
+        # flush file system buffers
+        sync && sleep 1
         mkdir -p ${EPHEMERAL_DIR}/test_dir
         touch ${EPHEMERAL_DIR}/test_dir/test_file
       fi
