@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.0.2
+------
+
+**BUG FIXES**
+- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
+
 3.0.1
 ------
 
