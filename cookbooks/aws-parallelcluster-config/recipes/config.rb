@@ -15,6 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_recipe 'aws-parallelcluster-config::base'
+include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbastch'
+
 include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-byos::config' if node['cluster']['scheduler'] == 'byos'
 
