@@ -118,14 +118,12 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
-
 # BYOS (Custom Scheduler) Configuration
 default['cluster']['byos']['name'] = 'byos'
 default['cluster']['byos']['user'] = default['cluster']['byos']['name']
 default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
 default['cluster']['byos']['group'] = default['cluster']['byos']['user']
 default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
-
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"

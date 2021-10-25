@@ -21,11 +21,11 @@ service "supervisord" do
   action %i[enable start]
 end
 
-include_recipe 'aws-parallelcluster-config::byos_finalize' if node['cluster']['scheduler'] == 'byos'
+include_recipe 'aws-parallelcluster-byos::config_finalize' if node['cluster']['scheduler'] == 'byos'
 
 case node['cluster']['node_type']
 when 'HeadNode'
-  include_recipe 'aws-parallelcluster-config::head_node_slurm_finalize' if node['cluster']['scheduler'] == 'slurm'
+  include_recipe 'aws-parallelcluster-slurm::head_node_finalize' if node['cluster']['scheduler'] == 'slurm'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-config::compute_slurm_finalize' if node['cluster']['scheduler'] == 'slurm'
+  include_recipe 'aws-parallelcluster-slurm::compute_finalize' if node['cluster']['scheduler'] == 'slurm'
 end
