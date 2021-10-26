@@ -50,14 +50,14 @@ action_class do # rubocop:disable Metrics/BlockLength
 
     # copy launch templates config
     target_launch_templates = "#{node['cluster']['byos']['handler_dir']}/launch_templates_config.json"
-    copy_config("launch templates", "#{node['cluster']['shared_dir']}/launch_templates_config.json", target_launch_templates)
+    copy_config("launch templates", node.dig(:cluster, :launch_templates_config_path), target_launch_templates)
 
     # copy instance type data
     target_instance_types_data = "#{node['cluster']['byos']['handler_dir']}/instance-types-data.json"
-    copy_config("instance types data", node['cluster']['instance_types_data_path'], target_instance_types_data)
+    copy_config("instance types data", node.dig(:cluster, :instance_types_data_path), target_instance_types_data)
 
     # generated substack outputs json
-    source_byos_substack_outputs = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
+    source_byos_substack_outputs = node['cluster']['byos']['byos_substack_outputs_path']
     target_byos_substack_outputs = "#{node['cluster']['byos']['handler_dir']}/byos_substack_outputs.json"
     byos_substack_arn = node.dig(:cluster, :byos_substack_arn)
     if byos_substack_arn && !byos_substack_arn.empty?
@@ -152,11 +152,11 @@ action_class do # rubocop:disable Metrics/BlockLength
     # PCLUSTER_BYOS_CFN_SUBSTACK_OUTPUTS
     env.merge!({ 'PCLUSTER_BYOS_CFN_SUBSTACK_OUTPUTS' => target_byos_substack_outputs }) if ::File.exist?(target_byos_substack_outputs)
 
-    # PCLUSTER_SHARED_SCHEDULER_DIR
-    env.merge!(build_hash_from_node('PCLUSTER_SHARED_SCHEDULER_DIR', true, :cluster, :byos, :shared_dir))
+    # PCLUSTER_SHARED_BYOS_DIR
+    env.merge!(build_hash_from_node('PCLUSTER_SHARED_BYOS_DIR', true, :cluster, :byos, :shared_dir))
 
-    # PCLUSTER_LOCAL_SCHEDULER_DIR
-    env.merge!(build_hash_from_node('PCLUSTER_LOCAL_SCHEDULER_DIR', true, :cluster, :byos, :local_dir))
+    # PCLUSTER_LOCAL_BYOS_DIR
+    env.merge!(build_hash_from_node('PCLUSTER_LOCAL_BYOS_DIR', true, :cluster, :byos, :local_dir))
 
     # PCLUSTER_AWS_REGION and AWS_REGION
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))

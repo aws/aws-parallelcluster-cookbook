@@ -29,15 +29,8 @@ unless virtualized?
     not_if { ::File.exist?(node['cluster']['cluster_config_path']) }
   end
 
-  ruby_block "load cluster configuration" do
-    block do
-      require 'yaml'
-      config = YAML.load_file(node['cluster']['cluster_config_path'])
-      Chef::Log.debug("Config read #{config}")
-      node.override['cluster']['config'].merge! config
-    end
-    only_if { node['cluster']['config'].nil? }
-  end
+  # load cluster config into node object
+  load_cluster_config
 
   # Copy instance type infos file from S3 URI
   fetch_config_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object --bucket #{node['cluster']['cluster_s3_bucket']}"\

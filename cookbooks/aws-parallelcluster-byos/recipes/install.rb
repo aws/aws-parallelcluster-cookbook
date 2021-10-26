@@ -33,3 +33,10 @@ directory node['cluster']['byos']['shared_dir'] do
   mode '0755'
   action :create
 end
+
+cookbook_file '/usr/local/sbin/invoke-byos-event-handler.sh' do
+  source 'event_handler/invoke-byos-event-handler.sh'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
