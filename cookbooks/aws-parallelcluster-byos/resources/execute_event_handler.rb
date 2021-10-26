@@ -180,6 +180,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     # PCLUSTER_CLUSTER_CONFIG_OLD
     # TODO: to be implemented
 
+    env.merge!(setup_proxy(:cluster, :proxy))
     env
   end
 
@@ -188,6 +189,16 @@ action_class do # rubocop:disable Metrics/BlockLength
     raise "Unable to find node attribute #{path_in_node}" if (!var || var.empty?) && raise_if_not_found
 
     var && !var.empty? ? { name => var } : {}
+  end
+
+  def setup_proxy(*path_in_node)
+    var = node.dig(*path_in_node)
+
+    if var && !var.empty?
+      { 'http_proxy' => var, 'HTTP_PROXY' => var, 'https_proxy' => var, 'HTTPS_PROXY' => var, 'no_proxy' => "localhost,127.0.0.1,169.254.169.254", 'NO_PROXY' => "localhost,127.0.0.1,169.254.169.254" }
+    else
+      {}
+    end
   end
 
   def command_with_retries(command, retries, user, cwd, env)
