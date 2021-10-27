@@ -77,5 +77,7 @@ include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualiz
 
 include_recipe "aws-parallelcluster-config::mount_home" if node['cluster']['node_type'] == "ComputeFleet"
 
+include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbastch'
+
 include_recipe "aws-parallelcluster-slurm::prep_env" if node['cluster']['scheduler'] == 'slurm'
-include_recipe "aws-parallelcluster-byos::config_prep_env" if node['cluster']['scheduler'] == 'byos'
+include_recipe "aws-parallelcluster-byos::prep_env" if node['cluster']['scheduler'] == 'byos'

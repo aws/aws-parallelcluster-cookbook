@@ -13,6 +13,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
 - Do not strip `-` from compute resource name when configuring Slurm nodes.
 
+**BUG FIXES**
+- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
+
 3.0.1
 ------
 
@@ -60,14 +63,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix cluster update when using proxy setup
-
-2.11.3
------
-
-**BUG FIXES**
-- Fix failure when building AMI, due to SGE sources not available at arc.liv.ac.uk
-- Fix cluster update when using proxy setup.
-- Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
 
 2.11.2
 -----

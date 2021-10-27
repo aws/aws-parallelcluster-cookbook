@@ -1,5 +1,5 @@
 [computemgtd]
-cluster_name = <%= node['cluster']['stack_name'].sub("parallelcluster-", "") %>
+cluster_name = <%= node['cluster']['stack_name'] %>
 region = <%= node['cluster']['region'] %>
 proxy = <%= node['cluster']['proxy'] %>
 clustermgtd_heartbeat_file_path = /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat
