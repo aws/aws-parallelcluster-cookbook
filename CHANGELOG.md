@@ -35,6 +35,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Compile Slurm with jobcomp/elasticsearch support.
 
 **CHANGES**
+- Update pre / post install scripts to drop the first argument which was the script being run
 - Drop support for SGE and Torque schedulers.
 - Drop support for CentOS8.
 - Remove nodewatcher, sqswatcher, jobwatcher related code.
