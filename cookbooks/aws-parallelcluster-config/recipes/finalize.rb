@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook Name:: aws-parallelcluster-config
 # Recipe:: finalize
 #
 # Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
