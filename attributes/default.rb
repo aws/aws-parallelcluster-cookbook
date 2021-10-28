@@ -29,6 +29,7 @@ default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
+default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch_templates_config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['reserved_base_uid'] = 400
 
@@ -124,8 +125,17 @@ default['cluster']['byos']['user'] = default['cluster']['byos']['name']
 default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
 default['cluster']['byos']['group'] = default['cluster']['byos']['user']
 default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
+
 default['cluster']['byos']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
 default['cluster']['byos']['system_group_id_start'] = default['cluster']['byos']['system_user_id_start']
+
+# BYOS event handler
+default['cluster']['byos']['home'] = '/home/byos/'
+default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
+default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
+default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
+default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
+default['cluster']['byos']['byos_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
 
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
@@ -480,11 +490,3 @@ default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
 default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['byos']['user']) if node['cluster']['scheduler'] == 'byos'
-
-# BYOS event handler
-default['cluster']['byos']['user'] = 'byos'
-default['cluster']['byos']['home'] = '/home/byos/'
-default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
-default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
-default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
-default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
