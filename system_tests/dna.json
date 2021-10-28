@@ -38,6 +38,5 @@
     "custom_node_package": "",
     "custom_awsbatchcli_package": "",
     "head_node_imds_secured": "true"
-  },
-  "run_list": "recipe[aws-parallelcluster::slurm_config]"
+  }
 }
