@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix failure when building AMI, due to SGE sources not available at arc.liv.ac.uk
 - Fix cluster update when using proxy setup.
 - Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
+- Upgrade EFA installer to version 1.14.0. Thereafter, EFA enables GDR support by default on supported instance type(s). ParallelCluster does not reinstall EFA during node start. Previously, EFA was reinstalled if `enable_efa_gdr` had been turned on in the configuration file.
 
 2.11.2
 -----
