@@ -23,7 +23,7 @@ service "supervisord" do
   action %i[enable start]
 end
 
-include_recipe 'aws-parallelcluster-byos::config_finalize' if node['cluster']['scheduler'] == 'byos'
+include_recipe 'aws-parallelcluster-byos::finalize' if node['cluster']['scheduler'] == 'byos'
 
 case node['cluster']['node_type']
 when 'HeadNode'
