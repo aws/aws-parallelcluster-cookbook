@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: mount_shared
+# Recipe:: invoke_byos_event_handler
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,22 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Mount /home over NFS
-mount '/home' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
-  retries 10
-  retry_delay 6
-end
+event_name = node['cluster']['event_name']
+raise "Event name not specified" if !event_name && event_name.empty?
 
-# Mount /opt/parallelcluster/shared over NFS
-mount node['cluster']['shared_dir'] do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir']}" })
-  fstype "nfs"
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
-  retries 10
-  retry_delay 6
+load_cluster_config
+
+execute_event_handler event_name do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, event_name, :ExecuteCommand, :Command) })
 end
