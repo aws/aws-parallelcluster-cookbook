@@ -396,17 +396,6 @@ def get_nvswitches
   nvswitch_check.stdout.strip.to_i
 end
 
-# Check if EFA GDR is enabled (and supported) on this instance
-def efa_gdr_enabled?
-  config_value = node['cluster']['enable_efa_gdr']
-  enabling_value = if node['cluster']['node_type'] == "ComputeFleet"
-                     "compute"
-                   else
-                     "head_node"
-                   end
-  (config_value == enabling_value || config_value == "cluster") && graphic_instance?
-end
-
 # Alinux OSs currently not correctly supported by NFS cookbook
 # Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
