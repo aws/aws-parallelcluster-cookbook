@@ -124,6 +124,8 @@ default['cluster']['byos']['user'] = default['cluster']['byos']['name']
 default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
 default['cluster']['byos']['group'] = default['cluster']['byos']['user']
 default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
+default['cluster']['byos']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
+
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"

@@ -34,6 +34,15 @@ user node['cluster']['byos']['user'] do
   shell '/bin/bash'
 end
 
+# Reserve byos system users that will be replaced at node configuration time.
+(0..9).each do |i|
+  user node['cluster']['byos']['user'] + i.to_s do
+    comment "byos system user #{i}"
+    uid node['cluster']['byos']['system_user_id_start'] + i
+    gid node['cluster']['byos']['system_user_id_start'] + i
+  end
+end
+
 # create dir /home/byos/.parallelcluster
 directory node['cluster']['byos']['handler_dir'] do
   owner node['cluster']['byos']['user']
