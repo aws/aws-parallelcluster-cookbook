@@ -48,7 +48,7 @@ suites:
 
   - name: base_config_HeadNode
     run_list:
-      - recipe[aws-parallelcluster::prep_env]
+      - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::base_config]
     attributes:
       cluster:
@@ -67,7 +67,7 @@ suites:
 
   - name: slurm_config_HeadNode_x86_64
     run_list: &run_lists_slurm_config_HeadNode
-      - recipe[aws-parallelcluster::prep_env]
+      - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -104,7 +104,7 @@ suites:
 
   - name: awsbatch_config_HeadNode_x86_64
     run_list: &run_lists_awsbatch_config_HeadNode
-      - recipe[aws-parallelcluster::prep_env]
+      - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::awsbatch_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
@@ -137,7 +137,7 @@ suites:
 
   - name: slurm_config_ComputeFleet_x86_64
     run_list: &run_lists_slurm_config_ComputeFleet
-      - recipe[aws-parallelcluster::prep_env]
+      - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::slurm_config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]

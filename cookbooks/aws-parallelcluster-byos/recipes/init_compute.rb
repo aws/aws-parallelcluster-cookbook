@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: cprep_env
+# Recipe:: init_compute
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,11 +15,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-byos::prep_env_head_node'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-byos::prep_env_compute'
-else
-  raise "node_type must be HeadNode or ComputeFleet"
+# Mount /opt/parallelcluster/shared over NFS
+mount node['cluster']['shared_dir'] do
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['scheduler']['opt_shared_path']}" })
+  fstype "nfs"
+  options node['cluster']['nfs']['hard_mount_options']
+  action %i[mount enable]
+  retries 10
+  retry_delay 6
+end
+
+execute_event_handler 'ComputeInitEnvironment' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeInitEnvironment, :ExecuteCommand, :Command) })
 end

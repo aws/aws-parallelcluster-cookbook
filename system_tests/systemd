@@ -77,7 +77,7 @@ mkdir -p /opt/slurm/etc/pcluster/.slurm_plugin/
 touch /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat
 
 run_list=$(cat /etc/chef/dna.json | jq -r '.run_list')
-chef-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::prep_env &&
+chef-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::init &&
 /opt/parallelcluster/scripts/fetch_and_run -preinstall &&
 chef-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist "${run_list}" &&
 /opt/parallelcluster/scripts/fetch_and_run -postinstall &&
