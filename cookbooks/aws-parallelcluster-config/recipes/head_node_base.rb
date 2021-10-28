@@ -118,6 +118,13 @@ nfs_export "/home" do
   options ['no_root_squash']
 end
 
+# Export /opt/parallelcluster/shared
+nfs_export node['cluster']['shared_dir'] do
+  network get_vpc_cidr_list
+  writeable true
+  options ['no_root_squash']
+end
+
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
   network get_vpc_cidr_list

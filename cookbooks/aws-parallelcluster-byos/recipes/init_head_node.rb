@@ -15,13 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Export /opt/parallelcluster/shared
-nfs_export node['cluster']['shared_dir'] do
-  network get_vpc_cidr_list
-  writeable true
-  options ['no_root_squash']
-end
-
 execute_event_handler 'HeadInit' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadInit, :ExecuteCommand, :Command) })
 end

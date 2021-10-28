@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster
-# Recipe:: mount_home
+# Recipe:: mount_shared
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -19,6 +19,16 @@
 mount '/home' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
   fstype 'nfs'
+  options node['cluster']['nfs']['hard_mount_options']
+  action %i[mount enable]
+  retries 10
+  retry_delay 6
+end
+
+# Mount /opt/parallelcluster/shared over NFS
+mount node['cluster']['shared_dir'] do
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['scheduler']['opt_shared_path']}" })
+  fstype "nfs"
   options node['cluster']['nfs']['hard_mount_options']
   action %i[mount enable]
   retries 10
