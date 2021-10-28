@@ -25,6 +25,6 @@ mount node['cluster']['shared_dir'] do
   retry_delay 6
 end
 
-execute_event_handler 'ComputeInitEnvironment' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeInitEnvironment, :ExecuteCommand, :Command) })
+execute_event_handler 'ComputeInit' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeInit, :ExecuteCommand, :Command) })
 end
