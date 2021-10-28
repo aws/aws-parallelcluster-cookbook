@@ -22,6 +22,6 @@ nfs_export node['cluster']['shared_dir'] do
   options ['no_root_squash']
 end
 
-execute_event_handler 'HeadInitEnvironment' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadInitEnvironment, :ExecuteCommand, :Command) })
+execute_event_handler 'HeadInit' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadInit, :ExecuteCommand, :Command) })
 end
