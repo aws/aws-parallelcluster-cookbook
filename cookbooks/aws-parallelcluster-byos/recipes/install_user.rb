@@ -38,7 +38,7 @@ end
 (0..9).each do |i|
   group node['cluster']['byos']['group'] + i.to_s do
     comment "byos system group #{i}"
-    gid node['cluster']['byos']['group_id'] + i
+    gid node['cluster']['byos']['system_group_id_start'] + i
     system true
   end
 
