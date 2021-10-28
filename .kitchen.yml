@@ -38,14 +38,6 @@ suites:
         nvidia:
           enabled: 'yes'
 
-  - name: slurm_install
-    run_list:
-      - recipe[aws-parallelcluster::slurm_install]
-
-  - name: awsbatch_install
-    run_list:
-      - recipe[aws-parallelcluster::awsbatch_install]
-
   - name: base_config_HeadNode
     run_list:
       - recipe[aws-parallelcluster::init]
@@ -68,7 +60,7 @@ suites:
   - name: slurm_config_HeadNode_x86_64
     run_list: &run_lists_slurm_config_HeadNode
       - recipe[aws-parallelcluster::init]
-      - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes: &attributes_slurm_config_HeadNode
@@ -105,7 +97,7 @@ suites:
   - name: awsbatch_config_HeadNode_x86_64
     run_list: &run_lists_awsbatch_config_HeadNode
       - recipe[aws-parallelcluster::init]
-      - recipe[aws-parallelcluster::awsbatch_config]
+      - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes: &attributes_awsbatch_config_HeadNode
@@ -138,7 +130,7 @@ suites:
   - name: slurm_config_ComputeFleet_x86_64
     run_list: &run_lists_slurm_config_ComputeFleet
       - recipe[aws-parallelcluster::init]
-      - recipe[aws-parallelcluster::slurm_config]
+      - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
     attributes: &attributes_slurm_config_ComputeFleet

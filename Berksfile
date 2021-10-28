@@ -20,4 +20,5 @@ cookbook "aws-parallelcluster-install", path: "./cookbooks/aws-parallelcluster-i
 cookbook "aws-parallelcluster-config", path: "./cookbooks/aws-parallelcluster-config"
 cookbook "aws-parallelcluster-slurm", path: "./cookbooks/aws-parallelcluster-slurm"
 cookbook "aws-parallelcluster-byos", path: "./cookbooks/aws-parallelcluster-byos"
+cookbook "aws-parallelcluster-awsbatch", path: "./cookbooks/aws-parallelcluster-awsbatch"
 cookbook "aws-parallelcluster-test", path: "./cookbooks/aws-parallelcluster-test"
