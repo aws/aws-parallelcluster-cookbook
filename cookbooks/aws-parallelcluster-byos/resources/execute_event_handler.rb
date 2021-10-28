@@ -194,7 +194,7 @@ action_class do # rubocop:disable Metrics/BlockLength
   def setup_proxy(*path_in_node)
     var = node.dig(*path_in_node)
 
-    if var && !var.empty?
+    if var && !var.empty? && var != "NONE"
       { 'http_proxy' => var, 'HTTP_PROXY' => var, 'https_proxy' => var, 'HTTPS_PROXY' => var, 'no_proxy' => "localhost,127.0.0.1,169.254.169.254", 'NO_PROXY' => "localhost,127.0.0.1,169.254.169.254" }
     else
       {}
