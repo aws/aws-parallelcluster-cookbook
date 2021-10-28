@@ -36,6 +36,12 @@ end
 
 # Reserve byos system users that will be replaced at node configuration time.
 (0..9).each do |i|
+  group node['cluster']['byos']['group'] + i.to_s do
+    comment "byos system group #{i}"
+    gid node['cluster']['byos']['group_id'] + i
+    system true
+  end
+
   user node['cluster']['byos']['user'] + i.to_s do
     comment "byos system user #{i}"
     uid node['cluster']['byos']['system_user_id_start'] + i
