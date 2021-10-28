@@ -20,6 +20,4 @@ include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']
 
 include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-byos::config' if node['cluster']['scheduler'] == 'byos'
-
-# TODO: to be moved under aws-parallelcluster-awsbatch
-include_recipe 'aws-parallelcluster-config::awsbatch' if node['cluster']['scheduler'] == 'awsbatch'
+include_recipe 'aws-parallelcluster-awsbatch::config' if node['cluster']['scheduler'] == 'awsbatch'
