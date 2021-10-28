@@ -27,7 +27,7 @@ end
 
 # Mount /opt/parallelcluster/shared over NFS
 mount node['cluster']['shared_dir'] do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['scheduler']['opt_shared_path']}" })
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir']}" })
   fstype "nfs"
   options node['cluster']['nfs']['hard_mount_options']
   action %i[mount enable]
