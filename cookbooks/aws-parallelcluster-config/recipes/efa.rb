@@ -15,9 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Installation recipe must be re-executed at runtime to enable GDR
-include_recipe "aws-parallelcluster-install::efa"
-
 if platform?('ubuntu') && node['cluster']['enable_efa'] == 'compute' && node['cluster']['node_type'] == 'ComputeFleet'
   # Disabling ptrace protection is needed for EFA in order to use SHA transfer for intra-node communication.
   sysctl 'kernel.yama.ptrace_scope' do

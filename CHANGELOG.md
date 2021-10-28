@@ -17,8 +17,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Do not strip `-` from compute resource name when configuring Slurm nodes.
 - Upgrade Slurm to version 21.08.4.
 
-**BUG FIXES**
-- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
 
 3.0.2
 ------
@@ -33,6 +31,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - RDMA core: ``rdma-core-37.0``
   - Libfabric: ``libfabric-1.13.2``
   - Open MPI: ``openmpi40-aws-4.1.1-2``
+
+**BUG FIXES**
+- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
 
 3.0.1
 ------
