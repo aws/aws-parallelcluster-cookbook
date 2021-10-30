@@ -15,6 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+fetch_artifacts 'Fetch Cluster Shared Artifacts' do
+  plugin_resources(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :PluginResources) })
+end
+
 execute_event_handler 'HeadInit' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadInit, :ExecuteCommand, :Command) })
 end

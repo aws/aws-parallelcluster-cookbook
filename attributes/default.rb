@@ -126,7 +126,7 @@ default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
 default['cluster']['byos']['group'] = default['cluster']['byos']['user']
 default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
 # BYOS event handler
-default['cluster']['byos']['home'] = '/home/byos/'
+default['cluster']['byos']['home'] = '/home/byos'
 default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
 default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
 default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
