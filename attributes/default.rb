@@ -104,10 +104,10 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # Python packages
-default['cluster']['parallelcluster-version'] = '3.0.1'
-default['cluster']['parallelcluster-cookbook-version'] = '3.0.1'
-default['cluster']['parallelcluster-node-version'] = '3.0.1'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
+default['cluster']['parallelcluster-version'] = '3.1.0'
+default['cluster']['parallelcluster-cookbook-version'] = '3.1.0'
+default['cluster']['parallelcluster-node-version'] = '3.1.0'
+default['cluster']['parallelcluster-awsbatch-cli-version'] = '3.0.0'
 
 # URLs to software packages used during install recipes
 # Slurm software
@@ -130,7 +130,7 @@ default['cluster']['byos']['system_user_id_start'] = node['cluster']['reserved_b
 default['cluster']['byos']['system_group_id_start'] = default['cluster']['byos']['system_user_id_start']
 
 # BYOS event handler
-default['cluster']['byos']['home'] = '/home/byos/'
+default['cluster']['byos']['home'] = '/home/byos'
 default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
 default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
 default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
