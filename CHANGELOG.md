@@ -16,6 +16,21 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
 
+3.0.2
+------
+
+**BUG FIXES**
+- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
+- Upgrade EFA installer to version 1.14.1. Thereafter, EFA enables GDR support by default on supported instance type(s).
+    ParallelCluster does not reinstall EFA during node start. Previously, EFA was reinstalled if `GdrSupport` had been
+    turned on in the configuration file.
+    - EFA configuration: ``efa-config-1.9-1``
+    - EFA profile: ``efa-profile-1.5-1``
+    - EFA kernel module: ``efa-1.14.2``
+    - RDMA core: ``rdma-core-37.0``
+    - Libfabric: ``libfabric-1.13.2``
+    - Open MPI: ``openmpi40-aws-4.1.1-2``
+
 3.0.1
 ------
 
