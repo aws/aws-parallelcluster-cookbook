@@ -125,6 +125,10 @@ default['cluster']['byos']['user'] = default['cluster']['byos']['name']
 default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
 default['cluster']['byos']['group'] = default['cluster']['byos']['user']
 default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
+
+default['cluster']['byos']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
+default['cluster']['byos']['system_group_id_start'] = default['cluster']['byos']['system_user_id_start']
+
 # BYOS event handler
 default['cluster']['byos']['home'] = '/home/byos'
 default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
@@ -132,6 +136,7 @@ default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugi
 default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
 default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
 default['cluster']['byos']['byos_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
+
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
