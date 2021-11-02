@@ -16,7 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-config::base'
-include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbastch'
+include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbatch'
 
 include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-byos::config' if node['cluster']['scheduler'] == 'byos'
