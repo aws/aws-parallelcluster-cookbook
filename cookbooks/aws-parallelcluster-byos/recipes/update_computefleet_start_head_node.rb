@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-slurm
-# Recipe:: install
+# Cookbook Name:: aws-parallelcluster-byos
+# Recipe:: update_computefleet_start_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-slurm::install_pmix'
-include_recipe 'aws-parallelcluster-slurm::install_munge'
-include_recipe 'aws-parallelcluster-slurm::install_slurm'
+execute_event_handler 'HeadComputeFleetStart' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadComputeFleetStart, :ExecuteCommand, :Command) })
+end

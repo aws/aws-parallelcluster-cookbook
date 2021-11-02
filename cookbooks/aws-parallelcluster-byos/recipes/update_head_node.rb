@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: config_update_head_node
+# Recipe:: update_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

@@ -17,9 +17,9 @@
 
 case node['cluster']['node_type']
 when 'HeadNode'
-  include_recipe 'aws-parallelcluster-slurm::head_node_config'
+  include_recipe 'aws-parallelcluster-slurm::config_head_node'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-slurm::compute_config'
+  include_recipe 'aws-parallelcluster-slurm::config_compute'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end
