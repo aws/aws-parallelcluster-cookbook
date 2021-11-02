@@ -15,8 +15,20 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-package %w[slurm* libslurm*] do
+package %w(slurm* libslurm*) do
   action :purge
+end
+
+slurm_build_deps = value_for_platform(
+  'ubuntu' => {
+    'default' => %w(libjson-c-dev libhttp-parser-dev),
+  },
+  'default' => %w(json-c-devel http-parser-devel)
+)
+
+package slurm_build_deps do
+  retries 3
+  retry_delay 5
 end
 
 # Setup slurm group
@@ -71,7 +83,7 @@ bash 'make install' do
 
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cluster']['slurm']['version']}
-    ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
+    ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix --enable-slurmrestd
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install

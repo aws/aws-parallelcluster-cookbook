@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade PMIx to version 3.2.3
 - Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
 - Do not strip `-` from compute resource name when configuring Slurm nodes.
+- Upgrade Slurm to version 21.08.3.
 
 **BUG FIXES**
 - Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
