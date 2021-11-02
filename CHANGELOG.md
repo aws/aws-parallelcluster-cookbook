@@ -6,10 +6,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.11.3
 -----
 
-**BUG FIXES**
-- Fix failure when building AMI, due to SGE sources not available at arc.liv.ac.uk
-- Fix cluster update when using proxy setup.
-- Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
+**CHANGES**
 - Upgrade EFA installer to version 1.14.1. Thereafter, EFA enables GDR support by default on supported instance type(s).
   ParallelCluster does not reinstall EFA during node start. Previously, EFA was reinstalled if `enable_efa_gdr` had been
   turned on in the configuration file.
@@ -19,6 +16,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - RDMA core: ``rdma-core-37.0``
   - Libfabric: ``libfabric-1.13.2``
   - Open MPI: ``openmpi40-aws-4.1.1-2``
+
+**BUG FIXES**
+- Fix failure when building AMI, due to SGE sources not available at arc.liv.ac.uk
+- Fix cluster update when using proxy setup.
+- Update ca-certificates package during AMI build time and prevent Chef from using outdated/distrusted CA certificates.
 
 2.11.2
 -----
