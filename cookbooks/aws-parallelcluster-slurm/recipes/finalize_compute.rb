@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster-slurm
-# Recipe:: compute_finalize
+# Recipe:: finalize_compute
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

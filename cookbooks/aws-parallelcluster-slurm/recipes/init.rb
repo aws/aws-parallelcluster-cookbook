@@ -49,4 +49,4 @@ if node['cluster']['node_type'] == "ComputeFleet"
 end
 
 # Configure hostname and DNS
-include_recipe "aws-parallelcluster-slurm::dns"
+include_recipe "aws-parallelcluster-slurm::init_dns"

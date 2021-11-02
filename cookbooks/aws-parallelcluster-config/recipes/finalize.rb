@@ -24,10 +24,4 @@ service "supervisord" do
 end
 
 include_recipe 'aws-parallelcluster-byos::finalize' if node['cluster']['scheduler'] == 'byos'
-
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-slurm::head_node_finalize' if node['cluster']['scheduler'] == 'slurm'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-slurm::compute_finalize' if node['cluster']['scheduler'] == 'slurm'
-end
+include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
