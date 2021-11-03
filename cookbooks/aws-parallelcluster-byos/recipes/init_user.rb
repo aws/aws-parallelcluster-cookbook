@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: init
+# Recipe:: init_user
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,14 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# create system user
-include_recipe "aws-parallelcluster-byos::init_user"
-
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-byos::init_head_node'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-byos::init_compute'
-else
-  raise "node_type must be HeadNode or ComputeFleet"
+# create system user in config file
+create_user 'Create system users' do
+  system_users(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :SystemUsers) })
 end
