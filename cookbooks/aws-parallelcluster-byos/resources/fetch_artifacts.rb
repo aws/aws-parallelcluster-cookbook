@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
+# with the License. A copy of the License is located at http://aws.amazon.com/apache2.0/
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
 resource_name :fetch_artifacts
 provides :fetch_artifacts
 
@@ -7,6 +15,9 @@ provides :fetch_artifacts
 
 property :name, String, name_property: true
 property :plugin_resources, Hash, required: false
+property :force_download, [true, false],
+         default: false,
+         description: 'force download if file exists'
 
 default_action :run
 
@@ -20,7 +31,7 @@ action :run do
         artifact_source_url = artifact[:Source]
         source_name = artifact_source_url.split("/")[-1]
         target_source_path = "#{node['cluster']['byos']['home']}/#{source_name}"
-        next if ::File.exist?(target_source_path)
+        next if ::File.exist?(target_source_path) && !new_resource.force_download
 
         Chef::Log.info("Downloading artifacts from (#{artifact_source_url}) to (#{target_source_path})")
         if artifact_source_url.start_with?("s3")
