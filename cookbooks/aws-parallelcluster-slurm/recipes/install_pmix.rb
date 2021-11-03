@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster-slurm
-# Recipe:: pmix_install
+# Recipe:: install_pmix
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

@@ -2,7 +2,7 @@
 
 #
 # Cookbook Name:: aws-parallelcluster-slurm
-# Recipe:: munge_install
+# Recipe:: install_munge
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
