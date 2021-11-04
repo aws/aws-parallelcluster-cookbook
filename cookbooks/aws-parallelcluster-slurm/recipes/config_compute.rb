@@ -38,6 +38,13 @@ end
 # Check to see if is GPU instance with Nvidia installed
 Chef::Log.warn("GPU instance but no Nvidia drivers found") if graphic_instance? && !nvidia_installed?
 
+# Run nvidia-smi triggers loading of the kernel module and creation of the device files
+if graphic_instance? && nvidia_installed?
+  execute "run_nvidiasmi" do
+    command 'nvidia-smi'
+  end
+end
+
 cookbook_file '/etc/systemd/system/slurmd.service' do
   source 'compute_slurm/slurmd.service'
   owner 'root'
