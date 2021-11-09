@@ -81,3 +81,6 @@ include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
 include_recipe "aws-parallelcluster-byos::init" if node['cluster']['scheduler'] == 'byos'
+
+# IMDS
+include_recipe 'aws-parallelcluster-config::imds' unless virtualized?

@@ -176,6 +176,3 @@ if node['cluster']['dcv_enabled'] == "head_node"
   # Activate DCV on head node
   include_recipe 'aws-parallelcluster-config::dcv'
 end
-
-# IMDS
-include_recipe 'aws-parallelcluster-config::imds' unless virtualized?

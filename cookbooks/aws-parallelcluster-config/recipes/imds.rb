@@ -36,9 +36,8 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] !=
 
   case node['cluster']['head_node_imds_secured']
   when 'true'
-    imds_allowed_users = node['cluster']['head_node_imds_allowed_users'].join(',')
     execute 'IMDS lockdown enable' do
-      command "bash #{imds_access_script} --flush && bash #{imds_access_script} --allow #{imds_allowed_users}"
+      command(lazy { "bash #{imds_access_script} --flush && bash #{imds_access_script} --allow #{node['cluster']['head_node_imds_allowed_users'].join(',')}" })
       user 'root'
     end
   when 'false'
