@@ -19,3 +19,8 @@
 create_user 'Create system users' do
   system_users(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :SystemUsers) })
 end
+
+# set sudo privileges for scheduler user
+set_user_privileges 'Set sudo privileges' do
+  grant_sudo_privileges(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :GrantSudoPrivileges) })
+end

@@ -41,11 +41,3 @@ directory node['cluster']['scheduler_plugin']['handler_dir'] do
   mode '0755'
   action :create
 end
-
-# Ensure byos user has sudoers capability
-template '/etc/sudoers.d/99-parallelcluster-scheduler-plugin' do
-  source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin.erb'
-  owner 'root'
-  group 'root'
-  mode '0600'
-end
