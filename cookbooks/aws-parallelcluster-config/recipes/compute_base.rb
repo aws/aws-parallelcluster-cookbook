@@ -90,6 +90,3 @@ shared_dir_array.each do |dir|
     retry_delay 6
   end
 end
-
-# IMDS
-include_recipe 'aws-parallelcluster-config::imds'
