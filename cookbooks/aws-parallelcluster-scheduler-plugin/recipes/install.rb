@@ -17,6 +17,8 @@
 
 # setup the user accounts
 include_recipe "aws-parallelcluster-scheduler-plugin::install_user"
+# setup Pyenv and Virtualenv
+include_recipe "aws-parallelcluster-scheduler-plugin::install_python"
 
 # create e.g. /opt/parallelcluster/byos
 directory node['cluster']['scheduler_plugin']['local_dir'] do

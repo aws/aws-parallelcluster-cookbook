@@ -136,6 +136,16 @@ default['cluster']['scheduler_plugin']['handler_log'] = '/var/log/parallelcluste
 default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['shared_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler-plugin-substack-outputs.json"
+default['cluster']['scheduler_plugin']['python_version'] = '3.9.9'
+default['cluster']['scheduler_plugin']['virtualenv'] = 'scheduler_plugin_virtualenv'
+default['cluster']['scheduler_plugin']['virtualenv_path'] = [
+  node['cluster']['scheduler_plugin']['home'],
+  '.pyenv',
+  'versions',
+  node['cluster']['scheduler_plugin']['python_version'],
+  'envs',
+  node['cluster']['scheduler_plugin']['virtualenv'],
+].join('/')
 
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'

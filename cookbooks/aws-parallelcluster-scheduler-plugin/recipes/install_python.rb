@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster-scheduler-plugin
-# Recipe:: init_user
+# Recipe:: install_python
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -14,13 +14,16 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-# create scheduler plugin users in config file
-create_user 'Create scheduler plugin users' do
-  system_users(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :SystemUsers) })
+install_pyenv node['cluster']['scheduler_plugin']['python_version'] do
+  user_only true
+  user node['cluster']['scheduler_plugin']['user']
 end
 
-# set sudo privileges for scheduler plugin user
-set_user_privileges 'Set sudo privileges' do
-  grant_sudo_privileges(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :GrantSudoPrivileges) })
+activate_virtual_env node['cluster']['scheduler_plugin']['virtualenv'] do
+  pyenv_path node['cluster']['scheduler_plugin']['virtualenv_path']
+  user node['cluster']['scheduler_plugin']['user']
+  python_version node['cluster']['scheduler_plugin']['python_version']
+  not_if { ::File.exist?("#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin/activate") }
 end
