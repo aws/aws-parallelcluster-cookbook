@@ -49,7 +49,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     copy_config("cluster configuration", node.dig(:cluster, :cluster_config_path), target_cluster_config)
 
     # copy launch templates config
-    target_launch_templates = "#{node['cluster']['scheduler_plugin']['handler_dir']}/launch_templates_config.json"
+    target_launch_templates = "#{node['cluster']['scheduler_plugin']['handler_dir']}/launch-templates-config.json"
     copy_config("launch templates", node.dig(:cluster, :launch_templates_config_path), target_launch_templates)
 
     # copy instance type data
@@ -58,7 +58,7 @@ action_class do # rubocop:disable Metrics/BlockLength
 
     # generated substack outputs json
     source_scheduler_plugin_substack_outputs = node['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path']
-    target_scheduler_plugin_substack_outputs = "#{node['cluster']['scheduler_plugin']['handler_dir']}/scheduler_plugin_substack_outputs.json"
+    target_scheduler_plugin_substack_outputs = "#{node['cluster']['scheduler_plugin']['handler_dir']}/scheduler-plugin-substack-outputs.json"
     scheduler_plugin_substack_arn = node.dig(:cluster, :scheduler_plugin_substack_arn)
     if scheduler_plugin_substack_arn && !scheduler_plugin_substack_arn.empty?
       Chef::Log.info("Found scheduler plugin substack (#{scheduler_plugin_substack_arn})")
@@ -84,7 +84,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     end
 
     # Load static env from file or build it if file not found
-    source_handler_env = "#{node['cluster']['shared_dir']}/handler_env.json"
+    source_handler_env = "#{node['cluster']['shared_dir']}/handler-env.json"
     if ::File.exist?(source_handler_env)
       Chef::Log.info("Found handler environment file (#{source_handler_env})")
       env = JSON.load_file(source_handler_env)
