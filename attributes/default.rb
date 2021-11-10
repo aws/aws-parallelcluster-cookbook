@@ -29,7 +29,7 @@ default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
-default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch_templates_config.json"
+default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['reserved_base_uid'] = 400
 
@@ -120,22 +120,22 @@ default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 # BYOS (Custom Scheduler) Configuration
-default['cluster']['byos']['name'] = 'byos'
-default['cluster']['byos']['user'] = default['cluster']['byos']['name']
-default['cluster']['byos']['user_id'] = node['cluster']['reserved_base_uid'] + 4
-default['cluster']['byos']['group'] = default['cluster']['byos']['user']
-default['cluster']['byos']['group_id'] = default['cluster']['byos']['user_id']
+default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
+default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
+default['cluster']['scheduler_plugin']['user_id'] = node['cluster']['reserved_base_uid'] + 4
+default['cluster']['scheduler_plugin']['group'] = default['cluster']['scheduler_plugin']['user']
+default['cluster']['scheduler_plugin']['group_id'] = default['cluster']['scheduler_plugin']['user_id']
 
-default['cluster']['byos']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
-default['cluster']['byos']['system_group_id_start'] = default['cluster']['byos']['system_user_id_start']
+default['cluster']['scheduler_plugin']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
+default['cluster']['scheduler_plugin']['system_group_id_start'] = default['cluster']['scheduler_plugin']['system_user_id_start']
 
 # BYOS event handler
-default['cluster']['byos']['home'] = '/home/byos'
-default['cluster']['byos']['handler_dir'] = '/home/byos/.parallelcluster'
-default['cluster']['byos']['handler_log'] = '/var/log/parallelcluster/byos-plugin.log'
-default['cluster']['byos']['shared_dir'] = "#{node['cluster']['shared_dir']}/byos"
-default['cluster']['byos']['local_dir'] = "#{node['cluster']['base_dir']}/byos"
-default['cluster']['byos']['byos_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/byos_substack_outputs.json"
+default['cluster']['scheduler_plugin']['home'] = '/home/pcluster-scheduler-plugin'
+default['cluster']['scheduler_plugin']['handler_dir'] = '/home/pcluster-scheduler-plugin/.parallelcluster'
+default['cluster']['scheduler_plugin']['handler_log'] = '/var/log/parallelcluster/scheduler-plugin.log'
+default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['shared_dir']}/scheduler-plugin"
+default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
+default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler-plugin-substack-outputs.json"
 
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
@@ -489,4 +489,4 @@ default['cluster']['instance_types_data'] = nil
 default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
-default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['byos']['user']) if node['cluster']['scheduler'] == 'byos'
+default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['scheduler_plugin']['user']) if node['cluster']['scheduler'] == 'plugin'

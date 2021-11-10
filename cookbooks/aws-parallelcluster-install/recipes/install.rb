@@ -31,7 +31,7 @@ end
 include_recipe 'aws-parallelcluster-install::base'
 include_recipe "aws-parallelcluster-install::intel"
 include_recipe 'aws-parallelcluster-slurm::install'
-include_recipe 'aws-parallelcluster-byos::install'
+include_recipe 'aws-parallelcluster-scheduler-plugin::install'
 include_recipe 'aws-parallelcluster-awsbatch::install'
 
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment

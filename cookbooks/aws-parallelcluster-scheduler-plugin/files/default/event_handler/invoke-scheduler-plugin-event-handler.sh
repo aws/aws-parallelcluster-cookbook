@@ -3,30 +3,30 @@
 DUMMY_DIR="/tmp"
 ORIGINAL_SHARED_DIR="/opt/parallelcluster/shared"
 CLUSTER_CONFIGURATION_FILE="cluster-config.yaml"
-LAUNCH_TEMPLATES_CONFIG_FILE="launch_templates_config.json"
+LAUNCH_TEMPLATES_CONFIG_FILE="launch-templates-config.json"
 INSTANCE_TYPES_DATA_FILE="instance-types-data.json"
-BYOS_SUBSTACK_OUTPUTS_FILE="byos_substack_outputs.json"
+SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS_FILE="scheduler-plugin-substack-outputs.json"
 ORIGINAL_CLUSTER_CONFIGURATION="${ORIGINAL_SHARED_DIR}/${CLUSTER_CONFIGURATION_FILE}"
 DUMMY_LAUNCH_TEMPLATES_CONFIG="${DUMMY_DIR}/${LAUNCH_TEMPLATES_CONFIG_FILE}"
 ORIGINAL_LAUNCH_TEMPLATES_CONFIG="${ORIGINAL_SHARED_DIR}/${LAUNCH_TEMPLATES_CONFIG_FILE}"
 DUMMY_INSTANCE_TYPES_DATA="${DUMMY_DIR}/${INSTANCE_TYPES_DATA_FILE}"
 ORIGINAL_INSTANCE_TYPES_DATA="${ORIGINAL_SHARED_DIR}/${INSTANCE_TYPES_DATA_FILE}"
-DUMMY_BYOS_SUBSTACK_OUTPUTS="${DUMMY_DIR}/${BYOS_SUBSTACK_OUTPUTS_FILE}"
-ORIGINAL_BYOS_SUBSTACK_OUTPUTS="${ORIGINAL_SHARED_DIR}/${BYOS_SUBSTACK_OUTPUTS_FILE}"
+DUMMY_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS="${DUMMY_DIR}/${SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS_FILE}"
+ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS="${ORIGINAL_SHARED_DIR}/${SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS_FILE}"
 
 help() {
-  echo "Utility to call BYOS event handler for development/debugging purposes"
+  echo "Utility to call ParallelCluster scheduler plugin event handler for development/debugging purposes"
     echo
-    echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config> --instance-types-data <instance types data> --byos-stack-outputs <byos substack outputs>] --cluster-configuration <cluster configuration> --event-name <event name>"
+    echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config> --instance-types-data <instance types data> --scheduler-plugin-stack-outputs <scheduler plugin substack outputs>] --cluster-configuration <cluster configuration> --event-name <event name>"
     echo "options:"
-    echo "--help                    Print this help."
-    echo "--debug                   Exec in debug mode (with set -x)."
-    echo "--event-name              The name of the event to trigger, possible values are:"
-    echo "                            HeadInit, HeadConfigure, HeadFinalize, ComputeInit, ComputeConfigure, ComputeFinalize, HeadClusterUpdate, HeadComputeFleetStart or HeadComputeFleetStop."
-    echo "--cluster-configuration   Required local path to cluster configuration file, in YAML format."
-    echo "--launch-templates-config Local path to launch templates config file, in JSON format. When not set, if instance is not created by cluster creation, dummy launch templates config is created, otherwise the one retrieved from cluster will be used"
-    echo "--instance-types-data     Local path to instance types data file, in JSON format. When not set, if instance is not created by cluster creation, dummy instance types data is created, otherwise the one retrieved from cluster will be used"
-    echo "--byos-substack-outputs   Local path to byos substack outputs file, in JSON format. When not set, if instance is not created by cluster creation, dummy byos substack outputs is created, otherwise the one retrieved from cluster will be used"
+    echo "--help                                Print this help."
+    echo "--debug                               Exec in debug mode (with set -x)."
+    echo "--event-name                          The name of the event to trigger, possible values are:"
+    echo "                                          HeadInit, HeadConfigure, HeadFinalize, ComputeInit, ComputeConfigure, ComputeFinalize, HeadClusterUpdate, HeadComputeFleetStart or HeadComputeFleetStop."
+    echo "--cluster-configuration               Required local path to cluster configuration file, in YAML format."
+    echo "--launch-templates-config             Local path to launch templates config file, in JSON format. When not set, if instance is not created by cluster creation, dummy launch templates config is created, otherwise the one retrieved from cluster will be used"
+    echo "--instance-types-data                 Local path to instance types data file, in JSON format. When not set, if instance is not created by cluster creation, dummy instance types data is created, otherwise the one retrieved from cluster will be used"
+    echo "--scheduler-plugin-substack-outputs   Local path to scheduler plugin substack outputs file, in JSON format. When not set, if instance is not created by cluster creation, dummy scheduler plugin substack outputs is created, otherwise the one retrieved from cluster will be used"
     echo
 }
 
@@ -36,7 +36,7 @@ fail() {
 }
 
 log() {
-  echo "$1" | ts "[%Y-%m-%d %H:%M:%S,000] - [invoke-byos-event-handler] - INFO:"
+  echo "$1" | ts "[%Y-%m-%d %H:%M:%S,000] - [invoke-scheduler-plugin-event-handler] - INFO:"
 }
 
 if [ $# -eq 0 ]; then
@@ -81,12 +81,12 @@ while [ $# -gt 0 ]; do
     --instance-types-data=*)
       instance_types_data+=("${1#*=}")
     ;;
-    --byos-substack-outputs)
-      byos_substack_outputs+=("$2")
+    --scheduler-plugin-substack-outputs)
+      scheduler_plugin_substack_outputs+=("$2")
       shift
     ;;
-    --byos-substack-outputs=*)
-      byos_substack_outputs+=("${1#*=}")
+    --scheduler-plugin-substack-outputs=*)
+      scheduler_plugin_substack_outputs+=("${1#*=}")
     ;;
     *)
       fail "Unrecognized option ($1)"
@@ -133,8 +133,8 @@ build_dna_json() {
     "launch_templates_config_path": "$(readlink -f ${launch_templates_config})",
     "instance_types_data_path": "$(readlink -f ${instance_types_data})",
     "event_name": "${event_name}",
-    "byos": {
-      "byos_substack_outputs_path": "$(readlink -f ${byos_substack_outputs})"
+    "scheduler_plugin": {
+      "scheduler_plugin_substack_outputs_path": "$(readlink -f ${scheduler_plugin_substack_outputs})"
     }
   }
 }
@@ -153,7 +153,7 @@ call_chef_run() {
     --no-color \
     --chef-zero-port 8889 \
     --json-attributes /tmp/dna.json \
-    --override-runlist aws-parallelcluster::invoke_byos_event_handler)
+    --override-runlist aws-parallelcluster::invoke_scheduler_plugin_event_handler)
 
   log "Calling event handler with command (${chef_command[*]})"
   "${chef_command[@]}"
@@ -293,10 +293,10 @@ create_dummy_instance_types_data() {
 EOF
 }
 
-create_dummy_byos_substack_outputs() {
-  byos_substack_outputs="${DUMMY_BYOS_SUBSTACK_OUTPUTS}"
-  log "Instance types data not specified, creating dummy one under (${byos_substack_outputs})"
-  cat << EOF > ${byos_substack_outputs}
+create_dummy_scheduler_plugin_substack_outputs() {
+  scheduler_plugin_substack_outputs="${DUMMY_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}"
+  log "Instance types data not specified, creating dummy one under (${scheduler_plugin_substack_outputs})"
+  cat << EOF > ${scheduler_plugin_substack_outputs}
 {
    "Outputs": {
      "Key1": "Value1",
@@ -325,9 +325,9 @@ if [[ -f "/etc/chef/dna.json" ]]; then
     instance_types_data="${ORIGINAL_INSTANCE_TYPES_DATA}"
   fi
 
-  if [[ -z "${byos_substack_outputs}" ]]; then
-    log "Byos substack outputs not specified, will be generated under (${ORIGINAL_BYOS_SUBSTACK_OUTPUTS}) if there is a substack with outputs."
-    byos_substack_outputs="${ORIGINAL_BYOS_SUBSTACK_OUTPUTS}"
+  if [[ -z "${scheduler_plugin_substack_outputs}" ]]; then
+    log "Scheduler plugion substack outputs not specified, will be generated under (${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}) if there is a substack with outputs."
+    scheduler_plugin_substack_outputs="${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}"
   fi
 else
   log "Instance not created as part of cluster creation"
@@ -344,8 +344,8 @@ else
     create_dummy_instance_types_data
   fi
 
-  if [[ -z "${byos_substack_outputs}" ]]; then
-    create_dummy_byos_substack_outputs
+  if [[ -z "${scheduler_plugin_substack_outputs}" ]]; then
+    create_dummy_scheduler_plugin_substack_outputs
   fi
 
   build_minimal_dna_json

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: update_computefleet_stop_head_node
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
+# Recipe:: init
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute_event_handler 'HeadComputeFleetStop' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadComputeFleetStop, :ExecuteCommand, :Command) })
+# create system user
+include_recipe "aws-parallelcluster-scheduler-plugin::init_user"
+
+case node['cluster']['node_type']
+when 'HeadNode'
+  include_recipe 'aws-parallelcluster-scheduler-plugin::init_head_node'
+when 'ComputeFleet'
+  include_recipe 'aws-parallelcluster-scheduler-plugin::init_compute'
+else
+  raise "node_type must be HeadNode or ComputeFleet"
 end

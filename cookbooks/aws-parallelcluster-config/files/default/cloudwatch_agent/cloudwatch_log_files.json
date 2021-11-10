@@ -13,7 +13,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "amazon",
@@ -32,7 +32,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "ubuntu"
@@ -50,7 +50,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "amazon",
@@ -69,7 +69,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "amazon",
@@ -88,7 +88,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "amazon",
@@ -107,7 +107,7 @@
       "log_stream_name": "cloud-init-output",
       "schedulers": [
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "amazon",
@@ -126,7 +126,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "amazon",
@@ -248,7 +248,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -272,7 +272,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -296,7 +296,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -320,7 +320,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -344,7 +344,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -368,7 +368,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -392,7 +392,7 @@
       "schedulers": [
         "awsbatch",
         "slurm",
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
@@ -411,10 +411,10 @@
     },
     {
       "timestamp_format_key": "default",
-      "file_path": "/var/log/parallelcluster/byos-plugin.log",
-      "log_stream_name": "byos-plugin",
+      "file_path": "/var/log/parallelcluster/scheduler-plugin.log",
+      "log_stream_name": "scheduler-plugin",
       "schedulers": [
-        "byos"
+        "plugin"
       ],
       "platforms": [
         "centos",
