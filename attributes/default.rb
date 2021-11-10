@@ -29,7 +29,7 @@ default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
-default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch_templates_config.json"
+default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['reserved_base_uid'] = 400
 
@@ -135,7 +135,7 @@ default['cluster']['scheduler_plugin']['handler_dir'] = '/home/pcluster-schedule
 default['cluster']['scheduler_plugin']['handler_log'] = '/var/log/parallelcluster/scheduler-plugin.log'
 default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['shared_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
-default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler_plugin_substack_outputs.json"
+default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler-plugin-substack-outputs.json"
 
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
