@@ -26,8 +26,9 @@ action :run do
   Chef::Log.info("Executing Event #{new_resource.event_name}, with user (#{event_user}), cwd (#{event_cwd}), command (#{new_resource.event_command}), log (#{event_log})")
   # shellout https://github.com/chef/mixlib-shellout
   # switch stderr/stdout with (2>&1 1>&3-), process error (now on stdout), switch back stdout/stderr with (3>&1 1>&2) and then process output
-  cmd = Mixlib::ShellOut.new("set -o pipefail; { (#{new_resource.event_command}) 2>&1 1>&3- | ts '#{event_log_prefix_error}' | tee -a #{event_log}; } " \
-    "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log}", user: event_user, group: event_user, login: true, env: event_env, cwd: event_cwd, timeout: event_timeout)
+  event_command = Shellwords.escape("set -o pipefail; { (#{new_resource.event_command}) 2>&1 1>&3- | ts '#{event_log_prefix_error}' | tee -a #{event_log}; } " \
+    "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log}")
+  cmd = Mixlib::ShellOut.new("/bin/bash -c #{event_command}", user: event_user, group: event_user, login: true, env: event_env, cwd: event_cwd, timeout: event_timeout)
   cmd.run_command
 
   if cmd.error?
