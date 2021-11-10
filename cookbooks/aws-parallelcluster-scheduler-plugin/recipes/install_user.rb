@@ -34,6 +34,14 @@ user node['cluster']['scheduler_plugin']['user'] do
   shell '/bin/bash'
 end
 
+bash "set virtualenv in scheduler plugin user bash profile " do
+  user node['cluster']['scheduler_plugin']['user']
+  code <<-PROFILE
+    echo "PATH=#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin:\\$PATH" >> "#{node['cluster']['scheduler_plugin']['home']}/.bash_profile"
+    echo "export PATH" >> "#{node['cluster']['scheduler_plugin']['home']}/.bash_profile"
+  PROFILE
+end
+
 # create dir /home/byos/.parallelcluster
 directory node['cluster']['scheduler_plugin']['handler_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
