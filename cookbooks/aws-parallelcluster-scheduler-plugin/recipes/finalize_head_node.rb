@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
 # Recipe:: finalize_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -16,5 +16,5 @@
 # limitations under the License.
 
 execute_event_handler 'HeadFinalize' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :HeadFinalize, :ExecuteCommand, :Command) })
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadFinalize, :ExecuteCommand, :Command) })
 end

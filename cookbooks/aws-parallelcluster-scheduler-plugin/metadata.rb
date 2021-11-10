@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-name 'aws-parallelcluster-byos'
+name 'aws-parallelcluster-scheduler-plugin'
 maintainer 'Amazon Web Services'
 maintainer_email ''
 license 'Apache-2.0'

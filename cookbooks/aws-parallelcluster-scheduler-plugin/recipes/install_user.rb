@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
 # Recipe:: install_user
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -16,35 +16,35 @@
 # limitations under the License.
 
 # Setup byos group
-group node['cluster']['byos']['group'] do
-  comment 'byos group'
-  gid node['cluster']['byos']['group_id']
+group node['cluster']['scheduler_plugin']['group'] do
+  comment 'ParallelCluster scheduler plugin group'
+  gid node['cluster']['scheduler_plugin']['group_id']
   system true
 end
 
 # Setup byos user
-user node['cluster']['byos']['user'] do
-  comment 'byos user'
-  uid node['cluster']['byos']['user_id']
-  gid node['cluster']['byos']['group_id']
+user node['cluster']['scheduler_plugin']['user'] do
+  comment 'ParallelCluster scheduler plugin user'
+  uid node['cluster']['scheduler_plugin']['user_id']
+  gid node['cluster']['scheduler_plugin']['group_id']
   # home is mounted from the head node
   manage_home true
-  home "/home/#{node['cluster']['byos']['user']}"
+  home "/home/#{node['cluster']['scheduler_plugin']['user']}"
   system true
   shell '/bin/bash'
 end
 
 # create dir /home/byos/.parallelcluster
-directory node['cluster']['byos']['handler_dir'] do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
+directory node['cluster']['scheduler_plugin']['handler_dir'] do
+  owner node['cluster']['scheduler_plugin']['user']
+  group node['cluster']['scheduler_plugin']['user']
   mode '0755'
   action :create
 end
 
 # Ensure byos user has sudoers capability
-template '/etc/sudoers.d/99-parallelcluster-byos' do
-  source 'byos_user/99-parallelcluster-byos.erb'
+template '/etc/sudoers.d/99-parallelcluster-scheduler-plugin' do
+  source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin.erb'
   owner 'root'
   group 'root'
   mode '0600'
