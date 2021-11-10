@@ -23,5 +23,5 @@ service "supervisord" do
   action %i[enable start]
 end
 
-include_recipe 'aws-parallelcluster-byos::finalize' if node['cluster']['scheduler'] == 'byos'
-include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
+include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'plugin'
+include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'slurm'

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: finalize_compute
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
+# Recipe:: init_user
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute_event_handler 'ComputeFinalize' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :ByosSettings, :SchedulerDefinition, :Events, :ComputeFinalize, :ExecuteCommand, :Command) })
+# create system user in config file
+create_user 'Create system users' do
+  system_users(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :SystemUsers) })
 end

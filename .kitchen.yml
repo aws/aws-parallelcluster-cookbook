@@ -94,17 +94,17 @@ suites:
     run_list: *run_lists_slurm_config_HeadNode
     attributes: *attributes_slurm_config_HeadNode
 
-  - name: byos_config_HeadNode_x86_64
-    run_list: &run_lists_byos_config_HeadNode
+  - name: scheduler_plugin_config_HeadNode_x86_64
+    run_list: &run_lists_scheduler_plugin_config_HeadNode
       - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
-    attributes: &attributes_byos_config_HeadNode
+    attributes: &attributes_scheduler_plugin_config_HeadNode
       kitchen: true
       cluster:
         node_type: 'HeadNode'
-        scheduler: 'byos'
+        scheduler: 'plugin'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -127,9 +127,9 @@ suites:
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
-  - name: byos_config_HeadNode_arm64
-    run_list: *run_lists_byos_config_HeadNode
-    attributes: *attributes_byos_config_HeadNode
+  - name: scheduler_plugin_config_HeadNode_arm64
+    run_list: *run_lists_scheduler_plugin_config_HeadNode
+    attributes: *attributes_scheduler_plugin_config_HeadNode
 
   - name: awsbatch_config_HeadNode_x86_64
     run_list: &run_lists_awsbatch_config_HeadNode
@@ -199,17 +199,17 @@ suites:
     run_list: *run_lists_slurm_config_ComputeFleet
     attributes: *attributes_slurm_config_ComputeFleet
 
-  - name: byos_config_ComputeFleet_x86_64
-    run_list: &run_lists_byos_config_ComputeFleet
+  - name: scheduler_plugin_config_ComputeFleet_x86_64
+    run_list: &run_lists_scheduler_plugin_config_ComputeFleet
       - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
       - recipe[aws-parallelcluster::tests]
-    attributes: &attributes_byos_config_ComputeFleet
+    attributes: &attributes_scheduler_plugin_config_ComputeFleet
       kitchen: true
       cluster:
         node_type: 'ComputeFleet'
-        scheduler: 'byos'
+        scheduler: 'plugin'
         stack_name: <%= ENV['AWS_STACK_NAME'] %>
         volume: <%= ENV['VOLUME'] %>
         region: <%= ENV['AWS_DEFAULT_REGION'] %>
@@ -220,7 +220,7 @@ suites:
         head_node_private_ip: <%= ENV['HEAD_NODE_PRIVATE_IP'] %>
         # base_os is one of the base OSs supported by pcluster
         base_os: <%= ENV['BASE_OS'] %>
-        byos_nodename: 'fake-dy-compute-1'
+        scheduler_plugin_nodename: 'fake-dy-compute-1'
         custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
         # os attribute is used in pipeline code. i.e. centos7, centos7-custom
         os: <%= ENV['OS'] %>
@@ -230,6 +230,6 @@ suites:
         nvidia:
           enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
-  - name: byos_config_ComputeFleet_arm64
-    run_list: *run_lists_byos_config_ComputeFleet
-    attributes: *attributes_byos_config_ComputeFleet
+  - name: scheduler_plugin_config_ComputeFleet_arm64
+    run_list: *run_lists_scheduler_plugin_config_ComputeFleet
+    attributes: *attributes_scheduler_plugin_config_ComputeFleet

@@ -26,22 +26,22 @@ action :run do
     new_resource.system_users.each_with_index do |user, index|
       name = user[:Name]
       enable_imds = user[:EnableImds]
-      system_user_id = node['cluster']['byos']['system_user_id_start'] + index
-      system_group_id = node['cluster']['byos']['system_group_id_start'] + index
+      system_user_id = node['cluster']['scheduler_plugin']['system_user_id_start'] + index
+      system_group_id = node['cluster']['scheduler_plugin']['system_group_id_start'] + index
 
       check_gid(system_group_id)
       check_uid(system_user_id)
 
       Chef::Log.info("Create gid #{system_group_id} group with group name #{name}.")
       group name do
-        comment "byos system group #{name}"
+        comment "ParallelCluster scheduler plugin system group #{name}"
         gid system_group_id
         system true
       end
 
       Chef::Log.info("Create uid #{system_user_id} user with user name #{name}.")
       user name do
-        comment "byos system user #{name}"
+        comment "ParallelCluster scheduler plugin system user #{name}"
         uid system_user_id
         gid system_group_id
       end
@@ -63,8 +63,8 @@ action_class do
     return if cmd.error?
 
     raise("gid #{gid} is used by #{check_group_stdout}, it should be reserved for ParallelCluster system group. " \
-        "Reserved gid range is #{node['cluster']['byos']['system_group_id_start']}-" \
-        "#{node['cluster']['byos']['system_group_id_start'] + 9}.")
+        "Reserved gid range is #{node['cluster']['scheduler_plugin']['system_group_id_start']}-" \
+        "#{node['cluster']['scheduler_plugin']['system_group_id_start'] + 9}.")
   end
 
   def check_uid(uid)
@@ -73,7 +73,7 @@ action_class do
     return if cmd.error?
 
     raise("uid #{uid} is used by #{check_user_stdout}, it should be reserved for ParallelCluster system user. " \
-        "Reserved uid range is #{node['cluster']['byos']['system_user_id_start']}-" \
-        "#{node['cluster']['byos']['system_user_id_start'] + 9}.")
+        "Reserved uid range is #{node['cluster']['scheduler_plugin']['system_user_id_start']}-" \
+        "#{node['cluster']['scheduler_plugin']['system_user_id_start'] + 9}.")
   end
 end

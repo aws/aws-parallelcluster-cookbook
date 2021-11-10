@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: config
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
+# Recipe:: init_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,11 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-byos::config_head_node'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-byos::config_compute'
-else
-  raise "node_type must be HeadNode or ComputeFleet"
+fetch_artifacts 'Fetch Cluster Shared Artifacts' do
+  plugin_resources(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :PluginResources) })
+end
+
+execute_event_handler 'HeadInit' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadInit, :ExecuteCommand, :Command) })
 end

@@ -30,7 +30,7 @@ action :run do
       shared_artifacts.each do |artifact|
         artifact_source_url = artifact[:Source]
         source_name = artifact_source_url.split("/")[-1]
-        target_source_path = "#{node['cluster']['byos']['home']}/#{source_name}"
+        target_source_path = "#{node['cluster']['scheduler_plugin']['home']}/#{source_name}"
         next if ::File.exist?(target_source_path) && !new_resource.force_download
 
         Chef::Log.info("Downloading artifacts from (#{artifact_source_url}) to (#{target_source_path})")
@@ -55,11 +55,11 @@ action :run do
           end
         end
 
-        Chef::Log.info("Changing ownership of file (#{target_source_path}) to (#{node['cluster']['byos']['user']})")
+        Chef::Log.info("Changing ownership of file (#{target_source_path}) to (#{node['cluster']['scheduler_plugin']['user']})")
         file target_source_path do
           mode '0744'
-          owner node['cluster']['byos']['user']
-          group node['cluster']['byos']['group']
+          owner node['cluster']['scheduler_plugin']['user']
+          group node['cluster']['scheduler_plugin']['group']
         end
       end
     end

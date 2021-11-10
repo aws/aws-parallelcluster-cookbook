@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
 # Recipe:: install
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -16,26 +16,26 @@
 # limitations under the License.
 
 # setup the user accounts
-include_recipe "aws-parallelcluster-byos::install_user"
+include_recipe "aws-parallelcluster-scheduler-plugin::install_user"
 
 # create e.g. /opt/parallelcluster/byos
-directory node['cluster']['byos']['local_dir'] do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
+directory node['cluster']['scheduler_plugin']['local_dir'] do
+  owner node['cluster']['scheduler_plugin']['user']
+  group node['cluster']['scheduler_plugin']['user']
   mode '0755'
   action :create
 end
 
 # create e.g. /opt/parallelcluster/shared/byos
-directory node['cluster']['byos']['shared_dir'] do
-  owner node['cluster']['byos']['user']
-  group node['cluster']['byos']['user']
+directory node['cluster']['scheduler_plugin']['shared_dir'] do
+  owner node['cluster']['scheduler_plugin']['user']
+  group node['cluster']['scheduler_plugin']['user']
   mode '0755'
   action :create
 end
 
-cookbook_file '/usr/local/sbin/invoke-byos-event-handler.sh' do
-  source 'event_handler/invoke-byos-event-handler.sh'
+cookbook_file '/usr/local/sbin/invoke-scheduler-plugin-event-handler.sh' do
+  source 'event_handler/invoke-scheduler-plugin-event-handler.sh'
   owner 'root'
   group 'root'
   mode '0755'

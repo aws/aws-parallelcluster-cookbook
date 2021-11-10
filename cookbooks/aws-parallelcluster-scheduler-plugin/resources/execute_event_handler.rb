@@ -3,7 +3,7 @@
 resource_name :execute_event_handler
 provides :execute_event_handler
 
-# Resource to execute BYOS event handler
+# Resource to execute scheduler plugin event handler
 
 property :event_name, String, name_property: true
 property :event_command, String, required: false
@@ -16,9 +16,9 @@ action :run do
     return
   end
 
-  event_log = node['cluster']['byos']['handler_log']
-  event_cwd = node['cluster']['byos']['home']
-  event_user = node['cluster']['byos']['user']
+  event_log = node['cluster']['scheduler_plugin']['handler_log']
+  event_cwd = node['cluster']['scheduler_plugin']['home']
+  event_user = node['cluster']['scheduler_plugin']['user']
   event_timeout = 3600
   event_env = build_env
   event_log_prefix_error = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - ERROR:"
@@ -45,42 +45,42 @@ action_class do # rubocop:disable Metrics/BlockLength
 
   def build_env
     # copy cluster config
-    target_cluster_config = "#{node['cluster']['byos']['handler_dir']}/cluster-config.yaml"
+    target_cluster_config = "#{node['cluster']['scheduler_plugin']['handler_dir']}/cluster-config.yaml"
     copy_config("cluster configuration", node.dig(:cluster, :cluster_config_path), target_cluster_config)
 
     # copy launch templates config
-    target_launch_templates = "#{node['cluster']['byos']['handler_dir']}/launch_templates_config.json"
+    target_launch_templates = "#{node['cluster']['scheduler_plugin']['handler_dir']}/launch_templates_config.json"
     copy_config("launch templates", node.dig(:cluster, :launch_templates_config_path), target_launch_templates)
 
     # copy instance type data
-    target_instance_types_data = "#{node['cluster']['byos']['handler_dir']}/instance-types-data.json"
+    target_instance_types_data = "#{node['cluster']['scheduler_plugin']['handler_dir']}/instance-types-data.json"
     copy_config("instance types data", node.dig(:cluster, :instance_types_data_path), target_instance_types_data)
 
     # generated substack outputs json
-    source_byos_substack_outputs = node['cluster']['byos']['byos_substack_outputs_path']
-    target_byos_substack_outputs = "#{node['cluster']['byos']['handler_dir']}/byos_substack_outputs.json"
-    byos_substack_arn = node.dig(:cluster, :byos_substack_arn)
-    if byos_substack_arn && !byos_substack_arn.empty?
-      Chef::Log.info("Found byos substack (#{byos_substack_arn})")
-      unless ::File.exist?(source_byos_substack_outputs)
-        byos_substack_outputs = { 'Outputs' => {} }
-        Chef::Log.info("Executing describe-stack on byos substack (#{byos_substack_arn})")
-        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{byos_substack_arn}", 3, 'root', nil, nil)
-        raise "Unable to execute describe-stack on byos substack (#{byos_substack_arn})\n #{format_stderr(cmd)}" if cmd.error?
+    source_scheduler_plugin_substack_outputs = node['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path']
+    target_scheduler_plugin_substack_outputs = "#{node['cluster']['scheduler_plugin']['handler_dir']}/scheduler_plugin_substack_outputs.json"
+    scheduler_plugin_substack_arn = node.dig(:cluster, :scheduler_plugin_substack_arn)
+    if scheduler_plugin_substack_arn && !scheduler_plugin_substack_arn.empty?
+      Chef::Log.info("Found scheduler plugin substack (#{scheduler_plugin_substack_arn})")
+      unless ::File.exist?(source_scheduler_plugin_substack_outputs)
+        scheduler_plugin_substack_outputs = { 'Outputs' => {} }
+        Chef::Log.info("Executing describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})")
+        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{scheduler_plugin_substack_arn}", 3, 'root', nil, nil)
+        raise "Unable to execute describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})\n #{format_stderr(cmd)}" if cmd.error?
 
         if cmd.stdout && !cmd.stdout.empty?
-          Chef::Log.debug("Output of describe-stacks on substack (#{byos_substack_arn}): (#{cmd.stdout})")
+          Chef::Log.debug("Output of describe-stacks on substack (#{scheduler_plugin_substack_arn}): (#{cmd.stdout})")
           substack_describe = JSON.parse(cmd.stdout)
           substack_outputs = substack_describe['Stacks'][0]['Outputs']
           if substack_outputs && !substack_outputs.empty?
             substack_outputs.each do |substack_output|
-              byos_substack_outputs['Outputs'].merge!({ substack_output['OutputKey'] => substack_output['OutputValue'] })
+              scheduler_plugin_substack_outputs['Outputs'].merge!({ substack_output['OutputKey'] => substack_output['OutputValue'] })
             end
           end
-          ::File.write(source_byos_substack_outputs, byos_substack_outputs.to_json(:only))
+          ::File.write(source_scheduler_plugin_substack_outputs, scheduler_plugin_substack_outputs.to_json(:only))
         end
       end
-      FileUtils.cp(source_byos_substack_outputs, target_byos_substack_outputs)
+      FileUtils.cp(source_scheduler_plugin_substack_outputs, target_scheduler_plugin_substack_outputs)
     end
 
     # Load static env from file or build it if file not found
@@ -91,7 +91,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       Chef::Log.debug("Loaded handler environment #{env}")
     else
       Chef::Log.info("No handler environment file found, building it")
-      env = build_static_env(target_cluster_config, target_launch_templates, target_instance_types_data, target_byos_substack_outputs)
+      env = build_static_env(target_cluster_config, target_launch_templates, target_instance_types_data, target_scheduler_plugin_substack_outputs)
 
       Chef::Log.info("Dumping handler environment to file (#{source_handler_env})")
       ::File.write(source_handler_env, env.to_json(:only))
@@ -127,7 +127,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     env
   end
 
-  def build_static_env(target_cluster_config, target_launch_templates, target_instance_types_data, target_byos_substack_outputs)
+  def build_static_env(target_cluster_config, target_launch_templates, target_instance_types_data, target_scheduler_plugin_substack_outputs)
     Chef::Log.info("Building static handler environment")
     env = {}
 
@@ -146,17 +146,17 @@ action_class do # rubocop:disable Metrics/BlockLength
     # PCLUSTER_CFN_STACK_ARN
     env.merge!(build_hash_from_node('PCLUSTER_CFN_STACK_ARN', true, :cluster, :stack_arn))
 
-    # PCLUSTER_BYOS_CFN_SUBSTACK_ARN
-    env.merge!(build_hash_from_node('PCLUSTER_BYOS_CFN_SUBSTACK_ARN', false, :cluster, :byos_substack_arn))
+    # PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_ARN
+    env.merge!(build_hash_from_node('PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_ARN', false, :cluster, :scheduler_plugin_substack_arn))
 
-    # PCLUSTER_BYOS_CFN_SUBSTACK_OUTPUTS
-    env.merge!({ 'PCLUSTER_BYOS_CFN_SUBSTACK_OUTPUTS' => target_byos_substack_outputs }) if ::File.exist?(target_byos_substack_outputs)
+    # PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_OUTPUTS
+    env.merge!({ 'PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_OUTPUTS' => target_scheduler_plugin_substack_outputs }) if ::File.exist?(target_scheduler_plugin_substack_outputs)
 
-    # PCLUSTER_SHARED_BYOS_DIR
-    env.merge!(build_hash_from_node('PCLUSTER_SHARED_BYOS_DIR', true, :cluster, :byos, :shared_dir))
+    # PCLUSTER_SHARED_SCHEDULER_PLUGIN_DIR
+    env.merge!(build_hash_from_node('PCLUSTER_SHARED_SCHEDULER_PLUGIN_DIR', true, :cluster, :scheduler_plugin, :shared_dir))
 
-    # PCLUSTER_LOCAL_BYOS_DIR
-    env.merge!(build_hash_from_node('PCLUSTER_LOCAL_BYOS_DIR', true, :cluster, :byos, :local_dir))
+    # PCLUSTER_LOCAL_SCHEDULER_PLUGIN_DIR
+    env.merge!(build_hash_from_node('PCLUSTER_LOCAL_SCHEDULER_PLUGIN_DIR', true, :cluster, :scheduler_plugin, :local_dir))
 
     # PCLUSTER_AWS_REGION and AWS_REGION
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))

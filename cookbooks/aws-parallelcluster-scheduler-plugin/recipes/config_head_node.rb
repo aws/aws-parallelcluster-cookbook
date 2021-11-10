@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-byos
-# Recipe:: init
+# Cookbook Name:: aws-parallelcluster-scheduler-plugin
+# Recipe:: config_head_node
 #
 # Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,14 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# create system user
-include_recipe "aws-parallelcluster-byos::init_user"
-
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-byos::init_head_node'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-byos::init_compute'
-else
-  raise "node_type must be HeadNode or ComputeFleet"
+execute_event_handler 'HeadConfigure' do
+  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadConfigure, :ExecuteCommand, :Command) })
 end

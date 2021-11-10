@@ -80,7 +80,7 @@ include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['no
 include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbatch'
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
-include_recipe "aws-parallelcluster-byos::init" if node['cluster']['scheduler'] == 'byos'
+include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
 
 # IMDS
 include_recipe 'aws-parallelcluster-config::imds' unless virtualized?
