@@ -108,27 +108,22 @@ if [[ ! "${event_name}" =~ ^(HeadInit|HeadConfigure|HeadFinalize|ComputeInit|Com
   fail "Event name ${event_name} not supported"
 fi
 
-build_minimal_dna_json() {
-  # Build minimal dna.json
-  if [[ "${event_name}" =~ ^Head ]]; then
-    node_type="HeadNode"
-  else
-    node_type="Compute"
-  fi
-
-  cat << EOF > /etc/chef/dna.json
-{
-  "cluster": {
-    "node_type": "${node_type}"
-  }
-}
-EOF
+build_empty_dna_json() {
+  # Build empty dna.json
+  echo "{}" > /etc/chef/dna.json
 }
 
 build_dna_json() {
+  if [[ "${event_name}" =~ ^Head ]]; then
+    node_type="HeadNode"
+  else
+    node_type="ComputeFleet"
+  fi
+
   cat << EOF > /tmp/extra.json
 {
   "cluster": {
+    "node_type": "${node_type}",
     "cluster_config_path": "$(readlink -f ${cluster_configuration})",
     "launch_templates_config_path": "$(readlink -f ${launch_templates_config})",
     "instance_types_data_path": "$(readlink -f ${instance_types_data})",
@@ -348,7 +343,7 @@ else
     create_dummy_scheduler_plugin_substack_outputs
   fi
 
-  build_minimal_dna_json
+  build_empty_dna_json
 fi
 
 build_dna_json

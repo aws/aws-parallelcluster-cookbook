@@ -119,10 +119,16 @@ action_class do # rubocop:disable Metrics/BlockLength
     case node['cluster']['node_type']
     when 'ComputeFleet'
       # PCLUSTER_QUEUE_NAME
-      env.merge!(build_hash_from_node('PCLUSTER_QUEUE_NAME', true, :cluster, :scheduler_queue_name))
+      env.merge!(build_hash_from_node('PCLUSTER_QUEUE_NAME', false, :cluster, :scheduler_queue_name))
 
       # PCLUSTER_COMPUTE_RESOURCE_NAME
-      env.merge!(build_hash_from_node('PCLUSTER_COMPUTE_RESOURCE_NAME', true, :cluster, :scheduler_compute_resource_name))
+      env.merge!(build_hash_from_node('PCLUSTER_COMPUTE_RESOURCE_NAME', false, :cluster, :scheduler_compute_resource_name))
+
+      # PCLUSTER_NODE_TYPE
+      env.merge!({ 'PCLUSTER_NODE_TYPE' => 'COMPUTE' })
+    when 'HeadNode'
+      # PCLUSTER_NODE_TYPE
+      env.merge!({ 'PCLUSTER_NODE_TYPE' => 'HEAD' })
     end
 
     env
