@@ -22,7 +22,7 @@ load_cluster_config
 
 create_user 'Create system users' do
   system_users(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :SystemUsers) })
-  raise_error false
+  force_creation true
 end
 
 fetch_artifacts 'Fetch Cluster Shared Artifacts' do
