@@ -67,3 +67,6 @@ include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['
 
 # IMDS
 include_recipe 'aws-parallelcluster-config::imds' unless virtualized?
+
+# Active Directory Service
+include_recipe "aws-parallelcluster-config::directory_service"
