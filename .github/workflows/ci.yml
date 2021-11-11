@@ -38,11 +38,7 @@ jobs:
           ruby-version: 2.7
       - name: Install dependencies
         run: bundle install --with style
-      - name: Run Rubocop
-        run: rubocop
       - name: Run Cookstyle
-        # FC071 is a check for a LICENSE file.
-        # It doesn't like that ours is named LICENSE.txt.
         run: cookstyle .
   python:
     runs-on: ${{ matrix.os }}
