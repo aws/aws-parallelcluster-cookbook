@@ -20,6 +20,11 @@ raise "Event name not specified" if !event_name && event_name.empty?
 
 load_cluster_config
 
+create_user 'Create system users' do
+  system_users(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :SystemUsers) })
+  force_creation true
+end
+
 fetch_artifacts 'Fetch Cluster Shared Artifacts' do
   plugin_resources(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :PluginResources) })
   force_download true

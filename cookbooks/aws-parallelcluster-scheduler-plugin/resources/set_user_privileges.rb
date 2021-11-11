@@ -28,7 +28,7 @@ action :run do
     Chef::Log.info("Set sudo privileges for #{node['cluster']['scheduler_plugin']['user']}")
     # Ensure scheduler user has sudoers capability
     template '/etc/sudoers.d/99-parallelcluster-scheduler-plugin' do
-      source 'byos_user/99-parallelcluster-scheduler-plugin.erb'
+      source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin.erb'
       owner 'root'
       group 'root'
       mode '0600'

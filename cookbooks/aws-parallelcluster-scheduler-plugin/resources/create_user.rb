@@ -15,6 +15,9 @@ provides :create_user
 
 property :name, String, name_property: true
 property :system_users, Array, required: false
+property :force_creation, [true, false],
+         default: false,
+         description: 'force creation if uid/gid already exists'
 
 default_action :run
 
@@ -60,7 +63,7 @@ action_class do
   def check_gid(gid)
     cmd = Mixlib::ShellOut.new("getent group #{gid}")
     check_group_stdout = cmd.run_command.stdout.strip
-    return if cmd.error?
+    return if cmd.error? || new_resource.force_creation
 
     raise("gid #{gid} is used by #{check_group_stdout}, it should be reserved for ParallelCluster system group. " \
         "Reserved gid range is #{node['cluster']['scheduler_plugin']['system_group_id_start']}-" \
@@ -70,7 +73,7 @@ action_class do
   def check_uid(uid)
     cmd = Mixlib::ShellOut.new("getent passwd #{uid}")
     check_user_stdout = cmd.run_command.stdout.strip
-    return if cmd.error?
+    return if cmd.error? || new_resource.force_creation
 
     raise("uid #{uid} is used by #{check_user_stdout}, it should be reserved for ParallelCluster system user. " \
         "Reserved uid range is #{node['cluster']['scheduler_plugin']['system_user_id_start']}-" \
