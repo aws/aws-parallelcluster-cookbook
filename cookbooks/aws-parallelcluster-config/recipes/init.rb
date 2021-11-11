@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-config
+# Cookbook:: aws-parallelcluster-config
 # Recipe:: init
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -19,7 +19,7 @@
 validate_os_type
 
 # Validate init system
-raise "Init package #{node['init_package']} not supported." unless node['init_package'] == 'systemd'
+raise "Init package #{node['init_package']} not supported." unless systemd?
 
 # Determine scheduler_slots settings and update instance_slots appropriately
 node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slots']

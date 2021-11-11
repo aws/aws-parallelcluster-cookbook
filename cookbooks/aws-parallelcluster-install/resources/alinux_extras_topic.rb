@@ -2,8 +2,9 @@
 
 resource_name :alinux_extras_topic
 provides :alinux_extras_topic
+unified_mode true
 
-# Resource to install a package via the Amazon Linux Extras package manager,
+# Resource:: to install a package via the Amazon Linux Extras package manager,
 # available starting in Amazon Linux 2.
 
 property :topic, String, name_property: true

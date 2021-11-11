@@ -2,8 +2,9 @@
 
 resource_name :execute_event_handler
 provides :execute_event_handler
+unified_mode true
 
-# Resource to execute scheduler plugin event handler
+# Resource:: to execute scheduler plugin event handler
 
 property :event_name, String, name_property: true
 property :event_command, String, required: false

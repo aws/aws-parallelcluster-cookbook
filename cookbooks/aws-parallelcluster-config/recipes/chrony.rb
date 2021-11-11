@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: chrony
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -19,5 +19,5 @@ service node['cluster']['chrony']['service'] do
   # chrony service supports restart but is not correctly checking if the process is stopped before starting the new one
   supports restart: false
   reload_command chrony_reload_command
-  action %i[enable start]
+  action %i(enable start)
 end

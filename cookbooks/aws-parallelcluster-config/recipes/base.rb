@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: base
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -19,7 +19,7 @@ include_recipe "aws-parallelcluster::setup_envars"
 include_recipe 'aws-parallelcluster-config::openssh'
 
 # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
-if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 20
+if platform?('ubuntu') && node['platform_version'].to_i == 20
   sysctl 'fs.protected_regular' do
     value 0
   end
@@ -29,7 +29,7 @@ include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
 
 service "setup-ephemeral" do
   supports restart: false
-  action %i[enable start]
+  action %i(enable start)
 end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting

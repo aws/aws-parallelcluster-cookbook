@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: compute_base
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -35,7 +35,7 @@ if raid_shared_dir != "NONE"
     device(lazy { "#{node['cluster']['head_node_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
-    action %i[mount enable]
+    action %i(mount enable)
     retries 10
     retry_delay 6
   end
@@ -46,7 +46,7 @@ mount '/opt/intel' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/intel" })
   fstype 'nfs'
   options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
+  action %i(mount enable)
   retries 10
   retry_delay 6
   only_if { ::File.directory?("/opt/intel") }
@@ -85,7 +85,7 @@ shared_dir_array.each do |dir|
     device(lazy { "#{node['cluster']['head_node_private_ip']}:#{dirname}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
-    action %i[mount enable]
+    action %i(mount enable)
     retries 10
     retry_delay 6
   end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: cloudwatch_agent
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -37,13 +37,13 @@ platform_url_component = value_for_platform(
   'default' => node['platform']
 )
 Chef::Log.info("Platform for cloudwatch is #{platform_url_component}")
-package_extension = node['platform'] == 'ubuntu' ? 'deb' : 'rpm'
+package_extension = platform?('ubuntu') ? 'deb' : 'rpm'
 package_url = [
   package_url_prefix,
   platform_url_component,
   arch_url_component,
   "latest",
-  "amazon-cloudwatch-agent.#{package_extension}"
+  "amazon-cloudwatch-agent.#{package_extension}",
 ].join('/')
 package_path = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
 signature_url = "#{package_url}.sig"

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: dcv
 #
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License. A copy of the License is located at
@@ -120,7 +120,7 @@ if node['conditions']['dcv_supported']
       # This is incorrect and it led to MPI applications hanging when they tried to send or receive MPI messages
       # see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
       service 'libvirtd' do
-        action %i[disable stop]
+        action %i(disable stop)
       end
 
     when 'ubuntu'
@@ -145,10 +145,10 @@ if node['conditions']['dcv_supported']
       end
 
     when 'amazon'
-      prereq_packages = %w[gdm gnome-session gnome-classic-session gnome-session-xsession
+      prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
                            xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
                            gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
-                           gnu-free-serif-fonts glx-utils]
+                           gnu-free-serif-fonts glx-utils)
       # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
       # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
       #       which is done in base_install.
@@ -199,7 +199,7 @@ if node['conditions']['dcv_supported']
     end
 
     # Install server and xdcv packages
-    dcv_packages = %W[#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']}]
+    dcv_packages = %W(#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']})
     dcv_packages_path = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/"
     # Rewrite dcv_packages object by cycling each package file name and appending the path to them
     dcv_packages.map! { |package| dcv_packages_path + package }
@@ -210,11 +210,10 @@ if node['conditions']['dcv_supported']
   end
 
   # Post-installation action
-  case node['platform']
-  when 'centos'
+  if platform?('centos')
     # stop firewall
     service "firewalld" do
-      action %i[disable stop]
+      action %i(disable stop)
     end
 
     # Disable selinux

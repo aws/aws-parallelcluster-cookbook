@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
 # with the License. A copy of the License is located at http://aws.amazon.com/apache2.0/
@@ -10,10 +10,10 @@
 
 resource_name :create_user
 provides :create_user
+unified_mode true
 
 # Resource to create system user
 
-property :name, String, name_property: true
 property :system_users, Array, required: false
 property :force_creation, [true, false],
          default: false,
