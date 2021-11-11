@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.X.X
 ------
 
+**ENHANCEMENTS**
+- Enable clusters to authenticate users by integrating with Active Directory (AD) domains managed via AWS Directory Service.
+
 **CHANGES**
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
 - Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
