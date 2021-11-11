@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-config
+# Cookbook:: aws-parallelcluster-config
 # Recipe:: finalize
 #
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -20,7 +20,7 @@ include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']
 # Restart supervisord
 service "supervisord" do
   supports restart: true
-  action %i[enable start]
+  action %i(enable start)
 end
 
 include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'plugin'

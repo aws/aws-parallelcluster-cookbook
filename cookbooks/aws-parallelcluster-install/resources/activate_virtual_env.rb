@@ -2,8 +2,9 @@
 
 resource_name :activate_virtual_env
 provides :activate_virtual_env
+unified_mode true
 
-# Resource to create a Python virtual environment and install a list of packages on it
+# Resource:: to create a Python virtual environment and install a list of packages on it
 
 property :pyenv_name, String, name_property: true
 property :pyenv_path, String, required: true

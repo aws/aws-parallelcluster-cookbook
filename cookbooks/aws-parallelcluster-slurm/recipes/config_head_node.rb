@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-slurm
+# Cookbook:: aws-parallelcluster-slurm
 # Recipe:: config_head_node
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -175,5 +175,5 @@ end
 
 service "slurmctld" do
   supports restart: false
-  action %i[enable start]
+  action %i(enable start)
 end

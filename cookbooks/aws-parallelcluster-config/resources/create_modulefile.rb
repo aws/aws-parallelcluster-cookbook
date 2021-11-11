@@ -2,6 +2,7 @@
 
 resource_name :create_modulefile
 provides :create_modulefile
+unified_mode true
 
 # Modulefiles are used to manage software versions, such as intelmpi versus openmpi
 # when a modulefile is loaded, the PATH and sometimes LD_LIBRARY_PATH are changed

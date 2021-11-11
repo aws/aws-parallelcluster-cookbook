@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: update_certificates
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -21,7 +21,7 @@ end
 
 # Prevent Chef from using outdated/distrusted CA certificates
 # https://github.com/chef/chef/issues/12126
-if node['platform'] == 'ubuntu'
+if platform?('ubuntu')
   link '/opt/cinc/embedded/ssl/certs/cacert.pem' do
     to '/etc/ssl/certs/ca-certificates.crt'
   end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: base
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -22,9 +22,9 @@ include_recipe "aws-parallelcluster-install::cluster_admin_user"
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
-  if node['platform_family'] == 'amazon'
+  if platform_family?('amazon')
     alinux_extras_topic 'epel'
-  elsif node['platform'] == 'centos'
+  elsif platform?('centos')
     include_recipe "yum-epel"
   end
 
@@ -37,13 +37,13 @@ when 'rhel', 'amazon'
     end
   end
 
-  if node['platform'] == 'redhat'
+  if platform?('redhat')
     execute 'yum-config-manager-rhel' do
       command "yum-config-manager --enable #{node['cluster']['rhel']['extra_repo']}"
     end
   end
 when 'debian'
-  include_recipe 'apt'
+  apt_update
 end
 
 # Setup directories

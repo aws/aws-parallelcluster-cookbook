@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: nvidia
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -76,7 +76,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     mode '0644'
   end
 
-  if node['platform'] == 'ubuntu'
+  if platform?('ubuntu')
     execute 'initramfs to remove nouveau' do
       command 'update-initramfs -u'
       only_if 'lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau'
@@ -94,7 +94,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     "/"
   )
 
-  if node['platform'] == 'ubuntu'
+  if platform?('ubuntu')
     # For ubuntu, CINC17 apt-package resources need full versions for `version`
     execute "install_fabricmanager_for_ubuntu" do
       command "apt -y install #{node['cluster']['nvidia']['fabricmanager']['package']}=#{node['cluster']['nvidia']['fabricmanager']['version']} "\
@@ -105,7 +105,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
   else
     package node['cluster']['nvidia']['fabricmanager']['package'] do
       version node['cluster']['nvidia']['fabricmanager']['version']
-      action %i[install lock]
+      action %i(install lock)
     end
   end
 

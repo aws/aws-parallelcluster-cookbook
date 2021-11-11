@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: dcv
 #
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License. A copy of the License is located at
@@ -80,8 +80,7 @@ if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadN
     end
   end
 
-  case node['platform']
-  when 'ubuntu'
+  if platform?('ubuntu')
     # Disable RNDFILE from openssl to avoid error during certificate generation
     # See https://github.com/openssl/openssl/issues/7754#issuecomment-444063355
     execute 'No RND' do
@@ -135,6 +134,6 @@ if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadN
 
   # Start NICE DCV server
   service "dcvserver" do
-    action %i[enable start]
+    action %i(enable start)
   end
 end

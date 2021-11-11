@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-slurm
+# Cookbook:: aws-parallelcluster-slurm
 # Recipe:: init
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -40,7 +40,7 @@ if node['cluster']['node_type'] == "ComputeFleet"
     end
   end
 
-  file "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename" do # ~FC005
+  file "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename" do
     content(lazy { node['cluster']['slurm_nodename'] })
     mode '0644'
     owner 'root'

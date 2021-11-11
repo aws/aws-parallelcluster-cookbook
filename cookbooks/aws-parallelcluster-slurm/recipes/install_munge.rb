@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-slurm
+# Cookbook:: aws-parallelcluster-slurm
 # Recipe:: install_munge
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-package %w[munge* libmunge*] do
+package %w(munge* libmunge*) do
   action :purge
 end
 
@@ -33,7 +33,7 @@ end
 
 # Set libdir based on platform, default is /usr/lib64 for RHEL/CentOS/Alinux
 munge_libdir = '/usr/lib64'
-munge_libdir = '/usr/lib' if node['platform_family'] == 'debian'
+munge_libdir = '/usr/lib' if platform_family?('debian')
 
 # Install munge
 bash 'make install' do

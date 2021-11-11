@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: nfs
 #
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -22,7 +22,7 @@
 # NFS threads enhancement is omitted for Ubuntu1604
 node.force_override['nfs']['threads'] = [node['cpu']['cores'].to_i, 8].max
 
-if node['platform'] == 'ubuntu' && node['platform_version'].to_f >= 16.04
+if platform?('ubuntu') && node['platform_version'].to_f >= 16.04
   # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
   include_recipe "nfs::server"
 end

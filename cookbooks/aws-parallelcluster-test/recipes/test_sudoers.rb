@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: test_sudoers
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -16,6 +16,6 @@
 # limitations under the License.
 
 # Verifies that commands in the secure_path can be executed with sudo
-%W[root #{node['cluster']['cluster_user']}].each do |user|
+%W(root #{node['cluster']['cluster_user']}).each do |user|
   check_sudo_command('aws --version', user)
 end

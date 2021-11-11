@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: intel
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -72,7 +72,7 @@ when 'HeadNode'
   end
 
   # Download PSXE runtime packages and dependencies for 32- and 64-bit Intel compatible processors
-  %w[i486 x86_64].each do |intel_architecture|
+  %w(i486 x86_64).each do |intel_architecture|
     # Download main package
     package_basename = "intel-psxe-runtime-#{node['cluster']['psxe']['version']}.#{intel_architecture}.rpm"
     download_intel_hpc_pkg_from_s3('psxe', package_basename, "#{intel_psxe_rpms_dir}/#{package_basename}")
@@ -98,7 +98,7 @@ when 'HeadNode'
   end
 
   # Intel optimized versions of python
-  %w[2 3].each do |python_version|
+  %w(2 3).each do |python_version|
     package_version = node['cluster']["intelpython#{python_version}"]['version']
     package_basename = "intelpython#{python_version}-#{package_version}.x86_64.rpm"
     dest_path = "#{node['cluster']['sources_dir']}/#{package_basename}"

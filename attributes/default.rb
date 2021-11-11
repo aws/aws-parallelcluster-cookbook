@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Attributes:: default
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -52,23 +52,23 @@ default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyen
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
-default['cluster']['psxe']['noarch_packages'] = %w[intel-tbb-common-runtime intel-mkl-common-runtime intel-psxe-common-runtime
+default['cluster']['psxe']['noarch_packages'] = %w(intel-tbb-common-runtime intel-mkl-common-runtime intel-psxe-common-runtime
                                                    intel-ipp-common-runtime intel-ifort-common-runtime intel-icc-common-runtime
-                                                   intel-daal-common-runtime intel-comp-common-runtime]
-default['cluster']['psxe']['archful_packages']['i486'] = %w[intel-tbb-runtime intel-tbb-libs-runtime intel-comp-runtime
+                                                   intel-daal-common-runtime intel-comp-common-runtime)
+default['cluster']['psxe']['archful_packages']['i486'] = %w(intel-tbb-runtime intel-tbb-libs-runtime intel-comp-runtime
                                                             intel-daal-runtime intel-icc-runtime intel-ifort-runtime
-                                                            intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime]
-default['cluster']['psxe']['archful_packages']['x86_64'] = node['cluster']['psxe']['archful_packages']['i486'] + %w[intel-mpi-runtime]
+                                                            intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime)
+default['cluster']['psxe']['archful_packages']['x86_64'] = node['cluster']['psxe']['archful_packages']['i486'] + %w(intel-mpi-runtime)
 default['cluster']['intelhpc']['platform_name'] = value_for_platform(
   'centos' => {
-    '~>7' => 'el7'
+    '~>7' => 'el7',
   }
 )
-default['cluster']['intelhpc']['packages'] = %w[intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
+default['cluster']['intelhpc']['packages'] = %w(intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
                                                 intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
-                                                intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime]
+                                                intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime)
 default['cluster']['intelhpc']['version'] = '2018.0-7'
-default['cluster']['intelhpc']['dependencies'] = %w[compat-libstdc++-33 nscd nss-pam-ldapd openssl098e]
+default['cluster']['intelhpc']['dependencies'] = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e)
 default['cluster']['intelpython2']['version'] = '2019.4-088'
 default['cluster']['intelpython3']['version'] = '2020.2-902'
 
@@ -87,20 +87,20 @@ default['cluster']['armpl']['gcc']['patch_version'] = '0'
 default['cluster']['armpl']['gcc']['url'] = [
   'https://ftp.gnu.org/gnu/gcc',
   "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}",
-  "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz"
+  "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz",
 ].join('/')
 default['cluster']['armpl']['platform'] = value_for_platform(
   'centos' => { '~>7' => 'RHEL-7' },
   'amazon' => { '2' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
-    '20.04' => 'Ubuntu-20.04'
+    '20.04' => 'Ubuntu-20.04',
   }
 )
 default['cluster']['armpl']['url'] = [
   'archives/armpl',
   node['cluster']['armpl']['platform'],
-  "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar"
+  "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar",
 ].join('/')
 
 # Python packages
@@ -178,77 +178,77 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 default['cluster']['efa']['installer_version'] = '1.13.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['enable_efa_gdr'] = "no"
-default['cluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
+default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
 default['cluster']['dcv']['version'] = '2021.1-10851'
 if arm_instance?
-  default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
+  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 amazon2)
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "41713fc864e260a5ad6c4ffd53a1a497fb3c3fe316b74a947ad2eac8f2c1b330"
+      '~>7' => "41713fc864e260a5ad6c4ffd53a1a497fb3c3fe316b74a947ad2eac8f2c1b330",
     },
     'amazon' => { '2' => "41713fc864e260a5ad6c4ffd53a1a497fb3c3fe316b74a947ad2eac8f2c1b330" },
     'ubuntu' => { '18.04' => "06e55124769ae2a5314b0c5e6335cb53b3d9ae95d18776eb5cc9cb6debe512a1" }
   )
 else
-  default['cluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 ubuntu20 amazon2]
+  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2)
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "509ed64c248ac0c09c3f4b0b67231fbda9e27bc902539cca7d0be0dca465ad8a"
+      '~>7' => "509ed64c248ac0c09c3f4b0b67231fbda9e27bc902539cca7d0be0dca465ad8a",
     },
     'amazon' => { '2' => "509ed64c248ac0c09c3f4b0b67231fbda9e27bc902539cca7d0be0dca465ad8a" },
     'ubuntu' => {
       '18.04' => "8015f5c55f0e763b1dda7749761149e181a751dc1ea5e8f519a9b500e3f0893d",
-      '20.04' => "767a15a5f9923e988ef2b000ad546af5a1648142636dc1df79adc0fd795151f2"
+      '20.04' => "767a15a5f9923e988ef2b000ad546af5a1648142636dc1df79adc0fd795151f2",
     }
   )
 end
-if node['platform'].to_s == 'ubuntu'
+if platform?('ubuntu')
   # Unlike the other supported OSs, the DCV package names for Ubuntu use different architecture abbreviations than those used in the download URLs.
   default['cluster']['dcv']['package_architecture_id'] = arm_instance? ? 'arm64' : 'amd64'
 end
 default['cluster']['dcv']['package'] = value_for_platform(
   'centos' => {
-    '~>7' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}"
+    '~>7' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}",
   },
   'amazon' => { '2' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}" },
   'ubuntu' => {
-    'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}"
+    'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}",
   }
 )
 default['cluster']['dcv']['server']['version'] = '2021.1.10851-1'
 default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
-    '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
+    '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
   'amazon' => { '2' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
-    'default' => "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
+    'default' => "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
 default['cluster']['dcv']['xdcv']['version'] = '2021.1.392-1'
 default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
-    '~>7' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
+    '~>7' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
   'amazon' => { '2' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
-    'default' => "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
+    'default' => "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
 default['cluster']['dcv']['gl']['version'] = '2021.1.937-1'
 default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
-    '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
+    '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
   'amazon' => { '2' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
-    'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
+    'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
 default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.1/Servers/#{node['cluster']['dcv']['package']}.tgz"
@@ -266,7 +266,7 @@ default['cluster']['dcv']['authenticator']['virtualenv_path'] = [
   'versions',
   node['cluster']['python-version'],
   'envs',
-  node['cluster']['dcv']['authenticator']['virtualenv']
+  node['cluster']['dcv']['authenticator']['virtualenv'],
 ].join('/')
 
 # CloudWatch Agent
@@ -311,21 +311,21 @@ when 'rhel', 'amazon'
   # Config file used to set default MODULEPATH list
   default['cluster']['modulepath_config_file'] = value_for_platform(
     'centos' => {
-      '~>7' => "#{node['cluster']['moduleshome']}/init/.modulespath"
+      '~>7' => "#{node['cluster']['moduleshome']}/init/.modulespath",
     },
     'amazon' => { 'default' => "#{node['cluster']['moduleshome']}/init/.modulespath" }
   )
 
   case node['platform']
-  when 'centos', 'redhat', 'scientific' # ~FC024
-    default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+  when 'centos', 'redhat', 'scientific'
+    default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                              httpd boost-devel redhat-lsb mlocate lvm2 R atlas-devel
                                              blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                             coreutils moreutils]
+                                             coreutils moreutils)
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
@@ -334,7 +334,7 @@ when 'rhel', 'amazon'
     end
 
   when 'amazon'
-    default['cluster']['base_packages'] = %w[vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+    default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                              httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
                                              libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
@@ -344,7 +344,7 @@ when 'rhel', 'amazon'
                                              gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                              jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
                                              librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                             coreutils moreutils]
+                                             coreutils moreutils)
 
     # Install R via amazon linux extras
     default['cluster']['alinux_extras'] = ['R3.4']
@@ -355,14 +355,14 @@ when 'rhel', 'amazon'
 
 when 'debian'
   default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
-  default['cluster']['base_packages'] = %w[vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
+  default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                            tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                            apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
                                            libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
                                            r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
                                            libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
-                                           coreutils moreutils]
+                                           coreutils moreutils)
 
   case node['platform_version']
   when '18.04'
@@ -405,7 +405,7 @@ default['cluster']['lustre']['centos7']['base_url_prefix'] = arm_instance? ? 'ce
 default['cluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
     # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
-    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_rhel_minor_version}/#{node['kernel']['machine']}/"
+    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_rhel_minor_version}/#{node['kernel']['machine']}/",
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
 )
@@ -413,19 +413,19 @@ default['cluster']['lustre']['base_url'] = value_for_platform(
 default['cluster']['lustre']['version'] = value_for_platform(
   'centos' => {
     '7.6' => "2.10.6",
-    '7.5' => "2.10.5"
+    '7.5' => "2.10.5",
   }
 )
 default['cluster']['lustre']['kmod_url'] = value_for_platform(
   'centos' => {
     '7.6' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el7.x86_64.rpm",
-    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/kmod-lustre-client-2.10.5-1.el7.x86_64.rpm"
+    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/kmod-lustre-client-2.10.5-1.el7.x86_64.rpm",
   }
 )
 default['cluster']['lustre']['client_url'] = value_for_platform(
   'centos' => {
     '7.6' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/lustre-client-2.10.6-1.el7.x86_64.rpm",
-    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm"
+    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm",
   }
 )
 
@@ -477,7 +477,7 @@ default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
 
 # AWS domain
-default['cluster']['aws_domain'] = aws_domain # ~FC044
+default['cluster']['aws_domain'] = aws_domain
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: fsx_mount
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -41,9 +41,9 @@ if fsx_shared_dir != "NONE"
              end
 
   mountname = node['cluster']['fsx_mount_name']
-  mount_options = %w[defaults _netdev flock user_xattr noatime]
+  mount_options = %w(defaults _netdev flock user_xattr noatime)
 
-  mount_options.concat(%w[noauto x-systemd.automount])
+  mount_options.concat(%w(noauto x-systemd.automount))
 
   # Mount FSx over NFS
   mount fsx_shared_dir do
@@ -52,7 +52,7 @@ if fsx_shared_dir != "NONE"
     dump 0
     pass 0
     options mount_options
-    action %i[mount enable]
+    action %i(mount enable)
     retries 10
     retry_delay 6
   end

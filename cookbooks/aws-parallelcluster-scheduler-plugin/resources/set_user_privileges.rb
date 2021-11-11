@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
 # with the License. A copy of the License is located at http://aws.amazon.com/apache2.0/
@@ -10,10 +10,10 @@
 
 resource_name :set_user_privileges
 provides :set_user_privileges
+unified_mode true
 
 # Resource to set user privileges
 
-property :name, String, name_property: true
 property :grant_sudo_privileges, [true, false],
          default: false,
          description: 'flag to set sudo privileges'

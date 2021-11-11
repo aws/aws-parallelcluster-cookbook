@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: efa
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -36,7 +36,7 @@ end
 # new one is installed in /opt/amazon/efa/bin/
 case node['platform_family']
 when 'rhel', 'amazon'
-  package %w[openmpi-devel openmpi] do
+  package %w(openmpi-devel openmpi) do
     action :remove
     not_if { efa_installed }
   end

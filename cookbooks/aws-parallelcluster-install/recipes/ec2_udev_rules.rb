@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: ec2_udev_rules
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -55,7 +55,7 @@ cookbook_file 'attachVolume.py' do
   mode '0755'
 end
 
-if node['platform'] == 'ubuntu'
+if platform?('ubuntu')
   # allow Ubuntu udev to do network call
   execute 'udev-daemon-reload' do
     command 'udevadm control --reload'
@@ -77,5 +77,5 @@ end
 
 service "ec2blkdev" do
   supports restart: true
-  action %i[enable start]
+  action %i(enable start)
 end

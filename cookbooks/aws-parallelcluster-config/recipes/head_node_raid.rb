@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: head_node_raid
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -105,7 +105,7 @@ if raid_shared_dir != "NONE"
     device "/dev/md0"
     fstype "ext4"
     options "defaults,nofail,_netdev"
-    action %i[mount enable]
+    action %i(mount enable)
     retries 10
     retry_delay 6
   end

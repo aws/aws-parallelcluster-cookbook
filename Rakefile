@@ -26,4 +26,4 @@ rescue LoadError
 end
 
 # default tasks are quick, commit tests
-task default: %w[cookstyle rubocop chefspec]
+task default: %w(cookstyle rubocop chefspec)

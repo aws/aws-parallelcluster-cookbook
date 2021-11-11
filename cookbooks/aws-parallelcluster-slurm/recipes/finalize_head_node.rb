@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-slurm
+# Cookbook:: aws-parallelcluster-slurm
 # Recipe:: finalize_head_node
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -21,7 +21,7 @@ execute "check if clustermgtd heartbeat is available" do
   retry_delay 10
 end
 
-ruby_block "wait for static fleet capacity" do # ~FC014
+ruby_block "wait for static fleet capacity" do
   block do
     require 'chef/mixin/shell_out'
     require 'shellwords'

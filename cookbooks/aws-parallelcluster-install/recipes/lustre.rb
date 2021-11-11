@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: lustre
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version'].to_f)
+if platform?('centos') && %w(7.5 7.6).include?(node['platform_version'].to_f)
   # Centos 7.6 and 7.5
 
   lustre_kmod_rpm = "#{node['cluster']['sources_dir']}/kmod-lustre-client-#{node['cluster']['lustre']['version']}.x86_64.rpm"
@@ -51,7 +51,7 @@ if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version']
 
   kernel_module 'lnet'
 
-elsif node['platform'] == 'centos' && node['platform_version'].to_f >= 7.7
+elsif platform?('centos') && node['platform_version'].to_f >= 7.7
   # Centos >= 7.7
 
   # add fsx lustre repository
@@ -63,23 +63,22 @@ elsif node['platform'] == 'centos' && node['platform_version'].to_f >= 7.7
     retry_delay 5
   end
 
-  package %w[kmod-lustre-client lustre-client] do
+  package %w(kmod-lustre-client lustre-client) do
     retries 3
     retry_delay 5
   end
 
   kernel_module 'lnet'
 
-elsif node['platform'] == 'centos'
+elsif platform?('centos')
   # Centos 6
   Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are >= 7.5")
 
-elsif node['platform'] == 'ubuntu'
+elsif platform?('ubuntu')
 
   apt_repository 'fsxlustreclientrepo' do
     uri          node['cluster']['lustre']['base_url']
     components   ['main']
-    distribution node['lsb']['codename']
     key          node['cluster']['lustre']['public_key']
     retries 3
     retry_delay 5
@@ -99,7 +98,7 @@ elsif node['platform'] == 'ubuntu'
 
   kernel_module 'lnet'
 
-elsif node['platform'] == 'amazon'
+elsif platform?('amazon')
 
   alinux_extras_topic 'lustre2.10'
 
