@@ -5,10 +5,10 @@
 require 'rspec/core/rake_task'
 RSpec::Core::RakeTask.new(:chefspec)
 
-# foodcritic rake task
-desc 'Foodcritic linter'
-task :foodcritic do
-  sh 'foodcritic -f correctness .'
+# cookstyle rake task
+desc 'Cookstyle linter'
+task :cookstyle do
+  sh 'cookstyle .'
 end
 
 # rubocop rake task
@@ -26,4 +26,4 @@ rescue LoadError
 end
 
 # default tasks are quick, commit tests
-task default: %w[foodcritic rubocop chefspec]
+task default: %w[cookstyle rubocop chefspec]
