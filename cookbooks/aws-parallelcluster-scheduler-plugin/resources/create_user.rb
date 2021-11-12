@@ -47,6 +47,8 @@ action :run do
         comment "ParallelCluster scheduler plugin system user #{name}"
         uid system_user_id
         gid system_group_id
+        system true
+        shell '/bin/bash'
       end
 
       if enable_imds
