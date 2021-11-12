@@ -108,9 +108,16 @@ if [[ ! "${event_name}" =~ ^(HeadInit|HeadConfigure|HeadFinalize|ComputeInit|Com
   fail "Event name ${event_name} not supported"
 fi
 
-build_empty_dna_json() {
-  # Build empty dna.json
-  echo "{}" > /etc/chef/dna.json
+build_dummy_dna_json() {
+  log "Building dummy dna.json in ${source_dna_json}"
+  cat << EOF > ${source_dna_json}
+{
+  "cluster": {
+    "stack_name": "dummy-stack-name",
+    "stack_arn": "dummy-stack-arn"
+  }
+}
+EOF
 }
 
 build_dna_json() {
@@ -135,7 +142,7 @@ build_dna_json() {
 }
 EOF
 
-  jq --argfile f1 /etc/chef/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster' > /tmp/dna.json
+  jq --argfile f1 ${source_dna_json} --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster' > /tmp/dna.json
   log "Generated dna.json:"
   log "$(cat /tmp/dna.json)"
 }
@@ -324,6 +331,7 @@ if [[ -f "/etc/chef/dna.json" ]]; then
     log "Scheduler plugion substack outputs not specified, will be generated under (${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}) if there is a substack with outputs."
     scheduler_plugin_substack_outputs="${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}"
   fi
+  source_dna_json="/etc/chef/dna.json"
 else
   log "Instance not created as part of cluster creation"
 
@@ -343,7 +351,8 @@ else
     create_dummy_scheduler_plugin_substack_outputs
   fi
 
-  build_empty_dna_json
+  source_dna_json="/tmp/dummy_dna.json"
+  build_dummy_dna_json
 fi
 
 build_dna_json

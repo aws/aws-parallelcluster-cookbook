@@ -55,6 +55,13 @@ directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
 directory node['cluster']['shared_dir']
 
+# Create ParallelCluster log folder
+directory '/var/log/parallelcluster/' do
+  owner 'root'
+  mode '1777'
+  recursive true
+end
+
 build_essential
 include_recipe "aws-parallelcluster-install::python"
 
