@@ -126,10 +126,10 @@ action_class do # rubocop:disable Metrics/BlockLength
       env.merge!(build_hash_from_node('PCLUSTER_COMPUTE_RESOURCE_NAME', false, :cluster, :scheduler_compute_resource_name))
 
       # PCLUSTER_NODE_TYPE
-      env.merge!({ 'PCLUSTER_NODE_TYPE' => 'COMPUTE' })
+      env.merge!({ 'PCLUSTER_NODE_TYPE' => 'compute' })
     when 'HeadNode'
       # PCLUSTER_NODE_TYPE
-      env.merge!({ 'PCLUSTER_NODE_TYPE' => 'HEAD' })
+      env.merge!({ 'PCLUSTER_NODE_TYPE' => 'head' })
     end
 
     env
