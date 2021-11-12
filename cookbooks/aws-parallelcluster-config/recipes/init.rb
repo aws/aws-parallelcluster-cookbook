@@ -36,13 +36,6 @@ node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slot
 #       to one of the constants looked for in the above conditionals
 include_recipe "aws-parallelcluster-config::disable_hyperthreading"
 
-# Setup directories
-directory node['cluster']['base_dir']
-directory node['cluster']['sources_dir']
-directory node['cluster']['scripts_dir']
-directory node['cluster']['license_dir']
-directory node['cluster']['configs_dir']
-
 template '/etc/parallelcluster/cfnconfig' do
   source 'init/cfnconfig.erb'
   mode '0644'
