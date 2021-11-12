@@ -37,21 +37,11 @@ node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slot
 include_recipe "aws-parallelcluster-config::disable_hyperthreading"
 
 # Setup directories
-directory '/etc/parallelcluster'
-directory '/opt/parallelcluster'
-directory '/opt/parallelcluster/scripts'
 directory node['cluster']['base_dir']
 directory node['cluster']['sources_dir']
 directory node['cluster']['scripts_dir']
 directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
-
-# Create ParallelCluster log folder
-directory '/var/log/parallelcluster/' do
-  owner 'root'
-  mode '1777'
-  recursive true
-end
 
 template '/etc/parallelcluster/cfnconfig' do
   source 'init/cfnconfig.erb'
