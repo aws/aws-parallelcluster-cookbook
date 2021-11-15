@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Attributes:: test_attributes
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the 'License'). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -24,7 +24,7 @@ default['cluster']['parallelcluster-node-version'] = '3.0.0'
 # These are mock values for things that might be read from something external
 # so we provide stubs here so that recipes can run successfully
 default['cluster']['kernel_release'] =
-  if node['platform'] == 'centos'
+  if platform?('centos')
     '3.10.0-1160.42.2.el7.x86_64'
   else
     '5.11.0-1017-aws'
@@ -69,9 +69,9 @@ default['ec2'] = {
       Code: 'Success',
       LastUpdated: '2021-09-23T18:38:46Z',
       InstanceProfileArn: 'arn:aws:iam::z000000000000:instance-profile/parallelcluster/cluster/cluster-InstanceProfileHeadNode-AAAAAAAAAAAAA',
-      InstanceProfileId: 'AIAAAAAAAAAAAAAAAAAAA'
+      InstanceProfileId: 'AIAAAAAAAAAAAAAAAAAAA',
     },
-    role_name: 'cluster_RoleHeadNode_AAAAAAAAAAAA'
+    role_name: 'cluster_RoleHeadNode_AAAAAAAAAAAA',
   },
   identity_credentials_ec2_info: '{\n  \'Code\' : \'Success\',\n  \'LastUpdated\' : \'2021-09-23T18:38:43Z\',\n  \'AccountId\' : \'z000000000000\'\n}',
   instance_action: 'none',
@@ -87,7 +87,7 @@ default['ec2'] = {
       device_number: '0',
       interface_id: 'eni-00000000000000000',
       'ipv4-associations': {
-        '127.0.0.1': '172.00.00.100'
+        '127.0.0.1': '172.00.00.100',
       },
       local_hostname: 'ip-172-00-00-100.ec2.internal',
       local_ipv4s: '172.00.00.100',
@@ -101,8 +101,8 @@ default['ec2'] = {
       subnet_ipv4_cidr_block: '172.0.0.0/20',
       vpc_id: 'vpc-28cf8c52',
       vpc_ipv4_cidr_block: '172.0.0.0/16',
-      vpc_ipv4_cidr_blocks: '172.0.0.0/16'
-    }
+      vpc_ipv4_cidr_blocks: '172.0.0.0/16',
+    },
   },
   placement_availability_zone: 'us-east-1b',
   placement_availability_zone_id: 'use1-az6',
@@ -113,12 +113,12 @@ default['ec2'] = {
   public_keys_0_openssh_key: 'ssh-rsa AAAA user\n',
   reservation_id: 'r-00000000000000000',
   security_groups: [
-    'cluster-HeadNodeSecurityGroup-AAAAAAAAAAAAA'
+    'cluster-HeadNodeSecurityGroup-AAAAAAAAAAAAA',
   ],
   services_domain: 'amazonaws.com',
   services_partition: 'aws',
   userdata: '',
   account_id: 'z000000000000',
   availability_zone: 'us-east-1b',
-  region: 'us-east-1'
+  region: 'us-east-1',
 }

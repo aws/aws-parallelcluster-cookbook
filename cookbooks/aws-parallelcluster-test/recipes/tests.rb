@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: tests
 #
-# Copyright 2013-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -251,7 +251,7 @@ end
 ###################
 # Bridge Network Interface
 ###################
-if node['platform'] == 'centos'
+if platform?('centos')
   bash 'test bridge network interface presence' do
     code <<-TESTBRIDGE
       set -e
@@ -282,7 +282,7 @@ end
 
 # Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
 require 'bigdecimal/util'
-unless node['platform'] == 'ubuntu' && node['platform_version'].to_d == 16.04.to_d
+unless platform?('ubuntu') && node['platform_version'].to_d == 16.04.to_d
   ruby_block 'check_nfs_threads' do
     block do
       nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
@@ -382,7 +382,7 @@ end
 ###################
 if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'HeadNode'
   # Test that batch commands can be accessed without absolute path
-  batch_cli_commands = %w[awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat]
+  batch_cli_commands = %w(awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat)
   batch_cli_commands.each do |cli_commmand|
     bash "test_#{cli_commmand}" do
       cwd Chef::Config[:file_cache_path]

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -242,14 +242,14 @@ end
 #
 def restart_network_service
   network_service_name = value_for_platform(
-    %w[ubuntu debian] => {
-      '>=18.04' => 'systemd-resolved'
+    %w(ubuntu debian) => {
+      '>=18.04' => 'systemd-resolved',
     },
     'default' => 'network'
   )
   Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
   service network_service_name.to_s do
-    action %i[restart]
+    action %i(restart)
     ignore_failure true
   end
 end
@@ -412,14 +412,14 @@ end
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
 def overwrite_nfs_template?
   [
-    node['platform'] == 'amazon'
+    node['platform'] == 'amazon',
   ].any?
 end
 
 def enable_munge_service
   service "munge" do
     supports restart: true
-    action %i[enable start]
+    action %i(enable start)
   end
 end
 

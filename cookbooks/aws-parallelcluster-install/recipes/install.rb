@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: install
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -31,7 +31,7 @@ end
 include_recipe 'aws-parallelcluster-install::base'
 include_recipe "aws-parallelcluster-install::intel"
 include_recipe 'aws-parallelcluster-slurm::install'
-include_recipe 'aws-parallelcluster-byos::install'
+include_recipe 'aws-parallelcluster-scheduler-plugin::install'
 include_recipe 'aws-parallelcluster-awsbatch::install'
 
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment

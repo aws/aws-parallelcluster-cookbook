@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: head_node_base
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -91,7 +91,7 @@ vol_array.each_with_index do |volumeid, index|
     device_type :uuid
     options "_netdev"
     pass 0
-    action %i[mount enable]
+    action %i(mount enable)
     retries 10
     retry_delay 6
   end

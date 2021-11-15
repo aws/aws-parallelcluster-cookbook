@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: mount_shared
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -20,7 +20,7 @@ mount '/home' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
   fstype 'nfs'
   options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
+  action %i(mount enable)
   retries 10
   retry_delay 6
 end
@@ -30,7 +30,7 @@ mount node['cluster']['shared_dir'] do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir']}" })
   fstype "nfs"
   options node['cluster']['nfs']['hard_mount_options']
-  action %i[mount enable]
+  action %i(mount enable)
   retries 10
   retry_delay 6
 end

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster
 # Recipe:: imds
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -65,7 +65,7 @@ template '/etc/init.d/parallelcluster-iptables' do
 end
 
 service "parallelcluster-iptables" do
-  action %i[enable start]
+  action %i(enable start)
 end
 
 include_recipe 'aws-parallelcluster-test::test_imds'

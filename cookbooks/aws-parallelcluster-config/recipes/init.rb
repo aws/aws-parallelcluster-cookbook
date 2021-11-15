@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook Name:: aws-parallelcluster-config
+# Cookbook:: aws-parallelcluster-config
 # Recipe:: init
 #
-# Copyright 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -19,7 +19,7 @@
 validate_os_type
 
 # Validate init system
-raise "Init package #{node['init_package']} not supported." unless node['init_package'] == 'systemd'
+raise "Init package #{node['init_package']} not supported." unless systemd?
 
 # Determine scheduler_slots settings and update instance_slots appropriately
 node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slots']
@@ -35,23 +35,6 @@ node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slot
 #       node['cpu']['total'], which would break the expected behavior when setting scheduler_slots
 #       to one of the constants looked for in the above conditionals
 include_recipe "aws-parallelcluster-config::disable_hyperthreading"
-
-# Setup directories
-directory '/etc/parallelcluster'
-directory '/opt/parallelcluster'
-directory '/opt/parallelcluster/scripts'
-directory node['cluster']['base_dir']
-directory node['cluster']['sources_dir']
-directory node['cluster']['scripts_dir']
-directory node['cluster']['license_dir']
-directory node['cluster']['configs_dir']
-
-# Create ParallelCluster log folder
-directory '/var/log/parallelcluster/' do
-  owner 'root'
-  mode '1777'
-  recursive true
-end
 
 template '/etc/parallelcluster/cfnconfig' do
   source 'init/cfnconfig.erb'
@@ -80,7 +63,7 @@ include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['no
 include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbatch'
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
-include_recipe "aws-parallelcluster-byos::init" if node['cluster']['scheduler'] == 'byos'
+include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
 
 # IMDS
 include_recipe 'aws-parallelcluster-config::imds' unless virtualized?

@@ -2,8 +2,9 @@
 
 resource_name :install_pyenv
 provides :install_pyenv
+unified_mode true
 
-# Resource to create a Python virtual environment for a given user
+# Resource:: to create a Python virtual environment for a given user
 
 property :python_version, String, name_property: true
 property :prefix, String, required: true
