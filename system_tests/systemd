@@ -76,11 +76,11 @@ mkdir /etc/parallelcluster/slurm_plugin
 mkdir -p /opt/slurm/etc/pcluster/.slurm_plugin/
 touch /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat
 
-chef-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::init &&
+cinc-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::init &&
 /opt/parallelcluster/scripts/fetch_and_run -preinstall &&
-chef-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::config &&
+cinc-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::config &&
 /opt/parallelcluster/scripts/fetch_and_run -postinstall &&
-chef-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::finalize &&
+cinc-client --local-mode --config /etc/chef/client.rb --log_level auto --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster::finalize &&
 
 # if there is a chef error, show it to the user.
 if [ -e /etc/chef/local-mode-cache/cache/cinc-stacktrace.out ]; then
