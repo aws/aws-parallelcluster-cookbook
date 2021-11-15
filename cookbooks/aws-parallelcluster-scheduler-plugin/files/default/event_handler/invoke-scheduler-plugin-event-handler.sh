@@ -14,24 +14,35 @@ ORIGINAL_INSTANCE_TYPES_DATA="${ORIGINAL_SHARED_DIR}/${INSTANCE_TYPES_DATA_FILE}
 DUMMY_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS="${DUMMY_DIR}/${SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS_FILE}"
 ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS="${ORIGINAL_SHARED_DIR}/${SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS_FILE}"
 
+syntax() {
+  echo
+  echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config> --instance-types-data <instance types data> --scheduler-plugin-stack-outputs <scheduler plugin substack outputs>] --cluster-configuration <cluster configuration> --event-name <event name>"
+  echo "options:"
+  echo "--help                                Print this help."
+  echo "--debug                               Exec in debug mode (with set -x)."
+  echo "--event-name                          The name of the event to trigger, possible values are:"
+  echo "                                          HeadInit, HeadConfigure, HeadFinalize, ComputeInit, ComputeConfigure, ComputeFinalize, HeadClusterUpdate, HeadComputeFleetStart or HeadComputeFleetStop."
+  echo "--cluster-configuration               Required local path to cluster configuration file, in YAML format."
+  echo "--launch-templates-config             Local path to launch templates config file, in JSON format. When not set, if instance is not created by cluster creation, dummy launch templates config is created, otherwise the one retrieved from cluster will be used"
+  echo "--instance-types-data                 Local path to instance types data file, in JSON format. When not set, if instance is not created by cluster creation, dummy instance types data is created, otherwise the one retrieved from cluster will be used"
+  echo "--scheduler-plugin-substack-outputs   Local path to scheduler plugin substack outputs file, in JSON format. When not set, if instance is not created by cluster creation, dummy scheduler plugin substack outputs is created, otherwise the one retrieved from cluster will be used"
+  echo
+}
+
 help() {
   echo "Utility to call ParallelCluster scheduler plugin event handler for development/debugging purposes"
-    echo
-    echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config> --instance-types-data <instance types data> --scheduler-plugin-stack-outputs <scheduler plugin substack outputs>] --cluster-configuration <cluster configuration> --event-name <event name>"
-    echo "options:"
-    echo "--help                                Print this help."
-    echo "--debug                               Exec in debug mode (with set -x)."
-    echo "--event-name                          The name of the event to trigger, possible values are:"
-    echo "                                          HeadInit, HeadConfigure, HeadFinalize, ComputeInit, ComputeConfigure, ComputeFinalize, HeadClusterUpdate, HeadComputeFleetStart or HeadComputeFleetStop."
-    echo "--cluster-configuration               Required local path to cluster configuration file, in YAML format."
-    echo "--launch-templates-config             Local path to launch templates config file, in JSON format. When not set, if instance is not created by cluster creation, dummy launch templates config is created, otherwise the one retrieved from cluster will be used"
-    echo "--instance-types-data                 Local path to instance types data file, in JSON format. When not set, if instance is not created by cluster creation, dummy instance types data is created, otherwise the one retrieved from cluster will be used"
-    echo "--scheduler-plugin-substack-outputs   Local path to scheduler plugin substack outputs file, in JSON format. When not set, if instance is not created by cluster creation, dummy scheduler plugin substack outputs is created, otherwise the one retrieved from cluster will be used"
-    echo
+  syntax
 }
+
 
 fail() {
   echo "$1"
+  exit 1
+}
+
+fail_syntax() {
+  echo "$1"
+  syntax
   exit 1
 }
 
@@ -89,7 +100,7 @@ while [ $# -gt 0 ]; do
       scheduler_plugin_substack_outputs+=("${1#*=}")
     ;;
     *)
-      fail "Unrecognized option ($1)"
+      fail_syntax "Unrecognized option ($1)"
     ;;
   esac
   shift
@@ -148,7 +159,7 @@ EOF
 }
 
 call_chef_run() {
-  chef_command=(chef-client --local-mode \
+  chef_command=(cinc-client --local-mode \
     --config /etc/chef/client.rb \
     --log_level info \
     --force-formatter \
