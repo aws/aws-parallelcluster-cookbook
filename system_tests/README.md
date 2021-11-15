@@ -34,7 +34,7 @@ what would be present on a node during AMI creation.
 Finally, the Dockerfile runs the `bootstrap.sh` process. This script is
 responsible for mocking several applications which would be available on a node
 but do not make sense in a virtual environment (e.g. `sysctl`, `modprobe`, etc...).
-The `bootstrap.sh` process then launches the `chef-client` with the `aws-parallelcluster::default` recipe 
+The `bootstrap.sh` process then launches the `cinc-client` with the `aws-parallelcluster::default` recipe 
 as the cloudformation would.
 
 ### Configuration / Docker Run
@@ -69,7 +69,7 @@ Now simply run the command that was commented. This provides a convenient way
 to iterate on the installation scripts.
 
 ```
-chef-client --local-mode --config /etc/chef/client.rb --log_level info --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/parallelcluster/image_dna.json --override-runlist aws-parallelcluster::default
+cinc-client --local-mode --config /etc/chef/client.rb --log_level info --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/parallelcluster/image_dna.json --override-runlist aws-parallelcluster::default
 ```
 
 ### Testing the configuration
