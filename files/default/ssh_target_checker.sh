@@ -18,14 +18,14 @@ log() {
 }
 
 retrieve_vpc_cidr_list() {
-    TOKEN=$(curl --retry 3 --retry-delay 0 --fail -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
-    if ! mac=$(curl --retry 3 --retry-delay 0 --silent --fail -H "X-aws-ec2-metadata-token: ${TOKEN}" http://169.254.169.254/latest/meta-data/mac); then
+    TOKEN=$(curl --retry 20 --retry-delay 1 --fail -s -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+    if ! mac=$(curl --retry 20 --retry-delay 1 --silent --fail -H "X-aws-ec2-metadata-token: ${TOKEN}" http://169.254.169.254/latest/meta-data/mac); then
        log  "Unable to determine MAC address for network interface"
        exit 1
     fi
 
     vpc_cidr_uri="http://169.254.169.254/latest/meta-data/network/interfaces/macs/${mac}/vpc-ipv4-cidr-blocks"
-    vpc_cidr_list=($(curl --retry 3 --retry-delay 0 --silent --fail -H "X-aws-ec2-metadata-token: ${TOKEN}" "${vpc_cidr_uri}"))
+    vpc_cidr_list=($(curl --retry 20 --retry-delay 1 --silent --fail -H "X-aws-ec2-metadata-token: ${TOKEN}" "${vpc_cidr_uri}"))
 
     if ! (( ${#vpc_cidr_list[@]} )); then
        log "Unable to retrieve VPC CIDR list from EC2 meta-data"

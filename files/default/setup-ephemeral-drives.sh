@@ -33,7 +33,7 @@ function exec_command() {
 
 function set_imds_token(){
   if [ -z "${IMDS_TOKEN}" ];then
-    IMDS_TOKEN=$(curl --retry 3 --retry-delay 0 --fail -s -f -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 900" http://169.254.169.254/latest/api/token)
+    IMDS_TOKEN=$(curl --retry 20 --retry-delay 1 --fail -s -f -X PUT -H "X-aws-ec2-metadata-token-ttl-seconds: 900" http://169.254.169.254/latest/api/token)
     if [ "${?}" -gt 0 ] || [ -z "${IMDS_TOKEN}" ]; then
       echo '[ERROR] Could not get IMDSv2 token. Instance Metadata might have been disabled or this is not an EC2 instance.'
       exit 1
@@ -43,7 +43,7 @@ function set_imds_token(){
 
 # param1 = query
 function get_meta() {
-    local imds_out=$(curl --retry 3 --retry-delay 0 --fail -s -q -H "X-aws-ec2-metadata-token:${IMDS_TOKEN}" -f http://169.254.169.254/latest/${1})
+    local imds_out=$(curl --retry 20 --retry-delay 1 --fail -s -q -H "X-aws-ec2-metadata-token:${IMDS_TOKEN}" -f http://169.254.169.254/latest/${1})
     echo -n "${imds_out}"
 }
 
