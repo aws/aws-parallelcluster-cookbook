@@ -10,16 +10,19 @@ property :pyenv_name, String, name_property: true
 property :pyenv_path, String, required: true
 property :python_version, String, required: true
 property :requirements_path, String, default: ""
+property :user, String
 
 default_action :run
 
 action :run do
   pyenv_script "pyenv virtualenv #{new_resource.pyenv_name}" do
     code "pyenv virtualenv #{new_resource.python_version} #{new_resource.pyenv_name}"
+    user new_resource.user if new_resource.user
   end
 
   pyenv_pip "pip" do
     virtualenv new_resource.pyenv_path
+    user new_resource.user if new_resource.user
     action :upgrade
   end
 
@@ -33,6 +36,7 @@ action :run do
     # Install given requirements in the virtual environment
     pyenv_pip "#{new_resource.pyenv_path}/requirements.txt" do
       virtualenv new_resource.pyenv_path
+      user new_resource.user if new_resource.user
       requirement true
     end
   end
