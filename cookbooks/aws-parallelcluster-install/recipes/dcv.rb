@@ -88,126 +88,123 @@ if node['conditions']['dcv_supported']
     uid node['cluster']['dcv']['authenticator']['user_id']
     gid node['cluster']['dcv']['authenticator']['group_id']
     # home is mounted from the head node
-    manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
+    manage_home true
     home node['cluster']['dcv']['authenticator']['user_home']
     system true
     shell '/bin/bash'
   end
 
-  case node['cluster']['node_type']
-  when 'HeadNode', nil
-    dcv_tarball = "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
+  dcv_tarball = "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
 
-    # Install DCV pre-requisite packages
-    case node['platform']
-    when 'centos'
-      # Install the desktop environment and the desktop manager packages
-      execute 'Install gnome desktop' do
-        command 'yum -y install @gnome'
-        retries 3
-        retry_delay 5
-      end
-      # Install X Window System (required when using GPU acceleration)
-      package "xorg-x11-server-Xorg" do
-        retries 3
-        retry_delay 5
-      end
-
-      # libvirtd service creates virtual bridge interfaces.
-      # It's provided by libvirt-daemon, installed as requirement for gnome-boxes, included in @gnome.
-      # Open MPI does not ignore other local-only devices other than loopback:
-      # if virtual bridge interface is up, Open MPI assumes that that network is usable for MPI communications.
-      # This is incorrect and it led to MPI applications hanging when they tried to send or receive MPI messages
-      # see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
-      service 'libvirtd' do
-        action %i(disable stop)
-      end
-
-    when 'ubuntu'
-      apt_update
-
-      bash 'install pre-req' do
-        cwd Chef::Config[:file_cache_path]
-        # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
-        # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
-        # Run dpkg --configure -a if there is a `dpkg interrupted` issue when installing ubuntu-desktop
-        code <<-PREREQ
-          set -e
-          DEBIAN_FRONTEND=noninteractive
-          apt -y install whoopsie
-          apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)
-          apt -y purge ifupdown
-          wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
-          gpg --import NICE-GPG-KEY
-        PREREQ
-        retries 10
-        retry_delay 5
-      end
-
-    when 'amazon'
-      prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
-                           xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
-                           gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
-                           gnu-free-serif-fonts glx-utils)
-      # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
-      # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
-      #       which is done in base_install.
-      if arm_instance?
-        prereq_packages.push('mate-terminal')
-      else
-        prereq_packages.push('gnome-terminal')
-      end
-      package prereq_packages do
-        retries 10
-        retry_delay 5
-      end
-
-      # Use Gnome in place of Gnome-classic
-      file "Setup Gnome standard" do
-        content "PREFERRED=/usr/bin/gnome-session"
-        owner "root"
-        group "root"
-        mode "0755"
-        path "/etc/sysconfig/desktop"
-      end
-
+  # Install DCV pre-requisite packages
+  case node['platform']
+  when 'centos'
+    # Install the desktop environment and the desktop manager packages
+    execute 'Install gnome desktop' do
+      command 'yum -y install @gnome'
+      retries 3
+      retry_delay 5
     end
-    disable_lock_screen
-
-    # Extract DCV packages
-    unless File.exist?(dcv_tarball)
-      remote_file dcv_tarball do
-        source node['cluster']['dcv']['url']
-        mode '0644'
-        retries 3
-        retry_delay 5
-      end
-
-      # Verify checksum of dcv package
-      ruby_block "verify dcv checksum" do
-        block do
-          require 'digest'
-          checksum = Digest::SHA256.file(dcv_tarball).hexdigest
-          raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cluster']['dcv']['package']['sha256sum']}" if checksum != node['cluster']['dcv']['sha256sum']
-        end
-      end
-
-      bash 'extract dcv packages' do
-        cwd node['cluster']['sources_dir']
-        code "tar -xvzf #{dcv_tarball}"
-      end
+    # Install X Window System (required when using GPU acceleration)
+    package "xorg-x11-server-Xorg" do
+      retries 3
+      retry_delay 5
     end
 
-    # Install server and xdcv packages
-    dcv_packages = %W(#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']})
-    dcv_packages_path = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/"
-    # Rewrite dcv_packages object by cycling each package file name and appending the path to them
-    dcv_packages.map! { |package| dcv_packages_path + package }
-    install_package_list(dcv_packages)
+    # libvirtd service creates virtual bridge interfaces.
+    # It's provided by libvirt-daemon, installed as requirement for gnome-boxes, included in @gnome.
+    # Open MPI does not ignore other local-only devices other than loopback:
+    # if virtual bridge interface is up, Open MPI assumes that that network is usable for MPI communications.
+    # This is incorrect and it led to MPI applications hanging when they tried to send or receive MPI messages
+    # see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
+    service 'libvirtd' do
+      action %i(disable stop)
+    end
 
-    # Create Python virtual env for the external authenticator
-    install_ext_auth_virtual_env
+  when 'ubuntu'
+    apt_update
+
+    bash 'install pre-req' do
+      cwd Chef::Config[:file_cache_path]
+      # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
+      # Must purge ifupdown before creating the AMI or the instance will have an ssh failure
+      # Run dpkg --configure -a if there is a `dpkg interrupted` issue when installing ubuntu-desktop
+      code <<-PREREQ
+        set -e
+        DEBIAN_FRONTEND=noninteractive
+        apt -y install whoopsie
+        apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)
+        apt -y purge ifupdown
+        wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY
+        gpg --import NICE-GPG-KEY
+      PREREQ
+      retries 10
+      retry_delay 5
+    end
+
+  when 'amazon'
+    prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
+                         xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
+                         gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
+                         gnu-free-serif-fonts glx-utils)
+    # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
+    # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
+    #       which is done in base_install.
+    if arm_instance?
+      prereq_packages.push('mate-terminal')
+    else
+      prereq_packages.push('gnome-terminal')
+    end
+    package prereq_packages do
+      retries 10
+      retry_delay 5
+    end
+
+    # Use Gnome in place of Gnome-classic
+    file "Setup Gnome standard" do
+      content "PREFERRED=/usr/bin/gnome-session"
+      owner "root"
+      group "root"
+      mode "0755"
+      path "/etc/sysconfig/desktop"
+    end
+
   end
+  disable_lock_screen
+
+  # Extract DCV packages
+  unless File.exist?(dcv_tarball)
+    remote_file dcv_tarball do
+      source node['cluster']['dcv']['url']
+      mode '0644'
+      retries 3
+      retry_delay 5
+    end
+
+    # Verify checksum of dcv package
+    ruby_block "verify dcv checksum" do
+      block do
+        require 'digest'
+        checksum = Digest::SHA256.file(dcv_tarball).hexdigest
+        raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cluster']['dcv']['package']['sha256sum']}" if checksum != node['cluster']['dcv']['sha256sum']
+      end
+    end
+
+    bash 'extract dcv packages' do
+      cwd node['cluster']['sources_dir']
+      code "tar -xvzf #{dcv_tarball}"
+    end
+  end
+
+  # Install server and xdcv packages
+  dcv_packages = %W(#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']})
+  dcv_packages_path = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/"
+  # Rewrite dcv_packages object by cycling each package file name and appending the path to them
+  dcv_packages.map! { |package| dcv_packages_path + package }
+  install_package_list(dcv_packages)
+
+  # Create Python virtual env for the external authenticator
+  install_ext_auth_virtual_env
 
   # Post-installation action
   if platform?('centos')
