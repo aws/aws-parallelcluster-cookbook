@@ -185,6 +185,9 @@ action_class do # rubocop:disable Metrics/BlockLength
     # PCLUSTER_HEADNODE_HOSTNAME
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_HOSTNAME', true, :hostname))
 
+    # PCLUSTER_PYTHON_ROOT
+    env.merge!({ 'PCLUSTER_PYTHON_ROOT' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin" })
+
     # PCLUSTER_CLUSTER_CONFIG_OLD
     # TODO: to be implemented
 
