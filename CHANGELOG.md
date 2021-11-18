@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade Slurm to version 20.11.8.
 - Upgrade Cinc Client to version 17.2.29.
+- Upgrade NICE DCV to version 2021.2-11190.
 
 2.11.3
 -----
