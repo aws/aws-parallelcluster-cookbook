@@ -335,6 +335,7 @@ def find_rhel_minor_version
       os_minor_version = '2' if kernel_patch_version[1] >= '193'
       os_minor_version = '3' if kernel_patch_version[1] >= '240'
       os_minor_version = '4' if kernel_patch_version[1] >= '305'
+      os_minor_version = '5' if kernel_patch_version[1] >= '348'
     else
       raise "CentOS version #{node['platform_version']} not supported."
     end
