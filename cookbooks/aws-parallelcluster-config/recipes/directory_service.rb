@@ -17,9 +17,9 @@
 
 return if node['cluster']["directory_service"]["enabled"] == 'false'
 
-directory_service_dir = "#{node['cluster']['shared_dir']}/directory_service"
 sssd_conf_path = "/etc/sssd/sssd.conf"
-shared_sssd_conf_path = "#{directory_service_dir}/sssd.conf"
+shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_service"
+shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
 if node['cluster']['node_type'] == 'HeadNode'
   # Head node writes the sssd.conf file and contacts the secret manager to retrieve the LDAP password.
@@ -32,28 +32,12 @@ if node['cluster']['node_type'] == 'HeadNode'
     owner 'root'
     group 'root'
     mode '0600'
-    sensitive true
-  end
-
-  # Generate and run the script to set obfuscated password
-  script_path = "/tmp/set_obfuscated_password.sh"
-
-  template script_path do
-    source 'directory_service/set_obfuscated_password.sh.erb'
-    owner 'root'
-    group 'root'
-    mode '0700'
-    sensitive true
-  end
-
-  execute 'Set obfuscated password' do
-    user 'root'
-    command script_path
+    variables(ldap_default_authtok: shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout)
     sensitive true
   end
 
   # Share the sssd.conf file to shared directory
-  directory directory_service_dir do
+  directory shared_directory_service_dir do
     owner 'root'
     group 'root'
     mode '0600'
