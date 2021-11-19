@@ -139,59 +139,28 @@ action_class do # rubocop:disable Metrics/BlockLength
     Chef::Log.info("Building static handler environment")
     env = {}
 
-    # PCLUSTER_CLUSTER_CONFIG
     env.merge!({ 'PCLUSTER_CLUSTER_CONFIG' => target_cluster_config })
-
-    # PCLUSTER_LAUNCH_TEMPLATES
     env.merge!({ 'PCLUSTER_LAUNCH_TEMPLATES' => target_launch_templates })
-
-    # PCLUSTER_INSTANCE_TYPES_DATA
     env.merge!({ 'PCLUSTER_INSTANCE_TYPES_DATA' => target_instance_types_data })
-
-    # PCLUSTER_CLUSTER_NAME
     env.merge!(build_hash_from_node('PCLUSTER_CLUSTER_NAME', true, :cluster, :stack_name))
-
-    # PCLUSTER_CFN_STACK_ARN
     env.merge!(build_hash_from_node('PCLUSTER_CFN_STACK_ARN', true, :cluster, :stack_arn))
-
-    # PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_ARN
     env.merge!(build_hash_from_node('PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_ARN', false, :cluster, :scheduler_plugin_substack_arn))
-
-    # PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_OUTPUTS
     env.merge!({ 'PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_OUTPUTS' => target_scheduler_plugin_substack_outputs }) if ::File.exist?(target_scheduler_plugin_substack_outputs)
-
-    # PCLUSTER_SHARED_SCHEDULER_PLUGIN_DIR
     env.merge!(build_hash_from_node('PCLUSTER_SHARED_SCHEDULER_PLUGIN_DIR', true, :cluster, :scheduler_plugin, :shared_dir))
-
-    # PCLUSTER_LOCAL_SCHEDULER_PLUGIN_DIR
     env.merge!(build_hash_from_node('PCLUSTER_LOCAL_SCHEDULER_PLUGIN_DIR', true, :cluster, :scheduler_plugin, :local_dir))
-
-    # PCLUSTER_AWS_REGION and AWS_REGION
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))
     env.merge!(build_hash_from_node('AWS_REGION', true, :ec2, :region))
-
-    # PCLUSTER_OS
     env.merge!(build_hash_from_node('PCLUSTER_OS', true, :cluster, :config, :Image, :Os))
-
-    # PCLUSTER_ARCH
     env.merge!(build_hash_from_node('PCLUSTER_ARCH', true, :cpu, :architecture))
-
-    # PCLUSTER_VERSION
     env.merge!(build_hash_from_node('PCLUSTER_VERSION', true, :cluster, :'parallelcluster-version'))
-
-    # PCLUSTER_HEADNODE_PRIVATE_IP
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_PRIVATE_IP', true, :ec2, :local_ipv4))
-
-    # PCLUSTER_HEADNODE_HOSTNAME
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_HOSTNAME', true, :hostname))
-
-    # PCLUSTER_PYTHON_ROOT
     env.merge!({ 'PCLUSTER_PYTHON_ROOT' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin" })
-
+    env.merge!({ 'PATH' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/aws/bin:#{node['cluster']['scheduler_plugin']['home']}/.local/bin:#{node['cluster']['scheduler_plugin']['home']}/bin" })
+    env.merge!(setup_proxy(:cluster, :proxy))
     # PCLUSTER_CLUSTER_CONFIG_OLD
     # TODO: to be implemented
 
-    env.merge!(setup_proxy(:cluster, :proxy))
     env
   end
 
