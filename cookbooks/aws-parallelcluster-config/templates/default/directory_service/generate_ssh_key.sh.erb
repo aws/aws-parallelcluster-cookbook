@@ -1,0 +1,14 @@
+#!/bin/bash
+set -ex
+env
+if [ ! -d /home/${PAM_USER}/.ssh ] ; then
+    mkdir /home/${PAM_USER}/.ssh
+    ssh-keygen -q -t rsa -f /home/${PAM_USER}/.ssh/id_rsa -N ''
+    cat /home/${PAM_USER}/.ssh/id_rsa.pub >> /home/${PAM_USER}/.ssh/authorized_keys
+    chmod 0600 /home/${PAM_USER}/.ssh/authorized_keys
+    ssh-keyscan <%=  node['hostname'] %> > /home/${PAM_USER}/.ssh/known_hosts
+    chmod 0600 /home/${PAM_USER}/.ssh/known_hosts
+    chown ${PAM_USER}:$(id -g ${PAM_USER}) -R /home/${PAM_USER}/.ssh
+else
+    exit 0
+fi
