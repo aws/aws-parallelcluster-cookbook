@@ -119,7 +119,7 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
-# BYOS (Custom Scheduler) Configuration
+# Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
 default['cluster']['scheduler_plugin']['user_id'] = node['cluster']['reserved_base_uid'] + 4
@@ -129,13 +129,13 @@ default['cluster']['scheduler_plugin']['group_id'] = default['cluster']['schedul
 default['cluster']['scheduler_plugin']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
 default['cluster']['scheduler_plugin']['system_group_id_start'] = default['cluster']['scheduler_plugin']['system_user_id_start']
 
-# BYOS event handler
+# Scheduler plugin event handler
 default['cluster']['scheduler_plugin']['home'] = '/home/pcluster-scheduler-plugin'
-default['cluster']['scheduler_plugin']['handler_dir'] = '/home/pcluster-scheduler-plugin/.parallelcluster'
 default['cluster']['scheduler_plugin']['handler_log_out'] = '/var/log/parallelcluster/scheduler-plugin.out.log'
 default['cluster']['scheduler_plugin']['handler_log_err'] = '/var/log/parallelcluster/scheduler-plugin.err.log'
 default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['shared_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
+default['cluster']['scheduler_plugin']['handler_dir'] = "#{node['cluster']['scheduler_plugin']['local_dir']}/.configs"
 default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler-plugin-substack-outputs.json"
 default['cluster']['scheduler_plugin']['python_version'] = '3.9.9'
 default['cluster']['scheduler_plugin']['virtualenv'] = 'scheduler_plugin_virtualenv'
