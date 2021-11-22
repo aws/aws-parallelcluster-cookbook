@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'uri'
+
 return if node['cluster']["directory_service"]["enabled"] == 'false'
 
 sssd_conf_path = "/etc/sssd/sssd.conf"
@@ -22,6 +24,12 @@ shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_servi
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
 if node['cluster']['node_type'] == 'HeadNode'
+  # If domain_addr doesn't specify a protocol, assume it's ldaps
+  unless URI.parse(node['cluster']['directory_service']['domain_addr']).scheme
+    Chef::Log.info("No protocol specified in domain_addr #{node['cluster']['directory_service']['domain_addr']}. Assuming ldaps.")
+    node['cluster']['directory_service']['domain_addr'] = "ldaps://#{node['cluster']['directory_service']['domain_addr']}"
+  end
+
   # Head node writes the sssd.conf file and contacts the secret manager to retrieve the LDAP password.
   # Then the sssd.conf file is shared through shared_sssd_conf_path to compute nodes.
   # Only contacting the secret manager from head node avoids giving permission to compute nodes to contact the secret manager.
