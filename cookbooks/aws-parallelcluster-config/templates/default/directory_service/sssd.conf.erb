@@ -1,28 +1,26 @@
-# TODO: check what parameters should we keep inside this file
 [domain/default]
-debug_level = 0x1f0
 id_provider = ldap
 cache_credentials = True
 ldap_schema = AD
-ldap_uri = <%=  node['cluster']["directory_service"]["domain_addr"] %>
-ldap_search_base = <%=  node['cluster']["directory_service"]["domain_name"] %>
-ldap_default_bind_dn = <%=  node['cluster']["directory_service"]["domain_read_only_user"] %>
+ldap_uri = <%=  node['cluster']['directory_service']['domain_addr'] %>
+ldap_search_base = <%=  node['cluster']['directory_service']['domain_name'] %>
+ldap_default_bind_dn = <%=  node['cluster']['directory_service']['domain_read_only_user'] %>
 ldap_default_authtok = <%= @ldap_default_authtok %>
-ldap_tls_cacert = <%=  node['cluster']["directory_service"]["ldap_tls_ca_cert"] %>
-ldap_tls_reqcert = <%=  node['cluster']["directory_service"]["ldap_tls_req_cert"] %>
+ldap_tls_cacert = <%=  node['cluster']['directory_service']['ldap_tls_ca_cert'] %>
+ldap_tls_reqcert = <%=  node['cluster']['directory_service']['ldap_tls_req_cert'] %>
 ldap_id_mapping = True
-ldap_referrals = False
-enumerate = True
 fallback_homedir = /home/%u
 default_shell = /bin/bash
-# TODO:  use SSL
-ldap_auth_disable_tls_never_use_in_production = true
 use_fully_qualified_names = False
+<% if node['cluster']['directory_service']['additional_sssd_configs'] %>
+  <% node['cluster']['directory_service']['additional_sssd_configs'].each_pair do |param, value| %>
+<%= "#{param} = #{value}" %>
+  <% end %>
+<% end %>
 
 [domain/local]
 id_provider = local
 enumerate = True
-
 
 [sssd]
 config_file_version = 2
@@ -36,4 +34,3 @@ filter_groups = nobody,root
 
 [pam]
 offline_credentials_expiration = 7
-
