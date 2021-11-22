@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'uri'
+
 return if node['cluster']["directory_service"]["enabled"] == 'false'
 
 sssd_conf_path = "/etc/sssd/sssd.conf"
@@ -22,6 +24,13 @@ shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_servi
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
 if node['cluster']['node_type'] == 'HeadNode'
+  # If domain_addr doesn't specify a protocol, assume it's ldaps
+  domain_addr_prefix = ''
+  unless URI.parse(node['cluster']['directory_service']['domain_addr']).scheme
+    Chef::Log.info("No protocol specified in domain_addr #{node['cluster']['directory_service']['domain_addr']}. Assuming ldaps.")
+    domain_addr_prefix = 'ldaps://'
+  end
+
   # Head node writes the sssd.conf file and contacts the secret manager to retrieve the LDAP password.
   # Then the sssd.conf file is shared through shared_sssd_conf_path to compute nodes.
   # Only contacting the secret manager from head node avoids giving permission to compute nodes to contact the secret manager.
@@ -32,7 +41,10 @@ if node['cluster']['node_type'] == 'HeadNode'
     owner 'root'
     group 'root'
     mode '0600'
-    variables(ldap_default_authtok: shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout)
+    variables(
+      ldap_default_authtok: shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout,
+      domain_addr_prefix: domain_addr_prefix
+    )
     sensitive true
   end
 
