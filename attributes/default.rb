@@ -475,6 +475,7 @@ default['cluster']["directory_service"]["ldap_tls_ca_cert"] = nil
 default['cluster']["directory_service"]["ldap_tls_req_cert"] = nil
 default['cluster']["directory_service"]["ldap_access_filter"] = nil
 default['cluster']["directory_service"]["generate_ssh_keys_for_users"] = nil
+default['cluster']['directory_service']['additional_sssd_configs'] = nil
 
 # Other ParallelCluster internal variables
 default['cluster']['ddb_table'] = nil
