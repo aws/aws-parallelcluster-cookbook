@@ -15,14 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Setup byos group
+# Setup scheduler-plugin group
 group node['cluster']['scheduler_plugin']['group'] do
   comment 'ParallelCluster scheduler plugin group'
   gid node['cluster']['scheduler_plugin']['group_id']
   system true
 end
 
-# Setup byos user
+# Setup scheduler-plugin user
 user node['cluster']['scheduler_plugin']['user'] do
   comment 'ParallelCluster scheduler plugin user'
   uid node['cluster']['scheduler_plugin']['user_id']
@@ -40,12 +40,4 @@ bash "set virtualenv in scheduler plugin user bash profile " do
     echo "PATH=#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin:\\$PATH" >> "#{node['cluster']['scheduler_plugin']['home']}/.bash_profile"
     echo "export PATH" >> "#{node['cluster']['scheduler_plugin']['home']}/.bash_profile"
   PROFILE
-end
-
-# create dir /home/byos/.parallelcluster
-directory node['cluster']['scheduler_plugin']['handler_dir'] do
-  owner node['cluster']['scheduler_plugin']['user']
-  group node['cluster']['scheduler_plugin']['user']
-  mode '0755'
-  action :create
 end

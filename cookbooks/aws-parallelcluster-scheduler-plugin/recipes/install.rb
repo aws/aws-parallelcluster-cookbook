@@ -20,7 +20,6 @@ include_recipe "aws-parallelcluster-scheduler-plugin::install_user"
 # setup Pyenv and Virtualenv
 include_recipe "aws-parallelcluster-scheduler-plugin::install_python"
 
-# create e.g. /opt/parallelcluster/byos
 directory node['cluster']['scheduler_plugin']['local_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
@@ -28,7 +27,13 @@ directory node['cluster']['scheduler_plugin']['local_dir'] do
   action :create
 end
 
-# create e.g. /opt/parallelcluster/shared/byos
+directory node['cluster']['scheduler_plugin']['handler_dir'] do
+  owner node['cluster']['scheduler_plugin']['user']
+  group node['cluster']['scheduler_plugin']['user']
+  mode '0755'
+  action :create
+end
+
 directory node['cluster']['scheduler_plugin']['shared_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
