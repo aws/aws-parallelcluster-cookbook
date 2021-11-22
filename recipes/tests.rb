@@ -136,6 +136,13 @@ end
 if node['cfncluster']['cfn_scheduler'] == 'slurm'
   case node['cfncluster']['cfn_node_type']
   when 'MasterServer'
+    execute 'check-slurm-version' do
+      # version is in the form: major-minor-micro-release, sinfo output is "slurm major.minor.micro"
+      command "sinfo -V | grep #{node['cfncluster']['slurm']['version'].split('-')[0..2].join('.')}"
+      environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
+      user node['cfncluster']['cfn_cluster_user']
+    end
+
     execute 'execute sinfo' do
       command "sinfo --help"
       environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
