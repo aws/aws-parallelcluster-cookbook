@@ -62,6 +62,13 @@ if node['cluster']['node_type'] == 'HeadNode'
     sensitive true
   end
 
+  bash 'Enable SSH password authentication on head node' do
+    user 'root'
+    code <<-AD
+      sed -ri 's/\s*PasswordAuthentication\s+no$/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+    AD
+  end
+
   if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
     generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
     template generate_ssh_key_path do
@@ -91,10 +98,8 @@ end
 bash 'Configure Directory Service' do
   user 'root'
   # Tell NSS, PAM to use SSSD for system authentication and identity information
-  # Modify SSHD config to enable password login
   code <<-AD
       authconfig --enablemkhomedir --enablesssdauth --enablesssd --updateall
-      sed -ri 's/\s*PasswordAuthentication\s+no$/PasswordAuthentication yes/g' /etc/ssh/sshd_config
   AD
   sensitive true
 end
