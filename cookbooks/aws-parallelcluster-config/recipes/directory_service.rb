@@ -49,6 +49,24 @@ if node['cluster']['node_type'] == 'HeadNode'
     command "cp #{sssd_conf_path} #{shared_sssd_conf_path}"
     sensitive true
   end
+
+  if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
+    generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
+    template generate_ssh_key_path do
+      source 'directory_service/generate_ssh_key.sh.erb'
+      owner 'root'
+      group 'root'
+      mode '0755'
+    end
+    filter_lines 'Configure PAM sshd script to call generate SSH key script' do
+      path '/etc/pam.d/sshd'
+      filters(
+        [
+          { after: [/^session.*include.*postlogin/, "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}", :first] },
+        ]
+      )
+    end
+  end
 else
   # Compute nodes copy sssd.conf from shared dir.
   execute 'Copy sssd.conf from the shared folder to the compute node' do
