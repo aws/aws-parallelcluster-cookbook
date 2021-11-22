@@ -83,8 +83,9 @@ action_class do # rubocop:disable Metrics/BlockLength
           ::File.write(source_scheduler_plugin_substack_outputs, scheduler_plugin_substack_outputs.to_json(:only))
         end
       end
-      FileUtils.cp(source_scheduler_plugin_substack_outputs, target_scheduler_plugin_substack_outputs)
     end
+
+    FileUtils.cp(source_scheduler_plugin_substack_outputs, target_scheduler_plugin_substack_outputs) if ::File.exist?(source_scheduler_plugin_substack_outputs)
 
     # Load static env from file or build it if file not found
     source_handler_env = "#{node['cluster']['shared_dir']}/handler-env.json"
