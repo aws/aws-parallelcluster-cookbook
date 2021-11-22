@@ -6,7 +6,9 @@ ldap_uri = <%=  node['cluster']['directory_service']['domain_addr'] %>
 ldap_search_base = <%=  node['cluster']['directory_service']['domain_name'] %>
 ldap_default_bind_dn = <%=  node['cluster']['directory_service']['domain_read_only_user'] %>
 ldap_default_authtok = <%= @ldap_default_authtok %>
+<% if node['cluster']['directory_service']['ldap_tls_ca_cert'] %>
 ldap_tls_cacert = <%=  node['cluster']['directory_service']['ldap_tls_ca_cert'] %>
+<% end %>
 ldap_tls_reqcert = <%=  node['cluster']['directory_service']['ldap_tls_req_cert'] %>
 ldap_id_mapping = True
 fallback_homedir = /home/%u
