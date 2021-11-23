@@ -54,7 +54,7 @@ if node['platform'] == 'centos' && %w[7.5 7.6].include?(node['platform_version']
   kernel_module 'lnet'
 
 elsif node['platform'] == 'centos' && node['platform_version'].to_f >= 7.7
-  # Centos 8 and >= 7.7
+  # Centos >= 7.7
 
   # add fsx lustre repository
   yum_repository "aws-fsx" do
