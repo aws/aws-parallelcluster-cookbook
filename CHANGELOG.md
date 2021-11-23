@@ -11,6 +11,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Slurm to version 20.11.8.
 - Upgrade Cinc Client to version 17.2.29.
 - Upgrade NICE DCV to version 2021.2-11190.
+- Upgrade NVIDIA driver to version 470.82.01.
+- Upgrade CUDA library to version 11.4.3.
+- Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-470`.
 - Disable unattended upgrades for Ubuntu.
 
 2.11.3

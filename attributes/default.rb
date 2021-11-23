@@ -123,13 +123,17 @@ default['cfncluster']['ganglia_enabled'] = 'no'
 
 # NVIDIA
 default['cfncluster']['nvidia']['enabled'] = 'no'
-default['cfncluster']['nvidia']['driver_version'] = '460.73.01'
-default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/460.73.01/NVIDIA-Linux-x86_64-460.73.01.run'
-default['cfncluster']['nvidia']['cuda_version'] = '11.3'
-default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.3.0/local_installers/cuda_11.3.0_465.19.01_linux.run'
+default['cfncluster']['nvidia']['driver_version'] = '470.82.01'
+default['cfncluster']['nvidia']['driver_url'] = 'https://us.download.nvidia.com/tesla/470.82.01/NVIDIA-Linux-x86_64-470.82.01.run'
+default['cfncluster']['nvidia']['cuda_version'] = '11.4'
+default['cfncluster']['nvidia']['cuda_url'] = 'https://developer.download.nvidia.com/compute/cuda/11.4.3/local_installers/cuda_11.4.3_470.82.01_linux.run'
 
-# NVIDIA fabric-manager
-default['cfncluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager-460"
+# The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-<version>
+# For ubuntu, it is nvidia-fabricmanager-<major-version>_<version>
+default['cfncluster']['nvidia']['fabricmanager']['package'] = value_for_platform(
+  'default' => "nvidia-fabric-manager",
+  'ubuntu' => { 'default' => "nvidia-fabricmanager-470" }
+)
 default['cfncluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
 default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cfncluster']['nvidia']['driver_version'],
