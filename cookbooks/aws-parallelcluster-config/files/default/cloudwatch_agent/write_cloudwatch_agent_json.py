@@ -108,8 +108,15 @@ def select_configs_for_feature(configs):
     for config in configs:
         conditions = config.get("feature_conditions", [])
         for condition in conditions:
-            node_info_key = condition.get("dna_key")
-            if node_info.get(node_info_key) not in condition.get("satisfying_values"):
+            dna_keys = condition.get("dna_key")
+            if isinstance(dna_keys, str):  # dna_key can be a string for single level dict or a list for nested dicts
+                dna_keys = [dna_keys]
+            value = node_info
+            for key in dna_keys:
+                value = value.get(key)
+                if value is None:
+                    break
+            if value not in condition.get("satisfying_values"):
                 break
         else:
             selected_configs.append(config)
