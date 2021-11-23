@@ -14,6 +14,7 @@ ldap_id_mapping = True
 fallback_homedir = /home/%u
 default_shell = /bin/bash
 use_fully_qualified_names = False
+ldap_referrals = False
 <% if node['cluster']['directory_service']['additional_sssd_configs'] %>
   <% node['cluster']['directory_service']['additional_sssd_configs'].each_pair do |param, value| %>
 <%= "#{param} = #{value}" %>
