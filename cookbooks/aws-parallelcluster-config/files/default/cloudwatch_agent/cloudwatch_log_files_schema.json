@@ -27,7 +27,7 @@
             "items": {
               "type": "object",
               "properties": {
-                "dna_key": {"type": "string"},
+                "dna_key": {"type": ["string", "array"]},
                 "satisfying_values": {"type": "array", "items": {"type": "string"}}
               },
               "required": ["dna_key", "satisfying_values"]
