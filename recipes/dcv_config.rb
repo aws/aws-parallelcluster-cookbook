@@ -91,17 +91,6 @@ if node['conditions']['dcv_supported'] && node['cfncluster']['cfn_node_type'] ==
       user 'root'
       command "sed --in-place '/RANDFILE/d' /etc/ssl/openssl.cnf"
     end
-  when 'centos'
-    if node['platform_version'].to_i >= 8
-      # Wayland, the default GNOME Display Manager for CentOS 8, is not supported by DCV
-      Chef::Log.info("Disabling Wayland and force login screen to use Xorg")
-      replace_or_add "Disable Wayland in /etc/gdm/custom.conf" do
-        path "/etc/gdm/custom.conf"
-        pattern ".*WaylandEnable.*"
-        line "WaylandEnable=false"
-        replace_only true
-      end
-    end
   end
 
   # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one

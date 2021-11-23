@@ -54,12 +54,7 @@ default['cfncluster']['psxe']['archful_packages']['i486'] = %w[intel-tbb-runtime
                                                                intel-daal-runtime intel-icc-runtime intel-ifort-runtime
                                                                intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime]
 default['cfncluster']['psxe']['archful_packages']['x86_64'] = node['cfncluster']['psxe']['archful_packages']['i486'] + %w[intel-mpi-runtime]
-default['cfncluster']['intelhpc']['platform_name'] = value_for_platform(
-  'centos' => {
-    '~>8' => 'el8',
-    '~>7' => 'el7'
-  }
-)
+default['cfncluster']['intelhpc']['platform_name'] = 'el7'
 default['cfncluster']['intelhpc']['packages'] = %w[intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
                                                    intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
                                                    intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime]
@@ -85,10 +80,7 @@ default['cfncluster']['armpl']['gcc']['url'] = [
   "gcc-#{node['cfncluster']['armpl']['gcc']['major_minor_version']}.#{node['cfncluster']['armpl']['gcc']['patch_version']}.tar.gz"
 ].join('/')
 default['cfncluster']['armpl']['platform'] = value_for_platform(
-  'centos' => {
-    '~>7' => 'RHEL-7',
-    '~>8' => 'RHEL-8'
-  },
+  'centos' => { '~>7' => 'RHEL-7' },
   'amazon' => { '2' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
@@ -146,40 +138,31 @@ default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform
 )
 default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
   'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel7/x86_64",
-  'centos' => {
-    '~>8' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel8/x86_64"
-  },
   'ubuntu' => { 'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cfncluster']['cfn_base_os']}/x86_64" }
 )
 
 # EFA
 default['cfncluster']['efa']['installer_version'] = '1.14.1'
 default['cfncluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cfncluster']['efa']['installer_version']}.tar.gz"
-default['cfncluster']['efa']['unsupported_aarch64_oses'] = %w[centos7 centos8]
+default['cfncluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
 
 # NICE DCV
 default['cfncluster']['dcv_port'] = 8443
 default['cfncluster']['dcv']['installed'] = 'yes'
 default['cfncluster']['dcv']['version'] = '2021.2-11190'
 if arm_instance?
-  default['cfncluster']['dcv']['supported_os'] = %w[centos7 centos8 ubuntu18 amazon2]
+  default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
-    'centos' => {
-      '~>8' => "d8b77201ee7b85c9ed52d793b120e29503febfec54fcc347aada702a00470154",
-      '~>7' => "49c9c74d124a1b66237af2882b686ba4433827e5147d7ada4e3a106ef449b68f"
-    },
+    'centos' => { '~>7' => "49c9c74d124a1b66237af2882b686ba4433827e5147d7ada4e3a106ef449b68f" },
     'amazon' => { '2' => "49c9c74d124a1b66237af2882b686ba4433827e5147d7ada4e3a106ef449b68f" },
     'ubuntu' => { '18.04' => "9d4cd826f6a705f087afa869a9aefa1bd2f4acbcff80f1134f4dab292ec63adb" }
   )
 else
-  default['cfncluster']['dcv']['supported_os'] = %w[centos8 centos7 ubuntu18 ubuntu20 amazon2]
+  default['cfncluster']['dcv']['supported_os'] = %w[centos7 ubuntu18 ubuntu20 amazon2]
   default['cfncluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cfncluster']['dcv']['sha256sum'] = value_for_platform(
-    'centos' => {
-      '~>8' => "04a34933ec6d4f187754793a14ba4ac0bf9cd24c1a6a71777c47689e2c33566c",
-      '~>7' => "176a1f127c8537c96392e63f31f77435637e393188d0b5b0613e788f4264223c"
-    },
+    'centos' => { '~>7' => "176a1f127c8537c96392e63f31f77435637e393188d0b5b0613e788f4264223c" },
     'amazon' => { '2' => "176a1f127c8537c96392e63f31f77435637e393188d0b5b0613e788f4264223c" },
     'ubuntu' => {
       '18.04' => "ef33cda5c00e9afd9a3c897a1a4c0a70bc3f428ff2cc451c25e39819607312bf",
@@ -192,10 +175,7 @@ if node['platform'].to_s == 'ubuntu'
   default['cfncluster']['dcv']['package_architecture_id'] = arm_instance? ? 'arm64' : 'amd64'
 end
 default['cfncluster']['dcv']['package'] = value_for_platform(
-  'centos' => {
-    '~>8' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el8-#{node['cfncluster']['dcv']['url_architecture_id']}",
-    '~>7' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}"
-  },
+  'centos' => { '~>7' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}" },
   'amazon' => { '2' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-el7-#{node['cfncluster']['dcv']['url_architecture_id']}" },
   'ubuntu' => {
     'default' => "nice-dcv-#{node['cfncluster']['dcv']['version']}-#{node['cfncluster']['cfn_base_os']}-#{node['cfncluster']['dcv']['url_architecture_id']}"
@@ -203,10 +183,7 @@ default['cfncluster']['dcv']['package'] = value_for_platform(
 )
 default['cfncluster']['dcv']['server']['version'] = '2021.2.11190-1'
 default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
-  'centos' => {
-    '~>8' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
-    '~>7' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
-  },
+  'centos' => { '~>7' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
   'amazon' => { '2' => "nice-dcv-server-#{node['cfncluster']['dcv']['server']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
     'default' => "nice-dcv-server_#{node['cfncluster']['dcv']['server']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
@@ -214,10 +191,7 @@ default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server p
 )
 default['cfncluster']['dcv']['xdcv']['version'] = '2021.2.411-1'
 default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
-  'centos' => {
-    '~>8' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
-    '~>7' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
-  },
+  'centos' => { '~>7' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
   'amazon' => { '2' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
     'default' => "nice-xdcv_#{node['cfncluster']['dcv']['xdcv']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
@@ -225,10 +199,7 @@ default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create 
 )
 default['cfncluster']['dcv']['gl']['version'] = '2021.2.946-1'
 default['cfncluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
-  'centos' => {
-    '~>8' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el8.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm",
-    '~>7' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm"
-  },
+  'centos' => { '~>7' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
   'amazon' => { '2' => "nice-dcv-gl-#{node['cfncluster']['dcv']['gl']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
     'default' => "nice-dcv-gl_#{node['cfncluster']['dcv']['gl']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
@@ -292,10 +263,7 @@ when 'rhel', 'amazon'
   default['cfncluster']['moduleshome'] = "/usr/share/Modules"
   # Config file used to set default MODULEPATH list
   default['cfncluster']['modulepath_config_file'] = value_for_platform(
-    'centos' => {
-      '~>8' => '/etc/environment-modules/modulespath',
-      '~>7' => "#{node['cfncluster']['moduleshome']}/init/.modulespath"
-    },
+    'centos' => { '~>7' => "#{node['cfncluster']['moduleshome']}/init/.modulespath" },
     'amazon' => { 'default' => "#{node['cfncluster']['moduleshome']}/init/.modulespath" }
   )
 
@@ -308,17 +276,6 @@ when 'rhel', 'amazon'
                                                 libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                                 mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                                 iproute NetworkManager-config-routing-rules python3 python3-pip yum-plugin-versionlock]
-    if node['platform_version'].to_i >= 8
-      # Do not install unversioned python
-      default['cfncluster']['base_packages'].delete('python')
-      default['cfncluster']['base_packages'].delete('python-pip')
-      # iptables used in configure-pat.sh
-      # gdisk required for FSx
-      # environment-modules required for IntelMPI
-      # libtirpc and libtirpc-devel required for SGE
-      # cryptsetup used for ephemeral drive encryption
-      default['cfncluster']['base_packages'].push(%w[iptables gdisk environment-modules libtirpc libtirpc-devel cryptsetup])
-    end
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
       # Do not install bind-utils on centos7+arm due to issue with package checksum
@@ -412,7 +369,6 @@ default['cfncluster']['lustre']['centos7']['base_url_prefix'] = arm_instance? ? 
 default['cfncluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
     # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
-    '>=8' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8.#{find_rhel_minor_version}/#{node['kernel']['machine']}/",
     'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cfncluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_rhel_minor_version}/#{node['kernel']['machine']}/"
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }

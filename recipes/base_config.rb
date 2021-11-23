@@ -17,16 +17,6 @@
 
 include_recipe 'aws-parallelcluster::base_install'
 
-# Restart sshd.service to make sure the service is running
-# This is a workaround for Centos 8 where the sshd.service fails at first start since it does not properly
-# wait for cloud-init.service to start. There is something wrong in Centos 8 systemd dependency chain.
-if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  service "sshd" do
-    supports restart: true
-    action %i[enable restart]
-  end
-end
-
 # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
 # This is especially needed for sge install recipes
 if node['platform'] == 'ubuntu' && node['platform_version'].to_i == 20

@@ -17,15 +17,6 @@
 
 return unless node['conditions']['intel_hpc_platform_supported'] && node['cfncluster']['enable_intel_hpc_platform'] == 'true'
 
-if node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  # Enforce keepcache=True for dnf, else downloaded packages will be removed after any successful install
-  replace_or_add "configure dnf caching" do
-    path "/etc/dnf/dnf.conf"
-    pattern "keepcache.*"
-    line "keepcache=True"
-  end
-end
-
 def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
   # S3 key prefix under which all packages to be downloaded reside
   s3_base_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}"
@@ -41,10 +32,7 @@ end
 
 # Install non-intel dependencies first
 intel_hpc_base_dependencies = value_for_platform(
-  'centos' => {
-    '~>8' => %w[tcsh libnsl nss-pam-ldapd nss_nis nscd],
-    '~>7' => %w[tcsh compat-libstdc++-33 nscd nss-pam-ldapd openssl098e]
-  }
+  'centos' => { '~>7' => %w[tcsh compat-libstdc++-33 nscd nss-pam-ldapd openssl098e] }
 )
 package intel_hpc_base_dependencies
 intel_hpc_spec_rpms_dir = '/opt/intel/rpms'

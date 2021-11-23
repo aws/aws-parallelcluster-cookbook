@@ -237,12 +237,7 @@ end
 #
 def restart_network_service
   network_service_name = value_for_platform(
-    ['centos'] => {
-      '>=8.0' => 'NetworkManager'
-    },
-    %w[ubuntu debian] => {
-      '>=18.04' => 'systemd-resolved'
-    },
+    %w[ubuntu debian] => { '>=18.04' => 'systemd-resolved' },
     'default' => 'network'
   )
   Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
@@ -316,7 +311,7 @@ end
 # Retrieve RHEL OS minor version from running kernel version
 # The OS minor version is retrieved from the patch version of the running kernel
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for CentOS8 minor version >=2 and CentOS7 minor version >=7
+# Method works for CentOS7 minor version >=7
 #
 def find_rhel_minor_version
   os_minor_version = ''
@@ -331,11 +326,6 @@ def find_rhel_minor_version
       os_minor_version = '7' if kernel_patch_version[1] >= '1062'
       os_minor_version = '8' if kernel_patch_version[1] >= '1127'
       os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    when 8
-      os_minor_version = '2' if kernel_patch_version[1] >= '193'
-      os_minor_version = '3' if kernel_patch_version[1] >= '240'
-      os_minor_version = '4' if kernel_patch_version[1] >= '305'
-      os_minor_version = '5' if kernel_patch_version[1] >= '348'
     else
       raise "CentOS version #{node['platform_version']} not supported."
     end
@@ -414,14 +404,11 @@ def get_nvswitches
   nvswitch_check.stdout.strip.to_i
 end
 
-# CentOS8 and alinux OSs currently not correctly supported by NFS cookbook
+# alinux OSs currently not correctly supported by NFS cookbook
 # Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
 def overwrite_nfs_template?
-  [
-    node['platform'] == 'amazon',
-    node['platform'] == 'centos' && node['platform_version'].to_i == 8
-  ].any?
+  [node['platform'] == 'amazon'].any?
 end
 
 def enable_munge_service
