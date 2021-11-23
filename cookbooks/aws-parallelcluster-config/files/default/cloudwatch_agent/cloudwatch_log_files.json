@@ -266,6 +266,84 @@
       ]
     },
     {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/sssd/sssd.log",
+      "log_stream_name": "sssd",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": [
+            "directory_service",
+            "enabled"
+          ],
+          "satisfying_values": ["true"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/sssd/sssd_default.log",
+      "log_stream_name": "sssd_domain_default",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": [
+            "directory_service",
+            "enabled"
+          ],
+          "satisfying_values": ["true"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/pam_ssh_key_generator.log",
+      "log_stream_name": "pam_ssh_key_generator",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": [
+            "directory_service",
+            "generate_ssh_keys_for_users"
+          ],
+          "satisfying_values": ["true"]
+        }
+      ]
+    },
+    {
       "timestamp_format_key": "bracket_default",
       "file_path": "/var/log/parallelcluster/pcluster_dcv_connect.log",
       "log_stream_name": "dcv-ext-authenticator",
