@@ -60,7 +60,7 @@ include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualiz
 
 include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
 
-include_recipe "aws-parallelcluster-config::fetch_config" unless node['cluster']['scheduler'] == 'awsbatch'
+fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
 include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
