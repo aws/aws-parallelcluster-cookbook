@@ -167,7 +167,8 @@
     {
       "type": "shell",
       "inline": [
-        "sudo flock $(apt-config shell StateDir Dir::State/d | sed -r \"s/.*'(.*)\\/?'$/\\1/\")/daily_lock systemctl stop apt-daily.timer apt-daily.service apt-daily-upgrade.timer apt-daily-upgrade.service"
+        "sudo flock $(apt-config shell StateDir Dir::State/d | sed -r \"s/.*'(.*)\\/?'$/\\1/\")/daily_lock systemctl disable --now apt-daily.timer apt-daily.service apt-daily-upgrade.timer apt-daily-upgrade.service",
+        "sudo sh -c \"sed \\\"/Update-Package-Lists/s/1/0/; /Unattended-Upgrade/s/1/0/;\\\" /etc/apt/apt.conf.d/20auto-upgrades > /etc/apt/apt.conf.d/51pcluster-unattended-upgrades\""
       ]
     },
     {
