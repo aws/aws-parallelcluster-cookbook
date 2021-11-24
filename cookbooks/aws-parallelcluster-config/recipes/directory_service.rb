@@ -70,18 +70,27 @@ if node['cluster']['node_type'] == 'HeadNode'
   end
 
   if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
+    sshd_pam_config_path = '/etc/pam.d/sshd'
     generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
+    ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
     template generate_ssh_key_path do
       source 'directory_service/generate_ssh_key.sh.erb'
       owner 'root'
       group 'root'
       mode '0755'
     end
+    if platform_family?('debian')
+      sshd_pam_config_regex = /^session.*required/
+      match_to_add_line_after = :last
+    else
+      sshd_pam_config_regex = /^session.*include.*postlogin/
+      match_to_add_line_after = :first
+    end
     filter_lines 'Configure PAM sshd script to call generate SSH key script' do
-      path '/etc/pam.d/sshd'
+      path sshd_pam_config_path
       filters(
         [
-          { after: [/^session.*include.*postlogin/, "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}", :first] },
+          { after: [sshd_pam_config_regex, ssh_key_generator_pam_config_line, match_to_add_line_after] },
         ]
       )
     end
@@ -95,13 +104,24 @@ else
   end
 end
 
-bash 'Configure Directory Service' do
-  user 'root'
-  # Tell NSS, PAM to use SSSD for system authentication and identity information
-  code <<-AD
+case node['platform_family']
+when 'rhel', 'amazon'
+  bash 'Configure Directory Service' do
+    user 'root'
+    # Tell NSS, PAM to use SSSD for system authentication and identity information
+    code <<-AD
       authconfig --enablemkhomedir --enablesssdauth --enablesssd --updateall
-  AD
-  sensitive true
+    AD
+    sensitive true
+  end
+when 'debian'
+  bash 'Enable PAM mkhomedir module' do
+    user 'root'
+    code <<-AD
+      pam-auth-update --enable mkhomedir
+    AD
+    sensitive true
+  end
 end
 
 # Restart modified services
