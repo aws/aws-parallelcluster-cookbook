@@ -52,6 +52,14 @@ action_class do # rubocop:disable Metrics/BlockLength
     target_cluster_config = "#{node['cluster']['scheduler_plugin']['handler_dir']}/cluster-config.yaml"
     copy_config("cluster configuration", node.dig(:cluster, :cluster_config_path), target_cluster_config)
 
+    # copy previous cluster config if exist otherwise delete the old target
+    target_previous_cluster_config = "#{node['cluster']['scheduler_plugin']['handler_dir']}/previous-cluster-config.yaml"
+    if ::File.exist?(node['cluster']['previous_cluster_config_path'])
+      copy_config("previous cluster configuration", node.dig(:cluster, :previous_cluster_config_path), target_previous_cluster_config)
+    elsif ::File.exist?(target_previous_cluster_config)
+      ::File.delete(target_previous_cluster_config)
+    end
+
     # copy launch templates config
     target_launch_templates = "#{node['cluster']['scheduler_plugin']['handler_dir']}/launch-templates-config.json"
     copy_config("launch templates", node.dig(:cluster, :launch_templates_config_path), target_launch_templates)
@@ -105,7 +113,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     end
 
     # Merge env with dyanmic env
-    env.merge!(build_dynamic_env)
+    env.merge!(build_dynamic_env(target_previous_cluster_config))
     env
   end
 
@@ -117,25 +125,21 @@ action_class do # rubocop:disable Metrics/BlockLength
     FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
   end
 
-  def build_dynamic_env
+  def build_dynamic_env(target_previous_cluster_config)
     Chef::Log.info("Building dynamic handler environment")
     env = {}
 
-    # PCLUSTER_EC2_INSTANCE_TYPE
+    if ::File.exist?(target_previous_cluster_config)
+      env.merge!({ 'PCLUSTER_CLUSTER_CONFIG_OLD' => target_previous_cluster_config })
+    end
     env.merge!(build_hash_from_node('PCLUSTER_EC2_INSTANCE_TYPE', true, :ec2, :instance_type))
 
     case node['cluster']['node_type']
     when 'ComputeFleet'
-      # PCLUSTER_QUEUE_NAME
       env.merge!(build_hash_from_node('PCLUSTER_QUEUE_NAME', false, :cluster, :scheduler_queue_name))
-
-      # PCLUSTER_COMPUTE_RESOURCE_NAME
       env.merge!(build_hash_from_node('PCLUSTER_COMPUTE_RESOURCE_NAME', false, :cluster, :scheduler_compute_resource_name))
-
-      # PCLUSTER_NODE_TYPE
       env.merge!({ 'PCLUSTER_NODE_TYPE' => 'compute' })
     when 'HeadNode'
-      # PCLUSTER_NODE_TYPE
       env.merge!({ 'PCLUSTER_NODE_TYPE' => 'head' })
     end
 
@@ -165,8 +169,6 @@ action_class do # rubocop:disable Metrics/BlockLength
     env.merge!({ 'PCLUSTER_PYTHON_ROOT' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin" })
     env.merge!({ 'PATH' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/aws/bin:#{node['cluster']['scheduler_plugin']['home']}/.local/bin:#{node['cluster']['scheduler_plugin']['home']}/bin" })
     env.merge!(setup_proxy(:cluster, :proxy))
-    # PCLUSTER_CLUSTER_CONFIG_OLD
-    # TODO: to be implemented
 
     env
   end

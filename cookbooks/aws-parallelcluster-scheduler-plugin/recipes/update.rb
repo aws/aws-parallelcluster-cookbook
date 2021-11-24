@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-config
-# Recipe:: config
+# Cookbook:: aws-parallelcluster-scheduler-plugin
+# Recipe:: update
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,10 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-config::base'
-
-fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
-
-include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
-include_recipe 'aws-parallelcluster-scheduler-plugin::config' if node['cluster']['scheduler'] == 'plugin'
-include_recipe 'aws-parallelcluster-awsbatch::config' if node['cluster']['scheduler'] == 'awsbatch'
+case node['cluster']['node_type']
+when 'HeadNode'
+  include_recipe 'aws-parallelcluster-scheduler-plugin::update_head_node'
+else
+  raise "node_type must be HeadNode"
+end

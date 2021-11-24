@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster
-# Recipe:: update_head_node
+# Recipe:: update
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -17,5 +17,4 @@
 
 include_recipe 'aws-parallelcluster::setup_envars'
 include_recipe 'aws-parallelcluster-config::openssh'
-include_recipe 'aws-parallelcluster-slurm::update_head_node' if node['cluster']['scheduler'] == 'slurm'
-include_recipe 'aws-parallelcluster-scheduler-plugin::update_head_node' if node['cluster']['scheduler'] == 'plugin'
+include_recipe 'aws-parallelcluster-config::update' unless node['cluster']['scheduler'] == 'awsbatch'

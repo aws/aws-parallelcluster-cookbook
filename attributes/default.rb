@@ -29,6 +29,7 @@ default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
+default['cluster']['previous_cluster_config_path'] = "#{node['cluster']['shared_dir']}/previous-cluster-config.yaml"
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['reserved_base_uid'] = 400

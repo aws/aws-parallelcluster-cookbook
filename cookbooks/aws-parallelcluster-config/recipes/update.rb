@@ -2,9 +2,9 @@
 
 #
 # Cookbook:: aws-parallelcluster-config
-# Recipe:: config
+# Recipe:: update
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,10 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-config::base'
+unless node['cluster']['scheduler'] == 'awsbatch'
+  fetch_config 'Fetch and load cluster configs' do
+    update true
+  end
+end
 
-fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
-
-include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
-include_recipe 'aws-parallelcluster-scheduler-plugin::config' if node['cluster']['scheduler'] == 'plugin'
-include_recipe 'aws-parallelcluster-awsbatch::config' if node['cluster']['scheduler'] == 'awsbatch'
+include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
+include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']['scheduler'] == 'plugin'
