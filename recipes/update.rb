@@ -17,4 +17,5 @@
 
 include_recipe 'aws-parallelcluster::setup_envars'
 include_recipe 'aws-parallelcluster-config::openssh'
+include_recipe 'aws-parallelcluster-config::directory_service'
 include_recipe 'aws-parallelcluster-config::update' unless node['cluster']['scheduler'] == 'awsbatch'
