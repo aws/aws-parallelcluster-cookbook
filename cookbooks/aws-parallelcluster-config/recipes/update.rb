@@ -21,5 +21,6 @@ unless node['cluster']['scheduler'] == 'awsbatch'
   end
 end
 
+include_recipe 'aws-parallelcluster-config::directory_service'
 include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']['scheduler'] == 'plugin'
