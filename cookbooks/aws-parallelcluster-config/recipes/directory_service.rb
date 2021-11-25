@@ -69,10 +69,10 @@ if node['cluster']['node_type'] == 'HeadNode'
     AD
   end
 
+  sshd_pam_config_path = '/etc/pam.d/sshd'
+  generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
+  ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
   if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
-    sshd_pam_config_path = '/etc/pam.d/sshd'
-    generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
-    ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
     template generate_ssh_key_path do
       source 'directory_service/generate_ssh_key.sh.erb'
       owner 'root'
@@ -93,6 +93,17 @@ if node['cluster']['node_type'] == 'HeadNode'
           { after: [sshd_pam_config_regex, ssh_key_generator_pam_config_line, match_to_add_line_after] },
         ]
       )
+    end
+  else
+    # Remove script used to generate key if it exists and ensure PAM is not configured to try to call it
+    file generate_ssh_key_path do
+      action :delete
+      only_if { ::File.exist? generate_ssh_key_path }
+    end
+    delete_lines "Ensure SSHD PAM module is not configured to call SSH key-generating script" do
+      path sshd_pam_config_path
+      pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
+      ignore_missing true
     end
   end
 else
