@@ -411,8 +411,26 @@
     },
     {
       "timestamp_format_key": "default",
-      "file_path": "/var/log/parallelcluster/scheduler-plugin.log",
-      "log_stream_name": "scheduler-plugin",
+      "file_path": "/var/log/parallelcluster/scheduler-plugin.out.log",
+      "log_stream_name": "scheduler-plugin-out",
+      "schedulers": [
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/scheduler-plugin.err.log",
+      "log_stream_name": "scheduler-plugin-err",
       "schedulers": [
         "plugin"
       ],

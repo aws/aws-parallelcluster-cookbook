@@ -17,24 +17,26 @@ action :run do
     return
   end
 
-  event_log = node['cluster']['scheduler_plugin']['handler_log']
+  event_log_out = node['cluster']['scheduler_plugin']['handler_log_out']
+  event_log_err = node['cluster']['scheduler_plugin']['handler_log_err']
   event_cwd = node['cluster']['scheduler_plugin']['home']
   event_user = node['cluster']['scheduler_plugin']['user']
+  event_user_group = node['cluster']['scheduler_plugin']['group']
   event_timeout = 3600
   event_env = build_env
   event_log_prefix_error = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - ERROR:"
   event_log_prefix_info = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - INFO:"
-  Chef::Log.info("Executing Event #{new_resource.event_name}, with user (#{event_user}), cwd (#{event_cwd}), command (#{new_resource.event_command}), log (#{event_log})")
+  Chef::Log.info("Executing Event #{new_resource.event_name}, with user (#{event_user}), cwd (#{event_cwd}), command (#{new_resource.event_command}), log out (#{event_log_out}), log err (#{event_log_err})")
   # shellout https://github.com/chef/mixlib-shellout
   # switch stderr/stdout with (2>&1 1>&3-), process error (now on stdout), switch back stdout/stderr with (3>&1 1>&2) and then process output
-  event_command = Shellwords.escape("set -o pipefail; { (#{new_resource.event_command}) 2>&1 1>&3- | ts '#{event_log_prefix_error}' | tee -a #{event_log}; } " \
-    "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log}")
-  cmd = Mixlib::ShellOut.new("/bin/bash -c #{event_command}", user: event_user, group: event_user, login: true, env: event_env, cwd: event_cwd, timeout: event_timeout)
+  event_command = Shellwords.escape("set -o pipefail; { (#{new_resource.event_command}) 2>&1 1>&3- | ts '#{event_log_prefix_error}' | tee -a #{event_log_err}; } " \
+    "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log_out}")
+  cmd = Mixlib::ShellOut.new("/bin/bash -c #{event_command}", user: event_user, group: event_user_group, login: true, env: event_env, cwd: event_cwd, timeout: event_timeout)
   cmd.run_command
 
   if cmd.error?
     raise "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}," \
-      " but received '#{cmd.exitstatus}', complete log in #{event_log}\n #{format_stderr(cmd)}"
+      " but received '#{cmd.exitstatus}', complete log info in #{event_log_out} and error in #{event_log_err}\n #{format_stderr(cmd)}"
   end
 end
 
@@ -82,7 +84,10 @@ action_class do # rubocop:disable Metrics/BlockLength
           ::File.write(source_scheduler_plugin_substack_outputs, scheduler_plugin_substack_outputs.to_json(:only))
         end
       end
-      FileUtils.cp(source_scheduler_plugin_substack_outputs, target_scheduler_plugin_substack_outputs)
+    end
+
+    if ::File.exist?(source_scheduler_plugin_substack_outputs)
+      copy_config("scheduler plugin substack outputs", source_scheduler_plugin_substack_outputs, target_scheduler_plugin_substack_outputs)
     end
 
     # Load static env from file or build it if file not found
@@ -107,7 +112,9 @@ action_class do # rubocop:disable Metrics/BlockLength
   def copy_config(config_type, source_config, target_config)
     raise "Expected #{config_type} file not found in (#{source_config})" unless ::File.exist?(source_config)
 
+    Chef::Log.info("Copying #{config_type} file from (#{source_config}) to (#{target_config})")
     FileUtils.cp(source_config, target_config)
+    FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
   end
 
   def build_dynamic_env
@@ -139,59 +146,28 @@ action_class do # rubocop:disable Metrics/BlockLength
     Chef::Log.info("Building static handler environment")
     env = {}
 
-    # PCLUSTER_CLUSTER_CONFIG
     env.merge!({ 'PCLUSTER_CLUSTER_CONFIG' => target_cluster_config })
-
-    # PCLUSTER_LAUNCH_TEMPLATES
     env.merge!({ 'PCLUSTER_LAUNCH_TEMPLATES' => target_launch_templates })
-
-    # PCLUSTER_INSTANCE_TYPES_DATA
     env.merge!({ 'PCLUSTER_INSTANCE_TYPES_DATA' => target_instance_types_data })
-
-    # PCLUSTER_CLUSTER_NAME
     env.merge!(build_hash_from_node('PCLUSTER_CLUSTER_NAME', true, :cluster, :stack_name))
-
-    # PCLUSTER_CFN_STACK_ARN
     env.merge!(build_hash_from_node('PCLUSTER_CFN_STACK_ARN', true, :cluster, :stack_arn))
-
-    # PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_ARN
     env.merge!(build_hash_from_node('PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_ARN', false, :cluster, :scheduler_plugin_substack_arn))
-
-    # PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_OUTPUTS
     env.merge!({ 'PCLUSTER_SCHEDULER_PLUGIN_CFN_SUBSTACK_OUTPUTS' => target_scheduler_plugin_substack_outputs }) if ::File.exist?(target_scheduler_plugin_substack_outputs)
-
-    # PCLUSTER_SHARED_SCHEDULER_PLUGIN_DIR
     env.merge!(build_hash_from_node('PCLUSTER_SHARED_SCHEDULER_PLUGIN_DIR', true, :cluster, :scheduler_plugin, :shared_dir))
-
-    # PCLUSTER_LOCAL_SCHEDULER_PLUGIN_DIR
     env.merge!(build_hash_from_node('PCLUSTER_LOCAL_SCHEDULER_PLUGIN_DIR', true, :cluster, :scheduler_plugin, :local_dir))
-
-    # PCLUSTER_AWS_REGION and AWS_REGION
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))
     env.merge!(build_hash_from_node('AWS_REGION', true, :ec2, :region))
-
-    # PCLUSTER_OS
     env.merge!(build_hash_from_node('PCLUSTER_OS', true, :cluster, :config, :Image, :Os))
-
-    # PCLUSTER_ARCH
     env.merge!(build_hash_from_node('PCLUSTER_ARCH', true, :cpu, :architecture))
-
-    # PCLUSTER_VERSION
     env.merge!(build_hash_from_node('PCLUSTER_VERSION', true, :cluster, :'parallelcluster-version'))
-
-    # PCLUSTER_HEADNODE_PRIVATE_IP
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_PRIVATE_IP', true, :ec2, :local_ipv4))
-
-    # PCLUSTER_HEADNODE_HOSTNAME
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_HOSTNAME', true, :hostname))
-
-    # PCLUSTER_PYTHON_ROOT
     env.merge!({ 'PCLUSTER_PYTHON_ROOT' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin" })
-
+    env.merge!({ 'PATH' => "#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/aws/bin:#{node['cluster']['scheduler_plugin']['home']}/.local/bin:#{node['cluster']['scheduler_plugin']['home']}/bin" })
+    env.merge!(setup_proxy(:cluster, :proxy))
     # PCLUSTER_CLUSTER_CONFIG_OLD
     # TODO: to be implemented
 
-    env.merge!(setup_proxy(:cluster, :proxy))
     env
   end
 
