@@ -464,7 +464,7 @@ default['cluster']['head_node_private_ip'] = nil
 default['cluster']['volume'] = nil
 
 # ParallelCluster internal variables to configure active directory service
-default['cluster']["directory_service"]["enabled"] = nil
+default['cluster']["directory_service"]["enabled"] = 'false'
 default['cluster']["directory_service"]["domain_name"] = nil
 default['cluster']["directory_service"]["domain_addr"] = nil
 default['cluster']["directory_service"]["password_secret_arn"] = nil
