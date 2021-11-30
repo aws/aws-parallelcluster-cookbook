@@ -21,9 +21,9 @@ end
 
 slurm_build_deps = value_for_platform(
   'ubuntu' => {
-    'default' => %w(libjson-c-dev libhttp-parser-dev),
+    'default' => %w(libjson-c-dev libhttp-parser-dev libjwt-dev),
   },
-  'default' => %w(json-c-devel http-parser-devel)
+  'default' => %w(json-c-devel http-parser-devel libjwt-devel)
 )
 
 package slurm_build_deps do
