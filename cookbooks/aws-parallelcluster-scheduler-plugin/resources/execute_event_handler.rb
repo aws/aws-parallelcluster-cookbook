@@ -72,7 +72,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     scheduler_plugin_substack_arn = node.dig(:cluster, :scheduler_plugin_substack_arn)
     if scheduler_plugin_substack_arn && !scheduler_plugin_substack_arn.empty?
       Chef::Log.info("Found scheduler plugin substack (#{scheduler_plugin_substack_arn})")
-      unless ::File.exist?(source_scheduler_plugin_substack_outputs)
+      if !::File.exist?(source_scheduler_plugin_substack_outputs) || new_resource.event_name == 'HeadClusterUpdate'
         scheduler_plugin_substack_outputs = { 'Outputs' => {} }
         Chef::Log.info("Executing describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})")
         cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{scheduler_plugin_substack_arn}", 3, 'root', nil, nil)

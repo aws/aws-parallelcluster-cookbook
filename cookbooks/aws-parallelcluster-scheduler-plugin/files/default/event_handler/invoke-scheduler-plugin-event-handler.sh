@@ -361,7 +361,7 @@ if [[ -f "/etc/chef/dna.json" ]]; then
   fi
 
   if [[ -z "${scheduler_plugin_substack_outputs}" ]]; then
-    log "Scheduler plugion substack outputs not specified, will be generated under (${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}) if there is a substack with outputs."
+    log "Scheduler plugin substack outputs not specified, will be generated under (${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}) if there is a substack with outputs."
     scheduler_plugin_substack_outputs="${ORIGINAL_SCHEDULER_PLUGIN_SUBSTACK_OUTPUTS}"
   fi
   source_dna_json="/etc/chef/dna.json"
