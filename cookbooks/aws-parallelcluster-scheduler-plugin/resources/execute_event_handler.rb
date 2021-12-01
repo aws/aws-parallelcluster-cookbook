@@ -52,12 +52,10 @@ action_class do # rubocop:disable Metrics/BlockLength
     target_cluster_config = "#{node['cluster']['scheduler_plugin']['handler_dir']}/cluster-config.yaml"
     copy_config("cluster configuration", node.dig(:cluster, :cluster_config_path), target_cluster_config)
 
-    # copy previous cluster config if exist otherwise delete the old target
+    # copy previous cluster config if event is HeadClusterUpdate
     target_previous_cluster_config = "#{node['cluster']['scheduler_plugin']['handler_dir']}/previous-cluster-config.yaml"
-    if ::File.exist?(node['cluster']['previous_cluster_config_path'])
+    if new_resource.event_name == 'HeadClusterUpdate'
       copy_config("previous cluster configuration", node.dig(:cluster, :previous_cluster_config_path), target_previous_cluster_config)
-    elsif ::File.exist?(target_previous_cluster_config)
-      ::File.delete(target_previous_cluster_config)
     end
 
     # copy launch templates config
@@ -129,7 +127,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     Chef::Log.info("Building dynamic handler environment")
     env = {}
 
-    if ::File.exist?(target_previous_cluster_config)
+    if new_resource.event_name == 'HeadClusterUpdate'
       env.merge!({ 'PCLUSTER_CLUSTER_CONFIG_OLD' => target_previous_cluster_config })
     end
     env.merge!(build_hash_from_node('PCLUSTER_EC2_INSTANCE_TYPE', true, :ec2, :instance_type))
