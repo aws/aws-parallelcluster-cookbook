@@ -23,21 +23,21 @@ include_recipe "aws-parallelcluster-scheduler-plugin::install_python"
 directory node['cluster']['scheduler_plugin']['local_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
-  mode '0755'
+  mode '0700'
   action :create
 end
 
 directory node['cluster']['scheduler_plugin']['handler_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
-  mode '0755'
+  mode '0700'
   action :create
 end
 
 directory node['cluster']['scheduler_plugin']['shared_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
-  mode '0755'
+  mode '0700'
   action :create
 end
 
