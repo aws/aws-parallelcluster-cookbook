@@ -105,9 +105,9 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # Python packages
-default['cluster']['parallelcluster-version'] = '3.1.0a1'
-default['cluster']['parallelcluster-cookbook-version'] = '3.1.0a1'
-default['cluster']['parallelcluster-node-version'] = '3.1.0a1'
+default['cluster']['parallelcluster-version'] = '3.1.0b1'
+default['cluster']['parallelcluster-cookbook-version'] = '3.1.0b1'
+default['cluster']['parallelcluster-node-version'] = '3.1.0b1'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 
 # URLs to software packages used during install recipes
