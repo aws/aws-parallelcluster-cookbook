@@ -135,8 +135,6 @@ def check_iptables_rules_file(file)
   bash "check iptables rules backup file exists: #{file}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      set -e
-
       if [[ ! -f #{file} ]]; then
         >&2 echo "Missing expected iptables rules file: #{file}"
         exit 1
@@ -153,8 +151,6 @@ def check_directories_in_path(directories, user = nil)
   bash "check PATH for #{context} contains #{directories}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      set -e
-
       #{user.nil? ? nil : "sudo su - #{user}"}
 
       for directory in #{directories.join(' ')}; do
@@ -173,8 +169,6 @@ def check_run_level_script(script_name, levels_on, levels_off)
   bash "check run level script #{script_name}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      set -e
-
       for level in #{levels_on.join(' ')}; do
         ls /etc/rc$level.d/ | egrep '^S[0-9]+#{script_name}$' > /dev/null
         [[ $? == 0 ]] || missing_levels_on="$missing_levels_on $level"
