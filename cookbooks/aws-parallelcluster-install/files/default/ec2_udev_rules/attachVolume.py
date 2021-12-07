@@ -136,7 +136,7 @@ def main():
         if x == 60:
             print("Volume %s failed to mount in 300 seconds." % volume_id)
             exit(1)
-        if state in ["busy" or "detached"]:
+        if state in ["busy", "detached"]:
             print("Volume %s in bad state %s" % (volume_id, state))
             exit(1)
         print("Volume %s in state %s ... waiting to be 'attached'" % (volume_id, state))
