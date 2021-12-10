@@ -16,6 +16,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
 - Do not strip `-` from compute resource name when configuring Slurm nodes.
 - Upgrade Slurm to version 21.08.4.
+- Upgrade NICE DCV to version 2021.2-11445.
 
 
 3.0.2
@@ -67,7 +68,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Make PATH include required directories for every user and recipes context.
 - Fail cluster creation when IMDS lockdown is not working correctly.
 - Make sudoers secure_path include the same directories in every platform.
-- Remove option for instance store software encryption (encrypted_ephemeral).  
+- Remove option for instance store software encryption (encrypted_ephemeral).
 - Add support for iptables restore on instance reboot.
 - Allow IMDS access for dcv user when dcv is enabled.
 - Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem
