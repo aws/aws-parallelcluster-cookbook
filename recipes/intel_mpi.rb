@@ -4,7 +4,7 @@
 # Cookbook Name:: aws-parallelcluster
 # Recipe:: intel_mpi
 #
-# Copyright 2013-2019 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -17,10 +17,11 @@
 
 return unless node['conditions']['intel_mpi_supported']
 
-intelmpi_modulefile = "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/intelmpi"
-intelmpi_installer_archive = "l_mpi_#{node['cfncluster']['intelmpi']['version']}.tgz"
-intelmpi_installer_path = "#{node['cfncluster']['sources_dir']}/#{intelmpi_installer_archive}"
-intelmpi_installer_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/archives/impi/#{intelmpi_installer_archive}"
+intelmpi_installation_path = "/opt/intel/mpi/#{node['cfncluster']['intelmpi']['version']}"
+intelmpi_modulefile = "#{intelmpi_installation_path}/modulefiles/intelmpi"
+intelmpi_installer = "l_mpi_oneapi_p_#{node['cfncluster']['intelmpi']['full_version']}_offline.sh"
+intelmpi_installer_path = "#{node['cfncluster']['sources_dir']}/#{intelmpi_installer}"
+intelmpi_installer_url = "https://#{node['cfncluster']['cfn_region']}-aws-parallelcluster.s3.#{node['cfncluster']['cfn_region']}.#{aws_domain}/archives/impi/#{intelmpi_installer}"
 
 # fetch intelmpi installer script
 remote_file intelmpi_installer_path do
@@ -28,29 +29,34 @@ remote_file intelmpi_installer_path do
   mode '0744'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?("/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}") }
+  not_if { ::File.exist?(intelmpi_installation_path.to_s) }
 end
 
 bash "install intel mpi" do
   cwd node['cfncluster']['sources_dir']
   code <<-INTELMPI
     set -e
-    tar -xf #{intelmpi_installer_archive}
-    cd l_mpi_#{node['cfncluster']['intelmpi']['version']}/
-    ./install.sh -s silent.cfg --accept_eula
-    mv rpm/EULA.txt /opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}
-    cd ..
-    rm -rf l_mpi_#{node['cfncluster']['intelmpi']['version']}*
+    chmod +x #{intelmpi_installer}
+    ./#{intelmpi_installer} --remove-extracted-files yes -a --silent --eula accept --install-dir /opt/intel
+    rm -f #{intelmpi_installer}
   INTELMPI
-  creates "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}"
+  creates intelmpi_installation_path.to_s
 end
 
 append_if_no_line "append intel modules file dir to modules conf" do
   path node['cfncluster']['modulepath_config_file']
-  line "/opt/intel/impi/#{node['cfncluster']['intelmpi']['version']}/intel64/modulefiles/"
+  line "#{intelmpi_installation_path}/modulefiles/"
 end
 
 execute "rename intel mpi modules file name" do
   command "mv #{node['cfncluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}"
   creates intelmpi_modulefile.to_s
+end
+
+# Add Qt source file
+template "#{intelmpi_installation_path}/qt_source_code.txt" do
+  source 'intel_mpi/qt_source_code.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
 end
