@@ -13,9 +13,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NICE DCV to version 2021.2-11190.
 - Upgrade NVIDIA driver to version 470.82.01.
 - Upgrade CUDA library to version 11.4.3.
-- Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-470`.
-- Disable unattended upgrades for Ubuntu.
-- Install Python 3 version of `aws-cfn-bootstrap` scripts on CentOS 7 and Ubuntu 18.04.
+- Upgrade NVIDIA Fabric manager to 470.82.01.
+- Disable unattended packages update on Ubuntu.
+- Install Python 3 version of `aws-cfn-bootstrap` scripts on CentOS 7 and Ubuntu 18.04, aligning with Ubuntu 20.04 and Amazon Linux 2.
+
 
 2.11.3
 -----
