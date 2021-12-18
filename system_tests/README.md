@@ -50,7 +50,8 @@ configuration recipes as would be done during node boot time.
 
 
 ### Full Testing
-The `system_tests/test.sh` script runs the full process described above.
+The `system_tests/test_ubuntu.sh` and `system_tests/test_centos7` scripts runs
+the full process described above for the respective operating system.
 
 ### Skipping tests
 A few of the tests are not setup to run in the virtual enviroment and thus can be

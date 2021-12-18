@@ -58,7 +58,7 @@ mkdir -p /lib/modules/`uname -r`
 platform=$(cat /etc/*-release | grep ID_LIKE | sed 's/.*=//')
 
 if [ "$platform" == "debian" ]; then
-    apt install -y linux-modules-`uname -r`
+    apt install -y linux-modules-${KERNEL_RELEASE}
 else
     yum install -y kernel-modules
 fi

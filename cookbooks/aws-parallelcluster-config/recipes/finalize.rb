@@ -25,3 +25,7 @@ end
 
 include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'plugin'
 include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
+
+# Log the uptime at the end of running chef scripts.
+uptime_ms = IO.read('/proc/uptime').split[0].to_f * 1000
+printf("Recipes Finish Uptime: %f\n", uptime_ms)
