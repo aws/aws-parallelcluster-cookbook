@@ -15,6 +15,23 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# create placeholder for computefleet-status.json, so it can be written by clusterstatusmgtd which run as pcluster admin user
+file node['cluster']['computefleet_data_path'] do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_user']
+  content '{}'
+  mode '0755'
+  action :create
+end
+
+# create sudoers entry to let pcluster admin user execute update compute fleet recipe
+template '/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd' do
+  source 'clusterstatusmgtd/99-parallelcluster-clusterstatusmgtd.erb'
+  owner 'root'
+  group 'root'
+  mode '0600'
+end
+
 fetch_artifacts 'Fetch Cluster Shared Artifacts' do
   plugin_resources(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :PluginResources) })
 end

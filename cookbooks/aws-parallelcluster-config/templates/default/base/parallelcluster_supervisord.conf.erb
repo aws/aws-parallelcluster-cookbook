@@ -17,7 +17,14 @@ environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clustermgtd
 <% end -%>
-
+<% if node['cluster']['scheduler'] == 'plugin' -%>
+[program:clusterstatusmgtd]
+command = <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python /opt/parallelcluster/scripts/scheduler_plugin/clusterstatusmgtd.py
+user = <%= node['cluster']['cluster_admin_user'] %>
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
+redirect_stderr = true
+stdout_logfile = /var/log/parallelcluster/clusterstatusmgtd
+<% end -%>
 <% if node['cluster']['dcv_enabled'] == "head_node" && node['conditions']['dcv_supported'] -%>
 [program:pcluster_dcv_authenticator]
 command = <%= node['cluster']['dcv']['authenticator']['virtualenv_path'] %>/bin/python <%= node['cluster']['dcv']['authenticator']['user_home'] %>/pcluster_dcv_authenticator.py
