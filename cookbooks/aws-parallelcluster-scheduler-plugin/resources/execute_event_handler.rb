@@ -58,6 +58,12 @@ action_class do # rubocop:disable Metrics/BlockLength
       copy_config("previous cluster configuration", node.dig(:cluster, :previous_cluster_config_path), target_previous_cluster_config)
     end
 
+    # copy computefleet status if event is HeadComputeFleetUpdate
+    target_computefleet_status = "#{node['cluster']['scheduler_plugin']['handler_dir']}/computefleet-status.json"
+    if new_resource.event_name == 'HeadComputeFleetUpdate'
+      copy_config("computefleet status", node.dig(:cluster, :computefleet_status_path), target_computefleet_status)
+    end
+
     # copy launch templates config
     target_launch_templates = "#{node['cluster']['scheduler_plugin']['handler_dir']}/launch-templates-config.json"
     copy_config("launch templates", node.dig(:cluster, :launch_templates_config_path), target_launch_templates)
@@ -111,7 +117,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     end
 
     # Merge env with dyanmic env
-    env.merge!(build_dynamic_env(target_previous_cluster_config))
+    env.merge!(build_dynamic_env(target_previous_cluster_config, target_computefleet_status))
     env
   end
 
@@ -123,12 +129,15 @@ action_class do # rubocop:disable Metrics/BlockLength
     FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
   end
 
-  def build_dynamic_env(target_previous_cluster_config)
+  def build_dynamic_env(target_previous_cluster_config, target_computefleet_status)
     Chef::Log.info("Building dynamic handler environment")
     env = {}
 
     if new_resource.event_name == 'HeadClusterUpdate'
       env.merge!({ 'PCLUSTER_CLUSTER_CONFIG_OLD' => target_previous_cluster_config })
+    end
+    if new_resource.event_name == 'HeadComputeFleetUpdate'
+      env.merge!({ 'PCLUSTER_COMPUTEFLEET_STATUS' => target_computefleet_status })
     end
     env.merge!(build_hash_from_node('PCLUSTER_EC2_INSTANCE_TYPE', true, :ec2, :instance_type))
 
