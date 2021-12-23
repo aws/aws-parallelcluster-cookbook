@@ -257,6 +257,14 @@ class ClusterstatusmgtdConfig:
         attrs = ", ".join([f"{key}={repr(value)}" for key, value in self.__dict__.items()])
         return f"{self.__class__.__name__}({attrs})"
 
+    def __eq__(self, other):  # noqa: D105
+        if type(other) is type(self):
+            return self._config == other._config
+        return False
+
+    def __ne__(self, other):  # noqa: D105
+        return not self.__eq__(other)
+
     @log_exception(
         log, "reading cluster status manger configuration file", catch_exception=IOError, raise_on_error=True
     )
