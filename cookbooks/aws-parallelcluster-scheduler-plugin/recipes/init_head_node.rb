@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # create placeholder for computefleet-status.json, so it can be written by clusterstatusmgtd which run as pcluster admin user
-file node['cluster']['computefleet_data_path'] do
+file node['cluster']['computefleet_status_path'] do
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
   content '{}'
