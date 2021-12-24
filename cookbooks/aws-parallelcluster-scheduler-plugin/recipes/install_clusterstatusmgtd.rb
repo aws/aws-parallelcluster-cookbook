@@ -31,12 +31,3 @@ cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusm
   group 'root'
   mode '0755'
 end
-
-directory '/etc/parallelcluster/scheduler_plugin'
-
-template "/etc/parallelcluster/scheduler_plugin/clusterstatusmgtd.conf" do
-  source 'clusterstatusmgtd/clusterstatusmgtd.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
