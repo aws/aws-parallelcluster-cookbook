@@ -219,7 +219,7 @@ def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
   output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-                      "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
+                      "--region #{node['cluster']['region']} query --table-name #{node['cluster']['slurm_ddb_table']} " \
                       "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
                       "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
                       "--projection-expression 'Id' " \
