@@ -16,19 +16,23 @@
 # limitations under the License.
 #
 
-cookbook_file '/opt/parallelcluster/scripts/scheduler_plugin/clusterstatusmgtd.py' do
+directory "#{node['cluster']['scripts_dir']}/scheduler_plugin"
+
+cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusmgtd.py" do
   source 'clusterstatusmgtd/clusterstatusmgtd.py'
   owner 'root'
   group 'root'
   mode '0755'
 end
 
-cookbook_file '/opt/parallelcluster/scripts/scheduler_plugin/clusterstatusmgtd_logging.conf' do
+cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusmgtd_logging.conf" do
   source 'clusterstatusmgtd/clusterstatusmgtd_logging.conf'
   owner 'root'
   group 'root'
   mode '0755'
 end
+
+directory '/etc/parallelcluster/scheduler_plugin'
 
 template "/etc/parallelcluster/scheduler_plugin/clusterstatusmgtd.conf" do
   source 'clusterstatusmgtd/clusterstatusmgtd.conf.erb'
