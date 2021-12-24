@@ -491,6 +491,7 @@ default['cluster']['directory_service']['additional_sssd_configs'] = nil
 
 # Other ParallelCluster internal variables
 default['cluster']['ddb_table'] = nil
+default['cluster']['slurm_ddb_table'] = nil
 default['cluster']['log_group_name'] = "NONE"
 default['cluster']['disable_hyperthreading_manually'] = 'false'
 default['cluster']['volume_fs_type'] = 'ext4'
