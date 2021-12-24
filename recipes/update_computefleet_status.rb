@@ -16,4 +16,4 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster::setup_envars'
-include_recipe 'aws-parallelcluster-config::update_computefleet' unless node['cluster']['scheduler'] == 'awsbatch'
+include_recipe 'aws-parallelcluster-config::update_computefleet_status' unless node['cluster']['scheduler'] == 'awsbatch'
