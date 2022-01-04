@@ -522,6 +522,28 @@
         "HeadNode"
       ],
       "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_prolog_epilog.log",
+      "log_stream_name": "slurm_prolog_epilog",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "use_private_hostname",
+          "satisfying_values": ["true"]
+        }
+      ]
     }
   ]
 }

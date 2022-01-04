@@ -512,6 +512,7 @@ default['cluster']['raid_parameters'] = 'NONE'
 default['cluster']['raid_vol_ids'] = nil
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
+default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
 
 # AWS domain
