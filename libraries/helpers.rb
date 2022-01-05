@@ -149,6 +149,14 @@ def nvidia_installed?
 end
 
 #
+# Check if GPU acceleration is supported by DCV
+#
+def dcv_gpu_accel_supported?
+  unsupported_gpu_accel_list = ["g5g."]
+  !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
+end
+
+#
 # Check if the AMI is bootstrapped
 #
 def ami_bootstrapped?

@@ -62,7 +62,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     cwd '/tmp'
     code <<-CUDA
       set -e
-      ./cuda.run --silent --toolkit
+      ./cuda.run --silent --toolkit --samples
       rm -f /tmp/cuda.run
     CUDA
     creates "/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}"
@@ -83,31 +83,34 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     end
   end
 
-  # Install NVIDIA Fabric Manager
-  repo_domain = "com"
-  repo_domain = "cn" if node['cluster']['region'].start_with?("cn-")
-  repo_uri = node['cluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
-  add_package_repository(
-    "nvidia-fm-repo",
-    repo_uri,
-    "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}",
-    "/"
-  )
+  # NVIDIA Fabric Manager not present on ARM
+  unless arm_instance?
+    # Install NVIDIA Fabric Manager
+    repo_domain = "com"
+    repo_domain = "cn" if node['cluster']['region'].start_with?("cn-")
+    repo_uri = node['cluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
+    add_package_repository(
+      "nvidia-fm-repo",
+      repo_uri,
+      "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}",
+      "/"
+    )
 
-  if platform?('ubuntu')
-    # For ubuntu, CINC17 apt-package resources need full versions for `version`
-    execute "install_fabricmanager_for_ubuntu" do
-      command "apt -y install #{node['cluster']['nvidia']['fabricmanager']['package']}=#{node['cluster']['nvidia']['fabricmanager']['version']} "\
-              "&& apt-mark hold #{node['cluster']['nvidia']['fabricmanager']['package']}"
-      retries 3
-      retry_delay 5
+    if platform?('ubuntu')
+      # For ubuntu, CINC17 apt-package resources need full versions for `version`
+      execute "install_fabricmanager_for_ubuntu" do
+        command "apt -y install #{node['cluster']['nvidia']['fabricmanager']['package']}=#{node['cluster']['nvidia']['fabricmanager']['version']} "\
+                "&& apt-mark hold #{node['cluster']['nvidia']['fabricmanager']['package']}"
+        retries 3
+        retry_delay 5
+      end
+    else
+      package node['cluster']['nvidia']['fabricmanager']['package'] do
+        version node['cluster']['nvidia']['fabricmanager']['version']
+        action %i(install lock)
+      end
     end
-  else
-    package node['cluster']['nvidia']['fabricmanager']['package'] do
-      version node['cluster']['nvidia']['fabricmanager']['version']
-      action %i(install lock)
-    end
+
+    remove_package_repository("nvidia-fm-repo")
   end
-
-  remove_package_repository("nvidia-fm-repo")
 end
