@@ -29,6 +29,7 @@ action :run do
     if shared_artifacts && !shared_artifacts.empty?
       shared_artifacts.each do |artifact|
         artifact_source_url = artifact[:Source]
+        s3_bucket_owner = artifact[:S3BucketOwner]
         source_name = artifact_source_url.split("/")[-1]
         target_source_path = "#{node['cluster']['scheduler_plugin']['home']}/#{source_name}"
         next if ::File.exist?(target_source_path) && !new_resource.force_download
@@ -36,10 +37,14 @@ action :run do
         Chef::Log.info("Downloading artifacts from (#{artifact_source_url}) to (#{target_source_path})")
         if artifact_source_url.start_with?("s3")
           # download artifacts from s3
-          fetch_artifact_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 cp"\
-                               " --region #{node['cluster']['region']}"\
-                               " #{artifact_source_url}"\
-                               " #{target_source_path}"
+          bucket_name, object_key = artifact_source_url.match(%r{^s3:\/\/(.*?)\/(.*)}).captures
+          fetch_artifact_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object" \
+                         " --bucket #{bucket_name}" \
+                         " --key #{object_key}" \
+                         " --region #{node['cluster']['region']}" \
+                         " #{target_source_path}"
+          fetch_artifact_command += " --expected-bucket-owner #{s3_bucket_owner}" unless s3_bucket_owner.nil?
+
           execute "copy_shared_artifact_from_s3" do
             command fetch_artifact_command
             retries 3
@@ -52,6 +57,17 @@ action :run do
             source artifact_source_url
             retries 3
             retry_delay 5
+          end
+        end
+
+        # Verify checksum of artifact
+        ruby_block "verify artifact checksum" do
+          block do
+            if artifact[:Checksum]
+              require 'digest'
+              checksum = Digest::SHA256.file(target_source_path).hexdigest
+              raise "The checksum of artifact #{artifact_source_url} (#{checksum}) does not match expected checksum (#{artifact[:Checksum]})" unless checksum == artifact[:Checksum]
+            end
           end
         end
 
