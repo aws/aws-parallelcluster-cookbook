@@ -29,6 +29,7 @@ action :run do
     new_resource.system_users.each_with_index do |user, index|
       name = user[:Name]
       enable_imds = user[:EnableImds]
+      sudoer_configuration = user[:SudoerConfiguration]
       system_user_id = node['cluster']['scheduler_plugin']['system_user_id_start'] + index
       system_group_id = node['cluster']['scheduler_plugin']['system_group_id_start'] + index
 
@@ -54,6 +55,11 @@ action :run do
       if enable_imds
         Chef::Log.info("Add #{name} to head node imds allowed users.")
         node.default['cluster']['head_node_imds_allowed_users'].append(name)
+      end
+
+      template "/etc/sudoers.d/99_parallelcluster-scheduler-plugin-#{name}" do
+        source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin-sudoer-configuration.erb'
+        variables(sudoer_configuration: sudoer_configuration, user: name)
       end
     end
   else
