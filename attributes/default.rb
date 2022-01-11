@@ -75,9 +75,11 @@ default['cluster']['intelpython2']['version'] = '2019.4-088'
 default['cluster']['intelpython3']['version'] = '2020.2-902'
 
 # Intel MPI
-default['cluster']['intelmpi']['version'] = '2019.8.254'
-default['cluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
-default['cluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 8'
+default['cluster']['intelmpi']['version'] = '2021.4.0'
+default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi']['version']}.441"
+default['cluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/mpi"
+default['cluster']['intelmpi']['kitchen_test_string'] = 'Version 2021 Update 4'
+default['cluster']['intelmpi']['qt_version'] = '5.15.2'
 
 # Arm Performance Library
 default['cluster']['armpl']['major_minor_version'] = '21.0'
