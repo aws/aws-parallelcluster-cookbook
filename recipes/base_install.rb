@@ -17,6 +17,7 @@
 
 include_recipe "aws-parallelcluster::setup_envars"
 include_recipe "aws-parallelcluster::sudoers_install"
+include_recipe "aws-parallelcluster::disable_log4j_patcher"
 
 return if node['conditions']['ami_bootstrapped']
 
