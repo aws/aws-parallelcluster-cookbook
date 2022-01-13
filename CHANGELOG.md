@@ -16,7 +16,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
 - Do not strip `-` from compute resource name when configuring Slurm nodes.
 - Upgrade Slurm to version 21.08.5.
-- Upgrade NICE DCV to version 2021.2-11445.
+- Upgrade NICE DCV to version 2021.3-11591.
 - Upgrade NVIDIA driver to version 470.82.01.
 - Upgrade CUDA library to version 11.4.3.
 - Upgrade NVIDIA Fabric manager to version 470.82.01.

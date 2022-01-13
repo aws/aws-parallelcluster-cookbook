@@ -64,9 +64,7 @@ def allow_gpu_acceleration
 end
 
 if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadNode"
-  node.default['cluster']['dcv']['is_graphic_instance'] = graphic_instance?
-  node.default['cluster']['dcv']['is_graphic_instance_with_nvidia_installed'] = graphic_instance? && nvidia_installed?
-  if node.default['cluster']['dcv']['is_graphic_instance_with_nvidia_installed']
+  if graphic_instance? && nvidia_installed? && dcv_gpu_accel_supported?
     # Enable graphic acceleration in dcv conf file for graphic instances.
     allow_gpu_acceleration
   else
