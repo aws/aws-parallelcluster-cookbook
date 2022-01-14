@@ -20,7 +20,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA driver to version 470.82.01.
 - Upgrade CUDA library to version 11.4.3.
 - Upgrade NVIDIA Fabric manager to version 470.82.01.
+- Upgrade Intel MPI Library to 2021.4.0.441.
 
+3.0.3
+------
+
+**CHANGES**
+- Disable log4j-cve-2021-44228-hotpatch service on Amazon Linux to avoid incurring in potential performance degradation.
 
 3.0.2
 ------
