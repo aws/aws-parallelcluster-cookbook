@@ -27,3 +27,25 @@ end
 execute_event_handler 'HeadConfigure' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadConfigure, :ExecuteCommand, :Command) })
 end
+
+cookbook_file "#{node['cluster']['scripts_dir']}/compute_fleet_status.py" do
+  source 'compute_fleet_status/compute_fleet_status.py'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  not_if { ::File.exist?("#{node['cluster']['scripts_dir']}/compute_fleet_status.py") }
+end
+
+template "/usr/local/bin/update-compute-fleet-status.sh" do
+  source 'compute_fleet_status/update-compute-fleet-status.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+template "/usr/local/bin/get-compute-fleet-status.sh" do
+  source 'compute_fleet_status/get-compute-fleet-status.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
