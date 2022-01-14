@@ -22,6 +22,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA Fabric manager to version 470.82.01.
 - Upgrade Intel MPI Library to 2021.4.0.441.
 
+**BUG FIXES**
+- Fix the way ExtraChefAttributes are merged into the final configuration.
+
 3.0.3
 ------
 
