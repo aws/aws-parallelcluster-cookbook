@@ -544,3 +544,11 @@ def load_cluster_config
     only_if { node['cluster']['config'].nil? }
   end
 end
+
+def raise_and_write_chef_error(raise_message, chef_error = nil)
+  unless chef_error
+    chef_error = raise_message
+  end
+  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/chef_error_msg").run_command
+  raise raise_message
+end

@@ -35,8 +35,11 @@ action :run do
   cmd.run_command
 
   if cmd.error?
-    raise "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}," \
+    raise_message = "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}," \
       " but received '#{cmd.exitstatus}', complete log info in #{event_log_out} and error in #{event_log_err}\n #{format_stderr(cmd)}"
+    chef_error = "Failed when running #{new_resource.event_name} for the configured scheduler plugin." \
+      " Additional info can be found in /var/log/chef-client.log, #{event_log_out} and #{event_log_err}."
+    raise_and_write_chef_error(raise_message, chef_error)
   end
 end
 
