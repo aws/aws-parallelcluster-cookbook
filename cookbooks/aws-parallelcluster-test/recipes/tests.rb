@@ -162,8 +162,8 @@ if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "hea
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
-  if graphic_instance?
-    execute "Ensure local users can access X server" do
+  if graphic_instance? && dcv_gpu_accel_supported?
+    execute "Ensure local users can access X server (dcv-gl must be installed)" do
       command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
     end
   end
