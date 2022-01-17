@@ -42,6 +42,7 @@ allowed_users.each { |allowed_user| check_imds_access(allowed_user, true) }
 
 denied_users.each { |denied_user| check_imds_access(denied_user, false) }
 
-check_run_level_script('parallelcluster-iptables', %w(1 2 3 4 5), %w(0 6))
-
-check_iptables_rules_file('/etc/parallelcluster/sysconfig/iptables.rules')
+if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
+  check_run_level_script('parallelcluster-iptables', %w(1 2 3 4 5), %w(0 6))
+  check_iptables_rules_file('/etc/parallelcluster/sysconfig/iptables.rules')
+end
