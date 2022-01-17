@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Enable clusters to authenticate users by integrating with Active Directory (AD) domains managed via AWS Directory Service.
+- Install NVIDIA and CUDA for ARM.
 
 **CHANGES**
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
