@@ -66,7 +66,7 @@ default['cfncluster']['intelpython3']['version'] = '2020.2-902'
 default['cfncluster']['intelmpi']['version'] = '2021.4.0'
 default['cfncluster']['intelmpi']['full_version'] = "#{node['cfncluster']['intelmpi']['version']}.441"
 default['cfncluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cfncluster']['intelmpi']['version']}/modulefiles/mpi"
-default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2021 Update 4'
+default['cfncluster']['intelmpi']['kitchen_test_string'] = 'Version 2021.4'
 default['cfncluster']['intelmpi']['qt_version'] = '5.15.2'
 
 # Arm Performance Library
