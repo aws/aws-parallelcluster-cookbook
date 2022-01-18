@@ -22,6 +22,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 11.4.3.
 - Upgrade NVIDIA Fabric manager to version 470.82.01.
 - Upgrade Intel MPI Library to 2021.4.0.441.
+- Add cluster parameter `directory_service.disabled_on_compute_nodes` to disable AD integration on compute nodes.
 
 **BUG FIXES**
 - Fix the way ExtraChefAttributes are merged into the final configuration.

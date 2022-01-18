@@ -18,6 +18,7 @@
 require 'uri'
 
 return if node['cluster']["directory_service"]["enabled"] == 'false'
+return if node['cluster']['node_type'] == 'ComputeFleet' && node['cluster']['directory_service']['disabled_on_compute_nodes'] == 'true'
 
 sssd_conf_path = "/etc/sssd/sssd.conf"
 shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_service"
@@ -56,10 +57,12 @@ if node['cluster']['node_type'] == 'HeadNode'
     recursive true
   end
 
-  execute 'Copy sssd.conf from head node to the shared folder' do
-    user 'root'
-    command "cp #{sssd_conf_path} #{shared_sssd_conf_path}"
-    sensitive true
+  unless node['cluster']['directory_service']['disabled_on_compute_nodes'] == 'true'
+    execute 'Copy sssd.conf from head node to the shared folder' do
+      user 'root'
+      command "cp #{sssd_conf_path} #{shared_sssd_conf_path}"
+      sensitive true
+    end
   end
 
   bash 'Enable SSH password authentication on head node' do
