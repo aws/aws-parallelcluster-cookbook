@@ -17,13 +17,11 @@
 #
 
 install_pyenv node['cluster']['scheduler_plugin']['python_version'] do
-  user_only true
-  user node['cluster']['scheduler_plugin']['user']
+  prefix node['cluster']['scheduler_plugin']['pyenv_root']
 end
 
 activate_virtual_env node['cluster']['scheduler_plugin']['virtualenv'] do
   pyenv_path node['cluster']['scheduler_plugin']['virtualenv_path']
-  user node['cluster']['scheduler_plugin']['user']
   python_version node['cluster']['scheduler_plugin']['python_version']
   not_if { ::File.exist?("#{node['cluster']['scheduler_plugin']['virtualenv_path']}/bin/activate") }
 end

@@ -17,8 +17,6 @@
 
 # setup the user accounts
 include_recipe "aws-parallelcluster-scheduler-plugin::install_user"
-# setup Pyenv and Virtualenv
-include_recipe "aws-parallelcluster-scheduler-plugin::install_python"
 
 directory node['cluster']['scheduler_plugin']['local_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
@@ -40,6 +38,9 @@ directory node['cluster']['scheduler_plugin']['shared_dir'] do
   mode '0755'
   action :create
 end
+
+# setup Pyenv and Virtualenv under node['cluster']['scheduler_plugin']['shared_dir']
+include_recipe "aws-parallelcluster-scheduler-plugin::install_python"
 
 cookbook_file '/usr/local/sbin/invoke-scheduler-plugin-event-handler.sh' do
   source 'event_handler/invoke-scheduler-plugin-event-handler.sh'
