@@ -57,9 +57,11 @@ action :run do
         node.default['cluster']['head_node_imds_allowed_users'].append(name)
       end
 
-      template "/etc/sudoers.d/99_parallelcluster-scheduler-plugin-#{name}" do
-        source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin-sudoer-configuration.erb'
-        variables(sudoer_configuration: sudoer_configuration, user: name)
+      if sudoer_configuration && !sudoer_configuration.empty?  # rubocop:disable Style/Next
+        template "/etc/sudoers.d/99-parallelcluster-scheduler-plugin-#{name}" do
+          source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin-sudoer-configuration.erb'
+          variables(sudoer_configuration: sudoer_configuration, user: name)
+        end
       end
     end
   else
