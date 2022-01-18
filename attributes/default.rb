@@ -78,7 +78,7 @@ default['cluster']['intelpython3']['version'] = '2020.2-902'
 default['cluster']['intelmpi']['version'] = '2021.4.0'
 default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi']['version']}.441"
 default['cluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/mpi"
-default['cluster']['intelmpi']['kitchen_test_string'] = 'Version 2021 Update 4'
+default['cluster']['intelmpi']['kitchen_test_string'] = 'Version 2021.4'
 default['cluster']['intelmpi']['qt_version'] = '5.15.2'
 
 # Arm Performance Library
