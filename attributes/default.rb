@@ -195,6 +195,14 @@ default['cfncluster']['dcv']['server'] = value_for_platform( # NICE DCV server p
     'default' => "nice-dcv-server_#{node['cfncluster']['dcv']['server']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
   }
 )
+default['cfncluster']['dcv']['web_viewer']['version'] = '2021.2.11190-1'
+default['cfncluster']['dcv']['web_viewer'] = value_for_platform( # NICE DCV server package
+  'centos' => { '~>7' => "nice-dcv-web-viewer-#{node['cfncluster']['dcv']['web_viewer']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
+  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cfncluster']['dcv']['web_viewer']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },
+  'ubuntu' => {
+    'default' => "nice-dcv-web-viewer_#{node['cfncluster']['dcv']['web_viewer']['version']}_#{node['cfncluster']['dcv']['package_architecture_id']}.#{node['cfncluster']['cfn_base_os']}.deb"
+  }
+)
 default['cfncluster']['dcv']['xdcv']['version'] = '2021.2.411-1'
 default['cfncluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => { '~>7' => "nice-xdcv-#{node['cfncluster']['dcv']['xdcv']['version']}.el7.#{node['cfncluster']['dcv']['url_architecture_id']}.rpm" },

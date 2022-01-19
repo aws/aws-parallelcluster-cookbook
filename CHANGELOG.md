@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+2.11.5
+-----
+
+**BUG FIXES**
+- Fix DCV connection through browsers.
+
 2.11.4
 -----
 
