@@ -20,6 +20,7 @@ action :run do
 
     pyenv_user_install new_resource.python_version do
       user new_resource.user
+      user_prefix new_resource.prefix if new_resource.prefix
     end
   else
     raise "prefix property is required for resource install_pyenv when user_only is set to false" unless new_resource.prefix

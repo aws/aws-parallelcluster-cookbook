@@ -26,6 +26,7 @@
     "node_type": "HeadNode",
     "cluster_user": "ubuntu",
     "ddb_table": "parallelcluster-pc3cluster",
+    "slurm_ddb_table": "parallelclusterslurm-pc3cluster",
     "log_group_name": "/aws/parallelcluster/pc3cluster-202109141712",
     "dcv_enabled": "false",
     "dcv_port": "NONE",

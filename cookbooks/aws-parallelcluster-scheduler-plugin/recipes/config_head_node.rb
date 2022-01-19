@@ -24,6 +24,17 @@ template "/etc/parallelcluster/scheduler_plugin/clusterstatusmgtd.conf" do
   mode '0644'
 end
 
+unless virtualized?
+  execute 'initialize compute fleet status in DynamoDB' do
+    # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+            " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Data\": {\"M\": {\"status\": {\"S\": \"RUNNING\"}, \"lastStatusUpdatedTime\": {\"S\": \"#{Time.now.utc}\"}}}}'" \
+            " --region #{node['cluster']['region']}"
+    retries 3
+    retry_delay 5
+  end
+end
+
 execute_event_handler 'HeadConfigure' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadConfigure, :ExecuteCommand, :Command) })
 end

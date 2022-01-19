@@ -43,21 +43,3 @@ ruby_block "wait for static fleet capacity" do
     Chef::Log.info("Static fleet capacity is ready")
   end
 end
-
-ruby_block "wait for dynamic fleet capacity" do
-  block do
-    require 'chef/mixin/shell_out'
-    require 'shellwords'
-
-    # $ /opt/slurm/bin/squeue --name='parallelcluster-init-cluster' -O state -h
-    # CONFIGURING
-    # RUNNING
-    are_jobs_running_command = Shellwords.escape("set -o pipefail && /opt/slurm/bin/squeue --name='parallelcluster-init-cluster' -O state -h | { grep -v 'RUNNING' || true; }")
-    until shell_out!("/bin/bash -c #{are_jobs_running_command}").stdout.strip.empty?
-      Chef::Log.info("Waiting for dynamic fleet capacity provisioning")
-      sleep(15)
-    end
-    Chef::Log.info("Dynamic fleet capacity is ready. Terminating provisioning jobs.")
-    shell_out!("/opt/slurm/bin/scancel --jobname=parallelcluster-init-cluster")
-  end
-end
