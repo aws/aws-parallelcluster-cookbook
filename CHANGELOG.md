@@ -8,24 +8,24 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Enable clusters to authenticate users by integrating with Active Directory (AD) domains managed via AWS Directory Service.
-- Install NVIDIA and CUDA for ARM.
+- Install NVIDIA drivers and CUDA library for ARM.
 
 **CHANGES**
-- Do not configure GPUs in Slurm when Nvidia driver is not installed.
-- Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
-- Upgrade PMIx to version 3.2.3
-- Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
-- Do not strip `-` from compute resource name when configuring Slurm nodes.
 - Upgrade Slurm to version 21.08.5.
 - Upgrade NICE DCV to version 2021.3-11591.
 - Upgrade NVIDIA driver to version 470.82.01.
 - Upgrade CUDA library to version 11.4.3.
 - Upgrade NVIDIA Fabric manager to version 470.82.01.
 - Upgrade Intel MPI Library to 2021.4.0.441.
+- Upgrade PMIx to version 3.2.3.
+- Do not configure GPUs in Slurm when NVIDIA driver is not installed.
+- Move the configure/install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
+- Download dependencies of Intel HPC platform during AMI build time to avoid contacting internet during cluster creation time.
+- Do not strip `-` from compute resource name when configuring Slurm nodes.
 - Add cluster parameter `directory_service.disabled_on_compute_nodes` to disable AD integration on compute nodes.
 
 **BUG FIXES**
-- Fix the way ExtraChefAttributes are merged into the final configuration.
+- Fix the way `ExtraChefAttributes` are merged into the final configuration.
 
 3.0.3
 ------
