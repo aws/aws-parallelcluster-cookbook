@@ -1,9 +1,10 @@
 import argparse
+import datetime
 import json
 import sys
-from datetime import datetime, timezone
 
 import boto3
+import dateutil
 from boto3.dynamodb.conditions import Attr
 
 DB_KEY = "COMPUTE_FLEET"
@@ -11,6 +12,46 @@ DB_DATA = "Data"
 
 COMPUTE_FLEET_STATUS_ATTRIBUTE = "status"
 COMPUTE_FLEET_LAST_UPDATED_TIME_ATTRIBUTE = "lastStatusUpdatedTime"
+
+
+def to_utc_datetime(time_in, default_timezone=datetime.timezone.utc) -> datetime.datetime:
+    """
+    Convert a given string, datetime or int into utc datetime.
+
+    :param time_in: Time in a format that may be parsed, integers are assumed to
+    be timestamps in UTC timezone.
+    :param default_timezone: Timezone to assum in the event that the time is
+    unspecified in the input parameter. This applies only for datetime and str inputs
+    :return time as a datetime in UTC timezone
+    """
+    if isinstance(time_in, int):
+        if time_in > 1e12:
+            time_in /= 1000
+        time_ = datetime.datetime.utcfromtimestamp(time_in)
+        time_ = time_.replace(tzinfo=datetime.timezone.utc)
+    elif isinstance(time_in, str):
+        time_ = dateutil.parser.parse(time_in)
+    elif isinstance(time_in, datetime.date):
+        time_ = time_in
+    else:
+        raise TypeError("to_utc_datetime object must be 'str', 'int' or 'datetime'.")
+    if time_.tzinfo is None:
+        time_ = time_.replace(tzinfo=default_timezone)
+    return time_.astimezone(datetime.timezone.utc)
+
+
+def to_iso_timestr(time_in: datetime.datetime) -> str:
+    """
+    Convert a given datetime ISO 8601 format with milliseconds.
+
+    :param time_in: datetime to be converted
+    :return time in ISO 8601 UTC format with ms (e.g. 2021-07-15T01:22:02.655Z)
+    """
+    if time_in.tzinfo is None:
+        time_ = time_in.replace(tzinfo=datetime.timezone.utc)
+    else:
+        time_ = time_in.astimezone(datetime.timezone.utc)
+    return to_utc_datetime(time_).isoformat(timespec="milliseconds")[:-6] + "Z"
 
 
 def update_item(table, status, current_status):
@@ -24,7 +65,7 @@ def update_item(table, status, current_status):
         },
         ExpressionAttributeValues={
             ":s": str(status),
-            ":t": str(datetime.now(tz=timezone.utc)),
+            ":t": str(datetime.datetime.now(tz=datetime.timezone.utc)),
         },
         ConditionExpression=Attr(f"{DB_DATA}.{COMPUTE_FLEET_STATUS_ATTRIBUTE}").eq(str(current_status)),
     )
@@ -66,8 +107,8 @@ def get_status_with_last_updated_time(table_name, region):
             json.dumps(
                 {
                     COMPUTE_FLEET_STATUS_ATTRIBUTE: dynamo_db_data.get(COMPUTE_FLEET_STATUS_ATTRIBUTE),
-                    COMPUTE_FLEET_LAST_UPDATED_TIME_ATTRIBUTE: dynamo_db_data.get(
-                        COMPUTE_FLEET_LAST_UPDATED_TIME_ATTRIBUTE
+                    COMPUTE_FLEET_LAST_UPDATED_TIME_ATTRIBUTE: to_iso_timestr(
+                        dateutil.parser.parse(dynamo_db_data.get(COMPUTE_FLEET_LAST_UPDATED_TIME_ATTRIBUTE))
                     ),
                 },
                 sort_keys=True,

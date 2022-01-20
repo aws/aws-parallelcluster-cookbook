@@ -12,7 +12,7 @@ def test_get_status_with_last_updated_time(no_error, mocker, capsys):
     if no_error:
         mocker.patch(
             "compute_fleet_status.get_dynamo_db_data",
-            return_value={"lastStatusUpdatedTime": "2022-01-14 04:40:47.653442+00:00", "status": "PROTECTED"},
+            return_value={"lastStatusUpdatedTime": "2022-01-14T04:40:47.653Z", "status": "PROTECTED"},
         )
     else:
         mocker.patch(
@@ -24,7 +24,7 @@ def test_get_status_with_last_updated_time(no_error, mocker, capsys):
         get_status_with_last_updated_time("table", "us-east-1")
         readouterr = capsys.readouterr()
         assert_that(readouterr.out).contains(
-            '{\n    "lastStatusUpdatedTime": "2022-01-14 04:40:47.653442+00:00",\n    "status": "PROTECTED"\n}\n'
+            '{\n    "lastStatusUpdatedTime": "2022-01-14T04:40:47.653Z",\n    "status": "PROTECTED"\n}\n'
         )
     except Exception as e:
         assert_that(e.args[0]).contains("Failed when retrieving data from DynamoDB with error")
@@ -42,7 +42,7 @@ def test_update_status_with_last_updated_time(current_status, mocker, capsys):
 
     mocker.patch(
         "compute_fleet_status.get_dynamo_db_data",
-        return_value={"lastStatusUpdatedTime": "2022-01-14 04:40:47.653442+00:00", "status": current_status},
+        return_value={"lastStatusUpdatedTime": "2022-01-14T04:40:47.653Z", "status": current_status},
     )
     update_item_mock = mocker.patch("compute_fleet_status.update_item")
 
