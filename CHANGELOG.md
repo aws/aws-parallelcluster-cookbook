@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Enable clusters to authenticate users by integrating with Active Directory (AD) domains managed via AWS Directory Service.
+- Install NVIDIA and CUDA for ARM.
 
 **CHANGES**
 - Do not configure GPUs in Slurm when Nvidia driver is not installed.
@@ -21,6 +22,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 11.4.3.
 - Upgrade NVIDIA Fabric manager to version 470.82.01.
 - Upgrade Intel MPI Library to 2021.4.0.441.
+- Add cluster parameter `directory_service.disabled_on_compute_nodes` to disable AD integration on compute nodes.
 
 **BUG FIXES**
 - Fix the way ExtraChefAttributes are merged into the final configuration.
