@@ -1,0 +1,49 @@
+#!/bin/bash
+
+_error_exit() {
+  >&2 echo "ERROR: $1"
+  exit 1
+}
+
+_help() {
+    local -- _cmd=$(basename "$0")
+
+    cat << EOF
+
+  Usage: ${_cmd} [OPTION]...
+
+  Update compute fleet status.
+
+  --status                      --status Specify the compute fleet status to set, can be only PROTECTED
+  -h, --help                    Print this help message
+EOF
+}
+
+main() {
+    # parse input options
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+            --status)           _status="$2"; shift;;
+            --status=*)         _status="${1#*=}";;
+            -h|--help|help)     _help; exit 0;;
+            *)                  _help; echo "ERROR: Unrecognized option '$1'"; exit 1;;
+        esac
+        shift
+    done
+
+    # verify required parameters
+    if [ -z "${_status}" ]; then
+        _error_exit "--status parameter not specified"
+        _help;
+    fi
+
+    if [ ${_status} != "PROTECTED" ]; then
+        _error_exit "invalid choice for parameter --status (can be only 'PROTECTED')"
+        _help;
+    fi
+
+
+    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cluster']['scripts_dir'] %>/compute_fleet_status.py --table-name <%= node['cluster']['ddb_table'] %> --region <%= node['cluster']['region'] %> --status "${_status}" --action update
+}
+
+main "$@"
