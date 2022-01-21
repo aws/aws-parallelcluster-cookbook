@@ -173,6 +173,22 @@ cookbook_file '/etc/systemd/system/slurmctld.service' do
   action :create
 end
 
+if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
+  cookbook_file '/opt/slurm/etc/pcluster/prolog' do
+    source 'head_node_slurm/prolog'
+    owner node['cluster']['slurm']['user']
+    group node['cluster']['slurm']['group']
+    mode '0744'
+  end
+
+  cookbook_file '/opt/slurm/etc/pcluster/epilog' do
+    source 'head_node_slurm/epilog'
+    owner node['cluster']['slurm']['user']
+    group node['cluster']['slurm']['group']
+    mode '0744'
+  end
+end
+
 service "slurmctld" do
   supports restart: false
   action %i(enable start)

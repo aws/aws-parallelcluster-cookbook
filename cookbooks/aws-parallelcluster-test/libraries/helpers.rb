@@ -169,6 +169,9 @@ def check_run_level_script(script_name, levels_on, levels_off)
   bash "check run level script #{script_name}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
+      set -x
+      set -o pipefail
+
       for level in #{levels_on.join(' ')}; do
         ls /etc/rc$level.d/ | egrep '^S[0-9]+#{script_name}$' > /dev/null
         [[ $? == 0 ]] || missing_levels_on="$missing_levels_on $level"
