@@ -492,11 +492,6 @@ end
 ###################
 # Verify required service are enabled
 ###################
-if node['cluster']['node_type'] == 'HeadNode'
-  execute 'check parallelcluster-iptables service is enabled' do
-    command "systemctl is-enabled parallelcluster-iptables"
-  end
-end
 execute 'check supervisord service is enabled' do
   command "systemctl is-enabled supervisord"
 end
