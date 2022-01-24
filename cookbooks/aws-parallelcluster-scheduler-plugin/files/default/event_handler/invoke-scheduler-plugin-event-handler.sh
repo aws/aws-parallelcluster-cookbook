@@ -212,7 +212,7 @@ build_dna_json() {
 }
 EOF
 
-  jq --argfile f1 "${source_dna_json}" --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster' > /tmp/dna.json
+  jq --argfile f1 "${source_dna_json}" --argfile f2 /tmp/extra.json -n '$f1 * $f2' > /tmp/dna.json
   log "Generated dna.json:"
   log "$(cat /tmp/dna.json)"
 }

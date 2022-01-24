@@ -20,6 +20,10 @@ ldap_referrals = False
 <%= "#{param} = #{value}" %>
   <% end %>
 <% end %>
+<% if node['cluster']['directory_service']['ldap_access_filter'] != 'NONE' %>
+access_provider = ldap
+ldap_access_filter = <%= node['cluster']['directory_service']['ldap_access_filter'] %>
+<% end %>
 
 [domain/local]
 id_provider = local

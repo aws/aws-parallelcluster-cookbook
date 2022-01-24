@@ -162,8 +162,8 @@ if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "hea
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
-  if graphic_instance?
-    execute "Ensure local users can access X server" do
+  if graphic_instance? && dcv_gpu_accel_supported?
+    execute "Ensure local users can access X server (dcv-gl must be installed)" do
       command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
     end
   end
@@ -265,7 +265,7 @@ unless node['cluster']['os'].end_with?("-custom")
       export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
       echo '{"cluster": {"region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::slurm_config]"}' > /tmp/dna.json
       echo '{ "cluster" : { "dcv_enabled" : "head_node" } }' > /tmp/extra.json
-      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster'
+      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 * $f2'
     JQMERGE
   end
 end
@@ -492,11 +492,6 @@ end
 ###################
 # Verify required service are enabled
 ###################
-if node['cluster']['node_type'] == 'HeadNode'
-  execute 'check parallelcluster-iptables service is enabled' do
-    command "systemctl is-enabled parallelcluster-iptables"
-  end
-end
 execute 'check supervisord service is enabled' do
   command "systemctl is-enabled supervisord"
 end
