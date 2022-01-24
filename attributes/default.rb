@@ -267,14 +267,14 @@ default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU s
     'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
-default['cluster']['dcv']['web-viewer']['version'] = '2021.3.11591-1'
-default['cluster']['dcv']['web-viewer'] = value_for_platform( # required to enable WEB client
+default['cluster']['dcv']['web_viewer']['version'] = '2021.3.11591-1'
+default['cluster']['dcv']['web_viewer'] = value_for_platform( # required to enable WEB client
   'centos' => {
-    '~>7' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web-viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
+    '~>7' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
-  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web-viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
+  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
-    'default' => "nice-dcv-web-viewer_#{node['cluster']['dcv']['web-viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
+    'default' => "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
 default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.3/Servers/#{node['cluster']['dcv']['package']}.tgz"
