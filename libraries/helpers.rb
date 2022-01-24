@@ -149,6 +149,14 @@ def nvidia_installed?
 end
 
 #
+# Check if GPU acceleration is supported by DCV
+#
+def dcv_gpu_accel_supported?
+  unsupported_gpu_accel_list = ["g5g."]
+  !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
+end
+
+#
 # Check if the AMI is bootstrapped
 #
 def ami_bootstrapped?
@@ -394,17 +402,6 @@ def get_nvswitches
   nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
   nvswitch_check.run_command
   nvswitch_check.stdout.strip.to_i
-end
-
-# Check if EFA GDR is enabled (and supported) on this instance
-def efa_gdr_enabled?
-  config_value = node['cluster']['enable_efa_gdr']
-  enabling_value = if node['cluster']['node_type'] == "ComputeFleet"
-                     "compute"
-                   else
-                     "head_node"
-                   end
-  (config_value == enabling_value || config_value == "cluster") && graphic_instance?
 end
 
 # Alinux OSs currently not correctly supported by NFS cookbook

@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
-# Recipe:: efa
+# Cookbook:: aws-parallelcluster-config
+# Recipe:: update_computefleet_status
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,9 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if platform?('ubuntu') && node['cluster']['enable_efa'] == 'compute' && node['cluster']['node_type'] == 'ComputeFleet'
-  # Disabling ptrace protection is needed for EFA in order to use SHA transfer for intra-node communication.
-  sysctl 'kernel.yama.ptrace_scope' do
-    value 0
-  end
+unless node['cluster']['scheduler'] == 'awsbatch'
+  load_cluster_config
 end
+
+include_recipe 'aws-parallelcluster-scheduler-plugin::update_computefleet_status' if node['cluster']['scheduler'] == 'plugin'

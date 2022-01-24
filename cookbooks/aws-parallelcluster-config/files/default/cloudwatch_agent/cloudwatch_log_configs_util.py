@@ -18,8 +18,8 @@ import json
 import os
 import shutil
 import sys
-import jsonschema
 
+import jsonschema
 
 DEFAULT_SCHEMA_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_log_files_schema.json"))
 SCHEMA_PATH = os.environ.get("CW_LOGS_CONFIGS_SCHEMA_PATH", DEFAULT_SCHEMA_PATH)
@@ -37,15 +37,13 @@ def parse_args():
     """Parse command line args."""
     parser = argparse.ArgumentParser(
         description="Validate of add new CloudWatch log configs.",
-        epilog="If neither --input-json nor --input-file are used, this script will validate the existing config."
+        epilog="If neither --input-json nor --input-file are used, this script will validate the existing config.",
     )
     add_group = parser.add_mutually_exclusive_group()
     add_group.add_argument(
         "--input-file", type=argparse.FileType("r"), help="Path to file containing configs for log files to add."
     )
-    add_group.add_argument(
-        "--input-json", type=json.loads, help="String containing configs for log files to add."
-    )
+    add_group.add_argument("--input-json", type=json.loads, help="String containing configs for log files to add.")
     return parser.parse_args()
 
 
@@ -97,12 +95,11 @@ def _validate_timestamp_keys(input_json):
         if log_config.get("timestamp_format_key") not in valid_keys:
             _fail(
                 "Log config with log_stream_name {log_stream_name} and file_path {file_path} contains an invalid "
-                "timestamp_format_key: {timestamp_format_key}. Valid values are {valid_keys}"
-                .format(
+                "timestamp_format_key: {timestamp_format_key}. Valid values are {valid_keys}".format(
                     log_stream_name=log_config.get("log_stream_name"),
                     file_path=log_config.get("file_path"),
                     timestamp_format_key=log_config.get("timestamp_format_key"),
-                    valid_keys=", ".join(valid_keys)
+                    valid_keys=", ".join(valid_keys),
                 )
             )
 

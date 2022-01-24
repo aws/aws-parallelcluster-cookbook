@@ -19,7 +19,7 @@ efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
 efa_installed = efa_installed?
 
 if efa_installed && !::File.exist?(efa_tarball)
-  Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration. enable_gdr option will be ignored.")
+  Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
   return
 end
 
@@ -50,8 +50,6 @@ end
 installer_options = "-y"
 # skip efa-kmod installation on not supported platforms
 installer_options += " -k" unless node['conditions']['efa_supported']
-# enable gpudirect support
-installer_options += " -g" if efa_gdr_enabled?
 
 bash "install efa" do
   cwd node['cluster']['sources_dir']
@@ -62,5 +60,5 @@ bash "install efa" do
     ./efa_installer.sh #{installer_options}
     rm -rf #{node['cluster']['sources_dir']}/aws-efa-installer
   EFAINSTALL
-  not_if { efa_installed && !efa_gdr_enabled? }
+  not_if { efa_installed }
 end

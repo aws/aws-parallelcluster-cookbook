@@ -73,9 +73,12 @@ execute "cloudwatch-config-creation" do
     'CONFIG_DATA_PATH' => config_data_path
   )
   not_if { ::File.exist?('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json') }
+
+  cluster_config_path = node['cluster']['scheduler'] == 'plugin' ? "--cluster-config-path #{node['cluster']['cluster_config_path']}" : ""
+
   command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python #{config_script_path} "\
-          "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
-          "--scheduler $SCHEDULER --node-role $NODE_ROLE"
+      "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
+      "--scheduler $SCHEDULER --node-role $NODE_ROLE #{cluster_config_path}"
 end
 
 execute "cloudwatch-agent-start" do

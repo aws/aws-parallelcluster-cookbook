@@ -23,21 +23,21 @@ include_recipe "aws-parallelcluster-scheduler-plugin::install_python"
 directory node['cluster']['scheduler_plugin']['local_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
-  mode '0700'
+  mode '0755'
   action :create
 end
 
 directory node['cluster']['scheduler_plugin']['handler_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
-  mode '0700'
+  mode '0755'
   action :create
 end
 
 directory node['cluster']['scheduler_plugin']['shared_dir'] do
   owner node['cluster']['scheduler_plugin']['user']
   group node['cluster']['scheduler_plugin']['user']
-  mode '0700'
+  mode '0755'
   action :create
 end
 
@@ -47,3 +47,6 @@ cookbook_file '/usr/local/sbin/invoke-scheduler-plugin-event-handler.sh' do
   group 'root'
   mode '0755'
 end
+
+# install cluster status management demon
+include_recipe "aws-parallelcluster-scheduler-plugin::install_clusterstatusmgtd"

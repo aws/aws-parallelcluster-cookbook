@@ -3,22 +3,35 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.X.X
+3.1.0
 ------
 
 **ENHANCEMENTS**
-- Enable clusters to authenticate users by integrating with Active Directory (AD) domains managed via AWS Directory Service.
+- Add support for multiple users cluster environments by integrating with Active Directory (AD) domains managed via AWS Directory Service.
+- Install NVIDIA drivers and CUDA library for ARM.
 
 **CHANGES**
-- Do not configure GPUs in Slurm when Nvidia driver is not installed.
-- Move the configure / install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
-- Upgrade PMIx to version 3.2.3
-- Download dependencies of Intel HPC platform during AMI build time to avoid contacting Internet during cluster creation time.
+- Upgrade Slurm to version 21.08.5.
+- Upgrade NICE DCV to version 2021.3-11591.
+- Upgrade NVIDIA driver to version 470.82.01.
+- Upgrade CUDA library to version 11.4.3.
+- Upgrade NVIDIA Fabric manager to version 470.82.01.
+- Upgrade Intel MPI Library to 2021.4.0.441.
+- Upgrade PMIx to version 3.2.3.
+- Move the configure/install recipes to separate cookbooks that are called from the main one. Existing entrypoints are maintained and backwards compatible.
+- Download dependencies of Intel HPC platform during AMI build time to avoid contacting internet during cluster creation time.
 - Do not strip `-` from compute resource name when configuring Slurm nodes.
-- Upgrade Slurm to version 21.08.4.
+- Add cluster parameter `directory_service.disabled_on_compute_nodes` to disable AD integration on compute nodes.
 
 **BUG FIXES**
-- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
+- Do not configure GPUs in Slurm when NVIDIA driver is not installed.
+- Fix the way `ExtraChefAttributes` are merged into the final configuration.
+
+3.0.3
+------
+
+**CHANGES**
+- Disable log4j-cve-2021-44228-hotpatch service on Amazon Linux to avoid incurring in potential performance degradation.
 
 3.0.2
 ------
@@ -33,6 +46,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - RDMA core: ``rdma-core-37.0``
   - Libfabric: ``libfabric-1.13.2``
   - Open MPI: ``openmpi40-aws-4.1.1-2``
+
+**BUG FIXES**
+- Fix issue that is preventing cluster names to start with `parallelcluster-` prefix.
 
 3.0.1
 ------
@@ -66,7 +82,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Make PATH include required directories for every user and recipes context.
 - Fail cluster creation when IMDS lockdown is not working correctly.
 - Make sudoers secure_path include the same directories in every platform.
-- Remove option for instance store software encryption (encrypted_ephemeral).  
+- Remove option for instance store software encryption (encrypted_ephemeral).
 - Add support for iptables restore on instance reboot.
 - Allow IMDS access for dcv user when dcv is enabled.
 - Restore ``noatime`` option, which has positive impact on the performances of NFS filesystem

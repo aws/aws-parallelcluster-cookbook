@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster-scheduler-plugin
-# Recipe:: update_computefleet_stop_head_node
+# Recipe:: install_clusterstatusmgtd
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -14,7 +14,20 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-execute_event_handler 'HeadComputeFleetStop' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadComputeFleetStop, :ExecuteCommand, :Command) })
+directory "#{node['cluster']['scripts_dir']}/scheduler_plugin"
+
+cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusmgtd.py" do
+  source 'clusterstatusmgtd/clusterstatusmgtd.py'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusmgtd_logging.conf" do
+  source 'clusterstatusmgtd/clusterstatusmgtd_logging.conf'
+  owner 'root'
+  group 'root'
+  mode '0755'
 end

@@ -15,6 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+directory '/etc/parallelcluster/scheduler_plugin'
+
+template "/etc/parallelcluster/scheduler_plugin/clusterstatusmgtd.conf" do
+  source 'clusterstatusmgtd/clusterstatusmgtd.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 execute_event_handler 'HeadConfigure' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadConfigure, :ExecuteCommand, :Command) })
 end

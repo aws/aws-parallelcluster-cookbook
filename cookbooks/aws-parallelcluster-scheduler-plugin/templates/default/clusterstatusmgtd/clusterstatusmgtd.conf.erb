@@ -1,0 +1,6 @@
+[clusterstatusmgtd]
+cluster_name = <%= node['cluster']['stack_name'] %>
+region = <%= node['cluster']['region'] %>
+proxy = <%= node['cluster']['proxy'] %>
+dynamodb_table = <%= node['cluster']['ddb_table'] %>
+computefleet_status_path = <%= node['cluster']['computefleet_status_path'] %>

@@ -162,8 +162,8 @@ if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "hea
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i graphical.target"
   end
-  if graphic_instance?
-    execute "Ensure local users can access X server" do
+  if graphic_instance? && dcv_gpu_accel_supported?
+    execute "Ensure local users can access X server (dcv-gl must be installed)" do
       command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
     end
   end
@@ -222,12 +222,34 @@ if node['conditions']['intel_mpi_supported']
 end
 
 ###################
-# EFA - GDR (GPUDirect RDMA)
+# EFA
 ###################
-if node['conditions']['efa_supported'] && efa_gdr_enabled?
-  execute 'check efa gdr installed' do
-    command "modinfo efa | grep 'gdr:\ *Y'"
-    user node['cluster']['cluster_user']
+if node['conditions']['efa_supported']
+  if node['cluster']['os'].end_with?("-custom")
+    # only check EFA is installed because when found in the base AMI we skip installation
+    bash 'check efa installed' do
+      cwd Chef::Config[:file_cache_path]
+      code <<-EFA
+        set -ex
+        modinfo efa
+        cat /opt/amazon/efa_installed_packages
+      EFA
+    end
+  else
+    # check EFA is installed and the version is expected
+    bash 'check correct version of efa installed' do
+      cwd Chef::Config[:file_cache_path]
+      code <<-EFA
+        set -ex
+        modinfo efa
+        grep "EFA installer version: #{node['cluster']['efa']['installer_version']}" /opt/amazon/efa_installed_packages
+      EFA
+    end
+    # GDR (GPUDirect RDMA)
+    execute 'check efa gdr installed' do
+      command "modinfo efa | grep 'gdr:\ *Y'"
+      user node['cluster']['cluster_user']
+    end
   end
 end
 
@@ -243,7 +265,7 @@ unless node['cluster']['os'].end_with?("-custom")
       export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
       echo '{"cluster": {"region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::slurm_config]"}' > /tmp/dna.json
       echo '{ "cluster" : { "dcv_enabled" : "head_node" } }' > /tmp/extra.json
-      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 + $f2 | .cluster = $f1.cluster + $f2.cluster'
+      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 * $f2'
     JQMERGE
   end
 end
@@ -470,11 +492,6 @@ end
 ###################
 # Verify required service are enabled
 ###################
-if node['cluster']['node_type'] == 'HeadNode'
-  execute 'check parallelcluster-iptables service is enabled' do
-    command "systemctl is-enabled parallelcluster-iptables"
-  end
-end
 execute 'check supervisord service is enabled' do
   command "systemctl is-enabled supervisord"
 end
