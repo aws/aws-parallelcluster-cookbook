@@ -20,6 +20,9 @@ SwitchType=switch/none
 SlurmctldPidFile=/var/run/slurmctld.pid
 SlurmdPidFile=/var/run/slurmd.pid
 ReconfigFlags=KeepPartState
+<% if node['cluster']['enable_nss_slurm'] == 'true' -%>
+LaunchParameters=enable_nss_slurm
+<% end -%>
 #
 # CLOUD CONFIGS OPTIONS
 <% if node['cluster']['use_private_hostname'] == 'true' or node['cluster']['dns_domain'].nil? or node['cluster']['dns_domain'].empty? -%>

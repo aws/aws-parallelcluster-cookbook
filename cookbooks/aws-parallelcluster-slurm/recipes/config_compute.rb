@@ -52,3 +52,13 @@ cookbook_file '/etc/systemd/system/slurmd.service' do
   mode '0644'
   action :create
 end
+
+if node['cluster']['enable_nss_slurm'] == 'true'
+  nsswitch_path = '/etc/nsswitch.conf'
+  bash 'Add Slurm to nsswitch.conf' do
+    code <<-NSSWITCH
+      sed -i 's/^passwd: */&slurm /' #{nsswitch_path}
+      sed -i 's/^group: */&slurm /' #{nsswitch_path}
+    NSSWITCH
+  end
+end
