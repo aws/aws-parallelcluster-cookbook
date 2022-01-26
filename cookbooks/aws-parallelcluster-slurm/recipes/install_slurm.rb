@@ -126,3 +126,8 @@ when 'centos', 'amazon'
     retry_delay 5
   end
 end
+
+file '/etc/ld.so.conf.d/slurm.conf' do
+  content '/opt/slurm/lib/'
+  mode '0744'
+end
