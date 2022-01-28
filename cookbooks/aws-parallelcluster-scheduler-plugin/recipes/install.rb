@@ -48,6 +48,3 @@ cookbook_file '/usr/local/sbin/invoke-scheduler-plugin-event-handler.sh' do
   group 'root'
   mode '0755'
 end
-
-# install cluster status management demon
-include_recipe "aws-parallelcluster-scheduler-plugin::install_clusterstatusmgtd"

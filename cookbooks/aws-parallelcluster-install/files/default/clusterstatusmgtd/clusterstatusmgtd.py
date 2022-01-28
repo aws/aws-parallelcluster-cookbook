@@ -26,7 +26,7 @@ import boto3
 from boto3.dynamodb.conditions import Attr
 from botocore.config import Config
 
-CONFIG_FILE_DIR = "/etc/parallelcluster/scheduler_plugin"
+CONFIG_FILE_DIR = "/etc/parallelcluster"
 LOOP_TIME = 60
 log = logging.getLogger(__name__)
 
@@ -62,9 +62,9 @@ def log_exception(
     raise_on_error=True,
     exception_to_raise=None,
 ):
-    def _log_exception(function):
+    def decorator_log_exception(function):
         @functools.wraps(function)
-        def wrapper(*args, **kwargs):
+        def wrapper_log_expection(*args, **kwargs):
             try:
                 return function(*args, **kwargs)
             except catch_exception as e:
@@ -75,9 +75,9 @@ def log_exception(
                     else:
                         raise
 
-        return wrapper
+        return wrapper_log_expection
 
-    return _log_exception
+    return decorator_log_exception
 
 
 def _run_command(  # noqa: C901
@@ -384,7 +384,17 @@ class ClusterStatusManager:
 
     @log_exception(log, "handling compute fleet status transitions", catch_exception=Exception, raise_on_error=False)
     def manage_cluster_status(self):
-        """Manage cluster status."""
+        """
+        Manage cluster status.
+
+        When running pcluster start/stop command the fleet status is set to START_REQUESTED/STOP_REQUESTED.
+        The function fetches the current fleet status and performs the following transitions:
+          - START_REQUESTED -> STARTING -> RUNNING
+          - STOP_REQUESTED -> STOPPING -> STOPPED
+        STARTING/STOPPING states are only used to communicate that the request is being processed by clusterstatusmgtd.
+        On status STARTING|STOPPING, the update event handler baked by the recipe
+        aws-parallelcluster::update_computefleet_status is called
+        """
         self._current_time = datetime.now(tz=timezone.utc)
         self._compute_fleet_status = self._get_compute_fleet_status(fallback=self._compute_fleet_status)
         log.info("Current compute fleet status: %s", self._compute_fleet_status)
@@ -432,7 +442,7 @@ def _run_clusterstatusmgtd(config_file):
 
 
 def retry(delay):
-    def _retry(func):
+    def decorator_retry(func):
         @functools.wraps(func)
         def wrapper_retry(*args, **kwargs):
             while True:
@@ -443,7 +453,7 @@ def retry(delay):
 
         return wrapper_retry
 
-    return _retry
+    return decorator_retry
 
 
 @retry(LOOP_TIME)
