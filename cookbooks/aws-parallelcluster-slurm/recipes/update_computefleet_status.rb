@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-config
+# Cookbook:: aws-parallelcluster-slurm
 # Recipe:: update_computefleet_status
 #
-# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,9 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-unless node['cluster']['scheduler'] == 'awsbatch'
-  load_cluster_config
+case node['cluster']['node_type']
+when 'HeadNode'
+  include_recipe 'aws-parallelcluster-slurm::update_computefleet_status_head_node'
+else
+  raise "node_type must be HeadNode"
 end
-
-include_recipe 'aws-parallelcluster-scheduler-plugin::update_computefleet_status' if node['cluster']['scheduler'] == 'plugin'
-include_recipe 'aws-parallelcluster-slurm::update_computefleet_status' if node['cluster']['scheduler'] == 'slurm'
