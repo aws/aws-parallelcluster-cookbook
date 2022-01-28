@@ -147,12 +147,16 @@ class ComputeFleetStatus(Enum):
 
     @staticmethod
     def _transform_compute_fleet_data(compute_fleet_data):
-        compute_fleet_data[
-            ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE
-        ] = ComputeFleetStatus.EVENT_HANDLER_STATUS_MAPPING.value.get(
-            compute_fleet_data.get(ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE), ComputeFleetStatus.UNKNOWN
-        )
-        return compute_fleet_data
+        try:
+            compute_fleet_data[
+                ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE
+            ] = ComputeFleetStatus.EVENT_HANDLER_STATUS_MAPPING.value.get(
+                compute_fleet_data.get(ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE),
+                str(ComputeFleetStatus.UNKNOWN),
+            )
+            return compute_fleet_data
+        except AttributeError as e:
+            raise Exception("Unable to parse compute fleet status data: %s", e)
 
     @staticmethod
     def is_start_in_progress(status):  # noqa: D102
@@ -351,8 +355,12 @@ class ClusterStatusManager:
         self._compute_fleet_status = new_status
 
     def _call_update_event(self):
-        compute_fleet_data = ComputeFleetStatus._transform_compute_fleet_data(self._compute_fleet_data)
-        _write_json_to_file(self._config.computefleet_status_path, compute_fleet_data)
+        try:
+            compute_fleet_data = ComputeFleetStatus._transform_compute_fleet_data(self._compute_fleet_data)
+            _write_json_to_file(self._config.computefleet_status_path, compute_fleet_data)
+        except Exception as e:
+            log.error("Update event handler failed during fleet status translation: %s", e)
+            raise
 
         cinc_log_file = "/var/log/chef-client.log"
         log.info("Calling update event handler, log can be found at %s", cinc_log_file)
