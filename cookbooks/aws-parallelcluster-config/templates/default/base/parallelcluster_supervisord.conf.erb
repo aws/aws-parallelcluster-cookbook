@@ -17,9 +17,9 @@ environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clustermgtd
 <% end -%>
-<% if node['cluster']['scheduler'] == 'plugin' -%>
+<% unless node['cluster']['scheduler'] == 'awsbatch' -%>
 [program:clusterstatusmgtd]
-command = <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python /opt/parallelcluster/scripts/scheduler_plugin/clusterstatusmgtd.py
+command = <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python /opt/parallelcluster/scripts/clusterstatusmgtd.py
 user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 redirect_stderr = true

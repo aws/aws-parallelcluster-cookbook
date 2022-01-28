@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-scheduler-plugin
-# Recipe:: install_clusterstatusmgtd
+# Cookbook:: aws-parallelcluster-install
+# Recipe:: clusterstatusmgtd
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -16,16 +16,14 @@
 # limitations under the License.
 #
 
-directory "#{node['cluster']['scripts_dir']}/scheduler_plugin"
-
-cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusmgtd.py" do
+cookbook_file "#{node['cluster']['scripts_dir']}/clusterstatusmgtd.py" do
   source 'clusterstatusmgtd/clusterstatusmgtd.py'
   owner 'root'
   group 'root'
   mode '0755'
 end
 
-cookbook_file "#{node['cluster']['scripts_dir']}/scheduler_plugin/clusterstatusmgtd_logging.conf" do
+cookbook_file "#{node['cluster']['scripts_dir']}/clusterstatusmgtd_logging.conf" do
   source 'clusterstatusmgtd/clusterstatusmgtd_logging.conf'
   owner 'root'
   group 'root'
