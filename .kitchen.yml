@@ -74,6 +74,7 @@ suites:
         ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] %>
         ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] %>
         cluster_user: <%= ENV['CLUSTER_USER'] %>
+        ddb_table: <%= ENV['DDB_TABLE'] %>
         slurm_ddb_table: <%= ENV['DDB_TABLE'] %>
         # base_os is one of the base OSs supported by pcluster
         base_os: <%= ENV['BASE_OS'] %>
