@@ -743,3 +743,18 @@ bash 'check ipv4 gc_thresh is correctly configured' do
   GC
   user 'root'
 end
+
+##################
+# log4j hotpatch
+##################
+if node['platform_family'] == 'amazon'
+  bash 'verify log4j-cve-2021-44228-hotpatch service is disabled' do
+    code <<-LOG4J
+      set -e
+      systemctl show -p SubState log4j-cve-2021-44228-hotpatch | grep -i -v running
+      echo "log4j-cve-2021-44228-hotpatch service is not running"
+      systemctl show -p LoadState log4j-cve-2021-44228-hotpatch | grep -i "LoadState=masked"
+      echo "log4j-cve-2021-44228-hotpatch service is masked"
+    LOG4J
+  end
+end

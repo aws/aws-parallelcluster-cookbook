@@ -17,6 +17,8 @@
 
 return if node['conditions']['ami_bootstrapped']
 
+include_recipe "aws-parallelcluster::disable_log4j_patcher"
+
 case node['platform_family']
 when 'rhel', 'amazon'
   include_recipe 'yum'
