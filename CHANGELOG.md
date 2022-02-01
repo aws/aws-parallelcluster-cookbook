@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 2.11.5
 -----
 
+**CHANGES**
+- Disable log4j-cve-2021-44228-hotpatch service on Amazon Linux to avoid incurring in potential performance degradation.
+
 **BUG FIXES**
 - Fix DCV connection through browsers.
 
