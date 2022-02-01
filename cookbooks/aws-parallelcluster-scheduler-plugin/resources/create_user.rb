@@ -18,6 +18,9 @@ property :system_users, Array, required: false
 property :force_creation, [true, false],
          default: false,
          description: 'force creation if uid/gid already exists'
+property :grant_sudo_privileges, [true, false],
+         default: false,
+         description: 'flag to set sudo privileges'
 
 default_action :run
 
@@ -57,7 +60,7 @@ action :run do
         node.default['cluster']['head_node_imds_allowed_users'].append(name)
       end
 
-      if sudoer_configuration && !sudoer_configuration.empty?  # rubocop:disable Style/Next
+      if sudoer_configuration && !sudoer_configuration.empty? && new_resource.grant_sudo_privileges # rubocop:disable Style/Next
         template "/etc/sudoers.d/99-parallelcluster-scheduler-plugin-#{name}" do
           source 'scheduler_plugin_user/99-parallelcluster-scheduler-plugin-sudoer-configuration.erb'
           variables(sudoer_configuration: sudoer_configuration, user: name)
