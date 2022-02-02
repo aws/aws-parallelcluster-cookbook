@@ -128,7 +128,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     raise "Expected #{config_type} file not found in (#{source_config})" unless ::File.exist?(source_config)
 
     Chef::Log.info("Copying #{config_type} file from (#{source_config}) to (#{target_config})")
-    FileUtils.cp(source_config, target_config)
+    FileUtils.cp_r(source_config, target_config, remove_destination: true)
     FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
   end
 
@@ -172,7 +172,8 @@ action_class do # rubocop:disable Metrics/BlockLength
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))
     env.merge!(build_hash_from_node('AWS_REGION', true, :ec2, :region))
     env.merge!(build_hash_from_node('PCLUSTER_OS', true, :cluster, :config, :Image, :Os))
-    env.merge!(build_hash_from_node('PCLUSTER_ARCH', true, :cpu, :architecture))
+    arch = "#{node['cpu']['architecture']}" == 'aarch64' ? 'arm64' : "#{node['cpu']['architecture']}"
+    env.merge!({ 'PCLUSTER_ARCH' => arch })
     env.merge!(build_hash_from_node('PCLUSTER_VERSION', true, :cluster, :'parallelcluster-version'))
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_PRIVATE_IP', true, :ec2, :local_ipv4))
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_HOSTNAME', true, :hostname))
