@@ -14,7 +14,7 @@ action :run do
   unless virtualized?
     if new_resource.update
       Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
-      ::FileUtils.cp(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'])
+      ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
       fetch_cluster_config(node['cluster']['cluster_config_path'])
       fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
     else
