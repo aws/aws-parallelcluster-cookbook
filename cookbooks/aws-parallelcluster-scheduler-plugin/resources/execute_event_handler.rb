@@ -128,7 +128,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     raise "Expected #{config_type} file not found in (#{source_config})" unless ::File.exist?(source_config)
 
     Chef::Log.info("Copying #{config_type} file from (#{source_config}) to (#{target_config})")
-    FileUtils.cp(source_config, target_config)
+    FileUtils.cp_r(source_config, target_config, remove_destination: true)
     FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
   end
 
