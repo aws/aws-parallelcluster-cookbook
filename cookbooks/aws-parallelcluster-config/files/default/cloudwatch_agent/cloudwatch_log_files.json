@@ -567,6 +567,7 @@
       "file_path": "/var/log/parallelcluster/clusterstatusmgtd",
       "log_stream_name": "clusterstatusmgtd",
       "schedulers": [
+        "slurm",
         "plugin"
       ],
       "platforms": [
