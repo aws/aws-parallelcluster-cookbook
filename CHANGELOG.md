@@ -8,6 +8,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Disable log4j-cve-2021-44228-hotpatch service on Amazon Linux to avoid incurring in potential performance degradation.
+- Upgrade NVIDIA driver to version 470.103.01.
+- Upgrade CUDA library to version 11.4.4.
+- Upgrade NVIDIA Fabric manager to version 470.103.01.
 
 **BUG FIXES**
 - Fix DCV connection through browsers.
