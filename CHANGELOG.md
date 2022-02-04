@@ -26,6 +26,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Do not configure GPUs in Slurm when NVIDIA driver is not installed.
 - Fix the way `ExtraChefAttributes` are merged into the final configuration.
+- Fix sporadic failure of build-image due to missing package
 
 3.0.3
 ------
