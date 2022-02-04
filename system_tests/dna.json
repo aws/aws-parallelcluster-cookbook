@@ -38,6 +38,7 @@
     "instance_types_data_s3_key": "parallelcluster/3.0.1/clusters/pc3cluster-0000000000000000/configs/instance-types-data.json",
     "custom_node_package": "",
     "custom_awsbatchcli_package": "",
-    "head_node_imds_secured": "true"
+    "head_node_imds_secured": "true",
+    "compute_node_bootstrap_timeout": 1800
   }
 }

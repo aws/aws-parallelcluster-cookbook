@@ -66,7 +66,8 @@ unless virtualized?
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
             " --output-directory /opt/slurm/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
-            " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']} #{no_gpu}"
+            " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"\
+            " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"
   end
 end
 

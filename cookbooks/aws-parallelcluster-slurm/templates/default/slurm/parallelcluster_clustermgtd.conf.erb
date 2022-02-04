@@ -9,3 +9,4 @@ dns_domain = <%= node['cluster']['dns_domain'] %>
 use_private_hostname = <%= node['cluster']['use_private_hostname'] %>
 head_node_private_ip = <%= node['ec2']['local_ipv4'] %>
 head_node_hostname = <%= node['ec2']['local_hostname'] %>
+node_replacement_timeout = <%= node['cluster']['compute_node_bootstrap_timeout'] %>

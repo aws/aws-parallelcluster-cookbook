@@ -31,7 +31,13 @@ class CriticalError(Exception):
 
 
 def generate_slurm_config_files(
-    output_directory, template_directory, input_file, instance_types_data_path, dryrun, no_gpu
+    output_directory,
+    template_directory,
+    input_file,
+    instance_types_data_path,
+    dryrun,
+    no_gpu,
+    compute_node_bootstrap_timeout,
 ):
     """
     Generate Slurm configuration files.
@@ -75,6 +81,7 @@ def generate_slurm_config_files(
             head_node_config,
             cluster_config["Scheduling"]["SlurmSettings"],
             template_name,
+            compute_node_bootstrap_timeout,
             env,
             output_directory,
             dryrun,
@@ -127,13 +134,21 @@ def _generate_queue_config(
 
 
 def _generate_slurm_parallelcluster_configs(
-    queues, head_node_config, scaling_config, template_name, jinja_env, output_dir, dryrun
+    queues,
+    head_node_config,
+    scaling_config,
+    template_name,
+    compute_node_bootstrap_timeout,
+    jinja_env,
+    output_dir,
+    dryrun,
 ):
     log.info("Generating %s", template_name)
     rendered_template = jinja_env.get_template(f"{template_name}").render(
         queues=queues,
         head_node_config=head_node_config,
         scaling_config=scaling_config,
+        compute_node_bootstrap_timeout=compute_node_bootstrap_timeout,
         output_dir=output_dir,
     )
     if not dryrun:
@@ -288,6 +303,13 @@ def main():
             required=False,
             default=False,
         )
+        parser.add_argument(
+            "--compute-node-bootstrap-timeout",
+            type=int,
+            help="Configure ResumeTimeout",
+            required=False,
+            default=1800,
+        )
         args = parser.parse_args()
         generate_slurm_config_files(
             args.output_directory,
@@ -296,6 +318,7 @@ def main():
             args.instance_types_data,
             args.dryrun,
             args.no_gpu,
+            args.compute_node_bootstrap_timeout,
         )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)

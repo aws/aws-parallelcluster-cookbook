@@ -20,7 +20,13 @@ def test_generate_slurm_config_files(mocker, test_datadir, tmpdir, no_gpu):
     )
     template_directory = os.path.dirname(slurm.__file__) + "/templates"
     generate_slurm_config_files(
-        tmpdir, template_directory, input_file, instance_types_data, dryrun=False, no_gpu=no_gpu
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=no_gpu,
+        compute_node_bootstrap_timeout=1600,
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
