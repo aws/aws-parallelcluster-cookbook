@@ -61,4 +61,11 @@ if node['cluster']['enable_nss_slurm'] == 'true'
       sed -i 's/^group: */&slurm /' #{nsswitch_path}
     NSSWITCH
   end
+
+  file '/etc/nss_slurm.conf' do
+    content("NodeName=#{hit_slurm_nodename}")
+    mode '0644'
+    owner 'root'
+    group 'root'
+  end
 end
