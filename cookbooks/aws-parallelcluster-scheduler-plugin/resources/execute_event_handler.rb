@@ -22,7 +22,6 @@ action :run do
   event_cwd = node['cluster']['scheduler_plugin']['home']
   event_user = node['cluster']['scheduler_plugin']['user']
   event_user_group = node['cluster']['scheduler_plugin']['group']
-  event_timeout = 3600
   event_env = build_env
   event_log_prefix_error = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - ERROR:"
   event_log_prefix_info = "%Y-%m-%d %H:%M:%S,000 - [#{new_resource.event_name}] - INFO:"
@@ -31,7 +30,7 @@ action :run do
   # switch stderr/stdout with (2>&1 1>&3-), process error (now on stdout), switch back stdout/stderr with (3>&1 1>&2) and then process output
   event_command = Shellwords.escape("set -o pipefail; { (#{new_resource.event_command}) 2>&1 1>&3- | ts '#{event_log_prefix_error}' | tee -a #{event_log_err}; } " \
     "3>&1 1>&2 | ts '#{event_log_prefix_info}' | tee -a #{event_log_out}")
-  cmd = Mixlib::ShellOut.new("/bin/bash -c #{event_command}", user: event_user, group: event_user_group, login: true, env: event_env, cwd: event_cwd, timeout: event_timeout)
+  cmd = Mixlib::ShellOut.new("/bin/bash -c #{event_command}", user: event_user, group: event_user_group, login: true, env: event_env, cwd: event_cwd)
   cmd.run_command
 
   if cmd.error?

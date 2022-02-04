@@ -21,6 +21,7 @@ execute "generate_pcluster_slurm_configs" do
           " --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/" \
           " --input-file #{node['cluster']['cluster_config_path']}" \
           " --instance-types-data #{node['cluster']['instance_types_data_path']}" \
+          " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']}" \
           " #{nvidia_installed? ? '' : '--no-gpu'}"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
 end
@@ -28,6 +29,13 @@ end
 execute 'stop clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
+end
+
+replace_or_add "update node replacement timeout" do
+  path "/etc/parallelcluster/slurm_plugin/parallelcluster_clustermgtd.conf"
+  pattern "node_replacement_timeout*"
+  line "node_replacement_timeout = #{node['cluster']['compute_node_bootstrap_timeout']}"
+  replace_only true
 end
 
 service 'slurmctld' do
