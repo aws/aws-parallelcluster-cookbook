@@ -305,10 +305,6 @@ if node['conditions']['intel_mpi_supported']
       command "rpm -qa | grep libfabric && rpm -qa | grep efa-"
       user node['cfncluster']['cfn_cluster_user']
     end
-    execute 'check intel mpi installed' do
-      command "rpm -qa | grep intel-mpi"
-      user node['cfncluster']['cfn_cluster_user']
-    end
   when 'ubuntu1804'
     case node['cfncluster']['cfn_node_type']
     when 'MasterServer'
