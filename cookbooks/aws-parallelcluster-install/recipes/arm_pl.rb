@@ -65,8 +65,8 @@ gcc_tarball = "#{node['cluster']['sources_dir']}/gcc-#{node['cluster']['armpl'][
 remote_file gcc_tarball do
   source node['cluster']['armpl']['gcc']['url']
   mode '0644'
-  retries 3
-  retry_delay 5
+  retries 5
+  retry_delay 10
   not_if { ::File.exist?(gcc_tarball) }
 end
 

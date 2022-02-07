@@ -32,6 +32,7 @@ default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cl
 default['cluster']['previous_cluster_config_path'] = "#{node['cluster']['shared_dir']}/previous-cluster-config.yaml"
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
+default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
@@ -74,9 +75,11 @@ default['cluster']['intelpython2']['version'] = '2019.4-088'
 default['cluster']['intelpython3']['version'] = '2020.2-902'
 
 # Intel MPI
-default['cluster']['intelmpi']['version'] = '2019.8.254'
-default['cluster']['intelmpi']['modulefile'] = "/opt/intel/impi/#{node['cluster']['intelmpi']['version']}/intel64/modulefiles/mpi"
-default['cluster']['intelmpi']['kitchen_test_string'] = 'Version 2019 Update 8'
+default['cluster']['intelmpi']['version'] = '2021.4.0'
+default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi']['version']}.441"
+default['cluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/mpi"
+default['cluster']['intelmpi']['kitchen_test_string'] = 'Version 2021.4'
+default['cluster']['intelmpi']['qt_version'] = '5.15.2'
 
 # Arm Performance Library
 default['cluster']['armpl']['major_minor_version'] = '21.0'
@@ -105,17 +108,17 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # Python packages
-default['cluster']['parallelcluster-version'] = '3.1.0b1'
-default['cluster']['parallelcluster-cookbook-version'] = '3.1.0b1'
-default['cluster']['parallelcluster-node-version'] = '3.1.0b1'
+default['cluster']['parallelcluster-version'] = '3.1.0'
+default['cluster']['parallelcluster-cookbook-version'] = '3.1.0'
+default['cluster']['parallelcluster-node-version'] = '3.1.0'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '21-08-4-1'
+default['cluster']['slurm']['version'] = '21-08-5-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = '24dad6a71e7664a2781d0c8723bce30f6bc5ae47'
+default['cluster']['slurm']['sha1'] = '1416539a06c866605b8d464daf6c98d881592361'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -163,10 +166,12 @@ default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '470.82.01'
-default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-x86_64-#{node['cluster']['nvidia']['driver_version']}.run"
+default['cluster']['nvidia']['driver_version'] = '470.103.01'
 default['cluster']['nvidia']['cuda_version'] = '11.4'
-default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.4.3/local_installers/cuda_11.4.3_470.82.01_linux.run"
+default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
+default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
+default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
+default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.4.4/local_installers/cuda_11.4.4_470.82.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
 
 # NVIDIA fabric-manager
 # The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
@@ -194,28 +199,28 @@ default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
-default['cluster']['dcv']['version'] = '2021.2-11445'
+default['cluster']['dcv']['version'] = '2021.3-11591'
 if arm_instance?
   default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 amazon2)
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "91a1fd8ac2941bc14f2f22e3fd855654398fc8fbe98bb6694e1056332263e435",
+      '~>7' => "45975985688d09704cb51466845187a7c8a711362d70aeab66824c5dac80c6a2",
     },
-    'amazon' => { '2' => "91a1fd8ac2941bc14f2f22e3fd855654398fc8fbe98bb6694e1056332263e435" },
-    'ubuntu' => { '18.04' => "86e8706e6bb76b7a3af3e2250d090779ed0d97c7e069c0714a84e3db457b9096" }
+    'amazon' => { '2' => "45975985688d09704cb51466845187a7c8a711362d70aeab66824c5dac80c6a2" },
+    'ubuntu' => { '18.04' => "ef6f9a75395ed4578d9f68fe024ac974a97de3cdbad6a4624e60fbc9822282f4" }
   )
 else
   default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2)
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
   default['cluster']['dcv']['sha256sum'] = value_for_platform(
     'centos' => {
-      '~>7' => "90127bc92b52f60b680f343b21d9dc30c958a6d239974e96a463b4479e35f4e0",
+      '~>7' => "cb42b7905e7408793429e837a22d7e57eebfa9c3ed083ed27bea6611d0991d87",
     },
-    'amazon' => { '2' => "90127bc92b52f60b680f343b21d9dc30c958a6d239974e96a463b4479e35f4e0" },
+    'amazon' => { '2' => "cb42b7905e7408793429e837a22d7e57eebfa9c3ed083ed27bea6611d0991d87" },
     'ubuntu' => {
-      '18.04' => "c55cb6a9bd45244c712e6ba4206bf969eb240e2a37c055f6cb0dbee2fad49b6a",
-      '20.04' => "701474b075d586988dd051c73bb959b5e0adc9065440c39908771a9fcf1de2d0",
+      '18.04' => "3ab7e94a0ffefd2bb55c97d67a13b360cf6368277727ba524878e55ef381f406",
+      '20.04' => "4e8fe559e6373654739e45f58444a8192be3180d66b75faea99a6ab57bebc88b",
     }
   )
 end
@@ -232,7 +237,7 @@ default['cluster']['dcv']['package'] = value_for_platform(
     'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}",
   }
 )
-default['cluster']['dcv']['server']['version'] = '2021.2.11445-1'
+default['cluster']['dcv']['server']['version'] = '2021.3.11591-1'
 default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
   'centos' => {
     '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
@@ -242,7 +247,7 @@ default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server pack
     'default' => "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
-default['cluster']['dcv']['xdcv']['version'] = '2021.2.411-1'
+default['cluster']['dcv']['xdcv']['version'] = '2021.3.415-1'
 default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
   'centos' => {
     '~>7' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
@@ -252,7 +257,7 @@ default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create vir
     'default' => "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
-default['cluster']['dcv']['gl']['version'] = '2021.2.946-1'
+default['cluster']['dcv']['gl']['version'] = '2021.3.952-1'
 default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
     '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
@@ -262,7 +267,17 @@ default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU s
     'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
-default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.2/Servers/#{node['cluster']['dcv']['package']}.tgz"
+default['cluster']['dcv']['web_viewer']['version'] = '2021.3.11591-1'
+default['cluster']['dcv']['web_viewer'] = value_for_platform( # required to enable WEB client
+  'centos' => {
+    '~>7' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
+  },
+  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
+  'ubuntu' => {
+    'default' => "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
+  }
+)
+default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.3/Servers/#{node['cluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
@@ -475,6 +490,7 @@ default['cluster']["directory_service"]["ldap_tls_req_cert"] = nil
 default['cluster']["directory_service"]["ldap_access_filter"] = nil
 default['cluster']["directory_service"]["generate_ssh_keys_for_users"] = nil
 default['cluster']['directory_service']['additional_sssd_configs'] = nil
+default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
 
 # Other ParallelCluster internal variables
 default['cluster']['ddb_table'] = nil
@@ -497,7 +513,9 @@ default['cluster']['raid_parameters'] = 'NONE'
 default['cluster']['raid_vol_ids'] = nil
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
+default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
+default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain

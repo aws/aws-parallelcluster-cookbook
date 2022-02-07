@@ -52,15 +52,15 @@ template "/opt/parallelcluster/scripts/fetch_and_run" do
   mode "0755"
 end
 
+include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
+
+fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
+
 # Install cloudwatch, write configuration and start it.
 include_recipe "aws-parallelcluster-config::cloudwatch_agent"
 
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualized?
-
-include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
-
-fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
 include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'

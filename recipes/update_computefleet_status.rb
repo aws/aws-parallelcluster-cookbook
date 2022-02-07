@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-scheduler-plugin
-# Recipe:: update_computefleet_start_head_node
+# Cookbook:: aws-parallelcluster
+# Recipe:: update_computefleet_status
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +15,5 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-execute_event_handler 'HeadComputeFleetStart' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadComputeFleetStart, :ExecuteCommand, :Command) })
-end
+include_recipe 'aws-parallelcluster::setup_envars'
+include_recipe 'aws-parallelcluster-config::update_computefleet_status' unless node['cluster']['scheduler'] == 'awsbatch'

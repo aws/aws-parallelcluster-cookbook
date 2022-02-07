@@ -196,8 +196,8 @@ if node['conditions']['dcv_supported']
     end
   end
 
-  # Install server and xdcv packages
-  dcv_packages = %W(#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']})
+  # Install server, xdcv and web-viewer packages
+  dcv_packages = %W(#{node['cluster']['dcv']['server']} #{node['cluster']['dcv']['xdcv']} #{node['cluster']['dcv']['web_viewer']})
   dcv_packages_path = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/"
   # Rewrite dcv_packages object by cycling each package file name and appending the path to them
   dcv_packages.map! { |package| dcv_packages_path + package }

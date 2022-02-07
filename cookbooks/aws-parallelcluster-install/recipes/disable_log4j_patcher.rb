@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-scheduler-plugin
-# Recipe:: config_head_node
+# Cookbook:: aws-parallelcluster
+# Recipe:: disable_log4j_patcher
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,15 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-directory '/etc/parallelcluster/scheduler_plugin'
+# default openmpi installation conflicts with new install
+# new one is installed in /opt/amazon/efa/bin/
 
-template "/etc/parallelcluster/scheduler_plugin/clusterstatusmgtd.conf" do
-  source 'clusterstatusmgtd/clusterstatusmgtd.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
-
-execute_event_handler 'HeadConfigure' do
-  event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadConfigure, :ExecuteCommand, :Command) })
+if platform_family?('amazon')
+  # masking the service in order to prevent it from being automatically enabled
+  # if not installed yet
+  service 'log4j-cve-2021-44228-hotpatch' do
+    action %i(disable stop mask)
+  end
 end
