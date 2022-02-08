@@ -9,6 +9,9 @@ x.x.x
 **BUG FIXES**
 - Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
 
+- **CHANGES**
+- Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
+
 3.1.2
 ------
 
