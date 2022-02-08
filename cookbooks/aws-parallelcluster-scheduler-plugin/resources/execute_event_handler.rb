@@ -84,7 +84,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       if !::File.exist?(source_scheduler_plugin_substack_outputs) || new_resource.event_name == 'HeadClusterUpdate'
         scheduler_plugin_substack_outputs = { 'Outputs' => {} }
         Chef::Log.info("Executing describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})")
-        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{scheduler_plugin_substack_arn}", 3, 'root', nil, nil)
+        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{scheduler_plugin_substack_arn}", 3, 'root', 'root', nil, nil)
         raise "Unable to execute describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})\n #{format_stderr(cmd)}" if cmd.error?
 
         if cmd.stdout && !cmd.stdout.empty?
@@ -128,8 +128,8 @@ action_class do # rubocop:disable Metrics/BlockLength
     raise "Expected #{config_type} file not found in (#{source_config})" unless ::File.exist?(source_config)
 
     Chef::Log.info("Copying #{config_type} file from (#{source_config}) to (#{target_config})")
-    FileUtils.cp_r(source_config, target_config, remove_destination: true)
-    FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
+    cmd = command_with_retries("cp -f #{source_config} #{target_config}", 0, node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], nil, nil)
+    raise "Unable to copy #{config_type} file from (#{source_config}) to (#{target_config})\n #{format_stderr(cmd)}" if cmd.error?
   end
 
   def build_dynamic_env(target_previous_cluster_config, target_computefleet_status)
@@ -201,11 +201,12 @@ action_class do # rubocop:disable Metrics/BlockLength
     end
   end
 
-  def command_with_retries(command, retries, user, cwd, env)
+  def command_with_retries(command, retries, user, group, cwd, env)
     retries_count = 0
-    cmd = Mixlib::ShellOut.new(command, user: user, cwd: cwd, env: env)
+    cmd = Mixlib::ShellOut.new(command, user: user, group: group, cwd: cwd, env: env)
     begin
       cmd.run_command
+      Chef::Log.debug("Failed when executing command (#{command}), with error (#{cmd.stderr.strip}), attempt #{retries_count + 1}/#{retries + 1}")
       raise if cmd.error?
     rescue StandardError
       if (retries_count += 1) <= retries
