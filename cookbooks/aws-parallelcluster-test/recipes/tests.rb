@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-test
 # Recipe:: tests
 #
 # Copyright:: 2013-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -497,4 +497,13 @@ execute 'check supervisord service is enabled' do
 end
 execute 'check ec2blkdev service is enabled' do
   command "systemctl is-enabled ec2blkdev"
+end
+
+###################
+# Verify C-states are disabled
+###################
+if node['kernel']['machine'] == 'x86_64'
+  execute 'Verify C-states are disabled' do
+    command 'test "$(cat /sys/module/intel_idle/parameters/max_cstate)" = "1"'
+  end
 end
