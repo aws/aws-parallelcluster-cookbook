@@ -14,11 +14,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   according to the secret stored in AWS Secrets Manager.
 
 **CHANGES**
-- Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
-
-**CHANGES**
 - Add script to manually update the password used to read from Active Directory,
   according to the secret stored in AWS Secrets Manager.
+- Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
 
 **BUG FIXES**
 - Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
