@@ -166,12 +166,12 @@ default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '470.82.01'
+default['cluster']['nvidia']['driver_version'] = '470.103.01'
 default['cluster']['nvidia']['cuda_version'] = '11.4'
 default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
 default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
 default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
-default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.4.3/local_installers/cuda_11.4.3_470.82.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
+default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.4.4/local_installers/cuda_11.4.4_470.82.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
 
 # NVIDIA fabric-manager
 # The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
@@ -267,14 +267,14 @@ default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU s
     'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
-default['cluster']['dcv']['web-viewer']['version'] = '2021.3.11591-1'
-default['cluster']['dcv']['web-viewer'] = value_for_platform( # required to enable WEB client
+default['cluster']['dcv']['web_viewer']['version'] = '2021.3.11591-1'
+default['cluster']['dcv']['web_viewer'] = value_for_platform( # required to enable WEB client
   'centos' => {
-    '~>7' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web-viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
+    '~>7' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
-  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web-viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
+  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
   'ubuntu' => {
-    'default' => "nice-dcv-web-viewer_#{node['cluster']['dcv']['web-viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
+    'default' => "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
   }
 )
 default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2021.3/Servers/#{node['cluster']['dcv']['package']}.tgz"
@@ -516,6 +516,7 @@ default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
+default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
