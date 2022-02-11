@@ -61,15 +61,6 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
 end
 
 unless virtualized?
-  execute 'initialize compute fleet status in DynamoDB' do
-    # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
-            " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}, \"LastUpdatedTime\": {\"S\": \"#{Time.now.utc}\"}}'"\
-            " --region #{node['cluster']['region']}"
-    retries 3
-    retry_delay 5
-  end
-
   # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
@@ -99,6 +90,26 @@ cookbook_file '/opt/slurm/etc/slurm.csh' do
   owner 'root'
   group 'root'
   mode '0755'
+end
+
+template "#{node['cluster']['scripts_dir']}/slurm/slurm_fleet_status_manager" do
+  source 'slurm/fleet_status_manager_program.erb'
+  owner node['cluster']['slurm']['user']
+  group node['cluster']['slurm']['group']
+  mode '0744'
+end
+
+file "/var/log/parallelcluster/slurm_fleet_status_manager.log" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0644'
+end
+
+template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_fleet_status_manager.conf" do
+  source 'slurm/parallelcluster_slurm_fleet_status_manager.conf.erb'
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0644'
 end
 
 template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do

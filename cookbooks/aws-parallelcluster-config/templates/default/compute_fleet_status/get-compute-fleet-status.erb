@@ -1,0 +1,29 @@
+#!/bin/bash
+
+_help() {
+    local -- _cmd=$(basename "$0")
+
+    cat << EOF
+
+  Usage: ${_cmd} [OPTION]...
+
+  Get compute fleet status.
+
+  -h, --help                    Print this help message
+EOF
+}
+
+main() {
+    # parse input options
+    while [ $# -gt 0 ] ; do
+        case "$1" in
+            -h|--help|help)     _help; exit 0;;
+            *)                  _help; echo "ERROR: Unrecognized option '$1'"; exit 1;;
+        esac
+        shift
+    done
+
+    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cluster']['scripts_dir'] %>/compute_fleet_status.py --table-name <%= node['cluster']['ddb_table'] %> --region <%= node['cluster']['region'] %> --action get
+}
+
+main "$@"

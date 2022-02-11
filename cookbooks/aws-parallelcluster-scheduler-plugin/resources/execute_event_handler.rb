@@ -35,8 +35,11 @@ action :run do
   cmd.run_command
 
   if cmd.error?
-    raise "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}," \
+    raise_message = "Expected Event #{new_resource.event_name} to exit with #{cmd.valid_exit_codes.inspect}," \
       " but received '#{cmd.exitstatus}', complete log info in #{event_log_out} and error in #{event_log_err}\n #{format_stderr(cmd)}"
+    chef_error = "Failed when running #{new_resource.event_name} for the configured scheduler plugin." \
+      " Additional info can be found in /var/log/chef-client.log, #{event_log_out} and #{event_log_err}."
+    raise_and_write_chef_error(raise_message, chef_error)
   end
 end
 
@@ -81,7 +84,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       if !::File.exist?(source_scheduler_plugin_substack_outputs) || new_resource.event_name == 'HeadClusterUpdate'
         scheduler_plugin_substack_outputs = { 'Outputs' => {} }
         Chef::Log.info("Executing describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})")
-        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{scheduler_plugin_substack_arn}", 3, 'root', nil, nil)
+        cmd = command_with_retries("aws cloudformation describe-stacks --region #{node.dig(:ec2, :region)} --stack-name #{scheduler_plugin_substack_arn}", 3, 'root', 'root', nil, nil)
         raise "Unable to execute describe-stack on scheduler plugin substack (#{scheduler_plugin_substack_arn})\n #{format_stderr(cmd)}" if cmd.error?
 
         if cmd.stdout && !cmd.stdout.empty?
@@ -125,8 +128,8 @@ action_class do # rubocop:disable Metrics/BlockLength
     raise "Expected #{config_type} file not found in (#{source_config})" unless ::File.exist?(source_config)
 
     Chef::Log.info("Copying #{config_type} file from (#{source_config}) to (#{target_config})")
-    FileUtils.cp(source_config, target_config)
-    FileUtils.chown(node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], target_config)
+    cmd = command_with_retries("cp -f #{source_config} #{target_config}", 0, node['cluster']['scheduler_plugin']['user'], node['cluster']['scheduler_plugin']['group'], nil, nil)
+    raise "Unable to copy #{config_type} file from (#{source_config}) to (#{target_config})\n #{format_stderr(cmd)}" if cmd.error?
   end
 
   def build_dynamic_env(target_previous_cluster_config, target_computefleet_status)
@@ -169,7 +172,8 @@ action_class do # rubocop:disable Metrics/BlockLength
     env.merge!(build_hash_from_node('PCLUSTER_AWS_REGION', true, :ec2, :region))
     env.merge!(build_hash_from_node('AWS_REGION', true, :ec2, :region))
     env.merge!(build_hash_from_node('PCLUSTER_OS', true, :cluster, :config, :Image, :Os))
-    env.merge!(build_hash_from_node('PCLUSTER_ARCH', true, :cpu, :architecture))
+    arch = "#{node['cpu']['architecture']}" == 'aarch64' ? 'arm64' : "#{node['cpu']['architecture']}"
+    env.merge!({ 'PCLUSTER_ARCH' => arch })
     env.merge!(build_hash_from_node('PCLUSTER_VERSION', true, :cluster, :'parallelcluster-version'))
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_PRIVATE_IP', true, :ec2, :local_ipv4))
     env.merge!(build_hash_from_node('PCLUSTER_HEADNODE_HOSTNAME', true, :hostname))
@@ -197,11 +201,12 @@ action_class do # rubocop:disable Metrics/BlockLength
     end
   end
 
-  def command_with_retries(command, retries, user, cwd, env)
+  def command_with_retries(command, retries, user, group, cwd, env)
     retries_count = 0
-    cmd = Mixlib::ShellOut.new(command, user: user, cwd: cwd, env: env)
+    cmd = Mixlib::ShellOut.new(command, user: user, group: group, cwd: cwd, env: env)
     begin
       cmd.run_command
+      Chef::Log.debug("Failed when executing command (#{command}), with error (#{cmd.stderr.strip}), attempt #{retries_count + 1}/#{retries + 1}")
       raise if cmd.error?
     rescue StandardError
       if (retries_count += 1) <= retries

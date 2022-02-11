@@ -208,6 +208,23 @@
       "feature_conditions": []
     },
     {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_fleet_status_manager.log",
+      "log_stream_name": "slurm_fleet_status_manager",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
       "timestamp_format_key": "slurm",
       "file_path": "/var/log/slurmd.log",
       "log_stream_name": "slurmd",
@@ -544,6 +561,24 @@
           "satisfying_values": ["true"]
         }
       ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/clusterstatusmgtd",
+      "log_stream_name": "clusterstatusmgtd",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
     }
   ]
 }

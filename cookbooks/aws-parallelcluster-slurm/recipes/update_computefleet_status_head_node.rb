@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
-# Recipe:: invoke_scheduler_plugin_event_handler
+# Cookbook:: aws-parallelcluster-slurm
+# Recipe:: update_computefleet_head_node
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,4 +15,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-scheduler-plugin::invoke_scheduler_plugin_event_handler"
+bash 'update compute fleet' do
+  user 'root'
+  code <<-UPDATE_COMPUTE_FLEET
+      set -xe
+      #{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd
+      #{node['cluster']['scripts_dir']}/slurm/slurm_fleet_status_manager -cf #{node['cluster']['computefleet_status_path']}
+      #{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd
+  UPDATE_COMPUTE_FLEET
+end

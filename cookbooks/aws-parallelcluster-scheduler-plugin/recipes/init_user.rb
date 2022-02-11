@@ -18,6 +18,7 @@
 # create scheduler plugin users in config file
 create_user 'Create scheduler plugin users' do
   system_users(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :SystemUsers) })
+  grant_sudo_privileges(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :GrantSudoPrivileges) })
 end
 
 # set sudo privileges for scheduler plugin user

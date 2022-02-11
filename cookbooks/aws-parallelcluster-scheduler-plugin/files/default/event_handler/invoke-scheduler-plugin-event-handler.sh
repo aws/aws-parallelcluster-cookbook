@@ -20,18 +20,33 @@ DUMMY_COMPUTEFLEET_STATUS="${DUMMY_DIR}/${COMPUTEFLEET_STATUS_FILE}"
 
 syntax() {
   echo
-  echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config> --instance-types-data <instance types data> --scheduler-plugin-stack-outputs <scheduler plugin substack outputs>] --cluster-configuration <cluster configuration> --event-name <event name>"
-  echo "options:"
-  echo "--help                                Print this help."
-  echo "--debug                               Exec in debug mode (with set -x)."
-  echo "--event-name                          The name of the event to trigger, possible values are:"
-  echo "                                          HeadInit, HeadConfigure, HeadFinalize, ComputeInit, ComputeConfigure, ComputeFinalize, HeadClusterUpdate or HeadComputeFleetUpdate."
-  echo "--cluster-configuration               Required local path to cluster configuration file, in YAML format."
-  echo "--previous-cluster-configuration      Required for the HeadClusterUpdate event. Local path to previous cluster configuration file, in YAML format."
-  echo "--computefleet-status                 Required for the HeadComputeFleetUpdate. Can be one between STOP_REQUESTED or START_REQUESTED"
-  echo "--launch-templates-config             Local path to launch templates config file, in JSON format. When not set, if instance is not created by cluster creation, dummy launch templates config is created, otherwise the one retrieved from cluster will be used"
-  echo "--instance-types-data                 Local path to instance types data file, in JSON format. When not set, if instance is not created by cluster creation, dummy instance types data is created, otherwise the one retrieved from cluster will be used"
-  echo "--scheduler-plugin-substack-outputs   Local path to scheduler plugin substack outputs file, in JSON format. When not set, if instance is not created by cluster creation, dummy scheduler plugin substack outputs is created, otherwise the one retrieved from cluster will be used"
+  echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config>]
+    [--instance-types-data <instance types data>] [--scheduler-plugin-stack-outputs <scheduler plugin substack outputs>]
+    [--previous-cluster-configuration <previous cluster configuration>] [--computefleet-status <compute fleet status>]
+    --cluster-configuration <cluster configuration> --event-name <event name>"
+  echo
+  echo "Options:"
+  echo " --help                                Print this help."
+  echo " --debug                               Exec in debug mode (with set -x)."
+  echo " --event-name                          The name of the event to trigger, possible values are:
+                                               HeadInit, HeadConfigure, HeadFinalize, ComputeInit, ComputeConfigure,
+                                               ComputeFinalize, HeadClusterUpdate or HeadComputeFleetUpdate."
+  echo " --cluster-configuration               Required local path to cluster configuration file, in YAML format."
+  echo " --previous-cluster-configuration      Required for the HeadClusterUpdate event. Local path to previous cluster
+                                               configuration file, in YAML format."
+  echo " --computefleet-status                 Required for the HeadComputeFleetUpdate. Can be one between
+                                               STOP_REQUESTED or START_REQUESTED"
+  echo " --launch-templates-config             Local path to launch templates config file, in JSON format.
+                                               When not set, if instance is not created by cluster creation,
+                                               dummy launch templates config is created, otherwise the one retrieved
+                                               from cluster will be used"
+  echo " --instance-types-data                 Local path to instance types data file, in JSON format. When not set,
+                                               if instance is not created by cluster creation, dummy instance types
+                                               data is created, otherwise the one retrieved from cluster will be used"
+  echo " --scheduler-plugin-substack-outputs   Local path to scheduler plugin substack outputs file, in JSON format.
+                                               When not set, if instance is not created by cluster creation,
+                                               dummy scheduler plugin substack outputs is created, otherwise the one
+                                               retrieved from cluster will be used"
   echo
 }
 
@@ -147,7 +162,7 @@ if [[ "${event_name}" == "HeadComputeFleetUpdate" ]] && [[ -z ${computefleet_sta
   fail "Option --computefleet-status is required when event name is (${event_name})"
 fi
 
-if [[ ! "${computefleet_status}" =~ ^(STOP_REQUESTED|START_REQUESTED)$ ]]; then
+if [[ "${event_name}" == "HeadComputeFleetUpdate" ]] && [[ ! "${computefleet_status}" =~ ^(STOP_REQUESTED|START_REQUESTED)$ ]]; then
   fail "Requested status ${computefleet_status} not supported. Supported status are STOP_REQUESTED or START_REQUESTED"
 fi
 

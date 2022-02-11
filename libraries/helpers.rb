@@ -219,7 +219,7 @@ def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
   output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-                      "--region #{node['cluster']['region']} query --table-name #{node['cluster']['ddb_table']} " \
+                      "--region #{node['cluster']['region']} query --table-name #{node['cluster']['slurm_ddb_table']} " \
                       "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
                       "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
                       "--projection-expression 'Id' " \
@@ -537,10 +537,18 @@ def load_cluster_config
   ruby_block "load cluster configuration" do
     block do
       require 'yaml'
-      config = YAML.load_file(node['cluster']['cluster_config_path'])
+      config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
       Chef::Log.debug("Config read #{config}")
       node.override['cluster']['config'].merge! config
     end
     only_if { node['cluster']['config'].nil? }
   end
+end
+
+def raise_and_write_chef_error(raise_message, chef_error = nil)
+  unless chef_error
+    chef_error = raise_message
+  end
+  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/chef_error_msg").run_command
+  raise raise_message
 end

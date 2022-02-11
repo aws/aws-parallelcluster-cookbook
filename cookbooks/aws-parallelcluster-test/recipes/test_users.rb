@@ -115,6 +115,6 @@ if node['cluster']['scheduler'] == 'slurm'
   check_sudoers_permissions(
     sudoers_file,
     cluster_slurm_user, cluster_admin_user, "SLURM_HOOKS_COMMANDS",
-    "#{venv_path}/bin/slurm_suspend, #{venv_path}/bin/slurm_resume"
+    "#{venv_path}/bin/slurm_suspend, #{venv_path}/bin/slurm_resume, #{venv_path}/bin/slurm_fleet_status_manager"
   )
 end
