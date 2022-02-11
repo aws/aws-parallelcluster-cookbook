@@ -23,6 +23,7 @@ syntax() {
   echo "Syntax: $0 [--help] [--debug] [--launch-templates-config <launch templates config>]
     [--instance-types-data <instance types data>] [--scheduler-plugin-stack-outputs <scheduler plugin substack outputs>]
     [--previous-cluster-configuration <previous cluster configuration>] [--computefleet-status <compute fleet status>]
+    [--skip-artifacts-download]
     --cluster-configuration <cluster configuration> --event-name <event name>"
   echo
   echo "Options:"
@@ -47,6 +48,9 @@ syntax() {
                                                When not set, if instance is not created by cluster creation,
                                                dummy scheduler plugin substack outputs is created, otherwise the one
                                                retrieved from cluster will be used"
+  echo " --skip-artifacts-download             Skip scheduler plugin artifacts download if already present. By default,
+                                               scheduler plugin artifacts are downloaded at every execution of this
+                                               utility"
   echo
 }
 
@@ -134,6 +138,9 @@ while [ $# -gt 0 ]; do
     --computefleet-status=*)
       computefleet_status="${1#*=}"
     ;;
+    --skip-artifacts-download)
+      FORCE_ARTIFACTS_DOWNLOAD="false"
+    ;;
     *)
       fail_syntax "Unrecognized option ($1)"
     ;;
@@ -206,7 +213,10 @@ build_dna_json() {
     "computefleet_status_path": "$(readlink -f ${DUMMY_COMPUTEFLEET_STATUS})",
     "event_name": "${event_name}",
     "scheduler_plugin": {
-      "scheduler_plugin_substack_outputs_path": "$(readlink -f ${scheduler_plugin_substack_outputs})"
+      "scheduler_plugin_substack_outputs_path": "$(readlink -f ${scheduler_plugin_substack_outputs})",
+      "invoke_event_handler_script": {
+        "force_download_artifacts": ${FORCE_ARTIFACTS_DOWNLOAD:-true}
+      }
     }
   }
 }
