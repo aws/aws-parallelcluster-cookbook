@@ -27,7 +27,7 @@ end
 
 fetch_artifacts 'Fetch Cluster Shared Artifacts' do
   plugin_resources(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :PluginResources) })
-  force_download true
+  force_download node['cluster']['scheduler_plugin']['invoke_event_handler_script']['force_download_artifacts']
 end
 
 execute_event_handler event_name do
