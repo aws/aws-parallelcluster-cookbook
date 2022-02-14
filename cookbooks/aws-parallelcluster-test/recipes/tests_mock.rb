@@ -17,6 +17,9 @@
 
 # Recipe used to mock node environment before the execution of kitchen tests
 
+# mock cluster stack arn
+node.override['cluster']['stack_arn'] = "arn:aws:cloudformation:eu-west-1:1234567890:stack/fake-stack/07684870-8b1d-11ec-b57f-0a6d1e873bc9"
+
 # mock launch templates config content
 file node['cluster']['launch_templates_config_path'] do
   content <<-LAUNCH_TEMPLATE_DATA
