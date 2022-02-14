@@ -97,6 +97,7 @@ suites:
 
   - name: scheduler_plugin_config_HeadNode_x86_64
     run_list: &run_lists_scheduler_plugin_config_HeadNode
+      - recipe[aws-parallelcluster::tests_mock]
       - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
@@ -205,6 +206,7 @@ suites:
 
   - name: scheduler_plugin_config_ComputeFleet_x86_64
     run_list: &run_lists_scheduler_plugin_config_ComputeFleet
+      - recipe[aws-parallelcluster::tests_mock]
       - recipe[aws-parallelcluster::init]
       - recipe[aws-parallelcluster::config]
       - recipe[aws-parallelcluster::finalize]
