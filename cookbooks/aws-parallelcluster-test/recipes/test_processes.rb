@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-test
 # Recipe:: tests_processes
 #
 # Copyright:: 2013-2018 Amazon.com, Inc. or its affiliates. All Rights Reserved.
