@@ -177,8 +177,8 @@ build_dummy_computefleet_status_json() {
   log "Building dummy computefleet-status.json in (${DUMMY_COMPUTEFLEET_STATUS})"
   cat << EOF > "${DUMMY_COMPUTEFLEET_STATUS}"
 {
-  "Status": "${computefleet_status}",
-  "LastUpdatedTime": "$(date "+%Y-%m-%d %H:%M:%S.%N%:z")"
+  "status": "${computefleet_status}",
+  "lastStatusUpdatedTime": "$(date "+%Y-%m-%d %H:%M:%S.%N%:z")"
 }
 EOF
 }
