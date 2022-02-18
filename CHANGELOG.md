@@ -7,7 +7,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **BUG FIXES**
-- Fix update of `/etc/hosts` files for clusters deployed in VPC without internet access. 
+- Fix update of `/etc/hosts` files for clusters deployed in VPC without internet access.
+- Wait for ephemeral drives setup before having a compute node join the scheduler.
 
 3.1.0
 ------
