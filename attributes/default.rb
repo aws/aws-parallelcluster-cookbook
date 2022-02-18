@@ -400,7 +400,6 @@ default['cfncluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cfncluster']['cfn_region'] = 'us-east-1'
 default['cfncluster']['stack_name'] = nil
-default['cfncluster']['cfn_sqs_queue'] = nil
 default['cfncluster']['cfn_ddb_table'] = nil
 default['cfncluster']['cfn_node_type'] = nil
 default['cfncluster']['cfn_preinstall'] = 'NONE'

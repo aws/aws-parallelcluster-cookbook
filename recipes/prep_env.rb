@@ -66,13 +66,6 @@ template "/opt/parallelcluster/scripts/fetch_and_run" do
   mode "0755"
 end
 
-template '/opt/parallelcluster/scripts/compute_ready' do
-  source 'compute_ready.erb'
-  owner "root"
-  group "root"
-  mode "0755"
-end
-
 include_recipe "aws-parallelcluster::setup_python"
 
 # Install cloudwatch, write configuration and start it.
