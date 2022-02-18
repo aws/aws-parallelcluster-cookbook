@@ -83,7 +83,6 @@ suites:
         cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         # cfn_base_os is one of the base OSs supported by pcluster
         cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
@@ -118,7 +117,6 @@ suites:
         cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_ddb_table: <%= ENV['CFN_DDB_TABLE'] %>
         # cfn_base_os is one of the base OSs supported by pcluster
         cfn_base_os: <%= ENV['CFN_BASE_OS'] %>
@@ -150,7 +148,6 @@ suites:
         cfn_ephemeral_dir: <%= ENV['CFN_EPHEMERAL_DIR'] %>
         cfn_shared_dir: <%= ENV['CFN_SHARED_DIR'] %>
         cfn_cluster_user: <%= ENV['CFN_CLUSTER_USER'] %>
-        cfn_sqs_queue: <%= ENV['CFN_SQS_QUEUE'] %>
         cfn_master: <%= ENV['CFN_MASTER'] %>
         cfn_master_private_ip: <%= ENV['CFN_MASTER_PRIVATE_IP'] %>
         # cfn_base_os is one of the base OSs supported by pcluster
