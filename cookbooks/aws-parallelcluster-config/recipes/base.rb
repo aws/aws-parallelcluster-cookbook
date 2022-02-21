@@ -29,7 +29,13 @@ include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
 
 service "setup-ephemeral" do
   supports restart: false
-  action %i(enable start)
+  action :enable
+end
+
+# Execution timeout 3600 seconds
+execute "Setup of ephemeral drivers" do
+  user "root"
+  command "/usr/local/sbin/setup-ephemeral-drives.sh"
 end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting

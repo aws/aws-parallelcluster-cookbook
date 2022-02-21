@@ -3,6 +3,13 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.1.2
+------
+
+**BUG FIXES**
+- Fix update of `/etc/hosts` files for clusters deployed in VPC without internet access.
+- Wait for ephemeral drives setup before having a compute node join the scheduler.
+
 3.1.1
 ------
 
