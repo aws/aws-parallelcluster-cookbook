@@ -119,7 +119,7 @@ function setup_ephemeral_drives () {
       chmod 0400 /root/keystore/keyfile || RC=1
       cryptsetup -q luksFormat /dev/vg.01/lv_ephemeral /root/keystore/keyfile || RC=1
       cryptsetup -d /root/keystore/keyfile luksOpen /dev/vg.01/lv_ephemeral ephemeral_luks || RC=1
-      mkfs.ext4 /dev/mapper/ephemeral_luks || RC=1
+      mkfs.ext4 -F /dev/mapper/ephemeral_luks || RC=1
       mount -v -t ext4 -o noatime,nodiratime /dev/mapper/ephemeral_luks ${cfn_ephemeral_dir} || RC=1
     else
       mkfs.ext4 /dev/vg.01/lv_ephemeral || RC=1
