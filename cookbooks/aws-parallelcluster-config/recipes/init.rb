@@ -81,6 +81,13 @@ if node['cluster']['node_type'] == 'HeadNode'
       group 'root'
       mode '0600'
     end
+
+    # create log file for clusterstatusmgtd
+    file "/var/log/parallelcluster/clusterstatusmgtd" do
+      owner 'root'
+      group 'root'
+      mode '0640'
+    end
   end
 end
 
