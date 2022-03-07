@@ -7,15 +7,17 @@ x.x.x
 ------
 
 **ENHANCEMENTS**
+- Execute SSH key creation alongside with the creation of HOME directory, i.e.
+  during SSH login, when switching to another user and when executing a command as another user.
 - Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
-
-**BUG FIXES**
-- Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
+- Add script to manually update the password used to read from Active Directory,
+  according to the secret stored in AWS Secrets Manager.
 
 **CHANGES**
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
-- Add script to manually update the password used to read from Active Directory,
-  according to the secret stored in AWS Secrets Manager.
+
+**BUG FIXES**
+- Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
 
 3.1.2
 ------
