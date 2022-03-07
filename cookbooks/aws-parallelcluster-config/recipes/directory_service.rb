@@ -113,7 +113,8 @@ if node['cluster']['node_type'] == 'HeadNode'
     sensitive true
   end
 
-  sshd_pam_config_path = '/etc/pam.d/sshd'
+  pam_services = %w(sudo su sshd)
+  pam_config_dir = "/etc/pam.d"
   generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
   ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
   if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
@@ -123,20 +124,12 @@ if node['cluster']['node_type'] == 'HeadNode'
       group 'root'
       mode '0755'
     end
-    if platform_family?('debian')
-      sshd_pam_config_regex = /^session.*required/
-      match_to_add_line_after = :last
-    else
-      sshd_pam_config_regex = /^session.*include.*postlogin/
-      match_to_add_line_after = :first
-    end
-    filter_lines 'Configure PAM sshd script to call generate SSH key script' do
-      path sshd_pam_config_path
-      filters(
-        [
-          { after: [sshd_pam_config_regex, ssh_key_generator_pam_config_line, match_to_add_line_after] },
-        ]
-      )
+    pam_services.each do |pam_service|
+      pam_config_file = "#{pam_config_dir}/#{pam_service}"
+      append_if_no_line "Ensure PAM service #{pam_service} is configured to call SSH key generation script" do
+        path pam_config_file
+        line ssh_key_generator_pam_config_line
+      end
     end
   else
     # Remove script used to generate key if it exists and ensure PAM is not configured to try to call it
@@ -144,10 +137,14 @@ if node['cluster']['node_type'] == 'HeadNode'
       action :delete
       only_if { ::File.exist? generate_ssh_key_path }
     end
-    delete_lines "Ensure SSHD PAM module is not configured to call SSH key-generating script" do
-      path sshd_pam_config_path
-      pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
-      ignore_missing true
+
+    pam_services.each do |pam_service|
+      pam_config_file = "#{pam_config_dir}/#{pam_service}"
+      delete_lines "Ensure PAM service #{pam_service} is not configured to call SSH key generation script" do
+        path pam_config_file
+        pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
+        ignore_missing true
+      end
     end
   end
 else
