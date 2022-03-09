@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+x.x.x
+------
+
+**BUG FIXES**
+- Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
+
 3.1.2
 ------
 
