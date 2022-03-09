@@ -2,7 +2,7 @@
 id_provider = ldap
 cache_credentials = True
 ldap_schema = AD
-ldap_uri = <%=  "#{@domain_addr_prefix}#{node['cluster']['directory_service']['domain_addr']}" %>
+ldap_uri = <%= @ldap_uri %>
 ldap_search_base = <%=  node['cluster']['directory_service']['domain_name'] %>
 ldap_default_bind_dn = <%=  node['cluster']['directory_service']['domain_read_only_user'] %>
 ldap_default_authtok = <%= @ldap_default_authtok %>
