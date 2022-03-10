@@ -9,6 +9,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
 
+**CHANGES**
+- Add script to manually update the password used to read from Active Directory,
+  according to the secret stored in AWS Secrets Manager.
+
 **BUG FIXES**
 - Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
 
