@@ -25,6 +25,19 @@ shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_servi
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
 if node['cluster']['node_type'] == 'HeadNode'
+  # DomainName
+  # We can assume that DomainName can only be a FQDN or the domain section in a LDAP Distinguished Name.
+  # We can assume it because the CLI is in charge of validating it.
+  FQDN_PATTERN = /^([a-zA-Z0-9_-]+)(\.[a-zA-Z0-9_-]+)*$/.freeze
+  domain_name = node['cluster']['directory_service']['domain_name']
+  ldap_search_base =
+    if domain_name =~ FQDN_PATTERN
+      domain_name.split('.').map { |v| "DC=#{v}" }.join(',')
+    else
+      domain_name
+    end
+
+  # Domain Address
   domain_addresses = node['cluster']['directory_service']['domain_addr'].split(",")
   # If a domain address does not include a protocol, ldaps is assumed for it.
   ldap_uri_components = domain_addresses.map do |domain_address|
@@ -48,7 +61,8 @@ if node['cluster']['node_type'] == 'HeadNode'
     mode '0600'
     variables(
       ldap_default_authtok: shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout,
-      ldap_uri: ldap_uri_components.join(",")
+      ldap_uri: ldap_uri_components.join(","),
+      ldap_search_base: ldap_search_base
     )
     sensitive true
   end

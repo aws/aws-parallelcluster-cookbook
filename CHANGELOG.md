@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.1.3
 ------
 
+**ENHANCEMENTS**
+- Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
+
 **BUG FIXES**
 - Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
 
