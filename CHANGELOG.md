@@ -6,10 +6,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 x.x.x
 ------
 
+**ENHANCEMENTS**
+- Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
+
 **BUG FIXES**
 - Fix `DirectoryService.DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
 
-- **CHANGES**
+**CHANGES**
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
 - Add script to manually update the password used to read from Active Directory,
   according to the secret stored in AWS Secrets Manager.
