@@ -21,6 +21,8 @@ include_recipe 'aws-parallelcluster-test::test_processes'
 include_recipe 'aws-parallelcluster-test::test_imds'
 include_recipe 'aws-parallelcluster-test::test_sudoers'
 include_recipe 'aws-parallelcluster-test::test_openssh'
+include_recipe 'aws-parallelcluster-test::test_nvidia'
+include_recipe 'aws-parallelcluster-test::test_dcv'
 
 ###################
 # AWS Cli
