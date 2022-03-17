@@ -16,9 +16,9 @@
 # limitations under the License.
 
 # Parse and get RAID shared directory info and turn into an array
-raid_shared_dir = node['cluster']['raid_parameters'].split(',')[0]
+raid_shared_dir = node['cluster']['raid_shared_dir']
 
-if raid_shared_dir != "NONE"
+unless raid_shared_dir.empty?
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
 
@@ -66,8 +66,6 @@ shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
 # Mount each volume with NFS
 shared_dir_array.each do |dir|
   dirname = dir.strip
-
-  next if dirname == "NONE"
 
   dirname = "/#{dirname}" unless dirname.start_with?('/')
 

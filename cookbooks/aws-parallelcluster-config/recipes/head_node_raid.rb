@@ -17,14 +17,14 @@
 
 # RAID RELATED
 # Parse and get RAID shared directory info and turn into an array
-raid_shared_dir = node['cluster']['raid_parameters'].split(',')[0]
+raid_shared_dir = node['cluster']['raid_shared_dir']
 
-if raid_shared_dir != "NONE"
+unless raid_shared_dir.empty?
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
 
   # Parse and determine RAID type (cast into integer)
-  raid_type = node['cluster']['raid_parameters'].split(',')[1].strip.to_i
+  raid_type = node['cluster']['raid_type'].strip.to_i
 
   # Parse volume info into an array
   raid_vol_array = node['cluster']['raid_vol_ids'].split(',')
