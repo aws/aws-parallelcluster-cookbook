@@ -1,8 +1,8 @@
 {
   "cluster": {
     "stack_name": "pc3cluster",
-    "raid_vol_ids": "NONE",
-    "raid_parameters": "NONE,NONE,NONE,NONE,NONE,NONE,NONE,NONE,NONE",
+    "raid_vol_ids": "",
+    "raid_shared_dir": "",
     "disable_hyperthreading_manually": "false",
     "base_os": "ubuntu2004",
     "preinstall": "NONE",
@@ -16,10 +16,10 @@
     "fsx_mount_names": "",
     "fsx_dns_names": "",
     "fsx_shared_dirs": "",
-    "volume": "NONE",
+    "volume": "",
     "scheduler": "slurm",
     "ephemeral_dir": "/scratch",
-    "ebs_shared_dirs": "NONE,NONE,NONE,NONE,NONE",
+    "ebs_shared_dirs": "",
     "proxy": "NONE",
     "dns_domain": "pc3cluster.pcluster.",
     "hosted_zone": "Z0000000000000000000",

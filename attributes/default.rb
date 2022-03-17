@@ -477,7 +477,7 @@ default['cluster']['proxy'] = 'NONE'
 default['cluster']['node_type'] = nil
 default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node_private_ip'] = nil
-default['cluster']['volume'] = nil
+default['cluster']['volume'] = ''
 
 # ParallelCluster internal variables to configure active directory service
 default['cluster']["directory_service"]["enabled"] = 'false'
@@ -510,8 +510,9 @@ default['cluster']['fsx_dns_names'] = ''
 default['cluster']['fsx_mount_names'] = ''
 default['cluster']['custom_node_package'] = nil
 default['cluster']['custom_awsbatchcli_package'] = nil
-default['cluster']['raid_parameters'] = 'NONE'
-default['cluster']['raid_vol_ids'] = nil
+default['cluster']['raid_shared_dir'] = ''
+default['cluster']['raid_type'] = ''
+default['cluster']['raid_vol_ids'] = ''
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
