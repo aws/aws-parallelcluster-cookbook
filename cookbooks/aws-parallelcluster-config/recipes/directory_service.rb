@@ -90,6 +90,29 @@ if node['cluster']['node_type'] == 'HeadNode'
     AD
   end
 
+  # Create directory for tools related to the directory service
+  directory_service_scripts_path = "#{node['cluster']['scripts_dir']}/directory_service"
+  directory directory_service_scripts_path do
+    owner 'root'
+    group 'root'
+    mode '0744'
+    recursive true
+  end
+
+  update_directory_service_password_path = "#{directory_service_scripts_path}/update_directory_service_password.sh"
+  template update_directory_service_password_path do
+    source 'directory_service/update_directory_service_password.sh.erb'
+    owner 'root'
+    group 'root'
+    mode '0744'
+    variables(
+      secret_arn: node['cluster']['directory_service']['password_secret_arn'],
+      region: node['cluster']['region'],
+      shared_sssd_conf_path: shared_sssd_conf_path
+    )
+    sensitive true
+  end
+
   sshd_pam_config_path = '/etc/pam.d/sshd'
   generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
   ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
@@ -114,29 +137,6 @@ if node['cluster']['node_type'] == 'HeadNode'
           { after: [sshd_pam_config_regex, ssh_key_generator_pam_config_line, match_to_add_line_after] },
         ]
       )
-    end
-
-    # Create directory for tools related to the directory service
-    directory_service_scripts_path = "#{node['cluster']['scripts_dir']}/directory_service"
-    directory directory_service_scripts_path do
-      owner 'root'
-      group 'root'
-      mode '0744'
-      recursive true
-    end
-
-    update_directory_service_password_path = "#{directory_service_scripts_path}/update_directory_service_password.sh"
-    template update_directory_service_password_path do
-      source 'directory_service/update_directory_service_password.sh.erb'
-      owner 'root'
-      group 'root'
-      mode '0744'
-      variables(
-        secret_arn: node['cluster']['directory_service']['password_secret_arn'],
-        region: node['cluster']['region'],
-        shared_sssd_conf_path: shared_sssd_conf_path
-      )
-      sensitive true
     end
   else
     # Remove script used to generate key if it exists and ensure PAM is not configured to try to call it
