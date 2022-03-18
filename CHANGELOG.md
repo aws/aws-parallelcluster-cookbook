@@ -12,6 +12,8 @@ x.x.x
 - Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
 - Add script to manually update the password used to read from Active Directory,
   according to the secret stored in AWS Secrets Manager.
+- Add support for multiple Elastic File Systems.
+- Add support for multiple FSx File System.
 
 **CHANGES**
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
