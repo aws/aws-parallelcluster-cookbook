@@ -20,3 +20,5 @@ build.log
 build-*.log
 
 .tox/
+
+*.iml
