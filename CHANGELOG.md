@@ -10,12 +10,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Execute SSH key creation alongside with the creation of HOME directory, i.e.
   during SSH login, when switching to another user and when executing a command as another user.
 - Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
-- Add script to manually update the password used to read from Active Directory,
+- Add script in the head node to manually update the password used to read from Active Directory,
   according to the secret stored in AWS Secrets Manager.
 
 **CHANGES**
-- Add script to manually update the password used to read from Active Directory,
-  according to the secret stored in AWS Secrets Manager.
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
 
 **BUG FIXES**
