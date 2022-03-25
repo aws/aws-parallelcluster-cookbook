@@ -7,13 +7,17 @@ x.x.x
 ------
 
 **ENHANCEMENTS**
+- Add support for multiple Elastic File Systems.
+- Add support for multiple FSx File System.
+
+3.1.3
+------
+
+**ENHANCEMENTS**
 - Execute SSH key creation alongside with the creation of HOME directory, i.e.
   during SSH login, when switching to another user and when executing a command as another user.
 - Add support for both FQDN and LDAP Distinguished Names in property `DirectoryService.DomainName`.
-- Add script to manually update the password used to read from Active Directory,
-  according to the secret stored in AWS Secrets Manager.
-- Add support for multiple Elastic File Systems.
-- Add support for multiple FSx File System.
+- Add script in the head node to manually update the password used to read from Active Directory, according to the secret stored in AWS Secrets Manager.
 
 **CHANGES**
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
