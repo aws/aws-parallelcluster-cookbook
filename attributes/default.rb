@@ -258,7 +258,7 @@ default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create vir
   }
 )
 default['cluster']['dcv']['gl']['version'] = '2021.3.952-1'
-default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
+default['cluster']['dcv']['gl']['installer'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
     '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
