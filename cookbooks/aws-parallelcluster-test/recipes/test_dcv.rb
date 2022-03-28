@@ -15,7 +15,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['cluster']['node_type'] == "HeadNode" && node['conditions']['dcv_supported'] && graphic_instance? && nvidia_installed? && dcv_gpu_accel_supported?
+return unless node['cluster']['node_type'] == "HeadNode" &&
+              node['conditions']['dcv_supported'] &&
+              node['cluster']['dcv_enabled'] == "head_node" &&
+              graphic_instance? &&
+              nvidia_installed? &&
+              dcv_gpu_accel_supported?
 
 bash "check nice-dcv-gl installation" do
   cwd Chef::Config[:file_cache_path]
