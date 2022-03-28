@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if (node['cluster']['base_os'] == 'centos7' && arm_instance?) || node['cluster']['os'].end_with?("-custom")
+
 bash "check Nvidia drivers" do
   cwd Chef::Config[:file_cache_path]
   code <<-TEST
