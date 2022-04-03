@@ -10,6 +10,9 @@ x.x.x
 - Add support for multiple Elastic File Systems.
 - Add support for multiple FSx File System.
 
+**CHANGES**
+- Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
+
 3.1.3
 ------
 

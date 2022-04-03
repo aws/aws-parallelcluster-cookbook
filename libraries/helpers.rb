@@ -552,3 +552,19 @@ def raise_and_write_chef_error(raise_message, chef_error = nil)
   Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/chef_error_msg").run_command
   raise raise_message
 end
+
+# Verify if Scheduling section of cluster configuration and compute node bootstrap_timeout have been updated
+def are_queues_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"] != previous_config["Scheduling"] or is_compute_node_bootstrap_timeout_updated?(previous_config, config)
+end
+
+def evaluate_compute_bootstrap_timeout(config)
+  config.dig("DevSettings", "Timeouts", "ComputeNodeBootstrapTimeout") or 1800
+end
+
+def is_compute_node_bootstrap_timeout_updated?(previous_config, config)
+  evaluate_compute_bootstrap_timeout(previous_config) != evaluate_compute_bootstrap_timeout(config)
+end
