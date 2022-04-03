@@ -9,6 +9,7 @@ x.x.x
 **ENHANCEMENTS**
 - Add support for multiple Elastic File Systems.
 - Add support for multiple FSx File System.
+- Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
