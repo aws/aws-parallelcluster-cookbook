@@ -32,6 +32,17 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     action :uninstall
   end
 
+  # Amazon linux 2 with Kernel 5 need to set CC to /usr/bin/gcc10-gcc using dkms override
+  if platform?('amazon') && node['kernel']['release'].split('.')[0].to_i == 5
+    cookbook_file 'dkms/nvidia.conf' do
+      source 'dkms/nvidia.conf'
+      path '/etc/dkms/nvidia.conf'
+      owner 'root'
+      group 'root'
+      mode '0644'
+    end
+  end
+
   # Install NVIDIA driver
   bash 'nvidia.run advanced' do
     user 'root'
