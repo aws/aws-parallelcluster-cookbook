@@ -18,6 +18,18 @@
 # create system user
 include_recipe "aws-parallelcluster-scheduler-plugin::init_user"
 
+file "#{node['cluster']['scheduler_plugin']['handler_log_err']}" do
+  owner node['cluster']['scheduler_plugin']['user']
+  group node['cluster']['scheduler_plugin']['group']
+  mode '0640'
+end
+
+file "#{node['cluster']['scheduler_plugin']['handler_log_out']}" do
+  owner node['cluster']['scheduler_plugin']['user']
+  group node['cluster']['scheduler_plugin']['group']
+  mode '0640'
+end
+
 case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster-scheduler-plugin::init_head_node'

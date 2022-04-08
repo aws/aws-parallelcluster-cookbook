@@ -25,11 +25,28 @@ shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_servi
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
 if node['cluster']['node_type'] == 'HeadNode'
-  # If domain_addr doesn't specify a protocol, assume it's ldaps
-  domain_addr_prefix = ''
-  unless URI.parse(node['cluster']['directory_service']['domain_addr']).scheme
-    Chef::Log.info("No protocol specified in domain_addr #{node['cluster']['directory_service']['domain_addr']}. Assuming ldaps.")
-    domain_addr_prefix = 'ldaps://'
+  # DomainName
+  # We can assume that DomainName can only be a FQDN or the domain section in a LDAP Distinguished Name.
+  # We can assume it because the CLI is in charge of validating it.
+  FQDN_PATTERN = /^([a-zA-Z0-9_-]+)(\.[a-zA-Z0-9_-]+)*$/.freeze
+  domain_name = node['cluster']['directory_service']['domain_name']
+  ldap_search_base =
+    if domain_name =~ FQDN_PATTERN
+      domain_name.split('.').map { |v| "DC=#{v}" }.join(',')
+    else
+      domain_name
+    end
+
+  # Domain Address
+  domain_addresses = node['cluster']['directory_service']['domain_addr'].split(",")
+  # If a domain address does not include a protocol, ldaps is assumed for it.
+  ldap_uri_components = domain_addresses.map do |domain_address|
+    if URI.parse(domain_address).scheme
+      domain_address
+    else
+      Chef::Log.info("No protocol specified for domain address #{domain_address}. Assuming ldaps.")
+      "ldaps://#{domain_address}"
+    end
   end
 
   # Head node writes the sssd.conf file and contacts the secret manager to retrieve the LDAP password.
@@ -44,7 +61,8 @@ if node['cluster']['node_type'] == 'HeadNode'
     mode '0600'
     variables(
       ldap_default_authtok: shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout,
-      domain_addr_prefix: domain_addr_prefix
+      ldap_uri: ldap_uri_components.join(","),
+      ldap_search_base: ldap_search_base
     )
     sensitive true
   end
@@ -72,7 +90,31 @@ if node['cluster']['node_type'] == 'HeadNode'
     AD
   end
 
-  sshd_pam_config_path = '/etc/pam.d/sshd'
+  # Create directory for tools related to the directory service
+  directory_service_scripts_path = "#{node['cluster']['scripts_dir']}/directory_service"
+  directory directory_service_scripts_path do
+    owner 'root'
+    group 'root'
+    mode '0744'
+    recursive true
+  end
+
+  update_directory_service_password_path = "#{directory_service_scripts_path}/update_directory_service_password.sh"
+  template update_directory_service_password_path do
+    source 'directory_service/update_directory_service_password.sh.erb'
+    owner 'root'
+    group 'root'
+    mode '0744'
+    variables(
+      secret_arn: node['cluster']['directory_service']['password_secret_arn'],
+      region: node['cluster']['region'],
+      shared_sssd_conf_path: shared_sssd_conf_path
+    )
+    sensitive true
+  end
+
+  pam_services = %w(sudo su sshd)
+  pam_config_dir = "/etc/pam.d"
   generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
   ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
   if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
@@ -82,20 +124,12 @@ if node['cluster']['node_type'] == 'HeadNode'
       group 'root'
       mode '0755'
     end
-    if platform_family?('debian')
-      sshd_pam_config_regex = /^session.*required/
-      match_to_add_line_after = :last
-    else
-      sshd_pam_config_regex = /^session.*include.*postlogin/
-      match_to_add_line_after = :first
-    end
-    filter_lines 'Configure PAM sshd script to call generate SSH key script' do
-      path sshd_pam_config_path
-      filters(
-        [
-          { after: [sshd_pam_config_regex, ssh_key_generator_pam_config_line, match_to_add_line_after] },
-        ]
-      )
+    pam_services.each do |pam_service|
+      pam_config_file = "#{pam_config_dir}/#{pam_service}"
+      append_if_no_line "Ensure PAM service #{pam_service} is configured to call SSH key generation script" do
+        path pam_config_file
+        line ssh_key_generator_pam_config_line
+      end
     end
   else
     # Remove script used to generate key if it exists and ensure PAM is not configured to try to call it
@@ -103,10 +137,14 @@ if node['cluster']['node_type'] == 'HeadNode'
       action :delete
       only_if { ::File.exist? generate_ssh_key_path }
     end
-    delete_lines "Ensure SSHD PAM module is not configured to call SSH key-generating script" do
-      path sshd_pam_config_path
-      pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
-      ignore_missing true
+
+    pam_services.each do |pam_service|
+      pam_config_file = "#{pam_config_dir}/#{pam_service}"
+      delete_lines "Ensure PAM service #{pam_service} is not configured to call SSH key generation script" do
+        path pam_config_file
+        pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
+        ignore_missing true
+      end
     end
   end
 else

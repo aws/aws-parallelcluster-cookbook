@@ -3,12 +3,38 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+x.x.x
+------
+
+**ENHANCEMENTS**
+- Add support for multiple Elastic File Systems.
+- Add support for multiple FSx File System.
+
+3.1.3
+------
+
+**ENHANCEMENTS**
+- Execute SSH key creation alongside with the creation of HOME directory, i.e.
+  during SSH login, when switching to another user and when executing a command as another user.
+- Add support for both FQDN and LDAP Distinguished Names in the configuration parameter `DirectoryService/DomainName`. The new validator now checks both the syntaxes.
+- New `update_directory_service_password.sh` script deployed on the head node supports the manual update of the Active Directory password in the SSSD configuration.
+  The password is retrieved by the AWS Secrets Manager as from the cluster configuration.
+
+**CHANGES**
+- Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
+
+**BUG FIXES**
+- Fix the configuration parameter `DirectoryService/DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
+
 3.1.2
 ------
 
 **BUG FIXES**
 - Fix the update of `/etc/hosts` file on computes nodes when a cluster is deployed in subnets without internet access.
 - Fix compute nodes bootstrap by waiting for ephemeral drives initialization before joining the cluster.
+
+**CHANGES**
+- Upgrade Slurm to version 21.08.6.
 
 3.1.1
 ------

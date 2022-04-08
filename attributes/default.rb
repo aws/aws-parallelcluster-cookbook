@@ -116,9 +116,9 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '21-08-5-1'
+default['cluster']['slurm']['version'] = '21-08-6-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = '1416539a06c866605b8d464daf6c98d881592361'
+default['cluster']['slurm']['sha1'] = '61c24d0dc89981112710cca571fcd0a2bdefb879'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -258,7 +258,7 @@ default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create vir
   }
 )
 default['cluster']['dcv']['gl']['version'] = '2021.3.952-1'
-default['cluster']['dcv']['gl'] = value_for_platform( # required to enable GPU sharing
+default['cluster']['dcv']['gl']['installer'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
     '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
   },
@@ -477,7 +477,7 @@ default['cluster']['proxy'] = 'NONE'
 default['cluster']['node_type'] = nil
 default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node_private_ip'] = nil
-default['cluster']['volume'] = nil
+default['cluster']['volume'] = ''
 
 # ParallelCluster internal variables to configure active directory service
 default['cluster']["directory_service"]["enabled"] = 'false'
@@ -498,20 +498,21 @@ default['cluster']['slurm_ddb_table'] = nil
 default['cluster']['log_group_name'] = "NONE"
 default['cluster']['disable_hyperthreading_manually'] = 'false'
 default['cluster']['volume_fs_type'] = 'ext4'
-default['cluster']['efs_shared_dir'] = 'NONE'
-default['cluster']['efs_fs_id'] = nil
+default['cluster']['efs_shared_dirs'] = ''
+default['cluster']['efs_fs_ids'] = ''
 default['cluster']['cluster_admin_user'] = 'pcluster-admin'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
 default['cluster']['cluster_admin_group_id'] = node['cluster']['cluster_admin_user_id']
-default['cluster']['fsx_options'] = 'NONE'
-default['cluster']['fsx_fs_id'] = nil
-default['cluster']['fsx_dns_name'] = nil
-default['cluster']['fsx_mount_name'] = nil
+default['cluster']['fsx_shared_dirs'] = ''
+default['cluster']['fsx_fs_ids'] = ''
+default['cluster']['fsx_dns_names'] = ''
+default['cluster']['fsx_mount_names'] = ''
 default['cluster']['custom_node_package'] = nil
 default['cluster']['custom_awsbatchcli_package'] = nil
-default['cluster']['raid_parameters'] = 'NONE'
-default['cluster']['raid_vol_ids'] = nil
+default['cluster']['raid_shared_dir'] = ''
+default['cluster']['raid_type'] = ''
+default['cluster']['raid_vol_ids'] = ''
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']

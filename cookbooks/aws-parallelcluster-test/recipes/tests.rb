@@ -21,6 +21,8 @@ include_recipe 'aws-parallelcluster-test::test_processes'
 include_recipe 'aws-parallelcluster-test::test_imds'
 include_recipe 'aws-parallelcluster-test::test_sudoers'
 include_recipe 'aws-parallelcluster-test::test_openssh'
+include_recipe 'aws-parallelcluster-test::test_nvidia'
+include_recipe 'aws-parallelcluster-test::test_dcv'
 
 ###################
 # AWS Cli
@@ -527,5 +529,14 @@ end
 if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
   execute "check clusterstatusmgtd is configured to be executed by supervisord" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING"
+  end
+end
+
+###################
+# Verify C-states are disabled
+###################
+if node['kernel']['machine'] == 'x86_64'
+  execute 'Verify C-states are disabled' do
+    command 'test "$(cat /sys/module/intel_idle/parameters/max_cstate)" = "1"'
   end
 end

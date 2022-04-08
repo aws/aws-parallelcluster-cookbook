@@ -31,7 +31,7 @@ def allow_gpu_acceleration
 
   # dcvgl package must be installed after NVIDIA and before starting up X
   # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
-  dcv_gl = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/#{node['cluster']['dcv']['gl']}"
+  dcv_gl = "#{node['cluster']['sources_dir']}/#{node['cluster']['dcv']['package']}/#{node['cluster']['dcv']['gl']['installer']}"
   case node['platform']
   when 'centos', 'amazon'
     package dcv_gl do

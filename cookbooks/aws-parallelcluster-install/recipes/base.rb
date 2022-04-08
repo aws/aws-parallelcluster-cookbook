@@ -222,3 +222,6 @@ include_recipe "aws-parallelcluster-install::chrony"
 
 # Install ARM Performance Library
 include_recipe "aws-parallelcluster-install::arm_pl"
+
+# Disable x86_64 C states
+include_recipe "aws-parallelcluster-install::c_states" unless virtualized?

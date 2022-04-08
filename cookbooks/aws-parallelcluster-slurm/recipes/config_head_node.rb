@@ -103,7 +103,7 @@ end
 file "/var/log/parallelcluster/slurm_fleet_status_manager.log" do
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_group']
-  mode '0644'
+  mode '0640'
 end
 
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_fleet_status_manager.conf" do
