@@ -53,6 +53,50 @@ if node['cluster']['node_type'] == 'HeadNode'
   # Then the sssd.conf file is shared through shared_sssd_conf_path to compute nodes.
   # Only contacting the secret manager from head node avoids giving permission to compute nodes to contact the secret manager.
 
+  # Configure SSSD domain properties
+  domain_properties = {
+    # Mandatory properties that must not be overridden by the user.
+    'id_provider' => 'ldap',
+    'ldap_schema' => 'AD',
+
+    # Mandatory properties that are meant to be set via dedicated cluster config properties,
+    # but that can also be overridden via DirectoryService/AdditionalSssdConfigs.
+    'ldap_uri' => ldap_uri_components.join(','),
+    'ldap_search_base' => ldap_search_base,
+    'ldap_default_bind_dn' => node['cluster']['directory_service']['domain_read_only_user'],
+    'ldap_default_authtok' => shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout.strip,
+    'ldap_tls_reqcert' => node['cluster']['directory_service']['ldap_tls_req_cert'],
+
+    # Optional properties for which we provide a default value,
+    # that are not meant to be set via dedicated cluster config properties,
+    # but that can be overridden by the user via DirectoryService/AdditionalSssdConfigs.
+    'cache_credentials' => 'True',
+    'default_shell' => '/bin/bash',
+    'fallback_homedir' => '/home/%u',
+    'ldap_id_mapping' => 'True',
+    'ldap_referrals' => 'False',
+    'use_fully_qualified_names' => 'False',
+  }
+
+  # Optional properties that are meant to be set via dedicated cluster config properties.
+  # - ldap_tls_ca_cert
+  # - ldap_access_filter
+  # - access_provider only if ldap_access_filter is specified
+
+  unless node['cluster']['directory_service']['ldap_tls_ca_cert'].eql?('NONE')
+    domain_properties['ldap_tls_cacert'] = node['cluster']['directory_service']['ldap_tls_ca_cert']
+  end
+
+  unless node['cluster']['directory_service']['ldap_access_filter'].eql?('NONE')
+    domain_properties['access_provider'] = 'ldap'
+    domain_properties['ldap_access_filter'] = node['cluster']['directory_service']['ldap_access_filter']
+  end
+
+  # Optional properties that are meant to be set via DirectoryService/AdditionalSssdConfigs
+  if node['cluster']['directory_service']['additional_sssd_configs']
+    domain_properties.merge!(node['cluster']['directory_service']['additional_sssd_configs'])
+  end
+
   # Write sssd.conf file
   template sssd_conf_path do
     source 'directory_service/sssd.conf.erb'
@@ -60,9 +104,7 @@ if node['cluster']['node_type'] == 'HeadNode'
     group 'root'
     mode '0600'
     variables(
-      ldap_default_authtok: shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout,
-      ldap_uri: ldap_uri_components.join(","),
-      ldap_search_base: ldap_search_base
+      domain_properties: domain_properties
     )
     sensitive true
   end

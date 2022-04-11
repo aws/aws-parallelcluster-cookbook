@@ -1,28 +1,7 @@
 [domain/default]
-id_provider = ldap
-cache_credentials = True
-ldap_schema = AD
-ldap_uri = <%= @ldap_uri %>
-ldap_search_base = <%=  @ldap_search_base %>
-ldap_default_bind_dn = <%=  node['cluster']['directory_service']['domain_read_only_user'] %>
-ldap_default_authtok = <%= @ldap_default_authtok %>
-<% if node['cluster']['directory_service']['ldap_tls_ca_cert'] != 'NONE' %>
-ldap_tls_cacert = <%=  node['cluster']['directory_service']['ldap_tls_ca_cert'] %>
-<% end %>
-ldap_tls_reqcert = <%=  node['cluster']['directory_service']['ldap_tls_req_cert'] %>
-ldap_id_mapping = True
-fallback_homedir = /home/%u
-default_shell = /bin/bash
-use_fully_qualified_names = False
-ldap_referrals = False
-<% if node['cluster']['directory_service']['additional_sssd_configs'] %>
-  <% node['cluster']['directory_service']['additional_sssd_configs'].each_pair do |param, value| %>
+<%# Domain properties are added in lexicographic order to make the resulting configuration easier to navigate %>
+<% @domain_properties.sort_by { |key| key }.to_h.each_pair do |param, value| %>
 <%= "#{param} = #{value}" %>
-  <% end %>
-<% end %>
-<% if node['cluster']['directory_service']['ldap_access_filter'] != 'NONE' %>
-access_provider = ldap
-ldap_access_filter = <%= node['cluster']['directory_service']['ldap_access_filter'] %>
 <% end %>
 
 [domain/local]
