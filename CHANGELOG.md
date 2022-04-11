@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for both FQDN and LDAP Distinguished Names in the configuration parameter `DirectoryService/DomainName`. The new validator now checks both the syntaxes.
 - New `update_directory_service_password.sh` script deployed on the head node supports the manual update of the Active Directory password in the SSSD configuration.
   The password is retrieved by the AWS Secrets Manager as from the cluster configuration.
+- Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
 
 **CHANGES**
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
