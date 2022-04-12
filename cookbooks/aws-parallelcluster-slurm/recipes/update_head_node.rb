@@ -23,12 +23,12 @@ execute "generate_pcluster_slurm_configs" do
           " --instance-types-data #{node['cluster']['instance_types_data_path']}" \
           " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']}" \
           " #{nvidia_installed? ? '' : '--no-gpu'}"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
 execute 'stop clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
 replace_or_add "update node replacement timeout" do
@@ -40,17 +40,17 @@ end
 
 service 'slurmctld' do
   action :restart
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
 execute 'reload config for running nodes' do
   command "/opt/slurm/bin/scontrol reconfigure && sleep 15"
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
 execute 'start clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
