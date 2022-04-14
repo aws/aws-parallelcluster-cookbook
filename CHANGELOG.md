@@ -15,6 +15,9 @@ x.x.x
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
 
+**BUG FIXES**
+- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
+
 3.1.3
 ------
 
