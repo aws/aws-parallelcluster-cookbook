@@ -43,6 +43,13 @@
 # If not specified, the default value is 'default-on'.
 #enable-gl-in-virtual-sessions = "default-on"
 
+# Property "virtual-session-source-profile" specifies whether the shell that
+# runs the session starter script should source the user profile.
+# Allowed values: 'false', 'true'.
+# If not specified, the default value is 'false' and DCV will run the session
+# starter script with "bash --noprofile --norc"
+virtual-session-source-profile = true
+
 ###############################################################################
 ## Section "session-management/defaults" contains the default properties of DCV sessions
 ###############################################################################
