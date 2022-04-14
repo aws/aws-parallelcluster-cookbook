@@ -20,6 +20,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix the configuration parameter `DirectoryService/DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
+- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
 
 3.1.2
 ------
