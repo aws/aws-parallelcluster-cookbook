@@ -1,0 +1,16 @@
+[Unit]
+Description=Slurm REST daemon
+After=network.target munge.service slurmctld.service
+ConditionPathExists=/opt/slurm/etc/slurm.conf
+Documentation=man:slurmrestd(8)
+
+[Service]
+Type=simple
+User=slumrestd
+Group=slumrestd
+Environment="SLURM_JWT=daemon"
+ExecStart=/opt/slurm/sbin/slurmrestd -a rest_auth/jwt 0.0.0.0:8080
+ExecReload=/bin/kill -HUP $MAINPID
+
+[Install]
+WantedBy=multi-user.target

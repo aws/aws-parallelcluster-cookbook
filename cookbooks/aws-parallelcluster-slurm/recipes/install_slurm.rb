@@ -50,6 +50,23 @@ user node['cluster']['slurm']['user'] do
   shell '/bin/bash'
 end
 
+# Setup slurm restd group
+group node['cluster']['slurm']['restd_group'] do
+  comment 'slurm restd group'
+  gid node['cluster']['slurm']['restd_group_id']
+  system true
+end
+
+# Setup slurm restd user
+user node['cluster']['slurm']['restd_user'] do
+  comment 'slurm restd user'
+  uid node['cluster']['slurm']['restd_user_id']
+  gid node['cluster']['slurm']['restd_group_id']
+  home "/home/#{node['cluster']['slurm']['user']}"
+  system true
+  shell '/bin/bash'
+end
+
 slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 
 # Get slurm tarball

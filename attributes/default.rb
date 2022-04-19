@@ -120,9 +120,13 @@ default['cluster']['slurm']['version'] = '21-08-6-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 default['cluster']['slurm']['sha1'] = '61c24d0dc89981112710cca571fcd0a2bdefb879'
 default['cluster']['slurm']['user'] = 'slurm'
+default['cluster']['slurm']['restd_user'] = 'slurmrestd'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
+default['cluster']['slurm']['restd_group'] = node['cluster']['slurm']['restd_user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
+default['cluster']['slurm']['restd_user_id'] = node['cluster']['reserved_base_uid'] + 5
+default['cluster']['slurm']['restd_group_id'] = node['cluster']['slurm']['restd_user_id']
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']

@@ -177,6 +177,14 @@ template "/opt/slurm/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf
   mode '0644'
 end
 
+cookbook_file '/etc/systemd/system/slurmrestd.service' do
+  source 'head_node_slurm/slurmrestd.service'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+end
+
 cookbook_file '/etc/systemd/system/slurmctld.service' do
   source 'head_node_slurm/slurmctld.service'
   owner 'root'
