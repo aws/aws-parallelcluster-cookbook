@@ -33,9 +33,11 @@ service "setup-ephemeral" do
 end
 
 # Execution timeout 3600 seconds
-execute "Setup of ephemeral drivers" do
-  user "root"
-  command "/usr/local/sbin/setup-ephemeral-drives.sh"
+unless virtualized?
+  execute "Setup of ephemeral drivers" do
+    user "root"
+    command "/usr/local/sbin/setup-ephemeral-drives.sh"
+  end
 end
 
 # Increase somaxconn and tcp_max_syn_backlog for large scale setting
