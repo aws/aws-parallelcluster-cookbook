@@ -12,6 +12,7 @@ x.x.x
 - Add support for multiple FSx File System.
 - Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 - Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
+- During cluster update set Slurm nodes state accordingly to strategy set through QueueUpdateStrategy parameter.
 
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.

@@ -29,9 +29,9 @@ action :run do
 end
 
 action_class do # rubocop:disable Metrics/BlockLength
-  def execute_command(label, command)
+  def execute_command(label, run_command)
     execute label do
-      command command
+      command run_command
       retries 3
       retry_delay 5
       timeout 300
