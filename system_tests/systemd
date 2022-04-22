@@ -35,7 +35,7 @@ mkdir -p /home/ubuntu/.ssh
 chown -R ubuntu:ubuntu /home/ubuntu/.ssh
 
 mkdir -p /opt/parallelcluster
-echo "aws-parallelcluster-cookbook-3.0.1" > /opt/parallelcluster/.bootstrapped
+echo "aws-parallelcluster-cookbook-3.2.0" > /opt/parallelcluster/.bootstrapped
 
 mkdir -p /opt/parallelcluster/scripts
 mkdir -p /etc/parallelcluster
