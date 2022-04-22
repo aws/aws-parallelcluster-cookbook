@@ -50,6 +50,8 @@ user node['cluster']['slurm']['user'] do
   shell '/bin/bash'
 end
 
+include_recipe 'aws-parallelcluster-slurm::install_jwt'
+
 slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 
 # Get slurm tarball
@@ -83,7 +85,7 @@ bash 'make install' do
 
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cluster']['slurm']['version']}
-    ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix --enable-slurmrestd
+    ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install

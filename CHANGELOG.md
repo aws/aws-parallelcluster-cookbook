@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade Slurm to version 21.08.8.
 
+**ENHANCEMENTS**
+- Add support for enabling JWT authentication Slurm.
+
 3.1.3
 ------
 
