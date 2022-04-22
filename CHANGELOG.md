@@ -7,6 +7,7 @@ x.x.x
 ------
 
 **ENHANCEMENTS**
+- Add support for enabling JWT authentication Slurm.
 - Add support for multiple Elastic File Systems.
 - Add support for multiple FSx File System.
 - Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
@@ -14,6 +15,7 @@ x.x.x
 
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
+- Upgrade Slurm to version 21.08.7.
 
 **BUG FIXES**
 - Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
