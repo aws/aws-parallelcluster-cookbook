@@ -17,9 +17,6 @@ x.x.x
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
 - Upgrade Slurm to version 21.08.7.
 
-**BUG FIXES**
-- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
-
 3.1.3
 ------
 
@@ -29,6 +26,7 @@ x.x.x
 - Add support for both FQDN and LDAP Distinguished Names in the configuration parameter `DirectoryService/DomainName`. The new validator now checks both the syntaxes.
 - New `update_directory_service_password.sh` script deployed on the head node supports the manual update of the Active Directory password in the SSSD configuration.
   The password is retrieved by the AWS Secrets Manager as from the cluster configuration.
+- Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
 
 **CHANGES**
 - Disable deeper C-States in x86_64 official AMIs and AMIs created through `build-image` command, to guarantee high performance and low latency.
@@ -36,16 +34,17 @@ x.x.x
 
 **BUG FIXES**
 - Fix the configuration parameter `DirectoryService/DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
+- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
 
 3.1.2
 ------
 
+**CHANGES**
+- Upgrade Slurm to version 21.08.6.
+
 **BUG FIXES**
 - Fix the update of `/etc/hosts` file on computes nodes when a cluster is deployed in subnets without internet access.
 - Fix compute nodes bootstrap by waiting for ephemeral drives initialization before joining the cluster.
-
-**CHANGES**
-- Upgrade Slurm to version 21.08.6.
 
 3.1.1
 ------
