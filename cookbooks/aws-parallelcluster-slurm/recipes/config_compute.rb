@@ -26,8 +26,8 @@ end
 
 # Mount /opt/slurm over NFS
 # Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
-mount '/opt/slurm' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/slurm" })
+mount "#{node['cluster']['slurm']['install_dir']}" do
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['slurm']['install_dir']}" })
   fstype "nfs"
   options node['cluster']['nfs']['hard_mount_options']
   action %i(mount enable)
@@ -45,8 +45,8 @@ if graphic_instance? && nvidia_installed?
   end
 end
 
-cookbook_file '/etc/systemd/system/slurmd.service' do
-  source 'compute_slurm/slurmd.service'
+template '/etc/systemd/system/slurmd.service' do
+  source 'slurm/compute/slurmd.service.erb'
   owner 'root'
   group 'root'
   mode '0644'
