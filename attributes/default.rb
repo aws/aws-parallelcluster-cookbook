@@ -184,7 +184,10 @@ default['cluster']['nvidia']['fabricmanager']['package'] = value_for_platform(
   'default' => "nvidia-fabric-manager",
   'ubuntu' => { 'default' => "nvidia-fabricmanager-470" }
 )
-default['cluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
+default['cluster']['nvidia']['fabricmanager']['repository_key'] = value_for_platform(
+  'default' => "D42D0685.pub",
+  'ubuntu' => { 'default' => "7fa2af80.pub" }
+)
 default['cluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cluster']['nvidia']['driver_version'],
   # with apt a star is needed to match the package version
