@@ -568,3 +568,15 @@ end
 def is_compute_node_bootstrap_timeout_updated?(previous_config, config)
   evaluate_compute_bootstrap_timeout(previous_config) != evaluate_compute_bootstrap_timeout(config)
 end
+
+def raise_command_error(command, cmd)
+  Chef::Log.error("Error while executing command (#{command})")
+  raise "#{cmd.stderr.strip}"
+end
+
+def execute_command(command, user = "root", timeout = 300, raise_on_error = true)
+  cmd = Mixlib::ShellOut.new(command, user: user, timeout: timeout)
+  cmd.run_command
+  raise_command_error(command, cmd) if raise_on_error && cmd.error?
+  cmd.stdout.strip
+end

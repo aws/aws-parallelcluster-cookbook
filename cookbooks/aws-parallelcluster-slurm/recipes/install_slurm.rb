@@ -85,7 +85,7 @@ bash 'make install' do
 
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cluster']['slurm']['version']}
-    ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
+    ./configure --prefix=#{node['cluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
@@ -93,7 +93,7 @@ bash 'make install' do
     deactivate
   SLURM
   # TODO: Fix, so it works for upgrade
-  creates '/opt/slurm/bin/srun'
+  creates "#{node['cluster']['slurm']['install_dir']}/bin/srun"
 end
 
 # Copy required licensing files
@@ -130,6 +130,6 @@ when 'centos', 'amazon'
 end
 
 file '/etc/ld.so.conf.d/slurm.conf' do
-  content '/opt/slurm/lib/'
+  content "#{node['cluster']['slurm']['install_dir']}/lib/"
   mode '0744'
 end

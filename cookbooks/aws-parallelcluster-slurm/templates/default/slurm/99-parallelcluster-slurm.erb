@@ -1,4 +1,4 @@
-Cmnd_Alias SLURM_COMMANDS = /opt/slurm/bin/scontrol
+Cmnd_Alias SLURM_COMMANDS = <%= node['cluster']['slurm']['install_dir'] %>/bin/scontrol
 Cmnd_Alias SLURM_HOOKS_COMMANDS = <%= node['cluster']['node_virtualenv_path'] %>/bin/slurm_suspend, <%= node['cluster']['node_virtualenv_path'] %>/bin/slurm_resume, <%= node['cluster']['node_virtualenv_path'] %>/bin/slurm_fleet_status_manager
 Cmnd_Alias SHUTDOWN = /usr/sbin/shutdown
 

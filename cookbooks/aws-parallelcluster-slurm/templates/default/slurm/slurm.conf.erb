@@ -47,8 +47,8 @@ SuspendRate=0
 # PrologFlags specifies the prolog is executed at job allocation and prologs and epilogs are of different jobs are executed serially
 # SchedulerParameters allows jobs to be requeued to other nodes if prolog error exits.
 # Note the error exit of prolog drains a node, because the error of prolog is considered as a node error.
-Epilog=/opt/slurm/etc/pcluster/epilog
-Prolog=/opt/slurm/etc/pcluster/prolog
+Epilog=<%= node['cluster']['slurm']['install_dir'] %>/etc/pcluster/epilog
+Prolog=<%= node['cluster']['slurm']['install_dir'] %>/etc/pcluster/prolog
 PrologFlags=alloc,serial
 SchedulerParameters=nohold_on_prolog_fail
 <% end -%>
