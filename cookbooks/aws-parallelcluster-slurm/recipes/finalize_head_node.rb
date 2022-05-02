@@ -16,7 +16,7 @@
 # limitations under the License.
 
 execute "check if clustermgtd heartbeat is available" do
-  command "cat /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
+  command "cat #{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
   retries 30
   retry_delay 10
 end
@@ -34,7 +34,7 @@ ruby_block "wait for static fleet capacity" do
     # spot-st-t2.large-1 down
     # spot-st-t2.large-2 idle
     is_fleet_ready_command = Shellwords.escape(
-      "set -o pipefail && /opt/slurm/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9\\-]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
+      "set -o pipefail && #{node['cluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9\\-]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
     )
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for static fleet capacity provisioning")

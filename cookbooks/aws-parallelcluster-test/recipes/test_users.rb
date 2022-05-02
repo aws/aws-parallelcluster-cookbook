@@ -32,7 +32,7 @@ check_group_definition(
 
 if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] == 'slurm'
   check_path_permissions(
-    "/opt/slurm/etc/pcluster/.slurm_plugin",
+    "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin",
     node['cluster']['cluster_admin_user'],
     node['cluster']['cluster_admin_group'],
     "drwxr-xr-x"
@@ -103,7 +103,7 @@ if node['cluster']['scheduler'] == 'slurm'
   check_sudoers_permissions(
     sudoers_file,
     cluster_admin_user, "root", "SLURM_COMMANDS",
-    "/opt/slurm/bin/scontrol"
+    "#{node['cluster']['slurm']['install_dir']}/bin/scontrol"
   )
 
   check_sudoers_permissions(

@@ -123,6 +123,7 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
+default['cluster']['slurm']['install_dir'] = "/opt/slurm"
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']

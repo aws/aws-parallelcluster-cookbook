@@ -67,26 +67,26 @@ if node['cluster']['scheduler'] == 'slurm'
   when 'HeadNode'
     execute 'execute sinfo' do
       command "sinfo --help"
-      environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
+      environment('PATH' => "#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH")
       user node['cluster']['cluster_user']
     end
 
     execute 'execute scontrol' do
       command "scontrol --help"
-      environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
+      environment('PATH' => "#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH")
       user node['cluster']['cluster_user']
     end
 
     execute 'check-slurm-accounting-mysql-plugins' do
-      command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep accounting_storage_mysql"
     end
 
     execute 'check-slurm-jobcomp-mysql-plugins' do
-      command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep jobcomp_mysql"
     end
 
     execute 'check-slurm-pmix-plugins' do
-      command 'ls /opt/slurm/lib/slurm/ | grep pmix'
+      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep pmix"
     end
     execute 'ensure-pmix-shared-library-can-be-found' do
       command '/opt/pmix/bin/pmix_info'
@@ -96,7 +96,7 @@ if node['cluster']['scheduler'] == 'slurm'
     end
   when 'ComputeFleet'
     execute 'ls slurm root' do
-      command "ls /opt/slurm"
+      command "ls #{node['cluster']['slurm']['install_dir']}"
       user node['cluster']['cluster_user']
     end
   else
