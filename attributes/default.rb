@@ -103,9 +103,9 @@ default['cfncluster']['cfncluster-node-version'] = '2.11.6'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cfncluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cfncluster']['slurm']['version'] = '20-11-8-1'
+default['cfncluster']['slurm']['version'] = '20-11-9-1'
 default['cfncluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
-default['cfncluster']['slurm']['sha1'] = 'bc91a25355400f85ece1a204121591e6a2424617'
+default['cfncluster']['slurm']['sha1'] = 'f033dab0dc01b41473eebdbeb2c65e08cd05d26a'
 # PMIx software
 default['cfncluster']['pmix']['version'] = '3.1.5'
 default['cfncluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cfncluster']['pmix']['version']}/pmix-#{node['cfncluster']['pmix']['version']}.tar.gz"
