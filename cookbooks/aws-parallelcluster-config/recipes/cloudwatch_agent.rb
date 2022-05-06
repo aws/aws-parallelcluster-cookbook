@@ -57,6 +57,7 @@ end
 
 execute "cloudwatch-config-validation" do
   user 'root'
+  timeout 300
   environment(
     'CW_LOGS_CONFIGS_SCHEMA_PATH' => config_schema_path,
     'CW_LOGS_CONFIGS_PATH' => config_data_path
@@ -66,6 +67,7 @@ end
 
 execute "cloudwatch-config-creation" do
   user 'root'
+  timeout 300
   environment(
     'LOG_GROUP_NAME' => node['cluster']['log_group_name'],
     'SCHEDULER' => node['cluster']['scheduler'],
@@ -83,6 +85,7 @@ end
 
 execute "cloudwatch-agent-start" do
   user 'root'
+  timeout 300
   command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
   not_if do
     system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") ||
