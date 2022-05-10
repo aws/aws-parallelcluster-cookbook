@@ -7,7 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **CHANGES**
-- Upgrade Slurm to version 21.08.8.
+- Upgrade Slurm to version 21.08.8-2.
 
 3.1.3
 ------
