@@ -33,8 +33,7 @@ ruby_block "replace slurm queue nodes" do
     # NodeName=compute1-st-compute1-i1-[1-1] CPUs=16 State=CLOUD Feature=static,c5.4xlarge,compute1-i1
     # NodeName=compute1-dy-compute1-i1-[1-9] CPUs=16 State=CLOUD Feature=dynamic,c5.4xlarge,compute1-i1
     #
-    # compute1-st-compute1-i1-[1-1],compute1-dy-compute1-i1-[1-9]
-    # compute1-st-compute1-i1-[1-1],compute1-dy-compute1-i1-[1-9]
+    # NodeSet=compute1_nodes Nodes=compute1-st-compute1-i1-[1-1],compute1-dy-compute1-i1-[1-9]
     # PartitionName=compute1 Nodes=compute1_nodes MaxTime=INFINITE State=UP
     #
     command = "sed -n 's/.*NodeSet.*Nodes=\\(.*\\)/\\1/p' #{node['cluster']['slurm']['install_dir']}/etc/pcluster/slurm_parallelcluster_#{queue}_partition.conf"
@@ -44,10 +43,36 @@ ruby_block "replace slurm queue nodes" do
     node_list
   end
 
-  def update_nodes(power_saving, nodelist)
-    command = "sudo -i scontrol update state=#{power_saving} nodename=#{nodelist}"
+  def update_slurm_nodes(state, nodelist)
+    command = "sudo -i scontrol update state=#{state} nodename=#{nodelist} reason='updating node state during cluster update'"
     Chef::Log.info("Executing node state update with command (#{command})")
     execute_command(command)
+  end
+
+  def split_static_and_dynamic_nodes(nodelist)
+    static_nodes = []
+    dynamic_nodes = []
+    nodes = nodelist.split(',')
+    nodes.each do |node|
+      if is_static_node?(node)
+        static_nodes.push(node)
+      else
+        dynamic_nodes.push(node)
+      end
+    end
+
+    [static_nodes, dynamic_nodes]
+  end
+
+  def update_nodes(strategy, nodelist)
+    if strategy == "DRAIN"
+      static_nodes, dynamic_nodes = split_static_and_dynamic_nodes(nodelist)
+      # Set static nodes to DRAIN to keep clustermgtd in charge of managing static nodes lifecycle
+      update_slurm_nodes(strategy, static_nodes.join(",")) if static_nodes.any?
+      update_slurm_nodes(SLURM_POWER_SAVING_MAPPING[strategy.to_sym], dynamic_nodes.join(",")) if dynamic_nodes.any?
+    elsif strategy == "TERMINATE"
+      update_slurm_nodes(SLURM_POWER_SAVING_MAPPING[strategy.to_sym], nodelist)
+    end
   end
 
   def get_queues_with_changes
@@ -72,7 +97,7 @@ ruby_block "replace slurm queue nodes" do
       queues.each do |queue|
         node_list = get_slurm_nodelist(queue)
         Chef::Log.info("Updating node state for queue (#{queue})")
-        update_nodes(SLURM_POWER_SAVING_MAPPING[strategy.to_sym], node_list)
+        update_nodes(strategy, node_list)
       end
     end
   end
