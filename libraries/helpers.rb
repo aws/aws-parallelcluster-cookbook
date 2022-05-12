@@ -235,9 +235,9 @@ def hit_dynamodb_info
 end
 
 #
-# Verify if a given node name is a static node or a dynamic one (HIT only)
+# Verify if a given node name is a static node or a dynamic one (Slurm only)
 #
-def hit_is_static_node?(nodename)
+def is_static_node?(nodename)
   match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9\-]+)-\d+$/)
   raise "Failed when parsing Compute nodename: #{nodename}" if match.nil?
 

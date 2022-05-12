@@ -46,5 +46,5 @@ execute 'resume_node' do
   command(lazy { "#{node['cluster']['slurm']['install_dir']}/bin/scontrol update nodename=#{node.run_state['slurm_compute_nodename']} state=resume reason='Node start up'" })
   ignore_failure true
   # Only resume static nodes
-  only_if { hit_is_static_node?(node.run_state['slurm_compute_nodename']) }
+  only_if { is_static_node?(node.run_state['slurm_compute_nodename']) }
 end
