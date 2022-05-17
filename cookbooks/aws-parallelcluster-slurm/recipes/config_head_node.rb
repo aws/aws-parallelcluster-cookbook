@@ -18,14 +18,14 @@
 setup_munge_head_node
 
 # Export /opt/slurm
-nfs_export "/opt/slurm" do
+nfs_export "#{node['cluster']['slurm']['install_dir']}" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
 end
 
 # Ensure config directory is in place
-directory '/opt/slurm/etc' do
+directory "#{node['cluster']['slurm']['install_dir']}/etc" do
   user 'root'
   group 'root'
   mode '0755'
@@ -38,14 +38,14 @@ directory '/var/spool/slurm.state' do
   mode '0700'
 end
 
-template '/opt/slurm/etc/slurm.conf' do
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf" do
   source 'slurm/slurm.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
-template '/opt/slurm/etc/gres.conf' do
+template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
   source 'slurm/gres.conf.erb'
   owner 'root'
   group 'root'
@@ -65,29 +65,29 @@ unless virtualized?
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-            " --output-directory /opt/slurm/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
+            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
             " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"\
             " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"
   end
 end
 
 # all other OSs use /sys/fs/cgroup, which is the default
-template '/opt/slurm/etc/cgroup.conf' do
+template "#{node['cluster']['slurm']['install_dir']}/etc/cgroup.conf" do
   source 'slurm/cgroup.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
-cookbook_file '/opt/slurm/etc/slurm.sh' do
-  source 'head_node_slurm/slurm.sh'
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.sh" do
+  source 'slurm/head_node/slurm.sh.erb'
   owner 'root'
   group 'root'
   mode '0755'
 end
 
-cookbook_file '/opt/slurm/etc/slurm.csh' do
-  source 'head_node_slurm/slurm.csh'
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.csh" do
+  source 'slurm/head_node/slurm.csh.erb'
   owner 'root'
   group 'root'
   mode '0755'
@@ -161,7 +161,7 @@ template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_clustermgtd.con
 end
 
 # Create shared directory used to store clustermgtd heartbeat and computemgtd config
-directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
+directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin" do
   user node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_group']
   mode '0755'
@@ -170,7 +170,7 @@ directory "/opt/slurm/etc/pcluster/.slurm_plugin" do
 end
 
 # Put computemgtd config under /opt/slurm/etc/pcluster/.slurm_plugin so all compute nodes share a config
-template "/opt/slurm/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf" do
+template "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf" do
   source 'slurm/parallelcluster_computemgtd.conf.erb'
   owner 'root'
   group 'root'
@@ -185,8 +185,8 @@ cookbook_file '/etc/systemd/system/slurmrestd.service' do
   action :create
 end
 
-cookbook_file '/etc/systemd/system/slurmctld.service' do
-  source 'head_node_slurm/slurmctld.service'
+template '/etc/systemd/system/slurmctld.service' do
+  source 'slurm/head_node/slurmctld.service.erb'
   owner 'root'
   group 'root'
   mode '0644'
@@ -194,14 +194,14 @@ cookbook_file '/etc/systemd/system/slurmctld.service' do
 end
 
 if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
-  cookbook_file '/opt/slurm/etc/pcluster/prolog' do
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog" do
     source 'head_node_slurm/prolog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
     mode '0744'
   end
 
-  cookbook_file '/opt/slurm/etc/pcluster/epilog' do
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog" do
     source 'head_node_slurm/epilog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']

@@ -2,7 +2,7 @@
 cluster_name = <%= node['cluster']['stack_name'] %>
 region = <%= node['cluster']['region'] %>
 proxy = <%= node['cluster']['proxy'] %>
-heartbeat_file_path = /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat
+heartbeat_file_path = <%= node['cluster']['slurm']['install_dir'] %>/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat
 dynamodb_table = <%= node['cluster']['slurm_ddb_table'] %>
 hosted_zone = <%= node['cluster']['hosted_zone'] %>
 dns_domain = <%= node['cluster']['dns_domain'] %>
@@ -10,3 +10,4 @@ use_private_hostname = <%= node['cluster']['use_private_hostname'] %>
 head_node_private_ip = <%= node['ec2']['local_ipv4'] %>
 head_node_hostname = <%= node['ec2']['local_hostname'] %>
 node_replacement_timeout = <%= node['cluster']['compute_node_bootstrap_timeout'] %>
+insufficient_capacity_timeout = 600

@@ -1,12 +1,13 @@
 [Unit]
 Description=Slurm controller daemon
 After=network.target munge.service
-ConditionPathExists=/opt/slurm/etc/slurm.conf
+Wants=network-online.target
+ConditionPathExists=<%= node['cluster']['slurm']['install_dir'] %>/etc/slurm.conf
 
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/slurmctld
-ExecStart=/opt/slurm/sbin/slurmctld -D $SLURMCTLD_OPTIONS
+ExecStart=<%= node['cluster']['slurm']['install_dir'] %>/sbin/slurmctld -D -s $SLURMCTLD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 LimitNOFILE=562930
 LimitMEMLOCK=infinity

@@ -35,6 +35,7 @@
     "cluster_s3_bucket": "parallelcluster-0000000000000000-v1-do-not-delete",
     "cluster_config_s3_key": "parallelcluster/3.0.1/clusters/pc3cluster-0000000000000000/configs/cluster-config-with-implied-values.yaml",
     "cluster_config_version": "90000000000000000000000000000000",
+    "change_set_s3_key": "parallelcluster/3.0.1/clusters/pc3cluster-0000000000000000/configs/change-set.json",
     "instance_types_data_s3_key": "parallelcluster/3.0.1/clusters/pc3cluster-0000000000000000/configs/instance-types-data.json",
     "custom_node_package": "",
     "custom_awsbatchcli_package": "",

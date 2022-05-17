@@ -27,9 +27,11 @@ default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
+default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
 default['cluster']['previous_cluster_config_path'] = "#{node['cluster']['shared_dir']}/previous-cluster-config.yaml"
+default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change-set.json"
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
@@ -116,9 +118,9 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '21-08-6-1'
+default['cluster']['slurm']['version'] = '21-08-8-2'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = '61c24d0dc89981112710cca571fcd0a2bdefb879'
+default['cluster']['slurm']['sha1'] = 'f7687c11f024fbbe5399b93906d1179adc5c3fb6'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['restd_user'] = 'slurmrestd'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
@@ -127,6 +129,8 @@ default['cluster']['slurm']['restd_group'] = node['cluster']['slurm']['restd_use
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 default['cluster']['slurm']['restd_user_id'] = node['cluster']['reserved_base_uid'] + 5
 default['cluster']['slurm']['restd_group_id'] = node['cluster']['slurm']['restd_user_id']
+default['cluster']['slurm']['install_dir'] = "/opt/slurm"
+
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
@@ -167,6 +171,10 @@ default['cluster']['munge']['user'] = 'munge'
 default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
 default['cluster']['munge']['group'] = node['cluster']['munge']['user']
 default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
+# JWT
+default['cluster']['jwt']['version'] = '1.12.0'
+default['cluster']['jwt']['url'] = "https://github.com/benmcollins/libjwt/archive/refs/tags/v#{node['cluster']['jwt']['version']}.tar.gz"
+default['cluster']['jwt']['sha1'] = '1c6fec984a8e0ca1122bfc3552a49f45bdb0c4e8'
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
@@ -184,7 +192,10 @@ default['cluster']['nvidia']['fabricmanager']['package'] = value_for_platform(
   'default' => "nvidia-fabric-manager",
   'ubuntu' => { 'default' => "nvidia-fabricmanager-470" }
 )
-default['cluster']['nvidia']['fabricmanager']['repository_key'] = "7fa2af80.pub"
+default['cluster']['nvidia']['fabricmanager']['repository_key'] = value_for_platform(
+  'default' => "D42D0685.pub",
+  'ubuntu' => { 'default' => "7fa2af80.pub" }
+)
 default['cluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cluster']['nvidia']['driver_version'],
   # with apt a star is needed to match the package version

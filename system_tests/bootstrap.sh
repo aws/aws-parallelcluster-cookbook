@@ -53,12 +53,12 @@ cp system_tests/systemctl /bin/systemctl
 
 echo "cookbook_path [\"/etc/chef/cookbooks\"]" > /etc/chef/client.rb
 
-mkdir -p /lib/modules/`uname -r`
+mkdir -p /lib/modules/${KERNEL_RELEASE}
 
 platform=$(cat /etc/*-release | grep ID_LIKE | sed 's/.*=//')
 
 if [ "$platform" == "debian" ]; then
-    apt install -y linux-modules-`uname -r`
+    apt install -y linux-modules-${KERNEL_RELEASE}
 else
     yum install -y kernel-modules
 fi

@@ -67,6 +67,8 @@ user node['cluster']['slurm']['restd_user'] do
   shell '/bin/bash'
 end
 
+include_recipe 'aws-parallelcluster-slurm::install_jwt'
+
 slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
 
 # Get slurm tarball
@@ -100,7 +102,7 @@ bash 'make install' do
 
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cluster']['slurm']['version']}
-    ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix --enable-slurmrestd
+    ./configure --prefix=#{node['cluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
@@ -108,7 +110,7 @@ bash 'make install' do
     deactivate
   SLURM
   # TODO: Fix, so it works for upgrade
-  creates '/opt/slurm/bin/srun'
+  creates "#{node['cluster']['slurm']['install_dir']}/bin/srun"
 end
 
 # Copy required licensing files
@@ -145,6 +147,6 @@ when 'centos', 'amazon'
 end
 
 file '/etc/ld.so.conf.d/slurm.conf' do
-  content '/opt/slurm/lib/'
+  content "#{node['cluster']['slurm']['install_dir']}/lib/"
   mode '0744'
 end

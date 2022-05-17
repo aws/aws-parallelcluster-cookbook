@@ -235,10 +235,11 @@ def hit_dynamodb_info
 end
 
 #
-# Verify if a given node name is a static node or a dynamic one (HIT only)
+# Verify if a given node name is a static node or a dynamic one (Slurm only)
 #
-def hit_is_static_node?(nodename)
-  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9\-]+)-\d+$/)
+def is_static_node?(nodename)
+  # Match queue1-st-compute2-1 or queue1-st-compute2-[1-1000] format
+  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9\-]+)-\[?\d+[\-\d+]*\]?$/)
   raise "Failed when parsing Compute nodename: #{nodename}" if match.nil?
 
   match[2] == "st"
@@ -567,4 +568,16 @@ end
 
 def is_compute_node_bootstrap_timeout_updated?(previous_config, config)
   evaluate_compute_bootstrap_timeout(previous_config) != evaluate_compute_bootstrap_timeout(config)
+end
+
+def raise_command_error(command, cmd)
+  Chef::Log.error("Error while executing command (#{command})")
+  raise "#{cmd.stderr.strip}"
+end
+
+def execute_command(command, user = "root", timeout = 300, raise_on_error = true)
+  cmd = Mixlib::ShellOut.new(command, user: user, timeout: timeout)
+  cmd.run_command
+  raise_command_error(command, cmd) if raise_on_error && cmd.error?
+  cmd.stdout.strip
 end
