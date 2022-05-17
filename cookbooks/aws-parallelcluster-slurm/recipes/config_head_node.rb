@@ -186,14 +186,26 @@ template '/etc/systemd/system/slurmctld.service' do
 end
 
 if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog" do
+  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d" do
+    user 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/pcluster_prolog" do
     source 'head_node_slurm/prolog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
     mode '0744'
   end
 
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog" do
+  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d" do
+    user 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/pcluster_epilog" do
     source 'head_node_slurm/epilog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
