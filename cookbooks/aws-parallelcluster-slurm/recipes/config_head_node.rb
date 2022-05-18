@@ -192,7 +192,7 @@ if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
     mode '0755'
   end
 
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/pcluster_prolog" do
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/01-pcluster-prolog" do
     source 'head_node_slurm/prolog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
@@ -205,7 +205,7 @@ if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
     mode '0755'
   end
 
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/pcluster_epilog" do
+  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/01-pcluster-epilog" do
     source 'head_node_slurm/epilog'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
