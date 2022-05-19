@@ -132,7 +132,7 @@ default['cfncluster']['nvidia']['fabricmanager']['package'] = value_for_platform
 )
 default['cfncluster']['nvidia']['fabricmanager']['repository_key'] = value_for_platform(
   'default' => "D42D0685.pub",
-  'ubuntu' => { 'default' => "7fa2af80.pub" }
+  'ubuntu' => { 'default' => "3bf863cc.pub" }
 )
 default['cfncluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
   'default' => node['cfncluster']['nvidia']['driver_version'],
