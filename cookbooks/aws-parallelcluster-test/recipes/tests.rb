@@ -99,6 +99,13 @@ if node['cluster']['scheduler'] == 'slurm'
       command "ls #{node['cluster']['slurm']['install_dir']}"
       user node['cluster']['cluster_user']
     end
+    execute 'check cgroup memory resource controller is enabled' do
+      # We expect a 1 in the fourth field of the cgroups table, which is formatted as follows:
+      # subsys_name  hierarchy  num_cgroups  enabled
+      # ...
+      # memory       <int>      <int>        1
+      command "[[ $(grep memory /proc/cgroups | awk '{print $4}') == 1 ]]"
+    end
   else
     raise "node_type must be HeadNode or ComputeFleet"
   end

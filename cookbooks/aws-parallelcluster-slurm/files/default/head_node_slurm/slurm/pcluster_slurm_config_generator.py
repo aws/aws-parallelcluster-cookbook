@@ -12,6 +12,7 @@
 import argparse
 import json
 import logging
+import math
 import re
 from os import makedirs, path
 from socket import gethostname
@@ -74,8 +75,12 @@ def generate_slurm_config_files(
             )
         is_default_queue = False
 
-    # Generate slurm_parallelcluster.conf and slurm_parallelcluster_gres.conf
-    for template_name in ["slurm_parallelcluster.conf", "slurm_parallelcluster_gres.conf"]:
+    # Generate slurm_parallelcluster.conf, slurm_parallelcluster_gres.conf and slurm_parallelcluster_cgroup.conf
+    for template_name in [
+        "slurm_parallelcluster.conf",
+        "slurm_parallelcluster_gres.conf",
+        "slurm_parallelcluster_cgroup.conf",
+    ]:
         _generate_slurm_parallelcluster_configs(
             queues,
             head_node_config,
@@ -167,6 +172,7 @@ def _get_jinja_env(template_directory):
     env.filters["gpus"] = _gpu_count
     env.filters["gpu_type"] = _gpu_type
     env.filters["vcpus"] = _vcpus
+    env.filters["realmemory"] = _realmemory
 
     return env
 
@@ -210,6 +216,16 @@ def _vcpus(compute_resource) -> int:
         supported_architectures = instance_type_info.get("ProcessorInfo", {}).get("SupportedArchitectures", [])
         threads_per_core = 2 if "x86_64" in supported_architectures else 1
     return vcpus_count if not disable_simultaneous_multithreading else (vcpus_count // threads_per_core)
+
+
+def _realmemory(compute_resource) -> int:
+    """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
+    instance_type = compute_resource["InstanceType"]
+    instance_type_info = instance_types_data[instance_type]
+    memory_info = instance_type_info.get("MemoryInfo", {})
+    ec2_memory = memory_info.get("SizeInMiB")
+    realmemory = math.floor(ec2_memory * 0.95)
+    return realmemory
 
 
 def _write_rendered_template_to_file(rendered_template, filename):

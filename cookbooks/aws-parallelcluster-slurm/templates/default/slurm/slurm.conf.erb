@@ -26,10 +26,10 @@ LaunchParameters=enable_nss_slurm
 #
 # CLOUD CONFIGS OPTIONS
 <% if node['cluster']['use_private_hostname'] == 'true' or node['cluster']['dns_domain'].nil? or node['cluster']['dns_domain'].empty? -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30
+SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem_percent=75
 TreeWidth=65533
 <% else -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_dns
+SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_dns,node_reg_mem_percent=75
 <% end -%>
 CommunicationParameters=NoAddrCache
 SuspendProgram=<%= node['cluster']['scripts_dir'] %>/slurm/slurm_suspend
@@ -75,7 +75,6 @@ TaskPlugin=task/affinity,task/cgroup
 # TRES AND GPU CONFIG OPTIONS
 GresTypes=gpu
 SelectType=select/cons_tres
-SelectTypeParameters=CR_CPU
 #
 # LOGGING
 SlurmctldDebug=info
@@ -84,7 +83,6 @@ SlurmdDebug=info
 SlurmdLogFile=/var/log/slurmd.log
 JobCompType=jobcomp/none
 #
-# WARNING!!! The slurm_parallelcluster.conf file included
-# get updated by pcluster process, be careful
-# when manually editing!
+# WARNING!!! The slurm_parallelcluster.conf file included below can be updated by the pcluster process.
+# Please do not edit it.
 include slurm_parallelcluster.conf
