@@ -17,6 +17,7 @@ x.x.x
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
 - Update slurmctld and slurmd systemd service files.
+- Upgrade Slurm to version 22.05.0-1.
 
 3.1.4
 ------
