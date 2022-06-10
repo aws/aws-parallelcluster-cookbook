@@ -1,0 +1,13 @@
+{
+    "multiple_spot": {
+        "multiplespot-1": "c4.xlarge",
+        "multiplespot-2": "c5.2xlarge"
+    },
+    "efa": {
+        "efa-c5n": "c5n.18xlarge"
+    },
+    "gpu": {
+        "gpu-g38xlarge": "g3.8xlarge",
+        "gpu-p3dn24xlarge": "p3dn.24xlarge"
+    }
+}
