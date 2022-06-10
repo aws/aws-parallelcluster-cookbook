@@ -21,6 +21,8 @@ x.x.x
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
 - Update slurmctld and slurmd systemd service files.
 - Upgrade NICE DCV to version 2022.0-12760.
+- Upgrade NVIDIA driver to version 470.129.06.
+- Upgrade NVIDIA Fabric Manager to version 470.129.06.
 - Upgrade EFA installer to version 1.15.2.
   - EFA driver: ``efa-1.16.0-1``
   - EFA configuration: ``efa-config-1.9-1``
