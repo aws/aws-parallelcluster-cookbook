@@ -222,8 +222,10 @@ def _realmemory(compute_resource) -> int:
     """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
     instance_type = compute_resource["InstanceType"]
     instance_type_info = instance_types_data[instance_type]
-    memory_info = instance_type_info.get("MemoryInfo", {})
-    ec2_memory = memory_info.get("SizeInMiB")
+    # These are protections against potentially missing elements in the instance description json.
+    # In case of missing MemoryInfo or SizeInMiB, the following evaluations will fail with KeyError.
+    memory_info = instance_type_info["MemoryInfo"]
+    ec2_memory = memory_info["SizeInMiB"]
     realmemory = math.floor(ec2_memory * 0.95)
     return realmemory
 
