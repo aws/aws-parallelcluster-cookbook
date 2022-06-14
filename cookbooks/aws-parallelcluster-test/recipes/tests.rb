@@ -104,7 +104,7 @@ if node['cluster']['scheduler'] == 'slurm'
       # subsys_name  hierarchy  num_cgroups  enabled
       # ...
       # memory       <int>      <int>        1
-      command "[[ $(grep memory /proc/cgroups | awk '{print $4}') == 1 ]]"
+      command "test $(grep memory /proc/cgroups | awk '{print $4}') = 1"
     end
   else
     raise "node_type must be HeadNode or ComputeFleet"
