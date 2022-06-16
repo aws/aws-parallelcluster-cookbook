@@ -530,6 +530,8 @@ default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
+default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
+default['cluster']['slurm_node_reg_mem_percent'] = 75
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
