@@ -29,3 +29,4 @@ aws-parallelcluster-cookbook-*.date
 .coverage
 __pycache__
 report.html
+/assets/style.css
