@@ -20,6 +20,7 @@ Scheduling:
                 MinCount: 5
                 Name: multiplespot-2
                 SpotPrice: 1.5
+                SchedulableMemory: 13000
           ComputeSettings: null
           CustomActions: null
           Iam:
@@ -56,6 +57,7 @@ Scheduling:
                 MinCount: 1
                 Name: gpu-g38xlarge
                 SpotPrice: null
+                SchedulableMemory: 248000
               - DisableSimultaneousMultithreading: true
                 Efa:
                     Enabled: false
