@@ -244,11 +244,15 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
     instance_type = compute_resource["InstanceType"]
     instance_type_info = instance_types_data[instance_type]
-    # These are protections against potentially missing elements in the instance description json.
-    # In case of missing MemoryInfo or SizeInMiB, the following evaluations will fail with KeyError.
-    memory_info = instance_type_info["MemoryInfo"]
-    ec2_memory = memory_info["SizeInMiB"]
-    realmemory = math.floor(ec2_memory * realmemory_to_ec2memory_ratio)
+    schedulable_memory = compute_resource.get("SchedulableMemory", None)
+    if schedulable_memory is None:
+        # These are protections against potentially missing elements in the instance description json.
+        # In case of missing MemoryInfo or SizeInMiB, the following evaluations will fail with KeyError.
+        memory_info = instance_type_info["MemoryInfo"]
+        ec2_memory = memory_info["SizeInMiB"]
+        realmemory = math.floor(ec2_memory * realmemory_to_ec2memory_ratio)
+    else:
+        realmemory = schedulable_memory
     return realmemory
 
 
