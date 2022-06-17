@@ -31,6 +31,7 @@ x.x.x
   - Libfabric: ``libfabric-aws-1.14.1-1``
   - RDMA core: ``rdma-core-39.0-2``
   - Open MPI: ``openmpi40-aws-4.1.2-2``
+- Restrict IPv6 access to IMDS to root and cluster admin users only.
 
 3.1.4
 ------
