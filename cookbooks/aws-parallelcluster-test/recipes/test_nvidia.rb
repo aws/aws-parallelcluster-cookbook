@@ -37,3 +37,19 @@ bash "check Nvidia drivers" do
     echo "Correctly installed CUDA ${cuda_output}"
   TEST
 end
+
+bash "Check NVIDIA GdrCopy" do
+  cwd Chef::Config[:file_cache_path]
+  code <<-TEST
+    expected_gdrcopy_version="#{node['cluster']['nvidia']['gdrcopy']['version']}"
+
+    echo "Checking NVIDIA GdrCopy version"
+    gdrcopy_version=$(modinfo -F version gdrdrv)
+    [[ "${gdrcopy_version}" != "${expected_gdrcopy_version}" ]] && "ERROR Installed NVIDIA GdrCopy version ${gdrcopy_version} but expected ${expected_gdrcopy_version}" && exit 1
+    echo "Correctly installed NVIDIA GdrCopy ${expected_gdrcopy_version}"
+
+    #echo "Checking NVIDIA GdrCopy installation with copybw"
+    #copybw
+    #[[ $? != 0 ]] && "ERROR Installed NVIDIA GdrCopy is not working properly: copybw test failed" && exit 1
+  TEST
+end

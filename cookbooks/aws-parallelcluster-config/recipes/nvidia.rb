@@ -22,3 +22,9 @@ if get_nvswitches > 1
     supports status: true
   end
 end
+
+# NVIDIA GdrCopy
+service 'gdrcopy' do
+  action %i(start enable)
+  supports status: true
+end
