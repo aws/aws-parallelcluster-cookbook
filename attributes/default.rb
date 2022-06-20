@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster
 # Attributes:: default
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -205,6 +205,14 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
   'ubuntu' => { 'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cluster']['base_os']}/x86_64" }
 )
 
+# NVIDIA GDRCopy
+default['cluster']['nvidia']['gdrcopy']['version'] = '2.3'
+default['cluster']['nvidia']['gdrcopy']['url'] = "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
+default['cluster']['nvidia']['gdrcopy']['sha1'] = '8ee4f0e3c9d0454ff461742c69b0c0ee436e06e1'
+default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
+  'ubuntu' => { 'default' => 'gdrdrv' },
+  'default' => 'gdrcopy'
+)
 # EFA
 default['cluster']['efa']['installer_version'] = '1.16.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
