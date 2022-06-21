@@ -47,12 +47,16 @@ default['cluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 default['cluster']['node_virtualenv'] = 'node_virtualenv'
 # Virtualenv AWSBatch Name
 default['cluster']['awsbatch_virtualenv'] = 'awsbatch_virtualenv'
+# Virtualenv cfn-bootstrap Name
+default['cluster']['cfn_bootstrap_virtualenv'] = 'cfn_bootstrap_virtualenv'
 # Cookbook Virtualenv Path
 default['cluster']['cookbook_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cookbook_virtualenv']}"
 # Node Virtualenv Path
 default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['node_virtualenv']}"
 # AWSBatch Virtualenv Path
 default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['awsbatch_virtualenv']}"
+# cfn-bootstrap Virtualenv Path
+default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'

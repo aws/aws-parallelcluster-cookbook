@@ -39,6 +39,13 @@ activate_virtual_env node['cluster']['awsbatch_virtualenv'] do
   not_if { ::File.exist?("#{node['cluster']['awsbatch_virtualenv_path']}/bin/activate") }
 end
 
+# Install cfn_bootstrap virtualenv
+activate_virtual_env node['cluster']['cfn_bootstrap_virtualenv'] do
+  pyenv_path node['cluster']['cfn_bootstrap_virtualenv_path']
+  python_version node['cluster']['python-version']
+  not_if { ::File.exist?("#{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/activate") }
+end
+
 bash 'install CloudFormation helpers' do
   user 'root'
   group 'root'
@@ -49,7 +56,15 @@ bash 'install CloudFormation helpers' do
       bucket="s3.amazonaws.com"
       [[ ${region} =~ ^cn- ]] && bucket="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
       curl --retry 3 -L -o aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
-      #{node['cluster']['cookbook_virtualenv_path']}/bin/pip install aws-cfn-bootstrap-py3-latest.tar.gz
+      #{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/pip install aws-cfn-bootstrap-py3-latest.tar.gz
   CFNTOOLS
-  creates "#{node['cluster']['cookbook_virtualenv_path']}/bin/cfn-hup"
+  creates "#{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/cfn-hup"
+end
+
+# Add cfn_bootstrap virtualenv to default path
+template "/etc/profile.d/pcluster.sh" do
+  source "base/pcluster.sh.erb"
+  owner 'root'
+  group 'root'
+  mode '0644'
 end
