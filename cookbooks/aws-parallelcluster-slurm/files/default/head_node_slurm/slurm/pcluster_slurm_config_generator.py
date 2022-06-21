@@ -10,6 +10,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 import argparse
+import functools
 import json
 import logging
 import math
@@ -39,6 +40,7 @@ def generate_slurm_config_files(
     dryrun,
     no_gpu,
     compute_node_bootstrap_timeout,
+    realmemory_to_ec2memory_ratio,
 ):
     """
     Generate Slurm configuration files.
@@ -56,7 +58,7 @@ def generate_slurm_config_files(
     output_directory = path.abspath(output_directory)
     pcluster_subdirectory = path.join(output_directory, "pcluster")
     makedirs(pcluster_subdirectory, exist_ok=True)
-    env = _get_jinja_env(template_directory)
+    env = _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio)
 
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
@@ -71,7 +73,14 @@ def generate_slurm_config_files(
     for queue in queues:
         for file_type in ["partition", "gres"]:
             _generate_queue_config(
-                queue["Name"], queue, is_default_queue, file_type, env, pcluster_subdirectory, dryrun, no_gpu=no_gpu
+                queue["Name"],
+                queue,
+                is_default_queue,
+                file_type,
+                env,
+                pcluster_subdirectory,
+                dryrun,
+                no_gpu=no_gpu,
             )
         is_default_queue = False
 
@@ -120,11 +129,21 @@ def _get_head_node_private_ip():
 
 
 def _generate_queue_config(
-    queue_name, queue_config, is_default_queue, file_type, jinja_env, output_dir, dryrun, no_gpu=False
+    queue_name,
+    queue_config,
+    is_default_queue,
+    file_type,
+    jinja_env,
+    output_dir,
+    dryrun,
+    no_gpu=False,
 ):
     log.info("Generating slurm_parallelcluster_%s_%s.conf", queue_name, file_type)
     rendered_template = jinja_env.get_template(f"slurm_parallelcluster_queue_{file_type}.conf").render(
-        queue_name=queue_name, queue_config=queue_config, is_default_queue=is_default_queue, no_gpu=no_gpu
+        queue_name=queue_name,
+        queue_config=queue_config,
+        is_default_queue=is_default_queue,
+        no_gpu=no_gpu,
     )
     if not dryrun:
         filename = path.join(output_dir, f"slurm_parallelcluster_{queue_name}_{file_type}.conf")
@@ -161,7 +180,7 @@ def _generate_slurm_parallelcluster_configs(
         _write_rendered_template_to_file(rendered_template, filename)
 
 
-def _get_jinja_env(template_directory):
+def _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio):
     """Return jinja environment with trim_blocks/lstrip_blocks set to True."""
     file_loader = FileSystemLoader(template_directory)
     # A nosec comment is appended to the following line in order to disable the B701 check.
@@ -172,7 +191,10 @@ def _get_jinja_env(template_directory):
     env.filters["gpus"] = _gpu_count
     env.filters["gpu_type"] = _gpu_type
     env.filters["vcpus"] = _vcpus
-    env.filters["realmemory"] = _realmemory
+    env.filters["realmemory"] = functools.partial(
+        _realmemory,
+        realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
+    )
 
     return env
 
@@ -218,7 +240,7 @@ def _vcpus(compute_resource) -> int:
     return vcpus_count if not disable_simultaneous_multithreading else (vcpus_count // threads_per_core)
 
 
-def _realmemory(compute_resource) -> int:
+def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
     instance_type = compute_resource["InstanceType"]
     instance_type_info = instance_types_data[instance_type]
@@ -226,7 +248,7 @@ def _realmemory(compute_resource) -> int:
     # In case of missing MemoryInfo or SizeInMiB, the following evaluations will fail with KeyError.
     memory_info = instance_type_info["MemoryInfo"]
     ec2_memory = memory_info["SizeInMiB"]
-    realmemory = math.floor(ec2_memory * 0.95)
+    realmemory = math.floor(ec2_memory * realmemory_to_ec2memory_ratio)
     return realmemory
 
 
@@ -285,6 +307,23 @@ def _get_metadata(metadata_path):
 
 
 def main():
+    def memory_ratio_float(arg):
+        """Type function for realmemory_to_ec2memory_ratio with custom lower and upper bounds."""
+        # We cannot allow 0 as minimum value because `RealMemory=0` is not valid in Slurm.
+        # We put a minimum value= 0.1. It doesn't make sense to put such a low value anyway.
+        min_value = 0.1
+        max_value = 1.0
+        try:
+            f = float(arg)
+        except ValueError:
+            raise argparse.ArgumentTypeError("The argument must be a floating point number")
+        if f < min_value or f > max_value:
+            raise argparse.ArgumentTypeError(
+                f"The argument must be greater or equal than {str(min_value)} and less "
+                f"or equal than {str(max_value)}"
+            )
+        return f
+
     try:
         _setup_logger()
         log.info("Running ParallelCluster Slurm Config Generator")
@@ -328,6 +367,12 @@ def main():
             required=False,
             default=1800,
         )
+        parser.add_argument(
+            "--realmemory-to-ec2memory-ratio",
+            type=memory_ratio_float,
+            help="Configure ratio between RealMemory and memory advertised by EC2",
+            required=True,
+        )
         args = parser.parse_args()
         generate_slurm_config_files(
             args.output_directory,
@@ -337,6 +382,7 @@ def main():
             args.dryrun,
             args.no_gpu,
             args.compute_node_bootstrap_timeout,
+            args.realmemory_to_ec2memory_ratio,
         )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)

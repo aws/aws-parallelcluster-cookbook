@@ -177,7 +177,7 @@ default['cluster']['jwt']['sha1'] = '1c6fec984a8e0ca1122bfc3552a49f45bdb0c4e8'
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '470.103.01'
+default['cluster']['nvidia']['driver_version'] = '470.129.06'
 default['cluster']['nvidia']['cuda_version'] = '11.4'
 default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
 default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
@@ -206,7 +206,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.14.1'
+default['cluster']['efa']['installer_version'] = '1.15.2'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
@@ -534,6 +534,8 @@ default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
+default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
+default['cluster']['slurm_node_reg_mem_percent'] = 75
 
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain

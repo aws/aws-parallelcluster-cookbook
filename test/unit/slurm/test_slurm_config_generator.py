@@ -27,6 +27,7 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
         dryrun=False,
         no_gpu=no_gpu,
         compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -47,10 +48,12 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
 
 
 @pytest.mark.parametrize(
-    "memory_scheduling",
-    [False, True],
+    "memory_scheduling,realmemory_to_ec2memory_ratio",
+    [(False, 0.95), (True, 0.90)],
 )
-def test_generate_slurm_config_files_memory_scheduling(mocker, test_datadir, tmpdir, memory_scheduling):
+def test_generate_slurm_config_files_memory_scheduling(
+    mocker, test_datadir, tmpdir, memory_scheduling, realmemory_to_ec2memory_ratio
+):
     if memory_scheduling:
         input_file = str(test_datadir / "sample_input_mem_sched.yaml")
     else:
@@ -70,13 +73,15 @@ def test_generate_slurm_config_files_memory_scheduling(mocker, test_datadir, tmp
         dryrun=False,
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
         for file_type in ["partition", "gres"]:
             file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
             no_nvidia = ""
-            output_file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}{no_nvidia}.conf"
+            mem_sched = "_mem_sched" if (memory_scheduling and file_type == "partition") else ""
+            output_file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}{no_nvidia}{mem_sched}.conf"
             _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
     for file_type in ["", "_gres", "_cgroup"]:
