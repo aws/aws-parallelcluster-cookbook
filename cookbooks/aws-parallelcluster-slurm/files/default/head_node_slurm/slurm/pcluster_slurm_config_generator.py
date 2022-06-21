@@ -245,11 +245,13 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     instance_type = compute_resource["InstanceType"]
     instance_type_info = instance_types_data[instance_type]
     schedulable_memory = compute_resource.get("SchedulableMemory", None)
+    ec2_memory = instance_type_info.get("MemoryInfo", {}).get("SizeInMiB")
+    if ec2_memory is None:
+        # This circumstance can only happen if EnableMemoryBasedScheduling is set to false and
+        # the instance_types_data does not have memory information for the requested instance type.
+        # In this case we set RealMemory to 1 (Slurm default value for RealMemory)
+        return 1
     if schedulable_memory is None:
-        # These are protections against potentially missing elements in the instance description json.
-        # In case of missing MemoryInfo or SizeInMiB, the following evaluations will fail with KeyError.
-        memory_info = instance_type_info["MemoryInfo"]
-        ec2_memory = memory_info["SizeInMiB"]
         realmemory = math.floor(ec2_memory * realmemory_to_ec2memory_ratio)
     else:
         realmemory = schedulable_memory
