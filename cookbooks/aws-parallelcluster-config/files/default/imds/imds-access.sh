@@ -35,7 +35,7 @@ EOF
 }
 
 function iptables_delete() {
-  local $iptables_command=$1
+  local iptables_command=$1
   local chain=$2
   local destination=$3
   local jump=$4
