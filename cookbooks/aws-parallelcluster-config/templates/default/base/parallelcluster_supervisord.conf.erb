@@ -4,7 +4,7 @@
 <%# HeadNode -%>
 <% when 'HeadNode' -%>
 [program:cfn-hup]
-command = bash -c "[ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh; <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/cfn-hup"
+command = bash -c "[ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh; <%= node['cluster']['cfn_bootstrap_virtualenv_path'] %>/bin/cfn-hup"
 # The following are needed because cfn-hup starts as a daemon
 exitcodes = 0
 autorestart = unexpected
