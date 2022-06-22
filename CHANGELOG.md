@@ -17,6 +17,7 @@ x.x.x
   scheduling in Slurm.
   - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
   - Add new configuration parameter to override default value of schedulable memory on compute nodes.
+- Add support for rebooting compute nodes via Slurm.
 
 **CHANGES**
 - Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
