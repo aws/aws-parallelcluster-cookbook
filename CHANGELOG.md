@@ -24,11 +24,11 @@ x.x.x
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
 - Upgrade NVIDIA Fabric Manager to version 470.129.06.
-- Upgrade EFA installer to version 1.15.2.
+- Upgrade EFA installer to version 1.16.0.
   - EFA driver: ``efa-1.16.0-1``
-  - EFA configuration: ``efa-config-1.9-1``
+  - EFA configuration: ``efa-config-1.10-1``
   - EFA profile: ``efa-profile-1.5-1``
-  - Libfabric: ``libfabric-aws-1.14.1-1``
+  - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
   - RDMA core: ``rdma-core-39.0-2``
   - Open MPI: ``openmpi40-aws-4.1.2-2``
 - Restrict IPv6 access to IMDS to root and cluster admin users only.
