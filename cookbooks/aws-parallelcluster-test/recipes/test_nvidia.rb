@@ -61,21 +61,19 @@ if graphic_instance?
     code <<-TEST
       echo "Checking NVIDIA GDRCopy is working with sanity"
       sanity
-      [[ $? != 0 ]] && echo "ERROR NVIDIA GDRCopy is not working properly: sanity test failed." && exit 1
+      [[ $? == 0 ]] || { echo "ERROR Installed NVIDIA GDRCopy is not working properly: sanity test failed"; exit 1; };
 
       echo "Checking NVIDIA GDRCopy is working with copybw"
       copybw
-      [[ $? != 0 ]] && "ERROR Installed NVIDIA GDRCopy is not working properly: copybw test failed" && exit 1
+      [[ $? == 0 ]] || { echo "ERROR Installed NVIDIA GDRCopy is not working properly: copybw test failed"; exit 1; };
 
       echo "Checking NVIDIA GDRCopy is working with copylat"
       copylat
-      [[ $? != 0 ]] && "ERROR Installed NVIDIA GDRCopy is not working properly: copylat test failed" && exit 1
+      [[ $? == 0 ]] || { echo "ERROR Installed NVIDIA GDRCopy is not working properly: copylat test failed"; exit 1; };
 
-      # The following test is disabled because some assertions in the apiperf code are failing.
-      # https://github.com/NVIDIA/gdrcopy/blob/master/tests/apiperf.cpp
-      #echo "Checking NVIDIA GDRCopy is working with apiperf"
-      #apiperf -s 8
-      #[[ $? != 0 ]] && "ERROR Installed NVIDIA GDRCopy is not working properly: apiperf test failed" && exit 1
+      echo "Checking NVIDIA GDRCopy is working with apiperf"
+      apiperf -s 8
+      [[ $? == 0 ]] || { echo "ERROR Installed NVIDIA GDRCopy is not working properly: apiperf test failed"; exit 1; };
     TEST
   end
 else
