@@ -10,6 +10,7 @@ x.x.x
 - Add support for multiple Elastic File Systems.
 - Add support for multiple FSx File System.
 - Add support for attaching existing FSx for Ontap and FSx for OpenZFS File Systems.
+- Install NVIDIA GDRCopy 2.3 to enable low-latency GPU memory copy on supported instance types.
 - Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 - Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
 - During cluster update set Slurm nodes state accordingly to strategy set through QueueUpdateStrategy parameter.
@@ -25,13 +26,14 @@ x.x.x
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
 - Upgrade NVIDIA Fabric Manager to version 470.129.06.
-- Upgrade EFA installer to version 1.15.2.
+- Upgrade EFA installer to version 1.16.0.
   - EFA driver: ``efa-1.16.0-1``
-  - EFA configuration: ``efa-config-1.9-1``
+  - EFA configuration: ``efa-config-1.10-1``
   - EFA profile: ``efa-profile-1.5-1``
-  - Libfabric: ``libfabric-aws-1.14.1-1``
+  - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
   - RDMA core: ``rdma-core-39.0-2``
   - Open MPI: ``openmpi40-aws-4.1.2-2``
+- Restrict IPv6 access to IMDS to root and cluster admin users only.
 
 3.1.4
 ------

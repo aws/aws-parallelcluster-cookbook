@@ -37,3 +37,50 @@ bash "check Nvidia drivers" do
     echo "Correctly installed CUDA ${cuda_output}"
   TEST
 end
+
+bash "Check NVIDIA GDRCopy installation" do
+  cwd Chef::Config[:file_cache_path]
+  code <<-TEST
+      expected_gdrcopy_version="#{node['cluster']['nvidia']['gdrcopy']['version']}"
+
+      echo "Checking NVIDIA GDRCopy version"
+      gdrcopy_version=$(modinfo -F version gdrdrv)
+      [[ "${gdrcopy_version}" != "${expected_gdrcopy_version}" ]] && "ERROR Installed NVIDIA GDRCopy version ${gdrcopy_version} but expected ${expected_gdrcopy_version}" && exit 1
+      echo "Correctly installed NVIDIA GDRCopy ${expected_gdrcopy_version}"
+  TEST
+end
+
+if graphic_instance?
+  # GDRCopy is enabled in graphic instances only
+  execute "check #{node['cluster']['nvidia']['gdrcopy']['service']} service is enabled" do
+    command "systemctl is-enabled #{node['cluster']['nvidia']['gdrcopy']['service']}"
+  end
+
+  bash "Check NVIDIA GDRCopy " do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      echo "Checking NVIDIA GDRCopy is working with sanity"
+      sanity
+      [[ $? != 0 ]] && echo "ERROR NVIDIA GDRCopy is not working properly: sanity test failed." && exit 1
+
+      echo "Checking NVIDIA GDRCopy is working with copybw"
+      copybw
+      [[ $? != 0 ]] && "ERROR Installed NVIDIA GDRCopy is not working properly: copybw test failed" && exit 1
+
+      echo "Checking NVIDIA GDRCopy is working with copylat"
+      copylat
+      [[ $? != 0 ]] && "ERROR Installed NVIDIA GDRCopy is not working properly: copylat test failed" && exit 1
+
+      # The following test is disabled because some assertions in the apiperf code are failing.
+      # https://github.com/NVIDIA/gdrcopy/blob/master/tests/apiperf.cpp
+      #echo "Checking NVIDIA GDRCopy is working with apiperf"
+      #apiperf -s 8
+      #[[ $? != 0 ]] && "ERROR Installed NVIDIA GDRCopy is not working properly: apiperf test failed" && exit 1
+    TEST
+  end
+else
+  # GDRCopy is enabled in graphic instances only
+  execute "check #{node['cluster']['nvidia']['gdrcopy']['service']} service is not enabled" do
+    command "systemctl is-enabled #{node['cluster']['nvidia']['gdrcopy']['service']} | grep disabled"
+  end
+end
