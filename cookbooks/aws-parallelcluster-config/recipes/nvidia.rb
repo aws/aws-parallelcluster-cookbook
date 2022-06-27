@@ -25,8 +25,12 @@ end
 
 if graphic_instance?
   # NVIDIA GDRCopy
+  execute "enable #{node['cluster']['nvidia']['gdrcopy']['service']} service" do
+    # Using command in place of service resource because of: https://github.com/chef/chef/issues/12053
+    command "systemctl enable #{node['cluster']['nvidia']['gdrcopy']['service']}"
+  end
   service node['cluster']['nvidia']['gdrcopy']['service'] do
-    action %i(start enable)
+    action :start
     supports status: true
   end
 end
