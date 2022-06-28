@@ -3,7 +3,7 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-x.x.x
+3.2.0
 ------
 
 **ENHANCEMENTS**
@@ -11,17 +11,13 @@ x.x.x
 - Add support for multiple FSx File System.
 - Add support for attaching existing FSx for Ontap and FSx for OpenZFS File Systems.
 - Install NVIDIA GDRCopy 2.3 to enable low-latency GPU memory copy on supported instance types.
-- Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
-- Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
-- During cluster update set Slurm nodes state accordingly to strategy set through QueueUpdateStrategy parameter.
-- Add new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based
-  scheduling in Slurm.
-  - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
-  - Add new configuration parameter to override default value of schedulable memory on compute nodes.
+- During cluster update set Slurm nodes state accordingly to strategy set through the configuration parameter `Scheduling/SchedulerSettings/QueueUpdateStrategy`.
+- Add new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based scheduling in Slurm.
+- Add new configuration parameter `Scheduling/SlurmQueues/ComputeResources/SchedulableMemory` to override default value of the memory seen by the scheduler on compute nodes.
 - Add support for rebooting compute nodes via Slurm.
 
 **CHANGES**
-- Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
+- Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
 - Update slurmctld and slurmd systemd service files.
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
@@ -33,7 +29,9 @@ x.x.x
   - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
   - RDMA core: ``rdma-core-39.0-2``
   - Open MPI: ``openmpi40-aws-4.1.2-2``
-- Restrict IPv6 access to IMDS to root and cluster admin users only.
+- Restrict IPv6 access to IMDS to root and cluster admin users only, when configuration parameter `HeadNode/Imds/Secured` is enabled.
+- Set Slurm configuration `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
+- Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
 
 3.1.4
 ------
