@@ -22,13 +22,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
 - Upgrade NVIDIA Fabric Manager to version 470.129.06.
-- Upgrade EFA installer to version 1.16.0.
+- Upgrade EFA installer to version 1.17.1.
   - EFA driver: ``efa-1.16.0-1``
   - EFA configuration: ``efa-config-1.10-1``
   - EFA profile: ``efa-profile-1.5-1``
-  - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
-  - RDMA core: ``rdma-core-39.0-2``
-  - Open MPI: ``openmpi40-aws-4.1.2-2``
+  - Libfabric: ``libfabric-aws-1.16.0~amzn2.0-1``
+  - RDMA core: ``rdma-core-41.0-2``
+  - Open MPI: ``openmpi40-aws-4.1.4-2``
 - Restrict IPv6 access to IMDS to root and cluster admin users only, when configuration parameter `HeadNode/Imds/Secured` is enabled.
 - Set Slurm configuration `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
