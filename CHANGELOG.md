@@ -36,6 +36,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Restrict IPv6 access to IMDS to root and cluster admin users only, when configuration parameter `HeadNode/Imds/Secured` is enabled.
 - Set Slurm configuration `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
+- Upgrade third-party cookbook dependencies:
+  - apt-7.4.2 (from apt-7.4.0)
+  - line-4.5.2 (from line-4.0.1)
+  - openssh-2.10.3 (from openssh-2.9.1)
+  - pyenv-3.5.1 (from pyenv-3.4.2)
+  - selinux-6.0.4 (from selinux-3.1.1)
+  - yum-7.4.0 (from yum-6.1.1)
+  - yum-epel-4.5.0 (from yum-epel-4.1.2)
 
 3.1.4
 ------

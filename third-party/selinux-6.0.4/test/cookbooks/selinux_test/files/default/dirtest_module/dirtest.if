@@ -1,0 +1,16 @@
+interface(`dirtest_domtrans',`
+    gen_requires(`
+        type dirtest_t, dirtest_exec_t;
+    ')
+
+    domtrans_pattern($1,dirtest_exec_t,dirtest_t)
+')
+
+interface(`dirtest_read_log',`
+    gen_requires(`
+        type dirtest_log_t;
+    ')
+
+    logging_search_logs($1)
+    allow $1 dirtest_log_t:file read_file_perms;
+')
