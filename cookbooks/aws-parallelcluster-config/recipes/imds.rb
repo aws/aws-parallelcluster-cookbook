@@ -57,12 +57,21 @@ if node['cluster']['node_type'] == 'HeadNode'
     command "mkdir -p $(dirname #{iptables_rules_file}) && iptables-save > #{iptables_rules_file}"
   end
 
+  ip6tables_rules_file = '/etc/parallelcluster/sysconfig/ip6tables.rules'
+
+  execute "Save ip6tables rules" do
+    command "mkdir -p $(dirname #{ip6tables_rules_file}) && ip6tables-save > #{ip6tables_rules_file}"
+  end
+
   template '/etc/init.d/parallelcluster-iptables' do
     source 'imds/parallelcluster-iptables.erb'
     user 'root'
     group 'root'
     mode '0744'
-    variables(iptables_rules_file: iptables_rules_file)
+    variables(
+      iptables_rules_file: iptables_rules_file,
+      ip6tables_rules_file: ip6tables_rules_file
+    )
   end
 
   service "parallelcluster-iptables" do
