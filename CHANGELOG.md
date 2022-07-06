@@ -12,8 +12,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for attaching existing FSx for Ontap and FSx for OpenZFS File Systems.
 - Install NVIDIA GDRCopy 2.3 to enable low-latency GPU memory copy on supported instance types.
 - During cluster update set Slurm nodes state accordingly to strategy set through the configuration parameter `Scheduling/SchedulerSettings/QueueUpdateStrategy`.
-- Add new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based scheduling in Slurm.
-- Add new configuration parameter `Scheduling/SlurmQueues/ComputeResources/SchedulableMemory` to override default value of the memory seen by the scheduler on compute nodes.
+- Add support for memory-based scheduling in Slurm.
+  - Configure `RealMemory` on compute nodes by default as 95% of the EC2 memory.
+  - Move `SelectTypeParameters` to `slurm_parallelcluster.conf` include file.
+  - Move `ConstrainRAMSpace` to `slurm_parallelcluster_cgroup.conf` include file.
+  - Add support for new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based scheduling in Slurm.
+  - Add support for new configuration parameter `Scheduling/SlurmQueues/ComputeResources/SchedulableMemory` to override default value of the memory seen by the scheduler on compute nodes.
 - Add support for rebooting compute nodes via Slurm.
 
 **CHANGES**
