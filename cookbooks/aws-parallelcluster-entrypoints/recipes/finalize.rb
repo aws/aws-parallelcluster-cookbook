@@ -16,6 +16,11 @@ include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
 
 fetch_config 'Fetch and load cluster configs'
 
+if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
+  # Install custom aws-parallelcluster-node package
+  include_recipe 'aws-parallelcluster-shared::custom_parallelcluster_node'
+end
+
 # Restart supervisord
 service "supervisord" do
   supports restart: true

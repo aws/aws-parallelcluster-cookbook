@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-computefleet::node' do
+describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:node_version) { 'node_version' }

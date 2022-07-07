@@ -8,7 +8,7 @@ suites:
   - name: node
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-computefleet::node]
+      - recipe[aws-parallelcluster-computefleet::parallelcluster_node]
     verifier:
       controls:
         - /node_virtualenv_created/
