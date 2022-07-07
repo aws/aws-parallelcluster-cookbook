@@ -25,3 +25,18 @@ include_recipe 'aws-parallelcluster-config::fs_update'
 include_recipe 'aws-parallelcluster-config::directory_service'
 include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']['scheduler'] == 'plugin'
+
+# Update node package - useful for development purposes only
+if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
+
+  service "supervisord" do
+    action :stop
+  end
+
+  include_recipe 'aws-parallelcluster-install::parallelcluster_custom_node'
+
+  service "supervisord" do
+    action :start
+  end
+
+end
