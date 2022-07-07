@@ -3,7 +3,7 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-x.x.x
+3.2.0
 ------
 
 **ENHANCEMENTS**
@@ -11,29 +11,39 @@ x.x.x
 - Add support for multiple FSx File System.
 - Add support for attaching existing FSx for Ontap and FSx for OpenZFS File Systems.
 - Install NVIDIA GDRCopy 2.3 to enable low-latency GPU memory copy on supported instance types.
-- Slurm: Set `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
-- Make `DirectoryService/AdditionalSssdConfigs` be merged into final SSSD configuration rather than be appended.
-- During cluster update set Slurm nodes state accordingly to strategy set through QueueUpdateStrategy parameter.
-- Add new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based
-  scheduling in Slurm.
-  - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
-  - Add new configuration parameter to override default value of schedulable memory on compute nodes.
+- During cluster update set Slurm nodes state accordingly to strategy set through the configuration parameter `Scheduling/SchedulerSettings/QueueUpdateStrategy`.
+- Add support for memory-based scheduling in Slurm.
+  - Configure `RealMemory` on compute nodes by default as 95% of the EC2 memory.
+  - Move `SelectTypeParameters` to `slurm_parallelcluster.conf` include file.
+  - Move `ConstrainRAMSpace` to `slurm_parallelcluster_cgroup.conf` include file.
+  - Add support for new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based scheduling in Slurm.
+  - Add support for new configuration parameter `Scheduling/SlurmQueues/ComputeResources/SchedulableMemory` to override default value of the memory seen by the scheduler on compute nodes.
 - Add support for rebooting compute nodes via Slurm.
 
 **CHANGES**
-- Slurm: Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
+- Restart `clustermgtd` and `slurmctld` daemons at cluster update time only when `Scheduling` parameters are updated in the cluster configuration.
 - Update slurmctld and slurmd systemd service files.
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
 - Upgrade NVIDIA Fabric Manager to version 470.129.06.
-- Upgrade EFA installer to version 1.16.0.
+- Upgrade EFA installer to version 1.17.1.
   - EFA driver: ``efa-1.16.0-1``
   - EFA configuration: ``efa-config-1.10-1``
   - EFA profile: ``efa-profile-1.5-1``
-  - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
-  - RDMA core: ``rdma-core-39.0-2``
-  - Open MPI: ``openmpi40-aws-4.1.2-2``
-- Restrict IPv6 access to IMDS to root and cluster admin users only.
+  - Libfabric: ``libfabric-aws-1.16.0~amzn2.0-1``
+  - RDMA core: ``rdma-core-41.0-2``
+  - Open MPI: ``openmpi40-aws-4.1.4-2``
+- Restrict IPv6 access to IMDS to root and cluster admin users only, when configuration parameter `HeadNode/Imds/Secured` is enabled.
+- Set Slurm configuration `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
+- Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
+- Upgrade third-party cookbook dependencies:
+  - apt-7.4.2 (from apt-7.4.0)
+  - line-4.5.2 (from line-4.0.1)
+  - openssh-2.10.3 (from openssh-2.9.1)
+  - pyenv-3.5.1 (from pyenv-3.4.2)
+  - selinux-6.0.4 (from selinux-3.1.1)
+  - yum-7.4.0 (from yum-6.1.1)
+  - yum-epel-4.5.0 (from yum-epel-4.1.2)
 
 3.1.4
 ------
