@@ -26,7 +26,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
 - Upgrade NVIDIA Fabric Manager to version 470.129.06.
-- Upgrade EFA installer to version 1.17.1.
+- Upgrade EFA installer to version 1.17.2.
   - EFA driver: ``efa-1.16.0-1``
   - EFA configuration: ``efa-config-1.10-1``
   - EFA profile: ``efa-profile-1.5-1``
