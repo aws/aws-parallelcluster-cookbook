@@ -27,7 +27,7 @@ end
 
 include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
 
-# Disable mounting of ephemeral drive under /scratch if /scratch is used by another device
+# Mount the ephemeral drive unless there is a mountpoint collision with shared drives
 shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',') + \
                    node['cluster']['efs_shared_dirs'].split(',') + \
                    node['cluster']['fsx_shared_dirs'].split(',') + \

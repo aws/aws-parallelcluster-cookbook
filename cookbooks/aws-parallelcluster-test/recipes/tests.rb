@@ -373,8 +373,8 @@ if ebs_shared_dirs_array.include? node['cluster']['ephemeral_dir']
     cwd Chef::Config[:file_cache_path]
     user node['cluster']['cluster_user']
     code <<-COLLISION
-      systemctl show setup-ephemeral.service | grep "ActiveState=inactive"
-      systemctl show setup-ephemeral.service | grep "UnitFileState=disabled"
+      systemctl show setup-ephemeral.service -p ActiveState | grep "=inactive"
+      systemctl show setup-ephemeral.service -p UnitFileState | grep "=disabled"
     COLLISION
   end
 else
