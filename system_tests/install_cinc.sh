@@ -22,7 +22,7 @@ elif [ `echo "${RELEASE}" | grep '^ubuntu\.20'` ]; then
   OS='ubuntu2004'
 else
   echo "Operating System '${RELEASE}' is not supported. Failing build."
-  exit -1
+  exit 1
 fi
 
 if [ `echo "${OS}" | grep -E '^(alinux|centos)'` ]; then
