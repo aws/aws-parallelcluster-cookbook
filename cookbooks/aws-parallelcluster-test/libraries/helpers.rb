@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -222,5 +222,16 @@ def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_c
         exit 1
       fi
     TEST
+  end
+end
+
+#
+# Check if a service is disabled
+#
+def is_service_disabled(service, platform_families = %i(rhel amazon debian))
+  if platform_family?(platform_families)
+    execute "check #{service} service is disabled" do
+      command "systemctl is-enabled #{service} && exit 1 || exit 0"
+    end
   end
 end
