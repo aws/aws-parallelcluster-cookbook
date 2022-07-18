@@ -44,6 +44,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - selinux-6.0.4 (from selinux-3.1.1)
   - yum-7.4.0 (from yum-6.1.1)
   - yum-epel-4.5.0 (from yum-epel-4.1.2)
+- Disable `aws-ubuntu-eni-helper` service, available in Deep Learning AMIs, to avoid conflicts with `configure_nw_interface.sh` when configuring instances with multiple network cards.
+- Set MTU to 9001 for all the network interfaces when configuring instances with multiple network cards.
 
 3.1.4
 ------
