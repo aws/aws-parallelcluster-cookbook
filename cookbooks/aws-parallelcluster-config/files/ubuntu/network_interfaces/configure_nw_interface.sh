@@ -47,6 +47,7 @@ network:
   ethernets:
     ${DEVICE_NAME}:
 $STATIC_IP_CONFIG
+      mtu: '9001'
       routes:
        - to: 0.0.0.0/0
          via: ${GW_IP_ADDRESS} # Default gateway
