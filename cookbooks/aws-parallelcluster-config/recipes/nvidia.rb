@@ -23,7 +23,7 @@ if get_nvswitches > 1
   end
 end
 
-if graphic_instance?
+if graphic_instance? && is_service_installed?(node['cluster']['nvidia']['gdrcopy']['service'])
   # NVIDIA GDRCopy
   execute "enable #{node['cluster']['nvidia']['gdrcopy']['service']} service" do
     # Using command in place of service resource because of: https://github.com/chef/chef/issues/12053
