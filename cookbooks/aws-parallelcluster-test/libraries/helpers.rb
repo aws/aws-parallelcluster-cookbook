@@ -228,7 +228,7 @@ end
 #
 # Check if a service is disabled
 #
-def is_service_disabled(service, platform_families = %i(rhel amazon debian))
+def is_service_disabled(service, platform_families = node['platform_family'])
   if platform_family?(platform_families)
     execute "check #{service} service is disabled" do
       command "systemctl is-enabled #{service} && exit 1 || exit 0"
