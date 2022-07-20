@@ -97,6 +97,6 @@ end
 replace_or_add "set fqdn in the /etc/hosts" do
   path "/etc/hosts"
   pattern "^#{node['ec2']['local_ipv4']}\s+"
-  line(lazy { "#{node['ec2']['local_ipv4']} #{node['cluster']['assigned_hostname']} #{node['cluster']['assigned_short_hostname']}" })
+  line(lazy { "#{node['ec2']['local_ipv4']} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
   notifies :reload, "ohai[reload_hostname]"
 end
