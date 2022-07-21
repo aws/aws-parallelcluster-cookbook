@@ -17,7 +17,9 @@
 #
 def is_service_installed?(service, platform_families = node['platform_family'])
   if platform_family?(platform_families)
-    service_check = Mixlib::ShellOut.new("systemctl daemon-reload && systemctl list-unit-files --all | grep #{service}")
+    # Add chkconfig for alinux2 and centos platform, because they do not generate systemd unit file automatically from init script
+    # Ubuntu platform generate systemd unit file from init script automatically, if the service is not found by systemd the check will fail because chkconfig does not exist
+    service_check = Mixlib::ShellOut.new("systemctl daemon-reload; systemctl list-unit-files --all | grep #{service} || chkconfig --list #{service}")
     service_check.run_command
     # convert return code in boolean
     service_check.exitstatus.to_i.zero?
