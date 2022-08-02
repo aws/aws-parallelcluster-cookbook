@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.x.x
+-----
+
+**CHANGES**
+* Assign a lower weight to Slurm static nodes so that they get prioritized over active dynamic nodes.
+
 3.4.0
 ------
 
