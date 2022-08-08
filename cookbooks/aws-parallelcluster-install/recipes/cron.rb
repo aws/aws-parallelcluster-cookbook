@@ -17,9 +17,17 @@
 #
 
 # Disable cron/anacron jobs that may impact performance
-cookbook_file 'cron.jobs.deny' do
-  source 'cron/jobs.deny'
+cookbook_file 'cron.jobs.deny.daily' do
+  source 'cron/jobs.deny.daily'
   path '/etc/cron.daily/jobs.deny'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+cookbook_file 'cron.jobs.deny.weekly' do
+  source 'cron/jobs.deny.weekly'
+  path '/etc/cron.weekly/jobs.deny'
   owner 'root'
   group 'root'
   mode '0644'
