@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
 - Upgrade NVIDIA Fabric Manager to version 470.141.03.
+- Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
 
 3.2.0
 ------

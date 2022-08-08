@@ -217,6 +217,9 @@ include_recipe "aws-parallelcluster-install::lustre"
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 
+# Configure cron and anacron
+include_recipe "aws-parallelcluster-install::cron"
+
 # Install Amazon Time Sync
 include_recipe "aws-parallelcluster-install::chrony"
 
