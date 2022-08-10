@@ -31,11 +31,6 @@ node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slot
                                               node['cluster']['scheduler_slots']
                                             end
 
-# NOTE: this recipe must be included after instance_slot because it may alter the values of
-#       node['cpu']['total'], which would break the expected behavior when setting scheduler_slots
-#       to one of the constants looked for in the above conditionals
-include_recipe "aws-parallelcluster-config::disable_hyperthreading"
-
 template '/etc/parallelcluster/cfnconfig' do
   source 'init/cfnconfig.erb'
   mode '0644'
