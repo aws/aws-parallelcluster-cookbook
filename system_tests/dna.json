@@ -3,7 +3,6 @@
     "stack_name": "pc3cluster",
     "raid_vol_ids": "",
     "raid_shared_dir": "",
-    "disable_hyperthreading_manually": "false",
     "base_os": "ubuntu2004",
     "preinstall": "NONE",
     "preinstall_args": "NONE",

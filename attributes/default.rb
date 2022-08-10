@@ -518,7 +518,6 @@ default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
 default['cluster']['ddb_table'] = nil
 default['cluster']['slurm_ddb_table'] = nil
 default['cluster']['log_group_name'] = "NONE"
-default['cluster']['disable_hyperthreading_manually'] = 'false'
 default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['efs_shared_dirs'] = ''
 default['cluster']['efs_fs_ids'] = ''
