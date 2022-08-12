@@ -600,6 +600,17 @@ def are_queues_updated?
   config["Scheduling"] != previous_config["Scheduling"] or is_compute_node_bootstrap_timeout_updated?(previous_config, config)
 end
 
+def are_mount_or_unmount_required?
+  require 'json'
+  change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
+  change_set["changeSet"].each do |change|
+    next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
+    return true
+  end
+  Chef::Log.info("No shared storages operation required.")
+  false
+end
+
 def evaluate_compute_bootstrap_timeout(config)
   config.dig("DevSettings", "Timeouts", "ComputeNodeBootstrapTimeout") or 1800
 end
@@ -618,4 +629,22 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   cmd.run_command
   raise_command_error(command, cmd) if raise_on_error && cmd.error?
   cmd.stdout.strip
+end
+
+# load cluster configuration file into node object
+def load_shared_storages_mapping
+  ruby_block "load shared storages mapping during cluster update" do
+    block do
+      require 'yaml'
+      # regenerate the shared storages mapping file after update
+      node.default['cluster']['shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['shared_storages_mapping_path']))
+      node.default['cluster']['update_shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['update_shared_storages_mapping_path']))
+    end
+  end
+end
+
+def format_directory(dir)
+  format_dir = dir.strip
+  format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
+  format_dir
 end

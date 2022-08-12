@@ -7,6 +7,7 @@ import time
 import boto3
 import requests
 from botocore.config import Config
+import argparse
 
 
 def convert_dev(dev):
@@ -60,24 +61,7 @@ def get_imdsv2_token():
     return headers
 
 
-def main():
-    # Get EBS volume Id
-    try:
-        volume_id = str(sys.argv[1])
-    except IndexError:
-        print("Provide an EBS volume ID to attach i.e. vol-cc789ea5")
-        sys.exit(1)
-
-    # Get IMDSv2 token
-    token = get_imdsv2_token()
-
-    # Get instance ID
-    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=token).text
-
-    # Get region
-    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=token).text
-    region = region[:-1]
-
+def attach_volume(volume_id, instance_id, ec2):
     # Generate a list of system paths minus the root path
     paths = [convert_dev(device) for device in get_all_devices()]
 
@@ -113,7 +97,57 @@ def main():
     # List of available block devices after removing currently used block devices
     available_devices = [a for a in block_devices if a not in paths]
 
-    # Parse configuration file to read proxy settings
+    # Attach the volume
+    dev = available_devices[0]
+    response = ec2.attach_volume(VolumeId=volume_id, InstanceId=instance_id, Device=dev)
+
+    # Poll for volume to attach
+    state = response.get("State")
+    delay = 5  # seconds
+    elapsed = 0
+    timeout = 300  # seconds
+    while state != "attached":
+        if elapsed >= timeout:
+            print("ERROR: Volume %s failed to mount in % seconds." % (volume_id, timeout))
+            exit(1)
+        if state in ["busy", "detached"]:
+            print("ERROR: Volume %s in bad state %s" % (volume_id, state))
+            exit(1)
+        print("Volume %s in state %s ... waiting to be 'attached'" % (volume_id, state))
+        time.sleep(delay)
+        elapsed += delay
+        try:
+            state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("Attachments")[0].get("State")
+        except IndexError:
+            continue
+
+
+def detach_volume(volume_id, ec2):
+    response = ec2.detach_volume(VolumeId=volume_id)
+
+    # Poll for volume to attach
+    state = response.get("State")
+    delay = 5  # seconds
+    elapsed = 0
+    timeout = 300  # seconds
+    while state != "available":
+        if elapsed >= timeout:
+            print("ERROR: Volume %s failed to detach in %s seconds." % (volume_id, timeout))
+            exit(1)
+        if state in ["busy", "attached"]:
+            print("ERROR: Volume %s in bad state %s" % (volume_id, state))
+            exit(1)
+        print("Volume %s in state %s ... waiting to be 'detach'" % (volume_id, state))
+        time.sleep(delay)
+        elapsed += delay
+        try:
+            state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("State")
+        except IndexError:
+            continue
+
+
+def parse_proxy_config():
+    """Parse configuration file to read proxy settings."""
     config = configparser.RawConfigParser()
     config.read("/etc/boto.cfg")
     proxy_config = Config()
@@ -121,31 +155,53 @@ def main():
         proxy = config.get("Boto", "proxy")
         proxy_port = config.get("Boto", "proxy_port")
         proxy_config = Config(proxies={"https": "{0}:{1}".format(proxy, proxy_port)})
+    return proxy_config
+
+
+def handle_volume(volume_id, attach, detach):
+    # Get IMDSv2 token
+    token = get_imdsv2_token()
+
+    # Get instance ID
+    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=token).text
+
+    # Get region
+    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=token).text
+    region = region[:-1]
+
+    # Parse configuration file to read proxy settings
+    proxy_config = parse_proxy_config()
 
     # Connect to AWS using boto
     ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
 
-    # Attach the volume
-    dev = available_devices[0]
-    response = ec2.attach_volume(VolumeId=volume_id, InstanceId=instance_id, Device=dev)
+    if attach:
+        attach_volume(volume_id, instance_id, ec2)
+    elif detach:
+        detach_volume(volume_id, ec2)
 
-    # Poll for volume to attach
-    state = response.get("State")
-    x = 0
-    while state != "attached":
-        if x == 60:
-            print("Volume %s failed to mount in 300 seconds." % volume_id)
-            exit(1)
-        if state in ["busy", "detached"]:
-            print("Volume %s in bad state %s" % (volume_id, state))
-            exit(1)
-        print("Volume %s in state %s ... waiting to be 'attached'" % (volume_id, state))
-        time.sleep(5)
-        x += 1
-        try:
-            state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("Attachments")[0].get("State")
-        except IndexError:
-            continue
+
+def main():
+    try:
+        parser = argparse.ArgumentParser(description="Attach or detach ebs volume")
+        parser.add_argument(
+            "--attach", action="store_true", help="Attach EBS volume", required=False, default=False,
+        )
+        parser.add_argument(
+            "--detach", action="store_true", help="Detach EBS volume", required=False, default=False,
+        )
+        parser.add_argument(
+            "--volume-id",
+            required=True,
+        )
+        args = parser.parse_args()
+        if not args.attach and not args.detach:
+            raise Exception("Must specify attach or detach action.")
+        handle_volume(args.volume_id, args.attach, args.detach)
+
+    except Exception as e:
+        print("ERROR: Failed to attach or detach volume, exception: %s", e)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

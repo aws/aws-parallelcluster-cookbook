@@ -12,8 +12,8 @@ resource_name :manage_ebs
 provides :manage_ebs
 unified_mode true
 
-property :shared_dir_array, required: true
-property :vol_array, required: true
+property :shared_dir_array, Array, required: true
+property :vol_array, Array, required: true
 
 default_action :mount
 
@@ -22,8 +22,7 @@ action :mount do
   vol_array = new_resource.vol_array.dup
 
   shared_dir_array.each_with_index do |dir, index|
-    shared_dir_array[index] = dir.strip
-    shared_dir_array[index] = "/#{shared_dir_array[index]}" unless shared_dir_array[index].start_with?('/')
+    shared_dir_array[index] = format_directory(dir)
   end
 
   vol_array.each_with_index do |vol, index|
@@ -39,7 +38,7 @@ action :mount do
 
     # Attach EBS volume
     execute "attach_volume_#{index}" do
-      command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
+      command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volumeid} --attach"
       creates dev_path[index]
     end
 
@@ -108,13 +107,74 @@ action :export do
   shared_dir_array = new_resource.shared_dir_array.dup
 
   shared_dir_array.each_with_index do |dir, index|
-    shared_dir_array[index] = dir.strip
-    shared_dir_array[index] = "/#{shared_dir_array[index]}" unless shared_dir_array[index].start_with?('/')
+    shared_dir_array[index] = format_directory(dir)
     # Export shared dir
     nfs_export shared_dir_array[index] do
       network get_vpc_cidr_list
       writeable true
       options ['no_root_squash']
     end
+  end
+end
+
+action :unmount do
+  shared_dir_array = new_resource.shared_dir_array.dup
+  vol_array = new_resource.vol_array.dup
+
+  shared_dir_array.each_with_index do |dir, index|
+    shared_dir_array[index] = format_directory(dir)
+  end
+
+  vol_array.each_with_index do |vol, index|
+    vol_array[index] = vol.strip
+  end
+
+  # Mount each volume
+  dev_path = [] # device labels
+  dev_uuids = [] # device uuids
+
+  vol_array.each_with_index do |volumeid, index|
+    dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
+    dev_uuids[index] = get_uuid(dev_path[index])
+
+    # Unmount and remove volume from /etc/fstab
+    mount shared_dir_array[index] do
+      device(DelayedEvaluator.new { dev_uuids[index] })
+      fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
+      device_type :uuid
+      options "_netdev"
+      pass 0
+      action %i(unmount disable)
+      retries 10
+      retry_delay 6
+    end
+
+    # Detach EBS volume
+    execute "detach_volume_#{index}" do
+      command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volumeid} --detach"
+    end
+
+    # Delete the shared directories
+    directory shared_dir_array[index] do
+      recursive true
+      action :delete
+    end
+  end
+end
+
+action :unexport do
+  shared_dir_array = new_resource.shared_dir_array.dup
+
+  shared_dir_array.each_with_index do |dir, index|
+    shared_dir_array[index] = format_directory(dir)
+    # unexport the volume
+    delete_lines "remove volume from /etc/exports" do
+      path "/etc/exports"
+      pattern "#{shared_dir_array[index]} *"
+    end
+  end
+
+  execute "unexport volume" do
+    command "exportfs -ra"
   end
 end

@@ -35,6 +35,9 @@ default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
+default['cluster']['shared_storages_mapping_path'] = "/etc/parallelcluster/shared_storages_data.yaml"
+default['cluster']['update_shared_storages_mapping_path'] = "/etc/parallelcluster/update_shared_storages_data.yaml"
+
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
