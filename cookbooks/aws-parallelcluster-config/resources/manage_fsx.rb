@@ -8,8 +8,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource_name :mount_fsx
-provides :mount_fsx
+resource_name :manage_fsx
+provides :manage_fsx
 unified_mode true
 
 property :fsx, String, name_property: true
@@ -23,12 +23,12 @@ property :fsx_volume_junction_path_array, Array, required: true
 default_action :mount
 
 action :mount do
-  fsx_fs_id_array = new_resource.fsx_fs_id_array
-  fsx_fs_type_array = new_resource.fsx_fs_type_array
-  fsx_shared_dir_array = new_resource.fsx_shared_dir_array
-  fsx_dns_name_array = new_resource.fsx_dns_name_array
-  fsx_mount_name_array = new_resource.fsx_mount_name_array
-  fsx_volume_junction_path_array = new_resource.fsx_volume_junction_path_array
+  fsx_fs_id_array = new_resource.fsx_fs_id_array.dup
+  fsx_fs_type_array = new_resource.fsx_fs_type_array.dup
+  fsx_shared_dir_array = new_resource.fsx_shared_dir_array.dup
+  fsx_dns_name_array = new_resource.fsx_dns_name_array.dup
+  fsx_mount_name_array = new_resource.fsx_mount_name_array.dup
+  fsx_volume_junction_path_array = new_resource.fsx_volume_junction_path_array.dup
   fsx_fs_id_array.each_with_index do |fsx_fs_id, index|
     fsx_shared_dir = fsx_shared_dir_array[index]
     fsx_dns_name = fsx_dns_name_array[index]
@@ -102,6 +102,62 @@ action :mount do
       owner 'root'
       group 'root'
       mode '1777'
+    end
+  end
+end
+
+action :unmount do
+  fsx_fs_id_array = new_resource.fsx_fs_id_array.dup
+  fsx_fs_type_array = new_resource.fsx_fs_type_array.dup
+  fsx_shared_dir_array = new_resource.fsx_shared_dir_array.dup
+  fsx_dns_name_array = new_resource.fsx_dns_name_array.dup
+  fsx_mount_name_array = new_resource.fsx_mount_name_array.dup
+  fsx_volume_junction_path_array = new_resource.fsx_volume_junction_path_array.dup
+
+  fsx_fs_id_array.each_with_index do |fsx_fs_id, index|
+    fsx_shared_dir = fsx_shared_dir_array[index]
+    fsx_dns_name = fsx_dns_name_array[index]
+    fsx_fs_type = fsx_fs_type_array[index]
+    fsx_volume_junction_path = fsx_volume_junction_path_array[index]
+
+    dns_name = if fsx_dns_name && !fsx_dns_name.empty?
+                 # DNS names of existing Lustre, Ontap, OpenZFS file systems are passed in from CLI
+                 fsx_dns_name
+               else
+                 # DNS names of newly created Lustre file systems are hardcoded here.
+                 # Note the Hardcoding format is only valid for lustre file systems created after Mar-1 2021
+                 "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
+               end
+    fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
+    execute 'unmount fsx' do
+      command "umount #{fsx_shared_dir}"
+      retries 10
+      retry_delay 6
+    end
+
+    # remove volume from fstab
+    case fsx_fs_type
+    when 'LUSTRE'
+      mount_name = fsx_mount_name_array[index]
+      delete_lines "remove volume from /etc/fstab" do
+        path "/etc/fstab"
+        pattern "#{dns_name}@tcp:/#{mount_name} *"
+      end
+
+    when 'OPENZFS', 'ONTAP'
+      delete_lines "remove volume from /etc/fstab" do
+        path "/etc/fstab"
+        pattern "#{dns_name}:#{fsx_volume_junction_path} *"
+      end
+    end
+
+    # Delete the shared directories
+    directory fsx_shared_dir do
+      owner 'root'
+      group 'root'
+      mode '1777'
+      recursive true
+      action :delete
     end
   end
 end

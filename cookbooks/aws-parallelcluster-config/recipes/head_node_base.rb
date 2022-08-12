@@ -15,10 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-manage_ebs "ebs" do
+manage_ebs "add ebs" do
   shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
   vol_array node['cluster']['volume'].split(',')
   action %i(mount export)
+  not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
 end
 
 # Export /home

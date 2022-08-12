@@ -47,9 +47,9 @@ cookbook_file 'ec2blkdev-init' do
   mode '0744'
 end
 
-cookbook_file 'attachVolume.py' do
-  source 'ec2_udev_rules/attachVolume.py'
-  path '/usr/local/sbin/attachVolume.py'
+cookbook_file 'manageVolume.py' do
+  source 'ec2_udev_rules/manageVolume.py'
+  path '/usr/local/sbin/manageVolume.py'
   user 'root'
   group 'root'
   mode '0755'

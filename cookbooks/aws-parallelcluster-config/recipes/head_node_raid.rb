@@ -39,7 +39,7 @@ unless raid_shared_dir.empty?
 
     # Attach RAID EBS volume
     execute "attach_raid_volume_#{index}" do
-      command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
+      command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volumeid} --attach"
       creates raid_dev_path[index]
     end
 
