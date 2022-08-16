@@ -533,6 +533,20 @@ def efa_installed?
   dir_exist
 end
 
+def neuron_installed?
+  package_name = "aws-neuronx-dkms"
+  command = value_for_platform(
+  %w(ubuntu debian) => {
+    'default' => "apt list --installed | grep #{package_name}",
+  },
+  'default' => "yum list installed | grep #{package_name}")
+
+  cmd = Mixlib::ShellOut.new(command, timeout: 60)
+  cmd.run_command
+  # Return false if the package is not installed
+  !(cmd.exitstatus != 0)
+end
+
 # load cluster configuration file into node object
 def load_cluster_config
   ruby_block "load cluster configuration" do
