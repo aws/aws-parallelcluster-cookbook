@@ -479,6 +479,18 @@ default['cluster']['lustre']['client_url'] = value_for_platform(
   }
 )
 
+# Neuron
+default['cluster']['neuron']['repository_name'] = "neuron"
+default['cluster']['neuron']['base_url'] = value_for_platform(
+  'default' => 'https://yum.repos.neuron.amazonaws.com',
+  'ubuntu' => { 'default' => 'https://apt.repos.neuron.amazonaws.com' }
+)
+default['cluster']['neuron']['public_key'] = value_for_platform(
+  'default' => 'https://yum.repos.neuron.amazonaws.com/GPG-PUB-KEY-AMAZON-AWS-NEURON.PUB',
+  'ubuntu' => { 'default' => 'https://apt.repos.neuron.amazonaws.com/GPG-PUB-KEY-AMAZON-AWS-NEURON.PUB' }
+)
+default['cluster']['neuron']['packages'] = 'aws-neuronx-dkms'
+
 # Default gc_thresh values for performance at scale
 default['cluster']['sysctl']['ipv4']['gc_thresh1'] = 0
 default['cluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
