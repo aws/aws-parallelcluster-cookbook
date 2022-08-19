@@ -96,6 +96,39 @@ def test_generate_slurm_config_files_memory_scheduling(
     )
 
 
+def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):
+    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch(
+        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
+    )
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+    )
+
+    for queue in ["queue1", "queue2", "queue3"]:
+        for file_type in ["partition", "gres"]:
+            file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
+            output_file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
+            _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+    for file_type in ["", "_gres", "_cgroup"]:
+        file_name = f"slurm_parallelcluster{file_type}.conf"
+        output_file_name = f"slurm_parallelcluster{file_type}.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
 def _assert_files_are_equal(file, expected_file):
     with open(file, "r") as f, open(expected_file, "r") as exp_f:
         expected_file_content = exp_f.read()
