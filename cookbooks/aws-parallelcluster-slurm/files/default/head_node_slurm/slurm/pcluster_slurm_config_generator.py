@@ -191,12 +191,24 @@ def _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio):
     env.filters["gpus"] = _gpu_count
     env.filters["gpu_type"] = _gpu_type
     env.filters["vcpus"] = _vcpus
+    env.filters["get_instance_type"] = _instance_type
     env.filters["realmemory"] = functools.partial(
         _realmemory,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
     )
 
     return env
+
+
+def _instance_type(compute_resource):
+    """Return the instance type in a compute resource.
+
+    If the compute resource contains multiple instance types, it returns the first one.
+    """
+    if compute_resource.get("InstanceTypeList"):
+        return compute_resource["InstanceTypeList"][0].get("InstanceType")
+    else:
+        return compute_resource["InstanceType"]
 
 
 def _gpu_count(instance_type):
@@ -228,7 +240,7 @@ def _gpu_type(instance_type):
 
 def _vcpus(compute_resource) -> int:
     """Get the number of vcpus for the instance according to disable_hyperthreading and instance features."""
-    instance_type = compute_resource["InstanceType"]
+    instance_type = _instance_type(compute_resource)
     disable_simultaneous_multithreading = compute_resource["DisableSimultaneousMultithreading"]
     instance_type_info = instance_types_data[instance_type]
     vcpus_info = instance_type_info.get("VCpuInfo", {})
@@ -242,7 +254,7 @@ def _vcpus(compute_resource) -> int:
 
 def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
-    instance_type = compute_resource["InstanceType"]
+    instance_type = _instance_type(compute_resource)
     instance_type_info = instance_types_data[instance_type]
     schedulable_memory = compute_resource.get("SchedulableMemory", None)
     ec2_memory = instance_type_info.get("MemoryInfo", {}).get("SizeInMiB")
