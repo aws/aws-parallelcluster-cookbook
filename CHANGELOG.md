@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA Fabric Manager to version 470.141.03.
 - Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
 - Add support for generating Slurm Configuration files for Compute Resources with Multiple Instance Types.
+- Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
 
 3.2.0
 ------
@@ -83,7 +84,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix the configuration parameter `DirectoryService/DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
-- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
+- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.
 
 3.1.2
 ------

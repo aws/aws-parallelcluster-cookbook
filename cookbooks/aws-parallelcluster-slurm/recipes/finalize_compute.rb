@@ -17,7 +17,7 @@
 
 ruby_block 'get_compute_nodename' do
   block do
-    node.run_state['slurm_compute_nodename'] = hit_slurm_nodename
+    node.run_state['slurm_compute_nodename'] = slurm_nodename
   end
 end
 
