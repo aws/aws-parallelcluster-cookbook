@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA Fabric Manager to version 470.141.03.
 - Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
 - Upgrade Intel MPI Library to 2021.6.0.602.
+- Change the logic to number the routing tables when an instance have multiple NICs.
 
 3.2.0
 ------
