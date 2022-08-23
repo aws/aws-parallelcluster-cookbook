@@ -136,6 +136,12 @@ execute "generate_pcluster_slurm_configs" do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
+execute "generate_pcluster_fleet_config" do
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
+          " --output-file #{node['cluster']['fleet_config_path']} --input-file #{node['cluster']['cluster_config_path']}"
+  not_if { ::File.exist?(node['cluster']['fleet_config_path']) && !are_queues_updated? }
+end
+
 replace_or_add "update node replacement timeout" do
   path "/etc/parallelcluster/slurm_plugin/parallelcluster_clustermgtd.conf"
   pattern "node_replacement_timeout*"

@@ -41,11 +41,6 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
         output_file_name = f"slurm_parallelcluster{file_type}.conf"
         _assert_files_are_equal(tmpdir / output_file_name, test_datadir / "expected_outputs" / output_file_name)
 
-    _assert_files_are_equal(
-        tmpdir / "pcluster/instance_name_type_mappings.json",
-        test_datadir / "expected_outputs/pcluster/instance_name_type_mappings.json",
-    )
-
 
 @pytest.mark.parametrize(
     "memory_scheduling,realmemory_to_ec2memory_ratio",
@@ -89,11 +84,6 @@ def test_generate_slurm_config_files_memory_scheduling(
         mem_sched = "_mem_sched" if memory_scheduling else ""
         output_file_name = f"slurm_parallelcluster{file_type}{mem_sched}.conf"
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
-
-    _assert_files_are_equal(
-        tmpdir / "pcluster/instance_name_type_mappings.json",
-        test_datadir / "expected_outputs/pcluster/instance_name_type_mappings.json",
-    )
 
 
 def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):
