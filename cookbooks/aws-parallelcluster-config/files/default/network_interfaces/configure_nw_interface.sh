@@ -22,6 +22,8 @@ fi
 
 ROUTE_TABLE="100${DEVICE_NUMBER}"
 
+echo "Configuring ${DEVICE_NAME} with IP:${DEVICE_IP_ADDRESS} CIDR_PREFIX:${CIDR_PREFIX_LENGTH} NETMASK:${NETMASK} GW:${GW_IP_ADDRESS} ROUTING_TABLE:${ROUTE_TABLE}"
+
 # config file
 FILE="/etc/sysconfig/network-scripts/ifcfg-${DEVICE_NAME}"
 if [ ! -f "$FILE" ]; then

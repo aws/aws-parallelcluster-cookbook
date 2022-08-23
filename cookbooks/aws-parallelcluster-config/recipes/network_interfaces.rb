@@ -27,11 +27,6 @@ def device_name(mac)
   cmd.stdout.delete("\n")
 end
 
-def device_number(mac, token)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
-  get_metadata_with_token(token, uri)
-end
-
 def device_ip(mac, token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/local-ipv4s")
   get_metadata_with_token(token, uri)
@@ -73,9 +68,8 @@ if macs.length > 1
   end
 
   # Configure nw interfaces
-  macs.each do |mac|
+  macs.each_with_index do |mac, device_number|
     device_name = device_name(mac)
-    device_number = device_number(mac, token)
     gw_ip_address = gateway_address
     device_ip_address = device_ip(mac, token)
     cidr_prefix_length = cidr_prefix_length(mac, token)
@@ -88,7 +82,7 @@ if macs.length > 1
       cwd "/tmp"
       environment(
         'DEVICE_NAME' => device_name,
-        'DEVICE_NUMBER' => device_number,
+        'DEVICE_NUMBER' => "#{device_number}",
         'GW_IP_ADDRESS' => gw_ip_address,
         'DEVICE_IP_ADDRESS' => device_ip_address,
         'CIDR_PREFIX_LENGTH' => cidr_prefix_length,
