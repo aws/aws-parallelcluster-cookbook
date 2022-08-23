@@ -35,6 +35,7 @@ default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
+default['cluster']['fleet_config_path'] = "#{node['cluster']['shared_dir']}/fleet-config.json"
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version

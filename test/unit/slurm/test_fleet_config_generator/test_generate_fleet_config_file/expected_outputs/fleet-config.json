@@ -1,0 +1,46 @@
+{
+    "ondemand-mixed": {
+        "single": {
+            "InstanceType": "c5n.4xlarge"
+        },
+        "fleet": {
+            "CapacityType": "on-demand",
+            "AllocationStrategy": "lowest-price",
+            "InstanceTypeList": [
+                {
+                    "InstanceType": "c5n.4xlarge"
+                },
+                {
+                    "InstanceType": "r5.4xlarge"
+                },
+                {
+                    "InstanceType": "r5n.4xlarge"
+                }
+            ]
+        }
+    },
+    "spot-mixed": {
+        "single": {
+            "InstanceType": "c5n.18xlarge"
+        },
+        "fleet-price": {
+            "CapacityType": "spot",
+            "AllocationStrategy": "capacity-optimized",
+            "InstanceTypeList": [
+                {
+                    "InstanceType": "c5n.18xlarge"
+                }
+            ],
+            "MaxPrice": 10
+        },
+        "fleet-noprice": {
+            "CapacityType": "spot",
+            "AllocationStrategy": "capacity-optimized",
+            "InstanceTypeList": [
+                {
+                    "InstanceType": "c5n.18xlarge"
+                }
+            ]
+        }
+    }
+}

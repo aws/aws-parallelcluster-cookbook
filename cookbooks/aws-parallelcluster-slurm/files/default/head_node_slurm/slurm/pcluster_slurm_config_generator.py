@@ -27,7 +27,7 @@ instance_types_data = {}
 
 
 class CriticalError(Exception):
-    """Critical error for the daemon."""
+    """Critical error for the script."""
 
     pass
 
@@ -100,8 +100,6 @@ def generate_slurm_config_files(
             output_directory,
             dryrun,
         )
-
-    generate_instance_type_mapping_file(pcluster_subdirectory, queues)
 
     log.info("Finished.")
 
@@ -282,23 +280,6 @@ def _setup_logger():
     )
 
 
-def generate_instance_type_mapping_file(output_dir, queues):
-    """Generate a mapping file to retrieve the Instance Type related to the instance key used in the slurm nodename."""
-    instance_name_type_mapping = {}
-    for queue in queues:
-        instance_name_type_mapping[queue["Name"]] = {}
-        compute_resources = queue["ComputeResources"]
-        for compute_resource in compute_resources:
-            instance_type = compute_resource.get("InstanceType")
-            # Remove all characters excepts letters and numbers
-            instance_name_type_mapping[queue["Name"]][compute_resource["Name"]] = instance_type
-
-    filename = f"{output_dir}/instance_name_type_mappings.json"
-    log.info("Generating %s", filename)
-    with open(filename, "w") as output_file:
-        output_file.write(json.dumps(instance_name_type_mapping, indent=4))
-
-
 def _get_metadata(metadata_path):
     """
     Get EC2 instance metadata.
@@ -347,23 +328,11 @@ def main():
         log.info("Running ParallelCluster Slurm Config Generator")
         parser = argparse.ArgumentParser(description="Take in slurm configuration generator related parameters")
         parser.add_argument(
-            "--output-directory", type=str, help="The output directory for generated slurm configs", required=True
+            "--output-directory", help="The output directory for generated slurm configs", required=True
         )
-        parser.add_argument(
-            "--template-directory", type=str, help="The directory storing slurm config templates", required=True
-        )
-        parser.add_argument(
-            "--input-file",
-            type=str,
-            # Todo: is the default necessary?
-            default="/opt/parallelcluster/slurm_config.json",
-            help="Yaml file containing pcluster configuration file",
-        )
-        parser.add_argument(
-            "--instance-types-data",
-            type=str,
-            help="JSON file containing info about instance types",
-        )
+        parser.add_argument("--template-directory", help="The directory storing slurm config templates", required=True)
+        parser.add_argument("--input-file", help="Yaml file containing pcluster configuration file", required=True)
+        parser.add_argument("--instance-types-data", help="JSON file containing info about instance types")
         parser.add_argument(
             "--dryrun",
             action="store_true",
