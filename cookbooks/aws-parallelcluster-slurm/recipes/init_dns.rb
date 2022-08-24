@@ -53,7 +53,7 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
     # - fqdn: $QUEUE-st-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
     ruby_block "retrieve assigned hostname" do
       block do
-        assigned_hostname = hit_slurm_nodename
+        assigned_hostname = slurm_nodename
         node.force_default['cluster']['assigned_short_hostname'] = assigned_hostname.to_s
 
         if node['cluster']['dns_domain'].nil? || node['cluster']['dns_domain'].empty?

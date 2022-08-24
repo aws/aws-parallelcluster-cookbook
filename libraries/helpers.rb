@@ -204,9 +204,9 @@ def raise_os_not_match(current_os, specified_os)
 end
 
 #
-# Retrieve compute nodename from file (HIT only)
+# Retrieve compute nodename from file
 #
-def hit_slurm_nodename
+def slurm_nodename
   slurm_nodename_file = "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename"
 
   IO.read(slurm_nodename_file).chomp
@@ -215,15 +215,17 @@ end
 #
 # Retrieve compute and head node info from dynamo db (Slurm only)
 #
-def hit_dynamodb_info
-  require 'chef/mixin/shell_out'
-
-  output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
+def dynamodb_info(aws_connection_timeout_seconds: 30, aws_read_timeout_seconds: 60, shell_timout_seconds: 300)
+  output = Mixlib::ShellOut.new("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
                       "--region #{node['cluster']['region']} query --table-name #{node['cluster']['slurm_ddb_table']} " \
                       "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
                       "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
                       "--projection-expression 'Id' " \
-                      "--output text --query 'Items[0].[Id.S]'", user: 'root').stdout.strip
+                      "--cli-connect-timeout #{aws_connection_timeout_seconds} " \
+                      "--cli-read-timeout #{aws_read_timeout_seconds} " \
+                      "--output text --query 'Items[0].[Id.S]'",
+                                user: 'root',
+                                timeout: shell_timout_seconds).run_command.stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
