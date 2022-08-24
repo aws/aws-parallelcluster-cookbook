@@ -189,11 +189,13 @@ default['cluster']['jwt']['sha1'] = '1c6fec984a8e0ca1122bfc3552a49f45bdb0c4e8'
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '470.141.03'
-default['cluster']['nvidia']['cuda_version'] = '11.4'
+default['cluster']['nvidia']['cuda_version'] = '11.7'
+default['cluster']['nvidia']['cuda_samples_version'] = '11.6'
 default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
 default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
 default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
-default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.4.4/local_installers/cuda_11.4.4_470.82.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
+default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
+default['cluster']['nvidia']['cuda_samples_url'] = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{node['cluster']['nvidia']['cuda_samples_version']}.tar.gz"
 
 # NVIDIA fabric-manager
 # The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
