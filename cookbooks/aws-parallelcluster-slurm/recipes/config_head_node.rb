@@ -70,6 +70,12 @@ unless virtualized?
             " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
             " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
   end
+
+  # Generate pcluster fleet config
+  execute "generate_pcluster_fleet_config" do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
+            " --output-file #{node['cluster']['fleet_config_path']} --input-file #{node['cluster']['cluster_config_path']}"
+  end
 end
 
 # all other OSs use /sys/fs/cgroup, which is the default
