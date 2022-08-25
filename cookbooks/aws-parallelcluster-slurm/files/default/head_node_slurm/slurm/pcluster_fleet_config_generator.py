@@ -31,8 +31,9 @@ def generate_fleet_config_file(output_file, input_file):
 
     Generate fleet-config.json
     {
-        "my-create-fleet-queue": {
-            "my-compute-resource": {
+        "my-queue": {
+            "fleet-compute-resource": {
+                "Api": "create-fleet",
                 "CapacityType": "on-demand|spot",
                 "AllocationStrategy": "lowest-price"
                 "InstanceTypeList": [
@@ -40,13 +41,11 @@ def generate_fleet_config_file(output_file, input_file):
                 ],
                 "MaxPrice": ...
             }
-        },
-        "my-run-instances-queue": {
-            "my-compute-resource": {
-                "CapacityType": "on-demand|spot",
-                "AllocationStrategy": "lowest-price"
-                "InstanceType": ...,
-                "MaxPrice": ...
+            "single-compute-resource": {
+                "Api": "run-instances",
+                "InstanceTypeList": [
+                    { "InstanceType": ... }
+                ],
             }
         }
     }
@@ -67,6 +66,7 @@ def generate_fleet_config_file(output_file, input_file):
 
                 if compute_resource_config.get("InstanceTypeList"):
                     fleet_config[queue][compute_resource] = {
+                        "Api": "create-fleet",
                         "CapacityType": capacity_type,
                         "AllocationStrategy": allocation_strategy,
                         "InstanceTypeList": copy.deepcopy(compute_resource_config["InstanceTypeList"]),
@@ -75,7 +75,10 @@ def generate_fleet_config_file(output_file, input_file):
                         fleet_config[queue][compute_resource]["MaxPrice"] = compute_resource_config["SpotPrice"]
 
                 elif compute_resource_config.get("InstanceType"):
-                    fleet_config[queue][compute_resource]["InstanceType"] = compute_resource_config["InstanceType"]
+                    fleet_config[queue][compute_resource] = {
+                        "Api": "run-instances",
+                        "InstanceTypeList": [{"InstanceType": compute_resource_config["InstanceType"]}],
+                    }
 
                 else:
                     raise Exception(
