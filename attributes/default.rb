@@ -35,7 +35,6 @@ default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
-default['cluster']['fleet_config_path'] = "#{node['cluster']['shared_dir']}/fleet-config.json"
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
@@ -131,6 +130,8 @@ default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 default['cluster']['slurm']['install_dir'] = "/opt/slurm"
+default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
+
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
