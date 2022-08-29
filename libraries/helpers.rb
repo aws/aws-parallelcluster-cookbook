@@ -548,18 +548,19 @@ def efa_installed?
   dir_exist
 end
 
-def neuron_installed?
-  package_name = "aws-neuronx-dkms"
+def is_package_installed?(package_name)
   command = value_for_platform(
-  %w(ubuntu debian) => {
-    'default' => "apt list --installed | grep #{package_name}",
-  },
-  'default' => "yum list installed | grep #{package_name}")
+    %w(ubuntu debian) => {
+      'default' => "apt list --installed | grep #{package_name}",
+    },
+    'default' => "yum list installed | grep #{package_name}"
+  )
 
   cmd = Mixlib::ShellOut.new(command, timeout: 60)
   cmd.run_command
-  # Return false if the package is not installed
-  !(cmd.exitstatus != 0)
+  Chef::Log.info("Checking if #{package_name} is installed...\n#{command}\n#{cmd.stdout.strip}")
+  # Convert return code to boolean
+  cmd.exitstatus.to_i.zero?
 end
 
 def is_neuron_instance?
