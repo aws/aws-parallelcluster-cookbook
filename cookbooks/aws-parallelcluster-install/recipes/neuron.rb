@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['cluster']['base_os'] == 'centos7' || arm_instance? || neuron_installed?
+return if node['cluster']['base_os'] == 'centos7' || arm_instance? || is_package_installed?("aws-neuronx-dkms")
 
 if platform?('amazon')
   # add neuron repository
