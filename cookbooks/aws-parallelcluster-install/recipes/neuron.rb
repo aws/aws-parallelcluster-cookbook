@@ -22,26 +22,7 @@ return if node['cluster']['base_os'] == 'centos7' || arm_instance?
 return if is_package_installed?("aws-neuronx-dkms") || is_package_installed?("aws-neuron-dkms")
 
 # add neuron repository
-if platform?('amazon')
-  yum_repository "neuron" do
-    description "Neuron YUM Repository"
-    baseurl node['cluster']['neuron']['base_url']
-    gpgkey node['cluster']['neuron']['public_key']
-    retries 3
-    retry_delay 5
-  end
-
-elsif platform?('ubuntu')
-  apt_repository 'neuron' do
-    uri node['cluster']['neuron']['base_url']
-    components ['main']
-    key node['cluster']['neuron']['public_key']
-    retries 3
-    retry_delay 5
-  end
-
-  apt_update
-end
+add_package_repository('neuron', node['cluster']['neuron']['base_url'], node['cluster']['neuron']['public_key'], 'focal', ['main'])
 
 package node['cluster']['neuron']['packages'] do
   retries 10
