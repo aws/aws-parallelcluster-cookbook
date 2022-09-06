@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
 - Upgrade Intel MPI Library to 2021.6.0.602.
 - Change the logic to number the routing tables when an instance have multiple NICs.
+- Upgrade Python from 3.7.10 to 3.7.13 in response to this [security risk](https://nvd.nist.gov/vuln/detail/CVE-2021-3737).
 
 3.2.0
 ------
