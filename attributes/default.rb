@@ -131,6 +131,10 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
+default['cluster']['slurm']['dbduser'] = 'slurmdbd'
+default['cluster']['slurm']['dbduser_id'] = node['cluster']['reserved_base_uid'] + 5
+default['cluster']['slurm']['dbdgroup'] = node['cluster']['slurm']['dbduser']
+default['cluster']['slurm']['dbdgroup_id'] = node['cluster']['slurm']['dbduser_id']
 default['cluster']['slurm']['install_dir'] = "/opt/slurm"
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
 
@@ -527,6 +531,12 @@ default['cluster']["directory_service"]["ldap_access_filter"] = nil
 default['cluster']["directory_service"]["generate_ssh_keys_for_users"] = nil
 default['cluster']['directory_service']['additional_sssd_configs'] = nil
 default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
+
+# ParallelCluster internal variables to configure Slurm Accounting
+default['cluster']['slurm_database']['enabled'] = 'false'
+default['cluster']['slurm_database']['uri'] = nil
+default['cluster']['slurm_database']['user_name'] = nil
+default['cluster']['slurm_database']['password_secret_arn'] = nil
 
 # Other ParallelCluster internal variables
 default['cluster']['ddb_table'] = nil

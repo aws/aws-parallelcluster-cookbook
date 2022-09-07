@@ -17,6 +17,7 @@ import math
 import re
 from os import makedirs, path
 from socket import gethostname
+from urllib.parse import urlparse
 from typing import Tuple
 
 import requests
@@ -65,6 +66,8 @@ def generate_slurm_config_files(
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
     queues = cluster_config["Scheduling"]["SlurmQueues"]
+    tags_dict = {a["Key"]:a["Value"] for a in cluster_config["Tags"]}
+    cluster_name = tags_dict["parallelcluster:cluster-name"]
 
     global instance_types_data
     with open(instance_types_data_path) as input_file:
@@ -86,16 +89,18 @@ def generate_slurm_config_files(
             )
         is_default_queue = False
 
-    # Generate slurm_parallelcluster.conf, slurm_parallelcluster_gres.conf and slurm_parallelcluster_cgroup.conf
+    # Generate include files for slurm configuration files
     for template_name in [
         "slurm_parallelcluster.conf",
         "slurm_parallelcluster_gres.conf",
         "slurm_parallelcluster_cgroup.conf",
+        "slurm_parallelcluster_slurmdbd.conf",
     ]:
         _generate_slurm_parallelcluster_configs(
             queues,
             head_node_config,
             cluster_config["Scheduling"]["SlurmSettings"],
+            cluster_name,
             template_name,
             compute_node_bootstrap_timeout,
             env,
@@ -161,6 +166,7 @@ def _generate_slurm_parallelcluster_configs(
     queues,
     head_node_config,
     scaling_config,
+    cluster_name,
     template_name,
     compute_node_bootstrap_timeout,
     jinja_env,
@@ -172,6 +178,7 @@ def _generate_slurm_parallelcluster_configs(
         queues=queues,
         head_node_config=head_node_config,
         scaling_config=scaling_config,
+        cluster_name=cluster_name,
         compute_node_bootstrap_timeout=compute_node_bootstrap_timeout,
         output_dir=output_dir,
     )
@@ -195,6 +202,8 @@ def _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio):
         _realmemory,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
     )
+    env.filters["uri_host"] = functools.partial(_parse_uri, attr="host")
+    env.filters["uri_port"] = functools.partial(_parse_uri, attr="port")
 
     return env
 
@@ -305,6 +314,50 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     else:
         realmemory = schedulable_memory
     return realmemory
+
+
+def _parse_uri(uri, attr) -> str:
+    """Get a host from a URI/URL using urlparse"""
+
+    # First, throw error if the URI starts with a "/" (to prevent issues with the
+    # manipulation below
+    if uri[0] == "/":
+        error_msg = f"Invalid URI specified. Please remove any trailing / at the beginning of the provided URI ('{uri}')."
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+
+    uri_parse = urlparse(uri)
+    if not uri_parse.scheme and not uri_parse.netloc:
+        # This happens if users provide an URI without explicit scheme followed by ://
+        # (for example 'test.example.com:3306' instead of 'mysql://test.example.com:3306`).
+        uri_parse = urlparse("//" + uri_parse.path)
+
+    try:
+        scheme = uri_parse.scheme
+    except ValueError as e:
+        error_msg = f"Failure to parse uri with error '{str(e)}'. Please review the provided URI ('{uri}')",
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+    if scheme:
+        error_msg = f"Invalid URI specified. Please do not provide a scheme ('{scheme}://')",
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+
+    try:
+        if attr == "host":
+            ret = uri_parse.hostname
+        elif attr == "port":
+            ret = uri_parse.port
+    except ValueError as e:
+        error_msg = f"Failure to parse uri with error '{str(e)}'. Please review the provided URI ('{uri}')",
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+
+    # Provide default MySQL port if port is not explicitely set
+    if attr == "port" and not ret:
+        ret = 3306
+
+    return ret
 
 
 def _write_rendered_template_to_file(rendered_template, filename):

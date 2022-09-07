@@ -71,6 +71,12 @@ unless virtualized?
             " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
   end
 
+  file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
+    owner "#{node['cluster']['slurm']['dbduser']}"
+    group "#{node['cluster']['slurm']['dbdgroup']}"
+    mode '0600'
+  end
+
   # Generate pcluster fleet config
   execute "generate_pcluster_fleet_config" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
@@ -84,6 +90,13 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/cgroup.conf" do
   owner 'root'
   group 'root'
   mode '0644'
+end
+
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
+  source 'slurm/slurmdbd.conf.erb'
+  owner "#{node['cluster']['slurm']['dbduser']}"
+  group "#{node['cluster']['slurm']['dbdgroup']}"
+  mode '0600'
 end
 
 template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.sh" do
@@ -192,6 +205,14 @@ template '/etc/systemd/system/slurmctld.service' do
   action :create
 end
 
+template '/etc/systemd/system/slurmdbd.service' do
+  source 'slurm/head_node/slurmdbd.service.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+end
+
 if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
   directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d" do
     user 'root'
@@ -218,6 +239,10 @@ if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
     group node['cluster']['slurm']['group']
     mode '0744'
   end
+end
+
+if node['cluster']['slurm_database']['enabled'] == "true"
+  include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
 end
 
 service "slurmctld" do
