@@ -38,7 +38,7 @@ default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir'
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
-default['cluster']['python-version'] = '3.7.10'
+default['cluster']['python-version'] = '3.7.13'
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
