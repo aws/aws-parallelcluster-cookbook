@@ -107,7 +107,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         realmemory_to_ec2memory_ratio=0.95,
     )
 
-    for queue in ["queue1", "queue2", "queue3"]:
+    for queue in ["queue1", "queue2", "queue3", "queue4"]:
         for file_type in ["partition", "gres"]:
             file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
             output_file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
