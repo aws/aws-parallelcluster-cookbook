@@ -189,24 +189,13 @@ def _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio):
     env.filters["sanify_name"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
     env.filters["gpus"] = _gpus
     env.filters["vcpus"] = _vcpus
-    env.filters["get_instance_type"] = _instance_type
+    env.filters["get_instance_types"] = _instance_types
     env.filters["realmemory"] = functools.partial(
         _realmemory,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
     )
 
     return env
-
-
-def _instance_type(compute_resource):
-    """Return the instance type in a compute resource.
-
-    If the compute resource contains multiple instance types, it returns the first one.
-    """
-    if compute_resource.get("InstanceTypeList"):
-        return compute_resource["InstanceTypeList"][0].get("InstanceType")
-    else:
-        return compute_resource["InstanceType"]
 
 
 def _instance_types(compute_resource):
