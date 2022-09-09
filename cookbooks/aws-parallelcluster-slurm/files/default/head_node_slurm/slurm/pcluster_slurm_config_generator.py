@@ -280,18 +280,28 @@ def _vcpus(compute_resource) -> int:
     return vcpus_count if not disable_simultaneous_multithreading else (vcpus_count // threads_per_core)
 
 
+def _get_min_ec2_memory(instance_types) -> int:
+    """Return min value for EC2 memory in the instance type list."""
+    min_ec2_memory = None
+    for instance_type in instance_types:
+        instance_type_info = instance_types_data[instance_type]
+        # The instance_types_data does not have memory information for the requested instance type.
+        # In this case we set RealMemory to 1 (Slurm default value for RealMemory)
+        ec2_memory = instance_type_info.get("MemoryInfo", {}).get("SizeInMiB", 1)
+        if min_ec2_memory is None or ec2_memory < min_ec2_memory:
+            min_ec2_memory = ec2_memory
+        if min_ec2_memory == 1:
+            # ec2 memory lower bound
+            break
+    return min_ec2_memory
+
+
 def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
-    instance_type = _instance_type(compute_resource)
-    instance_type_info = instance_types_data[instance_type]
     schedulable_memory = compute_resource.get("SchedulableMemory", None)
-    ec2_memory = instance_type_info.get("MemoryInfo", {}).get("SizeInMiB")
-    if ec2_memory is None:
-        # This circumstance can only happen if EnableMemoryBasedScheduling is set to false and
-        # the instance_types_data does not have memory information for the requested instance type.
-        # In this case we set RealMemory to 1 (Slurm default value for RealMemory)
-        return 1
     if schedulable_memory is None:
+        instance_types = _instance_types(compute_resource)
+        ec2_memory = _get_min_ec2_memory(instance_types)
         realmemory = math.floor(ec2_memory * realmemory_to_ec2memory_ratio)
     else:
         realmemory = schedulable_memory
