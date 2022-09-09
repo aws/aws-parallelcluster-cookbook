@@ -9,5 +9,8 @@
     },
     "queue3": {
         "cr1": "c5n.18xlarge"
+    },
+    "queue4": {
+        "cr1": null
     }
 }

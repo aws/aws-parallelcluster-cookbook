@@ -17,6 +17,7 @@ import math
 import re
 from os import makedirs, path
 from socket import gethostname
+from typing import Tuple
 
 import requests
 import yaml
@@ -209,6 +210,17 @@ def _instance_type(compute_resource):
         return compute_resource["InstanceType"]
 
 
+def _instance_types(compute_resource):
+    """Return the instance type list in a compute resource.
+
+    If the compute resource is defined with single InstanceType, it returns a list of one element.
+    """
+    if compute_resource.get("InstanceTypeList"):
+        return [instance.get("InstanceType") for instance in compute_resource["InstanceTypeList"]]
+    else:
+        return [compute_resource["InstanceType"]]
+
+
 def _gpu_count(instance_type):
     """Return the number of GPUs for the instance."""
     gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
@@ -236,17 +248,35 @@ def _gpu_type(instance_type):
     return "no_gpu_type" if not gpu_info else gpu_info.get("Gpus")[0].get("Name").replace(" ", "").lower()
 
 
+def _get_min_vcpus(instance_types) -> Tuple[int, int]:
+    """Return min value for vCPUs and threads per core in the instance type list."""
+    min_vcpus_count = None
+    min_threads_per_core = None
+    for instance_type in instance_types:
+        instance_type_info = instance_types_data[instance_type]
+        vcpus_info = instance_type_info.get("VCpuInfo", {})
+        # The instance_types_data does not have vCPUs information for the requested instance type.
+        # In this case we set vCPUs to 1
+        vcpus_count = vcpus_info.get("DefaultVCpus", 1)
+        if min_vcpus_count is None or vcpus_count < min_vcpus_count:
+            min_vcpus_count = vcpus_count
+        threads_per_core = vcpus_info.get("DefaultThreadsPerCore")
+        if threads_per_core is None:
+            supported_architectures = instance_type_info.get("ProcessorInfo", {}).get("SupportedArchitectures", [])
+            threads_per_core = 2 if "x86_64" in supported_architectures else 1
+        if min_threads_per_core is None or threads_per_core < min_threads_per_core:
+            min_threads_per_core = threads_per_core
+        if min_vcpus_count == 1 and min_threads_per_core == 1:
+            # vcpus and threads numbers lower bound
+            break
+    return min_vcpus_count, min_threads_per_core
+
+
 def _vcpus(compute_resource) -> int:
-    """Get the number of vcpus for the instance according to disable_hyperthreading and instance features."""
-    instance_type = _instance_type(compute_resource)
+    """Get the number of vcpus according to disable_hyperthreading and instance features."""
+    instance_types = _instance_types(compute_resource)
     disable_simultaneous_multithreading = compute_resource["DisableSimultaneousMultithreading"]
-    instance_type_info = instance_types_data[instance_type]
-    vcpus_info = instance_type_info.get("VCpuInfo", {})
-    vcpus_count = vcpus_info.get("DefaultVCpus")
-    threads_per_core = vcpus_info.get("DefaultThreadsPerCore")
-    if threads_per_core is None:
-        supported_architectures = instance_type_info.get("ProcessorInfo", {}).get("SupportedArchitectures", [])
-        threads_per_core = 2 if "x86_64" in supported_architectures else 1
+    vcpus_count, threads_per_core = _get_min_vcpus(instance_types)
     return vcpus_count if not disable_simultaneous_multithreading else (vcpus_count // threads_per_core)
 
 
