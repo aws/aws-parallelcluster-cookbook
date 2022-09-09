@@ -187,8 +187,7 @@ def _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio):
     # validated by the CLI.
     env = Environment(loader=file_loader, trim_blocks=True, lstrip_blocks=True)  # nosec nosemgrep
     env.filters["sanify_name"] = lambda value: re.sub(r"[^A-Za-z0-9]", "", value)
-    env.filters["gpus"] = _gpu_count
-    env.filters["gpu_type"] = _gpu_type
+    env.filters["gpus"] = _gpus
     env.filters["vcpus"] = _vcpus
     env.filters["get_instance_type"] = _instance_type
     env.filters["realmemory"] = functools.partial(
@@ -221,31 +220,41 @@ def _instance_types(compute_resource):
         return [compute_resource["InstanceType"]]
 
 
-def _gpu_count(instance_type):
-    """Return the number of GPUs for the instance."""
-    gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
+def _get_min_gpu_count_and_type(instance_types) -> Tuple[int, str]:
+    """Return min value for GPU and associated type in the instance type list."""
+    min_gpu_count = None
+    gpu_type_min_count = "no_gpu_type"
+    for instance_type in instance_types:
+        gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
+        gpu_count = 0
+        if gpu_info:
+            for gpus in gpu_info.get("Gpus", []):
+                gpu_manufacturer = gpus.get("Manufacturer", "")
+                if gpu_manufacturer.upper() == "NVIDIA":
+                    gpu_count += gpus.get("Count", 0)
+                    gpu_type = gpus.get("Name").replace(" ", "").lower()
+                else:
+                    log.info(
+                        f"ParallelCluster currently does not offer native support for '{gpu_manufacturer}' GPUs. "
+                        "Please make sure to use a custom AMI with the appropriate drivers in order to leverage "
+                        "GPUs functionalities"
+                    )
+        else:
+            gpu_type = "no_gpu_type"
+        if min_gpu_count is None or gpu_count < min_gpu_count:
+            min_gpu_count = gpu_count
+            gpu_type_min_count = gpu_type
+        if min_gpu_count == 0:
+            # gpu number lower bound
+            break
+    return min_gpu_count, gpu_type_min_count
 
-    gpu_count = 0
-    if gpu_info:
-        for gpus in gpu_info.get("Gpus", []):
-            gpu_manufacturer = gpus.get("Manufacturer", "")
-            if gpu_manufacturer.upper() == "NVIDIA":
-                gpu_count += gpus.get("Count", 0)
-            else:
-                log.info(
-                    f"ParallelCluster currently does not offer native support for '{gpu_manufacturer}' GPUs. "
-                    "Please make sure to use a custom AMI with the appropriate drivers in order to leverage "
-                    "GPUs functionalities"
-                )
 
-    return gpu_count
-
-
-def _gpu_type(instance_type):
-    """Return name or type of the GPU for the instance."""
-    gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
-    # Remove space and change to all lowercase for name
-    return "no_gpu_type" if not gpu_info else gpu_info.get("Gpus")[0].get("Name").replace(" ", "").lower()
+def _gpus(compute_resource) -> dict:
+    """Return the number of GPUs and type for the compute resource."""
+    instance_types = _instance_types(compute_resource)
+    gpu_count, gpu_type = _get_min_gpu_count_and_type(instance_types)
+    return {"count": gpu_count, "type": gpu_type}
 
 
 def _get_min_vcpus(instance_types) -> Tuple[int, int]:
