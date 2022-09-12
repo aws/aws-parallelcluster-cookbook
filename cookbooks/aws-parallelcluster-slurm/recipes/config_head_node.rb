@@ -71,12 +71,6 @@ unless virtualized?
             " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
   end
 
-  file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
-    owner "#{node['cluster']['slurm']['dbduser']}"
-    group "#{node['cluster']['slurm']['dbdgroup']}"
-    mode '0600'
-  end
-
   # Generate pcluster fleet config
   execute "generate_pcluster_fleet_config" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\

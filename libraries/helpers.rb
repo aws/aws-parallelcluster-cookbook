@@ -619,3 +619,10 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   raise_command_error(command, cmd) if raise_on_error && cmd.error?
   cmd.stdout.strip
 end
+
+def is_slurm_database_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
+end

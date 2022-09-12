@@ -15,6 +15,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
+  owner "#{node['cluster']['slurm']['dbduser']}"
+  group "#{node['cluster']['slurm']['dbdgroup']}"
+  mode '0600'
+end
+
 template "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh" do
   source 'slurm/head_node/update_slurm_database_password.sh.erb'
   owner 'root'
