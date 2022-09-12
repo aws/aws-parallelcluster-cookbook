@@ -215,6 +215,33 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'ubuntu' => { 'default' => 'gdrdrv' },
   'default' => 'gdrcopy'
 )
+
+# MySQL
+default['cluster']['mysql']['repository']['name'] = value_for_platform(
+  'default' => "mysql80-community-release.noarch",
+  'ubuntu' => { 'default' => "mysql" }
+)
+default['cluster']['mysql']['repository']['definition'] = value_for_platform(
+  'default' => "mysql80-community-release-el7-5.noarch.rpm",
+  'ubuntu' => { 'default' => "" }
+)
+default['cluster']['mysql']['repository']['url'] = value_for_platform(
+  'default' => "https://dev.mysql.com/get/#{node['cluster']['mysql']['repository']['definition']}",
+  'ubuntu' =>  { 'default' => "https://repo.mysql.com/apt/ubuntu" }
+)
+default['cluster']['mysql']['repository']['key'] = value_for_platform(
+  'default' => "",
+  'ubuntu' => { 'default' => "https://repo.mysql.com/RPM-GPG-KEY-mysql-2022" }
+)
+default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+  'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+  'ubuntu' => { 'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-community-client-plugins mysql-common) }
+)
+default['cluster']['mysql']['repository']['expected-source'] = value_for_platform(
+  'default' => "mysql80-community",
+  'ubuntu' => { 'default' => node['cluster']['mysql']['repository']['url'] }
+)
+
 # EFA
 default['cluster']['efa']['installer_version'] = '1.17.2'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"

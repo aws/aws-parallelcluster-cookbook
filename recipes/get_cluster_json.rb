@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-slurm
-# Recipe:: install
+# Cookbook:: aws-parallelcluster-test
+# Recipe:: test_nvidia
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,7 +15,5 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-slurm::install_pmix'
-include_recipe 'aws-parallelcluster-slurm::install_munge'
-include_recipe 'aws-parallelcluster-slurm::install_mysql_client'
-include_recipe 'aws-parallelcluster-slurm::install_slurm'
+cluster_json = JSON.generate(node['cluster'], allow_nan: true, max_nesting: false)
+puts "CLUSTER JSON: #{cluster_json}"
