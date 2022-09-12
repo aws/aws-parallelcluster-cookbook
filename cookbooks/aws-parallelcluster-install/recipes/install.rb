@@ -20,9 +20,6 @@ validate_os_type
 
 return if node['conditions']['ami_bootstrapped']
 
-# Update certificates
-include_recipe "aws-parallelcluster-install::update_certificates"
-
 # Calling user_ulimit will override every existing limit
 user_ulimit "*" do
   filehandle_limit node['cluster']['filehandle_limit']

@@ -9,9 +9,9 @@ Scheduling:
         Enabled: false
         GdrSupport: false
       InstanceTypeList:
-      - InstanceType: c5n.4xlarge
       - InstanceType: r5.4xlarge
       - InstanceType: r5n.4xlarge
+      - InstanceType: c5n.4xlarge
       MaxCount: 10
       MinCount: 2
       Name: cr1
@@ -145,6 +145,177 @@ Scheduling:
       SecurityGroups: null
       SubnetIds:
       - subnet-0230367ab0e5123a4
+  - AllocationStrategy: lowest-price
+    CapacityType: ONDEMAND
+    ComputeResources:
+      - DisableSimultaneousMultithreading: false
+        Efa:
+          Enabled: false
+          GdrSupport: false
+        InstanceTypeList:
+        - InstanceType: c5.4xlarge
+        - InstanceType: c5.xlarge
+        - InstanceType: c5.2xlarge
+        MaxCount: 10
+        MinCount: 2
+        Name: cr1
+        SchedulableMemory: null
+        SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: queue4
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+        - subnet-0230367ab0e5123a4
+  - AllocationStrategy: lowest-price
+    CapacityType: ONDEMAND
+    ComputeResources:
+      - DisableSimultaneousMultithreading: false
+        Efa:
+          Enabled: false
+          GdrSupport: false
+        InstanceTypeList:
+          - InstanceType: c5.4xlarge
+          - InstanceType: c5.xlarge
+          - InstanceType: g5.24xlarge
+        MaxCount: 10
+        MinCount: 2
+        Name: cr1
+        SchedulableMemory: null
+        SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: queue5
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+        - subnet-0230367ab0e5123a4
+  - AllocationStrategy: lowest-price
+    CapacityType: ONDEMAND
+    ComputeResources:
+      - DisableSimultaneousMultithreading: true
+        Efa:
+          Enabled: false
+          GdrSupport: false
+        InstanceTypeList:
+          - InstanceType: g5.48xlarge
+          - InstanceType: p3.8xlarge
+        MaxCount: 5
+        MinCount: 2
+        Name: cr1
+        SchedulableMemory: null
+        SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: queue6
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+        - subnet-0230367ab0e5123a4
+  - AllocationStrategy: lowest-price
+    CapacityType: ONDEMAND
+    ComputeResources:
+      - DisableSimultaneousMultithreading: false
+        Efa:
+          Enabled: false
+          GdrSupport: false
+        InstanceTypeList:
+          - InstanceType: g5.48xlarge
+          - InstanceType: p3.8xlarge
+          - InstanceType: c5.large
+        MaxCount: 5
+        MinCount: 2
+        Name: cr1
+        SchedulableMemory: null
+        SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: queue7
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+        - subnet-0230367ab0e5123a4
   SlurmSettings:
     Dns:
       DisableManagedDns: false
