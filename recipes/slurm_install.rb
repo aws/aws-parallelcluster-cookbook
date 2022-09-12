@@ -25,6 +25,18 @@ package %w[slurm* libslurm*] do
   action :purge
 end
 
+slurm_build_deps = value_for_platform(
+  'ubuntu' => {
+    'default' => ['libjson-c-dev', 'libhttp-parser-dev']
+  },
+  'default' => ['json-c-devel', 'http-parser-devel']
+)
+
+package slurm_build_deps do
+  retries 3
+  retry_delay 5
+end
+
 case node['cfncluster']['cfn_node_type']
 when 'MasterServer', nil
   slurm_tarball = "#{node['cfncluster']['sources_dir']}/slurm-#{node['cfncluster']['slurm']['version']}.tar.gz"
@@ -60,7 +72,7 @@ when 'MasterServer', nil
 
       tar xf #{slurm_tarball}
       cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
-      ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix
+      ./configure --prefix=/opt/slurm --with-pmix=/opt/pmix --enable-slurmrestd
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
       make install
