@@ -90,11 +90,8 @@ template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   mode '0644'
 end
 
-# Mount EFS directory with efs_mount recipe
-include_recipe 'aws-parallelcluster-config::efs_mount'
-
-# Mount FSx directory with fsx_mount recipe
-include_recipe 'aws-parallelcluster-config::fsx_mount'
+# Mount EFS, FSx
+include_recipe "aws-parallelcluster-config::fs_mount"
 
 # Intel Runtime Libraries
 include_recipe "aws-parallelcluster-config::intel"
