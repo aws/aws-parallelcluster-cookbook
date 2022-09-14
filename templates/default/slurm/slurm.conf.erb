@@ -32,6 +32,7 @@ CommunicationParameters=NoAddrCache
 SuspendProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
 ResumeProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_resume
 ResumeFailProgram=<%= node['cfncluster']['scripts_dir'] %>/slurm/slurm_suspend
+RebootProgram=/sbin/reboot
 SuspendTimeout=120
 ResumeTimeout=3600
 PrivateData=cloud
