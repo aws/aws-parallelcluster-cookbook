@@ -235,7 +235,7 @@ if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
   end
 end
 
-if node['cluster']['slurm_database']['enabled'] == "true"
+if node['cluster']['slurm']['database']['enabled'] == "true"
   include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
 end
 

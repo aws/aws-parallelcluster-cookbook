@@ -138,6 +138,12 @@ default['cluster']['slurm']['dbdgroup_id'] = node['cluster']['slurm']['dbduser_i
 default['cluster']['slurm']['install_dir'] = "/opt/slurm"
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
 
+# ParallelCluster internal variables to configure Slurm Accounting
+default['cluster']['slurm']['database']['enabled'] = 'false'
+default['cluster']['slurm']['database']['uri'] = nil
+default['cluster']['slurm']['database']['user_name'] = nil
+default['cluster']['slurm']['database']['password_secret_arn'] = nil
+
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
@@ -531,12 +537,6 @@ default['cluster']["directory_service"]["ldap_access_filter"] = nil
 default['cluster']["directory_service"]["generate_ssh_keys_for_users"] = nil
 default['cluster']['directory_service']['additional_sssd_configs'] = nil
 default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
-
-# ParallelCluster internal variables to configure Slurm Accounting
-default['cluster']['slurm_database']['enabled'] = 'false'
-default['cluster']['slurm_database']['uri'] = nil
-default['cluster']['slurm_database']['user_name'] = nil
-default['cluster']['slurm_database']['password_secret_arn'] = nil
 
 # Other ParallelCluster internal variables
 default['cluster']['ddb_table'] = nil

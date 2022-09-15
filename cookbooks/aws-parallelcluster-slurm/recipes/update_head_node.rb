@@ -150,7 +150,7 @@ replace_or_add "update node replacement timeout" do
 end
 
 if ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated?
-  if node['cluster']['slurm_database']['enabled'] == "true"
+  if node['cluster']['slurm']['database']['enabled'] == "true"
     include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
   else
     include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"

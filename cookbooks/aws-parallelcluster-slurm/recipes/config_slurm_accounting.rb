@@ -27,7 +27,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password
   group 'root'
   mode '0700'
   variables(
-    secret_arn: node['cluster']['slurm_database']['password_secret_arn'],
+    secret_arn: node['cluster']['slurm']['database']['password_secret_arn'],
     region: node['cluster']['region'],
     )
   sensitive true
