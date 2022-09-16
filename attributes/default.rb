@@ -39,6 +39,8 @@ default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
 default['cluster']['python-version'] = '3.9.13'
+# FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
+default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.14'
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
@@ -56,7 +58,7 @@ default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_ro
 # AWSBatch Virtualenv Path
 default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['awsbatch_virtualenv']}"
 # cfn-bootstrap Virtualenv Path
-default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
+default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
