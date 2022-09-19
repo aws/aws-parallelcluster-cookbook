@@ -44,8 +44,29 @@ service "slurmdbd" do
   action %i(enable start)
 end
 
-# Necessary to avoid having the database not fully ready after slurmdbd has been started
-chef_sleep '10'
+# After starting slurmdbd the database may not be fully responsive yet and
+# its bootstrapping may fail. We need to wait for sacctmgr to successfully
+# query the database before proceeding.
+bash "wait for slurm database" do
+  user 'root'
+  group 'root'
+  code <<-WAIT
+    SACCTMGR_CMD=#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr
+    RETRY_DELAY=5
+    MAX_RETRIES=6
+
+    rc=1
+    retry=0
+    while [ $rc -ne 0 ]; do
+        if [ $retry -eq $MAX_RETRIES ]; then break; fi
+        sleep $RETRY_DELAY
+        $SACCTMGR_CMD show clusters -Pn
+        rc=$?
+        retry=$(( $retry + 1 ))
+    done
+    exit $rc
+  WAIT
+end
 
 bash "bootstrap slurm database" do
   user 'root'
