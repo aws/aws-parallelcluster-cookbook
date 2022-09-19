@@ -78,3 +78,7 @@ Scheduling:
     SlurmSettings:
         ScaledownIdletime: 10
         EnableMemoryBasedScheduling: true
+        Database: null
+Tags:
+  - Key: parallelcluster:cluster-name
+    Value: test-cluster-mem-sched
