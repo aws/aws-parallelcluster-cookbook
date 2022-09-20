@@ -28,8 +28,8 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password
   mode '0700'
   variables(
     secret_arn: node['cluster']['slurm']['database']['password_secret_arn'],
-    region: node['cluster']['region'],
-    )
+    region: node['cluster']['region']
+  )
   sensitive true
 end
 
@@ -77,16 +77,16 @@ bash "bootstrap slurm database" do
     DEF_ACCOUNT=pcdefault
     SLURM_USER=#{node['cluster']['slurm']['user']}
     DEF_USER=#{node['cluster']['cluster_user']}
-    
+
     # Add cluster to database if it is not present yet
     [[ $($SACCTMGR_CMD show clusters -Pn cluster=$CLUSTER_NAME | grep $CLUSTER_NAME) ]] || \
         $SACCTMGR_CMD -iQ add cluster $CLUSTER_NAME
-    
+
     # Add account-cluster association to database if it is not present yet
     [[ $($SACCTMGR_CMD list associations -Pn cluster=$CLUSTER_NAME account=$DEF_ACCOUNT format=account | grep $DEF_ACCOUNT) ]] || \
         $SACCTMGR_CMD -iQ add account $DEF_ACCOUNT Cluster=$CLUSTER_NAME \
             Description="ParallelCluster default account" Organization="none"
-    
+
     # Add user-account associations to database if they are not present yet
     [[ $($SACCTMGR_CMD list associations -Pn cluster=$CLUSTER_NAME account=$DEF_ACCOUNT user=$SLURM_USER format=user | grep $SLURM_USER) ]] || \
         $SACCTMGR_CMD -iQ add user $SLURM_USER Account=$DEF_ACCOUNT AdminLevel=Admin
@@ -98,4 +98,3 @@ bash "bootstrap slurm database" do
     exit 0
   BOOTSTRAP
 end
-

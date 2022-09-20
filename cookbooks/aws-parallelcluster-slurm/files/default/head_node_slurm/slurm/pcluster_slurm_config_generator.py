@@ -323,7 +323,6 @@ def _check_trailing_slash(uri: str) -> bool:
         )
         log.critical(error_msg)
         raise CriticalError(error_msg)
-        return False
     return True
 
 
@@ -334,12 +333,10 @@ def _check_scheme(uri: str, uri_parse: ParseResult) -> bool:
         error_msg = (f"Failure to parse uri with error '{str(e)}'. Please review the provided URI ('{uri}')",)
         log.critical(error_msg)
         raise CriticalError(error_msg)
-        return False
     if scheme:
         error_msg = (f"Invalid URI specified. Please do not provide a scheme ('{scheme}://')",)
         log.critical(error_msg)
         raise CriticalError(error_msg)
-        return False
     return True
 
 
@@ -350,12 +347,10 @@ def _parse_netloc(uri: str, uri_parse: ParseResult, attr: str) -> str:
         error_msg = f"Failure to parse uri with error '{str(e)}'. Please review the provided URI ('{uri}')"
         log.critical(error_msg)
         raise CriticalError(error_msg)
-        return None
     if not netloc:
         error_msg = f"Invalid URI specified. Please review the provided URI ('{uri}')"
         log.critical(error_msg)
         raise CriticalError(error_msg)
-        return None
     if attr == "host":
         ret = uri_parse.hostname
     elif attr == "port":
@@ -371,7 +366,7 @@ def _parse_uri(uri, attr) -> str:
     # First, throw error if the URI starts with a "/" (to prevent issues with the
     # manipulation below
     if not _check_trailing_slash(uri):
-        return
+        return None
 
     uri_parse = urlparse(uri)
     if not uri_parse.scheme and not uri_parse.netloc:
@@ -381,7 +376,7 @@ def _parse_uri(uri, attr) -> str:
 
     # Throw error if the URI contains a scheme
     if not _check_scheme(uri, uri_parse):
-        return
+        return None
 
     # Parse netloc to get hostname or port
     return _parse_netloc(uri, uri_parse, attr)

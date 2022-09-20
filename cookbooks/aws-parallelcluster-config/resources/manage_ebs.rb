@@ -12,8 +12,8 @@ resource_name :manage_ebs
 provides :manage_ebs
 unified_mode true
 
-property :shared_dir_array, required: true
-property :vol_array, required: true
+property :shared_dir_array, Array, required: true
+property :vol_array, Array, required: true
 
 default_action :mount
 
