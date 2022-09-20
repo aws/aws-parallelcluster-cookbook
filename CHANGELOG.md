@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for AWS Trainium instances.
+- Upgrade NFS cookbook recipe from `2.6.4` to `5.0.0`.
 
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
