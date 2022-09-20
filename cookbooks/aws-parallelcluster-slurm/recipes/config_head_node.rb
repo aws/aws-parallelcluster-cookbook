@@ -192,34 +192,6 @@ template '/etc/systemd/system/slurmctld.service' do
   action :create
 end
 
-if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
-  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d" do
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/01-pcluster-prolog" do
-    source 'head_node_slurm/prolog'
-    owner node['cluster']['slurm']['user']
-    group node['cluster']['slurm']['group']
-    mode '0744'
-  end
-
-  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d" do
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/01-pcluster-epilog" do
-    source 'head_node_slurm/epilog'
-    owner node['cluster']['slurm']['user']
-    group node['cluster']['slurm']['group']
-    mode '0744'
-  end
-end
-
 service "slurmctld" do
   supports restart: false
   action %i(enable start)

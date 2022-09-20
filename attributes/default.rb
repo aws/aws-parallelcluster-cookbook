@@ -552,7 +552,6 @@ default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
-default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
 default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
