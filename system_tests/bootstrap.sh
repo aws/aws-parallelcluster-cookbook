@@ -39,6 +39,7 @@ LANG=en_US.UTF-8 /opt/cinc/embedded/bin/berks vendor /etc/chef/cookbooks --delet
 mocks=(
        /etc/init.d/rpc-statd
        /etc/init.d/rpc-statd.service
+       /etc/init.d/nfs-idmapd
        /etc/init.d/nfs-client.target
        /etc/init.d/nfs-config.service
        /etc/init.d/nfs-kernel-server.service
