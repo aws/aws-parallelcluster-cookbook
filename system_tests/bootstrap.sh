@@ -36,8 +36,13 @@ cp system_tests/image_dna.json /etc/parallelcluster/image_dna.json
 LANG=en_US.UTF-8 /opt/cinc/embedded/bin/berks vendor /etc/chef/cookbooks --delete || (echo 'Vendoring cookbook failed.' && exit 1)
 
 # Mock aspects of the system so that recipes run and complete cleanly
-mocks=(/etc/init.d/rpc-statd
+mocks=(
+       /etc/init.d/rpc-statd
+       /etc/init.d/rpc-statd.service
+       /etc/init.d/nfs-idmapd
+       /etc/init.d/nfs-client.target
        /etc/init.d/nfs-config.service
+       /etc/init.d/nfs-kernel-server.service
        /usr/local/bin/udevadm
        /usr/local/sbin/sysctl
        /usr/local/sbin/modprobe)
