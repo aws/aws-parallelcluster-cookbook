@@ -122,7 +122,7 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
 end
 
 # Install NFS packages
-include_recipe "nfs::server"
+include_recipe "nfs::server4"
 
 # Put setup-ephemeral-drives.sh onto the host
 cookbook_file 'setup-ephemeral-drives.sh' do
