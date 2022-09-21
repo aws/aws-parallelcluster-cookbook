@@ -316,10 +316,10 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     return realmemory
 
 
-def _check_trailing_slash(uri: str) -> bool:
-    if uri[0] == "/":
+def _check_leading_slash(uri: str) -> bool:
+    if uri.startswith("/"):
         error_msg = (
-            f"Invalid URI specified. Please remove any trailing / at the beginning of the provided URI ('{uri}')."
+            f"Invalid URI specified. Please remove any leading / at the beginning of the provided URI ('{uri}')."
         )
         log.critical(error_msg)
         raise CriticalError(error_msg)
@@ -365,7 +365,7 @@ def _parse_uri(uri, attr) -> str:
     """Get a host from a URI/URL using urlparse."""
     # First, throw error if the URI starts with a "/" (to prevent issues with the
     # manipulation below
-    if not _check_trailing_slash(uri):
+    if not _check_leading_slash(uri):
         return None
 
     uri_parse = urlparse(uri)
