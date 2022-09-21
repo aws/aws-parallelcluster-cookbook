@@ -22,12 +22,6 @@
 # NFS threads enhancement is omitted for Ubuntu1604
 node.force_override['nfs']['threads'] = [node['cpu']['cores'].to_i, 8].max
 
-if platform?('ubuntu') && node['platform_version'].to_f >= 16.04
-  # FIXME: https://github.com/atomic-penguin/cookbook-nfs/issues/93
-  include_recipe "nfs::server"
-end
-include_recipe "nfs::server4"
-
 if node['conditions']['overwrite_nfs_template']
   edit_resource(:template, node['nfs']['config']['server_template']) do
     source 'nfs/nfs.conf.erb'
