@@ -22,11 +22,11 @@
 # NFS threads enhancement is omitted for Ubuntu1604
 node.force_override['nfs']['threads'] = [node['cpu']['cores'].to_i, 8].max
 
-if node['conditions']['overwrite_nfs_template']
-  edit_resource(:template, node['nfs']['config']['server_template']) do
-    source 'nfs/nfs.conf.erb'
-    cookbook 'aws-parallelcluster-config'
-  end
+# Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
+# When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
+edit_resource(:template, node['nfs']['config']['server_template']) do
+  source 'nfs/nfs.conf.erb'
+  cookbook 'aws-parallelcluster-config'
 end
 
 # Explicitly restart NFS server for thread setting to take effect
