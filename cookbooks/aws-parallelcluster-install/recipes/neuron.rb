@@ -15,14 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['cluster']['base_os'] == 'centos7' || arm_instance?
+return if node['cluster']['base_os'] == 'centos7' || arm_instance? || is_package_installed?("aws-neuronx-dkms")
 
-# Skip installation if Trainium or Inferentia drivers are already installed.
-# Inferentia packages might be installed in old DLAMIs and they will conflict with Neuron packages
-return if is_package_installed?("aws-neuronx-dkms") || is_package_installed?("aws-neuron-dkms")
-
-# add neuron repository
 if platform?('amazon')
+  # add neuron repository
   yum_repository "neuron" do
     description "Neuron YUM Repository"
     baseurl node['cluster']['neuron']['base_url']
@@ -32,6 +28,7 @@ if platform?('amazon')
   end
 
 elsif platform?('ubuntu')
+
   apt_repository 'neuron' do
     uri node['cluster']['neuron']['base_url']
     components ['main']

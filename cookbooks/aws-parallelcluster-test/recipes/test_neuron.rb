@@ -14,7 +14,6 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-return if node['cluster']['base_os'] == 'centos7' || arm_instance? || node['cluster']['os'].end_with?("-custom")
 
 ruby_block "Verify Neuron repository is enabled" do
   block do
