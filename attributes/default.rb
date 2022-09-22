@@ -41,7 +41,9 @@ default['cluster']['update_shared_storages_mapping_path'] = "/etc/parallelcluste
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
-default['cluster']['python-version'] = '3.7.13'
+default['cluster']['python-version'] = '3.9.13'
+# FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
+default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.14'
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
@@ -59,7 +61,7 @@ default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_ro
 # AWSBatch Virtualenv Path
 default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['awsbatch_virtualenv']}"
 # cfn-bootstrap Virtualenv Path
-default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
+default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
@@ -125,9 +127,9 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '21-08-8-2'
+default['cluster']['slurm']['version'] = '22-05-3-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = 'f7687c11f024fbbe5399b93906d1179adc5c3fb6'
+default['cluster']['slurm']['sha1'] = 'f7340a7def5ba359327dd8ff41272b76e28d8bdf'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -553,7 +555,6 @@ default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
-default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
 default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95

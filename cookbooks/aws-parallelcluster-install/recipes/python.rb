@@ -19,6 +19,11 @@ install_pyenv node['cluster']['python-version'] do
   prefix node['cluster']['system_pyenv_root']
 end
 
+# FIXME: Python install for cfn_bootstrap_virtualenv due to a bug with cfn-hup
+install_pyenv node['cluster']['python-version-cfn_bootstrap_virtualenv'] do
+  prefix node['cluster']['system_pyenv_root']
+end
+
 activate_virtual_env node['cluster']['cookbook_virtualenv'] do
   pyenv_path node['cluster']['cookbook_virtualenv_path']
   python_version node['cluster']['python-version']
@@ -42,7 +47,7 @@ end
 # Install cfn_bootstrap virtualenv
 activate_virtual_env node['cluster']['cfn_bootstrap_virtualenv'] do
   pyenv_path node['cluster']['cfn_bootstrap_virtualenv_path']
-  python_version node['cluster']['python-version']
+  python_version node['cluster']['python-version-cfn_bootstrap_virtualenv']
   not_if { ::File.exist?("#{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/activate") }
 end
 

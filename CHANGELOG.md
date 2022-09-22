@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for AWS Trainium instances.
+- Upgrade NFS cookbook recipe from `2.6.4` to `5.0.0`.
 
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
@@ -16,7 +17,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for generating Slurm Configuration files for Compute Resources with Multiple Instance Types.
 - Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
 - Change the logic to number the routing tables when an instance have multiple NICs.
-- Upgrade Python from 3.7.10 to 3.7.13 in response to this [security risk](https://nvd.nist.gov/vuln/detail/CVE-2021-3737).
+- Upgrade Python from 3.7.13 to 3.9.13.
+- Upgrade Slurm to version 22.05.3.
 
 3.2.0
 ------

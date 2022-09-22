@@ -423,15 +423,6 @@ def get_nvswitches
   nvswitch_check.stdout.strip.to_i
 end
 
-# Alinux OSs currently not correctly supported by NFS cookbook
-# Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
-# When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
-def overwrite_nfs_template?
-  [
-    node['platform'] == 'amazon',
-  ].any?
-end
-
 def enable_munge_service
   service "munge" do
     supports restart: true

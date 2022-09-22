@@ -1,0 +1,7 @@
+---
+name: server
+title: Integration tests for the nfs cookbook
+
+depends:
+  - name: default
+    path: test/integration/default
