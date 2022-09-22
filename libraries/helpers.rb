@@ -353,7 +353,7 @@ end
 
 # Add an external package repository to the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
-def add_package_repository(repo_name, baseurl, gpgkey, distribution, components = [])
+def add_package_repository(repo_name, baseurl, gpgkey, distribution)
   case node['platform_family']
   when 'rhel', 'amazon'
     yum_repository repo_name do
@@ -367,7 +367,6 @@ def add_package_repository(repo_name, baseurl, gpgkey, distribution, components 
       uri          baseurl
       key          gpgkey
       distribution distribution
-      components components
       retries 3
       retry_delay 5
     end
