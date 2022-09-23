@@ -8,47 +8,26 @@ name: ci
       - main
 
 jobs:
-  delivery:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@main
-      - name: Run Chef Delivery
-        uses: actionshub/chef-delivery@main
-        env:
-          CHEF_LICENSE: accept-no-persist
-
-  yamllint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@main
-      - name: Run yaml Lint
-        uses: actionshub/yamllint@main
-
-  mdl:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out code
-        uses: actions/checkout@main
-      - name: Run Markdown Lint
-        uses: actionshub/markdownlint@main
+  lint-unit:
+    uses: sous-chefs/.github/.github/workflows/lint-unit.yml@0.0.3
 
   integration:
-    needs: [mdl, yamllint, delivery]
+    needs: lint-unit
     runs-on: macos-10.15
     strategy:
       matrix:
         os:
+          - almalinux-8
           - centos-7
-          - centos-8
           - centos-stream-8
           # - fedora-latest # TODO: reenable once https://github.com/chef/bento/issues/1333 is fixed
           - debian-10
+          - debian-11
           - ubuntu-1804
           - ubuntu-2004
           - oracle-7
           - oracle-8
+          - rockylinux-8
         suite:
           - enforcing
           - permissive

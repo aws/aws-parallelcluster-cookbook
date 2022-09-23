@@ -20,15 +20,17 @@ verifier:
   name: inspec
 
 platforms:
+  - name: almalinux-8
   - name: centos-7
-  - name: centos-8
   - name: centos-stream-8
   - name: fedora-latest
   - name: debian-10
+  - name: debian-11
   - name: ubuntu-18.04
   - name: ubuntu-20.04
   - name: oracle-7
   - name: oracle-8
+  - name: rockylinux-8
 
 suites:
   - name: enforcing
