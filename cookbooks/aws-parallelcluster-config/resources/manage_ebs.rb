@@ -135,7 +135,7 @@ action :unmount do
 
   vol_array.each_with_index do |volumeid, index|
     dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
-    dev_uuids[index] = get_uuid(dev_path[index])
+    dev_uuids[index] = get_uuid_for_unmount(shared_dir_array[index])
 
     # Unmount and remove volume from /etc/fstab
     mount shared_dir_array[index] do
@@ -170,11 +170,18 @@ action :unexport do
     # unexport the volume
     delete_lines "remove volume from /etc/exports" do
       path "/etc/exports"
-      pattern "#{shared_dir_array[index]} *"
+      pattern "#{shared_dir_array[index]} "
     end
   end
 
   execute "unexport volume" do
     command "exportfs -ra"
+  end
+end
+
+action_class do
+  def get_uuid_for_unmount(mount_dir)
+    cmd = Mixlib::ShellOut.new("lsblk -f | grep #{mount_dir} | awk '{{print $3}}'")
+    cmd.run_command.stdout.strip
   end
 end
