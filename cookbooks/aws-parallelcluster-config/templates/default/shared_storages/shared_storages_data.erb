@@ -6,6 +6,14 @@ ebs:
   - volume_id: <%= volumeid %>
     mount_dir: <%= shared_dir_array[index] %>
 <% end -%>
+<%# RAID %>
+raid:
+<% raid_shared_dir = node['cluster']['raid_shared_dir'] -%>
+<% unless raid_shared_dir.empty? -%>
+  - raid_shared_dir: <%= node['cluster']['raid_shared_dir'] %>
+    raid_type: <%= node['cluster']['raid_type'] %>
+    raid_vol_array: <%= node['cluster']['raid_vol_ids'] %>
+<% end -%>
 <%# EFS %>
 <% efs_fs_ids_array = node['cluster']['efs_fs_ids'].split(',') -%>
 <% efs_shared_dir_array = node['cluster']['efs_shared_dirs'].split(',') -%>
