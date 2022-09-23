@@ -51,17 +51,17 @@ activate_virtual_env node['cluster']['cfn_bootstrap_virtualenv'] do
   not_if { ::File.exist?("#{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/activate") }
 end
 
-bash 'install CloudFormation helpers' do
+bash "Install CloudFormation helpers from #{node['cluster']['cfn_bootstrap']['package']}" do
   user 'root'
   group 'root'
-  cwd Chef::Config[:file_cache_path]
+  cwd '/tmp'
   code <<-CFNTOOLS
       set -e
       region="#{node['cluster']['region']}"
       bucket="s3.amazonaws.com"
       [[ ${region} =~ ^cn- ]] && bucket="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
-      curl --retry 3 -L -o aws-cfn-bootstrap-py3-latest.tar.gz https://${bucket}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz
-      #{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/pip install aws-cfn-bootstrap-py3-latest.tar.gz
+      curl --retry 3 -L -o #{node['cluster']['cfn_bootstrap']['package']} https://${bucket}/cloudformation-examples/#{node['cluster']['cfn_bootstrap']['package']}
+      #{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/pip install #{node['cluster']['cfn_bootstrap']['package']}
   CFNTOOLS
   creates "#{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/cfn-hup"
 end
