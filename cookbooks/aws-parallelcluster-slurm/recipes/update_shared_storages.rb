@@ -24,6 +24,10 @@ ruby_block "get storage to mount and unmount" do
     node.default['cluster']['unmount_shared_dir_array'], node.default['cluster']['unmount_vol_array'] = get_ebs(UNMOUNT_ACTION)
     # get ebs to mount
     node.default['cluster']['mount_shared_dir_array'], node.default['cluster']['mount_vol_array'] = get_ebs(MOUNT_ACTION)
+    # get raid to unmount
+    node.default['cluster']['unmount_raid_shared_dir'], node.default['cluster']['unmount_raid_type'], node.default['cluster']['unmount_raid_vol_array'] = get_raid(UNMOUNT_ACTION)
+    # get raid to mount
+    node.default['cluster']['mount_raid_shared_dir'], node.default['cluster']['mount_raid_type'], node.default['cluster']['mount_raid_vol_array'] = get_raid(MOUNT_ACTION)
     # get efs to unmount
     node.default['cluster']['unmount_efs_shared_dir_array'], node.default['cluster']['unmount_efs_fs_id_array'] = get_efs(UNMOUNT_ACTION)
     # get efs to mount
@@ -105,8 +109,31 @@ ruby_block "get storage to mount and unmount" do
     end
     [fsx_fs_id_array, fsx_fs_type_array, fsx_shared_dir_array, fsx_dns_name_array, fsx_mount_name_array, fsx_volume_junction_path_array]
   end
+
+  def get_raid(action)
+    # get raid to mount or unmount
+    if action == UNMOUNT_ACTION
+      in_shared_storages_mapping = node['cluster']['shared_storages_mapping']
+      not_in_shared_storages_mapping = node['cluster']['update_shared_storages_mapping']
+    elsif action == MOUNT_ACTION
+      in_shared_storages_mapping = node['cluster']['update_shared_storages_mapping']
+      not_in_shared_storages_mapping = node['cluster']['shared_storages_mapping']
+    end
+    raid_shared_dir = nil
+    raid_type = nil
+    raid_vol_array = nil
+    unless in_shared_storages_mapping["raid"].nil?
+      in_shared_storages_mapping["raid"].each do |storage|
+        next unless not_in_shared_storages_mapping["raid"].nil? || !not_in_shared_storages_mapping["raid"].include?(storage)
+        raid_shared_dir = storage["raid_shared_dir"]
+        raid_type = storage["raid_type"].to_s
+        raid_vol_array = storage["raid_vol_array"]
+      end
+    end
+    [raid_shared_dir, raid_type, raid_vol_array]
+  end
 end
-# unmount ebs
+# remove ebs
 manage_ebs "remove ebs" do
   shared_dir_array(lazy { node['cluster']['unmount_shared_dir_array'] })
   vol_array(lazy { node['cluster']['unmount_vol_array'] })
@@ -114,11 +141,29 @@ manage_ebs "remove ebs" do
   not_if { node['cluster']['unmount_shared_dir_array'].empty? }
 end
 
+# add ebs
 manage_ebs "add ebs" do
   shared_dir_array(lazy { node['cluster']['mount_shared_dir_array'] })
   vol_array(lazy { node['cluster']['mount_vol_array'] })
   action %i(mount export)
   not_if { node['cluster']['mount_shared_dir_array'].empty? }
+end
+
+# remove raid
+manage_raid "remove raid" do
+  raid_shared_dir(lazy { node['cluster']['unmount_raid_shared_dir'] })
+  raid_vol_array(lazy { node['cluster']['unmount_raid_vol_array'] })
+  action %i(unexport unmount)
+  not_if { node['cluster']['unmount_raid_shared_dir'].nil? }
+end
+
+# add raid
+manage_raid "add raid" do
+  raid_shared_dir(lazy { node['cluster']['mount_raid_shared_dir'] })
+  raid_type(lazy { node['cluster']['mount_raid_type'] })
+  raid_vol_array(lazy { node['cluster']['mount_raid_vol_array'] })
+  action %i(mount export)
+  not_if { node['cluster']['mount_raid_shared_dir'].nil? }
 end
 
 # unmount efs
