@@ -220,6 +220,41 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'ubuntu' => { 'default' => 'gdrdrv' },
   'default' => 'gdrcopy'
 )
+
+# MySQL
+default['cluster']['mysql']['repository']['definition']['file-name'] = value_for_platform(
+  'default' => "mysql80-community-release-el7-7.noarch.rpm",
+  'ubuntu' => { 'default' => "mysql-apt-config_0.8.23-1_all.deb" }
+)
+
+default['cluster']['mysql']['repository']['definition']['url'] = "https://dev.mysql.com/get/#{node['cluster']['mysql']['repository']['definition']['file-name']}"
+default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platform(
+  'default' => "659400f9842fffb8d64ae0b650f081b9",
+  'ubuntu' => { 'default' => "c2b410031867dc7c966ca5b1aa0c72aa" }
+)
+if arm_instance?
+  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+    'ubuntu' => {
+      'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common),
+      '18.04' =>  %w(libmysqlclient-dev libmysqlclient20 mysql-common),
+    }
+  )
+  default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
+    'default' => "mysql80-community",
+    'ubuntu' => { 'default' => "http://us-east-1.ec2.ports.ubuntu.com/ubuntu-ports" }
+  )
+else
+  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+    'ubuntu' => { 'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common mysql-community-client-plugins) }
+  )
+  default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
+    'default' => "mysql80-community",
+    'ubuntu' => { 'default' => "http://repo.mysql.com/apt/ubuntu" }
+  )
+end
+
 # EFA
 default['cluster']['efa']['installer_version'] = '1.17.2'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
