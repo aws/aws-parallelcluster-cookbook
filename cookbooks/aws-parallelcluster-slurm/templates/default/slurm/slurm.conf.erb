@@ -13,8 +13,6 @@ ClusterName=<%= node['cluster']['stack_name'] %>
 SlurmUser=<%= node['cluster']['slurm']['user'] %>
 SlurmctldPort=6820-6829
 SlurmdPort=6818
-AccountingStoragePort=6819
-AccountingStorageUser=<%= node['cluster']['slurm']['dbduser'] %>
 AuthType=auth/munge
 StateSaveLocation=/var/spool/slurm.state
 SlurmdSpoolDir=/var/spool/slurmd

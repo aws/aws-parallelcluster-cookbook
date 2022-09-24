@@ -140,9 +140,6 @@ default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plu
 
 # ParallelCluster internal variables to configure Slurm Accounting
 default['cluster']['slurm']['database']['enabled'] = 'false'
-default['cluster']['slurm']['database']['uri'] = nil
-default['cluster']['slurm']['database']['user_name'] = nil
-default['cluster']['slurm']['database']['password_secret_arn'] = nil
 
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'

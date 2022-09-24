@@ -27,7 +27,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password
   group 'root'
   mode '0700'
   variables(
-    secret_arn: node['cluster']['slurm']['database']['password_secret_arn'],
+    secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database,:PasswordSecretArn) },
     region: node['cluster']['region']
   )
   sensitive true
@@ -47,25 +47,10 @@ end
 # After starting slurmdbd the database may not be fully responsive yet and
 # its bootstrapping may fail. We need to wait for sacctmgr to successfully
 # query the database before proceeding.
-bash "wait for slurm database" do
-  user 'root'
-  group 'root'
-  code <<-WAIT
-    SACCTMGR_CMD=#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr
-    RETRY_DELAY=5
-    MAX_RETRIES=6
-
-    rc=1
-    retry=0
-    while [ $rc -ne 0 ]; do
-        if [ $retry -eq $MAX_RETRIES ]; then break; fi
-        sleep $RETRY_DELAY
-        $SACCTMGR_CMD show clusters -Pn
-        rc=$?
-        retry=$(( $retry + 1 ))
-    done
-    exit $rc
-  WAIT
+execute "wait for slurm database" do
+  command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
+  retries 30
+  retry_delay 10
 end
 
 bash "bootstrap slurm database" do

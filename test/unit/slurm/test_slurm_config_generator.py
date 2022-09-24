@@ -28,6 +28,7 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
         no_gpu=no_gpu,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurmdbd",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -69,6 +70,7 @@ def test_generate_slurm_config_files_memory_scheduling(
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
+        slurmdbd_user="slurmdbd",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -111,6 +113,7 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurmdbd",
     )
 
     for file_type in ["", "_slurmdbd"]:
@@ -139,6 +142,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurmdbd",
     )
 
     for queue in ["queue1", "queue2", "queue3", "queue4", "queue5", "queue6", "queue7"]:

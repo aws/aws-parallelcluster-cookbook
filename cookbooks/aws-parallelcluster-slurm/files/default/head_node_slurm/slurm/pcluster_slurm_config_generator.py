@@ -44,6 +44,7 @@ def generate_slurm_config_files(
     no_gpu,
     compute_node_bootstrap_timeout,
     realmemory_to_ec2memory_ratio,
+    slurmdbd_user,
 ):
     """
     Generate Slurm configuration files.
@@ -66,8 +67,7 @@ def generate_slurm_config_files(
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
     queues = cluster_config["Scheduling"]["SlurmQueues"]
-    tags_dict = {a["Key"]: a["Value"] for a in cluster_config["Tags"]}
-    cluster_name = tags_dict["parallelcluster:cluster-name"]
+    cluster_name = next(tag["Value"] for tag in cluster_config["Tags"] if tag["Key"] == "parallelcluster:cluster-name")
 
     global instance_types_data
     with open(instance_types_data_path) as input_file:
@@ -101,6 +101,7 @@ def generate_slurm_config_files(
             head_node_config,
             cluster_config["Scheduling"]["SlurmSettings"],
             cluster_name,
+            slurmdbd_user,
             template_name,
             compute_node_bootstrap_timeout,
             env,
@@ -167,6 +168,7 @@ def _generate_slurm_parallelcluster_configs(
     head_node_config,
     scaling_config,
     cluster_name,
+    slurmdbd_user,
     template_name,
     compute_node_bootstrap_timeout,
     jinja_env,
@@ -179,6 +181,7 @@ def _generate_slurm_parallelcluster_configs(
         head_node_config=head_node_config,
         scaling_config=scaling_config,
         cluster_name=cluster_name,
+        slurmdbd_user=slurmdbd_user,
         compute_node_bootstrap_timeout=compute_node_bootstrap_timeout,
         output_dir=output_dir,
     )
@@ -316,17 +319,16 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     return realmemory
 
 
-def _check_leading_slash(uri: str) -> bool:
+def _check_leading_slash(uri: str):
     if uri.startswith("/"):
         error_msg = (
             f"Invalid URI specified. Please remove any leading / at the beginning of the provided URI ('{uri}')."
         )
         log.critical(error_msg)
         raise CriticalError(error_msg)
-    return True
 
 
-def _check_scheme(uri: str, uri_parse: ParseResult) -> bool:
+def _check_scheme(uri: str, uri_parse: ParseResult):
     try:
         scheme = uri_parse.scheme
     except ValueError as e:
@@ -337,7 +339,6 @@ def _check_scheme(uri: str, uri_parse: ParseResult) -> bool:
         error_msg = (f"Invalid URI specified. Please do not provide a scheme ('{scheme}://')",)
         log.critical(error_msg)
         raise CriticalError(error_msg)
-    return True
 
 
 def _parse_netloc(uri: str, uri_parse: ParseResult, attr: str) -> str:
@@ -365,8 +366,7 @@ def _parse_uri(uri, attr) -> str:
     """Get a host from a URI/URL using urlparse."""
     # First, throw error if the URI starts with a "/" (to prevent issues with the
     # manipulation below
-    if not _check_leading_slash(uri):
-        return None
+    _check_leading_slash(uri)
 
     uri_parse = urlparse(uri)
     if not uri_parse.netloc:
@@ -375,8 +375,7 @@ def _parse_uri(uri, attr) -> str:
         uri_parse = urlparse("//" + uri)
 
     # Throw error if the URI contains a scheme
-    if not _check_scheme(uri, uri_parse):
-        return None
+    _check_scheme(uri, uri_parse)
 
     # Parse netloc to get hostname or port
     return _parse_netloc(uri, uri_parse, attr)
@@ -474,6 +473,7 @@ def main():
             help="Configure ratio between RealMemory and memory advertised by EC2",
             required=True,
         )
+        parser.add_argument("--slurmdbd-user", help="User for the slurmdbd service.", required=True)
         args = parser.parse_args()
         generate_slurm_config_files(
             args.output_directory,
@@ -484,6 +484,7 @@ def main():
             args.no_gpu,
             args.compute_node_bootstrap_timeout,
             args.realmemory_to_ec2memory_ratio,
+            args.slurmdbd_user,
         )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)
