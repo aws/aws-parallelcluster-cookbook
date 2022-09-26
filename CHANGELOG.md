@@ -3,6 +3,18 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.1.5
+------
+
+**ENHANCEMENTS**
+- Upgrade EFA installer to `1.18.0`
+  - Efa-driver: `efa-1.16.0-1`
+  - Efa-config: `efa-config-1.11-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.0~amzn4.0-1`
+  - Rdma-core: `rdma-core-41.0-2`
+  - Open MPI: `openmpi40-aws-4.1.4-2`
+
 3.1.4
 ------
 
@@ -29,7 +41,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix the configuration parameter `DirectoryService/DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
-- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
+- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.
 
 3.1.2
 ------
@@ -64,6 +76,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Do not configure GPUs in Slurm when NVIDIA driver is not installed.
 - Fix the way `ExtraChefAttributes` are merged into the final configuration.
+- Fix sporadic failure of build-image due to missing package
 
 3.0.3
 ------
