@@ -28,6 +28,7 @@ end
 include_recipe 'aws-parallelcluster-install::base'
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
 include_recipe "aws-parallelcluster-install::intel"
+include_recipe 'aws-parallelcluster-install::install_mysql_client'
 include_recipe 'aws-parallelcluster-slurm::install'
 include_recipe 'aws-parallelcluster-scheduler-plugin::install'
 include_recipe 'aws-parallelcluster-awsbatch::install'

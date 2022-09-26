@@ -15,12 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# generate the shared storages mapping file
-template node['cluster']['shared_storages_mapping_path'] do
-  source 'shared_storages/shared_storages_data.erb'
-  mode '0644'
-end
-
 # Mount EFS directory with manage_efs resource
 manage_efs "mount efs" do
   shared_dir_array node['cluster']['efs_shared_dirs'].split(',')

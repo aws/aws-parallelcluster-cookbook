@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-slurm
+# Cookbook:: aws-parallelcluster-config
 # Recipe:: update_shared_storages
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
