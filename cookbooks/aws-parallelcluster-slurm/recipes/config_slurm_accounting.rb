@@ -21,7 +21,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
   group "#{node['cluster']['slurm']['dbdgroup']}"
   mode '0600'
   # Do not overwrite possible user customization if the database credentials are updated
-  not_if { ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf")}
+  not_if { ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf") }
 end
 
 file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
@@ -36,7 +36,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password
   group 'root'
   mode '0700'
   variables(
-    secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database,:PasswordSecretArn) },
+    secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database, :PasswordSecretArn) },
     region: node['cluster']['region']
   )
   sensitive true
