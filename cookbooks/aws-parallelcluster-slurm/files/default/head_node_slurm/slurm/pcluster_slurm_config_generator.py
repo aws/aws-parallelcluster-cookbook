@@ -18,6 +18,7 @@ import re
 from os import makedirs, path
 from socket import gethostname
 from typing import Tuple
+from urllib.parse import ParseResult, urlparse
 
 import requests
 import yaml
@@ -43,6 +44,7 @@ def generate_slurm_config_files(
     no_gpu,
     compute_node_bootstrap_timeout,
     realmemory_to_ec2memory_ratio,
+    slurmdbd_user,
 ):
     """
     Generate Slurm configuration files.
@@ -65,6 +67,7 @@ def generate_slurm_config_files(
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
     queues = cluster_config["Scheduling"]["SlurmQueues"]
+    cluster_name = next(tag["Value"] for tag in cluster_config["Tags"] if tag["Key"] == "parallelcluster:cluster-name")
 
     global instance_types_data
     with open(instance_types_data_path) as input_file:
@@ -86,16 +89,19 @@ def generate_slurm_config_files(
             )
         is_default_queue = False
 
-    # Generate slurm_parallelcluster.conf, slurm_parallelcluster_gres.conf and slurm_parallelcluster_cgroup.conf
+    # Generate include files for slurm configuration files
     for template_name in [
         "slurm_parallelcluster.conf",
         "slurm_parallelcluster_gres.conf",
         "slurm_parallelcluster_cgroup.conf",
+        "slurm_parallelcluster_slurmdbd.conf",
     ]:
         _generate_slurm_parallelcluster_configs(
             queues,
             head_node_config,
             cluster_config["Scheduling"]["SlurmSettings"],
+            cluster_name,
+            slurmdbd_user,
             template_name,
             compute_node_bootstrap_timeout,
             env,
@@ -161,6 +167,8 @@ def _generate_slurm_parallelcluster_configs(
     queues,
     head_node_config,
     scaling_config,
+    cluster_name,
+    slurmdbd_user,
     template_name,
     compute_node_bootstrap_timeout,
     jinja_env,
@@ -172,6 +180,8 @@ def _generate_slurm_parallelcluster_configs(
         queues=queues,
         head_node_config=head_node_config,
         scaling_config=scaling_config,
+        cluster_name=cluster_name,
+        slurmdbd_user=slurmdbd_user,
         compute_node_bootstrap_timeout=compute_node_bootstrap_timeout,
         output_dir=output_dir,
     )
@@ -195,6 +205,8 @@ def _get_jinja_env(template_directory, realmemory_to_ec2memory_ratio):
         _realmemory,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
     )
+    env.filters["uri_host"] = functools.partial(_parse_uri, attr="host")
+    env.filters["uri_port"] = functools.partial(_parse_uri, attr="port")
 
     return env
 
@@ -307,6 +319,39 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     return realmemory
 
 
+def _parse_netloc(uri: str, uri_parse: ParseResult, attr: str) -> str:
+    try:
+        netloc = uri_parse.netloc
+    except ValueError as e:
+        error_msg = f"Failure to parse uri with error '{str(e)}'. Please review the provided URI ('{uri}')"
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+    if not netloc:
+        error_msg = f"Invalid URI specified. Please review the provided URI ('{uri}')"
+        log.critical(error_msg)
+        raise CriticalError(error_msg)
+    if attr == "host":
+        ret = uri_parse.hostname
+    elif attr == "port":
+        ret = uri_parse.port
+        # Provide default MySQL port if port is not explicitely set
+        if not ret:
+            ret = "3306"
+    return ret
+
+
+def _parse_uri(uri, attr) -> str:
+    """Get a host from a URI/URL using urlparse."""
+    uri_parse = urlparse(uri)
+    if not uri_parse.netloc:
+        # This happens if users provide an URI without explicit scheme followed by ://
+        # (for example 'test.example.com:3306' instead of 'mysql://test.example.com:3306`).
+        uri_parse = urlparse("//" + uri)
+
+    # Parse netloc to get hostname or port
+    return _parse_netloc(uri, uri_parse, attr)
+
+
 def _write_rendered_template_to_file(rendered_template, filename):
     log.info("Writing contents of %s", filename)
     with open(filename, "w") as output_file:
@@ -399,6 +444,7 @@ def main():
             help="Configure ratio between RealMemory and memory advertised by EC2",
             required=True,
         )
+        parser.add_argument("--slurmdbd-user", help="User for the slurmdbd service.", required=True)
         args = parser.parse_args()
         generate_slurm_config_files(
             args.output_directory,
@@ -409,6 +455,7 @@ def main():
             args.no_gpu,
             args.compute_node_bootstrap_timeout,
             args.realmemory_to_ec2memory_ratio,
+            args.slurmdbd_user,
         )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)

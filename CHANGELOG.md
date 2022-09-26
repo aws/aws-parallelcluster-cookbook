@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for AWS Trainium instances.
+- Add support for Slurm Accounting.
 - Upgrade third-party cookbook dependencies:
   - selinux-6.0.5 (from selinux-6.0.4)
   - nfs-5.0.0 (from nfs-2.6.4)

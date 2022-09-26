@@ -68,7 +68,8 @@ unless virtualized?
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
             " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"\
             " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
-            " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
+            " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
+            " --slurmdbd-user #{node['cluster']['slurm']['dbduser']}"
   end
 
   # Generate pcluster fleet config
@@ -190,6 +191,21 @@ template '/etc/systemd/system/slurmctld.service' do
   group 'root'
   mode '0644'
   action :create
+end
+
+template '/etc/systemd/system/slurmdbd.service' do
+  source 'slurm/head_node/slurmdbd.service.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+end
+
+ruby_block "Configure Slurm Accounting" do
+  block do
+    run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+  end
+  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
 end
 
 service "slurmctld" do

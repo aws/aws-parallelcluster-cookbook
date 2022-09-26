@@ -622,6 +622,13 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   cmd.stdout.strip
 end
 
+def is_slurm_database_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
+end
+
 # load cluster configuration file into node object
 def load_shared_storages_mapping
   ruby_block "load shared storages mapping during cluster update" do

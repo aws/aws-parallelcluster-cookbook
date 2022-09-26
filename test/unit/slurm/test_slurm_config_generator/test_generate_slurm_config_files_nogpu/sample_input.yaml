@@ -75,3 +75,7 @@ Scheduling:
     Scheduler: slurm
     SlurmSettings:
         ScaledownIdletime: 10
+        Database: null
+Tags:
+  - Key: parallelcluster:cluster-name
+    Value: test-cluster-no-gpu

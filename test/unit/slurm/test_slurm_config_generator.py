@@ -28,6 +28,7 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
         no_gpu=no_gpu,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurmdbd",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -69,6 +70,7 @@ def test_generate_slurm_config_files_memory_scheduling(
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
+        slurmdbd_user="slurmdbd",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -83,6 +85,41 @@ def test_generate_slurm_config_files_memory_scheduling(
         file_name = f"slurm_parallelcluster{file_type}.conf"
         mem_sched = "_mem_sched" if memory_scheduling else ""
         output_file_name = f"slurm_parallelcluster{file_type}{mem_sched}.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
+@pytest.mark.parametrize(
+    "slurm_accounting",
+    [(False), (True)],
+)
+def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, slurm_accounting):
+    if slurm_accounting:
+        input_file = str(test_datadir / "sample_input_slurm_accounting.yaml")
+    else:
+        input_file = str(test_datadir / "sample_input.yaml")
+    instance_types_data = str(test_datadir / "sample_instance_types_data.json")
+
+    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch(
+        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
+    )
+    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurmdbd",
+    )
+
+    for file_type in ["", "_slurmdbd"]:
+        file_name = f"slurm_parallelcluster{file_type}.conf"
+        postfix = "_slurm_accounting" if slurm_accounting else ""
+        output_file_name = f"slurm_parallelcluster{file_type}{postfix}.conf"
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
@@ -105,6 +142,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurmdbd",
     )
 
     for queue in ["queue1", "queue2", "queue3", "queue4", "queue5", "queue6", "queue7"]:

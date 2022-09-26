@@ -57,6 +57,25 @@ if node['cluster']['scheduler'] == 'slurm'
 end
 
 ###################
+# Slurmdbd user
+###################
+if node['cluster']['scheduler'] == 'slurm'
+  unless node['cluster']['slurm']['dbduser'].eql?(node['cluster']['slurm']['user'])
+    check_user_definition(
+      node['cluster']['slurm']['dbduser'],
+      node['cluster']['slurm']['dbduser_id'],
+      node['cluster']['slurm']['dbdgroup_id'],
+      'slurmdbd user'
+    )
+
+    check_group_definition(
+      node['cluster']['slurm']['dbdgroup'],
+      node['cluster']['slurm']['dbdgroup_id']
+    )
+  end
+end
+
+###################
 # Munge user
 ###################
 if node['cluster']['scheduler'] == 'slurm'

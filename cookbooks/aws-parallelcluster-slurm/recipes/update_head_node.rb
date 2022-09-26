@@ -154,7 +154,8 @@ execute "generate_pcluster_slurm_configs" do
           " --instance-types-data #{node['cluster']['instance_types_data_path']}" \
           " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']}" \
           " #{nvidia_installed? ? '' : '--no-gpu'}"\
-          " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
+          " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
+          " --slurmdbd-user #{node['cluster']['slurm']['dbduser']}"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
@@ -169,6 +170,17 @@ replace_or_add "update node replacement timeout" do
   pattern "node_replacement_timeout*"
   line "node_replacement_timeout = #{node['cluster']['compute_node_bootstrap_timeout']}"
   replace_only true
+end
+
+ruby_block "Update Slurm Accounting" do
+  block do
+    if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
+      run_context.include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
+    else
+      run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+    end
+  end
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
 end
 
 service 'slurmctld' do
