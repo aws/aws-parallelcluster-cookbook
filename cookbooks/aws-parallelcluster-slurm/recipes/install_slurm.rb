@@ -62,9 +62,7 @@ user node['cluster']['slurm']['dbduser'] do
   comment 'slurmdbd user'
   uid node['cluster']['slurm']['dbduser_id']
   gid node['cluster']['slurm']['dbdgroup_id']
-  # home is mounted from the head node
-  manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
-  home "/home/#{node['cluster']['slurm']['dbduser']}"
+  manage_home false
   system true
   shell '/bin/bash'
 end

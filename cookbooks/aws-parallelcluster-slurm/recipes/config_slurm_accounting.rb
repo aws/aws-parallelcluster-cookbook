@@ -15,6 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
+  source 'slurm/slurmdbd.conf.erb'
+  owner "#{node['cluster']['slurm']['dbduser']}"
+  group "#{node['cluster']['slurm']['dbdgroup']}"
+  mode '0600'
+  # Do not overwrite possible user customization if the database credentials are updated
+  not_if { ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf")}
+end
+
 file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
   owner "#{node['cluster']['slurm']['dbduser']}"
   group "#{node['cluster']['slurm']['dbdgroup']}"
@@ -49,7 +58,9 @@ end
 # query the database before proceeding.
 execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
-  retries 30
+  # Very large value to simulate infinite loop (we will hit some other timeout
+  # before this).
+  retries 100000
   retry_delay 10
 end
 

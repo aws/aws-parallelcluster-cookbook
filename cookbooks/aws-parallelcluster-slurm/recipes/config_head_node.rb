@@ -87,13 +87,6 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/cgroup.conf" do
   mode '0644'
 end
 
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
-  source 'slurm/slurmdbd.conf.erb'
-  owner "#{node['cluster']['slurm']['dbduser']}"
-  group "#{node['cluster']['slurm']['dbdgroup']}"
-  mode '0600'
-end
-
 template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.sh" do
   source 'slurm/head_node/slurm.sh.erb'
   owner 'root'
@@ -236,8 +229,11 @@ if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
   end
 end
 
-if node['cluster']['slurm']['database']['enabled'] == "true"
-  include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+ruby_block "Configure Slurm Accounting" do
+  block do
+    run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+  end
+  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
 end
 
 service "slurmctld" do

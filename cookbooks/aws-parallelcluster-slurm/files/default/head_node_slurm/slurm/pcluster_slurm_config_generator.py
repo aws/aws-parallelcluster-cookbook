@@ -319,28 +319,6 @@ def _realmemory(compute_resource, realmemory_to_ec2memory_ratio) -> int:
     return realmemory
 
 
-def _check_leading_slash(uri: str):
-    if uri.startswith("/"):
-        error_msg = (
-            f"Invalid URI specified. Please remove any leading / at the beginning of the provided URI ('{uri}')."
-        )
-        log.critical(error_msg)
-        raise CriticalError(error_msg)
-
-
-def _check_scheme(uri: str, uri_parse: ParseResult):
-    try:
-        scheme = uri_parse.scheme
-    except ValueError as e:
-        error_msg = (f"Failure to parse uri with error '{str(e)}'. Please review the provided URI ('{uri}')",)
-        log.critical(error_msg)
-        raise CriticalError(error_msg)
-    if scheme:
-        error_msg = (f"Invalid URI specified. Please do not provide a scheme ('{scheme}://')",)
-        log.critical(error_msg)
-        raise CriticalError(error_msg)
-
-
 def _parse_netloc(uri: str, uri_parse: ParseResult, attr: str) -> str:
     try:
         netloc = uri_parse.netloc
@@ -364,18 +342,11 @@ def _parse_netloc(uri: str, uri_parse: ParseResult, attr: str) -> str:
 
 def _parse_uri(uri, attr) -> str:
     """Get a host from a URI/URL using urlparse."""
-    # First, throw error if the URI starts with a "/" (to prevent issues with the
-    # manipulation below
-    _check_leading_slash(uri)
-
     uri_parse = urlparse(uri)
     if not uri_parse.netloc:
         # This happens if users provide an URI without explicit scheme followed by ://
         # (for example 'test.example.com:3306' instead of 'mysql://test.example.com:3306`).
         uri_parse = urlparse("//" + uri)
-
-    # Throw error if the URI contains a scheme
-    _check_scheme(uri, uri_parse)
 
     # Parse netloc to get hostname or port
     return _parse_netloc(uri, uri_parse, attr)

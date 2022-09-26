@@ -150,12 +150,15 @@ replace_or_add "update node replacement timeout" do
   replace_only true
 end
 
-if ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated?
-  if node['cluster']['slurm']['database']['enabled'] == "true"
-    include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
-  else
-    include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
+ruby_block "Update Slurm Accounting" do
+  block do
+    if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
+      run_context.include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
+    else
+      run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+    end
   end
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
 end
 
 service 'slurmctld' do

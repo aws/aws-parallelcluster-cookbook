@@ -138,9 +138,6 @@ default['cluster']['slurm']['dbdgroup_id'] = node['cluster']['slurm']['dbduser_i
 default['cluster']['slurm']['install_dir'] = "/opt/slurm"
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
 
-# ParallelCluster internal variables to configure Slurm Accounting
-default['cluster']['slurm']['database']['enabled'] = 'false'
-
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
 default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
