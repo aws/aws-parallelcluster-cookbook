@@ -2,6 +2,13 @@
 
 This file is used to list changes made in each version of the selinux cookbook.
 
+## 6.0.5 - *2022-09-18*
+
+- Standardise files with files in sous-chefs/repo-management
+- Add testing for Debian 11, Alma Linux and Rocky Linux
+- Remove testing for CentOS 8 (prefer Stream instead)
+- Update Github CI config
+
 ## 6.0.4 - *2022-02-17*
 
 - Standardise files with files in sous-chefs/repo-management
