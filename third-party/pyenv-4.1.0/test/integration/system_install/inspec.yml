@@ -1,0 +1,11 @@
+---
+name: pyenv
+title: pyenv user install
+maintainer: Sous-Chefs
+summary: Verifies pyenv is installed correctly at a system level
+version: 1.0.0
+supports:
+  - os-family: linux
+depends:
+  - name: common
+    path: test/integration/common
