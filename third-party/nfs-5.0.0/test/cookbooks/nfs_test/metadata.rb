@@ -1,0 +1,10 @@
+name 'nfs_test'
+maintainer 'Eric G. Wolfe'
+maintainer_email 'wolfe21@marshall.edu'
+license 'Apache-2.0'
+description 'Tests NFS cookbook'
+version '0.0.2'
+
+depends 'apt'
+depends 'nfs'
+depends 'line'

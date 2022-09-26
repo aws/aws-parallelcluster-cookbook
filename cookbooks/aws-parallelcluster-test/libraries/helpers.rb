@@ -235,3 +235,27 @@ def is_service_disabled(service, platform_families = node['platform_family'])
     end
   end
 end
+
+def validate_package_source(package, expected_source)
+  case node['platform']
+  when 'amazon', 'centos'
+    test_expression = "$(yum info #{package} | grep 'From repo' | awk '{print $4}')"
+  when 'ubuntu'
+    test_expression = "$(apt show #{package} | grep 'APT-Sources:' | awk '{print $2}')"
+  else
+    raise "Platform not supported: #{node['platform']}"
+  end
+
+  bash "Check that package #{package} is installed" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      echo "Testing package #{package} source"
+      actual_source=#{test_expression}
+      if [ "#{expected_source}" != "${actual_source}" ]; then
+        echo "ERROR Expected package source #{expected_source} for #{package} does not match actual source: ${actual_source}"
+        exit 1
+      fi
+      echo "#{package} correctly installed from #{expected_source}"
+    TEST
+  end
+end

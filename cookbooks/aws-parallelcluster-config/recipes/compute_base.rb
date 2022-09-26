@@ -65,9 +65,7 @@ shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
 
 # Mount each volume with NFS
 shared_dir_array.each do |dir|
-  dirname = dir.strip
-
-  dirname = "/#{dirname}" unless dirname.start_with?('/')
+  dirname = format_directory(dir)
 
   # Created shared mount point
   directory dirname do

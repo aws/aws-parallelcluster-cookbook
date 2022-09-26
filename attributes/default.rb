@@ -35,6 +35,9 @@ default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change
 default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
+default['cluster']['shared_storages_mapping_path'] = "/etc/parallelcluster/shared_storages_data.yaml"
+default['cluster']['update_shared_storages_mapping_path'] = "/etc/parallelcluster/update_shared_storages_data.yaml"
+
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
@@ -124,9 +127,9 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '21-08-8-2'
+default['cluster']['slurm']['version'] = '22-05-3-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = 'f7687c11f024fbbe5399b93906d1179adc5c3fb6'
+default['cluster']['slurm']['sha1'] = 'f7340a7def5ba359327dd8ff41272b76e28d8bdf'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -221,8 +224,43 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'ubuntu' => { 'default' => 'gdrdrv' },
   'default' => 'gdrcopy'
 )
+
+# MySQL
+default['cluster']['mysql']['repository']['definition']['file-name'] = value_for_platform(
+  'default' => "mysql80-community-release-el7-7.noarch.rpm",
+  'ubuntu' => { 'default' => "mysql-apt-config_0.8.23-1_all.deb" }
+)
+
+default['cluster']['mysql']['repository']['definition']['url'] = "https://dev.mysql.com/get/#{node['cluster']['mysql']['repository']['definition']['file-name']}"
+default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platform(
+  'default' => "659400f9842fffb8d64ae0b650f081b9",
+  'ubuntu' => { 'default' => "c2b410031867dc7c966ca5b1aa0c72aa" }
+)
+if arm_instance?
+  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+    'ubuntu' => {
+      'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common),
+      '18.04' =>  %w(libmysqlclient-dev libmysqlclient20 mysql-common),
+    }
+  )
+  default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
+    'default' => "mysql80-community",
+    'ubuntu' => { 'default' => "http://us-east-1.ec2.ports.ubuntu.com/ubuntu-ports" }
+  )
+else
+  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+    'ubuntu' => { 'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common mysql-community-client-plugins) }
+  )
+  default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
+    'default' => "mysql80-community",
+    'ubuntu' => { 'default' => "http://repo.mysql.com/apt/ubuntu" }
+  )
+end
+
 # EFA
-default['cluster']['efa']['installer_version'] = '1.17.2'
+default['cluster']['efa']['installer_version'] = '1.18.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
@@ -556,7 +594,6 @@ default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
-default['cluster']['add_node_hostnames_in_hosts_file'] = node['cluster']['use_private_hostname']
 default['cluster']['skip_install_recipes'] = 'yes'
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
 default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95

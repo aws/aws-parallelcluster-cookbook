@@ -9,6 +9,16 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for AWS Trainium instances.
 - Add support for Slurm Accounting.
+- Upgrade third-party cookbook dependencies:
+  - selinux-6.0.5 (from selinux-6.0.4)
+  - nfs-5.0.0 (from nfs-2.6.4)
+- Upgrade EFA installer to `1.18.0`
+  - Efa-driver: `efa-1.16.0-1`
+  - Efa-config: `efa-config-1.11-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.0~amzn4.0-1`
+  - Rdma-core: `rdma-core-41.0-2`
+  - Open MPI: `openmpi40-aws-4.1.4-2`
 
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
@@ -18,6 +28,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
 - Change the logic to number the routing tables when an instance have multiple NICs.
 - Upgrade Python from 3.7.13 to 3.9.13.
+- Upgrade Slurm to version 22.05.3.
 
 3.2.0
 ------

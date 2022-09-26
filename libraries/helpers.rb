@@ -423,15 +423,6 @@ def get_nvswitches
   nvswitch_check.stdout.strip.to_i
 end
 
-# Alinux OSs currently not correctly supported by NFS cookbook
-# Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
-# When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
-def overwrite_nfs_template?
-  [
-    node['platform'] == 'amazon',
-  ].any?
-end
-
 def enable_munge_service
   service "munge" do
     supports restart: true
@@ -600,6 +591,17 @@ def are_queues_updated?
   config["Scheduling"] != previous_config["Scheduling"] or is_compute_node_bootstrap_timeout_updated?(previous_config, config)
 end
 
+def are_mount_or_unmount_required?
+  require 'json'
+  change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
+  change_set["changeSet"].each do |change|
+    next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
+    return true
+  end
+  Chef::Log.info("No shared storages operation required.")
+  false
+end
+
 def evaluate_compute_bootstrap_timeout(config)
   config.dig("DevSettings", "Timeouts", "ComputeNodeBootstrapTimeout") or 1800
 end
@@ -625,4 +627,22 @@ def is_slurm_database_updated?
   config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
   config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
+end
+
+# load cluster configuration file into node object
+def load_shared_storages_mapping
+  ruby_block "load shared storages mapping during cluster update" do
+    block do
+      require 'yaml'
+      # regenerate the shared storages mapping file after update
+      node.default['cluster']['shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['shared_storages_mapping_path']))
+      node.default['cluster']['update_shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['update_shared_storages_mapping_path']))
+    end
+  end
+end
+
+def format_directory(dir)
+  format_dir = dir.strip
+  format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
+  format_dir
 end

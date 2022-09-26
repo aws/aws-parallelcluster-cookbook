@@ -20,6 +20,13 @@ execute 'stop clustermgtd' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
+ruby_block "update_shared_storages" do
+  block do
+    run_context.include_recipe 'aws-parallelcluster-config::update_shared_storages'
+  end
+  only_if { are_mount_or_unmount_required? }
+end
+
 ruby_block "replace slurm queue nodes" do
   SLURM_POWER_SAVING_MAPPING = {
     DRAIN: "POWER_DOWN_ASAP",
@@ -75,16 +82,31 @@ ruby_block "replace slurm queue nodes" do
     end
   end
 
-  def get_queues_with_changes
+  def get_all_queues(config)
+    # Get all queue names from the cluster config
+    slurm_queues = config.dig("Scheduling", "SlurmQueues")
+    queues_name = Set.new
+    slurm_queues.each do |queue|
+      queues_name.add(queue["Name"])
+    end
+    queues_name
+  end
+
+  def get_queues_with_changes(config)
     # Load change set and find queue with changes
     queues = Set.new
     change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
     Chef::Log.debug("Loaded change set (#{change_set})")
-    change_set["changeSet"].each do |change|
-      next unless change["updatePolicy"] == "QUEUE_UPDATE_STRATEGY"
-      queue = change["parameter"][/Scheduling\.SlurmQueues\[([^\]]*)\]/, 1]
-      Chef::Log.info("Adding queue (#{queue}) to list of queue to be updated")
-      queues.add(queue)
+    if are_mount_or_unmount_required? # Changes with SHARED_STORAGE_UPDATE_POLICY require all queues to update
+      queues = get_all_queues(config)
+      Chef::Log.info("All queues will be updated in order to update shared storages")
+    else
+      change_set["changeSet"].each do |change|
+        next unless change["updatePolicy"] == "QUEUE_UPDATE_STRATEGY"
+        queue = change["parameter"][/Scheduling\.SlurmQueues\[([^\]]*)\]/, 1]
+        Chef::Log.info("Adding queue (#{queue}) to list of queue to be updated")
+        queues.add(queue)
+      end
     end
     queues
   end
@@ -115,7 +137,7 @@ ruby_block "replace slurm queue nodes" do
         Chef::Log.info("Queue update strategy is (#{queue_update_strategy}), doing nothing")
       when "DRAIN", "TERMINATE"
         Chef::Log.info("Queue update strategy is (#{queue_update_strategy})")
-        queues = get_queues_with_changes
+        queues = get_queues_with_changes(config)
         update_nodes_in_queue(queue_update_strategy, queues)
       else
         Chef::Log.info("Queue update strategy not managed, no-op")

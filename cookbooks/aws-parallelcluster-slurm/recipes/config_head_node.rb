@@ -201,34 +201,6 @@ template '/etc/systemd/system/slurmdbd.service' do
   action :create
 end
 
-if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
-  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d" do
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/01-pcluster-prolog" do
-    source 'head_node_slurm/prolog'
-    owner node['cluster']['slurm']['user']
-    group node['cluster']['slurm']['group']
-    mode '0744'
-  end
-
-  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d" do
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/01-pcluster-epilog" do
-    source 'head_node_slurm/epilog'
-    owner node['cluster']['slurm']['user']
-    group node['cluster']['slurm']['group']
-    mode '0744'
-  end
-end
-
 ruby_block "Configure Slurm Accounting" do
   block do
     run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
