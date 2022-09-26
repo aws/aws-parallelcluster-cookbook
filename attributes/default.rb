@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster
 # Attributes:: default
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -199,7 +199,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.14.1'
+default['cluster']['efa']['installer_version'] = '1.18.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
