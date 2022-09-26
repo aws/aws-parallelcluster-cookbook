@@ -273,16 +273,7 @@
       "node_roles": [
         "HeadNode"
       ],
-      "feature_conditions": [
-        {
-          "dna_key": [
-            "slurm",
-            "database",
-            "enabled"
-          ],
-          "satisfying_values": ["true", "yes"]
-        }
-      ]
+      "feature_conditions": []
     },
     {
       "timestamp_format_key": "default",
