@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade third-party cookbook dependencies:
   - selinux-6.0.5 (from selinux-6.0.4)
   - nfs-5.0.0 (from nfs-2.6.4)
+  - pyenv-4.1.0 (from pyenv-3.5.1)
 
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
