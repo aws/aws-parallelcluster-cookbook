@@ -19,6 +19,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.16.0~amzn4.0-1`
   - Rdma-core: `rdma-core-41.0-2`
   - Open MPI: `openmpi40-aws-4.1.4-2`
+- Upgrade NICE DCV to version `2022.1-13300`.
+  - server: `2022.1.13300-1`
+  - xdcv: `2022.1.433-1`
+  - gl: `2022.1.973-1`
+  - web_viewer: `2022.1.13300-1`
 
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
