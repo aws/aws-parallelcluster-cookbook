@@ -23,6 +23,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.
 - Upgrade NVIDIA Fabric Manager to version 470.141.03.
+- Upgrade NVIDIA CUDA Toolkit to version 11.7.1.
 - Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
 - Add support for generating Slurm Configuration files for Compute Resources with Multiple Instance Types.
 - Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.

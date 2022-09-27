@@ -83,6 +83,30 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
     creates "/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}"
   end
 
+  # Get CUDA Sample Files
+  cuda_samples_directory = "/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}/samples"
+  cuda_tmp_sample_file = "/tmp/cuda-sample.tar.gz"
+  remote_file cuda_tmp_sample_file do
+    source node['cluster']['nvidia']['cuda_samples_url']
+    mode '0644'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(cuda_samples_directory) }
+  end
+
+  # Unpack CUDA Samples
+  bash 'cuda.sample install' do
+    user 'root'
+    group 'root'
+    cwd '/tmp'
+    code <<-CUDA
+      set -e
+      tar xf "#{cuda_tmp_sample_file}" --directory "/usr/local/"
+      rm -f "#{cuda_tmp_sample_file}"
+    CUDA
+    creates cuda_samples_directory
+  end
+
   cookbook_file 'blacklist-nouveau.conf' do
     source 'nvidia/blacklist-nouveau.conf'
     path '/etc/modprobe.d/blacklist-nouveau.conf'
