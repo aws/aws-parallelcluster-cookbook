@@ -155,38 +155,45 @@ if node['cluster']['node_type'] == 'HeadNode'
     sensitive true
   end
 
-  pam_services = %w(sudo su sshd)
-  pam_config_dir = "/etc/pam.d"
   generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
-  ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
-  if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
+  ssh_key_generator_profile_config_line = "bash #{generate_ssh_key_path} >> /var/log/parallelcluster/pam_ssh_key_generator.log 2>&1"
+  if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true' 
     template generate_ssh_key_path do
       source 'directory_service/generate_ssh_key.sh.erb'
       owner 'root'
       group 'root'
       mode '0755'
     end
-    pam_services.each do |pam_service|
-      pam_config_file = "#{pam_config_dir}/#{pam_service}"
-      append_if_no_line "Ensure PAM service #{pam_service} is configured to call SSH key generation script" do
-        path pam_config_file
-        line ssh_key_generator_pam_config_line
-      end
+    file "/var/log/parallelcluster/pam_ssh_key_generator.log" do
+      action :touch
+      mode '0777'
+    end
+    append_if_no_line "Ensure /etc/profile is configured to call SSH key generation script" do
+      path "/etc/profile"
+      line ssh_key_generator_profile_config_line
     end
   else
-    # Remove script used to generate key if it exists and ensure PAM is not configured to try to call it
+    # Remove script used to generate key if it exists and ensure /etc/profile is not configured to try to call it
     file generate_ssh_key_path do
       action :delete
       only_if { ::File.exist? generate_ssh_key_path }
     end
-
-    pam_services.each do |pam_service|
-      pam_config_file = "#{pam_config_dir}/#{pam_service}"
-      delete_lines "Ensure PAM service #{pam_service} is not configured to call SSH key generation script" do
-        path pam_config_file
-        pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
-        ignore_missing true
-      end
+    delete_lines "Ensure /etc/profile is not configured to call SSH key generation script" do
+      path "/etc/profile"
+      line ssh_key_generator_profile_config_line
+    end
+  end
+  
+  # Ensure pam.d based SSH generation is removed
+  ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
+  pam_services = %w(sudo su sshd)
+  pam_config_dir = "/etc/pam.d"
+  pam_services.each do |pam_service|
+    pam_config_file = "#{pam_config_dir}/#{pam_service}"
+    delete_lines "Ensure PAM service #{pam_service} is not configured to call SSH key generation script" do
+      path pam_config_file
+      pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
+      ignore_missing true
     end
   end
 else
