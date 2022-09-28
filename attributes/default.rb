@@ -266,6 +266,11 @@ default['cluster']['efa']['installer_version'] = '1.18.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
+# EFS Utils
+default['cluster']['efs_utils']['version'] = '1.34.1'
+default['cluster']['efs_utils']['url'] = "https://github.com/aws/efs-utils/archive/v#{node['cluster']['efs_utils']['version']}.tar.gz"
+default['cluster']['efs_utils']['sha256'] = '69d0d8effca3b58ccaf4b814960ec1d16263807e508b908975c2627988c7eb6c'
+
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
