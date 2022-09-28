@@ -67,7 +67,7 @@ def generate_slurm_config_files(
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
     queues = cluster_config["Scheduling"]["SlurmQueues"]
-    cluster_name = next(tag["Value"] for tag in cluster_config["Tags"] if tag["Key"] == "parallelcluster:cluster-name")
+    cluster_name = _get_cluster_name()
 
     global instance_types_data
     with open(instance_types_data_path) as input_file:
@@ -132,6 +132,11 @@ def _get_head_node_config():
 def _get_head_node_private_ip():
     """Get head node private ip from EC2 metadata."""
     return _get_metadata("local-ipv4")
+
+
+def _get_cluster_name():
+    with open("/etc/parallelcluster/cfnconfig") as f:
+        return [line.rstrip().split(sep="=")[1] for line in f.readlines() if line.startswith("stack_name=")][0]
 
 
 def _generate_queue_config(

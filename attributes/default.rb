@@ -134,8 +134,12 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
-default['cluster']['slurm']['dbduser'] = 'slurmdbd'
-default['cluster']['slurm']['dbduser_id'] = node['cluster']['reserved_base_uid'] + 5
+default['cluster']['slurm']['dbduser'] = 'slurm'
+default['cluster']['slurm']['dbduser_id'] = if node['cluster']['slurm']['dbduser'].eql?(node['cluster']['slurm']['user'])
+                                              default['cluster']['slurm']['user_id']
+                                            else
+                                              node['cluster']['reserved_base_uid'] + 5
+                                            end
 default['cluster']['slurm']['dbdgroup'] = node['cluster']['slurm']['dbduser']
 default['cluster']['slurm']['dbdgroup_id'] = node['cluster']['slurm']['dbduser_id']
 default['cluster']['slurm']['install_dir'] = "/opt/slurm"

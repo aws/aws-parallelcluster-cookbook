@@ -325,6 +325,3 @@ Scheduling:
     QueueUpdateStrategy: COMPUTE_FLEET_STOP
     ScaledownIdletime: 10
     Database: null
-Tags:
-  - Key: parallelcluster:cluster-name
-    Value: test-cluster-flexible-instance-types
