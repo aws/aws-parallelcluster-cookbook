@@ -221,6 +221,9 @@ include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
 # Install FSx options
 include_recipe "aws-parallelcluster-install::lustre"
 
+# Install EFS Utils
+include_recipe "aws-parallelcluster-install::efs"
+
 # Install the AWS cloudwatch agent
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 
