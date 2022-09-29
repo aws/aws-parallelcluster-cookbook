@@ -244,7 +244,7 @@ if arm_instance?
   )
   default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
     'default' => "mysql80-community",
-    'ubuntu' => { 'default' => "http://us-east-1.ec2.ports.ubuntu.com/ubuntu-ports" }
+    'ubuntu' => { 'default' => "http://#{node['cluster']['region']}.ec2.ports.ubuntu.com/ubuntu-ports" }
   )
 else
   default['cluster']['mysql']['repository']['packages'] = value_for_platform(
