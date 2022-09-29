@@ -18,7 +18,6 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
     mocker.patch(
         "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    mocker.patch("slurm.pcluster_slurm_config_generator._get_cluster_name", return_value="test-cluster", autospec=True)
     template_directory = os.path.dirname(slurm.__file__) + "/templates"
     generate_slurm_config_files(
         tmpdir,
@@ -30,6 +29,7 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
         slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -61,7 +61,6 @@ def test_generate_slurm_config_files_memory_scheduling(
     mocker.patch(
         "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    mocker.patch("slurm.pcluster_slurm_config_generator._get_cluster_name", return_value="test-cluster", autospec=True)
     template_directory = os.path.dirname(slurm.__file__) + "/templates"
     generate_slurm_config_files(
         tmpdir,
@@ -73,6 +72,7 @@ def test_generate_slurm_config_files_memory_scheduling(
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
         slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -105,7 +105,6 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
     mocker.patch(
         "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    mocker.patch("slurm.pcluster_slurm_config_generator._get_cluster_name", return_value="test-cluster", autospec=True)
     template_directory = os.path.dirname(slurm.__file__) + "/templates"
     generate_slurm_config_files(
         tmpdir,
@@ -117,6 +116,7 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
         slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
 
     for file_type in ["", "_slurmdbd"]:
@@ -131,7 +131,6 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
     mocker.patch(
         "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    mocker.patch("slurm.pcluster_slurm_config_generator._get_cluster_name", return_value="test-cluster", autospec=True)
 
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
@@ -147,6 +146,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
         slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
 
     for queue in ["queue1", "queue2", "queue3", "queue4", "queue5", "queue6", "queue7"]:

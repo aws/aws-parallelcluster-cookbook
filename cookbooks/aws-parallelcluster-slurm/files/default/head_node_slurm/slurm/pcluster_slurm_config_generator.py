@@ -45,6 +45,7 @@ def generate_slurm_config_files(
     compute_node_bootstrap_timeout,
     realmemory_to_ec2memory_ratio,
     slurmdbd_user,
+    cluster_name,
 ):
     """
     Generate Slurm configuration files.
@@ -67,7 +68,6 @@ def generate_slurm_config_files(
     cluster_config = _load_cluster_config(input_file)
     head_node_config = _get_head_node_config()
     queues = cluster_config["Scheduling"]["SlurmQueues"]
-    cluster_name = _get_cluster_name()
 
     global instance_types_data
     with open(instance_types_data_path) as input_file:
@@ -132,11 +132,6 @@ def _get_head_node_config():
 def _get_head_node_private_ip():
     """Get head node private ip from EC2 metadata."""
     return _get_metadata("local-ipv4")
-
-
-def _get_cluster_name():
-    with open("/etc/parallelcluster/cfnconfig") as f:
-        return [line.rstrip().split(sep="=")[1] for line in f.readlines() if line.startswith("stack_name=")][0]
 
 
 def _generate_queue_config(
@@ -450,6 +445,7 @@ def main():
             required=True,
         )
         parser.add_argument("--slurmdbd-user", help="User for the slurmdbd service.", required=True)
+        parser.add_argument("--cluster-name", help="Name of the cluster.", required=True)
         args = parser.parse_args()
         generate_slurm_config_files(
             args.output_directory,
@@ -461,6 +457,7 @@ def main():
             args.compute_node_bootstrap_timeout,
             args.realmemory_to_ec2memory_ratio,
             args.slurmdbd_user,
+            args.cluster_name,
         )
     except Exception as e:
         log.exception("Failed to generate slurm configurations, exception: %s", e)
