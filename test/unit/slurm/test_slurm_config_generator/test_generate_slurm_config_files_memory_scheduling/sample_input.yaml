@@ -77,6 +77,3 @@ Scheduling:
         ScaledownIdletime: 10
         EnableMemoryBasedScheduling: false
         Database: null
-Tags:
-  - Key: parallelcluster:cluster-name
-    Value: test-cluster-no-mem-sched

@@ -155,7 +155,8 @@ execute "generate_pcluster_slurm_configs" do
           " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']}" \
           " #{nvidia_installed? ? '' : '--no-gpu'}"\
           " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
-          " --slurmdbd-user #{node['cluster']['slurm']['dbduser']}"
+          " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
+          " --cluster-name #{node['cluster']['stack_name']}"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
