@@ -17,16 +17,16 @@
 
 template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
   source 'slurm/slurmdbd.conf.erb'
-  owner "#{node['cluster']['slurm']['dbduser']}"
-  group "#{node['cluster']['slurm']['dbdgroup']}"
+  owner "#{node['cluster']['slurm']['user']}"
+  group "#{node['cluster']['slurm']['group']}"
   mode '0600'
   # Do not overwrite possible user customization if the database credentials are updated
   not_if { ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf") }
 end
 
 file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
-  owner "#{node['cluster']['slurm']['dbduser']}"
-  group "#{node['cluster']['slurm']['dbdgroup']}"
+  owner "#{node['cluster']['slurm']['user']}"
+  group "#{node['cluster']['slurm']['group']}"
   mode '0600'
 end
 

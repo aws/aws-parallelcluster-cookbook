@@ -50,25 +50,6 @@ user node['cluster']['slurm']['user'] do
   shell '/bin/bash'
 end
 
-unless node['cluster']['slurm']['dbduser'].eql?(node['cluster']['slurm']['user'])
-  # Setup slurmdbd group
-  group node['cluster']['slurm']['dbdgroup'] do
-    comment 'slurm group'
-    gid node['cluster']['slurm']['dbdgroup_id']
-    system true
-  end
-
-  # Setup slurmdbd user
-  user node['cluster']['slurm']['dbduser'] do
-    comment 'slurmdbd user'
-    uid node['cluster']['slurm']['dbduser_id']
-    gid node['cluster']['slurm']['dbdgroup_id']
-    manage_home false
-    system true
-    shell '/bin/bash'
-  end
-end
-
 include_recipe 'aws-parallelcluster-slurm::install_jwt'
 
 slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
