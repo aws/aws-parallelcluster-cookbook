@@ -58,9 +58,7 @@ end
 # query the database before proceeding.
 execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
-  # Very large value to simulate infinite loop (we will hit some other timeout
-  # before this).
-  retries 100000
+  retries node['cluster']['slurmdbd_response_retries']
   retry_delay 10
 end
 
