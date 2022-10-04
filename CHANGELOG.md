@@ -35,6 +35,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Change the logic to number the routing tables when an instance have multiple NICs.
 - Upgrade Python from 3.7.13 to 3.9.13.
 - Upgrade Slurm to version 22.05.3.
+- Move SSH key generation from pam.d to /etc/profile to enable root_squash'd FSx
 
 3.2.0
 ------
