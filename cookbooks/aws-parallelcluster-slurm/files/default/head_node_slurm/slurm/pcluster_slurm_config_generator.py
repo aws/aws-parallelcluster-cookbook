@@ -218,8 +218,8 @@ def _instance_types(compute_resource):
     """
     if compute_resource.get("InstanceTypeList"):
         return [instance.get("InstanceType") for instance in compute_resource["InstanceTypeList"]]
-    else:
-        return [compute_resource["InstanceType"]]
+
+    return [compute_resource["InstanceType"]]
 
 
 def _get_min_gpu_count_and_type(instance_types) -> Tuple[int, str]:
@@ -229,6 +229,7 @@ def _get_min_gpu_count_and_type(instance_types) -> Tuple[int, str]:
     for instance_type in instance_types:
         gpu_info = instance_types_data[instance_type].get("GpuInfo", None)
         gpu_count = 0
+        gpu_type = "no_gpu_type"
         if gpu_info:
             for gpus in gpu_info.get("Gpus", []):
                 gpu_manufacturer = gpus.get("Manufacturer", "")
@@ -237,12 +238,11 @@ def _get_min_gpu_count_and_type(instance_types) -> Tuple[int, str]:
                     gpu_type = gpus.get("Name").replace(" ", "").lower()
                 else:
                     log.info(
-                        f"ParallelCluster currently does not offer native support for '{gpu_manufacturer}' GPUs. "
+                        "ParallelCluster currently does not offer native support for '%s' GPUs. "
                         "Please make sure to use a custom AMI with the appropriate drivers in order to leverage "
-                        "GPUs functionalities"
+                        "GPUs functionalities",
+                        gpu_manufacturer,
                     )
-        else:
-            gpu_type = "no_gpu_type"
         if min_gpu_count is None or gpu_count < min_gpu_count:
             min_gpu_count = gpu_count
             gpu_type_min_count = gpu_type

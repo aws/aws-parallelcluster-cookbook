@@ -149,7 +149,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         cluster_name="test-cluster",
     )
 
-    for queue in ["queue1", "queue2", "queue3", "queue4", "queue5", "queue6", "queue7"]:
+    for queue in ["queue1", "queue2", "queue3", "queue4", "queue5", "queue6", "queue7", "queue8"]:
         for file_type in ["partition", "gres"]:
             file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
             output_file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
