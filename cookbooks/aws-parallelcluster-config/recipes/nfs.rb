@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster
 # Recipe:: nfs
 #
-# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,12 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# For performance, set NFS threads to max(num_cores, 8)
-# This change will not be effective on Ubuntu1604 unless instance is restarted
-# Changing thread in /etc/default/nfs-kernel-server and restarting NFS server will not change nfsd settings for Ubuntu1604
-# See: https://ubuntuforums.org/showthread.php?t=2345636
-# NFS threads enhancement is omitted for Ubuntu1604
-node.force_override['nfs']['threads'] = [node['cpu']['cores'].to_i, 8].max
+node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
 
 # Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
