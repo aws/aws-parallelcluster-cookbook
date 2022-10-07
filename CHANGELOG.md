@@ -24,6 +24,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2022.1.433-1`
   - gl: `2022.1.973-1`
   - web_viewer: `2022.1.13300-1`
+- Configure NFS threads to be `min(256, max(8, num_cores * 4))` to ensure better stability and performance.
 
 **CHANGES**
 - Upgrade NVIDIA driver to version 470.141.03.

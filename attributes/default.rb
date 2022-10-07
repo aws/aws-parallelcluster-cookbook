@@ -484,6 +484,8 @@ end
 
 # Default NFS mount options
 default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
+# For performance, set NFS threads to min(256, max(8, num_cores * 4))
+default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
 # Lustre defaults (for CentOS >=7.7 and Ubuntu)
 default['cluster']['lustre']['public_key'] = value_for_platform(
