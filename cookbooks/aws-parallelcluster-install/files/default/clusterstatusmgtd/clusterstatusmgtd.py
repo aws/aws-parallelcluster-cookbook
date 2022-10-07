@@ -64,7 +64,7 @@ def log_exception(
 ):
     def decorator_log_exception(function):
         @functools.wraps(function)
-        def wrapper_log_expection(*args, **kwargs):
+        def wrapper_log_expection(*args, **kwargs):  # pylint: disable=R1710
             try:
                 return function(*args, **kwargs)
             except catch_exception as e:
@@ -72,8 +72,7 @@ def log_exception(
                 if raise_on_error:
                     if exception_to_raise:
                         raise exception_to_raise
-                    else:
-                        raise
+                    raise
 
         return wrapper_log_expection
 
@@ -101,6 +100,7 @@ def _run_command(  # noqa: C901
             encoding="utf-8",
             env=env,
             timeout=timeout,
+            check=False,
         )
         result.check_returncode()
     except subprocess.CalledProcessError:
@@ -122,7 +122,7 @@ def _run_command(  # noqa: C901
 
 def _write_json_to_file(filename, json_data):
     """Write json to file."""
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         file.write(json.dumps(json_data))
 
 
@@ -156,7 +156,7 @@ class ComputeFleetStatus(Enum):
             )
             return compute_fleet_data
         except AttributeError as e:
-            raise Exception("Unable to parse compute fleet status data: %s", e)
+            raise Exception(f"Unable to parse compute fleet status data: {e}")
 
     @staticmethod
     def is_start_in_progress(status):  # noqa: D102
@@ -276,7 +276,8 @@ class ClusterstatusmgtdConfig:
         """Get clusterstatusmgtd configuration."""
         log.info("Reading %s", config_file_path)
         self._config = ConfigParser()
-        self._config.read_file(open(config_file_path, "r"))
+        with open(config_file_path, "r", encoding="utf-8") as config_file:
+            self._config.read_file(config_file)
 
         # Get config settings
         self._get_basic_config(self._config)
@@ -341,7 +342,7 @@ class ClusterStatusManager:
             )
         except Exception as e:
             log.error(
-                "Failed when retrieving computefleet status from DynamoDB with error %s, " "using fallback value %s",
+                "Failed when retrieving computefleet status from DynamoDB with error %s, using fallback value %s",
                 e,
                 fallback,
             )
@@ -356,7 +357,9 @@ class ClusterStatusManager:
 
     def _call_update_event(self):
         try:
-            compute_fleet_data = ComputeFleetStatus._transform_compute_fleet_data(self._compute_fleet_data)
+            compute_fleet_data = ComputeFleetStatus._transform_compute_fleet_data(  # pylint: disable=W0212
+                self._compute_fleet_data
+            )
             _write_json_to_file(self._config.computefleet_status_path, compute_fleet_data)
         except Exception as e:
             log.error("Update event handler failed during fleet status translation: %s", e)
@@ -440,7 +443,7 @@ def _run_clusterstatusmgtd(config_file):
             fileConfig(config.logging_config, disable_existing_loggers=False)
         except Exception as e:
             log.warning(
-                "Unable to configure logging from %s, " "using default logging settings.\nException: %s",
+                "Unable to configure logging from %s, using default logging settings.\nException: %s",
                 config.logging_config,
                 e,
             )

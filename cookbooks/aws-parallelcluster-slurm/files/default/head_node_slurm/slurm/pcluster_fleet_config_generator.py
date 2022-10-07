@@ -94,7 +94,7 @@ def generate_fleet_config_file(output_file, input_file):
         raise CriticalError(message)
 
     log.info("Generating %s", output_file)
-    with open(output_file, "w") as output:
+    with open(output_file, "w", encoding="utf-8") as output:
         output.write(json.dumps(fleet_config, indent=4))
 
     log.info("Finished.")
@@ -102,7 +102,7 @@ def generate_fleet_config_file(output_file, input_file):
 
 def _load_cluster_config(input_file_path):
     """Load cluster config file."""
-    with open(input_file_path) as input_file:
+    with open(input_file_path, encoding="utf-8") as input_file:
         return yaml.load(input_file, Loader=yaml.SafeLoader)
 
 

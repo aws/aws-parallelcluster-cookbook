@@ -20,6 +20,7 @@ import re
 import ssl
 import string
 import subprocess
+import sys
 import time
 from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
@@ -53,7 +54,7 @@ def retry(func, func_args, attempts=1, wait=0):
             if not attempts:
                 raise e
 
-            logger.info("{0}, retrying in {1} seconds..".format(e, wait))
+            logger.info("%s, retrying in %s seconds..", e, wait)
             time.sleep(wait)
 
 
@@ -146,7 +147,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     session_token_manager = OneTimeTokenHandler(max_number_of_tokens=MAX_NUMBER_OF_SESSION_TOKENS)
     session_token_ttl = timedelta(seconds=SESSION_TOKEN_EXPIRE_SECONDS)
 
-    def do_GET(self):  # noqa N802
+    def do_GET(self):  # noqa N802, pylint: disable=C0103
         """
         Handle GET requests coming from the user to obtain request and session tokens.
 
@@ -160,7 +161,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             parameters = dict(parse_qsl(urlparse(self.path).query))
             if not parameters or len(parameters) > 3:
                 raise DCVAuthenticator.IncorrectRequestError(
-                    "Incorrect number of parameters passed.\nParameters: {0}".format(parameters)
+                    f"Incorrect number of parameters passed.\nParameters: {parameters}"
                 )
 
             # evaluate action parameter
@@ -172,7 +173,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
                 request_token = self._extract_parameters_values(parameters, ["requestToken"])[0]
                 result = self._get_session_token(request_token)
             else:
-                raise DCVAuthenticator.IncorrectRequestError("The action specified '{0}' is not valid.".format(action))
+                raise DCVAuthenticator.IncorrectRequestError(f"The action specified '{action}' is not valid.")
 
             self._set_headers(400, content="application/json")
             self.wfile.write(result.encode())
@@ -181,7 +182,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             logger.error(e)
             self._return_bad_request(e)
 
-    def do_POST(self):  # noqa N802
+    def do_POST(self):  # noqa N802 pylint: disable=C0103
         """
         Handle POST requests, coming from NICE DCV server.
 
@@ -194,7 +195,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             parameters = dict(parse_qsl(field_data))
             if len(parameters) != 3:
                 raise DCVAuthenticator.IncorrectRequestError(
-                    "Incorrect number of parameters passed.\nParameters: {0}".format(parameters)
+                    f"Incorrect number of parameters passed.\nParameters: {parameters}"
                 )
             session_token, session_id = self._extract_parameters_values(
                 parameters, ["authenticationToken", "sessionId"]
@@ -213,7 +214,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
         """Override Server log message by removing authentication actions."""
         if all(auth_action not in args[0] for auth_action in ["requestToken", "sectionToken"]):
-            logger.info(fmt % args)
+            logger.info(fmt, args)
 
     def _set_headers(self, response, content="text/xml", length=None):
         self.send_response(response)
@@ -223,27 +224,25 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _return_auth_ko(self, message):
-        http_string = '<auth result="no"><message>{0}</message></auth>'.format(message)
+        http_string = f'<auth result="no"><message>{message}</message></auth>'
         self._set_headers(200, length=len(http_string))
         self.wfile.write(http_string.encode())
 
     def _return_auth_ok(self, username):
-        http_string = '<auth result="yes"><username>{0}</username></auth>'.format(username)
+        http_string = f'<auth result="yes"><username>{username}</username></auth>'
         self._set_headers(200, length=len(http_string))
         self.wfile.write(http_string.format(username).encode())
 
     def _return_bad_request(self, message):
         self._set_headers(200)
-        self.wfile.write("{0}\n".format(message).encode())
+        self.wfile.write(f"{message}\n".encode())
 
     @staticmethod
     def _extract_parameters_values(parameters, keys):
         try:
             return [parameters[key] for key in keys]
         except KeyError:
-            raise DCVAuthenticator.IncorrectRequestError(
-                "Wrong parameters. Required parameters are {0}".format(", ".join(keys))
-            )
+            raise DCVAuthenticator.IncorrectRequestError(f"Wrong parameters. Required parameters are {', '.join(keys)}")
 
     @classmethod
     def _check_auth(cls, session_id, session_token):
@@ -260,6 +259,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             and datetime.utcnow() - token_info.creation_time <= cls.session_token_ttl
         ):
             return token_info.user
+        return None
 
     @classmethod
     def _get_request_token(cls, user, session_id):
@@ -269,7 +269,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         Generate a Request token, store in memory and returns a json containing the token itself
         and the name of the file the user must create in the AUTHORIZATION_FILE_DIR.
         """
-        logger.info("New request for Request Token from user '{0}' and DCV Session Id '{1}'.".format(user, session_id))
+        logger.info("New request for Request Token from user '%s' and DCV Session Id '%s'.", user, session_id)
         # validate user and session
         DCVAuthenticator._validate_param(user, DCVAuthenticator.USER_REGEX, "authUser")
         DCVAuthenticator._validate_param(session_id, DCVAuthenticator.SESSION_ID_REGEX, "sessionId")
@@ -316,7 +316,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         # verify user by checking if the access_file is created by the user asking the session token
         logger.info("Verifying Access File..")
         try:
-            access_file_path = "{0}/{1}".format(AUTHORIZATION_FILE_DIR, access_file)
+            access_file_path = f"{AUTHORIZATION_FILE_DIR}/{access_file}"
             file_details = os.stat(access_file_path)
             if getpwuid(file_details.st_uid).pw_name != user:
                 raise DCVAuthenticator.IncorrectRequestError("The user is not the one that created the access file")
@@ -342,7 +342,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
     @staticmethod
     def _validate_param(string_to_test, regex, resource_name):
         if not re.match(regex, string_to_test):
-            raise DCVAuthenticator.IncorrectRequestError("The {0} parameter is not valid".format(resource_name))
+            raise DCVAuthenticator.IncorrectRequestError(f"The {resource_name} parameter is not valid")
 
     @staticmethod
     def _is_session_valid(user, session_id):
@@ -407,15 +407,16 @@ def _run_server(port, certificate=None, key=None):
 
     if certificate:
         if key:
-            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep
+            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep pylint: disable=W4902
                 httpd.socket, certfile=certificate, keyfile=key, server_side=True
             )
         else:
-            httpd.socket = ssl.wrap_socket(httpd.socket, certfile=certificate, server_side=True)  # nosec nosemgrep
+            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep pylint: disable=W4902
+                httpd.socket, certfile=certificate, server_side=True
+            )
     print(
-        "Starting DCV external authenticator {PROTOCOL} server on port {PORT}, use <Ctrl-C> to stop".format(
-            PROTOCOL="HTTPS" if certificate else "HTTP", PORT=port
-        )
+        f"Starting DCV external authenticator {'HTTPS' if certificate else 'HTTP'} server on port {port}, use "
+        f"<Ctrl-C> to stop "
     )
     httpd.serve_forever()
 
@@ -453,7 +454,7 @@ def fail(message):
     :param message: message to print
     """
     logger.error(message)
-    exit(1)
+    sys.exit(1)
 
 
 def _config_logger():
@@ -470,23 +471,23 @@ def _config_logger():
         if e.errno == errno.EEXIST and os.path.isdir(logdir):
             pass
         else:
-            print("Cannot create log file (%s). Failed with exception: %s" % (logfile, e))
-            exit(1)
+            print(f"Cannot create log file ({logfile}). Failed with exception: {e}")
+            sys.exit(1)
 
     formatter = logging.Formatter("%(asctime)s %(levelname)s [%(module)s:%(funcName)s] %(message)s")
 
     logfile_handler = RotatingFileHandler(logfile, maxBytes=5 * 1024 * 1024, backupCount=1)
     logfile_handler.setFormatter(formatter)
 
-    logger = logging.getLogger("pcluster_dcv_authenticator")
-    logger.addHandler(logfile_handler)
+    dcv_authenticator_logger = logging.getLogger("pcluster_dcv_authenticator")
+    dcv_authenticator_logger.addHandler(logfile_handler)
 
-    logger.setLevel("INFO")
-    return logger
+    dcv_authenticator_logger.setLevel("INFO")
+    return dcv_authenticator_logger
 
 
 def main():
-    global logger
+    global logger  # pylint: disable=C0103,W0603
     logger = _config_logger()
     try:
         logger.info("Starting NICE DCV authenticator server")
@@ -496,7 +497,7 @@ def main():
     except KeyboardInterrupt:
         logger.info("Closing NICE DCV authenticator server")
     except Exception as e:
-        fail("Unexpected error of type {0}: {1}".format(type(e).__name__, e))
+        fail(f"Unexpected error of type {type(e).__name__}: {e}")
 
 
 if __name__ == "__main__":

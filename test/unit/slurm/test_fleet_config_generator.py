@@ -107,7 +107,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
         ),
     ],
 )
-def test_generate_fleet_config_file_error_cases(mocker, tmpdir, cluster_config, expected_message, caplog):
+def test_generate_fleet_config_file_error_cases(mocker, tmpdir, cluster_config, expected_message):
     mocker.patch("slurm.pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
     output_file = f"{tmpdir}/fleet-config.json"
 
@@ -128,7 +128,7 @@ def test_generate_fleet_config_file(test_datadir, tmpdir):
 
 
 def _assert_files_are_equal(file, expected_file):
-    with open(file, "r") as f, open(expected_file, "r") as exp_f:
+    with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
         assert_that(f.read()).is_equal_to(expected_file_content)

@@ -20,4 +20,4 @@ def test_datadir(request, datadir):
         return datadir / function_name
 
     class_name = request.cls.__name__
-    return datadir / "{0}/{1}".format(class_name, function_name)
+    return datadir / class_name / function_name

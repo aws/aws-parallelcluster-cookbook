@@ -229,7 +229,7 @@ class TestClusterstatusmgtdConfig:
         for key in expected_attributes:
             assert_that(sync_config.__dict__.get(key)).is_equal_to(expected_attributes.get(key))
 
-    def test_config_comparison(self, test_datadir, mocker):
+    def test_config_comparison(self, test_datadir):
         """Test configs comparison."""
         config = test_datadir / "config.conf"
         config_modified = test_datadir / "config_modified.conf"
@@ -238,8 +238,8 @@ class TestClusterstatusmgtdConfig:
         assert_that(ClusterstatusmgtdConfig(config)).is_not_equal_to(ClusterstatusmgtdConfig(config_modified))
 
 
-@pytest.fixture()
-def initialize_compute_fleet_status_manager_mock(mocker):
+@pytest.fixture(name="initialize_compute_fleet_status_manager_mock")
+def fixture_initialize_compute_fleet_status_manager_mock(mocker):
     compute_fleet_status_manager_mock = mocker.Mock(spec=ComputeFleetStatusManager)
     compute_fleet_status_manager_mock.get_status.return_value = ComputeFleetStatus.RUNNING
     compute_fleet_status_manager_mock.COMPUTE_FLEET_STATUS_ATTRIBUTE = (
@@ -406,7 +406,7 @@ class TestClusterStatusManager:
 
             clusterstatus_manager._call_update_event()
 
-            file_writer_mock.assert_called_once_with(computeflee_json_path, "w")
+            file_writer_mock.assert_called_once_with(computeflee_json_path, "w", encoding="utf-8")
             file_writer_mock().write.assert_called_once_with(translated_status)
             run_command_mock.assert_called_once_with(cmd, 1)
 

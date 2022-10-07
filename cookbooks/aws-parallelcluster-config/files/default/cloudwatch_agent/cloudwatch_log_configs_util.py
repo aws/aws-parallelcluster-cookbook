@@ -25,7 +25,7 @@ DEFAULT_SCHEMA_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_
 SCHEMA_PATH = os.environ.get("CW_LOGS_CONFIGS_SCHEMA_PATH", DEFAULT_SCHEMA_PATH)
 DEFAULT_LOG_CONFIGS_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_log_files.json"))
 LOG_CONFIGS_PATH = os.environ.get("CW_LOGS_CONFIGS_PATH", DEFAULT_LOG_CONFIGS_PATH)
-LOG_CONFIGS_BAK_PATH = "{}.bak".format(LOG_CONFIGS_PATH)
+LOG_CONFIGS_BAK_PATH = f"{LOG_CONFIGS_PATH}.bak"
 
 
 def _fail(message):
@@ -59,12 +59,13 @@ def get_input_json(args):
 def _read_json_at(path):
     """Read the JSON file at path."""
     try:
-        with open(path) as input_file:
+        with open(path, encoding="utf-8") as input_file:
             return json.load(input_file)
     except FileNotFoundError:
-        _fail("No file exists at {}".format(path))
+        _fail(f"No file exists at {path}")
     except ValueError:
-        _fail("File at {} contains invalid JSON".format(path))
+        _fail(f"File at {path} contains invalid JSON")
+    return None
 
 
 def _read_schema():
@@ -94,13 +95,9 @@ def _validate_timestamp_keys(input_json):
     for log_config in input_json.get("log_configs"):
         if log_config.get("timestamp_format_key") not in valid_keys:
             _fail(
-                "Log config with log_stream_name {log_stream_name} and file_path {file_path} contains an invalid "
-                "timestamp_format_key: {timestamp_format_key}. Valid values are {valid_keys}".format(
-                    log_stream_name=log_config.get("log_stream_name"),
-                    file_path=log_config.get("file_path"),
-                    timestamp_format_key=log_config.get("timestamp_format_key"),
-                    valid_keys=", ".join(valid_keys),
-                )
+                f"Log config with log_stream_name {log_config.get('log_stream_name')} and "
+                f"file_path {log_config.get('file_path'),} contains an invalid timestamp_format_key: "
+                f"{log_config.get('timestamp_format_key')}. Valid values are {', '.join(valid_keys),}"
             )
 
 
@@ -116,11 +113,7 @@ def _validate_log_config_fields_uniqueness(input_json):
     for field in unique_fields:
         duplicates = _get_duplicate_values([config.get(field) for config in input_json.get("log_configs")])
         if duplicates:
-            _fail(
-                "The following {field} values are used multiple times: {duplicates}".format(
-                    field=field, duplicates=", ".join(duplicates)
-                )
-            )
+            _fail(f"The following {field} values are used multiple times: {', '.join(duplicates)}")
 
 
 def validate_json(input_json=None):
@@ -135,7 +128,7 @@ def validate_json(input_json=None):
 def _write_log_configs(log_configs):
     """Write log_configs back to the CloudWatch log configs file."""
     log_configs_path = os.environ.get("CW_LOGS_CONFIGS_PATH", DEFAULT_LOG_CONFIGS_PATH)
-    with open(log_configs_path, "w") as log_configs_file:
+    with open(log_configs_path, "w", encoding="utf-8") as log_configs_file:
         json.dump(log_configs, log_configs_file, indent=2)
 
 
