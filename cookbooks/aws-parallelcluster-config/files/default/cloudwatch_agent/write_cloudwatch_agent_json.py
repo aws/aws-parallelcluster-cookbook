@@ -46,7 +46,7 @@ def gethostname():
 
 def write_config(config):
     """Write config to AWS_CLOUDWATCH_CFG_PATH."""
-    with open(AWS_CLOUDWATCH_CFG_PATH, "w+") as output_config_file:
+    with open(AWS_CLOUDWATCH_CFG_PATH, "w+", encoding="utf-8") as output_config_file:
         json.dump(config, output_config_file, indent=4)
 
 
@@ -60,15 +60,13 @@ def add_log_group_name_params(log_group_name, configs):
 def add_instance_log_stream_prefixes(configs):
     """Prefix all log_stream_name fields with instance identifiers."""
     for config in configs:
-        config["log_stream_name"] = "{host}.{{instance_id}}.{log_stream_name}".format(
-            host=gethostname(), log_stream_name=config["log_stream_name"]
-        )
+        config["log_stream_name"] = f"{gethostname()}.{{instance_id}}.{config['log_stream_name']}"
     return configs
 
 
 def read_data(config_path):
     """Read in log configuration data from config_path."""
-    with open(config_path) as infile:
+    with open(config_path, encoding="utf-8") as infile:
         return json.load(infile)
 
 
@@ -92,7 +90,7 @@ def get_node_info():
     node_info = {}
     dna_path = "/etc/chef/dna.json"
     if os.path.isfile(dna_path):
-        with open(dna_path) as node_info_file:
+        with open(dna_path, encoding="utf-8") as node_info_file:
             node_info = json.load(node_info_file).get("cluster")
     return node_info
 
@@ -134,7 +132,7 @@ def get_node_roles(scheudler_plugin_node_roles):
 
 
 def load_config(cluster_config_path):
-    with open(cluster_config_path) as input_file:
+    with open(cluster_config_path, encoding="utf-8") as input_file:
         return yaml.load(input_file, Loader=yaml.SafeLoader)
 
 
@@ -184,7 +182,7 @@ def create_config(log_configs):
     return {
         "logs": {
             "logs_collected": {"files": {"collect_list": log_configs}},
-            "log_stream_name": "{host}.{{instance_id}}.default-log-stream".format(host=gethostname()),
+            "log_stream_name": f"{gethostname()}.{{instance_id}}.default-log-stream",
         }
     }
 

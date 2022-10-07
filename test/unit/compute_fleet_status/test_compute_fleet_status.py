@@ -48,7 +48,7 @@ def test_get_status_with_last_updated_time(no_error, mocker, capsys):
         "STOPPED",
     ],
 )
-def test_update_status_with_last_updated_time(current_status, mocker, capsys):
+def test_update_status_with_last_updated_time(current_status, mocker):
 
     mocker.patch(
         "compute_fleet_status.get_dynamo_db_data",

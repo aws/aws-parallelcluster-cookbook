@@ -25,6 +25,7 @@ import yaml
 from jinja2 import FileSystemLoader
 from jinja2.sandbox import SandboxedEnvironment
 
+METADATA_REQUEST_TIMEOUT = 60
 log = logging.getLogger()
 instance_types_data = {}
 
@@ -69,9 +70,9 @@ def generate_slurm_config_files(
     head_node_config = _get_head_node_config()
     queues = cluster_config["Scheduling"]["SlurmQueues"]
 
-    global instance_types_data
-    with open(instance_types_data_path) as input_file:
-        instance_types_data = json.load(input_file)
+    global instance_types_data  # pylint: disable=C0103,W0603 (global-statement)
+    with open(instance_types_data_path, encoding="utf-8") as instance_types_input_file:
+        instance_types_data = json.load(instance_types_input_file)
 
     # Generate slurm_parallelcluster_{QueueName}_partitions.conf and slurm_parallelcluster_{QueueName}_gres.conf
     is_default_queue = True  # The first queue in the queues list is the default queue
@@ -118,7 +119,7 @@ def _load_cluster_config(input_file_path):
 
     :return: queues_info containing id for first queue, head_node_hostname and queue_name
     """
-    with open(input_file_path) as input_file:
+    with open(input_file_path, encoding="utf-8") as input_file:
         return yaml.load(input_file, Loader=yaml.SafeLoader)
 
 
@@ -354,7 +355,7 @@ def _parse_uri(uri, attr) -> str:
 
 def _write_rendered_template_to_file(rendered_template, filename):
     log.info("Writing contents of %s", filename)
-    with open(filename, "w") as output_file:
+    with open(filename, "w", encoding="utf-8") as output_file:
         output_file.write(rendered_template)
 
 
@@ -373,15 +374,17 @@ def _get_metadata(metadata_path):
     """
     try:
         token = requests.put(
-            "http://169.254.169.254/latest/api/token", headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+            "http://169.254.169.254/latest/api/token",
+            headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"},
+            timeout=METADATA_REQUEST_TIMEOUT,
         )
         headers = {}
         if token.status_code == requests.codes.ok:
             headers["X-aws-ec2-metadata-token"] = token.content
-        metadata_url = "http://169.254.169.254/latest/meta-data/{0}".format(metadata_path)
-        metadata_value = requests.get(metadata_url, headers=headers).text
+        metadata_url = f"http://169.254.169.254/latest/meta-data/{metadata_path}"
+        metadata_value = requests.get(metadata_url, headers=headers, timeout=METADATA_REQUEST_TIMEOUT).text
     except Exception as e:
-        error_msg = "Unable to get {0} metadata. Failed with exception: {1}".format(metadata_path, e)
+        error_msg = f"Unable to get {metadata_path} metadata. Failed with exception: {e}"
         log.critical(error_msg)
         raise CriticalError(error_msg)
 

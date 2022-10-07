@@ -62,6 +62,7 @@ disable=raw-checker-failed,
         unused-import, # handled by flake8
         no-else-return, # A complete if else block can improve readability even with returns in the body
         wrong-import-order,
+        protected-access
 
 
 # Enable the message, report, category or checker with the given id(s). You can

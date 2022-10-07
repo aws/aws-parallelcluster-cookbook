@@ -162,7 +162,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
 
 
 def _assert_files_are_equal(file, expected_file):
-    with open(file, "r") as f, open(expected_file, "r") as exp_f:
+    with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
         assert_that(f.read()).is_equal_to(expected_file_content)
