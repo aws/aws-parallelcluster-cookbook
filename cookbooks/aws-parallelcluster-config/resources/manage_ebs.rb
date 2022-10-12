@@ -89,9 +89,22 @@ action :mount do
       device_type :uuid
       options "_netdev"
       pass 0
-      action %i(mount enable)
+      action :mount
       retries 10
       retry_delay 6
+      not_if "mount | grep ' #{shared_dir_array[index]} '"
+    end
+
+    mount shared_dir_array[index] do
+      device(DelayedEvaluator.new { dev_uuids[index] })
+      fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
+      device_type :uuid
+      options "_netdev"
+      pass 0
+      action :enable
+      retries 10
+      retry_delay 6
+      only_if "mount | grep ' #{shared_dir_array[index]} '"
     end
 
     # Make sure shared directory permissions are correct
@@ -131,22 +144,23 @@ action :unmount do
 
   # Mount each volume
   dev_path = [] # device labels
-  dev_uuids = [] # device uuids
 
   vol_array.each_with_index do |volumeid, index|
     dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
-    dev_uuids[index] = get_uuid_for_unmount(shared_dir_array[index])
 
     # Unmount and remove volume from /etc/fstab
-    mount shared_dir_array[index] do
-      device(DelayedEvaluator.new { dev_uuids[index] })
-      fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
-      device_type :uuid
-      options "_netdev"
-      pass 0
-      action %i(unmount disable)
+    execute 'unmount ebs' do
+      command "umount -fl #{shared_dir_array[index]}"
       retries 10
       retry_delay 6
+      timeout 60
+      only_if "mount | grep ' #{shared_dir_array[index]} '"
+    end
+
+    # remove volume from fstab
+    delete_lines "remove volume from /etc/fstab" do
+      path "/etc/fstab"
+      pattern " #{shared_dir_array[index]} "
     end
 
     # Detach EBS volume
