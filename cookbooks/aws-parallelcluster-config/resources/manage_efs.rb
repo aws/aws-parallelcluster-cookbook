@@ -42,7 +42,7 @@ action :mount do
       pass 0
       action :mount
       retries 10
-      retry_delay 6
+      retry_delay 60 # increase to 60s because it takes about 5 minutes for a  managed EFS to be ready to mount after creation complete
       not_if "mount | grep ' #{efs_shared_dir} '"
     end
 
