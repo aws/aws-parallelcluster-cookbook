@@ -203,9 +203,3 @@ manage_fsx "mount fsx" do
   fsx_volume_junction_path_array(lazy { node['cluster']['mount_fsx_volume_junction_path_array'] })
   not_if { node['cluster']['mount_fsx_fs_id_array'].empty? }
 end
-
-ruby_block "replace shared storages mappings" do
-  block do
-    ::FileUtils.cp_r(node['cluster']['update_shared_storages_mapping_path'], node['cluster']['shared_storages_mapping_path'], remove_destination: true)
-  end
-end

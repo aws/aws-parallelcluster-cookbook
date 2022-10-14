@@ -175,10 +175,32 @@ def handle_volume(volume_id, attach, detach):
     # Connect to AWS using boto
     ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
 
-    if attach:
+    if attach and is_volume_avaialble(ec2, volume_id):
         attach_volume(volume_id, instance_id, ec2)
-    elif detach:
+    elif detach and is_volume_attached(ec2, volume_id):
         detach_volume(volume_id, ec2)
+
+
+def is_volume_avaialble(ec2, volume_id):
+    try:
+        state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("State")
+        if state == "available":
+            return True
+        return False
+    except Exception as e:
+        print(f"ERROR: Volume {volume_id} is not available, skip attaching, exception: {e}")
+        return False
+
+
+def is_volume_attached(ec2, volume_id):
+    try:
+        state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("State")
+        if state == "in-use":
+            return True
+        return False
+    except Exception as e:
+        print(f"ERROR: Volume {volume_id} is not attached, skip detaching, exception: {e}")
+        return False
 
 
 def main():
