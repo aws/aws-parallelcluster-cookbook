@@ -127,9 +127,9 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '22-05-4-1'
+default['cluster']['slurm']['version'] = '22-05-5-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = 'd9d03c95c1dec082bfc33424ac9c3e788dc98187'
+default['cluster']['slurm']['sha1'] = 'afc0b304755718655f523b973401b243f98f0062'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
