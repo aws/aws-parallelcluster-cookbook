@@ -336,7 +336,7 @@ unless platform?('ubuntu') && node['platform_version'].to_d == 16.04.to_d
     block do
       nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
       Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
-      expected_threads = [node['cpu']['cores'].to_i, 8].max
+      expected_threads = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
       raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}" if nfs_threads != expected_threads
     end
     action :nothing
