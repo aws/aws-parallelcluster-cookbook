@@ -228,16 +228,6 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
 )
 
 # MySQL
-default['cluster']['mysql']['repository']['definition']['file-name'] = value_for_platform(
-  'default' => "mysql80-community-release-el7-7.noarch.rpm",
-  'ubuntu' => { 'default' => "mysql-apt-config_0.8.23-1_all.deb" }
-)
-
-default['cluster']['mysql']['repository']['definition']['url'] = "https://dev.mysql.com/get/#{node['cluster']['mysql']['repository']['definition']['file-name']}"
-default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platform(
-  'default' => "659400f9842fffb8d64ae0b650f081b9",
-  'ubuntu' => { 'default' => "c2b410031867dc7c966ca5b1aa0c72aa" }
-)
 if arm_instance?
   default['cluster']['mysql']['repository']['packages'] = value_for_platform(
     'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
@@ -258,6 +248,27 @@ else
   default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
     'default' => "mysql80-community",
     'ubuntu' => { 'default' => "http://repo.mysql.com/apt/ubuntu" }
+  )
+end
+
+default['cluster']['mysql']['remove']['packages'] = value_for_platform(
+  'default' => %w(mariadb-libs),
+  'ubuntu' => { 'default' => %w() }
+)
+default['cluster']['mysql']['package']['bucket'] = "parallelcluster-packages-439493970194-us-east-1"
+default['cluster']['mysql']['package']['prefix'] = "mysql-client"
+
+if arm_instance?
+  default['cluster']['mysql']['package']['file'] = value_for_platform(
+    'default' => "mysql-community-client-8.0.31-1.el7.aarch64.tar.gz"
+  )
+else
+  default['cluster']['mysql']['package']['file'] = value_for_platform(
+    'default' => "mysql-community-client-8.0.31-1.el7.x86_64.tar.gz",
+    'ubuntu' => {
+      '20.04' => "mysql-community-client-8.0.31-1ubuntu20.04_amd64.tar.gz",
+      '18.04' => "mysql-community-client-8.0.31-1ubuntu18.04_amd64.tar.gz"
+    }
   )
 end
 
