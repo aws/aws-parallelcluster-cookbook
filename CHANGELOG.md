@@ -35,7 +35,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
 - Change the logic to number the routing tables when an instance have multiple NICs.
 - Upgrade Python from 3.7.13 to 3.9.15.
-- Upgrade Slurm to version 22.05.4.
+- Upgrade Slurm to version 22.05.5.
 
 3.2.1
 ------
