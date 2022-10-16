@@ -40,9 +40,22 @@ action :mount do
       options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
       dump 0
       pass 0
-      action %i(mount enable)
+      action :mount
+      retries 10
+      retry_delay 60 # increase to 60s because it takes about 5 minutes for a  managed EFS to be ready to mount after creation complete
+      not_if "mount | grep ' #{efs_shared_dir} '"
+    end
+
+    mount efs_shared_dir do
+      device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
+      fstype 'nfs4'
+      options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
+      dump 0
+      pass 0
+      action :enable
       retries 10
       retry_delay 6
+      only_if "mount | grep ' #{efs_shared_dir} '"
     end
 
     # Make sure EFS shared directory permissions are correct
@@ -57,21 +70,22 @@ end
 action :unmount do
   efs_shared_dir_array = new_resource.shared_dir_array.dup
   efs_fs_id_array = new_resource.efs_fs_id_array.dup
-  efs_fs_id_array.zip(efs_shared_dir_array).each do |efs_fs_id, efs_shared_dir|
+  efs_fs_id_array.zip(efs_shared_dir_array).each do |efs_shared_dir|
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
     # Unmount EFS
-    mount efs_shared_dir do
-      device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
-      fstype 'nfs4'
-      options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
-      dump 0
-      pass 0
-      action %i(unmount disable)
+    execute 'unmount efs' do
+      command "umount -fl #{efs_shared_dir}"
       retries 10
       retry_delay 6
+      timeout 60
+      only_if "mount | grep ' #{efs_shared_dir} '"
     end
-
+    # remove volume from fstab
+    delete_lines "remove volume from /etc/fstab" do
+      path "/etc/fstab"
+      pattern " #{efs_shared_dir} "
+    end
     # Delete the EFS shared directory
     directory efs_shared_dir do
       owner 'root'

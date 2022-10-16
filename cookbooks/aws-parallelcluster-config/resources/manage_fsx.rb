@@ -67,9 +67,22 @@ action :mount do
         dump 0
         pass 0
         options mount_options
-        action %i(mount enable)
+        action :mount
         retries 10
         retry_delay 6
+        not_if "mount | grep ' #{fsx_shared_dir} '"
+      end
+
+      mount fsx_shared_dir do
+        device "#{dns_name}@tcp:/#{mount_name}"
+        fstype 'lustre'
+        dump 0
+        pass 0
+        options mount_options
+        action :enable
+        retries 10
+        retry_delay 6
+        only_if "mount | grep ' #{fsx_shared_dir} '"
       end
     when 'OPENZFS'
       mount fsx_shared_dir do
@@ -78,9 +91,21 @@ action :mount do
         dump 0
         pass 0
         options 'nfsvers=4.2'
-        action %i(mount enable)
+        action :mount
         retries 10
         retry_delay 6
+        not_if "mount | grep ' #{fsx_shared_dir} '"
+      end
+      mount fsx_shared_dir do
+        device "#{dns_name}:#{fsx_volume_junction_path}"
+        fstype 'nfs'
+        dump 0
+        pass 0
+        options 'nfsvers=4.2'
+        action :enable
+        retries 10
+        retry_delay 6
+        only_if "mount | grep ' #{fsx_shared_dir} '"
       end
     when 'ONTAP'
       mount fsx_shared_dir do
@@ -88,9 +113,21 @@ action :mount do
         fstype 'nfs'
         dump 0
         pass 0
-        action %i(mount enable)
+        action :mount
         retries 10
         retry_delay 6
+        not_if "mount | grep ' #{fsx_shared_dir} '"
+      end
+
+      mount fsx_shared_dir do
+        device "#{dns_name}:#{fsx_volume_junction_path}"
+        fstype 'nfs'
+        dump 0
+        pass 0
+        action :enable
+        retries 10
+        retry_delay 6
+        only_if "mount | grep ' #{fsx_shared_dir} '"
       end
     end
 
@@ -130,9 +167,11 @@ action :unmount do
                end
     fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
     execute 'unmount fsx' do
-      command "umount #{fsx_shared_dir}"
+      command "umount -fl #{fsx_shared_dir}"
       retries 10
       retry_delay 6
+      timeout 60
+      only_if "mount | grep ' #{fsx_shared_dir} '"
     end
 
     # remove volume from fstab

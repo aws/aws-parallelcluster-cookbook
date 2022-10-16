@@ -21,8 +21,14 @@ unless node['cluster']['scheduler'] == 'awsbatch'
   end
 end
 
+ruby_block "backup storages mappings" do # backup shared storages mapping file to used for update and rollback
+  block do
+    ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
+  end
+end
+
 # generate the update shared storages mapping file
-template node['cluster']['update_shared_storages_mapping_path'] do
+template node['cluster']['shared_storages_mapping_path'] do
   source 'shared_storages/shared_storages_data.erb'
   mode '0644'
 end
