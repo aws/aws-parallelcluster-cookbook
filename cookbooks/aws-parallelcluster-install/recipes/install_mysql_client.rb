@@ -24,18 +24,16 @@ else
 
   package_installer = value_for_platform(
     'default' => "yum install -y",
-    'ubunutu' => { 'default' => "apt install" }
+    'ubuntu' => { 'default' => "apt install" }
   )
 
   mysql_source_key = "#{node['cluster']['mysql']['package']['prefix']}/#{node['cluster']['mysql']['package']['file']}"
-
-  mysql_extract_directory = "/tmp/mysql"
   mysql_tar_file = "/tmp/#{node['cluster']['mysql']['package']['file']}"
 
-  # Remove packages that break MySQL installation
-  package node['cluster']['mysql']['remove']['packages'] do
-    action :remove
-  end
+  # # Remove packages that break MySQL installation
+  # package node['cluster']['mysql']['remove']['packages'] do
+  #   action :remove
+  # end
 
   bash 'Install MySQL packages' do
     user 'root'
@@ -48,12 +46,9 @@ else
                          --key "#{mysql_source_key}" \
                          --region "#{node['cluster']['region']}" \
                          "#{mysql_tar_file}"
-      mkdir "#{mysql_extract_directory}"
-      tar xf "#{mysql_tar_file}" --directory "#{mysql_extract_directory}"
-
-      cat "#{mysql_extract_directory}/install.txt" | while read line; do
-        #{package_installer} "#{mysql_extract_directory}/${line}"
-      done
+      EXTRACT_DIR=$(mktemp -d --tmpdir mysql.XXXXXXX)
+      tar xf "#{mysql_tar_file}" --directory "${EXTRACT_DIR}"
+      #{package_installer} ${EXTRACT_DIR}/*
     MYSQL
   end
 
