@@ -16,7 +16,7 @@
 # limitations under the License.
 
 execute "check if clustermgtd heartbeat is available" do
-  command "cat /opt/slurm/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
+  command "cat #{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
   retries 30
   retry_delay 10
 end
