@@ -83,39 +83,39 @@ if node['cfncluster']['cfn_scheduler'] == 'slurm'
     execute 'check-slurm-version' do
       # version is in the form: major-minor-micro-release, sinfo output is "slurm major.minor.micro"
       command "sinfo -V | grep #{node['cfncluster']['slurm']['version'].split('-')[0..2].join('.')}"
-      environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
+      environment('PATH' => '#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH')
       user node['cfncluster']['cfn_cluster_user']
     end
 
     execute 'execute sinfo' do
       command "sinfo --help"
-      environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
+      environment('PATH' => '#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH')
       user node['cfncluster']['cfn_cluster_user']
     end
 
     execute 'execute scontrol' do
       command "scontrol --help"
-      environment('PATH' => '/opt/slurm/bin:/bin:/usr/bin:$PATH')
+      environment('PATH' => '#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH')
       user node['cfncluster']['cfn_cluster_user']
     end
 
     execute 'check-slurm-accounting-mysql-plugins' do
-      command "ls /opt/slurm/lib/slurm/ | grep accounting_storage_mysql"
+      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep accounting_storage_mysql"
     end
 
     execute 'check-slurm-jobcomp-mysql-plugins' do
-      command "ls /opt/slurm/lib/slurm/ | grep jobcomp_mysql"
+      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep jobcomp_mysql"
     end
 
     execute 'check-slurm-pmix-plugins' do
-      command 'ls /opt/slurm/lib/slurm/ | grep pmix'
+      command 'ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep pmix'
     end
     execute 'ensure-pmix-shared-library-can-be-found' do
       command '/opt/pmix/bin/pmix_info'
     end
   when 'ComputeFleet'
     execute 'ls slurm root' do
-      command "ls /opt/slurm"
+      command "ls #{node['cluster']['slurm']['install_dir']}"
       user node['cfncluster']['cfn_cluster_user']
     end
   else
