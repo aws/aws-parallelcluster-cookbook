@@ -629,7 +629,7 @@ def is_slurm_database_updated?
   config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
 end
 
-# load cluster configuration file into node object
+# load shared storages data into node object
 def load_shared_storages_mapping
   ruby_block "load shared storages mapping during cluster update" do
     block do
