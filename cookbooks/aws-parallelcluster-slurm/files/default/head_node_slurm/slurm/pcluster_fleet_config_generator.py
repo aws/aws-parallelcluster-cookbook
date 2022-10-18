@@ -36,14 +36,14 @@ def generate_fleet_config_file(output_file, input_file):
                 "Api": "create-fleet",
                 "CapacityType": "on-demand|spot",
                 "AllocationStrategy": "lowest-price"
-                "InstanceTypeList": [
+                "Instances": [
                     { "InstanceType": ... }
                 ],
                 "MaxPrice": ...
             }
             "single-compute-resource": {
                 "Api": "run-instances",
-                "InstanceTypeList": [
+                "Instances": [
                     { "InstanceType": ... }
                 ],
             }
@@ -64,12 +64,12 @@ def generate_fleet_config_file(output_file, input_file):
                 compute_resource = compute_resource_config["Name"]
                 fleet_config[queue][compute_resource] = {}
 
-                if compute_resource_config.get("InstanceTypeList"):
+                if compute_resource_config.get("Instances"):
                     fleet_config[queue][compute_resource] = {
                         "Api": "create-fleet",
                         "CapacityType": capacity_type,
                         "AllocationStrategy": allocation_strategy,
-                        "InstanceTypeList": copy.deepcopy(compute_resource_config["InstanceTypeList"]),
+                        "Instances": copy.deepcopy(compute_resource_config["Instances"]),
                     }
                     if capacity_type == "spot" and compute_resource_config["SpotPrice"]:
                         fleet_config[queue][compute_resource]["MaxPrice"] = compute_resource_config["SpotPrice"]
@@ -77,12 +77,12 @@ def generate_fleet_config_file(output_file, input_file):
                 elif compute_resource_config.get("InstanceType"):
                     fleet_config[queue][compute_resource] = {
                         "Api": "run-instances",
-                        "InstanceTypeList": [{"InstanceType": compute_resource_config["InstanceType"]}],
+                        "Instances": [{"InstanceType": compute_resource_config["InstanceType"]}],
                     }
 
                 else:
                     raise Exception(
-                        "InstanceTypeList or InstanceType field not found "
+                        "Instances or InstanceType field not found "
                         f"in queue: {queue}, compute resource: {compute_resource} configuration"
                     )
     except KeyError as e:

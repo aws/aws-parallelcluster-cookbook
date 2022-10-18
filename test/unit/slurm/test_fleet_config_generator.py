@@ -37,9 +37,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
         (
             {
                 "Scheduling": {
-                    "SlurmQueues": [
-                        {"Name": "q1", "CapacityType": "SPOT", "ComputeResources": [{"InstanceTypeList": []}]}
-                    ]
+                    "SlurmQueues": [{"Name": "q1", "CapacityType": "SPOT", "ComputeResources": [{"Instances": []}]}]
                 }
             },
             "Unable to find key 'Name' in the configuration of queue: q1",
@@ -51,12 +49,12 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                         {
                             "Name": "q1",
                             "CapacityType": "ONDEMAND",
-                            "ComputeResources": [{"Name": "cr1", "InstanceTypeList": []}],
+                            "ComputeResources": [{"Name": "cr1", "Instances": []}],
                         }
                     ]
                 }
             },
-            "InstanceTypeList or InstanceType field not found in queue: q1, compute resource: cr1 configuration",
+            "Instances or InstanceType field not found in queue: q1, compute resource: cr1 configuration",
         ),
         (
             {
@@ -66,7 +64,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                             "Name": "q1",
                             "CapacityType": "ONDEMAND",
                             "ComputeResources": [
-                                {"Name": "cr1", "InstanceTypeList": [{"InstanceType": "test"}]},
+                                {"Name": "cr1", "Instances": [{"InstanceType": "test"}]},
                                 {"Name": "cr2", "InstanceType": "test"},
                             ],
                         }
@@ -82,7 +80,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                         {
                             "Name": "q1",
                             "CapacityType": "SPOT",
-                            "ComputeResources": [{"Name": "cr1", "InstanceTypeList": [{"InstanceType": "test"}]}],
+                            "ComputeResources": [{"Name": "cr1", "Instances": [{"InstanceType": "test"}]}],
                         }
                     ]
                 }
@@ -97,7 +95,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                             "Name": "q1",
                             "CapacityType": "SPOT",
                             "ComputeResources": [
-                                {"Name": "cr1", "InstanceTypeList": [{"InstanceType": "test"}], "SpotPrice": 10}
+                                {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
                             ],
                         }
                     ]
