@@ -217,8 +217,8 @@ def _instance_types(compute_resource):
 
     If the compute resource is defined with single InstanceType, it returns a list of one element.
     """
-    if compute_resource.get("InstanceTypeList"):
-        return [instance.get("InstanceType") for instance in compute_resource["InstanceTypeList"]]
+    if compute_resource.get("Instances"):
+        return [instance.get("InstanceType") for instance in compute_resource["Instances"]]
 
     return [compute_resource["InstanceType"]]
 

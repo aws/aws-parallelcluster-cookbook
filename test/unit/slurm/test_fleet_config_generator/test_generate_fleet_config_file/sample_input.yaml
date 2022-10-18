@@ -18,7 +18,7 @@ Scheduling:
       Efa:
         Enabled: true
         GdrSupport: false
-      InstanceTypeList:
+      Instances:
         - InstanceType: c5n.4xlarge
         - InstanceType: r5.4xlarge
         - InstanceType: r5n.4xlarge
@@ -71,7 +71,7 @@ Scheduling:
       Efa:
         Enabled: true
         GdrSupport: false
-      InstanceTypeList:
+      Instances:
         - InstanceType: c5n.18xlarge
       MaxCount: 10
       MinCount: 1
@@ -82,7 +82,7 @@ Scheduling:
       Efa:
         Enabled: true
         GdrSupport: false
-      InstanceTypeList:
+      Instances:
         - InstanceType: c5n.18xlarge
       MaxCount: 10
       MinCount: 1

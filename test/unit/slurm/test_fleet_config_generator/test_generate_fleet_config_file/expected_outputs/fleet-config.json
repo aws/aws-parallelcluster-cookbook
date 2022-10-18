@@ -2,7 +2,7 @@
     "ondemand-mixed": {
         "single": {
             "Api": "run-instances",
-            "InstanceTypeList": [
+            "Instances": [
                 {
                     "InstanceType": "c5n.4xlarge"
                 }
@@ -12,7 +12,7 @@
             "Api": "create-fleet",
             "CapacityType": "on-demand",
             "AllocationStrategy": "lowest-price",
-            "InstanceTypeList": [
+            "Instances": [
                 {
                     "InstanceType": "c5n.4xlarge"
                 },
@@ -28,7 +28,7 @@
     "spot-mixed": {
         "single": {
             "Api": "run-instances",
-            "InstanceTypeList": [
+            "Instances": [
                 {
                     "InstanceType": "c5n.18xlarge"
                 }
@@ -38,7 +38,7 @@
             "Api": "create-fleet",
             "CapacityType": "spot",
             "AllocationStrategy": "capacity-optimized",
-            "InstanceTypeList": [
+            "Instances": [
                 {
                     "InstanceType": "c5n.18xlarge"
                 }
@@ -49,7 +49,7 @@
             "Api": "create-fleet",
             "CapacityType": "spot",
             "AllocationStrategy": "capacity-optimized",
-            "InstanceTypeList": [
+            "Instances": [
                 {
                     "InstanceType": "c5n.18xlarge"
                 }
