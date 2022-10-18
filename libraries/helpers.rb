@@ -140,7 +140,7 @@ def ami_bootstrapped?
   current_version = "aws-parallelcluster-cookbook-#{node['cfncluster']['cfncluster-cookbook-version']}"
 
   if ::File.exist?(bootstrapped_file)
-    version = IO.read(bootstrapped_file).chomp
+    version = File.read(bootstrapped_file).chomp
     Chef::Log.info("Detected bootstrap file #{version}")
     if version != current_version
       raise "This AMI was created with #{version}, but is trying to be used with #{current_version}. " \
@@ -185,7 +185,7 @@ def hit_head_node_info
   head_node_private_ip_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_ip"
   head_node_private_dns_file = "#{node['cfncluster']['slurm_plugin_dir']}/master_private_dns"
 
-  [IO.read(head_node_private_ip_file).chomp, IO.read(head_node_private_dns_file).chomp]
+  [File.read(head_node_private_ip_file).chomp, File.read(head_node_private_dns_file).chomp]
 end
 
 #
@@ -194,7 +194,7 @@ end
 def hit_slurm_nodename
   slurm_nodename_file = "#{node['cfncluster']['slurm_plugin_dir']}/slurm_nodename"
 
-  IO.read(slurm_nodename_file).chomp
+  File.read(slurm_nodename_file).chomp
 end
 
 #
@@ -204,11 +204,11 @@ def hit_dynamodb_info
   require 'chef/mixin/shell_out'
 
   output = shell_out!("#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-    "--region #{node['cfncluster']['cfn_region']} query --table-name #{node['cfncluster']['cfn_ddb_table']} " \
-    "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
-    "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
-    "--projection-expression 'Id,MasterPrivateIp,MasterHostname' " \
-    "--output text --query 'Items[0].[Id.S,MasterPrivateIp.S,MasterHostname.S]'", user: 'root').stdout.strip
+                      "--region #{node['cfncluster']['cfn_region']} query --table-name #{node['cfncluster']['cfn_ddb_table']} " \
+                      "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
+                      "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
+                      "--projection-expression 'Id,MasterPrivateIp,MasterHostname' " \
+                      "--output text --query 'Items[0].[Id.S,MasterPrivateIp.S,MasterHostname.S]'", user: 'root').stdout.strip
 
   raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
 
