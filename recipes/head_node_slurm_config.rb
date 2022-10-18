@@ -18,14 +18,14 @@
 setup_munge_head_node
 
 # Export /opt/slurm
-nfs_export "#{node['cluster']['slurm']['install_dir']}" do
+nfs_export "#{node['cfncluster']['slurm']['install_dir']}" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
 end
 
 # Ensure config directory is in place
-directory "#{node['cluster']['slurm']['install_dir']}/etc" do
+directory "#{node['cfncluster']['slurm']['install_dir']}/etc" do
   user 'root'
   group 'root'
   mode '0755'
@@ -38,14 +38,14 @@ directory '/var/spool/slurm.state' do
   mode '0700'
 end
 
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf" do
+template "#{node['cfncluster']['slurm']['install_dir']}/etc/slurm.conf" do
   source 'slurm/slurm.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
-template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
+template "#{node['cfncluster']['slurm']['install_dir']}/etc/gres.conf" do
   source 'slurm/gres.conf.erb'
   owner 'root'
   group 'root'
@@ -91,25 +91,25 @@ end
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
   command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-          " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
+          " --output-directory #{node['cfncluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
 end
 
 # all other OSs use /sys/fs/cgroup, which is the default
-template "#{node['cluster']['slurm']['install_dir']}/etc/cgroup.conf" do
+template "#{node['cfncluster']['slurm']['install_dir']}/etc/cgroup.conf" do
   source 'slurm/cgroup.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.sh" do
+template "#{node['cfncluster']['slurm']['install_dir']}/etc/slurm.sh" do
   source 'slurm/head_node/slurm.sh.erb'
   owner 'root'
   group 'root'
   mode '0755'
 end
 
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.csh" do
+template "#{node['cfncluster']['slurm']['install_dir']}/etc/slurm.csh" do
   source 'slurm/head_node/slurm.csh.erb'
   owner 'root'
   group 'root'
@@ -164,7 +164,7 @@ template "#{node['cfncluster']['slurm_plugin_dir']}/parallelcluster_clustermgtd.
 end
 
 # Create shared directory used to store clustermgtd heartbeat and computemgtd config
-directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin" do
+directory "#{node['cfncluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin" do
   user 'root'
   group 'root'
   mode '0755'
@@ -173,7 +173,7 @@ directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin
 end
 
 # Put computemgtd config under /opt/slurm/etc/pcluster/.slurm_plugin so all compute nodes share a config
-template "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf" do
+template "#{node['cfncluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/parallelcluster_computemgtd.conf" do
   source 'slurm/parallelcluster_computemgtd.conf.erb'
   owner 'root'
   group 'root'

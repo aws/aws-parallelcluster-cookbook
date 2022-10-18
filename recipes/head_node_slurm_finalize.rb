@@ -16,7 +16,7 @@
 # limitations under the License.
 
 execute "check if clustermgtd heartbeat is available" do
-  command "cat #{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
+  command "cat #{node['cfncluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat"
   retries 30
   retry_delay 10
 end
@@ -35,7 +35,7 @@ ruby_block "submit dynamic fleet initialization jobs" do
 
         # Submitting a job for each instance type that requires an initial_count > min_count
         Chef::Log.info("Submitting job to run dynamic capacity for queue #{queue_name} and instance #{instance_config['instance_type']}")
-        submit_job_command = Shellwords.escape("#{node['cluster']['slurm']['install_dir']}/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster "\
+        submit_job_command = Shellwords.escape("#{node['cfncluster']['slurm']['install_dir']}/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster "\
                                                "--constraint='[(dynamic&#{instance_config['instance_type']})*#{required_dynamic}]' --partition=#{queue_name}")
         shell_out!("/bin/bash -c #{submit_job_command}")
       end
@@ -49,14 +49,14 @@ ruby_block "wait for static fleet capacity" do # ~FC014
     require 'shellwords'
 
     # Example output for sinfo
-    # $ #{node['cluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t'
+    # $ #{node['cfncluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t'
     # ondemand-dy-c5.2xlarge-1 idle~
     # ondemand-dy-c5.2xlarge-2 idle~
     # spot-dy-c5.xlarge-1 idle~
     # spot-st-t2.large-1 down
     # spot-st-t2.large-2 idle
     is_fleet_ready_command = Shellwords.escape(
-      "set -o pipefail && #{node['cluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
+      "set -o pipefail && #{node['cfncluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
     )
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for static fleet capacity provisioning")
@@ -71,15 +71,15 @@ ruby_block "wait for dynamic fleet capacity" do
     require 'chef/mixin/shell_out'
     require 'shellwords'
 
-    # $ #{node['cluster']['slurm']['install_dir']}/bin/squeue --name='parallelcluster-init-cluster' -O state -h
+    # $ #{node['cfncluster']['slurm']['install_dir']}/bin/squeue --name='parallelcluster-init-cluster' -O state -h
     # CONFIGURING
     # RUNNING
-    are_jobs_running_command = Shellwords.escape("set -o pipefail && #{node['cluster']['slurm']['install_dir']}/bin/squeue --name='parallelcluster-init-cluster' -O state -h | { grep -v 'RUNNING' || true; }")
+    are_jobs_running_command = Shellwords.escape("set -o pipefail && #{node['cfncluster']['slurm']['install_dir']}/bin/squeue --name='parallelcluster-init-cluster' -O state -h | { grep -v 'RUNNING' || true; }")
     until shell_out!("/bin/bash -c #{are_jobs_running_command}").stdout.strip.empty?
       Chef::Log.info("Waiting for dynamic fleet capacity provisioning")
       sleep(15)
     end
     Chef::Log.info("Dynamic fleet capacity is ready. Terminating provisioning jobs.")
-    shell_out!("#{node['cluster']['slurm']['install_dir']}/bin/scancel --jobname=parallelcluster-init-cluster")
+    shell_out!("#{node['cfncluster']['slurm']['install_dir']}/bin/scancel --jobname=parallelcluster-init-cluster")
   end
 end

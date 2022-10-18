@@ -36,9 +36,9 @@ else
 end
 
 link '/etc/profile.d/slurm.sh' do
-  to "#{node['cluster']['slurm']['install_dir']}/etc/slurm.sh"
+  to "#{node['cfncluster']['slurm']['install_dir']}/etc/slurm.sh"
 end
 
 link '/etc/profile.d/slurm.csh' do
- to "#{node['cluster']['slurm']['install_dir']}/etc/slurm.csh"
+  to "#{node['cfncluster']['slurm']['install_dir']}/etc/slurm.csh"
 end

@@ -26,7 +26,7 @@ if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identic
   # Generate pcluster specific configs
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
-            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{updated_cluster_config_path}"
+            " --output-directory #{node['cfncluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{updated_cluster_config_path}"
   end
 
   execute 'stop clustermgtd' do
@@ -39,7 +39,7 @@ if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identic
   end
 
   execute 'reload config for running nodes' do
-    command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure && sleep 15"
+    command "#{node['cfncluster']['slurm']['install_dir']}/bin/scontrol reconfigure && sleep 15"
     retries 3
     retry_delay 5
   end

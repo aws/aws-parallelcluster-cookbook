@@ -72,7 +72,7 @@ when 'MasterServer', nil
 
       tar xf #{slurm_tarball}
       cd slurm-slurm-#{node['cfncluster']['slurm']['version']}
-      ./configure --prefix=#{node['cluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --enable-slurmrestd
+      ./configure --prefix=#{node['cfncluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --enable-slurmrestd
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES
       make install
@@ -80,7 +80,7 @@ when 'MasterServer', nil
       deactivate
     SLURM
     # TODO: Fix, so it works for upgrade
-    creates '#{node['cluster']['slurm']['install_dir']}/bin/srun'
+    creates '#{node['cfncluster']['slurm']['install_dir']}/bin/srun'
   end
 
   # Setup slurm user
@@ -127,7 +127,7 @@ when 'MasterServer', nil
 
 when 'ComputeFleet'
   # Created Slurm shared mount point
-  directory "#{node['cluster']['slurm']['install_dir']}" do
+  directory "#{node['cfncluster']['slurm']['install_dir']}" do
     mode '1777'
     owner 'root'
     group 'root'

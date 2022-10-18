@@ -7,7 +7,7 @@ ConditionPathExists=/opt/slurm/etc/slurm.conf
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/slurmd
-ExecStart=<%= node['cluster']['slurm']['install_dir'] %>/sbin/slurmd -D -s $SLURMD_OPTIONS
+ExecStart=<%= node['cfncluster']['slurm']['install_dir'] %>/sbin/slurmd -D -s $SLURMD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 LimitNOFILE=131072
