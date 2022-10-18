@@ -251,26 +251,28 @@ else
   )
 end
 
-default['cluster']['mysql']['remove']['packages'] = value_for_platform(
-  'default' => %w(mariadb-libs),
-  'ubuntu' => { 'default' => %w() }
-)
-default['cluster']['mysql']['package']['bucket'] = "parallelcluster-packages-439493970194-us-east-1"
-default['cluster']['mysql']['package']['prefix'] = "mysql-client"
 
+default['cluster']['mysql']['package']['url'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives"
+default['cluster']['mysql']['package']['root'] = "https://aws-parallelcluster-dev-commercial.s3.amazonaws.com/archives/mysql"
+default['cluster']['mysql']['package']['version'] = "8.0.31-1"
+default['cluster']['mysql']['package']['source-version'] = "8.0.31"
 if arm_instance?
-  default['cluster']['mysql']['package']['file'] = value_for_platform(
-    'default' => "mysql-community-client-8.0.31-1.el7.aarch64.tar.gz"
+  default['cluster']['mysql']['package']['platform'] = value_for_platform(
+    'default' => "el/7/aarch64"
   )
 else
-  default['cluster']['mysql']['package']['file'] = value_for_platform(
-    'default' => "mysql-community-client-8.0.31-1.el7.x86_64.tar.gz",
+  default['cluster']['mysql']['package']['platform'] = value_for_platform(
+    'default' => "el/7/x86_64",
     'ubuntu' => {
-      '20.04' => "mysql-community-client-8.0.31-1ubuntu20.04_amd64.tar.gz",
-      '18.04' => "mysql-community-client-8.0.31-1ubuntu18.04_amd64.tar.gz"
+      '20.04' => "ubuntu/20.04/x86_64",
+      '18.04' => "ubuntu/18.04/x86_64"
     }
   )
 end
+default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
+default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql']['package']['root']}/#{node['cluster']['mysql']['package']['platform']}/#{node['cluster']['mysql']['package']['file-name']}"
+default['cluster']['mysql']['package']['source'] = "#{node['cluster']['mysql']['package']['root']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
+
 
 # EFA
 default['cluster']['efa']['installer_version'] = '1.18.0'

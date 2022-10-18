@@ -27,13 +27,16 @@ else
     'ubuntu' => { 'default' => "apt install" }
   )
 
-  mysql_source_key = "#{node['cluster']['mysql']['package']['prefix']}/#{node['cluster']['mysql']['package']['file']}"
-  mysql_tar_file = "/tmp/#{node['cluster']['mysql']['package']['file']}"
+  mysql_archive_url = node['cluster']['mysql']['package']['archive']
+  mysql_tar_file = "/tmp/#{node['cluster']['mysql']['package']['file-name']}"
 
-  # # Remove packages that break MySQL installation
-  # package node['cluster']['mysql']['remove']['packages'] do
-  #   action :remove
-  # end
+  remote_file mysql_tar_file do
+    source mysql_archive_url
+    mode '0644'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(mysql_tar_file) }
+  end
 
   bash 'Install MySQL packages' do
     user 'root'
@@ -41,15 +44,19 @@ else
     cwd '/tmp'
     code <<-MYSQL
       set -e
-      #{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object \
-                         --bucket "#{node['cluster']['mysql']['package']['bucket']}" \
-                         --key "#{mysql_source_key}" \
-                         --region "#{node['cluster']['region']}" \
-                         "#{mysql_tar_file}"
+
       EXTRACT_DIR=$(mktemp -d --tmpdir mysql.XXXXXXX)
       tar xf "#{mysql_tar_file}" --directory "${EXTRACT_DIR}"
       #{package_installer} ${EXTRACT_DIR}/*
     MYSQL
   end
 
+end
+
+# Add MySQL source file
+template "#{node['cluster']['sources_dir']}/mysql_source_code.txt" do
+  source 'mysql/mysql_source_code.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
 end
