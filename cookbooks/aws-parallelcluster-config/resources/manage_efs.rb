@@ -69,8 +69,7 @@ end
 
 action :unmount do
   efs_shared_dir_array = new_resource.shared_dir_array.dup
-  efs_fs_id_array = new_resource.efs_fs_id_array.dup
-  efs_fs_id_array.zip(efs_shared_dir_array).each do |efs_shared_dir|
+  efs_shared_dir_array.each do |efs_shared_dir|
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
     # Unmount EFS
