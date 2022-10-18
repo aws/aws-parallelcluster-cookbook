@@ -8,7 +8,7 @@ Scheduling:
       Efa:
         Enabled: false
         GdrSupport: false
-      InstanceTypeList:
+      Instances:
       - InstanceType: r5.4xlarge
       - InstanceType: r5n.4xlarge
       - InstanceType: c5n.4xlarge
@@ -21,7 +21,7 @@ Scheduling:
       Efa:
         Enabled: true
         GdrSupport: false
-      InstanceTypeList:
+      Instances:
       - InstanceType: c5n.4xlarge
       MaxCount: 10
       MinCount: 0
@@ -72,7 +72,7 @@ Scheduling:
       Efa:
         Enabled: true
         GdrSupport: false
-      InstanceTypeList:
+      Instances:
       - InstanceType: c5n.18xlarge
       MaxCount: 10
       MinCount: 1
@@ -152,7 +152,7 @@ Scheduling:
         Efa:
           Enabled: false
           GdrSupport: false
-        InstanceTypeList:
+        Instances:
         - InstanceType: c5.4xlarge
         - InstanceType: c5.xlarge
         - InstanceType: c5.2xlarge
@@ -195,7 +195,7 @@ Scheduling:
         Efa:
           Enabled: false
           GdrSupport: false
-        InstanceTypeList:
+        Instances:
           - InstanceType: c5.4xlarge
           - InstanceType: c5.xlarge
           - InstanceType: g5.24xlarge
@@ -238,7 +238,7 @@ Scheduling:
         Efa:
           Enabled: false
           GdrSupport: false
-        InstanceTypeList:
+        Instances:
           - InstanceType: g5.48xlarge
           - InstanceType: p3.8xlarge
         MaxCount: 5
@@ -280,7 +280,7 @@ Scheduling:
         Efa:
           Enabled: false
           GdrSupport: false
-        InstanceTypeList:
+        Instances:
           - InstanceType: g5.48xlarge
           - InstanceType: p3.8xlarge
           - InstanceType: c5.large
@@ -323,7 +323,7 @@ Scheduling:
         Efa:
           Enabled: false
           GdrSupport: false
-        InstanceTypeList:
+        Instances:
           - InstanceType: g4ad.8xlarge
         MaxCount: 2
         MinCount: 1
