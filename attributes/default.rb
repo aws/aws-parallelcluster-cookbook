@@ -227,7 +227,7 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'default' => 'gdrcopy'
 )
 
-# MySQL
+# MySQL Repository Definitions
 default['cluster']['mysql']['repository']['definition']['file-name'] = value_for_platform(
   'default' => "mysql80-community-release-el7-7.noarch.rpm",
   'ubuntu' => { 'default' => "mysql-apt-config_0.8.23-1_all.deb" }
@@ -239,24 +239,23 @@ default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platf
   'ubuntu' => { 'default' => "c2b410031867dc7c966ca5b1aa0c72aa" }
 )
 
-
-default['cluster']['mysql']['package']['url'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives"
-default['cluster']['mysql']['package']['root'] = "https://aws-parallelcluster-dev-commercial.s3.amazonaws.com/archives/mysql"
+# MySQL Packages
+default['cluster']['mysql']['package']['root'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives/mysql"
 default['cluster']['mysql']['package']['version'] = "8.0.31-1"
 default['cluster']['mysql']['package']['source-version'] = "8.0.31"
-if arm_instance?
-  default['cluster']['mysql']['package']['platform'] = value_for_platform(
-    'default' => "el/7/aarch64"
-  )
-else
-  default['cluster']['mysql']['package']['platform'] = value_for_platform(
-    'default' => "el/7/x86_64",
-    'ubuntu' => {
-      '20.04' => "ubuntu/20.04/x86_64",
-      '18.04' => "ubuntu/18.04/x86_64"
-    }
-  )
-end
+default['cluster']['mysql']['package']['platform'] = if arm_instance?
+                                                       value_for_platform(
+                                                         'default' => "el/7/aarch64"
+                                                       )
+                                                     else
+                                                       value_for_platform(
+                                                         'default' => "el/7/x86_64",
+                                                         'ubuntu' => {
+                                                           '20.04' => "ubuntu/20.04/x86_64",
+                                                           '18.04' => "ubuntu/18.04/x86_64",
+                                                         }
+                                                       )
+                                                     end
 default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
 default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql']['package']['root']}/#{node['cluster']['mysql']['package']['platform']}/#{node['cluster']['mysql']['package']['file-name']}"
 default['cluster']['mysql']['package']['source'] = "#{node['cluster']['mysql']['package']['root']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
@@ -274,7 +273,7 @@ if arm_instance?
     'default' => "8.0.31",
     'ubuntu' => {
       '20.04' => "8.0.30-0ubuntu0.20.04.2",
-      '18.04' => "5.7.39-0ubuntu0.18.04.2"
+      '18.04' => "5.7.39-0ubuntu0.18.04.2",
     }
   )
 else
@@ -286,12 +285,10 @@ else
     'default' => "8.0.31",
     'ubuntu' => {
       '20.04' => "8.0.31-1ubuntu20.04",
-      '18.04' => "8.0.31-1ubuntu18.04"
+      '18.04' => "8.0.31-1ubuntu18.04",
     }
   )
 end
-
-
 
 # EFA
 default['cluster']['efa']['installer_version'] = '1.18.0'
