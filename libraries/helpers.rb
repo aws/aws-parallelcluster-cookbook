@@ -355,7 +355,7 @@ end
 
 # Add an external package repository to the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
-def add_package_repository(repo_name, baseurl, gpgkey, distribution, components = [])
+def add_package_repository(repo_name, baseurl, gpgkey, distribution)
   case node['platform_family']
   when 'rhel', 'amazon'
     yum_repository repo_name do
@@ -369,7 +369,6 @@ def add_package_repository(repo_name, baseurl, gpgkey, distribution, components 
       uri          baseurl
       key          gpgkey
       distribution distribution
-      components components
       retries 3
       retry_delay 5
     end
@@ -398,21 +397,6 @@ def remove_package_repository(repo_name)
   else
     raise "platform not supported: #{node['platform_family']}"
   end
-end
-
-# Check if package repository is enabled
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-def is_repository_enabled?(repo_name, base_url)
-  command = value_for_platform(
-  %w(ubuntu debian) => {
-    'default' => "grep -r -E '^deb +#{base_url}' /etc/apt/sources.list*",
-  },
-  'default' => "yum -v repolist #{repo_name} | grep 'Repo-status  : enabled' || exit 1 && yum -v repolist #{repo_name} | grep 'Repo-baseurl : #{base_url}'")
-
-  cmd = Mixlib::ShellOut.new(command, timeout: 60)
-  cmd.run_command
-  # Return false if the repository is not installed
-  cmd.exitstatus.to_i.zero?
 end
 
 # Get number of nv switches
@@ -540,26 +524,6 @@ def efa_installed?
     Chef::Log.info("`/opt/amazon/efa` directory already exists. \nmodinfo efa stdout: \n#{modinfo_efa_stdout} \nefa_installed_packages_file_content: \n#{efa_installed_packages_file}")
   end
   dir_exist
-end
-
-def is_package_installed?(package_name)
-  command = value_for_platform(
-    %w(ubuntu debian) => {
-      'default' => "apt list --installed | grep #{package_name}",
-    },
-    'default' => "yum list installed | grep #{package_name}"
-  )
-
-  cmd = Mixlib::ShellOut.new(command, timeout: 60)
-  cmd.run_command
-  Chef::Log.info("Checking if #{package_name} is installed...\n#{command}\n#{cmd.stdout.strip}")
-  # Convert return code to boolean
-  cmd.exitstatus.to_i.zero?
-end
-
-def is_neuron_instance?
-  neuron_filter = ["trn1."]
-  node['ec2']['instance_type'].start_with?(*neuron_filter)
 end
 
 # load cluster configuration file into node object

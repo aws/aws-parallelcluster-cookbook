@@ -124,6 +124,10 @@ default['cluster']['parallelcluster-cookbook-version'] = '3.3.0'
 default['cluster']['parallelcluster-node-version'] = '3.3.0'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 
+# cfn-bootstrap
+default['cluster']['cfn_bootstrap']['version'] = '2.0-10'
+default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz"
+
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
@@ -527,16 +531,6 @@ default['cluster']['lustre']['client_url'] = value_for_platform(
     '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm",
   }
 )
-
-# Neuron
-default['cluster']['neuron']['repository_name'] = "neuron"
-default['cluster']['neuron']['url_prefix'] = value_for_platform(
-  'default' => 'yum',
-  'ubuntu' => { 'default' => 'apt' }
-)
-default['cluster']['neuron']['base_url'] = "https://#{node['cluster']['neuron']['url_prefix']}.repos.neuron.amazonaws.com"
-default['cluster']['neuron']['public_key'] = "#{node['cluster']['neuron']['base_url']}/GPG-PUB-KEY-AMAZON-AWS-NEURON.PUB"
-default['cluster']['neuron']['packages'] = %w(aws-neuronx-dkms)
 
 # Default gc_thresh values for performance at scale
 default['cluster']['sysctl']['ipv4']['gc_thresh1'] = 0
