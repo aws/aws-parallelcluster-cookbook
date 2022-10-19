@@ -259,3 +259,27 @@ def validate_package_source(package, expected_source)
     TEST
   end
 end
+
+def validate_package_version(package, expected_version)
+  case node['platform']
+  when 'amazon', 'centos'
+    test_expression = "$(yum info #{package} | grep 'Version' | awk '{print $3}')"
+  when 'ubuntu'
+    test_expression = "$(apt show #{package} | grep 'Version:' | awk '{print $2}')"
+  else
+    raise "Platform not supported: #{node['platform']}"
+  end
+
+  bash "Check that package #{package} v#{expected_version} is installed" do
+    cwd Chef::Config[:file_cache_path]
+    code <<-TEST
+      echo "Testing package #{package} version"
+      actual_version=#{test_expression}
+      if [ "#{expected_version}" != "${actual_version}" ]; then
+        echo "ERROR Expected package source #{expected_version} for #{package} does not match actual source: ${actual_version}"
+        exit 1
+      fi
+      echo "#{package} correctly installed version #{expected_version}"
+    TEST
+  end
+end

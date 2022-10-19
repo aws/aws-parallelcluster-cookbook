@@ -264,24 +264,30 @@ default['cluster']['mysql']['package']['source'] = "#{node['cluster']['mysql']['
 # MySQL Validation
 if arm_instance?
   default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
     'ubuntu' => {
-      'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common),
-      '18.04' =>  %w(libmysqlclient-dev libmysqlclient20 mysql-common),
+      'default' => %w(libmysqlclient-dev libmysqlclient21),
+      '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
     }
   )
-  default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
-    'default' => "mysql80-community",
-    'ubuntu' => { 'default' => "http://#{node['cluster']['region']}.ec2.ports.ubuntu.com/ubuntu-ports" }
+  default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
+    'default' => "8.0.31",
+    'ubuntu' => {
+      '20.04' => "8.0.30-0ubuntu0.20.04.2",
+      '18.04' => "5.7.39-0ubuntu0.18.04.2"
+    }
   )
 else
   default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
+    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
     'ubuntu' => { 'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common mysql-community-client-plugins) }
   )
-  default['cluster']['mysql']['repository']['expected']['source'] = value_for_platform(
-    'default' => "mysql80-community",
-    'ubuntu' => { 'default' => "http://repo.mysql.com/apt/ubuntu" }
+  default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
+    'default' => "8.0.31",
+    'ubuntu' => {
+      '20.04' => "8.0.31-1ubuntu20.04",
+      '18.04' => "8.0.31-1ubuntu18.04"
+    }
   )
 end
 
