@@ -399,21 +399,6 @@ def remove_package_repository(repo_name)
   end
 end
 
-# Check if package repository is enabled
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-def is_repository_enabled?(repo_name, base_url)
-  command = value_for_platform(
-  %w(ubuntu debian) => {
-    'default' => "grep -r -E '^deb +#{base_url}' /etc/apt/sources.list*",
-  },
-  'default' => "yum -v repolist #{repo_name} | grep 'Repo-status  : enabled' || exit 1 && yum -v repolist #{repo_name} | grep 'Repo-baseurl : #{base_url}'")
-
-  cmd = Mixlib::ShellOut.new(command, timeout: 60)
-  cmd.run_command
-  # Return false if the repository is not installed
-  cmd.exitstatus.to_i.zero?
-end
-
 # Get number of nv switches
 def get_nvswitches
   # NVSwitch device id is 10de:1af1
@@ -553,11 +538,6 @@ def neuron_installed?
   cmd.run_command
   # Return false if the package is not installed
   !(cmd.exitstatus != 0)
-end
-
-def is_neuron_instance?
-  neuron_filter = ["trn1."]
-  node['ec2']['instance_type'].start_with?(*neuron_filter)
 end
 
 # load cluster configuration file into node object
