@@ -211,9 +211,6 @@ end
 # Install NVIDIA and CUDA
 include_recipe "aws-parallelcluster-install::nvidia"
 
-# Install Neuron driver
-include_recipe "aws-parallelcluster-install::neuron" unless virtualized?
-
 # Install EFA & Intel MPI
 include_recipe "aws-parallelcluster-install::efa" unless virtualized?
 include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
