@@ -228,6 +228,40 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
 )
 
 # MySQL
+default['cluster']['mysql']['repository']['definition']['file-name'] = value_for_platform(
+  'default' => "mysql80-community-release-el7-7.noarch.rpm",
+  'ubuntu' => { 'default' => "mysql-apt-config_0.8.23-1_all.deb" }
+)
+
+default['cluster']['mysql']['repository']['definition']['url'] = "https://dev.mysql.com/get/#{node['cluster']['mysql']['repository']['definition']['file-name']}"
+default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platform(
+  'default' => "659400f9842fffb8d64ae0b650f081b9",
+  'ubuntu' => { 'default' => "c2b410031867dc7c966ca5b1aa0c72aa" }
+)
+
+
+default['cluster']['mysql']['package']['url'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives"
+default['cluster']['mysql']['package']['root'] = "https://aws-parallelcluster-dev-commercial.s3.amazonaws.com/archives/mysql"
+default['cluster']['mysql']['package']['version'] = "8.0.31-1"
+default['cluster']['mysql']['package']['source-version'] = "8.0.31"
+if arm_instance?
+  default['cluster']['mysql']['package']['platform'] = value_for_platform(
+    'default' => "el/7/aarch64"
+  )
+else
+  default['cluster']['mysql']['package']['platform'] = value_for_platform(
+    'default' => "el/7/x86_64",
+    'ubuntu' => {
+      '20.04' => "ubuntu/20.04/x86_64",
+      '18.04' => "ubuntu/18.04/x86_64"
+    }
+  )
+end
+default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
+default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql']['package']['root']}/#{node['cluster']['mysql']['package']['platform']}/#{node['cluster']['mysql']['package']['file-name']}"
+default['cluster']['mysql']['package']['source'] = "#{node['cluster']['mysql']['package']['root']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
+
+# MySQL Validation
 if arm_instance?
   default['cluster']['mysql']['repository']['packages'] = value_for_platform(
     'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins),
@@ -251,27 +285,6 @@ else
   )
 end
 
-
-default['cluster']['mysql']['package']['url'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives"
-default['cluster']['mysql']['package']['root'] = "https://aws-parallelcluster-dev-commercial.s3.amazonaws.com/archives/mysql"
-default['cluster']['mysql']['package']['version'] = "8.0.31-1"
-default['cluster']['mysql']['package']['source-version'] = "8.0.31"
-if arm_instance?
-  default['cluster']['mysql']['package']['platform'] = value_for_platform(
-    'default' => "el/7/aarch64"
-  )
-else
-  default['cluster']['mysql']['package']['platform'] = value_for_platform(
-    'default' => "el/7/x86_64",
-    'ubuntu' => {
-      '20.04' => "ubuntu/20.04/x86_64",
-      '18.04' => "ubuntu/18.04/x86_64"
-    }
-  )
-end
-default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
-default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql']['package']['root']}/#{node['cluster']['mysql']['package']['platform']}/#{node['cluster']['mysql']['package']['file-name']}"
-default['cluster']['mysql']['package']['source'] = "#{node['cluster']['mysql']['package']['root']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
 
 
 # EFA
