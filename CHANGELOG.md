@@ -7,7 +7,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Add support for AWS Trainium instances.
 - Add support for Slurm Accounting.
 - Add support for adding and removing shared storages at cluster update.
 - Add possibility to specify multiple instance types for the same compute resource.
