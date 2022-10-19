@@ -9,10 +9,21 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for AWS Trainium instances.
 - Add support for Slurm Accounting.
-- Upgrade third-party cookbook dependencies:
-  - selinux-6.0.5 (from selinux-6.0.4)
-  - nfs-5.0.0 (from nfs-2.6.4)
-- Upgrade EFA installer to `1.18.0`
+- Add support for adding and removing shared storages at cluster update.
+- Add possibility to specify multiple instance types for the same compute resource.
+- Configure NFS threads to be `min(256, max(8, num_cores * 4))` to ensure better stability and performance.
+- Move NFS installation at build time to reduce configuration time.
+
+**CHANGES**
+- Upgrade NVIDIA driver to version 470.141.03.
+- Upgrade NVIDIA Fabric Manager to version 470.141.03.
+- Upgrade NVIDIA CUDA Toolkit to version 11.7.1.
+- Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
+- Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
+- Change the logic to number the routing tables when an instance have multiple NICs.
+- Upgrade Python from 3.7.13 to 3.9.15.
+- Upgrade Slurm to version 22.05.5.
+- Upgrade EFA installer to `1.18.0`.
   - Efa-driver: `efa-1.16.0-1`
   - Efa-config: `efa-config-1.11-1`
   - Efa-profile: `efa-profile-1.5-1`
@@ -24,18 +35,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2022.1.433-1`
   - gl: `2022.1.973-1`
   - web_viewer: `2022.1.13300-1`
-- Configure NFS threads to be `min(256, max(8, num_cores * 4))` to ensure better stability and performance.
-
-**CHANGES**
-- Upgrade NVIDIA driver to version 470.141.03.
-- Upgrade NVIDIA Fabric Manager to version 470.141.03.
-- Upgrade NVIDIA CUDA Toolkit to version 11.7.1.
-- Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
-- Add support for generating Slurm Configuration files for Compute Resources with Multiple Instance Types.
-- Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
-- Change the logic to number the routing tables when an instance have multiple NICs.
-- Upgrade Python from 3.7.13 to 3.9.15.
-- Upgrade Slurm to version 22.05.5.
+- Upgrade third-party cookbook dependencies:
+  - selinux-6.0.5 (from selinux-6.0.4)
+  - nfs-5.0.0 (from nfs-2.6.4)
 
 3.2.1
 ------
