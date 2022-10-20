@@ -26,7 +26,7 @@ end
 
 # Mount /opt/slurm over NFS
 # Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
-mount (node['cfncluster']['slurm']['install_dir']).to_s do
+mount "#{node['cfncluster']['slurm']['install_dir']}" do
   device(lazy { "#{node['cfncluster']['cfn_master_private_ip']}:#{node['cfncluster']['slurm']['install_dir']}" })
   fstype "nfs"
   options node['cfncluster']['nfs']['hard_mount_options']
