@@ -2,7 +2,7 @@
 # slurm.csh:
 #     Sets the C shell user environment for slurm commands
 #
-set path = ($path /opt/slurm/bin)
+set path = ($path <%= node['cfncluster']['slurm']['install_dir'] %>/bin)
 if ( ${?MANPATH} ) then
   setenv MANPATH ${MANPATH}:/opt/slurm/share/man
 else
