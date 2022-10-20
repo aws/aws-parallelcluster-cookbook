@@ -2,7 +2,7 @@
 Description=Slurm controller daemon
 After=network-online.target munge.service
 Wants=network-online.target
-ConditionPathExists=/opt/slurm/etc/slurm.conf
+ConditionPathExists=<%= node['cfncluster']['slurm']['install_dir'] %>/etc/slurm.conf
 
 [Service]
 Type=simple
