@@ -35,7 +35,7 @@ ruby_block "submit dynamic fleet initialization jobs" do
 
         # Submitting a job for each instance type that requires an initial_count > min_count
         Chef::Log.info("Submitting job to run dynamic capacity for queue #{queue_name} and instance #{instance_config['instance_type']}")
-        submit_job_command = Shellwords.escape("#{node['cfncluster']['slurm']['install_dir']}/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster " \
+        submit_job_command = Shellwords.escape("#{node['cfncluster']['slurm']['install_dir']}/bin/sbatch --wrap 'sleep infinity' --job-name=parallelcluster-init-cluster "\
                                                "--constraint='[(dynamic&#{instance_config['instance_type']})*#{required_dynamic}]' --partition=#{queue_name}")
         shell_out!("/bin/bash -c #{submit_job_command}")
       end

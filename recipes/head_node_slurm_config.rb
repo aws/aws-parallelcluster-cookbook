@@ -18,7 +18,7 @@
 setup_munge_head_node
 
 # Export /opt/slurm
-nfs_export (node['cfncluster']['slurm']['install_dir']).to_s do
+nfs_export "#{node['cfncluster']['slurm']['install_dir']}" do
   network node['cfncluster']['ec2-metadata']['vpc-ipv4-cidr-blocks']
   writeable true
   options ['no_root_squash']
@@ -61,9 +61,9 @@ remote_directory "#{node['cfncluster']['scripts_dir']}/slurm" do
 end
 
 # Copy cluster config file from S3 URI
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object" \
-                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}" \
-                       " --key #{node['cfncluster']['cluster_config_s3_key']}" \
+fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
+                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
+                       " --key #{node['cfncluster']['cluster_config_s3_key']}"\
                        " --region #{node['cfncluster']['cfn_region']} #{node['cfncluster']['cluster_config_path']}"
 fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
 execute "copy_cluster_config_from_s3" do
@@ -73,7 +73,7 @@ execute "copy_cluster_config_from_s3" do
 end
 
 execute 'initialize cluster config hash in DynamoDB' do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}" \
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
           " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cfncluster']['cluster_config_version']}\"}}' --region #{node['cfncluster']['cfn_region']}"
   retries 3
   retry_delay 5
@@ -82,7 +82,7 @@ end
 
 execute 'initialize compute fleet status in DynamoDB' do
   # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}" \
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
           " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Status\": {\"S\": \"RUNNING\"}}' --region #{node['cfncluster']['cfn_region']}"
   retries 3
   retry_delay 5
@@ -90,7 +90,7 @@ end
 
 # Generate pcluster specific configs
 execute "generate_pcluster_slurm_configs" do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/python #{node['cfncluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
           " --output-directory #{node['cfncluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cfncluster']['scripts_dir']}/slurm/templates/ --input-file #{node['cfncluster']['cluster_config_path']}"
 end
 

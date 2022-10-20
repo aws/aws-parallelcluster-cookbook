@@ -91,7 +91,7 @@ if node['cfncluster']['nvidia']['enabled'] == 'yes' || node['cfncluster']['nvidi
   if node['platform'] == 'ubuntu'
     # For ubuntu, CINC17 apt-package resources need full versions for `version`
     execute "install_fabricmanager_for_ubuntu" do
-      command "apt -y install #{node['cfncluster']['nvidia']['fabricmanager']['package']}=#{node['cfncluster']['nvidia']['fabricmanager']['version']} " \
+      command "apt -y install #{node['cfncluster']['nvidia']['fabricmanager']['package']}=#{node['cfncluster']['nvidia']['fabricmanager']['version']} "\
               "&& apt-mark hold #{node['cfncluster']['nvidia']['fabricmanager']['package']}"
       retries 3
       retry_delay 5
