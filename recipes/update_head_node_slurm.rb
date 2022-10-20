@@ -16,9 +16,9 @@
 # limitations under the License.
 
 updated_cluster_config_path = "/tmp/cluster-config.updated.json"
-fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object"\
-                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}"\
-                       " --key #{node['cfncluster']['cluster_config_s3_key']}"\
+fetch_config_command = "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object" \
+                       " --bucket #{node['cfncluster']['cluster_s3_bucket']}" \
+                       " --key #{node['cfncluster']['cluster_config_s3_key']}" \
                        " --region #{node['cfncluster']['cfn_region']} #{updated_cluster_config_path}"
 fetch_config_command += " --version-id #{node['cfncluster']['cluster_config_version']}" unless node['cfncluster']['cluster_config_version'].nil?
 shell_out!(fetch_config_command)
@@ -54,7 +54,7 @@ if !File.exist?(node['cfncluster']['cluster_config_path']) || !FileUtils.identic
 end
 
 execute 'update cluster config hash in DynamoDB' do
-  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}"\
+  command "#{node['cfncluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cfncluster']['cfn_ddb_table']}" \
           " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG\"}, \"Version\": {\"S\": \"#{node['cfncluster']['cluster_config_version']}\"}}' --region #{node['cfncluster']['cfn_region']}"
   retries 3
   retry_delay 5
