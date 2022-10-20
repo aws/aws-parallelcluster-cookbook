@@ -1,3 +1,5 @@
+require: rubocop-gitlab-security
+
 Layout/LineLength:
   Max: 200
 Layout/ParameterAlignment:
@@ -59,7 +61,7 @@ Style/StringChars: # (new in 1.12)
 Style/SwapValues: # (new in 1.1)
   Enabled: true
 
-Gemspec/DeprecatedAttributeAssignment: # (new in 1.10)
+Gemspec/DateAssignment: # (new in 1.10)
   Enabled: true
 
 Lint/AmbiguousAssignment: # (new in 1.7)
