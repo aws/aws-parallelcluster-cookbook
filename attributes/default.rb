@@ -23,6 +23,9 @@ default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
 default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 
+# AWS domain
+default['cluster']['aws_domain'] = aws_domain
+
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
@@ -628,8 +631,6 @@ default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
 default['cluster']['slurm_node_reg_mem_percent'] = 75
 default['cluster']['slurmdbd_response_retries'] = 30
 
-# AWS domain
-default['cluster']['aws_domain'] = aws_domain
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false
