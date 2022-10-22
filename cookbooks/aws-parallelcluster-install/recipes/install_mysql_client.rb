@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster
-# Recipe:: mysql
+# Recipe:: install_mysql_client
 #
 # Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -24,7 +24,7 @@ else
 
   package_installer = value_for_platform(
     'default' => "yum install -y",
-    'ubuntu' => { 'default' => "apt install" }
+    'ubuntu' => { 'default' => "apt install -y" }
   )
 
   mysql_archive_url = node['cluster']['mysql']['package']['archive']
@@ -55,7 +55,7 @@ end
 
 # Add MySQL source file
 template "#{node['cluster']['sources_dir']}/mysql_source_code.txt" do
-  source 'mysql/mysql_source_code.erb'
+  source 'mysql/mysql_source_code.txt.erb'
   owner 'root'
   group 'root'
   mode '0644'
