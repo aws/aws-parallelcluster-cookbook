@@ -26,6 +26,10 @@ default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
 
+# URL for ParallelCluster Artifacts stored in public S3 buckets
+# ['cluster']['region'] will need to be defined by image_dna.json during AMI build.
+default['cluster']['artifacts_s3_url'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives"
+
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
@@ -243,7 +247,7 @@ default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platf
 )
 
 # MySQL Packages
-default['cluster']['mysql']['package']['root'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives/mysql"
+default['cluster']['mysql']['package']['root'] = "#{node['cluster']['artifacts_s3_url']}/mysql"
 default['cluster']['mysql']['package']['version'] = "8.0.31-1"
 default['cluster']['mysql']['package']['source-version'] = "8.0.31"
 default['cluster']['mysql']['package']['platform'] = if arm_instance?
@@ -261,7 +265,7 @@ default['cluster']['mysql']['package']['platform'] = if arm_instance?
                                                      end
 default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
 default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql']['package']['root']}/#{node['cluster']['mysql']['package']['platform']}/#{node['cluster']['mysql']['package']['file-name']}"
-default['cluster']['mysql']['package']['source'] = "#{node['cluster']['mysql']['package']['root']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
+default['cluster']['mysql']['package']['source'] = "#{node['cluster']['artifacts_s3_url']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
 
 # MySQL Validation
 if arm_instance?
@@ -630,7 +634,6 @@ default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['e
 default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
 default['cluster']['slurm_node_reg_mem_percent'] = 75
 default['cluster']['slurmdbd_response_retries'] = 30
-
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false
