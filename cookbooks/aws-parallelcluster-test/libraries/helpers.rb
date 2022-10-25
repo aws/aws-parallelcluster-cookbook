@@ -263,9 +263,9 @@ end
 def validate_package_version(package, expected_version)
   case node['platform']
   when 'amazon', 'centos'
-    test_expression = "$(yum info #{package} | grep 'Version' | awk '{print $3}')"
+    test_expression = "$(yum info installed #{package} | grep 'Version' | awk '{print $3}')"
   when 'ubuntu'
-    test_expression = "$(apt show #{package} | grep 'Version:' | awk '{print $2}')"
+    test_expression = "$(apt list --installed #{package} | awk '{print $2}')"
   else
     raise "Platform not supported: #{node['platform']}"
   end

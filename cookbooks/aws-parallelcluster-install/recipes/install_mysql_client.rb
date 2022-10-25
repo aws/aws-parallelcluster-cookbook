@@ -30,6 +30,8 @@ else
   mysql_archive_url = node['cluster']['mysql']['package']['archive']
   mysql_tar_file = "/tmp/#{node['cluster']['mysql']['package']['file-name']}"
 
+  log "Downloading MySQL packages archive from #{mysql_archive_url}"
+
   remote_file mysql_tar_file do
     source mysql_archive_url
     mode '0644'
