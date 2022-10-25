@@ -277,11 +277,8 @@ if arm_instance?
     }
   )
   default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
-    'default' => "8.0.31",
-    'ubuntu' => {
-      '20.04' => "8.0.30-0ubuntu0.20.04.2",
-      '18.04' => "5.7.39-0ubuntu0.18.04.2",
-    }
+    'default' => "8.0.31"
+    # Ubuntu 18.04/20.04 ARM: MySQL packages are installed from OS repo and we do not assert on a specific version.
   )
 else
   default['cluster']['mysql']['repository']['packages'] = value_for_platform(
