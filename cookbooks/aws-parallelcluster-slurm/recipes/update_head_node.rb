@@ -35,6 +35,8 @@ service 'slurmctld' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path']) }
 end
 
+chef_sleep '5'
+
 execute 'reload config for running nodes' do
   command "/opt/slurm/bin/scontrol reconfigure && sleep 15"
   retries 3
