@@ -7,7 +7,7 @@ description 'Tests AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '17.2.29'
-version '3.1.4'
+version '3.1.5'
 
 supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
