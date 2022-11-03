@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Fix Slurm issue that prevents idle nodes termination.
 - Upgrade EFA installer to `1.18.0`
   - Efa-driver: `efa-1.16.0-1`
   - Efa-config: `efa-config-1.11-1`
@@ -14,6 +15,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.16.0~amzn4.0-1`
   - Rdma-core: `rdma-core-41.0-2`
   - Open MPI: `openmpi40-aws-4.1.4-2`
+
+**CHANGES**
+- Upgrade Intel MPI Library to 2021.6.0.602.
+- Upgrade NVIDIA driver to version 470.141.03.
+- Upgrade NVIDIA Fabric Manager to version 470.141.03.
 
 3.1.4
 ------
