@@ -40,6 +40,9 @@ def generate_fleet_config_file(output_file, input_file):
                     { "InstanceType": ... }
                 ],
                 "MaxPrice": ...
+                "Networking": {
+                    "SubnetIds": [...]
+                }
             }
             "single-compute-resource": {
                 "Api": "run-instances",
@@ -73,6 +76,9 @@ def generate_fleet_config_file(output_file, input_file):
                     }
                     if capacity_type == "spot" and compute_resource_config["SpotPrice"]:
                         fleet_config[queue][compute_resource]["MaxPrice"] = compute_resource_config["SpotPrice"]
+                    fleet_config[queue][compute_resource]["Networking"] = {
+                        "SubnetIds": queue_config["Networking"]["SubnetIds"]
+                    }
 
                 elif compute_resource_config.get("InstanceType"):
                     fleet_config[queue][compute_resource] = {

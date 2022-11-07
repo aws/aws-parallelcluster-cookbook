@@ -50,6 +50,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                             "Name": "q1",
                             "CapacityType": "ONDEMAND",
                             "ComputeResources": [{"Name": "cr1", "Instances": []}],
+                            "Networking": {"SubnetIds": ["123"]},
                         }
                     ]
                 }
@@ -67,6 +68,47 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                                 {"Name": "cr1", "Instances": [{"InstanceType": "test"}]},
                                 {"Name": "cr2", "InstanceType": "test"},
                             ],
+                            "Networking": {"SubnetIds": ["123"]},
+                        }
+                    ]
+                }
+            },
+            None,
+        ),
+        (
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "ONDEMAND",
+                            "ComputeResources": [
+                                {"Name": "cr1", "Instances": [{"InstanceType": "test"}, {"InstanceType": "test-2"}]},
+                                {"Name": "cr2", "InstanceType": "test"},
+                            ],
+                            "Networking": {"SubnetIds": ["123", "456", "789"]},
+                        }
+                    ]
+                }
+            },
+            None,
+        ),
+        (
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "SPOT",
+                            "ComputeResources": [
+                                {
+                                    "Name": "cr1",
+                                    "Instances": [{"InstanceType": "test"}, {"InstanceType": "test-2"}],
+                                    "SpotPrice": "10",
+                                },
+                                {"Name": "cr2", "InstanceType": "test", "SpotPrice": "10"},
+                            ],
+                            "Networking": {"SubnetIds": ["123", "456", "789"]},
                         }
                     ]
                 }
@@ -81,6 +123,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                             "Name": "q1",
                             "CapacityType": "SPOT",
                             "ComputeResources": [{"Name": "cr1", "Instances": [{"InstanceType": "test"}]}],
+                            "Networking": {"SubnetIds": ["123"]},
                         }
                     ]
                 }
@@ -97,11 +140,45 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                             "ComputeResources": [
                                 {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
                             ],
+                            "Networking": {"SubnetIds": ["123"]},
                         }
                     ]
                 }
             },
             None,
+        ),
+        (
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "SPOT",
+                            "ComputeResources": [
+                                {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
+                            ],
+                        }
+                    ]
+                }
+            },
+            "Unable to find key 'Networking' in the configuration of queue: q1, compute resource: cr1",
+        ),
+        (
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "SPOT",
+                            "ComputeResources": [
+                                {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
+                            ],
+                            "Networking": {},
+                        }
+                    ]
+                }
+            },
+            "Unable to find key 'SubnetIds' in the configuration of queue: q1, compute resource: cr1",
         ),
     ],
 )

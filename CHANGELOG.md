@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.x.x
+------
+
+**ENHANCEMENTS**
+- Add support for specifying multiple subnets for each queue to increase the EC2 capacity pool available for use.
+
 3.3.0
 ------
 
