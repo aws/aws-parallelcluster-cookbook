@@ -21,6 +21,10 @@ when 'rhel', 'amazon'
     command "yum -y update && package-cleanup -y --oldkernels --count=1"
   end
 when 'debian'
+  execute 'install-efibootmanager' do # temporary workaround to solve https://bugs.launchpad.net/ubuntu/+source/grub2-signed/+bug/1936857
+    command "apt-get -y install efibootmgr"
+    only_if { arm_instance? }
+  end
   apt_update
   execute 'apt-upgrade' do
     command "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::=\"--force-confdef\" -o Dpkg::Options::=\"--force-confold\" --with-new-pkgs upgrade && apt-get autoremove -y"
