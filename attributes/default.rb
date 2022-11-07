@@ -145,7 +145,7 @@ default['cfncluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_p
 )
 
 # EFA
-default['cfncluster']['efa']['installer_version'] = '1.18.0'
+default['cfncluster']['efa']['installer_version'] = '1.19.0'
 default['cfncluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cfncluster']['efa']['installer_version']}.tar.gz"
 default['cfncluster']['efa']['unsupported_aarch64_oses'] = %w[centos7]
 
