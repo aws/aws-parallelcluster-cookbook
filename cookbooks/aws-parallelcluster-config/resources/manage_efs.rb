@@ -14,15 +14,32 @@ unified_mode true
 
 property :shared_dir_array, Array, required: true
 property :efs_fs_id_array, Array, required: true
+property :efs_encryption_in_transit_array, Array, required: true
+property :efs_iam_authorization_array, Array, required: true
 
 default_action :mount
 
 action :mount do
   efs_shared_dir_array = new_resource.shared_dir_array.dup
   efs_fs_id_array = new_resource.efs_fs_id_array.dup
-  efs_fs_id_array.zip(efs_shared_dir_array).each do |efs_fs_id, efs_shared_dir|
+  efs_encryption_in_transit_array = new_resource.efs_encryption_in_transit_array.dup
+  efs_iam_authorization_array = new_resource.efs_iam_authorization_array.dup
+
+  efs_fs_id_array.each_with_index do |efs_fs_id, index|
+    efs_shared_dir = efs_shared_dir_array[index]
+    efs_encryption_in_transit = efs_encryption_in_transit_array[index]
+    efs_iam_authorization = efs_iam_authorization_array[index]
+
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
+
+    # See reference of mount options: https://docs.aws.amazon.com/efs/latest/ug/automount-with-efs-mount-helper.html
+    mount_options = "_netdev,noresvport"
+    if efs_encryption_in_transit == "true"
+      mount_options.concat(",tls")
+    elsif efs_iam_authorization == "true"
+      mount_options.concat(",iam")
+    end
 
     # Create the EFS shared directory
     directory efs_shared_dir do
@@ -35,9 +52,9 @@ action :mount do
 
     # Mount EFS over NFS
     mount efs_shared_dir do
-      device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
-      fstype 'nfs4'
-      options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
+      device "#{efs_fs_id}:/"
+      fstype 'efs'
+      options mount_options
       dump 0
       pass 0
       action :mount
@@ -48,8 +65,8 @@ action :mount do
 
     mount efs_shared_dir do
       device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
-      fstype 'nfs4'
-      options 'nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=30,retrans=2,noresvport,_netdev'
+      fstype 'efs'
+      options mount_options
       dump 0
       pass 0
       action :enable
