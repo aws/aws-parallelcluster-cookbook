@@ -247,11 +247,6 @@ if node['conditions']['efa_supported']
         grep "EFA installer version: #{node['cluster']['efa']['installer_version']}" /opt/amazon/efa_installed_packages
       EFA
     end
-    # GDR (GPUDirect RDMA)
-    execute 'check efa gdr installed' do
-      command "modinfo efa | grep 'gdr:\ *Y'"
-      user node['cluster']['cluster_user']
-    end
   end
 end
 
