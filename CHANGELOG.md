@@ -9,6 +9,15 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for specifying multiple subnets for each queue to increase the EC2 capacity pool available for use.
 
+**CHANGES**
+- Upgrade EFA installer to `1.19.0`
+  - Efa-driver: `efa-1.16.0-1`
+  - Efa-config: `efa-config-1.11-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.0-1`
+  - Rdma-core: `rdma-core-41.0-2`
+  - Open MPI: `openmpi40-aws-4.1.4-3`
+  
 3.3.0
 ------
 
