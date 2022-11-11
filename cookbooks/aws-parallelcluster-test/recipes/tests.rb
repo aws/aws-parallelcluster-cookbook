@@ -334,25 +334,9 @@ end
 ###################
 # instance store
 ###################
-
-ebs_shared_dirs_array = node['cluster']['ebs_shared_dirs'].split(',')
-
-if ebs_shared_dirs_array.include? node['cluster']['ephemeral_dir']
-  # In this case the ephemeral storage should not be mounted because the mountpoint
-  # clashes with the mountpoint coming from t
-  bash 'test instance store mountpoint collision' do
-    cwd Chef::Config[:file_cache_path]
-    user node['cluster']['cluster_user']
-    code <<-COLLISION
-      systemctl show setup-ephemeral.service -p ActiveState | grep "=inactive"
-      systemctl show setup-ephemeral.service -p UnitFileState | grep "=disabled"
-    COLLISION
-  end
-else
-  bash 'test instance store' do
-    cwd Chef::Config[:file_cache_path]
-    user node['cluster']['cluster_user']
-    code <<-EPHEMERAL
+bash 'test instance store' do
+  cwd Chef::Config[:file_cache_path]
+  code <<-EPHEMERAL
       set -xe
       EPHEMERAL_DIR="#{node['cluster']['ephemeral_dir']}"
 
@@ -405,11 +389,11 @@ else
         mkdir -p ${EPHEMERAL_DIR}/test_dir
         touch ${EPHEMERAL_DIR}/test_dir/test_file
       fi
-    EPHEMERAL
-  end
-  execute 'check setup-ephemeral service is enabled' do
-    command "systemctl is-enabled setup-ephemeral"
-  end
+  EPHEMERAL
+  user node['cluster']['cluster_user']
+end
+execute 'check setup-ephemeral service is enabled' do
+  command "systemctl is-enabled setup-ephemeral"
 end
 
 ###################

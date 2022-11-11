@@ -27,23 +27,16 @@ end
 
 include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
 
-# Mount the ephemeral drive unless there is a mountpoint collision with shared drives
-shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',') + \
-                   node['cluster']['efs_shared_dirs'].split(',') + \
-                   node['cluster']['fsx_shared_dirs'].split(',') + \
-                   [ node['cluster']['raid_shared_dir'] ]
-unless shared_dir_array.include? node['cluster']['ephemeral_dir']
-  service "setup-ephemeral" do
-    supports restart: false
-    action :enable
-  end
+service "setup-ephemeral" do
+  supports restart: false
+  action :enable
+end
 
-  # Execution timeout 3600 seconds
-  unless virtualized?
-    execute "Setup of ephemeral drives" do
-      user "root"
-      command "/usr/local/sbin/setup-ephemeral-drives.sh"
-    end
+# Execution timeout 3600 seconds
+unless virtualized?
+  execute "Setup of ephemeral drivers" do
+    user "root"
+    command "/usr/local/sbin/setup-ephemeral-drives.sh"
   end
 end
 
