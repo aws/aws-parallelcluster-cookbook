@@ -295,7 +295,7 @@ else
 end
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.18.0'
+default['cluster']['efa']['installer_version'] = '1.19.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
@@ -303,6 +303,11 @@ default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 default['cluster']['efs_utils']['version'] = '1.34.1'
 default['cluster']['efs_utils']['url'] = "https://github.com/aws/efs-utils/archive/v#{node['cluster']['efs_utils']['version']}.tar.gz"
 default['cluster']['efs_utils']['sha256'] = '69d0d8effca3b58ccaf4b814960ec1d16263807e508b908975c2627988c7eb6c'
+default['cluster']['efs_utils']['tarball_path'] = "#{node['cluster']['sources_dir']}/efs-utils-#{node['cluster']['efs_utils']['version']}.tar.gz"
+default['cluster']['stunnel']['version'] = '5.67'
+default['cluster']['stunnel']['url'] = "https://www.stunnel.org/downloads/stunnel-#{node['cluster']['stunnel']['version']}.tar.gz"
+default['cluster']['stunnel']['sha256'] = '3086939ee6407516c59b0ba3fbf555338f9d52f459bcab6337c0f00e91ea8456'
+default['cluster']['stunnel']['tarball_path'] = "#{node['cluster']['sources_dir']}/stunnel-#{node['cluster']['stunnel']['version']}.tar.gz"
 
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
@@ -609,6 +614,8 @@ default['cluster']['log_group_name'] = "NONE"
 default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['efs_shared_dirs'] = ''
 default['cluster']['efs_fs_ids'] = ''
+default['cluster']['efs_encryption_in_transits'] = ''
+default['cluster']['efs_iam_authorizations'] = ''
 default['cluster']['cluster_admin_user'] = 'pcluster-admin'
 default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
 default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
