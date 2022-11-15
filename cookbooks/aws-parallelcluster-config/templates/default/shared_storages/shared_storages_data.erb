@@ -17,10 +17,14 @@ raid:
 <%# EFS %>
 <% efs_fs_ids_array = node['cluster']['efs_fs_ids'].split(',') -%>
 <% efs_shared_dir_array = node['cluster']['efs_shared_dirs'].split(',') -%>
+<% efs_encryption_in_transit_array = node['cluster']['efs_encryption_in_transits'].split(',') -%>
+<% efs_iam_authorization_array = node['cluster']['efs_iam_authorizations'].split(',') -%>
 efs:
 <% efs_fs_ids_array.each_with_index do |efs_fs_id, index| -%>
   - efs_fs_id: <%= efs_fs_id %>
     mount_dir: <%= efs_shared_dir_array[index] %>
+    efs_encryption_in_transit: <%= efs_encryption_in_transit_array[index] %>
+    efs_iam_authorization: <%= efs_iam_authorization_array[index] %>
 <% end -%>
 <%# FSX %>
 <% fsx_fs_id_array = node['cluster']['fsx_fs_ids'].split(',') -%>
