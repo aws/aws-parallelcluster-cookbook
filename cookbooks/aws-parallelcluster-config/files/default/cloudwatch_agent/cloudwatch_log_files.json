@@ -158,6 +158,23 @@
     },
     {
       "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/compute_console_output.log",
+      "log_stream_name": "compute_console_output",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
       "file_path": "/var/log/parallelcluster/computemgtd",
       "log_stream_name": "computemgtd",
       "schedulers": [
