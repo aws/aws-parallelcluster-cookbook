@@ -173,6 +173,20 @@ replace_or_add "update node replacement timeout" do
   replace_only true
 end
 
+replace_or_add "update compute console logging enabled" do
+  path "/etc/parallelcluster/slurm_plugin/parallelcluster_clustermgtd.conf"
+  pattern "node_replacement_timeout*"
+  line "compute_console_logging_enabled = #{node['cluster']['config'].dig(:Monitoring, :ComputeConsoleLoggingEnabled) || 'True'}"
+  replace_only true
+end
+
+replace_or_add "update compute console logging sample size" do
+  path "/etc/parallelcluster/slurm_plugin/parallelcluster_clustermgtd.conf"
+  pattern "node_replacement_timeout*"
+  line "compute_console_logging_max_sample_size = #{node['cluster']['config'].dig(:Monitoring, :ComputeConsoleLoggingMaxSampleSize) || 100}"
+  replace_only true
+end
+
 ruby_block "Update Slurm Accounting" do
   block do
     if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
