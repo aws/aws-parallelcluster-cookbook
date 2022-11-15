@@ -14,8 +14,8 @@ unified_mode true
 
 property :shared_dir_array, Array, required: true
 property :efs_fs_id_array, Array, required: true
-property :efs_encryption_in_transit_array, Array, required: true
-property :efs_iam_authorization_array, Array, required: true
+property :efs_encryption_in_transit_array, Array, required: false
+property :efs_iam_authorization_array, Array, required: false
 
 default_action :mount
 

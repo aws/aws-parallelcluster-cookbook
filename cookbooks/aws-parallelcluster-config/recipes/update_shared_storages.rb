@@ -29,9 +29,9 @@ ruby_block "get storage to mount and unmount" do
     # get raid to mount
     node.default['cluster']['mount_raid_shared_dir'], node.default['cluster']['mount_raid_type'], node.default['cluster']['mount_raid_vol_array'] = get_raid(MOUNT_ACTION)
     # get efs to unmount
-    node.default['cluster']['unmount_efs_shared_dir_array'], node.default['cluster']['unmount_efs_fs_id_array'] = get_efs(UNMOUNT_ACTION)
+    node.default['cluster']['unmount_efs_shared_dir_array'], node.default['cluster']['unmount_efs_fs_id_array'], = get_efs(UNMOUNT_ACTION)
     # get efs to mount
-    node.default['cluster']['mount_efs_shared_dir_array'], node.default['cluster']['mount_efs_fs_id_array'] = get_efs(MOUNT_ACTION)
+    node.default['cluster']['mount_efs_shared_dir_array'], node.default['cluster']['mount_efs_fs_id_array'], node.default['cluster']['mount_efs_encryption_in_transit_array'], node.default['cluster']['mount_efs_iam_authorization_array'] = get_efs(MOUNT_ACTION)
     # get fsx to unmount
     node.default['cluster']['unmount_fsx_fs_id_array'], node.default['cluster']['unmount_fsx_fs_type_array'], node.default['cluster']['unmount_fsx_shared_dir_array'], node.default['cluster']['unmount_fsx_dns_name_array'], node.default['cluster']['unmount_fsx_mount_name_array'], node.default['cluster']['unmount_fsx_volume_junction_path_array'] = get_fsx(UNMOUNT_ACTION)
     # get fsx to mount
@@ -70,14 +70,18 @@ ruby_block "get storage to mount and unmount" do
     end
     shared_dir_array = []
     efs_fs_id_array = []
+    efs_encryption_in_transit_array = []
+    efs_iam_authorization_array = []
     unless in_shared_storages_mapping["efs"].nil?
       in_shared_storages_mapping["efs"].each do |storage|
         next unless not_in_shared_storages_mapping["efs"].nil? || !not_in_shared_storages_mapping["efs"].include?(storage)
         shared_dir_array.push(storage["mount_dir"])
         efs_fs_id_array.push(storage["efs_fs_id"])
+        efs_encryption_in_transit_array.push(storage["efs_encryption_in_transit"])
+        efs_iam_authorization_array.push(storage["efs_iam_authorization"])
       end
     end
-    [shared_dir_array, efs_fs_id_array]
+    [shared_dir_array, efs_fs_id_array, efs_encryption_in_transit_array, efs_iam_authorization_array]
   end
 
   def get_fsx(action)
@@ -178,6 +182,8 @@ end
 manage_efs "mount efs" do
   shared_dir_array(lazy { node['cluster']['mount_efs_shared_dir_array'] })
   efs_fs_id_array(lazy { node['cluster']['mount_efs_fs_id_array'] })
+  efs_encryption_in_transit_array(lazy { node['cluster']['mount_efs_encryption_in_transit_array'] })
+  efs_iam_authorization_array(lazy { node['cluster']['mount_efs_iam_authorization_array'] })
   not_if { node['cluster']['mount_efs_shared_dir_array'].empty? }
 end
 
