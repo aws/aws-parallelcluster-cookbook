@@ -128,6 +128,11 @@ if platform?('ubuntu') && node['platform_version'].to_f >= 16.04
 end
 include_recipe "nfs::server4"
 
+# Disable NFS server service start at boot
+service node['nfs']['service']['server'] do
+  action :disable
+end
+
 # Put setup-ephemeral-drives.sh onto the host
 cookbook_file 'setup-ephemeral-drives.sh' do
   source 'base/setup-ephemeral-drives.sh'
