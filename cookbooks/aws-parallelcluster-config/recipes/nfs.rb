@@ -25,7 +25,8 @@ edit_resource(:template, node['nfs']['config']['server_template']) do
 end
 
 # Explicitly restart NFS server for thread setting to take effect
+# and enable it to start at boot
 service node['nfs']['service']['server'] do
-  action :restart
+  action %i(restart enable)
   supports restart: true
 end
