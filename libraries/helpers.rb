@@ -543,7 +543,7 @@ def raise_and_write_chef_error(raise_message, chef_error = nil)
   unless chef_error
     chef_error = raise_message
   end
-  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/headnode_bootstrap_error_msg").run_command
+  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/bootstrap_error_msg").run_command
   raise raise_message
 end
 
