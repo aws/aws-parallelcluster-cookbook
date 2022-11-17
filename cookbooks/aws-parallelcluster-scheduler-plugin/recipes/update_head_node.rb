@@ -25,3 +25,10 @@ end
 execute_event_handler 'HeadClusterUpdate' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadClusterUpdate, :ExecuteCommand, :Command) })
 end
+
+# The updated cfnconfig will be used by post update custom scripts
+template '/etc/parallelcluster/cfnconfig' do
+  source 'init/cfnconfig.erb'
+  cookbook 'aws-parallelcluster-config'
+  mode '0644'
+end
