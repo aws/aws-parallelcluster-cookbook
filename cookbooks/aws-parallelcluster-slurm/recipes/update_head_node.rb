@@ -205,3 +205,10 @@ execute 'start clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
+
+# The updated cfnconfig will be used by post update custom scripts
+template '/etc/parallelcluster/cfnconfig' do
+  source 'init/cfnconfig.erb'
+  cookbook 'aws-parallelcluster-config'
+  mode '0644'
+end
