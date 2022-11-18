@@ -33,16 +33,7 @@
       "name" : "centos7",
       "type" : "amazon-ebs",
       "region" : "{{user `region`}}",
-      "source_ami_filter": {
-        "filters": {
-          "virtualization-type": "hvm",
-          "name": "CentOS 7.* *",
-          "root-device-type": "ebs",
-          "architecture": "{{user `ami_arch`}}"
-        },
-        "owners": ["125523088429"],
-        "most_recent": true
-      },
+      "source_ami": "{{user `custom_ami_id`}}",
       "ami_regions" : "{{user `build_for`}}",
       "ami_groups" : "{{user `ami_perms`}}",
       "instance_type" : "{{user `instance_type`}}",
