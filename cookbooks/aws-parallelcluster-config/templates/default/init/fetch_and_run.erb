@@ -25,18 +25,18 @@ function error_exit () {
 }
 
 function download_run (){
-    url=$1
-    shift
-    scheme=$(echo "${url}"| cut -d: -f1)
-    tmpfile=$(mktemp)
-    trap "/bin/rm -f $tmpfile" RETURN
-    if [ "${scheme}" == "s3" ]; then
-      <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
-    else
-      wget -qO- ${url} > $tmpfile || return 1
-    fi
-    chmod +x $tmpfile || return 1
-    $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${file} failed with non 0 return code: $?"
+  url=$1
+  shift
+  scheme=$(echo "${url}"| cut -d: -f1)
+  tmpfile=$(mktemp)
+  trap "/bin/rm -f $tmpfile" RETURN
+  if [ "${scheme}" == "s3" ]; then
+    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
+  else
+    wget -qO- ${url} > $tmpfile || return 1
+  fi
+  chmod +x $tmpfile || return 1
+  $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${file} failed with non 0 return code: $?"
 }
 
 function get_stack_status () {
@@ -50,23 +50,22 @@ function run_preinstall () {
   if [ "${cfn_preinstall}" != "NONE" ]; then
     file="${cfn_preinstall}"
     if [ "${cfn_preinstall_args}" != "NONE" ]; then
-        download_run ${cfn_preinstall} "${cfn_preinstall_args[@]}"
+      download_run ${cfn_preinstall} "${cfn_preinstall_args[@]}"
     else
-        download_run ${cfn_preinstall}
+      download_run ${cfn_preinstall}
     fi
-  fi || error_exit "Failed to run preinstall"
+  fi || error_exit "Failed to run pre install hook"
 }
 
 function run_postinstall () {
-  RC=0
   if [ "${cfn_postinstall}" != "NONE" ]; then
     file="${cfn_postinstall}"
     if [ "${cfn_postinstall_args}" != "NONE" ]; then
-        download_run ${cfn_postinstall} "${cfn_postinstall_args[@]}"
+      download_run ${cfn_postinstall} "${cfn_postinstall_args[@]}"
     else
-        download_run ${cfn_postinstall}
+      download_run ${cfn_postinstall}
     fi
-  fi || error_exit "Failed to run postinstall"
+  fi || error_exit "Failed to run post install hook"
 }
 
 function run_postupdate () {
