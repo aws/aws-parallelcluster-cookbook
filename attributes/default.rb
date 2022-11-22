@@ -126,9 +126,9 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # Python packages
-default['cluster']['parallelcluster-version'] = '3.3.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.3.0'
-default['cluster']['parallelcluster-node-version'] = '3.3.0'
+default['cluster']['parallelcluster-version'] = '3.3.1'
+default['cluster']['parallelcluster-cookbook-version'] = '3.3.1'
+default['cluster']['parallelcluster-node-version'] = '3.3.1'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
 
 # cfn-bootstrap
