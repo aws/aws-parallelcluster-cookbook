@@ -63,7 +63,20 @@ elif [[ ${PLATFORM} == DEBIAN ]]; then
   apt-get -y install build-essential curl wget jq
 fi
 
+if [[ ${PLATFORM} == RHEL ]]; then
+  CA_CERTS_FILE=/etc/ssl/certs/ca-bundle.crt
+  yum -y upgrade ca-certificates
+elif [[ ${PLATFORM} == DEBIAN ]]; then
+  CA_CERTS_FILE=/etc/ssl/certs/ca-certificates.crt
+  apt-get -y --only-upgrade install ca-certificates
+fi
+
 curl --retry 3 -L $CINC_URL | bash -s -- -v ${ChefVersion}
+
+if [[ -e ${CA_CERTS_FILE} ]]; then
+  ln -sf ${CA_CERTS_FILE} /opt/cinc/embedded/ssl/certs/cacert.pem
+fi
+
 /opt/cinc/embedded/bin/gem install --no-document berkshelf:${BerkshelfVersion}
 
 mkdir -p /etc/chef && chown -R root:root /etc/chef
