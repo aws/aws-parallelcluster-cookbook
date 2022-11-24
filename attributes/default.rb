@@ -23,6 +23,10 @@ default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
 default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 
+# ParallelCluster log dir
+default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
+default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
+
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
 
@@ -160,8 +164,8 @@ default['cluster']['scheduler_plugin']['system_group_id_start'] = default['clust
 
 # Scheduler plugin event handler
 default['cluster']['scheduler_plugin']['home'] = '/home/pcluster-scheduler-plugin'
-default['cluster']['scheduler_plugin']['handler_log_out'] = '/var/log/parallelcluster/scheduler-plugin.out.log'
-default['cluster']['scheduler_plugin']['handler_log_err'] = '/var/log/parallelcluster/scheduler-plugin.err.log'
+default['cluster']['scheduler_plugin']['handler_log_out'] = "#{node['cluster']['log_base_dir']}/scheduler-plugin.out.log"
+default['cluster']['scheduler_plugin']['handler_log_err'] = "#{node['cluster']['log_base_dir']}/scheduler-plugin.err.log"
 default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['shared_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['handler_dir'] = "#{node['cluster']['scheduler_plugin']['local_dir']}/.configs"
