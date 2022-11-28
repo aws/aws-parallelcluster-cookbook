@@ -21,7 +21,6 @@ function error_exit () {
   script=`basename $0`
   echo "parallelcluster: ${script} - $1"
   logger -t parallelcluster "${script} - $1"
-  echo "$1. If --rollback-on-failure was set to false, check /var/log/cfn-init.log and /var/log/cloud-init-output.log for more details." > /var/log/parallelcluster/bootstrap_error_msg
   exit 1
 }
 
@@ -32,11 +31,11 @@ function download_run (){
   tmpfile=$(mktemp)
   trap "/bin/rm -f $tmpfile" RETURN
   if [ "${scheme}" == "s3" ]; then
-    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || error_exit "Failed to run ${ACTION}, failed to download ${url} using aws s3, return code: $?"
+    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || return 1
   else
-    wget -qO- ${url} > $tmpfile || error_exit "Failed to run ${ACTION}, failed to download ${url} using wget, return code: $?"
+    wget -qO- ${url} > $tmpfile || return 1
   fi
-  chmod +x $tmpfile || error_exit "Failed to run ${ACTION}, failed to run chmod +x ${tmpfile}, return code: $?"
+  chmod +x $tmpfile || return 1
   $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${file} failed with non 0 return code: $?"
 }
 
