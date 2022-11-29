@@ -69,16 +69,12 @@ function run_postinstall () {
 }
 
 function run_postupdate () {
-  stack_status=$(get_stack_status) || error_exit "Failed to get the stack status"
-
-  if [ "${stack_status}" != "UPDATE_IN_PROGRESS" ]; then
-    echo "Post update hook called with CFN stack in state ${stack_status}, doing nothing"
-    exit 0
-  fi
-
   if [ "${cfn_postupdate}" != "NONE" ]; then
-    file="${cfn_postupdate}"
-    if [ "${cfn_postupdate_args}" != "NONE" ]; then
+    stack_status=$(get_stack_status) || error_exit "Failed to get the stack status, check the HeadNode instance profile's Iam policies"
+
+    if [ "${stack_status}" != "UPDATE_IN_PROGRESS" ]; then
+      echo "Post update hook called with CFN stack in state ${stack_status}, doing nothing"
+    elif [ "${cfn_postupdate_args}" != "NONE" ]; then
       download_run ${cfn_postupdate} "${cfn_postupdate_args[@]}"
     else
       download_run ${cfn_postupdate}
