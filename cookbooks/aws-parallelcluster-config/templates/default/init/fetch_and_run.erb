@@ -48,7 +48,6 @@ function get_stack_status () {
 
 function run_preinstall () {
   if [ "${cfn_preinstall}" != "NONE" ]; then
-    file="${cfn_preinstall}"
     if [ "${cfn_preinstall_args}" != "NONE" ]; then
       download_run ${cfn_preinstall} "${cfn_preinstall_args[@]}"
     else
@@ -59,7 +58,6 @@ function run_preinstall () {
 
 function run_postinstall () {
   if [ "${cfn_postinstall}" != "NONE" ]; then
-    file="${cfn_postinstall}"
     if [ "${cfn_postinstall_args}" != "NONE" ]; then
       download_run ${cfn_postinstall} "${cfn_postinstall_args[@]}"
     else
