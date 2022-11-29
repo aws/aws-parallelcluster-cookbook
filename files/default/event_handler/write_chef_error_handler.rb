@@ -18,19 +18,20 @@ module WriteChefError
   # this class is used to handle chef errors and write the errors into a certain file if the file does not exist yet
   class WriteChefError < Chef::Handler
     def report
+      extend Chef::Mixin::ShellOut
       # the run_status object is initialized by Chef Infra Client and keep track of status of a Chef Infra Client run
       # the "failed?" property is evaluated to be true when a Chef Infra Client run fails
       # reference: https://docs.chef.io/handlers/#run_status-object
       if run_status.failed?
         error_file = node['cluster']['bootstrap_error_path']
         unless File.exist?(error_file)
-          if node['cluster']['node_type'] == 'HeadNode'
-            more_details = "/var/log/chef-client.log and /var/log/cloud-init-output.log"
-          else
-            more_details = "/var/log/cloud-init-output.log"
-          end
+          more_details = if node['cluster']['node_type'] == 'HeadNode'
+                           "/var/log/chef-client.log and /var/log/cloud-init-output.log"
+                         else
+                           "/var/log/cloud-init-output.log"
+                         end
           message = "Failed when running chef recipes (If --rollback-on-failure was set to false, more details can be found in '#{more_details}'.):"
-          Mixlib::ShellOut.new("echo '#{message}' '#{run_status.formatted_exception}' > '#{error_file}'").run_command
+          shell_out("echo '#{message}' '#{run_status.formatted_exception}' > '#{error_file}'")
         end
       end
     end
