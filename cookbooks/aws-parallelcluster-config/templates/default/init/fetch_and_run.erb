@@ -49,9 +49,9 @@ function get_stack_status () {
 function run_preinstall () {
   if [ "${cfn_preinstall}" != "NONE" ]; then
     if [ "${cfn_preinstall_args}" != "NONE" ]; then
-      download_run ${cfn_preinstall} "${cfn_preinstall_args[@]}"
+      download_run "${cfn_preinstall}" "${cfn_preinstall_args[@]}"
     else
-      download_run ${cfn_preinstall}
+      download_run "${cfn_preinstall}"
     fi
   fi || error_exit "Failed to run pre install hook"
 }
@@ -59,23 +59,23 @@ function run_preinstall () {
 function run_postinstall () {
   if [ "${cfn_postinstall}" != "NONE" ]; then
     if [ "${cfn_postinstall_args}" != "NONE" ]; then
-      download_run ${cfn_postinstall} "${cfn_postinstall_args[@]}"
+      download_run "${cfn_postinstall}" "${cfn_postinstall_args[@]}"
     else
-      download_run ${cfn_postinstall}
+      download_run "${cfn_postinstall}"
     fi
   fi || error_exit "Failed to run post install hook"
 }
 
 function run_postupdate () {
   if [ "${cfn_postupdate}" != "NONE" ]; then
-    stack_status=$(get_stack_status) || error_exit "Failed to get the stack status, check the HeadNode instance profile's Iam policies"
+    stack_status=$(get_stack_status) || error_exit "Failed to get the stack status, check the HeadNode instance profile's IAM policies"
 
     if [ "${stack_status}" != "UPDATE_IN_PROGRESS" ]; then
       echo "Post update hook called with CFN stack in state ${stack_status}, doing nothing"
     elif [ "${cfn_postupdate_args}" != "NONE" ]; then
-      download_run ${cfn_postupdate} "${cfn_postupdate_args[@]}"
+      download_run "${cfn_postupdate}" "${cfn_postupdate_args[@]}"
     else
-      download_run ${cfn_postupdate}
+      download_run "${cfn_postupdate}"
     fi
   fi || error_exit "Failed to run post update hook"
 }
