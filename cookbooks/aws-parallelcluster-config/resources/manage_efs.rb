@@ -36,9 +36,10 @@ action :mount do
     # See reference of mount options: https://docs.aws.amazon.com/efs/latest/ug/automount-with-efs-mount-helper.html
     mount_options = "_netdev,noresvport"
     if efs_encryption_in_transit == "true"
-      mount_options.concat(",tls")
-    elsif efs_iam_authorization == "true"
-      mount_options.concat(",iam")
+      mount_options += ",tls"
+      if efs_iam_authorization == "true"
+        mount_options += ",iam"
+      end
     end
 
     # Create the EFS shared directory
