@@ -36,7 +36,7 @@ function download_run (){
     wget -qO- ${url} > $tmpfile || return 1
   fi
   chmod +x $tmpfile || return 1
-  $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${file} failed with non 0 return code: $?"
+  $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${url} failed with non 0 return code: $?"
 }
 
 function get_stack_status () {
