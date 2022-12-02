@@ -17,7 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.16.1`
   - Rdma-core: `rdma-core-43.0-2`
   - Open MPI: `openmpi40-aws-4.1.4-3`
-- Mount EFS file systems using `amazon-efs-utils`. EFS files systems can be mounted using in-transit encryption and IAM identity. 
+- Mount EFS file systems using `amazon-efs-utils`. EFS files systems can be mounted using in-transit encryption and IAM authorized user. 
 - Install `stunnel` 5.67 on CentOS7 and Ubuntu to support EFS in-transit encryption.
 - Add possibility to execute a custom script in the head node during the update of the cluster.
 
