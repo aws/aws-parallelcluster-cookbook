@@ -189,8 +189,6 @@ service 'slurmctld' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
-chef_sleep '5'
-
 execute 'reload config for running nodes' do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
