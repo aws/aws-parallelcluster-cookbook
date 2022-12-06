@@ -120,9 +120,10 @@ def check_imds_access(user, is_allowed)
         exit 1
       fi
 
-      region=$(TOKEN=`sudo curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` && sudo curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/placement/region)
-      instance_id=$(TOKEN=`sudo curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"` && sudo curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)
-      http_protocol_ipv6=$(aws --region ${region} ec2 describe-instances --instance-ids ${instance_id} --query "Reservations[*].Instances[*].MetadataOptions.HttpProtocolIpv6" --output text)
+      token=$(sudo curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+      region=$(sudo curl -H "X-aws-ec2-metadata-token: ${token}" -v http://169.254.169.254/latest/meta-data/placement/region)
+      instance_id=$(sudo curl -H "X-aws-ec2-metadata-token: ${token}" -v http://169.254.169.254/latest/meta-data/instance-id)
+      http_protocol_ipv6=$(aws --region ${region} ec2 describe-instances --instance-ids "${instance_id}" --query "Reservations[*].Instances[*].MetadataOptions.HttpProtocolIpv6" --output text)
 
       if [[ "$http_protocol_ipv6" == "enabled" ]]; then
         sudo -u #{user} curl -g -6 -H "X-aws-ec2-metadata-token-ttl-seconds: 900" -X PUT "http://[fd00:ec2::254]/latest/api/token" 1>/dev/null 2>/dev/null
