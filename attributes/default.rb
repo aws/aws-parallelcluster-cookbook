@@ -48,9 +48,9 @@ default['cluster']['previous_shared_storages_mapping_path'] = "/etc/parallelclus
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
-default['cluster']['python-version'] = '3.9.15'
+default['cluster']['python-version'] = '3.9.16'
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.15'
+default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
@@ -166,7 +166,7 @@ default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['share
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['handler_dir'] = "#{node['cluster']['scheduler_plugin']['local_dir']}/.configs"
 default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler-plugin-substack-outputs.json"
-default['cluster']['scheduler_plugin']['python_version'] = '3.9.15'
+default['cluster']['scheduler_plugin']['python_version'] = '3.9.16'
 default['cluster']['scheduler_plugin']['pyenv_root'] = "#{node['cluster']['scheduler_plugin']['shared_dir']}/pyenv"
 default['cluster']['scheduler_plugin']['virtualenv'] = 'scheduler_plugin_virtualenv'
 default['cluster']['scheduler_plugin']['virtualenv_path'] = [
