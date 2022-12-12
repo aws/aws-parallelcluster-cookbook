@@ -33,7 +33,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: 2.7
       - name: Install dependencies
@@ -47,15 +47,11 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         name:
-          - Python 3.6 Tests
           - Python 3.7 Tests
           - Python 3.8 Tests
           - Python 3.9 Tests
           - Code Checks
         include:
-          - name: Python 3.6 Tests
-            python: 3.6
-            toxenv: py36
           - name: Python 3.7 Tests
             python: 3.7
             toxenv: py37

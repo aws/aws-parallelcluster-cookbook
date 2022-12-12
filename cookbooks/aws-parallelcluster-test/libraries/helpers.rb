@@ -113,18 +113,27 @@ def check_imds_access(user, is_allowed)
   bash "check IMDS access for user #{user}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      sudo -u #{user} curl 169.254.169.254/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      sudo -u #{user} curl -H "X-aws-ec2-metadata-token-ttl-seconds: 900" -X PUT "http://169.254.169.254/latest/api/token" 1>/dev/null 2>/dev/null
       [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
       if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
         >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv4): #{user}"
         exit 1
       fi
 
-      sudo -u #{user} curl -g -6 [0:0:0:0:0:FFFF:A9FE:A9FE]/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
-      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
-      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
-        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
-        exit 1
+      token=$(sudo curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+      region=$(sudo curl -H "X-aws-ec2-metadata-token: ${token}" -v http://169.254.169.254/latest/meta-data/placement/region)
+      instance_id=$(sudo curl -H "X-aws-ec2-metadata-token: ${token}" -v http://169.254.169.254/latest/meta-data/instance-id)
+      http_protocol_ipv6=$(aws --region ${region} ec2 describe-instances --instance-ids "${instance_id}" --query "Reservations[*].Instances[*].MetadataOptions.HttpProtocolIpv6" --output text)
+
+      if [[ "$http_protocol_ipv6" == "enabled" ]]; then
+        sudo -u #{user} curl -g -6 -H "X-aws-ec2-metadata-token-ttl-seconds: 900" -X PUT "http://[fd00:ec2::254]/latest/api/token" 1>/dev/null 2>/dev/null
+        [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+        if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+          >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
+          exit 1
+        fi
+      else
+        >&2 echo "http protocol ipv6 is: ${http_protocol_ipv6}, skipping imds ipv6 test"
       fi
     TEST
   end

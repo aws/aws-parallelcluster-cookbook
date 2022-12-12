@@ -189,8 +189,6 @@ service 'slurmctld' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
-chef_sleep '5'
-
 execute 'reload config for running nodes' do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
@@ -204,4 +202,11 @@ chef_sleep '15'
 execute 'start clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
+end
+
+# The updated cfnconfig will be used by post update custom scripts
+template '/etc/parallelcluster/cfnconfig' do
+  source 'init/cfnconfig.erb'
+  cookbook 'aws-parallelcluster-config'
+  mode '0644'
 end

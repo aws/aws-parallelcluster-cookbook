@@ -48,9 +48,9 @@ default['cluster']['previous_shared_storages_mapping_path'] = "/etc/parallelclus
 default['cluster']['reserved_base_uid'] = 400
 
 # Python Version
-default['cluster']['python-version'] = '3.9.15'
+default['cluster']['python-version'] = '3.9.16'
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.15'
+default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
@@ -138,9 +138,9 @@ default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '22-05-5-1'
+default['cluster']['slurm']['version'] = '22-05-6-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha1'] = 'afc0b304755718655f523b973401b243f98f0062'
+default['cluster']['slurm']['sha1'] = 'bd2fbc4f6fcf41bfce899eaac0d92d9f09996cd3'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -166,7 +166,7 @@ default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['share
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['handler_dir'] = "#{node['cluster']['scheduler_plugin']['local_dir']}/.configs"
 default['cluster']['scheduler_plugin']['scheduler_plugin_substack_outputs_path'] = "#{node['cluster']['shared_dir']}/scheduler-plugin-substack-outputs.json"
-default['cluster']['scheduler_plugin']['python_version'] = '3.9.15'
+default['cluster']['scheduler_plugin']['python_version'] = '3.9.16'
 default['cluster']['scheduler_plugin']['pyenv_root'] = "#{node['cluster']['scheduler_plugin']['shared_dir']}/pyenv"
 default['cluster']['scheduler_plugin']['virtualenv'] = 'scheduler_plugin_virtualenv'
 default['cluster']['scheduler_plugin']['virtualenv_path'] = [
@@ -295,7 +295,7 @@ else
 end
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.19.0'
+default['cluster']['efa']['installer_version'] = '1.20.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
@@ -582,6 +582,8 @@ default['cluster']['preinstall'] = 'NONE'
 default['cluster']['preinstall_args'] = 'NONE'
 default['cluster']['postinstall'] = 'NONE'
 default['cluster']['postinstall_args'] = 'NONE'
+default['cluster']['postupdate'] = 'NONE'
+default['cluster']['postupdate_args'] = 'NONE'
 default['cluster']['scheduler'] = 'slurm'
 default['cluster']['scheduler_slots'] = 'vcpus'
 default['cluster']['scheduler_queue_name'] = nil
