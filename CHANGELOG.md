@@ -20,6 +20,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Mount EFS file systems using `amazon-efs-utils`. EFS files systems can be mounted using in-transit encryption and IAM authorized user. 
 - Install `stunnel` 5.67 on CentOS7 and Ubuntu to support EFS in-transit encryption.
 - Add possibility to execute a custom script in the head node during the update of the cluster.
+- Upgrade Slurm to version 22.05.6.
 - Upgrade Python to 3.9.16 and 3.7.16.
 
 3.3.0
