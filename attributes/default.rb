@@ -305,7 +305,7 @@ default['cluster']['efs_utils']['url'] = "https://github.com/aws/efs-utils/archi
 default['cluster']['efs_utils']['sha256'] = '69d0d8effca3b58ccaf4b814960ec1d16263807e508b908975c2627988c7eb6c'
 default['cluster']['efs_utils']['tarball_path'] = "#{node['cluster']['sources_dir']}/efs-utils-#{node['cluster']['efs_utils']['version']}.tar.gz"
 default['cluster']['stunnel']['version'] = '5.67'
-default['cluster']['stunnel']['url'] = "#{node['cluster']['artifacts_s3_url']}/stunnel/stunnel-5.67.tar.gz"
+default['cluster']['stunnel']['url'] = "#{node['cluster']['artifacts_s3_url']}/stunnel/stunnel-#{node['cluster']['stunnel']['version']}.tar.gz"
 default['cluster']['stunnel']['sha256'] = '3086939ee6407516c59b0ba3fbf555338f9d52f459bcab6337c0f00e91ea8456'
 default['cluster']['stunnel']['tarball_path'] = "#{node['cluster']['sources_dir']}/stunnel-#{node['cluster']['stunnel']['version']}.tar.gz"
 
