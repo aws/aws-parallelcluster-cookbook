@@ -7,7 +7,7 @@ description 'Manages AWS Batch in AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '17.2.29'
-version '3.4.0'
+version '3.4.1'
 
 supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
