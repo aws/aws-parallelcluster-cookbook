@@ -129,7 +129,7 @@ default['cluster']['armpl']['url'] = [
 default['cluster']['parallelcluster-version'] = '3.4.0'
 default['cluster']['parallelcluster-cookbook-version'] = '3.4.0'
 default['cluster']['parallelcluster-node-version'] = '3.4.0'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.0.0'
+default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
 
 # cfn-bootstrap
 default['cluster']['cfn_bootstrap']['version'] = '2.0-10'
