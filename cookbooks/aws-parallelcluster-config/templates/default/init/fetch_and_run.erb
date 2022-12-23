@@ -21,7 +21,11 @@ function error_exit () {
   script=`basename $0`
   echo "parallelcluster: ${script} - $1"
   logger -t parallelcluster "${script} - $1"
-  echo "$1. If --rollback-on-failure was set to false, check /var/log/cfn-init.log and /var/log/cloud-init-output.log for more details." > /var/log/parallelcluster/bootstrap_error_msg
+  case $custom_script in
+    OnNodeStart|OnNodeConfigured)
+      echo "$1 Please check /var/log/cfn-init.log in the head node, or check the cfn-init.log in CloudWatch logs. Please refer to https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs for more details on ParallelCluster logs." > /var/log/parallelcluster/bootstrap_error_msg
+      ;;
+  esac
   exit 1
 }
 
@@ -32,12 +36,12 @@ function download_run (){
   tmpfile=$(mktemp)
   trap "/bin/rm -f $tmpfile" RETURN
   if [ "${scheme}" == "s3" ]; then
-    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || error_exit "Failed to run ${ACTION}, failed to download ${url} using aws s3, return code: $?"
+    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || error_exit "Failed to download ${custom_script} script ${url} using aws s3, return code: $?."
   else
-    wget -qO- ${url} > $tmpfile || error_exit "Failed to run ${ACTION}, failed to download ${url} using wget, return code: $?"
+    wget -qO- ${url} > $tmpfile || error_exit "Failed to download ${custom_script} script ${url} using wget, return code: $?."
   fi
-  chmod +x $tmpfile || error_exit "Failed to run ${ACTION}, failed to run chmod +x ${tmpfile}, return code: $?"
-  $tmpfile "$@" || error_exit "Failed to run ${ACTION}, ${url} failed with non 0 return code: $?"
+  chmod +x $tmpfile || error_exit "Failed to run ${custom_script} script due to a failure in making the file executable, return code: $?."
+  $tmpfile "$@" || error_exit "Failed to execute ${custom_script} script ${url}, return code: $?."
 }
 
 function get_stack_status () {
@@ -48,26 +52,29 @@ function get_stack_status () {
 }
 
 function run_preinstall () {
+  custom_script="OnNodeStart"
   if [ "${cfn_preinstall}" != "NONE" ]; then
     if [ "${cfn_preinstall_args}" != "NONE" ]; then
       download_run "${cfn_preinstall}" "${cfn_preinstall_args[@]}"
     else
       download_run "${cfn_preinstall}"
     fi
-  fi || error_exit "Failed to run pre install hook"
+  fi || error_exit "Failed to run ${custom_script} script."
 }
 
 function run_postinstall () {
+  custom_script="OnNodeConfigured"
   if [ "${cfn_postinstall}" != "NONE" ]; then
     if [ "${cfn_postinstall_args}" != "NONE" ]; then
       download_run "${cfn_postinstall}" "${cfn_postinstall_args[@]}"
     else
       download_run "${cfn_postinstall}"
     fi
-  fi || error_exit "Failed to run post install hook"
+  fi || error_exit "Failed to run ${custom_script} script."
 }
 
 function run_postupdate () {
+  custom_script="OnNodeUpdated"
   if [ "${cfn_postupdate}" != "NONE" ]; then
     stack_status=$(get_stack_status) || error_exit "Failed to get the stack status, check the HeadNode instance profile's IAM policies"
 
@@ -84,6 +91,7 @@ function run_postupdate () {
 check_params
 
 ACTION=${1#?}
+custom_script=""
 case ${ACTION} in
   preinstall)
     run_preinstall
