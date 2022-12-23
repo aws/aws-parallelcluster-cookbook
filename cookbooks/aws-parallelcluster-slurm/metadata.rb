@@ -7,7 +7,7 @@ description 'Manages Slurm in AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '17.2.29'
-version '3.4.0'
+version '3.5.0'
 
 supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
