@@ -19,7 +19,10 @@ import random
 import re
 import ssl
 import string
-import subprocess
+
+# A nosec comment is appended to the following line in order to disable the B404 check.
+# In this file the input of the module subprocess is trusted.
+import subprocess  # nosec
 import sys
 import time
 from collections import OrderedDict, namedtuple
@@ -130,7 +133,9 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
 
     USER_REGEX = r"^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$"
     SESSION_ID_REGEX = r"^([a-zA-Z0-9_-]{0,128})$"
-    TOKEN_REGEX = r"^([a-zA-Z0-9_-]{256})$"
+    # A nosec comment is appended to the following line in order to disable the B105 check.
+    # Since the TOKEN_REGEX is not a hardcoded password
+    TOKEN_REGEX = r"^([a-zA-Z0-9_-]{256})$"  # nosec
 
     MAX_NUMBER_OF_REQUEST_TOKENS = 500
     MAX_NUMBER_OF_SESSION_TOKENS = 100
