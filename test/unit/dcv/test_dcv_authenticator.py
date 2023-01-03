@@ -292,7 +292,7 @@ def test_get_session_token(mocker):
     mock_verify_session_existence(mocker, exists=True)
     # A nosec comment is appended to the following line in order to disable the B105 check.
     # Since the session token is not a hardcoded password
-    session_token = "1234"  # nosec
+    session_token = "1234"  # nosec B105
     mock_generate_random_token(mocker, session_token)
     DCVAuthenticator.request_token_manager.add_token(
         request_token, DCVAuthenticator.RequestTokenInfo(user, session_id, datetime.utcnow(), access_file)
