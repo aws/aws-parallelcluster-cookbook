@@ -18,7 +18,7 @@ import shlex
 
 # A nosec comment is appended to the following line in order to disable the B404 check.
 # In this file the input of the module subprocess is trusted.
-import subprocess  # nosec
+import subprocess  # nosec B404
 import time
 from configparser import ConfigParser
 from datetime import datetime, timezone
