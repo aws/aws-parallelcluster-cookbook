@@ -72,6 +72,14 @@ ruby_block "Validate Slurm Tarball Checksum" do
   end
 end
 
+# Copy Slurm patches
+remote_directory "#{node['cluster']['sources_dir']}/slurm_patches" do
+  source 'install_slurm/slurm_patches'
+  mode '0755'
+  action :create
+  recursive true
+end
+
 # Install Slurm
 bash 'make install' do
   user 'root'
@@ -85,11 +93,23 @@ bash 'make install' do
 
     tar xf #{slurm_tarball}
     cd slurm-slurm-#{node['cluster']['slurm']['version']}
+    
+    # Apply possible Slurm patches
+    shopt -s nullglob  # with this an empty slurm_patches directory does not trigger the loop
+    for patch in #{node['cluster']['sources_dir']}/slurm_patches/*.diff; do
+      git apply ${patch}
+    done
+    shopt -u nullglob
+
+    # Configure Slurm
     ./configure --prefix=#{node['cluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
+
+    # Build Slurm
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
     make install-contrib
+
     deactivate
   SLURM
   # TODO: Fix, so it works for upgrade
