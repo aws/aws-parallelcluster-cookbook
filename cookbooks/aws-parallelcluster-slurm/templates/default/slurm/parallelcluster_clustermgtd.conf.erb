@@ -11,3 +11,6 @@ head_node_private_ip = <%= node['ec2']['local_ipv4'] %>
 head_node_hostname = <%= node['ec2']['local_hostname'] %>
 node_replacement_timeout = <%= node['cluster']['compute_node_bootstrap_timeout'] %>
 insufficient_capacity_timeout = 600
+compute_console_logging_enabled = <%= node['cluster']['cw_logging_enabled'] == 'true' && node['cluster']['slurm_console_logging']['enabled'] %>
+compute_console_logging_max_sample_size = <%=  node['cluster']['slurm_console_logging']['sample_size'] %>
+compute_console_wait_time = 300
