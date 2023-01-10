@@ -464,7 +464,7 @@ when 'rhel', 'amazon'
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                             coreutils moreutils sssd sssd-tools sssd-ldap curl)
+                                             coreutils moreutils sssd sssd-tools sssd-ldap curl git)
     default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
 
     if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
@@ -501,7 +501,7 @@ when 'debian'
                                            r-base libblas-dev libffi-dev libxml2-dev mdadm
                                            libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
                                            libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
-                                           coreutils moreutils sssd sssd-tools sssd-ldap curl)
+                                           coreutils moreutils sssd sssd-tools sssd-ldap curl git)
 
   case node['platform_version']
   when '18.04'
