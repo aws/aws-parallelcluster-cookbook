@@ -97,7 +97,9 @@ bash 'make install' do
     # Apply possible Slurm patches
     shopt -s nullglob  # with this an empty slurm_patches directory does not trigger the loop
     for patch in #{node['cluster']['sources_dir']}/slurm_patches/*.diff; do
+      echo "Applying patch ${patch}..."
       git apply ${patch}
+      echo "...DONE."
     done
     shopt -u nullglob
 
