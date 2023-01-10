@@ -1,0 +1,126 @@
+#diff --git a/NEWS b/NEWS
+#index ef51ddaee35..b847ab43ee9 100644
+#--- a/NEWS
+#+++ b/NEWS
+#@@ -9,6 +9,8 @@ documents those changes that are of interest to users and administrators.
+#     ping_nodes() calls all nodes to re-register.
+#  -- openapi/dbv0.0.3[6-8] - fix segfault that could arrise from Slurm database
+#     connnection failing.
+#+ -- Fix regression introduced in 22.05.0rc1 when updating a NodeName=<nodelist>
+#+    with NodeAddr and/or NodeHostname if the specified nodelist wasn't sorted.
+# 
+# * Changes in Slurm 22.05.7
+# ==========================
+diff --git a/doc/man/man1/scontrol.1 b/doc/man/man1/scontrol.1
+index d20c7a768ec..8913345038d 100644
+--- a/doc/man/man1/scontrol.1
++++ b/doc/man/man1/scontrol.1
+@@ -1,4 +1,4 @@
+-.TH scontrol "1" "Slurm Commands" "November 2022" "Slurm Commands"
++.TH scontrol "1" "Slurm Commands" "January 2023" "Slurm Commands"
+ 
+ .SH "NAME"
+ scontrol \- view or modify Slurm configuration and state.
+@@ -474,7 +474,7 @@ unique (e.g. tux2,tux1,tux2 = tux[2,1\-2]). If you wanted a sorted list use
+ 
+ .TP
+ \fBhostlistsorted\fR
+-Takes a list of host names and prints a sorted, unique hostlist
++Takes a list of host names and prints a sorted (but not unique) hostlist
+ expression for them. See \fBhostlist\fR.
+ .IP
+ 
+diff --git a/src/slurmctld/node_mgr.c b/src/slurmctld/node_mgr.c
+index ef4b111a595..a86e529c338 100644
+--- a/src/slurmctld/node_mgr.c
++++ b/src/slurmctld/node_mgr.c
+@@ -1368,14 +1368,18 @@ int update_node(update_node_msg_t *update_node_msg, uid_t auth_uid)
+ 	hostlist_t host_list, hostaddr_list = NULL, hostname_list = NULL;
+ 	uint32_t base_state = 0, node_flags, state_val;
+ 	time_t now = time(NULL);
++	bool uniq = true;
+ 
+ 	if (update_node_msg->node_names == NULL ) {
+ 		info("%s: invalid node name", __func__);
+ 		return ESLURM_INVALID_NODE_NAME;
+ 	}
+ 
++	if (update_node_msg->node_addr || update_node_msg->node_hostname)
++		uniq = false;
++
+ 	if (!(host_list = nodespec_to_hostlist(update_node_msg->node_names,
+-					       NULL)))
++					       uniq, NULL)))
+ 		return ESLURM_INVALID_NODE_NAME;
+ 
+ 	if (!(node_cnt = hostlist_count(host_list))) {
+@@ -4867,7 +4871,7 @@ extern int delete_nodes(char *names, char **err_msg)
+ 
+ 	lock_slurmctld(write_lock);
+ 
+-	if (!(to_delete = nodespec_to_hostlist(names, NULL))) {
++	if (!(to_delete = nodespec_to_hostlist(names, true, NULL))) {
+ 		ret_rc = ESLURM_INVALID_NODE_NAME;
+ 		goto cleanup;
+ 	}
+diff --git a/src/slurmctld/partition_mgr.c b/src/slurmctld/partition_mgr.c
+index d13e71d353f..b00d9f3392a 100644
+--- a/src/slurmctld/partition_mgr.c
++++ b/src/slurmctld/partition_mgr.c
+@@ -192,7 +192,7 @@ extern int build_part_bitmap(part_record_t *part_ptr)
+ 			   node_record_count - 1);
+ 	}
+ 
+-	if (!(host_list = nodespec_to_hostlist(part_ptr->orig_nodes,
++	if (!(host_list = nodespec_to_hostlist(part_ptr->orig_nodes, true,
+ 					       &part_ptr->nodesets))) {
+ 		/* Error, restore original bitmap */
+ 		FREE_NULL_BITMAP(part_ptr->node_bitmap);
+diff --git a/src/slurmctld/read_config.c b/src/slurmctld/read_config.c
+index f3e3a75deed..fb0f4e9a2f8 100644
+--- a/src/slurmctld/read_config.c
++++ b/src/slurmctld/read_config.c
+@@ -307,7 +307,9 @@ static void _add_nodes_with_feature(hostlist_t hl, char *feature)
+ 	}
+ }
+ 
+-extern hostlist_t nodespec_to_hostlist(const char *nodes, char **nodesets)
++extern hostlist_t nodespec_to_hostlist(const char *nodes,
++				       bool uniq,
++				       char **nodesets)
+ {
+ 	int count;
+ 	slurm_conf_nodeset_t *ptr, **ptr_array;
+@@ -354,7 +356,8 @@ extern hostlist_t nodespec_to_hostlist(const char *nodes, char **nodesets)
+ 		}
+ 	}
+ 
+-	hostlist_uniq(hl);
++	if (uniq)
++		hostlist_uniq(hl);
+ 	return hl;
+ }
+ 
+diff --git a/src/slurmctld/slurmctld.h b/src/slurmctld/slurmctld.h
+index d254cdda52e..b31a5c43f99 100644
+--- a/src/slurmctld/slurmctld.h
++++ b/src/slurmctld/slurmctld.h
+@@ -2941,6 +2941,7 @@ extern int update_node_avail_features(char *node_names, char *avail_features,
+  * Handles node range expressions, nodesets and ALL keyword.
+  *
+  * IN nodes - nodelist that can have nodesets or ALL in it.
++ * IN uniq - call hostlist_uniq() before returning the hostlist
+  * OUT nodesets (optional) - list of nodesets found in nodes string
+  *
+  * RET NULL on error, hostlist_t otherwise.
+@@ -2948,7 +2949,9 @@ extern int update_node_avail_features(char *node_names, char *avail_features,
+  * NOTE: Caller must FREE_NULL_HOSTLIST() returned hostlist_t.
+  * NOTE: Caller should interpret a non-NULL but empty hostlist conveniently.
+  */
+-extern hostlist_t nodespec_to_hostlist(const char *nodes, char **nodesets);
++extern hostlist_t nodespec_to_hostlist(const char *nodes,
++				       bool uniq,
++				       char **nodesets);
+ 
+ /*
+  * set_node_reboot_reason - appropriately set node reason with reboot message
