@@ -91,8 +91,8 @@ bash 'make install' do
       make -j $CORES
       make install
   GCC
-  retries 3
-  retry_delay 5
+  retries 5
+  retry_delay 10
   creates '/opt/arm/armpl/gcc'
 end
 
