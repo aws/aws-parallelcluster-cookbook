@@ -6,6 +6,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.5.0
 ------
 
+3.4.1
+-----
+
+**BUG FIXES**
+- Fix an issue with the Slurm scheduler that might incorrectly apply updates to its internal registry of compute nodes. This might result in EC2 instances to become inaccessible or backed by an incorrect instance type.
+
 3.4.0
 ------
 
