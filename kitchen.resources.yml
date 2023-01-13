@@ -1,0 +1,50 @@
+# Allows to test single resources.
+#
+# Must be run as local file (override) of kitchen.docker.yml
+# export KITCHEN_YAML=kitchen.docker.yml
+# export KITCHEN_LOCAL_YAML=kitchen.resources.yml
+# See: https://kitchen.ci/docs/reference/configuration
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # resource tests will use controls from this directory
+    - path: test/resources
+
+
+suites:
+# This is the result of the ERB block below
+#  - name: package_repos
+#    run_list:
+#      - recipe[aws-parallelcluster::test_resource]
+#    verifier:
+#      controls:
+#        - package_repos
+#    attributes:
+#      cluster:
+#        base_os: alinux2
+#      resource: package_repos
+
+<% ['example_resource'].each do |resource| %>
+  - name: <%= resource %>
+    run_list:
+      # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
+      # with default properties
+      - recipe[aws-parallelcluster::test_resource]
+    verifier:
+      controls:
+        - <%= resource %>
+    attributes:
+      cluster:
+        # right now tests depend on this parameter: we will try to remove the dependency later
+        base_os: alinux
+        region: us-east-1
+        dcv:
+          server: {}
+      resource: <%= resource %>
+
+<%end %>
+
+# If you need to test a resource with an action or properties different from the default ones,
+# add custom tests here and adjust `aws-parallelcluster-test::test_resource`
+# to allow `action` and/or `properties` parameters.
