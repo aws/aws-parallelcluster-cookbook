@@ -23,17 +23,107 @@ module WriteChefError
       # the "failed?" property is evaluated to be true when a Chef Infra Client run fails
       # reference: https://docs.chef.io/handlers/#run_status-object
       if run_status.failed?
+
+        # check the exception information
+        # will remove them after the development process
+        Chef::Log.info("run_status.exception:")
+        Chef::Log.info("'#{ run_status.exception }'\n\n")
+        Chef::Log.info("run_status.formatted_exception:")
+        Chef::Log.info("'#{ run_status.formatted_exception }'\n\n")
+
         error_file = node['cluster']['bootstrap_error_path']
+
+        # to avoid overwriting the error message from other mechanisms, such as the deprecated BYOS handler
+        # if the error file already exists we don't take any additional action here
         unless File.exist?(error_file)
-          more_details = if node['cluster']['node_type'] == 'HeadNode'
-                           "/var/log/chef-client.log and /var/log/cloud-init-output.log"
-                         else
-                           "/var/log/cloud-init-output.log"
-                         end
-          message = "Failed when running chef recipes (If --rollback-on-failure was set to false, more details can be found in '#{more_details}'.):"
-          shell_out("echo '#{message}' '#{run_status.formatted_exception}' > '#{error_file}'")
+          message_error = ''
+          message_logs_to_check =
+            if node['cluster']['node_type'] == 'HeadNode'
+              'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.'
+            else
+              'Please check the cloud-init-output.log in CloudWatch logs.'
+            end
+          message_troubleshooting_link = 'Please refer to'\
+            ' https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs'\
+            ' for more details on ParallelCluster logs.'
+
+          # get the failed action records using the chef function filtered_collection
+          # reference: https://github.com/cinc-project/chef/blob/stable/cinc/lib/chef/action_collection.rb#L107
+          failed_action_collection = action_collection.filtered_collection(
+            up_to_date: false, skipped: false, updated: false, failed: true, unprocessed: false
+          )
+
+          # if the exception is Timeout::Error, then we will first check if it is a storage mounting error
+          if run_status.formatted_exception == 'Timeout::Error: execution expired'
+            Chef::Log.info("We detected that the formatted_exception is Timeout::Error: execution expired.")
+            # define a mapping from the key of resource name to the error message we would like to display
+            mount_message_mapping = {
+              "add ebs" => "Failed to mount EBS volume.",
+              "add raid" => "Failed to mount RAID array.",
+              "mount efs" => "Failed to mount EFS.",
+              "mount fsx" => "Failed to mount FSX."
+            }
+
+            failed_action_collection.each do |action_record|
+              Chef::Log.info("We are checking one failed action_record.")
+              if action_record.action == :mount
+                Chef::Log.info("We detected an action_record that failed to mount something.")
+                if mount_message_mapping.has_key?(action_record.new_resource.name)
+                  Chef::Log.info("We detected an action_record that failed to mount '#{action_record.new_resource.name}'; now break the loop.")
+                  message_error = mount_message_mapping[action_record.new_resource.name]
+                  break
+                end
+              end
+            end
+          end
+
+          # if we didn't detect any storage mounting error for EBS, RAID, EFS, or FSX, then we will get the recipe information
+          if message_error == ''
+            Chef::Log.info("The error message is still empty, so we will try to get recipe information.")
+            failed_action_collection.each do |action_record|
+              # there might be multiple failed action records
+              # here we only look at the outer layer resource by setting nesting_level = 0
+              if action_record.nesting_level == 0
+                recipe_info = get_recipe_info(action_record)
+                message_error = "Failed to run chef recipe#{recipe_info}."
+                break
+              end
+            end
+          end
+
+          # at the end, put together and store the full error message into the dedicated file
+          shell_out("echo '#{message_error} #{message_logs_to_check} #{message_troubleshooting_link}'> '#{error_file}'")
+
+          # for troubleshooting purpose we can store some useful information
+          # will remove them after the development process
+          IO.write('/var/log/run_status_toh.log', data)
+          IO.write('/var/log/run_status_action_records.log', action_collection.action_records)
+          IO.write('/var/log/failed_action_records.log', failed_action_collection.action_records)
+
         end
       end
     end
+
+    def get_recipe_info(action_record)
+      # reference: https://github.com/cinc-project/chef/blob/stable/cinc/lib/chef/resource.rb#L1436
+      cookbook_name = action_record.new_resource.cookbook_name
+      recipe_name = action_record.new_resource.recipe_name
+      source_line = action_record.new_resource.source_line
+      if source_line
+        source_line_matches = source_line.match(/(.*):(\d+):?.*$/).to_a
+        source_line_file, source_line_number = source_line_matches[1], source_line_matches[2]
+        recipe_info =
+          if cookbook_name && recipe_name
+            " #{cookbook_name}::#{recipe_name} line #{source_line_number}"
+          else
+            " #{source_line_file} line #{source_line_number}"
+          end
+      else
+        recipe_info = ""
+      end
+      recipe_info
+    end
+
   end
 end
+
