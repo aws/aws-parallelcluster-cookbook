@@ -102,6 +102,8 @@ default['cluster']['armpl']['url'] = [
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['version'] = '22-05-8-1'
+# WARNING: specify the commit hash only if a development version of Slurm must be used
+# WARNING: the whole commit hash must be used here (not a shortened version of the hash)
 default['cluster']['slurm']['commit'] = ''
 if slurm_commit_hash?
   default['cluster']['slurm']['tar_name'] = "#{node['cluster']['slurm']['commit']}"
