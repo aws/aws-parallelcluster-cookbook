@@ -1,6 +1,6 @@
 # Amazon Linux 2 common attributes shared between multiple cookbooks
 
-return unless platform?('amazon') && node['platform_version'].to_i == 2
+return unless platform?('amazon') && node['platform_version'] == "2"
 
 # Modulefile Directory
 default['cluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
