@@ -23,7 +23,7 @@ suites:
       controls:
         # verifier runs controls listed above, looking for them in test/recipes and test/resources
         # beware: these are not file names but control names
-        # (see test/resources/prerequisites/controls/another.rb for an example)
+        # (see test/resources/example_control/controls/example_resource_spec.rb for an example)
         # this control tests the recipe
         - example_recipe
         # some resource tests can be reused to test the recipe including them, some might not fit
