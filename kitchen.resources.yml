@@ -25,7 +25,7 @@ suites:
 #        base_os: alinux2
 #      resource: package_repos
 
-<% ['example_resource'].each do |resource| %>
+<% ['package_repos'].each do |resource| %>
   - name: <%= resource %>
     run_list:
       # This is a test recipe executing the default action of the resource you pass as `resource` attribute,

@@ -20,35 +20,13 @@ include_recipe "aws-parallelcluster-install::sudo"
 include_recipe "aws-parallelcluster-install::users"
 include_recipe "aws-parallelcluster-install::disable_services" unless virtualized?
 
-case node['platform_family']
-when 'rhel', 'amazon'
-  include_recipe 'yum'
-  if platform_family?('amazon')
-    alinux_extras_topic 'epel'
-    # In the case of AL2, there are more packages to install via extras
-    node['cluster']['alinux_extras']&.each do |topic|
-      alinux_extras_topic topic
-    end
-  elsif platform?('centos')
-    include_recipe "yum-epel"
-  end
+package_repos 'setup the repositories'
 
-  # the epel recipe doesn't work on aarch64, needs epel-release package
-  package 'epel-release' if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
-
-  unless node['platform_version'].to_i < 7
-    execute 'yum-config-manager_skip_if_unavail' do
-      command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
-    end
+# In the case of AL2, there are more packages to install via extras
+if platform_family?('amazon')
+  node['cluster']['extra_packages']&.each do |topic|
+    alinux_extras_topic topic
   end
-
-  if platform?('redhat')
-    execute 'yum-config-manager-rhel' do
-      command "yum-config-manager --enable #{node['cluster']['rhel']['extra_repo']}"
-    end
-  end
-when 'debian'
-  apt_update
 end
 
 # Setup directories

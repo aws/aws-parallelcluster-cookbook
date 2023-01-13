@@ -1,6 +1,6 @@
-# Ubuntu 18 default attributes for aws-parallelcluster-install
+# Ubuntu 20 default attributes for aws-parallelcluster-install
 
-return unless platform?('ubuntu') && node['platform_version'].to_i == 20
+return unless platform?('ubuntu') && node['platform_version'] == "20.04"
 
 default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms

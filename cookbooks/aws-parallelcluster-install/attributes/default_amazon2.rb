@@ -1,6 +1,6 @@
 # Amazon Linux 2 default attributes for aws-parallelcluster-install
 
-return unless platform?('amazon') && node['platform_version'].to_i == 2
+return unless platform?('amazon') && node['platform_version'] == "2"
 
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                          libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
@@ -15,7 +15,7 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-
                                          coreutils moreutils sssd sssd-tools sssd-ldap)
 
 # Install R via amazon linux extras
-default['cluster']['alinux_extras'] = ['R3.4']
+default['cluster']['extra_packages'] = ['R3.4']
 
 default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
 default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')

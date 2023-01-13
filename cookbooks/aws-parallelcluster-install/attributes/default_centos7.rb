@@ -11,12 +11,14 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-
                                          iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
                                          coreutils moreutils sssd sssd-tools sssd-ldap curl)
 
+# TODO: check if it is still relevant. Evaluate if it is worth to remove the package.
 if node['kernel']['machine'] == 'aarch64'
   # Do not install bind-utils on centos7+arm due to issue with package checksum
   default['cluster']['base_packages'].delete('bind-utils')
 end
 
 default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
+# TODO: Evaluate to move the chomps where the attribute is used.
 default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
 
 default['cluster']['chrony']['conf'] = "/etc/chrony.conf"

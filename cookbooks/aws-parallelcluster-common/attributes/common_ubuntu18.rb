@@ -1,6 +1,6 @@
 # Ubuntu 18 common attributes shared between multiple cookbooks
 
-return unless platform?('ubuntu') && node['platform_version'].to_i == 18
+return unless platform?('ubuntu') && node['platform_version'] == "18.04"
 
 # Modulefile Directory
 default['cluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
