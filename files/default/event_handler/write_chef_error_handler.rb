@@ -36,7 +36,7 @@ module WriteChefError
         # to avoid overwriting the error message from other mechanisms, such as the deprecated BYOS handler
         # if the error file already exists we don't take any additional action here
         unless File.exist?(error_file)
-          message_error = ''
+          message_error = 'Failed to run chef recipe.'
           message_logs_to_check =
             if node['cluster']['node_type'] == 'HeadNode'
               'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.'
@@ -53,41 +53,35 @@ module WriteChefError
             up_to_date: false, skipped: false, updated: false, failed: true, unprocessed: false
           )
 
-          # if the exception is Timeout::Error, then we will first check if it is a storage mounting error
-          if run_status.formatted_exception == 'Timeout::Error: execution expired'
-            Chef::Log.info("We detected that the formatted_exception is Timeout::Error: execution expired.")
-            # define a mapping from the key of resource name to the error message we would like to display
-            mount_message_mapping = {
-              "add ebs" => "Failed to mount EBS volume.",
-              "add raid" => "Failed to mount RAID array.",
-              "mount efs" => "Failed to mount EFS.",
-              "mount fsx" => "Failed to mount FSX."
-            }
+          # define a mapping from the mount-related resource name to the error message we would like to display
+          mount_message_mapping = {
+            "add ebs" => "Failed to mount EBS volume.",
+            "add raid" => "Failed to mount RAID array.",
+            "mount efs" => "Failed to mount EFS.",
+            "mount fsx" => "Failed to mount FSX."
+          }
 
-            failed_action_collection.each do |action_record|
-              Chef::Log.info("We are checking one failed action_record.")
+          failed_action_collection.each do |action_record|
+            Chef::Log.info("We are checking one failed action_record.")
+            # there might be multiple failed action records
+            # here we only look at the outer layer resource by setting nesting_level = 0
+            # with the assumption that there is only one failed action record with nesting_level = 0
+            if action_record.nesting_level == 0
+              # we first check if it is a storage mounting error
               if action_record.action == :mount
                 Chef::Log.info("We detected an action_record that failed to mount something.")
                 if mount_message_mapping.has_key?(action_record.new_resource.name)
-                  Chef::Log.info("We detected an action_record that failed to mount '#{action_record.new_resource.name}'; now break the loop.")
+                  Chef::Log.info("We detected an action_record that failed to mount '#{action_record.new_resource.name}'.")
                   message_error = mount_message_mapping[action_record.new_resource.name]
-                  break
                 end
               end
-            end
-          end
-
-          # if we didn't detect any storage mounting error for EBS, RAID, EFS, or FSX, then we will get the recipe information
-          if message_error == ''
-            Chef::Log.info("The error message is still empty, so we will try to get recipe information.")
-            failed_action_collection.each do |action_record|
-              # there might be multiple failed action records
-              # here we only look at the outer layer resource by setting nesting_level = 0
-              if action_record.nesting_level == 0
+              # if we didn't detect any storage mounting error for EBS, RAID, EFS, or FSX, then we will get the recipe information
+              if message_error == 'Failed to run chef recipe.'
+                Chef::Log.info("We didn't detect any storage mounting error for EBS, RAID, EFS, or FSX, so we will try to get recipe information.")
                 recipe_info = get_recipe_info(action_record)
                 message_error = "Failed to run chef recipe#{recipe_info}."
-                break
               end
+              break
             end
           end
 
