@@ -12,34 +12,42 @@ import os
 
 import pytest
 from assertpy import assert_that
-from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
+from slurm.pcluster_fleet_config_generator import (
+    ConfigurationFieldNotFoundError,
+    CriticalError,
+    generate_fleet_config_file,
+)
 
 
 @pytest.mark.parametrize(
-    "cluster_config, expected_message",
+    "cluster_config, expected_exception, expected_message",
     [
-        ({}, "Unable to find key 'Scheduling' in the configuration file"),
-        ({"Scheduling": {}}, "Unable to find key 'SlurmQueues' in the configuration file"),
-        ({"Scheduling": {"SlurmQueues": []}}, None),
+        ({}, CriticalError, "Unable to find key 'Scheduling' in the configuration file"),
+        ({"Scheduling": {}}, CriticalError, "Unable to find key 'SlurmQueues' in the configuration file"),
+        ({"Scheduling": {"SlurmQueues": []}}, None, None),
         (
             {"Scheduling": {"SlurmQueues": [{"ComputeResources": []}]}},
+            CriticalError,
             "Unable to find key 'Name' in the configuration file",
         ),
         (
             {"Scheduling": {"SlurmQueues": [{"Name": "q1"}]}},
+            CriticalError,
             "Unable to find key 'CapacityType' in the configuration of queue: q1",
         ),
         (
             {"Scheduling": {"SlurmQueues": [{"Name": "q1", "CapacityType": "ONDEMAND"}]}},
+            CriticalError,
             "Unable to find key 'ComputeResources' in the configuration of queue: q1",
         ),
-        ({"Scheduling": {"SlurmQueues": [{"Name": "q1", "CapacityType": "SPOT", "ComputeResources": []}]}}, None),
+        ({"Scheduling": {"SlurmQueues": [{"Name": "q1", "CapacityType": "SPOT", "ComputeResources": []}]}}, None, None),
         (
             {
                 "Scheduling": {
                     "SlurmQueues": [{"Name": "q1", "CapacityType": "SPOT", "ComputeResources": [{"Instances": []}]}]
                 }
             },
+            CriticalError,
             "Unable to find key 'Name' in the configuration of queue: q1",
         ),
         (
@@ -55,6 +63,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                     ]
                 }
             },
+            ConfigurationFieldNotFoundError,
             "Instances or InstanceType field not found in queue: q1, compute resource: cr1 configuration",
         ),
         (
@@ -74,6 +83,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                 }
             },
             None,
+            None,
         ),
         (
             {
@@ -91,6 +101,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                     ]
                 }
             },
+            None,
             None,
         ),
         (
@@ -114,6 +125,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                 }
             },
             None,
+            None,
         ),
         (
             {
@@ -128,6 +140,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                     ]
                 }
             },
+            CriticalError,
             "Unable to find key 'SpotPrice' in the configuration of queue: q1, compute resource: cr1",
         ),
         (
@@ -146,6 +159,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                 }
             },
             None,
+            None,
         ),
         (
             {
@@ -161,6 +175,7 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                     ]
                 }
             },
+            CriticalError,
             "Unable to find key 'Networking' in the configuration of queue: q1, compute resource: cr1",
         ),
         (
@@ -178,16 +193,17 @@ from slurm.pcluster_fleet_config_generator import generate_fleet_config_file
                     ]
                 }
             },
+            CriticalError,
             "Unable to find key 'SubnetIds' in the configuration of queue: q1, compute resource: cr1",
         ),
     ],
 )
-def test_generate_fleet_config_file_error_cases(mocker, tmpdir, cluster_config, expected_message):
+def test_generate_fleet_config_file_error_cases(mocker, tmpdir, cluster_config, expected_exception, expected_message):
     mocker.patch("slurm.pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
     output_file = f"{tmpdir}/fleet-config.json"
 
     if expected_message:
-        with pytest.raises(Exception, match=expected_message):
+        with pytest.raises(expected_exception, match=expected_message):
             generate_fleet_config_file(output_file, input_file="fake")
     else:
         generate_fleet_config_file(output_file, input_file="fake")
