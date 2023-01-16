@@ -123,21 +123,18 @@ class TestComputeFleetStatusManager:
         return status_manager
 
     @pytest.mark.parametrize(
-        "get_item_response, expected_status",
+        "get_item_response, expected_exception, expected_status",
         [
-            ({"Item": {"Id": "COMPUTE_FLEET", "Data": {"status": "RUNNING"}}}, {"status": "RUNNING"}),
-            (
-                Exception,
-                None,
-            ),
+            ({"Item": {"Id": "COMPUTE_FLEET", "Data": {"status": "RUNNING"}}}, None, {"status": "RUNNING"}),
+            ({"NoData": "NoValue"}, ComputeFleetStatusManager.FleetDataNotFoundError, Exception()),
         ],
         ids=["success", "exception"],
     )
-    def test_get_status(self, compute_fleet_status_manager, get_item_response, expected_status):
+    def test_get_status(self, compute_fleet_status_manager, get_item_response, expected_exception, expected_status):
         """Test get_status method."""
-        if get_item_response is Exception:
+        if isinstance(expected_status, Exception):
             compute_fleet_status_manager._table.get_item.side_effect = get_item_response
-            with pytest.raises(Exception):
+            with pytest.raises(expected_exception):
                 compute_fleet_status_manager.get_status()
         else:
             compute_fleet_status_manager._table.get_item.return_value = get_item_response
@@ -398,7 +395,7 @@ class TestClusterStatusManager:
         run_command_mock = mocker.patch("clusterstatusmgtd._run_command")
         if isinstance(exception, Exception):
             run_command_mock.side_effect = exception
-            with pytest.raises(Exception):
+            with pytest.raises(ClusterStatusManager.ClusterStatusUpdateEventError):
                 clusterstatus_manager._call_update_event()
         else:
             file_writer_mock = mocker.mock_open()

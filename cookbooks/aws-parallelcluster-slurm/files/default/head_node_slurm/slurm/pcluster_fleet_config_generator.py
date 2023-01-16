@@ -25,6 +25,12 @@ class CriticalError(Exception):
     pass
 
 
+class ConfigurationFieldNotFoundError(Exception):
+    """Field not found in configuration."""
+
+    pass
+
+
 def generate_fleet_config_file(output_file, input_file):
     """
     Generate configuration file used by Fleet Manager in node daemon package.
@@ -87,7 +93,7 @@ def generate_fleet_config_file(output_file, input_file):
                     }
 
                 else:
-                    raise Exception(
+                    raise ConfigurationFieldNotFoundError(
                         "Instances or InstanceType field not found "
                         f"in queue: {queue}, compute resource: {compute_resource} configuration"
                     )
