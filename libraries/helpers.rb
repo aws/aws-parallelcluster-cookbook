@@ -285,7 +285,7 @@ end
 # Check if Slurm reference is provided as commit
 #
 def slurm_commit_hash?
-  node['cluster']['slurm']['commit'] != ''
+  !node['cluster']['slurm']['commit'].empty?
 end
 
 #
