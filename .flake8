@@ -11,7 +11,10 @@ ignore =
     # W503: line break before binary operator => Conflicts with black style.
     W503,
     # D413: Missing blank line after last section
-    D413
+    D413,
+    # B028: Consider replacing f"'{foo}'" with f"{foo!r}".
+    # Currently being disabled by flake8-bugbear. See https://github.com/PyCQA/flake8-bugbear/pull/333
+    B028
 exclude =
     .tox,
     .git,
@@ -28,4 +31,4 @@ max-complexity = 10
 max-line-length = 120
 import-order-style = google
 application-import-names = flake8
-format = ${cyan}%(path)s${reset}:${yellow_bold}%(row)d${reset}:${green_bold}%(col)d${reset}: ${red_bold}%(code)s${reset} %(text)s
+format = %(cyan)s%(path)s%(reset)s:%(bold)s%(yellow)s%(row)d%(reset)s:%(bold)s%(green)s%(col)d%(reset)s: %(bold)s%(red)s%(code)s%(reset)s %(text)s
