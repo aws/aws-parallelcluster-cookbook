@@ -37,9 +37,11 @@ bash "Install CloudFormation helpers from #{node['cluster']['cfn_bootstrap']['pa
   code <<-CFNTOOLS
       set -e
       region="#{node['cluster']['region']}"
-      bucket="s3.amazonaws.com"
-      [[ ${region} =~ ^cn- ]] && bucket="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
-      curl --retry 3 -L -o #{node['cluster']['cfn_bootstrap']['package']} https://${bucket}/cloudformation-examples/#{node['cluster']['cfn_bootstrap']['package']}
+      aws_domain="#{aws_domain}"
+      s3_endpoint="s3.amazonaws.com"
+      bucket="cloudformation-examples"
+      [[ ${aws_domain} != "amazonaws.com" ]] && s3_endpoint="s3.$region.$aws_domain" && bucket="$region-aws-parallelcluster/cloudformation-examples"
+      curl --retry 3 -L -o #{node['cluster']['cfn_bootstrap']['package']} https://${s3_endpoint}/${bucket}/#{node['cluster']['cfn_bootstrap']['package']}
       #{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/pip install #{node['cluster']['cfn_bootstrap']['package']}
   CFNTOOLS
   creates "#{node['cluster']['cfn_bootstrap_virtualenv_path']}/bin/cfn-hup"

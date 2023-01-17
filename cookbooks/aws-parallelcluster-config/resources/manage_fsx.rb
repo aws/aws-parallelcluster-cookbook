@@ -54,6 +54,7 @@ action :mount do
                else
                  # DNS names of newly created Lustre file systems are hardcoded here.
                  # Note the Hardcoding format is only valid for lustre file systems created after Mar-1 2021
+                 # Region Building Note: DNS names have the default AWS domain (amazonaws.com) also in China and GovCloud.
                  "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
                end
     case fsx_fs_type
@@ -163,6 +164,7 @@ action :unmount do
                else
                  # DNS names of newly created Lustre file systems are hardcoded here.
                  # Note the Hardcoding format is only valid for lustre file systems created after Mar-1 2021
+                 # Region Building Note: DNS names have the default AWS domain (amazonaws.com) also in China and GovCloud.
                  "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
                end
     fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')

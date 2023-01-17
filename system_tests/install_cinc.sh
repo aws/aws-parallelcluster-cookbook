@@ -31,12 +31,19 @@ elif [ `echo "${OS}" | grep -E '^ubuntu'` ]; then
   PLATFORM='DEBIAN'
 fi
 
-BUCKET="s3.amazonaws.com"
-[[ ${AWS_Region} =~ ^cn- ]] && BUCKET="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
+AWS_DOMAIN="amazonaws.com"
+[[ ${AWS_Region} =~ ^cn- ]] && AWS_DOMAIN="amazonaws.com.cn"
+[[ ${AWS_Region} =~ ^us-iso- ]] && AWS_DOMAIN="c2s.ic.gov"
+[[ ${AWS_Region} =~ ^us-isob- ]] && AWS_DOMAIN="sc2s.sgov.gov"
+
+S3_ENDPOINT="s3.${AWS_Region}.${AWS_DOMAIN}"
+
+BUCKET="cloudformation-examples"
+[[ ${AWS_DOMAIN} != "amazonaws.com" ]] BUCKET="${AWS_Region}-aws-parallelcluster/cloudformation-examples"
 if [[ ${OS} =~ ^(ubuntu2004)$ ]]; then
-  CfnBootstrapUrl="https://${BUCKET}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
+  CfnBootstrapUrl="https://${S3_ENDPOINT}/${BUCKET}/aws-cfn-bootstrap-py3-latest.tar.gz"
 else
-  CfnBootstrapUrl="https://${BUCKET}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
+  CfnBootstrapUrl="https://${S3_ENDPOINT}/${BUCKET}/aws-cfn-bootstrap-latest.tar.gz"
 fi
 
 ARCH=$(uname -m)

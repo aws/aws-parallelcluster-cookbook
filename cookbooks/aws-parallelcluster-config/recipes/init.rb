@@ -21,6 +21,11 @@ validate_os_type
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd?
 
+# Execute initialization steps required by isolated regions.
+# These steps are supposed to be executed as part of the install phase, but they cannot be executed there because
+# we can execute install phase steps in Classic only.
+include_recipe 'aws-parallelcluster-config::init_isolated' if node['cluster']['region'].start_with?('us-iso')
+
 include_recipe "aws-parallelcluster-config::cfnconfig_mixed"
 
 template "/opt/parallelcluster/scripts/fetch_and_run" do

@@ -3,6 +3,6 @@
 #   Setup ParallelCluster environment variables
 #
 
-PATH=$PATH:<%= node['cluster']['cfn_bootstrap_virtualenv_path'] %>/bin
+PATH=<%= node['cluster']['cfn_bootstrap_virtualenv_path'] %>/bin:$PATH
 
 export PATH

@@ -28,7 +28,7 @@ user node['cluster']['cluster_admin_user'] do
   system true
   shell '/bin/bash'
   home "/home/#{node['cluster']['cluster_admin_user']}"
-  manage_home false
+  manage_home node['cluster']['node_type'] == 'HeadNode'
 end
 
 # Calling user_ulimit will override every existing limit
