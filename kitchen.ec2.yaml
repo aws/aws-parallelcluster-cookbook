@@ -1,0 +1,48 @@
+---
+driver:
+  name: ec2
+  aws_ssh_key_id: <%= ENV['KITCHEN_KEY_NAME'] %>
+  security_group_ids: [ "<%= ENV['KITCHEN_SECURITY_GROUP_ID'] %>" ]
+  region: <%= ENV['KITCHEN_AWS_REGION'] %>
+  availability_zone: a
+  subnet_id: <%= ENV['KITCHEN_SUBNET_ID'] %>
+  # Disable IMDS v1
+  metadata_options:
+    http_tokens: 'required'
+    http_put_response_hop_limit: 1
+    instance_metadata_tags: 'enabled'
+  #iam_profile_name: chef-client
+  instance_type: t2.micro
+  associate_public_ip: true
+  interface: public
+  transport:
+    ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH'] %>
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: 17.2.29
+  chef_omnibus_url: https://raw.githubusercontent.com/aws/aws-parallelcluster-cookbook/develop/util/cinc-install.sh
+  chef_omnibus_root: /opt/cinc
+  retry_on_exit_code:
+    - 35 # 35 is the exit code signaling that the node is rebooting
+  max_retries: 1
+  wait_for_retry: 120
+  client_rb:
+    exit_status: :enabled # Opt-in to the standardized exit codes
+    client_fork: false  # Forked instances don't return the real exit code
+
+platforms:
+  - name: alinux2
+    driver_plugin: ec2
+    driver_config:
+      # Use the Amazon Linux 2 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_ALINUX2_AMI'] %>
+    transport:
+      username: ec2-user
+  - name: redhat8
+    driver_plugin: ec2
+    driver_config:
+      # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster  image
+      image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
+    transport:
+      username: ec2-user

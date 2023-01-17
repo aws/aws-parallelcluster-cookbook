@@ -1,0 +1,39 @@
+# Allows to test single recipes
+#
+# Must be run as local file (override) of kitchen.docker.yml
+# export KITCHEN_YAML=kitchen.docker.yml
+# export KITCHEN_LOCAL_YAML=kitchen.recipes.yml
+# See: https://kitchen.ci/docs/reference/configuration
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # recipe tests will use controls from these directories
+    - test/recipes
+    - test/resources
+
+suites:
+  - name: base
+    run_list:
+      # runs the recipe to test, along with the recipes it depends on
+      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster::example_recipe]
+      #- recipe[aws-parallelcluster-install::base]
+    verifier:
+      controls:
+        # verifier runs controls listed above, looking for them in test/recipes and test/resources
+        # beware: these are not file names but control names
+        # (see test/resources/example_control/controls/example_resource_spec.rb for an example)
+        # this control tests the recipe
+        - example_recipe
+        # some resource tests can be reused to test the recipe including them, some might not fit
+        #
+        # consider what is the expected outcome and decide what you want to test and what are just
+        # implementation details.
+    attributes:
+      cluster:
+        # right now tests depend on this parameter: we will try to remove the dependency later
+        base_os: alinux
+        region: us-east-1
+        dcv:
+          server: {}

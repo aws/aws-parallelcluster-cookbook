@@ -206,6 +206,11 @@ class ComputeFleetStatusManager:
 
         pass
 
+    class FleetDataNotFoundError(Exception):
+        """Raised when compute fleet data cannot be found in db table."""
+
+        pass
+
     def __init__(self, table_name, boto3_config, region):
         self._ddb_resource = boto3.resource("dynamodb", region_name=region, config=boto3_config)
         self._table = self._ddb_resource.Table(table_name)
@@ -216,7 +221,7 @@ class ComputeFleetStatusManager:
             Key={"Id": self.DB_KEY},
         )
         if not compute_fleet_item or "Item" not in compute_fleet_item:
-            raise Exception("COMPUTE_FLEET data not found in db table")
+            raise ComputeFleetStatusManager.FleetDataNotFoundError("COMPUTE_FLEET data not found in db table")
 
         log.debug("Found COMPUTE_FLEET data (%s)", compute_fleet_item)
         return compute_fleet_item["Item"].get(self.DB_DATA)
@@ -323,6 +328,11 @@ class ClusterStatusManager:
         self._compute_fleet_data = {}
         self.set_config(config)
 
+    class ClusterStatusUpdateEventError(Exception):
+        """Raised when there is a failure in updating the status due to an error on update event handler execution."""
+
+        pass
+
     def set_config(self, config):  # noqa: D102
         if self._config != config:
             log.info("Applying new clusterstatusmgtd config: %s", config)
@@ -366,7 +376,7 @@ class ClusterStatusManager:
             _write_json_to_file(self._config.computefleet_status_path, compute_fleet_data)
         except Exception as e:
             log.error("Update event handler failed during fleet status translation: %s", e)
-            raise
+            raise ClusterStatusManager.ClusterStatusUpdateEventError(e)
 
         cinc_log_file = "/var/log/chef-client.log"
         log.info("Calling update event handler, log can be found at %s", cinc_log_file)
@@ -384,9 +394,9 @@ class ClusterStatusManager:
         )
         try:
             _run_command(cmd, self._config.update_event_timeout_minutes)
-        except Exception:
+        except Exception as e:
             log.error("Update event handler failed. Check log file %s", cinc_log_file)
-            raise
+            raise ClusterStatusManager.ClusterStatusUpdateEventError(e)
 
     def _update_status(self, request_status, in_progress_status, final_status):
         if self._compute_fleet_status == request_status:
