@@ -85,3 +85,29 @@ jobs:
         with:
           severity: error
           ignore_paths: third-party
+  dokken-recipes:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+        suite: [ 'base' ]
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          suite: ${{ matrix.suite }}
+          os: ${{ matrix.os }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: kitchen.recipes.yml
+        continue-on-error: false
