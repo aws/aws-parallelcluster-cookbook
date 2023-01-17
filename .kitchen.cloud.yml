@@ -8,6 +8,10 @@ driver_config:
   instance_type: <%= ENV['AWS_FLAVOR_ID'] %>
   availability_zone: <%= ENV['AWS_AVAILABILITY_ZONE'] %>
   subnet_id: <%= ENV['AWS_SUBNET_ID'] %>
+  metadata_options:
+    http_tokens: 'required'
+    http_put_response_hop_limit: 1
+    instance_metadata_tags: 'enabled'
   security_group_ids:  [ <%= ENV['AWS_SECURITY_GROUP_ID'] %> ]
   iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
   user_data: <%= ENV['USER_DATA_SCRIPT'] %>
