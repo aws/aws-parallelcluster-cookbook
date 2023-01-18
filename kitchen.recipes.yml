@@ -13,20 +13,29 @@ verifier:
     - test/resources
 
 suites:
-  - name: base
+  - name: sudo
     run_list:
-      # runs the recipe to test, along with the recipes it depends on
       - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::sudo]
     verifier:
       controls:
-        # verifier runs controls listed above, looking for them in test/recipes and test/resources
-        # beware: these are not file names but control names
-        # some resource tests can be reused to test the recipe including them, some might not fit
         - sudo
-        #
-        # consider what is the expected outcome and decide what you want to test and what are just
-        # implementation details.
+    attributes:
+      cluster:
+        # right now tests depend on this parameter: we will try to remove the dependency later
+        base_os: alinux
+        region: us-east-1
+        dcv:
+          server: {}
+  - name: users
+    run_list:
+      # runs the recipe to test, along with the recipes it depends on
+      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster-install::users]
+    verifier:
+      controls:
+        - admin_user
+        - ulimit
     attributes:
       cluster:
         # right now tests depend on this parameter: we will try to remove the dependency later
