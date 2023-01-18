@@ -95,7 +95,6 @@ jobs:
           - ubuntu18
           - ubuntu20
           - redhat8
-        suite: [ 'base' ]
       fail-fast: false
     steps:
       - name: Check out code
@@ -105,7 +104,6 @@ jobs:
       - name: Test-Kitchen
         uses: actionshub/test-kitchen@main
         with:
-          suite: ${{ matrix.suite }}
           os: ${{ matrix.os }}
         env:
           CHEF_LICENSE: accept-no-persist
