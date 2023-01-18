@@ -20,11 +20,6 @@ validate_os_type
 
 return if node['conditions']['ami_bootstrapped']
 
-# Calling user_ulimit will override every existing limit
-user_ulimit "*" do
-  filehandle_limit node['cluster']['filehandle_limit']
-end
-
 include_recipe 'aws-parallelcluster-install::base'
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
 include_recipe "aws-parallelcluster-install::intel"

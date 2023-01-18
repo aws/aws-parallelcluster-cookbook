@@ -9,7 +9,7 @@ verifier:
   name: inspec
   inspec_tests:
     # recipe tests will use controls from these directories
-    - test/recipes
+    - test/recipes/aws-parallelcluster-install
     - test/resources
 
 suites:
@@ -17,6 +17,7 @@ suites:
     run_list:
       # runs the recipe to test, along with the recipes it depends on
       - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster-install::users]
       - recipe[aws-parallelcluster-install::sudo]
     verifier:
       controls:
@@ -24,6 +25,8 @@ suites:
         # beware: these are not file names but control names
         # some resource tests can be reused to test the recipe including them, some might not fit
         - sudo
+        - admin_user
+        - ulimit
         #
         # consider what is the expected outcome and decide what you want to test and what are just
         # implementation details.
