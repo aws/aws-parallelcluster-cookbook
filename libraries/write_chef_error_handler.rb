@@ -46,28 +46,27 @@ module WriteChefError
           "add ebs" => "Failed to mount EBS volume.",
           "add raid" => "Failed to mount RAID array.",
           "mount efs" => "Failed to mount EFS.",
-          "mount fsx" => "Failed to mount FSX."
+          "mount fsx" => "Failed to mount FSX.",
         }
 
         failed_action_collection.each do |action_record|
           # there might be multiple failed action records
           # here we only look at the outermost layer resource by setting nesting_level = 0
           # with the assumption that there is only one failed action record with nesting_level = 0
-          if action_record.nesting_level == 0
-            # we first check if it is a storage mounting error
-            if action_record.action == :mount
-              if mount_message_mapping.has_key?(action_record.new_resource.name)
-                message_error = mount_message_mapping[action_record.new_resource.name]
-              end
+          next unless action_record.nesting_level == 0
+          # we first check if it is a storage mounting error
+          if action_record.action == :mount
+            if mount_message_mapping.key?(action_record.new_resource.name)
+              message_error = mount_message_mapping[action_record.new_resource.name]
             end
-            # if we didn't detect any storage mounting error for EBS, RAID, EFS, or FSX,
-            # then we will get the recipe information
-            if message_error == 'Failed to run chef recipe.'
-              recipe_info = get_recipe_info(action_record)
-              message_error = "Failed to run chef recipe#{recipe_info}."
-            end
-            break
           end
+          # if we didn't detect any storage mounting error for EBS, RAID, EFS, or FSX,
+          # then we will get the recipe information
+          if message_error == 'Failed to run chef recipe.'
+            recipe_info = get_recipe_info(action_record)
+            message_error = "Failed to run chef recipe#{recipe_info}."
+          end
+          break
         end
 
         # at the end, put together and store the full error message into the dedicated file
@@ -83,7 +82,8 @@ module WriteChefError
       source_line = action_record.new_resource.source_line
       if source_line
         source_line_matches = source_line.match(/(.*):(\d+):?.*$/).to_a
-        source_line_file, source_line_number = source_line_matches[1], source_line_matches[2]
+        source_line_file = source_line_matches[1]
+        source_line_number = source_line_matches[2]
         recipe_info =
           if cookbook_name && recipe_name
             " #{cookbook_name}::#{recipe_name} line #{source_line_number}"
@@ -95,7 +95,5 @@ module WriteChefError
       end
       recipe_info
     end
-
   end
 end
-
