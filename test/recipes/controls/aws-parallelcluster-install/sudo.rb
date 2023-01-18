@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'sudoers' do
+control 'sudo' do
   title 'Install sudo package and prepare sudoers file'
 
   describe package('sudo') do
