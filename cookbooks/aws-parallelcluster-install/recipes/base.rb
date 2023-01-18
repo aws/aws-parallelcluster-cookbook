@@ -16,7 +16,7 @@
 # limitations under the License.
 
 include_recipe "aws-parallelcluster::setup_envars"
-include_recipe "aws-parallelcluster-install::sudoers"
+include_recipe "aws-parallelcluster-install::sudo"
 include_recipe "aws-parallelcluster-install::cluster_admin_user"
 include_recipe "aws-parallelcluster-install::disable_services" unless virtualized?
 

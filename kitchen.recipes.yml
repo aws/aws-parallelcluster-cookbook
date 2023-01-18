@@ -17,13 +17,13 @@ suites:
     run_list:
       # runs the recipe to test, along with the recipes it depends on
       - recipe[aws-parallelcluster::test_dummy]
-      - recipe[aws-parallelcluster-install::sudoers]
+      - recipe[aws-parallelcluster-install::sudo]
     verifier:
       controls:
         # verifier runs controls listed above, looking for them in test/recipes and test/resources
         # beware: these are not file names but control names
         # some resource tests can be reused to test the recipe including them, some might not fit
-        - sudoers
+        - sudo
         #
         # consider what is the expected outcome and decide what you want to test and what are just
         # implementation details.
