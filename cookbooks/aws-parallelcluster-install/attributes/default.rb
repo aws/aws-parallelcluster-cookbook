@@ -1,0 +1,1 @@
+# aws-parallelcluster-install attributes
