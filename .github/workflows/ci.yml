@@ -94,6 +94,7 @@ jobs:
           - centos7
           - ubuntu18
           - ubuntu20
+          - redhat8
         suite: [ 'base' ]
       fail-fast: false
     steps:

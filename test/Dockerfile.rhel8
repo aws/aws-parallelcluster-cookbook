@@ -1,4 +1,0 @@
-# Base image for RHEL8 tests.
-FROM registry.access.redhat.com/ubi8:8.0
-# Container must have an always active process to stay alive.
-ENTRYPOINT /bin/bash -c trap exit 0 SIGTERM; while :; do sleep 1; done

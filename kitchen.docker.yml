@@ -32,4 +32,4 @@ platforms:
       image: dokken/ubuntu-20.04
   - name: redhat8
     driver:
-      image: cookbook-registry.access.redhat.com/ubi8-8.0
+      image: registry.access.redhat.com/ubi8/ubi
