@@ -16,7 +16,6 @@
 # limitations under the License.
 
 chef_handler 'WriteChefError::WriteChefError' do
-  source "/etc/chef/cookbooks/aws-parallelcluster/files/default/event_handler/write_chef_error_handler.rb"
   type exception: true
   action :enable
 end
