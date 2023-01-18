@@ -175,9 +175,8 @@ end
 
 replace_or_add "Update compute console logging" do
   path "/etc/parallelcluster/slurm_plugin/parallelcluster_clustermgtd.conf"
-  pattern "compute_console_logging_enabled*"
-  line "compute_console_logging_enabled = <%= node['cluster']['cw_logging_enabled'] == 'true' && node['cluster']['slurm_console_logging']['enabled'] %>"
-  replace_only true
+  pattern "compute_console_logging_enabled.*"
+  line "compute_console_logging_enabled = #{node['cluster']['cw_logging_enabled']}"
 end
 
 ruby_block "Update Slurm Accounting" do
