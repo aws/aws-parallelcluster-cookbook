@@ -99,17 +99,7 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
   mode '0644'
 end
 
-# Install NFS packages
-if platform?('ubuntu') && node['platform_version'].to_f >= 16.04
-  # FIXME: https://github.com/sous-chefs/nfs/issues/93
-  include_recipe "nfs::server"
-end
-include_recipe "nfs::server4"
-
-# Disable NFS server service start at boot
-service node['nfs']['service']['server'] do
-  action :disable
-end
+nfs 'install NFS daemon'
 
 # Put setup-ephemeral-drives.sh onto the host
 cookbook_file 'setup-ephemeral-drives.sh' do

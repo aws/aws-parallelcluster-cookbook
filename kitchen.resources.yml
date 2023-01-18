@@ -25,7 +25,10 @@ suites:
 #        base_os: alinux2
 #      resource: package_repos
 
-<% ['package_repos'].each do |resource| %>
+<% [
+  'package_repos',
+  'nfs',
+  ].each do |resource| %>
   - name: <%= resource %>
     run_list:
       # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
@@ -36,7 +39,6 @@ suites:
         - <%= resource %>
     attributes:
       resource: <%= resource %>
-
 <%end %>
 
 # If you need to test a resource with an action or properties different from the default ones,
