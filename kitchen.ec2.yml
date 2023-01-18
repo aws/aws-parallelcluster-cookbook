@@ -42,7 +42,28 @@ platforms:
   - name: redhat8
     driver_plugin: ec2
     driver_config:
-      # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster  image
+      # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster image
       image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
     transport:
       username: ec2-user
+  - name: centos7
+    driver_plugin: ec2
+    driver_config:
+      # Use the CentOS 7 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_CENTOS7_AMI'] %>
+    transport:
+      username: centos
+  - name: ubuntu1804
+    driver_plugin: ec2
+    driver_config:
+      # Use the Ubuntu 18 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_UBUNTU18_AMI'] %>
+    transport:
+      username: ubuntu
+  - name: ubuntu2004
+    driver_plugin: ec2
+    driver_config:
+      # Use the Ubuntu 20 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
+    transport:
+      username: ubuntu
