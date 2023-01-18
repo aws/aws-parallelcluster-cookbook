@@ -16,6 +16,7 @@ user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clustermgtd
+stdout_logfile_maxbytes = 0
 <% end -%>
 <% unless node['cluster']['scheduler'] == 'awsbatch' -%>
 [program:clusterstatusmgtd]
@@ -24,6 +25,7 @@ user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clusterstatusmgtd
+stdout_logfile_maxbytes = 0
 <% end -%>
 <% if node['cluster']['dcv_enabled'] == "head_node" && node['conditions']['dcv_supported'] -%>
 [program:pcluster_dcv_authenticator]
@@ -44,6 +46,7 @@ user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/computemgtd
+stdout_logfile_maxbytes = 0
 <% end -%>
 
 <% end -%>
