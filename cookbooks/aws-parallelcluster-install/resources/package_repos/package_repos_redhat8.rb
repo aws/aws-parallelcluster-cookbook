@@ -28,5 +28,5 @@ action :setup do
 
   execute 'yum-config-manager-rhel' do
     command "yum-config-manager --enable #{node['cluster']['extra_repos']}"
-  end
+  end unless virtualized?
 end

@@ -1,0 +1,9 @@
+# export KITCHEN_GLOBAL_YAML=kitchen.global.yml
+provisioner:
+  attributes:
+    cluster:
+      # right now tests depend on this parameter: we will try to remove the dependency later
+      base_os: alinux
+      region: us-east-1
+      dcv:
+        server: {}
