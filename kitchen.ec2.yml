@@ -17,6 +17,8 @@ driver:
   interface: public
   transport:
     ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH'] %>
+  tags:
+    Name: test-kitchen-parallelcluster
 
 provisioner:
   name: chef_zero
