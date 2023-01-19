@@ -29,21 +29,7 @@ if platform_family?('amazon')
   end
 end
 
-# Setup directories
-directory '/etc/parallelcluster'
-directory node['cluster']['base_dir']
-directory node['cluster']['sources_dir']
-directory node['cluster']['scripts_dir']
-directory node['cluster']['license_dir']
-directory node['cluster']['configs_dir']
-directory node['cluster']['shared_dir']
-
-# Create ParallelCluster log folder
-directory '/var/log/parallelcluster/' do
-  owner 'root'
-  mode '1777'
-  recursive true
-end
+include_recipe "aws-parallelcluster-install::directories"
 
 build_essential
 include_recipe "aws-parallelcluster-install::python"

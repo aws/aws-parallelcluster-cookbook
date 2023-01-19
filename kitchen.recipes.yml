@@ -29,3 +29,12 @@ suites:
       controls:
         - admin_user
         - ulimit
+  - name: directories
+    run_list:
+      # runs the recipe to test, along with the recipes it depends on
+      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster-install::directories]
+    verifier:
+      controls:
+        - pcluster_directories_exist
+        - pcluster_log_dir_is_configured
