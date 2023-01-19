@@ -20,13 +20,6 @@ suites:
     verifier:
       controls:
         - sudo
-    attributes:
-      cluster:
-        # right now tests depend on this parameter: we will try to remove the dependency later
-        base_os: alinux
-        region: us-east-1
-        dcv:
-          server: {}
   - name: users
     run_list:
       # runs the recipe to test, along with the recipes it depends on
@@ -36,10 +29,3 @@ suites:
       controls:
         - admin_user
         - ulimit
-    attributes:
-      cluster:
-        # right now tests depend on this parameter: we will try to remove the dependency later
-        base_os: alinux
-        region: us-east-1
-        dcv:
-          server: {}

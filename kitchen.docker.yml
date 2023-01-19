@@ -10,6 +10,8 @@ driver:
 
 provisioner:
   name: dokken
+  attributes:
+    virtualized: true
 
 transport:
   name: dokken
