@@ -640,6 +640,7 @@ default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['e
 default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
 default['cluster']['slurm_node_reg_mem_percent'] = 75
 default['cluster']['slurmdbd_response_retries'] = 30
+default['cluster']['slurm_plugin_console_logging']['sample_size'] = 1
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false
