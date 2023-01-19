@@ -31,16 +31,7 @@ include_recipe 'aws-parallelcluster-install::node'
 
 install_packages 'Install OS and extra packages'
 
-bash "install awscli" do
-  cwd Chef::Config[:file_cache_path]
-  code <<-CLI
-    set -e
-    curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    unzip awscli-bundle.zip
-    #{node['cluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-  CLI
-  not_if { ::File.exist?("/usr/local/bin/aws") }
-end
+include_recipe "aws-parallelcluster-install::awscli"
 
 # Manage SSH via Chef
 include_recipe "openssh"
