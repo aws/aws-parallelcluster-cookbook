@@ -13,12 +13,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nfs, platform: 'alinux', platform_version: '2'
+provides :nfs, platform: 'amazon', platform_version: '2'
 unified_mode true
 
 use 'partial/_install_nfs4_and_disable'
 
-action :prepare do
+default_action :setup
+
+action :setup do
   action_install_nfs4
   action_disable_start_at_boot
 end

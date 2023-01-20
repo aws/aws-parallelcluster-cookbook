@@ -20,7 +20,9 @@ unified_mode true
 
 use 'partial/_install_nfs4_and_disable'
 
-action :prepare do
+default_action :setup
+
+action :setup do
   action_install_nfs4
   action_disable_start_at_boot
 end
