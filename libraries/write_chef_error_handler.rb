@@ -3,7 +3,7 @@
 #
 # Cookbook:: aws-parallelcluster
 #
-# Copyright:: 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -25,12 +25,11 @@ module WriteChefError
       # if the error file already exists we don't take any additional action here
       unless File.exist?(error_file)
         message_error = 'Failed to run chef recipe.'
-        message_logs_to_check =
-          if node['cluster']['node_type'] == 'HeadNode'
-            'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.'
-          else
-            'Please check the cloud-init-output.log in CloudWatch logs.'
-          end
+        node_type_to_log = {
+          'HeadNode' => 'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.',
+          'ComputeFleet' => 'Please check the cloud-init-output.log in CloudWatch logs.',
+        }
+        message_logs_to_check = node_type_to_log[node['cluster']['node_type']]
         message_troubleshooting_link = 'Please refer to'\
           ' https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs'\
           ' for more details on ParallelCluster logs.'
@@ -54,18 +53,9 @@ module WriteChefError
           # here we only look at the outermost layer resource by setting nesting_level = 0
           # with the assumption that there is only one failed action record with nesting_level = 0
           next unless action_record.nesting_level == 0
-          # we first check if it is a storage mounting error
-          if action_record.action == :mount
-            if mount_message_mapping.key?(action_record.new_resource.name)
-              message_error = mount_message_mapping[action_record.new_resource.name]
-            end
-          end
-          # if we didn't detect any storage mounting error for EBS, RAID, EFS, or FSX,
-          # then we will get the recipe information
-          if message_error == 'Failed to run chef recipe.'
-            recipe_info = get_recipe_info(action_record)
-            message_error = "Failed to run chef recipe#{recipe_info}."
-          end
+          # we first check if it is a storage mounting error for EBS, RAID, EFS, or FSX,
+          # otherwise we will get the recipe information
+          message_error = mount_message_mapping[action_record.new_resource.name] || "Failed to run chef recipe#{get_recipe_info(action_record)}."
           break
         end
 
@@ -76,24 +66,11 @@ module WriteChefError
     end
 
     def get_recipe_info(action_record)
+      # use the built-in function "defined_at" of Chef::Resource to get the recipe information
+      # when source_line is not available it will return "dynamically defined" and we replace it with empty string
       # reference: https://github.com/cinc-project/chef/blob/stable/cinc/lib/chef/resource.rb#L1436
-      cookbook_name = action_record.new_resource.cookbook_name
-      recipe_name = action_record.new_resource.recipe_name
-      source_line = action_record.new_resource.source_line
-      if source_line
-        source_line_matches = source_line.match(/(.*):(\d+):?.*$/).to_a
-        source_line_file = source_line_matches[1]
-        source_line_number = source_line_matches[2]
-        recipe_info =
-          if cookbook_name && recipe_name
-            " #{cookbook_name}::#{recipe_name} line #{source_line_number}"
-          else
-            " #{source_line_file} line #{source_line_number}"
-          end
-      else
-        recipe_info = ""
-      end
-      recipe_info
+      recipe_info = action_record.new_resource.defined_at
+      recipe_info == "dynamically defined" ? "" : " #{recipe_info}"
     end
   end
 end
