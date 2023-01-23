@@ -38,3 +38,11 @@ suites:
       controls:
         - pcluster_directories_exist
         - pcluster_log_dir_is_configured
+
+  - name: ephemeral_drives_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::ephemeral_drives]
+    verifier:
+      controls:
+        - 'Ephemeral drives script is copied to the target dir'
+        - 'Ephemeral service is set up to run ephemeral drives script'
