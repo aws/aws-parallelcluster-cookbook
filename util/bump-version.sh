@@ -26,6 +26,8 @@ sed -i "s/default\['cluster'\]\['parallelcluster-cookbook-version'\] = '$CURRENT
 sed -i "s/default\['cluster'\]\['parallelcluster-node-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-node-version'] = '${NEW_PCLUSTER_VERSION}'/g" attributes/default.rb
 sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
 
+sed -i "s/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${CURRENT_PCLUSTER_VERSION}'/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${NEW_PCLUSTER_VERSION}'/g" kitchen.ec2.yml
+
 # Update dependencies version in main cookbook metadata
 COOKBOOKS=("aws-parallelcluster-common" "aws-parallelcluster-awsbatch" "aws-parallelcluster-config" "aws-parallelcluster-install" "aws-parallelcluster-scheduler-plugin" "aws-parallelcluster-slurm" "aws-parallelcluster-test")
 for COOKBOOK in ${COOKBOOKS[*]}
