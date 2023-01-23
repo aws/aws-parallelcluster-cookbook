@@ -2,7 +2,6 @@
 
 return unless platform?('ubuntu') && node['platform_version'] == "20.04"
 
-default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                          tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                          apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
