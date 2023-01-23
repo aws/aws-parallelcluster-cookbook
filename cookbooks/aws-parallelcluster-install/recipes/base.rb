@@ -86,24 +86,7 @@ cookbook_file 'AWS-ParallelCluster-License-README.txt' do
 end
 
 nfs 'install NFS daemon'
-
-# Put setup-ephemeral-drives.sh onto the host
-cookbook_file 'setup-ephemeral-drives.sh' do
-  source 'base/setup-ephemeral-drives.sh'
-  path '/usr/local/sbin/setup-ephemeral-drives.sh'
-  user 'root'
-  group 'root'
-  mode '0744'
-end
-
-cookbook_file 'setup-ephemeral.service' do
-  source 'base/setup-ephemeral.service'
-  path '/etc/systemd/system/setup-ephemeral.service'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
-
+include_recipe "aws-parallelcluster-install::ephemeral_drives"
 include_recipe 'aws-parallelcluster-install::ec2_udev_rules'
 
 # Check whether install a custom aws-parallelcluster-node package or the standard one
