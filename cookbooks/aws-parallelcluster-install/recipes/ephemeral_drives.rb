@@ -19,7 +19,7 @@
 cookbook_file 'setup-ephemeral-drives.sh' do
   source 'base/setup-ephemeral-drives.sh'
   path '/usr/local/sbin/setup-ephemeral-drives.sh'
-  user 'root'
+  owner 'root'
   group 'root'
   mode '0744'
 end
