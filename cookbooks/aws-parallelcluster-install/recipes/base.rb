@@ -22,39 +22,12 @@ include_recipe "aws-parallelcluster-install::disable_services" unless virtualize
 
 package_repos 'setup the repositories'
 
-# In the case of AL2, there are more packages to install via extras
-if platform_family?('amazon')
-  node['cluster']['extra_packages']&.each do |topic|
-    alinux_extras_topic topic
-  end
-end
-
 include_recipe "aws-parallelcluster-install::directories"
 
 build_essential
 include_recipe "aws-parallelcluster-install::python"
 
-# Install lots of packages
-
-package node['cluster']['base_packages'] do
-  retries 10
-  retry_delay 5
-  flush_cache({ before: true }) if platform_family?('rhel', 'amazon')
-end
-
-unless virtualized?
-  package "install kernel packages" do
-    case node['platform_family']
-    when 'rhel', 'amazon'
-      package_name node['cluster']['kernel_devel_pkg']['name']
-      version node['cluster']['kernel_devel_pkg']['version']
-    when 'debian'
-      package_name node['cluster']['kernel_headers_pkg']
-    end
-    retries 3
-    retry_delay 5
-  end
-end
+install_packages 'Install OS and extra packages'
 
 bash "install awscli" do
   cwd Chef::Config[:file_cache_path]
