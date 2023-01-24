@@ -51,8 +51,22 @@ suites:
       controls:
         - awsbatch_virtualenv_created
         - cookbook_virtualenv_created
-        - node_virtualenv_created
+
+  - name: cfn_bootstrap_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::cfn_bootstrap]
+    verifier:
+      controls:
         - cfnbootstrap_virtualenv_created
+
+  - name: node_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::node]
+    verifier:
+      controls:
+        - node_virtualenv_created
 
   - name: supervisord_setup
     run_list:

@@ -26,6 +26,8 @@ include_recipe "aws-parallelcluster-install::directories"
 
 build_essential
 include_recipe "aws-parallelcluster-install::python"
+include_recipe "aws-parallelcluster-install::cfn_bootstrap"
+include_recipe 'aws-parallelcluster-install::node'
 
 install_packages 'Install OS and extra packages'
 
@@ -61,37 +63,6 @@ end
 nfs 'install NFS daemon'
 include_recipe "aws-parallelcluster-install::ephemeral_drives"
 include_recipe 'aws-parallelcluster-install::ec2_udev_rules'
-
-# Check whether install a custom aws-parallelcluster-node package or the standard one
-if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
-  # Install custom aws-parallelcluster-node package
-  bash "install aws-parallelcluster-node" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-NODE
-      set -e
-      [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
-      echo "PATH is $PATH"
-      source #{node['cluster']['node_virtualenv_path']}/bin/activate
-      pip uninstall --yes aws-parallelcluster-node
-      if [[ "#{node['cluster']['custom_node_package']}" =~ ^s3:// ]]; then
-        custom_package_url=$(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 presign #{node['cluster']['custom_node_package']} --region #{node['cluster']['region']})
-      else
-        custom_package_url=#{node['cluster']['custom_node_package']}
-      fi
-      curl --retry 3 -L -o aws-parallelcluster-node.tgz ${custom_package_url}
-      mkdir aws-parallelcluster-custom-node
-      tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
-      cd aws-parallelcluster-custom-node/*aws-parallelcluster-node-*
-      pip install .
-      deactivate
-    NODE
-  end
-else
-  pyenv_pip 'aws-parallelcluster-node' do
-    version node['cluster']['parallelcluster-node-version']
-    virtualenv node['cluster']['node_virtualenv_path']
-  end
-end
 
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
 configure_gc_thresh_values
