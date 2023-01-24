@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'Ephemeral drives script is copied to the target dir' do
+control 'ephemeral_drives_script_created' do
   title 'Ephemeral drives script is copied to the target dir'
 
   describe file('/usr/local/sbin/setup-ephemeral-drives.sh') do
@@ -21,7 +21,7 @@ control 'Ephemeral drives script is copied to the target dir' do
   end
 end
 
-control 'Ephemeral service is set up to run ephemeral drives script' do
+control 'ephemeral_service_set_up' do
   title 'Ephemeral service is set up to run ephemeral drives script'
 
   describe file('/etc/systemd/system/setup-ephemeral.service') do
