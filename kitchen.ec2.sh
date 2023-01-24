@@ -39,6 +39,14 @@
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 
+# Run tests as follows:
+# ./kitchen.ec2.sh <context> <kitchen options>
+# where <context> is either recipes or resources.
+#
+# For instance:
+# ./kitchen.ec2.sh recipes list
+# ./kitchen.ec2.sh recipes test ephemeral-drives-setup --parallel --concurrency 5 -l debug
+
 export KITCHEN_LOCAL_YAML="kitchen.$1.yml"; shift;
 export KITCHEN_YAML=kitchen.ec2.yml
 export KITCHEN_GLOBAL_YAML=kitchen.global.yml
