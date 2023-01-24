@@ -15,6 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# TODO: find a way to make this code work on ubi8
+return if ubi?
+
 install_pyenv node['cluster']['python-version'] do
   prefix node['cluster']['system_pyenv_root']
 end

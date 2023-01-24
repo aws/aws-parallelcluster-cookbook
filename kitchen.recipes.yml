@@ -15,14 +15,12 @@ verifier:
 suites:
   - name: sudo
     run_list:
-      - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::sudo]
     verifier:
       controls:
         - sudo
   - name: users
     run_list:
-      # runs the recipe to test, along with the recipes it depends on
       - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::users]
     verifier:
@@ -31,8 +29,6 @@ suites:
         - ulimit
   - name: directories
     run_list:
-      # runs the recipe to test, along with the recipes it depends on
-      - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::directories]
     verifier:
       controls:
@@ -46,3 +42,14 @@ suites:
       controls:
         - 'Ephemeral drives script is copied to the target dir'
         - 'Ephemeral service is set up to run ephemeral drives script'
+
+  - name: python_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::python]
+    verifier:
+      controls:
+        - 'awsbatch_virtualenv_installed'
+        - 'cookbook_virtualenv_installed'
+        - 'node_virtualenv_installed'
+        - 'cfnbootstrap_virtualenv_installed'
