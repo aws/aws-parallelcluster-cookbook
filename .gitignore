@@ -30,3 +30,4 @@ aws-parallelcluster-cookbook-*.date
 __pycache__
 report.html
 /assets/style.css
+/.kitchen.env.sh
