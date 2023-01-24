@@ -18,4 +18,8 @@ class OsProperties < Inspec.resource(1)
   def redhat_ubi?
     docker? && inspec.os.name == 'redhat'
   end
+
+  def alinux2?
+    inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
+  end
 end
