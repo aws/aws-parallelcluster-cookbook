@@ -40,8 +40,8 @@ suites:
       - recipe[aws-parallelcluster-install::ephemeral_drives]
     verifier:
       controls:
-        - 'ephemeral_drives_script_created'
-        - 'ephemeral_service_set_up'
+        - ephemeral_drives_script_created
+        - ephemeral_service_set_up
 
   - name: python_setup
     run_list:
@@ -49,7 +49,7 @@ suites:
       - recipe[aws-parallelcluster-install::python]
     verifier:
       controls:
-        - 'awsbatch_virtualenv_installed'
-        - 'cookbook_virtualenv_installed'
-        - 'node_virtualenv_installed'
-        - 'cfnbootstrap_virtualenv_installed'
+        - awsbatch_virtualenv_created
+        - cookbook_virtualenv_created
+        - node_virtualenv_created
+        - cfnbootstrap_virtualenv_created

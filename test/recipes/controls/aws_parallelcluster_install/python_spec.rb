@@ -14,8 +14,8 @@ cfn_python_version = '3.7.16'
 base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
-control 'awsbatch_virtualenv_installed' do
-  title "awsbatch virtualenv should be installed on #{python_version}"
+control 'awsbatch_virtualenv_created' do
+  title "awsbatch virtualenv should be created on #{python_version}"
 
   return if virtualization.system == 'docker' && os.name == 'redhat'
 
@@ -27,8 +27,8 @@ control 'awsbatch_virtualenv_installed' do
   end
 end
 
-control 'cookbook_virtualenv_installed' do
-  title "cookbook virtualenv should be installed on #{python_version}"
+control 'cookbook_virtualenv_created' do
+  title "cookbook virtualenv should be created on #{python_version}"
 
   return if virtualization.system == 'docker' && os.name == 'redhat'
 
@@ -40,8 +40,8 @@ control 'cookbook_virtualenv_installed' do
   end
 end
 
-control 'node_virtualenv_installed' do
-  title "node virtualenv should be installed on #{python_version}"
+control 'node_virtualenv_created' do
+  title "node virtualenv should be created on #{python_version}"
 
   return if virtualization.system == 'docker' && os.name == 'redhat'
 
@@ -53,8 +53,8 @@ control 'node_virtualenv_installed' do
   end
 end
 
-control 'cfnbootstrap_virtualenv_installed' do
-  title "cfnbootstrap virtualenv should be installed on #{cfn_python_version}"
+control 'cfnbootstrap_virtualenv_created' do
+  title "cfnbootstrap virtualenv should be created on #{cfn_python_version}"
 
   return if virtualization.system == 'docker' && os.name == 'redhat'
 
