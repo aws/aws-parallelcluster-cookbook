@@ -96,23 +96,7 @@ end
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
 configure_gc_thresh_values
 
-# Put supervisord config in place
-cookbook_file "supervisord.conf" do
-  source "base/supervisord.conf"
-  path "/etc/supervisord.conf"
-  owner "root"
-  group "root"
-  mode "0644"
-end
-
-# Put supervisord service in place
-template "supervisord-service" do
-  source "base/supervisord-service.erb"
-  path "/etc/systemd/system/supervisord.service"
-  owner "root"
-  group "root"
-  mode "0644"
-end
+include_recipe "aws-parallelcluster-install::supervisord"
 
 # AMI cleanup script
 cookbook_file "ami_cleanup.sh" do

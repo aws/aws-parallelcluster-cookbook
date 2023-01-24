@@ -53,3 +53,12 @@ suites:
         - cookbook_virtualenv_created
         - node_virtualenv_created
         - cfnbootstrap_virtualenv_created
+
+  - name: supervisord_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::supervisord]
+    verifier:
+      controls:
+        - supervisord_config_created
+        - supervisord_service_set_up
+
