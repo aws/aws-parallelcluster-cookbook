@@ -5,6 +5,6 @@ def virtualized?
   node['virtualization']['system'] == 'docker'
 end
 
-def ubi?
+def redhat_ubi?
   virtualized? && platform?('redhat')
 end
