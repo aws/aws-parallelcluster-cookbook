@@ -3,3 +3,7 @@ name: resources unit tests
 title: Resources unit test
 maintainer: aws-parallelcluster
 license: Apache-2.0
+
+depends:
+  - name: common
+    path: test/common
