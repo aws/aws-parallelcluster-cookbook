@@ -16,8 +16,7 @@ pyenv_dir = "#{base_dir}/pyenv"
 
 control 'awsbatch_virtualenv_created' do
   title "awsbatch virtualenv should be created on #{python_version}"
-
-  return if virtualization.system == 'docker' && os.name == 'redhat'
+  only_if { !os_properties.redhat_ubi? }
 
   describe directory("#{pyenv_dir}/versions/#{python_version}/envs/awsbatch_virtualenv") do
     it { should exist }
@@ -29,8 +28,7 @@ end
 
 control 'cookbook_virtualenv_created' do
   title "cookbook virtualenv should be created on #{python_version}"
-
-  return if virtualization.system == 'docker' && os.name == 'redhat'
+  only_if { !os_properties.redhat_ubi? }
 
   describe directory("#{pyenv_dir}/versions/#{python_version}/envs/cookbook_virtualenv") do
     it { should exist }
@@ -42,8 +40,7 @@ end
 
 control 'node_virtualenv_created' do
   title "node virtualenv should be created on #{python_version}"
-
-  return if virtualization.system == 'docker' && os.name == 'redhat'
+  only_if { !os_properties.redhat_ubi? }
 
   describe directory("#{pyenv_dir}/versions/#{python_version}/envs/cookbook_virtualenv") do
     it { should exist }
@@ -55,8 +52,7 @@ end
 
 control 'cfnbootstrap_virtualenv_created' do
   title "cfnbootstrap virtualenv should be created on #{cfn_python_version}"
-
-  return if virtualization.system == 'docker' && os.name == 'redhat'
+  only_if { !os_properties.redhat_ubi? }
 
   describe directory("#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv") do
     it { should exist }
