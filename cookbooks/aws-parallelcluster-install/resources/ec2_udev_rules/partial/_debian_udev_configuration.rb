@@ -17,6 +17,8 @@ action :set_udev_autoreload do
   # allow udev to do network call
   execute 'udev-daemon-reload' do
     command 'udevadm control --reload'
+    # This means the action is not executed until something triggers it with a 'notifies', as below
+    # https://docs.chef.io/resources/service/#actions
     action :nothing
   end
 

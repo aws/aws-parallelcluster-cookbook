@@ -22,5 +22,4 @@ class OsProperties < Inspec.resource(1)
   def alinux2?
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
   end
-
 end
