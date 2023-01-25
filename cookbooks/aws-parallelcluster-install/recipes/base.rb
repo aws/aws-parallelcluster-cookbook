@@ -53,7 +53,7 @@ end
 
 nfs 'install NFS daemon'
 include_recipe "aws-parallelcluster-install::ephemeral_drives"
-include_recipe 'aws-parallelcluster-install::ec2_udev_rules'
+ec2_udev_rules 'configure udev'
 
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
 configure_gc_thresh_values
