@@ -13,26 +13,19 @@ python_version = '3.9.16'
 base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
-control 'awsbatch_virtualenv_created' do
-  title "awsbatch virtualenv should be created on #{python_version}"
+control 'node_virtualenv_created' do
+  title "node virtualenv should be created on #{python_version}"
   only_if { !os_properties.redhat_ubi? }
 
-  describe directory("#{pyenv_dir}/versions/#{python_version}/envs/awsbatch_virtualenv") do
+  describe directory("#{pyenv_dir}/versions/#{python_version}/envs/node_virtualenv") do
     it { should exist }
     its('mode') { should cmp '0755' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end
-end
 
-control 'cookbook_virtualenv_created' do
-  title "cookbook virtualenv should be created on #{python_version}"
-  only_if { !os_properties.redhat_ubi? }
-
-  describe directory("#{pyenv_dir}/versions/#{python_version}/envs/cookbook_virtualenv") do
-    it { should exist }
-    its('mode') { should cmp '0755' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
+  describe bash("#{pyenv_dir}/versions/#{python_version}/envs/node_virtualenv/bin/pip list") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match('aws-parallelcluster-node') }
   end
 end
