@@ -94,12 +94,6 @@ default['cluster']['armpl']['url'] = [
   "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar",
 ].join('/')
 
-# Python packages
-default['cluster']['parallelcluster-version'] = '3.5.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.5.0'
-default['cluster']['parallelcluster-node-version'] = '3.5.0'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
-
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
