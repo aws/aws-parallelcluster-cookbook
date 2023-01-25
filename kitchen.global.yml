@@ -7,3 +7,4 @@ provisioner:
       region: us-east-1
       dcv:
         server: {}
+      parallelcluster-node-version: '3.4.1'
