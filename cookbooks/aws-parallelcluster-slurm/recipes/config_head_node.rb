@@ -115,6 +115,12 @@ file "/var/log/parallelcluster/slurm_fleet_status_manager.log" do
   mode '0640'
 end
 
+file "/var/log/parallelcluster/compute_console_output.log" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0600'
+end
+
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_fleet_status_manager.conf" do
   source 'slurm/parallelcluster_slurm_fleet_status_manager.conf.erb'
   owner node['cluster']['cluster_admin_user']
