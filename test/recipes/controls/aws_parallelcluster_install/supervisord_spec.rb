@@ -9,26 +9,26 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'ephemeral_drives_script_created' do
-  title 'Ephemeral drives script is copied to the target dir'
+control 'supervisord_config_created' do
+  title 'supervisord configuration created under /etc'
 
-  describe file('/usr/local/sbin/setup-ephemeral-drives.sh') do
-    it { should exist }
-    its('mode') { should cmp '0744' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('content') { should_not be_empty }
-  end
-end
-
-control 'ephemeral_service_set_up' do
-  title 'Ephemeral service is set up to run ephemeral drives script'
-
-  describe file('/etc/systemd/system/setup-ephemeral.service') do
+  describe file('/etc/supervisord.conf') do
     it { should exist }
     its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('content') { should match 'ExecStart=/usr/local/sbin/setup-ephemeral-drives.sh' }
+    its('content') { should match 'files = /etc/parallelcluster/parallelcluster_supervisord.conf' }
+  end
+end
+
+control 'supervisord_service_set_up' do
+  title 'supervisord is set up'
+
+  describe file('/etc/systemd/system/supervisord.service') do
+    it { should exist }
+    its('mode') { should cmp '0644' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('content') { should_not be_empty }
   end
 end

@@ -15,46 +15,19 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster::setup_envars"
+include_recipe "aws-parallelcluster-common::setup_envars"
 include_recipe "aws-parallelcluster-install::sudo"
 include_recipe "aws-parallelcluster-install::users"
 include_recipe "aws-parallelcluster-install::disable_services" unless virtualized?
 
 package_repos 'setup the repositories'
 
-# In the case of AL2, there are more packages to install via extras
-if platform_family?('amazon')
-  node['cluster']['extra_packages']&.each do |topic|
-    alinux_extras_topic topic
-  end
-end
-
 include_recipe "aws-parallelcluster-install::directories"
 
 build_essential
 include_recipe "aws-parallelcluster-install::python"
 
-# Install lots of packages
-
-package node['cluster']['base_packages'] do
-  retries 10
-  retry_delay 5
-  flush_cache({ before: true }) if platform_family?('rhel', 'amazon')
-end
-
-unless virtualized?
-  package "install kernel packages" do
-    case node['platform_family']
-    when 'rhel', 'amazon'
-      package_name node['cluster']['kernel_devel_pkg']['name']
-      version node['cluster']['kernel_devel_pkg']['version']
-    when 'debian'
-      package_name node['cluster']['kernel_headers_pkg']
-    end
-    retries 3
-    retry_delay 5
-  end
-end
+install_packages 'Install OS and extra packages'
 
 bash "install awscli" do
   cwd Chef::Config[:file_cache_path]
@@ -123,23 +96,7 @@ end
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
 configure_gc_thresh_values
 
-# Put supervisord config in place
-cookbook_file "supervisord.conf" do
-  source "base/supervisord.conf"
-  path "/etc/supervisord.conf"
-  owner "root"
-  group "root"
-  mode "0644"
-end
-
-# Put supervisord service in place
-template "supervisord-service" do
-  source "base/supervisord-service.erb"
-  path "/etc/systemd/system/supervisord.service"
-  owner "root"
-  group "root"
-  mode "0644"
-end
+include_recipe "aws-parallelcluster-install::supervisord"
 
 # AMI cleanup script
 cookbook_file "ami_cleanup.sh" do

@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Cookbook:: aws-parallelcluster
-# Recipe:: ephemeral_drives
-#
-# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -16,18 +12,18 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-cookbook_file 'setup-ephemeral-drives.sh' do
-  source 'base/setup-ephemeral-drives.sh'
-  path '/usr/local/sbin/setup-ephemeral-drives.sh'
-  owner 'root'
-  group 'root'
-  mode '0744'
-end
+provides :install_packages, platform: 'amazon', platform_version: '2'
+unified_mode true
+default_action :setup
 
-cookbook_file 'setup-ephemeral.service' do
-  source 'base/setup-ephemeral.service'
-  path '/etc/systemd/system/setup-ephemeral.service'
-  owner 'root'
-  group 'root'
-  mode '0644'
+use 'partial/_install_packages_rhel_amazon.rb'
+
+action :setup do
+  action_install_base_packages
+  action_install_kernel_source unless virtualized?
+
+  # In the case of AL2, there are more packages to install via extras
+  node['cluster']['extra_packages']&.each do |topic|
+    alinux_extras_topic topic
+  end
 end

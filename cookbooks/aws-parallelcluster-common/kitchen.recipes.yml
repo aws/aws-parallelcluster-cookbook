@@ -1,0 +1,20 @@
+# Allows to test single recipes
+#
+# Must be run as local file (override) of kitchen.docker.yml
+# export KITCHEN_YAML=kitchen.docker.yml
+# export KITCHEN_LOCAL_YAML=kitchen.recipes.yml
+# See: https://kitchen.ci/docs/reference/configuration
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # recipe tests will use controls from these directories
+    - test/recipes
+
+suites:
+  - name: setup_envars
+    run_list:
+      - recipe[aws-parallelcluster-common::setup_envars]
+    verifier:
+      controls:
+        - path_contains_required_directories

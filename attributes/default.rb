@@ -15,14 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Base dir
-default['cluster']['base_dir'] = '/opt/parallelcluster'
-default['cluster']['sources_dir'] = "#{node['cluster']['base_dir']}/sources"
-default['cluster']['scripts_dir'] = "#{node['cluster']['base_dir']}/scripts"
-default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
-default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
-default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
-
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
 
@@ -46,29 +38,6 @@ default['cluster']['shared_storages_mapping_path'] = "/etc/parallelcluster/share
 default['cluster']['previous_shared_storages_mapping_path'] = "/etc/parallelcluster/previous_shared_storages_data.yaml"
 
 default['cluster']['reserved_base_uid'] = 400
-
-# Python Version
-default['cluster']['python-version'] = '3.9.16'
-# FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
-# plcuster-specific pyenv system installation root
-default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
-# Virtualenv Cookbook Name
-default['cluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
-# Virtualenv Node Name
-default['cluster']['node_virtualenv'] = 'node_virtualenv'
-# Virtualenv AWSBatch Name
-default['cluster']['awsbatch_virtualenv'] = 'awsbatch_virtualenv'
-# Virtualenv cfn-bootstrap Name
-default['cluster']['cfn_bootstrap_virtualenv'] = 'cfn_bootstrap_virtualenv'
-# Cookbook Virtualenv Path
-default['cluster']['cookbook_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cookbook_virtualenv']}"
-# Node Virtualenv Path
-default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['node_virtualenv']}"
-# AWSBatch Virtualenv Path
-default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['awsbatch_virtualenv']}"
-# cfn-bootstrap Virtualenv Path
-default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
@@ -130,10 +99,6 @@ default['cluster']['parallelcluster-version'] = '3.5.0'
 default['cluster']['parallelcluster-cookbook-version'] = '3.5.0'
 default['cluster']['parallelcluster-node-version'] = '3.5.0'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
-
-# cfn-bootstrap
-default['cluster']['cfn_bootstrap']['version'] = '2.0-10'
-default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz"
 
 # URLs to software packages used during install recipes
 # Slurm software

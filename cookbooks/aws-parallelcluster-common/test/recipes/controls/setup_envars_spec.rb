@@ -9,26 +9,22 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'ephemeral_drives_script_created' do
-  title 'Ephemeral drives script is copied to the target dir'
+control 'path_contains_required_directories' do
+  title 'System path contains required directories'
 
-  describe file('/usr/local/sbin/setup-ephemeral-drives.sh') do
+  describe file('/etc/profile.d/path.sh') do
     it { should exist }
-    its('mode') { should cmp '0744' }
+    its('mode') { should cmp '0755' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('content') { should_not be_empty }
   end
-end
 
-control 'ephemeral_service_set_up' do
-  title 'Ephemeral service is set up to run ephemeral drives script'
-
-  describe file('/etc/systemd/system/setup-ephemeral.service') do
-    it { should exist }
-    its('mode') { should cmp '0644' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('content') { should match 'ExecStart=/usr/local/sbin/setup-ephemeral-drives.sh' }
+  path = command('source /etc/profile.d/path.sh; echo ${PATH}').stdout.strip().split(':')
+  describe "System path #{path}" do
+    subject { path }
+    it { should include '/usr/local/bin', '/usr/local/sbin' }
+    it { should include '/sbin', '/bin' }
+    it { should include '/usr/sbin', '/usr/bin' }
+    it { should include '/opt/aws/bin' }
   end
 end
