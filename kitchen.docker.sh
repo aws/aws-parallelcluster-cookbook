@@ -2,7 +2,7 @@
 
 # Run tests as follows:
 # ./kitchen.docker.sh <context> <kitchen options>
-# where <context> is either recipes or resources.
+# where <context> is either recipes, resources or validate.
 #
 # For instance:
 # ./kitchen.docker.sh recipes list

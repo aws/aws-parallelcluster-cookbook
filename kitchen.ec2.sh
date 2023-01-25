@@ -41,7 +41,7 @@
 
 # Run tests as follows:
 # ./kitchen.ec2.sh <context> <kitchen options>
-# where <context> is either recipes or resources.
+# where <context> is either recipes, resources or validate.
 #
 # For instance:
 # ./kitchen.ec2.sh recipes list
