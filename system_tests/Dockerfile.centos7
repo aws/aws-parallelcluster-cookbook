@@ -14,26 +14,6 @@ RUN yum install -y epel-release
 RUN yum install -y @gnome xorg-x11-server-Xorg
 RUN yum install -y kernel-modules
 
-# other packages required by various recipes, pre-install
-# so that we can cache the results
-RUN yum install -y vim ksh tcsh zsh libssl-dev net-tools \
-               dkms tcl-dev automake autoconf libtool    \
-               libconfuse-dev apache2 libboost-dev csh   \
-               man-db lvm2 mdadm iproute2 python3        \
-               python3-pip linux-headers-aws iptables    \
-               sudo pam-devel openmotif-dev libXmu-devel \
-               hwloc-devel libdb-devel tcl-devel httpd   \
-               boost-devel redhat-lsb mlocate R atlas-devel \
-               blas-devel libedit-devel                  \
-               libical-devel postgresql-devel            \
-               postgresql-server sendmail libxml2-devel  \
-               libglvnd-devel yum-plugin-versionlock     \
-               libcurl-devel kmod-lustre-client lustre-client \
-               openssh-server bison byacc cscope ctags   \
-               diffstat doxygen flex git indent intltool \
-               patchutils rcs rpm-build rpm-sign         \
-               subversion swig systemtap
-
 # install CINC
 COPY system_tests/install_cinc.sh /build/install_cinc.sh
 RUN /build/install_cinc.sh
