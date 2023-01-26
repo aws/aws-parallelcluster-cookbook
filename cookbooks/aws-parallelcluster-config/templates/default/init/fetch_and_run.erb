@@ -23,38 +23,29 @@ function error_exit () {
   logger -t parallelcluster "${script} - $1"
   case $custom_script in
     OnNodeStart|OnNodeConfigured)
-      echo "$1 Please check /var/log/cfn-init.log in the head node, or check the cfn-init.log in CloudWatch logs. Please refer to https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs for more details on ParallelCluster logs." > /var/log/parallelcluster/bootstrap_error_msg
+      if [ -z "$2" ]; then
+        echo "$1 Please check /var/log/cfn-init.log in the head node, or check the cfn-init.log in CloudWatch logs. Please refer to https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs for more details on ParallelCluster logs." > /var/log/parallelcluster/bootstrap_error_msg
+      else
+        echo "$2 Please check /var/log/cfn-init.log in the head node, or check the cfn-init.log in CloudWatch logs. Please refer to https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs for more details on ParallelCluster logs." > /var/log/parallelcluster/bootstrap_error_msg
+      fi
       ;;
   esac
   exit 1
-}
-
-# URLs longer than the limit will be trimmed by replacing the middle part with ellipsis
-function process_url (){
-  url=$1
-  if [ ${#url} -gt $url_len_limit ]; then
-    head_len=$(expr $url_len_limit / 2)
-    tail_len=$(expr $url_len_limit - $head_len)
-    echo "$(echo $url | head --bytes=${head_len})......$(echo $url | tail --bytes=${tail_len})"
-  else
-    echo $url
-  fi
 }
 
 function download_run (){
   url=$1
   shift
   scheme=$(echo "${url}"| cut -d: -f1)
-  url_processed="$(process_url "$url")"
   tmpfile=$(mktemp)
   trap "/bin/rm -f $tmpfile" RETURN
   if [ "${scheme}" == "s3" ]; then
-    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || error_exit "Failed to download ${custom_script} script ${url_processed} using aws s3, return code: $?."
+    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || error_exit "Failed to download ${custom_script} script ${url} using aws s3, return code: $?." "Failed to download ${custom_script} script using aws s3, return code: $?."
   else
-    wget -qO- ${url} > $tmpfile || error_exit "Failed to download ${custom_script} script ${url_processed} using wget, return code: $?."
+    wget -qO- ${url} > $tmpfile || error_exit "Failed to download ${custom_script} script ${url} using wget, return code: $?." "Failed to download ${custom_script} script using wget, return code: $?."
   fi
   chmod +x $tmpfile || error_exit "Failed to run ${custom_script} script due to a failure in making the file executable, return code: $?."
-  $tmpfile "$@" || error_exit "Failed to execute ${custom_script} script ${url_processed}, return code: $?."
+  $tmpfile "$@" || error_exit "Failed to execute ${custom_script} script ${url}, return code: $?." "Failed to execute ${custom_script} script, return code: $?."
 }
 
 function get_stack_status () {
@@ -102,9 +93,6 @@ function run_postupdate () {
 }
 
 custom_script=""
-# To prevent massive error messages that could get truncated by CloudFormation,
-# we set a length limit (100 for now) for custom scripts URLs, and URLs exceeding the limit will be trimmed
-url_len_limit=100
 check_params
 ACTION=${1#?}
 case ${ACTION} in
