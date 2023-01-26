@@ -9,7 +9,8 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev
                                          r-base libblas-dev libffi-dev libxml2-dev mdadm
                                          libgcrypt20-dev libevent-dev iproute2 python3 python3-pip
                                          libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
-                                         coreutils moreutils sssd sssd-tools sssd-ldap curl python-pip python-parted)
+                                         coreutils moreutils sssd sssd-tools sssd-ldap curl
+                                         python-pip python-parted environment-modules)
 
 default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
 
