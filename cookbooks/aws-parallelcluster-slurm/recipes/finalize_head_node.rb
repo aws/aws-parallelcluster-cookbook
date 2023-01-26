@@ -33,20 +33,26 @@ ruby_block "wait for static fleet capacity" do
     failure_count_wait_time = node['cluster']['min_failure_count_time']
 
     check_for_failures = lambda do
-      time_elapsed = Time.now - start_time
-
-      Chef::Log.info("Not checking failure map yet. Time elapsed: #{time_elapsed}") if time_elapsed < failure_count_wait_time
-      return if time_elapsed < failure_count_wait_time
-
       begin
-        failure_map = JSON.load_file(node['cluster']['failure_count_map_path'])
+        failure_state = JSON.load_file(node['cluster']['failure_count_map_path'])
       rescue
         Chef::Log.warn("Unable to load failure map")
         return
       end
 
-      Chef::Log.info("failure_map is empty") if failure_map.empty?
-      return if failure_map.empty?
+      Chef::Log.info("failure_state is empty") if failure_state.empty?
+      return if failure_state.empty?
+
+      raise "Cluster state has been set to PROTECTED" if failure_state["protected_mode"]
+
+      time_elapsed = Time.now - start_time
+
+      Chef::Log.info("Not checking failure map yet. Time elapsed: #{time_elapsed}") if time_elapsed < failure_count_wait_time
+      return if time_elapsed < failure_count_wait_time
+
+      failure_map = failure_state['failure_map']
+      Chef::Log.info("failure_map is empty") if not failure_map or failure_map.empty?
+      return if not failure_map or failure_map.empty?
 
       # Example contents of failure_map:
       #   {"queue-a": {"compute-a-1": 1, "compute-a-2": 2}, "queue-b": {"compute-b-1": 1}}
