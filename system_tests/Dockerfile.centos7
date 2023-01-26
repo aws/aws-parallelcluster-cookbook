@@ -24,7 +24,7 @@ RUN yum install -y vim ksh tcsh zsh libssl-dev net-tools \
                sudo pam-devel openmotif-dev libXmu-devel \
                hwloc-devel libdb-devel tcl-devel httpd   \
                boost-devel redhat-lsb mlocate R atlas-devel \
-               blas-devel mariadb-devel libedit-devel    \
+               blas-devel libedit-devel                  \
                libical-devel postgresql-devel            \
                postgresql-server sendmail libxml2-devel  \
                libglvnd-devel yum-plugin-versionlock     \
