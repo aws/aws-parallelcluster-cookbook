@@ -15,31 +15,66 @@ verifier:
 suites:
   - name: sudo
     run_list:
-      - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::sudo]
     verifier:
       controls:
         - sudo
-    attributes:
-      cluster:
-        # right now tests depend on this parameter: we will try to remove the dependency later
-        base_os: alinux
-        region: us-east-1
-        dcv:
-          server: {}
   - name: users
     run_list:
-      # runs the recipe to test, along with the recipes it depends on
       - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::users]
     verifier:
       controls:
         - admin_user
         - ulimit
-    attributes:
-      cluster:
-        # right now tests depend on this parameter: we will try to remove the dependency later
-        base_os: alinux
-        region: us-east-1
-        dcv:
-          server: {}
+  - name: directories
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+    verifier:
+      controls:
+        - pcluster_directories_exist
+        - pcluster_log_dir_is_configured
+  - name: ephemeral_drives_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::ephemeral_drives]
+    verifier:
+      controls:
+        - ephemeral_drives_script_created
+        - ephemeral_service_set_up
+  - name: python_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::python]
+    verifier:
+      controls:
+        - awsbatch_virtualenv_created
+        - cookbook_virtualenv_created
+  - name: cfn_bootstrap_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::cfn_bootstrap]
+    verifier:
+      controls:
+        - cfnbootstrap_virtualenv_created
+  - name: node_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::node]
+    verifier:
+      controls:
+        - node_virtualenv_created
+  - name: supervisord_setup
+    run_list:
+      - recipe[aws-parallelcluster-install::supervisord]
+    verifier:
+      controls:
+        - supervisord_config_created
+        - supervisord_service_set_up
+  - name: awscli
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::python]
+      - recipe[aws-parallelcluster-install::awscli]
+    verifier:
+      controls:
+        - awscli_is_installed

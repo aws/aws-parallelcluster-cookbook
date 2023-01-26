@@ -15,14 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Base dir
-default['cluster']['base_dir'] = '/opt/parallelcluster'
-default['cluster']['sources_dir'] = "#{node['cluster']['base_dir']}/sources"
-default['cluster']['scripts_dir'] = "#{node['cluster']['base_dir']}/scripts"
-default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
-default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
-default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
-
 # ParallelCluster log dir
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
@@ -50,29 +42,6 @@ default['cluster']['shared_storages_mapping_path'] = "/etc/parallelcluster/share
 default['cluster']['previous_shared_storages_mapping_path'] = "/etc/parallelcluster/previous_shared_storages_data.yaml"
 
 default['cluster']['reserved_base_uid'] = 400
-
-# Python Version
-default['cluster']['python-version'] = '3.9.16'
-# FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
-# plcuster-specific pyenv system installation root
-default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
-# Virtualenv Cookbook Name
-default['cluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
-# Virtualenv Node Name
-default['cluster']['node_virtualenv'] = 'node_virtualenv'
-# Virtualenv AWSBatch Name
-default['cluster']['awsbatch_virtualenv'] = 'awsbatch_virtualenv'
-# Virtualenv cfn-bootstrap Name
-default['cluster']['cfn_bootstrap_virtualenv'] = 'cfn_bootstrap_virtualenv'
-# Cookbook Virtualenv Path
-default['cluster']['cookbook_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cookbook_virtualenv']}"
-# Node Virtualenv Path
-default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['node_virtualenv']}"
-# AWSBatch Virtualenv Path
-default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['awsbatch_virtualenv']}"
-# cfn-bootstrap Virtualenv Path
-default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
@@ -128,16 +97,6 @@ default['cluster']['armpl']['url'] = [
   node['cluster']['armpl']['platform'],
   "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar",
 ].join('/')
-
-# Python packages
-default['cluster']['parallelcluster-version'] = '3.5.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.5.0'
-default['cluster']['parallelcluster-node-version'] = '3.5.0'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
-
-# cfn-bootstrap
-default['cluster']['cfn_bootstrap']['version'] = '2.0-10'
-default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz"
 
 # URLs to software packages used during install recipes
 # Slurm software
@@ -423,7 +382,6 @@ default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
 default['openssh']['server']['password_authentication'] = 'no'
 default['openssh']['server']['gssapi_authentication'] = 'yes'
 default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
-default['openssh']['server']['subsystem'] = 'sftp /usr/libexec/openssh/sftp-server'
 default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
 default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
 default['openssh']['client']['gssapi_authentication'] = 'yes'
@@ -437,101 +395,6 @@ default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
 # ulimit settings
 default['cluster']['filehandle_limit'] = 10_000
 default['cluster']['memory_limit'] = 'unlimited'
-
-# Platform defaults
-#
-default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
-case node['platform_family']
-when 'rhel', 'amazon'
-
-  default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
-  default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
-
-  # Modulefile Directory
-  default['cluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
-  # MODULESHOME
-  default['cluster']['moduleshome'] = "/usr/share/Modules"
-  # Config file used to set default MODULEPATH list
-  default['cluster']['modulepath_config_file'] = value_for_platform(
-    'centos' => {
-      '~>7' => "#{node['cluster']['moduleshome']}/init/.modulespath",
-    },
-    'amazon' => { 'default' => "#{node['cluster']['moduleshome']}/init/.modulespath" }
-  )
-
-  case node['platform']
-  when 'centos', 'redhat', 'scientific'
-    default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                             libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel redhat-lsb mlocate lvm2 R atlas-devel
-                                             blas-devel libffi-devel openssl-devel dkms mariadb-devel libedit-devel
-                                             libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
-                                             mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
-                                             iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                             coreutils moreutils sssd sssd-tools sssd-ldap curl)
-    default['cluster']['rhel']['extra_repo'] = 'rhui-REGION-rhel-server-optional'
-
-    if node['platform_version'].to_i == 7 && node['kernel']['machine'] == 'aarch64'
-      # Do not install bind-utils on centos7+arm due to issue with package checksum
-      default['cluster']['base_packages'].delete('bind-utils')
-    end
-
-  when 'amazon'
-    default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-                                             libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                             httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
-                                             libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
-                                             sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
-                                             libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
-                                             rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
-                                             gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
-                                             jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
-                                             librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                             coreutils moreutils sssd sssd-tools sssd-ldap)
-
-    # Install R via amazon linux extras
-    default['cluster']['alinux_extras'] = ['R3.4']
-  end
-
-  default['cluster']['chrony']['service'] = "chronyd"
-  default['cluster']['chrony']['conf'] = "/etc/chrony.conf"
-
-when 'debian'
-  default['openssh']['server']['subsystem'] = 'sftp internal-sftp'
-  default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
-                                           tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
-                                           apache2 libboost-dev libdb-dev tcsh libncurses5-dev libpam0g-dev libxt-dev
-                                           libmotif-dev libxmu-dev libxft-dev libhwloc-dev man-db lvm2 python
-                                           r-base libblas-dev libffi-dev libxml2-dev mdadm
-                                           libgcrypt20-dev libmysqlclient-dev libevent-dev iproute2 python3 python3-pip
-                                           libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
-                                           coreutils moreutils sssd sssd-tools sssd-ldap curl)
-
-  case node['platform_version']
-  when '18.04'
-    default['cluster']['base_packages'].push('python-pip', 'python-parted')
-  when '20.04'
-    default['cluster']['base_packages'].push('python3-parted')
-  end
-
-  # Modulefile Directory
-  default['cluster']['modulefile_dir'] = "/usr/share/modules/modulefiles"
-  # MODULESHOME
-  default['cluster']['moduleshome'] = "/usr/share/modules"
-  # Config file used to set default MODULEPATH list
-  default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
-  default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
-  default['cluster']['chrony']['service'] = "chrony"
-  default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
-
-  if Chef::VersionConstraint.new('>= 15.04').include?(node['platform_version'])
-    default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
-    default['nfs']['service_provider']['portmap'] = Chef::Provider::Service::Systemd
-    default['nfs']['service_provider']['lock'] = Chef::Provider::Service::Systemd
-    default['nfs']['service']['lock'] = 'rpc-statd'
-    default['nfs']['service']['idmap'] = 'nfs-idmapd'
-  end
-end
 
 # Default NFS mount options
 default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
@@ -644,8 +507,7 @@ default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['e
 default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
 default['cluster']['slurm_node_reg_mem_percent'] = 75
 default['cluster']['slurmdbd_response_retries'] = 30
-default['cluster']['slurm_console_logging']['enabled'] = 'true'
-default['cluster']['slurm_console_logging']['sample_size'] = 1
+default['cluster']['slurm_plugin_console_logging']['sample_size'] = 1
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false

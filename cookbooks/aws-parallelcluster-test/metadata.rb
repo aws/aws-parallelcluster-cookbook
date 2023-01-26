@@ -12,3 +12,5 @@ version '3.5.0'
 supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
 supports 'ubuntu', '>= 18.04'
+
+depends 'aws-parallelcluster-common', '~> 3.5.0'

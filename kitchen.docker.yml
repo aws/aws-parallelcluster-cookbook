@@ -10,6 +10,8 @@ driver:
 
 provisioner:
   name: dokken
+  attributes:
+    virtualized: true
 
 transport:
   name: dokken
@@ -33,3 +35,5 @@ platforms:
   - name: redhat8
     driver:
       image: registry.access.redhat.com/ubi8/ubi
+      intermediate_instructions:
+        - RUN chmod +t /tmp

@@ -1,11 +1,29 @@
+<%
+  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.5.0'
+  pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
+  aws_region = ENV['KITCHEN_AWS_REGION'] || ENV['AWS_DEFAULT_REGION'] || 'eu-west-1'
+  key_name = ENV['KITCHEN_KEY_NAME'] || 'kitchen'
+%>
 ---
 driver:
   name: ec2
-  aws_ssh_key_id: <%= ENV['KITCHEN_KEY_NAME'] %>
+  aws_ssh_key_id: <%= key_name %>
+  <% if ENV['KITCHEN_SECURITY_GROUP_ID'] %>
   security_group_ids: [ "<%= ENV['KITCHEN_SECURITY_GROUP_ID'] %>" ]
-  region: <%= ENV['KITCHEN_AWS_REGION'] %>
+  <% else %>
+  security_group_filter:
+    tag: 'Kitchen'
+    value: 'true'
+  <% end %>
+  region: <%= aws_region %>
   availability_zone: a
+  <% if ENV['KITCHEN_SUBNET_ID'] %>
   subnet_id: <%= ENV['KITCHEN_SUBNET_ID'] %>
+  <% else %>
+  subnet_filter:
+    tag: 'Kitchen'
+    value: 'true'
+  <% end %>
   # Disable IMDS v1
   metadata_options:
     http_tokens: 'required'
@@ -15,8 +33,12 @@ driver:
   instance_type: t2.micro
   associate_public_ip: true
   interface: public
-  transport:
-    ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH'] %>
+  tags:
+    Name: test-kitchen-parallelcluster
+
+transport:
+  ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH'] || "~/.ssh/#{key_name}-#{aws_region}.pem" %>
+  compression: true
 
 provisioner:
   name: chef_zero
@@ -34,36 +56,66 @@ provisioner:
 platforms:
   - name: alinux2
     driver_plugin: ec2
-    driver_config:
+    driver:
+      <% if ENV['KITCHEN_ALINUX2_AMI'] %>
       # Use the Amazon Linux 2 AMI most similar to the base AMI used to build the ParallelCluster image
       image_id: <%= ENV['KITCHEN_ALINUX2_AMI'] %>
+      <% else %>
+      image_search:
+        name: <%= pcluster_prefix %>-amzn2-hvm-*
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
     transport:
       username: ec2-user
   - name: redhat8
     driver_plugin: ec2
-    driver_config:
+    driver:
+      <% if ENV['KITCHEN_REDHAT8_AMI'] %>
       # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster image
       image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
+      <% else %>
+      image_search:
+        name: "RHEL-8*"
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
     transport:
       username: ec2-user
   - name: centos7
     driver_plugin: ec2
-    driver_config:
+    driver:
+      <% if ENV['KITCHEN_CENTOS7_AMI'] %>
       # Use the CentOS 7 AMI most similar to the base AMI used to build the ParallelCluster image
       image_id: <%= ENV['KITCHEN_CENTOS7_AMI'] %>
+      <% else %>
+      image_search:
+        name: <%= pcluster_prefix %>-centos7-hvm-*
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
     transport:
       username: centos
   - name: ubuntu1804
     driver_plugin: ec2
-    driver_config:
+    driver:
+      <% if ENV['KITCHEN_UBUNTU18_AMI'] %>
       # Use the Ubuntu 18 AMI most similar to the base AMI used to build the ParallelCluster image
       image_id: <%= ENV['KITCHEN_UBUNTU18_AMI'] %>
+      <% else %>
+      image_search:
+        name: <%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
     transport:
       username: ubuntu
   - name: ubuntu2004
     driver_plugin: ec2
-    driver_config:
+    driver:
+      <% if ENV['KITCHEN_UBUNTU20_AMI'] %>
       # Use the Ubuntu 20 AMI most similar to the base AMI used to build the ParallelCluster image
       image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
+      <% else %>
+      image_search:
+        name: <%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
     transport:
       username: ubuntu

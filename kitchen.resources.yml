@@ -25,7 +25,10 @@ suites:
 #        base_os: alinux2
 #      resource: package_repos
 
-<% ['example_resource'].each do |resource| %>
+<% [
+  'package_repos',
+  'nfs',
+  ].each do |resource| %>
   - name: <%= resource %>
     run_list:
       # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
@@ -35,15 +38,20 @@ suites:
       controls:
         - <%= resource %>
     attributes:
-      cluster:
-        # right now tests depend on this parameter: we will try to remove the dependency later
-        base_os: alinux
-        region: us-east-1
-        dcv:
-          server: {}
       resource: <%= resource %>
-
 <%end %>
+  - name: ec2_udev_rules
+    run_list:
+      # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
+      # with default properties
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - write_common_udev_configuration_files
+        - ec2blkdev_service_installation
+        - debian_udevd_reload_configuration
+    attributes:
+      resource: ec2_udev_rules
 
 # If you need to test a resource with an action or properties different from the default ones,
 # add custom tests here and adjust `aws-parallelcluster-test::test_resource`
