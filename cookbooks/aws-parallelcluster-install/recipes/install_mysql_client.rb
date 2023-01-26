@@ -24,7 +24,7 @@ else
 
   package_installer = value_for_platform(
     'default' => "yum install -y",
-    'ubuntu' => { 'default' => "apt install -y" }
+    'ubuntu' => { 'default' => "apt install -y --allow-downgrades" }
   )
 
   mysql_archive_url = node['cluster']['mysql']['package']['archive']
