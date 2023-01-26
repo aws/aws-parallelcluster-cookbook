@@ -17,6 +17,7 @@ unified_mode true
 default_action :generate_json
 
 action :generate_json do
+  return unless Chef::File.directory?('/etc/chef/')
   json_content = Chef::JSONCompat.to_json_pretty(node)
   file "/etc/chef/node_attributes.json" do
     content "#{json_content}"
