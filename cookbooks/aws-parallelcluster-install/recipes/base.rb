@@ -24,17 +24,15 @@ package_repos 'setup the repositories'
 
 include_recipe "aws-parallelcluster-install::directories"
 
-build_essential
+install_packages 'Install OS and extra packages'
+
 include_recipe "aws-parallelcluster-install::python"
 include_recipe "aws-parallelcluster-install::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-install::node'
-
-install_packages 'Install OS and extra packages'
-
 include_recipe "aws-parallelcluster-install::awscli"
 
 # Manage SSH via Chef
-include_recipe "openssh"
+include_recipe "openssh" unless redhat_ubi?
 
 # Disable selinux
 selinux_state "SELinux Disabled" do
@@ -69,30 +67,11 @@ cookbook_file "ami_cleanup.sh" do
   mode "0755"
 end
 
-# Install NVIDIA and CUDA
-include_recipe "aws-parallelcluster-install::nvidia"
-
-# Install EFA & Intel MPI
-include_recipe "aws-parallelcluster-install::efa" unless virtualized?
-include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
-
-# Install FSx options
-include_recipe "aws-parallelcluster-install::lustre"
-
-# Install EFS Utils
-include_recipe "aws-parallelcluster-install::efs"
-
-# Install the AWS cloudwatch agent
-include_recipe "aws-parallelcluster-install::cloudwatch_agent"
-
 # Configure cron and anacron
 include_recipe "aws-parallelcluster-install::cron"
 
 # Install Amazon Time Sync
-include_recipe "aws-parallelcluster-install::chrony"
-
-# Install ARM Performance Library
-include_recipe "aws-parallelcluster-install::arm_pl"
+include_recipe "aws-parallelcluster-install::chrony" unless redhat_ubi?
 
 # Disable x86_64 C states
-include_recipe "aws-parallelcluster-install::c_states" unless virtualized?
+include_recipe "aws-parallelcluster-install::c_states" unless virtualized? || platform?('redhat') # TODO; FIX!!

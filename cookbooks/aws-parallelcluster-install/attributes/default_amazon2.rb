@@ -5,14 +5,14 @@ return unless platform?('amazon') && node['platform_version'] == "2"
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                          libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                          httpd boost-devel system-lsb mlocate lvm2 atlas-devel glibc-static iproute
-                                         libffi-devel dkms mysql-devel libedit-devel postgresql-devel postgresql-server
+                                         libffi-devel dkms libedit-devel postgresql-devel postgresql-server
                                          sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
                                          libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
                                          rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
                                          gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                          jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
                                          librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                         coreutils moreutils sssd sssd-tools sssd-ldap)
+                                         coreutils moreutils sssd sssd-tools sssd-ldap environment-modules)
 
 # Install R via amazon linux extras
 default['cluster']['extra_packages'] = ['R3.4']
