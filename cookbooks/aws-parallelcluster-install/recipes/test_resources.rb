@@ -7,4 +7,6 @@
 #   action :default_action
 # end
 
-declare_resource(node['resource'].to_sym, 'test')
+node['resources'].each do |resource|
+  declare_resource(resource.to_sym, 'test')
+end
