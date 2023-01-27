@@ -78,3 +78,10 @@ suites:
     verifier:
       controls:
         - awscli_is_installed
+  - name: clusterstatusmgtd
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::clusterstatusmgtd]
+    verifier:
+      controls:
+        - clusterstatusmgtd_files_created
