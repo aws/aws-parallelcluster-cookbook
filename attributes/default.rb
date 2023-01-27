@@ -251,6 +251,8 @@ default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platf
 )
 
 # MySQL Packages
+# We install MySQL packages for RedHat derivatives from packages hosted on S3, while for Ubuntu we install them
+# from the OS repositories.
 default['cluster']['mysql']['package']['root'] = "#{node['cluster']['artifacts_s3_url']}/mysql"
 default['cluster']['mysql']['package']['version'] = "8.0.31-1"
 default['cluster']['mysql']['package']['source-version'] = "8.0.31"
@@ -260,11 +262,7 @@ default['cluster']['mysql']['package']['platform'] = if arm_instance?
                                                        )
                                                      else
                                                        value_for_platform(
-                                                         'default' => "el/7/x86_64",
-                                                         'ubuntu' => {
-                                                           '20.04' => "ubuntu/20.04/x86_64",
-                                                           '18.04' => "ubuntu/18.04/x86_64",
-                                                         }
+                                                         'default' => "el/7/x86_64"
                                                        )
                                                      end
 default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
@@ -272,31 +270,17 @@ default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql'][
 default['cluster']['mysql']['package']['source'] = "#{node['cluster']['artifacts_s3_url']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
 
 # MySQL Validation
-if arm_instance?
-  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
-    'ubuntu' => {
-      'default' => %w(libmysqlclient-dev libmysqlclient21),
-      '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
-    }
-  )
-  default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
-    'default' => "8.0.31"
-    # Ubuntu 18.04/20.04 ARM: MySQL packages are installed from OS repo and we do not assert on a specific version.
-  )
-else
-  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
-    'ubuntu' => { 'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common mysql-community-client-plugins) }
-  )
-  default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
-    'default' => "8.0.31",
-    'ubuntu' => {
-      '20.04' => "8.0.31-1ubuntu20.04",
-      '18.04' => "8.0.31-1ubuntu18.04",
-    }
-  )
-end
+default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+  'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
+  'ubuntu' => {
+    'default' => %w(libmysqlclient-dev libmysqlclient21),
+    '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
+  }
+)
+default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
+  'default' => "8.0.31"
+  # Ubuntu 18.04/20.04: MySQL packages are installed from OS repo and we do not assert on a specific version.
+)
 
 # EFA
 default['cluster']['efa']['installer_version'] = '1.20.0'
