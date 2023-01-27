@@ -39,7 +39,7 @@ include_recipe "aws-parallelcluster-install::efs" # EFS Utils
 
 # == SCHEDULER AND COMPUTE FLEET
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
-include_recipe 'aws-parallelcluster-install::install_mysql_client'
+mysql_client 'Install mysql client'
 include_recipe 'aws-parallelcluster-slurm::install'
 include_recipe 'aws-parallelcluster-scheduler-plugin::install'
 include_recipe 'aws-parallelcluster-awsbatch::install'
