@@ -7,13 +7,15 @@ import time
 import boto3
 import requests
 from botocore.config import Config
+from common import METADATA_REQUEST_TIMEOUT
 
 
 def get_imdsv2_token():
     # Try with getting IMDSv2 token, fall back to IMDSv1 if can not get the token
     token = requests.put(
         "http://169.254.169.254/latest/api/token",
-        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"},
+        timeout=METADATA_REQUEST_TIMEOUT,
     )
     headers = {}
     if token.status_code == requests.codes.ok:
@@ -26,7 +28,7 @@ def main():
     # Get dev
     try:
         dev = str(sys.argv[1])
-        syslog.syslog("Input block device is %s" % dev)
+        syslog.syslog(f"Input block device is {dev}")
     except IndexError:
         syslog.syslog(syslog.LOG_ERR, "Provide block device i.e. xvdf")
 
@@ -54,10 +56,18 @@ def main():
     token = get_imdsv2_token()
 
     # Get instance ID
-    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=token).text
+    instance_id = requests.get(
+        "http://169.254.169.254/latest/meta-data/instance-id",
+        headers=token,
+        timeout=METADATA_REQUEST_TIMEOUT,
+    ).text
 
     # Get region
-    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=token).text
+    region = requests.get(
+        "http://169.254.169.254/latest/meta-data/placement/availability-zone",
+        headers=token,
+        timeout=METADATA_REQUEST_TIMEOUT,
+    ).text
     region = region[:-1]
 
     # Parse configuration file to read proxy settings
@@ -67,7 +77,7 @@ def main():
     if config.has_option("Boto", "proxy") and config.has_option("Boto", "proxy_port"):
         proxy = config.get("Boto", "proxy")
         proxy_port = config.get("Boto", "proxy_port")
-        proxy_config = Config(proxies={"https": "{0}:{1}".format(proxy, proxy_port)})
+        proxy_config = Config(proxies={"https": f"{proxy}:{proxy_port}"})
 
     # Connect to AWS using boto
     ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
@@ -76,22 +86,22 @@ def main():
     devices = ec2.describe_instance_attribute(InstanceId=instance_id, Attribute="blockDeviceMapping").get(
         "BlockDeviceMappings"
     )
-    devmap = dict((d.get("DeviceName"), d) for d in devices)
-    x = 0
-    while dev not in devmap:
-        if x == 36:
-            syslog.syslog("Dev %s did not appears in 180 seconds." % dev)
+    dev_map = dict((d.get("DeviceName"), d) for d in devices)
+    loop_count = 0
+    while dev not in dev_map:
+        if loop_count == 36:
+            syslog.syslog(f"Dev {dev} did not appears in 180 seconds.")
             sys.exit(1)
-        syslog.syslog("Looking for dev %s in devmap %s" % (dev, devmap))
+        syslog.syslog(f"Looking for dev {dev} in dev_map {dev_map}")
         time.sleep(5)
         devices = ec2.describe_instance_attribute(InstanceId=instance_id, Attribute="blockDeviceMapping").get(
             "BlockDeviceMappings"
         )
-        devmap = dict((d.get("DeviceName"), d) for d in devices)
-        x += 1
+        dev_map = dict((d.get("DeviceName"), d) for d in devices)
+        loop_count += 1
 
     # Return volume ID
-    volume_id = devmap.get(dev).get("Ebs").get("VolumeId")
+    volume_id = dev_map.get(dev).get("Ebs").get("VolumeId")
     print(volume_id)
 
 
