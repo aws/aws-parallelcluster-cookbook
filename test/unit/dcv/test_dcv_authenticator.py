@@ -162,8 +162,8 @@ def test_get_request_token_parameter(parameters, keys, result):
 def test_get_request_token(mocker):
     """Verify the first step of the authentication process, the retrieval of the Request Token."""
     # A nosec comment is appended to the following line in order to disable the B105 check.
-    # Since the session token is not a hardcoded password
-    token_value = "1234abcd_-"  # nosec
+    # Since the request token is only being used for a unit test and not the actual auth service
+    token_value = "1234abcd_-"  # nosec B105
     user = "centos"
     session_id = "mysession"
 
@@ -291,7 +291,7 @@ def test_get_session_token(mocker):
     mock_os(mocker, user, obtain_timestamp(datetime.utcnow()))
     mock_verify_session_existence(mocker, exists=True)
     # A nosec comment is appended to the following line in order to disable the B105 check.
-    # Since the session token is not a hardcoded password
+    # Since the session token is not a hardcoded password but merely used for unit testing
     session_token = "1234"  # nosec B105
     mock_generate_random_token(mocker, session_token)
     DCVAuthenticator.request_token_manager.add_token(
