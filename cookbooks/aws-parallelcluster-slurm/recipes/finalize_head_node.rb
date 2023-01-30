@@ -27,14 +27,9 @@ ruby_block "wait for static fleet capacity" do
     require 'shellwords'
     require 'json'
 
-    start_time = Time.now
-
-    failure_count_cap = node['cluster']['failure_count_cap']
-    failure_count_wait_time = node['cluster']['min_failure_count_time']
-
-    check_for_failures = lambda do
+    def check_for_failures(failure_limit, start_time, failure_wait_time)
       begin
-        failure_state = JSON.load_file(node['cluster']['failure_count_map_path'])
+        failure_state = JSON.load_file(node['cluster']['launch_failure_map_path'])
       rescue
         Chef::Log.warn("Unable to load failure map")
         return
@@ -47,8 +42,8 @@ ruby_block "wait for static fleet capacity" do
 
       time_elapsed = Time.now - start_time
 
-      Chef::Log.info("Not checking failure map yet. Time elapsed: #{time_elapsed}") if time_elapsed < failure_count_wait_time
-      return if time_elapsed < failure_count_wait_time
+      Chef::Log.info("Not checking failure map yet. Time elapsed: #{time_elapsed}") if time_elapsed < failure_wait_time
+      return if time_elapsed < failure_wait_time
 
       failure_map = failure_state['failure_map']
       Chef::Log.info("failure_map is empty") if not failure_map or failure_map.empty?
@@ -68,8 +63,13 @@ ruby_block "wait for static fleet capacity" do
 
       Chef::Log.info("Maximum Failure: #{max_failure_count}")
 
-      raise "Failed too many times waiting for static compute fleet to start. Queue: #{max_failure_count[:queue]}, Resource: #{max_failure_count[:compute]}, Failure Count: #{max_failure_count[:count]}" if failure_count_cap and max_failure_count[:count] >= failure_count_cap
+      raise "Failed too many times waiting for static compute fleet to start. Queue: #{max_failure_count[:queue]}, Resource: #{max_failure_count[:compute]}, Failure Count: #{max_failure_count[:count]}" if failure_limit and max_failure_count[:count] >= failure_limit
     end
+
+    failure_limit = node['cluster']['launch_failure_limit']
+    failure_wait_time = node['cluster']['launch_failure_wait_time']
+    start_time = Time.now
+
 
     # Example output for sinfo
     # $ /opt/slurm/bin/sinfo -N -h -o '%N %t'
@@ -82,7 +82,7 @@ ruby_block "wait for static fleet capacity" do
       "set -o pipefail && #{node['cluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9\\-]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
     )
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
-      check_for_failures.()
+      check_for_failures(failure_limit, start_time, failure_wait_time)
 
       Chef::Log.info("Waiting for static fleet capacity provisioning")
       sleep(15)

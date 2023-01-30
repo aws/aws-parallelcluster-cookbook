@@ -14,4 +14,4 @@ insufficient_capacity_timeout = 600
 compute_console_logging_enabled = <%= node['cluster']['cw_logging_enabled'] || true %>
 compute_console_logging_max_sample_size = <%= node['cluster']['slurm_plugin_console_logging']['sample_size'] %>
 compute_console_wait_time = 300
-failure_count_map_path = <%= node['cluster']['failure_count_map_path'] %>
+launch_failure_map_path = <%= node['cluster']['launch_failure_map_path'] %>
