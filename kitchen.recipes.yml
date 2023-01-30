@@ -85,3 +85,10 @@ suites:
     verifier:
       controls:
         - clusterstatusmgtd_files_created
+  - name: cron
+    run_list:
+      - recipe[aws-parallelcluster-test::docker_mock]
+      - recipe[aws-parallelcluster-install::cron]
+    verifier:
+      controls:
+        - cron_disabled_selected_daily_and_weekly_jobs
