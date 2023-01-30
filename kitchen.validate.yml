@@ -1,0 +1,51 @@
+# Validates orchestration recipes
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # recipe tests will use controls from these directories
+    - test/recipes
+    - test/resources
+
+suites:
+  - name: platform_base
+    run_list:
+      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster-test::docker_mock]
+      - recipe[aws-parallelcluster-install::base]
+    verifier:
+      controls:
+        # This is the first stab at aws-parallelcluster-install::base testing
+        # Missing tests for:
+        #   - disable_services
+        #   - openssh
+        #   - Disable selinux
+        #   - License README
+        #   - configure_gc_thresh_values
+        #   - ami_cleanup
+        #   - cron
+        #   - chrony
+        #   - c_states
+        # We also need to test the effect some files (service config, profile config) have on the system.
+        # TODO: rethink and integrate
+        - sudo
+        - admin_user
+        - ulimit
+        - pcluster_directories_exist
+        - pcluster_log_dir_is_configured
+        - ephemeral_drives_script_created
+        - ephemeral_service_set_up
+        - awsbatch_virtualenv_created
+        - cookbook_virtualenv_created
+        - cfnbootstrap_virtualenv_created
+        - node_virtualenv_created
+        - supervisord_config_created
+        - supervisord_service_set_up
+        - awscli_is_installed
+        - write_common_udev_configuration_files
+        - ec2blkdev_service_installation
+        - debian_udevd_reload_configuration
+        - package_repos
+        - install_packages
+        - nfs
+

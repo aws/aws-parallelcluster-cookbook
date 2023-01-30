@@ -15,6 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# ParallelCluster log dir
+default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
+default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
+
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
 
@@ -94,12 +98,6 @@ default['cluster']['armpl']['url'] = [
   "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar",
 ].join('/')
 
-# Python packages
-default['cluster']['parallelcluster-version'] = '3.5.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.5.0'
-default['cluster']['parallelcluster-node-version'] = '3.5.0'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
-
 # URLs to software packages used during install recipes
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
@@ -125,8 +123,8 @@ default['cluster']['scheduler_plugin']['system_group_id_start'] = default['clust
 
 # Scheduler plugin event handler
 default['cluster']['scheduler_plugin']['home'] = '/home/pcluster-scheduler-plugin'
-default['cluster']['scheduler_plugin']['handler_log_out'] = '/var/log/parallelcluster/scheduler-plugin.out.log'
-default['cluster']['scheduler_plugin']['handler_log_err'] = '/var/log/parallelcluster/scheduler-plugin.err.log'
+default['cluster']['scheduler_plugin']['handler_log_out'] = "#{node['cluster']['log_base_dir']}/scheduler-plugin.out.log"
+default['cluster']['scheduler_plugin']['handler_log_err'] = "#{node['cluster']['log_base_dir']}/scheduler-plugin.err.log"
 default['cluster']['scheduler_plugin']['shared_dir'] = "#{node['cluster']['shared_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['local_dir'] = "#{node['cluster']['base_dir']}/scheduler-plugin"
 default['cluster']['scheduler_plugin']['handler_dir'] = "#{node['cluster']['scheduler_plugin']['local_dir']}/.configs"
@@ -212,6 +210,8 @@ default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platf
 )
 
 # MySQL Packages
+# We install MySQL packages for RedHat derivatives from packages hosted on S3, while for Ubuntu we install them
+# from the OS repositories.
 default['cluster']['mysql']['package']['root'] = "#{node['cluster']['artifacts_s3_url']}/mysql"
 default['cluster']['mysql']['package']['version'] = "8.0.31-1"
 default['cluster']['mysql']['package']['source-version'] = "8.0.31"
@@ -221,11 +221,7 @@ default['cluster']['mysql']['package']['platform'] = if arm_instance?
                                                        )
                                                      else
                                                        value_for_platform(
-                                                         'default' => "el/7/x86_64",
-                                                         'ubuntu' => {
-                                                           '20.04' => "ubuntu/20.04/x86_64",
-                                                           '18.04' => "ubuntu/18.04/x86_64",
-                                                         }
+                                                         'default' => "el/7/x86_64"
                                                        )
                                                      end
 default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
@@ -233,31 +229,17 @@ default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql'][
 default['cluster']['mysql']['package']['source'] = "#{node['cluster']['artifacts_s3_url']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
 
 # MySQL Validation
-if arm_instance?
-  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
-    'ubuntu' => {
-      'default' => %w(libmysqlclient-dev libmysqlclient21),
-      '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
-    }
-  )
-  default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
-    'default' => "8.0.31"
-    # Ubuntu 18.04/20.04 ARM: MySQL packages are installed from OS repo and we do not assert on a specific version.
-  )
-else
-  default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-    'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
-    'ubuntu' => { 'default' => %w(libmysqlclient-dev libmysqlclient21 mysql-common mysql-community-client-plugins) }
-  )
-  default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
-    'default' => "8.0.31",
-    'ubuntu' => {
-      '20.04' => "8.0.31-1ubuntu20.04",
-      '18.04' => "8.0.31-1ubuntu18.04",
-    }
-  )
-end
+default['cluster']['mysql']['repository']['packages'] = value_for_platform(
+  'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
+  'ubuntu' => {
+    'default' => %w(libmysqlclient-dev libmysqlclient21),
+    '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
+  }
+)
+default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
+  'default' => "8.0.31"
+  # Ubuntu 18.04/20.04: MySQL packages are installed from OS repo and we do not assert on a specific version.
+)
 
 # EFA
 default['cluster']['efa']['installer_version'] = '1.20.0'

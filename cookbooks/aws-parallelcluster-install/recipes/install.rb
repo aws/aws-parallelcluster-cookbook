@@ -22,14 +22,29 @@ return if node['conditions']['ami_bootstrapped']
 
 node_attributes 'Generate export in json at /etc/chef/node_attributes.json'
 
+# == PLATFORM - BASE
 include_recipe 'aws-parallelcluster-install::base'
+
+# == PLATFORM - FEATURES
+include_recipe "aws-parallelcluster-install::nvidia" # NVIDIA and CUDA
+include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
+include_recipe "aws-parallelcluster-install::cloudwatch_agent"
+include_recipe "aws-parallelcluster-install::arm_pl" # ARM Performance Library
+include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
+
+# == ENVIRONMENT
+include_recipe "aws-parallelcluster-install::efa" unless virtualized?
+include_recipe "aws-parallelcluster-install::lustre" # FSx options
+include_recipe "aws-parallelcluster-install::efs" # EFS Utils
+
+# == SCHEDULER AND COMPUTE FLEET
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
-include_recipe "aws-parallelcluster-install::intel"
 include_recipe 'aws-parallelcluster-install::install_mysql_client'
 include_recipe 'aws-parallelcluster-slurm::install'
 include_recipe 'aws-parallelcluster-scheduler-plugin::install'
 include_recipe 'aws-parallelcluster-awsbatch::install'
 
+# == WORKSTATIONS
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
 # used to build the schedulers packages
 include_recipe "aws-parallelcluster-install::dcv"
