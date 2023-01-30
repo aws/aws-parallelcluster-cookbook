@@ -23,7 +23,7 @@ end
 package %w(chrony) do
   retries 3
   retry_delay 5
-end
+end unless redhat_ubi?
 
 append_if_no_line "add configuration to chrony.conf" do
   path node['cluster']['chrony']['conf']
