@@ -492,9 +492,6 @@ default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
 default['cluster']['slurm_node_reg_mem_percent'] = 75
 default['cluster']['slurmdbd_response_retries'] = 30
 default['cluster']['slurm_plugin_console_logging']['sample_size'] = 1
-default['cluster']['launch_failure_map_path'] = '/var/log/parallelcluster/launch_failure_map.json'
-default['cluster']['launch_failure_limit'] = 3
-default['cluster']['launch_failure_wait_time'] = 300
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false

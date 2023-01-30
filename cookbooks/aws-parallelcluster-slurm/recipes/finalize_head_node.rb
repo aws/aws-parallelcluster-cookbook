@@ -27,50 +27,24 @@ ruby_block "wait for static fleet capacity" do
     require 'shellwords'
     require 'json'
 
-    def check_for_failures(failure_limit, start_time, failure_wait_time)
+    def check_for_protected_mode(fleet_status_command)
       begin
-        failure_state = JSON.load_file(node['cluster']['launch_failure_map_path'])
+        cluster_state_json = shell_out!("/bin/bash -c #{fleet_status_command}").stdout.strip
+        cluster_state = JSON.load(cluster_state_json)
       rescue
-        Chef::Log.warn("Unable to load failure map")
+        Chef::Log.warn("Unable to read cluster state")
         return
       end
 
-      Chef::Log.info("failure_state is empty") if failure_state.empty?
-      return if failure_state.empty?
+      Chef::Log.info("Cluster state is empty") if cluster_state.empty?
+      return if cluster_state.empty?
 
-      raise "Cluster state has been set to PROTECTED" if failure_state["protected_mode"]
-
-      time_elapsed = Time.now - start_time
-
-      Chef::Log.info("Not checking failure map yet. Time elapsed: #{time_elapsed}") if time_elapsed < failure_wait_time
-      return if time_elapsed < failure_wait_time
-
-      failure_map = failure_state['failure_map']
-      Chef::Log.info("failure_map is empty") if not failure_map or failure_map.empty?
-      return if not failure_map or failure_map.empty?
-
-      # Example contents of failure_map:
-      #   {"queue-a": {"compute-a-1": 1, "compute-a-2": 2}, "queue-b": {"compute-b-1": 1}}
-      max_failure_count = failure_map.map { |queue, compute_resources|
-        compute_resources.map { |compute, count|
-          {
-            :queue => queue,
-            :compute => compute,
-            :count => count
-          }
-        }
-      }.flatten(1).max_by { |item| item[:count] }
-
-      Chef::Log.info("Maximum Failure: #{max_failure_count}")
-
-      raise "Failed too many times waiting for static compute fleet to start. Queue: #{max_failure_count[:queue]}, Resource: #{max_failure_count[:compute]}, Failure Count: #{max_failure_count[:count]}" if failure_limit and max_failure_count[:count] >= failure_limit
+      raise "Cluster state has been set to PROTECTED during static node provisioning" if cluster_state["status"] == "PROTECTED"
     end
 
-    failure_limit = node['cluster']['launch_failure_limit']
-    failure_wait_time = node['cluster']['launch_failure_wait_time']
-    start_time = Time.now
-
-
+    fleet_status_command = Shellwords.escape(
+      "get-compute-fleet-status.sh"
+    )
     # Example output for sinfo
     # $ /opt/slurm/bin/sinfo -N -h -o '%N %t'
     # ondemand-dy-c5.2xlarge-1 idle~
@@ -82,7 +56,7 @@ ruby_block "wait for static fleet capacity" do
       "set -o pipefail && #{node['cluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9\\-]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix)$' || true; }"
     )
     until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
-      check_for_failures(failure_limit, start_time, failure_wait_time)
+      check_for_protected_mode(fleet_status_command)
 
       Chef::Log.info("Waiting for static fleet capacity provisioning")
       sleep(15)

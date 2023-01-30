@@ -7,8 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Fail cluster creation early if static nodes fail to launch after a number of retries
-  - Provide a failure reason in CloudFormation indicating that the cluster failed to create due to static fleet failure.
+- Fail cluster creation if cluster status changes to PROTECTED while provisioning static nodes.
 
 **CHANGES**
 - Upgrade Slurm to version 22.05.8.
