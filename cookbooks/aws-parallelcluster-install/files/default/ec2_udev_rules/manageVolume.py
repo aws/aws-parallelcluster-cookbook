@@ -1,18 +1,21 @@
+# pylint: disable=C0103
+# This file should name manage_volume.py by convention
+import argparse
 import configparser
 import os
-import subprocess
+import subprocess  # nosec B404
 import sys
 import time
 
 import boto3
 import requests
 from botocore.config import Config
-import argparse
+from common import METADATA_REQUEST_TIMEOUT
 
 
 def convert_dev(dev):
     # Translate the device name as provided by the OS to the one used by EC2
-    # FIXME This approach could be broken in some OS variants, see
+    # FIXME This approach could be broken in some OS variants, see  # pylint: disable=fixme
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
     #
     # A nosec comment is appended to the following line in order to disable the B605 check.
@@ -21,7 +24,9 @@ def convert_dev(dev):
     if "/nvme" in dev:
         return (
             "/dev/"
-            + os.popen("sudo /usr/local/sbin/parallelcluster-ebsnvme-id -u -b " + dev).read().strip()  # nosemgrep
+            + os.popen("sudo /usr/local/sbin/parallelcluster-ebsnvme-id -u -b " + dev)  # nosec B605 nosemgrep
+            .read()
+            .strip()
         )
     elif "/hd" in dev:
         return dev.replace("hd", "sd")
@@ -43,7 +48,7 @@ def get_all_devices():
             command, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\n")
         # fmt: on
-        return ["/dev/{}".format(line.split()[0]) for line in output if len(line.split()) > 0]
+        return [f"/dev/{line.split()[0]}" for line in output if len(line.split()) > 0]
     except subprocess.CalledProcessError as e:
         print("Failed to get devices with lsblk -d -n")
         raise e
@@ -53,7 +58,8 @@ def get_imdsv2_token():
     # Try with getting IMDSv2 token, fall back to IMDSv1 if can not get the token
     token = requests.put(
         "http://169.254.169.254/latest/api/token",
-        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"}
+        headers={"X-aws-ec2-metadata-token-ttl-seconds": "300"},
+        timeout=METADATA_REQUEST_TIMEOUT,
     )
     headers = {}
     if token.status_code == requests.codes.ok:
@@ -108,12 +114,12 @@ def attach_volume(volume_id, instance_id, ec2):
     timeout = 300  # seconds
     while state != "attached":
         if elapsed >= timeout:
-            print("ERROR: Volume %s failed to mount in % seconds." % (volume_id, timeout))
-            exit(1)
+            print(f"ERROR: Volume {volume_id} failed to mount in {timeout} seconds.")
+            sys.exit(1)
         if state in ["busy", "detached"]:
-            print("ERROR: Volume %s in bad state %s" % (volume_id, state))
-            exit(1)
-        print("Volume %s in state %s ... waiting to be 'attached'" % (volume_id, state))
+            print(f"ERROR: Volume {volume_id} in bad state {state}")
+            sys.exit(1)
+        print(f"Volume {volume_id} in state {state} ... waiting to be 'attached'")
         time.sleep(delay)
         elapsed += delay
         try:
@@ -132,12 +138,12 @@ def detach_volume(volume_id, ec2):
     timeout = 300  # seconds
     while state != "available":
         if elapsed >= timeout:
-            print("ERROR: Volume %s failed to detach in %s seconds." % (volume_id, timeout))
-            exit(1)
+            print(f"ERROR: Volume {volume_id} failed to detach in {timeout} seconds.")
+            sys.exit(1)
         if state in ["busy", "attached"]:
-            print("ERROR: Volume %s in bad state %s" % (volume_id, state))
-            exit(1)
-        print("Volume %s in state %s ... waiting to be 'detach'" % (volume_id, state))
+            print(f"ERROR: Volume {volume_id} in bad state {state}")
+            sys.exit(1)
+        print(f"Volume {volume_id} in state {state} ... waiting to be 'detach'")
         time.sleep(delay)
         elapsed += delay
         try:
@@ -154,7 +160,7 @@ def parse_proxy_config():
     if config.has_option("Boto", "proxy") and config.has_option("Boto", "proxy_port"):
         proxy = config.get("Boto", "proxy")
         proxy_port = config.get("Boto", "proxy_port")
-        proxy_config = Config(proxies={"https": "{0}:{1}".format(proxy, proxy_port)})
+        proxy_config = Config(proxies={"https": f"{proxy}:{proxy_port}"})
     return proxy_config
 
 
@@ -163,10 +169,18 @@ def handle_volume(volume_id, attach, detach):
     token = get_imdsv2_token()
 
     # Get instance ID
-    instance_id = requests.get("http://169.254.169.254/latest/meta-data/instance-id", headers=token).text
+    instance_id = requests.get(
+        "http://169.254.169.254/latest/meta-data/instance-id",
+        headers=token,
+        timeout=METADATA_REQUEST_TIMEOUT,
+    ).text
 
     # Get region
-    region = requests.get("http://169.254.169.254/latest/meta-data/placement/availability-zone", headers=token).text
+    region = requests.get(
+        "http://169.254.169.254/latest/meta-data/placement/availability-zone",
+        headers=token,
+        timeout=METADATA_REQUEST_TIMEOUT,
+    ).text
     region = region[:-1]
 
     # Parse configuration file to read proxy settings
@@ -207,10 +221,18 @@ def main():
     try:
         parser = argparse.ArgumentParser(description="Attach or detach ebs volume")
         parser.add_argument(
-            "--attach", action="store_true", help="Attach EBS volume", required=False, default=False,
+            "--attach",
+            action="store_true",
+            help="Attach EBS volume",
+            required=False,
+            default=False,
         )
         parser.add_argument(
-            "--detach", action="store_true", help="Detach EBS volume", required=False, default=False,
+            "--detach",
+            action="store_true",
+            help="Detach EBS volume",
+            required=False,
+            default=False,
         )
         parser.add_argument(
             "--volume-id",
