@@ -24,26 +24,15 @@ package_repos 'setup the repositories'
 
 include_recipe "aws-parallelcluster-install::directories"
 
-build_essential
+install_packages 'Install OS and extra packages'
+
 include_recipe "aws-parallelcluster-install::python"
 include_recipe "aws-parallelcluster-install::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-install::node'
-
-install_packages 'Install OS and extra packages'
-
-bash "install awscli" do
-  cwd Chef::Config[:file_cache_path]
-  code <<-CLI
-    set -e
-    curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    unzip awscli-bundle.zip
-    #{node['cluster']['cookbook_virtualenv_path']}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-  CLI
-  not_if { ::File.exist?("/usr/local/bin/aws") }
-end
+include_recipe "aws-parallelcluster-install::awscli"
 
 # Manage SSH via Chef
-include_recipe "openssh"
+include_recipe "openssh" unless redhat_ubi?
 
 # Disable selinux
 selinux_state "SELinux Disabled" do
@@ -62,7 +51,7 @@ end
 
 nfs 'install NFS daemon'
 include_recipe "aws-parallelcluster-install::ephemeral_drives"
-include_recipe 'aws-parallelcluster-install::ec2_udev_rules'
+ec2_udev_rules 'configure udev'
 
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
 configure_gc_thresh_values
@@ -78,30 +67,11 @@ cookbook_file "ami_cleanup.sh" do
   mode "0755"
 end
 
-# Install NVIDIA and CUDA
-include_recipe "aws-parallelcluster-install::nvidia"
-
-# Install EFA & Intel MPI
-include_recipe "aws-parallelcluster-install::efa" unless virtualized?
-include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
-
-# Install FSx options
-include_recipe "aws-parallelcluster-install::lustre"
-
-# Install EFS Utils
-include_recipe "aws-parallelcluster-install::efs"
-
-# Install the AWS cloudwatch agent
-include_recipe "aws-parallelcluster-install::cloudwatch_agent"
-
 # Configure cron and anacron
 include_recipe "aws-parallelcluster-install::cron"
 
 # Install Amazon Time Sync
-include_recipe "aws-parallelcluster-install::chrony"
-
-# Install ARM Performance Library
-include_recipe "aws-parallelcluster-install::arm_pl"
+include_recipe "aws-parallelcluster-install::chrony" unless redhat_ubi?
 
 # Disable x86_64 C states
-include_recipe "aws-parallelcluster-install::c_states" unless virtualized?
+include_recipe "aws-parallelcluster-install::c_states" unless virtualized? || platform?('redhat') # TODO; FIX!!

@@ -34,7 +34,6 @@ suites:
       controls:
         - pcluster_directories_exist
         - pcluster_log_dir_is_configured
-
   - name: ephemeral_drives_setup
     run_list:
       - recipe[aws-parallelcluster-install::ephemeral_drives]
@@ -42,7 +41,6 @@ suites:
       controls:
         - ephemeral_drives_script_created
         - ephemeral_service_set_up
-
   - name: python_setup
     run_list:
       - recipe[aws-parallelcluster-install::directories]
@@ -51,7 +49,6 @@ suites:
       controls:
         - awsbatch_virtualenv_created
         - cookbook_virtualenv_created
-
   - name: cfn_bootstrap_setup
     run_list:
       - recipe[aws-parallelcluster-install::directories]
@@ -59,7 +56,6 @@ suites:
     verifier:
       controls:
         - cfnbootstrap_virtualenv_created
-
   - name: node_setup
     run_list:
       - recipe[aws-parallelcluster-install::directories]
@@ -67,7 +63,6 @@ suites:
     verifier:
       controls:
         - node_virtualenv_created
-
   - name: supervisord_setup
     run_list:
       - recipe[aws-parallelcluster-install::supervisord]
@@ -75,4 +70,18 @@ suites:
       controls:
         - supervisord_config_created
         - supervisord_service_set_up
-
+  - name: awscli
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::python]
+      - recipe[aws-parallelcluster-install::awscli]
+    verifier:
+      controls:
+        - awscli_is_installed
+  - name: clusterstatusmgtd
+    run_list:
+      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster-install::clusterstatusmgtd]
+    verifier:
+      controls:
+        - clusterstatusmgtd_files_created

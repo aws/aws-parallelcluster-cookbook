@@ -18,7 +18,7 @@
 #
 # Check the repository source of a package
 #
-unless platform?('ubuntu') && arm_instance?
+unless platform?('ubuntu')
   Chef::Log.info("Checking for MySql implementation on #{node['platform']}:#{node['kernel']['machine']}")
   node['cluster']['mysql']['repository']['packages'].each do |pkg|
     validate_package_version(pkg, node['cluster']['mysql']['repository']['expected']['version'])
