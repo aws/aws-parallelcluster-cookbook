@@ -67,8 +67,8 @@ end
 ruby_block "Validate Slurm Tarball Checksum" do
   block do
     require 'digest'
-    checksum = Digest::SHA1.file(slurm_tarball).hexdigest # nosemgrep
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['slurm']['sha1']}" if checksum != node['cluster']['slurm']['sha1']
+    checksum = Digest::SHA256.file(slurm_tarball).hexdigest
+    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['slurm']['sha256']}" if checksum != node['cluster']['slurm']['sha256']
   end
 end
 

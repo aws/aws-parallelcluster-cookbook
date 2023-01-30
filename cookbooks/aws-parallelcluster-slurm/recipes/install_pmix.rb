@@ -28,8 +28,8 @@ end
 ruby_block "Validate PMIx Tarball Checksum" do
   block do
     require 'digest'
-    checksum = Digest::SHA1.file(pmix_tarball).hexdigest # nosemgrep
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['pmix']['sha1']}" if checksum != node['cluster']['pmix']['sha1']
+    checksum = Digest::SHA256.file(pmix_tarball).hexdigest
+    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['pmix']['sha256']}" if checksum != node['cluster']['pmix']['sha256']
   end
 end
 
