@@ -12,6 +12,11 @@ verifier:
     - test/recipes
     - test/resources
 
+# If you need to test a recipe with recipe/resources dependencies,
+# add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
+# then define a dependencies attribute, listing them with recipe: or resource: prefix.
+# You can find an example in the add_depdendencies.rb file.
+
 suites:
   - name: sudo
     run_list:
@@ -22,12 +27,15 @@ suites:
         - sudoers_file_configured
   - name: users
     run_list:
-      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::users]
     verifier:
       controls:
         - admin_user_created
         - ulimit_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
   - name: directories
     run_list:
       - recipe[aws-parallelcluster-install::directories]
@@ -44,26 +52,35 @@ suites:
         - ephemeral_service_set_up
   - name: python_setup
     run_list:
-      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::python]
     verifier:
       controls:
         - awsbatch_virtualenv_created
         - cookbook_virtualenv_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
   - name: cfn_bootstrap_setup
     run_list:
-      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::cfn_bootstrap]
     verifier:
       controls:
         - cfnbootstrap_virtualenv_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
   - name: node_setup
     run_list:
-      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::node]
     verifier:
       controls:
         - node_virtualenv_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
   - name: supervisord_setup
     run_list:
       - recipe[aws-parallelcluster-install::supervisord]
@@ -73,30 +90,42 @@ suites:
         - supervisord_service_set_up
   - name: awscli
     run_list:
-      - recipe[aws-parallelcluster-install::directories]
-      - recipe[aws-parallelcluster-install::python]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::awscli]
     verifier:
       controls:
         - awscli_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
   - name: clusterstatusmgtd
     run_list:
-      - recipe[aws-parallelcluster-install::directories]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::clusterstatusmgtd]
     verifier:
       controls:
         - clusterstatusmgtd_files_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
   - name: cron
     run_list:
-      - recipe[aws-parallelcluster-test::docker_mock]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::cron]
     verifier:
       controls:
         - cron_disabled_selected_daily_and_weekly_jobs
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
   - name: chrony
     run_list:
-      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::chrony]
     verifier:
       controls:
         - chrony_installed_and_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
