@@ -176,3 +176,10 @@ suites:
     verifier:
       controls:
         - ami_cleanup_file_created
+  - name: disable_services
+    run_list:
+      - recipe[aws-parallelcluster-install::disable_services]
+    verifier:
+      controls:
+        - services_disabled_on_debian_family
+        - services_disabled_on_amazon_family
