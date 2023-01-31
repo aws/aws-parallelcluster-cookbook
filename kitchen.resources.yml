@@ -106,3 +106,16 @@ suites:
       resource: jwt_dependencies
       dependencies:
         - resource:package_repos
+  - name: efa
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - efa_conflicting_packages_removed
+        - efa_installed
+    attributes:
+      resource: efa
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::directories
