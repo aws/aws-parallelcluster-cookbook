@@ -17,9 +17,9 @@
 
 # Disable DLAMI multi eni helper
 # no only_if statement because if the service is not present the action disable does not return error
-disable_service('aws-ubuntu-eni-helper', 'debian', %i(disable stop mask))
+disable_service('aws-ubuntu-eni-helper', 'debian', %i(disable stop mask)) unless virtualized?
 
 # Disable log4j-cve-2021-44228-hotpatch
 # masking the service in order to prevent it from being automatically enabled
 # if not installed yet
-disable_service('log4j-cve-2021-44228-hotpatch', 'amazon', %i(disable stop mask))
+disable_service('log4j-cve-2021-44228-hotpatch', 'amazon', %i(disable stop mask)) unless virtualized?

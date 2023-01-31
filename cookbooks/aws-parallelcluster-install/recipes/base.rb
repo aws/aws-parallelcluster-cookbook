@@ -18,7 +18,7 @@
 include_recipe "aws-parallelcluster-common::setup_envars"
 include_recipe "aws-parallelcluster-install::sudo"
 include_recipe "aws-parallelcluster-install::users"
-include_recipe "aws-parallelcluster-install::disable_services" unless virtualized?
+include_recipe "aws-parallelcluster-install::disable_services"
 
 package_repos 'setup the repositories'
 
