@@ -52,4 +52,6 @@ suites:
         - cron_disabled_selected_daily_and_weekly_jobs
         - openssh_installed
         - ami_cleanup_file_created
+        - efa_conflicting_packages_removed
+        - efa_installed
 
