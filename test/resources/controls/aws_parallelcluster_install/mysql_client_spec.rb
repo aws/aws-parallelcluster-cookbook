@@ -34,7 +34,7 @@ control 'mysql_client_installed' do
   end
 end
 
-control 'mysql_client_source_code_configured' do
+control 'mysql_client_source_node_created' do
   title 'MySql client source code is configured in target dir'
 
   describe file('/opt/parallelcluster/sources/mysql_source_code.txt') do

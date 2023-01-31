@@ -23,10 +23,9 @@ use 'partial/_download_and_install'
 # MySQL Packages
 # We install MySQL packages from the OS repositories for ubuntu platform, while we
 # retrieve the packages from S3 for RedHat & derivatives.
-# Also on ubuntu an apt update is required to align the apt cache with the current list
-# of available package versions.
 action :setup do
   if platform?('ubuntu')
+    # An apt update is required to align the apt cache with the current list of available package versions.
     apt_update
     package node['cluster']['mysql']['repository']['packages'] do
       retries 3

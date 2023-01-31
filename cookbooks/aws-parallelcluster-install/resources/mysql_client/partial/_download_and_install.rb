@@ -16,7 +16,6 @@
 action :download_and_install do
   mysql_archive_url = node['cluster']['mysql']['package']['archive']
   mysql_tar_file = "/tmp/#{node['cluster']['mysql']['package']['file-name']}"
-  package_installer = 'yum install -y'
 
   log "Downloading MySQL packages archive from #{mysql_archive_url}"
 
@@ -37,7 +36,7 @@ action :download_and_install do
 
         EXTRACT_DIR=$(mktemp -d --tmpdir mysql.XXXXXXX)
         tar xf "#{mysql_tar_file}" --directory "${EXTRACT_DIR}"
-        #{package_installer} ${EXTRACT_DIR}/*
+        yum install -y ${EXTRACT_DIR}/*
     MYSQL
   end
 end

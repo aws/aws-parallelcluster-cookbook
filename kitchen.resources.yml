@@ -54,15 +54,13 @@ suites:
       resource: ec2_udev_rules
   - name: mysql_client
     run_list:
-      # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
-      # with default properties
       - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::directories]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
         - mysql_client_installed
-        - mysql_client_source_code_configured
+        - mysql_client_source_node_created
     attributes:
       resource: mysql_client
 
