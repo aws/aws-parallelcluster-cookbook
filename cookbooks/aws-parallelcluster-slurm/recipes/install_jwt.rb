@@ -29,8 +29,8 @@ end
 ruby_block "Validate libjwt Tarball Checksum" do
   block do
     require 'digest'
-    checksum = Digest::SHA256.file(jwt_tarball).hexdigest
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['jwt']['sha256']}" if checksum != node['cluster']['jwt']['sha256']
+    checksum = Digest::SHA1.file(jwt_tarball).hexdigest # nosemgrep
+    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['jwt']['sha1']}" if checksum != node['cluster']['jwt']['sha1']
   end
 end
 

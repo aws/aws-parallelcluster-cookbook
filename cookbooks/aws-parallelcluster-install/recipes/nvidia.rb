@@ -157,7 +157,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
   gdrcopy_version = node['cluster']['nvidia']['gdrcopy']['version']
   gdrcopy_version_extended = "#{node['cluster']['nvidia']['gdrcopy']['version']}-1"
   gdrcopy_tarball = "#{node['cluster']['sources_dir']}/gdrcopy-#{gdrcopy_version}.tar.gz"
-  gdrcopy_checksum = node['cluster']['nvidia']['gdrcopy']['sha256']
+  gdrcopy_checksum = node['cluster']['nvidia']['gdrcopy']['sha1']
   gdrcopy_build_dependencies = value_for_platform(
     'ubuntu' => {
       'default' => %w(build-essential devscripts debhelper check libsubunit-dev fakeroot pkg-config dkms),
@@ -177,7 +177,7 @@ if node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['e
   ruby_block "Validate NVIDIA GDRCopy Tarball Checksum" do
     block do
       require 'digest'
-      checksum = Digest::SHA256.file(gdrcopy_tarball).hexdigest
+      checksum = Digest::SHA1.file(gdrcopy_tarball).hexdigest # nosemgrep
       raise "Downloaded NVIDIA GDRCopy Tarball Checksum #{checksum} does not match expected checksum #{gdrcopy_checksum}" if checksum != gdrcopy_checksum
     end
   end

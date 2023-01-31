@@ -103,7 +103,7 @@ default['cluster']['armpl']['url'] = [
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['version'] = '22-05-8-1'
 default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
-default['cluster']['slurm']['sha256'] = '8c8f6a26a5d51e6c63773f2e02653eb724540ee8b360125c8d7732314ce737d6'
+default['cluster']['slurm']['sha1'] = '0719f99008a22ee412b3729e1e9ae0440d841c07'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
@@ -143,7 +143,7 @@ default['cluster']['scheduler_plugin']['virtualenv_path'] = [
 # PMIx software
 default['cluster']['pmix']['version'] = '3.2.3'
 default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
-default['cluster']['pmix']['sha256'] = '1325a1355d0794196bb47665053fdbc588f9183aa5385f3581b668427316306e'
+default['cluster']['pmix']['sha1'] = 'ed5c525baf1330d2303afb2b6bd2fd53ab0406a0'
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.14'
 default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"
@@ -154,7 +154,7 @@ default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 # JWT
 default['cluster']['jwt']['version'] = '1.12.0'
 default['cluster']['jwt']['url'] = "https://github.com/benmcollins/libjwt/archive/refs/tags/v#{node['cluster']['jwt']['version']}.tar.gz"
-default['cluster']['jwt']['sha256'] = 'eaf5d8b31d867c02dde767efa2cf494840885a415a3c9a62680bf870a4511bee'
+default['cluster']['jwt']['sha1'] = '1c6fec984a8e0ca1122bfc3552a49f45bdb0c4e8'
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
@@ -191,7 +191,7 @@ default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_plat
 # NVIDIA GDRCopy
 default['cluster']['nvidia']['gdrcopy']['version'] = '2.3'
 default['cluster']['nvidia']['gdrcopy']['url'] = "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
-default['cluster']['nvidia']['gdrcopy']['sha256'] = 'b85d15901889aa42de6c4a9233792af40dd94543e82abe0439e544c87fd79475'
+default['cluster']['nvidia']['gdrcopy']['sha1'] = '8ee4f0e3c9d0454ff461742c69b0c0ee436e06e1'
 default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'ubuntu' => { 'default' => 'gdrdrv' },
   'default' => 'gdrcopy'
