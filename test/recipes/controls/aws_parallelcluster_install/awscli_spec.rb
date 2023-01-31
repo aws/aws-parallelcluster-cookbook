@@ -13,7 +13,7 @@ python_version = '3.9.16'
 base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
-control 'awscli_is_installed' do
+control 'awscli_installed' do
   title 'awscli package should be installed in cookbook virtualenv'
 
   only_if { !os_properties.redhat_ubi? }

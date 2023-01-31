@@ -9,12 +9,16 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'sudo' do
-  title 'Install sudo package and prepare sudoers file'
+control 'sudo_installed' do
+  title 'Verify sudo package is installed'
 
   describe package('sudo') do
     it { should be_installed }
   end
+end
+
+control 'sudoers_file_configured' do
+  title 'Verify sudoers file is correctly configured'
 
   describe file('/etc/sudoers.d/99-parallelcluster-secure-path') do
     it { should exist }
