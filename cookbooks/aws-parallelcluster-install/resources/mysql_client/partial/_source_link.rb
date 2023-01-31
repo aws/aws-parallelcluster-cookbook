@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :create_source_link do
-  # Add MySQL source file
+  # Add MySQL source file to be compliant with Licensing
   file "#{node['cluster']['sources_dir']}/mysql_source_code.txt" do
     content %(You can get MySQL source code here:
 
