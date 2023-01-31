@@ -31,6 +31,16 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
   end
 
+  def debian_family?
+    inspec.os.family == 'debian'
+  end
+
+  def amazon_family?
+    # Inspec family has `amazon` under `linux` family name, but Infra family has
+    # a specific `amazon` family, so we need to check this via the os name instead.
+    inspec.os.name == 'amazon'
+  end
+
   def arm?
     inspec.os.arch == 'aarch64'
   end
