@@ -242,7 +242,7 @@ default['cluster']['mysql']['repository']['expected']['version'] = value_for_pla
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.20.0'
+default['cluster']['efa']['installer_version'] = '1.21.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 

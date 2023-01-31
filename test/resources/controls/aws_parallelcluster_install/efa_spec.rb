@@ -46,7 +46,7 @@ control 'efa_installed' do
   describe "Verify version of EFA\n" do
     describe file("/opt/amazon/efa_installed_packages") do
       it { should exist }
-      its('content') { should match(/EFA installer version: 1.20.0/) }
+      its('content') { should match(/EFA installer version: 1.21.0/) }
     end
   end
 end
