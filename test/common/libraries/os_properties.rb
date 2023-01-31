@@ -26,4 +26,8 @@ class OsProperties < Inspec.resource(1)
   def arm?
     inspec.os.arch == 'aarch64'
   end
+
+  def x86?
+    inspec.os.arch == 'x86_64'
+  end
 end
