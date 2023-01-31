@@ -73,5 +73,4 @@ include_recipe "aws-parallelcluster-install::cron"
 # Install Amazon Time Sync
 include_recipe "aws-parallelcluster-install::chrony" unless redhat_ubi?
 
-# Disable x86_64 C states
-include_recipe "aws-parallelcluster-install::c_states" unless virtualized? || platform?('redhat') # TODO; FIX!!
+c_states 'disable x86_64 C states'

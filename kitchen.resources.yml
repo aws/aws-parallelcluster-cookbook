@@ -49,6 +49,16 @@ suites:
     attributes:
       resource: <%= resource %>
 <%end %>
+  - name: c_states
+    run_list:
+      # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
+      # with default properties
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - c_states_kernel_configuration
+    attributes:
+      resource: c_states
   - name: ec2_udev_rules
     run_list:
       - recipe[aws-parallelcluster-install::test_resource]
