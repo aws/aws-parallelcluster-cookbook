@@ -18,15 +18,16 @@ suites:
       - recipe[aws-parallelcluster-install::sudo]
     verifier:
       controls:
-        - sudo
+        - sudo_installed
+        - sudoers_file_configured
   - name: users
     run_list:
       - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-install::users]
     verifier:
       controls:
-        - admin_user
-        - ulimit
+        - admin_user_created
+        - ulimit_configured
   - name: directories
     run_list:
       - recipe[aws-parallelcluster-install::directories]
@@ -77,7 +78,7 @@ suites:
       - recipe[aws-parallelcluster-install::awscli]
     verifier:
       controls:
-        - awscli_is_installed
+        - awscli_installed
   - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-install::directories]

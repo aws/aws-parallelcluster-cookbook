@@ -28,9 +28,10 @@ suites:
         #   - c_states
         # We also need to test the effect some files (service config, profile config) have on the system.
         # TODO: rethink and integrate
-        - sudo
-        - admin_user
-        - ulimit
+        - sudo_installed
+        - sudoers_file_configured
+        - admin_user_created
+        - ulimit_configured
         - pcluster_directories_exist
         - pcluster_log_dir_is_configured
         - ephemeral_drives_script_created
@@ -41,7 +42,7 @@ suites:
         - node_virtualenv_created
         - supervisord_config_created
         - supervisord_service_set_up
-        - awscli_is_installed
+        - awscli_installed
         - write_common_udev_configuration_files
         - ec2blkdev_service_installation
         - debian_udevd_reload_configuration

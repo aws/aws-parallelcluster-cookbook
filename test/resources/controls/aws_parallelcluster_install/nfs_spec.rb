@@ -1,5 +1,5 @@
 control 'nfs' do
-  title 'NFS resource'
+  title 'Check NFS process is running and installed version'
 
   only_if { !os_properties.docker? }
 
