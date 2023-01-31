@@ -31,9 +31,9 @@ include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 include_recipe "aws-parallelcluster-install::arm_pl" # ARM Performance Library
 include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
+efa 'Install EFA'
 
 # == ENVIRONMENT
-include_recipe "aws-parallelcluster-install::efa" unless virtualized?
 include_recipe "aws-parallelcluster-install::lustre" # FSx options
 include_recipe "aws-parallelcluster-install::efs" # EFS Utils
 
