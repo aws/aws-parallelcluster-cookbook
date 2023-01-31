@@ -92,3 +92,10 @@ suites:
     verifier:
       controls:
         - cron_disabled_selected_daily_and_weekly_jobs
+  - name: chrony
+    run_list:
+      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster-install::chrony]
+    verifier:
+      controls:
+        - chrony_installed_and_configured
