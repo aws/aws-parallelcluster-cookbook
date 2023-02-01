@@ -11,7 +11,8 @@ import time
 import boto3
 import requests
 from botocore.config import Config
-from common import METADATA_REQUEST_TIMEOUT
+
+METADATA_REQUEST_TIMEOUT = 60
 
 
 def convert_dev(dev):
