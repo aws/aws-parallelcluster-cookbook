@@ -516,16 +516,6 @@ def kitchen_test?
   node['kitchen'] == 'true'
 end
 
-def efa_installed?
-  dir_exist = ::Dir.exist?('/opt/amazon/efa')
-  if dir_exist
-    modinfo_efa_stdout = Mixlib::ShellOut.new("modinfo efa").run_command.stdout
-    efa_installed_packages_file = Mixlib::ShellOut.new("cat /opt/amazon/efa_installed_packages").run_command.stdout
-    Chef::Log.info("`/opt/amazon/efa` directory already exists. \nmodinfo efa stdout: \n#{modinfo_efa_stdout} \nefa_installed_packages_file_content: \n#{efa_installed_packages_file}")
-  end
-  dir_exist
-end
-
 # load cluster configuration file into node object
 def load_cluster_config
   ruby_block "load cluster configuration" do
