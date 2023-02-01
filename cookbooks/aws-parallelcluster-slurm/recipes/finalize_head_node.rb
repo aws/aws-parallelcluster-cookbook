@@ -32,14 +32,14 @@ ruby_block "wait for static fleet capacity" do
         cluster_state_json = shell_out!("/bin/bash -c #{fleet_status_command}").stdout.strip
         cluster_state = JSON.load(cluster_state_json)
       rescue
-        Chef::Log.warn("Unable to read cluster state")
+        Chef::Log.warn("Unable to get compute fleet status")
         return
       end
 
-      Chef::Log.info("Cluster state is empty") if cluster_state.empty?
+      Chef::Log.info("Compute fleet status is empty") if cluster_state.empty?
       return if cluster_state.empty?
 
-      raise "Cluster state has been set to PROTECTED during static node provisioning" if cluster_state["status"] == "PROTECTED"
+      raise "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning" if cluster_state["status"] == "PROTECTED"
     end
 
     fleet_status_command = Shellwords.escape(
