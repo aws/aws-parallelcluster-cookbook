@@ -1,4 +1,5 @@
 # pylint: disable=C0103
+# pylint: disable=W0719
 # This file should name manage_volume.py by convention
 import argparse
 import configparser
