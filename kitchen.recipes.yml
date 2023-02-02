@@ -129,6 +129,12 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster::test_dummy
+  - name: disable_selinux
+    run_list:
+      - recipe[aws-parallelcluster-install::disable_selinux]
+    verifier:
+      controls:
+        - disable_selinux
   - name: openssh
     run_list:
       - recipe[aws-parallelcluster-install::openssh]

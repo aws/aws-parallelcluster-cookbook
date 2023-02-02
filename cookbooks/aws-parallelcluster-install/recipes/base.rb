@@ -33,11 +33,7 @@ include_recipe "aws-parallelcluster-install::awscli"
 
 include_recipe "aws-parallelcluster-install::openssh"
 
-# Disable selinux
-selinux_state "SELinux Disabled" do
-  action :disabled
-  only_if 'which getenforce'
-end
+include_recipe "aws-parallelcluster-install::disable_selinux"
 
 # Install LICENSE README
 cookbook_file 'AWS-ParallelCluster-License-README.txt' do
