@@ -288,14 +288,6 @@ def slurm_commit_hash?
   !node['cluster']['slurm']['commit'].empty?
 end
 
-#
-# Check if this is an ARM instance
-#
-def arm_instance?
-  node['kernel']['machine'] == 'aarch64'
-end
-
-#
 # Check if this platform supports intel's HPC platform
 #
 def platform_supports_intel_hpc_platform?
