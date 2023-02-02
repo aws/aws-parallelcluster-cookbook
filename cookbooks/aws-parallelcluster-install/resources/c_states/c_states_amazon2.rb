@@ -17,7 +17,7 @@ unified_mode true
 default_action :setup
 
 action :setup do
-  return if !x86? || system_test_or_docker?
+  return if !x86? || virtualized?
 
   grub_cmdline_attributes = {
     "processor.max_cstate" => { "value" => "1" },

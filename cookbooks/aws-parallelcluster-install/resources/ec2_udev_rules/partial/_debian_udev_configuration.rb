@@ -31,6 +31,6 @@ action :set_udev_autoreload do
     user 'root'
     group 'root'
     mode '0644'
-    notifies :run, "execute[udev-daemon-reload]", :immediately unless system_test_or_docker?
+    notifies :run, "execute[udev-daemon-reload]", :immediately unless virtualized?
   end
 end

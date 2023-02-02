@@ -38,7 +38,7 @@ action :remove_conflicting_packages do
 end
 
 action :setup do
-  return if docker?
+  return if virtualized?
 
   if efa_installed && !::File.exist?(efa_tarball)
     Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")

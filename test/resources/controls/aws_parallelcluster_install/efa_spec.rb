@@ -12,7 +12,7 @@
 control 'efa_conflicting_packages_removed' do
   title 'Check packages conflicting with EFA are not installed'
 
-  only_if { !os_properties.docker? }
+  only_if { !os_properties.virtualized? }
 
   if os.redhat?
     openmpi_packages = %w(openmpi-devel openmpi)
@@ -34,7 +34,7 @@ end
 control 'efa_installed' do
   title 'Check EFA is installed'
 
-  only_if { !os_properties.docker? }
+  only_if { !os_properties.virtualized? }
 
   describe "Verify EFA Kernel module is available\n" do
     describe command("modinfo efa") do

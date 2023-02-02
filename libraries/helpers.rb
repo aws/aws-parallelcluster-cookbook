@@ -289,13 +289,6 @@ def arm_instance?
 end
 
 #
-# Check if we are running in a virtualized environment
-#
-def virtualized?
-  node.include?('virtualized') and node['virtualized']
-end
-
-#
 # Check if this platform supports intel's HPC platform
 #
 def platform_supports_intel_hpc_platform?
