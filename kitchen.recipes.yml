@@ -170,3 +170,9 @@ suites:
         - recipe:aws-parallelcluster-install::users
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+  - name: ami_cleanup
+    run_list:
+      - recipe[aws-parallelcluster-install::ami_cleanup]
+    verifier:
+      controls:
+        - ami_cleanup_file_created
