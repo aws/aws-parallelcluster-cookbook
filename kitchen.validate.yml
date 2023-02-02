@@ -18,14 +18,14 @@ suites:
         # This is the first stab at aws-parallelcluster-install::base testing
         # Missing tests for:
         #   - disable_services
-        #   - openssh
         #   - Disable selinux
         #   - License README
         #   - configure_gc_thresh_values
-        #   - ami_cleanup
-        #   - cron
-        #   - chrony
+        #   - chrony_installed_and_configured
         #   - c_states
+        #   - clusterstatusmgtd_files_created
+        #   - mysql_client_installed
+        #   - mysql_client_source_node_created
         # We also need to test the effect some files (service config, profile config) have on the system.
         # TODO: rethink and integrate
         - sudo_installed
@@ -49,7 +49,7 @@ suites:
         - package_repos
         - install_packages
         - nfs
-        - efa_conflicting_packages_removed
-        - efa_installed
+        - cron_disabled_selected_daily_and_weekly_jobs
+        - openssh_installed
         - ami_cleanup_file_created
 
