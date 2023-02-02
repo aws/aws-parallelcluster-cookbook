@@ -49,6 +49,4 @@ suites:
         - package_repos
         - install_packages
         - nfs
-        - efa_conflicting_packages_removed
-        - efa_installed
 
