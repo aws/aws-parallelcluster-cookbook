@@ -18,7 +18,6 @@ from compute_fleet_status import get_status_with_last_updated_time, update_statu
     [True, False],
 )
 def test_get_status_with_last_updated_time(no_error, mocker, capsys):
-
     if no_error:
         mocker.patch(
             "compute_fleet_status.get_dynamo_db_data",
@@ -29,7 +28,6 @@ def test_get_status_with_last_updated_time(no_error, mocker, capsys):
             "compute_fleet_status.get_dynamo_db_data",
             side_effect=Exception("Failed when retrieving data from DynamoDB with error"),
         )
-
     try:
         get_status_with_last_updated_time("table", "us-east-1")
         readouterr = capsys.readouterr()
@@ -49,7 +47,6 @@ def test_get_status_with_last_updated_time(no_error, mocker, capsys):
     ],
 )
 def test_update_status_with_last_updated_time(current_status, mocker):
-
     mocker.patch(
         "compute_fleet_status.get_dynamo_db_data",
         return_value={"lastStatusUpdatedTime": "2022-01-14T04:40:47.653Z", "status": current_status},
