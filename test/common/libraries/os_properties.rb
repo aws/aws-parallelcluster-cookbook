@@ -19,6 +19,14 @@ class OsProperties < Inspec.resource(1)
     virtualized? && inspec.os.name == 'redhat'
   end
 
+  def redhat?
+    inspec.os.name == 'redhat'
+  end
+
+  def centos?
+    inspec.os.name == 'centos'
+  end
+
   def alinux2?
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
   end
