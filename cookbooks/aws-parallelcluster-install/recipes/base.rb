@@ -52,14 +52,7 @@ include_recipe "aws-parallelcluster-install::gc_thresh_values"
 
 include_recipe "aws-parallelcluster-install::supervisord"
 
-# AMI cleanup script
-cookbook_file "ami_cleanup.sh" do
-  source 'base/ami_cleanup.sh'
-  path '/usr/local/sbin/ami_cleanup.sh'
-  owner "root"
-  group "root"
-  mode "0755"
-end
+include_recipe "aws-parallelcluster-install::ami_cleanup"
 
 # Configure cron and anacron
 include_recipe "aws-parallelcluster-install::cron"
