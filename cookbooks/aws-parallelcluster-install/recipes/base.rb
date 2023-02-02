@@ -31,8 +31,7 @@ include_recipe "aws-parallelcluster-install::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-install::node'
 include_recipe "aws-parallelcluster-install::awscli"
 
-# Manage SSH via Chef
-include_recipe "openssh" unless redhat_ubi?
+include_recipe "aws-parallelcluster-install::openssh"
 
 # Disable selinux
 selinux_state "SELinux Disabled" do
