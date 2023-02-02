@@ -129,3 +129,10 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster::test_dummy
+  - name: openssh
+    run_list:
+      - recipe[aws-parallelcluster-install::openssh]
+    verifier:
+      controls:
+        - openssh_installed
+
