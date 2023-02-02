@@ -43,7 +43,7 @@ ruby_block "wait for static fleet capacity" do
     end
 
     fleet_status_command = Shellwords.escape(
-      "get-compute-fleet-status.sh"
+      "/usr/local/bin/get-compute-fleet-status.sh"
     )
     # Example output for sinfo
     # $ /opt/slurm/bin/sinfo -N -h -o '%N %t'
