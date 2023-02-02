@@ -271,7 +271,7 @@ end
 
 def validate_package_version(package, expected_version)
   case node['platform']
-  when 'amazon', 'centos'
+  when 'amazon', 'centos', 'redhat'
     test_expression = "$(yum info installed #{package} | grep 'Version' | awk '{print $3}')"
   when 'ubuntu'
     test_expression = "$(apt list --installed #{package} | awk '{printf \"%s\", $2}')"
