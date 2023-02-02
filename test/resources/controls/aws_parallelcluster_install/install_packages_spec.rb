@@ -16,7 +16,7 @@ control 'install_packages' do
 
     describe package('kernel-devel') do
       it { should be_installed }
-    end unless os_properties.docker?
+    end unless os_properties.virtualized?
 
     # Check amazon linux2 extra
     if os_properties.alinux2?
@@ -33,7 +33,7 @@ control 'install_packages' do
 
     describe bash('dpkg -l | grep linux-headers') do
       its('exit_status') { should eq 0 }
-    end unless os_properties.docker?
+    end unless os_properties.virtualized?
 
   else
     describe "unsupported OS" do

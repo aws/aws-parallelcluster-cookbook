@@ -1,7 +1,7 @@
 control 'nfs' do
   title 'Check NFS process is running and installed version'
 
-  only_if { !os_properties.docker? }
+  only_if { !os_properties.virtualized? }
 
   # Check nfsd process is running
   describe command('ps aux') do

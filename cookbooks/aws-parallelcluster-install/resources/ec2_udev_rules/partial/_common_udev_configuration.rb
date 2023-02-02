@@ -63,5 +63,5 @@ action :start_ec2blk do
   service "ec2blkdev" do
     supports restart: true
     action %i(enable start)
-  end unless system_test_or_docker?
+  end unless virtualized?
 end

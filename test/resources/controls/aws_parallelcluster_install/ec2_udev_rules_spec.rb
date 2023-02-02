@@ -32,7 +32,7 @@ end
 control 'ec2blkdev_service_installation' do
   title "Installation of the ec2blkdev service"
 
-  only_if { !os_properties.docker? }
+  only_if { !os_properties.virtualized? }
 
   describe service('ec2blkdev') do
     it { should be_installed }
