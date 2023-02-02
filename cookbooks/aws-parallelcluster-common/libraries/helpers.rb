@@ -12,3 +12,10 @@ end
 def x86?
   node['kernel']['machine'] == 'x86_64'
 end
+
+#
+# Check if this is an ARM instance
+#
+def arm_instance?
+  node['kernel']['machine'] == 'aarch64'
+end
