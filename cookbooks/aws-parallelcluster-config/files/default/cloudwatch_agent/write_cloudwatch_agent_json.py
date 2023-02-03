@@ -21,7 +21,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Create the cloudwatch agent config file")
     parser.add_argument("--config", help="Path to JSON file describing logs that should be monitored", required=True)
     parser.add_argument(
-        "--platform", help="OS family of this instance", choices=["amazon", "centos", "ubuntu"], required=True
+        "--platform", help="OS family of this instance", choices=["amazon", "centos", "ubuntu", "redhat"], required=True
     )
     parser.add_argument("--log-group", help="Name of the log group", required=True)
     parser.add_argument(
@@ -153,7 +153,7 @@ def add_scheduler_plugin_log(config_data, cluster_config_path):
                 "file_path": log_file.get("FilePath"),
                 "log_stream_name": log_file.get("LogStreamName"),
                 "schedulers": ["plugin"],
-                "platforms": ["centos", "ubuntu", "amazon"],
+                "platforms": ["centos", "ubuntu", "amazon", "redhat"],
                 "node_roles": get_node_roles(log_file.get("NodeType")),
                 "feature_conditions": [],
             }
