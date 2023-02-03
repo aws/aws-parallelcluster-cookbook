@@ -15,21 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-package %w(slurm* libslurm*) do
-  action :purge
-end
-
-slurm_build_deps = value_for_platform(
-  'ubuntu' => {
-    'default' => %w(libjson-c-dev libhttp-parser-dev),
-  },
-  'default' => %w(json-c-devel http-parser-devel)
-)
-
-package slurm_build_deps do
-  retries 3
-  retry_delay 5
-end
+slurm_dependencies 'Install slurm dependencies'
 
 # Setup slurm group
 group node['cluster']['slurm']['group'] do
