@@ -151,3 +151,16 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
+  - name: clusterstatusmgtd_init_slurm
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::clusterstatusmgtd_init_slurm]
+    verifier:
+      controls:
+        - clusterstatusmgtd_init_slurm_config
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::users
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::sudo

@@ -40,34 +40,7 @@ include_recipe "aws-parallelcluster-config::cloudwatch_agent"
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualized?
 
-# Cluster Status Management Demon
-if node['cluster']['node_type'] == 'HeadNode'
-  unless node['cluster']['scheduler'] == 'awsbatch'
-    # create placeholder for computefleet-status.json, so it can be written by clusterstatusmgtd which run as pcluster admin user
-    file node['cluster']['computefleet_status_path'] do
-      owner node['cluster']['cluster_admin_user']
-      group node['cluster']['cluster_admin_user']
-      content '{}'
-      mode '0755'
-      action :create
-    end
-
-    # create sudoers entry to let pcluster admin user execute update compute fleet recipe
-    template '/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd' do
-      source 'clusterstatusmgtd/99-parallelcluster-clusterstatusmgtd.erb'
-      owner 'root'
-      group 'root'
-      mode '0600'
-    end
-
-    # create log file for clusterstatusmgtd
-    file "/var/log/parallelcluster/clusterstatusmgtd" do
-      owner 'root'
-      group 'root'
-      mode '0640'
-    end
-  end
-end
+include_recipe "aws-parallelcluster-config::clusterstatusmgtd_init_slurm"
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
 include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
