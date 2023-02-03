@@ -17,7 +17,8 @@
       ],
       "platforms": [
         "amazon",
-        "centos"
+        "centos",
+        "redhat"
       ],
       "node_roles": [
         "ComputeFleet",
@@ -55,6 +56,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -74,6 +76,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -93,6 +96,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -112,6 +116,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -131,6 +136,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -149,6 +155,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -166,6 +173,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -183,6 +191,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -200,6 +209,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -217,6 +227,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -234,6 +245,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -251,6 +263,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -268,6 +281,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -285,6 +299,7 @@
       "platforms": [
         "amazon",
         "centos",
+        "redhat",
         "ubuntu"
       ],
       "node_roles": [
@@ -303,6 +318,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -326,6 +342,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -352,6 +369,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -378,6 +396,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -405,6 +424,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -429,6 +449,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -453,6 +474,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -477,6 +499,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -501,6 +524,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -525,6 +549,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -547,6 +572,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -565,6 +591,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
@@ -584,6 +611,7 @@
       ],
       "platforms": [
         "centos",
+        "redhat",
         "ubuntu",
         "amazon"
       ],
