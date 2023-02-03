@@ -21,24 +21,7 @@ validate_os_type
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd?
 
-# Determine scheduler_slots settings and update instance_slots appropriately
-node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slots']
-                                            when 'vcpus'
-                                              node['cpu']['total']
-                                            when 'cores'
-                                              node['cpu']['cores']
-                                            else
-                                              node['cluster']['scheduler_slots']
-                                            end
-
-template '/etc/parallelcluster/cfnconfig' do
-  source 'init/cfnconfig.erb'
-  mode '0644'
-end
-
-link '/opt/parallelcluster/cfnconfig' do
-  to '/etc/parallelcluster/cfnconfig'
-end
+include_recipe "aws-parallelcluster-config::cfnconfig_mixed"
 
 template "/opt/parallelcluster/scripts/fetch_and_run" do
   source 'init/fetch_and_run.erb'
