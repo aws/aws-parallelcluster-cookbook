@@ -183,3 +183,13 @@ suites:
       controls:
         - services_disabled_on_debian_family
         - services_disabled_on_amazon_family
+  - name: license_readme
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::license_readme]
+    verifier:
+      controls:
+        - license_readme_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
