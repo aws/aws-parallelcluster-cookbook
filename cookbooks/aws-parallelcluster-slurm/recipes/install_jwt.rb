@@ -34,17 +34,7 @@ ruby_block "Validate libjwt Tarball Checksum" do
   end
 end
 
-jwt_build_deps = value_for_platform(
-  'ubuntu' => {
-    'default' => 'libjansson-dev',
-  },
-  'default' => 'jansson-devel'
-)
-
-package jwt_build_deps do
-  retries 3
-  retry_delay 5
-end
+jwt_dependencies 'Install jwt dependencies'
 
 bash 'libjwt' do
   user 'root'
