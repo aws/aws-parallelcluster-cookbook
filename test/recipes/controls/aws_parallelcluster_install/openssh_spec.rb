@@ -12,8 +12,6 @@
 control 'openssh_installed' do
   title 'Check that openssh packages are installed and ssh/sshd config file exist'
 
-  only_if { !os_properties.virtualized? }
-
   files = %w(/etc/ssh/ssh_config)
   files.each do |file|
     describe file(file) do
@@ -25,10 +23,15 @@ control 'openssh_installed' do
   end
 
   files = %w(/etc/ssh/sshd_config /etc/ssh/ca_keys /etc/ssh/revoked_keys)
+  file_permission = if os.debian?
+                      '0644'
+                    else
+                      '0600'
+                    end
   files.each do |file|
     describe file(file) do
       it { should exist }
-      its('mode') { should cmp '0600' }
+      its('mode') { should cmp file_permission }
       its('owner') { should eq 'root' }
       its('group') { should eq 'root' }
     end

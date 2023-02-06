@@ -1,4 +1,4 @@
-control 'nfs' do
+control 'nfs_installed_with_right_version' do
   title 'Check NFS process is running and installed version'
 
   only_if { !os_properties.virtualized? }

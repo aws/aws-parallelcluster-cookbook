@@ -137,16 +137,25 @@ suites:
         - disable_selinux
   - name: openssh
     run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::openssh]
     verifier:
       controls:
         - openssh_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - resource:package_repos
   - name: gc_thresh_values
     run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::gc_thresh_values]
     verifier:
       controls:
         - gc_thresh_values_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
   - name: cfnconfig_mixed
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
