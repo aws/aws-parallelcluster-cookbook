@@ -18,6 +18,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.16.1amzn3.0-1`
   - Rdma-core: `rdma-core-43.0-1`
   - Open MPI: `openmpi40-aws-4.1.4-3`
+- Make Slurm controller logs more verbose and enable additional logging for the Slurm power save plugin.
 
 3.4.1
 -----
