@@ -4,8 +4,8 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV KERNEL_RELEASE 5.11.0-1017-aws
 
 # prep env so that required packages are cached
-RUN apt-get -y update && apt upgrade -y && \
-    apt-get -y install sudo build-essential curl wget jq nfs-common nfs-kernel-server udev
+RUN apt-get -y update && apt upgrade -y
+RUN apt-get -y install sudo build-essential curl wget jq nfs-common nfs-kernel-server udev
 
 # get packages that will be installed during bootstrapping
 RUN apt-get -y install vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools \
