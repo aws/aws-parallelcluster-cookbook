@@ -48,7 +48,7 @@ suites:
         - debian_udevd_reload_configuration
         - package_repos
         - install_packages
-        - nfs
+        - nfs_installed_with_right_version
         - cron_disabled_selected_daily_and_weekly_jobs
         - openssh_installed
         - ami_cleanup_file_created

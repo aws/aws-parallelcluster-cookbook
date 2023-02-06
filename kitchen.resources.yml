@@ -36,7 +36,6 @@ suites:
 
 <% [
   'package_repos',
-  'nfs',
   ].each do |resource| %>
   - name: <%= resource %>
     run_list:
@@ -51,8 +50,6 @@ suites:
 <%end %>
   - name: c_states
     run_list:
-      # This is a test recipe executing the default action of the resource you pass as `resource` attribute,
-      # with default properties
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -82,3 +79,13 @@ suites:
         - recipe:aws-parallelcluster::test_dummy
         - recipe:aws-parallelcluster-install::directories
       resource: mysql_client
+  - name: nfs
+    run_list:
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - nfs_installed_with_right_version
+    attributes:
+      resource: nfs
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
