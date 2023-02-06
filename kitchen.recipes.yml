@@ -147,3 +147,13 @@ suites:
     verifier:
       controls:
         - gc_thresh_values_configured
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::cfnconfig_mixed]
+    verifier:
+      controls:
+        - cfnconfig_file_configuration
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
