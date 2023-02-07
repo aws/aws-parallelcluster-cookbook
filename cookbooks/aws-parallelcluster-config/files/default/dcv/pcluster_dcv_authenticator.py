@@ -360,7 +360,8 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         """
         logger.info("Verifying NICE DCV session validity..")
         # Remove the first and the last because they are the heading and empty, respectively
-        processes = subprocess.check_output(["ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec
+        # All commands and arguments in this subprocess call are built as literals
+        processes = subprocess.check_output(["/bin/ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec B603
 
         # Check the filter is empty
         if not next(
