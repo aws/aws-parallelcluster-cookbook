@@ -148,10 +148,6 @@ default['cluster']['scheduler_plugin']['virtualenv_path'] = [
   node['cluster']['scheduler_plugin']['virtualenv'],
 ].join('/')
 
-# PMIx software
-default['cluster']['pmix']['version'] = '3.2.3'
-default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
-default['cluster']['pmix']['sha256'] = '1325a1355d0794196bb47665053fdbc588f9183aa5385f3581b668427316306e'
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.14'
 default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"

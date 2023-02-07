@@ -220,3 +220,16 @@ suites:
     verifier:
       controls:
         - networking_configured
+  - name: pmix_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_pmix]
+    verifier:
+      controls:
+        - pmix_installed
+        - pmix_library_shared
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
