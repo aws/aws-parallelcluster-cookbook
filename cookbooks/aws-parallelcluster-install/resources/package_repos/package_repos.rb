@@ -15,9 +15,10 @@
 provides :package_repos
 unified_mode true
 
+default_action :setup
+
 action :setup do
-  case node['platform_family']
-  when 'rhel', 'amazon'
+  if platform_family?('rhel', 'amazon')
     include_recipe 'yum'
     if platform_family?('amazon')
       alinux_extras_topic 'epel'
@@ -33,8 +34,13 @@ action :setup do
         command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
       end
     end
+  end
 
-  when 'debian'
+  action_update
+end
+
+action :update do
+  if platform_family?('debian')
     apt_update
   end
 end
