@@ -65,3 +65,11 @@ suites:
       resource: nfs
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
+  - name: sticky_bits
+    run_list:
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - sticky_bits_configured
+    attributes:
+      resource: sticky_bits
