@@ -52,7 +52,7 @@ end
 
 include_recipe 'aws-parallelcluster-slurm::install_jwt'
 
-slurm_tarball = "#{node['cluster']['sources_dir']}/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
+slurm_tarball = "#{node['cluster']['sources_dir']}/#{node['cluster']['slurm']['tar_name']}.tar.gz"
 
 # Get slurm tarball
 remote_file slurm_tarball do
@@ -84,7 +84,7 @@ bash 'make install' do
     source #{node['cluster']['cookbook_virtualenv_path']}/bin/activate
 
     tar xf #{slurm_tarball}
-    cd slurm-slurm-#{node['cluster']['slurm']['version']}
+    cd slurm-#{node['cluster']['slurm']['tar_name']}
     ./configure --prefix=#{node['cluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
