@@ -75,7 +75,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
       <% else %>
       image_search:
-        name: "RHEL-8*"
+        name: "RHEL-8*_HVM*"
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
     transport:
