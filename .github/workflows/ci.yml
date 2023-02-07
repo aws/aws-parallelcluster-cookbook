@@ -201,6 +201,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v1
         with:
           role-to-assume: arn:aws:iam::472648941662:role/my-github-actions-role
+          role-session-name: MySessionName
           aws-region: us-east-1
       - name: Check out code
         uses: actions/checkout@main
