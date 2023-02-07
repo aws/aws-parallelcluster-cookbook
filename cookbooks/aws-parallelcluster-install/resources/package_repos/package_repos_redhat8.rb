@@ -30,3 +30,7 @@ action :setup do
     command "yum-config-manager --enable #{node['cluster']['extra_repos']}"
   end unless virtualized?
 end
+
+action :update do
+  # Do nothing
+end
