@@ -189,3 +189,30 @@ jobs:
           KITCHEN_LOCAL_YAML: kitchen.validate.yml
           KITCHEN_GLOBAL_YAML: kitchen.global.yml
         continue-on-error: false
+  ec2-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - redhat8
+      fail-fast: false
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam::472648941662:role/my-github-actions-role
+          aws-region: us-east-2
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          os: ${{ matrix.os }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.ec2.yml
+          KITCHEN_LOCAL_YAML: kitchen.validate.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false
