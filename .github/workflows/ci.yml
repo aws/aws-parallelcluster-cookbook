@@ -87,6 +87,9 @@ jobs:
           ignore_paths: third-party
   ec2-validate:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     strategy:
       matrix:
         os:
@@ -94,7 +97,7 @@ jobs:
       fail-fast: false
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@master
         with:
           role-to-assume: arn:aws:iam::472648941662:role/my-github-actions-role
           role-session-name: MySessionName
