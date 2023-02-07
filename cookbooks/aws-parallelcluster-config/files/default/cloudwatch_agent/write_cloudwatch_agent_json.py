@@ -14,6 +14,7 @@ import socket
 import yaml
 
 AWS_CLOUDWATCH_CFG_PATH = "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+DEFAULT_METRICS_COLLECTION_INTERVAL = 60
 
 
 def parse_args():
@@ -140,8 +141,8 @@ def add_scheduler_plugin_log(config_data, cluster_config_path):
     """Add custom log files to config data if log files specified in scheduler plugin."""
     cluster_config = load_config(cluster_config_path)
     if (
-        get_dict_value(cluster_config, "Scheduling.SchedulerSettings.SchedulerDefinition.Monitoring.Logs.Files")
-        and get_dict_value(cluster_config, "Scheduling.Scheduler") == "plugin"
+            get_dict_value(cluster_config, "Scheduling.SchedulerSettings.SchedulerDefinition.Monitoring.Logs.Files")
+            and get_dict_value(cluster_config, "Scheduling.Scheduler") == "plugin"
     ):
         log_files = get_dict_value(
             cluster_config, "Scheduling.SchedulerSettings.SchedulerDefinition.Monitoring.Logs.Files"
@@ -177,14 +178,78 @@ def filter_output_fields(configs):
     return [{desired_key: config[desired_key] for desired_key in desired_keys} for config in configs]
 
 
-def create_config(log_configs):
-    """Return a dict representing the structure of the output JSON."""
-    return {
-        "logs": {
-            "logs_collected": {"files": {"collect_list": log_configs}},
-            "log_stream_name": f"{gethostname()}.{{instance_id}}.default-log-stream",
+def select_metrics(args):
+    """Add metrics_collected for CloudWatch Agent Metrics section."""
+    metric_configs = {}
+    metrics_collected = {}
+    metrics_collected = add_metrics_mem(metrics_collected, args.node_role)
+    metrics_collected = add_metrics_disk(metrics_collected, args.node_role)
+    metric_configs['metrics_collected'] = metrics_collected
+    return metric_configs
+
+
+def add_metrics_mem(metrics_collected, node_role):
+    """Add memory metrics for the metrics_collected field of CloudWatch Agent Metrics section."""
+    if node_role == "HeadNode":
+        metrics_collected['mem'] = {
+            "measurement": [
+                "mem_used_percent"
+            ],
+            "metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL,
+            "append_dimensions": {'ClusterName': get_node_info().get('stack_name')}
         }
+    return metrics_collected
+
+
+def add_metrics_disk(metrics_collected, node_role):
+    """Add disk metrics for the metrics_collected field of CloudWatch Agent Metrics section."""
+    if node_role == "HeadNode":
+        metrics_collected['disk'] = {
+            "measurement": [
+                "disk_used_percent"
+            ],
+            "metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL,
+            "resources": [
+                "/"
+            ],
+            "append_dimensions": {'ClusterName': get_node_info().get('stack_name')}
+        }
+    return metrics_collected
+
+
+def add_append_dimensions(metric_configs):
+    """Add the "append_dimensions" filed for the CloudWatch Agent Metrics section."""
+    append_dimensions = {"InstanceId": "${aws:InstanceId}"}
+    if len(metric_configs['metrics_collected']) > 0:
+        metric_configs['append_dimensions'] = append_dimensions
+    return metric_configs
+
+def add_aggregation_dimensions(metric_configs):
+    """Add the "aggregation_dimensions" filed for the CloudWatch Agent Metrics section."""
+    aggregation_dimensions = [
+        ['ClusterName'],
+        ['InstanceId']
+    ]
+    if len(metric_configs['metrics_collected']) > 0:
+        metric_configs['aggregation_dimensions'] = aggregation_dimensions
+    return metric_configs
+
+
+def create_config(log_configs, metric_configs):
+    """Return a dict representing the structure of the output JSON."""
+    logs_section = {
+        "logs_collected": {"files": {"collect_list": log_configs}},
+        "log_stream_name": f"{gethostname()}.{{instance_id}}.default-log-stream",
     }
+    metrics_section = {
+        "metrics_collected": metric_configs['metrics_collected'],
+        "append_dimensions": metric_configs['append_dimensions'],
+        "aggregation_dimensions": metric_configs['aggregation_dimensions']
+    } if len(metric_configs['metrics_collected']) > 0 else {}
+    cw_agent_config = {"logs": logs_section}
+    if len(metrics_section) > 0:
+        cw_agent_config["metrics"] = metrics_section
+    return cw_agent_config
 
 
 def get_dict_value(value, attributes, default=None):
@@ -207,7 +272,10 @@ def main():
     log_configs = add_log_group_name_params(args.log_group, log_configs)
     log_configs = add_instance_log_stream_prefixes(log_configs)
     log_configs = filter_output_fields(log_configs)
-    write_config(create_config(log_configs))
+    metric_configs = select_metrics(args)
+    metric_configs = add_append_dimensions(metric_configs)
+    metric_configs = add_aggregation_dimensions(metric_configs)
+    write_config(create_config(log_configs, metric_configs))
 
 
 if __name__ == "__main__":
