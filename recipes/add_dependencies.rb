@@ -2,7 +2,8 @@
 # This is useful if you need to test a resource with recipe/resources dependencies in the kitchen.resources/recipes.yml.
 
 # To use it add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
-# then define a dependencies attribute, listing them with recipe: or resource: prefix. Example:
+# then define a dependencies attribute, listing them with recipe: or resource: prefix.
+# For resources is also possible to specify the action. Example:
 
 #- name: resource_with_deps
 #  run_list:
@@ -16,14 +17,22 @@
 #    dependencies:
 #      - recipe:aws-parallelcluster::test_dummy
 #      - recipe:aws-parallelcluster-install::directories
-#      - resource:ec2_udev_rules
+#      - resource:package_repos:update
 
 if defined?(node['dependencies'])
   node['dependencies'].each do |dep|
     if dep.start_with?('recipe:')
       include_recipe dep.gsub('recipe:', '')
     else
-      declare_resource(dep.gsub('resource:', ''), 'test')
+      # expected syntax for resources is resource:resource-name:optional-action
+      resource_item = dep.split(/:/)
+      if resource_item[2].nil?
+        declare_resource(resource_item[1], 'test')
+      else
+        declare_resource(resource_item[1], 'test') do
+          action resource_item[2]
+        end
+      end
     end
   end
 end
