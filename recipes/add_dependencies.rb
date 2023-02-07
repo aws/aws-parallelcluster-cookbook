@@ -17,6 +17,7 @@
 #    dependencies:
 #      - recipe:aws-parallelcluster::test_dummy
 #      - recipe:aws-parallelcluster-install::directories
+#      - resource:ec2_udev_rules
 #      - resource:package_repos:update
 
 if defined?(node['dependencies'])

@@ -145,7 +145,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
-        - resource:package_repos
+        - resource:package_repos:update
   - name: gc_thresh_values
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
