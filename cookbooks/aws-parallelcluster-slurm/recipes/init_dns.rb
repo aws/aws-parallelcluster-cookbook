@@ -96,7 +96,56 @@ end
 # Configure fqdn in /etc/hosts
 replace_or_add "set fqdn in the /etc/hosts" do
   path "/etc/hosts"
-  pattern "^#{node['ec2']['local_ipv4']}\s+"
-  line(lazy { "#{node['ec2']['local_ipv4']} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
+  primary_ip = ""
+  # token = get_metadata_token
+  # generate the token for retrieving IMDSv2 metadata
+  token_uri = URI("http://169.254.169.254/latest/api/token")
+  token_request = Net::HTTP::Put.new(token_uri)
+  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
+  res = Net::HTTP.new("169.254.169.254").request(token_request)
+  token = res.body
+  Chef::Log.info("token: '#{token}'")
+  # macs = network_interface_macs(token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
+  # res = get_metadata_with_token(token, uri)
+  request = Net::HTTP::Get.new(uri)
+  request["X-aws-ec2-metadata-token"] = token
+  res = Net::HTTP.new("169.254.169.254").request(request)
+  metadata = res.body if res.code == '200'
+  res = metadata
+  macs = res.delete("/").split("\n")
+  Chef::Log.info("macs: '#{macs}'")
+  #log "macs: #{macs}"
+  for mac in macs
+    uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
+    #device_number = get_metadata_with_token(token, uri)
+    request = Net::HTTP::Get.new(uri)
+    request["X-aws-ec2-metadata-token"] = token
+    res = Net::HTTP.new("169.254.169.254").request(request)
+    metadata = res.body if res.code == '200'
+    device_number = metadata
+    Chef::Log.info("for mac '#{mac}' the device-number is '#{device_number}'")
+    uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
+    #network_card = get_metadata_with_token(token, uri)
+    request = Net::HTTP::Get.new(uri)
+    request["X-aws-ec2-metadata-token"] = token
+    res = Net::HTTP.new("169.254.169.254").request(request)
+    metadata = res.body if res.code == '200'
+    network_card = metadata
+    Chef::Log.info("for mac '#{mac}' the network-card is '#{network_card}'")
+    if device_number == '0' && network_card == '0'
+      uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/local-ipv4s")
+      #primary_ip = get_metadata_with_token(token, uri)
+      request = Net::HTTP::Get.new(uri)
+      request["X-aws-ec2-metadata-token"] = token
+      res = Net::HTTP.new("169.254.169.254").request(request)
+      metadata = res.body if res.code == '200'
+      primary_ip = metadata
+      Chef::Log.info("the primary_ip is '#{primary_ip}' from the mac '#{mac}'")
+      break
+    end
+  end
+  pattern "^#{primary_ip}\s+"
+  line(lazy { "#{primary_ip} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
   notifies :reload, "ohai[reload_hostname]"
 end
