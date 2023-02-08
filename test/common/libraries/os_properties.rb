@@ -11,16 +11,34 @@ class OsProperties < Inspec.resource(1)
     os_properties.redhat_ubi?
   '
 
-  def docker?
+  def virtualized?
     inspec.virtualization.system == 'docker'
   end
 
   def redhat_ubi?
-    docker? && inspec.os.name == 'redhat'
+    virtualized? && inspec.os.name == 'redhat'
+  end
+
+  def redhat?
+    inspec.os.name == 'redhat'
+  end
+
+  def centos?
+    inspec.os.name == 'centos'
   end
 
   def alinux2?
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
+  end
+
+  def debian_family?
+    inspec.os.family == 'debian'
+  end
+
+  def amazon_family?
+    # Inspec family has `amazon` under `linux` family name, but Infra family has
+    # a specific `amazon` family, so we need to check this via the os name instead.
+    inspec.os.name == 'amazon'
   end
 
   def arm?

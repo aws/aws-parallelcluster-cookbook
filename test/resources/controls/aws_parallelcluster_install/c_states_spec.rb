@@ -1,7 +1,7 @@
 
 control 'c_states_kernel_configuration' do
   title 'Check the configuration to disable c states'
-  only_if { !os_properties.docker? && os_properties.x86? }
+  only_if { !os_properties.virtualized? && os_properties.x86? }
 
   describe file('/etc/default/grub') do
     it { should exist }

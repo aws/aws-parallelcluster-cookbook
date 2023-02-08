@@ -102,7 +102,15 @@ default['cluster']['armpl']['url'] = [
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['version'] = '22-05-8-1'
-default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
+# WARNING: specify the commit hash only if a development version of Slurm must be used
+# WARNING: the whole commit hash must be used here (not a shortened version of the hash)
+default['cluster']['slurm']['commit'] = ''
+default['cluster']['slurm']['tar_name'] = if slurm_commit_hash?
+                                            "#{node['cluster']['slurm']['commit']}"
+                                          else
+                                            "slurm-#{node['cluster']['slurm']['version']}"
+                                          end
+default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/#{node['cluster']['slurm']['tar_name']}.tar.gz"
 default['cluster']['slurm']['sha256'] = '8c8f6a26a5d51e6c63773f2e02653eb724540ee8b360125c8d7732314ce737d6'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
@@ -242,7 +250,7 @@ default['cluster']['mysql']['repository']['expected']['version'] = value_for_pla
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.20.0'
+default['cluster']['efa']['installer_version'] = '1.21.0'
 default['cluster']['efa']['installer_url'] = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
@@ -420,11 +428,6 @@ default['cluster']['lustre']['client_url'] = value_for_platform(
     '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm",
   }
 )
-
-# Default gc_thresh values for performance at scale
-default['cluster']['sysctl']['ipv4']['gc_thresh1'] = 0
-default['cluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
-default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'

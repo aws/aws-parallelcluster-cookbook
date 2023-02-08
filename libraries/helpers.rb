@@ -282,17 +282,17 @@ def reload_network_config
 end
 
 #
+# Check if Slurm reference is provided as commit
+#
+def slurm_commit_hash?
+  !node['cluster']['slurm']['commit'].empty?
+end
+
+#
 # Check if this is an ARM instance
 #
 def arm_instance?
   node['kernel']['machine'] == 'aarch64'
-end
-
-#
-# Check if we are running in a virtualized environment
-#
-def virtualized?
-  node.include?('virtualized') and node['virtualized']
 end
 
 #
@@ -482,16 +482,6 @@ def get_metadata_with_token(token, uri)
   res = Net::HTTP.new("169.254.169.254").request(request)
   metadata = res.body if res.code == '200'
   metadata
-end
-
-def configure_gc_thresh_values
-  (1..3).each do |i|
-    # Configure gc_thresh values to be consistent with alinux2 default values
-    sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
-      value node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"]
-      action :apply
-    end
-  end
 end
 
 def get_system_users

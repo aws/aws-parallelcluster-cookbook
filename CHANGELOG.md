@@ -3,11 +3,31 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.6.0
+------
+
+**ENHANCEMENTS**
+- Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
+
+**CHANGES**
+- ...
+
 3.5.0
 ------
 
+**ENHANCEMENTS**
+- Fail cluster creation if cluster status changes to PROTECTED while provisioning static nodes.
+
 **CHANGES**
 - Upgrade Slurm to version 22.05.8.
+- Upgrade EFA installer to `1.21.0`
+  - Efa-driver: `efa-2.1.1-1`
+  - Efa-config: `efa-config-1.12-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.1amzn3.0-1`
+  - Rdma-core: `rdma-core-43.0-1`
+  - Open MPI: `openmpi40-aws-4.1.4-3`
+- Make Slurm controller logs more verbose and enable additional logging for the Slurm power save plugin.
 
 3.4.1
 -----
@@ -29,7 +49,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.16.1`
   - Rdma-core: `rdma-core-43.0-2`
   - Open MPI: `openmpi40-aws-4.1.4-3`
-- Mount EFS file systems using `amazon-efs-utils`. EFS files systems can be mounted using in-transit encryption and IAM authorized user. 
+- Mount EFS file systems using `amazon-efs-utils`. EFS files systems can be mounted using in-transit encryption and IAM authorized user.
 - Install `stunnel` 5.67 on CentOS7 and Ubuntu to support EFS in-transit encryption.
 - Add possibility to execute a custom script in the head node during the update of the cluster.
 - Upgrade Slurm to version 22.05.7.

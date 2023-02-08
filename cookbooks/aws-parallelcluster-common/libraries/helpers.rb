@@ -1,12 +1,12 @@
 #
-# Check if we are running in a virtualized environment
+# Check if we are running in a Docker System Tests
 #
-def docker?
-  node['virtualization']['system'] == 'docker'
+def virtualized?
+  node.include?('virtualized') and node['virtualized']
 end
 
 def redhat_ubi?
-  docker? && platform?('redhat')
+  virtualized? && platform?('redhat')
 end
 
 def x86?

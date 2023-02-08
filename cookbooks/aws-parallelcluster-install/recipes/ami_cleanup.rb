@@ -1,4 +1,10 @@
-# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# frozen_string_literal: true
+
+#
+# Cookbook:: aws-parallelcluster-install
+# Recipe:: ami_cleanup
+#
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -10,4 +16,11 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-METADATA_REQUEST_TIMEOUT = 60
+# Create AMI cleanup script
+cookbook_file "ami_cleanup.sh" do
+  source 'base/ami_cleanup.sh'
+  path '/usr/local/sbin/ami_cleanup.sh'
+  owner "root"
+  group "root"
+  mode "0755"
+end

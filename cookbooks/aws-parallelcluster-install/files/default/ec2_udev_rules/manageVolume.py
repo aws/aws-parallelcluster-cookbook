@@ -1,4 +1,5 @@
 # pylint: disable=C0103
+# pylint: disable=W0719
 # This file should name manage_volume.py by convention
 import argparse
 import configparser
@@ -10,7 +11,8 @@ import time
 import boto3
 import requests
 from botocore.config import Config
-from common import METADATA_REQUEST_TIMEOUT
+
+METADATA_REQUEST_TIMEOUT = 60
 
 
 def convert_dev(dev):

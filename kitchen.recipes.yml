@@ -129,3 +129,88 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster::test_dummy
+  - name: disable_selinux
+    run_list:
+      - recipe[aws-parallelcluster-install::disable_selinux]
+    verifier:
+      controls:
+        - disable_selinux
+  - name: openssh
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::openssh]
+    verifier:
+      controls:
+        - openssh_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - resource:package_repos:update
+  - name: gc_thresh_values
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::gc_thresh_values]
+    verifier:
+      controls:
+        - gc_thresh_values_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::cfnconfig_mixed]
+    verifier:
+      controls:
+        - cfnconfig_file_configuration
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+  - name: clusterstatusmgtd_init_slurm
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::clusterstatusmgtd_init_slurm]
+    verifier:
+      controls:
+        - clusterstatusmgtd_init_slurm_config
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::users
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::sudo
+  - name: ami_cleanup
+    run_list:
+      - recipe[aws-parallelcluster-install::ami_cleanup]
+    verifier:
+      controls:
+        - ami_cleanup_file_created
+  - name: disable_services
+    run_list:
+      - recipe[aws-parallelcluster-install::disable_services]
+    verifier:
+      controls:
+        - services_disabled_on_debian_family
+        - services_disabled_on_amazon_family
+  - name: license_readme
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::license_readme]
+    verifier:
+      controls:
+        - license_readme_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+  - name: cloudwatch_agent_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::cloudwatch_agent]
+    verifier:
+      controls:
+        - cloudwatch_agent_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
+        - recipe:aws-parallelcluster-install::cloudwatch_agent
