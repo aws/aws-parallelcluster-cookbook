@@ -25,13 +25,11 @@ unless shared_dir_array.include? node['cluster']['ephemeral_dir']
   service "setup-ephemeral" do
     supports restart: false
     action :enable
-  end
+  end unless virtualized?
 
   # Execution timeout 3600 seconds
-  unless virtualized?
-    execute "Setup of ephemeral drives" do
-      user "root"
-      command "/usr/local/sbin/setup-ephemeral-drives.sh"
-    end
-  end
+  execute "Setup of ephemeral drives" do
+    user "root"
+    command "/usr/local/sbin/setup-ephemeral-drives.sh"
+  end unless virtualized?
 end
