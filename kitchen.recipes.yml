@@ -18,6 +18,9 @@ verifier:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
+
+# Install recipes
+
   - name: sudo
     run_list:
       - recipe[aws-parallelcluster-install::sudo]
@@ -202,6 +205,9 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
+
+# Config recipes
+
 #  - name: cloudwatch_agent_configured
 #    run_list:
 #      - recipe[aws-parallelcluster::add_dependencies]
@@ -233,3 +239,39 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
+  - name: ephemeral_drives
+    #driver:
+    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::ephemeral_drives]
+    verifier:
+      controls:
+        - ephemeral_drives_service
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::ephemeral_drives
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: test3
+  - name: ephemeral_drives_skipped
+    #driver:
+    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::ephemeral_drives]
+    verifier:
+      controls:
+        - ephemeral_drives_with_name_clashing_not_mounted
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::ephemeral_drives
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: test1
