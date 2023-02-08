@@ -610,3 +610,9 @@ def format_directory(dir)
   format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
   format_dir
 end
+
+def network_interface_macs(token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
+  res = get_metadata_with_token(token, uri)
+  res.delete("/").split("\n")
+end
