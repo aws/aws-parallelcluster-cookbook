@@ -12,7 +12,7 @@
 control 'cloudwatch_agent_configured' do
   title 'Check that cloudwatch agent is correctly configured'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.virtualized? }
 
   describe file('/usr/local/bin/write_cloudwatch_agent_json.py') do
     it { should exist }

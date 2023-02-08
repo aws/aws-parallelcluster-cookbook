@@ -15,8 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: find a way to make this code work on ubi8
-return if redhat_ubi?
+return if virtualized?
 
 config_script_path = '/usr/local/bin/write_cloudwatch_agent_json.py'
 cookbook_file 'write_cloudwatch_agent_json.py' do

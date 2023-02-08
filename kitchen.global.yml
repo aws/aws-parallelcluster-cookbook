@@ -9,3 +9,4 @@ provisioner:
         server: {}
       parallelcluster-node-version: '3.4.1'
       node_type: 'HeadNode'
+      cw_logging_enabled: 'true'
