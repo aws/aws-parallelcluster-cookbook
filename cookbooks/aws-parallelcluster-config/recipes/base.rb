@@ -42,14 +42,7 @@ unless shared_dir_array.include? node['cluster']['ephemeral_dir']
   end
 end
 
-# Increase somaxconn and tcp_max_syn_backlog for large scale setting
-sysctl 'net.core.somaxconn' do
-  value 65_535
-end
-
-sysctl 'net.ipv4.tcp_max_syn_backlog' do
-  value 65_535
-end
+include_recipe 'aws-parallelcluster-config::networking'
 
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster-config::chrony'
