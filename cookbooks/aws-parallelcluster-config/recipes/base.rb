@@ -44,21 +44,7 @@ else
   raise "node_type must be HeadNode or ComputeFleet"
 end
 
-# Ensure cluster user can sudo on SSH
-template '/etc/sudoers.d/99-parallelcluster-user-tty' do
-  source 'base/99-parallelcluster-user-tty.erb'
-  owner 'root'
-  group 'root'
-  mode '0600'
-end
-
-# Install parallelcluster specific supervisord config
-template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
-  source 'base/parallelcluster_supervisord.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
+include_recipe "aws-parallelcluster-config::sudo"
 
 # Mount EFS, FSx
 include_recipe "aws-parallelcluster-config::fs_mount"

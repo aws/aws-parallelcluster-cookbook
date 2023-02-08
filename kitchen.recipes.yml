@@ -319,3 +319,14 @@ suites:
         fsx_shared_dirs: ''
         raid_shared_dir: ''
         ephemeral_dir: test1
+  - name: sudo_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::sudo]
+    verifier:
+      controls:
+        - sudo_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::sudo
