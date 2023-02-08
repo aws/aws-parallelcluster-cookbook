@@ -214,3 +214,9 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::python
         - recipe:aws-parallelcluster-install::cloudwatch_agent
+  - name: networking_configured
+    run_list:
+      - recipe[aws-parallelcluster-config::networking]
+    verifier:
+      controls:
+        - networking_configured
