@@ -17,6 +17,10 @@
 
 # Download the cloudwatch agent's public key. Note that the domain used to get
 # the public key must NOT be regionalized.
+
+# TODO: find a way to make this code work on ubi8
+return if redhat_ubi?
+
 remote_file node['cluster']['cloudwatch']['public_key_local_path'] do
   source node['cluster']['cloudwatch']['public_key_url']
   retries 3
@@ -95,6 +99,6 @@ when 'ubuntu'
   dpkg_package package_path do
     source package_path
   end
-when 'amazon', 'centos'
+when 'amazon', 'centos', 'redhat'
   package package_path
 end

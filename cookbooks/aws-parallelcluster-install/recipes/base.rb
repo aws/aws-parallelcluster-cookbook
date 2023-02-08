@@ -18,7 +18,7 @@
 include_recipe "aws-parallelcluster-common::setup_envars"
 include_recipe "aws-parallelcluster-install::sudo"
 include_recipe "aws-parallelcluster-install::users"
-include_recipe "aws-parallelcluster-install::disable_services" unless virtualized?
+include_recipe "aws-parallelcluster-install::disable_services"
 
 package_repos 'setup the repositories'
 
@@ -36,13 +36,7 @@ include_recipe "aws-parallelcluster-install::openssh"
 include_recipe "aws-parallelcluster-install::disable_selinux"
 
 # Install LICENSE README
-cookbook_file 'AWS-ParallelCluster-License-README.txt' do
-  source 'base/AWS-ParallelCluster-License-README.txt'
-  path "#{node['cluster']['license_dir']}/AWS-ParallelCluster-License-README.txt"
-  user 'root'
-  group 'root'
-  mode '0644'
-end
+include_recipe "aws-parallelcluster-install::license_readme"
 
 nfs 'install NFS daemon'
 include_recipe "aws-parallelcluster-install::ephemeral_drives"

@@ -22,7 +22,7 @@ def configure_gc_thresh_values
     sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
       value node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"]
       action :apply
-    end unless virtualized?
+    end
   end
 end
 

@@ -16,7 +16,7 @@
           },
           "platforms": {
             "type": "array",
-            "items": {"type": "string", "enum": ["amazon", "centos", "ubuntu"]}
+            "items": {"type": "string", "enum": ["amazon", "centos", "ubuntu", "redhat"]}
           },
           "node_roles": {
             "type": "array",

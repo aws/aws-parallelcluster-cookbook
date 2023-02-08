@@ -408,18 +408,17 @@ def _run_server(port, certificate=None, key=None):
     :param certificate: the certificate to use if HTTPSs
     :param key: the private key to use if HTTPSs
     """
-    server_address = ("localhost", port)
+    server_hostname = "localhost"
+    server_address = (server_hostname, port)
     httpd = ThreadedHTTPServer(server_address, DCVAuthenticator)
 
+    ssl_context = ssl.SSLContext()
+    ssl_context.minimum_version = ssl.TLSVersion.TLSv1_2
+    ssl_context.server_hostname = server_hostname
+
     if certificate:
-        if key:
-            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep pylint: disable=W4902
-                httpd.socket, certfile=certificate, keyfile=key, server_side=True
-            )
-        else:
-            httpd.socket = ssl.wrap_socket(  # nosec nosemgrep pylint: disable=W4902
-                httpd.socket, certfile=certificate, server_side=True
-            )
+        ssl_context.load_cert_chain(certfile=certificate, keyfile=key)
+        httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
     print(
         f"Starting DCV external authenticator {'HTTPS' if certificate else 'HTTP'} server on port {port}, use "
         f"<Ctrl-C> to stop "

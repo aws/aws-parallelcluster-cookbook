@@ -6,6 +6,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.6.0
 ------
 
+**ENHANCEMENTS**
+- Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
+
+**CHANGES**
+- ...
+
 3.5.0
 ------
 

@@ -17,6 +17,8 @@ case $action in
     ;;
     start)
     ;;
+    restart)
+    ;;
 esac
 }
 end
@@ -35,6 +37,7 @@ end
   /etc/init.d/nfs-client.target
   /etc/init.d/nfs-config.service
   /etc/init.d/nfs-kernel-server.service
+  /sbin/service
   /usr/local/bin/udevadm
   /usr/local/sbin/sysctl
   /usr/local/sbin/modprobe).each do |mock|
@@ -44,8 +47,5 @@ end
   end
 end
 
-directory '/sbin/service' do
-  mode '0777'
-end
 directory '/etc/cron.daily'
 directory '/etc/cron.weekly'

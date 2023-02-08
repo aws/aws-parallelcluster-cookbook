@@ -102,7 +102,15 @@ default['cluster']['armpl']['url'] = [
 # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['version'] = '22-05-8-1'
-default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/slurm-#{node['cluster']['slurm']['version']}.tar.gz"
+# WARNING: specify the commit hash only if a development version of Slurm must be used
+# WARNING: the whole commit hash must be used here (not a shortened version of the hash)
+default['cluster']['slurm']['commit'] = ''
+default['cluster']['slurm']['tar_name'] = if slurm_commit_hash?
+                                            "#{node['cluster']['slurm']['commit']}"
+                                          else
+                                            "slurm-#{node['cluster']['slurm']['version']}"
+                                          end
+default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/#{node['cluster']['slurm']['tar_name']}.tar.gz"
 default['cluster']['slurm']['sha256'] = '8c8f6a26a5d51e6c63773f2e02653eb724540ee8b360125c8d7732314ce737d6'
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
