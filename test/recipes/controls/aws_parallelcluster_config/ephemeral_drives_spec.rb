@@ -12,24 +12,26 @@
 control 'ephemeral_drives_service' do
   title 'Check ephemeral drives service is running'
 
+  only_if { !os_properties.virtualized? }
+
   describe service('setup-ephemeral') do
     it { should be_installed }
     it { should be_enabled }
   end
 
-  # TODO add test to see drivers are mounted
+  # TODO: add test to see drivers are mounted
 end
 
 control 'ephemeral_drives_with_name_clashing_not_mounted' do
   title 'Check ephemeral drives are not mounted when there is name clashing with reserved names'
+
+  only_if { !os_properties.virtualized? }
 
   describe service('setup-ephemeral') do
     it { should be_installed }
     it { should_not be_enabled }
     it { should_not be_running }
   end
-
-  only_if { !os_properties.virtualized? }
 
   describe bash('systemctl show setup-ephemeral.service -p ActiveState | grep "=inactive"') do
     its(:exit_status) { should eq 0 }
