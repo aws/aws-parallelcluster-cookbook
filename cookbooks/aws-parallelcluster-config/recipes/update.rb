@@ -22,10 +22,7 @@ unless node['cluster']['scheduler'] == 'awsbatch'
 end
 
 # generate the update shared storages mapping file
-template node['cluster']['shared_storages_mapping_path'] do
-  source 'shared_storages/shared_storages_data.erb'
-  mode '0644'
-end
+include_recipe 'aws-parallelcluster-config::fs_update'
 
 include_recipe 'aws-parallelcluster-config::directory_service'
 include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'

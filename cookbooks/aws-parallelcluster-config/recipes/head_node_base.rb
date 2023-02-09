@@ -16,10 +16,7 @@
 # limitations under the License.
 
 # generate the shared storages mapping file
-template node['cluster']['shared_storages_mapping_path'] do
-  source 'shared_storages/shared_storages_data.erb'
-  mode '0644'
-end
+include_recipe 'aws-parallelcluster-config::fs_update'
 
 manage_ebs "add ebs" do
   shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
