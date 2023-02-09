@@ -370,3 +370,13 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
+  - name: chrony_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::chrony]
+    verifier:
+      controls:
+        - chrony_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::chrony
