@@ -264,6 +264,20 @@ suites:
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
+  - name: nfs_threads
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::nfs]
+    verifier:
+      controls:
+        - nfs_thread_configured
+        - nfs_service_restarted
+    attributes:
+      cluster:
+        nfs:
+          threads: 10
+      dependencies:
+        - resource:nfs
   - name: networking_configured
     run_list:
       - recipe[aws-parallelcluster-config::networking]
