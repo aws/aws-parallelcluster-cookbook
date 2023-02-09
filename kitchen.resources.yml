@@ -147,3 +147,16 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
+  - name: stunnel_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - stunnel_installed
+    attributes:
+      resource: stunnel:setup
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
