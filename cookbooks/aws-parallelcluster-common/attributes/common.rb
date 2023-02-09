@@ -10,6 +10,10 @@ default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
 default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 
+default['cluster']['head_node_home_path'] = '/home'
+default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
+default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
+
 # Python Version
 default['cluster']['python-version'] = '3.9.16'
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
