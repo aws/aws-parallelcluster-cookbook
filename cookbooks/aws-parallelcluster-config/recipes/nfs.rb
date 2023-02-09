@@ -29,4 +29,4 @@ end
 service node['nfs']['service']['server'] do
   action %i(restart enable)
   supports restart: true
-end
+end unless virtualized?
