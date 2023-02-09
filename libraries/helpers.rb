@@ -482,13 +482,6 @@ def get_system_users
   cmd.stdout.split(/\n+/)
 end
 
-# Return the VPC CIDR list from node info
-def get_vpc_cidr_list
-  mac = node['ec2']['mac']
-  vpc_cidr_list = node['ec2']['network_interfaces_macs'][mac]['vpc_ipv4_cidr_blocks']
-  vpc_cidr_list.split(/\n+/)
-end
-
 def run_command(command)
   Mixlib::ShellOut.new(command).run_command.stdout.strip
 end
