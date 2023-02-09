@@ -10,7 +10,7 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-
                                              libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                              mdadm python2 python2-pip libgcrypt-devel libevent-devel glibc-static bind-utils
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                             coreutils moreutils sssd sssd-tools sssd-ldap curl environment-modules)
+                                             coreutils moreutils sssd sssd-tools sssd-ldap curl environment-modules gcc gcc-c++)
 
 # Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
 default['cluster']['extra_repos'] = 'codeready-builder-for-rhel-8-rhui-rpms'
