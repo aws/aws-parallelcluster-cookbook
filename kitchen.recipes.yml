@@ -400,6 +400,27 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::chrony
+  - name: install_slurm
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_slurm]
+    verifier:
+      controls:
+        - slurm_installed
+        - slurm_user_and_group_created
+        - slurm_licence_configured
+        - slurm_shared_libraries_compiled
+        - slurm_library_shared
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:mysql_client
+        - recipe:aws-parallelcluster-install::python
+        - recipe:aws-parallelcluster-slurm::install_jwt
+        - recipe:aws-parallelcluster-slurm::install_pmix
+        - resource:munge
   - name: imds_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
