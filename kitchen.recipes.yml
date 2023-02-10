@@ -18,6 +18,9 @@ verifier:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
+
+# Install recipes
+
   - name: sudo
     run_list:
       - recipe[aws-parallelcluster-install::sudo]
@@ -202,6 +205,9 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
+
+# Config recipes
+
 #  - name: cloudwatch_agent_configured
 #    run_list:
 #      - recipe[aws-parallelcluster::add_dependencies]
@@ -214,9 +220,141 @@ suites:
 #        - recipe:aws-parallelcluster-install::directories
 #        - recipe:aws-parallelcluster-install::python
 #        - recipe:aws-parallelcluster-install::cloudwatch_agent
+  - name: fs_update
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::fs_update]
+    verifier:
+      controls:
+        - fs_data_file_created_correctly
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster::test_dummy
+      cluster:
+        ebs_shared_dirs: ebs1,ebs2
+        volume: volume1,volume2
+        raid_shared_dir: raid1
+        raid_type: 1
+        raid_vol_ids: volume1,volume2
+        efs_shared_dirs: efs1,efs2
+        efs_fs_ids: efs-id1,efs-id2
+        efs_encryption_in_transits: true,false
+        efs_iam_authorizations: iam1,iam2
+        fsx_shared_dirs: fsx1,fsx2
+        fsx_fs_ids: fsx-id1,fsx-id2
+        fsx_fs_types: type1,type2
+        fsx_dns_names: dns1,dns2
+        fsx_mount_names: mount1,mount2
+        fsx_volume_junction_paths: value1,value2
+  - name: fs_update_default_values
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::fs_update]
+    verifier:
+      controls:
+        - fs_data_file_with_default_values
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster::test_dummy
+      cluster:
+        ebs_shared_dirs: '/shared'
+        volume: ''
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+  - name: nfs_threads
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::nfs]
+    verifier:
+      controls:
+        - nfs_thread_configured
+        - nfs_service_restarted
+    attributes:
+      cluster:
+        nfs:
+          threads: 10
+      dependencies:
+        - resource:nfs
   - name: networking_configured
     run_list:
       - recipe[aws-parallelcluster-config::networking]
     verifier:
       controls:
         - networking_configured
+  - name: pmix_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_pmix]
+    verifier:
+      controls:
+        - pmix_installed
+        - pmix_library_shared
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: ssh_target_checker
+    run_list:
+      - recipe[aws-parallelcluster-config::openssh]
+    verifier:
+      controls:
+        - ssh_target_checker_script_created
+    attributes:
+      ec2:
+        mac: mac1
+        network_interfaces_macs:
+          mac1:
+            vpc_ipv4_cidr_blocks: |
+              cidr1
+              cidr2
+  - name: ephemeral_drives
+    #driver:
+    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::ephemeral_drives]
+    verifier:
+      controls:
+        - ephemeral_drives_service
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::ephemeral_drives
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: test3
+  - name: ephemeral_drives_skipped
+    #driver:
+    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::ephemeral_drives]
+    verifier:
+      controls:
+        - ephemeral_drives_with_name_clashing_not_mounted
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::ephemeral_drives
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: test1
+  - name: sudo_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::sudo]
+    verifier:
+      controls:
+        - sudo_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::sudo
