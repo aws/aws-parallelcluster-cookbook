@@ -121,6 +121,11 @@ default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 default['cluster']['slurm']['install_dir'] = "/opt/slurm"
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
+# Munge
+default['cluster']['munge']['user'] = 'munge'
+default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
+default['cluster']['munge']['group'] = node['cluster']['munge']['user']
+default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # Scheduler plugin Configuration
 default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
@@ -150,14 +155,6 @@ default['cluster']['scheduler_plugin']['virtualenv_path'] = [
   'envs',
   node['cluster']['scheduler_plugin']['virtualenv'],
 ].join('/')
-
-# Munge
-default['cluster']['munge']['munge_version'] = '0.5.14'
-default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"
-default['cluster']['munge']['user'] = 'munge'
-default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
-default['cluster']['munge']['group'] = node['cluster']['munge']['user']
-default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
