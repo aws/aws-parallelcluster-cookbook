@@ -158,10 +158,6 @@ default['cluster']['munge']['user'] = 'munge'
 default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
 default['cluster']['munge']['group'] = node['cluster']['munge']['user']
 default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
-# JWT
-default['cluster']['jwt']['version'] = '1.12.0'
-default['cluster']['jwt']['url'] = "https://github.com/benmcollins/libjwt/archive/refs/tags/v#{node['cluster']['jwt']['version']}.tar.gz"
-default['cluster']['jwt']['sha256'] = 'eaf5d8b31d867c02dde767efa2cf494840885a415a3c9a62680bf870a4511bee'
 
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
