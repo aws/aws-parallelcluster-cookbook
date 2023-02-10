@@ -25,7 +25,7 @@ remote_file jwt_tarball do
   mode '0644'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(jwt_tarball) }
+  action :create_if_missing
 end
 
 ruby_block "Validate libjwt Tarball Checksum" do
