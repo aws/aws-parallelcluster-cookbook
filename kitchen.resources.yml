@@ -116,6 +116,17 @@ suites:
         - efa_prereq_packages_installed
         - efa_installed
     attributes:
-      resource: efa
+      resource: efa:setup
       dependencies:
         - recipe:aws-parallelcluster-install::directories
+  - name: efa_configure
+    run_list:
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - efa_system_settings_configured
+    attributes:
+      resource: efa:configure
+      cluster:
+        enable_efa: compute
+        node_type: ComputeFleet
