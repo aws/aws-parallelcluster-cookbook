@@ -17,49 +17,55 @@
 
 slurm_dependencies 'Install slurm dependencies'
 
+slurm_user = node['cluster']['slurm']['user']
+slurm_user_id = node['cluster']['slurm']['user_id']
+slurm_group = node['cluster']['slurm']['group']
+slurm_group_id = node['cluster']['slurm']['group_id']
+slurm_install_dir = node['cluster']['slurm']['install_dir']
+
+slurm_version = node['cluster']['slurm']['version']
+slurm_commit = node['cluster']['slurm']['commit']
+slurm_tar_name = if slurm_commit.empty?
+                   "slurm-#{slurm_version}"
+                 else
+                   "#{slurm_commit}"
+                 end
+slurm_tarball = "#{node['cluster']['sources_dir']}/#{slurm_tar_name}.tar.gz"
+slurm_url = "https://github.com/SchedMD/slurm/archive/#{slurm_tar_name}.tar.gz"
+slurm_sha256 = node['cluster']['slurm']['sha256']
+
 # Setup slurm group
-group node['cluster']['slurm']['group'] do
+group slurm_group do
   comment 'slurm group'
-  gid node['cluster']['slurm']['group_id']
+  gid slurm_group_id
   system true
 end
 
 # Setup slurm user
-user node['cluster']['slurm']['user'] do
+user slurm_user do
   comment 'slurm user'
-  uid node['cluster']['slurm']['user_id']
-  gid node['cluster']['slurm']['group_id']
+  uid slurm_user_id
+  gid slurm_group_id
   # home is mounted from the head node
   manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
-  home "/home/#{node['cluster']['slurm']['user']}"
+  home "/home/#{slurm_user}"
   system true
   shell '/bin/bash'
 end
 
-include_recipe 'aws-parallelcluster-slurm::install_jwt'
-
-slurm_tarball = "#{node['cluster']['sources_dir']}/#{node['cluster']['slurm']['tar_name']}.tar.gz"
-
 # Get slurm tarball
 remote_file slurm_tarball do
-  source node['cluster']['slurm']['url']
+  source slurm_url
   mode '0644'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(slurm_tarball) }
-end
-
-# Validate the authenticity of the downloaded archive based on the checksum published by SchedMD
-ruby_block "Validate Slurm Tarball Checksum" do
-  block do
-    require 'digest'
-    checksum = Digest::SHA256.file(slurm_tarball).hexdigest
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['slurm']['sha256']}" if checksum != node['cluster']['slurm']['sha256']
-  end
+  checksum slurm_sha256
+  action :create_if_missing
 end
 
 # Install Slurm
 bash 'make install' do
+  not_if { redhat_ubi? }
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
@@ -70,8 +76,8 @@ bash 'make install' do
     source #{node['cluster']['cookbook_virtualenv_path']}/bin/activate
 
     tar xf #{slurm_tarball}
-    cd slurm-#{node['cluster']['slurm']['tar_name']}
-    ./configure --prefix=#{node['cluster']['slurm']['install_dir']} --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
+    cd slurm-#{slurm_tar_name}
+    ./configure --prefix=#{slurm_install_dir} --with-pmix=/opt/pmix --with-jwt=/opt/libjwt --enable-slurmrestd
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     make install
@@ -79,19 +85,20 @@ bash 'make install' do
     deactivate
   SLURM
   # TODO: Fix, so it works for upgrade
-  creates "#{node['cluster']['slurm']['install_dir']}/bin/srun"
+  creates "#{slurm_install_dir}/bin/srun"
 end
 
 # Copy required licensing files
 directory "#{node['cluster']['license_dir']}/slurm"
 
 bash 'copy license stuff' do
+  not_if { redhat_ubi? }
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
   code <<-SLURMLICENSE
     set -e
-    cd slurm-slurm-#{node['cluster']['slurm']['version']}
+    cd slurm-slurm-#{slurm_version}
     cp -v COPYING #{node['cluster']['license_dir']}/slurm/COPYING
     cp -v DISCLAIMER #{node['cluster']['license_dir']}/slurm/DISCLAIMER
     cp -v LICENSE.OpenSSL #{node['cluster']['license_dir']}/slurm/LICENSE.OpenSSL
@@ -101,21 +108,8 @@ bash 'copy license stuff' do
   creates "#{node['cluster']['license_dir']}/slurm/README.rst"
 end
 
-# Install PerlSwitch
-case node['platform']
-when 'ubuntu'
-  package 'libswitch-perl' do
-    retries 3
-    retry_delay 5
-  end
-when 'centos', 'amazon'
-  package 'perl-Switch' do
-    retries 3
-    retry_delay 5
-  end
-end
-
 file '/etc/ld.so.conf.d/slurm.conf' do
-  content "#{node['cluster']['slurm']['install_dir']}/lib/"
+  not_if { redhat_ubi? }
+  content "#{slurm_install_dir}/lib/"
   mode '0744'
 end
