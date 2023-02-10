@@ -24,6 +24,17 @@ suites:
         - package_repos
     attributes:
       resource: package_repos
+  - name: install_packages
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - install_packages
+    attributes:
+      dependencies:
+        - resource:package_repos
+      resource: install_packages
   - name: c_states
     run_list:
       - recipe[aws-parallelcluster-install::test_resource]
