@@ -12,8 +12,6 @@
 control 'efa_conflicting_packages_removed' do
   title 'Check packages conflicting with EFA are not installed'
 
-  only_if { !os_properties.virtualized? }
-
   if os.redhat?
     openmpi_packages = %w(openmpi-devel openmpi)
   elsif os.debian?
@@ -31,6 +29,17 @@ control 'efa_conflicting_packages_removed' do
   end
 end
 
+control 'efa_prereq_packages_installed' do
+  title "EFA prereq packages are installed"
+
+  efa_prereq_packages = %w(environment-modules)
+  efa_prereq_packages.each do |pkg|
+    describe package(pkg) do
+      it { should be_installed }
+    end
+  end
+end
+
 control 'efa_installed' do
   title 'Check EFA is installed'
 
@@ -39,14 +48,14 @@ control 'efa_installed' do
   describe "Verify EFA Kernel module is available\n" do
     describe command("modinfo efa") do
       its('exit_status') { should eq(0) }
-      its('stdout') { should match "name:\s+efa" }
+      its('stdout') { should match "description:\s+Elastic Fabric Adapter" }
     end
   end
 
   describe "Verify version of EFA\n" do
     describe file("/opt/amazon/efa_installed_packages") do
       it { should exist }
-      its('content') { should match(/EFA installer version: 1.20.0/) }
+      its('content') { should match(/EFA installer version: 1.21.0/) }
     end
   end
 end
