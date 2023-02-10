@@ -26,7 +26,7 @@ remote_file pmix_tarball do
   mode '0644'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(pmix_tarball) }
+  action :create_if_missing
 end
 
 ruby_block "Validate PMIx Tarball Checksum" do
