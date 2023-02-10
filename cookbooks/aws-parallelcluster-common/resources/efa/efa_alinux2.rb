@@ -11,15 +11,19 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License
-provides :efa, platform: 'ubuntu', platform_version: '20.04'
+# See the License for the specific language governing permissions and limitations under the License.
+provides :efa, platform: 'amazon', platform_version: '2'
 unified_mode true
 default_action :setup
 
 use 'partial/_setup'
 
+action :configure do
+  # do nothing
+end
+
 action_class do
   def conflicting_packages
-    %w(libopenmpi-dev)
+    %w(openmpi-devel openmpi)
   end
 end

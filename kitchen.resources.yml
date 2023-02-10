@@ -109,7 +109,7 @@ suites:
   - name: efa
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-install::test_resource]
+      - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
         - efa_conflicting_packages_removed
