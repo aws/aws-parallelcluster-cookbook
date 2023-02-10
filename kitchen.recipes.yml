@@ -358,3 +358,15 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+  - name: jwt_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_jwt]
+    verifier:
+      controls:
+        - jwt_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
