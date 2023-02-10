@@ -255,7 +255,7 @@ end
 ###################
 # EFA
 ###################
-if node['conditions']['efa_supported']
+if efa_supported?
   if node['cluster']['os'].end_with?("-custom")
     # only check EFA is installed because when found in the base AMI we skip installation
     bash 'check efa installed' do

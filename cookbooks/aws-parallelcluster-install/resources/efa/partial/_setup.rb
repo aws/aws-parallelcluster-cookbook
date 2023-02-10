@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -12,52 +13,50 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :efa
-unified_mode true
-
-default_action :setup
-
-efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
-
-action :remove_conflicting_packages do
-  # default openmpi installation conflicts with new install
-  # new one is installed in /opt/amazon/efa/bin/
-  case node['platform_family']
-  when 'rhel', 'amazon'
-    package %w(openmpi-devel openmpi) do
-      action :remove
-      not_if efa_installed?
-    end
-  when 'debian'
-    package "libopenmpi-dev" do
-      action :remove
-      not_if efa_installed?
-    end
-  end
-end
-
 action :setup do
-  return if virtualized?
-
   if efa_installed? && !::File.exist?(efa_tarball)
     Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
     return
   end
 
-  action_remove_conflicting_packages
+  # remove conflicting packages
+  # default openmpi installation conflicts with new install
+  # new one is installed in /opt/amazon/efa/bin/
+  package conflicting_packages do
+    action :remove
+    not_if efa_installed?
+  end
+
+  # update repos and install prerequisite packages
+  package_repos 'update package repos' do
+    action :update
+  end
+  package %w(environment-modules) do
+    retries 3
+    retry_delay 5
+  end
+
+  action_download_and_install
+end
+
+action :download_and_install do
+  return if virtualized?
+
+  efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
+  efa_installer_url = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
 
   # Get EFA Installer
   remote_file efa_tarball do
-    source node['cluster']['efa']['installer_url']
+    source efa_installer_url
     mode '0644'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?(efa_tarball) }
+    action :create_if_missing
   end
 
   installer_options = "-y"
   # skip efa-kmod installation on not supported platforms
-  installer_options += " -k" unless node['conditions']['efa_supported']
+  installer_options += " -k" unless efa_supported?
 
   bash "install efa" do
     cwd node['cluster']['sources_dir']

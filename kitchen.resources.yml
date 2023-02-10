@@ -113,9 +113,9 @@ suites:
     verifier:
       controls:
         - efa_conflicting_packages_removed
+        - efa_prereq_packages_installed
         - efa_installed
     attributes:
       resource: efa
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
         - recipe:aws-parallelcluster-install::directories
