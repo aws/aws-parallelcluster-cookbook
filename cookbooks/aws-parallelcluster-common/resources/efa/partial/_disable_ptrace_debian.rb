@@ -11,15 +11,13 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License
-provides :efa, platform: 'ubuntu', platform_version: '18.04'
-unified_mode true
-default_action :setup
+# See the License for the specific language governing permissions and limitations under the License.
 
-use 'partial/_setup'
-
-action_class do
-  def conflicting_packages
-    %w(libopenmpi-dev)
+action :disable_ptrace do
+  # Disabling ptrace protection is needed for EFA in order to use SHA transfer for intra-node communication.
+  if node['cluster']['enable_efa'] == 'compute' && node['cluster']['node_type'] == 'ComputeFleet'
+    sysctl 'kernel.yama.ptrace_scope' do
+      value 0
+    end
   end
 end
