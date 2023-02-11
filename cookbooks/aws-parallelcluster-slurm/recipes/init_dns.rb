@@ -98,21 +98,17 @@ replace_or_add "set fqdn in the /etc/hosts" do
   path "/etc/hosts"
   primary_ip = ""
   token = get_metadata_token
-  Chef::Log.info("token: '#{token}'")
   macs = network_interface_macs(token)
   for mac in macs
     uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
     device_number = get_metadata_with_token(token, uri)
-    Chef::Log.info("for mac '#{mac}' the device-number is '#{device_number}'")
     uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
     network_card = get_metadata_with_token(token, uri)
-    Chef::Log.info("for mac '#{mac}' the network-card is '#{network_card}'")
-    if device_number == '0' && network_card == '0'
-      uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/local-ipv4s")
-      primary_ip = get_metadata_with_token(token, uri)
-      Chef::Log.info("the primary_ip is '#{primary_ip}' from the mac '#{mac}'")
-      break
-    end
+    next unless device_number == '0' && network_card == '0'
+
+    uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/local-ipv4s")
+    primary_ip = get_metadata_with_token(token, uri)
+    break
   end
   pattern "^#{primary_ip}\s+"
   line(lazy { "#{primary_ip} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
