@@ -22,7 +22,7 @@ control 'cloudwatch_agent_configured' do
     its('content') { should_not be_empty }
   end
 
-  files = %w(/usr/local/etc/cloudwatch_log_files.json /usr/local/etc/cloudwatch_log_files_schema.json /usr/local/bin/cloudwatch_log_configs_util.py)
+  files = %w(/usr/local/etc/cloudwatch_agent_config.json /usr/local/etc/cloudwatch_agent_config_schema.json /usr/local/bin/cloudwatch_agent_config_util.py)
   files.each do |file|
     describe file(file) do
       it { should exist }

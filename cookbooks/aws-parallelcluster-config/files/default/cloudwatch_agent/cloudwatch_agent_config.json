@@ -620,5 +620,49 @@
       ],
       "feature_conditions": []
     }
-  ]
+  ],
+  "metric_configs": {
+    "metrics_collected": [
+      {
+        "metric_type": "mem",
+        "measurement": [
+          "mem_used_percent"
+        ],
+        "metrics_collection_interval": 60,
+        "append_dimensions": [
+          "ClusterName"
+        ],
+        "node_roles": [
+          "HeadNode"
+        ]
+      },
+      {
+        "metric_type": "disk",
+        "measurement": [
+          "disk_used_percent"
+        ],
+        "resources": [
+          "/"
+        ],
+        "metrics_collection_interval": 60,
+        "append_dimensions": [
+          "ClusterName"
+        ],
+        "node_roles": [
+          "HeadNode"
+        ]
+      }
+    ],
+    "append_dimensions": [
+      "InstanceId"
+    ],
+    "aggregation_dimensions": [
+      [
+        "ClusterName"
+      ],
+      [
+        "InstanceId"
+      ]
+    ]
+  }
 }
