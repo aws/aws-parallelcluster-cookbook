@@ -201,29 +201,6 @@ def select_metrics(configs, args):
     return metric_configs
 
 
-# def add_metrics_mem(metrics_collected, node_role):
-#     """Add memory metrics for the metrics_collected field of CloudWatch Agent Metrics section."""
-#     if node_role == "HeadNode":
-#         metrics_collected["mem"] = {
-#             "measurement": ["mem_used_percent"],
-#             "metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL,
-#             "append_dimensions": {"ClusterName": get_node_info().get("stack_name")},
-#         }
-#     return metrics_collected
-#
-#
-# def add_metrics_disk(metrics_collected, node_role):
-#     """Add disk metrics for the metrics_collected field of CloudWatch Agent Metrics section."""
-#     if node_role == "HeadNode":
-#         metrics_collected["disk"] = {
-#             "measurement": ["disk_used_percent"],
-#             "metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL,
-#             "resources": ["/"],
-#             "append_dimensions": {"ClusterName": get_node_info().get("stack_name")},
-#         }
-#     return metrics_collected
-
-
 def select_append_dimensions(dimensions):
     """Create the dictionary of append dimensions according to a list of dimension names."""
     valid_append_dimensions = {
