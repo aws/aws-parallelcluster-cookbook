@@ -23,6 +23,7 @@ include_recipe 'aws-parallelcluster-test::test_sudoers'
 include_recipe 'aws-parallelcluster-test::test_openssh'
 include_recipe 'aws-parallelcluster-test::test_nvidia'
 include_recipe 'aws-parallelcluster-test::test_dcv'
+include_recipe 'aws-parallelcluster-test::test_primary_ip'
 
 ###################
 # AWS Cli
