@@ -185,7 +185,9 @@ def create_metrics_collected(selected_configs):
         metric_key = metric_config["metric_type"]
         metrics_collected[metric_key] = {
             "measurement": metric_config["measurement"],
-            "metrics_collection_interval": metric_config.get("metrics_collection_interval", DEFAULT_METRICS_COLLECTION_INTERVAL),
+            "metrics_collection_interval": metric_config.get(
+                "metrics_collection_interval", DEFAULT_METRICS_COLLECTION_INTERVAL
+            ),
         }
         if "resources" in metric_config.keys():
             metrics_collected[metric_key]["resources"] = metric_config["resources"]
@@ -209,7 +211,7 @@ def select_append_dimensions(dimensions):
         "InstanceType": "${aws:InstanceType}",
         "AutoScalingGroupName": "${aws:AutoScalingGroupName}",
     }
-    append_dimensions = {key : valid_append_dimensions[key] for key in dimensions}
+    append_dimensions = {key: valid_append_dimensions[key] for key in dimensions}
     return append_dimensions
 
 
