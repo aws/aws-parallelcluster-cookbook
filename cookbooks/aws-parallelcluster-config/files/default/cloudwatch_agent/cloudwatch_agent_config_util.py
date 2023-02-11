@@ -1,11 +1,11 @@
 """
-Validate and modify the data in the cloudwatch_log_files.json cookbook file.
+Validate and modify the data in the cloudwatch_agent_config.json cookbook file.
 
 This file is used to validate and add data to the JSON file that's used to
 configure the CloudWatch agent on a cluster's EC2 instances. The structure of
 the new and/or existing data is validated in the following ways:
 * jsonschema is used to ensure that the input and output configs both possess
-  a valid structure. See cloudwatch_log_files_schema.json for the schema.
+  a valid structure. See cloudwatch_agent_config_schema.json for the schema.
 * For each log_configs entry, it's verified that its timestamp_key is a valid
   key into the same config file's timestamp_formats object.
 * It's verified that all log_configs entries have unique values for their
@@ -21,9 +21,9 @@ import sys
 
 import jsonschema
 
-DEFAULT_SCHEMA_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_log_files_schema.json"))
+DEFAULT_SCHEMA_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_agent_config_schema.json"))
 SCHEMA_PATH = os.environ.get("CW_LOGS_CONFIGS_SCHEMA_PATH", DEFAULT_SCHEMA_PATH)
-DEFAULT_LOG_CONFIGS_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_log_files.json"))
+DEFAULT_LOG_CONFIGS_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_agent_config.json"))
 LOG_CONFIGS_PATH = os.environ.get("CW_LOGS_CONFIGS_PATH", DEFAULT_LOG_CONFIGS_PATH)
 LOG_CONFIGS_BAK_PATH = f"{LOG_CONFIGS_PATH}.bak"
 
@@ -74,7 +74,7 @@ def _read_schema():
 
 
 def _read_log_configs():
-    """Read the current version of the CloudWatch log configs file, cloudwatch_log_files.json."""
+    """Read the current version of the CloudWatch log configs file, cloudwatch_agent_config.json."""
     return _read_json_at(LOG_CONFIGS_PATH)
 
 

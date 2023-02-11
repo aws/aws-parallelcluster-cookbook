@@ -1,0 +1,101 @@
+{
+  "type": "object",
+  "properties": {
+    "timestamp_formats": {"type": "object"},
+    "log_configs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp_format_key": {"type": "string"},
+          "file_path": {"type": "string"},
+          "log_stream_name": {"type": "string"},
+          "schedulers": {
+            "type": "array",
+            "items": {"type": "string", "enum": ["awsbatch", "slurm", "plugin"]}
+          },
+          "platforms": {
+            "type": "array",
+            "items": {"type": "string", "enum": ["amazon", "centos", "ubuntu", "redhat"]}
+          },
+          "node_roles": {
+            "type": "array",
+            "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet"]}
+          },
+          "feature_conditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "dna_key": {"type": ["string", "array"]},
+                "satisfying_values": {"type": "array", "items": {"type": "string"}}
+              },
+              "required": ["dna_key", "satisfying_values"]
+            }
+          }
+        },
+        "required": [
+          "node_roles",
+          "platforms",
+          "schedulers",
+          "log_stream_name",
+          "file_path",
+          "timestamp_format_key",
+          "feature_conditions"
+        ]
+      }
+    },
+    "metric_configs": {
+      "type": "object",
+      "properties": {
+        "metrics_collected": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "metric_type": {"type": "string"},
+              "measurement": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "resources": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "metrics_collection_interval": {"type": "integer"},
+              "append_dimensions": {
+                "type": "array",
+                "items": {"type": "string", "enum": ["ClusterName"]}
+              },
+              "node_roles": {
+                "type": "array",
+                "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet"]}
+              }
+            },
+            "required": [
+              "metric_type",
+              "measurement",
+              "node_roles"
+            ]
+          }
+        },
+        "append_dimensions": {
+          "type": "array",
+          "item": {
+            "type": "string",
+            "enum": ["ImageId", "InstanceId", "InstanceType", "AutoScalingGroupName"]
+          }
+        },
+        "aggregation_dimensions": {
+          "type": "array",
+          "item": {
+            "type": "array",
+            "item": {"type": "string"}
+          }
+        }
+      },
+      "required": ["metrics_collected"]
+    }
+  },
+  "required": ["timestamp_formats", "log_configs", "metric_configs"]
+}

@@ -28,30 +28,30 @@ cookbook_file 'write_cloudwatch_agent_json.py' do
   mode '0755'
 end
 
-config_data_path = '/usr/local/etc/cloudwatch_log_files.json'
-cookbook_file 'cloudwatch_log_files.json' do
+config_data_path = '/usr/local/etc/cloudwatch_agent_config.json'
+cookbook_file 'cloudwatch_agent_config.json' do
   not_if { ::File.exist?(config_data_path) }
-  source 'cloudwatch_agent/cloudwatch_log_files.json'
+  source 'cloudwatch_agent/cloudwatch_agent_config.json'
   path config_data_path
   user 'root'
   group 'root'
   mode '0644'
 end
 
-config_schema_path = '/usr/local/etc/cloudwatch_log_files_schema.json'
-cookbook_file 'cloudwatch_log_files_schema.json' do
+config_schema_path = '/usr/local/etc/cloudwatch_agent_config_schema.json'
+cookbook_file 'cloudwatch_agent_config_schema.json' do
   not_if { ::File.exist?(config_schema_path) }
-  source 'cloudwatch_agent/cloudwatch_log_files_schema.json'
+  source 'cloudwatch_agent/cloudwatch_agent_config_schema.json'
   path config_schema_path
   user 'root'
   group 'root'
   mode '0644'
 end
 
-validator_script_path = '/usr/local/bin/cloudwatch_log_configs_util.py'
-cookbook_file 'cloudwatch_log_configs_util.py' do
+validator_script_path = '/usr/local/bin/cloudwatch_agent_config_util.py'
+cookbook_file 'cloudwatch_agent_config_util.py' do
   not_if { ::File.exist?(validator_script_path) }
-  source 'cloudwatch_agent/cloudwatch_log_configs_util.py'
+  source 'cloudwatch_agent/cloudwatch_agent_config_util.py'
   path validator_script_path
   user 'root'
   group 'root'
