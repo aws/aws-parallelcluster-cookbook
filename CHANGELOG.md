@@ -8,7 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
-- Add CloudWatch metrics: disk usage percentage (root volume) and memory usage percentage of the head node.
+- Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
 - Add log rotation support for ParallelCluster managed logs.
 
 **CHANGES**
