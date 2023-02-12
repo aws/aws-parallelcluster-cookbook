@@ -47,6 +47,14 @@ template "/opt/parallelcluster/scripts/fetch_and_run" do
   mode "0755"
 end
 
+cookbook_file '/etc/sudoers.d/99-parallelcluster-env-keep' do
+  source 'sudoers/99-parallelcluster-env-keep'
+  owner 'root'
+  group 'root'
+  mode '0600'
+  only_if { node['cluster']['region'].start_with?('us-iso') }
+end
+
 include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
 
 fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
