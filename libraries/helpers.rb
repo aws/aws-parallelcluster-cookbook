@@ -302,9 +302,11 @@ def platform_supports_dcv?
 end
 
 def aws_domain
-  # Set the aws domain name
+  # Get the aws domain name
   aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if node['cluster']['region'].start_with?("cn-")
+  aws_domain = "amazonaws.com.cn" if node['cluster']['region'].start_with?("cn-")
+  aws_domain = "c2s.ic.gov" if node['cluster']['region'].start_with?("us-iso-")
+  aws_domain = "sc2s.sgov.gov" if node['cluster']['region'].start_with?("us-isob-")
   aws_domain
 end
 

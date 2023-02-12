@@ -16,6 +16,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Add support for US isolated regions: us-iso-* and us-isob-*.
 - Fail cluster creation if cluster status changes to PROTECTED while provisioning static nodes.
 
 **CHANGES**
