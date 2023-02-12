@@ -19,6 +19,7 @@ default_action :setup
 
 use 'partial/_source_link'
 use 'partial/_download_and_install'
+use 'partial/_validate'
 
 # MySQL Packages
 # We install MySQL packages from the OS repositories for ubuntu platform, while we
@@ -27,7 +28,7 @@ action :setup do
   if platform?('ubuntu')
     # An apt update is required to align the apt cache with the current list of available package versions.
     apt_update
-    package node['cluster']['mysql']['repository']['packages'] do
+    package repository_packages do
       retries 3
       retry_delay 5
     end
@@ -37,4 +38,48 @@ action :setup do
 
   # Add MySQL source file
   action_create_source_link
+end
+
+action_class do
+  def package_platform
+    if arm_instance?
+      value_for_platform(
+        'default' => "el/7/aarch64"
+      )
+    else
+      value_for_platform(
+        'default' => "el/7/x86_64",
+        'ubuntu' => {
+          '20.04' => "ubuntu/20.04/x86_64",
+          '18.04' => "ubuntu/18.04/x86_64",
+        }
+      )
+    end
+  end
+
+  def expected_version
+    if arm_instance?
+      "8.0.31"
+    else
+      value_for_platform(
+        'default' => "8.0.31",
+        'ubuntu' => {
+          '20.04' => "8.0.31-1ubuntu20.04",
+          '18.04' => "8.0.31-1ubuntu18.04",
+        }
+      )
+    end
+  end
+
+  def repository_packages
+    value_for_platform(
+      'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
+      'ubuntu' => {
+        'default' => %w(libmysqlclient-dev libmysqlclient21),
+        '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
+      }
+    )
+  end
+
+  use 'partial/_package_properties'
 end

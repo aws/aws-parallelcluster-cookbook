@@ -394,6 +394,7 @@ class ClusterStatusManager:
             "--override-runlist aws-parallelcluster::update_computefleet_status"
         )
         try:
+            # The command being passed has been built from string literals and local variables and can be trusted.
             _run_command(cmd, self._config.update_event_timeout_minutes)
         except Exception as e:
             log.error("Update event handler failed. Check log file %s", cinc_log_file)

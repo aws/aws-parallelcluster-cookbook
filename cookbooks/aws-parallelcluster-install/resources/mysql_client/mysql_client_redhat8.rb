@@ -21,10 +21,27 @@ default_action :setup
 
 use 'partial/_source_link'
 use 'partial/_download_and_install'
+use 'partial/_validate'
 
 action :setup do
   action_download_and_install
 
   # Add MySQL source file
   action_create_source_link
+end
+
+action_class do
+  def package_platform
+    arm_instance? ? "el/7/aarch64" : "el/7/x86_64"
+  end
+
+  def expected_version
+    "8.0.31"
+  end
+
+  def repository_packages
+    %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat)
+  end
+
+  use 'partial/_package_properties'
 end

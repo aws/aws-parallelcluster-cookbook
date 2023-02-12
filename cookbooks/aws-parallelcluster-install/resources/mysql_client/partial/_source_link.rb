@@ -18,7 +18,7 @@ action :create_source_link do
   file "#{node['cluster']['sources_dir']}/mysql_source_code.txt" do
     content %(You can get MySQL source code here:
 
-#{node['cluster']['mysql']['package']['source']}
+#{package_source(node['cluster']['artifacts_s3_url'])}
 )
     owner 'root'
     group 'root'

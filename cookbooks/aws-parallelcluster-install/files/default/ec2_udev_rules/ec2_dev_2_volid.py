@@ -1,5 +1,6 @@
 import configparser
 import os
+import re
 import sys
 import syslog
 import time
@@ -24,11 +25,28 @@ def get_imdsv2_token():
     return headers
 
 
+def validate_device_name(device_name):
+    """
+    Validate an argument used to build a subprocess command against a regex pattern.
+
+    The validation is done after forcing the encoding to be the standard Python Unicode / UTF-8
+    :param device_name: an argument string to validate
+    :raise: Exception if the argument fails to match the patter
+    :return: True if the argument matches the pattern
+    """
+    device_name = (str(device_name).encode("utf-8", "ignore")).decode()
+    match = re.match(r"^(\w)+$", device_name)
+    if not match:
+        raise ValueError("Device name provided argument has an invalid pattern.")
+    return True
+
+
 def main():
     syslog.syslog("Starting ec2_dev_2_volid.py script")
     # Get dev
     try:
         dev = str(sys.argv[1])
+        validate_device_name(dev)
         syslog.syslog(f"Input block device is {dev}")
     except IndexError:
         syslog.syslog(syslog.LOG_ERR, "Provide block device i.e. xvdf")

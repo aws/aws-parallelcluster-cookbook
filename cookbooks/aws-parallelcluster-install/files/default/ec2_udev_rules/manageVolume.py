@@ -4,6 +4,7 @@
 import argparse
 import configparser
 import os
+import re
 import subprocess  # nosec B404
 import sys
 import time
@@ -15,6 +16,22 @@ from botocore.config import Config
 METADATA_REQUEST_TIMEOUT = 60
 
 
+def validate_device_name(device_name):
+    """
+    Validate an argument used to build a subprocess command against a regex pattern.
+
+    The validation is done after forcing the encoding to be the standard Python Unicode / UTF-8
+    :param device_name: an argument string to validate
+    :raise: Exception if the argument fails to match the patter
+    :return: True if the argument matches the pattern
+    """
+    device_name = (str(device_name).encode("utf-8", "ignore")).decode()
+    match = re.match(r"^/dev/(\w)+$", device_name)
+    if not match:
+        raise ValueError("Device name provided argument has an invalid pattern.")
+    return True
+
+
 def convert_dev(dev):
     # Translate the device name as provided by the OS to the one used by EC2
     # FIXME This approach could be broken in some OS variants, see  # pylint: disable=fixme
@@ -23,6 +40,8 @@ def convert_dev(dev):
     # A nosec comment is appended to the following line in order to disable the B605 check.
     # The only current use of this script in the repo sets the `dev` arg to the value of a device name
     # obtained via the OS.
+    # Validation to sanitize the input argument and make it safe to use the function affected by B605
+    validate_device_name(dev)
     if "/nvme" in dev:
         return (
             "/dev/"
@@ -46,6 +65,7 @@ def get_all_devices():
 
     try:
         # fmt: off
+        # All commands and arguments in this subprocess call are built as literals.
         output = subprocess.check_output(  # nosec
             command, stderr=subprocess.STDOUT, universal_newlines=True
         ).split("\n")
