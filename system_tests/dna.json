@@ -31,6 +31,7 @@
     "dcv_port": "NONE",
     "enable_intel_hpc_platform": "false",
     "cw_logging_enabled": "true",
+    "log_rotation_enabled": "true",
     "cluster_s3_bucket": "parallelcluster-0000000000000000-v1-do-not-delete",
     "cluster_config_s3_key": "parallelcluster/3.0.1/clusters/pc3cluster-0000000000000000/configs/cluster-config-with-implied-values.yaml",
     "cluster_config_version": "90000000000000000000000000000000",

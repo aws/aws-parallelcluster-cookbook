@@ -37,6 +37,9 @@ fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'
 # Install cloudwatch, write configuration and start it.
 include_recipe "aws-parallelcluster-config::cloudwatch_agent"
 
+# ParallelCluster log rotation configuration
+include_recipe "aws-parallelcluster-config::log_rotation"
+
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualized?
 
