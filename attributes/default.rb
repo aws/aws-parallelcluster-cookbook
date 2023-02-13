@@ -19,6 +19,9 @@
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
 
+# ParallelCluster log rotation file dir
+default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelcluster_log_rotation"
+
 # AWS domain
 default['cluster']['aws_domain'] = aws_domain
 
