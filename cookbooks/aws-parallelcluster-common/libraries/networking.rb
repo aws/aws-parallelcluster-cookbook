@@ -19,7 +19,7 @@ def get_vpc_cidr_list
 end
 
 def efa_supported?
-  !arm_instance? || !default['cluster']['efa']['unsupported_aarch64_oses'].include?(node['cluster']['base_os'])
+  !arm_instance? || !node['cluster']['efa']['unsupported_aarch64_oses'].include?(node['cluster']['base_os'])
 end
 
 def efa_installed?
