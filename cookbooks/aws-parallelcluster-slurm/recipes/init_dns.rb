@@ -23,28 +23,9 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
   if !node['cluster']['dns_domain'].nil? && !node['cluster']['dns_domain'].empty?
     # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
     # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
-    if platform?('ubuntu')
-
-      Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/systemd/resolved.conf")
-      # Configure resolved to automatically append Route53 search domain in resolv.conf.
-      # On Ubuntu18 resolv.conf is managed by systemd-resolved.
-      replace_or_add "append Route53 search domain in /etc/systemd/resolved.conf" do
-        path "/etc/systemd/resolved.conf"
-        pattern "Domains=*"
-        line "Domains=#{node['cluster']['dns_domain']}"
-      end
-    else
-
-      Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/dhcp/dhclient.conf")
-      # Configure dhclient to automatically append Route53 search domain in resolv.conf
-      # - on CentOS7 and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
-      replace_or_add "append Route53 search domain in /etc/dhcp/dhclient.conf" do
-        path "/etc/dhcp/dhclient.conf"
-        pattern "append domain-name*"
-        line "append domain-name \" #{node['cluster']['dns_domain']}\";"
-      end
+    dns_domain 'configure dns name resolution' do
+      :configure
     end
-    restart_network_service
   end
 
   if node['cluster']['node_type'] == "ComputeFleet"

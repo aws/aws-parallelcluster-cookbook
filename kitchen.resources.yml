@@ -173,3 +173,16 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
+  - name: dns_domain
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - dns_domain_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+      resource: dns_domain
+      cluster:
+        dns_domain: test-domain
