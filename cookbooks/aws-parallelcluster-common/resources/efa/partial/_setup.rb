@@ -13,6 +13,8 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
+
 action :setup do
   if efa_installed? && !::File.exist?(efa_tarball)
     Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
@@ -42,10 +44,8 @@ end
 action :download_and_install do
   return if virtualized?
 
-  efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
-  efa_installer_url = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
-
   # Get EFA Installer
+  efa_installer_url = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
   remote_file efa_tarball do
     source efa_installer_url
     mode '0644'
