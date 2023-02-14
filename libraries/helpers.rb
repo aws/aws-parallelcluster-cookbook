@@ -288,14 +288,6 @@ def slurm_commit_hash?
   !node['cluster']['slurm']['commit'].empty?
 end
 
-#
-# Check if this is an ARM instance
-#
-def arm_instance?
-  node['kernel']['machine'] == 'aarch64'
-end
-
-#
 # Check if this platform supports intel's HPC platform
 #
 def platform_supports_intel_hpc_platform?
@@ -488,13 +480,6 @@ def get_system_users
   cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
   cmd.run_command
   cmd.stdout.split(/\n+/)
-end
-
-# Return the VPC CIDR list from node info
-def get_vpc_cidr_list
-  mac = node['ec2']['mac']
-  vpc_cidr_list = node['ec2']['network_interfaces_macs'][mac]['vpc_ipv4_cidr_blocks']
-  vpc_cidr_list.split(/\n+/)
 end
 
 def run_command(command)

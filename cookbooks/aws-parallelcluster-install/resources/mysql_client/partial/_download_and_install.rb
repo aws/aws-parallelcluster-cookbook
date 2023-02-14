@@ -14,8 +14,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :download_and_install do
-  mysql_archive_url = node['cluster']['mysql']['package']['archive']
-  mysql_tar_file = "/tmp/#{node['cluster']['mysql']['package']['file-name']}"
+  mysql_archive_url = package_archive(node['cluster']['artifacts_s3_url'])
+  mysql_tar_file = "/tmp/#{package_filename}"
 
   log "Downloading MySQL packages archive from #{mysql_archive_url}"
 

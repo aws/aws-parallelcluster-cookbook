@@ -148,10 +148,6 @@ default['cluster']['scheduler_plugin']['virtualenv_path'] = [
   node['cluster']['scheduler_plugin']['virtualenv'],
 ].join('/')
 
-# PMIx software
-default['cluster']['pmix']['version'] = '3.2.3'
-default['cluster']['pmix']['url'] = "https://github.com/openpmix/openpmix/releases/download/v#{node['cluster']['pmix']['version']}/pmix-#{node['cluster']['pmix']['version']}.tar.gz"
-default['cluster']['pmix']['sha256'] = '1325a1355d0794196bb47665053fdbc588f9183aa5385f3581b668427316306e'
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.14'
 default['cluster']['munge']['munge_url'] = "https://github.com/dun/munge/archive/munge-#{node['cluster']['munge']['munge_version']}.tar.gz"
@@ -203,50 +199,6 @@ default['cluster']['nvidia']['gdrcopy']['sha256'] = 'b85d15901889aa42de6c4a92337
 default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'ubuntu' => { 'default' => 'gdrdrv' },
   'default' => 'gdrcopy'
-)
-
-# MySQL Repository Definitions
-default['cluster']['mysql']['repository']['definition']['file-name'] = value_for_platform(
-  'default' => "mysql80-community-release-el7-7.noarch.rpm",
-  'ubuntu' => { 'default' => "mysql-apt-config_0.8.23-1_all.deb" }
-)
-
-default['cluster']['mysql']['repository']['definition']['url'] = "https://dev.mysql.com/get/#{node['cluster']['mysql']['repository']['definition']['file-name']}"
-default['cluster']['mysql']['repository']['definition']['md5'] = value_for_platform(
-  'default' => "659400f9842fffb8d64ae0b650f081b9",
-  'ubuntu' => { 'default' => "c2b410031867dc7c966ca5b1aa0c72aa" }
-)
-
-# MySQL Packages
-# We install MySQL packages for RedHat derivatives from packages hosted on S3, while for Ubuntu we install them
-# from the OS repositories.
-default['cluster']['mysql']['package']['root'] = "#{node['cluster']['artifacts_s3_url']}/mysql"
-default['cluster']['mysql']['package']['version'] = "8.0.31-1"
-default['cluster']['mysql']['package']['source-version'] = "8.0.31"
-default['cluster']['mysql']['package']['platform'] = if arm_instance?
-                                                       value_for_platform(
-                                                         'default' => "el/7/aarch64"
-                                                       )
-                                                     else
-                                                       value_for_platform(
-                                                         'default' => "el/7/x86_64"
-                                                       )
-                                                     end
-default['cluster']['mysql']['package']['file-name'] = "mysql-community-client-#{node['cluster']['mysql']['package']['version']}.tar.gz"
-default['cluster']['mysql']['package']['archive'] = "#{node['cluster']['mysql']['package']['root']}/#{node['cluster']['mysql']['package']['platform']}/#{node['cluster']['mysql']['package']['file-name']}"
-default['cluster']['mysql']['package']['source'] = "#{node['cluster']['artifacts_s3_url']}/source/mysql-#{node['cluster']['mysql']['package']['source-version']}.tar.gz"
-
-# MySQL Validation
-default['cluster']['mysql']['repository']['packages'] = value_for_platform(
-  'default' => %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat),
-  'ubuntu' => {
-    'default' => %w(libmysqlclient-dev libmysqlclient21),
-    '18.04' =>  %w(libmysqlclient-dev libmysqlclient20),
-  }
-)
-default['cluster']['mysql']['repository']['expected']['version'] = value_for_platform(
-  'default' => "8.0.31"
-  # Ubuntu 18.04/20.04: MySQL packages are installed from OS repo and we do not assert on a specific version.
 )
 
 # EFA

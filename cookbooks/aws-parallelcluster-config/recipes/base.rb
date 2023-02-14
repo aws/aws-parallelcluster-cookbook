@@ -18,43 +18,13 @@
 include_recipe "aws-parallelcluster-common::setup_envars"
 include_recipe 'aws-parallelcluster-config::openssh'
 
-# Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
-if platform?('ubuntu') && node['platform_version'].to_i == 20
-  sysctl 'fs.protected_regular' do
-    value 0
-  end
-end
+sticky_bits "setup sticky bits"
 
 include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
 
-# Mount the ephemeral drive unless there is a mountpoint collision with shared drives
-shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',') + \
-                   node['cluster']['efs_shared_dirs'].split(',') + \
-                   node['cluster']['fsx_shared_dirs'].split(',') + \
-                   [ node['cluster']['raid_shared_dir'] ]
-unless shared_dir_array.include? node['cluster']['ephemeral_dir']
-  service "setup-ephemeral" do
-    supports restart: false
-    action :enable
-  end
+include_recipe 'aws-parallelcluster-config::ephemeral_drives'
 
-  # Execution timeout 3600 seconds
-  unless virtualized?
-    execute "Setup of ephemeral drives" do
-      user "root"
-      command "/usr/local/sbin/setup-ephemeral-drives.sh"
-    end
-  end
-end
-
-# Increase somaxconn and tcp_max_syn_backlog for large scale setting
-sysctl 'net.core.somaxconn' do
-  value 65_535
-end
-
-sysctl 'net.ipv4.tcp_max_syn_backlog' do
-  value 65_535
-end
+include_recipe 'aws-parallelcluster-config::networking'
 
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster-config::chrony'
@@ -74,21 +44,7 @@ else
   raise "node_type must be HeadNode or ComputeFleet"
 end
 
-# Ensure cluster user can sudo on SSH
-template '/etc/sudoers.d/99-parallelcluster-user-tty' do
-  source 'base/99-parallelcluster-user-tty.erb'
-  owner 'root'
-  group 'root'
-  mode '0600'
-end
-
-# Install parallelcluster specific supervisord config
-template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
-  source 'base/parallelcluster_supervisord.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
+include_recipe "aws-parallelcluster-config::sudo"
 
 # Mount EFS, FSx
 include_recipe "aws-parallelcluster-config::fs_mount"
