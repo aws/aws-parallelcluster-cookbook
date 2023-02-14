@@ -328,27 +328,29 @@ suites:
             vpc_ipv4_cidr_blocks: |
               cidr1
               cidr2
-  - name: ephemeral_drives
-    #driver:
-    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+  - name: ephemeral_drives_mounted
+    driver:
+      instance_type: m5d.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
     verifier:
       controls:
-        - ephemeral_drives_service
+        - ephemeral_drives_service_running
+        - ephemeral_drives_configured
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::ephemeral_drives
+        - recipe:aws-parallelcluster-test::cfnconfig_mock
       cluster:
         ebs_shared_dirs: test1,test2
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
-        ephemeral_dir: test3
+        ephemeral_dir: /scratch
   - name: ephemeral_drives_skipped
-    #driver:
-    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    driver:
+      instance_type: m5d.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]

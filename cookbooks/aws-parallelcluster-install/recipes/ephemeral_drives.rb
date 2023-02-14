@@ -16,6 +16,12 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+package "install Logical Volume Manager 2 utilities" do
+  package_name "lvm2"
+  retries 3
+  retry_delay 5
+end
+
 cookbook_file 'setup-ephemeral-drives.sh' do
   source 'base/setup-ephemeral-drives.sh'
   path '/usr/local/sbin/setup-ephemeral-drives.sh'
