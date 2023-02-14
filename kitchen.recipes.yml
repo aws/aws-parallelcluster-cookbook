@@ -399,3 +399,15 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::chrony
+  - name: init_dns
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::init_dns]
+    verifier:
+      controls:
+        - hostname_configured
+    attributes:
+      dependencies:
+        - resource:dns_domain
+      cluster:
+        dns_domain: test-domain
