@@ -99,7 +99,7 @@ replace_or_add "set fqdn in the /etc/hosts" do
   primary_ip = ""
   token = get_metadata_token
   macs = network_interface_macs(token)
-  for mac in macs
+  macs.each do |mac|
     uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
     device_number = get_metadata_with_token(token, uri)
     uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
