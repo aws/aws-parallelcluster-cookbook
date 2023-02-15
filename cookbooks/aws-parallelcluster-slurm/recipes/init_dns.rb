@@ -93,11 +93,18 @@ ohai 'reload_hostname' do
   action :nothing
 end
 
+# Delete all local ips in /etc/hosts
+node['ec2']['network_interfaces_macs'] do |key, mac|
+  delete_lines "delete #{mac['local_ipv4s']} in the /etc/hosts" do
+    path "/etc/hosts"
+    pattern "^#{mac['local_ipv4s']}\s+"
+  end
+end
+
 # Configure fqdn in /etc/hosts
-replace_or_add "set fqdn in the /etc/hosts" do
+append_if_no_line "Append primary ip to /etc/hosts" do
   path "/etc/hosts"
   primary_ip = get_primary_ip
-  pattern "^#{primary_ip}\s+"
   line(lazy { "#{primary_ip} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
   notifies :reload, "ohai[reload_hostname]"
 end

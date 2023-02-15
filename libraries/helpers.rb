@@ -593,19 +593,12 @@ def network_interface_macs(token)
   res.delete("/").split("\n")
 end
 
-def delete_matching_ips(primary_ip)
-  delete_lines "delete fqdn in the /etc/hosts" do
-    path "/etc/hosts"
-    pattern "^#{primary_ip}\s+"
-  end
-end
-
 def get_primary_ip
-  primary_ip = node['ec2']['local_ipv4']
+  primary_ip = "#{node['ec2']['local_ipv4']}"
+
+  token = get_metadata_token
+  macs = network_interface_macs(token)
   if macs.length > 1
-    delete_matching_ips(primary_ip)
-    token = get_metadata_token
-    macs = network_interface_macs(token)
     macs.each do |mac|
       uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
       device_number = get_metadata_with_token(token, uri)
