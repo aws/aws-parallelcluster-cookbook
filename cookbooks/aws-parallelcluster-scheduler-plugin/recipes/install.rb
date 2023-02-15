@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if redhat8?
+
 # setup the user accounts
 include_recipe "aws-parallelcluster-scheduler-plugin::install_user"
 
