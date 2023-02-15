@@ -23,5 +23,5 @@ control 'dns_domain_configured' do
     its('content') do
       should match(dns_domain_string)
     end
-  end
+  end unless os_properties.virtualized?
 end

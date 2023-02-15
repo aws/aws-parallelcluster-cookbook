@@ -16,6 +16,8 @@ default_action :configure
 # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
 # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
 action :configure do
+  return if virtualized?
+
   if platform?('ubuntu')
 
     Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/systemd/resolved.conf")
