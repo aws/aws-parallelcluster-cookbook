@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if redhat8?
+
 # Add awsbatch virtualenv to default path
 template "/etc/profile.d/pcluster_awsbatchcli.sh" do
   source "awsbatch/pcluster_awsbatchcli.sh.erb"
