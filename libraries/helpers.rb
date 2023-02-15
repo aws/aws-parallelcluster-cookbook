@@ -535,6 +535,7 @@ def are_mount_or_unmount_required?
   change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
   change_set["changeSet"].each do |change|
     next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
+
     return true
   end
   Chef::Log.info("No shared storages operation required.")
@@ -590,4 +591,32 @@ def network_interface_macs(token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
   res = get_metadata_with_token(token, uri)
   res.delete("/").split("\n")
+end
+
+def delete_matching_ips(primary_ip)
+  delete_lines "delete fqdn in the /etc/hosts" do
+    path "/etc/hosts"
+    pattern "^#{primary_ip}\s+"
+  end
+end
+
+def get_primary_ip
+  primary_ip = node['ec2']['local_ipv4']
+  if macs.length > 1
+    delete_matching_ips(primary_ip)
+    token = get_metadata_token
+    macs = network_interface_macs(token)
+    macs.each do |mac|
+      uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
+      device_number = get_metadata_with_token(token, uri)
+      uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
+      network_card = get_metadata_with_token(token, uri)
+      next unless device_number == '0' && network_card == '0'
+
+      uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/local-ipv4s")
+      primary_ip = get_metadata_with_token(token, uri)
+      break
+    end
+  end
+  primary_ip
 end
