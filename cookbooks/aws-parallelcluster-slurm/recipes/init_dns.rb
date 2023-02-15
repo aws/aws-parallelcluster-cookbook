@@ -94,7 +94,7 @@ ohai 'reload_hostname' do
 end
 
 # Delete all local ips in /etc/hosts
-node['ec2']['network_interfaces_macs'] do |key, mac|
+node['ec2']['network_interfaces_macs'] do |_key, mac|
   delete_lines "delete #{mac['local_ipv4s']} in the /etc/hosts" do
     path "/etc/hosts"
     pattern "^#{mac['local_ipv4s']}\s+"

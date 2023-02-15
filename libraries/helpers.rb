@@ -594,7 +594,7 @@ def network_interface_macs(token)
 end
 
 def get_primary_ip
-  primary_ip = "#{node['ec2']['local_ipv4']}"
+  primary_ip = node['ec2']['local_ipv4'].to_s
 
   token = get_metadata_token
   macs = network_interface_macs(token)
