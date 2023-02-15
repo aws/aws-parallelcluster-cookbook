@@ -17,7 +17,7 @@ control 'hostname_configured' do
     its('content') do
       should match("^ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*")
     end
-  end
+  end unless os_properties.virtualized?
 
   describe file('/etc/hosts') do
     it { should exist }
@@ -25,5 +25,5 @@ control 'hostname_configured' do
       should match("^[0-9]*.[0-9]*.[0-9]*.[0-9]*")
       should match("ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*")
     end
-  end
+  end unless os_properties.virtualized?
 end
