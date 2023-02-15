@@ -5,6 +5,10 @@ def virtualized?
   node.include?('virtualized') and node['virtualized']
 end
 
+def redhat8?
+  platform?('redhat') && node['platform_version'].to_i == 8
+end
+
 def redhat_ubi?
   virtualized? && platform?('redhat')
 end
