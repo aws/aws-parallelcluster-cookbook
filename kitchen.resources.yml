@@ -130,6 +130,19 @@ suites:
       cluster:
         enable_efa: compute
         node_type: ComputeFleet
+  - name: efs_configure
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - efs_utils_installed
+    attributes:
+      resource: efs
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
   - name: munge
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
