@@ -7,6 +7,7 @@
   size 10M
   rotate 1
   copytruncate
+  nodateext
 }
 <%# logs configured with supervisord %>
 /var/log/supervisord.log {
@@ -24,6 +25,15 @@
 }
 <% case node['cluster']['node_type'] -%>
 <% when 'HeadNode' -%>
+<%# cfn-init log %>
+/var/log/cfn-init.log {
+  missingok
+  notifempty
+  nodateext
+  size 10M
+  rotate 1
+  copytruncate
+}
 <%# chef-client log %>
 /var/log/chef-client.log {
   rotate 1
@@ -31,6 +41,7 @@
   missingok
   notifempty
   copytruncate
+  nodateext
 }
 <% if node['cluster']['dcv_enabled'] == "head_node" && node['conditions']['dcv_supported'] -%>
 <%# dcv log %>
@@ -46,6 +57,7 @@
   copytruncate
   rotate 5
   su dcv dcv
+  nodateext
 }
 <% end -%>
 <% if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true' -%>
@@ -56,6 +68,8 @@
   missingok
   notifempty
   su root root
+  copytruncate
+  nodateext
 }
 <% end -%>
 <% if node['cluster']['scheduler'] == 'slurm' -%>
@@ -93,6 +107,7 @@
   notifempty
   su pcluster-admin pcluster-admin
   copytruncate
+  nodateext
 }
 <%# slurm_resume log %>
 /var/log/parallelcluster/slurm_resume.log {
@@ -105,6 +120,7 @@
     echo 0
   endscript
   su pcluster-admin pcluster-admin
+  nodateext
 }
 <%# slurm_suspend log %>
 /var/log/parallelcluster/slurm_suspend.log {
@@ -117,6 +133,7 @@
     echo 0
   endscript
   su pcluster-admin pcluster-admin
+  nodateext
 }
 <%# slurmctld log %>
 /var/log/slurmctld.log {
@@ -128,6 +145,7 @@
     pkill -x --signal SIGUSR2 slurmctld
     exit 0
   endscript
+  nodateext
 }
 <%# slurmdbd log %>
 /var/log/slurmdbd.log {
@@ -139,6 +157,7 @@
     pkill -x --signal SIGUSR2 slurmdbd
     exit 0
   endscript
+  nodateext
 }
 <%# compute_console_output log %>
 /var/log/parallelcluster/compute_console_output.log {
@@ -148,6 +167,7 @@
   notifempty
   copytruncate
   su pcluster-admin pcluster-admin
+  nodateext
 }
 <% end -%>
 <% when 'ComputeFleet' -%>
@@ -183,6 +203,7 @@
     pkill --signal=SIGUSR2 slurmd
     echo 0
   endscript
+  nodateext
 }
 <% end -%>
 <% end -%>
