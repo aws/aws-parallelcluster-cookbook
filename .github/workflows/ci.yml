@@ -105,6 +105,7 @@ jobs:
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
+          action: 'test --concurrency 20 --parallel'
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
@@ -131,6 +132,7 @@ jobs:
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
+          action: 'test --concurrency 20 --parallel'
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
@@ -157,6 +159,7 @@ jobs:
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
+          action: 'test --concurrency 20 --parallel'
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
@@ -183,6 +186,7 @@ jobs:
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
+          action: 'test --concurrency 20 --parallel'
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
