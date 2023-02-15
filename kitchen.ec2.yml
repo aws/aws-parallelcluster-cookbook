@@ -30,7 +30,7 @@ driver:
     http_put_response_hop_limit: 1
     instance_metadata_tags: 'enabled'
   #iam_profile_name: chef-client
-  instance_type: t2.micro
+  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || "t2.micro" %>
   associate_public_ip: true
   interface: public
   tags:
