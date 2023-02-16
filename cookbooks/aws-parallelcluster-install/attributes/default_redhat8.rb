@@ -4,6 +4,7 @@ return unless platform?('redhat') && node['platform_version'].to_i == 8
 
 # environment-modules required by EFA, Intel MPI and ARM PL
 # Removed libssh2-devel from base_packages since is not shipped by RedHat 8 and in conflict with package libssh-0.9.6-3.el8.x86_64
+# iptables needed for IMDS setup
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                              libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                              httpd boost-devel redhat-lsb mlocate R atlas-devel
