@@ -4,7 +4,8 @@ control 'install_packages' do
 
   only_if { !os_properties.redhat_ubi? }
 
-  describe package('lvm2') do
+  # verify package with a common name is installed
+  describe package('coreutils') do
     it { should be_installed }
   end
 

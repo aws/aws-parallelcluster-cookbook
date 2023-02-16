@@ -34,6 +34,7 @@ suites:
         - ulimit_configured
         - pcluster_directories_exist
         - pcluster_log_dir_is_configured
+        - ephemeral_drives_logical_volumes_manager_installed
         - ephemeral_drives_script_created
         - ephemeral_service_set_up
         - awsbatch_virtualenv_created
