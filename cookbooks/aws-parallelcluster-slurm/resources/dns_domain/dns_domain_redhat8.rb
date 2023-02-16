@@ -15,19 +15,14 @@ unified_mode true
 
 default_action :configure
 
+use 'partial/_dns_search_domain_redhat'
+
 # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
 # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
 action :configure do
   return if virtualized?
 
-  Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/dhcp/dhclient.conf")
-  # Configure dhclient to automatically append Route53 search domain in resolv.conf
-  # - on CentOS7 and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
-  replace_or_add "append Route53 search domain in /etc/dhcp/dhclient.conf" do
-    path "/etc/dhcp/dhclient.conf"
-    pattern "append domain-name*"
-    line "append domain-name \" #{node['cluster']['dns_domain']}\";"
-  end
+  action_update_search_domain_redhat
 
   restart_network_service
 end

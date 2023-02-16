@@ -16,8 +16,6 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-return if virtualized?
-
 # It is possible to restore the SIT behaviour by setting the use_private_hostname = true as extra_json parameter
 if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostname'] == 'false'
   # Heterogeneous Instance Type
@@ -65,10 +63,13 @@ else
 end
 
 # Configure short hostname
+# setting the hostname requires root privileges, however by default docker containers are launched with limited root
+# privileges, so this command will fail.
+# Skipping this check in containers.
 hostname "set short hostname" do
   compile_time false
   hostname(lazy { node['cluster']['assigned_short_hostname'] })
-end
+end unless virtualized?
 
 # Resource to be called to reload ohai attributes after /etc/hosts update
 ohai 'reload_hostname' do
