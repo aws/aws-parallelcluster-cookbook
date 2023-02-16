@@ -103,9 +103,13 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # URLs to software packages used during install recipes
-# # Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
+# Slurm
+default['cluster']['slurm']['user'] = 'slurm'
+default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
+default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
+default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
 # Munge
 default['cluster']['munge']['user'] = 'munge'
 default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2

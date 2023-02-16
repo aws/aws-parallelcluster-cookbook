@@ -78,6 +78,7 @@ action :update_init_script do
   # Updated munge init script for Amazon Linux
   template '/etc/init.d/munge' do
     source 'munge/munge-init.erb'
+    cookbook 'aws-parallelcluster-slurm'
     owner 'root'
     group 'root'
     variables(munge_user: munge_user,

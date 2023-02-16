@@ -23,8 +23,8 @@ slurm_group = node['cluster']['slurm']['group']
 slurm_group_id = node['cluster']['slurm']['group_id']
 slurm_install_dir = node['cluster']['slurm']['install_dir']
 
-slurm_version = '22-05-8-1'
-slurm_commit = ''
+slurm_version = node['cluster']['slurm']['version']
+slurm_commit = node['cluster']['slurm']['commit']
 slurm_tar_name = if slurm_commit.empty?
                    "slurm-#{slurm_version}"
                  else
@@ -32,7 +32,7 @@ slurm_tar_name = if slurm_commit.empty?
                  end
 slurm_tarball = "#{node['cluster']['sources_dir']}/#{slurm_tar_name}.tar.gz"
 slurm_url = "https://github.com/SchedMD/slurm/archive/#{slurm_tar_name}.tar.gz"
-slurm_sha256 = '8c8f6a26a5d51e6c63773f2e02653eb724540ee8b360125c8d7732314ce737d6'
+slurm_sha256 = node['cluster']['slurm']['sha256']
 
 # Setup slurm group
 group slurm_group do
@@ -59,17 +59,9 @@ remote_file slurm_tarball do
   mode '0644'
   retries 3
   retry_delay 5
+  checksum slurm_sha256
   action :create_if_missing
-end unless redhat_ubi?
-
-# Validate the authenticity of the downloaded archive based on the checksum published by SchedMD
-ruby_block "Validate Slurm Tarball Checksum" do
-  block do
-    require 'digest'
-    checksum = Digest::SHA256.file(slurm_tarball).hexdigest
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{slurm_sha256}" if checksum != slurm_sha256
-  end
-end unless redhat_ubi?
+end
 
 # Copy Slurm patches
 remote_directory "#{node['cluster']['sources_dir']}/slurm_patches" do
@@ -81,6 +73,7 @@ end
 
 # Install Slurm
 bash 'make install' do
+  not_if { redhat_ubi? }
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
@@ -115,12 +108,13 @@ bash 'make install' do
   SLURM
   # TODO: Fix, so it works for upgrade
   creates "#{slurm_install_dir}/bin/srun"
-end unless redhat_ubi?
+end
 
 # Copy required licensing files
 directory "#{node['cluster']['license_dir']}/slurm"
 
 bash 'copy license stuff' do
+  not_if { redhat_ubi? }
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
@@ -134,9 +128,10 @@ bash 'copy license stuff' do
   SLURMLICENSE
   # TODO: Fix, so it works for upgrade
   creates "#{node['cluster']['license_dir']}/slurm/README.rst"
-end unless redhat_ubi?
+end
 
 file '/etc/ld.so.conf.d/slurm.conf' do
+  not_if { redhat_ubi? }
   content "#{slurm_install_dir}/lib/"
   mode '0744'
-end unless redhat_ubi?
+end
