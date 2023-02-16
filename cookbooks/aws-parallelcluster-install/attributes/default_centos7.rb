@@ -3,6 +3,7 @@
 return unless platform?('centos') && node['platform_version'].to_i == 7
 
 # environment-modules required by EFA, Intel MPI and ARM PL
+# iptables needed for IMDS setup
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                          libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                          httpd boost-devel redhat-lsb mlocate R atlas-devel

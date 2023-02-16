@@ -49,7 +49,7 @@ include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler']
 include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
 
 # IMDS
-include_recipe 'aws-parallelcluster-config::imds' unless virtualized?
+include_recipe 'aws-parallelcluster-config::imds'
 
 # Active Directory Service
 include_recipe "aws-parallelcluster-config::directory_service"
