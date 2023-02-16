@@ -408,6 +408,12 @@ suites:
         - hostname_configured
     attributes:
       dependencies:
-        - resource:dns_domain
+        - recipe:aws-parallelcluster-install::directories
       cluster:
+        node_type: HeadNode
         dns_domain: test-domain
+        assigned_hostname: fqn-hostname
+        assigned_short_hostname: short-hostname
+      ec2:
+        local_hostname: dokken
+        local_ipv4: 172.17.1.15

@@ -15,15 +15,14 @@ control 'hostname_configured' do
   describe file('/etc/hostname') do
     it { should exist }
     its('content') do
-      should match("^ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*")
+      should match("short-hostname")
     end
   end unless os_properties.virtualized?
 
   describe file('/etc/hosts') do
     it { should exist }
     its('content') do
-      should match("^[0-9]*.[0-9]*.[0-9]*.[0-9]*")
-      should match("ip-[0-9]*-[0-9]*-[0-9]*-[0-9]*")
+      should match('fqn-hostname short-hostname')
     end
-  end unless os_properties.virtualized?
+  end
 end
