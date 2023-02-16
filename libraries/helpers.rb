@@ -535,7 +535,6 @@ def are_mount_or_unmount_required?
   change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
   change_set["changeSet"].each do |change|
     next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
-
     return true
   end
   Chef::Log.info("No shared storages operation required.")
