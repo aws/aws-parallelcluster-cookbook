@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'ephemeral_drives_service' do
+control 'ephemeral_drives_service_running' do
   title 'Check ephemeral drives service is running'
 
   only_if { !os_properties.virtualized? }
@@ -18,8 +18,19 @@ control 'ephemeral_drives_service' do
     it { should be_installed }
     it { should be_enabled }
   end
+end
 
-  # TODO: add test to see drivers are mounted
+control 'ephemeral_drives_configured' do
+  title 'Ephemeral drives script is executed and we are able to write on them'
+
+  only_if { !os_properties.virtualized? }
+
+  # This value is set by cfnconfig_mock.rb
+  describe directory('/scratch') do
+    it { should exist }
+    it { should be_writable }
+    it { should be_mounted }
+  end
 end
 
 control 'ephemeral_drives_with_name_clashing_not_mounted' do

@@ -182,6 +182,23 @@ suites:
         - recipe:aws-parallelcluster-install::users
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+  - name: mount_shared
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::mount_shared]
+    verifier:
+      controls:
+        - mount_shared_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-test::export_directories_mock
+      cluster:
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
   - name: ami_cleanup
     run_list:
       - recipe[aws-parallelcluster-install::ami_cleanup]
@@ -311,27 +328,29 @@ suites:
             vpc_ipv4_cidr_blocks: |
               cidr1
               cidr2
-  - name: ephemeral_drives
-    #driver:
-    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+  - name: ephemeral_drives_mounted
+    driver:
+      instance_type: m5d.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
     verifier:
       controls:
-        - ephemeral_drives_service
+        - ephemeral_drives_service_running
+        - ephemeral_drives_configured
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::ephemeral_drives
+        - recipe:aws-parallelcluster-test::cfnconfig_mock
       cluster:
         ebs_shared_dirs: test1,test2
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
-        ephemeral_dir: test3
+        ephemeral_dir: /scratch
   - name: ephemeral_drives_skipped
-    #driver:
-    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    driver:
+      instance_type: m5d.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
@@ -358,3 +377,25 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+  - name: jwt_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_jwt]
+    verifier:
+      controls:
+        - jwt_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: chrony_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::chrony]
+    verifier:
+      controls:
+        - chrony_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::chrony
