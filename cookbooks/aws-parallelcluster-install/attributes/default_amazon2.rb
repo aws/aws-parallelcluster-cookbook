@@ -12,7 +12,7 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-
                                          gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
                                          jq wget python-pip NetworkManager-config-routing-rules libibverbs-utils
                                          librdmacm-utils python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                         coreutils moreutils sssd sssd-tools sssd-ldap environment-modules)
+                                         coreutils moreutils sssd sssd-tools sssd-ldap)
 
 # Install R via amazon linux extras
 default['cluster']['extra_packages'] = ['R3.4']
