@@ -1,0 +1,162 @@
+name: ParallelCluster Cookbook Unit Tests on Docker
+
+on: [pull_request]
+
+jobs:
+  dokken-common-recipes:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+          - redhat8
+        suite:
+          - setup-envars
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          os: ${{ matrix.os }}
+          suite: ${{ matrix.suite }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: cookbooks/aws-parallelcluster-common/kitchen.recipes.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false
+  dokken-recipes:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+          - redhat8
+        suite:
+          - sudo
+          - users
+          - directories
+          - ephemeral-drives-setup
+          - python-setup
+          - cfn-bootstrap-setup
+          - node-setup
+          - supervisord-setup
+          - awscli
+          - clusterstatusmgtd
+          - cron
+          - chrony
+          - disable-selinux
+          - openssh
+          - gc-thresh-values
+          - cfnconfig-mixed
+          - clusterstatusmgtd-init-slurm
+          - mount-shared
+          - ami-cleanup
+          - disable-services
+          - license-readme
+          - fs-update
+          - fs-update-default-values
+          - nfs-threads
+          - networking-configured
+          - pmix-installed
+          - ssh-target-checker
+          - ephemeral-drives-mounted
+          - ephemeral-drives-skipped
+          - sudo-configured
+          - jwt-installed
+          - chrony-configured
+          #- install-slurm
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          suite: ${{ matrix.suite }}
+          os: ${{ matrix.os }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: kitchen.recipes.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false
+  dokken-resources:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+          - redhat8
+        suite:
+          - package-repos
+          - install-packages
+          - c-states
+          - ec2-udev-rules
+          - mysql-client
+          - nfs
+          - sticky-bits
+          - slurm-dependencies
+          - jwt-dependencies
+          - efa
+          - efa-configure
+          - munge
+          - stunnel-installed
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          suite: ${{ matrix.suite }}
+          os: ${{ matrix.os }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: kitchen.resources.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false
+  dokken-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+          - redhat8
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          os: ${{ matrix.os }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: kitchen.validate.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false
