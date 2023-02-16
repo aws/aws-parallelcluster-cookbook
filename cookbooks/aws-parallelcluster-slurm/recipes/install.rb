@@ -16,5 +16,7 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-slurm::install_pmix'
-include_recipe 'aws-parallelcluster-slurm::install_munge'
+munge 'Install munge' do
+  action :setup
+end
 include_recipe 'aws-parallelcluster-slurm::install_slurm'

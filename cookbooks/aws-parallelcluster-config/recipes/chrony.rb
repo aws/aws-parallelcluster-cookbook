@@ -20,4 +20,4 @@ service node['cluster']['chrony']['service'] do
   supports restart: false
   reload_command chrony_reload_command
   action %i(enable start)
-end
+end unless virtualized?

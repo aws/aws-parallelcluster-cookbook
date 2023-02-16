@@ -17,7 +17,7 @@ unified_mode true
 default_action :setup
 
 action :setup do
-  package %w(json-c-devel http-parser-devel) do
+  package %w(json-c-devel http-parser-devel perl-Switch) do
     flush_cache({ before: true })
 
     retries 3
