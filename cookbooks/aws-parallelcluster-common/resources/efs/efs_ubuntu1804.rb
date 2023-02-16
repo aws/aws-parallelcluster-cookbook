@@ -17,5 +17,6 @@ provides :efs, platform: 'ubuntu', platform_version: '18.04'
 unified_mode true
 
 use 'partial/_build_install_efs_utils_debian'
+use 'partial/_mount_umount'
 
 default_action :build_install_efs_utils

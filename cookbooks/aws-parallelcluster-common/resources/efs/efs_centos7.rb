@@ -12,20 +12,21 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :efs, platform: 'amazon', platform_version: '2'
+provides :efs, platform: 'centos' do |node|
+  node['platform_version'].to_i == 7
+end
 unified_mode true
 
-default_action :install_utils
+use 'partial/_build_install_efs_utils_centos_redhat'
+use 'partial/_mount_umount'
 
-action :install_utils do
-  package_name = "amazon-efs-utils"
+default_action :install_efs_utils
 
-  # Do not install efs-utils if a same or newer version is already installed.
-  return if Gem::Version.new(get_package_version(package_name)) >= Gem::Version.new(node['cluster']['efs_utils']['version'])
-
-  # On Amazon Linux 2, amazon-efs-utils and stunnel are installed from OS repo.
-  package package_name do
+action :install_efs_utils do
+  package 'rpm-build' do
     retries 3
     retry_delay 5
   end
+
+  action_build_install_efs_utils
 end
