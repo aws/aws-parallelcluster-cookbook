@@ -400,3 +400,20 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::chrony
+  - name: imds_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::imds]
+    verifier:
+      controls:
+        - imds_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        head_node_imds_secured: 'true'
+        head_node_imds_allowed_users: ['root', 'nobody']
