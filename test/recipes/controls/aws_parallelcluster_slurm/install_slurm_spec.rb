@@ -17,6 +17,8 @@ slurm_library_folder = '/opt/slurm/lib/slurm'
 control 'slurm_installed' do
   title 'Checks slurm has been installed'
 
+  only_if { !os_properties.redhat_ubi? }
+
   describe file("/opt/slurm") do
     it { should exist }
     it { should be_directory }
@@ -24,10 +26,10 @@ control 'slurm_installed' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end
-end unless os_properties.redhat_ubi?
+end
 
 control 'slurm_user_and_group_created' do
-  title 'Check slrum user and group exist and are properly configured'
+  title 'Check slurm user and group exist and are properly configured'
 
   describe group(slurm_group) do
     it { should exist }
@@ -37,10 +39,12 @@ control 'slurm_user_and_group_created' do
     it { should exist }
     its('group') { should eq slurm_group }
   end
-end unless os_properties.redhat_ubi?
+end
 
 control 'slurm_licence_configured' do
   title 'Checks slurm licences folder has the required files'
+
+  only_if { !os_properties.redhat_ubi? }
 
   describe file(slurm_license_path) do
     it { should exist }
@@ -77,10 +81,12 @@ control 'slurm_licence_configured' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end
-end unless os_properties.redhat_ubi?
+end
 
-control 'slurm_plugin_libraries_compiled' do
-  title 'Checks that all required slurm plugin libraries were compiled'
+control 'slurm_shared_libraries_compiled' do
+  title 'Checks that all required slurm shared libraries were compiled'
+
+  only_if { !os_properties.redhat_ubi? }
 
   describe file("#{slurm_library_folder}/accounting_storage_mysql.so") do
     it { should exist }
@@ -109,10 +115,12 @@ control 'slurm_plugin_libraries_compiled' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end
-end unless os_properties.redhat_ubi?
+end
 
 control 'slurm_library_shared' do
   title 'Checks slurm shared library is part of the runtime search path'
+
+  only_if { !os_properties.redhat_ubi? }
 
   describe file("/etc/ld.so.conf.d/slurm.conf") do
     it { should exist }
@@ -123,4 +131,4 @@ control 'slurm_library_shared' do
       should match('/opt/slurm/lib/')
     end
   end
-end unless os_properties.redhat_ubi?
+end
