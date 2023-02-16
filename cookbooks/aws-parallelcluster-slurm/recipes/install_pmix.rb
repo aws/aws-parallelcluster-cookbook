@@ -26,15 +26,8 @@ remote_file pmix_tarball do
   mode '0644'
   retries 3
   retry_delay 5
+  checksum pmix_sha256
   action :create_if_missing
-end
-
-ruby_block "Validate PMIx Tarball Checksum" do
-  block do
-    require 'digest'
-    checksum = Digest::SHA256.file(pmix_tarball).hexdigest
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{pmix_sha256}" if checksum != pmix_sha256
-  end
 end
 
 bash 'Install PMIx' do
