@@ -171,7 +171,7 @@ manage_raid "add raid" do
 end
 
 # unmount efs
-manage_efs "unmount efs" do
+efs "unmount efs" do
   shared_dir_array(lazy { node['cluster']['unmount_efs_shared_dir_array'] })
   efs_fs_id_array(lazy { node['cluster']['unmount_efs_fs_id_array'] })
   action :unmount
@@ -179,11 +179,12 @@ manage_efs "unmount efs" do
 end
 
 # mount efs
-manage_efs "mount efs" do
+efs "mount efs" do
   shared_dir_array(lazy { node['cluster']['mount_efs_shared_dir_array'] })
   efs_fs_id_array(lazy { node['cluster']['mount_efs_fs_id_array'] })
   efs_encryption_in_transit_array(lazy { node['cluster']['mount_efs_encryption_in_transit_array'] })
   efs_iam_authorization_array(lazy { node['cluster']['mount_efs_iam_authorization_array'] })
+  action :mount
   not_if { node['cluster']['mount_efs_shared_dir_array'].empty? }
 end
 
