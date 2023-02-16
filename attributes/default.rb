@@ -90,6 +90,7 @@ default['cluster']['armpl']['gcc']['url'] = [
 default['cluster']['armpl']['platform'] = value_for_platform(
   'centos' => { '~>7' => 'RHEL-7' },
   'amazon' => { '2' => 'RHEL-8' },
+  'redhat' => { 'default' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
     '20.04' => 'Ubuntu-20.04',
