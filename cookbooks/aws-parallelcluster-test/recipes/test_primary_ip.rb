@@ -39,7 +39,9 @@ bash "check primary ip" do
         done
       fi
     done
-    echo Error: Route53 IP does not match host IP
+    echo "Primary ip ${mac_ip} not in file /etc/hosts"
+    echo "cat /etc/hosts"
+    cat /etc/hosts
     exit 1
   fi
   TEST
