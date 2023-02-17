@@ -437,3 +437,4 @@ suites:
       ec2:
         local_hostname: dokken
         local_ipv4: 172.17.1.15
+      ipaddress: 172.17.1.15
