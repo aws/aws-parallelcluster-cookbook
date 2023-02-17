@@ -18,6 +18,7 @@ end
 unified_mode true
 
 use 'partial/_build_install_efs_utils_centos_redhat'
+use 'partial/_mount_umount'
 
 default_action :install_efs_utils
 
