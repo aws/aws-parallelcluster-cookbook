@@ -182,7 +182,7 @@ ruby_block "Update Slurm Accounting" do
     end
   end
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
-end
+end unless virtualized?
 
 service 'slurmctld' do
   action :restart
