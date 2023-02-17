@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     name: DepCheck
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Dependency Check
         uses: dependency-check/Dependency-Check_Action@main
         with:
@@ -31,7 +31,7 @@ jobs:
           - name: Setup Ruby
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -66,7 +66,7 @@ jobs:
             toxenv: code-linters
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Setup Python
         uses: actions/setup-python@v2
         with:
@@ -79,7 +79,7 @@ jobs:
     name: Shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
         with:
