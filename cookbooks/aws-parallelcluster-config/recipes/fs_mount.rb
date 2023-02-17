@@ -15,12 +15,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Mount EFS directory with manage_efs resource
-manage_efs "mount efs" do
+# Mount EFS directory with efs resource
+efs "mount efs" do
   shared_dir_array node['cluster']['efs_shared_dirs'].split(',')
   efs_fs_id_array node['cluster']['efs_fs_ids'].split(',')
   efs_encryption_in_transit_array node['cluster']['efs_encryption_in_transits'].split(',')
   efs_iam_authorization_array node['cluster']['efs_iam_authorizations'].split(',')
+  action :mount
   not_if { node['cluster']['efs_shared_dirs'].split(',').empty? }
 end
 
