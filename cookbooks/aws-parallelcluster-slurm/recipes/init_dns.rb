@@ -16,6 +16,11 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+package "hostname" do
+  retries 3
+  retry_delay 5
+end
+
 # It is possible to restore the SIT behaviour by setting the use_private_hostname = true as extra_json parameter
 if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostname'] == 'false'
   # Heterogeneous Instance Type
