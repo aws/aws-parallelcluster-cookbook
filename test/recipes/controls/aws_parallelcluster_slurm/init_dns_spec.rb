@@ -17,7 +17,7 @@ control 'hostname_configured' do
     its('content') do
       should match("short-hostname")
     end
-  end unless os_properties.virtualized?
+  end
 
   describe file('/etc/hosts') do
     it { should exist }

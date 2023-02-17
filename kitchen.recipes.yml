@@ -424,6 +424,8 @@ suites:
     verifier:
       controls:
         - hostname_configured
+    driver:
+      privileged: true # required to set hostname
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
