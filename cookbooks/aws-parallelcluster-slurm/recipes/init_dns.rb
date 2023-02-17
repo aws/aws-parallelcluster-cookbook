@@ -24,7 +24,7 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
     # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
     # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
     dns_domain 'configure dns name resolution' do
-      :configure
+      action :configure
     end
   end
 
@@ -69,7 +69,7 @@ end
 hostname "set short hostname" do
   compile_time false
   hostname(lazy { node['cluster']['assigned_short_hostname'] })
-end unless virtualized?
+end
 
 # Resource to be called to reload ohai attributes after /etc/hosts update
 ohai 'reload_hostname' do
