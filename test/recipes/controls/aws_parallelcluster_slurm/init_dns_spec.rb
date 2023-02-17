@@ -12,6 +12,10 @@
 control 'hostname_configured' do
   title 'Checks hostname is properly set'
 
+  describe package('hostname') do
+    it { should be_installed }
+  end
+
   describe file('/etc/hostname') do
     it { should exist }
     its('content') do
