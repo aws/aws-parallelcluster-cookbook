@@ -2,6 +2,7 @@
 
 return unless platform?('centos') && node['platform_version'].to_i == 7
 
+# environment-modules required by EFA, Intel MPI and ARM PL
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                          libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
                                          httpd boost-devel redhat-lsb mlocate R atlas-devel
@@ -9,7 +10,7 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-
                                          libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
                                          mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
                                          iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-                                         coreutils moreutils sssd sssd-tools sssd-ldap curl)
+                                         coreutils moreutils sssd sssd-tools sssd-ldap curl environment-modules)
 
 # TODO: check if it is still relevant. Evaluate if it is worth to remove the package.
 if node['kernel']['machine'] == 'aarch64'
