@@ -629,9 +629,6 @@
           "mem_used_percent"
         ],
         "metrics_collection_interval": 60,
-        "append_dimensions": [
-          "ClusterName"
-        ],
         "node_roles": [
           "HeadNode"
         ]
@@ -645,9 +642,6 @@
           "/"
         ],
         "metrics_collection_interval": 60,
-        "append_dimensions": [
-          "ClusterName"
-        ],
         "node_roles": [
           "HeadNode"
         ]
@@ -655,14 +649,6 @@
     ],
     "append_dimensions": [
       "InstanceId"
-    ],
-    "aggregation_dimensions": [
-      [
-        "ClusterName"
-      ],
-      [
-        "InstanceId"
-      ]
     ]
   }
 }
