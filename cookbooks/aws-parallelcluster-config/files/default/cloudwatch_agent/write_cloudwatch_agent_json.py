@@ -180,20 +180,17 @@ def filter_output_fields(configs):
 
 def create_metrics_collected(selected_configs):
     """Create the "metrics_collected" section in metrics configuration for selected metrics."""
-    metrics_collected = {}
-    for metric_config in selected_configs:
-        metric_key = metric_config["metric_type"]
-        metrics_collected[metric_key] = {
-            "measurement": metric_config["measurement"],
-            "metrics_collection_interval": metric_config.get(
-                "metrics_collection_interval", DEFAULT_METRICS_COLLECTION_INTERVAL
-            ),
-        }
-        if "resources" in metric_config.keys():
-            metrics_collected[metric_key]["resources"] = metric_config["resources"]
-        if "append_dimensions" in metric_config.keys() and "ClusterName" in metric_config["append_dimensions"]:
-            metrics_collected[metric_key]["append_dimensions"] = {"ClusterName": get_node_info().get("stack_name")}
-    return metrics_collected
+    desired_keys = ["measurement", "resources", "metrics_collection_interval"]
+    def _collect_metric_properties(metric_config):
+        # initial dict with default key-value pairs
+        collected = {"metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL}
+        collected.update({key: metric_config[key] for key in desired_keys if key in metric_config})
+        if "append_dimensions" in metric_config and "ClusterName" in metric_config["append_dimensions"]:
+            collected.update({"append_dimensions": {"ClusterName": get_node_info().get("stack_name")}})
+        return collected
+    return {
+        metric_config["metric_type"]: _collect_metric_properties(metric_config) for metric_config in selected_configs
+    }
 
 
 def select_metrics(configs, args):
@@ -217,14 +214,14 @@ def select_append_dimensions(dimensions):
 
 def add_append_dimensions(metric_configs, configs):
     """Add the "append_dimensions" filed for the CloudWatch Agent Metrics section."""
-    if "append_dimensions" in configs.keys() and len(metric_configs["metrics_collected"]) > 0:
+    if "append_dimensions" in configs and metric_configs["metrics_collected"]:
         metric_configs["append_dimensions"] = select_append_dimensions(configs["append_dimensions"])
     return metric_configs
 
 
 def add_aggregation_dimensions(metric_configs, configs):
     """Add the "aggregation_dimensions" filed for the CloudWatch Agent Metrics section."""
-    if "aggregation_dimensions" in configs.keys() and len(metric_configs["metrics_collected"]) > 0:
+    if "aggregation_dimensions" in configs and metric_configs["metrics_collected"]:
         metric_configs["aggregation_dimensions"] = configs["aggregation_dimensions"]
     return metric_configs
 
@@ -237,7 +234,7 @@ def create_config(log_configs, metric_configs):
             "log_stream_name": f"{gethostname()}.{{instance_id}}.default-log-stream",
         }
     }
-    if len(metric_configs["metrics_collected"]) > 0:
+    if metric_configs["metrics_collected"]:
         cw_agent_config["metrics"] = metric_configs
     return cw_agent_config
 
