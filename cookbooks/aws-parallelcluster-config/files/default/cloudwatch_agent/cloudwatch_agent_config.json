@@ -649,6 +649,11 @@
     ],
     "append_dimensions": [
       "InstanceId"
+    ],
+    "aggregation_dimensions": [
+      [
+        "InstanceId"
+      ]
     ]
   }
 }
