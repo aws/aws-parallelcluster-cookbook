@@ -181,6 +181,7 @@ def filter_output_fields(configs):
 def create_metrics_collected(selected_configs):
     """Create the "metrics_collected" section in metrics configuration for selected metrics."""
     desired_keys = ["measurement", "resources", "metrics_collection_interval"]
+
     def _collect_metric_properties(metric_config):
         # initial dict with default key-value pairs
         collected = {"metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL}
@@ -188,6 +189,7 @@ def create_metrics_collected(selected_configs):
         if "append_dimensions" in metric_config and "ClusterName" in metric_config["append_dimensions"]:
             collected.update({"append_dimensions": {"ClusterName": get_node_info().get("stack_name")}})
         return collected
+
     return {
         metric_config["metric_type"]: _collect_metric_properties(metric_config) for metric_config in selected_configs
     }
