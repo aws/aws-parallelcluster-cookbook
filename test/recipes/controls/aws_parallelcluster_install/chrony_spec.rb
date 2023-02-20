@@ -12,9 +12,11 @@
 control 'chrony_installed_and_configured' do
   title 'Test chrony installation and configuration'
 
+  only_if { !os_properties.redhat_ubi? }
+
   describe package('chrony') do
     it { should be_installed }
-  end unless os_properties.redhat_ubi?
+  end
 
   describe package('ntp') do
     it { should_not be_installed }
