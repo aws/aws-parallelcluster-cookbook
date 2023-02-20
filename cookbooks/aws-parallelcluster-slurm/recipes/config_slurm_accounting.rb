@@ -21,7 +21,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
   group "#{node['cluster']['slurm']['group']}"
   mode '0600'
   # Do not overwrite possible user customization if the database credentials are updated
-  not_if { ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf") }
+  action :create_if_missing
 end
 
 file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
