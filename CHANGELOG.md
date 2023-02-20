@@ -30,6 +30,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.4-3`
 - Make Slurm controller logs more verbose and enable additional logging for the Slurm power save plugin.
 
+**BUG FIXES**
+- Fix an issue where custom AMI creation failed in Ubuntu 20.04 on MySQL packages installation.
+
 3.4.1
 -----
 
