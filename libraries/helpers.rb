@@ -264,33 +264,6 @@ def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
 end
 
-#
-# Retrieve RHEL OS minor version from running kernel version
-# The OS minor version is retrieved from the patch version of the running kernel
-# following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for CentOS7 minor version >=7
-#
-def find_rhel_minor_version
-  os_minor_version = ''
-
-  if node['platform'] == 'centos'
-    # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
-    kernel_patch_version = kernel_release.match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    raise "Unable to retrieve the kernel patch version from #{kernel_release}." unless kernel_patch_version
-
-    case node['platform_version'].to_i
-    when 7
-      os_minor_version = '7' if kernel_patch_version[1] >= '1062'
-      os_minor_version = '8' if kernel_patch_version[1] >= '1127'
-      os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    else
-      raise "CentOS version #{node['platform_version']} not supported."
-    end
-  end
-
-  os_minor_version
-end
-
 # Return chrony service reload command
 # Chrony doesn't support reload but only force-reload command
 def chrony_reload_command
