@@ -190,6 +190,9 @@ def validate_os_type
   when 'centos'
     current_os = "centos#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
+  when 'redhat'
+    current_os = "redhat#{node['platform_version'].to_i}"
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   end
 end
 
