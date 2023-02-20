@@ -183,6 +183,8 @@ suites:
         - recipe:aws-parallelcluster-install::users
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+      cluster:
+        node_type: 'HeadNode'
   - name: mount_shared
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
