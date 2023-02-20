@@ -27,17 +27,37 @@ platforms:
   - name: alinux2
     driver:
       image: dokken/amazonlinux-2
+    attributes:
+      cluster:
+        base_os: alinux2
+        kernel_release: '5.10.157-139.675.amzn2.x86_64'
   - name: centos7
     driver:
       image: dokken/centos-7
+    attributes:
+      cluster:
+        base_os: centos7
+        kernel_release: '3.10.0-1160.76.1.el7.x86_64'
   - name: ubuntu1804
     driver:
       image: dokken/ubuntu-18.04
+    attributes:
+      cluster:
+        base_os: ubuntu1804
+        kernel_release: '5.4.0-1092-aws'
   - name: ubuntu2004
     driver:
       image: dokken/ubuntu-20.04
+    attributes:
+      cluster:
+        base_os: ubuntu2004
+        kernel_release: '5.15.0-1028-aws'
   - name: redhat8
     driver:
       image: registry.access.redhat.com/ubi8/ubi
       intermediate_instructions:
         - RUN chmod +t /tmp
+    attributes:
+      cluster:
+        base_os: redhat8
+        kernel_release: '4.18.0-425.3.1.el8.x86_64'

@@ -3,9 +3,6 @@ provisioner:
   attributes:
     cluster:
       # right now tests depend on this parameter: we will try to remove the dependency later
-      base_os: alinux
+      base_os: alinux2
       region: us-east-1
-      dcv:
-        server: {}
       parallelcluster-node-version: '3.4.1'
-      node_type: 'HeadNode'
