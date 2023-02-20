@@ -27,6 +27,10 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'centos'
   end
 
+  def centos_min_version? (version)
+    centos? && inspec.os.release.to_f >= version
+  end
+
   def alinux2?
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
   end
