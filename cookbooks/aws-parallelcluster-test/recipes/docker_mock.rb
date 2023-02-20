@@ -49,3 +49,5 @@ end
 
 directory '/etc/cron.daily'
 directory '/etc/cron.weekly'
+
+directory '/etc/chef'
