@@ -9,6 +9,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+control 'ephemeral_drives_logical_volumes_manager_installed' do
+  title 'Check ephemeral drives management utility is installed'
+
+  describe package('lvm2') do
+    it { should be_installed }
+  end
+end
+
 control 'ephemeral_drives_script_created' do
   title 'Ephemeral drives script is copied to the target dir'
 

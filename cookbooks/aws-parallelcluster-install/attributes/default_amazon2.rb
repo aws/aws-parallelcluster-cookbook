@@ -2,9 +2,11 @@
 
 return unless platform?('amazon') && node['platform_version'] == "2"
 
+# environment-modules required by EFA, Intel MPI and ARM PL
+# iptables needed for IMDS setup
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
                                          libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-                                         httpd boost-devel system-lsb mlocate lvm2 atlas-devel glibc-static iproute
+                                         httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
                                          libffi-devel dkms libedit-devel postgresql-devel postgresql-server
                                          sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
                                          libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch

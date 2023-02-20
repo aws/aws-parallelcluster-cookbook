@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['cluster']['scheduler'] == 'awsbatch'
+return if virtualized? || node['cluster']['scheduler'] == 'awsbatch'
 
 # slurm and custom schedulers will have imds access on the head node
 if node['cluster']['node_type'] == 'HeadNode'

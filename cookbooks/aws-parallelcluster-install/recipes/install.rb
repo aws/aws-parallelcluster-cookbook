@@ -35,7 +35,8 @@ efa 'Install EFA'
 
 # == ENVIRONMENT
 include_recipe "aws-parallelcluster-install::lustre" # FSx options
-include_recipe "aws-parallelcluster-install::efs" # EFS Utils
+efs 'Install efs-utils'
+stunnel 'Install stunnel'
 
 # == SCHEDULER AND COMPUTE FLEET
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"

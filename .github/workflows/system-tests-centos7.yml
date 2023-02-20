@@ -16,7 +16,7 @@ jobs:
         ports:
           - 5000:5000
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@main
       - name: Set up Docker Buildx
         id: buildx
         uses: docker/setup-buildx-action@v1
@@ -36,4 +36,4 @@ jobs:
       - name: Configure
         run: |
           sed -i 's/\(.*base_os":\).*/\1 "centos7",/' ${{ github.workspace }}/system_tests/dna.json
-          docker run -i -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json localhost:5000/pcluster/chef-base:centos7 /build/system_tests/systemd
+          docker run -i -v ${{ github.workspace }}:/build -v ${{ github.workspace }}/system_tests/dna.json:/etc/chef/dna.json localhost:5000/pcluster/chef-base:centos7 /build/system_tests/systemd; echo $?

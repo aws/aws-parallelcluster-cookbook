@@ -25,15 +25,8 @@ remote_file jwt_tarball do
   mode '0644'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(jwt_tarball) }
-end
-
-ruby_block "Validate libjwt Tarball Checksum" do
-  block do
-    require 'digest'
-    checksum = Digest::SHA256.file(jwt_tarball).hexdigest
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{jwt_sha256}" if checksum != jwt_sha256
-  end
+  checksum jwt_sha256
+  action :create_if_missing
 end
 
 jwt_dependencies 'Install jwt dependencies'

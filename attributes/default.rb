@@ -90,6 +90,7 @@ default['cluster']['armpl']['gcc']['url'] = [
 default['cluster']['armpl']['platform'] = value_for_platform(
   'centos' => { '~>7' => 'RHEL-7' },
   'amazon' => { '2' => 'RHEL-8' },
+  'redhat' => { 'default' => 'RHEL-8' },
   'ubuntu' => {
     '18.04' => 'Ubuntu-18.04',
     '20.04' => 'Ubuntu-20.04',
@@ -102,25 +103,13 @@ default['cluster']['armpl']['url'] = [
 ].join('/')
 
 # URLs to software packages used during install recipes
-# Slurm software
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['version'] = '22-05-8-1'
-# WARNING: specify the commit hash only if a development version of Slurm must be used
-# WARNING: the whole commit hash must be used here (not a shortened version of the hash)
-default['cluster']['slurm']['commit'] = ''
-default['cluster']['slurm']['tar_name'] = if slurm_commit_hash?
-                                            "#{node['cluster']['slurm']['commit']}"
-                                          else
-                                            "slurm-#{node['cluster']['slurm']['version']}"
-                                          end
-default['cluster']['slurm']['url'] = "https://github.com/SchedMD/slurm/archive/#{node['cluster']['slurm']['tar_name']}.tar.gz"
-default['cluster']['slurm']['sha256'] = '8c8f6a26a5d51e6c63773f2e02653eb724540ee8b360125c8d7732314ce737d6'
+default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
+# Slurm
 default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
-default['cluster']['slurm']['install_dir'] = "/opt/slurm"
-default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
 # Munge
 default['cluster']['munge']['user'] = 'munge'
 default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
