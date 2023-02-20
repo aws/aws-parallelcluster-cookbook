@@ -34,7 +34,7 @@ include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
 efa 'Install EFA'
 
 # == ENVIRONMENT
-include_recipe "aws-parallelcluster-install::lustre" # FSx options
+lustre "Install FSx options" # FSx options
 efs 'Install efs-utils'
 stunnel 'Install stunnel'
 
