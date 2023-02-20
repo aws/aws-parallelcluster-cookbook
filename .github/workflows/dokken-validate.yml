@@ -14,7 +14,7 @@ jobs:
           - ubuntu20
           - redhat8
         suite:
-          - platform-base
+          - aws-parallelcluster-install
       fail-fast: false
     steps:
       - name: Check out code
