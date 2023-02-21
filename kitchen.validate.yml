@@ -42,10 +42,10 @@ suites:
         - cron_disabled_selected_daily_and_weekly_jobs
         - openssh_installed
         - ami_cleanup_file_created
-        - c_states_kernel_configuration
+        - c_states_kernel_configured
         - chrony_installed_and_configured
         - clusterstatusmgtd_files_created
-        - disable_selinux
+        - selinux_disabled
         - efa_conflicting_packages_removed
         - efa_installed
         - efa_prereq_packages_installed
@@ -54,7 +54,7 @@ suites:
         - license_readme_created
         - mysql_client_installed
         - mysql_client_source_node_created
-        - node_attributes
+        - node_attributes_created
         - services_disabled_on_amazon_family
         - services_disabled_on_debian_family
         - stunnel_installed
