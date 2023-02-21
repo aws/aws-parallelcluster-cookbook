@@ -138,7 +138,7 @@ suites:
       - recipe[aws-parallelcluster-install::disable_selinux]
     verifier:
       controls:
-        - disable_selinux
+        - selinux_disabled
   - name: openssh
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
