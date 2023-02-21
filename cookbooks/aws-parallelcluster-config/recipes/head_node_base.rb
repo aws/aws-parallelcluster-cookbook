@@ -30,14 +30,14 @@ nfs_export "/home" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end
+end unless redhat_ubi?
 
 # Export /opt/parallelcluster/shared
 nfs_export node['cluster']['shared_dir'] do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end
+end unless redhat_ubi?
 
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
@@ -45,7 +45,7 @@ nfs_export "/opt/intel" do
   writeable true
   options ['no_root_squash']
   only_if { ::File.directory?("/opt/intel") }
-end
+end unless redhat_ubi?
 
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-config::head_node_raid'

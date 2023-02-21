@@ -51,3 +51,24 @@ directory '/etc/cron.daily'
 directory '/etc/cron.weekly'
 
 directory '/etc/chef'
+
+if platform_family?('debian')
+  %w(nfs-common nfs-kernel-server).each do |nfspkg|
+    package nfspkg
+  end
+elsif !redhat_ubi?
+  #  Rhel family except redhat
+  package 'nfs-utils'
+end
+
+if redhat_ubi?
+  package 'openssh-clients'
+end
+
+file '/usr/bin/ssh-keyscan' do
+  content %(
+    #!/bin/bash
+    exit 0
+    )
+  mode '0755'
+end
