@@ -15,12 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if virtualized?
+
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cluster']['raid_shared_dir']
 
 unless raid_shared_dir.empty?
-  # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
+  raid_shared_dir = format_directory(raid_shared_dir)
+  exported_raid_shared_dir = format_directory(node['cluster']['exported_raid_shared_dir'])
 
   # Created RAID shared mount point
   directory raid_shared_dir do
@@ -32,7 +34,7 @@ unless raid_shared_dir.empty?
 
   # Mount RAID directory over NFS
   mount raid_shared_dir do
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{raid_shared_dir}" })
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_raid_shared_dir}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
     action %i(mount enable)
@@ -42,8 +44,9 @@ unless raid_shared_dir.empty?
 end
 
 # Mount /opt/intel over NFS
+exported_intel_dir = format_directory(node['cluster']['exported_intel_dir'])
 mount '/opt/intel' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:/opt/intel" })
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_intel_dir}" })
   fstype 'nfs'
   options node['cluster']['nfs']['hard_mount_options']
   action %i(mount enable)
@@ -62,10 +65,12 @@ end
 
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
+exported_shared_dir_array = node['cluster']['exported_ebs_shared_dirs'].split(',')
 
 # Mount each volume with NFS
-shared_dir_array.each do |dir|
+shared_dir_array.zip(exported_shared_dir_array).each do |dir, exported_dir|
   dirname = format_directory(dir)
+  exported_dirname = format_directory(exported_dir)
 
   # Created shared mount point
   directory dirname do
@@ -78,7 +83,7 @@ shared_dir_array.each do |dir|
 
   # Mount shared volume over NFS
   mount dirname do
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{dirname}" })
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_dirname}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
     action %i(mount enable)
