@@ -63,6 +63,10 @@ elsif platform?('centos') && node['platform_version'].to_f >= 7.7
     retry_delay 5
   end
 
+  package_repos 'centos_skip_if_unavail' do
+    action :centos_skip_if_unavail
+  end
+
   package %w(kmod-lustre-client lustre-client) do
     retries 3
     retry_delay 5
