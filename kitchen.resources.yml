@@ -40,7 +40,7 @@ suites:
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
-        - c_states_kernel_configuration
+        - c_states_kernel_configured
     attributes:
       resource: c_states
   - name: ec2_udev_rules
@@ -124,7 +124,7 @@ suites:
       - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
-        - efa_system_settings_configured
+        - efa_debian_system_settings_configured
     attributes:
       resource: efa:configure
       cluster:
