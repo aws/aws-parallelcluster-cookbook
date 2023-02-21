@@ -1,4 +1,4 @@
-control 'node_attributes' do
+control 'node_attributes_created' do
   title 'Test the generation of the node attributes json file'
 
   describe file('/etc/chef/node_attributes.json') do
