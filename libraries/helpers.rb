@@ -222,7 +222,7 @@ end
 def aws_domain
   # Set the aws domain name
   aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if node['cluster']['region'].start_with?("cn-")
+  aws_domain = "#{aws_domain}.cn" if !node['cluster']['region'].nil? && node['cluster']['region'].start_with?("cn-")
   aws_domain
 end
 
