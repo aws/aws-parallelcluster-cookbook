@@ -18,7 +18,7 @@ default['cluster']['lustre']['centos7']['base_url_prefix'] = arm_instance? ? 'ce
 default['cluster']['lustre']['base_url'] = value_for_platform(
   'centos' => {
     # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
-    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_rhel_minor_version}/#{node['kernel']['machine']}/",
+    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_centos_minor_version}/#{node['kernel']['machine']}/",
   },
   'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" },
   'redhat' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/$basearch" }

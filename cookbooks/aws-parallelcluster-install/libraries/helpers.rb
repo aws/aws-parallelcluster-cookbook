@@ -22,7 +22,7 @@ end
 # following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
 # Method works for CentOS7 minor version >=7
 #
-def find_rhel_minor_version
+def find_centos_minor_version
   os_minor_version = ''
 
   if node['platform'] == 'centos'
