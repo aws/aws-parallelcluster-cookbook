@@ -206,40 +206,6 @@ def raise_os_not_match(current_os, specified_os)
         "setting in your configuration file to #{current_os}."
 end
 
-#
-# Restart network service according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def restart_network_service
-  network_service_name = value_for_platform(
-    %w(ubuntu debian) => {
-      '>=18.04' => 'systemd-resolved',
-    },
-    'default' => 'network'
-  )
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
-  end
-end
-
-#
-# Reload the network configuration according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def reload_network_config
-  if node['platform'] == 'ubuntu'
-    ruby_block "apply network configuration" do
-      block do
-        Mixlib::ShellOut.new("netplan apply").run_command
-      end
-    end
-  else
-    restart_network_service
-  end
-end
-
 # Check if this platform supports intel's HPC platform
 #
 def platform_supports_intel_hpc_platform?
@@ -322,24 +288,6 @@ def get_nvswitches
   nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
   nvswitch_check.run_command
   nvswitch_check.stdout.strip.to_i
-end
-
-def get_metadata_token
-  # generate the token for retrieving IMDSv2 metadata
-  token_uri = URI("http://169.254.169.254/latest/api/token")
-  token_request = Net::HTTP::Put.new(token_uri)
-  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
-  res = Net::HTTP.new("169.254.169.254").request(token_request)
-  res.body
-end
-
-def get_metadata_with_token(token, uri)
-  # get IMDSv2 metadata with token
-  request = Net::HTTP::Get.new(uri)
-  request["X-aws-ec2-metadata-token"] = token
-  res = Net::HTTP.new("169.254.169.254").request(request)
-  metadata = res.body if res.code == '200'
-  metadata
 end
 
 def get_system_users
