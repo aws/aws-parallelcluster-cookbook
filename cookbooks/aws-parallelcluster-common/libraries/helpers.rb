@@ -32,3 +32,21 @@ end
 def arm_instance?
   Helpers.arm_instance?(node)
 end
+
+def get_metadata_token
+  # generate the token for retrieving IMDSv2 metadata
+  token_uri = URI("http://169.254.169.254/latest/api/token")
+  token_request = Net::HTTP::Put.new(token_uri)
+  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
+  res = Net::HTTP.new("169.254.169.254").request(token_request)
+  res.body
+end
+
+def get_metadata_with_token(token, uri)
+  # get IMDSv2 metadata with token
+  request = Net::HTTP::Get.new(uri)
+  request["X-aws-ec2-metadata-token"] = token
+  res = Net::HTTP.new("169.254.169.254").request(request)
+  metadata = res.body if res.code == '200'
+  metadata
+end
