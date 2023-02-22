@@ -1,5 +1,5 @@
 <%
-  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.5.0'
+  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.5.1'
   pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
   aws_region = ENV['KITCHEN_AWS_REGION'] || ENV['AWS_DEFAULT_REGION'] || 'eu-west-1'
   key_name = ENV['KITCHEN_KEY_NAME'] || 'kitchen'
