@@ -85,3 +85,17 @@ jobs:
         with:
           severity: error
           ignore_paths: third-party
+  rspec:
+    name: ChefSpec
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: actionshub/chef-install@main
+        with:
+          version: 22.10.1013
+      - name: Run ChefSpec on aws-parallelcluster-common
+        run: |
+          cd cookbooks/aws-parallelcluster-common
+          chef exec rspec
+        env:
+          CHEF_LICENSE: accept-no-persist
