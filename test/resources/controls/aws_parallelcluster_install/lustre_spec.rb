@@ -1,8 +1,7 @@
 control 'lustre_client_installed' do
   title "Verify that lustre client is installed"
 
-  kernel_release = command('uname -r').stdout.strip
-  if os_properties.centos_min_version?(7.5) || os_properties.redhat?
+  if (os_properties.centos? && inspec.os.release.to_f >= 7.5) || os_properties.redhat?
     describe package('kmod-lustre-client') do
       it { should be_installed }
     end
@@ -11,7 +10,7 @@ control 'lustre_client_installed' do
       it { should be_installed }
     end
 
-    if os_properties.centos_min_version?(7.7) || os_properties.redhat?
+    if (os_properties.centos? && inspec.os.release.to_f >= 7.7) || os_properties.redhat?
       describe yum.repo('aws-fsx') do
         it { should exist }
         it { should be_enabled }
@@ -30,9 +29,10 @@ control 'lustre_client_installed' do
       it { should be_installed }
     end
 
+    kernel_release = os_properties.ubuntu2004? ? '5.15.0-1028-aws' : '5.4.0-1092-aws'
     describe package("lustre-client-modules-#{kernel_release}") do
       it { should be_installed }
-    end unless os_properties.virtualized?
+    end
   end
 
   if os_properties.alinux2?
@@ -49,7 +49,7 @@ end
 
 control 'lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
-  only_if { !os_properties.virtualized? && (os_properties.debian_family? || os_properties.centos_min_version?(7.5)) }
+  only_if { !os_properties.virtualized? && !os_properties.alinux2? }
   describe kernel_module("lnet") do
     it { should be_loaded }
     it { should_not be_disabled }

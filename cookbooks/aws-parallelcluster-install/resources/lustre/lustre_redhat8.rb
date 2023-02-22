@@ -23,5 +23,21 @@ use 'partial/_install_lustre_centos_redhat'
 default_action :setup
 
 action :setup do
-  action_install_lustre
+  if node['platform_version'].to_f < 8.2
+    Chef::Log.warn("FSx for Lustre is not supported in this RHEL version #{node['platform_version']}, supported versions are >= 8.2")
+  elsif node['cluster']['kernel_release'].include? "4.18.0-425.3.1.el8"
+    Chef::Log.warn("FSx for Lustre is not supported in kernel version 4.18.0-425.3.1.el8 of RHEL, please update the kernel version")
+  else
+    action_install_lustre
+  end
+end
+
+action_class do
+  def base_url
+    "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/$basearch"
+  end
+
+  def public_key
+    "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc"
+  end
 end
