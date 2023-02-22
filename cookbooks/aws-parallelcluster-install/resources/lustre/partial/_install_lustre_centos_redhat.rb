@@ -18,8 +18,8 @@ action :install_lustre do
   # add fsx lustre repository
   yum_repository "aws-fsx" do
     description "AWS FSx Packages - $basearch"
-    baseurl node['cluster']['lustre']['base_url']
-    gpgkey node['cluster']['lustre']['public_key']
+    baseurl base_url
+    gpgkey public_key
     retries 3
     retry_delay 5
   end

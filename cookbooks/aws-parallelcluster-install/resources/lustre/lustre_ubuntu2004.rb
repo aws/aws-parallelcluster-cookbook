@@ -19,7 +19,3 @@ unified_mode true
 use 'partial/_install_lustre_debian'
 
 default_action :setup
-
-action :setup do
-  action_install_lustre
-end
