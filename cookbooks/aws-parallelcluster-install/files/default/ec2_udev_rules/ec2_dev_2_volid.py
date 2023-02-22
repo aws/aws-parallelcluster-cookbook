@@ -80,8 +80,16 @@ def main():
         proxy_port = config.get("Boto", "proxy_port")
         proxy_config = Config(proxies={"https": f"{proxy}:{proxy_port}"})
 
+    # Configure the AWS CA bundle.
+    # In US isolated regions the dedicated CA bundle will be used.
+    # In any other region, the default bundle will be used (None stands for the default settings).
+    # Note: We want to apply a more general solution that applies to every region,
+    # but for the time being this is enough to support US isolated regions without
+    # impacting the other ones.
+    ca_bundle = f"/etc/pki/{region}/certs/ca-bundle.pem" if region.startswith("us-iso") else None
+
     # Connect to AWS using boto
-    ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
+    ec2 = boto3.client("ec2", region_name=region, config=proxy_config, verify=ca_bundle)
 
     # Poll for blockdevicemapping
     devices = ec2.describe_instance_attribute(InstanceId=instance_id, Attribute="blockDeviceMapping").get(
