@@ -29,6 +29,10 @@ action :setup do
   execute 'yum-config-manager-rhel' do
     command "yum-config-manager --enable #{node['cluster']['extra_repos']}"
   end unless virtualized?
+
+  execute 'yum-config-manager_skip_if_unavail' do
+    command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
+  end
 end
 
 action :update do
