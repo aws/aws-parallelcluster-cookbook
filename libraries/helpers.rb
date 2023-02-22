@@ -220,10 +220,17 @@ def platform_supports_dcv?
 end
 
 def aws_domain
-  # Set the aws domain name
-  aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if !node['cluster']['region'].nil? && node['cluster']['region'].start_with?("cn-")
-  aws_domain
+  # Get the aws domain name
+  region = node['cluster']['region']
+  if region.start_with?("cn-")
+    "amazonaws.com.cn"
+  elsif region.start_with?("us-iso-")
+    "c2s.ic.gov"
+  elsif region.start_with?("us-isob-")
+    "sc2s.sgov.gov"
+  else
+    "amazonaws.com"
+  end
 end
 
 def kernel_release

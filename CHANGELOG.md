@@ -24,7 +24,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Lustre client version to 2.12 on Amazon Linux 2. Lustre client 2.12 has been installed on Ubuntu 20.04, 18.04 and CentOS >= 7.7.  Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
 
 **BUG FIXES**
-- Fix update cluster to remove shared EBS volumes can potentially cause node launching failures if `MountDir` match the same pattern in `/etc/exports`.
+- Fix update cluster to remove shared EBS volumes can potentially cause node launching failures if `MountDir` match the same pattern in `/etc/exports`. 
+
+3.5.1
+------
+
+**ENHANCEMENTS**
+- Add support for US isolated regions: us-iso-* and us-isob-*.
 
 3.5.0
 ------
