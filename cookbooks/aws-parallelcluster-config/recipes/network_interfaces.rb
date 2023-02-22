@@ -75,6 +75,7 @@ if macs.length > 1
     cidr_prefix_length = cidr_prefix_length(mac, token)
     netmask = cidr_to_netmask(cidr_prefix_length)
     cidr_block = subnet_cidr_block(mac, token)
+    log "device_number: #{device_number}, device_name: #{device_name}, device_ip_address: #{device_ip_address}"
 
     execute 'configure_nw_interface' do
       user 'root'
