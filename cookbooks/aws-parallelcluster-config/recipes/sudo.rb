@@ -24,9 +24,14 @@ template '/etc/sudoers.d/99-parallelcluster-user-tty' do
 end
 
 # Install parallelcluster specific supervisord config
+region = node['cluster']['region']
 template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   source 'base/parallelcluster_supervisord.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'
+  variables(
+    region: region,
+    aws_ca_bundle: region.start_with?('us-iso') ? "/etc/pki/#{region}/certs/ca-bundle.pem" : ''
+  )
 end

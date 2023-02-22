@@ -4,16 +4,19 @@
 <%# HeadNode -%>
 <% when 'HeadNode' -%>
 [program:cfn-hup]
-command = bash -c "[ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh; <%= node['cluster']['cfn_bootstrap_virtualenv_path'] %>/bin/cfn-hup"
+command = bash -c "[ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh; <%= node['cluster']['cfn_bootstrap_virtualenv_path'] %>/bin/cfn-hup --verbose"
 # The following are needed because cfn-hup starts as a daemon
 exitcodes = 0
 autorestart = unexpected
 startsecs = 0
+<% if @region.start_with?('us-iso') -%>
+environment = AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"
+<% end -%>
 <% if node['cluster']['scheduler'] == 'slurm' -%>
 [program:clustermgtd]
 command = <%= node['cluster']['node_virtualenv_path'] %>/bin/clustermgtd
 user = <%= node['cluster']['cluster_admin_user'] %>
-environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clustermgtd
 stdout_logfile_maxbytes = 0
@@ -22,7 +25,7 @@ stdout_logfile_maxbytes = 0
 [program:clusterstatusmgtd]
 command = <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python /opt/parallelcluster/scripts/clusterstatusmgtd.py
 user = <%= node['cluster']['cluster_admin_user'] %>
-environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/clusterstatusmgtd
 stdout_logfile_maxbytes = 0
@@ -34,7 +37,7 @@ command = <%= node['cluster']['dcv']['authenticator']['virtualenv_path'] %>/bin/
       --certificate <%= node['cluster']['dcv']['authenticator']['certificate'] %>
       --key <%= node['cluster']['dcv']['authenticator']['private_key'] %>
 user = <%= node['cluster']['dcv']['authenticator']['user'] %>
-environment = HOME="<%= node['cluster']['dcv']['authenticator']['user_home'] %>",USER="<%= node['cluster']['dcv']['authenticator']['user'] %>"
+environment = HOME="<%= node['cluster']['dcv']['authenticator']['user_home'] %>",USER="<%= node['cluster']['dcv']['authenticator']['user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 <% end -%>
 
 <%# ComputeFleet -%>
@@ -43,7 +46,7 @@ environment = HOME="<%= node['cluster']['dcv']['authenticator']['user_home'] %>"
 [program:computemgtd]
 command = <%= node['cluster']['node_virtualenv_path'] %>/bin/computemgtd
 user = <%= node['cluster']['cluster_admin_user'] %>
-environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/computemgtd
 stdout_logfile_maxbytes = 0
