@@ -14,9 +14,8 @@ default['cluster']['head_node_home_path'] = '/home'
 default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
 default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 
-default['cluster']['exported_raid_shared_dir'] = node['cluster']['raid_shared_dir']
+default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
-default['cluster']['exported_intel_dir'] = '/opt/intel'
 
 # Python Version
 default['cluster']['python-version'] = '3.9.16'
