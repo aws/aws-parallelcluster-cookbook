@@ -60,4 +60,4 @@ platforms:
     attributes:
       cluster:
         base_os: redhat8
-        kernel_release: '4.18.0-425.3.1.el8.x86_64'
+        kernel_release: '4.18.0-425.13.1.el8_7.x86_64'
