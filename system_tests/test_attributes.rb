@@ -15,8 +15,7 @@
 # limitations under the License.
 
 # These are overrides to force the system-tests to be pinned to a specific version
-# of the packages that we install.
-
+# of the packages that we install. DO NOT change them with the version-bump.
 default['cluster']['parallelcluster-version'] = '3.0.0'
 default['cluster']['parallelcluster-cookbook-version'] = '3.0.0'
 default['cluster']['parallelcluster-node-version'] = '3.0.0'

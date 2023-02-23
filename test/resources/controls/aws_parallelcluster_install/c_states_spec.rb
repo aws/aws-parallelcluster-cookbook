@@ -1,5 +1,5 @@
 
-control 'c_states_kernel_configuration' do
+control 'c_states_kernel_configured' do
   title 'Check the configuration to disable c states'
   only_if { !os_properties.virtualized? && os_properties.x86? }
 

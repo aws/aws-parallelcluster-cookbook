@@ -15,6 +15,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+return if redhat8?
 return if File.exist?("/etc/dcv/dcv.conf")
 
 # Utility function to install a list of packages

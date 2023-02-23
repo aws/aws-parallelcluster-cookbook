@@ -1,0 +1,34 @@
+name: ParallelCluster Cookbook Validation on Docker
+
+on: [push, pull_request]
+
+jobs:
+  dokken-validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+          - redhat8
+        suite:
+          - aws-parallelcluster-install
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        uses: actionshub/test-kitchen@main
+        with:
+          os: ${{ matrix.os }}
+          suite: ${{ matrix.suite }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: kitchen.validate.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false

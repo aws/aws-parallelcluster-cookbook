@@ -8,24 +8,13 @@ verifier:
     - test/resources
 
 suites:
-  - name: platform_base
+  - name: aws_parallelcluster_install
     run_list:
       - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-test::docker_mock]
-      - recipe[aws-parallelcluster-install::base]
+      - recipe[aws-parallelcluster-install::install]
     verifier:
       controls:
-        # This is the first stab at aws-parallelcluster-install::base testing
-        # Missing tests for:
-        #   - disable_services
-        #   - Disable selinux
-        #   - License README
-        #   - configure_gc_thresh_values
-        #   - chrony_installed_and_configured
-        #   - c_states
-        #   - clusterstatusmgtd_files_created
-        #   - mysql_client_installed
-        #   - mysql_client_source_node_created
         # We also need to test the effect some files (service config, profile config) have on the system.
         # TODO: rethink and integrate
         - sudo_installed
@@ -34,6 +23,7 @@ suites:
         - ulimit_configured
         - pcluster_directories_exist
         - pcluster_log_dir_is_configured
+        - ephemeral_drives_logical_volumes_manager_installed
         - ephemeral_drives_script_created
         - ephemeral_service_set_up
         - awsbatch_virtualenv_created
@@ -52,4 +42,19 @@ suites:
         - cron_disabled_selected_daily_and_weekly_jobs
         - openssh_installed
         - ami_cleanup_file_created
-
+        - c_states_kernel_configured
+        - chrony_installed_and_configured
+        - clusterstatusmgtd_files_created
+        - selinux_disabled
+        - efa_conflicting_packages_removed
+        - efa_installed
+        - efa_prereq_packages_installed
+        - efs_utils_installed
+        - gc_thresh_values_configured
+        - license_readme_created
+        - mysql_client_installed
+        - mysql_client_source_node_created
+        - node_attributes_created
+        - services_disabled_on_amazon_family
+        - services_disabled_on_debian_family
+        - stunnel_installed

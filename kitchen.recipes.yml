@@ -51,6 +51,7 @@ suites:
       - recipe[aws-parallelcluster-install::ephemeral_drives]
     verifier:
       controls:
+        - ephemeral_drives_logical_volumes_manager_installed
         - ephemeral_drives_script_created
         - ephemeral_service_set_up
   - name: python_setup
@@ -137,7 +138,7 @@ suites:
       - recipe[aws-parallelcluster-install::disable_selinux]
     verifier:
       controls:
-        - disable_selinux
+        - selinux_disabled
   - name: openssh
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
@@ -182,6 +183,25 @@ suites:
         - recipe:aws-parallelcluster-install::users
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+      cluster:
+        node_type: 'HeadNode'
+  - name: mount_shared
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::mount_shared]
+    verifier:
+      controls:
+        - mount_shared_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-test::export_directories_mock
+      cluster:
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
   - name: ami_cleanup
     run_list:
       - recipe[aws-parallelcluster-install::ami_cleanup]
@@ -311,27 +331,29 @@ suites:
             vpc_ipv4_cidr_blocks: |
               cidr1
               cidr2
-  - name: ephemeral_drives
-    #driver:
-    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+  - name: ephemeral_drives_mounted
+    driver:
+      instance_type: m5d.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
     verifier:
       controls:
-        - ephemeral_drives_service
+        - ephemeral_drives_service_running
+        - ephemeral_drives_configured
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::ephemeral_drives
+        - recipe:aws-parallelcluster-test::cfnconfig_mock
       cluster:
         ebs_shared_dirs: test1,test2
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
-        ephemeral_dir: test3
+        ephemeral_dir: /scratch
   - name: ephemeral_drives_skipped
-    #driver:
-    #  instance_type: m5d.xlarge  # instance type with ephemeral drives
+    driver:
+      instance_type: m5d.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
@@ -358,3 +380,106 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
+  - name: jwt_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_jwt]
+    verifier:
+      controls:
+        - jwt_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: chrony_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::chrony]
+    verifier:
+      controls:
+        - chrony_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::chrony
+  - name: install_slurm
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::install_slurm]
+    verifier:
+      controls:
+        - slurm_installed
+        - slurm_user_and_group_created
+        - slurm_licence_configured
+        - slurm_shared_libraries_compiled
+        - slurm_library_shared
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:mysql_client
+        - recipe:aws-parallelcluster-install::python
+        - recipe:aws-parallelcluster-slurm::install_jwt
+        - recipe:aws-parallelcluster-slurm::install_pmix
+        - resource:munge
+  - name: imds_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::imds]
+    verifier:
+      controls:
+        - imds_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        head_node_imds_secured: 'true'
+        head_node_imds_allowed_users: ['root', 'nobody']
+  - name: init_dns
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::init_dns]
+    verifier:
+      controls:
+        - hostname_configured
+    driver:
+      privileged: true # required to set hostname
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+      cluster:
+        node_type: HeadNode
+        dns_domain: test-domain
+        assigned_hostname: fqn-hostname
+        assigned_short_hostname: short-hostname
+      ec2:
+        local_hostname: dokken
+        local_ipv4: 172.17.1.15
+      ipaddress: 172.17.1.15
+  - name: compute_base
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::compute_base]
+    verifier:
+      controls:
+        - compute_base_configured
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-test::compute_base_mock
+      cluster:
+        node_type: ComputeNode
+        cluster_user: test_user
+        exported_intel_dir: exported_intel
+        raid_shared_dir: raid1
+        exported_raid_shared_dir: exported_raid1
+        ebs_shared_dirs: ebs1,ebs2
+        exported_ebs_shared_dirs: exported_ebs1,exported_ebs2
+        nfs:
+          hard_mount_options: hard,_netdev,noatime
+        head_node_private_ip: '127.0.0.1'

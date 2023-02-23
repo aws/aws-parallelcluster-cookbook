@@ -15,9 +15,9 @@ default_action :setup
 
 package_dependencies = value_for_platform(
   'ubuntu' => {
-    'default' => %w(libjson-c-dev libhttp-parser-dev),
+    'default' => %w(libjson-c-dev libhttp-parser-dev libswitch-perl),
   },
-  'default' => %w(json-c-devel http-parser-devel)
+  'default' => %w(json-c-devel http-parser-devel perl-Switch)
 )
 
 action :setup do

@@ -1,6 +1,6 @@
 AWS ParallelCluster Cookbook
 ============================
 
-[![Build Status](https://travis-ci.org/aws/aws-parallelcluster-cookbook.svg?branch=develop)](https://travis-ci.org/aws/aws-parallelcluster-cookbook)
+![Build Status](https://github.com/aws/aws-parallelcluster-cookbook/actions/workflows/ci.yml/badge.svg?event=push)
 
 This repo contains the AWS ParallelCluster Chef cookbook used in AWS ParallelCluster.

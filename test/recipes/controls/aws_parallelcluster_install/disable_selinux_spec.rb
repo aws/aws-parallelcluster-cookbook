@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'disable_selinux' do
+control 'selinux_disabled' do
   title 'Check if selinux is disabled'
   describe selinux do
     it { should be_disabled }
