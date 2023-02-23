@@ -61,7 +61,7 @@ control 'network_interfaces_configured' do
 
     desc 'Check all NICs have a private IP assigned'
     describe bash("ip a") do
-      its('stdout')      { should match /inet.*#{device_name}/ }
+      its('stdout') { should match /inet.*#{device_name}/ }
     end
   end
 end
