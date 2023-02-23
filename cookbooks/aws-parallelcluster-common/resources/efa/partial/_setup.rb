@@ -26,7 +26,7 @@ action :setup do
   # new one is installed in /opt/amazon/efa/bin/
   package conflicting_packages do
     action :remove
-    not_if efa_installed?
+    not_if { efa_installed? }
   end
 
   # update repos and install prerequisite packages
@@ -42,8 +42,6 @@ action :setup do
 end
 
 action :download_and_install do
-  return if virtualized?
-
   # Get EFA Installer
   efa_installer_url = "https://efa-installer.amazonaws.com/aws-efa-installer-#{node['cluster']['efa']['installer_version']}.tar.gz"
   remote_file efa_tarball do
@@ -67,6 +65,6 @@ action :download_and_install do
       ./efa_installer.sh #{installer_options}
       rm -rf #{node['cluster']['sources_dir']}/aws-efa-installer
     EFAINSTALL
-    not_if efa_installed?
+    not_if { efa_installed? || virtualized? }
   end
 end

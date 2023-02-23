@@ -1,6 +1,15 @@
 #
 # Check if we are running in a Docker System Tests
 #
+
+class Helpers
+  # Putting functions in a class makes them easier to mock
+
+  def self.arm_instance?(node)
+    node['kernel']['machine'] == 'aarch64'
+  end
+end
+
 def virtualized?
   node.include?('virtualized') and node['virtualized']
 end
@@ -21,5 +30,5 @@ end
 # Check if this is an ARM instance
 #
 def arm_instance?
-  node['kernel']['machine'] == 'aarch64'
+  Helpers.arm_instance?(node)
 end
