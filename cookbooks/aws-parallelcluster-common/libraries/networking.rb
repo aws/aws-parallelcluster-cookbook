@@ -42,39 +42,3 @@ end
 def efa_supported?
   Networking.efa_supported?(node)
 end
-
-#
-# Restart network service according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def restart_network_service
-  network_service_name = value_for_platform(
-    %w(ubuntu debian) => {
-      '>=18.04' => 'systemd-resolved',
-    },
-    'centos' => { 'default' => 'network' },
-    'amazon' => { 'default' => 'network' },
-    'default' => 'NetworkManager'
-  )
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
-  end
-end
-
-#
-# Reload the network configuration according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def reload_network_config
-  if node['platform'] == 'ubuntu'
-    ruby_block "apply network configuration" do
-      block do
-        Mixlib::ShellOut.new("netplan apply").run_command
-      end
-    end
-  else
-    restart_network_service
-  end
-end

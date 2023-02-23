@@ -96,5 +96,7 @@ if macs.length > 1
   end
 
   # Apply configuration
-  reload_network_config
+  network_service 'Reload network configuration' do
+    action :reload
+  end
 end
