@@ -652,7 +652,8 @@
     ],
     "aggregation_dimensions": [
       [
-        "InstanceId"
+        "InstanceId",
+        "path"
       ]
     ]
   }
