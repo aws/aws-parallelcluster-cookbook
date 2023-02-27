@@ -56,6 +56,7 @@ describe 'efa:setup' do
         ) do |node|
           # override node['cluster']['efa']['installer_version'] attribute
           node.override['cluster']['efa']['installer_version'] = 'version'
+          node.override['cluster']['platform_version'] = "8.7"
         end
       end
       let(:node) { chef_run.node }
@@ -144,6 +145,25 @@ describe 'efa:setup' do
           end
         end
       end
+    end
+  end
+
+  context 'when rhel version is older than 8.4' do
+    let(:chef_run) do
+      ChefSpec::Runner.new(
+        # Create a runner for the given platform/version
+        platform: "redhat",
+        step_into: ['efa']
+      ) do |node|
+        # override node['cluster']['efa']['installer_version'] attribute
+        node.override['cluster']['platform_version'] = "8.3"
+      end
+    end
+
+    it "version" do
+      setup(chef_run)
+      is_expected.to write_log('EFA is not supported in this RHEL version 8.3, supported versions are >= 8.4').with_level(:warn)
+      is_expected.not_to update_package_repos('update package repos')
     end
   end
 end
