@@ -26,10 +26,6 @@ def x86?
   node['kernel']['machine'] == 'x86_64'
 end
 
-def kernel_release
-  ENV['KERNEL_RELEASE'] || node['cluster']['kernel_release']
-end
-
 #
 # Check if this is an ARM instance
 #
