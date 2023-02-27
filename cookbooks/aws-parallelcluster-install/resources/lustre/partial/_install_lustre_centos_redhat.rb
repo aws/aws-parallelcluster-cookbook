@@ -24,10 +24,18 @@ action :install_lustre do
     retry_delay 5
   end
 
+  execute 'yum-config-manager_skip_if_unavail' do
+    command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
+  end
+
   package %w(kmod-lustre-client lustre-client) do
     retries 3
     retry_delay 5
   end
 
-  kernel_module 'lnet' unless virtualized?
+  package %w(dracut) do
+    retries 3
+    retry_delay 5
+  end
+  kernel_module 'lnet' unless redhat_ubi?
 end
