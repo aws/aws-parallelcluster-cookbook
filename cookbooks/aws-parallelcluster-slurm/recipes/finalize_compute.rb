@@ -40,6 +40,17 @@ service 'slurmd' do
   not_if { node['kitchen'] }
 end
 
+# The slurmd service does not return an error code to `systemctl start slurmd`, so
+# we must explicitly check the status of the service to capture failures
+chef_sleep 3
+
+execute "check slurmd status" do
+  command "systemctl is-active --quiet slurmd.service"
+  retries 5
+  retry_delay 2
+  not_if { node['kitchen'] }
+end
+
 execute 'resume_node' do
   # Always try to resume a static node on start up
   # Command will fail if node is already in IDLE, ignoring failure

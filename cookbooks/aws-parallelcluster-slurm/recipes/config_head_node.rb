@@ -219,3 +219,13 @@ service "slurmctld" do
   supports restart: false
   action %i(enable start)
 end
+
+# The slurmctld service does not return an error code to `systemctl start slurmctld`, so
+# we must explicitly check the status of the service to capture failures
+chef_sleep 3
+
+execute "check slurmctld status" do
+  command "systemctl is-active --quiet slurmctld.service"
+  retries 5
+  retry_delay 2
+end
