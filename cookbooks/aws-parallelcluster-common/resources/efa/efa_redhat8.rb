@@ -24,6 +24,18 @@ action :configure do
   # do nothing
 end
 
+action :check_efa_support do
+  if node['cluster']['platform_version'].to_f < 8.4
+    log "EFA is not supported in this RHEL version #{node['cluster']['platform_version']}, supported versions are >= 8.4" do
+      level :warn
+      action :write
+    end
+    node.override['cluster']['efa_supported'] = false
+  else
+    node.override['cluster']['efa_supported'] = true
+  end
+end
+
 action_class do
   def conflicting_packages
     %w(openmpi-devel openmpi)

@@ -16,29 +16,32 @@
 efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
 
 action :setup do
-  if efa_installed? && !::File.exist?(efa_tarball)
-    Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
-    return
-  end
+  action_check_efa_support
+  if node['cluster']['efa_supported']
+    if efa_installed? && !::File.exist?(efa_tarball)
+      Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
+      return
+    end
 
-  # remove conflicting packages
-  # default openmpi installation conflicts with new install
-  # new one is installed in /opt/amazon/efa/bin/
-  package conflicting_packages do
-    action :remove
-    not_if { efa_installed? }
-  end
+    # remove conflicting packages
+    # default openmpi installation conflicts with new install
+    # new one is installed in /opt/amazon/efa/bin/
+    package conflicting_packages do
+      action :remove
+      not_if { efa_installed? }
+    end
 
-  # update repos and install prerequisite packages
-  package_repos 'update package repos' do
-    action :update
-  end
-  package %w(environment-modules) do
-    retries 3
-    retry_delay 5
-  end
+    # update repos and install prerequisite packages
+    package_repos 'update package repos' do
+      action :update
+    end
+    package %w(environment-modules) do
+      retries 3
+      retry_delay 5
+    end
 
-  action_download_and_install
+    action_download_and_install
+  end
 end
 
 action :download_and_install do
@@ -67,4 +70,8 @@ action :download_and_install do
     EFAINSTALL
     not_if { efa_installed? || virtualized? }
   end
+end
+
+action :check_efa_support do
+  node.default['cluster']['efa_supported'] = true
 end

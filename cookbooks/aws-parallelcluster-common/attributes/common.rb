@@ -53,3 +53,6 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
 # EFA
 default['cluster']['efa']['installer_version'] = '1.21.0'
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
+
+# Created this new variable to be able to mock it freely
+default['cluster']['platform_version'] = node['platform_version']
