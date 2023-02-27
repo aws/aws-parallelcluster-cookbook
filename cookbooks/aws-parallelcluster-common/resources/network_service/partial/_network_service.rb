@@ -11,10 +11,13 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License
-provides :network_service, platform: 'ubuntu', platform_version: '20.04'
-unified_mode true
-default_action :restart
+# See the License for the specific language governing permissions and limitations under the License.
 
-use 'partial/_network_service'
-use 'partial/_network_service_debian'
+action :restart do
+  log "Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'"
+
+  service network_service_name do
+    action :restart
+    ignore_failure true
+  end
+end

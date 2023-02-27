@@ -13,12 +13,15 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :restart do
-  network_service_name = 'network'
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
+action :reload do
+  execute "apply network configuration" do
+    command "netplan apply"
+    timeout 60
+  end
+end
 
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
+action_class do
+  def network_service_name
+    'systemd-resolved'
   end
 end

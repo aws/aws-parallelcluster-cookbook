@@ -19,8 +19,11 @@ end
 unified_mode true
 default_action :restart
 
-use 'partial/_restart_network_alinux_centos'
+use 'partial/_network_service'
+use 'partial/_network_service_alinux_centos_redhat'
 
-action :reload do
-  action_restart
+action_class do
+  def network_service_name
+    'network'
+  end
 end

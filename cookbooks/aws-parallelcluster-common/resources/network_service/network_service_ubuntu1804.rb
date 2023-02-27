@@ -16,12 +16,5 @@ provides :network_service, platform: 'ubuntu', platform_version: '18.04'
 unified_mode true
 default_action :restart
 
-use 'partial/_restart_network_debian'
-
-action :restart do
-  action_restart_network
-end
-
-action :reload do
-  action_apply_network_changes
-end
+use 'partial/_network_service'
+use 'partial/_network_service_debian'
