@@ -184,7 +184,7 @@ action :unexport do
     # unexport the volume
     delete_lines "remove volume from /etc/exports" do
       path "/etc/exports"
-      pattern "#{shared_dir_array[index]} "
+      pattern "^#{shared_dir_array[index]} "
     end
   end
 
