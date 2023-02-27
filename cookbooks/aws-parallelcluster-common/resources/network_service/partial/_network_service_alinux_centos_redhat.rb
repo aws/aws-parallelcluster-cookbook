@@ -13,22 +13,6 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :restart_network do
-  network_service_name = 'systemd-resolved'
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
-
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
-  end
-end
-
-action :apply_network_changes do
-  action_restart_network
-
-  ruby_block "apply network configuration" do
-    block do
-      Mixlib::ShellOut.new("netplan apply").run_command
-    end
-  end
+action :reload do
+  action_restart
 end
