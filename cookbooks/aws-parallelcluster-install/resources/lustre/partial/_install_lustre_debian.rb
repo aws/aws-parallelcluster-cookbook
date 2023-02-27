@@ -34,5 +34,9 @@ action :setup do
     retry_delay 5
   end
 
-  kernel_module 'lnet' unless virtualized?
+  package %w(initramfs-tools) do
+    retries 3
+    retry_delay 5
+  end
+  kernel_module 'lnet'
 end
