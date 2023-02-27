@@ -18,16 +18,11 @@ end
 unified_mode true
 default_action :restart
 
-action :restart do
-  network_service_name = 'NetworkManager'
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
+use 'partial/_network_service'
+use 'partial/_network_service_alinux_centos_redhat'
 
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
+action_class do
+  def network_service_name
+    'NetworkManager'
   end
-end
-
-action :reload do
-  action_restart
 end
