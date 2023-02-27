@@ -1,6 +1,6 @@
 name: ParallelCluster Cookbook Unit Tests on Docker
 
-on: workflow_dispatch
+on: [workflow_dispatch]
 
 jobs:
   dokken-common-recipes:
