@@ -191,6 +191,14 @@ end
 
 chef_sleep '5'
 
+# The slurmctld service does not return an error code to `systemctl start slurmctld`, so
+# we must explicitly check the status of the service to capture failures
+execute "check slurmctld status" do
+  command "systemctl is-active --quiet slurmctld.service"
+  retries 5
+  retry_delay 2
+end
+
 execute 'reload config for running nodes' do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
