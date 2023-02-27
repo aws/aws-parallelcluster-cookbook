@@ -191,7 +191,7 @@ def validate_os_type
     current_os = "centos#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   when 'redhat'
-    current_os = "redhat#{node['platform_version'].to_i}"
+    current_os = "rhel#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   end
 end
@@ -200,7 +200,7 @@ end
 # Raise error if OS types do not match
 #
 def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the #{current_os} OS." \
+  raise "The custom AMI you have provided uses the #{current_os} OS. " \
         "However, the base_os specified in your config file is #{specified_os}. " \
         "Please either use an AMI with the #{specified_os} OS or update the base_os " \
         "setting in your configuration file to #{current_os}."
