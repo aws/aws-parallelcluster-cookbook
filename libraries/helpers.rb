@@ -230,12 +230,6 @@ def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
 end
 
-# Return chrony service reload command
-# Chrony doesn't support reload but only force-reload command
-def chrony_reload_command
-  "systemctl force-reload #{node['cluster']['chrony']['service']}"
-end
-
 # Add an external package repository to the OS's package manager
 # NOTE: This helper function defines a Chef resource function to be executed at Converge time
 def add_package_repository(repo_name, baseurl, gpgkey, distribution)
