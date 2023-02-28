@@ -76,7 +76,7 @@ suites:
   - name: node_setup
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-install::node]
+      - recipe[aws-parallelcluster-install::parallelcluster_node]
     verifier:
       controls:
         - node_virtualenv_created

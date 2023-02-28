@@ -16,6 +16,10 @@
 # limitations under the License.
 
 # Install custom aws-parallelcluster-node package
+
+# TODO: once the pyenv Chef resource supports installing packages from a path (e.g. `pip install .`), convert the
+# bash block to a recipe that uses the pyenv resource.
+
 bash "install custom aws-parallelcluster-node" do
   cwd Chef::Config[:file_cache_path]
   code <<-NODE
