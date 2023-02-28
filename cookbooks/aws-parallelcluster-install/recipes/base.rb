@@ -43,17 +43,6 @@ nfs 'install NFS daemon'
 ephemeral_drives 'install'
 ec2_udev_rules 'configure udev'
 
-# Check whether install a custom aws-parallelcluster-node package or the standard one
-if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
-  # Install custom aws-parallelcluster-node package
-  include_recipe 'aws-parallelcluster-install::parallelcluster_custom_node'
-else
-  pyenv_pip 'aws-parallelcluster-node' do
-    version node['cluster']['parallelcluster-node-version']
-    virtualenv node['cluster']['node_virtualenv_path']
-  end
-end
-
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
 include_recipe "aws-parallelcluster-install::gc_thresh_values"
 
