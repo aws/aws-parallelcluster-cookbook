@@ -38,4 +38,5 @@ suites:
       # subnet_id: private-subnet-id
     verifier:
       controls:
+        - network_interfaces_configuration_script_created
         - network_interfaces_configured
