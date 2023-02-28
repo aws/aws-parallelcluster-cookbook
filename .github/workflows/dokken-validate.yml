@@ -2,6 +2,10 @@ name: ParallelCluster Cookbook Validation on Docker
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   dokken-validate:
     runs-on: ubuntu-latest
