@@ -88,14 +88,20 @@ jobs:
   rspec:
     name: ChefSpec
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        cookbook:
+          - cookbooks/aws-parallelcluster-common
+          - cookbooks/aws-parallelcluster-install
     steps:
       - uses: actions/checkout@main
       - uses: actionshub/chef-install@main
         with:
           version: 22.10.1013
-      - name: Run ChefSpec on aws-parallelcluster-common
+      - name: Run ChefSpec on ${{ matrix.cookbook }}
         run: |
-          cd cookbooks/aws-parallelcluster-common
+          cd ${{ matrix.cookbook }}
           chef exec rspec
         env:
           CHEF_LICENSE: accept-no-persist
