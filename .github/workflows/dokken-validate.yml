@@ -23,9 +23,19 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@main
+      - name: Get changed files
+        id: changed-files-excluding-tests
+        uses: tj-actions/changed-files@v35
+        with:
+          files_ignore: |
+            !.github
+            !**/aws-parallelcluster-*/spec
+            !**/aws-parallelcluster-*/test
       - name: Install Chef
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true'
         uses: actionshub/chef-install@main
       - name: Test-Kitchen
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true'
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
