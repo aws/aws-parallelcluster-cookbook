@@ -33,7 +33,7 @@ if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node
     action :stop
   end
 
-  include_recipe 'aws-parallelcluster-install::parallelcluster_custom_node'
+  include_recipe 'aws-parallelcluster-install::custom_parallelcluster_node'
 
   service "supervisord" do
     action :start
