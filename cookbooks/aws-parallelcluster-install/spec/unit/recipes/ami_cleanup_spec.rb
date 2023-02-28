@@ -1,9 +1,6 @@
 require 'spec_helper'
 
 describe 'aws-parallelcluster-install::ami_cleanup' do
-  # print "It #{it.class}"
-  # print "Self #{self.class}"
-
   for_all_oses do |platform, version|
     let(:chef_run) do
       ChefSpec::Runner.new(platform: platform, version: version)
