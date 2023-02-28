@@ -18,6 +18,7 @@ provides :lustre, platform: 'centos' do |node|
 end
 
 use 'partial/_install_lustre_centos_redhat'
+use 'partial/_mount_unmount'
 
 lustre_version_hash = {
   '7.6' => "2.10.6",

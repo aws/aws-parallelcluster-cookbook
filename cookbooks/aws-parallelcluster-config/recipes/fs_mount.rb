@@ -26,12 +26,13 @@ efs "mount efs" do
 end
 
 # Mount FSx directory with manage_fsx resource
-manage_fsx "mount fsx" do
+lustre "mount fsx" do
   fsx_fs_id_array node['cluster']['fsx_fs_ids'].split(',')
   fsx_fs_type_array node['cluster']['fsx_fs_types'].split(',')
   fsx_shared_dir_array node['cluster']['fsx_shared_dirs'].split(',')
   fsx_dns_name_array node['cluster']['fsx_dns_names'].split(',')
   fsx_mount_name_array node['cluster']['fsx_mount_names'].split(',')
   fsx_volume_junction_path_array node['cluster']['fsx_volume_junction_paths'].split(',')
+  action :mount
   not_if { node['cluster']['fsx_fs_ids'].split(',').empty? }
 end
