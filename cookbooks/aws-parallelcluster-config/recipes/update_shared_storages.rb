@@ -189,7 +189,7 @@ efs "mount efs" do
 end
 
 # unmount fsx
-manage_fsx "unmount fsx" do
+lustre "unmount fsx" do
   fsx_fs_id_array(lazy { node['cluster']['unmount_fsx_fs_id_array'] })
   fsx_fs_type_array(lazy { node['cluster']['unmount_fsx_fs_type_array'] })
   fsx_shared_dir_array(lazy { node['cluster']['unmount_fsx_shared_dir_array'] })
@@ -201,12 +201,13 @@ manage_fsx "unmount fsx" do
 end
 
 # mount fsx
-manage_fsx "mount fsx" do
+lustre "mount fsx" do
   fsx_fs_id_array(lazy { node['cluster']['mount_fsx_fs_id_array'] })
   fsx_fs_type_array(lazy { node['cluster']['mount_fsx_fs_type_array'] })
   fsx_shared_dir_array(lazy { node['cluster']['mount_fsx_shared_dir_array'] })
   fsx_dns_name_array(lazy { node['cluster']['mount_fsx_dns_name_array'] })
   fsx_mount_name_array(lazy { node['cluster']['mount_fsx_mount_name_array'] })
   fsx_volume_junction_path_array(lazy { node['cluster']['mount_fsx_volume_junction_path_array'] })
+  action :mount
   not_if { node['cluster']['mount_fsx_fs_id_array'].empty? }
 end
