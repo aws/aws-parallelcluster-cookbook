@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance
 # with the License. A copy of the License is located at http://aws.amazon.com/apache2.0/
@@ -8,19 +8,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource_name :manage_fsx
-provides :manage_fsx
-unified_mode true
-
 property :fsx, String, name_property: true
-property :fsx_fs_id_array, Array, required: true
-property :fsx_fs_type_array, Array, required: true
-property :fsx_shared_dir_array, Array, required: true
-property :fsx_dns_name_array, Array, required: true
-property :fsx_mount_name_array, Array, required: true
-property :fsx_volume_junction_path_array, Array, required: true
-
-default_action :mount
+property :fsx_fs_id_array, Array, required: %i(mount unmount)
+property :fsx_fs_type_array, Array, required: %i(mount unmount)
+property :fsx_shared_dir_array, Array, required: %i(mount unmount)
+property :fsx_dns_name_array, Array, required: %i(mount unmount)
+property :fsx_mount_name_array, Array, required: %i(mount unmount)
+property :fsx_volume_junction_path_array, Array, required: %i(mount unmount)
 
 action :mount do
   fsx_fs_id_array = new_resource.fsx_fs_id_array.dup

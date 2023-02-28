@@ -19,6 +19,7 @@ end
 unified_mode true
 
 use 'partial/_install_lustre_centos_redhat'
+use 'partial/_mount_unmount'
 
 default_action :setup
 

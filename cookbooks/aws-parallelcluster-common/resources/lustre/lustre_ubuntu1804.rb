@@ -17,5 +17,6 @@ provides :lustre, platform: 'ubuntu', platform_version: '18.04'
 unified_mode true
 
 use 'partial/_install_lustre_debian'
+use 'partial/_mount_unmount'
 
 default_action :setup
