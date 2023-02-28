@@ -31,3 +31,12 @@ def for_all_oses(&block)
     end
   end
 end
+
+def mock_exist_call_original
+  # This is required before mocking existence of specific files
+  allow(File).to receive(:exist?).and_call_original
+end
+
+def mock_file_exists(file, exists)
+  allow(::File).to receive(:exist?).with(file).and_return(exists)
+end
