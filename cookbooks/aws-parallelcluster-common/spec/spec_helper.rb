@@ -15,7 +15,7 @@ module ChefSpec
   end
 end
 
-def for_all_oses(&block)
+def for_all_oses
   [
     %w(amazon 2),
     # The only Centos7 version supported by ChefSpec
@@ -25,9 +25,7 @@ def for_all_oses(&block)
     %w(ubuntu 20.04),
     %w(redhat 8),
   ].each do |platform, version|
-    context "on #{platform}#{version}" do
-      block.call(platform, version)
-    end
+    yield(platform, version)
   end
 end
 
