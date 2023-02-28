@@ -16,6 +16,7 @@
 provides :lustre, platform: 'centos' do |node|
   node['platform_version'].to_i == 7
 end
+unified_mode true
 
 use 'partial/_install_lustre_centos_redhat'
 use 'partial/_mount_unmount'
