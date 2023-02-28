@@ -26,7 +26,7 @@ node_attributes 'Generate export in json at /etc/chef/node_attributes.json'
 include_recipe 'aws-parallelcluster-install::base'
 
 # == PLATFORM - FEATURES
-include_recipe "aws-parallelcluster-install::nvidia" # NVIDIA and CUDA
+include_recipe "aws-parallelcluster-install::nvidia" unless redhat8? # NVIDIA and CUDA
 include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 include_recipe "aws-parallelcluster-install::arm_pl" # ARM Performance Library
