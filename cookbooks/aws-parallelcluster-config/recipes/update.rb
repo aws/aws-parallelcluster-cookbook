@@ -29,14 +29,14 @@ include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']
 # Update node package - useful for development purposes only
 if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
 
-  service "supervisord" do
-    action :stop
+  execute 'stop clustermgtd' do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
   end
 
   include_recipe 'aws-parallelcluster-install::custom_parallelcluster_node'
 
-  service "supervisord" do
-    action :start
+  execute 'start clustermgtd' do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
   end
 
 end
