@@ -9,10 +9,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'network_interfaces_configured' do
-  title 'Check that network interfaces have been configured'
+control 'network_interfaces_configuration_script_created' do
+  title 'Check script to configure network interface is created'
 
-  desc 'Check script to configure network interface is created'
   describe file('/tmp/configure_nw_interface.sh') do
     it { should exist }
     its('mode') { should cmp '0644' }
@@ -20,16 +19,19 @@ control 'network_interfaces_configured' do
     its('group') { should eq 'root' }
     its('content') { should match /^# Configure a specific Network Interface according to the OS/ }
   end
+end
+
+control 'network_interfaces_configured' do
+  title 'Check that network interfaces have been configured'
 
   only_if { !os_properties.virtualized? }
 
-  desc 'Check network interface are configured'
   device_names = bash("ip -o link | awk '{print substr($2, 1, length($2) -1)}' | grep -v lo").stdout.split(/\n+/)
   device_names.each do |device_name|
     if os_properties.debian_family?
       describe file("/etc/netplan/#{device_name}.yaml") do
         it { should exist }
-        its('content') { should match /^    #{device_name}:/ }
+        its('content') { should match /^\s+#{device_name}:/ }
         its('content') { should match /^\s+table:\s100\d/ }
       end
 
@@ -38,7 +40,7 @@ control 'network_interfaces_configured' do
         its('mode') { should cmp '0755' }
         its('owner') { should eq 'root' }
         its('group') { should eq 'root' }
-        its('content') { should match /^logger -t parallelcluster "Removing Automatic route/ }
+        its('content') { should match /^ip route del/ }
       end
     else
       describe file("/etc/sysconfig/network-scripts/ifcfg-#{device_name}") do
