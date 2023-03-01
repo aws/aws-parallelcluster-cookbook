@@ -27,9 +27,9 @@ include_recipe 'aws-parallelcluster-install::base'
 
 # == PLATFORM - FEATURES
 include_recipe "aws-parallelcluster-install::nvidia" unless redhat8? # NVIDIA and CUDA
-include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized?
+include_recipe "aws-parallelcluster-install::intel_mpi" unless virtualized? || redhat8?
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
-include_recipe "aws-parallelcluster-install::arm_pl" # ARM Performance Library
+include_recipe "aws-parallelcluster-install::arm_pl" unless redhat8? # ARM Performance Library
 include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
 efa 'Install EFA'
 
