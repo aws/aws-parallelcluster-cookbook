@@ -21,5 +21,5 @@ use 'partial/_mount_unmount'
 default_action :setup
 
 action :setup do
-  alinux_extras_topic 'lustre2.10'
+  alinux_extras_topic 'lustre'
 end
