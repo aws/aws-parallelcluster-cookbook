@@ -19,9 +19,15 @@ node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
 
 # Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
 # When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
-edit_resource(:template, node['nfs']['config']['server_template']) do
-  source 'nfs/nfs.conf.erb'
-  cookbook 'aws-parallelcluster-config'
+if platform_family?('amazon')
+  edit_resource(:template, node['nfs']['config']['server_template']) do
+    source 'nfs/nfs.conf.erb'
+    cookbook 'aws-parallelcluster-config'
+  end
+else
+  edit_resource(:template, node['nfs']['config']['server_template']) do
+    cookbook 'nfs'
+  end
 end
 
 # Explicitly restart NFS server for thread setting to take effect
