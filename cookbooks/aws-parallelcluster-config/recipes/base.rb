@@ -30,7 +30,7 @@ include_recipe 'aws-parallelcluster-config::networking'
 include_recipe 'aws-parallelcluster-config::chrony'
 
 # NVIDIA services (fabric manager)
-include_recipe "aws-parallelcluster-config::nvidia"
+include_recipe "aws-parallelcluster-config::nvidia" unless redhat8?
 
 # EFA runtime configuration
 efa 'Configure system for EFA' do

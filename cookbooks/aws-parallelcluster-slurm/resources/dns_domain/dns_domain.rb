@@ -28,5 +28,5 @@ action :configure do
     action_update_search_domain_redhat
   end
 
-  restart_network_service
+  network_service 'Restart network service'
 end

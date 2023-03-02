@@ -1,6 +1,15 @@
 #
 # Check if we are running in a Docker System Tests
 #
+
+class Helpers
+  # Putting functions in a class makes them easier to mock
+
+  def self.arm_instance?(node)
+    node['kernel']['machine'] == 'aarch64'
+  end
+end
+
 def virtualized?
   node.include?('virtualized') and node['virtualized']
 end
@@ -21,5 +30,23 @@ end
 # Check if this is an ARM instance
 #
 def arm_instance?
-  node['kernel']['machine'] == 'aarch64'
+  Helpers.arm_instance?(node)
+end
+
+def get_metadata_token
+  # generate the token for retrieving IMDSv2 metadata
+  token_uri = URI("http://169.254.169.254/latest/api/token")
+  token_request = Net::HTTP::Put.new(token_uri)
+  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
+  res = Net::HTTP.new("169.254.169.254").request(token_request)
+  res.body
+end
+
+def get_metadata_with_token(token, uri)
+  # get IMDSv2 metadata with token
+  request = Net::HTTP::Get.new(uri)
+  request["X-aws-ec2-metadata-token"] = token
+  res = Net::HTTP.new("169.254.169.254").request(request)
+  metadata = res.body if res.code == '200'
+  metadata
 end

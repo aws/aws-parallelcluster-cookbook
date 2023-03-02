@@ -14,9 +14,8 @@ default['cluster']['head_node_home_path'] = '/home'
 default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
 default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 
-default['cluster']['exported_raid_shared_dir'] = node['cluster']['raid_shared_dir']
+default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
-default['cluster']['exported_intel_dir'] = '/opt/intel'
 
 # Python Version
 default['cluster']['python-version'] = '3.9.16'
@@ -54,3 +53,6 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
 # EFA
 default['cluster']['efa']['installer_version'] = '1.21.0'
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
+
+# Created this new variable to be able to mock it freely
+default['cluster']['platform_version'] = node['platform_version']

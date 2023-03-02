@@ -53,6 +53,19 @@ suites:
         - debian_udevd_reload_configuration
     attributes:
       resource: ec2_udev_rules
+  - name: lustre_installation
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - lustre_client_installed
+        - lnet_kernel_module_enabled
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - resource:package_repos
+      resource: lustre
   - name: mysql_client
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

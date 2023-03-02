@@ -191,7 +191,7 @@ def validate_os_type
     current_os = "centos#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   when 'redhat'
-    current_os = "redhat#{node['platform_version'].to_i}"
+    current_os = "rhel#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   end
 end
@@ -200,44 +200,10 @@ end
 # Raise error if OS types do not match
 #
 def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the #{current_os} OS." \
+  raise "The custom AMI you have provided uses the #{current_os} OS. " \
         "However, the base_os specified in your config file is #{specified_os}. " \
         "Please either use an AMI with the #{specified_os} OS or update the base_os " \
         "setting in your configuration file to #{current_os}."
-end
-
-#
-# Restart network service according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def restart_network_service
-  network_service_name = value_for_platform(
-    %w(ubuntu debian) => {
-      '>=18.04' => 'systemd-resolved',
-    },
-    'default' => 'network'
-  )
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
-  end
-end
-
-#
-# Reload the network configuration according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def reload_network_config
-  if node['platform'] == 'ubuntu'
-    ruby_block "apply network configuration" do
-      block do
-        Mixlib::ShellOut.new("netplan apply").run_command
-      end
-    end
-  else
-    restart_network_service
-  end
 end
 
 # Check if this platform supports intel's HPC platform
@@ -256,39 +222,12 @@ end
 def aws_domain
   # Set the aws domain name
   aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if node['cluster']['region'].start_with?("cn-")
+  aws_domain = "#{aws_domain}.cn" if !node['cluster']['region'].nil? && node['cluster']['region'].start_with?("cn-")
   aws_domain
 end
 
 def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
-end
-
-#
-# Retrieve RHEL OS minor version from running kernel version
-# The OS minor version is retrieved from the patch version of the running kernel
-# following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for CentOS7 minor version >=7
-#
-def find_rhel_minor_version
-  os_minor_version = ''
-
-  if node['platform'] == 'centos'
-    # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
-    kernel_patch_version = kernel_release.match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    raise "Unable to retrieve the kernel patch version from #{kernel_release}." unless kernel_patch_version
-
-    case node['platform_version'].to_i
-    when 7
-      os_minor_version = '7' if kernel_patch_version[1] >= '1062'
-      os_minor_version = '8' if kernel_patch_version[1] >= '1127'
-      os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    else
-      raise "CentOS version #{node['platform_version']} not supported."
-    end
-  end
-
-  os_minor_version
 end
 
 # Return chrony service reload command
@@ -349,24 +288,6 @@ def get_nvswitches
   nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
   nvswitch_check.run_command
   nvswitch_check.stdout.strip.to_i
-end
-
-def get_metadata_token
-  # generate the token for retrieving IMDSv2 metadata
-  token_uri = URI("http://169.254.169.254/latest/api/token")
-  token_request = Net::HTTP::Put.new(token_uri)
-  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
-  res = Net::HTTP.new("169.254.169.254").request(token_request)
-  res.body
-end
-
-def get_metadata_with_token(token, uri)
-  # get IMDSv2 metadata with token
-  request = Net::HTTP::Get.new(uri)
-  request["X-aws-ec2-metadata-token"] = token
-  res = Net::HTTP.new("169.254.169.254").request(request)
-  metadata = res.body if res.code == '200'
-  metadata
 end
 
 def get_system_users

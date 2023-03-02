@@ -325,42 +325,6 @@ default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
 # For performance, set NFS threads to min(256, max(8, num_cores * 4))
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
-# Lustre defaults (for CentOS >=7.7 and Ubuntu)
-default['cluster']['lustre']['public_key'] = value_for_platform(
-  'centos' => { '>=7.7' => "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc" },
-  'ubuntu' => { 'default' => "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-ubuntu-public-key.asc" }
-)
-# Lustre repo string is built following the official doc
-# https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
-# 'centos' is used for arm and 'el' for x86_64
-default['cluster']['lustre']['centos7']['base_url_prefix'] = arm_instance? ? 'centos' : 'el'
-default['cluster']['lustre']['base_url'] = value_for_platform(
-  'centos' => {
-    # node['kernel']['machine'] contains the architecture: 'x86_64' or 'aarch64'
-    'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/#{default['cluster']['lustre']['centos7']['base_url_prefix']}/7.#{find_rhel_minor_version}/#{node['kernel']['machine']}/",
-  },
-  'ubuntu' => { 'default' => "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu" }
-)
-# Lustre defaults (for CentOS 7.6 and 7.5 only)
-default['cluster']['lustre']['version'] = value_for_platform(
-  'centos' => {
-    '7.6' => "2.10.6",
-    '7.5' => "2.10.5",
-  }
-)
-default['cluster']['lustre']['kmod_url'] = value_for_platform(
-  'centos' => {
-    '7.6' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el7.x86_64.rpm",
-    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/kmod-lustre-client-2.10.5-1.el7.x86_64.rpm",
-  }
-)
-default['cluster']['lustre']['client_url'] = value_for_platform(
-  'centos' => {
-    '7.6' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/lustre-client-2.10.6-1.el7.x86_64.rpm",
-    '7.5' => "https://downloads.whamcloud.com/public/lustre/lustre-2.10.5/el7.5.1804/client/RPMS/x86_64/lustre-client-2.10.5-1.el7.x86_64.rpm",
-  }
-)
-
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['region'] = 'us-east-1'
 default['cluster']['stack_name'] = nil
@@ -375,7 +339,6 @@ default['cluster']['scheduler_slots'] = 'vcpus'
 default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
 default['cluster']['ephemeral_dir'] = '/scratch'
-default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['node_type'] = nil
 default['cluster']['cluster_user'] = 'ec2-user'
@@ -416,7 +379,6 @@ default['cluster']['fsx_fs_types'] = ''
 default['cluster']['fsx_volume_junction_paths'] = ''
 default['cluster']['custom_node_package'] = nil
 default['cluster']['custom_awsbatchcli_package'] = nil
-default['cluster']['raid_shared_dir'] = ''
 default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['dns_domain'] = nil
