@@ -187,7 +187,7 @@ action :unexport do
   # Unexport RAID directory via nfs
   delete_lines "remove volume from /etc/exports" do
     path "/etc/exports"
-    pattern "#{raid_shared_dir} *"
+    pattern "^#{raid_shared_dir} *"
   end
 
   execute "unexport volume" do
