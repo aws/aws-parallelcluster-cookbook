@@ -15,8 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-cookbook_file "#{node['cluster']['scripts_dir']}/patch-iso-instance.sh" do
-  source 'base/patch-iso-instance.sh'
+template "#{node['cluster']['scripts_dir']}/patch-iso-instance.sh" do
+  source 'base/patch-iso-instance.sh.erb'
   owner 'root'
   group 'root'
   mode '0744'
