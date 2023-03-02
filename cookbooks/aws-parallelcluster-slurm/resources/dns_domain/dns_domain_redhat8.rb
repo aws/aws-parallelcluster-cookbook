@@ -22,6 +22,18 @@ use 'partial/_dns_search_domain_redhat'
 action :configure do
   return if virtualized?
 
+  # On RHEL8 dhclient is not enabled by default
+  # Put pcluster version of NetworkManager.conf in place
+  # dhcp = dhclient needs to be added under [main] section to enable dhclient
+  # https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/considerations_in_adopting_rhel_8/networking_considerations-in-adopting-rhel-8#dhcp_plugin_networking
+  cookbook_file 'NetworkManager.conf' do
+    path '/etc/NetworkManager/NetworkManager.conf'
+    source 'dns_domain/NetworkManager.conf'
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
   action_update_search_domain_redhat
 
   network_service 'Restart network service'
