@@ -24,4 +24,11 @@ control 'dns_domain_configured' do
       should match(dns_domain_string)
     end
   end unless os_properties.virtualized?
+
+  describe file("/etc/resolv.conf") do
+    it { should exist }
+    its('content') do
+      should match(dns_domain_string)
+    end
+  end unless os_properties.virtualized?
 end
