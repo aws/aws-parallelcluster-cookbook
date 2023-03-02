@@ -59,13 +59,17 @@ if node['cluster']['node_type'] == 'HeadNode'
   password_secret_service = password_secret_arn[:service]
   password_secret_resource = password_secret_arn[:resource]
   ldap_password =
-    if password_secret_service == "secretsmanager" && password_secret_resource.start_with?("secret")
-      shell_out!("aws secretsmanager get-secret-value --secret-id #{password_secret_arn_str} --region #{region} --query 'SecretString' --output text").stdout.strip
-    elsif password_secret_service == "ssm" && password_secret_resource.start_with?("parameter")
-      (parameter_name = password_secret_resource.split("/")[1])
-      shell_out!("aws ssm get-parameter --name #{parameter_name} --region #{region} --with-decryption --query 'Parameter.Value' --output text").stdout.strip
+    if kitchen_test? && !node['interact_with_secretmanager']
+      "fake-secret"
     else
-      raise "The secret #{password_secret_arn_str} is not supported"
+      if password_secret_service == "secretsmanager" && password_secret_resource.start_with?("secret")
+        shell_out!("aws secretsmanager get-secret-value --secret-id #{password_secret_arn_str} --region #{region} --query 'SecretString' --output text").stdout.strip
+      elsif password_secret_service == "ssm" && password_secret_resource.start_with?("parameter")
+        (parameter_name = password_secret_resource.split("/")[1])
+        shell_out!("aws ssm get-parameter --name #{parameter_name} --region #{region} --with-decryption --query 'Parameter.Value' --output text").stdout.strip
+      else
+        raise "The secret #{password_secret_arn_str} is not supported"
+      end
     end
 
   # Head node writes the sssd.conf file and contacts the secret manager to retrieve the LDAP password.
