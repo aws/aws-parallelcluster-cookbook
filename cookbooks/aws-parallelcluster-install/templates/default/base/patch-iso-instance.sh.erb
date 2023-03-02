@@ -5,12 +5,16 @@ set -ex
 # The script supports the configuration for Amazon Linux 2 only.
 # Furthermore, the script fails if the provided region is not a US isolated region.
 #
-# Usage:   ./patch-iso-instance.sh REGION_NAME
-# Example: ./patch-iso-instance.sh us-isob-east-1
+# Usage:   ./patch-iso-instance.sh
+# Example: ./patch-iso-instance.sh
 
-REGION="${1}"
+function get_instance_region {
+  local _token=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600")
+  curl -H "X-aws-ec2-metadata-token: $_token" -v "http://169.254.169.254/latest/meta-data/placement/region" 2> /dev/null
+}
 
-[[ -z ${REGION} ]] && echo "[ERROR] Missing required argument: REGION" && exit 1
+REGION="$(get_instance_region)"
+
 [[ ${REGION} != us-iso* ]] && echo "[ERROR] The specified region '${REGION}' is not a US isolated region" && exit 1
 
 source /etc/os-release
@@ -18,6 +22,8 @@ OS="${ID}${VERSION_ID}"
 [[ "${OS}" != "amzn2" ]] && echo "[ERROR] Unsupported OS '${OS}'. Configuration supported only on Amazon Linux 2." && exit 1
 
 echo "[INFO] Starting: instance configuration for US isolated region"
+
+echo "[INFO] Starting: installation of packages from amazon Linux 2 repository for US isolated region"
 
 REPOSITORY_DEFINITION_FILE="/etc/yum.repos.d/tmp-amzn2-iso.repo"
 
@@ -36,5 +42,20 @@ REPO_DEFINITION
 yum --disablerepo="*" --enablerepo="amzn2-iso" install -y "*-${REGION}"
 rm -f ${REPOSITORY_DEFINITION_FILE}
 yum --disablerepo="*" --enablerepo="amzn2-*" --security -y update
+
+echo "[INFO] Complete: installation of packages from amazon Linux 2 repository for US isolated region"
+
+echo "[INFO] Starting: CA bundle configuration for AWS CLI in US isolated region"
+
+USERS=(<%= ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']].join(' ') %>)
+CA_BUNDLE="/etc/pki/${REGION}/certs/ca-bundle.pem"
+
+for user in "${USERS[@]}"; do
+  echo "[INFO] Setting CA bundle ${CA_BUNDLE} for user ${user}"
+  sudo mkhomedir_helper $user
+  sudo -u $user aws configure set ca_bundle "$CA_BUNDLE"
+done
+
+echo "[INFO] Complete: CA bundle configuration for AWS CLI in US isolated region"
 
 echo "[INFO] Complete: instance configuration for US isolated region"
