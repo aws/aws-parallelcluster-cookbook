@@ -46,6 +46,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - gl: `2022.2.1012-1`
   - web_viewer: `2022.2.14521-1`
 
+**BUG FIXES**
+- Fix update cluster to remove shared EBS volumes can potentially cause node launching failures if `MountDir` match the same pattern in `/etc/exports`. 
+
 3.5.0
 ------
 
