@@ -600,3 +600,21 @@ def format_directory(dir)
   format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
   format_dir
 end
+
+# Parse an ARN.
+# ARN format: arn:PARTITION:SERVICE:REGION:ACCOUNT_ID:RESOURCE.
+# ARN examples:
+#   1. arn:aws:secretsmanager:eu-west-1:12345678910:secret:PasswordName
+#   2. arn:aws:ssm:eu-west-1:12345678910:parameter/PasswordName
+def parse_arn(arn_string)
+  parts = arn_string.nil? ? [] : arn_string.split(':', 6)
+  raise TypeError if parts.size < 6
+
+  {
+    partition: parts[1],
+    service: parts[2],
+    region: parts[3],
+    account_id: parts[4],
+    resource: parts[5],
+  }
+end
