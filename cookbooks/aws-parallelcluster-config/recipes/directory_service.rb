@@ -25,6 +25,7 @@ shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_servi
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
 if node['cluster']['node_type'] == 'HeadNode'
+  region = node['cluster']['region']
   # DomainName
   # We can assume that DomainName can only be a FQDN or the domain section in a LDAP Distinguished Name.
   # We can assume it because the CLI is in charge of validating it.
@@ -49,6 +50,25 @@ if node['cluster']['node_type'] == 'HeadNode'
     end
   end
 
+  # Password
+  # The Active Directory Password can be:
+  #   1. A secret in Secrets Manager, e.g. arn:aws:secretsmanager:eu-west-1:12345678910:secret:PasswordName
+  #   2. A parameter in SSM, e.g. arn:aws:ssm:eu-west-1:12345678910:parameter/PasswordName
+  password_secret_arn_str = node['cluster']['directory_service']['password_secret_arn']
+  password_secret_arn = parse_arn(password_secret_arn_str)
+  password_secret_service = password_secret_arn[:service]
+  password_secret_resource = password_secret_arn[:resource]
+  ldap_password =
+    if password_secret_service == "secretsmanager" && password_secret_resource.start_with?("secret")
+      (secret_name = password_secret_resource.split(":")[1])
+      shell_out!("aws secretsmanager get-secret-value --secret-id #{secret_name} --region #{region} --query 'SecretString' --output text").stdout.strip
+    elsif password_secret_service == "ssm" && password_secret_resource.start_with?("parameter")
+      (parameter_name = password_secret_resource.split("/")[1])
+      shell_out!("aws ssm get-parameter --name #{parameter_name} --region #{region} --with-decryption --query 'Parameter.Value' --output text").stdout.strip
+    else
+      raise "The secret #{password_secret_arn_str} is not supported"
+    end
+
   # Head node writes the sssd.conf file and contacts the secret manager to retrieve the LDAP password.
   # Then the sssd.conf file is shared through shared_sssd_conf_path to compute nodes.
   # Only contacting the secret manager from head node avoids giving permission to compute nodes to contact the secret manager.
@@ -64,7 +84,7 @@ if node['cluster']['node_type'] == 'HeadNode'
     'ldap_uri' => ldap_uri_components.join(','),
     'ldap_search_base' => ldap_search_base,
     'ldap_default_bind_dn' => node['cluster']['directory_service']['domain_read_only_user'],
-    'ldap_default_authtok' => shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout.strip,
+    'ldap_default_authtok' => ldap_password,
     'ldap_tls_reqcert' => node['cluster']['directory_service']['ldap_tls_req_cert'],
 
     # Optional properties for which we provide a default value,
@@ -141,15 +161,14 @@ if node['cluster']['node_type'] == 'HeadNode'
     recursive true
   end
 
-  update_directory_service_password_path = "#{directory_service_scripts_path}/update_directory_service_password.sh"
-  template update_directory_service_password_path do
+  template "#{directory_service_scripts_path}/update_directory_service_password.sh" do
     source 'directory_service/update_directory_service_password.sh.erb'
     owner 'root'
     group 'root'
     mode '0744'
     variables(
-      secret_arn: node['cluster']['directory_service']['password_secret_arn'],
-      region: node['cluster']['region'],
+      secret_arn: password_secret_arn_str,
+      region: region,
       shared_sssd_conf_path: shared_sssd_conf_path
     )
     sensitive true
