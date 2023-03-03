@@ -1,0 +1,11 @@
+# frozen_string_literal: true
+
+# To add a new cookbook dependency or to change version for an existing dependency
+# uncomment the following line to enable the public Chef supermarket endpoint
+# source 'https://supermarket.chef.io'
+source chef_repo: "."
+
+metadata
+
+cookbook "nfs", path: "../../third-party/nfs-5.0.0"
+cookbook "line", path: "../../third-party/line-4.5.2"
