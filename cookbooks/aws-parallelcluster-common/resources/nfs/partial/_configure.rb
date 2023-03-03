@@ -13,16 +13,15 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nfs, platform: 'ubuntu', platform_version: '20.04'
-unified_mode true
+action :configure do
+  node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
 
-use 'partial/_install_nfs_debian'
-use 'partial/_install_nfs4_and_disable'
+  override_server_template
 
-default_action :setup
-
-action :setup do
-  action_install_nfs
-  action_install_nfs4
-  action_disable_start_at_boot
+  # Explicitly restart NFS server for thread setting to take effect
+  # and enable it to start at boot
+  service node['nfs']['service']['server'] do
+    action %i(restart enable)
+    supports restart: true
+  end unless virtualized?
 end
