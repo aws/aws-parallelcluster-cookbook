@@ -20,7 +20,9 @@ include_recipe 'aws-parallelcluster-config::openssh'
 
 sticky_bits "setup sticky bits"
 
-include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
+nfs "Configure NFS" do
+  action :configure
+end
 
 include_recipe 'aws-parallelcluster-config::ephemeral_drives'
 
