@@ -13,3 +13,6 @@ supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
 supports 'ubuntu', '>= 18.04'
 supports 'redhat', '>= 8.0'
+
+depends 'nfs', '~> 5.0.0'
+depends 'line', '~> 4.5.2'
