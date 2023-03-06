@@ -28,14 +28,10 @@ action :install_lustre do
     command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
   end
 
-  package %w(kmod-lustre-client lustre-client) do
+  package %w(kmod-lustre-client lustre-client dracut) do
     retries 3
     retry_delay 5
   end
 
-  package %w(dracut) do
-    retries 3
-    retry_delay 5
-  end
   kernel_module 'lnet' unless redhat_ubi?
 end
