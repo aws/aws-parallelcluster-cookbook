@@ -160,7 +160,7 @@ action :unmount do
                  "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
                end
     fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
-    execute 'unmount fsx' do
+    execute "unmount fsx #{fsx_shared_dir}" do
       command "umount -fl #{fsx_shared_dir}"
       retries 10
       retry_delay 6
@@ -172,13 +172,13 @@ action :unmount do
     case fsx_fs_type
     when 'LUSTRE'
       mount_name = fsx_mount_name_array[index]
-      delete_lines "remove volume from /etc/fstab" do
+      delete_lines "remove volume #{dns_name}@tcp:/#{mount_name} from /etc/fstab" do
         path "/etc/fstab"
         pattern "#{dns_name}@tcp:/#{mount_name} *"
       end
 
     when 'OPENZFS', 'ONTAP'
-      delete_lines "remove volume from /etc/fstab" do
+      delete_lines "remove volume #{dns_name}:#{fsx_volume_junction_path} from /etc/fstab" do
         path "/etc/fstab"
         pattern "#{dns_name}:#{fsx_volume_junction_path} *"
       end
