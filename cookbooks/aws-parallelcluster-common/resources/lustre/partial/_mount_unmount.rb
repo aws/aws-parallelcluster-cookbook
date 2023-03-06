@@ -159,7 +159,10 @@ action :unmount do
                  # Note the Hardcoding format is only valid for lustre file systems created after Mar-1 2021
                  "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
                end
+
     fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
+    fsx_volume_junction_path = "/#{fsx_volume_junction_path}" unless fsx_volume_junction_path.nil? || fsx_volume_junction_path.start_with?('/')
+
     execute "unmount fsx #{fsx_shared_dir}" do
       command "umount -fl #{fsx_shared_dir}"
       retries 10
