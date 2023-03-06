@@ -24,19 +24,10 @@ action :setup do
 
   apt_update
 
-  package "lustre-client-modules-#{node['cluster']['kernel_release']}" do
+  package %W(lustre-client-modules-#{node['cluster']['kernel_release']} lustre-client-modules-aws initramfs-tools) do
     retries 3
     retry_delay 5
   end
 
-  package "lustre-client-modules-aws" do
-    retries 3
-    retry_delay 5
-  end
-
-  package %w(initramfs-tools) do
-    retries 3
-    retry_delay 5
-  end
   kernel_module 'lnet'
 end

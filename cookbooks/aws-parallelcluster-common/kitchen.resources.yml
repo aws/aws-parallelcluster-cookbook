@@ -1,0 +1,28 @@
+# Allows to test single recipes
+#
+# Must be run as local file (override) of kitchen.docker.yml
+# export KITCHEN_YAML=kitchen.docker.yml
+# export KITCHEN_LOCAL_YAML=kitchen.recipes.yml
+# See: https://kitchen.ci/docs/reference/configuration
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # resource tests will use controls from these directories
+    - path: test/resources
+
+suites:
+  - name: lustre_installation
+    run_list:
+      - recipe[aws-parallelcluster-common::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - lustre_client_installed
+        - lnet_kernel_module_enabled
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - resource:package_repos
+      resource: lustre
+

@@ -16,3 +16,7 @@ supports 'redhat', '>= 8.0'
 
 depends 'nfs', '~> 5.0.0'
 depends 'line', '~> 4.5.2'
+depends 'yum', '~> 7.4.0'
+depends 'yum-epel', '~> 4.5.0'
+
+depends 'aws-parallelcluster-test', '~> 3.6.0'
