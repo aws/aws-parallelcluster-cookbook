@@ -252,3 +252,118 @@ describe 'lustre:setup' do
     end
   end
 end
+
+describe 'lustre:find_centos_minor_version' do
+  context "centos version is not 7" do
+    let(:chef_run) do
+      runner = ChefSpec::Runner.new(
+        platform: 'centos', version: '7',
+        step_into: ['lustre']
+      ) do |node|
+        node.override['cluster']['platform_version'] = "8"
+      end
+      Lustre.setup(runner)
+    end
+
+    it 'raises error' do
+      expect { chef_run }.to(raise_error do |error|
+        expect(error).to be_a(Exception)
+        expect(error.message).to include("CentOS version 8 not supported")
+      end)
+    end
+  end
+
+  context('on centos 7') do
+    context "kernel release does not match expected format" do
+      let(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: 'centos', version: '7',
+          step_into: ['lustre']
+        ) do |node|
+          node.override['cluster']['platform_version'] = "7.7"
+          node.override['cluster']['kernel_release'] = 'unexpected.format'
+        end
+        Lustre.setup(runner)
+      end
+
+      it 'raises error' do
+        expect { chef_run }.to(raise_error do |error|
+          expect(error).to be_a(Exception)
+          expect(error.message).to include("Unable to retrieve the kernel patch version from unexpected.format.")
+        end)
+      end
+    end
+
+    context "kernel release below 3.10.0-1062" do
+      let(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: 'centos', version: '7',
+          step_into: ['lustre']
+        ) do |node|
+          node.override['cluster']['platform_version'] = "7.7"
+          node.override['cluster']['kernel_release'] = '3.10.0-1061.8.2.el7.x86_64'
+        end
+        Lustre.setup(runner)
+      end
+
+      it 'uses empty minor version' do
+        is_expected.to create_yum_repository("aws-fsx")
+          .with(baseurl: 'https://fsx-lustre-client-repo.s3.amazonaws.com/el/7./x86_64/')
+      end
+    end
+
+    context "kernel release 3.10.0-1062 to 3.10.0-1126" do
+      let(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: 'centos', version: '7',
+          step_into: ['lustre']
+        ) do |node|
+          node.override['cluster']['platform_version'] = "7.7"
+          node.override['cluster']['kernel_release'] = '3.10.0-1062.8.2.el7.x86_64'
+        end
+        Lustre.setup(runner)
+      end
+
+      it 'uses minor version 7' do
+        is_expected.to create_yum_repository("aws-fsx")
+          .with(baseurl: 'https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.7/x86_64/')
+      end
+    end
+
+    context "kernel release 3.10.0-1127 to 3.10.0-1167" do
+      let(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: 'centos', version: '7',
+          step_into: ['lustre']
+        ) do |node|
+          node.override['cluster']['platform_version'] = "7.7"
+          node.override['cluster']['kernel_release'] = '3.10.0-1127.8.2.el7.x86_64'
+        end
+        Lustre.setup(runner)
+      end
+
+      it 'uses minor version 7' do
+        is_expected.to create_yum_repository("aws-fsx")
+          .with(baseurl: 'https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.8/x86_64/')
+      end
+    end
+
+    context "kernel from 3.10.0-1168 on" do
+      let(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: 'centos', version: '7',
+          step_into: ['lustre']
+        ) do |node|
+          node.override['cluster']['platform_version'] = "7.7"
+          node.override['cluster']['kernel_release'] = '3.10.0-1168.8.2.el7.x86_64'
+        end
+        Lustre.setup(runner)
+      end
+
+      it 'uses minor version 7' do
+        is_expected.to create_yum_repository("aws-fsx")
+          .with(baseurl: 'https://fsx-lustre-client-repo.s3.amazonaws.com/el/7.9/x86_64/')
+      end
+    end
+  end
+end
