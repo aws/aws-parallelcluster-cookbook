@@ -275,7 +275,7 @@ describe 'lustre:unmount' do
               fsx_shared_dir_array %w(shared_dir_1 shared_dir_2)
               fsx_dns_name_array ['dns_name', '']
               fsx_mount_name_array %w(mount_name_1 mount_name_2)
-              fsx_volume_junction_path_array %w(junction_path_1 junction_path_2)
+              fsx_volume_junction_path_array %w(junction_path_1 /junction_path_2)
               action :unmount
             end
           end
@@ -292,13 +292,13 @@ describe 'lustre:unmount' do
         end
 
         it 'removes volume from /etc/fstab' do
-          is_expected.to edit_delete_lines('remove volume dns_name:junction_path_1 from /etc/fstab')
+          is_expected.to edit_delete_lines('remove volume dns_name:/junction_path_1 from /etc/fstab')
             .with(path: "/etc/fstab")
-            .with(pattern: "dns_name:junction_path_1 *")
+            .with(pattern: "dns_name:/junction_path_1 *")
 
-          is_expected.to edit_delete_lines('remove volume ontap_id_2.fsx.REGION.amazonaws.com:junction_path_2 from /etc/fstab')
+          is_expected.to edit_delete_lines('remove volume ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 from /etc/fstab')
             .with(path: "/etc/fstab")
-            .with(pattern: "ontap_id_2.fsx.REGION.amazonaws.com:junction_path_2 *")
+            .with(pattern: "ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 *")
         end
       end
     end
