@@ -15,10 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-unless node['cluster']['scheduler'] == 'awsbatch'
-  fetch_config 'Fetch and load cluster configs' do
-    update true
-  end
+fetch_config 'Fetch and load cluster configs' do
+  update true
 end
 
 # generate the update shared storages mapping file

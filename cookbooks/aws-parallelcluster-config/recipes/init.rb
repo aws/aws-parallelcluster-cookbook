@@ -32,7 +32,7 @@ end
 
 include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
 
-fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
+fetch_config 'Fetch and load cluster configs'
 
 # Install cloudwatch, write configuration and start it.
 include_recipe "aws-parallelcluster-config::cloudwatch_agent"
