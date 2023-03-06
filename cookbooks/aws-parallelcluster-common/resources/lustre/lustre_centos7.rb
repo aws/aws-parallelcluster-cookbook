@@ -39,7 +39,7 @@ kmod_url_hash = {
 default_action :setup
 
 action :setup do
-  version = node['platform_version']
+  version = node['cluster']['platform_version']
   if %w(7.5 7.6).include?(version)
     lustre_kmod_rpm = "#{node['cluster']['sources_dir']}/kmod-lustre-client-#{lustre_version_hash[version]}.x86_64.rpm"
     lustre_client_rpm = "#{node['cluster']['sources_dir']}/lustre-client-#{lustre_version_hash[version]}.x86_64.rpm"
@@ -76,8 +76,10 @@ action :setup do
 
   elsif version.to_f >= 7.7
     action_install_lustre
-  elsif Chef::Log.warn("Unsupported version of Centos, #{node['platform_version']}, supported versions are >= 7.5")
-    # Centos 6
+  else
+    log "Unsupported version of Centos, #{version}, supported versions are >= 7.5" do
+      level :warn
+    end
   end
 end
 

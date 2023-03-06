@@ -16,6 +16,12 @@ module ChefSpec
   end
 end
 
+def for_oses(os_list)
+  os_list.each do |platform, version|
+    yield(platform, version)
+  end
+end
+
 def for_all_oses
   [
     %w(amazon 2),
