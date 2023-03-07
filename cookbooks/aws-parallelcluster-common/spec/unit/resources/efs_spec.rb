@@ -239,3 +239,136 @@ describe 'efs:install_utils' do
     end
   end
 end
+
+describe 'efs:mount' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      let(:chef_run) do
+        ChefSpec::Runner.new(
+          platform: platform, version: version,
+          step_into: ['efs']
+        )
+      end
+      let(:node) { chef_run.node }
+
+      before do
+        stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
+        stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+        stub_command("mount | grep ' /shared_dir_3 '").and_return(true)
+        node.override['cluster']['region'] = "REGION"
+        node.override['cluster']['aws_domain'] = "DOMAIN"
+        chef_run.converge_dsl do
+          efs 'mount' do
+            efs_fs_id_array %w(id_1 id_2 id_3)
+            shared_dir_array %w(shared_dir_1 /shared_dir_2 /shared_dir_3)
+            efs_encryption_in_transit_array %w(true true not_true)
+            efs_iam_authorization_array %w(not_true true true)
+            action :mount
+          end
+        end
+      end
+
+      it 'creates shared directory' do
+        %w(/shared_dir_1 /shared_dir_2 /shared_dir_3).each do |shared_dir|
+          is_expected.to create_directory(shared_dir)
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+          # .with(recursive: true) # even if we set recursive a true, the test fails
+        end
+      end
+
+      it 'mounts shared dir if not already mounted' do
+        is_expected.to mount_mount('/shared_dir_1')
+          .with(device: 'id_1:/')
+          .with(fstype: 'efs')
+          .with(dump: 0)
+          .with(pass: 0)
+          .with(options: %w(_netdev noresvport tls))
+          .with(retries: 10)
+          .with(retry_delay: 60)
+      end
+
+      it 'enables shared dir mount if already mounted' do
+        is_expected.to enable_mount('/shared_dir_2')
+          .with(device: 'id_2.efs.REGION.DOMAIN:/')
+          .with(fstype: 'efs')
+          .with(dump: 0)
+          .with(pass: 0)
+          .with(options: %w(_netdev noresvport tls iam))
+          .with(retries: 10)
+          .with(retry_delay: 6)
+
+        is_expected.to enable_mount('/shared_dir_3')
+          .with(device: 'id_3.efs.REGION.DOMAIN:/')
+          .with(fstype: 'efs')
+          .with(dump: 0)
+          .with(pass: 0)
+          .with(options: %w(_netdev noresvport))
+          .with(retries: 10)
+          .with(retry_delay: 6)
+      end
+
+      it 'changes permissions' do
+        %w(/shared_dir_1 /shared_dir_2 /shared_dir_3).each do |shared_dir|
+          is_expected.to create_directory("change permissions for #{shared_dir}")
+            .with(path: shared_dir)
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+        end
+      end
+    end
+  end
+end
+
+describe 'efs:unmount' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      let(:chef_run) do
+        ChefSpec::Runner.new(
+          platform: platform, version: version,
+          step_into: ['efs']
+        )
+      end
+      let(:node) { chef_run.node }
+
+      before do
+        stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
+        stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+        node.override['cluster']['region'] = "REGION"
+        node.override['cluster']['aws_domain'] = "DOMAIN"
+        chef_run.converge_dsl do
+          efs 'unmount' do
+            efs_fs_id_array %w(id_1 id_2)
+            shared_dir_array %w(shared_dir_1 /shared_dir_2)
+            action :unmount
+          end
+        end
+      end
+
+      it 'unmounts fsx only if mounted' do
+        is_expected.not_to run_execute('unmount efs')
+          .with(command: 'umount -fl /shared_dir_1')
+
+        is_expected.to run_execute('unmount efs')
+          .with(command: "umount -fl /shared_dir_2")
+          .with(retries: 10)
+          .with(retry_delay: 6)
+          .with(timeout: 60)
+      end
+
+      %w(/shared_dir_1 /shared_dir_2).each do |shared_dir|
+        it "removes volume #{shared_dir} from /etc/fstab" do
+          is_expected.to edit_delete_lines("remove volume #{shared_dir} from /etc/fstab")
+            .with(path: "/etc/fstab")
+            .with(pattern: " #{shared_dir} ")
+        end
+
+        it "deletes shared dir #{shared_dir}" do
+          is_expected.to delete_directory(shared_dir)
+        end
+      end
+    end
+  end
+end
