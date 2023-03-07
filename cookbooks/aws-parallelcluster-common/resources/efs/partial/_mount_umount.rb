@@ -76,7 +76,8 @@ action :mount do
     end
 
     # Make sure EFS shared directory permissions are correct
-    directory efs_shared_dir do
+    directory "change permissions for #{efs_shared_dir}" do
+      path efs_shared_dir
       owner 'root'
       group 'root'
       mode '1777'
@@ -98,7 +99,7 @@ action :unmount do
       only_if "mount | grep ' #{efs_shared_dir} '"
     end
     # remove volume from fstab
-    delete_lines "remove volume from /etc/fstab" do
+    delete_lines "remove volume #{efs_shared_dir} from /etc/fstab" do
       path "/etc/fstab"
       pattern " #{efs_shared_dir} "
     end
