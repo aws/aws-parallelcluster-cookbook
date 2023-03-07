@@ -18,8 +18,6 @@ property :efs_fs_id_array, Array, required: %i(mount unmount)
 property :efs_encryption_in_transit_array, Array, required: false
 property :efs_iam_authorization_array, Array, required: false
 
-default_action :mount
-
 action :mount do
   efs_shared_dir_array = new_resource.shared_dir_array.dup
   efs_fs_id_array = new_resource.efs_fs_id_array.dup

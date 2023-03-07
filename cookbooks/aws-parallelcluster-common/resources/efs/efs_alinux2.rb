@@ -13,14 +13,11 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :efs, platform: 'amazon', platform_version: '2'
-unified_mode true
 
 use '../partial/_get_package_version_rpm'
 use '../partial/_get_package_version'
-use 'partial/_check_version'
+use 'partial/_common'
 use 'partial/_mount_umount'
-
-default_action :install_utils
 
 action :install_utils do
   package_name = "amazon-efs-utils"
