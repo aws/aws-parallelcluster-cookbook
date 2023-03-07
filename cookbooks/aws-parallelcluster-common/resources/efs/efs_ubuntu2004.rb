@@ -14,12 +14,10 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :efs, platform: 'ubuntu', platform_version: '20.04'
-unified_mode true
 
 use '../partial/_get_package_version_dpkg'
 use '../partial/_get_package_version'
-use 'partial/_check_version'
-use 'partial/_install_utils_debian'
+use 'partial/_common'
+use 'partial/_debian'
+use 'partial/_install_from_tar'
 use 'partial/_mount_umount'
-
-default_action :install_utils
