@@ -1,7 +1,3 @@
-#
-# Check if we are running in a Docker System Tests
-#
-
 class NilClass
   def blank?
     true
@@ -23,6 +19,7 @@ class Helpers
 end
 
 def virtualized?
+  # Check if we are running in a Docker System Tests
   node.include?('virtualized') and node['virtualized']
 end
 

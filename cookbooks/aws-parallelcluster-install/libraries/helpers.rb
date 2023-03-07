@@ -23,18 +23,6 @@ def disable_service(service, platform_families = node['platform_family'], operat
   end
 end
 
-def get_package_version(package_name)
-  cmd = value_for_platform(
-  'default' => "rpm -qi #{package_name} | grep Version | awk '{print $3}'",
-  'ubuntu' => { "default" => "dpkg-query --showformat='${Version}' --show #{package_name} | awk -F- '{print $1}'" }) # TODO: These commands do not fit all packages versions. e.g. dpkg-query --showformat='${Version}' --show stunnel4 | awk -F- '{print $1}'   Output:3:5.63
-  package_version_cmd = Mixlib::ShellOut.new(cmd)
-  version = package_version_cmd.run_command.stdout.strip
-  if version.empty?
-    Chef::Log.info("#{package_name} not found when trying to get the version.")
-  end
-  version
-end
-
 def validate_file_hash(file_path, expected_hash)
   hash_function = yield
   checksum = hash_function.file(file_path).hexdigest

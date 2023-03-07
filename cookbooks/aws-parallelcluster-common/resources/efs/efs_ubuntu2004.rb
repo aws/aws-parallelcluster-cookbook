@@ -16,7 +16,10 @@
 provides :efs, platform: 'ubuntu', platform_version: '20.04'
 unified_mode true
 
-use 'partial/_build_install_efs_utils_debian'
+use '../partial/_get_package_version_dpkg'
+use '../partial/_get_package_version'
+use 'partial/_check_version'
+use 'partial/_install_utils_debian'
 use 'partial/_mount_umount'
 
-default_action :build_install_efs_utils
+default_action :install_utils

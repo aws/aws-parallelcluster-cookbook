@@ -17,12 +17,15 @@ provides :efs, platform: 'redhat' do |node|
 end
 unified_mode true
 
+use '../partial/_get_package_version_rpm'
+use '../partial/_get_package_version'
+use 'partial/_check_version'
 use 'partial/_build_install_efs_utils_centos_redhat'
 use 'partial/_mount_umount'
 
-default_action :install_efs_utils
+default_action :install_utils
 
-action :install_efs_utils do
+action :install_utils do
   package %w(rpm-build make) do
     retries 3
     retry_delay 5

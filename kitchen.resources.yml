@@ -125,7 +125,7 @@ suites:
   - name: efs_configure
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-install::test_resource]
+      - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
         - efs_utils_installed
