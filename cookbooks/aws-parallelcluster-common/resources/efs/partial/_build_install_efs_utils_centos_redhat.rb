@@ -19,7 +19,7 @@ action :build_install_efs_utils do
   efs_utils_tarball = node['cluster']['efs_utils']['tarball_path']
 
   # Do not install efs-utils if a same or newer version is already installed.
-  return if Gem::Version.new(get_package_version(package_name)) >= Gem::Version.new(node['cluster']['efs_utils']['version'])
+  return if already_installed?(package_name, node['cluster']['efs_utils']['version'])
 
   # On RHEL like os amazon-efs-utils and stunnel are installed from source
   # Because their OS repos do not have amazon-efs-utils and new stunnel
