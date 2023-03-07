@@ -347,7 +347,7 @@ describe 'efs:unmount' do
         end
       end
 
-      it 'unmounts fsx only if mounted' do
+      it 'unmounts efs only if mounted' do
         is_expected.not_to run_execute('unmount efs')
           .with(command: 'umount -fl /shared_dir_1')
 
