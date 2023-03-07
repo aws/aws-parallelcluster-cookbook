@@ -15,6 +15,9 @@
 provides :efs, platform: 'amazon', platform_version: '2'
 unified_mode true
 
+use '../partial/_get_package_version_rpm'
+use '../partial/_get_package_version'
+use 'partial/_check_version'
 use 'partial/_mount_umount'
 
 default_action :install_utils
@@ -23,7 +26,7 @@ action :install_utils do
   package_name = "amazon-efs-utils"
 
   # Do not install efs-utils if a same or newer version is already installed.
-  return if Gem::Version.new(get_package_version(package_name)) >= Gem::Version.new(node['cluster']['efs_utils']['version'])
+  return if already_installed?(package_name, node['cluster']['efs_utils']['version'])
 
   # On Amazon Linux 2, amazon-efs-utils and stunnel are installed from OS repo.
   package package_name do

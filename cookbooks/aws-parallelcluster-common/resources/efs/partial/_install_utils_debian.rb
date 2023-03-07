@@ -13,12 +13,12 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :build_install_efs_utils do
+action :install_utils do
   package_name = "amazon-efs-utils"
   efs_utils_tarball = node['cluster']['efs_utils']['tarball_path']
 
   # Do not install efs-utils if a same or newer version is already installed.
-  return if Gem::Version.new(get_package_version(package_name)) >= Gem::Version.new(node['cluster']['efs_utils']['version'])
+  return if already_installed?(package_name, node['cluster']['efs_utils']['version'])
 
   # On Ubuntu, amazon-efs-utils and stunnel are installed from source
   # Because their OS repos do not have amazon-efs-utils and new stunnel
