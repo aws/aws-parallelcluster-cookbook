@@ -2,6 +2,18 @@
 # Check if we are running in a Docker System Tests
 #
 
+class NilClass
+  def blank?
+    true
+  end
+end
+
+class String
+  def blank?
+    strip.empty?
+  end
+end
+
 class Helpers
   # Putting functions in a class makes them easier to mock
 
