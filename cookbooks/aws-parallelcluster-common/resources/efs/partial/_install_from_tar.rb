@@ -14,14 +14,23 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_utils do
+  package prerequisites do
+    retries 3
+    retry_delay 5
+  end
+
+  return if redhat_ubi?
+
   package_name = "amazon-efs-utils"
+  package_version = node['cluster']['efs_utils']['version']
   efs_utils_tarball = node['cluster']['efs_utils']['tarball_path']
 
   # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?(package_name, node['cluster']['efs_utils']['version'])
+  return if already_installed?(package_name, package_version)
 
-  # On Ubuntu, amazon-efs-utils and stunnel are installed from source
-  # Because their OS repos do not have amazon-efs-utils and new stunnel
+  # On all OSes but Amazon Linux 2, amazon-efs-utils and stunnel are installed from source,
+  # because their OS repos do not have amazon-efs-utils and new stunnel
+
   # Get EFS Utils tarball
   remote_file efs_utils_tarball do
     source node['cluster']['efs_utils']['url']
@@ -35,12 +44,6 @@ action :install_utils do
   # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
   bash "install efs utils" do
     cwd node['cluster']['sources_dir']
-    code <<-EFSUTILSINSTALL
-      set -e
-      tar xf #{efs_utils_tarball}
-      cd efs-utils-#{node['cluster']['efs_utils']['version']}
-      ./build-deb.sh
-      apt-get -y install ./build/amazon-efs-utils*deb
-    EFSUTILSINSTALL
+    code install_script_code(efs_utils_tarball, package_name, package_version)
   end
 end

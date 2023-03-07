@@ -15,21 +15,14 @@
 provides :efs, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
-unified_mode true
 
 use '../partial/_get_package_version_rpm'
 use '../partial/_get_package_version'
-use 'partial/_check_version'
-use 'partial/_build_install_efs_utils_centos_redhat'
+use 'partial/_common'
+use 'partial/_redhat_based'
+use 'partial/_install_from_tar'
 use 'partial/_mount_umount'
 
-default_action :install_utils
-
-action :install_utils do
-  package %w(rpm-build make) do
-    retries 3
-    retry_delay 5
-  end
-
-  action_build_install_efs_utils
+def prerequisites
+  %w(rpm-build make)
 end
