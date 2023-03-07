@@ -17,24 +17,11 @@ property :fsx_mount_name_array, Array, required: %i(mount unmount)
 property :fsx_volume_junction_path_array, Array, required: %i(mount unmount)
 
 action :mount do
-  fsx_fs_id_array = new_resource.fsx_fs_id_array.dup
-  fsx_fs_type_array = new_resource.fsx_fs_type_array.dup
-  fsx_shared_dir_array = new_resource.fsx_shared_dir_array.dup
-  fsx_dns_name_array = new_resource.fsx_dns_name_array.dup
-  fsx_mount_name_array = new_resource.fsx_mount_name_array.dup
-  fsx_volume_junction_path_array = new_resource.fsx_volume_junction_path_array.dup
-  fsx_fs_id_array.each_with_index do |fsx_fs_id, index|
-    fsx_shared_dir = fsx_shared_dir_array[index]
-    fsx_dns_name = fsx_dns_name_array[index]
-    fsx_fs_type = fsx_fs_type_array[index]
-    fsx_volume_junction_path = fsx_volume_junction_path_array[index]
-
-    # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
-    fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
-    fsx_volume_junction_path = "/#{fsx_volume_junction_path}" unless fsx_volume_junction_path.nil? || fsx_volume_junction_path.start_with?('/')
+  new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
+    fsx = FSx.new(node, new_resource, index)
 
     # Create the shared directories
-    directory fsx_shared_dir do
+    directory fsx.shared_dir do
       owner 'root'
       group 'root'
       mode '1777'
@@ -42,158 +29,108 @@ action :mount do
       action :create
     end
 
-    dns_name = if fsx_dns_name && !fsx_dns_name.empty?
-                 # DNS names of existing Lustre, Ontap, OpenZFS file systems are passed in from CLI
-                 fsx_dns_name
-               else
-                 # DNS names of newly created Lustre file systems are hardcoded here.
-                 # Note the Hardcoding format is only valid for lustre file systems created after Mar-1 2021
-                 "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
-               end
-    case fsx_fs_type
-    when 'LUSTRE'
-      mount_name = fsx_mount_name_array[index]
-      mount_options = %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount)
-
-      mount fsx_shared_dir do
-        device "#{dns_name}@tcp:/#{mount_name}"
-        fstype 'lustre'
-        dump 0
-        pass 0
-        options mount_options
-        action :mount
-        retries 10
-        retry_delay 6
-        not_if "mount | grep ' #{fsx_shared_dir} '"
-      end
-
-      mount fsx_shared_dir do
-        device "#{dns_name}@tcp:/#{mount_name}"
-        fstype 'lustre'
-        dump 0
-        pass 0
-        options mount_options
-        action :enable
-        retries 10
-        retry_delay 6
-        only_if "mount | grep ' #{fsx_shared_dir} '"
-      end
-    when 'OPENZFS'
-      mount fsx_shared_dir do
-        device "#{dns_name}:#{fsx_volume_junction_path}"
-        fstype 'nfs'
-        dump 0
-        pass 0
-        options 'nfsvers=4.2'
-        action :mount
-        retries 10
-        retry_delay 6
-        not_if "mount | grep ' #{fsx_shared_dir} '"
-      end
-      mount fsx_shared_dir do
-        device "#{dns_name}:#{fsx_volume_junction_path}"
-        fstype 'nfs'
-        dump 0
-        pass 0
-        options 'nfsvers=4.2'
-        action :enable
-        retries 10
-        retry_delay 6
-        only_if "mount | grep ' #{fsx_shared_dir} '"
-      end
-    when 'ONTAP'
-      mount fsx_shared_dir do
-        device "#{dns_name}:#{fsx_volume_junction_path}"
-        fstype 'nfs'
-        dump 0
-        pass 0
-        action :mount
-        retries 10
-        retry_delay 6
-        not_if "mount | grep ' #{fsx_shared_dir} '"
-      end
-
-      mount fsx_shared_dir do
-        device "#{dns_name}:#{fsx_volume_junction_path}"
-        fstype 'nfs'
-        dump 0
-        pass 0
-        action :enable
-        retries 10
-        retry_delay 6
-        only_if "mount | grep ' #{fsx_shared_dir} '"
-      end
+    mount fsx.shared_dir do
+      device fsx.device_name
+      fstype fsx.fstype
+      dump 0
+      pass 0
+      options fsx.mount_options
+      action :mount
+      retries 10
+      retry_delay 6
+      not_if "mount | grep ' #{fsx.shared_dir} '"
     end
 
-    next if fsx_fs_type == "OPENZFS"
+    mount fsx.shared_dir do
+      device fsx.device_name
+      fstype fsx.fstype
+      dump 0
+      pass 0
+      options fsx.mount_options
+      action :enable
+      retries 10
+      retry_delay 6
+      only_if "mount | grep ' #{fsx.shared_dir} '"
+    end
+
     # Make sure permission is correct.
     # OpenZFS does not allow changing the permission of the root directory.
     # OpenZFS sets the directory permission to 1777 automatically.
-    directory fsx_shared_dir do
+    directory "change permissions for #{fsx.shared_dir}" do
+      path fsx.shared_dir
       owner 'root'
       group 'root'
       mode '1777'
+      only_if { fsx.can_change_shared_dir_permissions }
     end
   end
 end
 
 action :unmount do
-  fsx_fs_id_array = new_resource.fsx_fs_id_array.dup
-  fsx_fs_type_array = new_resource.fsx_fs_type_array.dup
-  fsx_shared_dir_array = new_resource.fsx_shared_dir_array.dup
-  fsx_dns_name_array = new_resource.fsx_dns_name_array.dup
-  fsx_mount_name_array = new_resource.fsx_mount_name_array.dup
-  fsx_volume_junction_path_array = new_resource.fsx_volume_junction_path_array.dup
+  new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
+    fsx = FSx.new(node, new_resource, index)
 
-  fsx_fs_id_array.each_with_index do |fsx_fs_id, index|
-    fsx_shared_dir = fsx_shared_dir_array[index]
-    fsx_dns_name = fsx_dns_name_array[index]
-    fsx_fs_type = fsx_fs_type_array[index]
-    fsx_volume_junction_path = fsx_volume_junction_path_array[index]
-
-    dns_name = if fsx_dns_name && !fsx_dns_name.empty?
-                 # DNS names of existing Lustre, Ontap, OpenZFS file systems are passed in from CLI
-                 fsx_dns_name
-               else
-                 # DNS names of newly created Lustre file systems are hardcoded here.
-                 # Note the Hardcoding format is only valid for lustre file systems created after Mar-1 2021
-                 "#{fsx_fs_id}.fsx.#{node['cluster']['region']}.amazonaws.com"
-               end
-
-    fsx_shared_dir = "/#{fsx_shared_dir}" unless fsx_shared_dir.start_with?('/')
-    fsx_volume_junction_path = "/#{fsx_volume_junction_path}" unless fsx_volume_junction_path.nil? || fsx_volume_junction_path.start_with?('/')
-
-    execute "unmount fsx #{fsx_shared_dir}" do
-      command "umount -fl #{fsx_shared_dir}"
+    execute "unmount fsx #{fsx.shared_dir}" do
+      command "umount -fl #{fsx.shared_dir}"
       retries 10
       retry_delay 6
       timeout 60
-      only_if "mount | grep ' #{fsx_shared_dir} '"
+      only_if "mount | grep ' #{fsx.shared_dir} '"
     end
 
-    # remove volume from fstab
-    case fsx_fs_type
-    when 'LUSTRE'
-      mount_name = fsx_mount_name_array[index]
-      delete_lines "remove volume #{dns_name}@tcp:/#{mount_name} from /etc/fstab" do
-        path "/etc/fstab"
-        pattern "#{dns_name}@tcp:/#{mount_name} *"
-      end
-
-    when 'OPENZFS', 'ONTAP'
-      delete_lines "remove volume #{dns_name}:#{fsx_volume_junction_path} from /etc/fstab" do
-        path "/etc/fstab"
-        pattern "#{dns_name}:#{fsx_volume_junction_path} *"
-      end
+    delete_lines "remove volume #{fsx.device_name} from /etc/fstab" do
+      path "/etc/fstab"
+      pattern "#{fsx.device_name} *"
     end
 
     # Delete the shared directories
-    directory fsx_shared_dir do
+    directory fsx.shared_dir do
       owner 'root'
       group 'root'
       mode '1777'
       recursive true
       action :delete
+    end
+  end
+end
+
+action_class do
+  class FSx
+    attr_accessor :type, :shared_dir, :device_name, :fstype, :mount_options, :can_change_shared_dir_permissions
+
+    def initialize(node, resource, index)
+      @id = resource.fsx_fs_id_array[index]
+      @type = resource.fsx_fs_type_array[index]
+      @dns_name = resource.fsx_dns_name_array[index]
+      @shared_dir = self.class.make_absolute(resource.fsx_shared_dir_array[index])
+      @volume_junction_path = self.class.make_absolute(resource.fsx_volume_junction_path_array[index])
+
+      if @dns_name.blank?
+        @dns_name = "#{@id}.fsx.#{node['cluster']['region']}.amazonaws.com"
+      end
+
+      @mount_name = resource.fsx_mount_name_array[index]
+
+      if @type == 'LUSTRE'
+        @mount_options = %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount)
+        @device_name = "#{@dns_name}@tcp:/#{@mount_name}"
+        @fstype = 'lustre'
+      else
+        @device_name = "#{@dns_name}:#{@volume_junction_path}"
+        @fstype = 'nfs'
+
+        if @type == 'OPENZFS'
+          @mount_options = %w(nfsvers=4.2)
+        elsif @type == 'ONTAP'
+          @mount_options = %w(defaults)
+        end
+      end
+
+      @can_change_shared_dir_permissions = @type != 'OPENZFS'
+    end
+
+    def self.make_absolute(path)
+      path.nil? || path.start_with?('/') ? path : "/#{path}"
     end
   end
 end

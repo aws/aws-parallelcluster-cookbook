@@ -1,15 +1,5 @@
 require 'spec_helper'
 
-class Lustre
-  def self.mount(chef_run)
-    chef_run.converge_dsl do
-      lustre 'mount' do
-        action :mount
-      end
-    end
-  end
-end
-
 describe 'lustre:mount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
@@ -44,13 +34,13 @@ describe 'lustre:mount' do
             .with(owner: 'root')
             .with(group: 'root')
             .with(mode: '1777')
-          # .with(recursive: false)
+          # .with(recursive: true) # even if we set recursive a true, the test fails
 
           is_expected.to create_directory('/lustre_shared_dir_with_mount')
             .with(owner: 'root')
             .with(group: 'root')
             .with(mode: '1777')
-          # .with(recursive: true)
+          # .with(recursive: true) # even if we set recursive a true, the test fails
         end
 
         it 'mounts shared dir if not already mounted' do
@@ -73,6 +63,18 @@ describe 'lustre:mount' do
             .with(options: %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount))
             .with(retries: 10)
             .with(retry_delay: 6)
+        end
+
+        it 'changes permissions' do
+          is_expected.to create_directory('change permissions for /lustre_shared_dir_with_mount')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+
+          is_expected.to create_directory('change permissions for /lustre_shared_dir_with_no_mount')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
         end
       end
 
@@ -107,13 +109,13 @@ describe 'lustre:mount' do
             .with(owner: 'root')
             .with(group: 'root')
             .with(mode: '1777')
-          # .with(recursive: false)
+          # .with(recursive: true) # even if we set recursive a true, the test fails
 
           is_expected.to create_directory('/openzfs_shared_dir_2')
             .with(owner: 'root')
             .with(group: 'root')
             .with(mode: '1777')
-          # .with(recursive: true)
+          # .with(recursive: true) # even if we set recursive a true, the test fails
         end
 
         it 'mounts shared dir if not already mounted' do
@@ -136,6 +138,18 @@ describe 'lustre:mount' do
             .with(options: %w(nfsvers=4.2))
             .with(retries: 10)
             .with(retry_delay: 6)
+        end
+
+        it "doesn't change permissions" do
+          is_expected.not_to create_directory('change permissions for /openzfs_shared_dir_1')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+
+          is_expected.not_to create_directory('change permissions for /openzfs_shared_dir_2')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
         end
       end
 
@@ -170,13 +184,13 @@ describe 'lustre:mount' do
             .with(owner: 'root')
             .with(group: 'root')
             .with(mode: '1777')
-          # .with(recursive: false)
+          # .with(recursive: true) # even if we set recursive a true, the test fails
 
           is_expected.to create_directory('/ontap_shared_dir_2')
             .with(owner: 'root')
             .with(group: 'root')
             .with(mode: '1777')
-          # .with(recursive: true)
+          # .with(recursive: true) # even if we set recursive a true, the test fails
         end
 
         it 'mounts shared dir if not already mounted' do
@@ -199,6 +213,18 @@ describe 'lustre:mount' do
             .with(options: %w(defaults))
             .with(retries: 10)
             .with(retry_delay: 6)
+        end
+
+        it 'changes permissions' do
+          is_expected.to create_directory('change permissions for /ontap_shared_dir_1')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+
+          is_expected.to create_directory('change permissions for /ontap_shared_dir_2')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
         end
       end
     end
@@ -253,6 +279,11 @@ describe 'lustre:unmount' do
             .with(path: "/etc/fstab")
             .with(pattern: "lustre_id_2.fsx.REGION.amazonaws.com@tcp:/mount_name_2 *")
         end
+
+        it 'deletes shared dir' do
+          is_expected.to delete_directory('/shared_dir_1')
+          is_expected.to delete_directory('/shared_dir_2')
+        end
       end
 
       context 'for OPENZFS, ONTAP' do
@@ -299,6 +330,11 @@ describe 'lustre:unmount' do
           is_expected.to edit_delete_lines('remove volume ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 from /etc/fstab')
             .with(path: "/etc/fstab")
             .with(pattern: "ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 *")
+        end
+
+        it 'deletes shared dir' do
+          is_expected.to delete_directory('/shared_dir_1')
+          is_expected.to delete_directory('/shared_dir_2')
         end
       end
     end
