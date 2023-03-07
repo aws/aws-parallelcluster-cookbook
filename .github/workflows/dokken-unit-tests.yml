@@ -96,7 +96,7 @@ jobs:
           - license-readme
           - fs-update
           - fs-update-default-values
-          - nfs-threads
+          - nfs-configured
           - networking-configured
           - pmix-installed
           - ssh-target-checker
