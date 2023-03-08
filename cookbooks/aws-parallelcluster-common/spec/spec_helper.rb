@@ -41,6 +41,12 @@ def mock_exist_call_original
   allow(File).to receive(:exist?).and_call_original
 end
 
+def block_stepping_into_recipe
+  allow_any_instance_of(Chef::RunContext).to receive(:include_recipe) do |_context, recipe|
+    Chef::Log.debug "Attempt to include #{recipe} blocked"
+  end
+end
+
 def mock_file_exists(file, exists)
   allow(::File).to receive(:exist?).with(file).and_return(exists)
 end
