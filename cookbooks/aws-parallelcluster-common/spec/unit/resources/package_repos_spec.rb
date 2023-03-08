@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergePackageRepos
   def self.setup(chef_run)
-    chef_run.converge_dsl('yum::default', 'yum-epel::default') do
+    chef_run.converge_dsl('yum', 'yum-epel') do
       package_repos 'setup' do
         action :setup
       end
