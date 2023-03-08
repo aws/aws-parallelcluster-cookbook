@@ -3,7 +3,8 @@
     "month_first": "%b %-d %H:%M:%S",
     "default": "%Y-%m-%d %H:%M:%S,%f",
     "bracket_default": "[%Y-%m-%d %H:%M:%S]",
-    "slurm": "%Y-%m-%dT%H:%M:%S.%f"
+    "slurm": "%Y-%m-%dT%H:%M:%S.%f",
+    "metric": ""
   },
   "log_configs": [
     {
@@ -149,6 +150,42 @@
       "timestamp_format_key": "default",
       "file_path": "/var/log/parallelcluster/clustermgtd",
       "log_stream_name": "clustermgtd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "metric",
+      "file_path": "/var/log/parallelcluster/clustermgtd.events",
+      "log_stream_name": "clustermgtd_events",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "metric",
+      "file_path": "/var/log/parallelcluster/slurm_resume.events",
+      "log_stream_name": "resume_events",
       "schedulers": [
         "slurm"
       ],
