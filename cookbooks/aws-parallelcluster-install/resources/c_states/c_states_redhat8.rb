@@ -15,21 +15,6 @@
 provides :c_states, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
-unified_mode true
-default_action :setup
 
-action :setup do
-  return if !x86? || virtualized?
-
-  grub_cmdline_attributes = {
-    "processor.max_cstate" => { "value" => "1" },
-    "intel_idle.max_cstate" => { "value" => "1" },
-  }
-
-  # Redhat name for grub kernel arguments is GRUB_CMDLINE_LINUX_DEFAULT
-  append_if_not_present_grub_cmdline(grub_cmdline_attributes, 'GRUB_CMDLINE_LINUX_DEFAULT')
-
-  execute "Regenerate grub boot menu" do
-    command '/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg'
-  end
-end
+use 'partial/_c_states_common'
+use 'partial/_c_states_redhat_based'
