@@ -12,12 +12,14 @@ end
 
 describe 'c_states:setup' do
   for_all_oses do |platform, version|
-    context "on #{platform}#{version}" do
+    context "on #{platform}#{version} x86" do
       cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['c_states']
-        )
+        ) do |node|
+          node.automatic['kernel']['machine'] = 'x86_64'
+        end
         ConvergeCStates.setup(runner)
       end
       cached(:grub_cmdline_attributes) do
@@ -44,6 +46,31 @@ describe 'c_states:setup' do
       it 'regenerate grub boot menus' do
         is_expected.to run_execute('Regenerate grub boot menu')
           .with(command: regenerate_grub_boot_menu_command)
+      end
+    end
+
+    context "on #{platform}#{version} arm" do
+      cached(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: platform, version: version,
+          step_into: ['c_states']
+        ) do |node|
+          node.automatic['kernel']['machine'] = 'aarch64'
+        end
+        ConvergeCStates.setup(runner)
+      end
+
+      before do
+        allow_any_instance_of(Object).to receive(:append_if_not_present_grub_cmdline)
+      end
+
+      it 'does not edit /etc/default/grub' do
+        expect_any_instance_of(Object).not_to receive(:append_if_not_present_grub_cmdline)
+        chef_run
+      end
+
+      it 'does not regenerate grub boot menus' do
+        is_expected.not_to run_execute('Regenerate grub boot menu')
       end
     end
   end
