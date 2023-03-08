@@ -1,0 +1,50 @@
+require 'spec_helper'
+
+class ConvergeCStates
+  def self.setup(chef_run)
+    chef_run.converge_dsl do
+      c_states 'setup' do
+        action :setup
+      end
+    end
+  end
+end
+
+describe 'c_states:setup' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: platform, version: version,
+          step_into: ['c_states']
+        )
+        ConvergeCStates.setup(runner)
+      end
+      cached(:grub_cmdline_attributes) do
+        {
+          "intel_idle.max_cstate" => { "value" => "1" },
+          "processor.max_cstate" => { "value" => "1" },
+        }
+      end
+      cached(:grub_variable) { platform == 'ubuntu' ? 'GRUB_CMDLINE_LINUX' : 'GRUB_CMDLINE_LINUX_DEFAULT' }
+      cached(:regenerate_grub_boot_menu_command) do
+        platform == 'ubuntu' ? '/usr/sbin/update-grub' : '/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg'
+      end
+
+      before do
+        allow_any_instance_of(Object).to receive(:append_if_not_present_grub_cmdline)
+      end
+
+      it 'edits /etc/default/grub' do
+        expect_any_instance_of(Object).to receive(:append_if_not_present_grub_cmdline)
+          .with(grub_cmdline_attributes, grub_variable)
+        chef_run
+      end
+
+      it 'regenerate grub boot menus' do
+        is_expected.to run_execute('Regenerate grub boot menu')
+          .with(command: regenerate_grub_boot_menu_command)
+      end
+    end
+  end
+end
