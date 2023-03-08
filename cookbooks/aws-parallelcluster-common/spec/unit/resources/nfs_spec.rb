@@ -28,8 +28,8 @@ describe 'nfs:setup' do
         )
       end
 
-      let(:node) { chef_run.node }
-      let(:nfs_service) { platform == 'ubuntu' ? 'nfs-kernel-server.service' : 'nfs-server.service' }
+      # cached(:node) { chef_run.node }
+      cached(:nfs_service) { platform == 'ubuntu' ? 'nfs-kernel-server.service' : 'nfs-server.service' }
 
       before :each do
         block_stepping_into_recipe

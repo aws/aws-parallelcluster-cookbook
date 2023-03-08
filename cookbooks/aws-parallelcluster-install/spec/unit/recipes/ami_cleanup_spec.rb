@@ -3,12 +3,8 @@ require 'spec_helper'
 describe 'aws-parallelcluster-install::ami_cleanup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
-        ChefSpec::Runner.new(platform: platform, version: version)
-      end
-
-      before do
-        chef_run.converge(described_recipe)
+      cached(:chef_run) do
+        ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
       end
 
       it 'Creates ami_cleanup.sh under /usr/local/sbin' do
