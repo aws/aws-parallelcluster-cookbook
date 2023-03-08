@@ -21,15 +21,15 @@ end
 describe 'network_service:restart' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['network_service']
         )
         NetworkService.restart(runner)
       end
-      let(:node) { chef_run.node }
-      let(:network_service_name) do
+      cached(:node) { chef_run.node }
+      cached(:network_service_name) do
         {
           'amazon' => 'network',
           'centos' => 'network',
@@ -51,15 +51,14 @@ end
 describe 'network_service:reload' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['network_service']
         )
         NetworkService.reload(runner)
       end
-      let(:node) { chef_run.node }
-      let(:network_service_name) do
+      cached(:network_service_name) do
         {
           'amazon' => 'network',
           'centos' => 'network',
