@@ -103,7 +103,7 @@ if node['cluster']['scheduler'] == 'slurm'
   check_sudoers_permissions(
     sudoers_file,
     cluster_admin_user, "root", "SLURM_COMMANDS",
-    "#{node['cluster']['slurm']['install_dir']}/bin/scontrol"
+    "#{node['cluster']['slurm']['install_dir']}/bin/scontrol, #{node['cluster']['slurm']['install_dir']}/bin/sinfo"
   )
 
   check_sudoers_permissions(
