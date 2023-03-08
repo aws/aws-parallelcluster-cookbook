@@ -33,19 +33,10 @@ source_dir = '/opt/parallelcluster/sources'
 
 describe 'efa:setup' do
   before do
-    # This is required before mocking existence of specific files
-    allow(File).to receive(:exist?).and_call_original
+    mock_exist_call_original
   end
 
-  [
-    %w(amazon 2),
-    # The only Centos7 version supported by ChefSpec
-    # See the complete list here: https://github.com/chefspec/fauxhai/blob/main/PLATFORMS.md
-    ['centos', '7.8.2003'],
-    ['ubuntu', '18.04'],
-    ['ubuntu', '20.04'],
-    %w(redhat 8),
-  ].each do |platform, version|
+  for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do
         ChefSpec::Runner.new(
@@ -59,7 +50,6 @@ describe 'efa:setup' do
           node.override['cluster']['platform_version'] = "8.7"
         end
       end
-      let(:node) { chef_run.node }
 
       context 'when efa installed' do
         before do
@@ -68,26 +58,26 @@ describe 'efa:setup' do
 
         context 'and installer tarball does not exist' do
           before do
-            allow(::File).to receive(:exist?).with("/opt/parallelcluster/sources/aws-efa-installer.tar.gz").and_return(false)
+            mock_file_exists('/opt/parallelcluster/sources/aws-efa-installer.tar.gz', false)
+            setup(chef_run)
           end
 
           it 'exits with warning' do
-            expect(Chef::Log).to receive(:warn).with("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
-            setup(chef_run)
+            is_expected.to write_log('efa installed')
+              .with(message: 'Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.')
+              .with(level: :warn)
           end
         end
 
         context 'and installer tarball exists' do
           before do
-            allow(::File).to receive(:exist?).with("#{source_dir}/aws-efa-installer.tar.gz").and_return(true)
+            mock_file_exists("#{source_dir}/aws-efa-installer.tar.gz", true)
             mock_efa_supported(true)
+            setup(chef_run)
           end
 
           it 'installs EFA' do
-            # the expectation must be declared before running the action
-            expect(Chef::Log).not_to receive(:warn)
-            setup(chef_run)
-
+            is_expected.not_to write_log('efa installed')
             is_expected.not_to remove_package(%w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
             is_expected.to install_package("environment-modules")
@@ -100,16 +90,16 @@ describe 'efa:setup' do
       context 'when efa not installed' do
         before do
           mock_efa_installed(false)
-          expect(Chef::Log).not_to receive(:warn)
         end
 
         context 'when efa supported' do
           before do
             mock_efa_supported(true)
+            setup(chef_run)
           end
 
           it 'installs EFA without skipping kmod' do
-            setup(chef_run)
+            is_expected.not_to write_log('efa installed')
             is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
             is_expected.to install_package("environment-modules")
@@ -127,10 +117,10 @@ describe 'efa:setup' do
         context 'when efa not supported' do
           before do
             mock_efa_supported(false)
+            setup(chef_run)
           end
 
           it 'installs EFA skipping kmod' do
-            setup(chef_run)
             is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
             is_expected.to install_package("environment-modules")
@@ -169,33 +159,10 @@ end
 
 describe 'efa:configure' do
   before do
-    allow(File).to receive(:exist?).and_call_original
+    mock_exist_call_original
   end
 
-  [
-    %w(amazon 2),
-    %w(centos 7.8.2003),
-    %w(redhat 8),
-  ].each do |platform, version|
-    context "on #{platform}#{version}" do
-      cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['efa']
-        )
-        configure(runner)
-      end
-
-      it 'does nothing' do
-        is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
-      end
-    end
-  end
-
-  [
-    %w(ubuntu 18.04),
-    %w(ubuntu 20.04),
-  ].each do |platform, version|
+  for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do
         ChefSpec::Runner.new(
@@ -204,40 +171,51 @@ describe 'efa:configure' do
         )
       end
 
-      context 'when efa enabled on compute node' do
-        before do
-          chef_run.node.override['cluster']['enable_efa'] = 'compute'
-          chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
-        end
-
-        it 'disables ptrace protection on compute nodes' do
-          configure(chef_run)
-          is_expected.to apply_sysctl('kernel.yama.ptrace_scope').with(value: "0")
-        end
-      end
-
-      context 'when efa not enabled on compute node' do
-        before do
-          chef_run.node.override['cluster']['enable_efa'] = 'other'
-          chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
-        end
-
-        it 'does not disable ptrace protection' do
+      if %w(amazon centos redhat).include?(platform)
+        it 'does nothing' do
           configure(chef_run)
           is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
         end
-      end
 
-      context 'when it is not a compute node' do
-        before do
-          chef_run.node.override['cluster']['enable_efa'] = 'compute'
-          chef_run.node.override['cluster']['node_type'] = 'other'
+      elsif platform == 'ubuntu'
+        context 'when efa enabled on compute node' do
+          before do
+            chef_run.node.override['cluster']['enable_efa'] = 'compute'
+            chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
+            configure(chef_run)
+          end
+
+          it 'disables ptrace protection on compute nodes' do
+            is_expected.to apply_sysctl('kernel.yama.ptrace_scope').with(value: "0")
+          end
         end
 
-        it 'does not disable ptrace protection' do
-          configure(chef_run)
-          is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
+        context 'when efa not enabled on compute node' do
+          before do
+            chef_run.node.override['cluster']['enable_efa'] = 'other'
+            chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
+            configure(chef_run)
+          end
+
+          it 'does not disable ptrace protection' do
+            is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
+          end
         end
+
+        context 'when it is not a compute node' do
+          before do
+            chef_run.node.override['cluster']['enable_efa'] = 'compute'
+            chef_run.node.override['cluster']['node_type'] = 'other'
+            configure(chef_run)
+          end
+
+          it 'does not disable ptrace protection' do
+            is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
+          end
+        end
+
+      else
+        pending "Implement for #{platform}"
       end
     end
   end
