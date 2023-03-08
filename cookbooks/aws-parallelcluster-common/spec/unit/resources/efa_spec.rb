@@ -149,19 +149,18 @@ describe 'efa:setup' do
   end
 
   context 'when rhel version is older than 8.4' do
-    let(:chef_run) do
-      ChefSpec::Runner.new(
+    cached(:chef_run) do
+      runner = ChefSpec::Runner.new(
         # Create a runner for the given platform/version
         platform: "redhat",
         step_into: ['efa']
       ) do |node|
-        # override node['cluster']['efa']['installer_version'] attribute
         node.override['cluster']['platform_version'] = "8.3"
       end
+      setup(runner)
     end
 
     it "version" do
-      setup(chef_run)
       is_expected.to write_log('EFA is not supported in this RHEL version 8.3, supported versions are >= 8.4').with_level(:warn)
       is_expected.not_to update_package_repos('update package repos')
     end
@@ -175,27 +174,27 @@ describe 'efa:configure' do
 
   [
     %w(amazon 2),
-    ['centos', '7.8.2003'],
+    %w(centos 7.8.2003),
     %w(redhat 8),
   ].each do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
-        ChefSpec::Runner.new(
+      cached(:chef_run) do
+        runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['efa']
         )
+        configure(runner)
       end
 
       it 'does nothing' do
-        configure(chef_run)
         is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
       end
     end
   end
 
   [
-    ['ubuntu', '18.04'],
-    ['ubuntu', '20.04'],
+    %w(ubuntu 18.04),
+    %w(ubuntu 20.04),
   ].each do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do

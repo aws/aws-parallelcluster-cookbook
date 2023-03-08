@@ -243,21 +243,15 @@ end
 describe 'efs:mount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
-        ChefSpec::Runner.new(
+      cached(:chef_run) do
+        runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['efs']
-        )
-      end
-      let(:node) { chef_run.node }
-
-      before do
-        stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
-        stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
-        stub_command("mount | grep ' /shared_dir_3 '").and_return(true)
-        node.override['cluster']['region'] = "REGION"
-        node.override['cluster']['aws_domain'] = "DOMAIN"
-        chef_run.converge_dsl do
+        ) do |node|
+          node.override['cluster']['region'] = "REGION"
+          node.override['cluster']['aws_domain'] = "DOMAIN"
+        end
+        runner.converge_dsl do
           efs 'mount' do
             efs_fs_id_array %w(id_1 id_2 id_3)
             shared_dir_array %w(shared_dir_1 /shared_dir_2 /shared_dir_3)
@@ -266,6 +260,12 @@ describe 'efs:mount' do
             action :mount
           end
         end
+      end
+
+      before do
+        stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
+        stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+        stub_command("mount | grep ' /shared_dir_3 '").and_return(true)
       end
 
       it 'creates shared directory' do
@@ -325,26 +325,26 @@ end
 describe 'efs:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
-        ChefSpec::Runner.new(
+      cached(:chef_run) do
+        runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['efs']
-        )
-      end
-      let(:node) { chef_run.node }
-
-      before do
-        stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
-        stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
-        node.override['cluster']['region'] = "REGION"
-        node.override['cluster']['aws_domain'] = "DOMAIN"
-        chef_run.converge_dsl do
+        ) do |node|
+          node.override['cluster']['region'] = "REGION"
+          node.override['cluster']['aws_domain'] = "DOMAIN"
+        end
+        runner.converge_dsl do
           efs 'unmount' do
             efs_fs_id_array %w(id_1 id_2)
             shared_dir_array %w(shared_dir_1 /shared_dir_2)
             action :unmount
           end
         end
+      end
+
+      before do
+        stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
+        stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
       end
 
       it 'unmounts efs only if mounted' do

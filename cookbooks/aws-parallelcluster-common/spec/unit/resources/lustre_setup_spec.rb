@@ -12,7 +12,7 @@ end
 
 describe 'lustre:setup' do
   context "on amazon2" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'amazon', version: '2',
         step_into: ['lustre']
@@ -26,7 +26,7 @@ describe 'lustre:setup' do
   end
 
   context "on centos 7.4 or lower" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'centos', version: '7',
         step_into: ['lustre']
@@ -43,7 +43,7 @@ describe 'lustre:setup' do
   end
 
   context "on centos 7.5" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'centos', version: '7',
         step_into: ['lustre']
@@ -82,7 +82,7 @@ describe 'lustre:setup' do
   end
 
   context "on centos 7.6" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'centos', version: '7',
         step_into: ['lustre']
@@ -121,7 +121,7 @@ describe 'lustre:setup' do
   end
 
   context "on centos 7.7 or higher" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'centos', version: '7',
         step_into: ['lustre']
@@ -154,7 +154,7 @@ describe 'lustre:setup' do
   end
 
   context "on redhat lower than 8.2" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'redhat', version: '8',
         step_into: ['lustre']
@@ -171,7 +171,7 @@ describe 'lustre:setup' do
   end
 
   context "on redhat with kernel 4.18.0-425.3.1.el8" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'redhat', version: '8',
         step_into: ['lustre']
@@ -189,7 +189,7 @@ describe 'lustre:setup' do
   end
 
   context "on redhat supporting lustre" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'redhat', version: '8',
         step_into: ['lustre']
@@ -223,7 +223,7 @@ describe 'lustre:setup' do
      %w(ubuntu 20.04),
   ]) do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['lustre']
@@ -255,7 +255,7 @@ end
 
 describe 'lustre:find_centos_minor_version' do
   context "centos version is not 7" do
-    let(:chef_run) do
+    cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'centos', version: '7',
         step_into: ['lustre']
@@ -275,7 +275,7 @@ describe 'lustre:find_centos_minor_version' do
 
   context('on centos 7') do
     context "kernel release does not match expected format" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: 'centos', version: '7',
           step_into: ['lustre']
@@ -295,7 +295,7 @@ describe 'lustre:find_centos_minor_version' do
     end
 
     context "kernel release below 3.10.0-1062" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: 'centos', version: '7',
           step_into: ['lustre']
@@ -313,7 +313,7 @@ describe 'lustre:find_centos_minor_version' do
     end
 
     context "kernel release 3.10.0-1062 to 3.10.0-1126" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: 'centos', version: '7',
           step_into: ['lustre']
@@ -331,7 +331,7 @@ describe 'lustre:find_centos_minor_version' do
     end
 
     context "kernel release 3.10.0-1127 to 3.10.0-1167" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: 'centos', version: '7',
           step_into: ['lustre']
@@ -349,7 +349,7 @@ describe 'lustre:find_centos_minor_version' do
     end
 
     context "kernel from 3.10.0-1168 on" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: 'centos', version: '7',
           step_into: ['lustre']
