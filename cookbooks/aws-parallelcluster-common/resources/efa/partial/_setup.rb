@@ -19,7 +19,10 @@ action :setup do
   action_check_efa_support
   if node['cluster']['efa_supported']
     if efa_installed? && !::File.exist?(efa_tarball)
-      Chef::Log.warn("Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.")
+      log 'efa installed' do
+        message 'Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.'
+        level :warn
+      end
       return
     end
 
