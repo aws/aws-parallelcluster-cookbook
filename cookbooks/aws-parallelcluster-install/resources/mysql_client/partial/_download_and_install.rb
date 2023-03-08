@@ -24,7 +24,7 @@ action :download_and_install do
     mode '0644'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?(mysql_tar_file) }
+    action :create_if_missing
   end
 
   bash 'Install MySQL packages' do
