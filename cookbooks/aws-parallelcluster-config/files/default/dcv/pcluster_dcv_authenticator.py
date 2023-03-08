@@ -59,6 +59,7 @@ def retry(func, func_args, attempts=1, wait=0):
 
             logger.info("%s, retrying in %s seconds..", e, wait)
             time.sleep(wait)
+    return None
 
 
 def generate_random_token(token_length):
