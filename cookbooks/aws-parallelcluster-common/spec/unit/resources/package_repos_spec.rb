@@ -13,7 +13,7 @@ end
 describe 'package_repos:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
+      cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['package_repos']
@@ -22,7 +22,6 @@ describe 'package_repos:setup' do
         end
         ConvergePackageRepos.setup(runner)
       end
-      let(:node) { chef_run.node }
 
       if platform == 'amazon'
         it 'installs yum' do

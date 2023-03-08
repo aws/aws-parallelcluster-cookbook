@@ -4,19 +4,14 @@ describe 'lustre:mount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       context 'for lustre' do
-        let(:chef_run) do
-          ChefSpec::Runner.new(
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-        end
-
-        before do
-          stub_command("mount | grep ' /lustre_shared_dir_with_no_mount '").and_return(false)
-          stub_command("mount | grep ' /lustre_shared_dir_with_mount '").and_return(true)
-          chef_run.converge_dsl do
+          runner.converge_dsl do
             lustre 'mount' do
               fsx_fs_id_array %w(lustre_id_1 lustre_id_2)
               fsx_fs_type_array %w(LUSTRE LUSTRE)
@@ -27,6 +22,11 @@ describe 'lustre:mount' do
               action :mount
             end
           end
+        end
+
+        before do
+          stub_command("mount | grep ' /lustre_shared_dir_with_no_mount '").and_return(false)
+          stub_command("mount | grep ' /lustre_shared_dir_with_mount '").and_return(true)
         end
 
         it 'creates_shared_dir' do
@@ -79,19 +79,14 @@ describe 'lustre:mount' do
       end
 
       context 'for openzfs' do
-        let(:chef_run) do
-          ChefSpec::Runner.new(
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-        end
-
-        before do
-          stub_command("mount | grep ' /openzfs_shared_dir_1 '").and_return(false)
-          stub_command("mount | grep ' /openzfs_shared_dir_2 '").and_return(true)
-          chef_run.converge_dsl do
+          runner.converge_dsl do
             lustre 'mount' do
               fsx_fs_id_array %w(openzfs_id_1 openzfs_id_2)
               fsx_fs_type_array %w(OPENZFS OPENZFS)
@@ -102,6 +97,11 @@ describe 'lustre:mount' do
               action :mount
             end
           end
+        end
+
+        before do
+          stub_command("mount | grep ' /openzfs_shared_dir_1 '").and_return(false)
+          stub_command("mount | grep ' /openzfs_shared_dir_2 '").and_return(true)
         end
 
         it 'creates_shared_dir' do
@@ -154,19 +154,14 @@ describe 'lustre:mount' do
       end
 
       context 'for ontap' do
-        let(:chef_run) do
-          ChefSpec::Runner.new(
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-        end
-
-        before do
-          stub_command("mount | grep ' /ontap_shared_dir_1 '").and_return(false)
-          stub_command("mount | grep ' /ontap_shared_dir_2 '").and_return(true)
-          chef_run.converge_dsl do
+          runner.converge_dsl do
             lustre 'mount' do
               fsx_fs_id_array %w(ontap_id_1 ontap_id_2)
               fsx_fs_type_array %w(ONTAP ONTAP)
@@ -177,6 +172,11 @@ describe 'lustre:mount' do
               action :mount
             end
           end
+        end
+
+        before do
+          stub_command("mount | grep ' /ontap_shared_dir_1 '").and_return(false)
+          stub_command("mount | grep ' /ontap_shared_dir_2 '").and_return(true)
         end
 
         it 'creates_shared_dir' do
@@ -235,19 +235,14 @@ describe 'lustre:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       context 'for lustre' do
-        let(:chef_run) do
-          ChefSpec::Runner.new(
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-        end
-
-        before do
-          stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
-          stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
-          chef_run.converge_dsl do
+          runner.converge_dsl do
             lustre 'unmount' do
               fsx_fs_id_array %w(lustre_id_1 lustre_id_2)
               fsx_fs_type_array %w(LUSTRE LUSTRE)
@@ -258,6 +253,11 @@ describe 'lustre:unmount' do
               action :unmount
             end
           end
+        end
+
+        before do
+          stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
+          stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
         end
 
         it 'unmounts fsx only if mounted' do
@@ -287,19 +287,14 @@ describe 'lustre:unmount' do
       end
 
       context 'for OPENZFS, ONTAP' do
-        let(:chef_run) do
-          ChefSpec::Runner.new(
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-        end
-
-        before do
-          stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
-          stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
-          chef_run.converge_dsl do
+          runner.converge_dsl do
             lustre 'unmount' do
               fsx_fs_id_array %w(openzfs_id_1 ontap_id_2)
               fsx_fs_type_array %w(OPENZFS ONTAP)
@@ -310,6 +305,11 @@ describe 'lustre:unmount' do
               action :unmount
             end
           end
+        end
+
+        before do
+          stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
+          stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
         end
 
         it 'unmounts fsx only if mounted' do
