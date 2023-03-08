@@ -13,21 +13,6 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :c_states, platform: 'ubuntu', platform_version: '18.04'
-unified_mode true
-default_action :setup
 
-action :setup do
-  return if !x86? || virtualized?
-
-  grub_cmdline_attributes = {
-    "processor.max_cstate" => { "value" => "1" },
-    "intel_idle.max_cstate" => { "value" => "1" },
-  }
-
-  # Ubutnu name for grub kernel arguments is GRUB_CMDLINE_LINUX
-  append_if_not_present_grub_cmdline(grub_cmdline_attributes, 'GRUB_CMDLINE_LINUX')
-
-  execute "Regenerate grub boot menu" do
-    command '/usr/sbin/update-grub'
-  end
-end
+use 'partial/_c_states_common'
+use 'partial/_c_states_debian'
