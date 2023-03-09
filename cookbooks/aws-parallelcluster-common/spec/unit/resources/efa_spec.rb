@@ -1,19 +1,20 @@
 require 'spec_helper'
 
-# Converge efa:setup
-def setup(chef_run)
-  chef_run.converge_dsl do
-    efa 'setup' do
-      action :setup
+class ConvergeEfa
+  def self.setup(chef_run)
+    chef_run.converge_dsl do
+      efa 'setup' do
+        action :setup
+      end
     end
   end
-end
 
-# Converge efa:configure
-def configure(chef_run)
-  chef_run.converge_dsl do
-    efa 'configure' do
-      action :configure
+  # Converge efa:configure
+  def self.configure(chef_run)
+    chef_run.converge_dsl do
+      efa 'configure' do
+        action :configure
+      end
     end
   end
 end
@@ -34,12 +35,9 @@ describe 'efa:setup' do
     context "on #{platform}#{version}" do
       let(:chef_run) do
         ChefSpec::Runner.new(
-          # Create a runner for the given platform/version
           platform: platform, version: version,
-          # Allow the runner to execute efa resource actions
           step_into: ['efa']
         ) do |node|
-          # override node['cluster']['efa']['installer_version'] attribute
           node.override['cluster']['efa']['installer_version'] = 'version'
           node.override['cluster']['platform_version'] = "8.7"
         end
@@ -53,7 +51,7 @@ describe 'efa:setup' do
         context 'and installer tarball does not exist' do
           before do
             mock_file_exists('/opt/parallelcluster/sources/aws-efa-installer.tar.gz', false)
-            setup(chef_run)
+            ConvergeEfa.setup(chef_run)
           end
 
           it 'exits with warning' do
@@ -67,7 +65,7 @@ describe 'efa:setup' do
           before do
             mock_file_exists("#{source_dir}/aws-efa-installer.tar.gz", true)
             mock_efa_supported(true)
-            setup(chef_run)
+            ConvergeEfa.setup(chef_run)
           end
 
           it 'installs EFA' do
@@ -89,7 +87,7 @@ describe 'efa:setup' do
         context 'when efa supported' do
           before do
             mock_efa_supported(true)
-            setup(chef_run)
+            ConvergeEfa.setup(chef_run)
           end
 
           it 'installs EFA without skipping kmod' do
@@ -111,7 +109,7 @@ describe 'efa:setup' do
         context 'when efa not supported' do
           before do
             mock_efa_supported(false)
-            setup(chef_run)
+            ConvergeEfa.setup(chef_run)
           end
 
           it 'installs EFA skipping kmod' do
@@ -141,7 +139,7 @@ describe 'efa:setup' do
       ) do |node|
         node.override['cluster']['platform_version'] = "8.3"
       end
-      setup(runner)
+      ConvergeEfa.setup(runner)
     end
 
     it "version" do
@@ -163,7 +161,7 @@ describe 'efa:configure' do
 
       if %w(amazon centos redhat).include?(platform)
         it 'does nothing' do
-          configure(chef_run)
+          ConvergeEfa.configure(chef_run)
           is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
         end
 
@@ -172,7 +170,7 @@ describe 'efa:configure' do
           before do
             chef_run.node.override['cluster']['enable_efa'] = 'compute'
             chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
-            configure(chef_run)
+            ConvergeEfa.configure(chef_run)
           end
 
           it 'disables ptrace protection on compute nodes' do
@@ -184,7 +182,7 @@ describe 'efa:configure' do
           before do
             chef_run.node.override['cluster']['enable_efa'] = 'other'
             chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
-            configure(chef_run)
+            ConvergeEfa.configure(chef_run)
           end
 
           it 'does not disable ptrace protection' do
@@ -196,7 +194,7 @@ describe 'efa:configure' do
           before do
             chef_run.node.override['cluster']['enable_efa'] = 'compute'
             chef_run.node.override['cluster']['node_type'] = 'other'
-            configure(chef_run)
+            ConvergeEfa.configure(chef_run)
           end
 
           it 'does not disable ptrace protection' do
