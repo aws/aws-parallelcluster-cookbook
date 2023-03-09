@@ -31,7 +31,7 @@ describe 'lustre:setup' do
         platform: 'centos', version: '7',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "7.4"
+        node.automatic['platform_version'] = "7.4"
       end
       Lustre.setup(runner)
     end
@@ -48,7 +48,7 @@ describe 'lustre:setup' do
         platform: 'centos', version: '7',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "7.5"
+        node.automatic['platform_version'] = "7.5"
         node.override['cluster']['sources_dir'] = "srcdir"
       end
       Lustre.setup(runner)
@@ -87,7 +87,7 @@ describe 'lustre:setup' do
         platform: 'centos', version: '7',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "7.6"
+        node.automatic['platform_version'] = "7.6"
         node.override['cluster']['sources_dir'] = "srcdir"
       end
       Lustre.setup(runner)
@@ -126,7 +126,7 @@ describe 'lustre:setup' do
         platform: 'centos', version: '7',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "7.7"
+        node.automatic['platform_version'] = "7.7"
       end
       Lustre.setup(runner)
     end
@@ -159,7 +159,7 @@ describe 'lustre:setup' do
         platform: 'redhat', version: '8',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "8.1"
+        node.automatic['platform_version'] = "8.1"
       end
       Lustre.setup(runner)
     end
@@ -176,7 +176,7 @@ describe 'lustre:setup' do
         platform: 'redhat', version: '8',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "8.2"
+        node.automatic['platform_version'] = "8.2"
         node.override['cluster']['kernel_release'] = "anything 4.18.0-425.3.1.el8 something"
       end
       Lustre.setup(runner)
@@ -194,7 +194,7 @@ describe 'lustre:setup' do
         platform: 'redhat', version: '8',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "8.2"
+        node.automatic['platform_version'] = "8.2"
         node.override['cluster']['kernel_release'] = "supported"
       end
       Lustre.setup(runner)
@@ -260,7 +260,7 @@ describe 'lustre:find_centos_minor_version' do
         platform: 'centos', version: '7',
         step_into: ['lustre']
       ) do |node|
-        node.override['cluster']['platform_version'] = "8"
+        node.automatic['platform_version'] = "8"
       end
       Lustre.setup(runner)
     end
@@ -268,7 +268,9 @@ describe 'lustre:find_centos_minor_version' do
     it 'raises error' do
       expect { chef_run }.to(raise_error do |error|
         expect(error).to be_a(Exception)
-        expect(error.message).to include("CentOS version 8 not supported")
+        # This can not happen because the resource is defined only for Centos7
+        # expect(error.message).to include("CentOS version 8 not supported")
+        expect(error.message).to include("Cannot find a resource for lustre on centos version 8")
       end)
     end
   end
@@ -280,7 +282,7 @@ describe 'lustre:find_centos_minor_version' do
           platform: 'centos', version: '7',
           step_into: ['lustre']
         ) do |node|
-          node.override['cluster']['platform_version'] = "7.7"
+          node.automatic['platform_version'] = "7.7"
           node.override['cluster']['kernel_release'] = 'unexpected.format'
         end
         Lustre.setup(runner)
@@ -300,7 +302,7 @@ describe 'lustre:find_centos_minor_version' do
           platform: 'centos', version: '7',
           step_into: ['lustre']
         ) do |node|
-          node.override['cluster']['platform_version'] = "7.7"
+          node.automatic['platform_version'] = "7.7"
           node.override['cluster']['kernel_release'] = '3.10.0-1061.8.2.el7.x86_64'
         end
         Lustre.setup(runner)
@@ -318,7 +320,7 @@ describe 'lustre:find_centos_minor_version' do
           platform: 'centos', version: '7',
           step_into: ['lustre']
         ) do |node|
-          node.override['cluster']['platform_version'] = "7.7"
+          node.automatic['platform_version'] = "7.7"
           node.override['cluster']['kernel_release'] = '3.10.0-1062.8.2.el7.x86_64'
         end
         Lustre.setup(runner)
@@ -336,7 +338,7 @@ describe 'lustre:find_centos_minor_version' do
           platform: 'centos', version: '7',
           step_into: ['lustre']
         ) do |node|
-          node.override['cluster']['platform_version'] = "7.7"
+          node.automatic['platform_version'] = "7.7"
           node.override['cluster']['kernel_release'] = '3.10.0-1127.8.2.el7.x86_64'
         end
         Lustre.setup(runner)
@@ -354,7 +356,7 @@ describe 'lustre:find_centos_minor_version' do
           platform: 'centos', version: '7',
           step_into: ['lustre']
         ) do |node|
-          node.override['cluster']['platform_version'] = "7.7"
+          node.automatic['platform_version'] = "7.7"
           node.override['cluster']['kernel_release'] = '3.10.0-1168.8.2.el7.x86_64'
         end
         Lustre.setup(runner)
