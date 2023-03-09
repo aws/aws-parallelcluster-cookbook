@@ -1,6 +1,12 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
 
+RSpec.configure do |c|
+  c.before(:each) do
+    allow(File).to receive(:exist?).and_call_original
+  end
+end
+
 module ChefSpec
   class Runner
     # Allows to converge a dynamic code block
