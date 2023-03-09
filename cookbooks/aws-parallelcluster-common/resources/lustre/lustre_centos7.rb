@@ -39,7 +39,7 @@ kmod_url_hash = {
 default_action :setup
 
 action :setup do
-  version = node['cluster']['platform_version']
+  version = node['platform_version']
   if %w(7.5 7.6).include?(version)
     lustre_kmod_rpm = "#{node['cluster']['sources_dir']}/kmod-lustre-client-#{lustre_version_hash[version]}.x86_64.rpm"
     lustre_client_rpm = "#{node['cluster']['sources_dir']}/lustre-client-#{lustre_version_hash[version]}.x86_64.rpm"
@@ -96,7 +96,7 @@ end
 def find_centos_minor_version
   os_minor_version = ''
 
-  version = node['cluster']['platform_version']
+  version = node['platform_version']
   case version.to_i
   when 7
     # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
