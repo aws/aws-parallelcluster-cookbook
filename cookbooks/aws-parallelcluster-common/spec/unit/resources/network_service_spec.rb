@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-class NetworkService
+class ConvergeNetworkService
   def self.restart(chef_run)
     chef_run.converge_dsl do
       network_service 'restart' do
@@ -26,7 +26,7 @@ describe 'network_service:restart' do
           platform: platform, version: version,
           step_into: ['network_service']
         )
-        NetworkService.restart(runner)
+        ConvergeNetworkService.restart(runner)
       end
       cached(:node) { chef_run.node }
       cached(:network_service_name) do
@@ -56,7 +56,7 @@ describe 'network_service:reload' do
           platform: platform, version: version,
           step_into: ['network_service']
         )
-        NetworkService.reload(runner)
+        ConvergeNetworkService.reload(runner)
       end
       cached(:network_service_name) do
         {
