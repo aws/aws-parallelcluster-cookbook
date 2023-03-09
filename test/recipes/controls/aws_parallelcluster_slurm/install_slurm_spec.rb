@@ -132,3 +132,33 @@ control 'slurm_library_shared' do
     end
   end
 end
+
+control 'pam_slurm_adopt_module_installed' do
+  title "Check that pam_slurm_adopt has been built and installed"
+
+  lib_security_folder = '/lib/security/'
+  if os.redhat?
+    lib_security_folder = '/lib64/security/'
+  end
+
+  describe file("#{lib_security_folder}/pam_slurm_adopt.a") do
+    it { should exist }
+    its('mode') { should cmp '0644' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+
+  describe file("#{lib_security_folder}/pam_slurm_adopt.la") do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+
+  describe file("#{lib_security_folder}/pam_slurm_adopt.so") do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+end
