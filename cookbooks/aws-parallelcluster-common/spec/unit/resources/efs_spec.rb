@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-class Efs
+class ConvergeEfs
   def self.install_utils(chef_run)
     chef_run.converge_dsl do
       efs 'install_utils' do
@@ -37,7 +37,7 @@ describe 'efs:install_utils' do
     context "when same version of amazon-efs-utils already installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '1.2.3')
-        Efs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'does not install amazon-efs-utils' do
@@ -48,7 +48,7 @@ describe 'efs:install_utils' do
     context "when newer version of amazon-efs-utils already installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '1.3.2')
-        Efs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'does not install amazon-efs-utils' do
@@ -59,7 +59,7 @@ describe 'efs:install_utils' do
     context "when amazon-efs-utils not installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '')
-        Efs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'installs amazon-efs-utils' do
@@ -70,7 +70,7 @@ describe 'efs:install_utils' do
     context "when older version of amazon-efs-utils installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '1.1.4')
-        Efs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'installs amazon-efs-utils' do
@@ -117,7 +117,7 @@ describe 'efs:install_utils' do
       context "utils package not yet installed" do
         before do
           mock_already_installed('amazon-efs-utils', utils_version, false)
-          Efs.install_utils(chef_run)
+          ConvergeEfs.install_utils(chef_run)
         end
 
         it 'downloads tarball' do
@@ -139,7 +139,7 @@ describe 'efs:install_utils' do
       context "utils package already installed" do
         before do
           mock_already_installed('amazon-efs-utils', utils_version, true)
-          Efs.install_utils(chef_run)
+          ConvergeEfs.install_utils(chef_run)
         end
 
         it 'does not download tarball' do
@@ -197,7 +197,7 @@ describe 'efs:install_utils' do
       context "utils package not yet installed" do
         before do
           mock_already_installed('amazon-efs-utils', utils_version, false)
-          Efs.install_utils(chef_run)
+          ConvergeEfs.install_utils(chef_run)
         end
 
         it 'installs prerequisites' do
@@ -225,7 +225,7 @@ describe 'efs:install_utils' do
       context "utils package already installed" do
         before do
           mock_already_installed('amazon-efs-utils', utils_version, true)
-          Efs.install_utils(chef_run)
+          ConvergeEfs.install_utils(chef_run)
         end
 
         it 'does not download tarball' do
