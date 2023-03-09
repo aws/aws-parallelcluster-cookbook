@@ -24,7 +24,7 @@ use 'partial/_mount_unmount'
 default_action :setup
 
 action :setup do
-  version = node['cluster']['platform_version']
+  version = node['platform_version']
   if version.to_f < 8.2
     log "FSx for Lustre is not supported in this RHEL version #{version}, supported versions are >= 8.2" do
       level :warn
