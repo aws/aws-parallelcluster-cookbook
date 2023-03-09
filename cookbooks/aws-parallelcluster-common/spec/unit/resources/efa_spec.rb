@@ -18,14 +18,12 @@ def configure(chef_run)
   end
 end
 
-# Mock Networking.efa_installed?
 def mock_efa_installed(installed)
-  allow(Networking).to receive(:efa_installed?).and_return(installed)
+  allow_any_instance_of(Object).to receive(:efa_installed?).and_return(installed)
 end
 
-# Mock Networking.efa_supported?
 def mock_efa_supported(supported)
-  allow(Networking).to receive(:efa_supported?).and_return(supported)
+  allow_any_instance_of(Object).to receive(:efa_supported?).and_return(supported)
 end
 
 # parallelcluster default source dir defined in attributes
