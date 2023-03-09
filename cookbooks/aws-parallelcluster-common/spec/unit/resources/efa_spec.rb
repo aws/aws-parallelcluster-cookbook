@@ -39,7 +39,7 @@ describe 'efa:setup' do
           step_into: ['efa']
         ) do |node|
           node.override['cluster']['efa']['installer_version'] = 'version'
-          node.override['cluster']['platform_version'] = "8.7"
+          if platform == 'redhat'; node.automatic['platform_version'] = "8.7" end
         end
       end
 
@@ -137,7 +137,7 @@ describe 'efa:setup' do
         platform: "redhat",
         step_into: ['efa']
       ) do |node|
-        node.override['cluster']['platform_version'] = "8.3"
+        node.automatic['platform_version'] = "8.3"
       end
       ConvergeEfa.setup(runner)
     end
