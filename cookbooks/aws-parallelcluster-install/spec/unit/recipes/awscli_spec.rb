@@ -1,10 +1,6 @@
 require 'spec_helper'
 
 describe 'aws-parallelcluster-install::awscli' do
-  before do
-    mock_exist_call_original
-  end
-
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do

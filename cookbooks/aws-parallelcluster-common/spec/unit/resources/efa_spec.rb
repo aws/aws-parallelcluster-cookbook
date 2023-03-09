@@ -32,10 +32,6 @@ end
 source_dir = '/opt/parallelcluster/sources'
 
 describe 'efa:setup' do
-  before do
-    mock_exist_call_original
-  end
-
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do
@@ -158,10 +154,6 @@ describe 'efa:setup' do
 end
 
 describe 'efa:configure' do
-  before do
-    mock_exist_call_original
-  end
-
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do
