@@ -3,14 +3,10 @@ require 'spec_helper'
 describe 'aws-parallelcluster-install::awscli' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      let(:chef_run) do
-        ChefSpec::Runner.new(platform: platform, version: version)
-      end
-
       context 'when aws cli exists' do
-        before do
+        cached(:chef_run) do
           mock_file_exists("/usr/local/bin/aws", true)
-          chef_run.converge(described_recipe)
+          ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
         end
 
         it "should not install it" do
@@ -19,9 +15,9 @@ describe 'aws-parallelcluster-install::awscli' do
       end
 
       context 'when aws cli does not exist' do
-        before do
+        cached(:chef_run) do
           mock_file_exists("/usr/local/bin/aws", false)
-          chef_run.converge(described_recipe)
+          ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
         end
 
         it "should install unzip" do
