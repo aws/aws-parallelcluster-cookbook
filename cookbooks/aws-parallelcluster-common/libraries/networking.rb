@@ -18,27 +18,16 @@ def get_vpc_cidr_list
   vpc_cidr_list.split(/\n+/)
 end
 
-class Networking
-  # Putting functions in a class makes them easier to mock
-  def self.efa_installed?(_node)
-    dir_exist = ::Dir.exist?('/opt/amazon/efa')
-    if dir_exist
-      modinfo_efa_stdout = Mixlib::ShellOut.new("modinfo efa").run_command.stdout
-      efa_installed_packages_file = Mixlib::ShellOut.new("cat /opt/amazon/efa_installed_packages").run_command.stdout
-      Chef::Log.info("`/opt/amazon/efa` directory already exists. \nmodinfo efa stdout: \n#{modinfo_efa_stdout} \nefa_installed_packages_file_content: \n#{efa_installed_packages_file}")
-    end
-    dir_exist
-  end
-
-  def self.efa_supported?(node)
-    !Helpers.arm_instance?(node) || !node['cluster']['efa']['unsupported_aarch64_oses'].include?(node['cluster']['base_os'])
-  end
-end
-
 def efa_installed?
-  Networking.efa_installed?(node)
+  dir_exist = ::Dir.exist?('/opt/amazon/efa')
+  if dir_exist
+    modinfo_efa_stdout = Mixlib::ShellOut.new("modinfo efa").run_command.stdout
+    efa_installed_packages_file = Mixlib::ShellOut.new("cat /opt/amazon/efa_installed_packages").run_command.stdout
+    Chef::Log.info("`/opt/amazon/efa` directory already exists. \nmodinfo efa stdout: \n#{modinfo_efa_stdout} \nefa_installed_packages_file_content: \n#{efa_installed_packages_file}")
+  end
+  dir_exist
 end
 
 def efa_supported?
-  Networking.efa_supported?(node)
+  !arm_instance? || !node['cluster']['efa']['unsupported_aarch64_oses'].include?(node['cluster']['base_os'])
 end

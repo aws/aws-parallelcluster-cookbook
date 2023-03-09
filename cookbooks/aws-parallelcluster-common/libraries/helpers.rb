@@ -10,14 +10,6 @@ class String
   end
 end
 
-class Helpers
-  # Putting functions in a class makes them easier to mock
-
-  def self.arm_instance?(node)
-    node['kernel']['machine'] == 'aarch64'
-  end
-end
-
 def virtualized?
   # Check if we are running in a Docker System Tests
   node.include?('virtualized') and node['virtualized']
@@ -39,7 +31,7 @@ end
 # Check if this is an ARM instance
 #
 def arm_instance?
-  Helpers.arm_instance?(node)
+  node['kernel']['machine'] == 'aarch64'
 end
 
 def get_metadata_token
