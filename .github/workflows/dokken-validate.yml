@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@main
       - name: Get changed files
         id: changed-files-excluding-tests
-        uses: tj-actions/changed-files@v35
+        uses: tj-actions/changed-files@v35.6.0
         with:
           files_ignore: |
             !.github
