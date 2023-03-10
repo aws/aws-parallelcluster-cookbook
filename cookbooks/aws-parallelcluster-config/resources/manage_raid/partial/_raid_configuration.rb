@@ -8,8 +8,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource_name :manage_raid
-provides :manage_raid
 unified_mode true
 
 property :raid_shared_dir, String, required: true
@@ -51,15 +49,10 @@ action :mount do
   end
 
   raid_dev = "/dev/md0"
-
-  # Create RAID device with mdadm
-  raid_superblock_version = value_for_platform(
-    'ubuntu' => { '>=20.04' => '1.2' },
-    'default' => '0.90'
-  )
   mdadm "MY_RAID" do
     raid_device raid_dev
     level raid_type
+    # Raid superblock documentation https://raid.wiki.kernel.org/index.php/RAID_superblock_formats
     metadata raid_superblock_version
     devices raid_dev_path
   end
