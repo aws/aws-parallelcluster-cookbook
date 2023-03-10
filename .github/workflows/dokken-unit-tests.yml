@@ -142,8 +142,8 @@ jobs:
           - sticky-bits
           - slurm-dependencies
           - jwt-dependencies
-          - efa
-          - efa-configure
+          - efa-setup
+          - efa-configure-compute
           - munge
           - stunnel-installed
       fail-fast: false
