@@ -13,6 +13,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+#
+# EFA setup: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
+#
+
 efa_tarball = "#{node['cluster']['sources_dir']}/aws-efa-installer.tar.gz"
 
 action :setup do
@@ -55,6 +59,7 @@ action :download_and_install do
     mode '0644'
     retries 3
     retry_delay 5
+    checksum node['cluster']['efa']['sha256']
     action :create_if_missing
   end
 
