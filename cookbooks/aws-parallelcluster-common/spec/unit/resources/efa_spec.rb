@@ -33,12 +33,15 @@ source_dir = '/opt/parallelcluster/sources'
 describe 'efa:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
+      cached(:efa_version) { 'version' }
+      cached(:efa_checksum) { 'checksum' }
       let(:chef_run) do
         ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['efa']
         ) do |node|
-          node.override['cluster']['efa']['installer_version'] = 'version'
+          node.override['cluster']['efa']['installer_version'] = efa_version
+          node.override['cluster']['efa']['sha256'] = efa_checksum
           if platform == 'redhat'; node.automatic['platform_version'] = "8.7" end
         end
       end
@@ -96,6 +99,12 @@ describe 'efa:setup' do
             is_expected.to update_package_repos('update package repos')
             is_expected.to install_package("environment-modules")
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
+              .with(source: "https://efa-installer.amazonaws.com/aws-efa-installer-#{efa_version}.tar.gz")
+              .with(mode: '0644')
+              .with(retries: 3)
+              .with(retry_delay: 5)
+              .with(checksum: efa_checksum)
+
             is_expected.to run_bash('install efa')
               .with(code: %(      set -e
       tar -xzf #{source_dir}/aws-efa-installer.tar.gz
@@ -117,6 +126,11 @@ describe 'efa:setup' do
             is_expected.to update_package_repos('update package repos')
             is_expected.to install_package("environment-modules")
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
+              .with(source: "https://efa-installer.amazonaws.com/aws-efa-installer-#{efa_version}.tar.gz")
+              .with(mode: '0644')
+              .with(retries: 3)
+              .with(retry_delay: 5)
+              .with(checksum: efa_checksum)
             is_expected.to run_bash('install efa')
               .with(code: %(      set -e
       tar -xzf #{source_dir}/aws-efa-installer.tar.gz
