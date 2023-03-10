@@ -30,7 +30,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Add support for US isolated regions: us-iso-* and us-isob-*.
+- Add support for US isolated regions: us-iso-east-1 and us-isob-east-1.
 
 **CHANGES**
 - Upgrade NICE DCV to version `2022.2-14521`.
