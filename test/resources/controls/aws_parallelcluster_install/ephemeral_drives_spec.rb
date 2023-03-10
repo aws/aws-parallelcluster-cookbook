@@ -52,3 +52,15 @@ control 'ephemeral_drives_with_name_clashing_not_mounted' do
     its(:exit_status) { should eq 0 }
   end
 end
+
+control 'ephemeral_service_after_network_config' do
+  title 'Check setup-ephemeral service to have the correct After statement'
+  network_target = os_properties.redhat? ? /^After=network-online.target/ : /^After=network.target$/
+  describe file('/etc/systemd/system/setup-ephemeral.service') do
+    it { should exist }
+    its('content') { should match network_target }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0644' }
+  end
+end
