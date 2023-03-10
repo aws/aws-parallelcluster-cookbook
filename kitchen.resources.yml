@@ -178,6 +178,17 @@ suites:
       resource: dns_domain
       cluster:
         dns_domain: test-domain
+  - name: ephemeral_drives
+    run_list:
+      - recipe[aws-parallelcluster-install::test_resource]
+    attributes:
+      resource: ephemeral_drives
+    verifier:
+      controls:
+        - ephemeral_drives_logical_volumes_manager_installed
+        - ephemeral_drives_script_created
+        - ephemeral_service_set_up
+        - ephemeral_service_after_network_config
   - name: nfs_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
