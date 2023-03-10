@@ -57,3 +57,9 @@ end
 def chrony_reload_command
   "systemctl force-reload #{node['cluster']['chrony']['service']}"
 end
+
+def format_directory(dir)
+  format_dir = dir.strip
+  format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
+  format_dir
+end
