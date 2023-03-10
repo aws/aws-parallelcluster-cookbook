@@ -39,7 +39,7 @@ include_recipe "aws-parallelcluster-install::disable_selinux"
 include_recipe "aws-parallelcluster-install::license_readme"
 
 nfs 'install NFS daemon'
-include_recipe "aws-parallelcluster-install::ephemeral_drives"
+ephemeral_drives 'install'
 ec2_udev_rules 'configure udev'
 
 include_recipe "aws-parallelcluster-install::gc_thresh_values"

@@ -49,14 +49,6 @@ suites:
       controls:
         - pcluster_directories_exist
         - pcluster_log_dir_is_configured
-  - name: ephemeral_drives_setup
-    run_list:
-      - recipe[aws-parallelcluster-install::ephemeral_drives]
-    verifier:
-      controls:
-        - ephemeral_drives_logical_volumes_manager_installed
-        - ephemeral_drives_script_created
-        - ephemeral_service_set_up
   - name: python_setup
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
