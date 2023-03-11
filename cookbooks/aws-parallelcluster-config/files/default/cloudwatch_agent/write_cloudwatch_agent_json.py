@@ -177,10 +177,7 @@ def add_timestamps(configs, timestamps_dict):
 def filter_output_fields(configs):
     """Remove fields that are not required by CloudWatch agent config file."""
     desired_keys = ["log_stream_name", "file_path", "timestamp_format", "log_group_name"]
-    return [
-        {desired_key: config[desired_key] for desired_key in desired_keys if desired_key in config}
-        for config in configs
-    ]
+    return [{desired_key: config[desired_key] for desired_key in (desired_keys & config.keys())} for config in configs]
 
 
 def create_metrics_collected(selected_configs):

@@ -4,7 +4,7 @@
     "default": "%Y-%m-%d %H:%M:%S,%f",
     "bracket_default": "[%Y-%m-%d %H:%M:%S]",
     "slurm": "%Y-%m-%dT%H:%M:%S.%f",
-    "metric": ""
+    "json": ""
   },
   "log_configs": [
     {
@@ -165,7 +165,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "metric",
+      "timestamp_format_key": "json",
       "file_path": "/var/log/parallelcluster/clustermgtd.events",
       "log_stream_name": "clustermgtd_events",
       "schedulers": [
@@ -183,9 +183,9 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "metric",
+      "timestamp_format_key": "json",
       "file_path": "/var/log/parallelcluster/slurm_resume.events",
-      "log_stream_name": "resume_events",
+      "log_stream_name": "slurm_resume_events",
       "schedulers": [
         "slurm"
       ],
