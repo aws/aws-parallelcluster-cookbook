@@ -162,3 +162,37 @@ control 'pam_slurm_adopt_module_installed' do
     its('group') { should eq 'root' }
   end
 end
+
+control 'slurm_lua_support_libraries_compiled' do
+  title 'Checks that all slurm libraries required for lua were compiled'
+
+  only_if { !os_properties.redhat_ubi? }
+
+  describe file("#{slurm_library_folder}/burst_buffer_lua.so") do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+
+  describe file("#{slurm_library_folder}/cli_filter_lua.so") do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+
+  describe file("#{slurm_library_folder}/job_submit_lua.so") do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+
+  describe file("#{slurm_library_folder}/jobcomp_lua.so") do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+end
