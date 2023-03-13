@@ -58,4 +58,12 @@ done
 
 echo "[INFO] Complete: CA bundle configuration for AWS CLI in US isolated region"
 
+echo "[INFO] Starting: Setting system-wide environment variables for AWS CLI in US isolated region"
+
+echo "export AWS_DEFAULT_REGION=${REGION}" >> /etc/profile.d/aws-cli-default-config.sh
+
+echo "Defaults env_keep += \"AWS_DEFAULT_REGION AWS_CA_BUNDLE\"" > /etc/sudoers.d/pcluster-aws-cli-envkeep
+
+echo "[INFO] Complete: Setting system-wide environment variables for AWS CLI in US isolated region"
+
 echo "[INFO] Complete: instance configuration for US isolated region"
