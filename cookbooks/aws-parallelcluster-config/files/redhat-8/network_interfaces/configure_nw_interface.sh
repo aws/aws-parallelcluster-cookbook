@@ -29,7 +29,7 @@ metric="100${DEVICE_NUMBER}"
 
 # Rename connection
 original_con_name=`nmcli -t -f GENERAL.CONNECTION device show ${DEVICE_NAME} | cut -f2 -d':'`
-nmcli connection modify "${original_con_name}" con-name "${con_name}" ifname ${DEVICE_NAME}
+sudo nmcli connection modify "${original_con_name}" con-name "${con_name}" ifname ${DEVICE_NAME}
 
 configured_ip=`nmcli -t -f IP4.ADDRESS device show ${DEVICE_NAME} | cut -f2 -d':'`
 if [ -z "${configured_ip}" ]; then
@@ -40,14 +40,14 @@ fi
 # Setup routes
 # This command uses the ipv4.routes parameter to add a static route to the routing table with ID ${route_table}.
 # This static route for 0.0.0.0/0 uses the IP of the gateway as next hop.
-nmcli connection modify "${con_name}" ipv4.routes "0.0.0.0/0 ${GW_IP_ADDRESS} ${metric} table=${route_table}"
+sudo nmcli connection modify "${con_name}" ipv4.routes "0.0.0.0/0 ${GW_IP_ADDRESS} ${metric} table=${route_table}"
 
 # Setup routing rules
 # The command uses the ipv4.routing-rules parameter to add a routing rule with priority ${priority} that routes
 # traffic from ${DEVICE_IP_ADDRESS} to table ${route_table}. Low values have a high priority.
 # The syntax in the ipv4.routing-rules parameter is the same as in an "ip rule add" command,
 # except that ipv4.routing-rules always requires specifying a priority.
-nmcli connection modify "${con_name}" ipv4.routing-rules "priority ${priority} from ${DEVICE_IP_ADDRESS} table ${route_table}"
+sudo nmcli connection modify "${con_name}" ipv4.routing-rules "priority ${priority} from ${DEVICE_IP_ADDRESS} table ${route_table}"
 
 # Reapply previous connection modification.
-nmcli device reapply ${DEVICE_NAME}
+sudo nmcli device reapply ${DEVICE_NAME}
