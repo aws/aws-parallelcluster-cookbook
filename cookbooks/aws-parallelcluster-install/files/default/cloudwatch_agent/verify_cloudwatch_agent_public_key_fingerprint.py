@@ -24,10 +24,8 @@ def main():
     fingerprint = get_key_fingerprint()
     if fingerprint != EXPECTED_FINGERPRINT:
         sys.exit(
-            "Observed fingerprint of cloudwatch agent public key ({observed}) "
-            "does not match expected fingerprint ({expected}).".format(
-                observed=fingerprint, expected=EXPECTED_FINGERPRINT
-            )
+            f"Observed fingerprint of cloudwatch agent public key ({fingerprint}) "
+            f"does not match expected fingerprint ({EXPECTED_FINGERPRINT})."
         )
 
 
