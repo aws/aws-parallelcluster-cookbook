@@ -39,7 +39,7 @@ LOG_FILE_PATH = "/var/log/parallelcluster/pcluster_dcv_authenticator.log"
 logger = logging.getLogger(__name__)
 
 
-def retry(func, func_args, attempts=1, wait=0):  # pylint: disable=R1710
+def retry(func, func_args, attempts=1, wait=0):
     """
     Call function and re-execute it if it raises an Exception.
 
