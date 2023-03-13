@@ -523,3 +523,18 @@ suites:
         nfs:
           hard_mount_options: hard,_netdev,noatime
         head_node_private_ip: '127.0.0.1'
+  - name: network_interfaces
+    # Verifies multiple Network Interfaces recipes
+    # These recipes can be tested on EC2 on instance type with multiple network interfaces
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#network-cards
+    run_list:
+      - recipe[aws-parallelcluster-config::network_interfaces]
+    driver:
+      instance_type: c6in.32xlarge # available in eu-west-1, all AZs
+      # availability_zone: ...
+      # subnet_id: ...
+    verifier:
+      controls:
+        - network_interfaces_configuration_script_created
+        - network_interfaces_configured
+        - multiple_network_interfaces_can_ping_gateway
