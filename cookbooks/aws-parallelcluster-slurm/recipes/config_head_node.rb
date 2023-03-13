@@ -115,6 +115,12 @@ file "/var/log/parallelcluster/slurm_fleet_status_manager.log" do
   mode '0640'
 end
 
+file "/var/log/parallelcluster/clustermgtd.events" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0600'
+end
+
 file "/var/log/parallelcluster/compute_console_output.log" do
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_group']
@@ -136,6 +142,12 @@ template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do
 end
 
 file "/var/log/parallelcluster/slurm_resume.log" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0644'
+end
+
+file "/var/log/parallelcluster/slurm_resume.events" do
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_group']
   mode '0644'

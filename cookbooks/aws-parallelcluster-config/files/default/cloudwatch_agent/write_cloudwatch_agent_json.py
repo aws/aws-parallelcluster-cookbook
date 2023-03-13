@@ -168,14 +168,19 @@ def add_scheduler_plugin_log(config_data, cluster_config_path):
 def add_timestamps(configs, timestamps_dict):
     """For each config, set its timestamp_format field based on its timestamp_format_key field."""
     for config in configs:
-        config["timestamp_format"] = timestamps_dict[config["timestamp_format_key"]]
+        timestamp_format = timestamps_dict[config["timestamp_format_key"]]
+        if timestamp_format:
+            config["timestamp_format"] = timestamp_format
     return configs
 
 
 def filter_output_fields(configs):
     """Remove fields that are not required by CloudWatch agent config file."""
     desired_keys = ["log_stream_name", "file_path", "timestamp_format", "log_group_name"]
-    return [{desired_key: config[desired_key] for desired_key in desired_keys} for config in configs]
+    return [
+        {desired_key: config[desired_key] for desired_key in desired_keys if desired_key in config}
+        for config in configs
+    ]
 
 
 def create_metrics_collected(selected_configs):
