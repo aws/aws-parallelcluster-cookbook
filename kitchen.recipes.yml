@@ -395,6 +395,7 @@ suites:
         - slurm_shared_libraries_compiled
         - slurm_library_shared
         - pam_slurm_adopt_module_installed
+        - slurm_lua_support_libraries_compiled
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
