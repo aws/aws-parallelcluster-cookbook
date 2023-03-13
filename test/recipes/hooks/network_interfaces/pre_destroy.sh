@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo "**** pre_destroy"
+
+[[ "${KITCHEN_DRIVER}" = "ec2" ]] || return
+
+read KITCHEN_ENI_ID KITCHEN_ATTACHMENT_ID <<< "$(aws ec2 describe-instances --instance-ids "${KITCHEN_EC2_INSTANCE_ID}" \
+    --query "Reservations[0].Instances[0].NetworkInterfaces[?Attachment.DeviceIndex==\`1\`].[NetworkInterfaceId, Attachment.AttachmentId]" \
+    --region "${KITCHEN_AWS_REGION}" --output text)"
+
+if [ -n "${KITCHEN_ATTACHMENT_ID}" ]; then
+  echo "** Detaching ENI: ${KITCHEN_ATTACHMENT_ID}"
+  aws ec2 detach-network-interface --attachment-id "${KITCHEN_ATTACHMENT_ID}" --region "${KITCHEN_AWS_REGION}"
+fi
+
+if [ -n "${KITCHEN_ENI_ID}" ]; then
+  echo "** Deleting ENI: ${KITCHEN_ENI_ID}"
+  aws ec2 delete-network-interface --network-interface-id "${KITCHEN_ENI_ID}" --region "${KITCHEN_AWS_REGION}"
+fi
