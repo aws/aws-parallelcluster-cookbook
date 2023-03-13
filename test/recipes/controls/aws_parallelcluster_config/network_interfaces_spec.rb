@@ -21,6 +21,28 @@ control 'network_interfaces_configuration_script_created' do
   end
 end
 
+control 'multiple_network_interfaces_can_ping_gateway' do
+  only_if { !os_properties.virtualized? }
+
+  describe bash("ip -o link | grep -v lo | wc -l") do
+    its('stdout.strip') { should cmp >= 2 }
+  end
+
+  gateway_ip = bash("ip r | grep default | head -n 1 | awk '{print $3}'").stdout.strip
+  ips = bash("ip address | grep 'inet ' | grep -v 'lo$' | awk '{print $2}' | awk -F/ '{split($0,a); print a[1]}'")
+        .stdout.split(/\n+/)
+
+  describe ips do
+    its('size') { should cmp >= 2 }
+  end
+
+  ips.each do |ip|
+    describe bash("ping -I #{ip} -c 5 #{gateway_ip}") do
+      its('stdout') { should match /.*5 packets transmitted, 5 received, 0% packet loss,.*/ }
+    end
+  end
+end
+
 control 'network_interfaces_configured' do
   title 'Check that network interfaces have been configured'
 
@@ -42,7 +64,7 @@ control 'network_interfaces_configured' do
         its('group') { should eq 'root' }
         its('content') { should match /^ip route del/ }
       end
-    else
+    elsif os_properties.amazon_family? || os_properties.centos?
       describe file("/etc/sysconfig/network-scripts/ifcfg-#{device_name}") do
         it { should exist }
         its('content') { should match /^DEVICE=#{device_name}/ }
