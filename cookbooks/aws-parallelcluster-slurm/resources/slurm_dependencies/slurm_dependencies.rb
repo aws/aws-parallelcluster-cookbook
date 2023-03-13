@@ -21,10 +21,26 @@ package_dependencies = value_for_platform(
 )
 
 action :setup do
+  package_dependencies.append(lua_devel_package())
+
   package package_dependencies do
     flush_cache({ before: true }) unless platform?('ubuntu') # not supported by apt
 
     retries 3
     retry_delay 5
+  end
+end
+
+action_class do
+  def lua_devel_package
+    # fix lua version to 5.3 on all platform with the exception of centos7
+    # where 5.3 is not available and 5.1 is installed instead
+    if platform?('ubuntu')
+      'liblua5.3-dev'
+    elsif platform?('amazon')
+      'lua53-devel'
+    else
+      'lua-devel'
+    end
   end
 end

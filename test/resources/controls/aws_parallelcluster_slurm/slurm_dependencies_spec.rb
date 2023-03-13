@@ -12,6 +12,16 @@
 control 'slurm_dependencies_installed' do
   title "Slurm dependencies are installed"
 
+  def lua_devel_package
+    if os.debian?
+      'liblua5.3-dev'
+    elsif os_properties.alinux2?
+      'lua53-devel'
+    else
+      'lua-devel'
+    end
+  end
+
   packages = []
   if os.redhat?
     # Skipping redhat on docker since ubi-appstream repo is not aligned with the main repo
@@ -24,6 +34,7 @@ control 'slurm_dependencies_installed' do
     end
   end
 
+  packages.append(lua_devel_package()) unless os_properties.redhat_ubi?
   packages.each do |pkg|
     describe package(pkg) do
       it { should be_installed }
