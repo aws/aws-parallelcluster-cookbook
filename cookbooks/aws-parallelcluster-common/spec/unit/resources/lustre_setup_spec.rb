@@ -21,7 +21,7 @@ describe 'lustre:setup' do
     end
 
     it 'installs lustre2.10 extra topic' do
-      is_expected.to install_alinux_extras_topic("lustre2.10")
+      is_expected.to install_alinux_extras_topic("lustre")
     end
   end
 
@@ -94,25 +94,25 @@ describe 'lustre:setup' do
     end
 
     it 'installs kmod-lustre-client from downloaded rpm' do
-      is_expected.to create_if_missing_remote_file("srcdir/kmod-lustre-client-2.10.6.x86_64.rpm")
-        .with(source: "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.6-1.el7.x86_64.rpm")
+      is_expected.to create_if_missing_remote_file("srcdir/kmod-lustre-client-2.10.8.x86_64.rpm")
+        .with(source: "https://downloads.whamcloud.com/public/lustre/lustre-2.10.8/el7/client/RPMS/x86_64/kmod-lustre-client-2.10.8-1.el7.x86_64.rpm")
         .with(mode: '0644')
         .with(retries: 3)
         .with(retry_delay: 5)
 
       is_expected.to install_package('lustre_kmod')
-        .with(source: "srcdir/kmod-lustre-client-2.10.6.x86_64.rpm")
+        .with(source: "srcdir/kmod-lustre-client-2.10.8.x86_64.rpm")
     end
 
     it 'installs lustre-client from downloaded rpm' do
-      is_expected.to create_if_missing_remote_file("srcdir/lustre-client-2.10.6.x86_64.rpm")
-        .with(source: "https://downloads.whamcloud.com/public/lustre/lustre-2.10.6/el7/client/RPMS/x86_64/lustre-client-2.10.6-1.el7.x86_64.rpm")
+      is_expected.to create_if_missing_remote_file("srcdir/lustre-client-2.10.8.x86_64.rpm")
+        .with(source: "https://downloads.whamcloud.com/public/lustre/lustre-2.10.8/el7/client/RPMS/x86_64/lustre-client-2.10.8-1.el7.x86_64.rpm")
         .with(mode: '0644')
         .with(retries: 3)
         .with(retry_delay: 5)
 
       is_expected.to install_package('lustre_client')
-        .with(source: "srcdir/lustre-client-2.10.6.x86_64.rpm")
+        .with(source: "srcdir/lustre-client-2.10.8.x86_64.rpm")
     end
 
     it 'installs kernel module lnet' do
