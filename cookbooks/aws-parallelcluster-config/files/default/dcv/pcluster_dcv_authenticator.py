@@ -59,6 +59,7 @@ def retry(func, func_args, attempts=1, wait=0):
 
             logger.info("%s, retrying in %s seconds..", e, wait)
             time.sleep(wait)
+    # We should never reach this line, but the linters say otherwise.
     return None
 
 
