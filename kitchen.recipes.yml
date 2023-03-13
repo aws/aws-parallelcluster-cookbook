@@ -15,6 +15,12 @@ verifier:
     - test/recipes
     - test/resources
 
+lifecycle:
+  <% %w(post_create pre_converge pre_destroy).each do |op| %>
+  <%= op %>:
+    - local: bash ./test/recipes/hooks/run.sh <%= op %> $(dirname "$0")
+  <% end %>
+
 # If you need to test a recipe with recipe/resources dependencies,
 # add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
 # then define a dependencies attribute, listing them with recipe: or resource: prefix.

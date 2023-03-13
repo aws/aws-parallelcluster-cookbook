@@ -1,13 +1,11 @@
 <%
   pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.6.0'
   pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
-  aws_region = ENV['KITCHEN_AWS_REGION'] || ENV['AWS_DEFAULT_REGION'] || 'eu-west-1'
-  key_name = ENV['KITCHEN_KEY_NAME'] || 'kitchen'
 %>
 ---
 driver:
   name: ec2
-  aws_ssh_key_id: <%= key_name %>
+  aws_ssh_key_id: <%= ENV['KITCHEN_KEY_NAME'] %>
   <% if ENV['KITCHEN_SECURITY_GROUP_ID'] %>
   security_group_ids: [ "<%= ENV['KITCHEN_SECURITY_GROUP_ID'] %>" ]
   <% else %>
@@ -15,29 +13,23 @@ driver:
     tag: 'Kitchen'
     value: 'true'
   <% end %>
-  region: <%= aws_region %>
-  availability_zone: a
-  <% if ENV['KITCHEN_SUBNET_ID'] %>
+  region: <%= ENV['KITCHEN_AWS_REGION'] %>
+  availability_zone: <%= ENV['KITCHEN_AVAILABILITY_ZONE'] %>
   subnet_id: <%= ENV['KITCHEN_SUBNET_ID'] %>
-  <% else %>
-  subnet_filter:
-    tag: 'Kitchen'
-    value: 'true'
-  <% end %>
   # Disable IMDS v1
   metadata_options:
     http_tokens: 'required'
     http_put_response_hop_limit: 1
     instance_metadata_tags: 'enabled'
   #iam_profile_name: chef-client
-  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || "t2.micro" %>
+  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
   associate_public_ip: true
   interface: public
   tags:
     Name: test-kitchen-parallelcluster
 
 transport:
-  ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH'] || "~/.ssh/#{key_name}-#{aws_region}.pem" %>
+  ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH']  %>
   compression: true
 
 provisioner:
@@ -75,7 +67,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
       <% else %>
       image_search:
-        name: "RHEL-8*_HVM*"
+        name: "RHEL-8.7.*_HVM*"
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
     transport:
