@@ -41,7 +41,6 @@ action :mount do
     ruby_block "sleeping_for_raid_volume_#{index}" do
       block do
         wait_for_block_dev(raid_dev_path[index])
-        puts "Attached index: #{index}, VolID: #{volumeid}"
       end
       action :nothing
       subscribes :run, "execute[attach_raid_volume_#{index}]", :immediately
