@@ -47,10 +47,14 @@
 # ./kitchen.ec2.sh recipes list
 # ./kitchen.ec2.sh recipes test ephemeral-drives-setup --parallel --concurrency 5 -l debug
 
-export KITCHEN_LOCAL_YAML="kitchen.$1.yml"; shift;
+KITCHEN_SCOPE=$1; shift;
+KITCHEN_PHASE=$(echo $KITCHEN_SCOPE | awk -F- '{print $2}')
+
+export KITCHEN_LOCAL_YAML="kitchen.${KITCHEN_SCOPE}.yml"
 export KITCHEN_YAML=kitchen.ec2.yml
 export KITCHEN_GLOBAL_YAML=kitchen.global.yml
 export KITCHEN_DRIVER=ec2
+export KITCHEN_PHASE
 
 THIS_DIR=$(dirname "$0")
 if [ -e "${THIS_DIR}/.kitchen.env.sh" ]
@@ -59,62 +63,78 @@ then
   source "${THIS_DIR}/.kitchen.env.sh"
 fi
 
-: "${KITCHEN_AWS_REGION:=${AWS_DEFAULT_REGION:-eu-west-1}}"
-: "${KITCHEN_KEY_NAME:=kitchen}"
-: "${KITCHEN_SSH_KEY_PATH:="~/.ssh/${KITCHEN_KEY_NAME}-${KITCHEN_AWS_REGION}.pem"}"
-: "${KITCHEN_AVAILABILITY_ZONE:=a}"
+if [ "$1" != "list" ]; then
+  : "${KITCHEN_AWS_REGION:=${AWS_DEFAULT_REGION:-eu-west-1}}"
+  : "${KITCHEN_KEY_NAME:=kitchen}"
+  : "${KITCHEN_SSH_KEY_PATH:="~/.ssh/${KITCHEN_KEY_NAME}-${KITCHEN_AWS_REGION}.pem"}"
+  : "${KITCHEN_AVAILABILITY_ZONE:=a}"
 
-# Subnet
-if [ -z "${KITCHEN_SUBNET_ID}" ]; then
-  echo "** KITCHEN_SUBNET_ID not explicitly set: looking for subnet tagged Kitchen=true"
+  # Subnet
+  if [ -z "${KITCHEN_SUBNET_ID}" ]; then
+    echo "** KITCHEN_SUBNET_ID not explicitly set: looking for subnet tagged Kitchen=true"
 
-  KITCHEN_SUBNET_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
-      --filters "Name=tag:Kitchen,Values=true" \
-                "Name=availability-zone,Values=${KITCHEN_AWS_REGION}${KITCHEN_AVAILABILITY_ZONE}" \
-      --query 'Subnets[0].SubnetId' --output text)
+    KITCHEN_SUBNET_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
+        --filters "Name=tag:Kitchen,Values=true" \
+                  "Name=availability-zone,Values=${KITCHEN_AWS_REGION}${KITCHEN_AVAILABILITY_ZONE}" \
+        --query 'Subnets[0].SubnetId' --output text)
 
+    echo "** KITCHEN_SUBNET_ID: ${KITCHEN_SUBNET_ID}"
+
+    if [ "${KITCHEN_SUBNET_ID}" = "None" ]; then
+      echo "Subnet tagged Kitchen=true not found in AZ ${KITCHEN_AWS_REGION}${KITCHEN_AVAILABILITY_ZONE}"
+      exit 1
+    fi
+  fi
+
+  # VPC
+  KITCHEN_VPC_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
+      --subnet-ids "${KITCHEN_SUBNET_ID}" \
+      --query 'Subnets[0].VpcId' --output text)
+
+  echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
+
+  # Security Group
+  if [ -z "${KITCHEN_SECURITY_GROUP_ID}" ]; then
+    echo "** KITCHEN_SECURITY_GROUP_ID not explicitly set"
+
+    if [ -z "${KITCHEN_SECURITY_GROUP_NAME}" ]; then
+      echo "** KITCHEN_SECURITY_GROUP_NAME not explicitly set, looking for tag Kitchen=true"
+
+      KITCHEN_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --region "${KITCHEN_AWS_REGION}" \
+                  --filters "Name=tag:Kitchen,Values=true" "Name=vpc-id,Values=${KITCHEN_VPC_ID}" \
+                  --query 'SecurityGroups[0].GroupId' --output text)
+    else
+      echo "** Looking for SG named ${KITCHEN_SECURITY_GROUP_NAME}"
+
+      KITCHEN_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --region "${KITCHEN_AWS_REGION}" \
+                  --filters "Name=vpc-id,Values=${KITCHEN_VPC_ID}" "Name=group-name,Values=${KITCHEN_SECURITY_GROUP_NAME}" \
+                  --query 'SecurityGroups[0].GroupId' --output text)
+    fi
+
+    echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"
+
+  fi
+
+  export KITCHEN_AWS_REGION
+  export KITCHEN_KEY_NAME
+  export KITCHEN_SSH_KEY_PATH
+  export KITCHEN_AVAILABILITY_ZONE
+  export KITCHEN_SUBNET_ID
+  export KITCHEN_VPC_ID
+  export KITCHEN_SECURITY_GROUP_ID
+
+  echo "** KITCHEN_AWS_REGION: ${KITCHEN_AWS_REGION}"
+  echo "** KITCHEN_KEY_NAME: ${KITCHEN_KEY_NAME}"
+  echo "** KITCHEN_SSH_KEY_PATH: ${KITCHEN_SSH_KEY_PATH}"
+  echo "** KITCHEN_AVAILABILITY_ZONE: ${KITCHEN_AVAILABILITY_ZONE}"
   echo "** KITCHEN_SUBNET_ID: ${KITCHEN_SUBNET_ID}"
-
-  if [ "${KITCHEN_SUBNET_ID}" = "None" ]; then
-    echo "Subnet tagged Kitchen=true not found in AZ ${KITCHEN_AWS_REGION}${KITCHEN_AVAILABILITY_ZONE}"
-    exit 1
-  fi
-fi
-
-# VPC
-KITCHEN_VPC_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
-    --subnet-ids "${KITCHEN_SUBNET_ID}" \
-    --query 'Subnets[0].VpcId' --output text)
-
-echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
-
-# Security Group
-if [ -z "${KITCHEN_SECURITY_GROUP_ID}" ]; then
-  echo "** KITCHEN_SECURITY_GROUP_ID not explicitly set"
-
-  if [ -z "${KITCHEN_SECURITY_GROUP_NAME}" ]; then
-    echo "** KITCHEN_SECURITY_GROUP_NAME not explicitly set, looking for tag Kitchen=true"
-
-    KITCHEN_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --region "${KITCHEN_AWS_REGION}" \
-                --filters "Name=tag:Kitchen,Values=true" "Name=vpc-id,Values=${KITCHEN_VPC_ID}" \
-                --query 'SecurityGroups[0].GroupId' --output text)
-  else
-    echo "** Looking for SG named ${KITCHEN_SECURITY_GROUP_NAME}"
-
-    KITCHEN_SECURITY_GROUP_ID=$(aws ec2 describe-security-groups --region "${KITCHEN_AWS_REGION}" \
-                --filters "Name=vpc-id,Values=${KITCHEN_VPC_ID}" "Name=group-name,Values=${KITCHEN_SECURITY_GROUP_NAME}" \
-                --query 'SecurityGroups[0].GroupId' --output text)
-  fi
-
+  echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
   echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"
-
 fi
 
-export KITCHEN_AWS_REGION
-export KITCHEN_KEY_NAME
-export KITCHEN_SSH_KEY_PATH
-export KITCHEN_SUBNET_ID
-export KITCHEN_VPC_ID
-export KITCHEN_SECURITY_GROUP_ID
+echo "export KITCHEN_LOCAL_YAML=$KITCHEN_LOCAL_YAML"
+echo "export KITCHEN_YAML=$KITCHEN_YAML"
+echo "export KITCHEN_GLOBAL_YAML=$KITCHEN_GLOBAL_YAML"
+echo "kitchen $*"
 
 kitchen "$@"

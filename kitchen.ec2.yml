@@ -54,7 +54,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_ALINUX2_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-amzn2-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>amzn2-ami-kernel-5.10-hvm*<% else %><%= pcluster_prefix %>-amzn2-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
     transport:
@@ -67,6 +67,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
       <% else %>
       image_search:
+        #name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
         name: "RHEL-8.7.*_HVM*"
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
@@ -80,7 +81,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_CENTOS7_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-centos7-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>CentOS-7*<% else %><%= pcluster_prefix %>-centos7-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
     transport:
@@ -93,7 +94,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU18_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20221207<% else %><%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
     transport:
@@ -106,7 +107,7 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230112<% else %><%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
     transport:
