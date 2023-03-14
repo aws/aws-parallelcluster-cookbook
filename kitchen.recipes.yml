@@ -538,3 +538,14 @@ suites:
         - network_interfaces_configuration_script_created
         - network_interfaces_configured
         - multiple_network_interfaces_can_ping_gateway
+  - name: intel_mpi
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::intel_mpi]
+    verifier:
+      controls:
+        - intel_mpi_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos:update
