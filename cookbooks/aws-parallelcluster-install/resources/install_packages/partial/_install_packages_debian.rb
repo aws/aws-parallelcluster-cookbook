@@ -18,6 +18,7 @@ action :install_base_packages do
     retries 10
     retry_delay 5
   end
+  dns_domain "Install dns related packages"
 end
 
 action :install_kernel_source do
