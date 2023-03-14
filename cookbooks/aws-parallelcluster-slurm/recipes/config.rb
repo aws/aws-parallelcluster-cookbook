@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_recipe "aws-parallelcluster-slurm::enable_chef_error_handler"
+
 case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster-slurm::config_head_node'
