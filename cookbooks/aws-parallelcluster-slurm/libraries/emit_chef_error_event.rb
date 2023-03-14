@@ -28,47 +28,8 @@ module WriteChefError
         failed_action_collection = action_collection.filtered_collection(
           up_to_date: false, skipped: false, updated: false, failed: true, unprocessed: false
         )
-        failures = failed_action_collection.map {|action_record|
-          {
-            "exception-type" => action_record.exception.class.name,
-            "error-title" => action_record.error_description["title"],
-            "nesting-level" => action_record.nesting_level,
-            "cookbook-name" => action_record.new_resource.cookbook_name,
-            "recipe-name" => action_record.new_resource.recipe_name,
-            "source-line" => action_record.new_resource.source_line,
-            "resource-name" => action_record.new_resource.name,
-            "resource-type" => action_record.new_resource.declared_type,
-            "action" => action_record.action,
-          }
-        }.compact
-
-        error_info = {
-          "datetime" => DateTime.now,
-          "version" => 0,
-          "cluster-name" => node["cluster"]["stack_name"],
-          "scheduler" => node["cluster"]["scheduler"],
-          "node-role" => "ComputeNode",
-          "level" => "ERROR",
-          "instance-id" => node["ec2"]["instance_id"],
-          "event-type" => "chef-recipe-exception",
-          "message" => "Chef recipe exception",
-          "component" => get_component(node.override_runlist),
-          "compute" => {
-            "name" => node["cluster"]["slurm_nodename"],
-            "instance-id" => node["ec2"]["instance_id"],
-            "instance-type" => node["ec2"]["instance_type"],
-            "availability-zone" => node["ec2"]["availability_zone"],
-            "address" => node["ipaddress"],
-            "hostname" => node["ec2"]["hostname"],
-            "queue-name" => node["cluster"]["scheduler_queue_name"],
-            "compute-resource" => node["cluster"]["scheduler_compute_resource_name"],
-            "node-type" => get_node_type(node["cluster"]["slurm_nodename"]),
-          },
-          "detail" => {
-            "failures" => failures
-          },
-        }
-
+        failures = failed_action_collection.map { |action_record| get_failure_detail(action_record) }.compact
+        error_info = get_error_info(node, failures)
         IO.write(compute_error_file, error_info.to_json + "\n")
 
         # the 5s sleep time here will extend the overall sleep time set in the CLI repo:
@@ -78,8 +39,55 @@ module WriteChefError
       end
     end
 
+    def get_failure_detail(action_record)
+      {
+        "exception-type" => action_record.exception.class.name,
+        "error-title" => action_record.error_description["title"],
+        "nesting-level" => action_record.nesting_level,
+        "cookbook-name" => action_record.new_resource.cookbook_name,
+        "recipe-name" => action_record.new_resource.recipe_name,
+        "source-line" => action_record.new_resource.source_line,
+        "resource-name" => action_record.new_resource.name,
+        "resource-type" => action_record.new_resource.declared_type,
+        "action" => action_record.action,
+      }
+    end
+
+    def get_error_info(node, failures)
+      {
+        "datetime" => DateTime.now,
+        "version" => 0,
+        "cluster-name" => node["cluster"]["stack_name"],
+        "scheduler" => node["cluster"]["scheduler"],
+        "node-role" => "ComputeNode",
+        "level" => "ERROR",
+        "instance-id" => node["ec2"]["instance_id"],
+        "event-type" => "chef-recipe-exception",
+        "message" => "Chef recipe exception",
+        "component" => get_component(node.override_runlist),
+        "compute" => {
+          "name" => node["cluster"]["slurm_nodename"],
+          "instance-id" => node["ec2"]["instance_id"],
+          "instance-type" => node["ec2"]["instance_type"],
+          "availability-zone" => node["ec2"]["availability_zone"],
+          "address" => node["ipaddress"],
+          "hostname" => node["ec2"]["hostname"],
+          "queue-name" => node["cluster"]["scheduler_queue_name"],
+          "compute-resource" => node["cluster"]["scheduler_compute_resource_name"],
+          "node-type" => get_node_type(node["cluster"]["slurm_nodename"]),
+        },
+        "detail" => {
+          "failures" => failures,
+        },
+      }
+    end
+
     def get_node_type(node_name)
-      node_name.nil? ? nil : (is_static_node?(node["cluster"]["slurm_nodename"]) ? "static" : "dynamic")
+      if node_name.nil?
+        nil
+      else
+        is_static_node?(node_name) ? "static" : "dynamic"
+      end
     end
 
     def get_component(runlist)
@@ -90,6 +98,5 @@ module WriteChefError
       raise "Failed when parsing the runlist: #{runlist}" if match.nil?
       match[2]
     end
-
   end
 end
