@@ -492,6 +492,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
+        - resource:dns_domain:setup
       cluster:
         node_type: HeadNode
         dns_domain: test-domain

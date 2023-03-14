@@ -13,10 +13,16 @@ provides :dns_domain, platform: 'redhat' do |node|
 end
 unified_mode true
 
-default_action :configure
+default_action :setup
 
 use 'partial/_dns_search_domain_redhat'
 
+action :setup do
+  package "hostname" do
+    retries 3
+    retry_delay 5
+  end
+end
 # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
 # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
 action :configure do
