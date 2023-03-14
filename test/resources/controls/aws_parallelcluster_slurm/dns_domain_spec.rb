@@ -9,6 +9,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+control 'dns_domain_setup' do
+  title "Checks that the we have everything to setup the dns domain"
+
+  describe package('hostname') do
+    it { should be_installed }
+  end
+end
+
 control 'dns_domain_configured' do
   title "Checks that the DNS search domain is configured"
 
