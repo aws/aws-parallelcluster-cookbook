@@ -19,6 +19,7 @@ action :install_base_packages do
     retry_delay 5
     flush_cache({ before: true })
   end
+  dns_domain "Install dns related packages"
 end
 
 action :install_kernel_source do

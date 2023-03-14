@@ -165,7 +165,15 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
-  - name: dns_domain
+  - name: dns_domain_setup
+    run_list:
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - dns_domain_setup
+    attributes:
+      resource: dns_domain
+  - name: dns_domain_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-slurm::test_resource]
@@ -175,7 +183,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
-      resource: dns_domain
+      resource: dns_domain:configure
       cluster:
         dns_domain: test-domain
   - name: ephemeral_drives

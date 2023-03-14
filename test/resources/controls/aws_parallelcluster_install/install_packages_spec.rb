@@ -9,6 +9,11 @@ control 'install_packages' do
     it { should be_installed }
   end
 
+  # verify dns-domain package
+  describe package('hostname') do
+    it { should be_installed }
+  end
+
   if os.redhat? # redhat includes amazon
 
     describe package('glibc-static') do
