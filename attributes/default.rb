@@ -18,6 +18,7 @@
 # ParallelCluster log dir
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
+default['cluster']['compute_node_chef_error_path'] = "#{node['cluster']['log_base_dir']}/chef_recipe_error"
 
 # ParallelCluster log rotation file dir
 default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelcluster_log_rotation"
