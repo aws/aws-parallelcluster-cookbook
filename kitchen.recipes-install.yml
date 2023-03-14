@@ -271,3 +271,14 @@ suites:
         - recipe:aws-parallelcluster-slurm::install_jwt
         - recipe:aws-parallelcluster-slurm::install_pmix
         - resource:munge
+  - name: intel_mpi
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::intel_mpi]
+    verifier:
+      controls:
+        - intel_mpi_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos:update
