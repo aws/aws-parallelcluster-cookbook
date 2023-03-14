@@ -23,6 +23,12 @@ intelmpi_installer = "l_mpi_oneapi_p_#{node['cluster']['intelmpi']['full_version
 intelmpi_installer_path = "#{node['cluster']['sources_dir']}/#{intelmpi_installer}"
 intelmpi_installer_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/archives/impi/#{intelmpi_installer}"
 
+# Prerequisite for module install
+package %w(environment-modules) do
+  retries 3
+  retry_delay 5
+end
+
 # fetch intelmpi installer script
 remote_file intelmpi_installer_path do
   source intelmpi_installer_url
@@ -43,7 +49,7 @@ bash "install intel mpi" do
   creates intelmpi_installation_path.to_s
 end
 
-append_if_no_line "append intel modules file dir to modules conf" do
+append_if_no_line "append intel modules file dir to modules conf #{node['cluster']['modulepath_config_file']}" do
   path node['cluster']['modulepath_config_file']
   line "#{intelmpi_installation_path}/modulefiles/"
 end
