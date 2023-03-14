@@ -55,7 +55,7 @@ describe 'manage_raid:unexport' do
       it "unexports raid directory via NFS" do
         is_expected.to edit_delete_lines("remove volume from /etc/exports")
           .with(path: "/etc/exports")
-          .with(pattern: "/raid_shared_dir *")
+          .with(pattern: "^/raid_shared_dir *")
       end
 
       it "unexports volume" do
