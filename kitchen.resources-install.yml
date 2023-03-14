@@ -111,30 +111,6 @@ suites:
       resource: efa:setup
       dependencies:
         - recipe:aws-parallelcluster-install::directories
-  - name: efa_configure_compute
-    run_list:
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - efa_debian_system_settings_configured
-    attributes:
-      resource: efa:configure
-      cluster:
-        enable_efa: compute
-        node_type: ComputeFleet
-  - name: efs_configure
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - efs_utils_installed
-    attributes:
-      resource: efs
-      dependencies:
-        - recipe:aws-parallelcluster-install::directories
-        - resource:package_repos
-        - resource:install_packages
   - name: munge
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
@@ -173,19 +149,6 @@ suites:
         - dns_domain_setup
     attributes:
       resource: dns_domain
-  - name: dns_domain_configured
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-slurm::test_resource]
-    verifier:
-      controls:
-        - dns_domain_configured
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-install::directories
-      resource: dns_domain:configure
-      cluster:
-        dns_domain: test-domain
   - name: ephemeral_drives
     run_list:
       - recipe[aws-parallelcluster-install::test_resource]
@@ -197,17 +160,3 @@ suites:
         - ephemeral_drives_script_created
         - ephemeral_service_set_up
         - ephemeral_service_after_network_config
-  - name: nfs_configured
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - nfs_configured
-    attributes:
-      resource: nfs:configure
-      cluster:
-        nfs:
-          threads: 10
-      dependencies:
-        - resource:nfs

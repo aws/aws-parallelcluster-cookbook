@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  dokken-validate:
+  dokken-validate-install:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -43,6 +43,6 @@ jobs:
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
-          KITCHEN_LOCAL_YAML: kitchen.validate.yml
+          KITCHEN_LOCAL_YAML: kitchen.validate-install.yml
           KITCHEN_GLOBAL_YAML: kitchen.global.yml
         continue-on-error: false
