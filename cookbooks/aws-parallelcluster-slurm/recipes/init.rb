@@ -15,7 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Ensure slurm plugin directory is in place
 # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
 directory node['cluster']['slurm_plugin_dir'] do
