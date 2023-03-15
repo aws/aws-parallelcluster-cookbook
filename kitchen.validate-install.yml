@@ -40,7 +40,6 @@ suites:
         - write_common_udev_configuration_files
         - ec2blkdev_service_installation
         - debian_udevd_reload_configuration
-        - package_repos
         - install_packages
         - nfs_installed_with_right_version
         - cron_disabled_selected_daily_and_weekly_jobs
@@ -62,3 +61,4 @@ suites:
         - services_disabled_on_amazon_family
         - services_disabled_on_debian_family
         - stunnel_installed
+        - intel_mpi_installed
