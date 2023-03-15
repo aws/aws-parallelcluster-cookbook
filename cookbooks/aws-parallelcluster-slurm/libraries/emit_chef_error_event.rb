@@ -18,25 +18,23 @@ module WriteChefError
   # this class is used to handle chef errors and write the errors into a certain file for slurm scheduler
   class SlurmChefHandler < Chef::Handler
     def report
-      # only if the node is a compute node we write a structured json content into a specific log file
-      if node["cluster"]["node_type"] == "ComputeFleet"
-        require 'date'
-        compute_error_file = node["cluster"]["compute_node_chef_error_path"]
+      require 'date'
+      error_file = node["cluster"]["bootstrap_error_path"]
 
-        # get the failed action records using the chef function filtered_collection
-        # reference: https://github.com/cinc-project/chef/blob/stable/cinc/lib/chef/action_collection.rb#L107
-        failed_action_collection = action_collection.filtered_collection(
-          up_to_date: false, skipped: false, updated: false, failed: true, unprocessed: false
-        )
-        failures = failed_action_collection.map { |action_record| get_failure_detail(action_record) }.compact
-        error_info = get_error_info(node, failures)
-        IO.write(compute_error_file, error_info.to_json + "\n")
+      # get the failed action records using the chef function filtered_collection
+      # reference: https://github.com/cinc-project/chef/blob/stable/cinc/lib/chef/action_collection.rb#L107
+      failed_action_collection = action_collection.filtered_collection(
+        up_to_date: false, skipped: false, updated: false, failed: true, unprocessed: false
+      )
+      failures = failed_action_collection.map { |action_record| get_failure_detail(action_record) }.compact
+      error_info = get_error_info(node, failures)
+      IO.write(error_file, error_info.to_json + "\n")
 
-        # the 5s sleep time here will extend the overall sleep time set in the CLI repo:
-        # cli/src/pcluster/resources/compute_node/user_data.sh, in order to allow CW agent enough time
-        # to detect this new error log file, create the logstream and push the content to the logstream
-        sleep(5)
-      end
+      # the 5s sleep time here will extend the overall sleep time set in the CLI repo:
+      # cli/src/pcluster/resources/compute_node/user_data.sh, in order to allow CW agent enough time
+      # to detect this new error log file, create the logstream and push the content to the logstream
+      sleep(5)
+
     end
 
     def get_failure_detail(action_record)
