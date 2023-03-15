@@ -25,11 +25,8 @@ module WriteChefError
       # if the error file already exists we don't take any additional action here
       unless File.exist?(error_file)
         message_error = 'Failed to run chef recipe.'
-        node_type_to_log = {
-          'HeadNode' => 'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.',
-          'ComputeFleet' => 'Please check the cloud-init-output.log in CloudWatch logs.',
-        }
-        message_logs_to_check = node_type_to_log[node['cluster']['node_type']]
+        message_logs_to_check = \
+          'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.'
         message_troubleshooting_link = 'Please refer to'\
           ' https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs'\
           ' for more details on ParallelCluster logs.'

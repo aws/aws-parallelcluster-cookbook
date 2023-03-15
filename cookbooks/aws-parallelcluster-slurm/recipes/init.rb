@@ -15,7 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-slurm::enable_chef_error_handler"
 
 # Ensure slurm plugin directory is in place
 # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
