@@ -11,11 +11,17 @@
 # KITCHEN_KEY_NAME:           KeyPair to use with EC2 instances
 #                             default kitchen
 #
-# KITCHEN_SUBNET_ID:          subnet-0c8a5dd6c753bec3f
+# KITCHEN_SUBNET_ID:          subnet to put EC2 instance into
 #                             if not set will use Subnet tagged with Kitchen=true
 #
-# KITCHEN_SECURITY_GROUP_ID:  sg-0ceecc41dfe5499a8
+# KITCHEN_SECURITY_GROUP_ID:  security group to associate to the instance
 #                             if not set will use SG tagged with Kitchen=true
+#
+# KITCHEN_IAM_PROFILE:        IAM instance profile
+#                             if not set no profile will be attached
+#
+# KITCHEN_USER_DATA_SCRIPT:   user-data script to launch on the instance
+#                             if not set no user-data script will be launched
 #
 # KITCHEN_SSH_KEY_PATH:       path to private key
 #                             default ~/.ssh/${key-name}-${region}.pem
@@ -63,7 +69,7 @@ then
   source "${THIS_DIR}/.kitchen.env.sh"
 fi
 
-if [ "$1" != "list" ]; then
+if [ "$1" == "create" ] || [ "$1" == "converge" ] || [ "$1" == "verify" ] || [ "$1" == "destroy" ] || [ "$1" == "test" ]; then
   : "${KITCHEN_AWS_REGION:=${AWS_DEFAULT_REGION:-eu-west-1}}"
   : "${KITCHEN_KEY_NAME:=kitchen}"
   : "${KITCHEN_SSH_KEY_PATH:="~/.ssh/${KITCHEN_KEY_NAME}-${KITCHEN_AWS_REGION}.pem"}"
@@ -130,6 +136,7 @@ if [ "$1" != "list" ]; then
   echo "** KITCHEN_SUBNET_ID: ${KITCHEN_SUBNET_ID}"
   echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
   echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"
+  echo "** KITCHEN_IAM_PROFILE: ${KITCHEN_IAM_PROFILE}"
 fi
 
 echo "export KITCHEN_LOCAL_YAML=$KITCHEN_LOCAL_YAML"
