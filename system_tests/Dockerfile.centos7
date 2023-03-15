@@ -38,6 +38,9 @@ RUN yum install -y vim ksh tcsh zsh libssl-dev net-tools \
 COPY system_tests/install_cinc.sh /build/install_cinc.sh
 RUN /build/install_cinc.sh
 
+# mock fetch_config that is virtualized
+COPY system_tests/cluster-config.yaml /opt/parallelcluster/shared/cluster-config.yaml
+
 # customization for build for docker environment
 COPY . /tmp/cookbooks
 

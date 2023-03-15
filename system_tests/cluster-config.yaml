@@ -1,0 +1,21 @@
+# this configuration can't currently contain any custom action in a system test env
+HeadNode:
+  Iam:
+    InstanceRole: arn:aws:iam::1234567:role/role_iam
+    S3Access:
+      - BucketName: amibucket11223
+      - BucketName: test
+        EnableWriteAccess: true
+        KeyName: hello/*
+  InstanceType: c5.xlarge
+Image:
+  CustomAmi: ami-12345
+  Os: alinux2
+Region: us-west-1
+Scheduling:
+  Scheduler: slurm
+Tags:
+  - Key: key
+    Value: value
+  - Key: key2
+    Value: value2
