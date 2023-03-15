@@ -34,7 +34,6 @@ module WriteChefError
       # cli/src/pcluster/resources/compute_node/user_data.sh, in order to allow CW agent enough time
       # to detect this new error log file, create the logstream and push the content to the logstream
       sleep(5)
-
     end
 
     def get_failure_detail(action_record)

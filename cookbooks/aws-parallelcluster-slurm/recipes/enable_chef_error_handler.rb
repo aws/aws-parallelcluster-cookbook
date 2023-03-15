@@ -21,4 +21,3 @@ if node["cluster"]["node_type"] == "ComputeFleet"
     action :enable
   end
 end
-
