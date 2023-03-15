@@ -73,7 +73,7 @@ platforms:
     attributes:
       cluster:
         cluster_user: ec2-user
-  - name: redhat8
+  - name: rhel8
     driver_plugin: ec2
     driver:
       <% if ENV['KITCHEN_REDHAT8_AMI'] %>
