@@ -69,12 +69,12 @@ then
   source "${THIS_DIR}/.kitchen.env.sh"
 fi
 
-if [ "$1" == "create" ] || [ "$1" == "converge" ] || [ "$1" == "verify" ] || [ "$1" == "destroy" ] || [ "$1" == "test" ]; then
-  : "${KITCHEN_AWS_REGION:=${AWS_DEFAULT_REGION:-eu-west-1}}"
-  : "${KITCHEN_KEY_NAME:=kitchen}"
-  : "${KITCHEN_SSH_KEY_PATH:="~/.ssh/${KITCHEN_KEY_NAME}-${KITCHEN_AWS_REGION}.pem"}"
-  : "${KITCHEN_AVAILABILITY_ZONE:=a}"
+: "${KITCHEN_AWS_REGION:=${AWS_DEFAULT_REGION:-eu-west-1}}"
+: "${KITCHEN_KEY_NAME:=kitchen}"
+: "${KITCHEN_SSH_KEY_PATH:="~/.ssh/${KITCHEN_KEY_NAME}-${KITCHEN_AWS_REGION}.pem"}"
+: "${KITCHEN_AVAILABILITY_ZONE:=a}"
 
+if [ "$1" == "create" ] || [ "$1" == "converge" ] || [ "$1" == "verify" ] || [ "$1" == "destroy" ] || [ "$1" == "test" ]; then
   # Subnet
   if [ -z "${KITCHEN_SUBNET_ID}" ]; then
     echo "** KITCHEN_SUBNET_ID not explicitly set: looking for subnet tagged Kitchen=true"
@@ -120,28 +120,27 @@ if [ "$1" == "create" ] || [ "$1" == "converge" ] || [ "$1" == "verify" ] || [ "
     echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"
 
   fi
-
-  export KITCHEN_AWS_REGION
-  export KITCHEN_KEY_NAME
-  export KITCHEN_SSH_KEY_PATH
-  export KITCHEN_AVAILABILITY_ZONE
-  export KITCHEN_SUBNET_ID
-  export KITCHEN_VPC_ID
-  export KITCHEN_SECURITY_GROUP_ID
-
-  echo "** KITCHEN_AWS_REGION: ${KITCHEN_AWS_REGION}"
-  echo "** KITCHEN_KEY_NAME: ${KITCHEN_KEY_NAME}"
-  echo "** KITCHEN_SSH_KEY_PATH: ${KITCHEN_SSH_KEY_PATH}"
-  echo "** KITCHEN_AVAILABILITY_ZONE: ${KITCHEN_AVAILABILITY_ZONE}"
-  echo "** KITCHEN_SUBNET_ID: ${KITCHEN_SUBNET_ID}"
-  echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
-  echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"
-  echo "** KITCHEN_IAM_PROFILE: ${KITCHEN_IAM_PROFILE}"
 fi
 
-echo "export KITCHEN_LOCAL_YAML=$KITCHEN_LOCAL_YAML"
-echo "export KITCHEN_YAML=$KITCHEN_YAML"
-echo "export KITCHEN_GLOBAL_YAML=$KITCHEN_GLOBAL_YAML"
+export KITCHEN_AWS_REGION
+export KITCHEN_KEY_NAME
+export KITCHEN_SSH_KEY_PATH
+export KITCHEN_AVAILABILITY_ZONE
+export KITCHEN_SUBNET_ID
+export KITCHEN_VPC_ID
+export KITCHEN_SECURITY_GROUP_ID
+
+echo "** KITCHEN_AWS_REGION: ${KITCHEN_AWS_REGION}"
+echo "** KITCHEN_KEY_NAME: ${KITCHEN_KEY_NAME}"
+echo "** KITCHEN_SSH_KEY_PATH: ${KITCHEN_SSH_KEY_PATH}"
+echo "** KITCHEN_AVAILABILITY_ZONE: ${KITCHEN_AVAILABILITY_ZONE}"
+echo "** KITCHEN_SUBNET_ID: ${KITCHEN_SUBNET_ID}"
+echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
+echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"
+echo "** KITCHEN_IAM_PROFILE: ${KITCHEN_IAM_PROFILE}"
+echo "** KITCHEN_LOCAL_YAML: $KITCHEN_LOCAL_YAML"
+echo "** KITCHEN_YAML: $KITCHEN_YAML"
+echo "** KITCHEN_GLOBAL_YAML: $KITCHEN_GLOBAL_YAML"
 echo "kitchen $*"
 
 kitchen "$@"
