@@ -7,12 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os:
+        os: &os-list
           - alinux2
           - centos7
           - ubuntu18
           - ubuntu20
-          - redhat8
+          - rhel8
         suite:
           - setup-envars
       fail-fast: false
@@ -36,12 +36,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os:
-          - alinux2
-          - centos7
-          - ubuntu18
-          - ubuntu20
-          - redhat8
+        os: *os-list
         suite:
           - package-repos
           - lustre-installation
@@ -66,12 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os:
-          - alinux2
-          - centos7
-          - ubuntu18
-          - ubuntu20
-          - redhat8
+        os: *os-list
         suite:
           - sudo
           - users
@@ -123,7 +113,7 @@ jobs:
           - centos7
           - ubuntu18
           - ubuntu20
-          - redhat8
+          - rhel8
         suite:
           - fs-update
           - fs-update-default-values
@@ -155,12 +145,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os:
-          - alinux2
-          - centos7
-          - ubuntu18
-          - ubuntu20
-          - redhat8
+        os: *os-list
         suite:
           - install-packages
           - c-states
@@ -193,12 +178,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        os:
-          - alinux2
-          - centos7
-          - ubuntu18
-          - ubuntu20
-          - redhat8
+        os: *os-list
         suite:
           - sticky-bits
           - efa-configure-compute

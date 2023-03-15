@@ -16,7 +16,7 @@ jobs:
           - centos7
           - ubuntu18
           - ubuntu20
-          - redhat8
+          - rhel8
         suite:
           - aws-parallelcluster-install
       fail-fast: false

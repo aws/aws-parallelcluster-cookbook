@@ -52,7 +52,7 @@ platforms:
       cluster:
         base_os: ubuntu2004
         kernel_release: '5.15.0-1028-aws'
-  - name: redhat8
+  - name: rhel8
     driver:
       image: registry.access.redhat.com/ubi8/ubi
       intermediate_instructions:
