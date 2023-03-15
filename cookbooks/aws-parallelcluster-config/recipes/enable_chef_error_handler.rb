@@ -15,7 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-chef_handler 'WriteChefError::WriteChefError' do
-  type exception: true
-  action :enable
+if node["cluster"]["node_type"] == "HeadNode"
+  chef_handler 'WriteChefError::WriteChefError' do
+    type exception: true
+    action :enable
+  end
 end
+
+include_recipe "aws-parallelcluster-slurm::enable_chef_error_handler" if node["cluster"]["scheduler"] == "slurm"
