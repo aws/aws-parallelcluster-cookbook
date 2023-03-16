@@ -217,7 +217,7 @@ end
 ###################
 # EFA - Intel MPI
 ###################
-if node['conditions']['intel_mpi_supported']
+if node['conditions']['intel_mpi_supported'] && !redhat8?
   if node['cluster']['os'] == 'ubuntu1804'
     case node['cluster']['node_type']
     when 'HeadNode'
@@ -235,7 +235,7 @@ if node['conditions']['intel_mpi_supported']
 
   # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
-  if node['cluster']['node_type'] == 'HeadNode'
+  if node['cluster']['node_type'] == 'HeadNode' && !redhat8?
     bash 'check intel mpi version' do
       cwd Chef::Config[:file_cache_path]
       code <<-INTELMPI

@@ -21,11 +21,12 @@ driver:
     http_tokens: 'required'
     http_put_response_hop_limit: 1
     instance_metadata_tags: 'enabled'
-  #iam_profile_name: chef-client
+  iam_profile_name: <%= ENV['KITCHEN_IAM_PROFILE'] %>
   instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
   associate_public_ip: true
-  interface: public
+  user_data: <%= ENV['KITCHEN_USER_DATA_SCRIPT'] %>
   tags:
+    created-by: test-kitchen
     Name: test-kitchen-parallelcluster
 
 transport:
@@ -54,12 +55,25 @@ platforms:
       image_id: <%= ENV['KITCHEN_ALINUX2_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-amzn2-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>amzn2-ami-kernel-5.10-hvm*<% else %><%= pcluster_prefix %>-amzn2-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
       <% end %>
     transport:
       username: ec2-user
-  - name: redhat8
+    attributes:
+      cluster:
+        cluster_user: ec2-user
+  - name: rhel8
     driver_plugin: ec2
     driver:
       <% if ENV['KITCHEN_REDHAT8_AMI'] %>
@@ -67,11 +81,24 @@ platforms:
       image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
       <% else %>
       image_search:
-        name: "RHEL-8.7.*_HVM*"
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
+    block_device_mappings:
+      - device_name: /dev/sda1
+        ebs:
+          volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+          volume_type: gp2
+          delete_on_termination: true
+    <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+      - device_name: /dev/xvdb<%= c %>
+        virtual_name: ephemeral<%= i %>
+    <% end %>
     transport:
       username: ec2-user
+    attributes:
+      cluster:
+        cluster_user: ec2-user
   - name: centos7
     driver_plugin: ec2
     driver:
@@ -80,11 +107,24 @@ platforms:
       image_id: <%= ENV['KITCHEN_CENTOS7_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-centos7-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>CentOS-7*<% else %><%= pcluster_prefix %>-centos7-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
       <% end %>
     transport:
       username: centos
+    attributes:
+      cluster:
+        cluster_user: centos
   - name: ubuntu1804
     driver_plugin: ec2
     driver:
@@ -93,11 +133,24 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU18_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-20221207<% else %><%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
       <% end %>
     transport:
       username: ubuntu
+    attributes:
+      cluster:
+        cluster_user: ubuntu
   - name: ubuntu2004
     driver_plugin: ec2
     driver:
@@ -106,8 +159,21 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
       <% else %>
       image_search:
-        name: <%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230112<% else %><%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
       <% end %>
     transport:
       username: ubuntu
+    attributes:
+      cluster:
+        cluster_user: ubuntu
