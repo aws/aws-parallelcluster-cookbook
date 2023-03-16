@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-config
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -18,7 +18,7 @@ require 'chef/handler'
 
 module WriteChefError
   # this class is used to handle chef errors and write the errors into a certain file if the file does not exist yet
-  class WriteChefError < Chef::Handler
+  class WriteHeadNodeChefError < Chef::Handler
     def report
       extend Chef::Mixin::ShellOut
       error_file = node['cluster']['bootstrap_error_path']

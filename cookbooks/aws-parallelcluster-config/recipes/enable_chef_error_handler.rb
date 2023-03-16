@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-config
 # Recipe:: enable_chef_error_handler
 #
 # Copyright:: 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -16,7 +16,7 @@
 # limitations under the License.
 
 if node["cluster"]["node_type"] == "HeadNode"
-  chef_handler 'WriteChefError::WriteChefError' do
+  chef_handler 'WriteChefError::WriteHeadNodeChefError' do
     type exception: true
     action :enable
   end
