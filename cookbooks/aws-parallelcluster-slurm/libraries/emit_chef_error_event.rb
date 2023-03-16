@@ -16,7 +16,7 @@
 
 module WriteChefError
   # this class is used to handle chef errors and write the errors into a certain file for slurm scheduler
-  class SlurmChefHandler < Chef::Handler
+  class WriteComputeFleetSlurmChefError < Chef::Handler
     def report
       require 'date'
       error_file = node["cluster"]["bootstrap_error_path"]

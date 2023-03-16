@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-slurm
 # Recipe:: enable_chef_error_handler
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -16,7 +16,7 @@
 # limitations under the License.
 
 if node["cluster"]["node_type"] == "ComputeFleet"
-  chef_handler 'WriteChefError::SlurmChefHandler' do
+  chef_handler 'WriteChefError::WriteComputeFleetSlurmChefError' do
     type exception: true
     action :enable
   end
