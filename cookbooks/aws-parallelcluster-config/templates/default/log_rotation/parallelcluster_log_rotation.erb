@@ -23,6 +23,16 @@
   endscript
   create 0644 root root
 }
+<%# bootstrap error log %>
+  /var/log/parallelcluster/bootstrap_error_msg {
+  rotate 1
+  size 10M
+  missingok
+  notifempty
+  copytruncate
+  su root root
+  nodateext
+}
 <% case node['cluster']['node_type'] -%>
 <% when 'HeadNode' -%>
 <%# cfn-init log %>
@@ -161,6 +171,26 @@
 }
 <%# compute_console_output log %>
 /var/log/parallelcluster/compute_console_output.log {
+  rotate 1
+  size 10M
+  missingok
+  notifempty
+  copytruncate
+  su pcluster-admin pcluster-admin
+  nodateext
+}
+<%# clustermgtd events log %>
+/var/log/parallelcluster/clustermgtd.events {
+  rotate 1
+  size 10M
+  missingok
+  notifempty
+  copytruncate
+  su pcluster-admin pcluster-admin
+  nodateext
+}
+<%# slurm resume events log %>
+/var/log/parallelcluster/slurm_resume.events {
   rotate 1
   size 10M
   missingok
