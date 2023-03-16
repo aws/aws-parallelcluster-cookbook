@@ -124,6 +124,7 @@ platforms:
       username: centos
     attributes:
       cluster:
+        base_os: centos7
         cluster_user: centos
   - name: ubuntu1804
     driver_plugin: ec2
@@ -150,6 +151,7 @@ platforms:
       username: ubuntu
     attributes:
       cluster:
+        base_os: ubuntu1804
         cluster_user: ubuntu
   - name: ubuntu2004
     driver_plugin: ec2
@@ -176,4 +178,5 @@ platforms:
       username: ubuntu
     attributes:
       cluster:
+        base_os: ubuntu2004
         cluster_user: ubuntu
