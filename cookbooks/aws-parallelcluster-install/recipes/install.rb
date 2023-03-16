@@ -20,7 +20,7 @@ validate_os_type
 
 return if node['conditions']['ami_bootstrapped']
 
-node_attributes 'Generate export in json at /etc/chef/node_attributes.json'
+include_recipe "aws-parallelcluster-common::node_attributes"
 
 # == PLATFORM - BASE
 include_recipe 'aws-parallelcluster-install::base'
