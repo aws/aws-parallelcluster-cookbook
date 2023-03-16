@@ -51,9 +51,16 @@ action_class do # rubocop:disable Metrics/BlockLength
   end
 
   def fetch_cluster_config(config_path)
-    # Copy cluster config file from S3 URI
-    version_id = node['cluster']['cluster_config_version'] unless node['cluster']['cluster_config_version'].nil?
-    fetch_s3_object("copy_cluster_config_from_s3", node['cluster']['cluster_config_s3_key'], config_path, version_id)
+    if kitchen_test? && !node['interact_with_s3']
+      remote_file "copy fake cluster config" do
+        path node['cluster']['cluster_config_path']
+        source "file://#{kitchen_cluster_config_path}"
+      end
+    else
+      # Copy cluster config file from S3 URI
+      version_id = node['cluster']['cluster_config_version'] unless node['cluster']['cluster_config_version'].nil?
+      fetch_s3_object("copy_cluster_config_from_s3", node['cluster']['cluster_config_s3_key'], config_path, version_id)
+    end
   end
 
   def fetch_change_set
@@ -62,7 +69,14 @@ action_class do # rubocop:disable Metrics/BlockLength
   end
 
   def fetch_instance_type_data
-    # Copy instance type infos file from S3 URI
-    fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'])
+    if kitchen_test? && !node['interact_with_s3']
+      remote_file "copy fake instance type data" do
+        path node['cluster']['instance_types_data_path']
+        source "file://#{kitchen_instance_types_data_path}"
+      end
+    else
+      # Copy instance type infos file from S3 URI
+      fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'])
+    end
   end
 end

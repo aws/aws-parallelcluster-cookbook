@@ -44,7 +44,7 @@ template "/etc/parallelcluster/clusterstatusmgtd.conf" do
   mode '0644'
 end
 
-unless virtualized?
+unless virtualized? || kitchen_test? && !node['interact_with_ddb']
   execute 'initialize compute fleet status in DynamoDB' do
     # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
