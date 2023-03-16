@@ -1,111 +1,36 @@
 #!/bin/bash
+# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the
+# License. A copy of the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
 
 set -euo pipefail
 
-cfnconfig_file="/etc/parallelcluster/cfnconfig"
-. ${cfnconfig_file}
+# Disclaimer: this env setup is for *internal use only*, custom actions scripts SHOULD NOT rely on it
 
-# Check expected variables from cfnconfig file
-function check_params () {
-  if [ -z "${cfn_region}" ] || \
-     [ -z "${cfn_preinstall}" ] || [ -z "${cfn_preinstall_args}" ] || \
-     [ -z "${cfn_postinstall}" ] || [ -z "${cfn_postinstall_args}" ] || \
-     [ -z "${cfn_postupdate}" ] || [ -z "${cfn_postupdate_args}" ]
-  then
-    error_exit "One or more required variables from ${cfnconfig_file} file are undefined"
-  fi
-}
+# please note that this env setup has potential independent but relevant duplication with:
+# build_env in cookbooks/aws-parallelcluster-scheduler-plugin/resources/execute_event_handler.rb
+PCLUSTER_COOKBOOK_VIRTUALENV_PATH="<%= node['cluster']['cookbook_virtualenv_path'] %>"
+PCLUSTER_SCRIPTS_DIR="<%= node['cluster']['scripts_dir'] %>"
+PCLUSTER_CONFIG_PATH="<%= node['cluster']['cluster_config_path'] %>"
+PCLUSTER_NODE_TYPE="<%= node['cluster']['node_type'] %>"
+PCLUSTER_SCHEDULER_QUEUE_NAME="<%= node['cluster']['scheduler_queue_name'] %>"
+PCLUSTER_STACK_NAME="<%= node['cluster']['stack_name'] %>"
+PCLUSTER_REGION="<%= node['cluster']['region'] %>"
 
-# Error exit function
-function error_exit () {
-  script=`basename $0`
-  echo "parallelcluster: ${script} - $1"
-  logger -t parallelcluster "${script} - $1"
-  case $custom_script in
-    OnNodeStart|OnNodeConfigured)
-      if [ -z "$2" ]; then
-        echo "$1 Please check /var/log/cfn-init.log in the head node, or check the cfn-init.log in CloudWatch logs. Please refer to https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs for more details on ParallelCluster logs." > /var/log/parallelcluster/bootstrap_error_msg
-      else
-        echo "$2 Please check /var/log/cfn-init.log in the head node, or check the cfn-init.log in CloudWatch logs. Please refer to https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs for more details on ParallelCluster logs." > /var/log/parallelcluster/bootstrap_error_msg
-      fi
-      ;;
-  esac
-  exit 1
-}
 
-function download_run (){
-  url=$1
-  shift
-  scheme=$(echo "${url}"| cut -d: -f1)
-  tmpfile=$(mktemp)
-  trap "/bin/rm -f $tmpfile" RETURN
-  if [ "${scheme}" == "s3" ]; then
-    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/aws --region ${cfn_region} s3 cp ${url} - > $tmpfile || error_exit "Failed to download ${custom_script} script ${url} using aws s3, return code: $?." "Failed to download ${custom_script} script using aws s3, return code: $?."
-  else
-    wget -qO- ${url} > $tmpfile || error_exit "Failed to download ${custom_script} script ${url} using wget, return code: $?." "Failed to download ${custom_script} script using wget, return code: $?."
-  fi
-  chmod +x $tmpfile || error_exit "Failed to run ${custom_script} script due to a failure in making the file executable, return code: $?."
-  $tmpfile "$@" || error_exit "Failed to execute ${custom_script} script ${url}, return code: $?." "Failed to execute ${custom_script} script, return code: $?."
-}
-
-function get_stack_status () {
-  region=$(sed -n 's/cfn_region=//p' /etc/parallelcluster/cfnconfig | xargs) || return 1
-  stack_name=$(sed -n 's/stack_name=//p' /etc/parallelcluster/cfnconfig | xargs) || return 1
-  stack_status=$(aws cloudformation describe-stacks --region "${region}" --stack-name "${stack_name}" --query Stacks[0].StackStatus | xargs) || return 1
-  echo ${stack_status}
-}
-
-function run_preinstall () {
-  custom_script="OnNodeStart"
-  if [ "${cfn_preinstall}" != "NONE" ]; then
-    if [ "${cfn_preinstall_args}" != "NONE" ]; then
-      download_run "${cfn_preinstall}" "${cfn_preinstall_args[@]}"
-    else
-      download_run "${cfn_preinstall}"
-    fi
-  fi || error_exit "Failed to run ${custom_script} script."
-}
-
-function run_postinstall () {
-  custom_script="OnNodeConfigured"
-  if [ "${cfn_postinstall}" != "NONE" ]; then
-    if [ "${cfn_postinstall_args}" != "NONE" ]; then
-      download_run "${cfn_postinstall}" "${cfn_postinstall_args[@]}"
-    else
-      download_run "${cfn_postinstall}"
-    fi
-  fi || error_exit "Failed to run ${custom_script} script."
-}
-
-function run_postupdate () {
-  custom_script="OnNodeUpdated"
-  if [ "${cfn_postupdate}" != "NONE" ]; then
-    stack_status=$(get_stack_status) || error_exit "Failed to get the stack status, check the HeadNode instance profile's IAM policies"
-
-    if [ "${stack_status}" != "UPDATE_IN_PROGRESS" ]; then
-      echo "Post update hook called with CFN stack in state ${stack_status}, doing nothing"
-    elif [ "${cfn_postupdate_args}" != "NONE" ]; then
-      download_run "${cfn_postupdate}" "${cfn_postupdate_args[@]}"
-    else
-      download_run "${cfn_postupdate}"
-    fi
-  fi || error_exit "Failed to run post update hook"
-}
-
-custom_script=""
-check_params
-ACTION=${1#?}
-case ${ACTION} in
-  preinstall)
-    run_preinstall
-    ;;
-  postinstall)
-    run_postinstall
-    ;;
-  postupdate)
-    run_postupdate
-    ;;
-  *)
-    echo "Unknown action. Exit gracefully"
-    exit 0
-esac
+"${PCLUSTER_COOKBOOK_VIRTUALENV_PATH}"/bin/python \
+  "${PCLUSTER_SCRIPTS_DIR}/custom_action_executor.py" \
+  --region "${PCLUSTER_REGION}" \
+  --stack-name "${PCLUSTER_STACK_NAME}" \
+  --node-type "${PCLUSTER_NODE_TYPE}" \
+  --queue-name "${PCLUSTER_SCHEDULER_QUEUE_NAME}" \
+  --cluster-configuration "${PCLUSTER_CONFIG_PATH}" \
+  "$@"
