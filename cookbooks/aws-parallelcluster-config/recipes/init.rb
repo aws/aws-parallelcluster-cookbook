@@ -23,13 +23,6 @@ raise "Init package #{node['init_package']} not supported." unless systemd?
 
 include_recipe "aws-parallelcluster-config::cfnconfig_mixed"
 
-template "/opt/parallelcluster/scripts/fetch_and_run" do
-  source 'init/fetch_and_run.erb'
-  owner "root"
-  group "root"
-  mode "0755"
-end
-
 include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
 
 fetch_config 'Fetch and load cluster configs'
@@ -39,6 +32,8 @@ include_recipe "aws-parallelcluster-config::cloudwatch_agent"
 
 # ParallelCluster log rotation configuration
 include_recipe "aws-parallelcluster-config::log_rotation"
+
+include_recipe "aws-parallelcluster-config::custom_actions_setup"
 
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualized?
