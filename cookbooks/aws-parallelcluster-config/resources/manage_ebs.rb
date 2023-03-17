@@ -31,7 +31,6 @@ action :mount do
 
   # Mount each volume
   dev_path = [] # device labels
-  dev_uuids = [] # device uuids
 
   vol_array.each_with_index do |volumeid, index|
     dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
@@ -67,7 +66,6 @@ action :mount do
           dev_path[index] = partition_dev
         end
         node.default['cluster']['volume_fs_type'] = fs_type
-        dev_uuids[index] = get_uuid(dev_path[index])
       end
       action :nothing
       subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
@@ -84,7 +82,7 @@ action :mount do
 
     # Add volume to /etc/fstab
     mount shared_dir_array[index] do
-      device(DelayedEvaluator.new { dev_uuids[index] })
+      device(DelayedEvaluator.new { get_uuid(dev_path[index]) })
       fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
       device_type :uuid
       options "_netdev"
@@ -96,7 +94,7 @@ action :mount do
     end
 
     mount shared_dir_array[index] do
-      device(DelayedEvaluator.new { dev_uuids[index] })
+      device(DelayedEvaluator.new { get_uuid(dev_path[index]) })
       fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
       device_type :uuid
       options "_netdev"
