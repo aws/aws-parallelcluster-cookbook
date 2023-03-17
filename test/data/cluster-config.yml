@@ -111,7 +111,7 @@ Scheduling:
       Instances:
       - InstanceType: c5.xlarge
       MaxCount: 150
-      MinCount: 2
+      MinCount: 0
       Name: cit
       Networking:
         PlacementGroup:
