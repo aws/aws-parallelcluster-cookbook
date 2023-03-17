@@ -9,6 +9,6 @@ class Instance < Inspec.resource(1)
   '
 
   def graphic?
-    !command("lspci | grep -i -o 'NVIDIA'").stdout.strip.empty?
+    !inspec.command("lspci | grep -i -o 'NVIDIA'").stdout.strip.empty?
   end
 end

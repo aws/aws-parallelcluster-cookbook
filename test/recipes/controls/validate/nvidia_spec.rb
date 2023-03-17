@@ -11,7 +11,7 @@
 
 control 'expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed' do
   only_if do
-    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) &&
+    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8'
       !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom"))
   end
 
@@ -44,7 +44,7 @@ end
 
 control 'gdrcopy_enabled_on_graphic_instances' do
   only_if do
-    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) &&
+    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8' &&
       !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom")) &&
       instance.graphic?
   end
@@ -64,7 +64,7 @@ end
 
 control 'gdrcopy_disabled_on_non_graphic_instances' do
   only_if do
-    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) &&
+    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8' &&
       !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom")) &&
       !instance.graphic?
   end
