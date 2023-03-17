@@ -12,7 +12,7 @@
 control 'expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed' do
   only_if do
     !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8'
-      !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom"))
+    !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom"))
   end
 
   expected_nvidia_driver_version = node['cluster']['nvidia']['driver_version']
