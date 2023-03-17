@@ -168,7 +168,9 @@ suites:
       - recipe[aws-parallelcluster-config::imds]
     verifier:
       controls:
-        - imds_configured
+        - allowed_users_can_access_imds
+        - not_allowed_users_can_not_access_imds
+        - iptables_correctly_configured
     attributes:
       dependencies:
         #- recipe:aws-parallelcluster-install::directories
