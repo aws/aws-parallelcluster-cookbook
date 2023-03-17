@@ -1,7 +1,7 @@
 # Validates config recipes
 ---
 _common_cluster_attributes: &_common_cluster_attributes
-  stack_name: <%= ENV['AWS_STACK_NAME'] %>
+  stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
   volume: <%= ENV['VOLUME'] || "''" %>
   region: <%= ENV['KITCHEN_AWS_REGION'] %>
   ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] || '/scratch' %>
@@ -76,6 +76,10 @@ suites:
         - computemgtd_runs_as_cluster_admin_user
         # OPENSSH
         - ssh_target_checker_contains_correct_vpc_cidr_list
+        # NVIDIA
+        - expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed
+        - gdrcopy_enabled_on_graphic_instances
+        - gdrcopy_disabled_on_non_graphic_instances
     attributes:
       cluster:
         << : *_head_node_cluster_attributes
