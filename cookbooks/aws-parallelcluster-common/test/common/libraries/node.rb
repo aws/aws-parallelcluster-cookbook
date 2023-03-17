@@ -12,7 +12,7 @@ class Node < Inspec.resource(1)
     Node properties
   '
   example "
-    node.node['cluster']['cluster_admin_user']
+    node['cluster']['cluster_admin_user']
   "
 
   def initialize
