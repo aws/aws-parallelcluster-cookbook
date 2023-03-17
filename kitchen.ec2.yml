@@ -72,6 +72,7 @@ platforms:
       username: ec2-user
     attributes:
       cluster:
+        base_os: alinux2
         cluster_user: ec2-user
   - name: rhel8
     driver_plugin: ec2
@@ -98,6 +99,7 @@ platforms:
       username: ec2-user
     attributes:
       cluster:
+        base_os: rhel8
         cluster_user: ec2-user
   - name: centos7
     driver_plugin: ec2
