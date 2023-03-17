@@ -30,7 +30,7 @@ control "paths_for_notable_users_contain_required_directories" do
   title "Path for notable users contain required directories"
 
   %W(root #{node['cluster']['cluster_admin_user']} #{node['cluster']['slurm']['user']}).each do |user|
-    path = command("sudo runuser -u #{user} -- echo source /etc/profile.d/path.sh; $PATH").stdout.strip().split(':')
+    path = command("sudo runuser -u #{user} -- source /etc/profile.d/path.sh; echo $PATH").stdout.strip().split(':')
 
     describe "Path #{path}", :sensitive do
       describe "for user #{user}" do
