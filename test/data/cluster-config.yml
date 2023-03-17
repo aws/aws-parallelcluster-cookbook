@@ -1,0 +1,224 @@
+AdditionalPackages: null
+AdditionalResources: null
+CustomS3Bucket: null
+DeploymentSettings: null
+DevSettings:
+  AmiSearchFilters:
+    Owner: self
+    Tags:
+    - Key: build:parallelcluster:cli_ref
+      Value: 62b28264975b1c030a37a39365a4a2496a110f9c
+    - Key: build:parallelcluster:cookbook_ref
+      Value: 949511d1b5689d7964619dfceafc8ea45a1c5b85
+    - Key: build:parallelcluster:node_ref
+      Value: 18cc9113b8ea8b2b185d3c5188e78e8a616a720c
+    - Key: parallelcluster:build_status
+      Value: available
+  AwsBatchCliPackage: https://github.com/aws/aws-parallelcluster/tarball/62b28264975b1c030a37a39365a4a2496a110f9c
+  ClusterTemplate: null
+  Cookbook: null
+  InstanceTypesData: '{"hpc5a.48xlarge": {"InstanceType": "hpc5a.48xlarge", "CurrentGeneration":
+    true, "FreeTierEligible": false, "SupportedUsageClasses": ["on-demand", "spot"],
+    "SupportedRootDeviceTypes": ["ebs"], "SupportedVirtualizationTypes": ["hvm"],
+    "BareMetal": true, "ProcessorInfo": {"SupportedArchitectures": ["x86_64"], "SustainedClockSpeedInGhz":
+    3.6}, "VCpuInfo": {"DefaultVCpus": 96, "DefaultCores": 96, "DefaultThreadsPerCore":
+    1}, "MemoryInfo": {"SizeInMiB": 196608}, "InstanceStorageSupported": false, "EbsInfo":
+    {"EbsOptimizedSupport": "default", "EncryptionSupport": "supported", "EbsOptimizedInfo":
+    {"BaselineBandwidthInMbps": 19000, "BaselineThroughputInMBps": 2375, "BaselineIops":
+    80000, "MaximumBandwidthInMbps": 19000, "MaximumThroughputInMBps": 2375, "MaximumIops":
+    80000}, "NvmeSupport": "unsupported"}, "NetworkInfo": {"NetworkPerformance": "25
+    Gigabit", "MaximumNetworkInterfaces": 15, "MaximumNetworkCards": 1, "DefaultNetworkCardIndex":
+    0, "NetworkCards": [{"NetworkCardIndex": 0, "NetworkPerformance": "25 Gigabit",
+    "MaximumNetworkInterfaces": 15}], "Ipv4AddressesPerInterface": 50, "Ipv6AddressesPerInterface":
+    50, "Ipv6Supported": true, "EnaSupport": "required", "EfaSupported": true}, "PlacementGroupInfo":
+    {"SupportedStrategies": ["cluster", "partition", "spread"]}, "HibernationSupported":
+    false, "BurstablePerformanceSupported": false, "DedicatedHostsSupported": false,
+    "AutoRecoverySupported": true}}'
+  NodePackage: null
+  Timeouts: null
+DirectoryService:
+  AdditionalSssdConfigs:
+    debug_level: '0x1ff'
+    ldap_auth_disable_tls_never_use_in_production: true
+  DomainAddr: ldap://192.168.97.191,ldap://192.168.67.176
+  DomainName: dc=microsoftad,dc=tktu9z82ms,dc=multiuser,dc=pcluster
+  DomainReadOnlyUser: CN=Admin,OU=Users,OU=NET,dc=microsoftad,dc=tktu9z82ms,dc=multiuser,dc=pcluster
+  GenerateSshKeysForUsers: false
+  LdapAccessFilter: null
+  LdapTlsCaCert: /opt/parallelcluster/shared/directory_service/certificate.crt
+  LdapTlsReqCert: never
+  PasswordSecretArn: arn:aws:secretsmanager:eu-west-1:447714826191:secret:integ-tests-secret-7sdy4zrosllo2g55-3-5-UMCQ1y
+HeadNode:
+  CustomActions: null
+  Dcv: null
+  DisableSimultaneousMultithreading: false
+  Iam:
+    AdditionalIamPolicies: []
+    InstanceProfile: null
+    InstanceRole: null
+    S3Access: null
+  Image: null
+  Imds:
+    Secured: true
+  InstanceType: c5.xlarge
+  LocalStorage:
+    EphemeralVolume: null
+    RootVolume:
+      DeleteOnTermination: true
+      Encrypted: true
+      Iops: 3000
+      Size: null
+      Throughput: 125
+      VolumeType: gp3
+  Networking:
+    AdditionalSecurityGroups: null
+    ElasticIp: null
+    Proxy: null
+    SecurityGroups: null
+    SubnetId: subnet-0b9ff5f2b4b2cdd7d
+  Ssh:
+    AllowedIps: 52.23.87.55/32
+    KeyName: cfncluster-jenkins-kitchen
+Iam: null
+Image:
+  CustomAmi: null
+  Os: centos7
+Imds:
+  ImdsSupport: v2.0
+Monitoring:
+  Dashboards:
+    CloudWatch:
+      Enabled: true
+  DetailedMonitoring: false
+  Logs:
+    CloudWatch:
+      DeletionPolicy: Retain
+      Enabled: true
+      RetentionInDays: 14
+Region: null
+Scheduling:
+  Scheduler: slurm
+  SlurmQueues:
+  - AllocationStrategy: lowest-price
+    CapacityReservationTarget: null
+    CapacityType: ONDEMAND
+    ComputeResources:
+    - CapacityReservationTarget: null
+      DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: false
+        GdrSupport: false
+      Instances:
+      - InstanceType: c5.xlarge
+      MaxCount: 150
+      MinCount: 2
+      Name: cit
+      Networking:
+        PlacementGroup:
+          Enabled: null
+          Id: null
+          Name: null
+      SchedulableMemory: null
+      SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: compute
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: null
+        Id: null
+        Name: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+      - subnet-0b2931f781f5b472e
+  SlurmSettings:
+    Database: null
+    Dns:
+      DisableManagedDns: false
+      HostedZoneId: null
+      UseEc2Hostnames: false
+    EnableMemoryBasedScheduling: false
+    QueueUpdateStrategy: COMPUTE_FLEET_STOP
+    ScaledownIdletime: 10
+SharedStorage:
+- FsxLustreSettings:
+    AutoImportPolicy: null
+    AutomaticBackupRetentionDays: null
+    BackupId: null
+    CopyTagsToBackups: null
+    DailyAutomaticBackupStartTime: null
+    DataCompressionType: null
+    DeletionPolicy: Delete
+    DeploymentType: SCRATCH_2
+    DriveCacheType: null
+    ExportPath: null
+    FileSystemId: null
+    ImportPath: null
+    ImportedFileChunkSize: null
+    KmsKeyId: null
+    PerUnitStorageThroughput: null
+    StorageCapacity: 2400
+    StorageType: null
+    WeeklyMaintenanceStartTime: null
+  MountDir: /shared
+  Name: fsx
+  StorageType: FsxLustre
+- EbsSettings:
+    DeletionPolicy: Delete
+    Encrypted: true
+    Iops: 3000
+    KmsKeyId: null
+    Raid: null
+    Size: 35
+    SnapshotId: null
+    Throughput: 125
+    VolumeId: null
+    VolumeType: gp3
+  MountDir: /ebs
+  Name: ebs
+  StorageType: Ebs
+- EfsSettings:
+    DeletionPolicy: Delete
+    Encrypted: false
+    EncryptionInTransit: false
+    FileSystemId: null
+    IamAuthorization: false
+    KmsKeyId: null
+    PerformanceMode: generalPurpose
+    ProvisionedThroughput: null
+    ThroughputMode: bursting
+  MountDir: /efs
+  Name: efs
+  StorageType: Efs
+- FsxOpenZfsSettings:
+    VolumeId: fsvol-07d03c5b85160c539
+  MountDir: /fsxopenzfs
+  Name: existingopenzfs
+  StorageType: FsxOpenZfs
+- FsxOntapSettings:
+    VolumeId: fsvol-082fa3427bda94724
+  MountDir: /fsxontap
+  Name: existingontap
+  StorageType: FsxOntap
+Tags:
+- Key: parallelcluster:cluster-name
+  Value: integ-tests-nn5bsd0ei1rrvm0j-3-5
+- Key: parallelcluster:version
+  Value: 3.5.1
