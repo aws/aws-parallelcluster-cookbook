@@ -66,6 +66,7 @@ end
 def setup_munge_head_node
   # Generate munge key
   bash 'generate_munge_key' do
+    not_if { ::File.exist?('/etc/munge/munge.key') }
     user node['cluster']['munge']['user']
     group node['cluster']['munge']['group']
     cwd '/tmp'
@@ -89,7 +90,7 @@ def share_munge_head_node
     group 'root'
     code <<-HEAD_SHARE_MUNGE_KEY
       set -e
-      mkdir /home/#{node['cluster']['cluster_user']}/.munge
+      mkdir -p /home/#{node['cluster']['cluster_user']}/.munge
       # Copy key to shared dir
       cp /etc/munge/munge.key /home/#{node['cluster']['cluster_user']}/.munge/.munge.key
     HEAD_SHARE_MUNGE_KEY
