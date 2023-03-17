@@ -86,6 +86,24 @@
       "feature_conditions": []
     },
     {
+      "timestamp_format_key": "json",
+      "file_path": "/var/log/parallelcluster/bootstrap_error_msg",
+      "log_stream_name": "bootstrap_error_msg",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
       "timestamp_format_key": "default",
       "file_path": "/var/log/cloud-init.log",
       "log_stream_name": "cloud-init",
