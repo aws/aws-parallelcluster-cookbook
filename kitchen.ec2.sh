@@ -93,11 +93,15 @@ if [ "$1" == "create" ] || [ "$1" == "converge" ] || [ "$1" == "verify" ] || [ "
   fi
 
   # VPC
-  KITCHEN_VPC_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
-      --subnet-ids "${KITCHEN_SUBNET_ID}" \
-      --query 'Subnets[0].VpcId' --output text)
+  if [ -z "${KITCHEN_VPC_ID}" ]; then
+    echo "** KITCHEN_VPC_ID not explicitly set: deriving from subnet"
 
-  echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
+    KITCHEN_VPC_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
+        --subnet-ids "${KITCHEN_SUBNET_ID}" \
+        --query 'Subnets[0].VpcId' --output text)
+
+    echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
+  fi
 
   # Security Group
   if [ -z "${KITCHEN_SECURITY_GROUP_ID}" ]; then
