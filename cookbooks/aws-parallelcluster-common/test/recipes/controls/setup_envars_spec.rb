@@ -9,7 +9,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'path_contains_required_directories' do
+# directories = %w(/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin /opt/aws/bin)
+directories = %w(/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin)
+
+control 't:config_system_path_contains_required_directories' do
   title 'System path contains required directories'
 
   describe file('/etc/profile.d/path.sh') do
@@ -19,12 +22,28 @@ control 'path_contains_required_directories' do
     its('group') { should eq 'root' }
   end
 
-  path = command('source /etc/profile.d/path.sh; echo ${PATH}').stdout.strip().split(':')
+  path = bash('. /etc/profile.d/path.sh; echo ${PATH}').stdout.strip().split(':')
   describe "System path #{path}" do
     subject { path }
-    it { should include '/usr/local/bin', '/usr/local/sbin' }
-    it { should include '/sbin', '/bin' }
-    it { should include '/usr/sbin', '/usr/bin' }
-    it { should include '/opt/aws/bin' }
+    directories.each do |dir|
+      it { should include dir }
+    end
+  end
+end
+
+control "t:config_paths_for_notable_users_contain_required_directories" do
+  title "Path for notable users contain required directories"
+
+  %W(root #{node['cluster']['cluster_admin_user']} #{node['cluster']['slurm']['user']}).each do |user|
+    path = bash("sudo runuser -u #{user} -- . /etc/profile.d/path.sh; echo $PATH").stdout.strip().split(':')
+
+    describe "Path #{path}", :sensitive do
+      describe "for user #{user}" do
+        subject { path }
+        directories.each do |dir|
+          it { should include dir }
+        end
+      end
+    end
   end
 end
