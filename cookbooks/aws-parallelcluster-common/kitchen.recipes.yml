@@ -17,4 +17,5 @@ suites:
       - recipe[aws-parallelcluster-common::setup_envars]
     verifier:
       controls:
-        - path_contains_required_directories
+        - /system_path_contains_required_directories/
+        - /paths_for_notable_users_contain_required_directories/
