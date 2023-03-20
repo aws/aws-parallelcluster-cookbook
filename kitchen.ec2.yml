@@ -59,7 +59,7 @@ platforms:
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
       block_device_mappings:
-        - device_name: /dev/sda1
+        - device_name: /dev/xvda
           ebs:
             volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
             volume_type: gp2
