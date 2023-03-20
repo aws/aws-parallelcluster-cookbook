@@ -1,5 +1,9 @@
 # Validates config recipes
 ---
+verifier:
+  controls:
+    - /t:config/
+
 _common_cluster_attributes: &_common_cluster_attributes
   stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
   volume: <%= ENV['VOLUME'] || "''" %>
@@ -51,35 +55,6 @@ provisioner:
 suites:
   - name: slurm_config_HeadNode
     run_list: *_run_list
-    verifier:
-      controls:
-        # ENVARS
-        - system_path_contains_required_directories
-        - paths_for_notable_users_contain_required_directories
-        # USERS
-        - admin_user_correctly_defined
-        - slurm_user_correctly_defined
-        - munge_user_correctly_defined
-        - dcv_external_authenticator_user_correctly_defined
-        # SUDOERS
-        - cluster_user_can_sudo
-        # PROCESSES
-        - supervisord_runs_as_root
-        # IMDS
-        - allowed_users_can_access_imds
-        - not_allowed_users_can_not_access_imds
-        - iptables_correctly_configured
-        # SLURM
-        - slurm_plugin_permissions_correctly_defined_on_head_node
-        - slurm_sudoers_correctly_defined
-        # not running - clustermgtd_runs_as_cluster_admin_user
-        - computemgtd_runs_as_cluster_admin_user
-        # OPENSSH
-        - ssh_target_checker_contains_correct_vpc_cidr_list
-        # NVIDIA
-        - expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed
-        - gdrcopy_enabled_on_graphic_instances
-        - gdrcopy_disabled_on_non_graphic_instances
     attributes:
       cluster:
         << : *_head_node_cluster_attributes
