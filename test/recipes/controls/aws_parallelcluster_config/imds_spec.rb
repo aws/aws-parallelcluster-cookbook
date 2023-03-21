@@ -9,29 +9,29 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'allowed_users_can_access_imds' do
-  title 'Check that IMDS has been configured correctly'
+control 'tag:config_only_allowed_users_can_access_imds' do
+  allowed_users =
+    if node['cluster']['node_type'] == 'HeadNode' &&
+       node['cluster']['scheduler'] != 'awsbatch' &&
+       node['cluster']['head_node_imds_secured'] == 'true'
+      node['cluster']['head_node_imds_allowed_users']
+    else
+      passwd.users
+    end
 
-  node['cluster']['head_node_imds_allowed_users'].each do |user|
-    describe "user ${user} is allowed to access imds" do
+  passwd.users.each do |user|
+    allowed = allowed_users.include?(user)
+    access_descr = allowed ? 'allowed' : 'denied'
+
+    describe "user #{user} is #{access_descr} to access imds" do
       subject { bash("sudo -u #{user} curl -H 'X-aws-ec2-metadata-token-ttl-seconds: 900' -X PUT 'http://169.254.169.254/latest/api/token'") }
-      its('exit_status') { should eq(0) }
+      its('exit_status') { should eq(allowed ? 0 : 7) }
     end
   end
 end
 
-control 'not_allowed_users_can_not_access_imds' do
-  allowed_users = node['cluster']['head_node_imds_allowed_users']
-  passwd.users.reject { |user| allowed_users.include?(user) }.each do |user|
-    describe "user ${user} is not allowed to access imds" do
-      subject { bash("sudo -u #{user} curl -H 'X-aws-ec2-metadata-token-ttl-seconds: 900' -X PUT 'http://169.254.169.254/latest/api/token'") }
-      its('exit_status') { should eq(7) }
-    end
-  end
-end
-
-control 'parallelcluster-iptables_correctly_configured' do
-  only_if { !os_properties.virtualized? }
+control 'tag:config_parallelcluster-iptables_correctly_configured' do
+  only_if { node['cluster']['scheduler'] != 'awsbatch' && !os_properties.virtualized? }
 
   describe service('parallelcluster-iptables') do
     it { should be_installed }
