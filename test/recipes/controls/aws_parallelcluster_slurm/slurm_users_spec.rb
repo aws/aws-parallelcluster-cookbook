@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 't:config_slurm_plugin_permissions_correctly_defined_on_head_node' do
+control 'tag:config_slurm_plugin_permissions_correctly_defined_on_head_node' do
   only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' }
 
   describe file("#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin") do
@@ -20,7 +20,7 @@ control 't:config_slurm_plugin_permissions_correctly_defined_on_head_node' do
   end
 end
 
-control 't:config_slurm_user_and_group_correctly_defined' do
+control 'tag:config_slurm_user_and_group_correctly_defined' do
   only_if { node['cluster']['scheduler'] == 'slurm' }
 
   describe user(node['cluster']['slurm']['user']) do
@@ -36,7 +36,7 @@ control 't:config_slurm_user_and_group_correctly_defined' do
   end
 end
 
-control 't:config_munge_user_and_group_correctly_defined' do
+control 'tag:config_munge_user_and_group_correctly_defined' do
   only_if { node['cluster']['scheduler'] == 'slurm' }
 
   describe user(node['cluster']['munge']['user']) do
@@ -53,7 +53,7 @@ control 't:config_munge_user_and_group_correctly_defined' do
   end
 end
 
-control 't:config_slurm_sudoers_correctly_defined' do
+control 'tag:config_slurm_sudoers_correctly_defined' do
   only_if { node['cluster']['scheduler'] == 'slurm' }
 
   install_dir = node['cluster']['slurm']['install_dir']
