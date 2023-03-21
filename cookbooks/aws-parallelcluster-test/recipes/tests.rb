@@ -34,10 +34,6 @@ end
 ###################
 # SSH client conf
 ###################
-execute 'grep ssh_config' do
-  command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
-end
-
 # Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
 if node['cluster']['node_type'] == 'HeadNode'
   execute 'ssh localhost as user' do
