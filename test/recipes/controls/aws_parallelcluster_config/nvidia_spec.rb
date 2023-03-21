@@ -9,16 +9,15 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed' do
+control 'tag:config_expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed' do
   only_if do
-    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8'
-    !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom"))
+    !(os_properties.centos7? && os_properties.arm?) && !os_properties.redhat8? && !instance.custom_ami?
   end
 
   expected_nvidia_driver_version = node['cluster']['nvidia']['driver_version']
 
   describe "nvidia driver version is expected to be #{expected_nvidia_driver_version}" do
-    subject { command('modinfo -F version nvidia').stdout.strip() }
+    subject { command('modinfo -F version nvidia').stdout.strip }
     it { should eq expected_nvidia_driver_version }
   end
 
@@ -30,7 +29,7 @@ control 'expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed' do
   )
 
   describe "cuda version is expected to be #{expected_cuda_version}" do
-    subject { command(cmd).stdout.strip() }
+    subject { command(cmd).stdout.strip }
     it { should eq "release #{expected_cuda_version}" }
   end
 
@@ -42,11 +41,10 @@ control 'expected_versions_of_nvidia_driver_cuda_and_gdrcopy_installed' do
   end
 end
 
-control 'gdrcopy_enabled_on_graphic_instances' do
+control 'tag:config_gdrcopy_enabled_on_graphic_instances' do
   only_if do
-    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8' &&
-      !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom")) &&
-      instance.graphic?
+    !(os_properties.centos7? && os_properties.arm?) && !os_properties.redhat8? &&
+      !instance.custom_ami? && instance.graphic?
   end
 
   describe 'gdrcopy service should be enabled' do
@@ -62,11 +60,10 @@ control 'gdrcopy_enabled_on_graphic_instances' do
   end
 end
 
-control 'gdrcopy_disabled_on_non_graphic_instances' do
+control 'tag:config_gdrcopy_disabled_on_non_graphic_instances' do
   only_if do
-    !(node['cluster']['base_os'] == 'centos7' && arm_instance?) && node['cluster']['base_os'] != 'rhel8' &&
-      !(node['cluster']['os'] && node['cluster']['os'].end_with?("-custom")) &&
-      !instance.graphic?
+    !(os_properties.centos7? && os_properties.arm?) && !os_properties.redhat8? &&
+      !instance.custom_ami? && !instance.graphic?
   end
 
   describe 'gdrcopy service should be disabled' do
