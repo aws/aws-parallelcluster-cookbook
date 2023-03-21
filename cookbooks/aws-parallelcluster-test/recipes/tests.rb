@@ -159,41 +159,8 @@ end
 ###################
 # DCV
 ###################
-if node['cluster']['node_type'] == "HeadNode" &&
-   node['conditions']['dcv_supported'] &&
-   (node['cluster']['dcv']['installed'] == 'yes' || node['cluster']['dcv']['installed'] == true)
-  execute 'check dcv installed' do
-    command 'dcv version'
-    user node['cluster']['cluster_user']
-  end
-  execute 'check DCV external authenticator python version' do
-    command %(#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V | grep "Python #{node['cluster']['python-version']}")
-  end
-  execute 'check screensaver screen lock disabled' do
-    command 'gsettings get org.gnome.desktop.screensaver lock-enabled | grep false'
-  end
-  execute 'check non-screensaver screen lock disabled' do
-    command 'gsettings get org.gnome.desktop.lockdown disable-lock-screen | grep true'
-  end
-end
-
 if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "HeadNode"
-  execute 'check dcvserver service is enabled' do
-    command "systemctl is-enabled dcvserver"
-  end
-  execute 'check systemd default runlevel' do
-    command "systemctl get-default | grep -i graphical.target"
-  end
-  if graphic_instance? && dcv_gpu_accel_supported?
-    execute "Ensure local users can access X server (dcv-gl must be installed)" do
-      command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"?
-    end
-  end
-  if node['cluster']['os'] == "ubuntu1804" || node['cluster']['os'] == "alinux2"
-    execute 'check gdm service is running' do
-      command "systemctl show -p SubState gdm | grep -i running"
-    end
-  end
+  # moved to InSpec
 elsif node['conditions']['ami_bootstrapped']
   execute 'check systemd default runlevel' do
     command "systemctl get-default | grep -i multi-user.target"
