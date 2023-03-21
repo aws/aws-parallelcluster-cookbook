@@ -186,45 +186,6 @@ if platform?('centos')
 end
 
 ###################
-# NFS
-###################
-
-case node['cluster']['node_type']
-when 'ComputeFleet'
-  execute 'check for nfs client protocol' do
-    command "nfsstat -m | grep vers=4"
-    user node['cluster']['cluster_user']
-  end
-when 'HeadNode'
-  execute 'check for nfs server protocol' do
-    command "rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs"
-    user node['cluster']['cluster_user']
-  end
-end
-
-# Skip nfs thread test for ubuntu16 because nfs thread enhancement is omitted
-require 'bigdecimal/util'
-unless platform?('ubuntu') && node['platform_version'].to_d == 16.04.to_d
-  ruby_block 'check_nfs_threads' do
-    block do
-      nfs_threads = shell_out!("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'").stdout.strip.to_i
-      Chef::Log.debug("nfs threads configured on machine is #{nfs_threads}")
-      expected_threads = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
-      raise "Expected number of nfs threads configured to be #{expected_threads} but is actually #{nfs_threads}" if nfs_threads != expected_threads
-    end
-    action :nothing
-  end
-
-  # Execute thread check at the end of chef run
-  ruby_block 'delay thread check' do
-    block do
-      true
-    end
-    notifies :run, "ruby_block[check_nfs_threads]", :delayed
-  end
-end
-
-###################
 # ulimit
 ###################
 unless node['cluster']['os'].end_with?("-custom")
