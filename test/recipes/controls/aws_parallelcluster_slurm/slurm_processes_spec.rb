@@ -22,7 +22,7 @@ control 'tag:config_computemgtd_runs_as_cluster_admin_user' do
   only_if { instance.compute_node? && node['cluster']['scheduler'] == 'slurm' }
 
   describe processes('computemgtd') do
-    it { should be_running }
+    its('count') { should eq 1 }
     its('users') { should eq [ node['cluster']['cluster_admin_user'] ] }
   end
 end
