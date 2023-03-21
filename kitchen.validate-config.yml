@@ -2,7 +2,7 @@
 ---
 verifier:
   controls:
-    - /t:config/
+    - /tag:config/
 
 _common_cluster_attributes: &_common_cluster_attributes
   stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
