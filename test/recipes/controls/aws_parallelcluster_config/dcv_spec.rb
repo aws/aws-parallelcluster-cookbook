@@ -24,3 +24,15 @@ control 'tag:config_dcv_external_authenticator_user_and_group_correctly_defined'
     its('gid') { should eq node['cluster']['dcv']['authenticator']['group_id'] }
   end
 end
+
+control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
+  only_if do
+    instance.head_node? && node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" &&
+      instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+  end
+
+  describe package('nice-dcv-gl') do
+    it { should be_installed }
+    its('version') { should eq node['cluster']['dcv']['gl']['version'] }
+  end
+end
