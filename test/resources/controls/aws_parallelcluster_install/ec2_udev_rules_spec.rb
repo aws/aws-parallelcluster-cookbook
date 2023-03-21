@@ -29,7 +29,7 @@ control 'write_common_udev_configuration_files' do
   end
 end
 
-control 'ec2blkdev_service_installation' do
+control 'tag:config_ec2blkdev_service_installation' do
   title "Installation of the ec2blkdev service"
 
   only_if { !os_properties.virtualized? }
