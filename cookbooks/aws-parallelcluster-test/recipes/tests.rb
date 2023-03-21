@@ -44,60 +44,6 @@ if node['cluster']['node_type'] == 'HeadNode'
 end
 
 ###################
-# Slurm
-###################
-if node['cluster']['scheduler'] == 'slurm'
-  execute 'check munge service is enabled' do
-    command "systemctl is-enabled munge"
-  end
-  case node['cluster']['node_type']
-  when 'HeadNode'
-    execute 'execute sinfo' do
-      command "sinfo --help"
-      environment('PATH' => "#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH")
-      user node['cluster']['cluster_user']
-    end
-
-    execute 'execute scontrol' do
-      command "scontrol --help"
-      environment('PATH' => "#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH")
-      user node['cluster']['cluster_user']
-    end
-
-    execute 'check-slurm-accounting-mysql-plugins' do
-      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep accounting_storage_mysql"
-    end
-
-    execute 'check-slurm-jobcomp-mysql-plugins' do
-      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep jobcomp_mysql"
-    end
-
-    execute 'check-slurm-pmix-plugins' do
-      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep pmix"
-    end
-    execute 'ensure-pmix-shared-library-can-be-found' do
-      command '/opt/pmix/bin/pmix_info'
-    end
-    execute 'check slurmctld service is enabled' do
-      command "systemctl is-enabled slurmctld"
-    end
-  when 'ComputeFleet'
-    execute 'ls slurm root' do
-      command "ls #{node['cluster']['slurm']['install_dir']}"
-      user node['cluster']['cluster_user']
-    end
-    execute 'check cgroup memory resource controller is enabled' do
-      # We expect a 1 in the fourth field of the cgroups table, which is formatted as follows:
-      # subsys_name  hierarchy  num_cgroups  enabled
-      # ...
-      # memory       <int>      <int>        1
-      command "test $(grep memory /proc/cgroups | awk '{print $4}') = 1"
-    end
-  else
-    raise "node_type must be HeadNode or ComputeFleet"
-  end
-end
-###################
 # Scheduler Plugin
 ###################
 if node['cluster']['scheduler'] == 'plugin'
