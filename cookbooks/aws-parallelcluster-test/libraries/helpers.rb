@@ -201,17 +201,6 @@ def check_run_level_script(script_name, levels_on, levels_off)
   end
 end
 
-def check_sudo_command(command, user = nil)
-  bash "check sudo command from user #{user}: #{command}" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-TEST
-      set -e
-      sudo #{command}
-    TEST
-    user user
-  end
-end
-
 def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_cidr_list)
   bash "check #{ssh_target_checker_script} contains the correct vpc cidr list: #{expected_cidr_list}" do
     cwd Chef::Config[:file_cache_path]
