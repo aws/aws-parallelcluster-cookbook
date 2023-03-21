@@ -83,44 +83,6 @@ elsif node['conditions']['ami_bootstrapped']
 end
 
 ###################
-# EFA - Intel MPI
-###################
-if node['conditions']['intel_mpi_supported'] && !redhat8?
-  if node['cluster']['os'] == 'ubuntu1804'
-    case node['cluster']['node_type']
-    when 'HeadNode'
-      execute 'check ptrace protection enabled' do
-        command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 1'"
-        user node['cluster']['cluster_user']
-      end
-    when 'ComputeFleet'
-      execute 'check ptrace protection disabled' do
-        command "sysctl kernel.yama.ptrace_scope | grep 'kernel.yama.ptrace_scope = 0'"
-        user node['cluster']['cluster_user']
-      end
-    end
-  end
-
-  # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
-  # overrides intel binaries.
-  if node['cluster']['node_type'] == 'HeadNode'
-    bash 'check intel mpi version' do
-      cwd Chef::Config[:file_cache_path]
-      code <<-INTELMPI
-        set -e
-        # Initialize module
-        # Unset MODULEPATH to force search path reinitialization when loading profile
-        unset MODULEPATH
-        # Must execute this in a bash script because source is a bash built-in function
-        source /etc/profile.d/modules.sh
-        module load intelmpi && mpirun --help | grep '#{node['cluster']['intelmpi']['kitchen_test_string']}'
-      INTELMPI
-      user node['cluster']['cluster_user']
-    end
-  end
-end
-
-###################
 # jq
 ###################
 unless node['cluster']['os'].end_with?("-custom")
