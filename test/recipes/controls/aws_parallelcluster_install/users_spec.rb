@@ -20,7 +20,7 @@ control 'ulimit_configured' do
   end
 end
 
-control 't:config_admin_user_and_group_correctly_defined' do
+control 'tag:config_admin_user_and_group_correctly_defined' do
   describe user(node['cluster']['cluster_admin_user']) do
     it { should exist }
     its('uid') { should eq node['cluster']['cluster_admin_user_id'] }

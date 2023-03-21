@@ -12,7 +12,7 @@
 # directories = %w(/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin /opt/aws/bin)
 directories = %w(/usr/local/sbin /usr/local/bin /sbin /bin /usr/sbin /usr/bin)
 
-control 't:config_system_path_contains_required_directories' do
+control 'tag:config_system_path_contains_required_directories' do
   title 'System path contains required directories'
 
   describe file('/etc/profile.d/path.sh') do
@@ -31,7 +31,7 @@ control 't:config_system_path_contains_required_directories' do
   end
 end
 
-control "t:config_paths_for_notable_users_contain_required_directories" do
+control "tag:config_paths_for_notable_users_contain_required_directories" do
   title "Path for notable users contain required directories"
 
   %W(root #{node['cluster']['cluster_admin_user']} #{node['cluster']['slurm']['user']}).each do |user|
