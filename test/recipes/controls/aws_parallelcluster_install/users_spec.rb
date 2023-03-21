@@ -19,3 +19,17 @@ control 'ulimit_configured' do
     its('*') { should include ['-', 'nofile', "10000"] }
   end
 end
+
+control 't:config_admin_user_and_group_correctly_defined' do
+  describe user(node['cluster']['cluster_admin_user']) do
+    it { should exist }
+    its('uid') { should eq node['cluster']['cluster_admin_user_id'] }
+    its('gid') { should eq node['cluster']['cluster_admin_group_id'] }
+    # "AWS ParallelCluster Admin user"
+  end
+
+  describe group(node['cluster']['cluster_admin_group']) do
+    it { should exist }
+    its('gid') { should eq node['cluster']['cluster_admin_group_id'] }
+  end
+end
