@@ -27,8 +27,20 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'centos'
   end
 
+  def redhat8?
+    redhat? && inspec.os.release.to_i == 8
+  end
+
+  def centos7?
+    centos? && inspec.os.release.to_i == 7
+  end
+
   def alinux2?
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
+  end
+
+  def ubuntu1804?
+    inspec.os.name == 'ubuntu' && inspec.os.release == '18.04'
   end
 
   def ubuntu2004?
