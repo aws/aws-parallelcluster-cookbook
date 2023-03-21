@@ -28,3 +28,18 @@ control 'sudo_configured' do
     its('content') { should_not be_empty }
   end
 end
+
+control 'tag:config_cluster_user_can_sudo' do
+  if os_properties.debian_family?
+    describe node['cluster']['cluster_user'] do
+      it { should eq 'ubuntu' }
+    end
+  end
+
+  %W(root #{node['cluster']['cluster_user']}).each do |user|
+    describe command("sudo runuser -u #{user} -- sudo -n aws --version") do
+      its('exit_status') { should eq 0 }
+      its('stdout') { should match /^aws/ }
+    end
+  end
+end
