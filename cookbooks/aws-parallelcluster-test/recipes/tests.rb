@@ -567,3 +567,11 @@ if node['kernel']['machine'] == 'x86_64'
     command 'test "$(cat /sys/module/intel_idle/parameters/max_cstate)" = "1"'
   end
 end
+
+execute 'unmount /home' do
+  command "umount -fl /home"
+  retries 10
+  retry_delay 6
+  timeout 60
+  only_if { node['cluster']['node_type'] == 'ComputeFleet' }
+end
