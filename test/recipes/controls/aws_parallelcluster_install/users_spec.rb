@@ -33,3 +33,11 @@ control 'tag:config_admin_user_and_group_correctly_defined' do
     its('gid') { should eq node['cluster']['cluster_admin_group_id'] }
   end
 end
+
+control 'tag:config_ulimit_is_not_lower_than_8192' do
+  only_if { !instance.custom_ami? }
+
+  describe bash("ulimit -Sn") do
+    its('stdout') { should cmp >= '8192' }
+  end
+end
