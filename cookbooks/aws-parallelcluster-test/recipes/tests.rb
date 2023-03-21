@@ -234,7 +234,7 @@ if node['conditions']['intel_mpi_supported'] && !redhat8?
 
   # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
-  if node['cluster']['node_type'] == 'HeadNode' && !redhat8?
+  if node['cluster']['node_type'] == 'HeadNode'
     bash 'check intel mpi version' do
       cwd Chef::Config[:file_cache_path]
       code <<-INTELMPI
