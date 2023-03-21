@@ -334,16 +334,6 @@ unless node['cluster']['base_os'] == 'centos7'
 end
 
 ###################
-# Verify required service are enabled
-###################
-execute 'check supervisord service is enabled' do
-  command "systemctl is-enabled supervisord"
-end
-execute 'check ec2blkdev service is enabled' do
-  command "systemctl is-enabled ec2blkdev"
-end
-
-###################
 # Verify that aws-ubuntu-eni-helper service is disabled
 ###################
 is_service_disabled('aws-ubuntu-eni-helper', 'debian')
