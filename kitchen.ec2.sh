@@ -45,13 +45,6 @@
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 
-# Run tests as follows:
-# ./kitchen.ec2.sh <context> <kitchen options>
-# where <context> is either recipes, resources or validate.
-#
-# For instance:
-# ./kitchen.ec2.sh recipes list
-# ./kitchen.ec2.sh recipes test ephemeral-drives-setup --parallel --concurrency 5 -l debug
 
 KITCHEN_SCOPE=$1; shift;
 KITCHEN_PHASE=$(echo $KITCHEN_SCOPE | awk -F- '{print $2}')
@@ -93,11 +86,15 @@ if [ "$1" == "create" ] || [ "$1" == "converge" ] || [ "$1" == "verify" ] || [ "
   fi
 
   # VPC
-  KITCHEN_VPC_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
-      --subnet-ids "${KITCHEN_SUBNET_ID}" \
-      --query 'Subnets[0].VpcId' --output text)
+  if [ -z "${KITCHEN_VPC_ID}" ]; then
+    echo "** KITCHEN_VPC_ID not explicitly set: deriving from subnet"
 
-  echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
+    KITCHEN_VPC_ID=$(aws ec2 describe-subnets --region "${KITCHEN_AWS_REGION}" \
+        --subnet-ids "${KITCHEN_SUBNET_ID}" \
+        --query 'Subnets[0].VpcId' --output text)
+
+    echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
+  fi
 
   # Security Group
   if [ -z "${KITCHEN_SECURITY_GROUP_ID}" ]; then

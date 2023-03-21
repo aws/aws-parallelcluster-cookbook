@@ -9,51 +9,50 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'imds_configured' do
+control 'allowed_users_can_access_imds' do
   title 'Check that IMDS has been configured correctly'
 
-  only_if { !os_properties.virtualized? }
-
-  desc 'Check allowed users'
-  allowed = %w(root nobody)
-  allowed.each do |user|
-    describe bash("sudo -u #{user} curl -H 'X-aws-ec2-metadata-token-ttl-seconds: 900' -X PUT 'http://169.254.169.254/latest/api/token'") do
+  node['cluster']['head_node_imds_allowed_users'].each do |user|
+    describe "user ${user} is allowed to access imds" do
+      subject { bash("sudo -u #{user} curl -H 'X-aws-ec2-metadata-token-ttl-seconds: 900' -X PUT 'http://169.254.169.254/latest/api/token'") }
       its('exit_status') { should eq(0) }
     end
   end
+end
 
-  desc 'Check denied users'
-  denied = passwd.users.reject { |user| allowed.include?(user) }
-  denied.each do |user|
-    describe bash("sudo -u #{user} curl -H 'X-aws-ec2-metadata-token-ttl-seconds: 900' -X PUT 'http://169.254.169.254/latest/api/token'") do
+control 'not_allowed_users_can_not_access_imds' do
+  allowed_users = node['cluster']['head_node_imds_allowed_users']
+  passwd.users.reject { |user| allowed_users.include?(user) }.each do |user|
+    describe "user ${user} is not allowed to access imds" do
+      subject { bash("sudo -u #{user} curl -H 'X-aws-ec2-metadata-token-ttl-seconds: 900' -X PUT 'http://169.254.169.254/latest/api/token'") }
       its('exit_status') { should eq(7) }
     end
   end
+end
 
-  desc 'Check that parallelcluster-iptables service is enabled'
+control 'parallelcluster-iptables_correctly_configured' do
+  only_if { !os_properties.virtualized? }
+
   describe service('parallelcluster-iptables') do
     it { should be_installed }
     it { should be_enabled }
     it { should be_running }
   end
 
-  desc 'Check parallelcluster-iptables run level on'
-  levels_on = %w(1 2 3 4 5)
-  levels_on.each do |level|
-    describe bash("ls /etc/rc#{level}.d/ | egrep '^S[0-9]+parallelcluster-iptables$'") do
+  %w(1 2 3 4 5).each do |level|
+    describe "Check parallelcluster-iptables run level #{level} on" do
+      subject { bash("ls /etc/rc#{level}.d/ | egrep '^S[0-9]+parallelcluster-iptables$'") }
       its('exit_status') { should eq(0) }
     end
   end
 
-  desc 'Check parallelcluster-iptables run level off'
-  levels_off = %w(0 6)
-  levels_off.each do |level|
-    describe bash("ls /etc/rc#{level}.d/ | egrep '^K[0-9]+parallelcluster-iptables$'") do
+  %w(0 6).each do |level|
+    describe "Check parallelcluster-iptables run level #{level} off" do
+      subject { bash("ls /etc/rc#{level}.d/ | egrep '^K[0-9]+parallelcluster-iptables$'") }
       its('exit_status') { should eq(0) }
     end
   end
 
-  desc 'Check iptables rules file exists'
   describe file('/etc/parallelcluster/sysconfig/iptables.rules') do
     it { should exist }
   end

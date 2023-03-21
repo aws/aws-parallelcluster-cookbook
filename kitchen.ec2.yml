@@ -59,12 +59,12 @@ platforms:
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
       block_device_mappings:
-        - device_name: /dev/sda1
+        - device_name: /dev/xvda
           ebs:
-            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
         - device_name: /dev/xvdb<%= c %>
           virtual_name: ephemeral<%= i %>
       <% end %>
@@ -72,6 +72,7 @@ platforms:
       username: ec2-user
     attributes:
       cluster:
+        base_os: alinux2
         cluster_user: ec2-user
   - name: rhel8
     driver_plugin: ec2
@@ -84,20 +85,21 @@ platforms:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
       <% end %>
-    block_device_mappings:
-      - device_name: /dev/sda1
-        ebs:
-          volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
-          volume_type: gp2
-          delete_on_termination: true
-    <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
-      - device_name: /dev/xvdb<%= c %>
-        virtual_name: ephemeral<%= i %>
-    <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
     transport:
       username: ec2-user
     attributes:
       cluster:
+        base_os: rhel8
         cluster_user: ec2-user
   - name: centos7
     driver_plugin: ec2
@@ -113,10 +115,10 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
         - device_name: /dev/xvdb<%= c %>
           virtual_name: ephemeral<%= i %>
       <% end %>
@@ -124,6 +126,7 @@ platforms:
       username: centos
     attributes:
       cluster:
+        base_os: centos7
         cluster_user: centos
   - name: ubuntu1804
     driver_plugin: ec2
@@ -139,10 +142,10 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
         - device_name: /dev/xvdb<%= c %>
           virtual_name: ephemeral<%= i %>
       <% end %>
@@ -150,6 +153,7 @@ platforms:
       username: ubuntu
     attributes:
       cluster:
+        base_os: ubuntu1804
         cluster_user: ubuntu
   - name: ubuntu2004
     driver_plugin: ec2
@@ -165,10 +169,10 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <%= ENV['KITCHEN_VOLUME_SIZE'] || 35 %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x y z).each_with_index do | c, i | %>
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
         - device_name: /dev/xvdb<%= c %>
           virtual_name: ephemeral<%= i %>
       <% end %>
@@ -176,4 +180,5 @@ platforms:
       username: ubuntu
     attributes:
       cluster:
+        base_os: ubuntu2004
         cluster_user: ubuntu

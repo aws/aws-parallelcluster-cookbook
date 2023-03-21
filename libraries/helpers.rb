@@ -294,24 +294,6 @@ def run_command(command)
   Mixlib::ShellOut.new(command).run_command.stdout.strip
 end
 
-# Check if recipes are executed during kitchen tests.
-def kitchen_test?
-  node['kitchen'] == 'true'
-end
-
-# load cluster configuration file into node object
-def load_cluster_config
-  ruby_block "load cluster configuration" do
-    block do
-      require 'yaml'
-      config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
-      Chef::Log.debug("Config read #{config}")
-      node.override['cluster']['config'].merge! config
-    end
-    only_if { node['cluster']['config'].nil? }
-  end
-end
-
 def raise_and_write_chef_error(raise_message, chef_error = nil)
   unless chef_error
     chef_error = raise_message
