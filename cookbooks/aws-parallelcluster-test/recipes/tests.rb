@@ -125,38 +125,6 @@ if node['cluster']['scheduler'] == 'plugin'
 end
 
 ###################
-# Amazon Time Sync
-###################
-get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
-# $ systemctl show -p SubState <service>
-# SubState=Running
-
-chrony_check_command = "#{get_chrony_status_command} | grep -i running"
-
-ruby_block 'log_chrony_status' do
-  block do
-    get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
-    chrony_log = shell_out!(get_chrony_service_log_command).stdout
-    Chef::Log.debug("chrony service log: #{chrony_log}")
-    chrony_status = shell_out!(get_chrony_status_command).stdout
-    Chef::Log.debug("chrony status is #{chrony_status}")
-  end
-end
-
-execute 'check chrony running' do
-  command chrony_check_command
-end
-
-execute 'check chrony service is enabled' do
-  command "systemctl is-enabled #{node['cluster']['chrony']['service']}"
-end
-
-execute 'check chrony conf' do
-  command "chronyc waitsync 30; chronyc tracking | grep -i reference | grep 169.254.169.123"
-  user node['cluster']['cluster_user']
-end
-
-###################
 # DCV
 ###################
 if node['cluster']['node_type'] == "HeadNode" &&
