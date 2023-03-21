@@ -15,7 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-test::test_users'
 include_recipe 'aws-parallelcluster-test::test_processes'
 include_recipe 'aws-parallelcluster-test::test_imds'
 include_recipe 'aws-parallelcluster-test::test_sudoers'
