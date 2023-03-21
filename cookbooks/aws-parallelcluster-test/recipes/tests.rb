@@ -244,33 +244,6 @@ if node['conditions']['intel_mpi_supported'] && !redhat8?
 end
 
 ###################
-# EFA
-###################
-if efa_supported?
-  if node['cluster']['os'].end_with?("-custom")
-    # only check EFA is installed because when found in the base AMI we skip installation
-    bash 'check efa installed' do
-      cwd Chef::Config[:file_cache_path]
-      code <<-EFA
-        set -ex
-        modinfo efa
-        cat /opt/amazon/efa_installed_packages
-      EFA
-    end
-  else
-    # check EFA is installed and the version is expected
-    bash 'check correct version of efa installed' do
-      cwd Chef::Config[:file_cache_path]
-      code <<-EFA
-        set -ex
-        modinfo efa
-        grep "EFA installer version: #{node['cluster']['efa']['installer_version']}" /opt/amazon/efa_installed_packages
-      EFA
-    end
-  end
-end
-
-###################
 # jq
 ###################
 unless node['cluster']['os'].end_with?("-custom")
