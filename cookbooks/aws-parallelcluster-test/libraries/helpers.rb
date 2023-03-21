@@ -201,28 +201,6 @@ def check_run_level_script(script_name, levels_on, levels_off)
   end
 end
 
-def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_cidr_list)
-  bash "check #{ssh_target_checker_script} contains the correct vpc cidr list: #{expected_cidr_list}" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-TEST
-      if [[ ! -f #{ssh_target_checker_script} ]]; then
-        >&2 echo "SSH target checker in #{ssh_target_checker_script} not found"
-        exit 1
-      fi
-
-      actual_value=$(egrep 'VPC_CIDR_LIST[ ]*=[ ]' #{ssh_target_checker_script})
-
-      egrep 'VPC_CIDR_LIST[ ]*=[ ]*\\([ ]*#{expected_cidr_list.join('[ ]*')}[ ]*\\)' #{ssh_target_checker_script}
-      if [[ $? != 0 ]]; then
-        >&2 echo "SSH target checker in #{ssh_target_checker_script} contains wrong VPC CIDR list"
-        >&2 echo "Expected VPC CIDR list: #{expected_cidr_list}"
-        >&2 echo "Actual VPC CIDR list: $actual_value"
-        exit 1
-      fi
-    TEST
-  end
-end
-
 #
 # Check if a service is disabled
 #
