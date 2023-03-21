@@ -45,13 +45,6 @@
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 
-# Run tests as follows:
-# ./kitchen.ec2.sh <context> <kitchen options>
-# where <context> is either recipes, resources or validate.
-#
-# For instance:
-# ./kitchen.ec2.sh recipes list
-# ./kitchen.ec2.sh recipes test ephemeral-drives-setup --parallel --concurrency 5 -l debug
 
 KITCHEN_SCOPE=$1; shift;
 KITCHEN_PHASE=$(echo $KITCHEN_SCOPE | awk -F- '{print $2}')
