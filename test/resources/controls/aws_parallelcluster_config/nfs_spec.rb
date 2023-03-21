@@ -28,3 +28,27 @@ control 'nfs_configured' do
     its('stdout') { should cmp 10 }
   end
 end
+
+control 'tag:config_nfs_correctly_installed_on_head_node' do
+  only_if { instance.head_node? }
+
+  describe 'check for nfs server protocol' do
+    subject { command "sudo -u #{node['cluster']['cluster_user']} rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs" }
+    its('exit_status') { should eq 0 }
+  end
+end
+
+control 'tag:config_nfs_correctly_installed_on_compute_node' do
+  only_if { instance.compute_node? }
+
+  describe 'check for nfs server protocol' do
+    subject { command "sudo -u #{node['cluster']['cluster_user']} nfsstat -m | grep vers=4" }
+    its('exit_status') { should eq 0 }
+  end
+end
+
+control 'tag:config_nfs_has_correct_number_of_threads' do
+  describe bash("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'") do
+    its('stdout') { should cmp node['cluster']['nfs']['threads'] }
+  end
+end
