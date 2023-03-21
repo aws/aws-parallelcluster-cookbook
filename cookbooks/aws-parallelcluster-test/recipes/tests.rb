@@ -553,15 +553,6 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] !=
   end
 end
 
-###################
-# Verify C-states are disabled
-###################
-if node['kernel']['machine'] == 'x86_64'
-  execute 'Verify C-states are disabled' do
-    command 'test "$(cat /sys/module/intel_idle/parameters/max_cstate)" = "1"'
-  end
-end
-
 execute 'unmount /home' do
   command "umount -fl /home"
   retries 10
