@@ -32,3 +32,10 @@ control 'supervisord_service_set_up' do
     its('content') { should_not be_empty }
   end
 end
+
+control 'tag:config_supervisord_runs_as_root' do
+  describe processes('supervisord') do
+    its('count') { should eq 1 }
+    its('users') { should eq ['root'] }
+  end
+end
