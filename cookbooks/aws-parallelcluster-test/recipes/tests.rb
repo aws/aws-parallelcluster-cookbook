@@ -296,16 +296,6 @@ unless node['cluster']['base_os'] == 'centos7'
 end
 
 ###################
-# Verify that aws-ubuntu-eni-helper service is disabled
-###################
-is_service_disabled('aws-ubuntu-eni-helper', 'debian')
-
-###################
-# Verify that log4j-cve-2021-44228-hotpatch service is disabled
-###################
-is_service_disabled('log4j-cve-2021-44228-hotpatch', 'amazon')
-
-###################
 # clusterstatusmgtd
 ###################
 if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
