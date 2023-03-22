@@ -40,10 +40,10 @@ control 'efa_prereq_packages_installed' do
   end
 end
 
-control 'efa_installed' do
+control 'tag:config_efa_installed' do
   title 'Check EFA is installed'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.virtualized? && instance.efa_supported? }
 
   describe "Verify EFA Kernel module is available\n" do
     describe command("modinfo efa") do
@@ -52,10 +52,11 @@ control 'efa_installed' do
     end
   end
 
-  describe "Verify version of EFA\n" do
-    describe file("/opt/amazon/efa_installed_packages") do
+  unless instance.custom_ami?
+    describe 'Verify EFA version' do
+      subject { file('/opt/amazon/efa_installed_packages') }
       it { should exist }
-      its('content') { should match(/EFA installer version: 1.21.0/) }
+      its('content') { should match /EFA installer version: #{node['cluster']['efa']['installer_version']}/ }
     end
   end
 end
