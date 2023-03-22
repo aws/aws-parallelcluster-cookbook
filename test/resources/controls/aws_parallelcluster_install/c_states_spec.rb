@@ -34,3 +34,11 @@ control 'c_states_kernel_configured' do
     end
   end
 end
+
+control 'tag:config_c_states_disabled' do
+  only_if { os_properties.x86? }
+
+  describe bash("cat /sys/module/intel_idle/parameters/max_cstate") do
+    its('stdout') { should cmp 1 }
+  end
+end
