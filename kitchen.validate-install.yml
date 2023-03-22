@@ -58,7 +58,7 @@ suites:
         - mysql_client_installed
         - mysql_client_source_node_created
         - node_attributes_created
-        - services_disabled_on_amazon_family
-        - services_disabled_on_debian_family
+        - /services_disabled_on_amazon_family/
+        - /services_disabled_on_debian_family/
         - stunnel_installed
         - /intel_mpi_installed/
