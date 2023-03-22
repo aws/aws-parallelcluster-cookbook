@@ -68,3 +68,13 @@ control 'munge_folders_created' do
     it { should be_directory }
   end
 end unless os_properties.redhat_ubi?
+
+control 'tag:config_munge_service_enabled' do
+  only_if { node['cluster']['scheduler'] == 'slurm' }
+
+  describe service('munge') do
+    it { should be_installed }
+    it { should be_enabled }
+    it { should be_running }
+  end
+end
