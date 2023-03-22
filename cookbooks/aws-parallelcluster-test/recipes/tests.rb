@@ -115,16 +115,6 @@ if platform?('centos')
 end
 
 ###################
-# ulimit
-###################
-unless node['cluster']['os'].end_with?("-custom")
-  bash 'test soft ulimit nofile' do
-    code "if (($(ulimit -Sn) < 8192)); then exit 1; fi"
-    user node['cluster']['cluster_user']
-  end
-end
-
-###################
 # instance store
 ###################
 
