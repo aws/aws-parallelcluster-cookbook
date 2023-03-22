@@ -39,3 +39,11 @@ control 'tag:config_supervisord_runs_as_root' do
     its('users') { should eq ['root'] }
   end
 end
+
+control 'tag:config_supervisord_service_is_enabled' do
+  describe service('supervisord') do
+    it { should be_installed }
+    it { should be_enabled }
+    it { should be_running }
+  end
+end
