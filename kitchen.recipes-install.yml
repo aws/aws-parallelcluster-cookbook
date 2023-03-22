@@ -277,7 +277,7 @@ suites:
       - recipe[aws-parallelcluster-install::intel_mpi]
     verifier:
       controls:
-        - intel_mpi_installed
+        - /intel_mpi_installed/
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
