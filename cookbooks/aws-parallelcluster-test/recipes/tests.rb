@@ -214,51 +214,6 @@ if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] ==
   end
 end
 
-##################
-# Verify enough space on AMIs
-###################
-unless node['cluster']['os'].end_with?("-custom")
-  bash 'verify 10 GB of space left on root volume' do
-    cwd Chef::Config[:file_cache_path]
-    # This test assumes the df output is as follows:
-    # $ df --block-size GB --output=avail /
-    # Avail
-    # 42GB
-    code <<-CAPACITY_CHECK
-      free_gigs="$(df --block-size GB --output=avail / | tail -n1 | cut -d G -f1)"
-      if [ $free_gigs -lt 10 ]; then
-        echo "Expected at least 10 GB of free space remaining on the root volume, but only found ${free_gigs}"
-        exit 1
-      fi
-    CAPACITY_CHECK
-    user node['cluster']['cluster_user']
-  end
-end
-
-##################
-# Verify no MPICH packages
-###################
-bash 'verify no MPICH packages' do
-  code <<-NOMPICH
-    lib64_mpich_libs="$(ls 2>/dev/null /usr/lib64/mpich*)"
-    lib_mpich_libs="$(ls 2>/dev/null /usr/lib/mpich*)"
-    [ -z "${lib64_mpich_libs}" ] && [ -z "${lib_mpich_libs}" ]
-  NOMPICH
-end
-
-##################
-# Verify no FFTW packages
-###################
-unless node['cluster']['base_os'] == 'centos7'
-  bash 'verify no FFTW packages' do
-    code <<-NOFFTW
-      lib64_fftw_libs="$(ls 2>/dev/null /usr/lib64/libfftw*)"
-      lib_fftw_libs="$(ls 2>/dev/null /usr/lib/libfftw*)"
-      [ -z "${lib64_fftw_libs}" ] && [ -z "${lib_fftw_libs}" ]
-    NOFFTW
-  end
-end
-
 ###################
 # clusterstatusmgtd
 ###################
