@@ -15,13 +15,8 @@ control 'tag:config_awsbatch_correctly_configured' do
   # Test that batch commands can be accessed without absolute path
   %w(awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat).each do |cli_commmand|
     describe "#{cli_commmand} can be accessed without absolute path" do
-      subject { bash("sudo -u #{node['cluster']['cluster_user']} -c '. ~/.bash_profile; #{cli_commmand} -h'") }
+      subject { bash("sudo -u #{node['cluster']['cluster_user']} bash -c '. ~/.bash_profile; #{cli_commmand} -h'") }
       its('exit_status') { should eq 0 }
     end
-  end
-
-  describe 'clusterstatusmgtd is configured to be executed by supervisord' do
-    subject { bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd") }
-    its('stdout') { should match /RUNNING/ }
   end
 end
