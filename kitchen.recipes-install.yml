@@ -211,8 +211,8 @@ suites:
       - recipe[aws-parallelcluster-install::disable_services]
     verifier:
       controls:
-        - services_disabled_on_debian_family
-        - services_disabled_on_amazon_family
+        - /services_disabled_on_debian_family/
+        - /services_disabled_on_amazon_family/
   - name: license_readme
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
