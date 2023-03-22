@@ -202,3 +202,12 @@ execute 'unmount /home' do
   timeout 60
   only_if { node['cluster']['node_type'] == 'ComputeFleet' }
 end
+
+###################
+# clusterstatusmgtd
+###################
+if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
+  execute "check clusterstatusmgtd is configured to be executed by supervisord" do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING"
+  end
+end
