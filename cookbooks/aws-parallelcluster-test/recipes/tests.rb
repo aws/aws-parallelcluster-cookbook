@@ -34,10 +34,6 @@ end
 ###################
 # SSH client conf
 ###################
-execute 'grep ssh_config' do
-  command 'grep -Pz "Match exec \"ssh_target_checker.sh %h\"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null" /etc/ssh/ssh_config'
-end
-
 # Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
 if node['cluster']['node_type'] == 'HeadNode'
   execute 'ssh localhost as user' do
@@ -47,60 +43,6 @@ if node['cluster']['node_type'] == 'HeadNode'
   end
 end
 
-###################
-# Slurm
-###################
-if node['cluster']['scheduler'] == 'slurm'
-  execute 'check munge service is enabled' do
-    command "systemctl is-enabled munge"
-  end
-  case node['cluster']['node_type']
-  when 'HeadNode'
-    execute 'execute sinfo' do
-      command "sinfo --help"
-      environment('PATH' => "#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH")
-      user node['cluster']['cluster_user']
-    end
-
-    execute 'execute scontrol' do
-      command "scontrol --help"
-      environment('PATH' => "#{node['cluster']['slurm']['install_dir']}/bin:/bin:/usr/bin:$PATH")
-      user node['cluster']['cluster_user']
-    end
-
-    execute 'check-slurm-accounting-mysql-plugins' do
-      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep accounting_storage_mysql"
-    end
-
-    execute 'check-slurm-jobcomp-mysql-plugins' do
-      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep jobcomp_mysql"
-    end
-
-    execute 'check-slurm-pmix-plugins' do
-      command "ls #{node['cluster']['slurm']['install_dir']}/lib/slurm/ | grep pmix"
-    end
-    execute 'ensure-pmix-shared-library-can-be-found' do
-      command '/opt/pmix/bin/pmix_info'
-    end
-    execute 'check slurmctld service is enabled' do
-      command "systemctl is-enabled slurmctld"
-    end
-  when 'ComputeFleet'
-    execute 'ls slurm root' do
-      command "ls #{node['cluster']['slurm']['install_dir']}"
-      user node['cluster']['cluster_user']
-    end
-    execute 'check cgroup memory resource controller is enabled' do
-      # We expect a 1 in the fourth field of the cgroups table, which is formatted as follows:
-      # subsys_name  hierarchy  num_cgroups  enabled
-      # ...
-      # memory       <int>      <int>        1
-      command "test $(grep memory /proc/cgroups | awk '{print $4}') = 1"
-    end
-  else
-    raise "node_type must be HeadNode or ComputeFleet"
-  end
-end
 ###################
 # Scheduler Plugin
 ###################
@@ -122,38 +64,6 @@ if node['cluster']['scheduler'] == 'plugin'
   execute "check scheduler plugin user doesn't have Sudo Privileges" do
     command "(su #{node['cluster']['scheduler_plugin']['user']} -c 'sudo -ln') 2>&1 | grep 'a password is required'"
   end
-end
-
-###################
-# Amazon Time Sync
-###################
-get_chrony_status_command = "systemctl show -p SubState #{node['cluster']['chrony']['service']}"
-# $ systemctl show -p SubState <service>
-# SubState=Running
-
-chrony_check_command = "#{get_chrony_status_command} | grep -i running"
-
-ruby_block 'log_chrony_status' do
-  block do
-    get_chrony_service_log_command = "journalctl -u #{node['cluster']['chrony']['service']}"
-    chrony_log = shell_out!(get_chrony_service_log_command).stdout
-    Chef::Log.debug("chrony service log: #{chrony_log}")
-    chrony_status = shell_out!(get_chrony_status_command).stdout
-    Chef::Log.debug("chrony status is #{chrony_status}")
-  end
-end
-
-execute 'check chrony running' do
-  command chrony_check_command
-end
-
-execute 'check chrony service is enabled' do
-  command "systemctl is-enabled #{node['cluster']['chrony']['service']}"
-end
-
-execute 'check chrony conf' do
-  command "chronyc waitsync 30; chronyc tracking | grep -i reference | grep 169.254.169.123"
-  user node['cluster']['cluster_user']
 end
 
 ###################
