@@ -12,13 +12,19 @@
 
 import argparse
 import asyncio
+import json
 import logging
 import os
+import re
 import subprocess  # nosec B404
 import tempfile
+import time
+from abc import ABC, abstractmethod
 from builtins import RuntimeError
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from enum import Enum
+from typing import Dict
 from urllib.parse import urlparse
 
 import boto3
@@ -86,6 +92,8 @@ class ScriptRunner:
         raise DownloadRunError(
             f"Failed to download {self.event_name} script {step_num} {script.url}, URL must be an s3 or HTTPs.",
             f"Failed to download {self.event_name} script {step_num}, URL must be an s3 or HTTPs.",
+            step_id=step_num,
+            stage="downloading",
         )
 
     @staticmethod
@@ -104,6 +112,9 @@ class ScriptRunner:
                     f"Failed to download {self.event_name} script {exe_script.step_num} {exe_script.url}"
                     f" using aws s3, cause: {err}.",
                     f"Failed to download {self.event_name} script {exe_script.step_num} using aws s3.",
+                    step_id=exe_script.step_num,
+                    stage="downloading",
+                    error=str(err),
                 ) from err
             exe_script.path = file.name
             return exe_script
@@ -116,6 +127,12 @@ class ScriptRunner:
                 f"Failed to download {self.event_name} script {exe_script.step_num} {url}, "
                 f"HTTP status code {response.status_code}.",
                 f"Failed to download {self.event_name} script {exe_script.step_num} via HTTP.",
+                step_id=exe_script.step_num,
+                stage="downloading",
+                error={
+                    "status_code": response.status_code,
+                    "status_reason": response.reason,
+                },
             )
         with tempfile.NamedTemporaryFile(delete=False) as file:
             file.write(response.content)
@@ -125,24 +142,40 @@ class ScriptRunner:
     async def _execute_script(self, exe_script: ExecutableScript):
         # preserving error case for making the script executable
         try:
-            subprocess.run(["chmod", "+x", exe_script.path], check=True)  # nosec - trusted input
+            subprocess.run(
+                ["chmod", "+x", exe_script.path], check=True, stderr=subprocess.PIPE
+            )  # nosec - trusted input
         except subprocess.CalledProcessError as err:
             raise DownloadRunError(
                 f"Failed to run {self.event_name} script {exe_script.step_num} {exe_script.url} "
                 f"due to a failure in making the file executable, return code: {err.returncode}.",
                 f"Failed to run {self.event_name} script {exe_script.step_num} "
                 f"due to a failure in making the file executable, return code: {err.returncode}.",
+                step_id=exe_script.step_num,
+                stage="executing",
+                error={
+                    "exit_code": err.returncode,
+                    "stderr": str(err.stderr),
+                },
             ) from err
 
         # execute script with it's args
         try:
             # arguments are provided by the user who has the privilege to create/update the cluster
-            subprocess.run([exe_script.path] + (exe_script.args or []), check=True)  # nosec - trusted input
+            subprocess.run(
+                [exe_script.path] + (exe_script.args or []), check=True, stderr=subprocess.PIPE
+            )  # nosec - trusted input
         except subprocess.CalledProcessError as err:
             raise DownloadRunError(
                 f"Failed to execute {self.event_name} script {exe_script.step_num} {exe_script.url},"
                 f" return code: {err.returncode}.",
                 f"Failed to execute {self.event_name} script {exe_script.step_num}, return code: {err.returncode}.",
+                step_id=exe_script.step_num,
+                stage="executing",
+                error={
+                    "exit_code": err.returncode,
+                    "stderr": str(err.stderr),
+                },
             ) from err
 
     @staticmethod
@@ -196,42 +229,42 @@ class CustomActionsConfig:
     region_name: str
     node_type: str
     queue_name: str
+    resource_name: str
+    instance_id: str
+    instance_type: str
+    ip_address: str
+    hostname: str
+    availability_zone: str
+    scheduler: str
     event_name: str
     legacy_event: LegacyEventName
     can_execute: bool
     dry_run: bool
     script_sequence: list  # type list[ScriptDefinition]
+    event_file_override: str
+    node_spec_file: str
 
 
-class CustomLogger:
-    """
-    Logs using the same logic as the legacy bash script.
-
-    Could be changed to a standard logger when error signaling is more testable.
-    """
+class CustomLogger(ABC):
+    """Abstract base class for custom loggers."""
 
     def __init__(self, conf: CustomActionsConfig):
         self.conf = conf
 
-    def error_exit_with_bootstrap_error(self, msg: str, msg_without_url: str = None):
+    @abstractmethod
+    def error_exit_with_bootstrap_error(
+        self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
+    ):
         """
         Log error message and exit with a bootstrap error.
 
+        :param error:
+        :param stage: downloading | executing
+        :param step: action index
         :param msg: error message
         :param msg_without_url: alternate error message with the URL masked
         """
-        self._log_message(msg)
-        self._write_bootstrap_error(msg_without_url if msg_without_url else msg)
-        raise SystemExit(1)
-
-    def _write_bootstrap_error(self, message):
-        if self.conf.dry_run:
-            print(f"Would write to {BOOSTRAP_ERROR_FILE}, message: {message}")
-            return
-
-        os.makedirs(os.path.dirname(BOOSTRAP_ERROR_FILE), exist_ok=True)
-        with open(BOOSTRAP_ERROR_FILE, "w", encoding="utf-8") as f:
-            f.write(message)
+        pass
 
     def error_exit(self, msg: str):
         """
@@ -242,11 +275,167 @@ class CustomLogger:
         self._log_message(msg)
         raise SystemExit(1)
 
-    def _log_message(self, msg: str):
-        complete_message = f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {msg} {ERROR_MSG_SUFFIX}"
-        print(complete_message)
+    def _log_message(self, message: str):
+        print(message)
         if not self.conf.dry_run:
-            subprocess.run(["logger", "-t", "parallelcluster", complete_message], check=True)  # nosec - trusted input
+            subprocess.run(["logger", "-t", "parallelcluster", message], check=True)  # nosec - trusted input
+
+    def _write_bootstrap_error(self, message):
+        output_path = self.conf.event_file_override
+        if self.conf.dry_run:
+            print(f"Would write to {output_path}, message: {message}")
+            return
+
+        os.makedirs(os.path.dirname(output_path), exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            f.write(f"{message}\n")
+
+
+class HeadNodeLogger(CustomLogger):
+    """
+    Logs using the same logic as the legacy bash script.
+
+    Could be changed to a standard logger when error signaling is more testable.
+    """
+
+    def __init__(self, conf: CustomActionsConfig):
+        super().__init__(conf)
+
+    def error_exit_with_bootstrap_error(
+        self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
+    ):
+        """Log error message and exit with a bootstrap error."""
+        self._log_message(msg)
+        self._write_bootstrap_error(message=msg_without_url if msg_without_url else msg)
+        raise SystemExit(1)
+
+    def _log_message(self, message: str):
+        complete_message = f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {message} {ERROR_MSG_SUFFIX}"
+        super()._log_message(complete_message)
+
+
+class ComputeFleetLogger(CustomLogger):
+    """
+    Logs using the same logic as the legacy bash script.
+
+    Could be changed to a standard logger when error signaling is more testable.
+
+    Example Event:
+    {
+        "datetime": "2023-03-22T22:40:34.524+00:00",
+        "version": 0,
+        "scheduler": "slurm",
+        "cluster-name": "integ-tests-t7cx6bzjwuokd1oj",
+        "node-role": "ComputeFleet",
+        "component": "custom-action",
+        "level": "ERROR",
+        "instance-id": "i-0036f2c5a7fdc7a25",
+        "compute": {
+            "name": "queue-1-dy-compute-a-1",
+            "instance-id": "i-0036f2c5a7fdc7a25",
+            "instance-type": "c5.xlarge",
+            "availability-zone": "us-east-1d",
+            "address": "192.168.111.173",
+            "hostname": "ip-192-168-111-173.ec2.internal",
+            "queue-name": "queue-1",
+            "compute-resource": "compute-a",
+            "node-type": "dynamic"
+        },
+        "event-type": "custom-action-error",
+        "message": "Failed to download OnNodeConfigured script 1 using aws s3.",
+        "detail": {
+            "action": "OnNodeConfigured",
+            "step": 1,
+            "stage": "downloading",
+            "error": "An error occurred (404) when calling the HeadObject operation: Not Found"
+        }
+    }
+    """
+
+    def __init__(self, conf: CustomActionsConfig):
+        super().__init__(conf)
+        self._node_name_pattern = re.compile(r"^[a-z0-9\-]+-(st|dy)-[a-z0-9\-]+-\d+$")
+        self._stack_name_pattern = re.compile(r"(.+)-ComputeFleetQueueBatch\d+QueueGroup\d+NestedStackQueueGroup\d+.+")
+
+    def error_exit_with_bootstrap_error(
+        self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
+    ):
+        """Log error message and exit with a bootstrap error."""
+        event = self._get_event(msg_without_url if msg_without_url else msg)
+        detail = event.setdefault("detail", {})
+        detail.update(
+            {
+                "action": self.conf.event_name,
+                "step": step,
+                "stage": stage,
+                "error": error,
+            }
+        )
+        self._write_bootstrap_error(message=json.dumps(event))
+        # Need to give CloudWatch Agent time to publish the error log
+        time.sleep(5)
+        self.error_exit(msg)
+
+    def _get_event(self, message: str):
+        now = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+        node_spec = self._get_node_spec()
+        return {
+            "datetime": now,
+            "version": 0,
+            "scheduler": "slurm",
+            "cluster-name": self._get_cluster_name(),
+            "node-role": self.conf.node_type,
+            "component": "custom-action",
+            "level": "ERROR",
+            "instance-id": self.conf.instance_id,
+            "compute": {
+                "name": node_spec.get("name"),
+                "instance-id": self.conf.instance_id,
+                "instance-type": self.conf.instance_type,
+                "availability-zone": self.conf.availability_zone,
+                "address": self.conf.ip_address,
+                "hostname": self.conf.hostname,
+                "queue-name": self.conf.queue_name,
+                "compute-resource": self.conf.resource_name,
+                "node-type": node_spec.get("type"),
+            },
+            "event-type": "custom-action-error",
+            "message": message,
+            "detail": {},
+        }
+
+    def _get_node_spec(self) -> Dict[str, str]:
+        if self.conf.node_spec_file:
+            try:
+                node_name = ComputeFleetLogger._read_node_name(self.conf.node_spec_file)
+                return {
+                    "name": node_name if node_name else "unknown",
+                    "type": self._get_node_type(node_name),
+                }
+            except Exception as e:
+                logging.error("Failed to load node spec file: %s", e)
+        return {
+            "name": "unknown",
+            "type": "unknown",
+        }
+
+    def _get_node_type(self, node_name: str) -> str:
+        if node_name:
+            match = self._node_name_pattern.match(node_name)
+            if match:
+                return "static" if match.group(1) == "st" else "dynamic"
+        return "unknown"
+
+    def _get_cluster_name(self):
+        match = self._stack_name_pattern.match(self.conf.stack_name)
+        if match:
+            return match.group(1)
+        return self.conf.stack_name
+
+    @staticmethod
+    def _read_node_name(node_spec_path: str) -> str:
+        with open(node_spec_path, "r", encoding="utf-8") as node_spec_file:
+            return node_spec_file.read().strip()
 
 
 class ConfigLoader:
@@ -308,6 +497,15 @@ class ConfigLoader:
             script_sequence=sequence,
             dry_run=args.dry_run,
             can_execute=len(sequence) > 0,
+            instance_id=args.instance_id,
+            instance_type=args.instance_type,
+            ip_address=args.ip_address,
+            hostname=args.hostname,
+            scheduler=args.scheduler,
+            availability_zone=args.availability_zone,
+            resource_name=args.resource_name,
+            event_file_override=args.event_file_override,
+            node_spec_file=args.node_spec_file,
         )
 
         logging.debug(conf)
@@ -329,9 +527,13 @@ class ConfigLoader:
 class DownloadRunError(Exception):
     """Error in script execution supporting masking of script urls in the logs."""
 
-    def __init__(self, msg, msg_with_url):
+    def __init__(self, msg, msg_with_url, step_id: int = None, stage: str = None, error: any = None):
         self.msg = msg
         self.msg_with_url = msg_with_url
+        self.step_id = step_id
+        self.stage = stage
+        self.step_id = step_id
+        self.error = error
 
 
 class ActionRunner:
@@ -355,7 +557,9 @@ class ActionRunner:
             try:
                 self._download_run()
             except DownloadRunError as e:
-                self.custom_logger.error_exit_with_bootstrap_error(msg=e.msg, msg_without_url=e.msg_with_url)
+                self.custom_logger.error_exit_with_bootstrap_error(
+                    msg=e.msg, msg_without_url=e.msg_with_url, step=e.step_id, stage=e.stage, error=e.error
+                )
             except RuntimeError as e:
                 logging.debug(e)
                 self.custom_logger.error_exit_with_bootstrap_error(f"Failed to run {self.conf.event_name} script.")
@@ -466,9 +670,50 @@ def _parse_cli_args():
         required=False,
         help="the cluster config file, defaults to " "/opt/parallelcluster/shared/cluster-config.yaml",
     )
+    parser.add_argument(
+        "--instance-id",
+        type=str,
+        default=None,
+        required=False,
+        help="the EC2 instance ID",
+    )
+    parser.add_argument(
+        "--instance-type",
+        type=str,
+        default=None,
+        required=False,
+        help="the EC2 instance type",
+    )
+    parser.add_argument(
+        "--ip-address",
+        type=str,
+        default=None,
+        required=False,
+        help="the IP address of this host",
+    )
+    parser.add_argument(
+        "--hostname",
+        type=str,
+        default=None,
+        required=False,
+        help="the name of this host",
+    )
+    parser.add_argument(
+        "--resource-name", type=str, default=None, help="the name of the compute resource pool this host belongs to"
+    )
+    parser.add_argument(
+        "--availability-zone", type=str, default=None, help="the availability zone this host is deployed to"
+    )
+    parser.add_argument("--scheduler", type=str, default=None, help="the cluster scheduler type")
     parser.add_argument("--verbose", "-v", action="store_true", help="enable verbose logging")
     parser.add_argument("--dry-run", "-d", action="store_true", help="enable dry run")
     parser.add_argument("--execute-via-cfnconfig", "-e", action="store_true", help="execute via cfnconfig")
+    parser.add_argument(
+        "--event-file-override", type=str, default=BOOSTRAP_ERROR_FILE, help="override event output file path"
+    )
+    parser.add_argument(
+        "--node-spec-file", type=str, default=None, required=False, help="path to file containing node description"
+    )
 
     try:
         args = parser.parse_args()
@@ -477,6 +722,12 @@ def _parse_cli_args():
         raise e
 
     return args
+
+
+CUSTOM_LOGGER = {
+    "HeadNode": HeadNodeLogger,
+    "ComputeFleet": ComputeFleetLogger,
+}
 
 
 def main():
@@ -503,7 +754,7 @@ def main():
             )
 
         conf = ConfigLoader().load_configuration(args)
-        ActionRunner(conf, CustomLogger(conf)).run()
+        ActionRunner(conf, CUSTOM_LOGGER.get(conf.node_type, ComputeFleetLogger)(conf)).run()
 
     except Exception as err:
         logging.exception(err)
