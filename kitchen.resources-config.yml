@@ -74,3 +74,15 @@ suites:
           threads: 10
       dependencies:
         - resource:nfs
+  - name: system_authentication_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - system_authentication_configured
+    attributes:
+      resource: system_authentication:configure
+      dependencies:
+        - resource:package_repos
+        - resource:system_authentication
