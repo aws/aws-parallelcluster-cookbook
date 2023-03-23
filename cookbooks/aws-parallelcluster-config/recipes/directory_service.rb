@@ -198,24 +198,8 @@ else
   end
 end
 
-case node['platform_family']
-when 'rhel', 'amazon'
-  bash 'Configure Directory Service' do
-    user 'root'
-    # Tell NSS, PAM to use SSSD for system authentication and identity information
-    code <<-AD
-      authconfig --enablemkhomedir --enablesssdauth --enablesssd --updateall
-    AD
-    sensitive true
-  end
-when 'debian'
-  bash 'Enable PAM mkhomedir module' do
-    user 'root'
-    code <<-AD
-      pam-auth-update --enable mkhomedir
-    AD
-    sensitive true
-  end
+system_authentication "Configure system authentication" do
+  action :configure
 end
 
 # Restart modified services

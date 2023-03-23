@@ -62,3 +62,4 @@ suites:
         - /services_disabled_on_debian_family/
         - stunnel_installed
         - /intel_mpi_installed/
+        - system_authentication_packages_installed

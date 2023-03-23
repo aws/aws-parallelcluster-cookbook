@@ -160,3 +160,14 @@ suites:
         - ephemeral_drives_script_created
         - ephemeral_service_set_up
         - ephemeral_service_after_network_config
+  - name: system_authentication
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - system_authentication_packages_installed
+    attributes:
+      resource: system_authentication
+      dependencies:
+        - resource:package_repos
