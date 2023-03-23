@@ -14,7 +14,7 @@ control 'tag:config_intel_mpi_installed' do
 
   # Test only on head node since on compute nodes we mount an empty /opt/intel drive in kitchen tests that
   # overrides intel binaries.
-  only_if { instance.head_node? }
+  only_if { node['conditions']['intel_mpi_supported'] && instance.head_node? }
 
   describe bash("unset MODULEPATH && source /etc/profile.d/modules.sh && module load intelmpi && mpirun --help") do
     its('exit_status') { should eq(0) }
