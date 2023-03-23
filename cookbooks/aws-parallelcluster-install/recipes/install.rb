@@ -37,6 +37,7 @@ efa 'Install EFA'
 lustre "Install FSx options" # FSx options
 efs 'Install efs-utils'
 stunnel 'Install stunnel'
+system_authentication "Install packages required for directory service integration"
 
 # == SCHEDULER AND COMPUTE FLEET
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
