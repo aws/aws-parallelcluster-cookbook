@@ -35,3 +35,5 @@ __pycache__
 report.html
 /assets/style.css
 /.kitchen.env.sh
+
+.DS_Store
