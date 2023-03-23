@@ -26,7 +26,11 @@ include_recipe "aws-parallelcluster-common::node_attributes"
 include_recipe 'aws-parallelcluster-install::base'
 
 # == PLATFORM - FEATURES
-include_recipe "aws-parallelcluster-install::nvidia" unless redhat8? # NVIDIA and CUDA
+include_recipe "aws-parallelcluster-install::nvidia_driver" unless redhat8?
+include_recipe "aws-parallelcluster-install::cuda" unless redhat8?
+include_recipe "aws-parallelcluster-install::gdrcopy" unless redhat8?
+include_recipe "aws-parallelcluster-install::fabric_manager" unless redhat8?
+
 include_recipe "aws-parallelcluster-install::intel_mpi"
 include_recipe "aws-parallelcluster-install::cloudwatch_agent"
 include_recipe "aws-parallelcluster-install::arm_pl" unless redhat8? # ARM Performance Library
