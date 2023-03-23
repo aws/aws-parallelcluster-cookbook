@@ -171,3 +171,23 @@ suites:
       resource: system_authentication
       dependencies:
         - resource:package_repos
+  - name: nvidia_driver
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /nvidia_driver/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g5.xlarge
+    attributes:
+      resource: nvidia_driver
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - resource:package_repos
+        - resource:install_packages
+        - recipe:aws-parallelcluster-common::node_attributes
+      cluster:
+        nvidia:
+          enabled: true
