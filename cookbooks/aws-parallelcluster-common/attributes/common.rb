@@ -49,8 +49,3 @@ default['cluster']['parallelcluster-version'] = '3.6.0'
 default['cluster']['parallelcluster-cookbook-version'] = '3.6.0'
 default['cluster']['parallelcluster-node-version'] = '3.6.0'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
-
-# EFA
-default['cluster']['efa']['installer_version'] = '1.21.0'
-default['cluster']['efa']['sha256'] = 'c64e6ca34ccfc3ebe8e82d08899ae8442b3ef552541cf5429c43d11a04333050'
-default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
