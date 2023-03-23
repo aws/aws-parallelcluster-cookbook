@@ -185,6 +185,11 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
   'default' => 'gdrcopy'
 )
 
+# EFA
+default['cluster']['efa']['installer_version'] = '1.21.0'
+default['cluster']['efa']['sha256'] = 'c64e6ca34ccfc3ebe8e82d08899ae8442b3ef552541cf5429c43d11a04333050'
+default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
+
 # EFS Utils
 default['cluster']['efs_utils']['version'] = '1.34.1'
 default['cluster']['efs_utils']['url'] = "https://github.com/aws/efs-utils/archive/v#{node['cluster']['efs_utils']['version']}.tar.gz"

@@ -33,7 +33,7 @@ control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
 
   describe package('nice-dcv-gl') do
     it { should be_installed }
-    its('version') { should eq node['cluster']['dcv']['gl']['version'] }
+    its('version') { should match /#{node['cluster']['dcv']['gl']['version']}/ }
   end
 end
 

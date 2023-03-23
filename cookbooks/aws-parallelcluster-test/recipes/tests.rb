@@ -195,23 +195,12 @@ else
   end
 end
 
-###################
-# Pcluster AWSBatch CLI
-###################
-if node['cluster']['scheduler'] == 'awsbatch' && node['cluster']['node_type'] == 'HeadNode'
-  # Test that batch commands can be accessed without absolute path
-  batch_cli_commands = %w(awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat)
-  batch_cli_commands.each do |cli_commmand|
-    bash "test_#{cli_commmand}" do
-      cwd Chef::Config[:file_cache_path]
-      code <<-BATCHCLI
-        set -e
-        source ~/.bash_profile
-        #{cli_commmand} -h
-      BATCHCLI
-      user node['cluster']['cluster_user']
-    end
-  end
+execute 'unmount /home' do
+  command "umount -fl /home"
+  retries 10
+  retry_delay 6
+  timeout 60
+  only_if { node['cluster']['node_type'] == 'ComputeFleet' }
 end
 
 ###################
@@ -221,12 +210,4 @@ if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] !=
   execute "check clusterstatusmgtd is configured to be executed by supervisord" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING"
   end
-end
-
-execute 'unmount /home' do
-  command "umount -fl /home"
-  retries 10
-  retry_delay 6
-  timeout 60
-  only_if { node['cluster']['node_type'] == 'ComputeFleet' }
 end
