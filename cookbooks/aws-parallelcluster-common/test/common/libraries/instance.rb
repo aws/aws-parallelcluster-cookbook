@@ -22,7 +22,7 @@ class Instance < Inspec.resource(1)
   end
 
   def efa_supported?
-    !inspec.os_properties.arm? || !node['cluster']['efa']['unsupported_aarch64_oses'].include?(node['cluster']['base_os'])
+    !inspec.os_properties.arm? || !inspec.node['cluster']['efa']['unsupported_aarch64_oses'].include?(inspec.node['cluster']['base_os'])
   end
 
   def imds_token
