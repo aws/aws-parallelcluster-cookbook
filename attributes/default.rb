@@ -144,47 +144,6 @@ default['cluster']['scheduler_plugin']['virtualenv_path'] = [
   node['cluster']['scheduler_plugin']['virtualenv'],
 ].join('/')
 
-# NVIDIA
-default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '470.141.03'
-default['cluster']['nvidia']['cuda_version'] = '11.7'
-default['cluster']['nvidia']['cuda_samples_version'] = '11.6'
-default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
-default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
-default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
-default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
-default['cluster']['nvidia']['cuda_samples_url'] = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{node['cluster']['nvidia']['cuda_samples_version']}.tar.gz"
-
-# NVIDIA fabric-manager
-# The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
-# For ubuntu, it is nvidia-fabricmanager-470_version
-default['cluster']['nvidia']['fabricmanager']['package'] = value_for_platform(
-  'default' => "nvidia-fabric-manager",
-  'ubuntu' => { 'default' => "nvidia-fabricmanager-470" }
-)
-default['cluster']['nvidia']['fabricmanager']['repository_key'] = value_for_platform(
-  'default' => "D42D0685.pub",
-  'ubuntu' => { 'default' => "3bf863cc.pub" }
-)
-default['cluster']['nvidia']['fabricmanager']['version'] = value_for_platform(
-  'default' => node['cluster']['nvidia']['driver_version'],
-  # with apt a star is needed to match the package version
-  'ubuntu' => { 'default' => "#{node['cluster']['nvidia']['driver_version']}*" }
-)
-default['cluster']['nvidia']['fabricmanager']['repository_uri'] = value_for_platform(
-  'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/rhel7/x86_64",
-  'ubuntu' => { 'default' => "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cluster']['base_os']}/x86_64" }
-)
-
-# NVIDIA GDRCopy
-default['cluster']['nvidia']['gdrcopy']['version'] = '2.3'
-default['cluster']['nvidia']['gdrcopy']['url'] = "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
-default['cluster']['nvidia']['gdrcopy']['sha256'] = 'b85d15901889aa42de6c4a9233792af40dd94543e82abe0439e544c87fd79475'
-default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
-  'ubuntu' => { 'default' => 'gdrdrv' },
-  'default' => 'gdrcopy'
-)
-
 # EFA
 default['cluster']['efa']['installer_version'] = '1.21.0'
 default['cluster']['efa']['sha256'] = 'c64e6ca34ccfc3ebe8e82d08899ae8442b3ef552541cf5429c43d11a04333050'

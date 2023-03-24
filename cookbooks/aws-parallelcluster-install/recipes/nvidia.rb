@@ -16,6 +16,14 @@
 # limitations under the License.
 
 nvidia_driver 'Install nvidia driver'
-include_recipe "aws-parallelcluster-install::cuda" unless redhat8?
+include_recipe "aws-parallelcluster-install::cuda"
 include_recipe "aws-parallelcluster-install::gdrcopy" unless redhat8?
-include_recipe "aws-parallelcluster-install::fabric_manager" unless redhat8?
+
+# Install NVIDIA Fabric Manager
+repo_domain = node['cluster']['region'].start_with?("cn-") ? "com" : "cn"
+repo_uri = node['cluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
+add_package_repository("nvidia-repo", repo_uri, "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}", "/")
+
+fabric_manager 'Install Nvidia Fabric Manager'
+
+remove_package_repository("nvidia-repo")
