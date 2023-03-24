@@ -65,18 +65,28 @@ unless virtualized?
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
-            " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"\
+            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
+            " --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
+            " --input-file #{node['cluster']['cluster_config_path']}"\
+            " --instance-types-data #{node['cluster']['instance_types_data_path']}"\
             " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
             " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
             " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
             " --cluster-name #{node['cluster']['stack_name']}"
   end
 
+  # Generate custom Slurm settings include files
+  execute "generate_pcluster_custom_slurm_settings_include_files" do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py"\
+            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
+            " --input-file #{node['cluster']['cluster_config_path']}"
+  end
+
   # Generate pcluster fleet config
   execute "generate_pcluster_fleet_config" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
-            " --output-file #{node['cluster']['slurm']['fleet_config_path']} --input-file #{node['cluster']['cluster_config_path']}"
+            " --output-file #{node['cluster']['slurm']['fleet_config_path']}"\
+            " --input-file #{node['cluster']['cluster_config_path']}"
   end
 end
 

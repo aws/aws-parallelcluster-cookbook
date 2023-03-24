@@ -1,0 +1,16 @@
+Scheduling:
+  SlurmSettings:
+    CustomSlurmSettings:
+      - InactiveLimit: 120
+      - MaxJobCount: 10000
+      - SlurmctldParameters: "idle_on_node_suspend,power_save_min_interval=30,cloud_dns,node_reg_mem_percent=75,allow_user_triggers"
+      - CPUs: 16
+        NodeName: test-node-[001-100]
+        State: CLOUD
+      - DownNodes: test-node-[101-120]
+        State: DOWN
+        Reason: '"Test Reason"'
+      - NodeSet: active-nodes
+        Nodes: test-node-[001-100]
+      - PartitionName: test-partition
+        Nodes: active-nodes
