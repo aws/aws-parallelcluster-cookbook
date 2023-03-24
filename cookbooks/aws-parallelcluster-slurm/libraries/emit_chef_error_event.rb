@@ -56,7 +56,7 @@ module WriteChefError
         "version" => 0,
         "cluster-name" => node["cluster"]["stack_name"],
         "scheduler" => node["cluster"]["scheduler"],
-        "node-role" => "ComputeNode",
+        "node-role" => "ComputeFleet",
         "level" => "ERROR",
         "instance-id" => node["ec2"]["instance_id"],
         "event-type" => "chef-recipe-exception",

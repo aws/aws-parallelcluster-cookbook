@@ -33,4 +33,13 @@ PCLUSTER_REGION="<%= node['cluster']['region'] %>"
   --node-type "${PCLUSTER_NODE_TYPE}" \
   --queue-name "${PCLUSTER_SCHEDULER_QUEUE_NAME}" \
   --cluster-configuration "${PCLUSTER_CONFIG_PATH}" \
+  --instance-id "<%= @instance_id %>" \
+  --instance-type "<%= @instance_type %>" \
+  --ip-address "<%= @ip_address %>" \
+  --hostname "<%= @hostname %>" \
+  --resource  "<%= @compute_resource %>" \
+  --availability-zone "<%= @availability_zone %>" \
+  --scheduler "<%= @cluster_sheduler %>" \
+  --node-spec-file "<%= @node_spec_file %>" \
+  --verbose \
   "$@"

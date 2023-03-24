@@ -9,13 +9,11 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-
-# pylint: disable=redefined-outer-name
-# pylint: disable=protected-access
-
+import json
 import os
 import subprocess  # nosec B404
 import tempfile
+from types import SimpleNamespace
 from unittest.mock import MagicMock, call
 
 import botocore
@@ -24,16 +22,20 @@ from assertpy import assert_that
 from custom_action_executor import (
     SCRIPT_LOG_NAME_FETCH_AND_RUN,
     ActionRunner,
+    ComputeFleetLogger,
     ConfigLoader,
-    CustomLogger,
     DownloadRunError,
     ExecutableScript,
+    HeadNodeLogger,
     LegacyEventName,
     ScriptDefinition,
     ScriptRunner,
     main,
 )
 from mock.mock import AsyncMock
+
+# pylint: disable=redefined-outer-name
+# pylint: disable=protected-access
 
 
 @pytest.fixture
@@ -166,8 +168,8 @@ async def test_execute_script(script_runner, mocker, args):
     # assert that subprocess_mock is called twice
     subprocess_mock.assert_has_calls(
         [
-            call(["chmod", "+x", exe_script.path], check=True),
-            call([exe_script.path] + (exe_script.args or []), check=True),
+            call(["chmod", "+x", exe_script.path], check=True, stderr=subprocess.PIPE),
+            call([exe_script.path] + (exe_script.args or []), check=True, stderr=subprocess.PIPE),
         ]
     )
 
@@ -287,7 +289,7 @@ def test_log_without_url(mocker):
     mock_print = mocker.patch("builtins.print")
 
     with pytest.raises(SystemExit) as err:
-        CustomLogger(mock_conf).error_exit_with_bootstrap_error("test message", "test_url")
+        HeadNodeLogger(mock_conf).error_exit_with_bootstrap_error("test message", "test_url")
 
     assert_that(err.value.code).is_equal_to(1)
     assert_that(mock_print.call_count).is_equal_to(2)
@@ -412,3 +414,218 @@ def test_main_execution_with_arguments(mocker, args):
         main()
 
     assert_that(err.value.code).is_equal_to(1)
+
+
+@pytest.mark.parametrize(
+    "node_name, action, expected_event",
+    [
+        (
+            None,
+            "OnNodeStart",
+            {
+                "datetime": r".*",
+                "version": 0,
+                "scheduler": "slurm",
+                "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
+                "node-role": "ComputeFleet",
+                "component": "custom-action",
+                "level": "ERROR",
+                "instance-id": "i-instance",
+                "compute": {
+                    "name": "unknown",
+                    "instance-id": "i-instance",
+                    "instance-type": "c5.xlarge",
+                    "availability-zone": "us-east-1c",
+                    "address": "127.0.0.1",
+                    "hostname": "my_immortal",
+                    "queue-name": "partition-1",
+                    "compute-resource": "compute-a",
+                    "node-type": "unknown",
+                },
+                "event-type": "custom-action-error",
+                "message": "hello",
+                "detail": {"action": "OnNodeStart", "step": 1, "stage": "executing", "error": {"a": 1, "b": "error"}},
+            },
+        ),
+        (
+            "fancy_biscuit",
+            "OnNodeStart",
+            {
+                "datetime": r".*",
+                "version": 0,
+                "scheduler": "slurm",
+                "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
+                "node-role": "ComputeFleet",
+                "component": "custom-action",
+                "level": "ERROR",
+                "instance-id": "i-instance",
+                "compute": {
+                    "name": "fancy_biscuit",
+                    "instance-id": "i-instance",
+                    "instance-type": "c5.xlarge",
+                    "availability-zone": "us-east-1c",
+                    "address": "127.0.0.1",
+                    "hostname": "my_immortal",
+                    "queue-name": "partition-1",
+                    "compute-resource": "compute-a",
+                    "node-type": "unknown",
+                },
+                "event-type": "custom-action-error",
+                "message": "hello",
+                "detail": {"action": "OnNodeStart", "step": 1, "stage": "executing", "error": {"a": 1, "b": "error"}},
+            },
+        ),
+        (
+            "a-very-static-st-node-1",
+            "OnNodeStart",
+            {
+                "datetime": r".*",
+                "version": 0,
+                "scheduler": "slurm",
+                "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
+                "node-role": "ComputeFleet",
+                "component": "custom-action",
+                "level": "ERROR",
+                "instance-id": "i-instance",
+                "compute": {
+                    "name": "a-very-static-st-node-1",
+                    "instance-id": "i-instance",
+                    "instance-type": "c5.xlarge",
+                    "availability-zone": "us-east-1c",
+                    "address": "127.0.0.1",
+                    "hostname": "my_immortal",
+                    "queue-name": "partition-1",
+                    "compute-resource": "compute-a",
+                    "node-type": "static",
+                },
+                "event-type": "custom-action-error",
+                "message": "hello",
+                "detail": {"action": "OnNodeStart", "step": 1, "stage": "executing", "error": {"a": 1, "b": "error"}},
+            },
+        ),
+        (
+            "an-action-oriented-dy-node-2",
+            "OnNodeConfigured",
+            {
+                "datetime": r".*",
+                "version": 0,
+                "scheduler": "slurm",
+                "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
+                "node-role": "ComputeFleet",
+                "component": "custom-action",
+                "level": "ERROR",
+                "instance-id": "i-instance",
+                "compute": {
+                    "name": "an-action-oriented-dy-node-2",
+                    "instance-id": "i-instance",
+                    "instance-type": "c5.xlarge",
+                    "availability-zone": "us-east-1c",
+                    "address": "127.0.0.1",
+                    "hostname": "my_immortal",
+                    "queue-name": "partition-1",
+                    "compute-resource": "compute-a",
+                    "node-type": "dynamic",
+                },
+                "event-type": "custom-action-error",
+                "message": "hello",
+                "detail": {
+                    "action": "OnNodeConfigured",
+                    "step": 1,
+                    "stage": "executing",
+                    "error": {"a": 1, "b": "error"},
+                },
+            },
+        ),
+    ],
+)
+def test_compute_fleet_logger(mocker, node_name, action, expected_event):
+    config = SimpleNamespace(
+        event_name=action,
+        stack_name="integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N"
+        "-VC66PPA3U8IR",
+        node_type="ComputeFleet",
+        instance_id="i-instance",
+        instance_type="c5.xlarge",
+        availability_zone="us-east-1c",
+        ip_address="127.0.0.1",
+        hostname="my_immortal",
+        queue_name="partition-1",
+        resource_name="compute-a",
+        node_spec_file="/opt/parallelcluster/slurm_nodename",
+        dry_run=False,
+    )
+
+    def name_reader(*args, **kwargs):
+        if node_name:
+            return node_name
+        raise ValueError()
+
+    def write_handler(**kwargs):
+        received_events.append(kwargs.get("message"))
+
+    received_events = []
+
+    ComputeFleetLogger._read_node_name = name_reader
+
+    fleet_logger = ComputeFleetLogger(config)
+    fleet_logger._write_bootstrap_error = write_handler
+    error_exit_mock = mocker.patch("custom_action_executor.CustomLogger.error_exit")
+    sleep_mock = mocker.patch("time.sleep")
+    fleet_logger.error_exit_with_bootstrap_error(
+        "hello url", "hello", step=1, stage="executing", error={"a": 1, "b": "error"}
+    )
+
+    assert_that(received_events).is_length(1)
+    actual_event = json.loads(received_events[0])
+
+    assert_that(actual_event).is_equal_to(expected_event, ignore="datetime")
+
+    error_exit_mock.assert_called_once_with("hello url")
+    sleep_mock.assert_called_once_with(5)
+
+
+@pytest.mark.parametrize(
+    "stack_name, expected_cluster_name",
+    [
+        ("", ""),
+        ("not-a-child-stack", "not-a-child-stack"),
+        (
+            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
+            "integ-tests-j3v1lgb0rx4uvt5y",
+        ),
+        (
+            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch332QueueGroup773NestedStackQueueGroup441N-VC66PPA3U8IR",
+            "integ-tests-j3v1lgb0rx4uvt5y",
+        ),
+        (
+            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR-"
+            + "ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
+            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
+        ),
+    ],
+    ids=[
+        "empty string",
+        "does not match pattern",
+        "matches pattern",
+        "matches pattern with larger numbers",
+        "repeated matching suffix strips last matching suffix",
+    ],
+)
+def test_cluster_name_parsing(stack_name, expected_cluster_name):
+    config = SimpleNamespace(
+        event_name="action",
+        stack_name=stack_name,
+        node_type="ComputeFleet",
+        instance_id="i-instance",
+        instance_type="c5.xlarge",
+        availability_zone="us-east-1c",
+        ip_address="127.0.0.1",
+        hostname="my_immortal",
+        queue_name="partition-1",
+        resource_name="compute-a",
+        node_spec_file="/opt/parallelcluster/slurm_nodename",
+        dry_run=False,
+    )
+    fleet_logger = ComputeFleetLogger(config)
+
+    assert_that(fleet_logger._get_cluster_name()).is_equal_to(expected_cluster_name)

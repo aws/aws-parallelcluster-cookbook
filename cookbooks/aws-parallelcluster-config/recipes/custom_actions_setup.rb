@@ -20,6 +20,17 @@ template "#{node['cluster']['scripts_dir']}/fetch_and_run" do
   owner "root"
   group "root"
   mode "0755"
+  variables(
+    sheduler: node['cluster']['scheduler'],
+    instance_id: node['ec2']['instance_id'],
+    instance_type: node['ec2']['instance_type'],
+    availability_zone: node['ec2']['availability_zone'],
+    ip_address: node['ipaddress'],
+    hostname: node['ec2']['hostname'],
+    compute_resource: node['cluster']['scheduler_compute_resource_name'],
+    # TODO: This needs to be abstracted somehow since this resource should be scheduler independent
+    node_spec_file: "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename"
+  )
 end
 
 cookbook_file "#{node['cluster']['scripts_dir']}/custom_action_executor.py" do
