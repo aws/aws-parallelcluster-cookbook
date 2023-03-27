@@ -64,3 +64,4 @@ suites:
         - /intel_mpi_installed/
         - system_authentication_packages_installed
         - /nvidia_driver/
+        - /fabric_manager/
