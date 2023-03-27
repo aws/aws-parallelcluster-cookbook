@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:install_expected_versions_of_nvidia_driver_installed' do
+control 'tag:config_expected_versions_of_nvidia_driver_installed' do
   only_if do
     !instance.custom_ami? && !(os_properties.centos7? && os_properties.arm?) &&
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
@@ -23,9 +23,9 @@ control 'tag:install_expected_versions_of_nvidia_driver_installed' do
   end
 end
 
-control 'tag:install_expected_versions_of_cuda_installed' do
+control 'tag:config_expected_versions_of_nvidia_cuda_installed' do
   only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !os_properties.redhat8? && !instance.custom_ami? &&
+    !(os_properties.centos7? && os_properties.arm?) && !instance.custom_ami? &&
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
@@ -42,7 +42,19 @@ control 'tag:install_expected_versions_of_cuda_installed' do
   end
 end
 
-control 'tag:install_expected_versions_of_gdrcopy_installed' do
+control 'tag:config_expected_versions_of_nvidia_fabric_manager_installed' do
+  only_if do
+    !(os_properties.centos7? && os_properties.arm?) && !instance.custom_ami? &&
+      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+  end
+
+  describe package(node['cluster']['nvidia']['fabricmanager']['package']) do
+    it { should be_installed }
+    its('version') { should match /#{node['cluster']['nvidia']['fabricmanager']['version']}/ }
+  end
+end
+
+control 'tag:config_expected_versions_of_nvidia_gdrcopy_installed' do
   only_if do
     !(os_properties.centos7? && os_properties.arm?) && !os_properties.redhat8? && !instance.custom_ami? &&
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)

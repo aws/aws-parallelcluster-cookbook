@@ -282,3 +282,22 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos:update
+  - name: nvidia
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::nvidia]
+    verifier:
+      controls:
+        - /nvidia/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g5.xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+        - recipe:aws-parallelcluster-common::node_attributes
+      cluster:
+        nvidia:
+          enabled: true
