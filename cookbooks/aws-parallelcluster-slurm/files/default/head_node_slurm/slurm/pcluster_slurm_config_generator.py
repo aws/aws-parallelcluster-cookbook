@@ -159,65 +159,45 @@ class ComputeResourceRenderer:
         self.vcpus_count, self.threads_per_core = _get_min_vcpus(self.instance_types, instance_types_info)
         self.gpu_count, self.gpu_type = _get_min_gpu_count_and_type(self.instance_types, instance_types_info, log)
 
-    def static_node_name(self):
-        """Render the NodeName section for static nodes."""
-        return self._node_name("st", self.static_nodes)
-
-    def dynamic_node_name(self):
-        """Render the NodeName section for dynamic nodes."""
-        return self._node_name("dy", self.dynamic_nodes)
-
-    def vcpus(self) -> int:
-        """Return the number of vcpus according to disable_hyperthreading and instance features."""
-        return (
-            self.vcpus_count
-            if not self.disable_simultaneous_multithreading
-            else (self.vcpus_count // self.threads_per_core)
-        )
-
-    def gpus(self) -> dict:
-        """Return the number of GPUs and type for the compute resource."""
-        return {"count": self.gpu_count, "type": self.gpu_type}
-
-    def render(self):
+    def render_as_nodename(self):
         """Launch the rendering process."""
         config = ""
         if self.static_nodes > 0:
-            config += f"NodeName={self.static_node_name()}{ self._definitions() }\n"
+            config += f"NodeName={self._static_node_name()}{self._definitions()}\n"
         if self.dynamic_nodes > 0:
-            config += f"NodeName={self.dynamic_node_name()}{ self._definitions(dynamic=True) }\n"
+            config += f"NodeName={self._dynamic_node_name()}{self._definitions(dynamic=True)}\n"
 
         return config
 
-    def as_node_set(self):
+    def render_as_nodeset_element(self) -> List[str]:
         """Alternative rendering for the NodeSet definition."""
-        node_set = ""
+        node_set = []
         if self.static_nodes > 0:
-            node_set += f"{self.static_node_name()},"
+            node_set.append(f"{self._static_node_name()}")
         if self.dynamic_nodes > 0:
-            node_set += f"{self.dynamic_node_name()},"
+            node_set.append(f"{self._dynamic_node_name()}")
 
         return node_set
 
-    def as_gres(self):
+    def render_as_gres_element(self):
         """Alternative rendering for the gres config."""
         gres_render = ""
         if self.gpu_count > 0:
             if self.static_nodes > 0:
                 gres_render += (
-                    f"NodeName={self.static_node_name()} Name=gpu "
-                    f"Type={ self.gpu_type } File=/dev/nvidia[0-{ self.gpu_count - 1 }]\n"
+                    f"NodeName={self._static_node_name()} Name=gpu "
+                    f"Type={self.gpu_type} File=/dev/nvidia[0-{self.gpu_count - 1}]\n"
                 )
             if self.dynamic_nodes > 0:
                 gres_render += (
-                    f"NodeName={self.dynamic_node_name()} Name=gpu "
-                    f"Type={ self.gpu_type } File=/dev/nvidia[0-{ self.gpu_count - 1 }]\n"
+                    f"NodeName={self._dynamic_node_name()} Name=gpu "
+                    f"Type={self.gpu_type} File=/dev/nvidia[0-{self.gpu_count - 1}]\n"
                 )
 
         return gres_render
 
     def _definitions(self, dynamic=False):
-        definitions = f" CPUs={ self.vcpus() } RealMemory={ self.real_memory } State=CLOUD {self._features(dynamic)}"
+        definitions = f" CPUs={self._vcpus()} RealMemory={self.real_memory} State=CLOUD {self._features(dynamic)}"
 
         if self.has_gpu and self.gpu_count > 0:
             definitions += f" Gres=gpu:{ self.gpu_type }:{self.gpu_count}"
@@ -244,8 +224,28 @@ class ComputeResourceRenderer:
 
         return features
 
+    def _static_node_name(self):
+        """Render the NodeName section for static nodes."""
+        return self._node_name("st", self.static_nodes)
+
+    def _dynamic_node_name(self):
+        """Render the NodeName section for dynamic nodes."""
+        return self._node_name("dy", self.dynamic_nodes)
+
     def _node_name(self, type, size):
-        return f"{self.queue_name}-{type}-{self.name}-[1-{ size }]"
+        return f"{self.queue_name}-{type}-{self.name}-[1-{size}]"
+
+    def _vcpus(self) -> int:
+        """Return the number of vcpus according to disable_hyperthreading and instance features."""
+        return (
+            self.vcpus_count
+            if not self.disable_simultaneous_multithreading
+            else (self.vcpus_count // self.threads_per_core)
+        )
+
+    def _gpus(self) -> dict:
+        """Return the number of GPUs and type for the compute resource."""
+        return {"count": self.gpu_count, "type": self.gpu_type}
 
 
 class QueueRenderer:
@@ -255,44 +255,45 @@ class QueueRenderer:
         self.name = queue_config["Name"]
         self.is_default = default
         self.conf_type = conf_type
-        self.capacity_type = queue_config["CapacityType"]
-        self.iam = queue_config["Iam"]
         self.compute_renderers = [
             ComputeResourceRenderer(self.name, compute_resource_config, no_gpu, memory_ratio, instance_types_info)
             for compute_resource_config in queue_config["ComputeResources"]
         ]
 
-    def render(self):
+    def render_config(self):
         """Launch the rendering of the required configuration."""
-        rendered = f"{CONFIG_HEADER}\n"
+        config = f"{CONFIG_HEADER}\n"
         if self.conf_type == "gres":
-            rendered += self._as_gres()
+            config += self._render_as_gres_config()
         else:
-            rendered += self._as_partition()
+            config += self._render_as_partition_config()
 
-        return rendered
+        return config
 
-    def _as_partition(self):
-        partition_render = "\n"
+    def _render_as_partition_config(self):
+        partition_config = "\n"
         for renderer in self.compute_renderers:
-            partition_render += f"{renderer.render()}"
+            partition_config += f"{renderer.render_as_nodename()}"
 
-        partition_render += f"\n{self._render_node_set()}\n{self._render_partition()}\n"
-        return partition_render
+        partition_config += f"\n{self._render_nodeset()}\n{self._render_partition()}\n"
+        return partition_config
 
-    def _as_gres(self):
-        gres_render = ""
+    def _render_as_gres_config(self):
+        gres = ""
         for renderer in self.compute_renderers:
-            gres_render += f"{renderer.as_gres()}"
+            gres += f"{renderer.render_as_gres_element()}"
 
-        return gres_render
+        return gres
 
-    def _render_node_set(self):
-        node_set = f"NodeSet={self.name}_nodes Nodes="
+    def _render_nodeset(self):
+        nodeset = f"NodeSet={self.name}_nodes Nodes="
+        nodes = []
         for renderer in self.compute_renderers:
-            node_set += f"{renderer.as_node_set()}"
+            nodes.extend(renderer.render_as_nodeset_element())
 
-        return node_set[:-1]
+        nodeset += ",".join(nodes)
+
+        return nodeset
 
     def _render_partition(self):
         partition = f"PartitionName={self.name} Nodes={self.name}_nodes MaxTime=INFINITE State=UP"
@@ -429,7 +430,7 @@ def _generate_queue_config(
         conf_type=file_type,
         default=is_default_queue,
     )
-    rendered_template = renderer.render()
+    rendered_config = renderer.render_config()
 
     if not dryrun:
         filename = path.join(output_dir, f"slurm_parallelcluster_{queue_name}_{file_type}.conf")
@@ -440,7 +441,7 @@ def _generate_queue_config(
                 filename,
             )
         else:
-            _write_rendered_template_to_file(rendered_template, filename)
+            _write_rendered_template_to_file(rendered_config, filename)
 
 
 def _generate_slurm_parallelcluster_configs(
