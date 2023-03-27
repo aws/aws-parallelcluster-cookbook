@@ -172,6 +172,30 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
+def test_generate_slurm_config_with_custom_settings(test_datadir, tmpdir):
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    for queue in ["efa", "gpu", "multiple_spot"]:
+        file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        output_file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
 def _assert_files_are_equal(file, expected_file):
     with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()
