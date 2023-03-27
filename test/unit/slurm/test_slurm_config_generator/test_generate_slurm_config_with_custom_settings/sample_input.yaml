@@ -1,0 +1,86 @@
+Scheduling:
+  SlurmQueues:
+    - Name: multiple_spot
+      CustomSlurmSettings:
+        CustomQueueParam: unique_queue_value
+        OtherQueueParam: second_queue_value
+      CapacityType: SPOT
+      ComputeResources:
+        - Name: multiplespot-1
+          CustomSlurmSettings:
+            CustomComputeParam: unique_compute_value
+            OtherComputeParam: second_compute_value
+          InstanceType: c4.xlarge
+          MaxCount: 10
+          MinCount: 5
+          SpotPrice: null
+        - DisableSimultaneousMultithreading: true
+          Efa:
+            Enabled: false
+            GdrSupport: false
+          InstanceType: c5.2xlarge
+          MaxCount: 5
+          MinCount: 5
+          Name: multiplespot-2
+          SpotPrice: 1.5
+      Iam:
+        AdditionalIamPolicies: []
+        InstanceRole: null
+        S3Access: null
+    - Name: efa
+      CapacityType: ONDEMAND
+      CustomSlurmSettings:
+        CustomEfaParam: unique_efa_value
+        OtherEfaParam: second_efa_value
+      ComputeResources:
+        - Name: efa-c5n
+          CustomSlurmSettings:
+            CustomEfaComputeParam: unique_efa_compute_value
+            OtherEfaComputeParam: second_efa_compute_value
+          DisableSimultaneousMultithreading: true
+          Efa:
+            Enabled: true
+            GdrSupport: false
+          InstanceType: c5n.18xlarge
+          MaxCount: 5
+          MinCount: 1
+
+          SpotPrice: null
+      ComputeSettings: null
+      CustomActions: null
+      Iam:
+        AdditionalIamPolicies: []
+        InstanceRole: null
+        S3Access: null
+    - Name: gpu
+      CapacityType: ONDEMAND
+      CustomSlurmSettings:
+        CustomParam: unique_value
+        OtherParam: second_value
+        TreeAsThird: 3
+      ComputeResources:
+        - Name: gpu-g38xlarge
+          CustomSlurmSettings:
+            CustomNvidiaParam: nvidia_setting
+            CustomAmdParam: amd_setting
+            CustomIntelParam: intel_setting
+          InstanceType: g3.8xlarge
+          MaxCount: 5
+          MinCount: 1
+          SpotPrice: null
+        - Name: gpu-p3dn24xlarge
+          InstanceType: p3dn.24xlarge
+          MaxCount: 10
+          MinCount: 0
+          SpotPrice: null
+      ComputeSettings: null
+      CustomActions: null
+      Iam:
+        AdditionalIamPolicies: []
+        InstanceRole: null
+        S3Access: null
+  Scheduler: slurm
+  SlurmSettings:
+    ScaledownIdletime: 10
+    EnableMemoryBasedScheduling: false
+    Database: null
