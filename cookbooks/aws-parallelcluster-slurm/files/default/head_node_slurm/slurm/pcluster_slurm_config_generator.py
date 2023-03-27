@@ -148,7 +148,8 @@ class ComputeResourceRenderer:
         self.static_nodes = compute_resource_config["MinCount"]
         self.dynamic_nodes = compute_resource_config["MaxCount"] - self.static_nodes
         self.name = compute_resource_config["Name"]
-        self.disable_simultaneous_multithreading = compute_resource_config["DisableSimultaneousMultithreading"]
+        self.disable_multithreading = compute_resource_config.get("DisableSimultaneousMultithreading", False)
+        self.custom_settings = compute_resource_config.get("CustomSlurmSettings", {})
         self.spot_price = compute_resource_config.get("SpotPrice", None)
         self.instance_types = _get_instance_types(compute_resource_config)
         self.real_memory = _get_real_memory(
@@ -169,11 +170,7 @@ class ComputeResourceRenderer:
 
     def vcpus(self) -> int:
         """Return the number of vcpus according to disable_hyperthreading and instance features."""
-        return (
-            self.vcpus_count
-            if not self.disable_simultaneous_multithreading
-            else (self.vcpus_count // self.threads_per_core)
-        )
+        return self.vcpus_count if not self.disable_multithreading else (self.vcpus_count // self.threads_per_core)
 
     def gpus(self) -> dict:
         """Return the number of GPUs and type for the compute resource."""
@@ -183,9 +180,11 @@ class ComputeResourceRenderer:
         """Launch the rendering process."""
         config = ""
         if self.static_nodes > 0:
-            config += f"NodeName={self.static_node_name()}{ self._definitions() }\n"
+            config += f"NodeName={self.static_node_name()}{ self._definitions() }{self._custom_settings()}\n"
         if self.dynamic_nodes > 0:
-            config += f"NodeName={self.dynamic_node_name()}{ self._definitions(dynamic=True) }\n"
+            config += (
+                f"NodeName={self.dynamic_node_name()}{ self._definitions(dynamic=True) }{self._custom_settings()}\n"
+            )
 
         return config
 
@@ -244,6 +243,13 @@ class ComputeResourceRenderer:
 
         return features
 
+    def _custom_settings(self):
+        custom = ""
+        for param, value in self.custom_settings.items():
+            custom += f" {param}={value}"
+
+        return custom
+
     def _node_name(self, type, size):
         return f"{self.queue_name}-{type}-{self.name}-[1-{ size }]"
 
@@ -256,6 +262,7 @@ class QueueRenderer:
         self.is_default = default
         self.conf_type = conf_type
         self.capacity_type = queue_config["CapacityType"]
+        self.custom_settings = queue_config.get("CustomSlurmSettings", {})
         self.iam = queue_config["Iam"]
         self.compute_renderers = [
             ComputeResourceRenderer(self.name, compute_resource_config, no_gpu, memory_ratio, instance_types_info)
@@ -299,7 +306,16 @@ class QueueRenderer:
         if self.is_default:
             partition += " Default=YES"
 
+        partition += f"{self._custom_settings()}"
+
         return partition
+
+    def _custom_settings(self):
+        custom = ""
+        for param, value in self.custom_settings.items():
+            custom += f" {param}={value}"
+
+        return custom
 
 
 # end of config_renderer.py
