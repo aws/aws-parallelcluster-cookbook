@@ -602,6 +602,14 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
             + "ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
             "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
         ),
+        (
+            "integ-tests-ddladsmelz9ytvwp-develop-ComputeFleetQueueBatch0QueueGroup0NestedStackQueu-1J01OX5L1J502",
+            "integ-tests-ddladsmelz9ytvwp-develop",
+        ),
+        (
+            "integ-tests-ddladsmelz9ytvwp-develop-super-long-maximum-name-ComputeFleetQueueBatch0Qu-1J01OX5L1J502",
+            "integ-tests-ddladsmelz9ytvwp-develop-super-long-maximum-name",
+        ),
     ],
     ids=[
         "empty string",
@@ -609,6 +617,8 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
         "matches pattern",
         "matches pattern with larger numbers",
         "repeated matching suffix strips last matching suffix",
+        "failing-integ-test-001",
+        "60 character cluster name",
     ],
 )
 def test_cluster_name_parsing(stack_name, expected_cluster_name):

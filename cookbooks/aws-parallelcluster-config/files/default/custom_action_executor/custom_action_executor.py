@@ -305,13 +305,12 @@ class HeadNodeLogger(CustomLogger):
         self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
     ):
         """Log error message and exit with a bootstrap error."""
-        self._log_message(msg)
-        self._write_bootstrap_error(message=msg_without_url if msg_without_url else msg)
-        raise SystemExit(1)
+        self._log_message(f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {msg} {ERROR_MSG_SUFFIX}")
 
-    def _log_message(self, message: str):
-        complete_message = f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {message} {ERROR_MSG_SUFFIX}"
-        super()._log_message(complete_message)
+        message = msg_without_url if msg_without_url else msg
+        self._write_bootstrap_error(message=f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {message} {ERROR_MSG_SUFFIX}")
+
+        raise SystemExit(1)
 
 
 class ComputeFleetLogger(CustomLogger):
@@ -355,7 +354,9 @@ class ComputeFleetLogger(CustomLogger):
     def __init__(self, conf: CustomActionsConfig):
         super().__init__(conf)
         self._node_name_pattern = re.compile(r"^[a-z0-9\-]+-(st|dy)-[a-z0-9\-]+-\d+$")
-        self._stack_name_pattern = re.compile(r"(.+)-ComputeFleetQueueBatch\d+QueueGroup\d+NestedStackQueueGroup\d+.+")
+        self._stack_name_pattern = re.compile(
+            r"(.+)-ComputeFleetQueueBatch\d+(QueueGroup\d+NestedStackQueueGroup\d+)?.+$"
+        )
 
     def error_exit_with_bootstrap_error(
         self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
@@ -527,9 +528,9 @@ class ConfigLoader:
 class DownloadRunError(Exception):
     """Error in script execution supporting masking of script urls in the logs."""
 
-    def __init__(self, msg, msg_with_url, step_id: int = None, stage: str = None, error: any = None):
+    def __init__(self, msg, msg_without_url, step_id: int = None, stage: str = None, error: any = None):
         self.msg = msg
-        self.msg_with_url = msg_with_url
+        self.msg_without_url = msg_without_url
         self.step_id = step_id
         self.stage = stage
         self.step_id = step_id
@@ -558,7 +559,7 @@ class ActionRunner:
                 self._download_run()
             except DownloadRunError as e:
                 self.custom_logger.error_exit_with_bootstrap_error(
-                    msg=e.msg, msg_without_url=e.msg_with_url, step=e.step_id, stage=e.stage, error=e.error
+                    msg=e.msg, msg_without_url=e.msg_without_url, step=e.step_id, stage=e.stage, error=e.error
                 )
             except RuntimeError as e:
                 logging.debug(e)
