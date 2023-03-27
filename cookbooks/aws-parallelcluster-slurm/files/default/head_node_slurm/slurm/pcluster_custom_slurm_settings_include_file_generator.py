@@ -90,14 +90,19 @@ def _generate_include_file(include_target: str, include_file_config: List[Dict],
     :return:
     """
     log.info("Generating custom_slurm_settings_include_file_%s.conf", include_target)
-    if not dryrun:
-        filename = path.join(output_directory, f"custom_slurm_settings_include_file_{include_target}.conf")
+    if dryrun:
+        return
 
-        # The include_file_config is structured as a list of dictionaries, which can either contain one
-        # single key-value pair (simple parameters) or multiple pairs (e.g. partition definitions).
-        with open(filename, "w", encoding="utf-8") as output_file:
-            output_file.write(INCLUDE_FILE_HEADER + "\n\n")
+    filename = path.join(output_directory, f"custom_slurm_settings_include_file_{include_target}.conf")
 
+    # The include_file_config is structured as a list of dictionaries, which can either contain one
+    # single key-value pair (simple parameters) or multiple pairs (e.g. partition definitions).
+    with open(filename, "w", encoding="utf-8") as output_file:
+        output_file.write(INCLUDE_FILE_HEADER + "\n\n")
+
+        # If include_file_config is empty, this function will generate an empty config file with only the header
+        # defined in INCLUDE_FILE_HEADER
+        if include_file_config:
             for param in include_file_config:
                 output_string = (
                     _generate_simple_parameter(param) if len(param) == 1 else _generate_complex_parameter(param)
@@ -124,13 +129,12 @@ def _generate_custom_slurm_config_include_files(
         include_file_config = cluster_config["Scheduling"]["SlurmSettings"].get(
             INCLUDE_TARGET_MAPPING[include_target], {}
         )
-        if include_file_config:
-            _generate_include_file(
-                include_target,
-                include_file_config,
-                pcluster_subdirectory,
-                dryrun,
-            )
+        _generate_include_file(
+            include_target,
+            include_file_config,
+            pcluster_subdirectory,
+            dryrun,
+        )
 
     log.info("Finished.")
 

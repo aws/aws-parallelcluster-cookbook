@@ -108,6 +108,19 @@ def test_generate_custom_slurm_settings_include_files(test_datadir, tmpdir, leve
         _assert_files_are_equal(tmpdir / output_file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
+@pytest.mark.parametrize(
+    "levels",
+    [["slurm"]],
+)
+def test_generate_empty_custom_slurm_settings_include_files(test_datadir, tmpdir, levels):
+    input_file = str(test_datadir / "sample_input.yaml")
+    _generate_custom_slurm_config_include_files(tmpdir, input_file, dryrun=False)
+
+    for level in levels:
+        output_file_name = f"pcluster/custom_slurm_settings_include_file_{level}.conf"
+        _assert_files_are_equal(tmpdir / output_file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
 def _assert_files_are_equal(file, expected_file):
     with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()

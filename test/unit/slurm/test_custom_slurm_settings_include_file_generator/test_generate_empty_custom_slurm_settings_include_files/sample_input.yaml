@@ -1,0 +1,3 @@
+Scheduling:
+  SlurmSettings:
+    ScaleDownIdleTime: 20  # Useless option for the sake of this test
