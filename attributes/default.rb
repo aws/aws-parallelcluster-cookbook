@@ -186,8 +186,8 @@ default['cluster']['nvidia']['gdrcopy']['service'] = value_for_platform(
 )
 
 # EFA
-default['cluster']['efa']['installer_version'] = '1.21.0'
-default['cluster']['efa']['sha256'] = 'c64e6ca34ccfc3ebe8e82d08899ae8442b3ef552541cf5429c43d11a04333050'
+default['cluster']['efa']['installer_version'] = '1.22.1'
+default['cluster']['efa']['sha256'] = 'f90f3d5f59c031b9a964466b5401e86fd0429272408f6c207c3f9048254e9665'
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
 
 # EFS Utils

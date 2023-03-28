@@ -12,6 +12,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add log rotation support for ParallelCluster managed logs.
 
 **CHANGES**
+- Upgrade EFA installer to `1.22.1`
+  - Dkms : `2.8.3-2` 
+  - Efa-driver: `efa-2.1.1g`
+  - Efa-config: `efa-config-1.13-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.17.1-1`
+  - Rdma-core: `rdma-core-43.0-1`
+  - Open MPI: `openmpi40-aws-4.1.5-1`
 - Upgrade Lustre client version to 2.12 on Amazon Linux 2. Lustre client 2.12 has been installed on Ubuntu 20.04, 18.04 and CentOS >= 7.7.  Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
 
 **BUG FIXES**
