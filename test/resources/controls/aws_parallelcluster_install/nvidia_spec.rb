@@ -67,3 +67,14 @@ control 'tag:config_expected_versions_of_nvidia_gdrcopy_installed' do
     it { should eq expected_gdrcopy_version }
   end
 end
+
+control 'tag:config_expected_nvidia_datacenter-gpu-manager_installed' do
+  only_if do
+    !(os_properties.centos7? && os_properties.arm?) && !instance.custom_ami? &&
+      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+  end
+
+  describe package('datacenter-gpu-manager') do
+    it { should be_installed }
+  end
+end
