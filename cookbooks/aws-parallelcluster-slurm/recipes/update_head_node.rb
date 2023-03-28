@@ -17,7 +17,7 @@
 
 execute 'stop clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_custom_slurm_settings_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 ruby_block "update_shared_storages" do
@@ -165,7 +165,7 @@ execute "generate_pcluster_custom_slurm_settings_include_files" do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py" \
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
             " --input-file #{node['cluster']['cluster_config_path']}"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_custom_slurm_settings_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_bulk_custom_slurm_settings_updated? }
 end
 
 execute "generate_pcluster_fleet_config" do
@@ -195,7 +195,7 @@ end unless virtualized?
 
 service 'slurmctld' do
   action :restart
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_custom_slurm_settings_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 chef_sleep '5'
@@ -213,14 +213,14 @@ execute 'reload config for running nodes' do
   retries 3
   retry_delay 5
   timeout 300
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_custom_slurm_settings_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 chef_sleep '15'
 
 execute 'start clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_custom_slurm_settings_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 # The updated cfnconfig will be used by post update custom scripts

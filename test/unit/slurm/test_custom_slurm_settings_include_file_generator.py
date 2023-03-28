@@ -14,15 +14,29 @@ import os
 import pytest
 from assertpy import assert_that
 from slurm.pcluster_custom_slurm_settings_include_file_generator import (
-    _generate_complex_parameter,
     _generate_custom_slurm_config_include_files,
-    _generate_simple_parameter,
+    _render_parameter,
 )
 
 
 @pytest.mark.parametrize(
     "param, output_string",
     [
+        # Simple parameter
+        (
+            {"FirstJobId": "65536"},
+            "FirstJobId=65536",
+        ),
+        # Simple parameter with special characters
+        (
+            {"PluginDir": "/usr/local/lib:/usr/local/slurm/lib"},
+            "PluginDir=/usr/local/lib:/usr/local/slurm/lib",
+        ),
+        # Simple "composed" parameter
+        (
+            {"SchedulerParameters": "allow_zero_lic,batch_sched_delay=30,delay_boot=120"},
+            "SchedulerParameters=allow_zero_lic,batch_sched_delay=30,delay_boot=120",
+        ),
         # Nodelist with generic parameters
         (
             {
@@ -77,22 +91,7 @@ from slurm.pcluster_custom_slurm_settings_include_file_generator import (
     ],
 )
 def test_generate_complex_parameter(param, output_string):
-    assert_that(_generate_complex_parameter(param)).is_equal_to(output_string)
-
-
-@pytest.mark.parametrize(
-    "param, output_string",
-    [
-        ({"FirstJobId": "65536"}, "FirstJobId=65536"),
-        ({"PluginDir": "/usr/local/lib:/usr/local/slurm/lib"}, "PluginDir=/usr/local/lib:/usr/local/slurm/lib"),
-        (
-            {"SchedulerParaneters": "allow_zero_lic,batch_sched_delay=30,delay_boot=120"},
-            "SchedulerParaneters=allow_zero_lic,batch_sched_delay=30,delay_boot=120",
-        ),
-    ],
-)
-def test_generate_simple_parameter(param, output_string):
-    assert_that(_generate_simple_parameter(param)).is_equal_to(output_string)
+    assert_that(_render_parameter(param)).is_equal_to(output_string)
 
 
 @pytest.mark.parametrize(

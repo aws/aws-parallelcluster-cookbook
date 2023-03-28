@@ -311,7 +311,7 @@ def are_queues_updated?
 end
 
 # Verify if CustomSlurmSettings has been updated in the config
-def are_custom_slurm_settings_updated?
+def are_bulk_custom_slurm_settings_updated?
   require 'yaml'
   config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))

@@ -14,3 +14,7 @@ Scheduling:
         Nodes: test-node-[001-100]
       - PartitionName: test-partition
         Nodes: active-nodes
+      # Wrong definition with multiple primary subparameters
+      - PartitionName: test-wrong-partition
+        NodeName: test-wrong-node-[1-10]
+        Nodes: test-wrong-nodelist

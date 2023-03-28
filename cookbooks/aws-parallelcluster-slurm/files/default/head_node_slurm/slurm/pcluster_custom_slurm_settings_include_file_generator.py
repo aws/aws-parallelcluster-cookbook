@@ -1,4 +1,4 @@
-# Copyright 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -40,43 +40,38 @@ def _setup_logger():
     )
 
 
-def _generate_simple_parameter(param: Dict) -> str:
+def _render_parameter(param: Dict) -> str:
     """
-    Generate string to represent a simple parameter in the Slurm configuration.
+    Render string to represent a parameter in the Slurm configuration.
 
     :param param: dictionary containing the parameter structure.
     :return: string to be included in the Slurm configuration file.
     """
-    key = list(param.keys())[0]
-    value = list(param.values())[0]
-    return f"{key}={value}"
+    first_subparam = {}
 
-
-def _generate_complex_parameter(param: Dict) -> str:
-    """
-    Generate string to represent a complex parameter in the Slurm configuration.
-
-    :param param: dictionary containing the parameter structure.
-    :return: string to be included in the Slurm configuration file.
-    """
     # Some complex parameters require a specific subparameter to be defined first in the line
     # (e.g. the NodeName parameter in the node definition)
     for key, value in param.items():
         # Here we assume that the users do not pass more than one of these parameters in the same dictionary.
         if key.lower() in ["nodename", "partitionname", "nodeset", "downnodes"]:
-            first_subparam = {key: value}
-            break
+            if not first_subparam:
+                first_subparam[key] = value
+            else:
+                log.warning(
+                    "Warning! Another subparameter to be placed in first position was already found: %s", first_subparam
+                )
 
     remaining_subparams = {key: value for key, value in param.items() if key not in first_subparam}
 
     output_string = ""
     # The first loop will either loop over a single parameter or not run at all
     for key, value in first_subparam.items():
-        output_string = f"{key}={value}"
+        output_string = " ".join([output_string, f"{key}={value}"])
     for key, value in remaining_subparams.items():
         output_string = " ".join([output_string, f"{key}={value}"])
 
-    return output_string
+    # Here the leading whitespace introduced by the first join() is removed
+    return output_string.lstrip()
 
 
 def _generate_include_file(include_target: str, include_file_config: List[Dict], output_directory, dryrun: bool):
@@ -104,9 +99,7 @@ def _generate_include_file(include_target: str, include_file_config: List[Dict],
         # defined in INCLUDE_FILE_HEADER
         if include_file_config:
             for param in include_file_config:
-                output_string = (
-                    _generate_simple_parameter(param) if len(param) == 1 else _generate_complex_parameter(param)
-                )
+                output_string = _render_parameter(param)
                 output_file.write(output_string + "\n")
 
 
@@ -124,19 +117,10 @@ def _generate_custom_slurm_config_include_files(
     # Load cluster configuration from YAML
     cluster_config = _load_cluster_config(input_file)
 
-    for include_target in ["slurm"]:
-        # Get specific custom Slurm settings section and if present, create the corresponding include file
-        include_file_config = cluster_config["Scheduling"]["SlurmSettings"].get(
-            INCLUDE_TARGET_MAPPING[include_target], {}
-        )
-        _generate_include_file(
-            include_target,
-            include_file_config,
-            pcluster_subdirectory,
-            dryrun,
-        )
+    include_file_config = cluster_config["Scheduling"]["SlurmSettings"].get("CustomSlurmSettings", {})
+    _generate_include_file("slurm", include_file_config, pcluster_subdirectory, dryrun)
 
-    log.info("Finished.")
+    log.info("Generation of custom Slurm settings include files finished.")
 
 
 def main():
