@@ -17,7 +17,7 @@
 
 nvidia_driver 'Install nvidia driver'
 include_recipe "aws-parallelcluster-install::cuda"
-include_recipe "aws-parallelcluster-install::gdrcopy" unless redhat8?
+gdrcopy 'Install Nvidia gdrcopy'
 
 # Install NVIDIA Fabric Manager
 repo_domain = node['cluster']['region'].start_with?("cn-") ? "com" : "cn"
