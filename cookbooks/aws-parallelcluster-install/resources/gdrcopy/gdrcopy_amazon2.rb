@@ -17,6 +17,14 @@ provides :gdrcopy, platform: 'amazon', platform_version: '2'
 use 'partial/_gdrcopy_common.rb'
 use 'partial/_gdrcopy_common_rhel.rb'
 
+unified_mode true
+default_action :setup
+
+action :setup do
+  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
+  action_gdrcopy_installation
+end
+
 action_class do
   def gdrcopy_build_dependencies
     %w(dkms rpm-build make check check-devel subunit subunit-devel)
