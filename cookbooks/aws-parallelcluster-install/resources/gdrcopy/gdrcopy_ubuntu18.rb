@@ -17,6 +17,14 @@ provides :gdrcopy, platform: 'ubuntu', platform_version: '18.04'
 use 'partial/_gdrcopy_common.rb'
 use 'partial/_gdrcopy_common_debian.rb'
 
+unified_mode true
+default_action :setup
+
+action :setup do
+  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
+  action_gdrcopy_installation
+end
+
 action_class do
   def platform
     'Ubuntu18_04'
