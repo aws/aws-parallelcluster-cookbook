@@ -21,7 +21,7 @@ gdrcopy 'Install Nvidia gdrcopy'
 
 # Install NVIDIA Fabric Manager
 repo_domain = node['cluster']['region'].start_with?("cn-") ? "com" : "cn"
-repo_uri = node['cluster']['nvidia']['fabricmanager']['repository_uri'].gsub('_domain_', repo_domain)
+repo_uri = node['cluster']['nvidia']['cuda']['repository_uri'].gsub('_domain_', repo_domain)
 add_package_repository("nvidia-repo", repo_uri, "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}", "/")
 
 fabric_manager 'Install Nvidia Fabric Manager'
