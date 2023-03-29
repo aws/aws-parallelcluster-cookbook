@@ -26,6 +26,6 @@ add_package_repository("nvidia-repo", repo_uri, "#{repo_uri}/#{node['cluster']['
 
 fabric_manager 'Install Nvidia Fabric Manager'
 
-package 'datacenter-gpu-manager'
+package 'datacenter-gpu-manager' unless arm_instance?
 
 remove_package_repository("nvidia-repo")

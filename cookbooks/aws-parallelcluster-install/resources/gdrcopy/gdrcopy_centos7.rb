@@ -19,16 +19,10 @@ end
 use 'partial/_gdrcopy_common.rb'
 use 'partial/_gdrcopy_common_rhel.rb'
 
-action_class do
-  def gdrcopy_build_dependencies
-    %w(dkms rpm-build make check check-devel subunit subunit-devel)
-  end
+unified_mode true
+default_action :setup
 
-  def platform
-    '.el7'
-  end
-
-  def arch
-    arm_instance? ? 'arm64' : 'x86_64'
-  end
+action :setup do
+  return if arm_instance? || !(node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+  action_gdrcopy_installation
 end

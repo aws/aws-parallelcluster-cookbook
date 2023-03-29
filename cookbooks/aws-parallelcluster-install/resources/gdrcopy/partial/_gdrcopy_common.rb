@@ -12,12 +12,8 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-unified_mode true
-default_action :setup
 
-action :setup do
-  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
-
+action :gdrcopy_installation do
   gdrcopy_version = node['cluster']['nvidia']['gdrcopy']['version']
   gdrcopy_tarball = "#{node['cluster']['sources_dir']}/gdrcopy-#{gdrcopy_version}.tar.gz"
   gdrcopy_checksum = node['cluster']['nvidia']['gdrcopy']['sha256']
