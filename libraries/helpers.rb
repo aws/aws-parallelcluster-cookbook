@@ -310,6 +310,14 @@ def are_queues_updated?
   config["Scheduling"] != previous_config["Scheduling"] or is_compute_node_bootstrap_timeout_updated?(previous_config, config)
 end
 
+# Verify if CustomSlurmSettings has been updated in the config
+def are_bulk_custom_slurm_settings_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"]["SlurmSettings"]["CustomSlurmSettings"] != previous_config["Scheduling"]["SlurmSettings"]["CustomSlurmSettings"]
+end
+
 def are_mount_or_unmount_required?
   require 'json'
   change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
