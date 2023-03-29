@@ -47,11 +47,8 @@ def _get_instance_types(compute_resource_config) -> List[str]:
 
 def _get_efa_settings(compute_resource_config) -> Tuple[bool, bool]:
     """Return a Tuple with EFA flags."""
-    if "Efa" in compute_resource_config:
-        efa = compute_resource_config["Efa"]
-        return efa["Enabled"], efa["GdrSupport"]
-    else:
-        return False, False
+    efa = compute_resource_config["Efa"]
+    return efa["Enabled"], efa["GdrSupport"]
 
 
 def _get_real_memory(compute_resource_config, instance_types, instance_types_info, memory_ratio) -> int:
@@ -148,7 +145,8 @@ class ComputeResourceRenderer:
         self.static_nodes = compute_resource_config["MinCount"]
         self.dynamic_nodes = compute_resource_config["MaxCount"] - self.static_nodes
         self.name = compute_resource_config["Name"]
-        self.disable_simultaneous_multithreading = compute_resource_config["DisableSimultaneousMultithreading"]
+        self.disable_multithreading = compute_resource_config["DisableSimultaneousMultithreading"]
+        self.custom_settings = compute_resource_config.get("CustomSlurmSettings", {})
         self.spot_price = compute_resource_config.get("SpotPrice", None)
         self.instance_types = _get_instance_types(compute_resource_config)
         self.real_memory = _get_real_memory(
@@ -163,21 +161,23 @@ class ComputeResourceRenderer:
         """Launch the rendering process."""
         config = ""
         if self.static_nodes > 0:
-            config += f"NodeName={self._static_node_name()}{self._definitions()}\n"
+            config += f"NodeName={self._static_node_name()}{self._definitions()}{self._custom_settings()}\n"
         if self.dynamic_nodes > 0:
-            config += f"NodeName={self._dynamic_node_name()}{self._definitions(dynamic=True)}\n"
+            config += (
+                f"NodeName={self._dynamic_node_name()}{self._definitions(dynamic=True)}{self._custom_settings()}\n"
+            )
 
         return config
 
     def render_as_nodeset_element(self) -> List[str]:
         """Alternative rendering for the NodeSet definition."""
-        node_set = []
+        nodeset = []
         if self.static_nodes > 0:
-            node_set.append(f"{self._static_node_name()}")
+            nodeset.append(f"{self._static_node_name()}")
         if self.dynamic_nodes > 0:
-            node_set.append(f"{self._dynamic_node_name()}")
+            nodeset.append(f"{self._dynamic_node_name()}")
 
-        return node_set
+        return nodeset
 
     def render_as_gres_element(self):
         """Alternative rendering for the gres config."""
@@ -224,6 +224,13 @@ class ComputeResourceRenderer:
 
         return features
 
+    def _custom_settings(self):
+        custom = ""
+        for param, value in self.custom_settings.items():
+            custom += f" {param}={value}"
+
+        return custom
+
     def _static_node_name(self):
         """Render the NodeName section for static nodes."""
         return self._node_name("st", self.static_nodes)
@@ -237,11 +244,7 @@ class ComputeResourceRenderer:
 
     def _vcpus(self) -> int:
         """Return the number of vcpus according to disable_hyperthreading and instance features."""
-        return (
-            self.vcpus_count
-            if not self.disable_simultaneous_multithreading
-            else (self.vcpus_count // self.threads_per_core)
-        )
+        return self.vcpus_count if not self.disable_multithreading else (self.vcpus_count // self.threads_per_core)
 
     def _gpus(self) -> dict:
         """Return the number of GPUs and type for the compute resource."""
@@ -255,6 +258,7 @@ class QueueRenderer:
         self.name = queue_config["Name"]
         self.is_default = default
         self.conf_type = conf_type
+        self.custom_settings = queue_config.get("CustomSlurmSettings", {})
         self.compute_renderers = [
             ComputeResourceRenderer(self.name, compute_resource_config, no_gpu, memory_ratio, instance_types_info)
             for compute_resource_config in queue_config["ComputeResources"]
@@ -300,7 +304,15 @@ class QueueRenderer:
         if self.is_default:
             partition += " Default=YES"
 
+        partition += f"{self._custom_settings()}"
         return partition
+
+    def _custom_settings(self):
+        custom = ""
+        for param, value in self.custom_settings.items():
+            custom += f" {param}={value}"
+
+        return custom
 
 
 # end of config_renderer.py
