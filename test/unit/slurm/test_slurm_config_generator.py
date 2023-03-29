@@ -1,14 +1,8 @@
-import inspect
 import os
 import pytest
 from assertpy import assert_that
-from pathlib import Path
 from pcluster_slurm_config_generator import generate_slurm_config_files
-
-def _get_template_folder() -> str:
-    module_file = inspect.getsourcefile(generate_slurm_config_files)
-    template_path = Path(module_file).parent / "templates"
-    return str(template_path)
+from config_utils import _get_template_folder
 
 @pytest.mark.parametrize(
     "no_gpu",
