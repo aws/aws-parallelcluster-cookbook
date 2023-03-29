@@ -8,16 +8,21 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+import inspect
 import os
-
 import pytest
 from assertpy import assert_that
-from slurm.pcluster_fleet_config_generator import (
+from pathlib import Path
+from pcluster_fleet_config_generator import (
     ConfigurationFieldNotFoundError,
     CriticalError,
     generate_fleet_config_file,
 )
 
+def _get_template_folder() -> str:
+    module_file = inspect.getsourcefile(generate_fleet_config_file)
+    template_path = Path(module_file).parent / "templates"
+    return str(template_path)
 
 @pytest.mark.parametrize(
     "cluster_config, expected_exception, expected_message",
@@ -199,7 +204,7 @@ from slurm.pcluster_fleet_config_generator import (
     ],
 )
 def test_generate_fleet_config_file_error_cases(mocker, tmpdir, cluster_config, expected_exception, expected_message):
-    mocker.patch("slurm.pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
+    mocker.patch("pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
     output_file = f"{tmpdir}/fleet-config.json"
 
     if expected_message:
