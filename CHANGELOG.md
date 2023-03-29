@@ -29,6 +29,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Set Slurm BatchStartTimeout to 3 minutes so to allow max 3 minutes Prolog execution during compute node registration.
 - Upgrade Slurm to version 23.02.1.
 - Upgrade munge to version 0.5.15.
+- Set Slurm default `TreeWidth` to 30. 
 
 **BUG FIXES**
 - Fix IP association on instances with multiple network cards.
