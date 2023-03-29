@@ -34,4 +34,4 @@ default['cluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabricmanager
 default['cluster']['nvidia']['fabricmanager']['repository_key'] = "3bf863cc.pub"
 # with apt a star is needed to match the package version
 default['cluster']['nvidia']['fabricmanager']['version'] = "#{node['cluster']['nvidia']['driver_version']}*"
-default['cluster']['nvidia']['fabricmanager']['repository_uri'] = "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cluster']['base_os']}/x86_64"
+default['cluster']['nvidia']['fabricmanager']['repository_uri'] = "https://developer.download.nvidia._domain_/compute/cuda/repos/#{node['cluster']['base_os']}/#{arm_instance? ? 'sbsa' : 'x86_64'}"
