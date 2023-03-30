@@ -1,6 +1,7 @@
 import math
 from typing import List, Tuple
 
+
 def _get_instance_types(compute_resource_config) -> List[str]:
     """Return the InstanceTypes defined in the ComputeResource always as list."""
     if compute_resource_config.get("Instances"):
