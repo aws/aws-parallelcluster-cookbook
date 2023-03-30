@@ -11,6 +11,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
 - Add log rotation support for ParallelCluster managed logs.
 - Add support for customizing the cluster Slurm configuration via the ParallelCluster configuration YAML file.
+- Add health check manager and GPU health check, which can be activated through cluster configuration. 
+  Health check manager execution is triggered by a Slurm prolog script. GPU check verifies healthiness of a node by executing NVIDIA DCGM L2 diagnostic.   
 
 **CHANGES**
 - Upgrade EFA installer to `1.22.1`
@@ -23,6 +25,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.5-1`
 - Upgrade Lustre client version to 2.12 on Amazon Linux 2. Lustre client 2.12 has been installed on Ubuntu 20.04, 18.04 and CentOS >= 7.7.  Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
 - Upgrade aws-cfn-bootstrap to version 2.0-24.
+- Set Slurm prolog and epilog configurations to target a directory, /opt/slurm/etc/scripts/prolog.d/ and /opt/slurm/etc/scripts/epilog.d/ respectively.
 
 3.5.1
 ------
