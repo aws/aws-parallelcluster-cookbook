@@ -82,6 +82,10 @@ unless virtualized?
             " --input-file #{node['cluster']['cluster_config_path']}"
   end
 
+  # If defined in the config, retrieve a remote Custom Slurm Settings file and overrides the existing one
+  custom_settings_file = lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) }
+  include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file' if custom_settings_file
+
   # Generate pcluster fleet config
   execute "generate_pcluster_fleet_config" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
