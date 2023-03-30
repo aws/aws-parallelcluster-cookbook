@@ -65,8 +65,9 @@ class ExecutableScript(ScriptDefinition):
 class ScriptRunner:
     """Performs download and execution of scripts."""
 
-    def __init__(self, event_name):
+    def __init__(self, event_name, region_name):
         self.event_name = event_name
+        self.region_name = region_name
 
     async def download_and_execute_scripts(self, scripts):
         """
@@ -101,7 +102,7 @@ class ScriptRunner:
         return ExecutableScript(script.url, script.args, step_num, path)
 
     async def _download_s3_script(self, exe_script: ExecutableScript):
-        s3_client = boto3.resource("s3")
+        s3_client = boto3.resource("s3", region_name=self.region_name)
         bucket_name, key = self._parse_s3_url(exe_script.url)
         with tempfile.NamedTemporaryFile(delete=False) as file:
             try:
@@ -587,7 +588,11 @@ class ActionRunner:
             for script in self.conf.script_sequence:
                 print(f"  {script.url} with args {script.args}")
         else:
-            asyncio.run(ScriptRunner(self.conf.event_name).download_and_execute_scripts(self.conf.script_sequence))
+            asyncio.run(
+                ScriptRunner(self.conf.event_name, self.conf.region_name).download_and_execute_scripts(
+                    self.conf.script_sequence
+                )
+            )
 
     def _get_stack_status(self) -> str:
         stack_status = "UNKNOWN"
