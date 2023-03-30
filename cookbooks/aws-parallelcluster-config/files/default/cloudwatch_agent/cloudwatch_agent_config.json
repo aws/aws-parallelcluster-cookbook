@@ -658,6 +658,24 @@
     },
     {
       "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_health_check.log",
+      "log_stream_name": "slurm_health_check",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
       "file_path": "/var/log/parallelcluster/clusterstatusmgtd",
       "log_stream_name": "clusterstatusmgtd",
       "schedulers": [

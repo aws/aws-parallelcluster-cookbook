@@ -238,6 +238,8 @@ template '/etc/systemd/system/slurmdbd.service' do
   action :create
 end
 
+include_recipe 'aws-parallelcluster-slurm::config_health_check'
+
 ruby_block "Configure Slurm Accounting" do
   block do
     run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"

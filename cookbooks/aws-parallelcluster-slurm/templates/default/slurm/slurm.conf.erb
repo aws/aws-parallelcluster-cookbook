@@ -41,6 +41,11 @@ PrivateData=cloud
 ResumeRate=0
 SuspendRate=0
 #
+# PROLOG AND EPILOG
+Prolog=<%= node['cluster']['slurm']['install_dir'] %>/etc/scripts/prolog.d/*
+Epilog=<%= node['cluster']['slurm']['install_dir'] %>/etc/scripts/epilog.d/*
+SchedulerParameters=nohold_on_prolog_fail
+#
 # TIMERS
 SlurmctldTimeout=300
 SlurmdTimeout=180

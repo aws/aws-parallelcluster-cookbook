@@ -373,3 +373,14 @@ suites:
       cluster:
         nvidia:
           enabled: true
+  - name: health_check
+    run_list:
+      - recipe[aws-parallelcluster-test::slurm_mock]
+      - recipe[aws-parallelcluster-slurm::config_health_check]
+    verifier:
+      controls:
+        - health_check_configured
+    attributes:
+      cluster:
+        slurm:
+          install_dir: "/opt/slurm"
