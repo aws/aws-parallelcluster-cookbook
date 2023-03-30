@@ -40,7 +40,7 @@ from mock.mock import AsyncMock
 
 @pytest.fixture
 def script_runner():
-    return ScriptRunner("OnMockTestEvent")
+    return ScriptRunner("OnMockTestEvent", "OnMockTestRegionName")
 
 
 @pytest.fixture
