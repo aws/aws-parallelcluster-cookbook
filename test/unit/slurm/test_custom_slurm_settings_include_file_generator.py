@@ -13,7 +13,7 @@ import os
 
 import pytest
 from assertpy import assert_that
-from slurm.pcluster_custom_slurm_settings_include_file_generator import (
+from pcluster_custom_slurm_settings_include_file_generator import (
     _generate_custom_slurm_config_include_files,
     _render_parameter,
 )

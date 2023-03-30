@@ -9,13 +9,18 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
 import os
-
 import pytest
 import slurm
 from assertpy import assert_that
-from slurm.pcluster_slurm_config_generator import generate_slurm_config_files
+from pathlib import Path
+from pcluster_slurm_config_generator import generate_slurm_config_files
 
+def _get_template_folder() -> str:
+    module_file = inspect.getsourcefile(generate_slurm_config_files)
+    template_path = Path(module_file).parent / "templates"
+    return str(template_path)
 
 @pytest.mark.parametrize(
     "no_gpu",
@@ -25,11 +30,11 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
     input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
     mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
+        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    template_directory = _get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
@@ -68,11 +73,11 @@ def test_generate_slurm_config_files_memory_scheduling(
         input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
     mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
+        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    template_directory = _get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
@@ -112,11 +117,11 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
         input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
     mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
+        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    template_directory = _get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
@@ -138,15 +143,15 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
 
 
 def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):
-    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
     mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
+        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
     )
 
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
 
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    template_directory = _get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
@@ -176,7 +181,7 @@ def test_generate_slurm_config_with_custom_settings(test_datadir, tmpdir):
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
 
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    template_directory = _get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
