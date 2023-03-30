@@ -291,3 +291,29 @@ suites:
         - network_interfaces_configuration_script_created
         - network_interfaces_configured
         - multiple_network_interfaces_can_ping_gateway
+  - name: directory_service
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::directory_service]
+    verifier:
+      controls:
+        - sssd_configured_correctly
+    attributes:
+      cluster:
+        node_type: HeadNode
+        directory_service:
+          enabled: 'true'
+          domain_name: corp.something.com
+          domain_addr: ldaps://corp.something.com
+          password_secret_arn: arn:aws:secretsmanager:eu-west-1:123456789:secret:a-secret-name
+          domain_read_only_user: cn=ReadOnlyUser,ou=Users,ou=CORP,dc=corp,dc=something,dc=com
+          ldap_tls_ca_cert: /path/to/domain-certificate.crt
+          ldap_tls_req_cert: never
+          ldap_access_filter: filter-string
+          generate_ssh_keys_for_users: 'true'
+          additional_sssd_configs:
+            debug_level: "0x1ff"
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:system_authentication

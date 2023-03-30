@@ -24,6 +24,14 @@ sssd_conf_path = "/etc/sssd/sssd.conf"
 shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_service"
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
+def get_ldap_password
+  if kitchen_test? && !node['interact_with_secretmanager']
+    "fake-secret"
+  else
+    shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout.strip
+  end
+end
+
 if node['cluster']['node_type'] == 'HeadNode'
   # DomainName
   # We can assume that DomainName can only be a FQDN or the domain section in a LDAP Distinguished Name.
@@ -64,7 +72,7 @@ if node['cluster']['node_type'] == 'HeadNode'
     'ldap_uri' => ldap_uri_components.join(','),
     'ldap_search_base' => ldap_search_base,
     'ldap_default_bind_dn' => node['cluster']['directory_service']['domain_read_only_user'],
-    'ldap_default_authtok' => shell_out!("aws secretsmanager get-secret-value --secret-id #{node['cluster']['directory_service']['password_secret_arn']} --region #{node['cluster']['region']} --query 'SecretString' --output text").stdout.strip,
+    'ldap_default_authtok' => get_ldap_password,
     'ldap_tls_reqcert' => node['cluster']['directory_service']['ldap_tls_req_cert'],
 
     # Optional properties for which we provide a default value,
