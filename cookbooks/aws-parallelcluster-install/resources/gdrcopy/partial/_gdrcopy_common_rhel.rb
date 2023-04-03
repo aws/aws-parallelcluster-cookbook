@@ -21,7 +21,7 @@ action_class do
     <<~COMMAND
     CUDA=/usr/local/cuda ./build-rpm-packages.sh
     rpm -i gdrcopy-kmod-#{gdrcopy_version_extended}dkms.noarch#{gdrcopy_platform}.rpm
-    rpm -i gdrcopy-#{gdrcopy_version_extended}.#{arch}#{gdrcopy_platform}.rpm
+    rpm -i gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_arch}#{gdrcopy_platform}.rpm
     rpm -i gdrcopy-devel-#{gdrcopy_version_extended}.noarch#{gdrcopy_platform}.rpm
     COMMAND
   end

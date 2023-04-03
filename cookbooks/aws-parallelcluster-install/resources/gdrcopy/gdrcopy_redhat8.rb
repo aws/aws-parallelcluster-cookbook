@@ -36,7 +36,7 @@ action_class do
     '.el8'
   end
 
-  def arch
+  def gdrcopy_arch
     arm_instance? ? 'aarch64' : 'x86_64'
   end
 end
