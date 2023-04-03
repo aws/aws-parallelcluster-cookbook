@@ -29,7 +29,7 @@ default['cluster']['nvidia']['gdrcopy']['sha256'] = 'b85d15901889aa42de6c4a92337
 default['cluster']['nvidia']['gdrcopy']['service'] = 'gdrcopy'
 
 # NVIDIA fabric-manager
-# The package name of Fabric Manager for alinux2 and centos7 is nvidia-fabric-manager-version
+# The package name of Fabric Manager for rhel8 is nvidia-fabric-manager-version
 default['cluster']['nvidia']['fabricmanager']['package'] = "nvidia-fabric-manager"
 default['cluster']['nvidia']['fabricmanager']['repository_key'] = "D42D0685.pub"
 default['cluster']['nvidia']['fabricmanager']['version'] = node['cluster']['nvidia']['driver_version']
