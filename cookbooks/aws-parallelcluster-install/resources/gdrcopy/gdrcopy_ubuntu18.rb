@@ -26,7 +26,7 @@ action :setup do
 end
 
 action_class do
-  def platform
+  def gdrcopy_platform
     'Ubuntu18_04'
   end
 end

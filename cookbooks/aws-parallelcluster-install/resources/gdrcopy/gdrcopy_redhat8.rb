@@ -32,7 +32,7 @@ action_class do
     %w(dkms rpm-build make check check-devel subunit subunit-devel)
   end
 
-  def platform
+  def gdrcopy_platform
     '.el8'
   end
 
