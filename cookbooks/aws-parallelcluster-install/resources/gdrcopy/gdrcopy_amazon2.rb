@@ -30,7 +30,7 @@ action_class do
     %w(dkms rpm-build make check check-devel subunit subunit-devel)
   end
 
-  def platform
+  def gdrcopy_platform
     'unknown_distro'
   end
 
