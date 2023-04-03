@@ -17,7 +17,7 @@ action_class do
     %w(build-essential devscripts debhelper check libsubunit-dev fakeroot pkg-config dkms)
   end
 
-  def arch
+  def gdrcopy_arch
     arm_instance? ? 'arm64' : 'amd64'
   end
 
@@ -28,10 +28,10 @@ action_class do
   def installation_code
     <<~COMMAND
     CUDA=/usr/local/cuda ./build-deb-packages.sh
-    dpkg -i gdrdrv-dkms_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
-    dpkg -i libgdrapi_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
-    dpkg -i gdrcopy-tests_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
-    dpkg -i gdrcopy_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
+    dpkg -i gdrdrv-dkms_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
+    dpkg -i libgdrapi_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
+    dpkg -i gdrcopy-tests_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
+    dpkg -i gdrcopy_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
     COMMAND
   end
 end
