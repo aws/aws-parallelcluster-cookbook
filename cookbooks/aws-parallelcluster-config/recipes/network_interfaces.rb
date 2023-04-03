@@ -15,12 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-def network_interface_macs(token)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
-  res = get_metadata_with_token(token, uri)
-  res.delete("/").split("\n")
-end
-
 def device_name(mac)
   cmd = Mixlib::ShellOut.new("ip -o link | grep #{mac} | awk '{print substr($2, 1, length($2) -1)}'")
   cmd.run_command
