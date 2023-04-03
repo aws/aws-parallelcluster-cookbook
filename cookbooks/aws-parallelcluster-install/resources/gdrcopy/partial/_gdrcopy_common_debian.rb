@@ -28,10 +28,10 @@ action_class do
   def installation_code
     <<~COMMAND
     CUDA=/usr/local/cuda ./build-deb-packages.sh
-    dpkg -i gdrdrv-dkms_#{gdrcopy_version_extended}_#{arch}.#{platform}.deb
-    dpkg -i libgdrapi_#{gdrcopy_version_extended}_#{arch}.#{platform}.deb
-    dpkg -i gdrcopy-tests_#{gdrcopy_version_extended}_#{arch}.#{platform}.deb
-    dpkg -i gdrcopy_#{gdrcopy_version_extended}_#{arch}.#{platform}.deb
+    dpkg -i gdrdrv-dkms_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
+    dpkg -i libgdrapi_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
+    dpkg -i gdrcopy-tests_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
+    dpkg -i gdrcopy_#{gdrcopy_version_extended}_#{arch}.#{gdrcopy_platform}.deb
     COMMAND
   end
 end

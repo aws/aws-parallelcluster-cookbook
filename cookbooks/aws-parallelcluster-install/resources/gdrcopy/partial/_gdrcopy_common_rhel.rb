@@ -20,9 +20,9 @@ action_class do
   def installation_code
     <<~COMMAND
     CUDA=/usr/local/cuda ./build-rpm-packages.sh
-    rpm -i gdrcopy-kmod-#{gdrcopy_version_extended}dkms.noarch#{platform}.rpm
-    rpm -i gdrcopy-#{gdrcopy_version_extended}.#{arch}#{platform}.rpm
-    rpm -i gdrcopy-devel-#{gdrcopy_version_extended}.noarch#{platform}.rpm
+    rpm -i gdrcopy-kmod-#{gdrcopy_version_extended}dkms.noarch#{gdrcopy_platform}.rpm
+    rpm -i gdrcopy-#{gdrcopy_version_extended}.#{arch}#{gdrcopy_platform}.rpm
+    rpm -i gdrcopy-devel-#{gdrcopy_version_extended}.noarch#{gdrcopy_platform}.rpm
     COMMAND
   end
 end
