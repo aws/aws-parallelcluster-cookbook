@@ -27,6 +27,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade aws-cfn-bootstrap to version 2.0-24.
 - Set Slurm prolog and epilog configurations to target a directory, /opt/slurm/etc/scripts/prolog.d/ and /opt/slurm/etc/scripts/epilog.d/ respectively.
 
+**BUG FIXES**
+- Fix an issue that was causing misalignment of compute nodes IP on multi NICS instances.
+
 3.5.1
 ------
 

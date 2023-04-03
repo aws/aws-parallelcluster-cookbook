@@ -330,6 +330,7 @@ def are_mount_or_unmount_required?
   change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
   change_set["changeSet"].each do |change|
     next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
+
     return true
   end
   Chef::Log.info("No shared storages operation required.")
@@ -391,4 +392,34 @@ def parse_arn(arn_string)
     account_id: parts[4],
     resource: parts[5],
   }
+end
+
+def network_interface_macs(token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
+  res = get_metadata_with_token(token, uri)
+  res.delete("/").split("\n")
+end
+
+def get_primary_ip
+  primary_ip = node['ec2']['local_ipv4']
+
+  # TODO: We should use instance info stored in node['ec2'] by Ohai, rather than calling IMDS.
+  # We cannot use MAC related data because we noticed a mismatch in the info returned by Ohai and IMDS.
+  # In particular, the data returned by Ohai is missing the 'network-card' information.
+  token = get_metadata_token
+  macs = network_interface_macs(token)
+
+  if macs.length > 1
+    macs.each do |mac|
+      mac_metadata_uri = "http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}"
+      device_number = get_metadata_with_token(token, URI("#{mac_metadata_uri}/device-number"))
+      network_card = get_metadata_with_token(token, URI("#{mac_metadata_uri}/network-card"))
+      next unless device_number == '0' && network_card == '0'
+
+      primary_ip = get_metadata_with_token(token, URI("#{mac_metadata_uri}/local-ipv4s"))
+      break
+    end
+  end
+
+  primary_ip
 end
