@@ -26,3 +26,9 @@ action :setup do
   return if arm_instance? || !(node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   action_gdrcopy_installation
 end
+
+action_class do
+  def gdrcopy_platform
+    '.el7'
+  end
+end
