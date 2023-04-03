@@ -31,4 +31,8 @@ action_class do
   def gdrcopy_platform
     '.el7'
   end
+
+  def arch
+    arm_instance? ? 'arm64' : 'x86_64'
+  end
 end
