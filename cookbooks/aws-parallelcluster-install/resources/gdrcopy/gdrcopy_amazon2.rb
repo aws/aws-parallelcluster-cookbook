@@ -34,7 +34,7 @@ action_class do
     'unknown_distro'
   end
 
-  def arch
+  def gdrcopy_arch
     arm_instance? ? 'aarch64' : 'x86_64'
   end
 end
