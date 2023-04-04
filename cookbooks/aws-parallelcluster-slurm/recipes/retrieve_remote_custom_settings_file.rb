@@ -26,4 +26,5 @@ local_path = if kitchen_test?
 remote_object 'Retrieve Custom Slurm Settings' do
   url(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) })
   destination(local_path)
+  only_if { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) }
 end
