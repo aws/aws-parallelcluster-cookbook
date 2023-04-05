@@ -355,3 +355,21 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:system_authentication
+  - name: nvidia
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::nvidia]
+    verifier:
+      controls:
+        - /nvidia-fabricmanager_enabled/
+        - /gdrcopy_enabled/
+        - /gdrcopy_disabled/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g4dn.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+      cluster:
+        nvidia:
+          enabled: true
