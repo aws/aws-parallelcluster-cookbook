@@ -30,6 +30,7 @@ PCLUSTER_REGION="<%= node['cluster']['region'] %>"
   "${PCLUSTER_SCRIPTS_DIR}/custom_action_executor.py" \
   --region "${PCLUSTER_REGION}" \
   --stack-name "${PCLUSTER_STACK_NAME}" \
+  --cluster-name "<%= @cluster_name %>" \
   --node-type "${PCLUSTER_NODE_TYPE}" \
   --queue-name "${PCLUSTER_SCHEDULER_QUEUE_NAME}" \
   --cluster-configuration "${PCLUSTER_CONFIG_PATH}" \
