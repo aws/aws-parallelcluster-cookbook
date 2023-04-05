@@ -42,6 +42,10 @@ class Instance < Inspec.resource(1)
     !inspec.command("lspci | grep -i -o 'NVIDIA'").stdout.strip.empty?
   end
 
+  def nvs_switch_enabled?
+    inspec.command("lspci -d 10de:1af1 | wc -l").stdout.strip.to_i > 1
+  end
+
   def custom_ami?
     inspec.node['cluster']['os'] && inspec.node['cluster']['os'].end_with?("-custom")
   end
