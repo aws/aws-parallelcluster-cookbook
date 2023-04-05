@@ -1,5 +1,14 @@
+import inspect
 import math
+from pathlib import Path
 from typing import List, Tuple
+
+
+def get_template_folder() -> str:
+    module_file = inspect.getsourcefile(_get_instance_types)
+    template_path = Path(module_file).parent / "templates"
+    return str(template_path)
+
 
 def _get_instance_types(compute_resource_config) -> List[str]:
     """Return the InstanceTypes defined in the ComputeResource always as list."""
