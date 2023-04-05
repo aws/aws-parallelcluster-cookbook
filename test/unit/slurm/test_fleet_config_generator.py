@@ -12,11 +12,7 @@ import os
 
 import pytest
 from assertpy import assert_that
-from pcluster_fleet_config_generator import (
-    ConfigurationFieldNotFoundError,
-    CriticalError,
-    generate_fleet_config_file,
-)
+from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, CriticalError, generate_fleet_config_file
 
 
 @pytest.mark.parametrize(
