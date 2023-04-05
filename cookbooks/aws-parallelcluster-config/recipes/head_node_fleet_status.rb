@@ -20,7 +20,7 @@ cookbook_file "#{node['cluster']['scripts_dir']}/compute_fleet_status.py" do
   owner 'root'
   group 'root'
   mode '0755'
-  not_if { ::File.exist?("#{node['cluster']['scripts_dir']}/compute_fleet_status.py") }
+  action :create_if_missing
 end
 
 template "/usr/local/bin/update-compute-fleet-status.sh" do

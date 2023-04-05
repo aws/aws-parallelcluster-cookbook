@@ -28,7 +28,7 @@ action :setup do
     mode '0644'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?(stunnel_tarball) }
+    action :create_if_missing
   end
 
   # Verify tarball

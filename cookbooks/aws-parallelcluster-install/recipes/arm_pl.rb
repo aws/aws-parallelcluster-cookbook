@@ -67,7 +67,7 @@ remote_file gcc_tarball do
   mode '0644'
   retries 5
   retry_delay 10
-  not_if { ::File.exist?(gcc_tarball) }
+  action :create_if_missing
 end
 
 # Install gcc

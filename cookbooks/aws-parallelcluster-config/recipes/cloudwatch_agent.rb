@@ -20,7 +20,7 @@ return if redhat_ubi?
 
 config_script_path = '/usr/local/bin/write_cloudwatch_agent_json.py'
 cookbook_file 'write_cloudwatch_agent_json.py' do
-  not_if { ::File.exist?(config_script_path) }
+  action :create_if_missing
   source 'cloudwatch_agent/write_cloudwatch_agent_json.py'
   path config_script_path
   user 'root'
@@ -30,7 +30,7 @@ end
 
 config_data_path = '/usr/local/etc/cloudwatch_agent_config.json'
 cookbook_file 'cloudwatch_agent_config.json' do
-  not_if { ::File.exist?(config_data_path) }
+  action :create_if_missing
   source 'cloudwatch_agent/cloudwatch_agent_config.json'
   path config_data_path
   user 'root'
@@ -40,7 +40,7 @@ end
 
 config_schema_path = '/usr/local/etc/cloudwatch_agent_config_schema.json'
 cookbook_file 'cloudwatch_agent_config_schema.json' do
-  not_if { ::File.exist?(config_schema_path) }
+  action :create_if_missing
   source 'cloudwatch_agent/cloudwatch_agent_config_schema.json'
   path config_schema_path
   user 'root'
@@ -50,7 +50,7 @@ end
 
 validator_script_path = '/usr/local/bin/cloudwatch_agent_config_util.py'
 cookbook_file 'cloudwatch_agent_config_util.py' do
-  not_if { ::File.exist?(validator_script_path) }
+  action :create_if_missing
   source 'cloudwatch_agent/cloudwatch_agent_config_util.py'
   path validator_script_path
   user 'root'
