@@ -25,7 +25,7 @@ remote_file node['cluster']['cloudwatch']['public_key_local_path'] do
   source node['cluster']['cloudwatch']['public_key_url']
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(node['cluster']['cloudwatch']['public_key_local_path']) }
+  action :create_if_missing
 end
 
 # Set the s3 domain name to use for all download URLs
@@ -58,13 +58,13 @@ remote_file signature_path do
   source signature_url
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(signature_path) }
+  action :create_if_missing
 end
 remote_file package_path do
   source package_url
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(package_path) }
+  action :create_if_missing
 end
 
 # Import cloudwatch agent's public key to the keyring
@@ -75,7 +75,7 @@ end
 
 # Verify that cloudwatch agent's public key has expected fingerprint
 cookbook_file 'verify_cloudwatch_agent_public_key_fingerprint.py' do
-  not_if { ::File.exist?('/usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py') }
+  action :create_if_missing
   source 'cloudwatch_agent/verify_cloudwatch_agent_public_key_fingerprint.py'
   path '/usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py'
   user 'root'

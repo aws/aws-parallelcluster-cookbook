@@ -72,7 +72,7 @@ cookbook_file "#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
   owner 'root'
   group 'root'
   mode '0755'
-  not_if { ::File.exist?("#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh") }
+  action :create_if_missing
 end
 
 if node['conditions']['dcv_supported']

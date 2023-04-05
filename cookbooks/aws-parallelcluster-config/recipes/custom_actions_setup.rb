@@ -38,5 +38,5 @@ cookbook_file "#{node['cluster']['scripts_dir']}/custom_action_executor.py" do
   owner 'root'
   group 'root'
   mode '0755'
-  not_if { ::File.exist?("#{node['cluster']['scripts_dir']}/custom_action_executor.py") }
+  action :create_if_missing
 end
