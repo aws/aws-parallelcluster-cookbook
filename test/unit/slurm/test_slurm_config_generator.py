@@ -13,7 +13,6 @@ import inspect
 import os
 
 import pytest
-import slurm
 from assertpy import assert_that
 from pathlib import Path
 from pcluster_slurm_config_generator import generate_slurm_config_files
