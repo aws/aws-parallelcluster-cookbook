@@ -9,14 +9,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-import inspect
 import os
 
 import pytest
 from assertpy import assert_that
-from pathlib import Path
-from pcluster_slurm_config_generator import generate_slurm_config_files
 from config_utils import get_template_folder
+from pcluster_slurm_config_generator import generate_slurm_config_files
+
 
 @pytest.mark.parametrize(
     "no_gpu",
@@ -27,9 +26,7 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
     mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch(
-        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
-    )
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
     template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
@@ -70,9 +67,7 @@ def test_generate_slurm_config_files_memory_scheduling(
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
     mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch(
-        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
-    )
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
     template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
@@ -114,9 +109,7 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
     mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch(
-        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
-    )
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
     template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
@@ -140,9 +133,7 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
 
 def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):
     mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch(
-        "pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
-    )
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
 
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")

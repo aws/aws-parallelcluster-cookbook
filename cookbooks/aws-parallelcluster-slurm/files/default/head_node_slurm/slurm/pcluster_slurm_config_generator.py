@@ -13,15 +13,14 @@ import argparse
 import functools
 import json
 import logging
-
 import re
 from os import makedirs, path
-from config_renderer import QueueRenderer
 from socket import gethostname
 from urllib.parse import ParseResult, urlparse
 
 import requests
 import yaml
+from config_renderer import QueueRenderer
 from jinja2 import FileSystemLoader
 from jinja2.sandbox import SandboxedEnvironment
 
