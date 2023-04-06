@@ -23,6 +23,7 @@ local_path = if kitchen_test?
                "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/custom_slurm_settings_include_slurm.conf"
              end
 
+# If defined in the config, retrieve a remote Custom Slurm Settings file and overrides the existing one
 remote_object 'Retrieve Custom Slurm Settings' do
   url(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) })
   destination(local_path)
