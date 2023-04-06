@@ -5,12 +5,12 @@ from typing import List, Tuple
 
 
 def get_template_folder() -> str:
-    module_file = inspect.getsourcefile(_get_instance_types)
+    module_file = inspect.getsourcefile(get_instance_types)
     template_path = Path(module_file).parent / "templates"
     return str(template_path)
 
 
-def _get_instance_types(compute_resource_config) -> List[str]:
+def get_instance_types(compute_resource_config) -> List[str]:
     """Return the InstanceTypes defined in the ComputeResource always as list."""
     if compute_resource_config.get("Instances"):
         return [instance.get("InstanceType") for instance in compute_resource_config["Instances"]]
@@ -18,7 +18,7 @@ def _get_instance_types(compute_resource_config) -> List[str]:
         return [compute_resource_config["InstanceType"]]
 
 
-def _get_efa_settings(compute_resource_config) -> Tuple[bool, bool]:
+def get_efa_settings(compute_resource_config) -> Tuple[bool, bool]:
     """Return a Tuple with EFA flags."""
     if "Efa" in compute_resource_config:
         efa = compute_resource_config["Efa"]
@@ -27,17 +27,17 @@ def _get_efa_settings(compute_resource_config) -> Tuple[bool, bool]:
         return False, False
 
 
-def _get_real_memory(compute_resource_config, instance_types, instance_types_info, memory_ratio) -> int:
+def get_real_memory(compute_resource_config, instance_types, instance_types_info, memory_ratio) -> int:
     """Get the RealMemory parameter to be added to the Slurm compute node configuration."""
     schedulable_memory = compute_resource_config.get("SchedulableMemory", None)
     if schedulable_memory is None:
-        ec2_memory = _get_min_ec2_memory(instance_types, instance_types_info)
+        ec2_memory = get_min_ec2_memory(instance_types, instance_types_info)
         return math.floor(ec2_memory * memory_ratio)
     else:
         return schedulable_memory
 
 
-def _get_min_ec2_memory(instance_types, instance_types_info) -> int:
+def get_min_ec2_memory(instance_types, instance_types_info) -> int:
     """Return min value for EC2 memory in the instance type list."""
     min_ec2_memory = None
     for instance_type in instance_types:
@@ -53,7 +53,7 @@ def _get_min_ec2_memory(instance_types, instance_types_info) -> int:
     return min_ec2_memory
 
 
-def _get_min_vcpus(instance_types, instance_types_info) -> Tuple[int, int]:
+def get_min_vcpus(instance_types, instance_types_info) -> Tuple[int, int]:
     """Return min value for vCPUs and threads per core in the instance type list."""
     min_vcpus_count = None
     min_threads_per_core = None
@@ -77,7 +77,7 @@ def _get_min_vcpus(instance_types, instance_types_info) -> Tuple[int, int]:
     return min_vcpus_count, min_threads_per_core
 
 
-def _get_min_gpu_count_and_type(instance_types, instance_types_info, logger) -> Tuple[int, str]:
+def get_min_gpu_count_and_type(instance_types, instance_types_info, logger) -> Tuple[int, str]:
     """Return min value for GPU and associated type in the instance type list."""
     min_gpu_count = None
     gpu_type_min_count = "no_gpu_type"
