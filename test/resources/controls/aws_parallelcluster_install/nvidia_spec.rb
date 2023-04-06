@@ -49,7 +49,7 @@ end
 
 control 'tag:config_expected_versions_of_nvidia_fabric_manager_installed' do
   only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !os_properties.arm? && !instance.custom_ami? &&
+    !(os_properties.centos7? && os_properties.arm?) && !os_properties.redhat8? && !os_properties.arm? && !instance.custom_ami? &&
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
