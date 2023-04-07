@@ -13,11 +13,36 @@ control 'system_authentication_packages_installed' do
   title 'Check that system authentication packages are installed correctly'
 
   packages = %w(sssd sssd-tools sssd-ldap)
+
+  if os_properties.redhat8?
+    packages.append("authselect")
+    packages.append("oddjob-mkhomedir")
+  end
+
   packages.each do |pkg|
     describe package(pkg) do
       it { should be_installed }
     end
   end unless os_properties.redhat_ubi?
+end
+
+control 'system_authentication_services_enabled' do
+  title 'Check that system authentication services are enabled and running'
+
+  only_if { !os_properties.virtualized? }
+
+  services = %w(sssd)
+
+  if os_properties.redhat8?
+    services.append("oddjobd")
+  end
+
+  services.each do |service|
+    describe service(service) do
+      it { should be_installed }
+      it { should be_enabled }
+    end
+  end
 end
 
 control 'system_authentication_configured' do
