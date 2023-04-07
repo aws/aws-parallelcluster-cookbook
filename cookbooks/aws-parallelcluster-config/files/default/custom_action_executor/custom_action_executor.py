@@ -96,6 +96,7 @@ class CustomActionsConfig:
     """
 
     stack_name: str
+    cluster_name: str
     region_name: str
     node_type: str
     queue_name: str
@@ -410,9 +411,6 @@ class ComputeFleetLogger(CustomLogger):
     def __init__(self, conf: CustomActionsConfig):
         super().__init__(conf)
         self._node_name_pattern = re.compile(r"^[a-z0-9\-]+-(st|dy)-[a-z0-9\-]+-\d+$")
-        self._stack_name_pattern = re.compile(
-            r"(.+)-ComputeFleetQueueBatch\d+(QueueGroup\d+NestedStackQueueGroup\d+)?.+$"
-        )
 
     def error_exit_with_bootstrap_error(
         self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
@@ -440,7 +438,7 @@ class ComputeFleetLogger(CustomLogger):
             "datetime": now,
             "version": 0,
             "scheduler": "slurm",
-            "cluster-name": self._get_cluster_name(),
+            "cluster-name": self.conf.cluster_name,
             "node-role": self.conf.node_type,
             "component": "custom-action",
             "level": "ERROR",
@@ -482,12 +480,6 @@ class ComputeFleetLogger(CustomLogger):
             if match:
                 return "static" if match.group(1) == "st" else "dynamic"
         return "unknown"
-
-    def _get_cluster_name(self):
-        match = self._stack_name_pattern.match(self.conf.stack_name)
-        if match:
-            return match.group(1)
-        return self.conf.stack_name
 
     @staticmethod
     def _read_node_name(node_spec_path: str) -> str:
@@ -543,6 +535,7 @@ class ConfigLoader:
             event_name=event_name,
             region_name=args.region,
             stack_name=args.stack_name,
+            cluster_name=args.cluster_name,
             script_sequence=script_sequence,
             script_sequences_per_event=script_sequences_per_event,
             dry_run=args.dry_run,
@@ -780,6 +773,7 @@ def _parse_cli_args():
     parser.add_argument(
         "--availability-zone", type=str, default=None, help="the availability zone this host is deployed to"
     )
+    parser.add_argument("--cluster-name", type=str, default=None, help="the cluster name")
     parser.add_argument("--scheduler", type=str, default=None, help="the cluster scheduler type")
     parser.add_argument("--verbose", "-v", action="store_true", help="enable verbose logging")
     parser.add_argument("--dry-run", "-d", action="store_true", help="enable dry run")

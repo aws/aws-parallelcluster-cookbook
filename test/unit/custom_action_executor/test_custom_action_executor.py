@@ -626,6 +626,7 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
         event_name=action,
         stack_name="integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N"
         "-VC66PPA3U8IR",
+        cluster_name="integ-tests-j3v1lgb0rx4uvt5y",
         node_type="ComputeFleet",
         instance_id="i-instance",
         instance_type="c5.xlarge",
@@ -665,60 +666,3 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
 
     error_exit_mock.assert_called_once_with("hello url")
     sleep_mock.assert_called_once_with(5)
-
-
-@pytest.mark.parametrize(
-    "stack_name, expected_cluster_name",
-    [
-        ("", ""),
-        ("not-a-child-stack", "not-a-child-stack"),
-        (
-            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
-            "integ-tests-j3v1lgb0rx4uvt5y",
-        ),
-        (
-            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch332QueueGroup773NestedStackQueueGroup441N-VC66PPA3U8IR",
-            "integ-tests-j3v1lgb0rx4uvt5y",
-        ),
-        (
-            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR-"
-            + "ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
-            "integ-tests-j3v1lgb0rx4uvt5y-ComputeFleetQueueBatch0QueueGroup0NestedStackQueueGroup0N-VC66PPA3U8IR",
-        ),
-        (
-            "integ-tests-ddladsmelz9ytvwp-develop-ComputeFleetQueueBatch0QueueGroup0NestedStackQueu-1J01OX5L1J502",
-            "integ-tests-ddladsmelz9ytvwp-develop",
-        ),
-        (
-            "integ-tests-ddladsmelz9ytvwp-develop-super-long-maximum-name-ComputeFleetQueueBatch0Qu-1J01OX5L1J502",
-            "integ-tests-ddladsmelz9ytvwp-develop-super-long-maximum-name",
-        ),
-    ],
-    ids=[
-        "empty string",
-        "does not match pattern",
-        "matches pattern",
-        "matches pattern with larger numbers",
-        "repeated matching suffix strips last matching suffix",
-        "failing-integ-test-001",
-        "60 character cluster name",
-    ],
-)
-def test_cluster_name_parsing(stack_name, expected_cluster_name):
-    config = SimpleNamespace(
-        event_name="action",
-        stack_name=stack_name,
-        node_type="ComputeFleet",
-        instance_id="i-instance",
-        instance_type="c5.xlarge",
-        availability_zone="us-east-1c",
-        ip_address="127.0.0.1",
-        hostname="my_immortal",
-        queue_name="partition-1",
-        resource_name="compute-a",
-        node_spec_file="/opt/parallelcluster/slurm_nodename",
-        dry_run=False,
-    )
-    fleet_logger = ComputeFleetLogger(config)
-
-    assert_that(fleet_logger._get_cluster_name()).is_equal_to(expected_cluster_name)
