@@ -54,7 +54,7 @@ module WriteChefError
       {
         "datetime" => DateTime.now,
         "version" => 0,
-        "cluster-name" => node["cluster"]["stack_name"],
+        "cluster-name" => node["cluster"]["cluster_name"],
         "scheduler" => node["cluster"]["scheduler"],
         "node-role" => "ComputeFleet",
         "level" => "ERROR",

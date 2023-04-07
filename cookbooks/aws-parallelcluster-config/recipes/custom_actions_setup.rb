@@ -22,6 +22,7 @@ template "#{node['cluster']['scripts_dir']}/fetch_and_run" do
   mode "0755"
   variables(
     sheduler: node['cluster']['scheduler'],
+    cluster_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
     instance_id: node['ec2']['instance_id'],
     instance_type: node['ec2']['instance_type'],
     availability_zone: node['ec2']['availability_zone'],
