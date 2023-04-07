@@ -81,6 +81,7 @@ suites:
     verifier:
       controls:
         - system_authentication_configured
+        - system_authentication_services_enabled
     attributes:
       resource: system_authentication:configure
       dependencies:

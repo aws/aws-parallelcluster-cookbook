@@ -83,8 +83,12 @@ unless virtualized?
   end
 
   # If defined in the config, retrieve a remote Custom Slurm Settings file and overrides the existing one
-  custom_settings_file = lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) }
-  include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file' if custom_settings_file
+  ruby_block "Override Custom Slurm Settings with remote file" do
+    block do
+      run_context.include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file'
+    end
+    not_if { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile).nil? }
+  end
 
   # Generate pcluster fleet config
   execute "generate_pcluster_fleet_config" do

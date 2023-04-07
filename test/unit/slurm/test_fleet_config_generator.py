@@ -12,11 +12,7 @@ import os
 
 import pytest
 from assertpy import assert_that
-from slurm.pcluster_fleet_config_generator import (
-    ConfigurationFieldNotFoundError,
-    CriticalError,
-    generate_fleet_config_file,
-)
+from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, CriticalError, generate_fleet_config_file
 
 
 @pytest.mark.parametrize(
@@ -199,7 +195,7 @@ from slurm.pcluster_fleet_config_generator import (
     ],
 )
 def test_generate_fleet_config_file_error_cases(mocker, tmpdir, cluster_config, expected_exception, expected_message):
-    mocker.patch("slurm.pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
+    mocker.patch("pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
     output_file = f"{tmpdir}/fleet-config.json"
 
     if expected_message:
