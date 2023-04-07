@@ -2,7 +2,6 @@ awscli
 boto3
 supervisor
 requests
-python-gnupg
 jsonschema
 jinja2
 requests
