@@ -14,7 +14,7 @@ import os
 import subprocess  # nosec B404
 import tempfile
 from types import SimpleNamespace
-from unittest.mock import MagicMock, call
+from unittest.mock import ANY, MagicMock, call
 
 import botocore
 import pytest
@@ -179,7 +179,12 @@ async def test_execute_script(script_runner, mocker, args):
         [
             call(["chmod", "+x", exe_script.path], check=True, stderr=subprocess.PIPE),
             call(
-                [exe_script.path] + (exe_script.args or []), check=True, stderr=subprocess.PIPE, stdout=None, text=True
+                [exe_script.path] + (exe_script.args or []),
+                check=True,
+                stderr=subprocess.PIPE,
+                stdout=None,
+                text=True,
+                env=ANY,
             ),
         ]
     )
