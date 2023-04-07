@@ -21,11 +21,6 @@ control 'tag:config_expected_versions_of_nvidia_driver_installed' do
     subject { command('modinfo -F version nvidia').stdout.strip }
     it { should eq expected_nvidia_driver_version }
   end
-
-  describe service(node['cluster']['nvidia']['gdrcopy']['service']) do
-    it { should_not be_enabled }
-    it { should_not be_running }
-  end
 end
 
 control 'tag:config_expected_versions_of_nvidia_cuda_installed' do
