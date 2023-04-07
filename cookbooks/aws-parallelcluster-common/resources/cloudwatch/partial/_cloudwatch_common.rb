@@ -17,8 +17,6 @@ unified_mode true
 default_action :setup
 
 action :setup do
-  return if redhat_ubi?
-
   remote_file node['cluster']['cloudwatch']['public_key_local_path'] do
     source node['cluster']['cloudwatch']['public_key_url']
     retries 3
@@ -60,21 +58,11 @@ action :setup do
   # Import cloudwatch agent's public key to the keyring
   execute 'import-cloudwatch-agent-key' do
     command "gpg --import #{node['cluster']['cloudwatch']['public_key_local_path']}"
-    user 'root'
   end
 
   # Verify that cloudwatch agent's public key has expected fingerprint
-  cookbook_file 'verify_cloudwatch_agent_public_key_fingerprint.py' do
-    action :create_if_missing
-    source 'cloudwatch/verify_cloudwatch_agent_public_key_fingerprint.py'
-    path '/usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py'
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
   execute 'verify-cloudwatch-agent-public-key-fingerprint' do
-    command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/bin/verify_cloudwatch_agent_public_key_fingerprint.py"
-    user 'root'
+    command 'gpg --list-keys --fingerprint "Amazon CloudWatch Agent" | grep "9376 16F3 450B 7D80 6CBD  9725 D581 6730 3B78 9C72"'
   end
 
   # Verify that the cloudwatch agent package matches its expected signature
