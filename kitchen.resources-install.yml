@@ -171,3 +171,17 @@ suites:
       resource: system_authentication
       dependencies:
         - resource:package_repos
+  - name: cloudwatch
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /cloudwatch/
+    attributes:
+      resource: cloudwatch
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
+        - recipe:aws-parallelcluster-common::node_attributes
