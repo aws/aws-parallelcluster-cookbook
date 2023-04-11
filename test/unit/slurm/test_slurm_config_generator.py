@@ -164,7 +164,10 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
-def test_generate_slurm_config_with_custom_settings(test_datadir, tmpdir):
+def test_generate_slurm_config_with_custom_settings(mocker, test_datadir, tmpdir):
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
 
