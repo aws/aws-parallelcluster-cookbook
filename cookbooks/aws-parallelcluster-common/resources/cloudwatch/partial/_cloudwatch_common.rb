@@ -78,3 +78,91 @@ action_class do
     "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.#{package_extension}"
   end
 end
+
+action :configure do
+  config_script_path = '/usr/local/bin/write_cloudwatch_agent_json.py'
+  cookbook_file 'write_cloudwatch_agent_json.py' do
+    action :create_if_missing
+    source 'cloudwatch/write_cloudwatch_agent_json.py'
+    path config_script_path
+    user 'root'
+    group 'root'
+    mode '0755'
+  end
+
+  config_data_path = '/usr/local/etc/cloudwatch_agent_config.json'
+  cookbook_file 'cloudwatch_agent_config.json' do
+    action :create_if_missing
+    source 'cloudwatch/cloudwatch_agent_config.json'
+    path config_data_path
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
+  config_schema_path = '/usr/local/etc/cloudwatch_agent_config_schema.json'
+  cookbook_file 'cloudwatch_agent_config_schema.json' do
+    action :create_if_missing
+    source 'cloudwatch/cloudwatch_agent_config_schema.json'
+    path config_schema_path
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
+  validator_script_path = '/usr/local/bin/cloudwatch_agent_config_util.py'
+  cookbook_file 'cloudwatch_agent_config_util.py' do
+    action :create_if_missing
+    source 'cloudwatch/cloudwatch_agent_config_util.py'
+    path validator_script_path
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
+  if redhat_ubi?
+    node.override!['cluster']['cookbook_virtualenv_path'] = '/usr'
+    node.override!['cluster']['node_virtualenv_path'] = '/usr'
+    node.override!['cluster']['awsbatch_virtualenv_path'] = '/usr'
+    node.override!['cluster']['cfn_bootstrap_virtualenv_path'] = '/usr'
+  end
+
+  execute "cloudwatch-config-validation" do
+    user 'root'
+    timeout 300
+    environment(
+      'CW_LOGS_CONFIGS_SCHEMA_PATH' => config_schema_path,
+      'CW_LOGS_CONFIGS_PATH' => config_data_path
+    )
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{validator_script_path}"
+  end
+
+  execute "cloudwatch-config-creation" do
+    user 'root'
+    timeout 300
+    environment(
+      'LOG_GROUP_NAME' => node['cluster']['log_group_name'],
+      'SCHEDULER' => node['cluster']['scheduler'],
+      'NODE_ROLE' => node['cluster']['node_type'],
+      'CONFIG_DATA_PATH' => config_data_path
+    )
+    not_if { ::File.exist?('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json') }
+
+    cluster_config_path = node['cluster']['scheduler'] == 'plugin' ? "--cluster-config-path #{node['cluster']['cluster_config_path']}" : ""
+
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{config_script_path} "\
+        "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
+        "--scheduler $SCHEDULER --node-role $NODE_ROLE #{cluster_config_path}"
+  end
+
+  execute "cloudwatch-agent-start" do
+    user 'root'
+    timeout 300
+    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
+    not_if do
+      system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") ||
+        node['cluster']['cw_logging_enabled'] != 'true' ||
+        virtualized?
+    end
+  end
+end
