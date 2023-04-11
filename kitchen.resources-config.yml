@@ -87,3 +87,23 @@ suites:
       dependencies:
         - resource:package_repos
         - resource:system_authentication
+  - name: cloudwatch_config
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - /tag:config_cloudwatch/
+    attributes:
+      resource: cloudwatch:configure
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
+        - resource:cloudwatch:setup
+        - recipe:aws-parallelcluster-common::node_attributes
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        cw_logging_enabled: "true"
+        log_group_name: test
