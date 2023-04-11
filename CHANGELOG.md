@@ -22,6 +22,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Rdma-core: `rdma-core-43.0-1`
   - Open MPI: `openmpi40-aws-4.1.5-1`
 - Upgrade Lustre client version to 2.12 on Amazon Linux 2. Lustre client 2.12 has been installed on Ubuntu 20.04, 18.04 and CentOS >= 7.7.  Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
+- Upgrade aws-cfn-bootstrap to version 2.0-24.
 
 3.5.1
 ------

@@ -41,7 +41,7 @@ default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyen
 default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 
 # cfn-bootstrap
-default['cluster']['cfn_bootstrap']['version'] = '2.0-10'
+default['cluster']['cfn_bootstrap']['version'] = '2.0-24'
 default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz"
 
 # Python packages
