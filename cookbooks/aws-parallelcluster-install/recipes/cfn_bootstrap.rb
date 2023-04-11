@@ -52,3 +52,11 @@ template "/etc/profile.d/pcluster.sh" do
   group 'root'
   mode '0644'
 end
+
+# Add cfn-hup runner
+template "#{node['cluster']['scripts_dir']}/cfn-hup-runner.sh" do
+  source "base/cfn-hup-runner.sh.erb"
+  owner 'root'
+  group 'root'
+  mode '0744'
+end
