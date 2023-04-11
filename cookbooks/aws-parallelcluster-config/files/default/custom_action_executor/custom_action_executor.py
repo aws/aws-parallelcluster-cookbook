@@ -71,20 +71,23 @@ class LegacyEventName(Enum):
 
     def map_to_current_name(self):
         """Return the current event name value as it's configured in the cluster config."""
-        if self == LegacyEventName.ON_NODE_START:
-            result = "OnNodeStart"
-        elif self == LegacyEventName.ON_NODE_CONFIGURED:
-            result = "OnNodeConfigured"
-        elif self == LegacyEventName.ON_NODE_UPDATED:
-            result = "OnNodeUpdated"
-        else:
-            raise ValueError(f"Unknown legacy event name: {self.value}")
+        try:
+            result = LEGACY_EVENT_TO_CURRENT_NAME_MAP[self]
+        except KeyError as err:
+            raise ValueError(f"Unknown legacy event name: {self.value}") from err
 
         return result
 
     def __str__(self):
         """Return the legacy event name value."""
         return self.value
+
+
+LEGACY_EVENT_TO_CURRENT_NAME_MAP = {
+    LegacyEventName.ON_NODE_START: "OnNodeStart",
+    LegacyEventName.ON_NODE_CONFIGURED: "OnNodeConfigured",
+    LegacyEventName.ON_NODE_UPDATED: "OnNodeUpdated",
+}
 
 
 @dataclass
@@ -134,17 +137,21 @@ class CfnConfigEnvEnricher(EnvEnricher):
     def __init__(self, conf: CustomActionsConfig):
         super().__init__()
         self.conf = conf
-        self._cfn_base_env = self._create_additional_cfnconfig_compatible_env()
+        self._cfn_base_env = CfnConfigEnvEnricher._create_additional_cfnconfig_compatible_env(
+            self.conf.script_sequences_per_event
+        )
 
-    def _create_additional_cfnconfig_compatible_env(self):
+    @staticmethod
+    def _create_additional_cfnconfig_compatible_env(script_sequences_per_event):
         additional_env = {}
-        for legacy_event, script_sequence in self.conf.script_sequences_per_event.items():
+        for legacy_event, script_sequence in script_sequences_per_event.items():
             script_definition = script_sequence[0] if script_sequence else None
-            additional_env.update(self._create_script_env(legacy_event, script_definition))
+            additional_env.update(CfnConfigEnvEnricher._create_script_env(legacy_event, script_definition))
 
         return additional_env
 
-    def _create_script_env(self, legacy_event, script_definition):
+    @staticmethod
+    def _create_script_env(legacy_event, script_definition):
         if script_definition is None:
             script_definition = ScriptDefinition("", [])
 
@@ -556,20 +563,25 @@ class ConfigLoader:
         return conf
 
     def _deserialize_script_sequences(self, cluster_config, event_name, node_type, queue_name):
+        # this is a good candidate for sharing logic with pcluster as library on the nodes
         try:
             if node_type == "HeadNode":
-                data = cluster_config["HeadNode"]["CustomActions"][event_name]
+                script_data = cluster_config["HeadNode"]["CustomActions"][event_name]
             else:
-                data = next(
+                script_data = next(
                     (
-                        q
-                        for q in next(v for v in cluster_config["Scheduling"].values() if isinstance(v, list))
-                        if q["Name"] == queue_name and q["CustomActions"]
+                        queue
+                        for queue in next(
+                            list_value
+                            for list_value in cluster_config["Scheduling"].values()
+                            if isinstance(list_value, list)
+                        )
+                        if queue["Name"] == queue_name and queue["CustomActions"]
                     ),
                     None,
                 )["CustomActions"][event_name]
 
-            sequence = self._extract_script_sequence(data)
+            sequence = self._extract_script_sequence(script_data)
         except (KeyError, TypeError) as err:
             logging.debug("Ignoring missing %s in configuration, cause: %s", event_name, err)
             sequence = []
