@@ -27,18 +27,6 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
-#  - name: cloudwatch_agent_configured
-#    run_list:
-#      - recipe[aws-parallelcluster::add_dependencies]
-#      - recipe[aws-parallelcluster-config::cloudwatch_agent]
-#    verifier:
-#      controls:
-#        - cloudwatch_agent_configured
-#    attributes:
-#      dependencies:
-#        - recipe:aws-parallelcluster-install::directories
-#        - recipe:aws-parallelcluster-install::python
-#        - recipe:aws-parallelcluster-install::cloudwatch_agent
   - name: fs_update
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

@@ -177,7 +177,7 @@ suites:
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
-        - /cloudwatch/
+        - /^cloudwatch/
     attributes:
       resource: cloudwatch
       dependencies:
