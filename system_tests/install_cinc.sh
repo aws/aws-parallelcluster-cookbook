@@ -31,22 +31,6 @@ elif [ `echo "${OS}" | grep -E '^ubuntu'` ]; then
   PLATFORM='DEBIAN'
 fi
 
-AWS_DOMAIN="amazonaws.com"
-[[ ${AWS_Region} =~ ^cn- ]] && AWS_DOMAIN="amazonaws.com.cn"
-[[ ${AWS_Region} =~ ^us-iso- ]] && AWS_DOMAIN="c2s.ic.gov"
-[[ ${AWS_Region} =~ ^us-isob- ]] && AWS_DOMAIN="sc2s.sgov.gov"
-
-S3_ENDPOINT="s3.${AWS_Region}.${AWS_DOMAIN}"
-
-BUCKET="cloudformation-examples"
-[[ ${AWS_DOMAIN} != "amazonaws.com" ]] && BUCKET="${AWS_Region}-aws-parallelcluster/cloudformation-examples"
-if [[ ${OS} =~ ^(ubuntu2004)$ ]]; then
-  PACKAGE_NAME="aws-cfn-bootstrap-py3-latest.tar.gz"
-else
-  PACKAGE_NAME="aws-cfn-bootstrap-latest.tar.gz"
-fi
-CfnBootstrapUrl="https://${S3_ENDPOINT}/${BUCKET}/${PACKAGE_NAME}"
-
 ARCH=$(uname -m)
 if [ "$ARCH" == "aarch64" ]; then
     ARCH=arm64
