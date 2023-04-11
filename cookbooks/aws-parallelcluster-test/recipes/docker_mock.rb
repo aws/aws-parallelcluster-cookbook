@@ -63,6 +63,17 @@ end
 
 if redhat_ubi?
   package 'openssh-clients'
+
+  # Mock python environment
+  package 'python39'
+  link '/usr/bin/python' do
+    to '/usr/bin/python3.9'
+  end
+
+  bash 'Install requirements' do
+    cwd Chef::Config[:file_cache_path]
+    code "/usr/bin/python -m pip install -r cookbooks/aws-parallelcluster-install/files/default/requirements.txt"
+  end
 end
 
 file '/usr/bin/ssh-keyscan' do
