@@ -306,10 +306,10 @@ suites:
       cluster:
         config:
           Scheduling:
-            SchedulerSettings:
+            SlurmSettings:
               # here we are just interested in testing that we can retrieve a file from S3 through S3 protocol
               CustomSlurmSettingsIncludeFile: 's3://us-east-1-aws-parallelcluster/templates/1-click/serverless-database.yaml'
-              LocalPath: '/tmp/custom_slurm_settings_include_slurm.conf'
+              LocalPath: '/tmp/custom_slurm_settings_include_file_slurm.conf'
   - name: custom_slurm_settings_file_via_https
     # check that we can retrieve a custom slurm settings file from internet through HTTP/S
     run_list:
@@ -325,10 +325,10 @@ suites:
       cluster:
         config:
           Scheduling:
-            SchedulerSettings:
+            SlurmSettings:
               # here we are just interested in testing that we can retrieve a file from S3 through https protocol
               CustomSlurmSettingsIncludeFile: 'https://us-east-1-aws-parallelcluster.s3.amazonaws.com/templates/1-click/serverless-database.yaml'
-              LocalPath: '/tmp/custom_slurm_settings_include_slurm.conf'
+              LocalPath: '/tmp/custom_slurm_settings_include_file_slurm.conf'
   - name: directory_service
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

@@ -87,7 +87,7 @@ unless virtualized?
     block do
       run_context.include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file'
     end
-    not_if { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile).nil? }
+    not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :CustomSlurmSettingsIncludeFile).nil? }
   end
 
   # Generate pcluster fleet config

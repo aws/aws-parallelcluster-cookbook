@@ -18,7 +18,7 @@
 control 'custom_settings_file_retrieved' do
   title 'Checks that customs settings file has been retrieved if specified in the config'
 
-  describe file("/tmp/custom_slurm_settings_include_slurm.conf") do
+  describe file("/tmp/custom_slurm_settings_include_file_slurm.conf") do
     it { should exist }
   end
 end
