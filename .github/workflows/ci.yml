@@ -83,6 +83,13 @@ jobs:
         run: pip install tox
       - name: Run Tox
         run: tox -e ${{ matrix.toxenv }}
+      - name: Upload code coverage report to Codecov
+        uses: codecov/codecov-action@v3
+        if: ${{ endsWith(matrix.toxenv, '-cov') }}
+        with:
+          files: coverage.xml
+          flags: unittests
+          verbose: true
   shellcheck:
     name: Shellcheck
     runs-on: ubuntu-latest
