@@ -18,13 +18,13 @@
 # Overrides destination while testing since remote_file expect the destination path to already exist
 # To keep the test dependencies at the minimum we use /tmp as destination
 local_path = if kitchen_test?
-               node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :LocalPath)
+               node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :LocalPath)
              else
-               "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/custom_slurm_settings_include_slurm.conf"
+               "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/custom_slurm_settings_include_file_slurm.conf"
              end
 
 remote_object 'Retrieve Custom Slurm Settings' do
-  url(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) })
-  destination(local_path)
-  only_if { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :CustomSlurmSettingsIncludeFile) }
+  url(lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :CustomSlurmSettingsIncludeFile) })
+  destination local_path
+  sensitive true
 end

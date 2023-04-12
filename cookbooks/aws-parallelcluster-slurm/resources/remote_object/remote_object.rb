@@ -17,6 +17,9 @@ property :url, required: true,
          description: 'Source URI of the remote file'
 property :destination, required: true,
          description: 'Local destination path where to store the file'
+property :sensitive, [true, false],
+         default: false,
+         description: 'mark the resource as senstive'
 
 default_action :get
 
@@ -49,6 +52,7 @@ action :get do
       remote_file "retrieve_object" do
         path local_path
         source source_url
+        sensitive new_resource.sensitive
         retries 3
         retry_delay 5
       end
