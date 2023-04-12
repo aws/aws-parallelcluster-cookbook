@@ -14,7 +14,7 @@ import os
 import subprocess  # nosec B404
 import tempfile
 from types import SimpleNamespace
-from unittest.mock import MagicMock, call
+from unittest.mock import ANY, MagicMock, call
 
 import botocore
 import pytest
@@ -22,8 +22,10 @@ from assertpy import assert_that
 from custom_action_executor import (
     SCRIPT_LOG_NAME_FETCH_AND_RUN,
     ActionRunner,
+    CfnConfigEnvEnricher,
     ComputeFleetLogger,
     ConfigLoader,
+    CustomActionsConfig,
     DownloadRunError,
     ExecutableScript,
     HeadNodeLogger,
@@ -74,6 +76,13 @@ def test_parse_s3_url(script_runner):
 def write_to_file(filename, file_contents: bytes):
     with open(filename, "w", encoding="utf-8") as file:
         file.write(file_contents.decode())
+
+
+def create_persistent_tmp_file(additional_content: str = "") -> str:
+    with tempfile.NamedTemporaryFile(delete=False) as f:
+        f.write(b"#!/bin/bash\n")
+        f.write(additional_content.encode())
+        return f.name
 
 
 @pytest.mark.asyncio
@@ -150,8 +159,8 @@ async def test_download_https_script_error(script_runner, mocker, https_script):
         await script_runner._download_script(https_script)
 
 
-def build_exe_script(args=None):
-    return ExecutableScript(url="s3://bucket/script.sh", step_num=0, path="/this/is/a/path/to/script.sh", args=args)
+def build_exe_script(args=None, path="/this/is/a/path/to/script.sh"):
+    return ExecutableScript(url="s3://bucket/script.sh", step_num=0, path=path, args=args)
 
 
 @pytest.mark.parametrize("args", [None, [], ["arg1", "arg2"], ["arg1", "arg2", "arg3"]])
@@ -169,9 +178,90 @@ async def test_execute_script(script_runner, mocker, args):
     subprocess_mock.assert_has_calls(
         [
             call(["chmod", "+x", exe_script.path], check=True, stderr=subprocess.PIPE),
-            call([exe_script.path] + (exe_script.args or []), check=True, stderr=subprocess.PIPE),
+            call(
+                [exe_script.path] + (exe_script.args or []),
+                check=True,
+                stderr=subprocess.PIPE,
+                stdout=None,
+                text=True,
+                env=ANY,
+            ),
         ]
     )
+
+
+@pytest.mark.parametrize(
+    "conf, expected_in_env_vars",
+    [
+        (
+            {
+                "legacy_event": LegacyEventName.ON_NODE_UPDATED,
+                "script_sequences_per_event": {
+                    LegacyEventName.ON_NODE_START: [],
+                    LegacyEventName.ON_NODE_CONFIGURED: [],
+                    LegacyEventName.ON_NODE_UPDATED: [],
+                },
+            },
+            {
+                "cfn_preinstall": '""',
+                "cfn_preinstall_args": "()",
+                "cfn_postinstall": '""',
+                "cfn_postinstall_args": "()",
+                "cfn_postupdate": '"s3://bucket/script.sh"',
+                "cfn_postupdate_args": "()",
+            },
+        ),
+        (
+            {
+                "legacy_event": LegacyEventName.ON_NODE_UPDATED,
+                "script_sequences_per_event": {
+                    LegacyEventName.ON_NODE_START: [
+                        ScriptDefinition(url="https://example.com/ON_NODE_STARTscript1.sh", args=["arg1", "arg2"]),
+                        ScriptDefinition(url="https://example.com/ON_NODE_STARTscript2.sh", args=["arg1", "arg2"]),
+                    ],
+                    LegacyEventName.ON_NODE_CONFIGURED: [
+                        ScriptDefinition(
+                            url="https://example.com/ON_NODE_CONFIGUREDscript1.sh", args=["CONFIGUREDarg"]
+                        ),
+                        ScriptDefinition(url="https://example.com/ON_NODE_CONFIGUREDscript2.sh", args=["arg1", "arg2"]),
+                    ],
+                    LegacyEventName.ON_NODE_UPDATED: [
+                        ScriptDefinition(url="https://example.com/ON_NODE_UPDATEDscript1.sh", args=["arg1", "arg2"]),
+                        ScriptDefinition(url="https://example.com/ON_NODE_UPDATEDscript2.sh", args=["arg1", "arg2"]),
+                    ],
+                },
+            },
+            {
+                "cfn_preinstall": '"https://example.com/ON_NODE_STARTscript1.sh"',
+                "cfn_preinstall_args": '("arg1" "arg2")',
+                "cfn_postinstall": '"https://example.com/ON_NODE_CONFIGUREDscript1.sh"',
+                "cfn_postinstall_args": '("CONFIGUREDarg")',
+                "cfn_postupdate": '"s3://bucket/script.sh"',
+                "cfn_postupdate_args": "()",
+            },
+        ),
+    ],
+)
+@pytest.mark.asyncio
+async def test_execute_script_supported_env_variables(conf, expected_in_env_vars):
+    persistent_tmp_file_path = create_persistent_tmp_file("env")
+    exe_script: ExecutableScript = build_exe_script(path=persistent_tmp_file_path)
+
+    conf_mock = MagicMock(spec=CustomActionsConfig)
+    for key, value in conf.items():
+        setattr(conf_mock, key, value)
+
+    script_runner = ScriptRunner("OnMockTestEvent", "OnMockTestRegionName", CfnConfigEnvEnricher(conf_mock))
+
+    with tempfile.TemporaryFile(mode="w+t") as f:
+        await script_runner._execute_script(exe_script, stdout=f)
+        f.seek(0)
+        output = f.read().strip()
+
+    for key, value in expected_in_env_vars.items():
+        assert_that(output).contains(f"{key}={value}")
+
+    os.unlink(persistent_tmp_file_path)
 
 
 @pytest.mark.asyncio
@@ -197,13 +287,6 @@ async def test_execute_script_error_in_execution(script_runner, mocker):
         match="Failed to execute OnMockTestEvent script 0 s3://bucket/script.sh, " "return code: 1.",
     ):
         await script_runner._execute_script(build_exe_script())
-
-
-def create_persistent_tmp_file(additional_content: str = "") -> str:
-    with tempfile.NamedTemporaryFile(delete=False) as f:
-        f.write(b"#!/bin/bash\n")
-        f.write(additional_content.encode())
-        return f.name
 
 
 @pytest.mark.asyncio

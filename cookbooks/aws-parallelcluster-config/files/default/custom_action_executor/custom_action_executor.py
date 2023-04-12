@@ -62,12 +62,123 @@ class ExecutableScript(ScriptDefinition):
     path: str
 
 
+class LegacyEventName(Enum):
+    """Maps legacy events names to avoid changing script contract."""
+
+    ON_NODE_START = "preinstall"
+    ON_NODE_CONFIGURED = "postinstall"
+    ON_NODE_UPDATED = "postupdate"
+
+    def map_to_current_name(self):
+        """Return the current event name value as it's configured in the cluster config."""
+        try:
+            result = LEGACY_EVENT_TO_CURRENT_NAME_MAP[self]
+        except KeyError as err:
+            raise ValueError(f"Unknown legacy event name: {self.value}") from err
+
+        return result
+
+    def __str__(self):
+        """Return the legacy event name value."""
+        return self.value
+
+
+LEGACY_EVENT_TO_CURRENT_NAME_MAP = {
+    LegacyEventName.ON_NODE_START: "OnNodeStart",
+    LegacyEventName.ON_NODE_CONFIGURED: "OnNodeConfigured",
+    LegacyEventName.ON_NODE_UPDATED: "OnNodeUpdated",
+}
+
+
+@dataclass
+class CustomActionsConfig:
+    """
+    Encapsulates custom actions configuration.
+
+    Contains all the configuration relevant to custom actions execution.
+    """
+
+    stack_name: str
+    cluster_name: str
+    region_name: str
+    node_type: str
+    queue_name: str
+    resource_name: str
+    instance_id: str
+    instance_type: str
+    ip_address: str
+    hostname: str
+    availability_zone: str
+    scheduler: str
+    event_name: str
+    legacy_event: LegacyEventName
+    can_execute: bool
+    dry_run: bool
+    script_sequence: list  # type list[ScriptDefinition]
+    script_sequences_per_event: dict
+    event_file_override: str
+    node_spec_file: str
+
+
+class EnvEnricher:
+    """Provide the environment variables for the ExecutableScript."""
+
+    def __init__(self):
+        self._base_env = os.environ.copy()
+
+    def build_env(self, exe_script: ExecutableScript):  # pylint: disable=unused-argument
+        """Provide a copy of the current process environment variables."""
+        return self._base_env.copy()
+
+
+class CfnConfigEnvEnricher(EnvEnricher):
+    """Provides cnfconfig backward compatible environment variables for the ExecutableScript."""
+
+    def __init__(self, conf: CustomActionsConfig):
+        super().__init__()
+        self.conf = conf
+        self._cfn_base_env = CfnConfigEnvEnricher._create_additional_cfnconfig_compatible_env(
+            self.conf.script_sequences_per_event
+        )
+
+    @staticmethod
+    def _create_additional_cfnconfig_compatible_env(script_sequences_per_event):
+        additional_env = {}
+        for legacy_event, script_sequence in script_sequences_per_event.items():
+            script_definition = script_sequence[0] if script_sequence else None
+            additional_env.update(CfnConfigEnvEnricher._create_script_env(legacy_event, script_definition))
+
+        return additional_env
+
+    @staticmethod
+    def _create_script_env(legacy_event, script_definition):
+        if script_definition is None:
+            script_definition = ScriptDefinition("", [])
+
+        script_env = {f"cfn_{legacy_event.value}": f'"{script_definition.url}"'}
+        # _args is a bash array and should support expansions like "${cfn_postupdate_args[@]}"
+        args = script_definition.args
+        if args is None:
+            args = []
+        arguments = " ".join(f'"{arg}"' for arg in args)
+        script_env[f"cfn_{legacy_event.value}_args"] = f"({arguments})"
+        return script_env
+
+    def build_env(self, exe_script: ExecutableScript):
+        """Provide a copy of the current process environment variables."""
+        full_env = super().build_env(exe_script)
+        full_env.update(self._cfn_base_env)
+        full_env.update(self._create_script_env(self.conf.legacy_event, exe_script))
+        return full_env
+
+
 class ScriptRunner:
     """Performs download and execution of scripts."""
 
-    def __init__(self, event_name, region_name):
+    def __init__(self, event_name, region_name, env_enricher: EnvEnricher = None):
         self.event_name = event_name
         self.region_name = region_name
+        self._env_enricher = env_enricher if env_enricher else EnvEnricher()
 
     async def download_and_execute_scripts(self, scripts):
         """
@@ -140,7 +251,7 @@ class ScriptRunner:
         exe_script.path = file.name
         return exe_script
 
-    async def _execute_script(self, exe_script: ExecutableScript):
+    async def _execute_script(self, exe_script: ExecutableScript, stdout=None):
         # preserving error case for making the script executable
         try:
             subprocess.run(
@@ -164,7 +275,12 @@ class ScriptRunner:
         try:
             # arguments are provided by the user who has the privilege to create/update the cluster
             subprocess.run(
-                [exe_script.path] + (exe_script.args or []), check=True, stderr=subprocess.PIPE
+                [exe_script.path] + (exe_script.args or []),
+                check=True,
+                stderr=subprocess.PIPE,
+                stdout=stdout,
+                text=True,
+                env=self._env_enricher.build_env(exe_script),
             )  # nosec - trusted input
         except subprocess.CalledProcessError as err:
             raise DownloadRunError(
@@ -191,60 +307,6 @@ class ScriptRunner:
     def _parse_s3_url(url):
         parsed_url = urlparse(url)
         return parsed_url.netloc, parsed_url.path.lstrip("/")
-
-
-class LegacyEventName(Enum):
-    """Maps legacy events names to avoid changing script contract."""
-
-    ON_NODE_START = "preinstall"
-    ON_NODE_CONFIGURED = "postinstall"
-    ON_NODE_UPDATED = "postupdate"
-
-    def map_to_current_name(self):
-        """Return the current event name value as it's configured in the cluster config."""
-        if self == LegacyEventName.ON_NODE_START:
-            result = "OnNodeStart"
-        elif self == LegacyEventName.ON_NODE_CONFIGURED:
-            result = "OnNodeConfigured"
-        elif self == LegacyEventName.ON_NODE_UPDATED:
-            result = "OnNodeUpdated"
-        else:
-            raise ValueError(f"Unknown legacy event name: {self.value}")
-
-        return result
-
-    def __str__(self):
-        """Return the legacy event name value."""
-        return self.value
-
-
-@dataclass
-class CustomActionsConfig:
-    """
-    Encapsulates custom actions configuration.
-
-    Contains all the configuration relevant to custom actions execution.
-    """
-
-    stack_name: str
-    cluster_name: str
-    region_name: str
-    node_type: str
-    queue_name: str
-    resource_name: str
-    instance_id: str
-    instance_type: str
-    ip_address: str
-    hostname: str
-    availability_zone: str
-    scheduler: str
-    event_name: str
-    legacy_event: LegacyEventName
-    can_execute: bool
-    dry_run: bool
-    script_sequence: list  # type list[ScriptDefinition]
-    event_file_override: str
-    node_spec_file: str
 
 
 class CustomLogger(ABC):
@@ -453,45 +515,38 @@ class ConfigLoader:
         :param args: command line arguments
         :return: configuration object
         """
-        legacy_event = None
-        for event in LegacyEventName:
-            if getattr(args, event.value):
-                legacy_event = event
-                break
-        event_name = legacy_event.map_to_current_name()
-        cluster_config = self._load_cluster_config(args.cluster_configuration)
+        node_type = args.node_type
+        queue_name = args.queue_name
 
+        cluster_config = self._load_cluster_config(args.cluster_configuration)
         logging.debug(cluster_config)
 
-        try:
-            if args.node_type == "HeadNode":
-                data = cluster_config["HeadNode"]["CustomActions"][event_name]
-            else:
-                data = next(
-                    (
-                        q
-                        for q in next(v for v in cluster_config["Scheduling"].values() if isinstance(v, list))
-                        if q["Name"] == args.queue_name and q["CustomActions"]
-                    ),
-                    None,
-                )["CustomActions"][event_name]
+        legacy_event = None
+        event_name = None
+        script_sequences_per_event = {}
+        for event in LegacyEventName:
+            current_event_name = event.map_to_current_name()
+            script_sequences_per_event[event] = self._deserialize_script_sequences(
+                cluster_config, current_event_name, node_type, queue_name
+            )
+            if getattr(args, event.value):
+                legacy_event = event
+                event_name = current_event_name
 
-            sequence = self._extract_script_sequence(data)
-        except (KeyError, TypeError) as err:
-            logging.debug("Ignoring missing %s in configuration, cause: %s", event_name, err)
-            sequence = []
+        script_sequence = script_sequences_per_event[legacy_event]
 
         conf = CustomActionsConfig(
             legacy_event=legacy_event,
-            node_type=args.node_type,
-            queue_name=args.queue_name,
+            node_type=node_type,
+            queue_name=queue_name,
             event_name=event_name,
             region_name=args.region,
             stack_name=args.stack_name,
             cluster_name=args.cluster_name,
-            script_sequence=sequence,
+            script_sequence=script_sequence,
+            script_sequences_per_event=script_sequences_per_event,
             dry_run=args.dry_run,
-            can_execute=len(sequence) > 0,
+            can_execute=len(script_sequence) > 0,
             instance_id=args.instance_id,
             instance_type=args.instance_type,
             ip_address=args.ip_address,
@@ -506,6 +561,31 @@ class ConfigLoader:
         logging.debug(conf)
 
         return conf
+
+    def _deserialize_script_sequences(self, cluster_config, event_name, node_type, queue_name):
+        # this is a good candidate for sharing logic with pcluster as library on the nodes
+        try:
+            if node_type == "HeadNode":
+                script_data = cluster_config["HeadNode"]["CustomActions"][event_name]
+            else:
+                script_data = next(
+                    (
+                        queue
+                        for queue in next(
+                            list_value
+                            for list_value in cluster_config["Scheduling"].values()
+                            if isinstance(list_value, list)
+                        )
+                        if queue["Name"] == queue_name and queue["CustomActions"]
+                    ),
+                    None,
+                )["CustomActions"][event_name]
+
+            sequence = self._extract_script_sequence(script_data)
+        except (KeyError, TypeError) as err:
+            logging.debug("Ignoring missing %s in configuration, cause: %s", event_name, err)
+            sequence = []
+        return sequence
 
     @staticmethod
     def _extract_script_sequence(data):
@@ -582,9 +662,11 @@ class ActionRunner:
                 print(f"  {script.url} with args {script.args}")
         else:
             asyncio.run(
-                ScriptRunner(self.conf.event_name, self.conf.region_name).download_and_execute_scripts(
-                    self.conf.script_sequence
-                )
+                ScriptRunner(
+                    self.conf.event_name,
+                    self.conf.region_name,
+                    CfnConfigEnvEnricher(self.conf),
+                ).download_and_execute_scripts(self.conf.script_sequence)
             )
 
     def _get_stack_status(self) -> str:
