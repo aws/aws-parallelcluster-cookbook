@@ -11,8 +11,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
 - Add log rotation support for ParallelCluster managed logs.
 - Add support for customizing the cluster Slurm configuration via the ParallelCluster configuration YAML file.
-- Add health check manager and GPU health check, which can be activated through cluster configuration. 
-  Health check manager execution is triggered by a Slurm prolog script. GPU check verifies healthiness of a node by executing NVIDIA DCGM L2 diagnostic.   
+- Add health check manager and GPU health check, which can be activated through cluster configuration.
+  Health check manager execution is triggered by a Slurm prolog script. GPU check verifies healthiness of a node by executing NVIDIA DCGM L2 diagnostic.
 
 **CHANGES**
 - Upgrade EFA installer to `1.22.1`
@@ -28,7 +28,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Set Slurm prolog and epilog configurations to target a directory, /opt/slurm/etc/scripts/prolog.d/ and /opt/slurm/etc/scripts/epilog.d/ respectively.
 
 **BUG FIXES**
-- Fix an issue that was causing misalignment of compute nodes IP on multi NICS instances.
+- Fix IP association on instances with multiple network cards.
 
 3.5.1
 ------
