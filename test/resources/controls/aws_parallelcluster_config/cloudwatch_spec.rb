@@ -34,7 +34,7 @@ control 'tag:config_cloudwatch_configured' do
   end
 
   describe 'Check the cloudwatch service'
-  if node['cluster']['cw_logging_enabled'] == 'true' || !os_properties.virtualized?
+  if node['cluster']['cw_logging_enabled'] == 'true' && !os_properties.virtualized?
     describe bash("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") do
       its('exit_status') { should eq 0 }
     end
