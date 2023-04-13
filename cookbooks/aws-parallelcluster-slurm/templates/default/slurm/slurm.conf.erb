@@ -45,6 +45,7 @@ SuspendRate=0
 Prolog=<%= node['cluster']['slurm']['install_dir'] %>/etc/scripts/prolog.d/*
 Epilog=<%= node['cluster']['slurm']['install_dir'] %>/etc/scripts/epilog.d/*
 SchedulerParameters=nohold_on_prolog_fail
+BatchStartTimeout=180
 #
 # TIMERS
 SlurmctldTimeout=300
