@@ -11,7 +11,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/etc/cloudwatch_agent_config.json') do
     it { should exist }
-    its('sha256sum') { should eq 'dc7a5006fcf635bca2ce65dad6db4df8f6b50db13def391cc5bc65d605a6d9a5' }
+    # No sha256sum check since the file is modified runtime by cloudwatch_agent_config_util.py
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
