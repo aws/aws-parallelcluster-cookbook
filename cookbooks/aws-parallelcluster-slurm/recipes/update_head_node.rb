@@ -168,6 +168,14 @@ execute "generate_pcluster_custom_slurm_settings_include_files" do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_bulk_custom_slurm_settings_updated? }
 end
 
+# If defined in the config, retrieve a remote Custom Slurm Settings file and overrides the existing one
+ruby_block "Override Custom Slurm Settings with remote file" do
+  block do
+    run_context.include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file'
+  end
+  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :CustomSlurmSettingsIncludeFile).nil? }
+end
+
 execute "generate_pcluster_fleet_config" do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
           " --output-file #{node['cluster']['slurm']['fleet_config_path']}"\
