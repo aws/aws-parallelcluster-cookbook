@@ -30,6 +30,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix IP association on instances with multiple network cards.
 
+**BUG FIXES**
+- Fix issue causing cfn-hup daemon to fail when it gets restarted.
+
 3.5.1
 ------
 
