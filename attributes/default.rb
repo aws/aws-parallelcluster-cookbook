@@ -137,28 +137,11 @@ default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
 default['cluster']['dcv']['version'] = '2022.2-14521'
 if arm_instance?
-  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 amazon2)
+  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 amazon2 redhat8)
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
-  default['cluster']['dcv']['sha256sum'] = value_for_platform(
-    'centos' => {
-      '~>7' => "e1828c4c86679726532d29171b0e033a2474185066e0373bccc0f8bfd494f4b7",
-    },
-    'amazon' => { '2' => "e1828c4c86679726532d29171b0e033a2474185066e0373bccc0f8bfd494f4b7" },
-    'ubuntu' => { '18.04' => "275c79a51a480a46ff2751f87ae6f597f88e5598da147d76cdc09655e24eab78" }
-  )
 else
-  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2)
+  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2 redhat8)
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
-  default['cluster']['dcv']['sha256sum'] = value_for_platform(
-    'centos' => {
-      '~>7' => "01a5e7e57f57d306f3e474963e4475078b0ac1df02440c3759e6dfee5cdaeb09",
-    },
-    'amazon' => { '2' => "01a5e7e57f57d306f3e474963e4475078b0ac1df02440c3759e6dfee5cdaeb09" },
-    'ubuntu' => {
-      '18.04' => "b3871281c8a1bff57e92cd2188f3051e09978ead2013decc4b6b2a9921ef2689",
-      '20.04' => "069818d56c1072db80b915750bc62584cd109aa7f1fdc0ef64c69d59270bb1a3",
-    }
-  )
 end
 if platform?('ubuntu')
   # Unlike the other supported OSs, the DCV package names for Ubuntu use different architecture abbreviations than those used in the download URLs.
@@ -174,25 +157,7 @@ default['cluster']['dcv']['package'] = value_for_platform(
   }
 )
 default['cluster']['dcv']['server']['version'] = '2022.2.14521-1'
-default['cluster']['dcv']['server'] = value_for_platform( # NICE DCV server package
-  'centos' => {
-    '~>7' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
-  },
-  'amazon' => { '2' => "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => {
-    'default' => "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
-  }
-)
 default['cluster']['dcv']['xdcv']['version'] = '2022.2.519-1'
-default['cluster']['dcv']['xdcv'] = value_for_platform( # required to create virtual sessions
-  'centos' => {
-    '~>7' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
-  },
-  'amazon' => { '2' => "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => {
-    'default' => "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
-  }
-)
 default['cluster']['dcv']['gl']['version'] = '2022.2.1012-1'
 default['cluster']['dcv']['gl']['installer'] = value_for_platform( # required to enable GPU sharing
   'centos' => {
@@ -204,16 +169,6 @@ default['cluster']['dcv']['gl']['installer'] = value_for_platform( # required to
   }
 )
 default['cluster']['dcv']['web_viewer']['version'] = '2022.2.14521-1'
-default['cluster']['dcv']['web_viewer'] = value_for_platform( # required to enable WEB client
-  'centos' => {
-    '~>7' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
-  },
-  'amazon' => { '2' => "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => {
-    'default' => "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
-  }
-)
-default['cluster']['dcv']['url'] = "https://d1uj6qtbmh3dt5.cloudfront.net/2022.2/Servers/#{node['cluster']['dcv']['package']}.tgz"
 # DCV external authenticator configuration
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3

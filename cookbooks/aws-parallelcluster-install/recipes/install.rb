@@ -49,4 +49,4 @@ include_recipe 'aws-parallelcluster-awsbatch::install'
 # == WORKSTATIONS
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
 # used to build the schedulers packages
-include_recipe "aws-parallelcluster-install::dcv"
+dcv "Install DCV"
