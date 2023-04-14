@@ -32,6 +32,7 @@ driver:
 transport:
   ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH']  %>
   compression: true
+  name: speedy_ssh
 
 provisioner:
   name: chef_zero
