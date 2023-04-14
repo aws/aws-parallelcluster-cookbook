@@ -74,33 +74,6 @@ default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi'][
 default['cluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/mpi"
 default['cluster']['intelmpi']['qt_version'] = '5.15.2'
 
-# Arm Performance Library
-default['cluster']['armpl']['major_minor_version'] = '21.0'
-default['cluster']['armpl']['patch_version'] = '0'
-default['cluster']['armpl']['version'] = "#{node['cluster']['armpl']['major_minor_version']}.#{node['cluster']['armpl']['patch_version']}"
-
-default['cluster']['armpl']['gcc']['major_minor_version'] = '9.3'
-default['cluster']['armpl']['gcc']['patch_version'] = '0'
-default['cluster']['armpl']['gcc']['url'] = [
-  'https://ftp.gnu.org/gnu/gcc',
-  "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}",
-  "gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz",
-].join('/')
-default['cluster']['armpl']['platform'] = value_for_platform(
-  'centos' => { '~>7' => 'RHEL-7' },
-  'amazon' => { '2' => 'RHEL-8' },
-  'redhat' => { 'default' => 'RHEL-8' },
-  'ubuntu' => {
-    '18.04' => 'Ubuntu-18.04',
-    '20.04' => 'Ubuntu-20.04',
-  }
-)
-default['cluster']['armpl']['url'] = [
-  'archives/armpl',
-  node['cluster']['armpl']['platform'],
-  "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar",
-].join('/')
-
 # URLs to software packages used during install recipes
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
