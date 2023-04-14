@@ -26,6 +26,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Lustre client version to 2.12 on Amazon Linux 2. Lustre client 2.12 has been installed on Ubuntu 20.04, 18.04 and CentOS >= 7.7.  Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
 - Upgrade aws-cfn-bootstrap to version 2.0-24.
 - Set Slurm prolog and epilog configurations to target a directory, /opt/slurm/etc/scripts/prolog.d/ and /opt/slurm/etc/scripts/epilog.d/ respectively.
+- Set Slurm BatchStartTimeout to 3 minutes so to allow max 3 minutes Prolog execution during compute node registration.
 - Upgrade Slurm to version 23.02.1.
 - Upgrade munge to version 0.5.15.
 
