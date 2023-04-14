@@ -11,13 +11,15 @@ This repo contains the AWS ParallelCluster Chef cookbook used in AWS ParallelClu
 ## About kitchen tests
 
 Kitchen is used to automatically test cookbooks across any combination of platforms and test suites.
-It requires  cinc-workstation to be installed on your environment:
+It requires cinc-workstation to be installed on your environment:
 
-curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 23
+`curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 23`
 
+To speedup the transfer of files when kitchens are run on ec2 instances, the [transport](https://docs.chef.io/workstation/config_yml_kitchen/#transport-settings) selected is `kitchen-transport-speedy` https://github.com/criteo/kitchen-transport-speedy.
+
+To install `kitchen-transport-speedy` in the kitchen embedded ruby environment: `/opt/cinc-workstation/embedded/bin/gem install kitchen-transport-speedy`
 
 In order to test on docker containers, you also need docker installed on your environment.
-
 
 ### Helpers
 

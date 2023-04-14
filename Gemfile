@@ -20,4 +20,5 @@ end
 
 group :aws do
   gem 'kitchen-ec2'
+  gem 'kitchen-transport-speedy'
 end
