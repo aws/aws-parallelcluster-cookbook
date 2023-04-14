@@ -66,3 +66,4 @@ suites:
         - /nvidia_driver/
         - /fabric_manager/
         - /^cloudwatch/
+        - /^arm_pl/

@@ -184,3 +184,20 @@ suites:
         - recipe:aws-parallelcluster-test::docker_mock
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-common::node_attributes
+  - name: arm_pl
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /^arm_pl/
+    driver:
+      # arm_pl can be executed only on arm instance example: c6g.large
+      instance_type: c6g.large
+    attributes:
+      resource: arm_pl
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+        - recipe:aws-parallelcluster-common::node_attributes
