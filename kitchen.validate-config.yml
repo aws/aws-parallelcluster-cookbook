@@ -40,14 +40,6 @@ _run_list: &_run_list
   - recipe[aws-parallelcluster::tests]
   - recipe[aws-parallelcluster-common::node_attributes]
 
-_run_list_with_mocks: &_run_list_with_mocks
-  - recipe[aws-parallelcluster::tests_mock]
-  - recipe[aws-parallelcluster::init]
-  - recipe[aws-parallelcluster::config]
-  - recipe[aws-parallelcluster::finalize]
-  - recipe[aws-parallelcluster::tests]
-  - recipe[aws-parallelcluster-common::node_attributes]
-
 provisioner:
   attributes:
     kitchen: true
@@ -60,14 +52,6 @@ suites:
         << : *_head_node_cluster_attributes
         scheduler: 'slurm'
         enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] || false %>"
-
-  - name: scheduler_plugin_config_HeadNode
-    run_list: *_run_list_with_mocks
-    attributes:
-      cluster:
-        << : *_head_node_cluster_attributes
-        scheduler: 'plugin'
-        enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] %>"
 
   - name: awsbatch_config_HeadNode
     run_list: *_run_list
@@ -84,11 +68,3 @@ suites:
         << : *_compute_node_cluster_attributes
         scheduler: 'slurm'
         slurm_nodename: 'fake-dy-compute-1'
-
-  - name: scheduler_plugin_config_ComputeFleet
-    run_list: *_run_list_with_mocks
-    attributes:
-      cluster:
-        << : *_compute_node_cluster_attributes
-        scheduler: 'plugin'
-        scheduler_plugin_nodename: 'fake-dy-compute-1'
