@@ -45,26 +45,38 @@ provisioner:
     kitchen: true
 
 suites:
-  - name: slurm_config_HeadNode
+  - name: slurm_config_HeadNode_x86_64
     run_list: *_run_list
-    attributes:
+    attributes: &attributes_slurm_config_HeadNode
       cluster:
         << : *_head_node_cluster_attributes
         scheduler: 'slurm'
         enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] || false %>"
 
-  - name: awsbatch_config_HeadNode
+  - name: slurm_config_HeadNode_arm64
     run_list: *_run_list
-    attributes:
+    attributes: *attributes_slurm_config_HeadNode
+
+  - name: awsbatch_config_HeadNode_x86_64
+    run_list: *_run_list
+    attributes: &attributes_awsbatch_config_HeadNode
       cluster:
         << : *_head_node_cluster_attributes
         scheduler: 'awsbatch'
         custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
 
-  - name: slurm_config_ComputeFleet
+  - name: awsbatch_config_HeadNode_arm64
     run_list: *_run_list
-    attributes:
+    attributes: *attributes_awsbatch_config_HeadNode
+
+  - name: slurm_config_ComputeFleet_x86_64
+    run_list: *_run_list
+    attributes: &attributes_slurm_config_ComputeFleet
       cluster:
         << : *_compute_node_cluster_attributes
         scheduler: 'slurm'
         slurm_nodename: 'fake-dy-compute-1'
+
+  - name: slurm_config_ComputeFleet_arm64
+    run_list: *_run_list
+    attributes: *attributes_slurm_config_ComputeFleet
