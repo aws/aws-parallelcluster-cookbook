@@ -20,3 +20,13 @@ action :setup do
   return if arm_instance? || !(node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   action_install_package
 end
+
+action :configure do
+  # Start nvidia fabric manager on NVSwitch enabled systems
+  if get_nvswitches > 1
+    service 'nvidia-fabricmanager' do
+      action %i(start enable)
+      supports status: true
+    end
+  end
+end

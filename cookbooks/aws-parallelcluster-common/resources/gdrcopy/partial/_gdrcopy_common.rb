@@ -74,3 +74,17 @@ action_class do
     "#{node['cluster']['nvidia']['gdrcopy']['version']}-1"
   end
 end
+
+action :configure do
+  if graphic_instance? && is_service_installed?(node['cluster']['nvidia']['gdrcopy']['service'])
+    # NVIDIA GDRCopy
+    execute "enable #{node['cluster']['nvidia']['gdrcopy']['service']} service" do
+      # Using command in place of service resource because of: https://github.com/chef/chef/issues/12053
+      command "systemctl enable #{node['cluster']['nvidia']['gdrcopy']['service']}"
+    end
+    service node['cluster']['nvidia']['gdrcopy']['service'] do
+      action :start
+      supports status: true
+    end
+  end
+end
