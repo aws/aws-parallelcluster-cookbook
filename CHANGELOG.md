@@ -33,6 +33,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix IP association on instances with multiple network cards.
+- Fix replacement of StoragePass in slurm_parallelcluster_slurmdbd.conf when a queue parameter update is performed and the Slurm accounting configurations are not updated.
 
 **BUG FIXES**
 - Fix issue causing cfn-hup daemon to fail when it gets restarted.

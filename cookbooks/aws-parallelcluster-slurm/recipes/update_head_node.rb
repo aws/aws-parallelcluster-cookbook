@@ -160,6 +160,16 @@ execute "generate_pcluster_slurm_configs" do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 
+# The previous execute resource may have overridden the slurmdbd password in slurm_parallelcluster_slurmdbd.conf with
+# a default value, so if it has run and Slurm accounting is enabled we must pull the database password from Secrets
+# Manager once again.
+execute "update Slurm database password" do
+  user 'root'
+  group 'root'
+  command "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh"
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+end
+
 # Generate custom Slurm settings include files
 execute "generate_pcluster_custom_slurm_settings_include_files" do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py" \
