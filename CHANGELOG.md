@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for customizing the cluster Slurm configuration via the ParallelCluster configuration YAML file.
 - Add health check manager and GPU health check, which can be activated through cluster configuration.
   Health check manager execution is triggered by a Slurm prolog script. GPU check verifies healthiness of a node by executing NVIDIA DCGM L2 diagnostic.
+- Build Slurm with support for LUA.
 
 **CHANGES**
 - Upgrade EFA installer to `1.22.1`
@@ -29,7 +30,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Set Slurm BatchStartTimeout to 3 minutes so to allow max 3 minutes Prolog execution during compute node registration.
 - Upgrade Slurm to version 23.02.1.
 - Upgrade munge to version 0.5.15.
-- Set Slurm default `TreeWidth` to 30. 
+- Set Slurm default `TreeWidth` to 30.
 
 **BUG FIXES**
 - Fix IP association on instances with multiple network cards.
