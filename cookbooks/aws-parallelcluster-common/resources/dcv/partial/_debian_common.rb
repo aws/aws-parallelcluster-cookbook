@@ -47,19 +47,39 @@ action_class do
     end
   end
 
+  def package_architecture_id
+    arm_instance? ? 'arm64' : 'amd64'
+  end
+
   def dcv_package
     "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}"
   end
 
   def dcv_server
-    "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
+    "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
   end
 
   def xdcv
-    "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
+    "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
   end
 
   def dcv_web_viewer
-    "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb"
+    "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
+  end
+
+  def install_dcv_gl
+    dcv_gl = "#{node['cluster']['sources_dir']}/#{dcv_package}/nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
+    execute 'apt install dcv-gl' do
+      command "apt -y install #{dcv_gl}"
+    end
+  end
+
+  def optionally_disable_rnd
+    # Disable RNDFILE from openssl to avoid error during certificate generation
+    # See https://github.com/openssl/openssl/issues/7754#issuecomment-444063355
+    execute 'No RND' do
+      user 'root'
+      command "sed --in-place '/RANDFILE/d' /etc/ssl/openssl.cnf"
+    end
   end
 end

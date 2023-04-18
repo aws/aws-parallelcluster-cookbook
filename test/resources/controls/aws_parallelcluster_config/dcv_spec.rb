@@ -66,6 +66,50 @@ control 'tag:config_dcv_services_correctly_configured' do
     instance.head_node? && node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node"
   end
 
+  describe file('/etc/dcv/dcv.conf') do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
+    it { should be_mode 0755 }
+  end
+
+  describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do
+    it { should exist }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_mode 01733 }
+  end
+
+  describe file("#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_mode 0700 }
+  end
+
+  describe file("/etc/parallelcluster/generate_certificate.sh") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by 'root' }
+    it { should be_mode 0700 }
+  end
+
+  describe file("#{node['cluster']['dcv']['authenticator']['certificate']}") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_grouped_into 'dcv' }
+    it { should be_mode 0440 }
+  end
+
+  describe file("#{node['cluster']['dcv']['authenticator']['private_key']}") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_grouped_into 'dcv' }
+    it { should be_mode 0440 }
+  end
+
   describe service('dcvserver') do
     it { should be_installed }
     it { should be_enabled }
@@ -77,7 +121,13 @@ control 'tag:config_dcv_services_correctly_configured' do
     its('exit_status') { should eq 0 }
   end
 
-  if instance.graphic? && instance.dcv_gpu_accel_supported?
+  if os_properties.debian_family?
+    describe file('/etc/ssl/openssl.conf') do
+      its('content') { should_not match /RANDFILE/ }
+    end
+  end
+
+  if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
     describe 'Ensure local users can access X server (dcv-gl must be installed)' do
       subject { command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"? }
       its('exit_status') { should eq(0) }

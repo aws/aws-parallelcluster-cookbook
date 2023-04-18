@@ -88,7 +88,9 @@ end
 
 if node['cluster']['dcv_enabled'] == "head_node"
   # Activate DCV on head node
-  include_recipe 'aws-parallelcluster-config::dcv'
+  dcv "Configure DCV" do
+    action :configure
+  end
 end
 
 unless node['cluster']['scheduler'] == 'awsbatch'

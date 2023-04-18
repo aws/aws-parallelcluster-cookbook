@@ -45,6 +45,7 @@ action_class do
     # Override default GSettings to disable lock screen for all the users
     cookbook_file "/usr/share/glib-2.0/schemas/10_org.gnome.desktop.screensaver.gschema.override" do
       source 'dcv/10_org.gnome.desktop.screensaver.gschema.override'
+      cookbook 'aws-parallelcluster-common'
       owner 'root'
       group 'root'
       mode '0755'
@@ -63,6 +64,44 @@ action_class do
   def post_install
     # empty by default
   end
+
+  # Configure the system to enable NICE DCV to have direct access to the Linux server's GPU and enable GPU sharing.
+  def allow_gpu_acceleration
+    # Update the xorg.conf to set up NVIDIA drivers.
+    # NOTE: --enable-all-gpus parameter is needed to support servers with more than one NVIDIA GPU.
+    nvidia_xconfig_command = "nvidia-xconfig --preserve-busid --enable-all-gpus"
+    nvidia_xconfig_command += " --use-display-device=none" if node['ec2']['instance_type'].start_with?("g2.")
+    execute "Set up Nvidia drivers for X configuration" do
+      user 'root'
+      command nvidia_xconfig_command
+    end
+
+    # dcvgl package must be installed after NVIDIA and before starting up X
+    # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
+    install_dcv_gl
+
+    # Configure the X server to start automatically when the Linux server boots and start the X server in background
+    bash 'Launch X' do
+      user 'root'
+      code <<-SETUPX
+      set -e
+      systemctl set-default graphical.target
+      systemctl isolate graphical.target &
+      SETUPX
+    end
+
+    # Verify that the X server is running
+    execute 'Wait for X to start' do
+      user 'root'
+      command "pidof X || pidof Xorg"
+      retries 5
+      retry_delay 5
+    end
+  end
+
+  def optionally_disable_rnd
+    # do nothing
+  end
 end
 
 action :setup do
@@ -72,6 +111,7 @@ action :setup do
   # Install pcluster_dcv_connect.sh script in all the OSes to use it for error handling
   cookbook_file "#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
     source 'dcv/pcluster_dcv_connect.sh'
+    cookbook 'aws-parallelcluster-common'
     owner 'root'
     group 'root'
     mode '0755'
@@ -145,6 +185,76 @@ action :setup do
   if node['cluster']['is_official_ami_build']
     execute "set default systemd runlevel to multi-user.target" do
       command "systemctl set-default multi-user.target"
+    end
+  end
+end
+
+action :configure do
+  if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadNode"
+    if graphic_instance? && nvidia_installed? && dcv_gpu_accel_supported?
+      # Enable graphic acceleration in dcv conf file for graphic instances.
+      allow_gpu_acceleration
+    else
+      bash 'set default systemd runlevel to graphical.target' do
+        user 'root'
+        code <<-SETUPX
+        set -e
+        systemctl set-default graphical.target
+        systemctl isolate graphical.target &
+        SETUPX
+      end
+    end
+
+    optionally_disable_rnd
+
+    # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one
+    cookbook_file "/etc/parallelcluster/generate_certificate.sh" do
+      source 'dcv/generate_certificate.sh'
+      cookbook 'aws-parallelcluster-common'
+      owner 'root'
+      mode '0700'
+    end
+    execute "certificate generation" do
+      # args to the script represent:
+      # * path to certificate
+      # * path to private key
+      # * user to make owner of the two files
+      # * group to make owner of the two files
+      # NOTE: the last arg is hardcoded to be 'dcv' so that the dcvserver can read the files when authenticating
+      command "/etc/parallelcluster/generate_certificate.sh"\
+            " \"#{node['cluster']['dcv']['authenticator']['certificate']}\""\
+            " \"#{node['cluster']['dcv']['authenticator']['private_key']}\""\
+            " #{node['cluster']['dcv']['authenticator']['user']} dcv"
+      user 'root'
+    end
+
+    # Generate dcv.conf starting from template
+    template "/etc/dcv/dcv.conf" do
+      action :create
+      source 'dcv/dcv.conf.erb'
+      owner 'root'
+      group 'root'
+      mode '0755'
+    end
+
+    # Create directory for the external authenticator to store access file created by the users
+    directory '/var/spool/parallelcluster/pcluster_dcv_authenticator' do
+      owner node['cluster']['dcv']['authenticator']['user']
+      mode '1733'
+      recursive true
+    end
+
+    # Install DCV external authenticator
+    cookbook_file "#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py" do
+      source 'dcv/pcluster_dcv_authenticator.py'
+      cookbook 'aws-parallelcluster-common'
+      owner node['cluster']['dcv']['authenticator']['user']
+      mode '0700'
+    end
+
+    # Start NICE DCV server
+    service "dcvserver" do
+      action %i(enable start)
     end
   end
 end

@@ -74,4 +74,12 @@ action_class do
   def dcv_web_viewer
     "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
   end
+
+  def install_dcv_gl
+    dcv_gl = "#{node['cluster']['sources_dir']}/#{dcv_package}/nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
+    package dcv_gl do
+      action :install
+      source dcv_gl
+    end
+  end
 end
