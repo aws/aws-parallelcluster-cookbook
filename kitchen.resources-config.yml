@@ -107,3 +107,29 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: dcv_config
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*dcv/
+    attributes:
+      resource: dcv:configure
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
+        - resource:package_repos
+        - resource:install_packages
+        - recipe:aws-parallelcluster-common::node_attributes
+        - recipe:aws-parallelcluster-install::nvidia
+        - resource:dcv:setup
+
+      cluster:
+        node_type: HeadNode
+        dcv_enabled: "head_node"
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge

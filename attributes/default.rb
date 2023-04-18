@@ -143,31 +143,9 @@ else
   default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2 redhat8)
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
 end
-if platform?('ubuntu')
-  # Unlike the other supported OSs, the DCV package names for Ubuntu use different architecture abbreviations than those used in the download URLs.
-  default['cluster']['dcv']['package_architecture_id'] = arm_instance? ? 'arm64' : 'amd64'
-end
-default['cluster']['dcv']['package'] = value_for_platform(
-  'centos' => {
-    '~>7' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}",
-  },
-  'amazon' => { '2' => "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}" },
-  'ubuntu' => {
-    'default' => "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}",
-  }
-)
 default['cluster']['dcv']['server']['version'] = '2022.2.14521-1'
 default['cluster']['dcv']['xdcv']['version'] = '2022.2.519-1'
 default['cluster']['dcv']['gl']['version'] = '2022.2.1012-1'
-default['cluster']['dcv']['gl']['installer'] = value_for_platform( # required to enable GPU sharing
-  'centos' => {
-    '~>7' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm",
-  },
-  'amazon' => { '2' => "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm" },
-  'ubuntu' => {
-    'default' => "nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{node['cluster']['dcv']['package_architecture_id']}.#{node['cluster']['base_os']}.deb",
-  }
-)
 default['cluster']['dcv']['web_viewer']['version'] = '2022.2.14521-1'
 # DCV external authenticator configuration
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
