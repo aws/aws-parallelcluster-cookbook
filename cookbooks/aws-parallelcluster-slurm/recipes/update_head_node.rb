@@ -167,7 +167,8 @@ execute "update Slurm database password" do
   user 'root'
   group 'root'
   command "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+  # This horrible only_if guard is needed to cover all cases that trigger "generate_pcluster_slurm_settings", in the case Slurm accounting is being used
+  only_if { !(::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated?) && !node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
 end
 
 # Generate custom Slurm settings include files
