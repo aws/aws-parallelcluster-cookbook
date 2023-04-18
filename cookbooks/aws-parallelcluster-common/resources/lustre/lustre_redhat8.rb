@@ -29,18 +29,30 @@ action :setup do
     log "FSx for Lustre is not supported in this RHEL version #{version}, supported versions are >= 8.2" do
       level :warn
     end
-  elsif node['cluster']['kernel_release'].include? "4.18.0-425.3.1.el8"
-    log "FSx for Lustre is not supported in kernel version 4.18.0-425.3.1.el8 of RHEL, please update the kernel version" do
-      level :warn
-    end
   else
     action_install_lustre
   end
 end
 
+def find_os_minor_version
+  os_minor_version = ''
+  kernel_patch_version = find_kernel_patch_version
+
+  # kernel patch version less than 193 is equivalent to a RHEL 8.2
+  os_minor_version = '2' if kernel_patch_version >= '193'
+  os_minor_version = '3' if kernel_patch_version >= '240'
+  os_minor_version = '4' if kernel_patch_version >= '305'
+  os_minor_version = '5' if kernel_patch_version >= '348'
+  os_minor_version = '6' if kernel_patch_version >= '372'
+  os_minor_version = '7' if kernel_patch_version >= '425'
+
+  os_minor_version
+end
+
 action_class do
   def base_url
-    "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/$basearch"
+    # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html#lustre-client-rhel
+    "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8.#{find_os_minor_version}/$basearch"
   end
 
   def public_key

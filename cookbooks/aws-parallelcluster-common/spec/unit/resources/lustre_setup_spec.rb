@@ -160,6 +160,7 @@ describe 'lustre:setup' do
         step_into: ['lustre']
       ) do |node|
         node.automatic['platform_version'] = "8.1"
+        node.override['cluster']['kernel_release'] = "4.18.0-147.9.1.el8"
       end
       Lustre.setup(runner)
     end
@@ -170,51 +171,54 @@ describe 'lustre:setup' do
     end
   end
 
-  context "on redhat with kernel 4.18.0-425.3.1.el8" do
-    cached(:chef_run) do
-      runner = ChefSpec::Runner.new(
-        platform: 'redhat', version: '8',
-        step_into: ['lustre']
-      ) do |node|
-        node.automatic['platform_version'] = "8.2"
-        node.override['cluster']['kernel_release'] = "anything 4.18.0-425.3.1.el8 something"
+  [%w(193 2), %w(240 3), %w(305 4), %w(348 5), %w(372 6), %w(425 7)].each do |kernel_patch, minor_version|
+    context "on redhat with kernel from 4.18.0-#{kernel_patch}.3.1.el8 supporting lustre" do
+      cached(:chef_run) do
+        runner = ChefSpec::Runner.new(
+          platform: 'redhat', version: '8',
+          step_into: ['lustre']
+        ) do |node|
+          node.override['cluster']['kernel_release'] = "4.18.0-#{kernel_patch}.9.1.el8"
+        end
+        Lustre.setup(runner)
       end
-      Lustre.setup(runner)
-    end
 
-    it 'can not install lustre' do
-      is_expected.to write_log("FSx for Lustre is not supported in kernel version 4.18.0-425.3.1.el8 of RHEL, please update the kernel version")
-        .with(level: :warn)
+      it 'installs lustre packages from repository and installs kernel module lnet' do
+        is_expected.to create_yum_repository("aws-fsx")
+          .with(baseurl: "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8.#{minor_version}/$basearch")
+          .with(gpgkey: 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc')
+          .with(retries: 3)
+          .with(retry_delay: 5)
+
+        is_expected.to run_execute('yum-config-manager_skip_if_unavail')
+          .with(command: "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save")
+
+        is_expected.to install_package(%w(kmod-lustre-client lustre-client dracut))
+          .with(retries: 3)
+          .with(retry_delay: 5)
+
+        is_expected.to install_kernel_module("lnet")
+      end
     end
   end
 
-  context "on redhat supporting lustre" do
+  context "kernel release does not match expected format" do
     cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'redhat', version: '8',
         step_into: ['lustre']
       ) do |node|
         node.automatic['platform_version'] = "8.2"
-        node.override['cluster']['kernel_release'] = "supported"
+        node.override['cluster']['kernel_release'] = 'unexpected.format'
       end
       Lustre.setup(runner)
     end
 
-    it 'installs lustre packages from repository and installs kernel module lnet' do
-      is_expected.to create_yum_repository("aws-fsx")
-        .with(baseurl: 'https://fsx-lustre-client-repo.s3.amazonaws.com/el/8/$basearch')
-        .with(gpgkey: 'https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc')
-        .with(retries: 3)
-        .with(retry_delay: 5)
-
-      is_expected.to run_execute('yum-config-manager_skip_if_unavail')
-        .with(command: "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save")
-
-      is_expected.to install_package(%w(kmod-lustre-client lustre-client dracut))
-        .with(retries: 3)
-        .with(retry_delay: 5)
-
-      is_expected.to install_kernel_module("lnet")
+    it 'raises error' do
+      expect { chef_run }.to(raise_error do |error|
+        expect(error).to be_a(Exception)
+        expect(error.message).to include("Unable to retrieve the kernel patch version from unexpected.format.")
+      end)
     end
   end
 
