@@ -25,7 +25,7 @@ fi
 function _log() {
   LOG_LEVEL=$1
   shift
-  echo "$(date +"%Y-%m-%d %H-%M-%S,%3N") - [$(basename $0)] - ${LOG_LEVEL} - Job ${SLURM_JOB_ID} - $*" >> "${LOG_FILE_PATH}"
+  echo "$(date +"%Y-%m-%d %H:%M:%S,%3N") - [$(basename $0)] - ${LOG_LEVEL} - Job ${SLURM_JOB_ID} - $*" >> "${LOG_FILE_PATH}"
 }
 
 function log_info() {
