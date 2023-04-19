@@ -122,10 +122,9 @@ suites:
         - recipe:aws-parallelcluster-install::python
         - resource:package_repos
         - resource:install_packages
-        - recipe:aws-parallelcluster-common::node_attributes
         - recipe:aws-parallelcluster-install::nvidia
         - resource:dcv:setup
-
+        - recipe:aws-parallelcluster-common::node_attributes
       cluster:
         node_type: HeadNode
         dcv_enabled: "head_node"
