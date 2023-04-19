@@ -126,7 +126,7 @@ function main() {
 }
 
 function _log() {
-  echo "$(date +"%Y-%m-%d %H-%M-%S,%3N") - [${0##*/}] - $1 - JobID $SLURM_JOB_ID - ${*:2}"
+  echo "$(date +"%Y-%m-%d %H:%M:%S,%3N") - [${0##*/}] - $1 - JobID $SLURM_JOB_ID - ${*:2}"
 }
 
 function log_info() {
