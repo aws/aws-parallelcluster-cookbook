@@ -38,7 +38,7 @@ def find_os_minor_version
   os_minor_version = ''
   kernel_patch_version = find_kernel_patch_version
 
-  # kernel patch version less than 193 is equivalent to a RHEL 8.2
+  # kernel patch versions under 193 are prior to RHEL 8.2
   os_minor_version = '2' if kernel_patch_version >= '193'
   os_minor_version = '3' if kernel_patch_version >= '240'
   os_minor_version = '4' if kernel_patch_version >= '305'
