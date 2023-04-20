@@ -29,6 +29,11 @@ action :setup do
     log "FSx for Lustre is not supported in this RHEL version #{version}, supported versions are >= 8.2" do
       level :warn
     end
+    # rhel8 kernel 4.18.0-425.3.1.el8 has broken kABI compat https://github.com/openzfs/zfs/issues/14724
+  elsif node['cluster']['kernel_release'].include? "4.18.0-425.3.1.el8"
+    log "FSx for Lustre is not supported in kernel version 4.18.0-425.3.1.el8 of RHEL, please update the kernel version" do
+      level :warn
+    end
   else
     action_install_lustre
   end
