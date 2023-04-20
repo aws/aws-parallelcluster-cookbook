@@ -40,8 +40,9 @@ FILES=("cookbooks/aws-parallelcluster-common/metadata.rb" "cookbooks/aws-paralle
 sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
 
 # Update dependencies version in specific(install, config, ecc...) cookbook metadata
-FILES=("cookbooks/aws-parallelcluster-awsbatch/metadata.rb" "cookbooks/aws-parallelcluster-config/metadata.rb" "cookbooks/aws-parallelcluster-install/metadata.rb" "cookbooks/aws-parallelcluster-scheduler-plugin/metadata.rb" "cookbooks/aws-parallelcluster-slurm/metadata.rb" "cookbooks/aws-parallelcluster-test/metadata.rb")
+FILES=("cookbooks/aws-parallelcluster-common/metadata.rb" "cookbooks/aws-parallelcluster-awsbatch/metadata.rb" "cookbooks/aws-parallelcluster-config/metadata.rb" "cookbooks/aws-parallelcluster-install/metadata.rb" "cookbooks/aws-parallelcluster-scheduler-plugin/metadata.rb" "cookbooks/aws-parallelcluster-slurm/metadata.rb" "cookbooks/aws-parallelcluster-test/metadata.rb")
 sed -i "s/depends 'aws-parallelcluster-common', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-common', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
+sed -i "s/depends 'aws-parallelcluster-test', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-test', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
 
 CURRENT_AWSBATCH_CLI_VERSION=$(sed -ne "s/^default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '\(.*\)'/\1/p" cookbooks/aws-parallelcluster-common/attributes/common.rb)
 
