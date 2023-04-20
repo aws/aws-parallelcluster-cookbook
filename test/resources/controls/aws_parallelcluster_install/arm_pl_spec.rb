@@ -18,10 +18,14 @@ control 'arm_pl_installed' do
     its('exit_status') { should eq(0) }
   end
 
-  describe bash("sudo bash -c 'unset MODULEPATH && source /etc/profile.d/modules.sh && module load armpl && cd /opt/arm/armpl/21.0.0/armpl_21.0_gcc-9.3/examples &&  \
-    gcc -c -I/opt/arm/armpl/21.0.0/armpl_21.0_gcc-9.3/include fftw_dft_r2c_1d_c_example.c -o fftw_dft_r2c_1d_c_example.o && \
-    gcc fftw_dft_r2c_1d_c_example.o -L/opt/arm/armpl/21.0.0/armpl_21.0_gcc-9.3/lib -o fftw_dft_r2c_1d_c_example.exe -larmpl_lp64 -lm && \
-    ./fftw_dft_r2c_1d_c_example.exe'") do
+  arm_version = node['cluster']['armpl']['major_minor_version']
+  arm_pl_installation = "armpl_#{arm_version}_gcc-9.3"
+  test_software = "fftw_dft_r2c_1d_c_example"
+
+  describe bash("sudo bash -c 'unset MODULEPATH && source /etc/profile.d/modules.sh && module load armpl && cd /opt/arm/armpl/#{arm_version}.0/#{arm_pl_installation}/examples &&  \
+    gcc -c -I/opt/arm/armpl/#{arm_version}.0/#{arm_pl_installation}/include #{test_software}.c -o #{test_software}.o && \
+    gcc #{test_software}.o -L/opt/arm/armpl/#{arm_version}.0/#{arm_pl_installation}/lib -o #{test_software}.exe -larmpl_lp64 -lm && \
+    ./#{test_software}.exe'") do
     its('exit_status') { should eq(0) }
     its('stdout') { should match /ARMPL example: FFT of a real sequence using fftw_plan_dft_r2c_1d/ }
   end
