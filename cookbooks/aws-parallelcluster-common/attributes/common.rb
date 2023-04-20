@@ -45,7 +45,7 @@ default['cluster']['cfn_bootstrap']['version'] = '2.0-24'
 default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz"
 
 # Python packages
-default['cluster']['parallelcluster-version'] = '3.6.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.6.0'
-default['cluster']['parallelcluster-node-version'] = '3.6.0'
+default['cluster']['parallelcluster-version'] = '3.7.0'
+default['cluster']['parallelcluster-cookbook-version'] = '3.7.0'
+default['cluster']['parallelcluster-node-version'] = '3.7.0'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
