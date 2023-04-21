@@ -31,13 +31,8 @@ include_recipe 'aws-parallelcluster-config::networking'
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster-config::chrony'
 
-# NVIDIA services
-fabric_manager 'Configure fabric manager' do
-  action :configure
-end
-gdrcopy 'Configure gdrcopy' do
-  action :configure
-end
+# Configure Nvidia driver
+include_recipe "aws-parallelcluster-config::nvidia"
 
 # EFA runtime configuration
 efa 'Configure system for EFA' do
