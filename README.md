@@ -15,6 +15,14 @@ It requires cinc-workstation to be installed on your environment:
 
 `curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 23`
 
+Make sure you have set a locale in your local shell environment, by exporting the `LC_ALL` and `LANG` variables, 
+for example by adding to your `.bashrc` or `.zshrc` the following and sourcing the file:
+
+```
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+```
+
 To speedup the transfer of files when kitchens are run on ec2 instances, the [transport](https://docs.chef.io/workstation/config_yml_kitchen/#transport-settings) selected is `kitchen-transport-speedy` https://github.com/criteo/kitchen-transport-speedy.
 
 To install `kitchen-transport-speedy` in the kitchen embedded ruby environment: `/opt/cinc-workstation/embedded/bin/gem install kitchen-transport-speedy`
