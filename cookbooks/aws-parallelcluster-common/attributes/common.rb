@@ -49,3 +49,14 @@ default['cluster']['parallelcluster-version'] = '3.6.0b1'
 default['cluster']['parallelcluster-cookbook-version'] = '3.6.0b1'
 default['cluster']['parallelcluster-node-version'] = '3.6.0b1'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
+
+# NVIDIA
+default['cluster']['nvidia']['enabled'] = 'no'
+default['cluster']['nvidia']['driver_version'] = '470.141.03'
+default['cluster']['nvidia']['cuda_version'] = '11.7'
+default['cluster']['nvidia']['cuda_samples_version'] = '11.6'
+default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
+default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
+default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
+default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
+default['cluster']['nvidia']['cuda_samples_url'] = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{node['cluster']['nvidia']['cuda_samples_version']}.tar.gz"
