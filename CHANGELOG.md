@@ -8,15 +8,20 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for RHEL8.
-- Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
-- Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
-- Add log rotation support for ParallelCluster managed logs.
 - Add support for customizing the cluster Slurm configuration via the ParallelCluster configuration YAML file.
+- Build Slurm with support for LUA.
 - Add health check manager and GPU health check, which can be activated through cluster configuration.
   Health check manager execution is triggered by a Slurm prolog script. GPU check verifies healthiness of a node by executing NVIDIA DCGM L2 diagnostic.
-- Build Slurm with support for LUA.
+- Add log rotation support for ParallelCluster managed logs.
+- Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
+- Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
 
 **CHANGES**
+- Upgrade Slurm to version 23.02.1.
+- Upgrade munge to version 0.5.15.
+- Set Slurm default `TreeWidth` to 30.
+- Set Slurm prolog and epilog configurations to target a directory, `/opt/slurm/etc/scripts/prolog.d/` and `/opt/slurm/etc/scripts/epilog.d/` respectively.
+- Set Slurm `BatchStartTimeout` to 3 minutes so to allow max 3 minutes Prolog execution during compute node registration.
 - Upgrade EFA installer to `1.22.1`
   - Dkms : `2.8.3-2`
   - Efa-driver: `efa-2.1.1g`
@@ -25,20 +30,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.17.1-1`
   - Rdma-core: `rdma-core-43.0-1`
   - Open MPI: `openmpi40-aws-4.1.5-1`
-- Upgrade Lustre client version to 2.12 on Amazon Linux 2. Lustre client 2.12 has been installed on Ubuntu 20.04, 18.04 and CentOS >= 7.7.  Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
-- Upgrade aws-cfn-bootstrap to version 2.0-24.
-- Set Slurm prolog and epilog configurations to target a directory, /opt/slurm/etc/scripts/prolog.d/ and /opt/slurm/etc/scripts/epilog.d/ respectively.
-- Set Slurm BatchStartTimeout to 3 minutes so to allow max 3 minutes Prolog execution during compute node registration.
-- Upgrade Slurm to version 23.02.1.
-- Upgrade munge to version 0.5.15.
-- Set Slurm default `TreeWidth` to 30.
+- Upgrade Lustre client version to 2.12 on Amazon Linux 2 (same version available on Ubuntu 20.04, 18.04 and CentOS >= 7.7).
+- Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
+- Upgrade `aws-cfn-bootstrap` to version 2.0-24.
 
 **BUG FIXES**
-- Fix IP association on instances with multiple network cards.
-- Fix replacement of StoragePass in slurm_parallelcluster_slurmdbd.conf when a queue parameter update is performed and the Slurm accounting configurations are not updated.
-
-**BUG FIXES**
-- Fix issue causing cfn-hup daemon to fail when it gets restarted.
+- Fix an issue that was causing misalignment of compute nodes IP on instances with multiple network interfaces.
+- Fix replacement of `StoragePass` in `slurm_parallelcluster_slurmdbd.conf` when a queue parameter update is performed and the Slurm accounting configurations are not updated.
+- Fix issue causing `cfn-hup` daemon to fail when it gets restarted.
 
 3.5.1
 ------
