@@ -15,6 +15,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add log rotation support for ParallelCluster managed logs.
 - Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
 - Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
+- Load kernel module [nvidia-uvm](https://developer.nvidia.com/blog/unified-memory-cuda-beginners/) by default to provide Unified Virtual Memory (UVM) functionality to the CUDA driver.
+- Install [NVIDIA Persistence Daemon](https://docs.nvidia.com/deploy/driver-persistence/index.html) as a system service.
 
 **CHANGES**
 - Upgrade Slurm to version 23.02.1.
