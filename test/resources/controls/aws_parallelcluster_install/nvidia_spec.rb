@@ -29,7 +29,7 @@ control 'tag:config_expected_versions_of_nvidia_cuda_installed' do
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
-  expected_cuda_version = node['cluster']['nvidia']['cuda_version']
+  expected_cuda_version = node['cluster']['nvidia']['cuda']['version']
   cmd = %(
     export PATH=/usr/local/cuda-#{expected_cuda_version}/bin:${PATH};
     export LD_LIBRARY_PATH=/usr/local/cuda-#{expected_cuda_version}/lib64:${LD_LIBRARY_PATH}
