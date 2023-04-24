@@ -8,7 +8,6 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-
 import logging
 import os
 from types import SimpleNamespace
@@ -569,13 +568,38 @@ def test_execute_health_checks(
     mocker, health_check_conf, expected_exit_code, expect_execution, expect_failure, test_datadir, caplog
 ):
     """Test _execute_health_checks method."""
+    args = SimpleNamespace(
+        node_spec_file="/node_spec_file",
+        job_id=1,
+    )
+
+    node_spec = {
+        "region": "us-east-1",
+        "cluster_name": "integ-tests-e95bxovykj8zskbz-develop",
+        "scheduler": "slurm",
+        "node_role": "ComputeFleet",
+        "instance_id": "i-051079accf0e1e224",
+        "compute": {
+            "queue-name": "queue-1",
+            "compute-resource": "compute-a",
+            "name": "queue-1-st-compute-a-1",
+            "node-type": "static",
+            "instance-id": "i-051079accf0e1e224",
+            "instance-type": "g5.xlarge",
+            "availability-zone": "us-east-1c",
+            "address": "192.168.99.195",
+            "hostname": "ip-192-168-99-195.ec2.internal",
+        },
+    }
+
     caplog.set_level(logging.INFO)
     health_check_manager_config = mocker.Mock(spec=HealthCheckManagerConfig)
     health_check_manager_config.health_check_timeout = 100
     mocker.patch("health_check_manager.HealthCheckConfigLoader.load_configuration", return_value=health_check_conf)
+    mocker.patch("event_utils._read_node_spec", return_value=node_spec)
     for health_check in health_check_conf.health_checks:
         health_check.check_path = str(test_datadir / health_check.check_path)
-    exit_code = health_check_manager._execute_health_checks(health_check_manager_config, [])
+    exit_code = health_check_manager._execute_health_checks(health_check_manager_config, args)
     assert_that(exit_code).is_equal_to(expected_exit_code)
     if expect_execution:
         assert_that(caplog.text).contains("err to stderr")

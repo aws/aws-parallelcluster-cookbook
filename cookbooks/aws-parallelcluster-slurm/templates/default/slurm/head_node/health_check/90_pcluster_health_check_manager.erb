@@ -64,5 +64,6 @@ PCLUSTER_SCHEDULER_COMPUTE_RESOURCE_NAME="$(cat "${PCLUSTER_DNA_JSON_PATH}" | jq
     --queue-name "${PCLUSTER_SCHEDULER_QUEUE_NAME}" \
     --compute-resource-name "${PCLUSTER_SCHEDULER_COMPUTE_RESOURCE_NAME}" \
     --job-id "${SLURM_JOB_ID}" \
-    --cluster-configuration "${PCLUSTER_CONFIG_PATH}"
+    --cluster-configuration "${PCLUSTER_CONFIG_PATH}" \
+    --node-spec-file "<%= @node_spec_file %>"
 ) {FLOCK_FILE_DESCRIPTOR_NUMBER}>/var/lock/health_check.lock

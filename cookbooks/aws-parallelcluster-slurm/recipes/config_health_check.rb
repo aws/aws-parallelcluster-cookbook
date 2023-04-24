@@ -41,6 +41,13 @@ directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin
   mode '0755'
 end
 
+cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/scripts/event_utils.py" do
+  source 'config_slurm/scripts/event_utils.py'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
 cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/scripts/health_check_manager.py" do
   source 'config_slurm/scripts/health_check_manager.py'
   owner 'root'
@@ -92,6 +99,9 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/
   owner 'root'
   group 'root'
   mode '0755'
+  variables(
+    node_spec_file: "#{node['cluster']['slurm_plugin_dir']}/slurm_node_spec.json"
+  )
 end
 
 link "#{node['cluster']['slurm']['install_dir']}/etc/scripts/prolog.d/90_pcluster_health_check_manager" do
