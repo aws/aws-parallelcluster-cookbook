@@ -28,11 +28,18 @@ from logging.config import fileConfig
 from typing import List
 
 import yaml
+from event_utils import (
+    EventPublisher,
+    get_node_spec_from_file,
+    publish_health_check_exception,
+    publish_health_check_result,
+)
 
 CONFIG_FILE_DIR = os.path.join(os.path.dirname(__file__), "conf")
 FILE_READ_TIMEOUT = 30
 
 log = logging.getLogger(__name__)
+event_logger = logging.getLogger("slurm_plugin.prolog.events")
 
 
 class ManagedHealthCheckName(Enum):
@@ -157,7 +164,7 @@ class HealthCheckConfigLoader:
         return yaml.load(StringIO(_read_file(input_file_path)), Loader=yaml.SafeLoader)
 
     def load_configuration(
-        self, health_check_manager_config: HealthCheckManagerConfig, args: List[str]
+        self, health_check_manager_config: HealthCheckManagerConfig, args: argparse.Namespace
     ) -> HealthCheckConfig:
         """
         Load Health Check configuration.
@@ -220,9 +227,11 @@ class HealthCheckConfigLoader:
         return health_check_conf
 
 
-def _execute_health_checks(health_check_manager_config: HealthCheckManagerConfig, args: List[str]) -> int:
+def _execute_health_checks(health_check_manager_config: HealthCheckManagerConfig, args: argparse.Namespace) -> int:
     """Execute all Health Check."""
     health_check_conf = HealthCheckConfigLoader().load_configuration(health_check_manager_config, args)
+
+    event_publisher = _get_event_publisher(args)
 
     exit_code_sum = 0
 
@@ -252,6 +261,9 @@ def _execute_health_checks(health_check_manager_config: HealthCheckManagerConfig
                 else:
                     output = " empty"
                 log.info("Output of Health Check '%s' execution is%s", health_check.name, output)
+                publish_health_check_result(
+                    event_publisher, args.job_id, health_check.name, result.returncode, result.stdout
+                )
             except (subprocess.SubprocessError, OSError) as err:
                 if hasattr(err, "message"):
                     err = err.message
@@ -262,13 +274,14 @@ def _execute_health_checks(health_check_manager_config: HealthCheckManagerConfig
                     health_check_conf.compute_resource_name,
                     err,
                 )
+                publish_health_check_exception(event_publisher, args.job_id, health_check.name, err)
     if not health_check_conf.health_checks:
         log.info("No Health Check enabled found")
 
     return exit_code_sum
 
 
-def _parse_arguments() -> List[str]:
+def _parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Health Check Manager")
     parser.add_argument(
         "-n",
@@ -300,8 +313,14 @@ def _parse_arguments() -> List[str]:
         required=True,
         help="Path to cluster configuration",
     )
+    parser.add_argument("--node-spec-file", required=False, help="File path to compute node description")
     args = parser.parse_args()
     return args
+
+
+def _get_event_publisher(args: argparse.Namespace):
+    node_spec = get_node_spec_from_file(args.node_spec_file)
+    return EventPublisher(event_logger=event_logger, component="health-check-manager", **node_spec)
 
 
 def main():
