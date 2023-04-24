@@ -53,10 +53,15 @@ default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '470.182.03'
-default['cluster']['nvidia']['cuda_version'] = '11.8'
+# Cuda installer from https://developer.nvidia.com/cuda-toolkit-archive
+# Cuda installer naming: cuda_11.8.0_520.61.05_linux
+default['cluster']['nvidia']['cuda']['version'] = '11.8'
+default['cluster']['nvidia']['cuda']['patch'] = '0'
+default['cluster']['nvidia']['cuda']['complete_version'] = "#{node['cluster']['nvidia']['cuda']['version']}.#{node['cluster']['nvidia']['cuda']['patch']}"
+default['cluster']['nvidia']['cuda']['version_suffix'] = '520.61.05'
 default['cluster']['nvidia']['cuda_samples_version'] = '11.8'
 default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
-default['cluster']['nvidia']['cuda_url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
+default['cluster']['nvidia']['cuda']['url_architecture_id'] = arm_instance? ? 'linux_sbsa' : 'linux'
 default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
-default['cluster']['nvidia']['cuda_url'] = "https://developer.download.nvidia.com/compute/cuda/11.7.1/local_installers/cuda_11.7.1_515.65.01_#{node['cluster']['nvidia']['cuda_url_architecture_id']}.run"
+default['cluster']['nvidia']['cuda']['url'] = "https://developer.download.nvidia.com/compute/cuda/#{node['cluster']['nvidia']['cuda']['complete_version']}/local_installers/cuda_#{node['cluster']['nvidia']['cuda']['complete_version']}_#{node['cluster']['nvidia']['cuda']['version_suffix']}_#{node['cluster']['nvidia']['cuda']['url_architecture_id']}.run"
 default['cluster']['nvidia']['cuda_samples_url'] = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{node['cluster']['nvidia']['cuda_samples_version']}.tar.gz"
