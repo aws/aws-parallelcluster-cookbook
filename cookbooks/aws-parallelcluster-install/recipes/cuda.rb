@@ -20,11 +20,11 @@ return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['
 # Get CUDA run file
 cuda_tmp_runfile = "/tmp/cuda.run"
 remote_file cuda_tmp_runfile do
-  source node['cluster']['nvidia']['cuda_url']
+  source node['cluster']['nvidia']['cuda']['url']
   mode '0755'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?("/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}") }
+  not_if { ::File.exist?("/usr/local/cuda-#{node['cluster']['nvidia']['cuda']['version']}") }
 end
 
 # Install CUDA driver
@@ -37,11 +37,11 @@ bash 'cuda.run advanced' do
     ./cuda.run --silent --toolkit --samples
     rm -f /tmp/cuda.run
   CUDA
-  creates "/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}"
+  creates "/usr/local/cuda-#{node['cluster']['nvidia']['cuda']['version']}"
 end
 
 # Get CUDA Sample Files
-cuda_samples_directory = "/usr/local/cuda-#{node['cluster']['nvidia']['cuda_version']}/samples"
+cuda_samples_directory = "/usr/local/cuda-#{node['cluster']['nvidia']['cuda']['version']}/samples"
 cuda_tmp_sample_file = "/tmp/cuda-sample.tar.gz"
 remote_file cuda_tmp_sample_file do
   source node['cluster']['nvidia']['cuda_samples_url']

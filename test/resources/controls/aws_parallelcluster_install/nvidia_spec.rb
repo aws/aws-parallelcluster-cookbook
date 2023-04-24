@@ -29,7 +29,7 @@ control 'tag:config_expected_versions_of_nvidia_cuda_installed' do
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
-  expected_cuda_version = node['cluster']['nvidia']['cuda_version']
+  expected_cuda_version = node['cluster']['nvidia']['cuda']['version']
   cmd = %(
     export PATH=/usr/local/cuda-#{expected_cuda_version}/bin:${PATH};
     export LD_LIBRARY_PATH=/usr/local/cuda-#{expected_cuda_version}/lib64:${LD_LIBRARY_PATH}
@@ -51,6 +51,11 @@ control 'tag:config_expected_versions_of_nvidia_fabric_manager_installed' do
   describe package(node['cluster']['nvidia']['fabricmanager']['package']) do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['nvidia']['fabricmanager']['version']}/ }
+  end
+
+  version_lock_check = os_properties.debian_family? ? 'apt-mark showhold | grep "nvidia-fabric.*manager"' : 'yum versionlock list | grep "nvidia-fabric.*manager"'
+  describe bash(version_lock_check) do
+    its('exit_status') { should eq 0 }
   end
 end
 
