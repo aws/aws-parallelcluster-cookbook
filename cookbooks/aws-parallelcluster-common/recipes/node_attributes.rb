@@ -26,4 +26,5 @@ file "/etc/chef/node_attributes.json" do
   content Chef::JSONCompat.to_json_pretty(node)
   owner 'root'
   mode '0644'
+  sensitive true # avoids logging node attributes
 end
