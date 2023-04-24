@@ -37,5 +37,6 @@ action :install_package do
     retries 3
     retry_delay 5
     source rpm_package
+    action %i(install lock)
   end
 end

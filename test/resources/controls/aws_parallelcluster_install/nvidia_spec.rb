@@ -52,6 +52,11 @@ control 'tag:config_expected_versions_of_nvidia_fabric_manager_installed' do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['nvidia']['fabricmanager']['version']}/ }
   end
+
+  version_lock_check = os_properties.debian_family? ? 'apt-mark showhold | grep "nvidia-fabric.*manager"' : 'yum versionlock list | grep "nvidia-fabric.*manager"'
+  describe bash(version_lock_check) do
+    its('exit_status') { should eq 0 }
+  end
 end
 
 control 'tag:config_expected_versions_of_nvidia_gdrcopy_installed' do
