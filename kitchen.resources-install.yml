@@ -201,6 +201,32 @@ suites:
         - resource:package_repos
         - resource:install_packages
         - recipe:aws-parallelcluster-common::node_attributes
+  - name: build_tools
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - build_tools_installed
+    attributes:
+      resource: build_tools
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - recipe:aws-parallelcluster-common::node_attributes
+  - name: modules
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - modules_installed
+    attributes:
+      resource: modules
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - recipe:aws-parallelcluster-common::node_attributes
   - name: dcv
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
