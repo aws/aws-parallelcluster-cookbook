@@ -16,6 +16,27 @@
 unified_mode true
 default_action :setup
 
+property :sources_dir, String, required: %i(setup), default: node['cluster']['sources_dir']
+property :region, String, required: %i(setup), default: aws_region
+property :aws_domain, String, required: %i(setup), default: aws_domain
+property :modulefile_dir, String, required: %i(setup), default: node['cluster']['modulefile_dir']
+
+# Find the latest version of Arm Performance Libraries (ArmPL) here:
+# https://developer.arm.com/downloads/-/arm-compiler-for-linux
+#
+# Usually we upgrade gcc version as well (see below).
+# We upload ArmPL to a ParallelCluster bucket (account for it in scope of the upgrade) and download it from there
+# to install ArmPL on the AMI.
+# We download gcc directly from gnu.org repository to install correct gcc version on the AMI.
+property :armpl_major_minor_version, String, default: '21.0'
+property :armpl_patch_version, String, default: '0'
+property :gcc_major_minor_version, String, default: '9.3'
+property :gcc_patch_version, String, default: '0'
+
+action :arm_pl_prerequisite do
+  # Do nothing
+end
+
 action :setup do
   return unless node['conditions']['arm_pl_supported']
 
@@ -25,48 +46,64 @@ action :setup do
 
   action_arm_pl_prerequisite
 
-  armpl_installer = "#{node['cluster']['sources_dir']}/"\
-                    "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar"
-  armpl_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/#{node['cluster']['armpl']['url']}"
+  armpl_version = "#{new_resource.armpl_major_minor_version}.#{new_resource.armpl_patch_version}"
+  armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{new_resource.gcc_major_minor_version}.tar"
 
-  # fetch armpl installer script
+  armpl_url = %W(
+    https://#{new_resource.region}-aws-parallelcluster.s3.#{new_resource.region}.#{new_resource.aws_domain}
+    archives/armpl/#{armpl_platform}
+    #{armpl_tarball_name}
+  ).join('/')
+
+  armpl_installer = "#{new_resource.sources_dir}/#{armpl_tarball_name}"
+
+  armpl_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}"
+
+  # download ArmPL tarball
   remote_file armpl_installer do
     source armpl_url
     mode '0644'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?("/opt/arm/armpl/#{node['cluster']['armpl']['version']}") }
+    not_if { ::File.exist?("/opt/arm/armpl/#{armpl_version}") }
   end
 
   bash "install arm performance library" do
-    cwd node['cluster']['sources_dir']
+    cwd new_resource.sources_dir
     code <<-ARMPL
       set -e
-      tar -xf arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar
-      cd arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}/
-      ./arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}.sh --accept --install-to /opt/arm/armpl/#{node['cluster']['armpl']['version']}
+      tar -xf #{armpl_tarball_name}
+      cd #{armpl_name}/
+      ./#{armpl_name}.sh --accept --install-to /opt/arm/armpl/#{armpl_version}
       cd ..
-      rm -rf arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}*
+      rm -rf #{armpl_name}*
     ARMPL
-    creates "/opt/arm/armpl/#{node['cluster']['armpl']['version']}"
+    creates "/opt/arm/armpl/#{armpl_version}"
   end
 
   # create armpl module directory
-  directory "#{node['cluster']['modulefile_dir']}/armpl"
+  directory "#{new_resource.modulefile_dir}/armpl"
 
   # arm performance library modulefile configuration
-  template "#{node['cluster']['modulefile_dir']}/armpl/#{node['cluster']['armpl']['version']}" do
+  template "#{new_resource.modulefile_dir}/armpl/#{armpl_version}" do
     source 'arm_pl/armpl_modulefile.erb'
     user 'root'
     group 'root'
     mode '0755'
+    variables(
+      armpl_version: armpl_version,
+      armpl_major_minor_version: new_resource.armpl_major_minor_version,
+      gcc_major_minor_version: new_resource.gcc_major_minor_version
+    )
   end
 
-  gcc_tarball = "#{node['cluster']['sources_dir']}/gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}.tar.gz"
+  gcc_version = "#{new_resource.gcc_major_minor_version}.#{new_resource.gcc_patch_version}"
+  gcc_url = "https://ftp.gnu.org/gnu/gcc/gcc-#{gcc_version}/gcc-#{gcc_version}.tar.gz"
+  gcc_tarball = "#{new_resource.sources_dir}/gcc-#{gcc_version}.tar.gz"
 
   # Get gcc tarball
   remote_file gcc_tarball do
-    source node['cluster']['armpl']['gcc']['url']
+    source gcc_url
     mode '0644'
     retries 5
     retry_delay 10
@@ -78,19 +115,19 @@ action :setup do
   bash 'make install' do
     user 'root'
     group 'root'
-    cwd node['cluster']['sources_dir']
+    cwd new_resource.sources_dir
     code <<-GCC
         set -e
 
         # Remove dir if it exists. This happens in case of retries.
-        rm -rf gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}
+        rm -rf gcc-#{gcc_version}
         tar -xf #{gcc_tarball}
-        cd gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']}
+        cd gcc-#{gcc_version}
         # Patch the download_prerequisites script to download over https and not ftp. This works better in China regions.
         sed -i "s#ftp://gcc\.gnu\.org#https://gcc.gnu.org#g" ./contrib/download_prerequisites
         ./contrib/download_prerequisites
         mkdir build && cd build
-        ../configure --prefix=/opt/arm/armpl/gcc/#{node['cluster']['armpl']['gcc']['major_minor_version']}.#{node['cluster']['armpl']['gcc']['patch_version']} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
+        ../configure --prefix=/opt/arm/armpl/gcc/#{gcc_version} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
         CORES=$(grep processor /proc/cpuinfo | wc -l)
         make -j $CORES
         make install
@@ -100,7 +137,7 @@ action :setup do
     creates '/opt/arm/armpl/gcc'
   end
 
-  gcc_modulefile = "/opt/arm/armpl/#{node['cluster']['armpl']['version']}/modulefiles/armpl/gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}"
+  gcc_modulefile = "/opt/arm/armpl/#{armpl_version}/modulefiles/armpl/gcc-#{new_resource.gcc_major_minor_version}"
 
   # gcc modulefile configuration
   template gcc_modulefile do
@@ -108,5 +145,20 @@ action :setup do
     user 'root'
     group 'root'
     mode '0755'
+    variables(
+      gcc_version: gcc_version
+    )
   end
+
+  # save ArmPL and gcc versions on the node environment so that they will be available
+  # to dependencies (for instance, test code)
+  # Complete versions are intentionally redundant.
+  node.default['cluster']['armpl']['major_minor_version'] = new_resource.armpl_major_minor_version
+  node.default['cluster']['armpl']['patch_version'] = new_resource.armpl_patch_version
+  node.default['cluster']['armpl']['version'] = armpl_version
+  node.default['cluster']['armpl']['gcc']['major_minor_version'] = new_resource.gcc_major_minor_version
+  node.default['cluster']['armpl']['gcc']['patch_version'] = new_resource.gcc_patch_version
+  node.default['cluster']['armpl']['gcc']['version'] = gcc_version
+
+  include_recipe "aws-parallelcluster-common::node_attributes"
 end

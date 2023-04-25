@@ -199,7 +199,6 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
-        - recipe:aws-parallelcluster-common::node_attributes
   - name: modules
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

@@ -23,11 +23,3 @@ default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
 default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
 
 default['cluster']['chrony']['conf'] = "/etc/chrony.conf"
-
-# Arm Performance Library
-default['cluster']['armpl']['platform'] = 'RHEL-8'
-default['cluster']['armpl']['url'] = [
-  'archives/armpl',
-  node['cluster']['armpl']['platform'],
-  "arm-performance-libraries_#{node['cluster']['armpl']['version']}_#{node['cluster']['armpl']['platform']}_gcc-#{node['cluster']['armpl']['gcc']['major_minor_version']}.tar",
-].join('/')
