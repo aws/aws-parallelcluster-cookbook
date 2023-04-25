@@ -20,8 +20,6 @@ validate_os_type
 
 return if node['conditions']['ami_bootstrapped']
 
-include_recipe "aws-parallelcluster-common::node_attributes"
-
 # == PLATFORM - BASE
 include_recipe 'aws-parallelcluster-install::base'
 
@@ -50,3 +48,5 @@ include_recipe 'aws-parallelcluster-awsbatch::install'
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
 # used to build the schedulers packages
 dcv "Install DCV"
+
+include_recipe "aws-parallelcluster-common::node_attributes"

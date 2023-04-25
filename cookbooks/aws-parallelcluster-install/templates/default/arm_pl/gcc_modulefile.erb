@@ -2,7 +2,7 @@
 
 ## Required internal variables
 set name     gcc
-set version  <%= node['cluster']['armpl']['gcc']['major_minor_version'] %>.<%= node['cluster']['armpl']['gcc']['patch_version'] %>
+set version  <%= @gcc_version %>
 set category arm
 set library armpl
 set root     /opt/$category/$library/$name/$version

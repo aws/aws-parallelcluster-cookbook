@@ -219,20 +219,6 @@ def platform_supports_dcv?
   node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
 
-def aws_domain
-  # Get the aws domain name
-  region = node['cluster']['region']
-  if region.start_with?("cn-")
-    "amazonaws.com.cn"
-  elsif region.start_with?("us-iso-")
-    "c2s.ic.gov"
-  elsif region.start_with?("us-isob-")
-    "sc2s.sgov.gov"
-  else
-    "amazonaws.com"
-  end
-end
-
 def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
 end
