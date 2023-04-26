@@ -30,6 +30,7 @@ jobs:
           files_ignore: |
             !.github
             !CHANGELOG.md
+            !README.md
             !**/aws-parallelcluster-*/spec
             !**/aws-parallelcluster-*/test
       - name: Install Chef

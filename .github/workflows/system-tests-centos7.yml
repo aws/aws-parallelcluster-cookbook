@@ -27,6 +27,7 @@ jobs:
         with:
           files_ignore: |
             !.github
+            !README.md
             !CHANGELOG.md
             !**/aws-parallelcluster-*/spec
             !**/aws-parallelcluster-*/test
