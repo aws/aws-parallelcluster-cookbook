@@ -76,6 +76,24 @@ export KITCHEN_UBUNTU18_AMI=ami-xxxxxxxxxxxxxxxxx
 export KITCHEN_UBUNTU20_AMI=ami-xxxxxxxxxxxxxxxxx
 ```
 
+### Kitchen lifecycle hooks
+Kitchen [lifecycle hooks](https://kitchen.ci/docs/reference/lifecycle-hooks/) allow running commands 
+before and/or after any phase of Kitchen tests (create, converge, verify, or destroy).
+
+We [leverage](https://github.com/aws/aws-parallelcluster-cookbook/blob/fea76da1afe36a9e62566bb248e66d826e7af375/kitchen.recipes-config.yml#L18-L22) 
+this feature in Kitchen tests to create/destroy AWS resources. 
+
+For each phase, a generic [run](https://github.com/aws/aws-parallelcluster-cookbook/tree/ac4698d44a6f0385dd9c4f2840562df4b4e26b77/test/recipes) 
+script executes custom `${KITCHEN_SUITE_NAME}/[pre|post]_${KITCHEN_PHASE}.sh` script, if it exists.
+
+__Example.__ 
+
+`network_interfaces` Kitchen test suite requires a network interface to be attached to the node. 
+- [network_interfaces/post_create.sh](https://github.com/aws/aws-parallelcluster-cookbook/blob/ac4698d44a6f0385dd9c4f2840562df4b4e26b77/test/recipes/hooks/network_interfaces/post_create.sh) 
+creates ENI and attaches it to the instance
+- [network_interfaces/pre_destroy.sh](https://github.com/aws/aws-parallelcluster-cookbook/blob/ac4698d44a6f0385dd9c4f2840562df4b4e26b77/test/recipes/hooks/network_interfaces/pre_destroy.sh)
+detaches and deletes ENI.
+
 ### Known issues with docker
 
 #### Running kitchen tests on non `amd64` architectures
