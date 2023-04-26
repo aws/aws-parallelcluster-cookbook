@@ -49,4 +49,4 @@ include_recipe 'aws-parallelcluster-awsbatch::install'
 # used to build the schedulers packages
 dcv "Install DCV"
 
-include_recipe "aws-parallelcluster-common::node_attributes"
+node_attributes "dump node attributes"

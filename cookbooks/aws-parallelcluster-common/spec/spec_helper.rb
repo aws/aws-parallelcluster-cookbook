@@ -7,6 +7,9 @@ RSpec.configure do |c|
     allow_any_instance_of(Object).to receive(:aws_domain).and_return("test_aws_domain")
     allow_any_instance_of(Object).to receive(:aws_region).and_return("test_region")
   end
+  # This will be used by default when platform doesn't matter
+  # When it matters, platform value must be overridden for a specific test
+  c.platform = 'ubuntu'
 end
 
 module ChefSpec

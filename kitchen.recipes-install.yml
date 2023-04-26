@@ -297,7 +297,7 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
-        - recipe:aws-parallelcluster-common::node_attributes
+        - resource:aws-parallelcluster-common::node_attributes
       cluster:
         nvidia:
           enabled: true
