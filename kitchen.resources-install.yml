@@ -183,7 +183,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
         - recipe:aws-parallelcluster-install::directories
-        - recipe:aws-parallelcluster-common::node_attributes
+        - resource:aws-parallelcluster-common::node_attributes
   - name: arm_pl
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
@@ -211,7 +211,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
-        - recipe:aws-parallelcluster-common::node_attributes
+        - resource:aws-parallelcluster-common::node_attributes
   - name: build_tools
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
@@ -224,7 +224,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
-        - recipe:aws-parallelcluster-common::node_attributes
+        - resource:aws-parallelcluster-common::node_attributes
   - name: dcv
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

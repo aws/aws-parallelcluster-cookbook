@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster-install
-# Recipe:: node_attributes
+# Resource:: node_attributes
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -16,15 +16,24 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-directory '/etc/chef' do
-  owner 'root'
-  group 'root'
-  recursive true
-end
+provides :node_attributes
+unified_mode true
 
-file "/etc/chef/node_attributes.json" do
-  content Chef::JSONCompat.to_json_pretty(node)
-  owner 'root'
-  mode '0644'
-  sensitive true # avoids logging node attributes
+property :file, String, default: '/etc/chef/node_attributes.json'
+
+default_action :write
+
+action :write do
+  directory '/etc/chef' do
+    owner 'root'
+    group 'root'
+    recursive true
+  end
+
+  file "/etc/chef/node_attributes.json" do
+    content Chef::JSONCompat.to_json_pretty(node)
+    owner 'root'
+    mode '0644'
+    sensitive true # avoids logging node attributes
+  end
 end

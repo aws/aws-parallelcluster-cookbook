@@ -160,5 +160,5 @@ action :setup do
   node.default['cluster']['armpl']['gcc']['patch_version'] = new_resource.gcc_patch_version
   node.default['cluster']['armpl']['gcc']['version'] = gcc_version
 
-  include_recipe "aws-parallelcluster-common::node_attributes"
+  node_attributes "dump node attributes"
 end

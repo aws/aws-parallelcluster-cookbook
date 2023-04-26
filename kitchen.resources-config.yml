@@ -101,7 +101,7 @@ suites:
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::python
         - resource:cloudwatch:setup
-        - recipe:aws-parallelcluster-common::node_attributes
+        - resource:aws-parallelcluster-common::node_attributes
       cluster:
         node_type: HeadNode
         scheduler: slurm
@@ -124,7 +124,7 @@ suites:
         - resource:install_packages
         - recipe:aws-parallelcluster-install::nvidia
         - resource:dcv:setup
-        - recipe:aws-parallelcluster-common::node_attributes
+        - resource:aws-parallelcluster-common::node_attributes
       cluster:
         node_type: HeadNode
         dcv_enabled: "head_node"
