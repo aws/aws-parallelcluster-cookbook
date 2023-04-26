@@ -69,10 +69,10 @@ default['cluster']['intelpython2']['version'] = '2019.4-088'
 default['cluster']['intelpython3']['version'] = '2020.2-902'
 
 # Intel MPI
-default['cluster']['intelmpi']['version'] = '2021.6.0'
-default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi']['version']}.602"
+default['cluster']['intelmpi']['version'] = '2021.9.0'
+default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi']['version']}.43482"
 default['cluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/mpi"
-default['cluster']['intelmpi']['qt_version'] = '5.15.2'
+default['cluster']['intelmpi']['qt_version'] = '6.4.2'
 
 # URLs to software packages used during install recipes
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
