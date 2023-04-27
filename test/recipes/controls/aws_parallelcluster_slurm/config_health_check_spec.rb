@@ -43,3 +43,27 @@ control 'health_check_configured' do
     it { should be_linked_to "#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/epilog.d/90_pcluster_noop" }
   end
 end
+
+control 'tag:config_gpu_health_check_execution' do
+  title 'Check GPU health check execution'
+  slurm_install_dir = "/opt/slurm"
+
+  if instance.graphic?
+    if instance.dcgmi_gpu_accel_supported?
+      describe command("#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
+        its('exit_status') { should eq 0 }
+        its('stdout') { should match /The GPU Health Check succeeded/ }
+      end
+    else
+      describe command("#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
+        its('exit_status') { should eq 0 }
+        its('stdout') { should match /The GPU Health Check is running in a NVIDIA GPU not supported by DCGM Diagnostic tool/ }
+      end
+    end
+  else
+    describe command("#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
+      its('exit_status') { should eq 0 }
+      its('stdout') { should match /The GPU Health Check is running in an instance without a supported GPU/ }
+    end
+  end
+end

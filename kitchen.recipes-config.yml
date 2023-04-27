@@ -372,3 +372,51 @@ suites:
       cluster:
         slurm:
           install_dir: "/opt/slurm"
+  - name: gpu_health_check
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::config_health_check]
+    verifier:
+      controls:
+        - /gpu_health_check_execution/
+    driver:
+      instance_type: g4dn.xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::slurm_mock
+        - resource:aws-parallelcluster-common::node_attributes
+      cluster:
+        slurm:
+          install_dir: "/opt/slurm"
+  - name: gpu_health_check_dcgm_not_supported
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::config_health_check]
+    verifier:
+      controls:
+        - /gpu_health_check_execution/
+    driver:
+      instance_type: g2.2xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::slurm_mock
+        - resource:aws-parallelcluster-common::node_attributes
+      cluster:
+        slurm:
+          install_dir: "/opt/slurm"
+  - name: gpu_health_check_no_gpu
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::config_health_check]
+    verifier:
+      controls:
+        - /gpu_health_check_execution/
+    driver:
+      instance_type: c5.xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::slurm_mock
+        - resource:aws-parallelcluster-common::node_attributes
+      cluster:
+        slurm:
+          install_dir: "/opt/slurm"
