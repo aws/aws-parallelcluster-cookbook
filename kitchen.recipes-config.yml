@@ -384,7 +384,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-test::slurm_mock
-        - resource:aws-parallelcluster-common::node_attributes
+        - resource:node_attributes
       cluster:
         slurm:
           install_dir: "/opt/slurm"
@@ -400,7 +400,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-test::slurm_mock
-        - resource:aws-parallelcluster-common::node_attributes
+        - resource:node_attributes
       cluster:
         slurm:
           install_dir: "/opt/slurm"
@@ -416,7 +416,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-test::slurm_mock
-        - resource:aws-parallelcluster-common::node_attributes
+        - resource:node_attributes
       cluster:
         slurm:
           install_dir: "/opt/slurm"
