@@ -53,9 +53,9 @@ action_class do
 
   def dcv_sha256sum
     if arm_instance?
-      "e1828c4c86679726532d29171b0e033a2474185066e0373bccc0f8bfd494f4b7"
+      "162396cad72bd357bd7aba8c01eeb60d4efec955cfec0bf456fbbd7c3801b79a"
     else
-      "01a5e7e57f57d306f3e474963e4475078b0ac1df02440c3759e6dfee5cdaeb09"
+      "50eb5e645f549e8a51ff64ede2d85e0a8051c7d929295fe3319dc23ba73d5c1d"
     end
   end
 

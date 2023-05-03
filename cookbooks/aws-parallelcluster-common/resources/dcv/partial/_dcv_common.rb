@@ -58,7 +58,7 @@ action_class do
   end
 
   def dcv_url
-    "https://d1uj6qtbmh3dt5.cloudfront.net/2022.2/Servers/#{dcv_package}.tgz"
+    "https://d1uj6qtbmh3dt5.cloudfront.net/#{node['cluster']['dcv']['version'].split('-')[0]}/Servers/#{dcv_package}.tgz"
   end
 
   def post_install
@@ -158,7 +158,7 @@ action :setup do
         block do
           require 'digest'
           checksum = Digest::SHA256.file(dcv_tarball).hexdigest
-          raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{node['cluster']['dcv']['package']['sha256sum']}" if checksum != dcv_sha256sum
+          raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{dcv_sha256sum}" if checksum != dcv_sha256sum
         end
       end
 
