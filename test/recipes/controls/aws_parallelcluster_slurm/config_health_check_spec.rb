@@ -45,6 +45,7 @@ control 'health_check_configured' do
 end
 
 control 'tag:config_gpu_health_check_execution' do
+  only_if { instance.compute_node? && node['cluster']['scheduler'] == 'slurm' }
   title 'Check GPU health check execution'
   slurm_install_dir = "/opt/slurm"
 
