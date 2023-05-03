@@ -44,12 +44,15 @@ function main() {
   command -v dcgmi  &>/dev/null
   fast_success_exit "$?" "The Gpu Health Check has been executed but the NVIDIA DCGM Diagnostic tool is not available in this system or is located in a different file path. Please consider using an official ParallelCluster AMI."
 
-  ## Check if there are GPU associated to the job
+  ## Check if the NVIDIA GPU is supported by DCGM tool
+  nvidia_smi_output=$(nvidia-smi -L)
+  fast_success_exit "$?" "The nvidia-smi tool failed its execution."
+  log_info "GPU list is '${nvidia_smi_output//$'\n'/, }'"
+  is_dcgm_supported
+  fast_success_exit "$?" "The GPU Health Check is running in a NVIDIA GPU not supported by DCGM Diagnostic tool: skipping its execution."
 
+  ## Check if there are GPU associated to the job
   if [ -z "$GPU_DEVICE_ORDINAL" ]; then
-    nvidia_smi_output=$(nvidia-smi -L)
-    nvidia_smi_exit_code=$(echo $?)
-    fast_success_exit $nvidia_smi_exit_code "The nvidia-smi tool failed its execution."
     # The "nvidia-smi -L" return the list of GPUs available on the node:
     # $nvidia-smi -L
     # GPU 0: NVIDIA A100-SXM4-80GB (UUID: GPU-e57350fc-1789-b69a-0637-18a3025b1da2)
@@ -88,8 +91,7 @@ function main() {
     # - the nvidia-smi command is not available
     # - the nvidia-smi command is available but it fails its execution
     nvidia_smi_out=$(nvidia-smi -q -i $gpu_id)
-    nvidia_smi_exit_code=$(echo $?)
-    fast_success_exit $nvidia_smi_exit_code "The nvidia-smi tool failed its execution."
+    fast_success_exit "$?" "The nvidia-smi tool failed its execution."
 
     ## Enable persistence mode in target GPU, required by the DCGM Diagnostic tool
     local persistence_mode_enabled_$gpu_id
@@ -114,7 +116,7 @@ function main() {
   ## Run GPUs Health Check test
   log_info "Running GPU Health Check with DCGMI level $DCGMI_LEVEL"
   dcgmi diag -i $GPU_DEVICE_ORDINAL -r $DCGMI_LEVEL
-  dcgmi_exit_code=$(echo $?)
+  dcgmi_exit_code=$?
 
   if [ $dcgmi_exit_code -ne 0 ]; then
     log_error "The GPU Health Check failed"
@@ -147,6 +149,11 @@ function fast_success_exit() {
 
 function is_nvidia() {
   $lspci_fullpath | grep -i -o 'NVIDIA' &>/dev/null
+  return $?
+}
+
+function is_dcgm_supported() {
+  echo $nvidia_smi_output | grep -v -i -o ' K520 ' &>/dev/null
   return $?
 }
 
