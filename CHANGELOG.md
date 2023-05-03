@@ -48,6 +48,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA Fabric Manager to version 470.182.03.
 - Upgrade NVIDIA CUDA Toolkit to version 11.8.0.
 - Upgrade NVIDIA CUDA sample to version 11.8.0.
+- Upgrade NICE DCV to version `2023.0-15022`.
+  - server: `2023.0.15022-1`
+  - xdcv: `2023.0.547-1`
+  - gl: `2023.0.1027-1`
+  - web_viewer: `2023.0.15022-1`
 
 **BUG FIXES**
 - Fix an issue that was causing misalignment of compute nodes IP on instances with multiple network interfaces.
