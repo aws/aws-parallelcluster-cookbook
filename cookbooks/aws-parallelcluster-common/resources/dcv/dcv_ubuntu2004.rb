@@ -19,6 +19,6 @@ use 'partial/_debian_common'
 
 action_class do
   def dcv_sha256sum
-    return "069818d56c1072db80b915750bc62584cd109aa7f1fdc0ef64c69d59270bb1a3" if x86?
+    return "6b4c6450bb39f31cb93082a2d1f3977da23d41d3f0646f71b2726e6ba632ea09" if x86?
   end
 end

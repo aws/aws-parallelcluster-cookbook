@@ -135,7 +135,7 @@ default['cluster']['stunnel']['tarball_path'] = "#{node['cluster']['sources_dir'
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'
-default['cluster']['dcv']['version'] = '2022.2-14521'
+default['cluster']['dcv']['version'] = '2023.0-15022'
 if arm_instance?
   default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 amazon2 redhat8)
   default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
@@ -143,10 +143,10 @@ else
   default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2 redhat8)
   default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
 end
-default['cluster']['dcv']['server']['version'] = '2022.2.14521-1'
-default['cluster']['dcv']['xdcv']['version'] = '2022.2.519-1'
-default['cluster']['dcv']['gl']['version'] = '2022.2.1012-1'
-default['cluster']['dcv']['web_viewer']['version'] = '2022.2.14521-1'
+default['cluster']['dcv']['server']['version'] = '2023.0.15022-1'
+default['cluster']['dcv']['xdcv']['version'] = '2023.0.547-1'
+default['cluster']['dcv']['gl']['version'] = '2023.0.1027-1'
+default['cluster']['dcv']['web_viewer']['version'] = '2023.0.15022-1'
 # DCV external authenticator configuration
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
