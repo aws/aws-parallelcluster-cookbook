@@ -99,3 +99,6 @@ AllCops:
   NewCops: enable
   Exclude:
     - 'third-party/**/*'
+
+Chef/Deprecations/ChefSpecCoverageReport:
+  Enabled: false
