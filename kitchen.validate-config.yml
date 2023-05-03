@@ -34,6 +34,7 @@ _compute_node_cluster_attributes: &_compute_node_cluster_attributes
   head_node_private_ip: <%= ENV['HEAD_NODE_PRIVATE_IP'] %>
 
 _run_list: &_run_list
+  - recipe[aws-parallelcluster::add_dependencies]
   - recipe[aws-parallelcluster::init]
   - recipe[aws-parallelcluster::config]
   - recipe[aws-parallelcluster::finalize]

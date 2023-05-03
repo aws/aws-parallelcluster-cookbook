@@ -20,7 +20,9 @@
 #      - resource:ec2_udev_rules
 #      - resource:package_repos:update
 
-if defined?(node['dependencies'])
+node_attributes 'dump node attributes'
+
+if defined?(node['dependencies']) && node['dependencies']
   node['dependencies'].each do |dep|
     if dep.start_with?('recipe:')
       include_recipe dep.gsub('recipe:', '')
