@@ -65,3 +65,5 @@ end
 def expect_to_include_recipe_from_resource(recipe, cookbook = 'any')
   expect_any_instance_of(Chef::RunContext).to receive(:include_recipe).with(recipe, { current_cookbook: cookbook })
 end
+
+at_exit { ChefSpec::Coverage.report! }
