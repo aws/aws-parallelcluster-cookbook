@@ -35,6 +35,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Lustre client version to 2.12 on Amazon Linux 2 (same version available on Ubuntu 20.04, 18.04 and CentOS >= 7.7).
 - Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
 - Upgrade `aws-cfn-bootstrap` to version 2.0-24.
+- Upgrade NICE DCV to version `2023.0-15022`.
+  - server: `2023.0.15022-1`
+  - xdcv: `2023.0.547-1`
+  - gl: `2023.0.1027-1`
+  - web_viewer: `2023.0.15022-1`
 
 **BUG FIXES**
 - Fix an issue that was causing misalignment of compute nodes IP on instances with multiple network interfaces.
