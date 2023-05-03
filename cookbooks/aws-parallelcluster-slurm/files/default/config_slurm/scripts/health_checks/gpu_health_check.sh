@@ -42,7 +42,7 @@ function main() {
 
   ## Check if the DCGM Diagnostic tool is available
   command -v dcgmi  &>/dev/null
-  fast_success_exit "$?" "The Gpu Health Check has been executed but the NVIDIA DCGM Diagnostic tool is not available in this system or is located in a different file path. Please consider using an official ParallelCluster AMI."
+  fast_success_exit "$?" "The GPU Health Check has been executed but the NVIDIA DCGM Diagnostic tool is not available in this system or is located in a different file path. Please consider using an official ParallelCluster AMI."
 
   ## Check if the NVIDIA GPU is supported by DCGM tool
   nvidia_smi_output=$(nvidia-smi -L)
