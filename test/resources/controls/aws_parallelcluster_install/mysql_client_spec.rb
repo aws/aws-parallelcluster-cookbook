@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'mysql_client_installed' do
+control 'tag:install_mysql_client_installed' do
   title "MySql client is installed"
 
   mysql_packages = []
@@ -36,7 +36,7 @@ control 'mysql_client_installed' do
   end
 end
 
-control 'mysql_client_source_node_created' do
+control 'tag:install_mysql_client_source_code_created' do
   title 'MySql client source code is configured in target dir'
 
   describe file('/opt/parallelcluster/sources/mysql_source_code.txt') do
