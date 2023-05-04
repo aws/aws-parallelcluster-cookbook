@@ -51,8 +51,7 @@ suites:
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
-        - mysql_client_installed
-        - mysql_client_source_node_created
+        - /mysql_client/
     attributes:
       dependencies:
         - recipe:aws-parallelcluster::test_dummy
