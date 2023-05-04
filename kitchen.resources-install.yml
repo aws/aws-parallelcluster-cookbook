@@ -189,7 +189,7 @@ suites:
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
-        - /^arm_pl/
+        - /^tag:install_arm_pl/
     driver:
       # arm_pl can be executed only on arm instance example: c6g.large
       instance_type: c6g.large

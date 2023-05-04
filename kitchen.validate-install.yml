@@ -55,8 +55,6 @@ suites:
         - efs_utils_installed
         - gc_thresh_values_configured
         - license_readme_created
-        - mysql_client_installed
-        - mysql_client_source_node_created
         - node_attributes_created
         - /services_disabled_on_amazon_family/
         - /services_disabled_on_debian_family/
@@ -66,4 +64,4 @@ suites:
         - /nvidia_driver/
         - /fabric_manager/
         - /^cloudwatch/
-        - /^arm_pl/
+        - /tag:install/

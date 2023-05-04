@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'arm_pl_installed' do
+control 'tag:install_arm_pl_installed' do
   title "Check ARM Performance libraries installation"
 
   only_if { os_properties.arm? && !os_properties.virtualized? }
@@ -61,7 +61,7 @@ control 'arm_pl_installed' do
   end
 end
 
-control 'arm_pl_gcc_installed' do
+control 'tag:install_arm_pl_gcc_installed' do
   title "Check ARM Performance libraries installation"
 
   only_if { os_properties.arm? && !os_properties.virtualized? }
