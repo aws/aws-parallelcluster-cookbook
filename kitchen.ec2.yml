@@ -57,7 +57,7 @@ platforms:
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>amzn2-ami-kernel-5.10-hvm*<% else %><%= pcluster_prefix %>-amzn2-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
         - device_name: /dev/xvda
@@ -84,7 +84,7 @@ platforms:
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
         - device_name: /dev/sda1
@@ -111,7 +111,7 @@ platforms:
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>CentOS Linux 7 *- 2211<% else %><%= pcluster_prefix %>-centos7-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
         - device_name: /dev/sda1
@@ -138,7 +138,7 @@ platforms:
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20221207<% else %><%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
         - device_name: /dev/sda1
@@ -164,8 +164,9 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
       <% else %>
       image_search:
+        #name: ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20230112
         name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-focal-20.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20230112<% else %><%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
         - device_name: /dev/sda1
