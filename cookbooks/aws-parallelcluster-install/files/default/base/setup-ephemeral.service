@@ -1,9 +1,0 @@
-[Unit]
-Description=Setup ephemeral drives service
-After=network.target
-
-[Service]
-ExecStart=/usr/local/sbin/setup-ephemeral-drives.sh
-
-[Install]
-WantedBy=multi-user.target

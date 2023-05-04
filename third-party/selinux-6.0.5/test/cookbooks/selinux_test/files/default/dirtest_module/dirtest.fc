@@ -1,0 +1,1 @@
+/usr/bin/dirtest    --  gen_context(system_u:object_r:dirtest_exec_t,s0)

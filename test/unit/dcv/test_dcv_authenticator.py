@@ -104,8 +104,8 @@ def test_is_process_valid(user, command, session_id, result):
     expected_user = "user1"
 
     ps_aux_output = (
-        "{USER}                63   0.0  0.0  4348844   3108   ??  Ss   23Jul19   2:32.46 {COMMAND} --mode full "
-        "--session-id {SESSION}".format(USER=user, COMMAND=command, SESSION=session_id)
+        f"{user}                63   0.0  0.0  4348844   3108   ??  Ss   23Jul19   2:32.46 {command} --mode full "
+        f"--session-id {session_id}"
     )
 
     assert_that(DCVAuthenticator.check_dcv_process(ps_aux_output, expected_user, expected_session_id)).is_equal_to(
@@ -118,7 +118,7 @@ def mock_generate_random_token(mocker, value):
 
 
 def mock_verify_session_existence(mocker, exists):
-    def _return_value(user, sessionid):
+    def _return_value(user, sessionid):  # pylint: disable=W0613
         if not exists:
             raise DCVAuthenticator.IncorrectRequestError("The given session for the user does not exists")
 
@@ -126,7 +126,7 @@ def mock_verify_session_existence(mocker, exists):
 
 
 def mock_os(mocker, user, timestamp):
-    class FileProperty(object):
+    class FileProperty:
         pass
 
     file_property = FileProperty
@@ -161,7 +161,9 @@ def test_get_request_token_parameter(parameters, keys, result):
 
 def test_get_request_token(mocker):
     """Verify the first step of the authentication process, the retrieval of the Request Token."""
-    token_value = "1234abcd_-"
+    # A nosec comment is appended to the following line in order to disable the B105 check.
+    # Since the request token is only being used for a unit test and not the actual auth service
+    token_value = "1234abcd_-"  # nosec B105
     user = "centos"
     session_id = "mysession"
 
@@ -288,7 +290,9 @@ def test_get_session_token(mocker):
     # working
     mock_os(mocker, user, obtain_timestamp(datetime.utcnow()))
     mock_verify_session_existence(mocker, exists=True)
-    session_token = "1234"
+    # A nosec comment is appended to the following line in order to disable the B105 check.
+    # Since the session token is not a hardcoded password but merely used for unit testing
+    session_token = "1234"  # nosec B105
     mock_generate_random_token(mocker, session_token)
     DCVAuthenticator.request_token_manager.add_token(
         request_token, DCVAuthenticator.RequestTokenInfo(user, session_id, datetime.utcnow(), access_file)

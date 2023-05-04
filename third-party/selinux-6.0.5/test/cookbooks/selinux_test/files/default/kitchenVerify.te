@@ -1,0 +1,34 @@
+module kitchenVerify 1.0;
+
+require {
+	type udev_t;
+	type NetworkManager_t;
+	type syslogd_t;
+	type unconfined_t;
+	type sshd_t;
+	type crond_t;
+	type auditd_t;
+	type systemd_logind_t;
+	type semanage_t;
+	type dhcpc_t;
+	type var_run_t;
+	class process signull;
+	class file { read rename };
+	class fifo_file { read write };
+}
+
+#============= semanage_t ==============
+allow semanage_t sshd_t:fifo_file { read write };
+
+#============= sshd_t ==============
+allow sshd_t var_run_t:file { read rename };
+
+#============= syslogd_t ==============
+allow syslogd_t NetworkManager_t:process signull;
+allow syslogd_t auditd_t:process signull;
+allow syslogd_t crond_t:process signull;
+allow syslogd_t dhcpc_t:process signull;
+allow syslogd_t sshd_t:process signull;
+allow syslogd_t systemd_logind_t:process signull;
+allow syslogd_t udev_t:process signull;
+allow syslogd_t unconfined_t:process signull;

@@ -1,0 +1,82 @@
+# Validates config recipes
+---
+verifier:
+  controls:
+    - /tag:config/
+
+_common_cluster_attributes: &_common_cluster_attributes
+  stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
+  volume: <%= ENV['VOLUME'] || "''" %>
+  region: <%= ENV['KITCHEN_AWS_REGION'] %>
+  ephemeral_dir: <%= ENV['EPHEMERAL_DIR'] || '/scratch' %>
+  ebs_shared_dirs: <%= ENV['EBS_SHARED_DIRS'] || '/shared' %>
+  cluster_s3_bucket: <%= ENV['CLUSTER_CONFIG_S3_BUCKET'] %>
+  cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
+  instance_types_data_s3_key: <%= ENV['INSTANCE_TYPES_DATA_S3_KEY'] %>
+  os: <%= ENV['OS'] %>
+  custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
+  dcv_enabled: 'head_node'
+  dcv_port: '8443'
+  enable_efa: 'compute'
+  nvidia:
+    enabled: <%= ENV['NVIDIA_ENABLED'] %>
+
+_head_node_cluster_attributes: &_head_node_cluster_attributes
+  << : *_common_cluster_attributes
+  node_type: 'HeadNode'
+  ddb_table: <%= ENV['DDB_TABLE'] %>
+  slurm_ddb_table: <%= ENV['DDB_TABLE'] %>
+
+_compute_node_cluster_attributes: &_compute_node_cluster_attributes
+  << : *_common_cluster_attributes
+  node_type: 'ComputeFleet'
+  head_node: <%= ENV['HEAD_NODE'] %>
+  head_node_private_ip: <%= ENV['HEAD_NODE_PRIVATE_IP'] %>
+
+_run_list: &_run_list
+  - recipe[aws-parallelcluster::add_dependencies]
+  - recipe[aws-parallelcluster::init]
+  - recipe[aws-parallelcluster::config]
+  - recipe[aws-parallelcluster::finalize]
+  - recipe[aws-parallelcluster::tests]
+
+provisioner:
+  attributes:
+    kitchen: true
+
+suites:
+  - name: slurm_config_HeadNode_x86_64
+    run_list: *_run_list
+    attributes: &attributes_slurm_config_HeadNode
+      cluster:
+        << : *_head_node_cluster_attributes
+        scheduler: 'slurm'
+        enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] || false %>"
+
+  - name: slurm_config_HeadNode_arm64
+    run_list: *_run_list
+    attributes: *attributes_slurm_config_HeadNode
+
+  - name: awsbatch_config_HeadNode_x86_64
+    run_list: *_run_list
+    attributes: &attributes_awsbatch_config_HeadNode
+      cluster:
+        << : *_head_node_cluster_attributes
+        scheduler: 'awsbatch'
+        custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
+
+  - name: awsbatch_config_HeadNode_arm64
+    run_list: *_run_list
+    attributes: *attributes_awsbatch_config_HeadNode
+
+  - name: slurm_config_ComputeFleet_x86_64
+    run_list: *_run_list
+    attributes: &attributes_slurm_config_ComputeFleet
+      cluster:
+        << : *_compute_node_cluster_attributes
+        scheduler: 'slurm'
+        slurm_nodename: 'fake-dy-compute-1'
+
+  - name: slurm_config_ComputeFleet_arm64
+    run_list: *_run_list
+    attributes: *attributes_slurm_config_ComputeFleet

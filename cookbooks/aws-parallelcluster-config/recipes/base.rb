@@ -15,48 +15,29 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster::setup_envars"
+include_recipe "aws-parallelcluster-common::setup_envars"
 include_recipe 'aws-parallelcluster-config::openssh'
 
-# Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
-if platform?('ubuntu') && node['platform_version'].to_i == 20
-  sysctl 'fs.protected_regular' do
-    value 0
-  end
+sticky_bits "setup sticky bits"
+
+nfs "Configure NFS" do
+  action :configure
 end
 
-include_recipe 'aws-parallelcluster-config::nfs' unless virtualized?
+include_recipe 'aws-parallelcluster-config::ephemeral_drives'
 
-service "setup-ephemeral" do
-  supports restart: false
-  action :enable
-end
-
-# Execution timeout 3600 seconds
-unless virtualized?
-  execute "Setup of ephemeral drivers" do
-    user "root"
-    command "/usr/local/sbin/setup-ephemeral-drives.sh"
-  end
-end
-
-# Increase somaxconn and tcp_max_syn_backlog for large scale setting
-sysctl 'net.core.somaxconn' do
-  value 65_535
-end
-
-sysctl 'net.ipv4.tcp_max_syn_backlog' do
-  value 65_535
-end
+include_recipe 'aws-parallelcluster-config::networking'
 
 # Amazon Time Sync
 include_recipe 'aws-parallelcluster-config::chrony'
 
-# NVIDIA services (fabric manager)
+# Configure Nvidia driver
 include_recipe "aws-parallelcluster-config::nvidia"
 
 # EFA runtime configuration
-include_recipe "aws-parallelcluster-config::efa" unless virtualized?
+efa 'Configure system for EFA' do
+  action :configure
+end
 
 case node['cluster']['node_type']
 when 'HeadNode'
@@ -67,27 +48,10 @@ else
   raise "node_type must be HeadNode or ComputeFleet"
 end
 
-# Ensure cluster user can sudo on SSH
-template '/etc/sudoers.d/99-parallelcluster-user-tty' do
-  source 'base/99-parallelcluster-user-tty.erb'
-  owner 'root'
-  group 'root'
-  mode '0600'
-end
+include_recipe "aws-parallelcluster-config::sudo"
 
-# Install parallelcluster specific supervisord config
-template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
-  source 'base/parallelcluster_supervisord.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
-
-# Mount EFS directory with efs_mount recipe
-include_recipe 'aws-parallelcluster-config::efs_mount'
-
-# Mount FSx directory with fsx_mount recipe
-include_recipe 'aws-parallelcluster-config::fsx_mount'
+# Mount EFS, FSx
+include_recipe "aws-parallelcluster-config::fs_mount"
 
 # Intel Runtime Libraries
 include_recipe "aws-parallelcluster-config::intel"

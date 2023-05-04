@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -113,18 +113,27 @@ def check_imds_access(user, is_allowed)
   bash "check IMDS access for user #{user}" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      sudo -u #{user} curl 169.254.169.254/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
+      sudo -u #{user} curl -H "X-aws-ec2-metadata-token-ttl-seconds: 900" -X PUT "http://169.254.169.254/latest/api/token" 1>/dev/null 2>/dev/null
       [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
       if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
         >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv4): #{user}"
         exit 1
       fi
 
-      sudo -u #{user} curl -g -6 [0:0:0:0:0:FFFF:A9FE:A9FE]/2021-03-23/meta-data/placement/region 1>/dev/null 2>/dev/null
-      [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
-      if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
-        >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
-        exit 1
+      token=$(sudo curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+      region=$(sudo curl -H "X-aws-ec2-metadata-token: ${token}" -v http://169.254.169.254/latest/meta-data/placement/region)
+      instance_id=$(sudo curl -H "X-aws-ec2-metadata-token: ${token}" -v http://169.254.169.254/latest/meta-data/instance-id)
+      http_protocol_ipv6=$(aws --region ${region} ec2 describe-instances --instance-ids "${instance_id}" --query "Reservations[*].Instances[*].MetadataOptions.HttpProtocolIpv6" --output text)
+
+      if [[ "$http_protocol_ipv6" == "enabled" ]]; then
+        sudo -u #{user} curl -g -6 -H "X-aws-ec2-metadata-token-ttl-seconds: 900" -X PUT "http://[fd00:ec2::254]/latest/api/token" 1>/dev/null 2>/dev/null
+        [[ $? = 0 ]] && actual_is_allowed="true" || actual_is_allowed="false"
+        if [[ "$actual_is_allowed" != "#{is_allowed}" ]]; then
+          >&2 echo "User #{is_allowed ? 'should' : 'should not'} have access to IMDS (IPv6): #{user}"
+          exit 1
+        fi
+      else
+        >&2 echo "http protocol ipv6 is: ${http_protocol_ipv6}, skipping imds ipv6 test"
       fi
     TEST
   end
@@ -192,35 +201,50 @@ def check_run_level_script(script_name, levels_on, levels_off)
   end
 end
 
-def check_sudo_command(command, user = nil)
-  bash "check sudo command from user #{user}: #{command}" do
+def validate_package_source(package, expected_source)
+  case node['platform']
+  when 'amazon', 'centos'
+    test_expression = "$(yum info #{package} | grep 'From repo' | awk '{print $4}')"
+  when 'ubuntu'
+    test_expression = "$(apt show #{package} | grep 'APT-Sources:' | awk '{print $2}')"
+  else
+    raise "Platform not supported: #{node['platform']}"
+  end
+
+  bash "Check that package #{package} is installed" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      set -e
-      sudo #{command}
+      echo "Testing package #{package} source"
+      actual_source=#{test_expression}
+      if [ "#{expected_source}" != "${actual_source}" ]; then
+        echo "ERROR Expected package source #{expected_source} for #{package} does not match actual source: ${actual_source}"
+        exit 1
+      fi
+      echo "#{package} correctly installed from #{expected_source}"
     TEST
-    user user
   end
 end
 
-def check_ssh_target_checker_vpc_cidr_list(ssh_target_checker_script, expected_cidr_list)
-  bash "check #{ssh_target_checker_script} contains the correct vpc cidr list: #{expected_cidr_list}" do
+def validate_package_version(package, expected_version)
+  case node['platform']
+  when 'amazon', 'centos', 'redhat'
+    test_expression = "$(yum info installed #{package} | grep 'Version' | awk '{print $3}')"
+  when 'ubuntu'
+    test_expression = "$(apt list --installed #{package} | awk '{printf \"%s\", $2}')"
+  else
+    raise "Platform not supported: #{node['platform']}"
+  end
+
+  bash "Check that package #{package} v#{expected_version} is installed" do
     cwd Chef::Config[:file_cache_path]
     code <<-TEST
-      if [[ ! -f #{ssh_target_checker_script} ]]; then
-        >&2 echo "SSH target checker in #{ssh_target_checker_script} not found"
+      echo "Testing package #{package} version"
+      actual_version=#{test_expression}
+      if [ "#{expected_version}" != "${actual_version}" ]; then
+        echo "ERROR Expected package source #{expected_version} for #{package} does not match actual source: ${actual_version}"
         exit 1
       fi
-
-      actual_value=$(egrep 'VPC_CIDR_LIST[ ]*=[ ]' #{ssh_target_checker_script})
-
-      egrep 'VPC_CIDR_LIST[ ]*=[ ]*\\([ ]*#{expected_cidr_list.join('[ ]*')}[ ]*\\)' #{ssh_target_checker_script}
-      if [[ $? != 0 ]]; then
-        >&2 echo "SSH target checker in #{ssh_target_checker_script} contains wrong VPC CIDR list"
-        >&2 echo "Expected VPC CIDR list: #{expected_cidr_list}"
-        >&2 echo "Actual VPC CIDR list: $actual_value"
-        exit 1
-      fi
+      echo "#{package} correctly installed version #{expected_version}"
     TEST
   end
 end

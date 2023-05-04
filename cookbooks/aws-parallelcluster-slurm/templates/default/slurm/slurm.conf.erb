@@ -9,7 +9,7 @@
 # See the slurm.conf man page for more information.
 #
 # CLUSTER SETTINGS
-ClusterName=parallelcluster
+ClusterName=<%= node['cluster']['stack_name'] %>
 SlurmUser=<%= node['cluster']['slurm']['user'] %>
 SlurmctldPort=6820-6829
 SlurmdPort=6818
@@ -30,6 +30,7 @@ SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem
 TreeWidth=65533
 <% else -%>
 SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_dns,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>
+TreeWidth=30
 <% end -%>
 CommunicationParameters=NoAddrCache
 SuspendProgram=<%= node['cluster']['scripts_dir'] %>/slurm/slurm_suspend
@@ -40,19 +41,12 @@ SuspendTimeout=120
 PrivateData=cloud
 ResumeRate=0
 SuspendRate=0
-<% if node["cluster"]["add_node_hostnames_in_hosts_file"] == 'true' -%>
 #
 # PROLOG AND EPILOG
-# prolog is executed to add nodes info to /etc/hosts on compute nodes when each job is allocated
-# epilog is executed to clean contents written by prolog
-# PrologFlags specifies the prolog is executed at job allocation and prologs and epilogs are of different jobs are executed serially
-# SchedulerParameters allows jobs to be requeued to other nodes if prolog error exits.
-# Note the error exit of prolog drains a node, because the error of prolog is considered as a node error.
-Epilog=<%= node['cluster']['slurm']['install_dir'] %>/etc/pcluster/epilog.d/*
-Prolog=<%= node['cluster']['slurm']['install_dir'] %>/etc/pcluster/prolog.d/*
-PrologFlags=alloc,serial
+Prolog=<%= node['cluster']['slurm']['install_dir'] %>/etc/scripts/prolog.d/*
+Epilog=<%= node['cluster']['slurm']['install_dir'] %>/etc/scripts/epilog.d/*
 SchedulerParameters=nohold_on_prolog_fail
-<% end -%>
+BatchStartTimeout=180
 #
 # TIMERS
 SlurmctldTimeout=300
@@ -78,12 +72,17 @@ GresTypes=gpu
 SelectType=select/cons_tres
 #
 # LOGGING
-SlurmctldDebug=info
+SlurmctldDebug=verbose
 SlurmctldLogFile=/var/log/slurmctld.log
 SlurmdDebug=info
 SlurmdLogFile=/var/log/slurmd.log
+DebugFlags=Power
 JobCompType=jobcomp/none
 #
 # WARNING!!! The slurm_parallelcluster.conf file included below can be updated by the pcluster process.
 # Please do not edit it.
 include slurm_parallelcluster.conf
+
+# WARNING!!! The custom_slurm_settings_include_file_slurm.conf file included below can be updated by the pcluster process.
+# Please do not edit it.
+include pcluster/custom_slurm_settings_include_file_slurm.conf

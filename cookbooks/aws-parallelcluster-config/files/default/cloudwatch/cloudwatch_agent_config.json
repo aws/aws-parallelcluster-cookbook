@@ -1,0 +1,751 @@
+{
+  "timestamp_formats": {
+    "month_first": "%b %-d %H:%M:%S",
+    "default": "%Y-%m-%d %H:%M:%S,%f",
+    "bracket_default": "[%Y-%m-%d %H:%M:%S]",
+    "slurm": "%Y-%m-%dT%H:%M:%S.%f",
+    "json": ""
+  },
+  "log_configs": [
+    {
+      "timestamp_format_key": "month_first",
+      "file_path": "/var/log/messages",
+      "log_stream_name": "system-messages",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "month_first",
+      "file_path": "/var/log/syslog",
+      "log_stream_name": "syslog",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cfn-init.log",
+      "log_stream_name": "cfn-init",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/chef-client.log",
+      "log_stream_name": "chef-client",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "json",
+      "file_path": "/var/log/parallelcluster/bootstrap_error_msg",
+      "log_stream_name": "bootstrap_error_msg",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cloud-init.log",
+      "log_stream_name": "cloud-init",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/cloud-init-output.log",
+      "log_stream_name": "cloud-init-output",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/supervisord.log",
+      "log_stream_name": "supervisord",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/clustermgtd",
+      "log_stream_name": "clustermgtd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "json",
+      "file_path": "/var/log/parallelcluster/clustermgtd.events",
+      "log_stream_name": "clustermgtd_events",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "json",
+      "file_path": "/var/log/parallelcluster/slurm_resume.events",
+      "log_stream_name": "slurm_resume_events",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/compute_console_output.log",
+      "log_stream_name": "compute_console_output",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/computemgtd",
+      "log_stream_name": "computemgtd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_resume.log",
+      "log_stream_name": "slurm_resume",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_suspend.log",
+      "log_stream_name": "slurm_suspend",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_fleet_status_manager.log",
+      "log_stream_name": "slurm_fleet_status_manager",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "slurm",
+      "file_path": "/var/log/slurmd.log",
+      "log_stream_name": "slurmd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "slurm",
+      "file_path": "/var/log/slurmctld.log",
+      "log_stream_name": "slurmctld",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "slurm",
+      "file_path": "/var/log/slurmdbd.log",
+      "log_stream_name": "slurmdbd",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/pcluster_dcv_authenticator.log",
+      "log_stream_name": "dcv-authenticator",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/sssd/sssd.log",
+      "log_stream_name": "sssd",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": [
+            "directory_service",
+            "enabled"
+          ],
+          "satisfying_values": ["true"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/sssd/sssd_default.log",
+      "log_stream_name": "sssd_domain_default",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": [
+            "directory_service",
+            "enabled"
+          ],
+          "satisfying_values": ["true"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/pam_ssh_key_generator.log",
+      "log_stream_name": "pam_ssh_key_generator",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": [
+            "directory_service",
+            "generate_ssh_keys_for_users"
+          ],
+          "satisfying_values": ["true"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "bracket_default",
+      "file_path": "/var/log/parallelcluster/pcluster_dcv_connect.log",
+      "log_stream_name": "dcv-ext-authenticator",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/server.log",
+      "log_stream_name": "dcv-server",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/sessionlauncher.log",
+      "log_stream_name": "dcv-session-launcher",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/agent.*.log",
+      "log_stream_name": "dcv-agent",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/dcv-xsession.*.log",
+      "log_stream_name": "dcv-xsession",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/dcv/Xdcv.*.log",
+      "log_stream_name": "Xdcv",
+      "schedulers": [
+        "awsbatch",
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": [
+        {
+          "dna_key": "dcv_enabled",
+          "satisfying_values": ["head_node"]
+        }
+      ]
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/scheduler-plugin.out.log",
+      "log_stream_name": "scheduler-plugin-out",
+      "schedulers": [
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/scheduler-plugin.err.log",
+      "log_stream_name": "scheduler-plugin-err",
+      "schedulers": [
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet",
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/slurm_health_check.log",
+      "log_stream_name": "slurm_health_check",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "json",
+      "file_path": "/var/log/parallelcluster/slurm_health_check.events",
+      "log_stream_name": "slurm_health_check_events",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/clusterstatusmgtd",
+      "log_stream_name": "clusterstatusmgtd",
+      "schedulers": [
+        "slurm",
+        "plugin"
+      ],
+      "platforms": [
+        "centos",
+        "redhat",
+        "ubuntu",
+        "amazon"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    }
+  ],
+  "metric_configs": {
+    "metrics_collected": [
+      {
+        "metric_type": "mem",
+        "measurement": [
+          "mem_used_percent"
+        ],
+        "metrics_collection_interval": 60,
+        "node_roles": [
+          "HeadNode"
+        ]
+      },
+      {
+        "metric_type": "disk",
+        "measurement": [
+          "disk_used_percent"
+        ],
+        "resources": [
+          "/"
+        ],
+        "metrics_collection_interval": 60,
+        "node_roles": [
+          "HeadNode"
+        ]
+      }
+    ],
+    "append_dimensions": [
+      "InstanceId"
+    ],
+    "aggregation_dimensions": [
+      [
+        "InstanceId",
+        "path"
+      ]
+    ]
+  }
+}

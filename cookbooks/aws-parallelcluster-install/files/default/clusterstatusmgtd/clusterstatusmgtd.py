@@ -10,12 +10,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# pylint: disable=W0719
 import functools
 import json
 import logging
 import os
 import shlex
-import subprocess
+
+# A nosec comment is appended to the following line in order to disable the B404 check.
+# In this file the input of the module subprocess is trusted.
+import subprocess  # nosec B404
 import time
 from configparser import ConfigParser
 from datetime import datetime, timezone
@@ -64,7 +68,7 @@ def log_exception(
 ):
     def decorator_log_exception(function):
         @functools.wraps(function)
-        def wrapper_log_expection(*args, **kwargs):
+        def wrapper_log_expection(*args, **kwargs):  # pylint: disable=R1710
             try:
                 return function(*args, **kwargs)
             except catch_exception as e:
@@ -72,8 +76,7 @@ def log_exception(
                 if raise_on_error:
                     if exception_to_raise:
                         raise exception_to_raise
-                    else:
-                        raise
+                    raise
 
         return wrapper_log_expection
 
@@ -101,6 +104,7 @@ def _run_command(  # noqa: C901
             encoding="utf-8",
             env=env,
             timeout=timeout,
+            check=False,
         )
         result.check_returncode()
     except subprocess.CalledProcessError:
@@ -122,7 +126,7 @@ def _run_command(  # noqa: C901
 
 def _write_json_to_file(filename, json_data):
     """Write json to file."""
-    with open(filename, "w") as file:
+    with open(filename, "w", encoding="utf-8") as file:
         file.write(json.dumps(json_data))
 
 
@@ -156,7 +160,7 @@ class ComputeFleetStatus(Enum):
             )
             return compute_fleet_data
         except AttributeError as e:
-            raise Exception("Unable to parse compute fleet status data: %s", e)
+            raise Exception(f"Unable to parse compute fleet status data: {e}")
 
     @staticmethod
     def is_start_in_progress(status):  # noqa: D102
@@ -203,6 +207,11 @@ class ComputeFleetStatusManager:
 
         pass
 
+    class FleetDataNotFoundError(Exception):
+        """Raised when compute fleet data cannot be found in db table."""
+
+        pass
+
     def __init__(self, table_name, boto3_config, region):
         self._ddb_resource = boto3.resource("dynamodb", region_name=region, config=boto3_config)
         self._table = self._ddb_resource.Table(table_name)
@@ -213,7 +222,7 @@ class ComputeFleetStatusManager:
             Key={"Id": self.DB_KEY},
         )
         if not compute_fleet_item or "Item" not in compute_fleet_item:
-            raise Exception("COMPUTE_FLEET data not found in db table")
+            raise ComputeFleetStatusManager.FleetDataNotFoundError("COMPUTE_FLEET data not found in db table")
 
         log.debug("Found COMPUTE_FLEET data (%s)", compute_fleet_item)
         return compute_fleet_item["Item"].get(self.DB_DATA)
@@ -276,7 +285,8 @@ class ClusterstatusmgtdConfig:
         """Get clusterstatusmgtd configuration."""
         log.info("Reading %s", config_file_path)
         self._config = ConfigParser()
-        self._config.read_file(open(config_file_path, "r"))
+        with open(config_file_path, "r", encoding="utf-8") as config_file:
+            self._config.read_file(config_file)
 
         # Get config settings
         self._get_basic_config(self._config)
@@ -319,6 +329,11 @@ class ClusterStatusManager:
         self._compute_fleet_data = {}
         self.set_config(config)
 
+    class ClusterStatusUpdateEventError(Exception):
+        """Raised when there is a failure in updating the status due to an error on update event handler execution."""
+
+        pass
+
     def set_config(self, config):  # noqa: D102
         if self._config != config:
             log.info("Applying new clusterstatusmgtd config: %s", config)
@@ -341,7 +356,7 @@ class ClusterStatusManager:
             )
         except Exception as e:
             log.error(
-                "Failed when retrieving computefleet status from DynamoDB with error %s, " "using fallback value %s",
+                "Failed when retrieving computefleet status from DynamoDB with error %s, using fallback value %s",
                 e,
                 fallback,
             )
@@ -356,11 +371,13 @@ class ClusterStatusManager:
 
     def _call_update_event(self):
         try:
-            compute_fleet_data = ComputeFleetStatus._transform_compute_fleet_data(self._compute_fleet_data)
+            compute_fleet_data = ComputeFleetStatus._transform_compute_fleet_data(  # pylint: disable=W0212
+                self._compute_fleet_data
+            )
             _write_json_to_file(self._config.computefleet_status_path, compute_fleet_data)
         except Exception as e:
             log.error("Update event handler failed during fleet status translation: %s", e)
-            raise
+            raise ClusterStatusManager.ClusterStatusUpdateEventError(e)
 
         cinc_log_file = "/var/log/chef-client.log"
         log.info("Calling update event handler, log can be found at %s", cinc_log_file)
@@ -377,10 +394,11 @@ class ClusterStatusManager:
             "--override-runlist aws-parallelcluster::update_computefleet_status"
         )
         try:
+            # The command being passed has been built from string literals and local variables and can be trusted.
             _run_command(cmd, self._config.update_event_timeout_minutes)
-        except Exception:
+        except Exception as e:
             log.error("Update event handler failed. Check log file %s", cinc_log_file)
-            raise
+            raise ClusterStatusManager.ClusterStatusUpdateEventError(e)
 
     def _update_status(self, request_status, in_progress_status, final_status):
         if self._compute_fleet_status == request_status:
@@ -440,7 +458,7 @@ def _run_clusterstatusmgtd(config_file):
             fileConfig(config.logging_config, disable_existing_loggers=False)
         except Exception as e:
             log.warning(
-                "Unable to configure logging from %s, " "using default logging settings.\nException: %s",
+                "Unable to configure logging from %s, using default logging settings.\nException: %s",
                 config.logging_config,
                 e,
             )

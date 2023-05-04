@@ -75,3 +75,4 @@ Scheduling:
     Scheduler: slurm
     SlurmSettings:
         ScaledownIdletime: 10
+        Database: null

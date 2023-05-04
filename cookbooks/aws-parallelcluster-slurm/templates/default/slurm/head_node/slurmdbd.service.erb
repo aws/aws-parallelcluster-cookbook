@@ -1,0 +1,15 @@
+[Unit]
+Description=Slurm DBD accounting daemon
+After=network-online.target munge.service mysql.service mysqld.service mariadb.service
+Wants=network-online.target
+ConditionPathExists=<%= node['cluster']['slurm']['install_dir'] %>/etc/slurmdbd.conf
+
+[Service]
+Type=simple
+EnvironmentFile=-/etc/sysconfig/slurmdbd
+ExecStart=<%= node['cluster']['slurm']['install_dir'] %>/sbin/slurmdbd -D -s $SLURMDBD_OPTIONS
+ExecReload=/bin/kill -HUP $MAINPID
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

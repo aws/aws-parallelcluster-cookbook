@@ -1,0 +1,9 @@
+AuthType=auth/munge
+LogFile=/var/log/slurmdbd.log
+DbdPort=6819
+SlurmUser=<%= node['cluster']['slurm']['user'] %>
+StorageType=accounting_storage/mysql
+
+# WARNING!!! The slurm_parallelcluster_slurmdbd.conf file included below can be updated by the pcluster process.
+# Please do not edit it.
+include slurm_parallelcluster_slurmdbd.conf

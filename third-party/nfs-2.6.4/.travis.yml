@@ -1,8 +1,0 @@
-language: ruby
-rvm:
-  - 2.5.1
-before_install:
-  - echo "rubygems 2.7.5 - https://github.com/berkshelf/berkshelf/issues/1744"
-  - gem update --system 2.7.5
-install: bundle install --without integration
-script: bundle exec rake

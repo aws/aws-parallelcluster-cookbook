@@ -1,0 +1,29 @@
+# Use boxes mirrored by OSUOSL to by-pass Hashicorp rate limiting on GitHub Actions
+platforms:
+  - name: centos-7
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/centos-7.box
+  - name: centos-8
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/centos-8.box
+  - name: centos-stream-8
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/centos-stream-8.box
+  - name: debian-9
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/debian-9.box
+  - name: debian-10
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/debian-10.box
+  - name: debian-11
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/debian-11.box
+  - name: fedora-latest
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/fedora-latest.box
+  - name: ubuntu-18.04
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/ubuntu-18.04.box
+  - name: ubuntu-20.04
+    driver:
+      box_url: https://ftp.osuosl.org/pub/sous-chefs/bento/ubuntu-20.04.box

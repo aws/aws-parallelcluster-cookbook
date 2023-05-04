@@ -63,7 +63,7 @@ if node['cluster']['enable_nss_slurm'] == 'true'
   end
 
   file '/etc/nss_slurm.conf' do
-    content("NodeName=#{hit_slurm_nodename}")
+    content("NodeName=#{slurm_nodename}")
     mode '0644'
     owner 'root'
     group 'root'

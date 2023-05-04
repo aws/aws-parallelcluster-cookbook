@@ -26,7 +26,7 @@ def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
     mode '0744'
     retries 3
     retry_delay 5
-    not_if { ::File.exist?(dest_path) }
+    action :create_if_missing
   end
 end
 

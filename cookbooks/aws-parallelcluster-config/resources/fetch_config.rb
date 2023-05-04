@@ -18,6 +18,8 @@ action :run do
       fetch_cluster_config(node['cluster']['cluster_config_path'])
       fetch_change_set
       fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
+      Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
+      ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
     else
       fetch_cluster_config(node['cluster']['cluster_config_path']) unless ::File.exist?(node['cluster']['cluster_config_path'])
       fetch_instance_type_data unless ::File.exist?(node['cluster']['instance_types_data_path'])
@@ -49,9 +51,16 @@ action_class do # rubocop:disable Metrics/BlockLength
   end
 
   def fetch_cluster_config(config_path)
-    # Copy cluster config file from S3 URI
-    version_id = node['cluster']['cluster_config_version'] unless node['cluster']['cluster_config_version'].nil?
-    fetch_s3_object("copy_cluster_config_from_s3", node['cluster']['cluster_config_s3_key'], config_path, version_id)
+    if kitchen_test? && !node['interact_with_s3']
+      remote_file "copy fake cluster config" do
+        path node['cluster']['cluster_config_path']
+        source "file://#{kitchen_cluster_config_path}"
+      end
+    else
+      # Copy cluster config file from S3 URI
+      version_id = node['cluster']['cluster_config_version'] unless node['cluster']['cluster_config_version'].nil?
+      fetch_s3_object("copy_cluster_config_from_s3", node['cluster']['cluster_config_s3_key'], config_path, version_id)
+    end
   end
 
   def fetch_change_set
@@ -60,7 +69,14 @@ action_class do # rubocop:disable Metrics/BlockLength
   end
 
   def fetch_instance_type_data
-    # Copy instance type infos file from S3 URI
-    fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'])
+    if kitchen_test? && !node['interact_with_s3']
+      remote_file "copy fake instance type data" do
+        path node['cluster']['instance_types_data_path']
+        source "file://#{kitchen_instance_types_data_path}"
+      end
+    else
+      # Copy instance type infos file from S3 URI
+      fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'])
+    end
   end
 end

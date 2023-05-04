@@ -1,0 +1,245 @@
+# Allows to test single resources.
+#
+# Must be run as local file (override) of kitchen.docker.yml
+# export KITCHEN_YAML=kitchen.docker.yml
+# export KITCHEN_LOCAL_YAML=kitchen.resources.yml
+# See: https://kitchen.ci/docs/reference/configuration
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # resource tests will use controls from this directory
+    - path: test/resources
+
+# If you need to test a resource with recipe/resources dependencies,
+# add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
+# then define a dependencies attribute, listing them with recipe: or resource: prefix.
+# You can find an example in the add_depdendencies.rb file.
+suites:
+  - name: install_packages
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - install_packages
+    attributes:
+      dependencies:
+        - resource:package_repos
+      resource: install_packages
+  - name: c_states
+    run_list:
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - c_states_kernel_configured
+    attributes:
+      resource: c_states
+  - name: ec2_udev_rules
+    run_list:
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - write_common_udev_configuration_files
+        - /ec2blkdev_service_installation/
+        - debian_udevd_reload_configuration
+    attributes:
+      resource: ec2_udev_rules
+  - name: mysql_client
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - mysql_client_installed
+        - mysql_client_source_node_created
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::directories
+      resource: mysql_client
+  - name: nfs
+    run_list:
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - nfs_installed_with_right_version
+    attributes:
+      resource: nfs
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+  - name: sticky_bits
+    run_list:
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - sticky_bits_configured
+    attributes:
+      resource: sticky_bits
+  - name: slurm_dependencies
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - slurm_dependencies_installed
+    attributes:
+      resource: slurm_dependencies
+      dependencies:
+        - resource:package_repos
+  - name: jwt_dependencies
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - jwt_dependencies_installed
+    attributes:
+      resource: jwt_dependencies
+      dependencies:
+        - resource:package_repos
+  - name: efa_setup
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - efa_conflicting_packages_removed
+        - efa_prereq_packages_installed
+        - efa_installed
+    attributes:
+      resource: efa:setup
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+  - name: munge
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - munge_installed
+        - munge_user_and_group_created
+        - munge_folders_created
+        - munge_init_script_configured
+    attributes:
+      resource: munge
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: stunnel_installed
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - stunnel_installed
+    attributes:
+      resource: stunnel:setup
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: dns_domain_setup
+    run_list:
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - dns_domain_setup
+    attributes:
+      resource: dns_domain
+  - name: ephemeral_drives
+    run_list:
+      - recipe[aws-parallelcluster-install::test_resource]
+    attributes:
+      resource: ephemeral_drives
+    verifier:
+      controls:
+        - ephemeral_drives_logical_volumes_manager_installed
+        - ephemeral_drives_script_created
+        - ephemeral_service_set_up
+        - ephemeral_service_after_network_config
+  - name: system_authentication
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - system_authentication_packages_installed
+    attributes:
+      resource: system_authentication
+      dependencies:
+        - resource:package_repos
+  - name: cloudwatch
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /^cloudwatch/
+    attributes:
+      resource: cloudwatch
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - resource:node_attributes
+  - name: arm_pl
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /^arm_pl/
+    driver:
+      # arm_pl can be executed only on arm instance example: c6g.large
+      instance_type: c6g.large
+    attributes:
+      resource: arm_pl
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+  - name: modules
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - modules_installed
+    attributes:
+      resource: modules
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:node_attributes
+  - name: build_tools
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - build_tools_installed
+    attributes:
+      resource: build_tools
+      dependencies:
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:node_attributes
+  - name: dcv
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /^dcv/
+    attributes:
+      resource: dcv
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - resource:node_attributes
+      cluster:
+        is_official_ami_build: true
+    driver:
+      instance_type: t3.medium
+

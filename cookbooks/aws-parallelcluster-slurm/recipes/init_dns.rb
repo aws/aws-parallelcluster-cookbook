@@ -23,28 +23,9 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
   if !node['cluster']['dns_domain'].nil? && !node['cluster']['dns_domain'].empty?
     # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
     # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
-    if platform?('ubuntu')
-
-      Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/systemd/resolved.conf")
-      # Configure resolved to automatically append Route53 search domain in resolv.conf.
-      # On Ubuntu18 resolv.conf is managed by systemd-resolved.
-      replace_or_add "append Route53 search domain in /etc/systemd/resolved.conf" do
-        path "/etc/systemd/resolved.conf"
-        pattern "Domains=*"
-        line "Domains=#{node['cluster']['dns_domain']}"
-      end
-    else
-
-      Chef::Log.info("Appending search domain '#{node['cluster']['dns_domain']}' to /etc/dhcp/dhclient.conf")
-      # Configure dhclient to automatically append Route53 search domain in resolv.conf
-      # - on CentOS7 and Alinux2 resolv.conf is managed by NetworkManager + dhclient,
-      replace_or_add "append Route53 search domain in /etc/dhcp/dhclient.conf" do
-        path "/etc/dhcp/dhclient.conf"
-        pattern "append domain-name*"
-        line "append domain-name \" #{node['cluster']['dns_domain']}\";"
-      end
+    dns_domain 'configure dns name resolution' do
+      action :configure
     end
-    restart_network_service
   end
 
   if node['cluster']['node_type'] == "ComputeFleet"
@@ -53,7 +34,7 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
     # - fqdn: $QUEUE-st-$INSTANCE_TYPE_1-[1-$MIN1].$CLUSTER_NAME.pcluster
     ruby_block "retrieve assigned hostname" do
       block do
-        assigned_hostname = hit_slurm_nodename
+        assigned_hostname = slurm_nodename
         node.force_default['cluster']['assigned_short_hostname'] = assigned_hostname.to_s
 
         if node['cluster']['dns_domain'].nil? || node['cluster']['dns_domain'].empty?
@@ -82,6 +63,9 @@ else
 end
 
 # Configure short hostname
+# setting the hostname requires root privileges, however by default docker containers are launched with limited root
+# privileges, so this command will fail.
+# Skipping this check in containers.
 hostname "set short hostname" do
   compile_time false
   hostname(lazy { node['cluster']['assigned_short_hostname'] })
@@ -93,10 +77,17 @@ ohai 'reload_hostname' do
   action :nothing
 end
 
+# Delete all local ips in /etc/hosts
+node['ec2']['network_interfaces_macs'].each_value do |mac|
+  delete_lines "delete #{mac['local_ipv4s']} in the /etc/hosts" do
+    path "/etc/hosts"
+    pattern "^#{mac['local_ipv4s']}\s+"
+  end
+end
+
 # Configure fqdn in /etc/hosts
-replace_or_add "set fqdn in the /etc/hosts" do
+append_if_no_line "Append primary ip to /etc/hosts" do
   path "/etc/hosts"
-  pattern "^#{node['ec2']['local_ipv4']}\s+"
-  line(lazy { "#{node['ec2']['local_ipv4']} #{node['cluster']['assigned_hostname']} #{node['cluster']['assigned_short_hostname']}" })
+  line(lazy { "#{get_primary_ip} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
   notifies :reload, "ohai[reload_hostname]"
 end

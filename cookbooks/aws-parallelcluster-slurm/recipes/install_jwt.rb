@@ -15,36 +15,21 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-jwt_version = node['cluster']['jwt']['version']
+jwt_version = '1.12.0'
+jwt_url = "https://github.com/benmcollins/libjwt/archive/refs/tags/v#{jwt_version}.tar.gz"
 jwt_tarball = "#{node['cluster']['sources_dir']}/libjwt-#{jwt_version}.tar.gz"
+jwt_sha256 = 'eaf5d8b31d867c02dde767efa2cf494840885a415a3c9a62680bf870a4511bee'
 
 remote_file jwt_tarball do
-  source node['cluster']['jwt']['url']
+  source jwt_url
   mode '0644'
   retries 3
   retry_delay 5
-  not_if { ::File.exist?(jwt_tarball) }
+  checksum jwt_sha256
+  action :create_if_missing
 end
 
-ruby_block "Validate libjwt Tarball Checksum" do
-  block do
-    require 'digest'
-    checksum = Digest::SHA1.file(jwt_tarball).hexdigest # nosemgrep
-    raise "Downloaded Tarball Checksum #{checksum} does not match expected checksum #{node['cluster']['jwt']['sha1']}" if checksum != node['cluster']['jwt']['sha1']
-  end
-end
-
-jwt_build_deps = value_for_platform(
-  'ubuntu' => {
-    'default' => 'libjansson-dev',
-  },
-  'default' => 'jansson-devel'
-)
-
-package jwt_build_deps do
-  retries 3
-  retry_delay 5
-end
+jwt_dependencies 'Install jwt dependencies'
 
 bash 'libjwt' do
   user 'root'
@@ -60,4 +45,4 @@ bash 'libjwt' do
     make -j $CORES
     sudo make install
   LIBJWT
-end
+end unless redhat_ubi?

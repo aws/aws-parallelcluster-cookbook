@@ -1,0 +1,25 @@
+{
+    "queue1": {
+        "cr1": null,
+        "cr2": null
+    },
+    "queue2": {
+        "cr1": "c5n.4xlarge",
+        "cr2": null
+    },
+    "queue3": {
+        "cr1": "c5n.18xlarge"
+    },
+    "queue4": {
+        "cr1": null
+    },
+    "queue5": {
+        "cr1": null
+    },
+    "queue6": {
+        "cr1": null
+    },
+    "queue7": {
+        "cr1": null
+    }
+}

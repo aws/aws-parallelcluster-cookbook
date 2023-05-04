@@ -123,21 +123,18 @@ class TestComputeFleetStatusManager:
         return status_manager
 
     @pytest.mark.parametrize(
-        "get_item_response, expected_status",
+        "get_item_response, expected_exception, expected_status",
         [
-            ({"Item": {"Id": "COMPUTE_FLEET", "Data": {"status": "RUNNING"}}}, {"status": "RUNNING"}),
-            (
-                Exception,
-                None,
-            ),
+            ({"Item": {"Id": "COMPUTE_FLEET", "Data": {"status": "RUNNING"}}}, None, {"status": "RUNNING"}),
+            ({"NoData": "NoValue"}, ComputeFleetStatusManager.FleetDataNotFoundError, Exception()),
         ],
         ids=["success", "exception"],
     )
-    def test_get_status(self, compute_fleet_status_manager, get_item_response, expected_status):
+    def test_get_status(self, compute_fleet_status_manager, get_item_response, expected_exception, expected_status):
         """Test get_status method."""
-        if get_item_response is Exception:
+        if isinstance(expected_status, Exception):
             compute_fleet_status_manager._table.get_item.side_effect = get_item_response
-            with pytest.raises(Exception):
+            with pytest.raises(expected_exception):
                 compute_fleet_status_manager.get_status()
         else:
             compute_fleet_status_manager._table.get_item.return_value = get_item_response
@@ -229,7 +226,7 @@ class TestClusterstatusmgtdConfig:
         for key in expected_attributes:
             assert_that(sync_config.__dict__.get(key)).is_equal_to(expected_attributes.get(key))
 
-    def test_config_comparison(self, test_datadir, mocker):
+    def test_config_comparison(self, test_datadir):
         """Test configs comparison."""
         config = test_datadir / "config.conf"
         config_modified = test_datadir / "config_modified.conf"
@@ -238,8 +235,8 @@ class TestClusterstatusmgtdConfig:
         assert_that(ClusterstatusmgtdConfig(config)).is_not_equal_to(ClusterstatusmgtdConfig(config_modified))
 
 
-@pytest.fixture()
-def initialize_compute_fleet_status_manager_mock(mocker):
+@pytest.fixture(name="initialize_compute_fleet_status_manager_mock")
+def fixture_initialize_compute_fleet_status_manager_mock(mocker):
     compute_fleet_status_manager_mock = mocker.Mock(spec=ComputeFleetStatusManager)
     compute_fleet_status_manager_mock.get_status.return_value = ComputeFleetStatus.RUNNING
     compute_fleet_status_manager_mock.COMPUTE_FLEET_STATUS_ATTRIBUTE = (
@@ -398,7 +395,7 @@ class TestClusterStatusManager:
         run_command_mock = mocker.patch("clusterstatusmgtd._run_command")
         if isinstance(exception, Exception):
             run_command_mock.side_effect = exception
-            with pytest.raises(Exception):
+            with pytest.raises(ClusterStatusManager.ClusterStatusUpdateEventError):
                 clusterstatus_manager._call_update_event()
         else:
             file_writer_mock = mocker.mock_open()
@@ -406,7 +403,7 @@ class TestClusterStatusManager:
 
             clusterstatus_manager._call_update_event()
 
-            file_writer_mock.assert_called_once_with(computeflee_json_path, "w")
+            file_writer_mock.assert_called_once_with(computeflee_json_path, "w", encoding="utf-8")
             file_writer_mock().write.assert_called_once_with(translated_status)
             run_command_mock.assert_called_once_with(cmd, 1)
 

@@ -17,7 +17,14 @@
 
 execute 'stop clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
+end
+
+ruby_block "update_shared_storages" do
+  block do
+    run_context.include_recipe 'aws-parallelcluster-config::update_shared_storages'
+  end
+  only_if { are_mount_or_unmount_required? }
 end
 
 ruby_block "replace slurm queue nodes" do
@@ -75,16 +82,31 @@ ruby_block "replace slurm queue nodes" do
     end
   end
 
-  def get_queues_with_changes
+  def get_all_queues(config)
+    # Get all queue names from the cluster config
+    slurm_queues = config.dig("Scheduling", "SlurmQueues")
+    queues_name = Set.new
+    slurm_queues.each do |queue|
+      queues_name.add(queue["Name"])
+    end
+    queues_name
+  end
+
+  def get_queues_with_changes(config)
     # Load change set and find queue with changes
     queues = Set.new
     change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
     Chef::Log.debug("Loaded change set (#{change_set})")
-    change_set["changeSet"].each do |change|
-      next unless change["updatePolicy"] == "QUEUE_UPDATE_STRATEGY"
-      queue = change["parameter"][/Scheduling\.SlurmQueues\[([^\]]*)\]/, 1]
-      Chef::Log.info("Adding queue (#{queue}) to list of queue to be updated")
-      queues.add(queue)
+    if are_mount_or_unmount_required? # Changes with SHARED_STORAGE_UPDATE_POLICY require all queues to update
+      queues = get_all_queues(config)
+      Chef::Log.info("All queues will be updated in order to update shared storages")
+    else
+      change_set["changeSet"].each do |change|
+        next unless change["updatePolicy"] == "QUEUE_UPDATE_STRATEGY"
+        queue = change["parameter"][/Scheduling\.SlurmQueues\[([^\]]*)\]/, 1]
+        Chef::Log.info("Adding queue (#{queue}) to list of queue to be updated")
+        queues.add(queue)
+      end
     end
     queues
   end
@@ -115,7 +137,7 @@ ruby_block "replace slurm queue nodes" do
         Chef::Log.info("Queue update strategy is (#{queue_update_strategy}), doing nothing")
       when "DRAIN", "TERMINATE"
         Chef::Log.info("Queue update strategy is (#{queue_update_strategy})")
-        queues = get_queues_with_changes
+        queues = get_queues_with_changes(config)
         update_nodes_in_queue(queue_update_strategy, queues)
       else
         Chef::Log.info("Queue update strategy not managed, no-op")
@@ -132,8 +154,33 @@ execute "generate_pcluster_slurm_configs" do
           " --instance-types-data #{node['cluster']['instance_types_data_path']}" \
           " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']}" \
           " #{nvidia_installed? ? '' : '--no-gpu'}"\
-          " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
+          " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
+          " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
+          " --cluster-name #{node['cluster']['stack_name']}"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
+end
+
+# Generate custom Slurm settings include files
+execute "generate_pcluster_custom_slurm_settings_include_files" do
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py" \
+            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
+            " --input-file #{node['cluster']['cluster_config_path']}"
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_bulk_custom_slurm_settings_updated? }
+end
+
+# If defined in the config, retrieve a remote Custom Slurm Settings file and overrides the existing one
+ruby_block "Override Custom Slurm Settings with remote file" do
+  block do
+    run_context.include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file'
+  end
+  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :CustomSlurmSettingsIncludeFile).nil? }
+end
+
+execute "generate_pcluster_fleet_config" do
+  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
+          " --output-file #{node['cluster']['slurm']['fleet_config_path']}"\
+          " --input-file #{node['cluster']['cluster_config_path']}"
+  not_if { ::File.exist?(node['cluster']['slurm']['fleet_config_path']) && !are_queues_updated? }
 end
 
 replace_or_add "update node replacement timeout" do
@@ -143,24 +190,61 @@ replace_or_add "update node replacement timeout" do
   replace_only true
 end
 
+ruby_block "Update Slurm Accounting" do
+  block do
+    if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
+      run_context.include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
+    else
+      run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+    end
+  end
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
+end unless virtualized?
+
+# The previous execute "generate_pcluster_slurm_configs" block resource may have overridden the slurmdbd password in
+# slurm_parallelcluster_slurmdbd.conf with a default value, so if it has run and Slurm accounting
+# is enabled we must pull the database password from Secrets Manager once again.
+execute "update Slurm database password" do
+  user 'root'
+  group 'root'
+  command "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh"
+  # This horrible only_if guard is needed to cover all cases that trigger "generate_pcluster_slurm_settings", in the case Slurm accounting is being used
+  only_if { !(::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated?) && !node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+end
+
 service 'slurmctld' do
   action :restart
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 chef_sleep '5'
+
+# The slurmctld service does not return an error code to `systemctl start slurmctld`, so
+# we must explicitly check the status of the service to capture failures
+execute "check slurmctld status" do
+  command "systemctl is-active --quiet slurmctld.service"
+  retries 5
+  retry_delay 2
+end
 
 execute 'reload config for running nodes' do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
   retry_delay 5
   timeout 300
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 chef_sleep '15'
 
 execute 'start clustermgtd' do
   command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
+end
+
+# The updated cfnconfig will be used by post update custom scripts
+template '/etc/parallelcluster/cfnconfig' do
+  source 'init/cfnconfig.erb'
+  cookbook 'aws-parallelcluster-config'
+  mode '0644'
 end

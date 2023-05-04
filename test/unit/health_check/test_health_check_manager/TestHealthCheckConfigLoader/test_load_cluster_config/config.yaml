@@ -1,0 +1,148 @@
+AdditionalPackages: null
+AdditionalResources: null
+CustomS3Bucket: null
+DeploymentSettings: null
+DevSettings: null
+DirectoryService: null
+HeadNode:
+  CustomActions: null
+  Dcv: null
+  DisableSimultaneousMultithreading: false
+  Iam:
+    AdditionalIamPolicies:
+      - Policy: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    InstanceProfile: null
+    InstanceRole: null
+    S3Access: null
+  Image: null
+  Imds:
+    Secured: true
+  InstanceType: c5.2xlarge
+  LocalStorage:
+    EphemeralVolume: null
+    RootVolume:
+      DeleteOnTermination: true
+      Encrypted: true
+      Iops: 3000
+      Size: null
+      Throughput: 125
+      VolumeType: gp3
+  Networking:
+    AdditionalSecurityGroups: null
+    ElasticIp: null
+    Proxy: null
+    SecurityGroups: null
+    SubnetId: subnet-044bb58d0b594c6ac
+  Ssh:
+    AllowedIps: 0.0.0.0/0
+    KeyName: carrogu-us-east-1
+Iam: null
+Image:
+  CustomAmi: null
+  Os: alinux2
+Imds:
+  ImdsSupport: v1.0
+Monitoring:
+  Dashboards:
+    CloudWatch:
+      Enabled: true
+  DetailedMonitoring: false
+  Logs:
+    CloudWatch:
+      DeletionPolicy: Retain
+      Enabled: true
+      RetentionInDays: 14
+Region: eu-west-1
+Scheduling:
+  Scheduler: slurm
+  SlurmQueues:
+    - AllocationStrategy: lowest-price
+      CapacityReservationTarget: null
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - CapacityReservationTarget: null
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: false
+            GdrSupport: false
+          Instances:
+            - InstanceType: g4dn.12xlarge
+          MaxCount: 4
+          MinCount: 0
+          Name: c1
+          Networking:
+            PlacementGroup:
+              Enabled: null
+              Id: null
+              Name: null
+          SchedulableMemory: null
+          SpotPrice: null
+          HealthChecks:
+            Gpu:
+              Enabled: true
+        - CapacityReservationTarget: null
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: false
+            GdrSupport: false
+          Instances:
+            - InstanceType: c5.12xlarge
+          MaxCount: 1
+          MinCount: 0
+          Name: c2
+          Networking:
+            PlacementGroup:
+              Enabled: null
+              Id: null
+              Name: null
+          SchedulableMemory: null
+          SpotPrice: null
+          HealthChecks:
+            Gpu:
+              Enabled: true
+      ComputeSettings:
+        LocalStorage:
+          EphemeralVolume: null
+          RootVolume:
+            Encrypted: true
+            Iops: 3000
+            Size: null
+            Throughput: 125
+            VolumeType: gp3
+      CustomActions: null
+      Iam:
+        AdditionalIamPolicies: []
+        InstanceProfile: null
+        InstanceRole: null
+        S3Access: null
+      Image: null
+      Name: q1
+      Networking:
+        AdditionalSecurityGroups: null
+        AssignPublicIp: null
+        PlacementGroup:
+          Enabled: null
+          Id: null
+          Name: null
+        Proxy: null
+        SecurityGroups: null
+        SubnetIds:
+          - subnet-044bb58d0b594c6ac
+      HealthChecks:
+        Gpu:
+          Enabled: null
+  SlurmSettings:
+    Database: null
+    Dns:
+      DisableManagedDns: false
+      HostedZoneId: null
+      UseEc2Hostnames: false
+    EnableMemoryBasedScheduling: false
+    QueueUpdateStrategy: COMPUTE_FLEET_STOP
+    ScaledownIdletime: 10
+SharedStorage: null
+Tags:
+  - Key: parallelcluster:cluster-name
+    Value: ui-test
+  - Key: parallelcluster:version
+    Value: 3.5.0

@@ -1,8 +1,10 @@
 stack_name=<%= node['cluster']['stack_name'] %>
-cfn_preinstall=<%= node['cluster']['preinstall'] %>
-cfn_preinstall_args=(<%= node['cluster']['preinstall_args'] %>)
-cfn_postinstall=<%= node['cluster']['postinstall'] %>
-cfn_postinstall_args=(<%= node['cluster']['postinstall_args'] %>)
+cfn_preinstall="<%= node['cluster']['scripts_dir']  %>/fetch_and_run --execute-via-cfnconfig -preinstall"
+cfn_preinstall_args=()
+cfn_postinstall="<%= node['cluster']['scripts_dir']  %>/fetch_and_run --execute-via-cfnconfig -postinstall"
+cfn_postinstall_args=()
+cfn_postupdate="<%= node['cluster']['scripts_dir']  %>/fetch_and_run --execute-via-cfnconfig -postupdate"
+cfn_postupdate_args=()
 cfn_region=<%= node['cluster']['region'] %>
 cfn_scheduler=<%= node['cluster']['scheduler'] %>
 cfn_scheduler_slots=<%= node['cluster']['scheduler_slots'] %>

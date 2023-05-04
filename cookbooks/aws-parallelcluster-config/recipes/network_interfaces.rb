@@ -15,21 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-def network_interface_macs(token)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
-  res = get_metadata_with_token(token, uri)
-  res.delete("/").split("\n")
-end
-
 def device_name(mac)
   cmd = Mixlib::ShellOut.new("ip -o link | grep #{mac} | awk '{print substr($2, 1, length($2) -1)}'")
   cmd.run_command
   cmd.stdout.delete("\n")
-end
-
-def device_number(mac, token)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
-  get_metadata_with_token(token, uri)
 end
 
 def device_ip(mac, token)
@@ -73,14 +62,14 @@ if macs.length > 1
   end
 
   # Configure nw interfaces
-  macs.each do |mac|
+  macs.each_with_index do |mac, device_number|
     device_name = device_name(mac)
-    device_number = device_number(mac, token)
     gw_ip_address = gateway_address
     device_ip_address = device_ip(mac, token)
     cidr_prefix_length = cidr_prefix_length(mac, token)
     netmask = cidr_to_netmask(cidr_prefix_length)
     cidr_block = subnet_cidr_block(mac, token)
+    log "device_number: #{device_number}, device_name: #{device_name}, device_ip_address: #{device_ip_address}"
 
     execute 'configure_nw_interface' do
       user 'root'
@@ -88,7 +77,7 @@ if macs.length > 1
       cwd "/tmp"
       environment(
         'DEVICE_NAME' => device_name,
-        'DEVICE_NUMBER' => device_number,
+        'DEVICE_NUMBER' => "#{device_number}",
         'GW_IP_ADDRESS' => gw_ip_address,
         'DEVICE_IP_ADDRESS' => device_ip_address,
         'CIDR_PREFIX_LENGTH' => cidr_prefix_length,
@@ -101,5 +90,7 @@ if macs.length > 1
   end
 
   # Apply configuration
-  reload_network_config
+  network_service 'Reload network configuration' do
+    action :reload
+  end
 end

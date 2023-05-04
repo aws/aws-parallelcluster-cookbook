@@ -1,0 +1,7 @@
+---
+name: permissive_resource
+title: Permissive resource suite tests for the SELinux cookbook
+
+depends:
+  - name: common
+    path: test/integration/common

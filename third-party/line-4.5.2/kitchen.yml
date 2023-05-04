@@ -1,0 +1,71 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_infra
+  deprecations_as_errors: true
+  enforce_idempotency: true
+  multiple_converge: 2
+  chef_license: accept-no-persist
+
+verifier: inspec
+
+platforms:
+  - name: debian-9
+  - name: debian-10
+  - name: centos-7
+  - name: centos-8
+  - name: centos-stream-8
+  - name: fedora-latest
+  - name: ubuntu-20.04
+  - name: ubuntu-21.04
+  - name: amazonlinux-2
+
+suites:
+  - name: add_to_list
+    run_list:
+      - recipe[test::add_to_list_1d]
+      - recipe[test::add_to_list_1d_terminal]
+      - recipe[test::add_to_list_2d]
+      - recipe[test::add_to_list_2d_terminal]
+      - recipe[test::add_to_list_3d]
+      - recipe[test::add_to_list_3d_terminal]
+      - recipe[test::add_to_list_empty]
+  - name: append_if_no_line
+    run_list:
+      - recipe[test::append_if_no_line_empty]
+      - recipe[test::append_if_no_line_single_line]
+      - recipe[test::append_if_no_line_template]
+  - name: delete_from_list
+    run_list:
+      - recipe[test::delete_from_list_1d]
+      - recipe[test::delete_from_list_2d]
+      - recipe[test::delete_from_list_3d]
+      - recipe[test::delete_from_list_empty]
+  - name: delete_lines
+    run_list:
+      - recipe[test::delete_lines_empty]
+      - recipe[test::delete_lines_regexp]
+      - recipe[test::delete_lines_string]
+  - name: filter_lines
+    run_list:
+      - recipe[test::filter_lines_after]
+      - recipe[test::filter_lines_before]
+      - recipe[test::filter_lines_between]
+      - recipe[test::filter_lines_comment]
+      - recipe[test::filter_lines_delete_between]
+      - recipe[test::filter_lines_inline]
+      - recipe[test::filter_lines_multi]
+      - recipe[test::filter_lines_misc]
+      - recipe[test::filter_lines_replace]
+      - recipe[test::filter_lines_replace_between]
+      - recipe[test::filter_lines_stanza]
+      - recipe[test::filter_lines_substitute]
+  - name: replace_or_add
+    run_list:
+      - recipe[test::replace_or_add_add_a_line_matching_pattern]
+      - recipe[test::replace_or_add_change_line_eof]
+      - recipe[test::replace_or_add_duplicate]
+      - recipe[test::replace_or_add_missing_file]
+      - recipe[test::replace_or_add_replace_only]

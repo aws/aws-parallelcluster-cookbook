@@ -78,3 +78,4 @@ Scheduling:
     SlurmSettings:
         ScaledownIdletime: 10
         EnableMemoryBasedScheduling: true
+        Database: null

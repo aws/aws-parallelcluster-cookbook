@@ -31,14 +31,18 @@ END
 # NOTE: In Ubuntu 20.04 all network interfaces are already configured in 50-cloud-init.yaml with dhcp4 enabled.
 # However, the specific configuration files created below (in the same way of Ubuntu 18) will override these initial
 # settings, as can be verified with the command `netplan get`
-if [ "${DEVICE_NUMBER}" = "0" ]
+grep "${DEVICE_NAME}:" /etc/netplan/50-cloud-init.yaml 1>/dev/null && STATIC_IP_CONFIG=""
+if [ "${STATIC_IP_CONFIG}" = "" ]
   then
-    echo "Device 0 is dhcp managed in current plaform"
-    STATIC_IP_CONFIG=""
+    echo "Device ${DEVICE_NAME} is dhcp managed in current platform"
+  else
+    echo "Device ${DEVICE_NAME} IP address will be set to ${DEVICE_IP_ADDRESS}"
 fi
 
 FILE="/etc/netplan/${DEVICE_NAME}.yaml"
 ROUTE_TABLE="100${DEVICE_NUMBER}"
+
+echo "Configuring ${DEVICE_NAME} with IP:${DEVICE_IP_ADDRESS} CIDR_PREFIX:${CIDR_PREFIX_LENGTH} NETMASK:${NETMASK} GW:${GW_IP_ADDRESS} ROUTING_TABLE:${ROUTE_TABLE}"
 
 /bin/cat <<EOF >${FILE}
 network:
@@ -47,6 +51,7 @@ network:
   ethernets:
     ${DEVICE_NAME}:
 $STATIC_IP_CONFIG
+      mtu: '9001'
       routes:
        - to: 0.0.0.0/0
          via: ${GW_IP_ADDRESS} # Default gateway

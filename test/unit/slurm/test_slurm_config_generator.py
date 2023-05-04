@@ -1,9 +1,20 @@
+# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with
+# the License. A copy of the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
 
 import pytest
-import slurm
 from assertpy import assert_that
-from slurm.pcluster_slurm_config_generator import generate_slurm_config_files
+from config_utils import get_template_folder
+from pcluster_slurm_config_generator import generate_slurm_config_files
 
 
 @pytest.mark.parametrize(
@@ -14,11 +25,9 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
     input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
-    )
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
@@ -28,6 +37,8 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
         no_gpu=no_gpu,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -40,11 +51,6 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
     for file_type in ["", "_gres", "_cgroup"]:
         output_file_name = f"slurm_parallelcluster{file_type}.conf"
         _assert_files_are_equal(tmpdir / output_file_name, test_datadir / "expected_outputs" / output_file_name)
-
-    _assert_files_are_equal(
-        tmpdir / "pcluster/instance_name_type_mappings.json",
-        test_datadir / "expected_outputs/pcluster/instance_name_type_mappings.json",
-    )
 
 
 @pytest.mark.parametrize(
@@ -60,11 +66,9 @@ def test_generate_slurm_config_files_memory_scheduling(
         input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("slurm.pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch(
-        "slurm.pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True
-    )
-    template_directory = os.path.dirname(slurm.__file__) + "/templates"
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
         template_directory,
@@ -74,6 +78,8 @@ def test_generate_slurm_config_files_memory_scheduling(
         no_gpu=False,
         compute_node_bootstrap_timeout=1600,
         realmemory_to_ec2memory_ratio=realmemory_to_ec2memory_ratio,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
 
     for queue in ["efa", "gpu", "multiple_spot"]:
@@ -90,14 +96,103 @@ def test_generate_slurm_config_files_memory_scheduling(
         output_file_name = f"slurm_parallelcluster{file_type}{mem_sched}.conf"
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
-    _assert_files_are_equal(
-        tmpdir / "pcluster/instance_name_type_mappings.json",
-        test_datadir / "expected_outputs/pcluster/instance_name_type_mappings.json",
+
+@pytest.mark.parametrize(
+    "slurm_accounting",
+    [(False), (True)],
+)
+def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, slurm_accounting):
+    if slurm_accounting:
+        input_file = str(test_datadir / "sample_input_slurm_accounting.yaml")
+    else:
+        input_file = str(test_datadir / "sample_input.yaml")
+    instance_types_data = str(test_datadir / "sample_instance_types_data.json")
+
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
     )
+
+    for file_type in ["", "_slurmdbd"]:
+        file_name = f"slurm_parallelcluster{file_type}.conf"
+        postfix = "_slurm_accounting" if slurm_accounting else ""
+        output_file_name = f"slurm_parallelcluster{file_type}{postfix}.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
+def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    for queue in ["queue1", "queue2", "queue3", "queue4", "queue5", "queue6", "queue7", "queue8"]:
+        for file_type in ["partition", "gres"]:
+            file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
+            output_file_name = f"pcluster/slurm_parallelcluster_{queue}_{file_type}.conf"
+            _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+    for file_type in ["", "_gres", "_cgroup"]:
+        file_name = f"slurm_parallelcluster{file_type}.conf"
+        output_file_name = f"slurm_parallelcluster{file_type}.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
+def test_generate_slurm_config_with_custom_settings(mocker, test_datadir, tmpdir):
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    for queue in ["efa", "gpu", "multiple_spot"]:
+        file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        output_file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
 def _assert_files_are_equal(file, expected_file):
-    with open(file, "r") as f, open(expected_file, "r") as exp_f:
+    with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
         assert_that(f.read()).is_equal_to(expected_file_content)

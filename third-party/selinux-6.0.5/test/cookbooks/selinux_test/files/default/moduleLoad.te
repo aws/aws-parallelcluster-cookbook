@@ -1,0 +1,10 @@
+module moduleLoad 1.0;
+
+require {
+	type semanage_t;
+	type selinux_config_t;
+	class file map;
+}
+
+#============= semanage_t ==============
+allow semanage_t selinux_config_t:file map;

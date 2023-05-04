@@ -617,9 +617,12 @@ instance_metadata_file=$tmp_dir/instance_metadata
 get_region instance_metadata_file
 
 # Download domain detection
-if [ "${region}" != "${region#cn-*}" ]
-then
+if [[ ${region} == cn-* ]]; then
   download_domain="amazonaws.com.cn"
+elif [[ ${region} == us-iso-* ]]; then
+  download_domain="c2s.ic.gov"
+elif [[ ${region} == us-isob-* ]]; then
+  download_domain="sc2s.sgov.gov"
 else
   download_domain="amazonaws.com"
 fi

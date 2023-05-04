@@ -1,0 +1,69 @@
+# Validates orchestration recipes
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # recipe tests will use controls from these directories
+    - test/recipes
+    - test/resources
+
+suites:
+  - name: aws_parallelcluster_install
+    run_list:
+      - recipe[aws-parallelcluster::test_dummy]
+      - recipe[aws-parallelcluster-test::docker_mock]
+      - recipe[aws-parallelcluster-install::install]
+    verifier:
+      controls:
+        # We also need to test the effect some files (service config, profile config) have on the system.
+        # TODO: rethink and integrate
+        - sudo_installed
+        - sudoers_file_configured
+        - admin_user_created
+        - ulimit_configured
+        - pcluster_directories_exist
+        - pcluster_log_dir_is_configured
+        - ephemeral_drives_logical_volumes_manager_installed
+        - ephemeral_drives_script_created
+        - ephemeral_service_set_up
+        - ephemeral_service_after_network_config
+        - ephemeral_drives_configured
+        - ephemeral_drives_service_running
+        - ephemeral_drives_with_name_clashing_not_mounted
+        - awsbatch_virtualenv_created
+        - cookbook_virtualenv_created
+        - cfnbootstrap_virtualenv_created
+        - node_virtualenv_created
+        - supervisord_config_created
+        - supervisord_service_set_up
+        - awscli_installed
+        - write_common_udev_configuration_files
+        - /ec2blkdev_service_installation/
+        - debian_udevd_reload_configuration
+        - install_packages
+        - nfs_installed_with_right_version
+        - cron_disabled_selected_daily_and_weekly_jobs
+        - openssh_installed
+        - ami_cleanup_file_created
+        - c_states_kernel_configured
+        - chrony_installed_and_configured
+        - clusterstatusmgtd_files_created
+        - selinux_disabled
+        - efa_conflicting_packages_removed
+        - efa_installed
+        - efa_prereq_packages_installed
+        - efs_utils_installed
+        - gc_thresh_values_configured
+        - license_readme_created
+        - mysql_client_installed
+        - mysql_client_source_node_created
+        - node_attributes_created
+        - /services_disabled_on_amazon_family/
+        - /services_disabled_on_debian_family/
+        - stunnel_installed
+        - /intel_mpi_installed/
+        - system_authentication_packages_installed
+        - /nvidia_driver/
+        - /fabric_manager/
+        - /^cloudwatch/
+        - /^arm_pl/

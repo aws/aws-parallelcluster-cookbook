@@ -1,0 +1,19 @@
+# Test module adapted from SELinux reference policy wiki
+# https://github.com/SELinuxProject/refpolicy/wiki/GettingStarted
+
+policy_module(dirtest,0.0.1)
+
+type dirtest_t;
+type dirtest_exec_t;
+type dirtest_log_t;
+type dirtest_tmp_t;
+
+domain_type(dirtest_t)
+domain_entry_file(dirtest_t, dirtest_exec_t)
+logging_log_file(dirtest_log_t)
+files_tmp_file(dirtest_tmp_t)
+
+allow dirtest_t dirtest_log_t:file append_file_perms;
+allow dirtest_t dirtest_tmp_t:file manage_file_perms;
+
+files_tmp_filetrans(dirtest_t,dirtest_tmp_t,file)

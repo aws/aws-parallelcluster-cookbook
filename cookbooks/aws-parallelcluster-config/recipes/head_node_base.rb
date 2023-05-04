@@ -15,97 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Parse shared directory info and turn into an array
-shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
-shared_dir_array.each_with_index do |dir, index|
-  shared_dir_array[index] = dir.strip
-  shared_dir_array[index] = "/#{shared_dir_array[index]}" unless shared_dir_array[index].start_with?('/')
-end
+# generate the shared storages mapping file
+include_recipe 'aws-parallelcluster-config::fs_update'
 
-# Parse volume info into an arary
-vol_array = node['cluster']['volume'].split(',')
-vol_array.each_with_index do |vol, index|
-  vol_array[index] = vol.strip
-end
-
-# Mount each volume
-dev_path = [] # device labels
-dev_uuids = [] # device uuids
-
-vol_array.each_with_index do |volumeid, index|
-  dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
-
-  # Attach EBS volume
-  execute "attach_volume_#{index}" do
-    command "#{node.default['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/attachVolume.py #{volumeid}"
-    creates dev_path[index]
-  end
-
-  # wait for the drive to attach, before making a filesystem
-  ruby_block "sleeping_for_volume_#{index}" do
-    block do
-      wait_for_block_dev(dev_path[index])
-    end
-    action :nothing
-    subscribes :run, "execute[attach_volume_#{index}]", :immediately
-  end
-
-  # Setup disk, will be formatted xfs if empty
-  ruby_block "setup_disk_#{index}" do
-    block do
-      pt_type = get_pt_type(dev_path[index])
-      if pt_type.nil?
-        Chef::Log.info("device #{dev_path[index]} not partitioned, mounting directly")
-        fs_type = setup_disk(dev_path[index])
-      else
-        # Partitioned device, mount 1st partition
-        Chef::Log.info("device #{dev_path[index]} partitioned, mounting first partition")
-        partition_dev = get_1st_partition(dev_path[index])
-        Chef::Log.info("First partition for device #{dev_path[index]} is: #{partition_dev}")
-        fs_type = get_fs_type(partition_dev)
-        dev_path[index] = partition_dev
-      end
-      node.default['cluster']['volume_fs_type'] = fs_type
-      dev_uuids[index] = get_uuid(dev_path[index])
-    end
-    action :nothing
-    subscribes :run, "ruby_block[sleeping_for_volume_#{index}]", :immediately
-  end
-
-  # Create the shared directories
-  directory shared_dir_array[index] do
-    owner 'root'
-    group 'root'
-    mode '1777'
-    recursive true
-    action :create
-  end
-
-  # Add volume to /etc/fstab
-  mount shared_dir_array[index] do
-    device(DelayedEvaluator.new { dev_uuids[index] })
-    fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })
-    device_type :uuid
-    options "_netdev"
-    pass 0
-    action %i(mount enable)
-    retries 10
-    retry_delay 6
-  end
-
-  # Make sure shared directory permissions are correct
-  directory shared_dir_array[index] do
-    owner 'root'
-    group 'root'
-    mode '1777'
-  end
-
-  # Export shared dir
-  nfs_export shared_dir_array[index] do
-    network get_vpc_cidr_list
-    writeable true
-    options ['no_root_squash']
-  end
+manage_ebs "add ebs" do
+  shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
+  vol_array node['cluster']['volume'].split(',')
+  action %i(mount export)
+  not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
 end
 
 # Export /home
@@ -113,14 +30,14 @@ nfs_export "/home" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end
+end unless redhat_ubi?
 
 # Export /opt/parallelcluster/shared
 nfs_export node['cluster']['shared_dir'] do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end
+end unless redhat_ubi?
 
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
@@ -128,7 +45,7 @@ nfs_export "/opt/intel" do
   writeable true
   options ['no_root_squash']
   only_if { ::File.directory?("/opt/intel") }
-end
+end unless redhat_ubi?
 
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-config::head_node_raid'
@@ -171,7 +88,9 @@ end
 
 if node['cluster']['dcv_enabled'] == "head_node"
   # Activate DCV on head node
-  include_recipe 'aws-parallelcluster-config::dcv'
+  dcv "Configure DCV" do
+    action :configure
+  end
 end
 
 unless node['cluster']['scheduler'] == 'awsbatch'

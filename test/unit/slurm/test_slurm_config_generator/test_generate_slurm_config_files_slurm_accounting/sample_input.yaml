@@ -1,0 +1,24 @@
+Scheduling:
+    SlurmQueues:
+        - CapacityType: ONDEMAND
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: true
+                    GdrSupport: false
+                InstanceType: c5n.18xlarge
+                MaxCount: 5
+                MinCount: 1
+                Name: efa-c5n
+                SpotPrice: null
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: efa
+    Scheduler: slurm
+    SlurmSettings:
+        ScaledownIdletime: 10
+        Database: null

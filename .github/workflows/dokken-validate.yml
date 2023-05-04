@@ -1,0 +1,51 @@
+name: ParallelCluster Cookbook Validation on Docker
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dokken-validate-install:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - alinux2
+          - centos7
+          - ubuntu18
+          - ubuntu20
+          - rhel8
+        suite:
+          - aws-parallelcluster-install
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@main
+      - name: Get changed files
+        id: changed-files-excluding-tests
+        uses: tj-actions/changed-files@v35.6.0
+        with:
+          files_ignore: |
+            !.*
+            !chefignore
+            !CHANGELOG.md
+            !README.md
+            !**/aws-parallelcluster-*/spec
+            !**/aws-parallelcluster-*/test
+      - name: Install Chef
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true'
+        uses: actionshub/chef-install@main
+      - name: Test-Kitchen
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true'
+        uses: actionshub/test-kitchen@main
+        with:
+          os: ${{ matrix.os }}
+          suite: ${{ matrix.suite }}
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_YAML: kitchen.docker.yml
+          KITCHEN_LOCAL_YAML: kitchen.validate-install.yml
+          KITCHEN_GLOBAL_YAML: kitchen.global.yml
+        continue-on-error: false

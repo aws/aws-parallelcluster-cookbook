@@ -1,0 +1,17 @@
+verifier:
+  name: inspec
+  inspec_tests:
+    - test/recipes
+    - test/resources
+  reporter:
+    - cli
+    - junit:.kitchen/inspec/results/%{platform}_%{suite}_inspec.xml
+
+provisioner:
+  data_path: test/data
+  attributes:
+    kitchen: true
+    cluster:
+      # right now tests depend on this parameter: we will try to remove the dependency later
+      region: us-east-1
+      parallelcluster-node-version: '3.4.1'

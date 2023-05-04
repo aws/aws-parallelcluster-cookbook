@@ -15,6 +15,20 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+ruby_block "update_shared_storages" do
+  block do
+    run_context.include_recipe 'aws-parallelcluster-config::update_shared_storages'
+  end
+  only_if { are_mount_or_unmount_required? }
+end
+
 execute_event_handler 'HeadClusterUpdate' do
   event_command(lazy { node['cluster']['config'].dig(:Scheduling, :SchedulerSettings, :SchedulerDefinition, :Events, :HeadClusterUpdate, :ExecuteCommand, :Command) })
+end
+
+# The updated cfnconfig will be used by post update custom scripts
+template '/etc/parallelcluster/cfnconfig' do
+  source 'init/cfnconfig.erb'
+  cookbook 'aws-parallelcluster-config'
+  mode '0644'
 end

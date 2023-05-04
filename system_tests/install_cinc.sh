@@ -22,21 +22,13 @@ elif [ `echo "${RELEASE}" | grep '^ubuntu\.20'` ]; then
   OS='ubuntu2004'
 else
   echo "Operating System '${RELEASE}' is not supported. Failing build."
-  exit -1
+  exit 1
 fi
 
 if [ `echo "${OS}" | grep -E '^(alinux|centos)'` ]; then
   PLATFORM='RHEL'
 elif [ `echo "${OS}" | grep -E '^ubuntu'` ]; then
   PLATFORM='DEBIAN'
-fi
-
-BUCKET="s3.amazonaws.com"
-[[ ${AWS_Region} =~ ^cn- ]] && BUCKET="s3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster"
-if [[ ${OS} =~ ^(ubuntu2004)$ ]]; then
-  CfnBootstrapUrl="https://${BUCKET}/cloudformation-examples/aws-cfn-bootstrap-py3-latest.tar.gz"
-else
-  CfnBootstrapUrl="https://${BUCKET}/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz"
 fi
 
 ARCH=$(uname -m)
@@ -63,7 +55,20 @@ elif [[ ${PLATFORM} == DEBIAN ]]; then
   apt-get -y install build-essential curl wget jq
 fi
 
+if [[ ${PLATFORM} == RHEL ]]; then
+  CA_CERTS_FILE=/etc/ssl/certs/ca-bundle.crt
+  yum -y upgrade ca-certificates
+elif [[ ${PLATFORM} == DEBIAN ]]; then
+  CA_CERTS_FILE=/etc/ssl/certs/ca-certificates.crt
+  apt-get -y --only-upgrade install ca-certificates
+fi
+
 curl --retry 3 -L $CINC_URL | bash -s -- -v ${ChefVersion}
+
+if [[ -e ${CA_CERTS_FILE} ]]; then
+  ln -sf ${CA_CERTS_FILE} /opt/cinc/embedded/ssl/certs/cacert.pem
+fi
+
 /opt/cinc/embedded/bin/gem install --no-document berkshelf:${BerkshelfVersion}
 
 mkdir -p /etc/chef && chown -R root:root /etc/chef

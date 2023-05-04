@@ -15,9 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+include_recipe "aws-parallelcluster-config::enable_chef_error_handler"
+
 include_recipe 'aws-parallelcluster-config::base'
 
-fetch_config 'Fetch and load cluster configs' unless node['cluster']['scheduler'] == 'awsbatch'
+fetch_config 'Fetch and load cluster configs'
 
 include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-scheduler-plugin::config' if node['cluster']['scheduler'] == 'plugin'

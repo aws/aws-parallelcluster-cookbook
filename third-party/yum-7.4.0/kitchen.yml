@@ -1,0 +1,38 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  product_name: chef
+  chef_license: accept-no-persist
+  multiple_converge: 2
+  enforce_idempotency: true
+  deprecations_as_errors: true
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: almalinux-8
+  - name: amazonlinux-2
+  - name: centos-7
+  - name: centos-stream-8
+  - name: fedora-latest
+  - name: oraclelinux-7
+  - name: oraclelinux-8
+  - name: rockylinux-8
+
+suites:
+  - name: default
+    run_list:
+      - recipe[yum::default]
+      - recipe[test::test_globalconfig_two]
+
+  - name: dnf_module
+    run_list:
+      - recipe[test::dnf_module]
+    excludes:
+      - amazonlinux-2
+      - centos-7
+      - oraclelinux-7

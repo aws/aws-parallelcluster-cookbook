@@ -3,6 +3,180 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.7.0
+------
+
+**ENHANCEMENTS**
+
+**CHANGES**
+
+**BUG FIXES**
+
+3.6.0
+------
+
+**ENHANCEMENTS**
+- Add support for RHEL8.
+- Add support for customizing the cluster Slurm configuration via the ParallelCluster configuration YAML file.
+- Build Slurm with support for LUA.
+- Add health check manager and GPU health check, which can be activated through cluster configuration.
+  Health check manager execution is triggered by a Slurm prolog script. GPU check verifies healthiness of a node by executing NVIDIA DCGM L2 diagnostic.
+- Add log rotation support for ParallelCluster managed logs.
+- Track head node memory and root volume disk utilization using the `mem_used_percent` and `disk_used_percent` metrics collected through the CloudWatch Agent.
+- Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
+- Load kernel module [nvidia-uvm](https://developer.nvidia.com/blog/unified-memory-cuda-beginners/) by default to provide Unified Virtual Memory (UVM) functionality to the CUDA driver.
+- Install [NVIDIA Persistence Daemon](https://docs.nvidia.com/deploy/driver-persistence/index.html) as a system service.
+
+**CHANGES**
+- Upgrade Slurm to version 23.02.1.
+- Upgrade munge to version 0.5.15.
+- Set Slurm default `TreeWidth` to 30.
+- Set Slurm prolog and epilog configurations to target a directory, `/opt/slurm/etc/scripts/prolog.d/` and `/opt/slurm/etc/scripts/epilog.d/` respectively.
+- Set Slurm `BatchStartTimeout` to 3 minutes so to allow max 3 minutes Prolog execution during compute node registration.
+- Upgrade EFA installer to `1.22.1`
+  - Dkms : `2.8.3-2`
+  - Efa-driver: `efa-2.1.1g`
+  - Efa-config: `efa-config-1.13-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.17.1-1`
+  - Rdma-core: `rdma-core-43.0-1`
+  - Open MPI: `openmpi40-aws-4.1.5-1`
+- Upgrade Lustre client version to 2.12 on Amazon Linux 2 (same version available on Ubuntu 20.04, 18.04 and CentOS >= 7.7).
+- Upgrade Lustre client version to 2.10.8 on CentOS 7.6.
+- Upgrade `aws-cfn-bootstrap` to version 2.0-24.
+- Upgrade NVIDIA driver to version 470.182.03.
+- Upgrade NVIDIA Fabric Manager to version 470.182.03.
+- Upgrade NVIDIA CUDA Toolkit to version 11.8.0.
+- Upgrade NVIDIA CUDA sample to version 11.8.0.
+- Upgrade NICE DCV to version `2023.0-15022`.
+  - server: `2023.0.15022-1`
+  - xdcv: `2023.0.547-1`
+  - gl: `2023.0.1027-1`
+  - web_viewer: `2023.0.15022-1`
+
+**BUG FIXES**
+- Fix an issue that was causing misalignment of compute nodes IP on instances with multiple network interfaces.
+- Fix replacement of `StoragePass` in `slurm_parallelcluster_slurmdbd.conf` when a queue parameter update is performed and the Slurm accounting configurations are not updated.
+- Fix issue causing `cfn-hup` daemon to fail when it gets restarted.
+
+3.5.1
+------
+
+**ENHANCEMENTS**
+- Add support for US isolated region us-isob-east-1.
+
+**CHANGES**
+- Upgrade EFA installer to `1.22.0`
+  - Efa-driver: `efa-2.1.1g`
+  - Efa-config: `efa-config-1.13-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.17.0-1`
+  - Rdma-core: `rdma-core-43.0-1`
+  - Open MPI: `openmpi40-aws-4.1.5-1`
+- Upgrade NICE DCV to version `2022.2-14521`.
+  - server: `2022.2.14521-1`
+  - xdcv: `2022.2.519-1`
+  - gl: `2022.2.1012-1`
+  - web_viewer: `2022.2.14521-1`
+
+**BUG FIXES**
+- Fix update cluster to remove shared EBS volumes can potentially cause node launching failures if `MountDir` match the same pattern in `/etc/exports`.
+
+3.5.0
+------
+
+**ENHANCEMENTS**
+- Fail cluster creation if cluster status changes to PROTECTED while provisioning static nodes.
+
+**CHANGES**
+- Upgrade Slurm to version 22.05.8.
+- Upgrade EFA installer to `1.21.0`
+  - Efa-driver: `efa-2.1.1-1`
+  - Efa-config: `efa-config-1.12-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.1amzn3.0-1`
+  - Rdma-core: `rdma-core-43.0-1`
+  - Open MPI: `openmpi40-aws-4.1.4-3`
+- Make Slurm controller logs more verbose and enable additional logging for the Slurm power save plugin.
+
+**BUG FIXES**
+- Fix an issue where custom AMI creation failed in Ubuntu 20.04 on MySQL packages installation.
+
+3.4.1
+-----
+
+**BUG FIXES**
+- Fix an issue with the Slurm scheduler that might incorrectly apply updates to its internal registry of compute nodes. This might result in EC2 instances to become inaccessible or backed by an incorrect instance type.
+
+3.4.0
+------
+
+**ENHANCEMENTS**
+- Add support for specifying multiple subnets for each queue to increase the EC2 capacity pool available for use.
+
+**CHANGES**
+- Upgrade EFA installer to `1.20.0`
+  - Efa-driver: `efa-2.1`
+  - Efa-config: `efa-config-1.11-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.1`
+  - Rdma-core: `rdma-core-43.0-2`
+  - Open MPI: `openmpi40-aws-4.1.4-3`
+- Mount EFS file systems using `amazon-efs-utils`. EFS files systems can be mounted using in-transit encryption and IAM authorized user.
+- Install `stunnel` 5.67 on CentOS7 and Ubuntu to support EFS in-transit encryption.
+- Add possibility to execute a custom script in the head node during the update of the cluster.
+- Upgrade Slurm to version 22.05.7.
+- Upgrade Python to 3.9.16 and 3.7.16.
+
+3.3.0
+------
+
+**ENHANCEMENTS**
+- Add support for Slurm Accounting.
+- Add support for adding and removing shared storages at cluster update.
+- Add possibility to specify multiple instance types for the same compute resource.
+- Configure NFS threads to be `min(256, max(8, num_cores * 4))` to ensure better stability and performance.
+- Move NFS installation at build time to reduce configuration time.
+
+**CHANGES**
+- Upgrade NVIDIA driver to version 470.141.03.
+- Upgrade NVIDIA Fabric Manager to version 470.141.03.
+- Upgrade NVIDIA CUDA Toolkit to version 11.7.1.
+- Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
+- Reduce timeout from 50 to a maximum of 5min in case of DynamoDB connection issues at compute node bootstrap.
+- Change the logic to number the routing tables when an instance have multiple NICs.
+- Upgrade Python from 3.7.13 to 3.9.15.
+- Upgrade Slurm to version 22.05.5.
+- Upgrade EFA installer to `1.18.0`.
+  - Efa-driver: `efa-1.16.0-1`
+  - Efa-config: `efa-config-1.11-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.0~amzn4.0-1`
+  - Rdma-core: `rdma-core-41.0-2`
+  - Open MPI: `openmpi40-aws-4.1.4-2`
+- Upgrade NICE DCV to version `2022.1-13300`.
+  - server: `2022.1.13300-1`
+  - xdcv: `2022.1.433-1`
+  - gl: `2022.1.973-1`
+  - web_viewer: `2022.1.13300-1`
+- Upgrade third-party cookbook dependencies:
+  - selinux-6.0.5 (from selinux-6.0.4)
+  - nfs-5.0.0 (from nfs-2.6.4)
+
+3.2.1
+------
+
+**ENHANCEMENTS**
+- Improve the logic to associate the host routing tables to the different network cards to better support EC2 instances with several NICs.
+
+**CHANGES**
+- Upgrade NVIDIA driver to version 470.141.03.
+- Upgrade NVIDIA Fabric Manager to version 470.141.03.
+- Pin cfn-bootstrap helper package version to 2.0-10
+- Disable cron job tasks man-db and mlocate, which may have a negative impact on node performance.
+- Upgrade Intel MPI Library to 2021.6.0.602.
+- Upgrade Python from 3.7.10 to 3.7.13 in response to this [security risk](https://nvd.nist.gov/vuln/detail/CVE-2021-3737).
+
 3.2.0
 ------
 
@@ -12,8 +186,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for attaching existing FSx for Ontap and FSx for OpenZFS File Systems.
 - Install NVIDIA GDRCopy 2.3 to enable low-latency GPU memory copy on supported instance types.
 - During cluster update set Slurm nodes state accordingly to strategy set through the configuration parameter `Scheduling/SchedulerSettings/QueueUpdateStrategy`.
-- Add new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based scheduling in Slurm.
-- Add new configuration parameter `Scheduling/SlurmQueues/ComputeResources/SchedulableMemory` to override default value of the memory seen by the scheduler on compute nodes.
+- Add support for memory-based scheduling in Slurm.
+  - Configure `RealMemory` on compute nodes by default as 95% of the EC2 memory.
+  - Move `SelectTypeParameters` to `slurm_parallelcluster.conf` include file.
+  - Move `ConstrainRAMSpace` to `slurm_parallelcluster_cgroup.conf` include file.
+  - Add support for new configuration parameter `Scheduling/SlurmSettings/EnableMemoryBasedScheduling` to configure memory-based scheduling in Slurm.
+  - Add support for new configuration parameter `Scheduling/SlurmQueues/ComputeResources/SchedulableMemory` to override default value of the memory seen by the scheduler on compute nodes.
 - Add support for rebooting compute nodes via Slurm.
 
 **CHANGES**
@@ -22,16 +200,45 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NICE DCV to version 2022.0-12760.
 - Upgrade NVIDIA driver to version 470.129.06.
 - Upgrade NVIDIA Fabric Manager to version 470.129.06.
-- Upgrade EFA installer to version 1.16.0.
+- Upgrade EFA installer to version 1.17.2.
   - EFA driver: ``efa-1.16.0-1``
   - EFA configuration: ``efa-config-1.10-1``
   - EFA profile: ``efa-profile-1.5-1``
-  - Libfabric: ``libfabric-aws-1.15.1.amzn1.0-1``
-  - RDMA core: ``rdma-core-39.0-2``
-  - Open MPI: ``openmpi40-aws-4.1.2-2``
+  - Libfabric: ``libfabric-aws-1.16.0~amzn2.0-1``
+  - RDMA core: ``rdma-core-41.0-2``
+  - Open MPI: ``openmpi40-aws-4.1.4-2``
 - Restrict IPv6 access to IMDS to root and cluster admin users only, when configuration parameter `HeadNode/Imds/Secured` is enabled.
 - Set Slurm configuration `AuthInfo=cred_expire=70` to reduce the time requeued jobs must wait before starting again when nodes are not available.
 - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
+- Upgrade third-party cookbook dependencies:
+  - apt-7.4.2 (from apt-7.4.0)
+  - line-4.5.2 (from line-4.0.1)
+  - openssh-2.10.3 (from openssh-2.9.1)
+  - pyenv-3.5.1 (from pyenv-3.4.2)
+  - selinux-6.0.4 (from selinux-3.1.1)
+  - yum-7.4.0 (from yum-6.1.1)
+  - yum-epel-4.5.0 (from yum-epel-4.1.2)
+- Disable `aws-ubuntu-eni-helper` service, available in Deep Learning AMIs, to avoid conflicts with `configure_nw_interface.sh` when configuring instances with multiple network cards.
+- Set MTU to 9001 for all the network interfaces when configuring instances with multiple network cards.
+- Remove the trailing dot when configuring the compute node FQDN.
+
+3.1.5
+------
+
+**CHANGES**
+- Upgrade EFA installer to `1.18.0`
+  - Efa-driver: `efa-1.16.0-1`
+  - Efa-config: `efa-config-1.11-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.16.0~amzn4.0-1`
+  - Rdma-core: `rdma-core-41.0-2`
+  - Open MPI: `openmpi40-aws-4.1.4-2`
+- Upgrade Intel MPI Library to 2021.6.0.602.
+- Upgrade NVIDIA driver to version 470.141.03.
+- Upgrade NVIDIA Fabric Manager to version 470.141.03.
+
+**BUG FIXES**
+- Fix Slurm issue that prevents idle nodes termination.
 
 3.1.4
 ------
@@ -59,7 +266,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix the configuration parameter `DirectoryService/DomainAddr` conversion to `ldap_uri` SSSD property when it contains multiples domain addresses.
-- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.  
+- Fix DCV not loading user profile at session start. The user's PATH was not correctly set at DCV session connection.
 
 3.1.2
 ------

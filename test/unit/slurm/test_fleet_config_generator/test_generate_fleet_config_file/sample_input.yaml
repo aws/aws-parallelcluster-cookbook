@@ -1,0 +1,179 @@
+Scheduling:
+  Scheduler: slurm
+  SlurmQueues:
+  - AllocationStrategy: lowest-price
+    CapacityType: ONDEMAND
+    ComputeResources:
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: false
+        GdrSupport: false
+      InstanceType: c5n.4xlarge
+      MaxCount: 10
+      MinCount: 0
+      Name: single
+      SchedulableMemory: null
+      SpotPrice: null
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: true
+        GdrSupport: false
+      Instances:
+        - InstanceType: c5n.4xlarge
+        - InstanceType: r5.4xlarge
+        - InstanceType: r5n.4xlarge
+      MaxCount: 10
+      MinCount: 1
+      Name: fleet
+      SchedulableMemory: null
+      SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: ondemand-mixed
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+      - subnet-0230367ab0e5123a4
+  - AllocationStrategy: lowest-price
+    CapacityType: ONDEMAND
+    ComputeResources:
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: false
+        GdrSupport: false
+      InstanceType: c5n.4xlarge
+      MaxCount: 10
+      MinCount: 0
+      Name: single
+      SchedulableMemory: null
+      SpotPrice: null
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: true
+        GdrSupport: false
+      Instances:
+        - InstanceType: c5n.4xlarge
+        - InstanceType: r5.4xlarge
+      MaxCount: 10
+      MinCount: 1
+      Name: fleet
+      SchedulableMemory: null
+      SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: multiple-subnets
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+      - subnet-0230367ab0e5123a4
+      - subnet-0b903123096649662
+  - AllocationStrategy: capacity-optimized
+    CapacityType: SPOT
+    ComputeResources:
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: true
+        GdrSupport: false
+      InstanceType: c5n.18xlarge
+      MaxCount: 10
+      MinCount: 1
+      Name: single
+      SchedulableMemory: null
+      SpotPrice: null
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: true
+        GdrSupport: false
+      Instances:
+        - InstanceType: c5n.18xlarge
+      MaxCount: 10
+      MinCount: 1
+      Name: fleet-price
+      SchedulableMemory: null
+      SpotPrice: 10
+    - DisableSimultaneousMultithreading: false
+      Efa:
+        Enabled: true
+        GdrSupport: false
+      Instances:
+        - InstanceType: c5n.18xlarge
+      MaxCount: 10
+      MinCount: 1
+      Name: fleet-noprice
+      SchedulableMemory: null
+      SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: spot-mixed
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+      - subnet-0230367ab0e5123a4
+  SlurmSettings:
+    Dns:
+      DisableManagedDns: false
+      HostedZoneId: null
+      UseEc2Hostnames: false
+    EnableMemoryBasedScheduling: false
+    QueueUpdateStrategy: COMPUTE_FLEET_STOP
+    ScaledownIdletime: 10

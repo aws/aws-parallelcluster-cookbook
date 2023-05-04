@@ -65,10 +65,36 @@ unless virtualized?
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
-            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/ --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
-            " --input-file #{node['cluster']['cluster_config_path']}  --instance-types-data #{node['cluster']['instance_types_data_path']}"\
+            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
+            " --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
+            " --input-file #{node['cluster']['cluster_config_path']}"\
+            " --instance-types-data #{node['cluster']['instance_types_data_path']}"\
             " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
-            " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"
+            " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
+            " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
+            " --cluster-name #{node['cluster']['stack_name']}"
+  end
+
+  # Generate custom Slurm settings include files
+  execute "generate_pcluster_custom_slurm_settings_include_files" do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py"\
+            " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
+            " --input-file #{node['cluster']['cluster_config_path']}"
+  end
+
+  # If defined in the config, retrieve a remote Custom Slurm Settings file and overrides the existing one
+  ruby_block "Override Custom Slurm Settings with remote file" do
+    block do
+      run_context.include_recipe 'aws-parallelcluster-slurm::retrieve_remote_custom_settings_file'
+    end
+    not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :CustomSlurmSettingsIncludeFile).nil? }
+  end
+
+  # Generate pcluster fleet config
+  execute "generate_pcluster_fleet_config" do
+    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
+            " --output-file #{node['cluster']['slurm']['fleet_config_path']}"\
+            " --input-file #{node['cluster']['cluster_config_path']}"
   end
 end
 
@@ -107,6 +133,18 @@ file "/var/log/parallelcluster/slurm_fleet_status_manager.log" do
   mode '0640'
 end
 
+file "/var/log/parallelcluster/clustermgtd.events" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0600'
+end
+
+file "/var/log/parallelcluster/compute_console_output.log" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0600'
+end
+
 template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_fleet_status_manager.conf" do
   source 'slurm/parallelcluster_slurm_fleet_status_manager.conf.erb'
   owner node['cluster']['cluster_admin_user']
@@ -122,6 +160,12 @@ template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do
 end
 
 file "/var/log/parallelcluster/slurm_resume.log" do
+  owner node['cluster']['cluster_admin_user']
+  group node['cluster']['cluster_admin_group']
+  mode '0644'
+end
+
+file "/var/log/parallelcluster/slurm_resume.events" do
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_group']
   mode '0644'
@@ -186,35 +230,34 @@ template '/etc/systemd/system/slurmctld.service' do
   action :create
 end
 
-if node['cluster']['add_node_hostnames_in_hosts_file'] == "true"
-  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d" do
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/prolog.d/01-pcluster-prolog" do
-    source 'head_node_slurm/prolog'
-    owner node['cluster']['slurm']['user']
-    group node['cluster']['slurm']['group']
-    mode '0744'
-  end
-
-  directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d" do
-    user 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  cookbook_file "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/epilog.d/01-pcluster-epilog" do
-    source 'head_node_slurm/epilog'
-    owner node['cluster']['slurm']['user']
-    group node['cluster']['slurm']['group']
-    mode '0744'
-  end
+template '/etc/systemd/system/slurmdbd.service' do
+  source 'slurm/head_node/slurmdbd.service.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
 end
+
+include_recipe 'aws-parallelcluster-slurm::config_health_check'
+
+ruby_block "Configure Slurm Accounting" do
+  block do
+    run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+  end
+  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+end unless virtualized?
 
 service "slurmctld" do
   supports restart: false
   action %i(enable start)
+end
+
+# The slurmctld service does not return an error code to `systemctl start slurmctld`, so
+# we must explicitly check the status of the service to capture failures
+chef_sleep 3
+
+execute "check slurmctld status" do
+  command "systemctl is-active --quiet slurmctld.service"
+  retries 5
+  retry_delay 2
 end

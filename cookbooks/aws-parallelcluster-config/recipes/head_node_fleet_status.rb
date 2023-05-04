@@ -20,7 +20,7 @@ cookbook_file "#{node['cluster']['scripts_dir']}/compute_fleet_status.py" do
   owner 'root'
   group 'root'
   mode '0755'
-  not_if { ::File.exist?("#{node['cluster']['scripts_dir']}/compute_fleet_status.py") }
+  action :create_if_missing
 end
 
 template "/usr/local/bin/update-compute-fleet-status.sh" do
@@ -44,7 +44,7 @@ template "/etc/parallelcluster/clusterstatusmgtd.conf" do
   mode '0644'
 end
 
-unless virtualized?
+unless virtualized? || kitchen_test? && !node['interact_with_ddb']
   execute 'initialize compute fleet status in DynamoDB' do
     # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
     command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\

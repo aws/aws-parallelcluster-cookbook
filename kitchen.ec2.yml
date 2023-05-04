@@ -1,0 +1,185 @@
+<%
+  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.7.0'
+  pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
+%>
+---
+driver:
+  name: ec2
+  aws_ssh_key_id: <%= ENV['KITCHEN_KEY_NAME'] %>
+  <% if ENV['KITCHEN_SECURITY_GROUP_ID'] %>
+  security_group_ids: [ "<%= ENV['KITCHEN_SECURITY_GROUP_ID'] %>" ]
+  <% else %>
+  security_group_filter:
+    tag: 'Kitchen'
+    value: 'true'
+  <% end %>
+  region: <%= ENV['KITCHEN_AWS_REGION'] %>
+  availability_zone: <%= ENV['KITCHEN_AVAILABILITY_ZONE'] %>
+  subnet_id: <%= ENV['KITCHEN_SUBNET_ID'] %>
+  # Disable IMDS v1
+  metadata_options:
+    http_tokens: 'required'
+    http_put_response_hop_limit: 1
+    instance_metadata_tags: 'enabled'
+  iam_profile_name: <%= ENV['KITCHEN_IAM_PROFILE'] %>
+  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  associate_public_ip: true
+  user_data: <%= ENV['KITCHEN_USER_DATA_SCRIPT'] %>
+  tags:
+    created-by: test-kitchen
+    Name: test-kitchen-parallelcluster
+
+transport:
+  ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH']  %>
+  compression: true
+  name: speedy_ssh
+
+provisioner:
+  name: chef_zero
+  require_chef_omnibus: 17.2.29
+  chef_omnibus_url: https://raw.githubusercontent.com/aws/aws-parallelcluster-cookbook/develop/util/cinc-install.sh
+  chef_omnibus_root: /opt/cinc
+  retry_on_exit_code:
+    - 35 # 35 is the exit code signaling that the node is rebooting
+  max_retries: 1
+  wait_for_retry: 120
+  client_rb:
+    exit_status: :enabled # Opt-in to the standardized exit codes
+    client_fork: false  # Forked instances don't return the real exit code
+
+platforms:
+  - name: alinux2
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_ALINUX2_AMI'] %>
+      # Use the Amazon Linux 2 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_ALINUX2_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>amzn2-ami-kernel-5.10-hvm*<% else %><%= pcluster_prefix %>-amzn2-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/xvda
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: ec2-user
+    attributes:
+      cluster:
+        base_os: alinux2
+        cluster_user: ec2-user
+  - name: rhel8
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_REDHAT8_AMI'] %>
+      # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: ec2-user
+    attributes:
+      cluster:
+        base_os: rhel8
+        cluster_user: ec2-user
+  - name: centos7
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_CENTOS7_AMI'] %>
+      # Use the CentOS 7 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_CENTOS7_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>CentOS Linux 7 *- 2211<% else %><%= pcluster_prefix %>-centos7-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: centos
+    attributes:
+      cluster:
+        base_os: centos7
+        cluster_user: centos
+  - name: ubuntu1804
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_UBUNTU18_AMI'] %>
+      # Use the Ubuntu 18 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_UBUNTU18_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20221207<% else %><%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: ubuntu
+    attributes:
+      cluster:
+        base_os: ubuntu1804
+        cluster_user: ubuntu
+  - name: ubuntu2004
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_UBUNTU20_AMI'] %>
+      # Use the Ubuntu 20 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-focal-20.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20230112<% else %><%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] || 'x86_64' %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: ubuntu
+    attributes:
+      cluster:
+        base_os: ubuntu2004
+        cluster_user: ubuntu

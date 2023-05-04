@@ -1,3 +1,4 @@
+# pylint: disable=W0719
 import argparse
 import datetime
 import json

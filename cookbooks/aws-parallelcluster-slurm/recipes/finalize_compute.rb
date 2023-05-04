@@ -17,7 +17,7 @@
 
 ruby_block 'get_compute_nodename' do
   block do
-    node.run_state['slurm_compute_nodename'] = hit_slurm_nodename
+    node.run_state['slurm_compute_nodename'] = slurm_nodename
   end
 end
 
@@ -37,6 +37,17 @@ end
 service 'slurmd' do
   supports restart: false
   action %i(enable start)
+  not_if { node['kitchen'] }
+end
+
+# The slurmd service does not return an error code to `systemctl start slurmd`, so
+# we must explicitly check the status of the service to capture failures
+chef_sleep 3
+
+execute "check slurmd status" do
+  command "systemctl is-active --quiet slurmd.service"
+  retries 5
+  retry_delay 2
   not_if { node['kitchen'] }
 end
 

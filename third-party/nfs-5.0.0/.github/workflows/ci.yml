@@ -1,0 +1,120 @@
+---
+name: 'Lint & Unit Test'
+
+'on':
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  delivery:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Run Chef Delivery
+        uses: actionshub/chef-delivery@main
+        env:
+          CHEF_LICENSE: accept-no-persist
+
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Run yaml Lint
+        uses: actionshub/yamllint@main
+
+  mdl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Run Markdown Lint
+        uses: actionshub/markdownlint@main
+
+  integration:
+    needs: [delivery, yamllint, mdl]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os:
+          - centos-7
+          - centos-8
+          - centos-stream-8
+          - debian-9
+          - debian-10
+          - debian-11
+          - fedora-latest
+          - ubuntu-1804
+          - ubuntu-2004
+        suite:
+          - default
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Dokken
+        uses: actionshub/test-kitchen@main
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_LOCAL_YAML: kitchen.dokken.yml
+        with:
+          suite: ${{ matrix.suite }}
+          os: ${{ matrix.os }}
+      - name: Print debug output on failure
+        if: failure()
+        run: |
+            set -x
+            sudo journalctl -l --since today
+            sudo docker version
+            sudo docker info
+            KITCHEN_LOCAL_YAML=kitchen.dokken.yml /usr/bin/kitchen exec ${{ matrix.suite }}-${{ matrix.os }} -c "journalctl -l"
+
+  # Server suite needs to run on VMs not docker
+  integration-vagrant:
+    needs: [delivery, yamllint, mdl]
+    runs-on: macos-10.15
+    strategy:
+      matrix:
+        os:
+          - centos-7
+          - centos-8
+          - centos-stream-8
+          - debian-9
+          - debian-10
+          - debian-11
+          # TODO: re-enable after fedora box has been fixed
+          # - fedora-latest
+          - ubuntu-1804
+          - ubuntu-2004
+        suite:
+          - server
+      fail-fast: false
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+      - name: Install Chef
+        uses: actionshub/chef-install@main
+      - name: Dokken
+        uses: actionshub/test-kitchen@main
+        env:
+          CHEF_LICENSE: accept-no-persist
+          KITCHEN_LOCAL_YAML: kitchen.platforms.yml
+        with:
+          suite: ${{ matrix.suite }}
+          os: ${{ matrix.os }}
+      - name: Print debug output on failure
+        if: failure()
+        run: |
+            set -x
+            KITCHEN_LOCAL_YAML=kitchen.platforms.yml /usr/bin/kitchen exec ${{ matrix.suite }}-${{ matrix.os }} -c "journalctl -l"
+
+  final:
+    runs-on: ubuntu-latest
+    needs: [integration, integration-vagrant]
+    steps:
+      - run: echo ${{needs.integration.outputs}}
+      - run: echo ${{needs.integration-vagrant.outputs}}

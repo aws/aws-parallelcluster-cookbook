@@ -190,6 +190,9 @@ def validate_os_type
   when 'centos'
     current_os = "centos#{node['platform_version'].to_i}"
     raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
+  when 'redhat'
+    current_os = "rhel#{node['platform_version'].to_i}"
+    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
   end
 end
 
@@ -197,103 +200,12 @@ end
 # Raise error if OS types do not match
 #
 def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the #{current_os} OS." \
+  raise "The custom AMI you have provided uses the #{current_os} OS. " \
         "However, the base_os specified in your config file is #{specified_os}. " \
         "Please either use an AMI with the #{specified_os} OS or update the base_os " \
         "setting in your configuration file to #{current_os}."
 end
 
-#
-# Retrieve compute nodename from file (HIT only)
-#
-def hit_slurm_nodename
-  slurm_nodename_file = "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename"
-
-  IO.read(slurm_nodename_file).chomp
-end
-
-#
-# Retrieve compute and head node info from dynamo db (Slurm only)
-#
-def hit_dynamodb_info
-  require 'chef/mixin/shell_out'
-
-  output = shell_out!("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb " \
-                      "--region #{node['cluster']['region']} query --table-name #{node['cluster']['slurm_ddb_table']} " \
-                      "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
-                      "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \
-                      "--projection-expression 'Id' " \
-                      "--output text --query 'Items[0].[Id.S]'", user: 'root').stdout.strip
-
-  raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
-
-  slurm_nodename = output
-
-  Chef::Log.info("Retrieved Slurm nodename is: #{slurm_nodename}")
-
-  slurm_nodename
-end
-
-#
-# Verify if a given node name is a static node or a dynamic one (Slurm only)
-#
-def is_static_node?(nodename)
-  # Match queue1-st-compute2-1 or queue1-st-compute2-[1-1000] format
-  match = nodename.match(/^([a-z0-9\-]+)-(st|dy)-([a-z0-9\-]+)-\[?\d+[\-\d+]*\]?$/)
-  raise "Failed when parsing Compute nodename: #{nodename}" if match.nil?
-
-  match[2] == "st"
-end
-
-#
-# Restart network service according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def restart_network_service
-  network_service_name = value_for_platform(
-    %w(ubuntu debian) => {
-      '>=18.04' => 'systemd-resolved',
-    },
-    'default' => 'network'
-  )
-  Chef::Log.info("Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'")
-  service network_service_name.to_s do
-    action %i(restart)
-    ignore_failure true
-  end
-end
-
-#
-# Reload the network configuration according to the OS.
-# NOTE: This helper function defines a Chef resource function to be executed at Converge time
-#
-def reload_network_config
-  if node['platform'] == 'ubuntu'
-    ruby_block "apply network configuration" do
-      block do
-        Mixlib::ShellOut.new("netplan apply").run_command
-      end
-    end
-  else
-    restart_network_service
-  end
-end
-
-#
-# Check if this is an ARM instance
-#
-def arm_instance?
-  node['kernel']['machine'] == 'aarch64'
-end
-
-#
-# Check if we are running in a virtualized environment
-#
-def virtualized?
-  node.include?('virtualized') and node['virtualized']
-end
-
-#
 # Check if this platform supports intel's HPC platform
 #
 def platform_supports_intel_hpc_platform?
@@ -307,48 +219,8 @@ def platform_supports_dcv?
   node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
 
-def aws_domain
-  # Set the aws domain name
-  aws_domain = "amazonaws.com"
-  aws_domain = "#{aws_domain}.cn" if node['cluster']['region'].start_with?("cn-")
-  aws_domain
-end
-
 def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
-end
-
-#
-# Retrieve RHEL OS minor version from running kernel version
-# The OS minor version is retrieved from the patch version of the running kernel
-# following the mapping reported here https://access.redhat.com/articles/3078#RHEL7
-# Method works for CentOS7 minor version >=7
-#
-def find_rhel_minor_version
-  os_minor_version = ''
-
-  if node['platform'] == 'centos'
-    # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
-    kernel_patch_version = kernel_release.match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
-    raise "Unable to retrieve the kernel patch version from #{kernel_release}." unless kernel_patch_version
-
-    case node['platform_version'].to_i
-    when 7
-      os_minor_version = '7' if kernel_patch_version[1] >= '1062'
-      os_minor_version = '8' if kernel_patch_version[1] >= '1127'
-      os_minor_version = '9' if kernel_patch_version[1] >= '1160'
-    else
-      raise "CentOS version #{node['platform_version']} not supported."
-    end
-  end
-
-  os_minor_version
-end
-
-# Return chrony service reload command
-# Chrony doesn't support reload but only force-reload command
-def chrony_reload_command
-  "systemctl force-reload #{node['cluster']['chrony']['service']}"
 end
 
 # Add an external package repository to the OS's package manager
@@ -405,152 +277,21 @@ def get_nvswitches
   nvswitch_check.stdout.strip.to_i
 end
 
-# Alinux OSs currently not correctly supported by NFS cookbook
-# Overwriting templates for node['nfs']['config']['server_template'] used by NFS cookbook for these OSs
-# When running, NFS cookbook will use nfs.conf.erb templates provided in this cookbook to generate server_template
-def overwrite_nfs_template?
-  [
-    node['platform'] == 'amazon',
-  ].any?
-end
-
-def enable_munge_service
-  service "munge" do
-    supports restart: true
-    action %i(enable start)
-  end
-end
-
-def setup_munge_head_node
-  # Generate munge key
-  bash 'generate_munge_key' do
-    user node['cluster']['munge']['user']
-    group node['cluster']['munge']['group']
-    cwd '/tmp'
-    code <<-HEAD_CREATE_MUNGE_KEY
-      set -e
-      # Generates munge key in /etc/munge/munge.key
-      /usr/sbin/mungekey --verbose
-      # Enforce correct permission on the key
-      chmod 0600 /etc/munge/munge.key
-    HEAD_CREATE_MUNGE_KEY
-  end
-
-  enable_munge_service
-  share_munge_head_node
-end
-
-def share_munge_head_node
-  # Share munge key
-  bash 'share_munge_key' do
-    user 'root'
-    group 'root'
-    code <<-HEAD_SHARE_MUNGE_KEY
-      set -e
-      mkdir /home/#{node['cluster']['cluster_user']}/.munge
-      # Copy key to shared dir
-      cp /etc/munge/munge.key /home/#{node['cluster']['cluster_user']}/.munge/.munge.key
-    HEAD_SHARE_MUNGE_KEY
-  end
-end
-
-def setup_munge_compute_node
-  # Get munge key
-  bash 'get_munge_key' do
-    user 'root'
-    group 'root'
-    code <<-COMPUTE_MUNGE_KEY
-      set -e
-      # Copy munge key from shared dir
-      cp /home/#{node['cluster']['cluster_user']}/.munge/.munge.key /etc/munge/munge.key
-      # Set ownership on the key
-      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
-      # Enforce correct permission on the key
-      chmod 0600 /etc/munge/munge.key
-    COMPUTE_MUNGE_KEY
-  end
-
-  enable_munge_service
-end
-
-def get_metadata_token
-  # generate the token for retrieving IMDSv2 metadata
-  token_uri = URI("http://169.254.169.254/latest/api/token")
-  token_request = Net::HTTP::Put.new(token_uri)
-  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
-  res = Net::HTTP.new("169.254.169.254").request(token_request)
-  res.body
-end
-
-def get_metadata_with_token(token, uri)
-  # get IMDSv2 metadata with token
-  request = Net::HTTP::Get.new(uri)
-  request["X-aws-ec2-metadata-token"] = token
-  res = Net::HTTP.new("169.254.169.254").request(request)
-  metadata = res.body if res.code == '200'
-  metadata
-end
-
-def configure_gc_thresh_values
-  (1..3).each do |i|
-    # Configure gc_thresh values to be consistent with alinux2 default values
-    sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
-      value node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"]
-      action :apply
-    end
-  end
-end
-
 def get_system_users
   cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
   cmd.run_command
   cmd.stdout.split(/\n+/)
 end
 
-# Return the VPC CIDR list from node info
-def get_vpc_cidr_list
-  mac = node['ec2']['mac']
-  vpc_cidr_list = node['ec2']['network_interfaces_macs'][mac]['vpc_ipv4_cidr_blocks']
-  vpc_cidr_list.split(/\n+/)
-end
-
 def run_command(command)
   Mixlib::ShellOut.new(command).run_command.stdout.strip
-end
-
-# Check if recipes are executed during kitchen tests.
-def kitchen_test?
-  node['kitchen'] == 'true'
-end
-
-def efa_installed?
-  dir_exist = ::Dir.exist?('/opt/amazon/efa')
-  if dir_exist
-    modinfo_efa_stdout = Mixlib::ShellOut.new("modinfo efa").run_command.stdout
-    efa_installed_packages_file = Mixlib::ShellOut.new("cat /opt/amazon/efa_installed_packages").run_command.stdout
-    Chef::Log.info("`/opt/amazon/efa` directory already exists. \nmodinfo efa stdout: \n#{modinfo_efa_stdout} \nefa_installed_packages_file_content: \n#{efa_installed_packages_file}")
-  end
-  dir_exist
-end
-
-# load cluster configuration file into node object
-def load_cluster_config
-  ruby_block "load cluster configuration" do
-    block do
-      require 'yaml'
-      config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
-      Chef::Log.debug("Config read #{config}")
-      node.override['cluster']['config'].merge! config
-    end
-    only_if { node['cluster']['config'].nil? }
-  end
 end
 
 def raise_and_write_chef_error(raise_message, chef_error = nil)
   unless chef_error
     chef_error = raise_message
   end
-  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/chef_error_msg").run_command
+  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/bootstrap_error_msg").run_command
   raise raise_message
 end
 
@@ -560,6 +301,26 @@ def are_queues_updated?
   config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
   config["Scheduling"] != previous_config["Scheduling"] or is_compute_node_bootstrap_timeout_updated?(previous_config, config)
+end
+
+# Verify if CustomSlurmSettings has been updated in the config
+def are_bulk_custom_slurm_settings_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"]["SlurmSettings"]["CustomSlurmSettings"] != previous_config["Scheduling"]["SlurmSettings"]["CustomSlurmSettings"]
+end
+
+def are_mount_or_unmount_required?
+  require 'json'
+  change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
+  change_set["changeSet"].each do |change|
+    next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
+
+    return true
+  end
+  Chef::Log.info("No shared storages operation required.")
+  false
 end
 
 def evaluate_compute_bootstrap_timeout(config)
@@ -580,4 +341,71 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   cmd.run_command
   raise_command_error(command, cmd) if raise_on_error && cmd.error?
   cmd.stdout.strip
+end
+
+def is_slurm_database_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
+end
+
+# load shared storages data into node object
+def load_shared_storages_mapping
+  ruby_block "load shared storages mapping during cluster update" do
+    block do
+      require 'yaml'
+      # regenerate the shared storages mapping file after update
+      node.default['cluster']['shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['previous_shared_storages_mapping_path']))
+      node.default['cluster']['update_shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['shared_storages_mapping_path']))
+    end
+  end
+end
+
+# Parse an ARN.
+# ARN format: arn:PARTITION:SERVICE:REGION:ACCOUNT_ID:RESOURCE.
+# ARN examples:
+#   1. arn:aws:secretsmanager:eu-west-1:12345678910:secret:PasswordName
+#   2. arn:aws:ssm:eu-west-1:12345678910:parameter/PasswordName
+def parse_arn(arn_string)
+  parts = arn_string.nil? ? [] : arn_string.split(':', 6)
+  raise TypeError if parts.size < 6
+
+  {
+    partition: parts[1],
+    service: parts[2],
+    region: parts[3],
+    account_id: parts[4],
+    resource: parts[5],
+  }
+end
+
+def network_interface_macs(token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
+  res = get_metadata_with_token(token, uri)
+  res.delete("/").split("\n")
+end
+
+def get_primary_ip
+  primary_ip = node['ec2']['local_ipv4']
+
+  # TODO: We should use instance info stored in node['ec2'] by Ohai, rather than calling IMDS.
+  # We cannot use MAC related data because we noticed a mismatch in the info returned by Ohai and IMDS.
+  # In particular, the data returned by Ohai is missing the 'network-card' information.
+  token = get_metadata_token
+  macs = network_interface_macs(token)
+
+  if macs.length > 1
+    macs.each do |mac|
+      mac_metadata_uri = "http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}"
+      device_number = get_metadata_with_token(token, URI("#{mac_metadata_uri}/device-number"))
+      network_card = get_metadata_with_token(token, URI("#{mac_metadata_uri}/network-card"))
+      next unless device_number == '0' && network_card == '0'
+
+      primary_ip = get_metadata_with_token(token, URI("#{mac_metadata_uri}/local-ipv4s"))
+      break
+    end
+  end
+
+  primary_ip
 end

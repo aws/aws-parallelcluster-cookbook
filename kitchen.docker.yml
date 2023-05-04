@@ -1,0 +1,63 @@
+---
+driver:
+  name: dokken
+  platform: linux/amd64
+  pull_platform_image: false # Use the local images, prevent pull of docker images from Docker Hub,
+  chef_version: 17 # Chef version aligned with the one used to build the images
+  chef_image: cincproject/cinc
+  env:
+    # Since the kernel version of the docker images is not in the expected pattern,
+    # KERNEL_RELEASE is set in the environment to override the system value.
+    - KERNEL_RELEASE=3.10.0-1160.42.2.el7.x86_64
+
+provisioner:
+  name: dokken
+  product_name: cinc
+  chef_binary: /opt/cinc/bin/cinc-client
+  attributes:
+    virtualized: true
+
+transport:
+  name: dokken
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: alinux2
+    driver:
+      image: dokken/amazonlinux-2
+    attributes:
+      cluster:
+        base_os: alinux2
+        kernel_release: '5.10.157-139.675.amzn2.x86_64'
+  - name: centos7
+    driver:
+      image: dokken/centos-7
+    attributes:
+      cluster:
+        base_os: centos7
+        kernel_release: '3.10.0-1160.76.1.el7.x86_64'
+  - name: ubuntu1804
+    driver:
+      image: dokken/ubuntu-18.04
+    attributes:
+      cluster:
+        base_os: ubuntu1804
+        kernel_release: '5.4.0-1092-aws'
+  - name: ubuntu2004
+    driver:
+      image: dokken/ubuntu-20.04
+    attributes:
+      cluster:
+        base_os: ubuntu2004
+        kernel_release: '5.15.0-1028-aws'
+  - name: rhel8
+    driver:
+      image: registry.access.redhat.com/ubi8/ubi
+      intermediate_instructions:
+        - RUN chmod +t /tmp
+    attributes:
+      cluster:
+        base_os: rhel8
+        kernel_release: '4.18.0-425.13.1.el8_7.x86_64'

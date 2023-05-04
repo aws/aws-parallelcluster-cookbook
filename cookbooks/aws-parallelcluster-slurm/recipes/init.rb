@@ -30,11 +30,9 @@ if node['cluster']['node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
     block do
-      slurm_nodename = hit_dynamodb_info
+      slurm_nodename = dynamodb_info
       node.force_default['cluster']['slurm_nodename'] = slurm_nodename
     end
-    retries 5
-    retry_delay 3
     not_if do
       !node['cluster']['slurm_nodename'].nil? && !node['cluster']['slurm_nodename'].empty?
     end
@@ -45,6 +43,28 @@ if node['cluster']['node_type'] == "ComputeFleet"
     mode '0644'
     owner 'root'
     group 'root'
+  end
+
+  template "#{node['cluster']['slurm_plugin_dir']}/slurm_node_spec.json" do
+    source 'slurm/compute/slurm_node_spec.json.erb'
+    owner "root"
+    group "root"
+    mode "0644"
+    variables(
+      region: node['cluster']['region'],
+      cluster_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
+      scheduler: node['cluster']['scheduler'],
+      node_role: "ComputeFleet",
+      queue_name: node['cluster']['scheduler_queue_name'],
+      compute_resource: node['cluster']['scheduler_compute_resource_name'],
+      node_name: lazy { node['cluster']['slurm_nodename'] },
+      node_type: lazy { is_static_node?(node['cluster']['slurm_nodename']) ? "static" : "dynamic" },
+      instance_id: node['ec2']['instance_id'],
+      instance_type: node['ec2']['instance_type'],
+      availability_zone: node['ec2']['availability_zone'],
+      ip_address: node['ipaddress'],
+      hostname: node['ec2']['hostname']
+    )
   end
 end
 

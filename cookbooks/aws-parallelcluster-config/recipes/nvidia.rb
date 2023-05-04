@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster
 # Recipe:: nvidia
 #
-# Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,22 +15,34 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Start nvidia fabric manager on NVSwitch enabled systems
-if get_nvswitches > 1
-  service 'nvidia-fabricmanager' do
-    action %i(start enable)
-    supports status: true
-  end
+fabric_manager 'Configure fabric manager' do
+  action :configure
+end
+gdrcopy 'Configure gdrcopy' do
+  action :configure
 end
 
-if graphic_instance?
-  # NVIDIA GDRCopy
-  execute "enable #{node['cluster']['nvidia']['gdrcopy']['service']} service" do
-    # Using command in place of service resource because of: https://github.com/chef/chef/issues/12053
-    command "systemctl enable #{node['cluster']['nvidia']['gdrcopy']['service']}"
+if graphic_instance? && nvidia_installed?
+  # Load kernel module Nvidia-uvm
+  kernel_module 'nvidia-uvm' do
+    action :load
   end
-  service node['cluster']['nvidia']['gdrcopy']['service'] do
-    action :start
-    supports status: true
+  # Make sure kernel module Nvidia-uvm is loaded at instance boot time
+  cookbook_file 'nvidia.conf' do
+    source 'nvidia/nvidia.conf'
+    path '/etc/modules-load.d/nvidia.conf'
+    owner 'root'
+    group 'root'
+    mode '0644'
+  end
+  # Install nvidia_persistenced. See https://download.nvidia.com/XFree86/Linux-x86_64/396.51/README/nvidia-persistenced.html
+  bash 'Install nvidia_persistenced' do
+    cwd '/usr/share/doc/NVIDIA_GLX-1.0/samples'
+    user 'root'
+    group 'root'
+    code <<-NVIDIA
+      tar -xf nvidia-persistenced-init.tar.bz2
+      ./nvidia-persistenced-init/install.sh
+    NVIDIA
   end
 end

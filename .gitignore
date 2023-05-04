@@ -1,3 +1,4 @@
+.vscode/
 .idea
 *.iml
 .vagrant
@@ -21,12 +22,18 @@ build.log
 build-*.log
 
 .tox/
+.python-version
 
 aws-parallelcluster-cookbook-*.tgz
 aws-parallelcluster-cookbook-*.md5
 aws-parallelcluster-cookbook-*.date
 
 .coverage
+coverage.xml
+
 __pycache__
 report.html
 /assets/style.css
+/.kitchen.env.sh
+
+.DS_Store

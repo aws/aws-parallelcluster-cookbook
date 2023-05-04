@@ -1,0 +1,134 @@
+# Allows to test single resources.
+#
+# Must be run as local file (override) of kitchen.docker.yml
+# export KITCHEN_YAML=kitchen.docker.yml
+# export KITCHEN_LOCAL_YAML=kitchen.resources.yml
+# See: https://kitchen.ci/docs/reference/configuration
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    # resource tests will use controls from this directory
+    - path: test/resources
+
+# If you need to test a resource with recipe/resources dependencies,
+# add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
+# then define a dependencies attribute, listing them with recipe: or resource: prefix.
+# You can find an example in the add_depdendencies.rb file.
+suites:
+  - name: sticky_bits
+    run_list:
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - sticky_bits_configured
+    attributes:
+      resource: sticky_bits
+  - name: efa_configure_compute
+    run_list:
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - efa_debian_system_settings_configured
+    attributes:
+      resource: efa:configure
+      cluster:
+        enable_efa: compute
+        node_type: ComputeFleet
+  - name: efs_configure
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - efs_utils_installed
+    attributes:
+      resource: efs
+      dependencies:
+        #- recipe:aws-parallelcluster-install::directories
+        #- resource:package_repos
+        #- resource:install_packages
+  - name: dns_domain_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::test_resource]
+    verifier:
+      controls:
+        - dns_domain_configured
+    attributes:
+      dependencies:
+        #- recipe:aws-parallelcluster-install::directories
+      resource: dns_domain:configure
+      cluster:
+        dns_domain: test-domain
+  - name: nfs_configured
+    run_list:
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - nfs_configured
+    attributes:
+      resource: nfs:configure
+      cluster:
+        nfs:
+          threads: 10
+      dependencies:
+        - resource:nfs
+  - name: system_authentication_configured
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - system_authentication_configured
+        - system_authentication_services_enabled
+    attributes:
+      resource: system_authentication:configure
+      dependencies:
+        - resource:package_repos
+        - resource:system_authentication
+  - name: cloudwatch_config
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - /tag:config_cloudwatch/
+    attributes:
+      resource: cloudwatch:configure
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
+        - resource:cloudwatch:setup
+        - resource:node_attributes
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        cw_logging_enabled: "true"
+        log_group_name: test
+  - name: dcv_config
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*dcv/
+    attributes:
+      resource: dcv:configure
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-install::python
+        - resource:package_repos
+        - resource:install_packages
+        - recipe:aws-parallelcluster-install::nvidia
+        - resource:dcv:setup
+        - resource:node_attributes
+      cluster:
+        node_type: HeadNode
+        dcv_enabled: "head_node"
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge
