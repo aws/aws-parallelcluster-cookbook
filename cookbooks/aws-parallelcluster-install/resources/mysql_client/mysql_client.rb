@@ -19,7 +19,6 @@ default_action :setup
 
 use 'partial/_source_link'
 use 'partial/_download_and_install'
-use 'partial/_validate'
 
 # MySQL Packages
 # We install MySQL packages from the OS repositories for ubuntu platform, while we
@@ -52,20 +51,6 @@ action_class do
         'ubuntu' => {
           '20.04' => "ubuntu/20.04/x86_64",
           '18.04' => "ubuntu/18.04/x86_64",
-        }
-      )
-    end
-  end
-
-  def expected_version
-    if arm_instance?
-      "8.0.31"
-    else
-      value_for_platform(
-        'default' => "8.0.31",
-        'ubuntu' => {
-          '20.04' => "8.0.31-1ubuntu20.04",
-          '18.04' => "8.0.31-1ubuntu18.04",
         }
       )
     end
