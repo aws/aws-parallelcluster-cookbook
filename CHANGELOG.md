@@ -20,7 +20,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install [NVIDIA Data Center GPU Manager (DCGM)](https://developer.nvidia.com/dcgm) package on all supported OSes except for aarch64 `centos7` and `alinux2`. 
 
 **CHANGES**
-- Upgrade Slurm to version 23.02.1.
+- Upgrade Slurm to version 23.02.2.
 - Upgrade munge to version 0.5.15.
 - Set Slurm default `TreeWidth` to 30.
 - Set Slurm prolog and epilog configurations to target a directory, `/opt/slurm/etc/scripts/prolog.d/` and `/opt/slurm/etc/scripts/epilog.d/` respectively.
