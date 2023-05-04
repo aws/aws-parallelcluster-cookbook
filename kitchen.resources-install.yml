@@ -54,7 +54,6 @@ suites:
         - /mysql_client/
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
         - recipe:aws-parallelcluster-install::directories
       resource: mysql_client
   - name: nfs
@@ -123,7 +122,6 @@ suites:
     attributes:
       resource: munge
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos
         - resource:install_packages
