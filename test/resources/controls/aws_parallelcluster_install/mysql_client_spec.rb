@@ -47,7 +47,7 @@ control 'tag:install_mysql_client_source_code_created' do
     its('content') do
       should eq %(You can get MySQL source code here:
 
-https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/source/mysql-8.0.31.tar.gz
+https://#{node['cluster']['region']}-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/source/mysql-8.0.31.tar.gz
 )
     end
   end
