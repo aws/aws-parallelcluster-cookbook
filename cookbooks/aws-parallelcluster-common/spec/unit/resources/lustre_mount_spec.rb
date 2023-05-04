@@ -78,6 +78,81 @@ describe 'lustre:mount' do
         end
       end
 
+      context 'for filecache' do
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
+            platform: platform, version: version,
+            step_into: ['lustre']
+          ) do |node|
+            node.override['cluster']['region'] = "REGION"
+          end
+          runner.converge_dsl do
+            lustre 'mount' do
+              fsx_fs_id_array %w(file_cache_id_1 file_cache_id_2)
+              fsx_fs_type_array %w(FILECACHE FILECACHE)
+              fsx_shared_dir_array %w(filecache_shared_dir_1 /filecache_shared_dir_2)
+              fsx_dns_name_array %w(filecache_dns_name_1 filecache_dns_name_2)
+              fsx_mount_name_array %w(filecache_mount_name_1 filecache_mount_name_2)
+              fsx_volume_junction_path_array ['', '']
+              action :mount
+            end
+          end
+        end
+
+        before do
+          stub_command("mount | grep ' /filecache_shared_dir_1 '").and_return(false)
+          stub_command("mount | grep ' /filecache_shared_dir_2 '").and_return(true)
+        end
+
+        it 'creates_shared_dir' do
+          is_expected.to create_directory('/filecache_shared_dir_1')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+          # .with(recursive: true) # even if we set recursive a true, the test fails
+
+          is_expected.to create_directory('/filecache_shared_dir_2')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+          # .with(recursive: true) # even if we set recursive a true, the test fails
+        end
+
+        it 'mounts shared dir if not already mounted' do
+          is_expected.to mount_mount('/filecache_shared_dir_1')
+            .with(device: 'filecache_dns_name_1@tcp:/filecache_mount_name_1')
+            .with(fstype: 'lustre')
+            .with(dump: 0)
+            .with(pass: 0)
+            .with(options: %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service))
+            .with(retries: 10)
+            .with(retry_delay: 6)
+        end
+
+        it 'enables shared dir mount if already mounted' do
+          is_expected.to enable_mount('/filecache_shared_dir_2')
+            .with(device: 'filecache_dns_name_2@tcp:/filecache_mount_name_2')
+            .with(fstype: 'lustre')
+            .with(dump: 0)
+            .with(pass: 0)
+            .with(options: %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service))
+            .with(retries: 10)
+            .with(retry_delay: 6)
+        end
+
+        it 'changes permissions' do
+          is_expected.to create_directory('change permissions for /filecache_shared_dir_1')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+
+          is_expected.to create_directory('change permissions for /filecache_shared_dir_2')
+            .with(owner: 'root')
+            .with(group: 'root')
+            .with(mode: '1777')
+        end
+      end
+
       context 'for openzfs' do
         cached(:chef_run) do
           runner = ChefSpec::Runner.new(
@@ -335,6 +410,58 @@ describe 'lustre:unmount' do
         it 'deletes shared dir' do
           is_expected.to delete_directory('/shared_dir_1')
           is_expected.to delete_directory('/shared_dir_2')
+        end
+      end
+
+      context 'for FILECACHE' do
+        cached(:chef_run) do
+          runner = ChefSpec::Runner.new(
+            platform: platform, version: version,
+            step_into: ['lustre']
+          ) do |node|
+            node.override['cluster']['region'] = "REGION"
+          end
+          runner.converge_dsl do
+            lustre 'unmount' do
+              fsx_fs_id_array %w(file_cache_id_1 file_cache_id_2)
+              fsx_fs_type_array %w(FILECACHE FILECACHE)
+              fsx_shared_dir_array %w(filecache_dir_1 filecache_dir_2)
+              fsx_dns_name_array %w(filecache_dns_name_1 filecache_dns_name_2)
+              fsx_mount_name_array %w(filecache_mount_name_1 filecache_mount_name_2)
+              fsx_volume_junction_path_array ['']
+              action :unmount
+            end
+          end
+        end
+
+        before do
+          stub_command("mount | grep ' /filecache_dir_1 '").and_return(false)
+          stub_command("mount | grep ' /filecache_dir_2 '").and_return(true)
+        end
+
+        it 'unmounts fsx only if mounted' do
+          is_expected.not_to run_execute('unmount fsx /filecache_dir_1')
+
+          is_expected.to run_execute('unmount fsx /filecache_dir_2')
+            .with(command: "umount -fl /filecache_dir_2")
+            .with(retries: 10)
+            .with(retry_delay: 6)
+            .with(timeout: 60)
+        end
+
+        it 'removes volume from /etc/fstab' do
+          is_expected.to edit_delete_lines('remove volume filecache_dns_name_1@tcp:/filecache_mount_name_1 from /etc/fstab')
+            .with(path: "/etc/fstab")
+            .with(pattern: "filecache_dns_name_1@tcp:/filecache_mount_name_1 *")
+
+          is_expected.to edit_delete_lines('remove volume filecache_dns_name_2@tcp:/filecache_mount_name_2 from /etc/fstab')
+            .with(path: "/etc/fstab")
+            .with(pattern: "filecache_dns_name_2@tcp:/filecache_mount_name_2 *")
+        end
+
+        it 'deletes shared dir' do
+          is_expected.to delete_directory('/filecache_dir_1')
+          is_expected.to delete_directory('/filecache_dir_2')
         end
       end
     end

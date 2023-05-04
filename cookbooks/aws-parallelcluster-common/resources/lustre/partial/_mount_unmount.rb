@@ -116,6 +116,11 @@ action_class do
         @mount_options = %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount)
         @device_name = "#{@dns_name}@tcp:/#{@mount_name}"
         @fstype = 'lustre'
+
+      elsif @type == 'FILECACHE'
+        @mount_options = %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service)
+        @device_name = "#{@dns_name}@tcp:/#{@mount_name}"
+        @fstype = 'lustre'
       else
         @device_name = "#{@dns_name}:#{@volume_junction_path}"
         @fstype = 'nfs'
