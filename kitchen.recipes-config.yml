@@ -37,7 +37,6 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
-        - recipe:aws-parallelcluster::test_dummy
       cluster:
         ebs_shared_dirs: ebs1,ebs2
         volume: volume1,volume2
@@ -63,7 +62,6 @@ suites:
         - fs_data_file_with_default_values
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster::test_dummy
       cluster:
         ebs_shared_dirs: '/shared'

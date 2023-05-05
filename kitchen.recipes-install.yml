@@ -123,14 +123,10 @@ suites:
         - recipe:aws-parallelcluster-test::docker_mock
   - name: chrony
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-install::chrony]
     verifier:
       controls:
         - chrony_installed_and_configured
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster::test_dummy
   - name: disable_selinux
     run_list:
       - recipe[aws-parallelcluster-install::disable_selinux]
@@ -177,7 +173,6 @@ suites:
         - clusterstatusmgtd_init_slurm_config
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
         - recipe:aws-parallelcluster-install::users
         - recipe:aws-parallelcluster-install::directories
         - recipe:aws-parallelcluster-install::sudo
@@ -192,7 +187,6 @@ suites:
         - mount_shared_configured
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
         - recipe:aws-parallelcluster-install::directories
         - resource:nfs
         - recipe:aws-parallelcluster-test::export_directories_mock
