@@ -5,7 +5,7 @@ verifier:
     - test/resources
   reporter:
     - cli
-    - junit:.kitchen/inspec/results/%{platform}_%{suite}_inspec.xml
+    - junit2:.kitchen/inspec/results/%{platform}_%{suite}_inspec.xml
 
 provisioner:
   data_path: test/data
