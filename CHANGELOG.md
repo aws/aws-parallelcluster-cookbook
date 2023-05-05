@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 
 **CHANGES**
+Upgrade Slurm to version 23.02.2.
 
 **BUG FIXES**
 
