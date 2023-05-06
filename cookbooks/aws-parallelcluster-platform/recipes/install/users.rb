@@ -1,5 +1,5 @@
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-platform
 # Recipe:: users
 #
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.

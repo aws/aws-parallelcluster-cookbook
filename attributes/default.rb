@@ -44,8 +44,6 @@ default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir'
 default['cluster']['shared_storages_mapping_path'] = "/etc/parallelcluster/shared_storages_data.yaml"
 default['cluster']['previous_shared_storages_mapping_path'] = "/etc/parallelcluster/previous_shared_storages_data.yaml"
 
-default['cluster']['reserved_base_uid'] = 400
-
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
 default['cluster']['psxe']['noarch_packages'] = %w(intel-tbb-common-runtime intel-mkl-common-runtime intel-psxe-common-runtime
@@ -77,26 +75,6 @@ default['cluster']['intelmpi']['qt_version'] = '6.4.2'
 # URLs to software packages used during install recipes
 default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
-# Slurm
-default['cluster']['slurm']['user'] = 'slurm'
-default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
-default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
-default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
-# Munge
-default['cluster']['munge']['user'] = 'munge'
-default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
-default['cluster']['munge']['group'] = node['cluster']['munge']['user']
-default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
-
-# Scheduler plugin Configuration
-default['cluster']['scheduler_plugin']['name'] = 'pcluster-scheduler-plugin'
-default['cluster']['scheduler_plugin']['user'] = default['cluster']['scheduler_plugin']['name']
-default['cluster']['scheduler_plugin']['user_id'] = node['cluster']['reserved_base_uid'] + 4
-default['cluster']['scheduler_plugin']['group'] = default['cluster']['scheduler_plugin']['user']
-default['cluster']['scheduler_plugin']['group_id'] = default['cluster']['scheduler_plugin']['user_id']
-
-default['cluster']['scheduler_plugin']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
-default['cluster']['scheduler_plugin']['system_group_id_start'] = default['cluster']['scheduler_plugin']['system_user_id_start']
 
 # Scheduler plugin event handler
 default['cluster']['scheduler_plugin']['home'] = '/home/pcluster-scheduler-plugin'
@@ -210,7 +188,6 @@ default['cluster']['instance_slots'] = '1'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['node_type'] = nil
-default['cluster']['cluster_user'] = 'ec2-user'
 default['cluster']['head_node_private_ip'] = nil
 default['cluster']['volume'] = ''
 
@@ -236,10 +213,6 @@ default['cluster']['efs_shared_dirs'] = ''
 default['cluster']['efs_fs_ids'] = ''
 default['cluster']['efs_encryption_in_transits'] = ''
 default['cluster']['efs_iam_authorizations'] = ''
-default['cluster']['cluster_admin_user'] = 'pcluster-admin'
-default['cluster']['cluster_admin_user_id'] = node['cluster']['reserved_base_uid']
-default['cluster']['cluster_admin_group'] = node['cluster']['cluster_admin_user']
-default['cluster']['cluster_admin_group_id'] = node['cluster']['cluster_admin_user_id']
 default['cluster']['fsx_shared_dirs'] = ''
 default['cluster']['fsx_fs_ids'] = ''
 default['cluster']['fsx_dns_names'] = ''
@@ -268,9 +241,9 @@ default['cluster']['instance_types_data'] = nil
 
 # IMDS
 default['cluster']['head_node_imds_secured'] = 'true'
-default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']]
+default['cluster']['head_node_imds_allowed_users'] = ['root', lazy { node['cluster']['cluster_admin_user'] }, lazy { node['cluster']['cluster_user'] }]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
-default['cluster']['head_node_imds_allowed_users'].append(node['cluster']['scheduler_plugin']['user']) if node['cluster']['scheduler'] == 'plugin'
+default['cluster']['head_node_imds_allowed_users'].append(lazy { node['cluster']['scheduler_plugin']['user'] }) if node['cluster']['scheduler'] == 'plugin'
 
 # Compute nodes bootstrap timeout
 default['cluster']['compute_node_bootstrap_timeout'] = 1800

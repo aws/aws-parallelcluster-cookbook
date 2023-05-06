@@ -27,17 +27,6 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
-  - name: users
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-install::users]
-    verifier:
-      controls:
-        - admin_user_created
-        - ulimit_configured
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster::test_dummy
   - name: directories
     run_list:
       - recipe[aws-parallelcluster-install::directories]
