@@ -1,0 +1,13 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: sudo
+    run_list:
+      - recipe[aws-parallelcluster-platform::sudo_install]
+    verifier:
+      controls:
+        - /tag:install_sudo/
