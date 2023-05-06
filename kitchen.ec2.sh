@@ -45,17 +45,14 @@
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 
+source kitchen.local-yml.sh
 
-KITCHEN_SCOPE=$1; shift;
-KITCHEN_PHASE=$(echo $KITCHEN_SCOPE | awk -F- '{print $2}')
+THIS_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-export KITCHEN_LOCAL_YAML="kitchen.${KITCHEN_SCOPE}.yml"
-export KITCHEN_YAML=kitchen.ec2.yml
-export KITCHEN_GLOBAL_YAML=kitchen.global.yml
+export KITCHEN_YAML="${THIS_DIR}/kitchen.ec2.yml"
+export KITCHEN_GLOBAL_YAML="${THIS_DIR}/kitchen.global.yml"
 export KITCHEN_DRIVER=ec2
-export KITCHEN_PHASE
 
-THIS_DIR=$(dirname "$0")
 if [ -e "${THIS_DIR}/.kitchen.env.sh" ]
 then
   echo "*** Apply local environment"
@@ -143,4 +140,4 @@ echo "** KITCHEN_YAML: $KITCHEN_YAML"
 echo "** KITCHEN_GLOBAL_YAML: $KITCHEN_GLOBAL_YAML"
 echo "kitchen $*"
 
-kitchen "$@"
+cd "${KITCHEN_COOKBOOK_PATH}" && kitchen "$@"

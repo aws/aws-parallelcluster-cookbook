@@ -51,13 +51,21 @@ For instance:
 ./kitchen.docker.sh recipes-install test cfnconfig-mixed -c 5 -l debug
 
 ./kitchen.ec2.sh resources-config test -c 5
+
+./kitchen.ec2.sh platform-install verify sudo -c 5
 ```
 
-To find all possible contexts you can run:
-```bash
-ls kitchen.{recipes,resources,validate}*.yml
-```
+A context must have the format `$subject-$phase`. 
 
+Supported phases are:
+- `install` (on EC2 it defaults to a bare base AMI)
+- `config` (on EC2 it defaults to a ParallelCluster official AMI)
+
+If $subject is `recipes`, `resources` or `validate`, the helper will use an "old-style" kitchen local yaml 
+`kitchen.${context}.yml` in `aws-parallelcluster-cookbook` root dir.
+
+Otherwise, it will use `kitchen.${context}.yml` in the specific cookbook, i.e. in
+`aws-parallelcluster-cookbook/cookbooks/aws-parallelcluster-$ubject` dir.
 
 Example of `.kitchen.env.sh` file you can define in your cookbook root folder:
 
@@ -67,13 +75,6 @@ export KITCHEN_AWS_REGION=eu-west-1
 export KITCHEN_SUBNET_ID=subnet-xxx
 export KITCHEN_SSH_KEY_PATH=/path/your-key.pem
 export KITCHEN_SECURITY_GROUP_ID=sg-your-group
-
-# amis for eu-west-1
-export KITCHEN_ALINUX2_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_REDHAT8_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_CENTOS7_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_UBUNTU18_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_UBUNTU20_AMI=ami-xxxxxxxxxxxxxxxxx
 ```
 
 ### Kitchen lifecycle hooks
