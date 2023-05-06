@@ -110,6 +110,7 @@ jobs:
           - cookbooks/aws-parallelcluster-common
           - cookbooks/aws-parallelcluster-install
           - cookbooks/aws-parallelcluster-config
+          - cookbooks/aws-parallelcluster-platform
     steps:
       - uses: actions/checkout@main
       - uses: actionshub/chef-install@main
