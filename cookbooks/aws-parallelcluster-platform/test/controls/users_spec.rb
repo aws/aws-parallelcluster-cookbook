@@ -1,6 +1,6 @@
 user = "pcluster-admin"
 
-control 'admin_user_created' do
+control 'tag:install_users_admin_user_created' do
   title 'Configure cluster admin user'
 
   describe command("grep #{user} /etc/passwd") do
@@ -13,7 +13,7 @@ control 'admin_user_created' do
   end
 end
 
-control 'ulimit_configured' do
+control 'tag:install_users_ulimit_configured' do
   title 'Configure soft ulimit nofile'
   describe limits_conf("/etc/security/limits.d/00_all_limits.conf") do
     its('*') { should include ['-', 'nofile', "10000"] }

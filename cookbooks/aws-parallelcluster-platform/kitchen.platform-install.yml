@@ -11,3 +11,9 @@ suites:
     verifier:
       controls:
         - /tag:install_sudo/
+  - name: users
+    run_list:
+      - recipe[aws-parallelcluster-platform::users]
+    verifier:
+      controls:
+        - /tag:install_users/
