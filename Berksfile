@@ -23,3 +23,4 @@ cookbook "aws-parallelcluster-slurm", path: "./cookbooks/aws-parallelcluster-slu
 cookbook "aws-parallelcluster-scheduler-plugin", path: "./cookbooks/aws-parallelcluster-scheduler-plugin"
 cookbook "aws-parallelcluster-awsbatch", path: "./cookbooks/aws-parallelcluster-awsbatch"
 cookbook "aws-parallelcluster-test", path: "./cookbooks/aws-parallelcluster-test"
+cookbook "aws-parallelcluster-platform", path: "./cookbooks/aws-parallelcluster-platform"
