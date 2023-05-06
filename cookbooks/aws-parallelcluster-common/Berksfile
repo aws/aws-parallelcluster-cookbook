@@ -12,4 +12,5 @@ cookbook "line", path: "../../third-party/line-4.5.2"
 cookbook "yum", path: "../../third-party/yum-7.4.0"
 cookbook "yum-epel", path: "../../third-party/yum-epel-4.5.0"
 
+cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
 cookbook "aws-parallelcluster-test", path: "../aws-parallelcluster-test"

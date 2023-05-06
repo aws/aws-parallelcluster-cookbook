@@ -1,3 +1,5 @@
 # frozen_string_literal: true
 source chef_repo: "."
 metadata
+
+cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
