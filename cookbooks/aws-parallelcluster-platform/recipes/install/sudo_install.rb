@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
-# Recipe:: sudoers
+# Cookbook:: aws-parallelcluster-platform
+# Recipe:: sudo_install
 #
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

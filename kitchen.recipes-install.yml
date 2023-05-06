@@ -27,13 +27,6 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
-  - name: sudo
-    run_list:
-      - recipe[aws-parallelcluster-install::sudo]
-    verifier:
-      controls:
-        - sudo_installed
-        - sudoers_file_configured
   - name: users
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
