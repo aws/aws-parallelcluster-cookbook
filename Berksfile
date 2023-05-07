@@ -25,3 +25,4 @@ cookbook "aws-parallelcluster-awsbatch", path: "./cookbooks/aws-parallelcluster-
 cookbook "aws-parallelcluster-test", path: "./cookbooks/aws-parallelcluster-test"
 cookbook "aws-parallelcluster-platform", path: "./cookbooks/aws-parallelcluster-platform"
 cookbook "aws-parallelcluster-shared", path: "./cookbooks/aws-parallelcluster-shared"
+cookbook "aws-parallelcluster-tests", path: "./cookbooks/aws-parallelcluster-tests"
