@@ -18,7 +18,7 @@
 include_recipe "aws-parallelcluster-common::setup_envars"
 include_recipe "aws-parallelcluster-platform::sudo_install"
 include_recipe "aws-parallelcluster-platform::users"
-include_recipe "aws-parallelcluster-install::disable_services"
+include_recipe "aws-parallelcluster-platform::disable_services"
 
 package_repos 'setup the repositories'
 
