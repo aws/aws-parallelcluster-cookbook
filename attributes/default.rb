@@ -93,38 +93,6 @@ default['cluster']['efs_utils']['url'] = "https://github.com/aws/efs-utils/archi
 default['cluster']['efs_utils']['sha256'] = '69d0d8effca3b58ccaf4b814960ec1d16263807e508b908975c2627988c7eb6c'
 default['cluster']['efs_utils']['tarball_path'] = "#{node['cluster']['sources_dir']}/efs-utils-#{node['cluster']['efs_utils']['version']}.tar.gz"
 
-# NICE DCV
-default['cluster']['dcv_port'] = 8443
-default['cluster']['dcv']['installed'] = 'yes'
-default['cluster']['dcv']['version'] = '2023.0-15022'
-if arm_instance?
-  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 amazon2 redhat8)
-  default['cluster']['dcv']['url_architecture_id'] = 'aarch64'
-else
-  default['cluster']['dcv']['supported_os'] = %w(centos7 ubuntu18 ubuntu20 amazon2 redhat8)
-  default['cluster']['dcv']['url_architecture_id'] = 'x86_64'
-end
-default['cluster']['dcv']['server']['version'] = '2023.0.15022-1'
-default['cluster']['dcv']['xdcv']['version'] = '2023.0.547-1'
-default['cluster']['dcv']['gl']['version'] = '2023.0.1027-1'
-default['cluster']['dcv']['web_viewer']['version'] = '2023.0.15022-1'
-# DCV external authenticator configuration
-default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
-default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
-default['cluster']['dcv']['authenticator']['group'] = node['cluster']['dcv']['authenticator']['user']
-default['cluster']['dcv']['authenticator']['group_id'] = node['cluster']['dcv']['authenticator']['user_id']
-default['cluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cluster']['dcv']['authenticator']['user']}"
-default['cluster']['dcv']['authenticator']['certificate'] = "/etc/parallelcluster/ext-auth-certificate.pem"
-default['cluster']['dcv']['authenticator']['private_key'] = "/etc/parallelcluster/ext-auth-private-key.pem"
-default['cluster']['dcv']['authenticator']['virtualenv'] = "dcv_authenticator_virtualenv"
-default['cluster']['dcv']['authenticator']['virtualenv_path'] = [
-  node['cluster']['system_pyenv_root'],
-  'versions',
-  node['cluster']['python-version'],
-  'envs',
-  node['cluster']['dcv']['authenticator']['virtualenv'],
-].join('/')
-
 # OpenSSH settings for AWS ParallelCluster instances
 default['openssh']['server']['protocol'] = '2'
 default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
