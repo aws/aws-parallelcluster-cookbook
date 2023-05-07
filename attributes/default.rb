@@ -125,10 +125,6 @@ default['cluster']['dcv']['authenticator']['virtualenv_path'] = [
   node['cluster']['dcv']['authenticator']['virtualenv'],
 ].join('/')
 
-# CloudWatch Agent
-default['cluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
-default['cluster']['cloudwatch']['public_key_local_path'] = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
-
 # OpenSSH settings for AWS ParallelCluster instances
 default['openssh']['server']['protocol'] = '2'
 default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
