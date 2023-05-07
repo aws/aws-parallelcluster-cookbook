@@ -78,3 +78,49 @@ def append_if_not_present_grub_cmdline(attributes, grub_variable)
     end
   end
 end
+
+# Add an external package repository to the OS's package manager
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
+def add_package_repository(repo_name, baseurl, gpgkey, distribution)
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    yum_repository repo_name do
+      baseurl baseurl
+      gpgkey gpgkey
+      retries 3
+      retry_delay 5
+    end
+  when 'debian'
+    apt_repository repo_name do
+      uri          baseurl
+      key          gpgkey
+      distribution distribution
+      retries 3
+      retry_delay 5
+    end
+    apt_update 'update' do
+      retries 3
+      retry_delay 5
+    end
+  else
+    raise "platform not supported: #{node['platform_family']}"
+  end
+end
+
+# Remove an external package repository from the OS's package manager
+# NOTE: This helper function defines a Chef resource function to be executed at Converge time
+def remove_package_repository(repo_name)
+  case node['platform_family']
+  when 'rhel', 'amazon'
+    yum_repository repo_name do
+      action :remove
+    end
+  when 'debian'
+    apt_repository repo_name do
+      action :remove
+    end
+    apt_update
+  else
+    raise "platform not supported: #{node['platform_family']}"
+  end
+end
