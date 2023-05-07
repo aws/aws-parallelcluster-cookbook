@@ -29,14 +29,14 @@ lifecycle:
 suites:
   - name: fs_update
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::fs_update]
     verifier:
       controls:
         - fs_data_file_created_correctly
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
       cluster:
         ebs_shared_dirs: ebs1,ebs2
         volume: volume1,volume2
@@ -129,15 +129,15 @@ suites:
         ephemeral_dir: test1
   - name: sudo_configured
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::sudo]
     verifier:
       controls:
         - sudo_configured
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::directories
-        #- recipe:aws-parallelcluster-install::sudo
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::sudo_install
   - name: chrony_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
@@ -149,8 +149,9 @@ suites:
       dependencies:
         #- recipe:aws-parallelcluster-install::chrony
   - name: imds_configured
+    # FIXME: breaks on Docker
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::imds]
     verifier:
       controls:
@@ -158,9 +159,9 @@ suites:
         - /iptables_correctly_configured/
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::directories
-        #- resource:package_repos
-        #- resource:install_packages
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
       cluster:
         node_type: HeadNode
         scheduler: slurm
@@ -184,7 +185,7 @@ suites:
         #- resource:install_packages
         #- resource:nfs
         #- recipe:aws-parallelcluster-install::python
-        #- recipe:aws-parallelcluster-install::users
+        #- recipe:aws-parallelcluster-platform::users
         - recipe:aws-parallelcluster-slurm::init_dns
       cluster:
         stack_name: "mock"
@@ -280,14 +281,14 @@ suites:
   - name: custom_slurm_settings_file_via_s3
     # check that we can retrieve a custom slurm settings file using the S3 protocol
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-slurm::retrieve_remote_custom_settings_file]
     verifier:
       controls:
         - custom_settings_file_retrieved
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-install::python
       cluster:
         config:
@@ -299,14 +300,14 @@ suites:
   - name: custom_slurm_settings_file_via_https
     # check that we can retrieve a custom slurm settings file from internet through HTTP/S
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-slurm::retrieve_remote_custom_settings_file]
     verifier:
       controls:
         - custom_settings_file_retrieved
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-install::python
       cluster:
         config:
@@ -316,8 +317,9 @@ suites:
               CustomSlurmSettingsIncludeFile: 'https://us-east-1-aws-parallelcluster.s3.amazonaws.com/templates/1-click/serverless-database.yaml'
               LocalPath: '/tmp/custom_slurm_settings_include_file_slurm.conf'
   - name: directory_service
+    # FIXME: breaks on Docker
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::directory_service]
     verifier:
       controls:
@@ -338,7 +340,7 @@ suites:
           additional_sssd_configs:
             debug_level: "0x1ff"
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:system_authentication
   - name: nvidia

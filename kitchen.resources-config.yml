@@ -89,7 +89,7 @@ suites:
         - resource:system_authentication
   - name: cloudwatch_config
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::test_resource]
     verifier:
       controls:
@@ -98,7 +98,7 @@ suites:
       resource: cloudwatch:configure
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-install::python
         - resource:cloudwatch:setup
         - resource:node_attributes
@@ -108,8 +108,9 @@ suites:
         cw_logging_enabled: "true"
         log_group_name: test
   - name: dcv_config
+    # FIXME: breaks on Docker
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::test_resource]
     verifier:
       controls:
@@ -118,7 +119,7 @@ suites:
       resource: dcv:configure
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-install::python
         - resource:package_repos
         - resource:install_packages

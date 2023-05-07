@@ -47,14 +47,14 @@ suites:
       resource: ec2_udev_rules
   - name: mysql_client
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
         - /mysql_client/
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
       resource: mysql_client
   - name: nfs
     run_list:
@@ -98,7 +98,7 @@ suites:
         - resource:package_repos
   - name: efa_setup
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
@@ -108,10 +108,10 @@ suites:
     attributes:
       resource: efa:setup
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: munge
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-slurm::test_resource]
     verifier:
       controls:
@@ -122,12 +122,12 @@ suites:
     attributes:
       resource: munge
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
   - name: stunnel_installed
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -135,7 +135,7 @@ suites:
     attributes:
       resource: stunnel:setup
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
   - name: dns_domain_setup
@@ -170,7 +170,7 @@ suites:
         - resource:package_repos
   - name: cloudwatch
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -179,11 +179,11 @@ suites:
       resource: cloudwatch
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:node_attributes
   - name: arm_pl
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -194,11 +194,11 @@ suites:
     attributes:
       resource: arm_pl
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
   - name: modules
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -206,12 +206,12 @@ suites:
     attributes:
       resource: modules
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:node_attributes
   - name: build_tools
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -219,12 +219,12 @@ suites:
     attributes:
       resource: build_tools
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:node_attributes
   - name: dcv
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
@@ -233,7 +233,7 @@ suites:
       resource: dcv
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:node_attributes
       cluster:
         is_official_ami_build: true
