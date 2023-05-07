@@ -117,3 +117,5 @@ default['cluster']['head_node_imds_allowed_users'].append(lazy { node['cluster']
 
 # Default NFS mount options
 default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
+
+default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
