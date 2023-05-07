@@ -31,4 +31,9 @@ suites:
     verifier:
       controls:
         - /patch_isolated_instance_script_created/
-
+  - name: disable_services
+    run_list:
+      - recipe[aws-parallelcluster-platform::disable_services]
+    verifier:
+      controls:
+        - /services_disabled/
