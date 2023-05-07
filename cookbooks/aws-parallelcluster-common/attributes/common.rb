@@ -70,3 +70,7 @@ default['cluster']['nvidia']['cuda_samples_url'] = "https://github.com/NVIDIA/cu
 default['cluster']['efa']['installer_version'] = '1.22.1'
 default['cluster']['efa']['sha256'] = 'f90f3d5f59c031b9a964466b5401e86fd0429272408f6c207c3f9048254e9665'
 default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
+
+# CloudWatch Agent
+default['cluster']['cloudwatch']['public_key_url'] = "https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
+default['cluster']['cloudwatch']['public_key_local_path'] = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
