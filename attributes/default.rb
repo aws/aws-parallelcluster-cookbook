@@ -107,8 +107,6 @@ default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
 default['cluster']['filehandle_limit'] = 10_000
 default['cluster']['memory_limit'] = 'unlimited'
 
-# Default NFS mount options
-default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
 # For performance, set NFS threads to min(256, max(8, num_cores * 4))
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 

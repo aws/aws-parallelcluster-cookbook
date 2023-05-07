@@ -114,3 +114,6 @@ default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', lazy { node['cluster']['cluster_admin_user'] }, lazy { node['cluster']['cluster_user'] }]
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && platform_supports_dcv?
 default['cluster']['head_node_imds_allowed_users'].append(lazy { node['cluster']['scheduler_plugin']['user'] }) if node['cluster']['scheduler'] == 'plugin'
+
+# Default NFS mount options
+default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
