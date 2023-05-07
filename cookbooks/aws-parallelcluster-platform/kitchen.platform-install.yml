@@ -17,3 +17,10 @@ suites:
     verifier:
       controls:
         - /tag:install_users/
+  - name: directories
+    run_list:
+      - recipe[aws-parallelcluster-platform::directories]
+    verifier:
+      controls:
+        - /pcluster_directories_exist/
+        - /pcluster_log_dir_is_configured/

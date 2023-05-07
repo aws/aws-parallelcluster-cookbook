@@ -1,4 +1,4 @@
-control 'pcluster_directories_exist' do
+control 'tag:install_pcluster_directories_exist' do
   title 'Setup of ParallelCluster directories'
 
   base_dir = "/opt/parallelcluster"
@@ -10,7 +10,7 @@ control 'pcluster_directories_exist' do
   end
 end
 
-control 'pcluster_log_dir_is_configured' do
+control 'tag:install_pcluster_log_dir_is_configured' do
   title 'Setup of ParallelCluster log folder'
 
   describe directory("/var/log/parallelcluster") do

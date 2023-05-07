@@ -15,7 +15,7 @@
 #  attributes:
 #    resource: resource_name
 #    dependencies:
-#      - recipe:aws-parallelcluster-install::directories
+#      - recipe:aws-parallelcluster-platform::directories
 #      - resource:ec2_udev_rules
 #      - resource:package_repos:update
 

@@ -22,7 +22,7 @@ include_recipe "aws-parallelcluster-install::disable_services"
 
 package_repos 'setup the repositories'
 
-include_recipe "aws-parallelcluster-install::directories"
+include_recipe "aws-parallelcluster-platform::directories"
 
 install_packages 'Install OS and extra packages'
 
