@@ -22,13 +22,6 @@ default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}
 # ParallelCluster log rotation file dir
 default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelcluster_log_rotation"
 
-# AWS domain
-default['cluster']['aws_domain'] = aws_domain
-
-# URL for ParallelCluster Artifacts stored in public S3 buckets
-# ['cluster']['region'] will need to be defined by image_dna.json during AMI build.
-default['cluster']['artifacts_s3_url'] = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}/archives"
-
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
@@ -120,7 +113,6 @@ default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
-default['cluster']['region'] = 'us-east-1'
 default['cluster']['stack_name'] = nil
 default['cluster']['preinstall'] = 'NONE'
 default['cluster']['preinstall_args'] = 'NONE'
