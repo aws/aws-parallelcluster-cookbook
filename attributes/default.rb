@@ -87,11 +87,6 @@ default['cluster']['scheduler_plugin']['virtualenv_path'] = [
   node['cluster']['scheduler_plugin']['virtualenv'],
 ].join('/')
 
-# EFA
-default['cluster']['efa']['installer_version'] = '1.22.1'
-default['cluster']['efa']['sha256'] = 'f90f3d5f59c031b9a964466b5401e86fd0429272408f6c207c3f9048254e9665'
-default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
-
 # EFS Utils
 default['cluster']['efs_utils']['version'] = '1.34.1'
 default['cluster']['efs_utils']['url'] = "https://github.com/aws/efs-utils/archive/v#{node['cluster']['efs_utils']['version']}.tar.gz"

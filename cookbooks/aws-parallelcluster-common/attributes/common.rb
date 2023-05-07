@@ -65,3 +65,8 @@ default['cluster']['nvidia']['cuda']['url_architecture_id'] = arm_instance? ? 'l
 default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
 default['cluster']['nvidia']['cuda']['url'] = "https://developer.download.nvidia.com/compute/cuda/#{node['cluster']['nvidia']['cuda']['complete_version']}/local_installers/cuda_#{node['cluster']['nvidia']['cuda']['complete_version']}_#{node['cluster']['nvidia']['cuda']['version_suffix']}_#{node['cluster']['nvidia']['cuda']['url_architecture_id']}.run"
 default['cluster']['nvidia']['cuda_samples_url'] = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{node['cluster']['nvidia']['cuda_samples_version']}.tar.gz"
+
+# EFA
+default['cluster']['efa']['installer_version'] = '1.22.1'
+default['cluster']['efa']['sha256'] = 'f90f3d5f59c031b9a964466b5401e86fd0429272408f6c207c3f9048254e9665'
+default['cluster']['efa']['unsupported_aarch64_oses'] = %w(centos7)
