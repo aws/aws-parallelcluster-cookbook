@@ -27,16 +27,9 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
-  - name: directories
-    run_list:
-      - recipe[aws-parallelcluster-install::directories]
-    verifier:
-      controls:
-        - pcluster_directories_exist
-        - pcluster_log_dir_is_configured
   - name: python_setup
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::python]
     verifier:
       controls:
@@ -44,27 +37,27 @@ suites:
         - cookbook_virtualenv_created
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: cfn_bootstrap_setup
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::cfn_bootstrap]
     verifier:
       controls:
         - cfnbootstrap_virtualenv_created
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: node_setup
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::node]
     verifier:
       controls:
         - node_virtualenv_created
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: supervisord_setup
     run_list:
       - recipe[aws-parallelcluster-install::supervisord]
@@ -74,25 +67,25 @@ suites:
         - supervisord_service_set_up
   - name: awscli
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::awscli]
     verifier:
       controls:
         - awscli_installed
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-install::python
   - name: clusterstatusmgtd
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::clusterstatusmgtd]
     verifier:
       controls:
         - clusterstatusmgtd_files_created
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: cron
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
@@ -138,38 +131,38 @@ suites:
         - recipe:aws-parallelcluster-test::docker_mock
   - name: cfnconfig_mixed
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::cfnconfig_mixed]
     verifier:
       controls:
         - cfnconfig_file_configuration
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: clusterstatusmgtd_init_slurm
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::clusterstatusmgtd_init_slurm]
     verifier:
       controls:
         - clusterstatusmgtd_init_slurm_config
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::users
-        - recipe:aws-parallelcluster-install::directories
-        - recipe:aws-parallelcluster-install::sudo
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::sudo_install
       cluster:
         node_type: 'HeadNode'
   - name: mount_shared
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::mount_shared]
     verifier:
       controls:
         - mount_shared_configured
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:nfs
         - recipe:aws-parallelcluster-test::export_directories_mock
       cluster:
@@ -191,17 +184,17 @@ suites:
         - /services_disabled_on_amazon_family/
   - name: license_readme
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::license_readme]
     verifier:
       controls:
         - license_readme_created
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
   - name: pmix_installed
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-slurm::install_pmix]
     verifier:
       controls:
@@ -209,24 +202,24 @@ suites:
         - pmix_library_shared
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
   - name: jwt_installed
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-slurm::install_jwt]
     verifier:
       controls:
         - jwt_installed
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
   - name: install_slurm
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-slurm::install_slurm]
     verifier:
       controls:
@@ -239,7 +232,7 @@ suites:
         - slurm_lua_support_libraries_compiled
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
         - resource:mysql_client
@@ -249,28 +242,28 @@ suites:
         - resource:munge
   - name: intel_mpi
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::intel_mpi]
     verifier:
       controls:
         - /intel_mpi_installed/
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos:update
   - name: nvidia
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-install::nvidia]
     verifier:
       controls:
-        - /nvidia/
+        - /tag:install_.*nvidia/
     driver:
       # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
       instance_type: g4dn.2xlarge
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-install::directories
+        - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
         - resource:node_attributes
