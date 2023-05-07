@@ -172,7 +172,6 @@ default['cluster']['postinstall_args'] = 'NONE'
 default['cluster']['postupdate'] = 'NONE'
 default['cluster']['postupdate_args'] = 'NONE'
 default['cluster']['scheduler'] = 'slurm'
-default['cluster']['scheduler_slots'] = 'vcpus'
 default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
 default['cluster']['ephemeral_dir'] = '/scratch'
