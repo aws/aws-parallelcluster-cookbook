@@ -63,3 +63,18 @@ def format_directory(dir)
   format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
   format_dir
 end
+
+#
+# Check if GPU acceleration is supported by DCV
+#
+def dcv_gpu_accel_supported?
+  unsupported_gpu_accel_list = ["g5g."]
+  !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
+end
+
+#
+# Check if DCV is supported on this OS
+#
+def platform_supports_dcv?
+  node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
+end
