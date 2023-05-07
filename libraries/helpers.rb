@@ -130,25 +130,6 @@ def ignore_failure(lookup)
 end
 
 #
-# Check if the instance has a GPU
-#
-def graphic_instance?
-  has_gpu = Mixlib::ShellOut.new("lspci | grep -i -o 'NVIDIA'")
-  has_gpu.run_command
-
-  !has_gpu.stdout.strip.empty?
-end
-
-#
-# Check if Nvidia driver is installed
-#
-def nvidia_installed?
-  nvidia_installed = ::File.exist?('/usr/bin/nvidia-smi')
-  Chef::Log.warn("Nvidia driver is not installed") unless nvidia_installed
-  nvidia_installed
-end
-
-#
 # Check if the AMI is bootstrapped
 #
 def ami_bootstrapped?
