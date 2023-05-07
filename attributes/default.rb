@@ -123,7 +123,6 @@ default['cluster']['instance_slots'] = '1'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['node_type'] = nil
-default['cluster']['head_node_private_ip'] = nil
 default['cluster']['volume'] = ''
 
 # ParallelCluster internal variables to configure active directory service
