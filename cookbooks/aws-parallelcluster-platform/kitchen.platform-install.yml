@@ -17,3 +17,9 @@ suites:
     verifier:
       controls:
         - /tag:install_users/
+  - name: disable_services
+    run_list:
+      - recipe[aws-parallelcluster-platform::disable_services]
+    verifier:
+      controls:
+        - /services_disabled/

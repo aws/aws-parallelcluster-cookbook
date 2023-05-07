@@ -15,14 +15,6 @@
 #
 # Disable service
 #
-def disable_service(service, platform_families = node['platform_family'], operations = :disable)
-  if platform_family?(platform_families)
-    service service do
-      action operations
-    end
-  end
-end
-
 def validate_file_hash(file_path, expected_hash)
   hash_function = yield
   checksum = hash_function.file(file_path).hexdigest

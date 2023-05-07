@@ -30,7 +30,7 @@ function unmock(){
 }
 
 cd /tmp/cookbooks
-cp system_tests/test_attributes.rb ./attributes
+cp system_tests/test_attributes.rb ./cookbooks/aws-parallelcluster-shared/attributes
 mkdir -p /etc/parallelcluster
 cp system_tests/image_dna.json /etc/parallelcluster/image_dna.json
 LANG=en_US.UTF-8 /opt/cinc/embedded/bin/berks vendor /etc/chef/cookbooks --delete || (echo 'Vendoring cookbook failed.' && exit 1)

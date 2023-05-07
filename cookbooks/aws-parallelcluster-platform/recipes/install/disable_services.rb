@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
+# Cookbook:: aws-parallelcluster-platform
 # Recipe:: disable_services
 #
 # Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -15,11 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Disable DLAMI multi eni helper
-# no only_if statement because if the service is not present the action disable does not return error
-disable_service('aws-ubuntu-eni-helper', 'debian', %i(disable stop mask)) unless virtualized?
+# If the service does not exist the action disable does not return error.
+# Masking the service in order to prevent it from being automatically enabled if not installed yet.
 
-# Disable log4j-cve-2021-44228-hotpatch
-# masking the service in order to prevent it from being automatically enabled
-# if not installed yet
-disable_service('log4j-cve-2021-44228-hotpatch', 'amazon', %i(disable stop mask)) unless virtualized?
+# on ubuntu, disable DLAMI multi eni helper
+service 'aws-ubuntu-eni-helper' do
+  action %i(disable stop mask)
+end unless docker?
+
+# on alinux, disable log4j-cve-2021-44228-hotpatch
+service 'log4j-cve-2021-44228-hotpatch' do
+  action %i(disable stop mask)
+end unless docker?
