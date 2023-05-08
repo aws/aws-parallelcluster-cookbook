@@ -345,7 +345,7 @@ suites:
         - resource:system_authentication
   - name: nvidia
     run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-config::nvidia]
     verifier:
       controls:
@@ -357,7 +357,11 @@ suites:
       instance_type: g4dn.xlarge
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:node_attributes
+        - recipe:aws-parallelcluster-install::nvidia
       cluster:
         nvidia:
           enabled: true
