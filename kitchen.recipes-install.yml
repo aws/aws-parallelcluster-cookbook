@@ -282,6 +282,8 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-install::directories
         - resource:package_repos:update
+      cluster:
+        node_type: 'HeadNode'
   - name: nvidia
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
