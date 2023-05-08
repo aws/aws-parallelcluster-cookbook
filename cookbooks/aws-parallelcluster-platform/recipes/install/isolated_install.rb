@@ -15,9 +15,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+directory node['cluster']['scripts_dir'] do
+  recursive true
+end
+
 template "#{node['cluster']['scripts_dir']}/patch-iso-instance.sh" do
-  source 'base/patch-iso-instance.sh.erb'
+  source 'isolated/patch-iso-instance.sh.erb'
   owner 'root'
   group 'root'
   mode '0744'
+  variables(
+    users: ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']].join(' ')
+  )
 end
