@@ -1,0 +1,14 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: isolated
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::isolated_install]
+    verifier:
+      controls:
+        - /patch_isolated_instance_script_created/
