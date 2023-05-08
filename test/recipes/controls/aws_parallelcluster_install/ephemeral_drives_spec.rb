@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'ephemeral_drives_logical_volumes_manager_installed' do
+control 'tag:install_ephemeral_drives_logical_volumes_manager_installed' do
   title 'Check ephemeral drives management utility is installed'
 
   describe package('lvm2') do
@@ -17,7 +17,7 @@ control 'ephemeral_drives_logical_volumes_manager_installed' do
   end
 end
 
-control 'ephemeral_drives_script_created' do
+control 'tag:install_ephemeral_drives_script_created' do
   title 'Ephemeral drives script is copied to the target dir'
 
   describe file('/usr/local/sbin/setup-ephemeral-drives.sh') do
@@ -29,7 +29,7 @@ control 'ephemeral_drives_script_created' do
   end
 end
 
-control 'ephemeral_service_set_up' do
+control 'tag:install_ephemeral_service_set_up' do
   title 'Ephemeral service is set up to run ephemeral drives script'
 
   describe file('/etc/systemd/system/setup-ephemeral.service') do
@@ -38,5 +38,17 @@ control 'ephemeral_service_set_up' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('content') { should match 'ExecStart=/usr/local/sbin/setup-ephemeral-drives.sh' }
+  end
+end
+
+control 'tag:install_ephemeral_service_after_network_config' do
+  title 'Check setup-ephemeral service to have the correct After statement'
+  network_target = os_properties.redhat? ? /^After=network-online.target/ : /^After=network.target$/
+  describe file('/etc/systemd/system/setup-ephemeral.service') do
+    it { should exist }
+    its('content') { should match network_target }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0644' }
   end
 end

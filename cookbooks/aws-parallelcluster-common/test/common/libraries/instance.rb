@@ -63,4 +63,18 @@ class Instance < Inspec.resource(1)
   def nvidia_installed?
     inspec.file('/usr/bin/nvidia-smi').exist?
   end
+
+  def get_ephemeral_devs
+    ephemeral_devs = []
+    if inspec.bash('ls /dev/nvme*').exit_status() == 0
+      ephemeral_devs += inspec.bash('realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "*Instance_Storage*" | uniq').stdout.split(/\n+/)
+    else
+      imds('block-device-mapping').split(/\n+/).each do |device|
+        if device.match(/ephemeral/)
+          ephemeral_devs += imds("block-device-mapping/#{device}").gsub('sd', 'xvd')
+        end
+      end
+    end
+    ephemeral_devs
+  end
 end
