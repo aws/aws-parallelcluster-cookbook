@@ -26,7 +26,7 @@ include_recipe "aws-parallelcluster-platform::directories"
 
 install_packages 'Install OS and extra packages'
 
-include_recipe "aws-parallelcluster-platform::isolated_install"
+include_recipe "aws-parallelcluster-environment::isolated_install"
 include_recipe "aws-parallelcluster-install::python"
 include_recipe "aws-parallelcluster-install::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-install::node'
