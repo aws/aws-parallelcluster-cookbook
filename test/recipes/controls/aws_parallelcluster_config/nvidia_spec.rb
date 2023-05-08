@@ -31,10 +31,12 @@ control 'tag:config_gdrcopy_enabled_on_graphic_instances' do
     its('exit_status') { should eq 0 }
   end
 
-  ['sanity', 'copybw', 'copylat', 'apiperf -s 8'].each do |cmd|
-    describe "NVIDIA GDRCopy works properly with #{cmd}" do
-      subject { command(cmd) }
-      its('exit_status') { should eq 0 }
+  if instance.gpudirect_rdma_supported?
+    ['sanity', 'copybw', 'copylat', 'apiperf -s 8'].each do |cmd|
+      describe "NVIDIA GDRCopy works properly with #{cmd}" do
+        subject { command(cmd) }
+        its('exit_status') { should eq 0 }
+      end
     end
   end
 end
