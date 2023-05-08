@@ -47,7 +47,7 @@ echo "[INFO] Complete: installation of packages from amazon Linux 2 repository f
 
 echo "[INFO] Starting: CA bundle configuration for AWS CLI in US isolated region"
 
-USERS=(<%= ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user']].join(' ') %>)
+USERS=(<%= @users %>)
 CA_BUNDLE="/etc/pki/${REGION}/certs/ca-bundle.pem"
 
 for user in "${USERS[@]}"; do
