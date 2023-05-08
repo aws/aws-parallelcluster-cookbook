@@ -357,7 +357,11 @@ suites:
       instance_type: g4dn.xlarge
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-install::directories
+        - resource:package_repos
+        - resource:install_packages
+        - recipe:aws-parallelcluster-common::node_attributes
+        - recipe:aws-parallelcluster-install::nvidia
       cluster:
         nvidia:
           enabled: true
