@@ -91,14 +91,13 @@ suites:
               cidr2
   - name: ephemeral_drives_mounted
     driver:
-      instance_type: m5d.xlarge  # instance type with ephemeral drives
+      instance_type: d3.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
     verifier:
       controls:
-        - ephemeral_drives_service_running
-        - ephemeral_drives_configured
+        - tag:config_ephemeral_drives_service_and_mount
     attributes:
       dependencies:
         #- recipe:aws-parallelcluster-install::ephemeral_drives
@@ -111,13 +110,13 @@ suites:
         ephemeral_dir: /scratch
   - name: ephemeral_drives_skipped
     driver:
-      instance_type: m5d.xlarge  # instance type with ephemeral drives
+      instance_type: d3.xlarge  # instance type with ephemeral drives
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-config::ephemeral_drives]
     verifier:
       controls:
-        - ephemeral_drives_with_name_clashing_not_mounted
+        - tag:config_ephemeral_drives_service_and_mount
     attributes:
       dependencies:
         #- recipe:aws-parallelcluster-install::ephemeral_drives
