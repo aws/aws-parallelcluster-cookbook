@@ -21,6 +21,11 @@ class Instance < Inspec.resource(1)
     !inspec.node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
   end
 
+  def gpudirect_rdma_supported?
+    unsupported_gpudirect_rdma_list = ["g2."]
+    !inspec.node['ec2']['instance_type'].start_with?(*unsupported_gpudirect_rdma_list)
+  end
+
   def dcv_gpu_accel_supported?
     unsupported_gpu_accel_list = ["g5g."]
     !inspec.node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
