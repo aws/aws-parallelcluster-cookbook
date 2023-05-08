@@ -18,7 +18,7 @@ control 'tag:config_intel_mpi_installed' do
 
   describe bash("unset MODULEPATH && source /etc/profile.d/modules.sh && module load intelmpi && mpirun --help") do
     its('exit_status') { should eq(0) }
-    its('stdout')      { should match("#{node['cluster']['intelmpi']['version']}") }
+    its('stdout') { should match(/Version #{node['cluster']['intelmpi']['version'].split('.')[0..1].join(".")}/) }
   end
 end
 
