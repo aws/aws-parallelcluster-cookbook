@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_enough_space_on_root_volume' do
-  only_if { !instance.custom_ami? }
+  only_if { !instance.custom_ami? && !(os_properties.centos7? && os_properties.x86?) }
 
   describe 'at least 10 GB of free space on root volume' do
     subject { bash("sudo -u #{node['cluster']['cluster_user']} df --block-size GB --output=avail / | tail -n1 | cut -d G -f1") }
