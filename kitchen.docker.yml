@@ -52,6 +52,13 @@ platforms:
       cluster:
         base_os: ubuntu2004
         kernel_release: '5.15.0-1028-aws'
+  - name: ubuntu2204
+    driver:
+      image: dokken/ubuntu-22.04
+    attributes:
+      cluster:
+        base_os: ubuntu2004
+        kernel_release: '5.15.0-1028-aws'
   - name: rhel8
     driver:
       image: registry.access.redhat.com/ubi8/ubi
