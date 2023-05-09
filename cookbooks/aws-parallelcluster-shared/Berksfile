@@ -1,0 +1,7 @@
+# frozen_string_literal: true
+
+source chef_repo: "."
+
+metadata
+
+cookbook "pyenv", path: "../../third-party/pyenv-3.5.1"
