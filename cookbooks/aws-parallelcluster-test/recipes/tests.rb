@@ -114,14 +114,6 @@ if platform?('centos')
   end
 end
 
-execute 'unmount /home' do
-  command "umount -fl /home"
-  retries 10
-  retry_delay 6
-  timeout 60
-  only_if { node['cluster']['node_type'] == 'ComputeFleet' }
-end
-
 ###################
 # clusterstatusmgtd
 ###################
