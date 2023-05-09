@@ -30,7 +30,9 @@ driver:
     Name: test-kitchen-parallelcluster
 
 transport:
+  <% if ENV['KITCHEN_SSH_KEY_PATH'] %>
   ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH']  %>
+  <% end %>
   compression: true
   name: speedy_ssh
 
