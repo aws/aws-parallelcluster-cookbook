@@ -151,3 +151,12 @@ docker rmi \
 
 **dokken** expects that `~/.docker/config.json` contains an `"auths"` key, fails in `docker_config_creds` with NPE
 otherwise, this issue is tracked in upstream as: https://github.com/test-kitchen/kitchen-dokken/issues/290
+
+### Known issues with EC2
+#### Ubuntu22
+
+On Ubuntu22, `kitchen create` keeps trying to connect to the instance via ssh indefinitely.
+If you interrupt it and try to run `kitchen verify`, you see authentication failures. 
+
+This happens because Ubuntu22 does not accept authentication via RSA key. You need to re-create a key pair 
+using `ED25519` key type.

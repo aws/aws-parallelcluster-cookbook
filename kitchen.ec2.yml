@@ -39,7 +39,7 @@ transport:
 provisioner:
   name: chef_zero
   require_chef_omnibus: 17.2.29
-  chef_omnibus_url: https://raw.githubusercontent.com/aws/aws-parallelcluster-cookbook/develop/util/cinc-install.sh
+  chef_omnibus_url: https://omnitruck.cinc.sh/install.sh
   chef_omnibus_root: /opt/cinc
   retry_on_exit_code:
     - 35 # 35 is the exit code signaling that the node is rebooting
