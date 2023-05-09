@@ -62,7 +62,7 @@ suites:
         - fs_data_file_with_default_values
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster::test_dummy
+        - recipe:aws-parallelcluster-platform::directories
       cluster:
         ebs_shared_dirs: '/shared'
         volume: ''
