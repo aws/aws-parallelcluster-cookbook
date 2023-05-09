@@ -97,3 +97,11 @@ end
 def platform_supports_dcv?
   node['cluster']['dcv']['supported_os'].include?("#{node['platform']}#{node['platform_version'].to_i}")
 end
+
+# Get number of nv switches
+def get_nvswitches
+  # NVSwitch device id is 10de:1af1
+  nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
+  nvswitch_check.run_command
+  nvswitch_check.stdout.strip.to_i
+end
