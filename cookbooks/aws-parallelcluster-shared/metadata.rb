@@ -13,3 +13,5 @@ supports 'amazon', '= 2.0'
 supports 'centos', '= 7.0'
 supports 'ubuntu', '>= 18.04'
 supports 'redhat', '= 8.7'
+
+depends 'pyenv', '~> 3.5.1'
