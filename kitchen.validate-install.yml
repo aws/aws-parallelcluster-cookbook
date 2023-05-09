@@ -10,9 +10,8 @@ verifier:
 suites:
   - name: aws_parallelcluster_install
     run_list:
-      - recipe[aws-parallelcluster::test_dummy]
       - recipe[aws-parallelcluster-test::docker_mock]
-      - recipe[aws-parallelcluster-install::install]
+      - recipe[aws-parallelcluster]
     verifier:
       controls:
         # We also need to test the effect some files (service config, profile config) have on the system.
