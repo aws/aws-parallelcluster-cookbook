@@ -87,7 +87,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
-        - recipe:aws-parallelcluster-install::python
+        - aws-parallelcluster-platform::cookbook_virtualenv
   - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -241,7 +241,7 @@ suites:
         - resource:package_repos
         - resource:install_packages
         - resource:mysql_client
-        - recipe:aws-parallelcluster-install::python
+        - aws-parallelcluster-platform::cookbook_virtualenv
         - recipe:aws-parallelcluster-slurm::install_jwt
         - recipe:aws-parallelcluster-slurm::install_pmix
         - resource:munge
