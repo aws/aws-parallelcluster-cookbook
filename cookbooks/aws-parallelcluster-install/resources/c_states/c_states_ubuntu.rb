@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -11,17 +10,9 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License
-provides :ec2_udev_rules, platform: 'ubuntu', platform_version: '20.04'
+# See the License for the specific language governing permissions and limitations under the License.
 
-unified_mode true
-use 'partial/_common_udev_configuration'
-use 'partial/_debian_udev_configuration'
+provides :c_states, platform: 'ubuntu'
 
-default_action :setup
-
-action :setup do
-  action_create_common_udev_files
-  action_set_udev_autoreload
-  action_start_ec2blk
-end
+use 'partial/_c_states_common'
+use 'partial/_c_states_debian'

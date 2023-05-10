@@ -12,7 +12,6 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :system_authentication, platform: 'ubuntu', platform_version: '20.04'
+provides :nvidia_dcgm, platform: 'ubuntu'
 
-use 'partial/_system_authentication_common'
-use 'partial/_system_authentication_debian'
+use 'partial/_nvidia_dcgm_common.rb'
