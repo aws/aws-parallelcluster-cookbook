@@ -9,6 +9,6 @@ set -ex
 [ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh
 
 while true; do
-  <%= node['cluster']['cfn_bootstrap_virtualenv_path'] %>/bin/cfn-hup --no-daemon --verbose
+  <%= @cfn_bootstrap_virtualenv_path %>/bin/cfn-hup --no-daemon --verbose
   sleep 120
 done
