@@ -17,17 +17,20 @@
 # See the License for the specific language governing permissions and limitations under the License.
 # Check whether install a custom aws-parallelcluster-node package or the standard one
 
+virtualenv_path = node_virtualenv_path
+
+node.default['cluster']['node_virtualenv_path'] = virtualenv_path
+node_attributes "dump node attributes"
+
 # TODO: find a way to make this code work on ubi8
 return if redhat_ubi?
 
-install_pyenv node['cluster']['python-version'] do
-  prefix node['cluster']['system_pyenv_root']
-end
+install_pyenv_new 'pyenv for default python version'
 
-activate_virtual_env node['cluster']['node_virtualenv'] do
-  pyenv_path node['cluster']['node_virtualenv_path']
-  python_version node['cluster']['python-version']
-  not_if { ::File.exist?("#{node['cluster']['node_virtualenv_path']}/bin/activate") }
+activate_virtual_env node_virtualenv_name do
+  pyenv_path node_virtualenv_path
+  python_version node_python_version
+  not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
 if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
@@ -38,7 +41,7 @@ if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node
       set -e
       [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
       echo "PATH is $PATH"
-      source #{node['cluster']['node_virtualenv_path']}/bin/activate
+      source #{virtualenv_path}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
       if [[ "#{node['cluster']['custom_node_package']}" =~ ^s3:// ]]; then
         custom_package_url=$(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 presign #{node['cluster']['custom_node_package']} --region #{node['cluster']['region']})
@@ -56,6 +59,6 @@ if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node
 else
   pyenv_pip 'aws-parallelcluster-node' do
     version node['cluster']['parallelcluster-node-version']
-    virtualenv node['cluster']['node_virtualenv_path']
+    virtualenv virtualenv_path
   end
 end

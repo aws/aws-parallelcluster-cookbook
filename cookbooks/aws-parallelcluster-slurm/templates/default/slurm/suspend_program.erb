@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo -u <%= node['cluster']['cluster_admin_user'] %> <%= node['cluster']['node_virtualenv_path'] %>/bin/slurm_suspend "$@"
+sudo -u <%= node['cluster']['cluster_admin_user'] %> <%= node_virtualenv_path %>/bin/slurm_suspend "$@"

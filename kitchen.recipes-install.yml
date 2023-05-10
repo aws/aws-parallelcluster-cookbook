@@ -33,27 +33,6 @@ suites:
     verifier:
       controls:
         - awsbatch_virtualenv_created
-  - name: python_setup
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::python]
-    verifier:
-      controls:
-        - awsbatch_virtualenv_created
-        - cookbook_virtualenv_created
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-  - name: node_setup
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::node]
-    verifier:
-      controls:
-        - node_virtualenv_created
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
   - name: supervisord_setup
     run_list:
       - recipe[aws-parallelcluster-install::supervisord]

@@ -1,0 +1,14 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: node
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-computefleet::node]
+    verifier:
+      controls:
+        - /node_virtualenv_created/
