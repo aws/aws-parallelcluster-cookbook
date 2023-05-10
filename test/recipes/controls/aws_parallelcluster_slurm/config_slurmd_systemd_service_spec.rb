@@ -11,6 +11,7 @@
 
 control 'systemd_slurmd_service' do
   title 'Check the basic configuration of the systemd slurmd service'
+  only_if { !os_properties.virtualized? }
 
   describe 'Check that slurmd service is defined'
   describe service('slurmd') do
@@ -23,15 +24,34 @@ control 'systemd_slurmd_service' do
   end
 end
 
+control 'systemd_slurmd_service_files' do
+  title 'Check the basic configuration of the systemd slurmd service'
+
+  describe 'Check that slurmd service file exists'
+  describe file('/etc/systemd/system/slurmd.service') do
+    it { should exist }
+  end
+end
+
 control 'systemd_slurmd_service_nvidia_gpu_nodes' do
   title 'Check the systemd slurmd service dependencies on NVIDIA GPU compute nodes'
+  only_if { !os_properties.virtualized? }
 
   describe 'Check slurmd systemd "after" dependencies'
   describe command('systemctl list-dependencies --after --plain slurmd.service') do
     its('stdout') { should include "nvidia-persistenced.service" }
   end
+
   describe 'Check slurmd systemd requirement dependencies'
   describe command('systemctl list-dependencies --plain slurmd.service') do
     its('stdout') { should include "nvidia-persistenced.service" }
+  end
+
+  describe 'Check that slurmd systemd drop-in configuration exists'
+  describe directory('/etc/systemd/system/slurmd.service.d') do
+    it { should exist }
+  end
+  describe file('/etc/systemd/system/slurmd.service.d/slurmd_nvidia_persistenced.conf') do
+    it { should exist }
   end
 end
