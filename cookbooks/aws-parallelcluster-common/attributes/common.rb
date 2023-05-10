@@ -11,12 +11,8 @@ default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
 
-# Python Version
-default['cluster']['python-version'] = '3.9.16'
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
 default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
-# plcuster-specific pyenv system installation root
-default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 # Virtualenv Cookbook Name
 default['cluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 # Virtualenv Node Name
