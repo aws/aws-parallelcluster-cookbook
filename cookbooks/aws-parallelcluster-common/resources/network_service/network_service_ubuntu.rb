@@ -11,12 +11,11 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations under the License
+provides :network_service, platform: 'ubuntu'
 
-provides :lustre, platform: 'ubuntu', platform_version: '18.04'
 unified_mode true
+default_action :restart
 
-use 'partial/_install_lustre_debian'
-use 'partial/_mount_unmount'
-
-default_action :setup
+use 'partial/_network_service'
+use 'partial/_network_service_debian'

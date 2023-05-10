@@ -12,13 +12,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :install_packages, platform: 'ubuntu', platform_version: '20.04'
-unified_mode true
-default_action :setup
+provides :nvidia_driver, platform: 'ubuntu'
 
-use 'partial/_install_packages_debian.rb'
-
-action :setup do
-  action_install_base_packages
-  action_install_kernel_source unless virtualized?
-end
+use 'partial/_nvidia_driver_common.rb'
+use 'partial/_nvidia_driver_debian.rb'

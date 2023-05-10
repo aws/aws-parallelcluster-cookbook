@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -10,15 +10,16 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations under the License
 
-provides :install_packages, platform: 'ubuntu', platform_version: '18.04'
+provides :stunnel, platform: 'ubuntu'
 unified_mode true
 default_action :setup
 
-use 'partial/_install_packages_debian.rb'
+use 'partial/_setup'
 
-action :setup do
-  action_install_base_packages
-  action_install_kernel_source unless virtualized?
+action_class do
+  def dependencies
+    %w(libwrap0-dev)
+  end
 end

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -11,8 +10,14 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License
-provides :cloudwatch, platform: 'ubuntu', platform_version: '20.04'
+# See the License for the specific language governing permissions and limitations under the License.
 
-use 'partial/_cloudwatch_common'
-use 'partial/_cloudwatch_install_package_debian'
+provides :ephemeral_drives, platform: 'ubuntu'
+
+use 'partial/_ephemeral_drives_common.rb'
+
+action_class do
+  def network_target
+    'network.target'
+  end
+end

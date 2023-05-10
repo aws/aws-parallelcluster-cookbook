@@ -12,6 +12,12 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_dcgm, platform: 'ubuntu', platform_version: '18.04'
+provides :arm_pl, platform: 'ubuntu'
 
-use 'partial/_nvidia_dcgm_common.rb'
+use 'partial/_arm_pl_common.rb'
+
+action_class do
+  def armpl_platform
+    "Ubuntu-#{node['platform_version']}"
+  end
+end
