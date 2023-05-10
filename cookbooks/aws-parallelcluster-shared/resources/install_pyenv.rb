@@ -25,6 +25,10 @@ action :run do
   else
     prefix = new_resource.prefix || node['cluster']['system_pyenv_root'] || "#{node['cluster']['base_dir']}/pyenv"
 
+    directory prefix do
+      recursive true
+    end
+
     pyenv_system_install python_version do
       global_prefix prefix
     end
