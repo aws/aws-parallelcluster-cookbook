@@ -153,10 +153,8 @@ suites:
       resource: ephemeral_drives
     verifier:
       controls:
-        - ephemeral_drives_logical_volumes_manager_installed
-        - ephemeral_drives_script_created
-        - ephemeral_service_set_up
-        - ephemeral_service_after_network_config
+        - /tag:install_ephemeral_drives/
+        - /tag:install_ephemeral_service/
   - name: system_authentication
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
