@@ -45,6 +45,10 @@ describe 'install_pyenv:run' do
           is_expected.to run_install_pyenv_new('run')
         end
 
+        it 'creates system pyenv root dir' do
+          is_expected.to create_directory(default_system_pyenv_root).with_recursive(true)
+        end
+
         it 'installs pyenv system with default python version and system pyenv root' do
           is_expected.to install_pyenv_system_install(default_python_version)
             .with_global_prefix(default_system_pyenv_root)
@@ -85,6 +89,10 @@ describe 'install_pyenv:run' do
         end
         cached(:node) { chef_run.node }
 
+        it 'creates pyenv root dir' do
+          is_expected.to create_directory(system_pyenv_root).with_recursive(true)
+        end
+
         it 'installs pyenv system' do
           is_expected.to install_pyenv_system_install(python_version)
             .with_global_prefix(system_pyenv_root)
@@ -115,6 +123,10 @@ describe 'install_pyenv:run' do
           ConvergeInstallPyenv.run(runner, python_version, system_pyenv_root)
         end
         cached(:node) { chef_run.node }
+
+        it 'creates pyenv root dir' do
+          is_expected.to create_directory(system_pyenv_root).with_recursive(true)
+        end
 
         it 'installs pyenv system' do
           is_expected.to install_pyenv_system_install(python_version)
