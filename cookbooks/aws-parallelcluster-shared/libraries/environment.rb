@@ -15,3 +15,24 @@ def aws_domain
     "amazonaws.com"
   end
 end
+
+# Virtual Environments
+def virtualenv_path(pyenv_root:, python_version:, virtualenv_name:)
+  "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_name}"
+end
+
+def node_virtualenv_name
+  'node_virtualenv'
+end
+
+def node_python_version
+  node['cluster']['python-version']
+end
+
+def node_pyenv_root
+  node['cluster']['system_pyenv_root']
+end
+
+def node_virtualenv_path
+  virtualenv_path(pyenv_root: node_pyenv_root, python_version: node_python_version, virtualenv_name: node_virtualenv_name)
+end

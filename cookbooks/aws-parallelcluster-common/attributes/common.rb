@@ -11,17 +11,6 @@ default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
 
-# Virtualenv Node Name
-default['cluster']['node_virtualenv'] = 'node_virtualenv'
-# Node Virtualenv Path
-default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['node_virtualenv']}"
-
-# Python packages
-default['cluster']['parallelcluster-version'] = '3.7.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.7.0'
-default['cluster']['parallelcluster-node-version'] = '3.7.0'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.1.0'
-
 # NVIDIA
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '470.182.03'

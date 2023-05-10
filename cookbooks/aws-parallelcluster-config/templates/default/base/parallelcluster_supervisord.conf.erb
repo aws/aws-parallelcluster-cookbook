@@ -14,7 +14,7 @@ environment = AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"
 <% end -%>
 <% if node['cluster']['scheduler'] == 'slurm' -%>
 [program:clustermgtd]
-command = <%= node['cluster']['node_virtualenv_path'] %>/bin/clustermgtd
+command = <%= node_virtualenv_path %>/bin/clustermgtd
 user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 redirect_stderr = true
@@ -44,7 +44,7 @@ environment = HOME="<%= node['cluster']['dcv']['authenticator']['user_home'] %>"
 <% when 'ComputeFleet' -%>
 <% if node['cluster']['scheduler'] == 'slurm' -%>
 [program:computemgtd]
-command = <%= node['cluster']['node_virtualenv_path'] %>/bin/computemgtd
+command = <%= node_virtualenv_path %>/bin/computemgtd
 user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 redirect_stderr = true
