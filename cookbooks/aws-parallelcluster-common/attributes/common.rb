@@ -11,20 +11,10 @@ default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
 
-# FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
 # Virtualenv Node Name
 default['cluster']['node_virtualenv'] = 'node_virtualenv'
-# Virtualenv cfn-bootstrap Name
-default['cluster']['cfn_bootstrap_virtualenv'] = 'cfn_bootstrap_virtualenv'
 # Node Virtualenv Path
 default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['node_virtualenv']}"
-# cfn-bootstrap Virtualenv Path
-default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
-
-# cfn-bootstrap
-default['cluster']['cfn_bootstrap']['version'] = '2.0-24'
-default['cluster']['cfn_bootstrap']['package'] = "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz"
 
 # Python packages
 default['cluster']['parallelcluster-version'] = '3.7.0'

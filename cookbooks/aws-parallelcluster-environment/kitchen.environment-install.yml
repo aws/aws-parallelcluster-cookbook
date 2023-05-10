@@ -12,3 +12,10 @@ suites:
     verifier:
       controls:
         - /patch_isolated_instance_script_created/
+  - name: cfn_bootstrap
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::cfn_bootstrap]
+    verifier:
+      controls:
+        - cfnbootstrap_virtualenv_created

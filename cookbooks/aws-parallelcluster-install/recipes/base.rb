@@ -28,7 +28,7 @@ install_packages 'Install OS and extra packages'
 
 include_recipe "aws-parallelcluster-environment::isolated_install"
 include_recipe "aws-parallelcluster-platform::cookbook_virtualenv"
-include_recipe "aws-parallelcluster-install::cfn_bootstrap"
+include_recipe "aws-parallelcluster-environment::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-install::node'
 include_recipe "aws-parallelcluster-install::awscli"
 
