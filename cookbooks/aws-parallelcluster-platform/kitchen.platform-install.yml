@@ -30,3 +30,9 @@ suites:
     verifier:
       controls:
         - /services_disabled/
+  - name: cookbook_virtualenv
+    run_list:
+      - recipe[aws-parallelcluster-platform::cookbook_virtualenv]
+    verifier:
+      controls:
+        - cookbook_virtualenv_created
