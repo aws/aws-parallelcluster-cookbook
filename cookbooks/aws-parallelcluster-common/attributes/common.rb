@@ -13,20 +13,12 @@ default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dir
 
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
 default['cluster']['python-version-cfn_bootstrap_virtualenv'] = '3.7.16'
-# Virtualenv Cookbook Name
-default['cluster']['cookbook_virtualenv'] = 'cookbook_virtualenv'
 # Virtualenv Node Name
 default['cluster']['node_virtualenv'] = 'node_virtualenv'
-# Virtualenv AWSBatch Name
-default['cluster']['awsbatch_virtualenv'] = 'awsbatch_virtualenv'
 # Virtualenv cfn-bootstrap Name
 default['cluster']['cfn_bootstrap_virtualenv'] = 'cfn_bootstrap_virtualenv'
-# Cookbook Virtualenv Path
-default['cluster']['cookbook_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['cookbook_virtualenv']}"
 # Node Virtualenv Path
 default['cluster']['node_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['node_virtualenv']}"
-# AWSBatch Virtualenv Path
-default['cluster']['awsbatch_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['awsbatch_virtualenv']}"
 # cfn-bootstrap Virtualenv Path
 default['cluster']['cfn_bootstrap_virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version-cfn_bootstrap_virtualenv']}/envs/#{node['cluster']['cfn_bootstrap_virtualenv']}"
 

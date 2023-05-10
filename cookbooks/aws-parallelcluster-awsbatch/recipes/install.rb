@@ -17,6 +17,8 @@
 
 return if redhat8?
 
+include_recipe "::awsbatch_virtualenv"
+
 # Add awsbatch virtualenv to default path
 template "/etc/profile.d/pcluster_awsbatchcli.sh" do
   source "awsbatch/pcluster_awsbatchcli.sh.erb"
