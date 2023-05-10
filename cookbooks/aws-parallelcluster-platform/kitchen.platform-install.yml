@@ -35,4 +35,4 @@ suites:
       - recipe[aws-parallelcluster-platform::cookbook_virtualenv]
     verifier:
       controls:
-        - cookbook_virtualenv_created
+        - /cookbook_virtualenv_created/
