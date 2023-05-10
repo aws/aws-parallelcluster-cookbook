@@ -39,19 +39,15 @@ end
 Chef::Log.warn("GPU instance but no Nvidia drivers found") if graphic_instance? && !nvidia_installed?
 
 # Run nvidia-smi triggers loading of the kernel module and creation of the device files
+# This should become useless with the configuration of the systemd dependency between
+# nvidia-persistenced and slurmd
 if graphic_instance? && nvidia_installed?
   execute "run_nvidiasmi" do
     command 'nvidia-smi'
   end
 end
 
-template '/etc/systemd/system/slurmd.service' do
-  source 'slurm/compute/slurmd.service.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
-end
+include_recipe 'aws-parallelcluster-slurm::config_slurmd_systemd_service'
 
 if node['cluster']['enable_nss_slurm'] == 'true'
   nsswitch_path = '/etc/nsswitch.conf'
