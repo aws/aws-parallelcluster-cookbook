@@ -72,7 +72,7 @@ if redhat_ubi?
 
   bash 'Install requirements' do
     cwd Chef::Config[:file_cache_path]
-    code "/usr/bin/python -m pip install -r cookbooks/aws-parallelcluster-install/files/default/requirements.txt"
+    code "/usr/bin/python -m pip install -r cookbooks/aws-parallelcluster-platform/files/cookbook_virtualenv/requirements.txt"
   end
 end
 
