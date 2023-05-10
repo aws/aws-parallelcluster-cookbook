@@ -45,9 +45,9 @@ suites:
     attributes:
       resource: efs
       dependencies:
-        #- recipe:aws-parallelcluster-install::directories
-        #- resource:package_repos
-        #- resource:install_packages
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
   - name: dns_domain_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
