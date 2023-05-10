@@ -1,4 +1,4 @@
-# Ubuntu 20 default attributes for aws-parallelcluster-install
+# Ubuntu 22 default attributes for aws-parallelcluster-install
 
 return unless platform?('ubuntu') && node['platform_version'] == "22.04"
 
