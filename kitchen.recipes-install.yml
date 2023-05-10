@@ -27,6 +27,12 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
+  - name: awsbatch_virtualenv
+    run_list:
+      - recipe[aws-parallelcluster-awsbatch::awsbatch_virtualenv]
+    verifier:
+      controls:
+        - awsbatch_virtualenv_created
   - name: python_setup
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
