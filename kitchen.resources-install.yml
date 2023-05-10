@@ -16,6 +16,14 @@ verifier:
 # then define a dependencies attribute, listing them with recipe: or resource: prefix.
 # You can find an example in the add_depdendencies.rb file.
 suites:
+  - name: package_repos
+    run_list:
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - package_repos
+    attributes:
+      resource: package_repos
   - name: install_packages
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
