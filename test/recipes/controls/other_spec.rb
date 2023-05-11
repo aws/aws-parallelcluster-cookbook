@@ -71,6 +71,16 @@ control 'tag:config_no_fftw_packages' do
   end
 end
 
+control 'tag:config_ssh_localhost' do
+  only_if { instance.head_node? && !os_properties.on_docker? }
+
+  hostname = bash("hostname").stdout
+
+  describe bash("su #{node['cluster']['cluster_user']} -c 'ssh localhost hostname'") do
+    its('stdout') { should eq hostname }
+  end
+end
+
 control 'tag:config_aws_cli_runs_in_all_regions' do
   regions = bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query \"Regions[].{Name:RegionName}\" --output text")
             .stdout.split(/\n+/)

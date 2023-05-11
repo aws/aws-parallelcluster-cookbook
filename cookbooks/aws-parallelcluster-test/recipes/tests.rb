@@ -16,18 +16,6 @@
 # limitations under the License.
 
 ###################
-# SSH client conf
-###################
-# Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
-if node['cluster']['node_type'] == 'HeadNode'
-  execute 'ssh localhost as user' do
-    command "ssh localhost hostname"
-    environment('PATH' => '/usr/local/bin:/usr/bin:/bin:$PATH')
-    user node['cluster']['cluster_user']
-  end
-end
-
-###################
 # jq
 ###################
 unless node['cluster']['os'].end_with?("-custom")
