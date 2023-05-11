@@ -30,7 +30,7 @@ control 'nfs_configured' do
 end
 
 control 'tag:config_nfs_correctly_installed_on_head_node' do
-  only_if { instance.head_node? }
+  only_if { instance.head_node? && !os_properties.on_docker? }
 
   describe 'check for nfs server protocol' do
     subject { command "sudo -u #{node['cluster']['cluster_user']} rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs" }
@@ -39,7 +39,7 @@ control 'tag:config_nfs_correctly_installed_on_head_node' do
 end
 
 control 'tag:config_nfs_correctly_installed_on_compute_node' do
-  only_if { instance.compute_node? }
+  only_if { instance.compute_node? && !os_properties.on_docker? }
 
   describe 'check for nfs server protocol' do
     subject { command "sudo -u #{node['cluster']['cluster_user']} nfsstat -m | grep vers=4" }
@@ -48,6 +48,8 @@ control 'tag:config_nfs_correctly_installed_on_compute_node' do
 end
 
 control 'tag:config_nfs_has_correct_number_of_threads' do
+  only_if { !os_properties.on_docker? }
+
   describe bash("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'") do
     its('stdout') { should cmp node['cluster']['nfs']['threads'] }
   end

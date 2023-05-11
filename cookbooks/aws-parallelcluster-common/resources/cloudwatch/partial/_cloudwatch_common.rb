@@ -135,7 +135,7 @@ action :configure do
       'CW_LOGS_CONFIGS_PATH' => config_data_path
     )
     command "#{cookbook_virtualenv_path}/bin/python #{validator_script_path}"
-  end
+  end unless redhat_ubi?
 
   execute "cloudwatch-config-creation" do
     user 'root'
@@ -153,7 +153,7 @@ action :configure do
     command "#{cookbook_virtualenv_path}/bin/python #{config_script_path} "\
         "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
         "--scheduler $SCHEDULER --node-role $NODE_ROLE #{cluster_config_path}"
-  end
+  end unless redhat_ubi?
 
   execute "cloudwatch-agent-start" do
     user 'root'

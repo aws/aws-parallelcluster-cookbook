@@ -22,6 +22,8 @@ control 'ssh_target_checker_script_created' do
 end
 
 control 'tag:config_ssh_target_checker_contains_correct_vpc_cidr_list' do
+  only_if { !os_properties.on_docker? }
+
   ssh_target_checker_script = '/usr/bin/ssh_target_checker.sh'
 
   vpc_cidr_list = node['ec2']['network_interfaces_macs'][node['ec2']['mac']]['vpc_ipv4_cidr_blocks']

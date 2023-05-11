@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_dcv_external_authenticator_user_and_group_correctly_defined' do
-  only_if { node['conditions']['dcv_supported'] }
+  only_if { node['conditions']['dcv_supported'] && !os_properties.redhat_ubi? }
 
   describe user(node['cluster']['dcv']['authenticator']['user']) do
     it { should exist }
@@ -39,7 +39,8 @@ end
 
 control 'tag:config_dcv_correctly_installed' do
   only_if do
-    instance.head_node? && node['conditions']['dcv_supported'] && ['yes', true].include?(node['cluster']['dcv']['installed'])
+    instance.head_node? && node['conditions']['dcv_supported'] &&
+      ['yes', true].include?(node['cluster']['dcv']['installed']) && !os_properties.redhat_ubi?
   end
 
   describe bash("sudo -u #{node['cluster']['cluster_user']} dcv version") do
@@ -63,7 +64,8 @@ end
 
 control 'tag:config_dcv_services_correctly_configured' do
   only_if do
-    instance.head_node? && node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node"
+    instance.head_node? && node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" &&
+      !os_properties.on_docker?
   end
 
   describe file('/etc/dcv/dcv.conf') do

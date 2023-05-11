@@ -32,4 +32,4 @@ end
 
 link '/opt/parallelcluster/cfnconfig' do
   to '/etc/parallelcluster/cfnconfig'
-end
+end unless on_docker?

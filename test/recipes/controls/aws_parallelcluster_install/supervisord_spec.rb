@@ -34,6 +34,8 @@ control 'supervisord_service_set_up' do
 end
 
 control 'tag:config_supervisord_runs_as_root' do
+  only_if { !os_properties.on_docker? }
+
   describe processes('supervisord') do
     its('count') { should eq 1 }
     its('users') { should eq ['root'] }

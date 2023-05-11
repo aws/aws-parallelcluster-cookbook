@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_clustermgtd_runs_as_cluster_admin_user' do
-  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' }
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.on_docker? }
 
   describe processes('clustermgtd') do
     its('count') { should eq 1 }

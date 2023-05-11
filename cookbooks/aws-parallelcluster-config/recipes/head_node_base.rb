@@ -23,21 +23,21 @@ manage_ebs "add ebs" do
   vol_array node['cluster']['volume'].split(',')
   action %i(mount export)
   not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
-end
+end unless on_docker?
 
 # Export /home
 nfs_export "/home" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end unless redhat_ubi?
+end unless on_docker?
 
 # Export /opt/parallelcluster/shared
 nfs_export node['cluster']['shared_dir'] do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end unless redhat_ubi?
+end unless on_docker?
 
 # Export /opt/intel if it exists
 nfs_export "/opt/intel" do
@@ -45,7 +45,7 @@ nfs_export "/opt/intel" do
   writeable true
   options ['no_root_squash']
   only_if { ::File.directory?("/opt/intel") }
-end unless redhat_ubi?
+end unless on_docker?
 
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-config::head_node_raid'
@@ -91,7 +91,7 @@ if node['cluster']['dcv_enabled'] == "head_node"
   dcv "Configure DCV" do
     action :configure
   end
-end
+end unless on_docker?
 
 unless node['cluster']['scheduler'] == 'awsbatch'
   include_recipe 'aws-parallelcluster-config::head_node_fleet_status'

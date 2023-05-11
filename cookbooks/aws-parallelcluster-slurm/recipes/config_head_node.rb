@@ -15,14 +15,21 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-setup_munge_head_node
+setup_munge_head_node unless redhat_ubi?
 
 # Export /opt/slurm
 nfs_export "#{node['cluster']['slurm']['install_dir']}" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
-end
+end unless on_docker?
+
+# Ensure config directory is in place
+directory "#{node['cluster']['slurm']['install_dir']}" do
+  user 'root'
+  group 'root'
+  mode '0755'
+end if redhat_ubi? # we skip slurm setup on Docker UBI because we don't install python
 
 # Ensure config directory is in place
 directory "#{node['cluster']['slurm']['install_dir']}/etc" do
@@ -60,7 +67,7 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
   recursive true
 end
 
-unless virtualized?
+unless on_docker?
   # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
@@ -176,6 +183,19 @@ template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.co
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_group']
   mode '0644'
+  variables(
+    cluster_name: node['cluster']['stack_name'],
+    region: node['cluster']['region'],
+    proxy: node['cluster']['proxy'],
+    dynamodb_table: node['cluster']['slurm_ddb_table'],
+    hosted_zone: node['cluster']['hosted_zone'],
+    dns_domain: node['cluster']['dns_domain'],
+    use_private_hostname: node['cluster']['use_private_hostname'],
+    head_node_private_ip: on_docker? ? 'local_ipv4' : node['ec2']['local_ipv4'],
+    head_node_hostname: on_docker? ? 'local_hostname' : node['ec2']['local_hostname'],
+    clustermgtd_heartbeat_file_path: "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat",
+    instance_id: on_docker? ? 'instance_id' : node['ec2']['instance_id']
+  )
 end
 
 template "#{node['cluster']['scripts_dir']}/slurm/slurm_suspend" do
@@ -203,7 +223,7 @@ template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_clustermgtd.con
   owner 'root'
   group 'root'
   mode '0644'
-end
+end unless on_docker?
 
 # Create shared directory used to store clustermgtd heartbeat and computemgtd config
 directory "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin" do
@@ -250,7 +270,7 @@ end unless virtualized?
 service "slurmctld" do
   supports restart: false
   action %i(enable start)
-end
+end unless on_docker?
 
 # The slurmctld service does not return an error code to `systemctl start slurmctld`, so
 # we must explicitly check the status of the service to capture failures

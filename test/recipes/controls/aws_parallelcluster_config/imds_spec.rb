@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_only_allowed_users_can_access_imds' do
+  only_if { !os_properties.on_docker? }
+
   allowed_users =
     if node['cluster']['node_type'] == 'HeadNode' &&
        node['cluster']['scheduler'] != 'awsbatch' &&

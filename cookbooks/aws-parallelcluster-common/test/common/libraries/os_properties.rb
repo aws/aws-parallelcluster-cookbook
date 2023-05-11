@@ -15,8 +15,12 @@ class OsProperties < Inspec.resource(1)
     inspec.virtualization.system == 'docker'
   end
 
+  def on_docker?
+    inspec.virtualization.system == 'docker'
+  end
+
   def redhat_ubi?
-    virtualized? && inspec.os.name == 'redhat'
+    on_docker? && inspec.os.name == 'redhat'
   end
 
   def redhat?
