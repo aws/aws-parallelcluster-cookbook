@@ -24,7 +24,7 @@ file node['cluster']['computefleet_status_path'] do
   content '{}'
   mode '0755'
   action :create
-end
+end unless on_docker?
 
 # create sudoers entry to let pcluster admin user execute update compute fleet recipe
 template '/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd' do

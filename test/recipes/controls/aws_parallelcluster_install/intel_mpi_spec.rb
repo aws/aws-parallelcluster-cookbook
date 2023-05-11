@@ -23,7 +23,7 @@ control 'tag:config_intel_mpi_installed' do
 end
 
 control 'tag:config_intel_mpi_ptrace_protection_configured_on_ubuntu1804' do
-  only_if { node['conditions']['intel_mpi_supported'] && os_properties.ubuntu1804? }
+  only_if { node['conditions']['intel_mpi_supported'] && os_properties.ubuntu1804? && !os_properties.on_docker? }
 
   ptrace_scope = instance.head_node? ? 1 : 0
   describe 'check ptrace protection enabled' do

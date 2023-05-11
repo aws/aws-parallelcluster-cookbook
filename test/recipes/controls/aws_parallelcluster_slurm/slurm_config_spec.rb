@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_slurm_correctly_installed_on_head_node' do
-  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' }
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.on_docker? }
 
   describe service('slurmctld') do
     it { should be_installed }

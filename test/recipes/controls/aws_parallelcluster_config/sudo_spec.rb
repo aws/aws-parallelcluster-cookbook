@@ -30,6 +30,8 @@ control 'sudo_configured' do
 end
 
 control 'tag:config_cluster_user_can_sudo' do
+  only_if { !os_properties.on_docker? }
+
   if os_properties.debian_family?
     describe node['cluster']['cluster_user'] do
       it { should eq 'ubuntu' }

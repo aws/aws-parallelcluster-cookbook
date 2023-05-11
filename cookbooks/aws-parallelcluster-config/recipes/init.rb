@@ -21,7 +21,7 @@ include_recipe "aws-parallelcluster-config::enable_chef_error_handler"
 validate_os_type
 
 # Validate init system
-raise "Init package #{node['init_package']} not supported." unless systemd?
+raise "Init package #{node['init_package']} not supported." unless systemd? || on_docker?
 
 include_recipe "aws-parallelcluster-config::cfnconfig_mixed"
 
@@ -37,10 +37,10 @@ end
 # ParallelCluster log rotation configuration
 include_recipe "aws-parallelcluster-config::log_rotation"
 
-include_recipe "aws-parallelcluster-config::custom_actions_setup"
+include_recipe "aws-parallelcluster-config::custom_actions_setup" unless on_docker?
 
 # Configure additional Networking Interfaces (if present)
-include_recipe "aws-parallelcluster-config::network_interfaces" unless virtualized?
+include_recipe "aws-parallelcluster-config::network_interfaces" unless on_docker?
 
 include_recipe "aws-parallelcluster-config::clusterstatusmgtd_init_slurm"
 

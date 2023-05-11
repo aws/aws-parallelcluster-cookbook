@@ -26,6 +26,8 @@ control 'gc_thresh_values_configured' do
 end
 
 control 'tag:config_ipv4_gc_thresh_correctly_configured' do
+  only_if { !os_properties.on_docker? }
+
   (1..3).each do |i|
     describe bash("cat /proc/sys/net/ipv4/neigh/default/gc_thresh#{i}") do
       its('stdout.strip') { should cmp node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"] }
