@@ -23,10 +23,10 @@ bash 'check awscli regions' do
   code <<-AWSREGIONS
     set -e
     export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query "Regions[].{Name:RegionName}" --output text))
+    regions=($(#{cookbook_virtualenv_path}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query "Regions[].{Name:RegionName}" --output text))
     for region in "${regions[@]}"
     do
-      #{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region "${region}"
+      #{cookbook_virtualenv_path}/bin/aws ec2 describe-regions --region "${region}"
     done
   AWSREGIONS
 end
@@ -119,6 +119,6 @@ end
 ###################
 if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
   execute "check clusterstatusmgtd is configured to be executed by supervisord" do
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING"
+    command "#{cookbook_virtualenv_path}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING"
   end
 end

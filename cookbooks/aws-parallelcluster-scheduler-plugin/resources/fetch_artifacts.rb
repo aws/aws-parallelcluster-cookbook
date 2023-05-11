@@ -38,7 +38,7 @@ action :run do
         if artifact_source_url.start_with?("s3")
           # download artifacts from s3
           bucket_name, object_key = artifact_source_url.match(%r{^s3:\/\/(.*?)\/(.*)}).captures
-          fetch_artifact_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3api get-object" \
+          fetch_artifact_command = "#{cookbook_virtualenv_path}/bin/aws s3api get-object" \
                          " --bucket #{bucket_name}" \
                          " --key #{object_key}" \
                          " --region #{node['cluster']['region']}" \

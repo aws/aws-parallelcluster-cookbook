@@ -64,7 +64,7 @@ unless virtualized?
   # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
+    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
             " --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
             " --input-file #{node['cluster']['cluster_config_path']}"\
@@ -77,7 +77,7 @@ unless virtualized?
 
   # Generate custom Slurm settings include files
   execute "generate_pcluster_custom_slurm_settings_include_files" do
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py"\
+    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py"\
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
             " --input-file #{node['cluster']['cluster_config_path']}"
   end
@@ -92,7 +92,7 @@ unless virtualized?
 
   # Generate pcluster fleet config
   execute "generate_pcluster_fleet_config" do
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
+    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
             " --output-file #{node['cluster']['slurm']['fleet_config_path']}"\
             " --input-file #{node['cluster']['cluster_config_path']}"
   end

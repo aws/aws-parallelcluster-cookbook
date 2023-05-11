@@ -13,7 +13,7 @@ action :attach do
   dev_path = "/dev/disk/by-ebs-volumeid/#{volume_id}"
 
   execute "attach_volume_#{volume_id}" do
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volume_id} --attach"
+    command "#{cookbook_virtualenv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volume_id} --attach"
     creates dev_path
   end
 
@@ -31,7 +31,7 @@ action :detach do
   volume_id = new_resource.volume_id.strip
   # Detach EBS volume
   execute "detach_volume_#{volume_id}" do
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volume_id} --detach"
+    command "#{cookbook_virtualenv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volume_id} --detach"
   end
 end
 
