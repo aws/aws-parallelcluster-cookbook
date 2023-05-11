@@ -32,18 +32,3 @@ unless node['cluster']['os'].end_with?("-custom")
   end
 end
 
-###################
-# Bridge Network Interface
-###################
-if platform?('centos')
-  bash 'test bridge network interface presence' do
-    code <<-TESTBRIDGE
-      set -e
-      # brctl show
-      # bridge name bridge id STP enabled interfaces
-      # virbr0 8000.525400e6e4f9 yes virbr0-nic
-      [ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0
-    TESTBRIDGE
-  end
-end
-
