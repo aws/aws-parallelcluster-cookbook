@@ -51,9 +51,11 @@ if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostn
     end
 
   else
-    # Head node
-    node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
-    node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+    unless on_docker?
+      # Head node
+      node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
+      node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+    end
   end
 
 else
@@ -83,7 +85,7 @@ node['ec2']['network_interfaces_macs'].each_value do |mac|
     path "/etc/hosts"
     pattern "^#{mac['local_ipv4s']}\s+"
   end
-end
+end unless on_docker?
 
 # Configure fqdn in /etc/hosts
 append_if_no_line "Append primary ip to /etc/hosts" do
