@@ -264,6 +264,29 @@ suites:
         nfs:
           hard_mount_options: hard,_netdev,noatime
         head_node_private_ip: '127.0.0.1'
+  - name: compute_slurmd_systemd
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::config_slurmd_systemd_service]
+    verifier:
+      controls:
+        - systemd_slurmd_service
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
+  - name: compute_slurmd_systemd_gpu
+    driver:
+      instance_type: g4dn.xlarge
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-slurm::config_slurmd_systemd_service]
+    verifier:
+      controls:
+        - systemd_slurmd_service
+        - systemd_slurmd_service_nvidia_gpu_nodes
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster::test_dummy
   - name: network_interfaces
     # Verifies multiple Network Interfaces recipes
     # These recipes can be tested on EC2 on instance type with multiple network interfaces
