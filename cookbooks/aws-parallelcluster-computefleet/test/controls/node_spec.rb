@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:testami_node_virtualenv_created' do
+control 'tag:install_tag:testami_node_virtualenv_created' do
   python_version = node['cluster']['python-version']
   virtualenv_path = node['cluster']['node_virtualenv_path']
   min_pip_version = '19.3'

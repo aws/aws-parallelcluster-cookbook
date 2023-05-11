@@ -1,4 +1,4 @@
-control 'tag:testami_cookbook_virtualenv_created' do
+control 'tag:install_tag:testami_cookbook_virtualenv_created' do
   python_version = node['cluster']['python-version']
   virtualenv_path = node['cluster']['cookbook_virtualenv_path']
   min_pip_version = '19.3'
