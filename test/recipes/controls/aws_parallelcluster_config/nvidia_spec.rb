@@ -65,7 +65,7 @@ control 'tag:config_gdrcopy_disabled_on_non_graphic_instances' do
   only_if do
     !(os_properties.centos7? && os_properties.arm?) &&
       !instance.custom_ami? && !instance.graphic? &&
-      node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
+      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
   describe 'gdrcopy service should be disabled' do
