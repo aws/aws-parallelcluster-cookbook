@@ -49,23 +49,6 @@ if node['cluster']['scheduler'] == 'plugin'
     command "(su #{node['cluster']['scheduler_plugin']['user']} -c 'sudo -ln') 2>&1 | grep 'a password is required'"
   end
 end
-
-###################
-# DCV
-###################
-if node['conditions']['dcv_supported'] && node['cluster']['dcv_enabled'] == "head_node" && node['cluster']['node_type'] == "HeadNode"
-  # moved to InSpec
-elsif node['conditions']['ami_bootstrapped']
-  execute 'check systemd default runlevel' do
-    command "systemctl get-default | grep -i multi-user.target"
-  end
-  if node['cluster']['os'] == "ubuntu1804" || node['cluster']['os'] == "alinux2"
-    execute 'check gdm service is stopped' do
-      command "systemctl show -p SubState gdm | grep -i dead"
-    end
-  end
-end
-
 ###################
 # jq
 ###################

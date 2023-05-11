@@ -37,6 +37,28 @@ control 'tag:config_no_mpich_packages' do
   end
 end
 
+control 'tag:config_check_non_graphical_systemd_settings' do
+  only_if do
+    (
+      !instance.head_node? ||
+      !node['conditions']['dcv_supported'] ||
+      node['cluster']['dcv_enabled'] != "head_node"
+    ) && node['conditions']['ami_bootstrapped']
+  end
+  describe 'check systemd default runlevel' do
+    subject { bash("systemctl get-default | grep -i multi-user.target") }
+    its('exit_status') { should eq 0 }
+  end
+
+  if os_properties.ubuntu1804? || os_properties.alinux2?
+    describe service('gdm') do
+      it { should be_installed }
+      it { should be_enabled }
+      it { should_not be_running }
+    end
+  end
+end
+
 control 'tag:config_no_fftw_packages' do
   only_if { !os_properties.centos7? }
 
