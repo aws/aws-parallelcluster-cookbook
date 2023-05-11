@@ -1,10 +1,6 @@
 name: ParallelCluster Cookbook System Test CentOS 7
 
-on:
-  push:
-    branches:
-      - develop
-  pull_request:
+on: [workflow_dispatch]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

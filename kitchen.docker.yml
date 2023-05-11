@@ -26,7 +26,8 @@ verifier:
 lifecycle:
   post_verify:
   - local: |
-      [[ ${KITCHEN_SAVE_IMAGE} == 'true' ]] || exit 0
+      echo "KITCHEN_SAVE_IMAGE=${KITCHEN_SAVE_IMAGE}"
+      [ "${KITCHEN_SAVE_IMAGE}" = true ] || exit 0
       docker_id=$(docker ps -a | grep ${KITCHEN_INSTANCE_NAME} | awk '{ print $1 }')
       docker commit ${docker_id} pcluster-${KITCHEN_PHASE}/${KITCHEN_INSTANCE_NAME}:latest
 
@@ -45,21 +46,21 @@ platforms:
       cluster:
         base_os: centos7
         kernel_release: '3.10.0-1160.76.1.el7.x86_64'
-  - name: ubuntu1804
+  - name: ubuntu18
     driver:
       image: <% if ENV['KITCHEN_UBUNTU18_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU18_IMAGE'] %> <% else %> dokken/ubuntu-18.04 <% end %>
     attributes:
       cluster:
         base_os: ubuntu1804
         kernel_release: '5.4.0-1092-aws'
-  - name: ubuntu2004
+  - name: ubuntu20
     driver:
       image: <% if ENV['KITCHEN_UBUNTU20_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU20_IMAGE'] %> <% else %> dokken/ubuntu-20.04 <% end %>
     attributes:
       cluster:
         base_os: ubuntu2004
         kernel_release: '5.15.0-1028-aws'
-  - name: ubuntu2204
+  - name: ubuntu22
     driver:
       image: <% if ENV['KITCHEN_UBUNTU22_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU22_IMAGE'] %> <% else %> dokken/ubuntu-22.04 <% end %>
     attributes:
@@ -68,7 +69,7 @@ platforms:
         kernel_release: '5.15.0-1028-aws'
   - name: rhel8
     driver:
-      image: <% if ENV['KITCHEN_REDHAT8_IMAGE'] %> <%= ENV['KITCHEN_REDHAT8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi <% end %>
+      image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi <% end %>
       intermediate_instructions:
         - RUN chmod +t /tmp
     attributes:
