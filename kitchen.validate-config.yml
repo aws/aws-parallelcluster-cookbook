@@ -63,6 +63,17 @@ suites:
         << : *_head_node_cluster_attributes
         scheduler: 'slurm'
         enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] || false %>"
+      chef_client:
+        config:
+          log_level: ":debug"
+
+  - name: slurm-config-head-node-x86-64
+    run_list: *_run_list
+    attributes: &attributes_slurm_config_HeadNode
+      cluster:
+        << : *_head_node_cluster_attributes
+        scheduler: 'slurm'
+        enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] || false %>"
 
   - name: slurm_config_HeadNode_arm64
     run_list: *_run_list
