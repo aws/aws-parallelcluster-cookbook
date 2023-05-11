@@ -29,6 +29,29 @@ driver:
     created-by: test-kitchen
     Name: test-kitchen-parallelcluster
 
+lifecycle:
+  post_verify:
+  - local: |
+      [[ ${KITCHEN_SAVE_IMAGE} == 'true' ]] || exit 0
+
+      echo "*** Retrieve EC2 instance id using key ${KITCHEN_SSH_KEY_PATH}"
+
+      case $KITCHEN_PLATFORM_NAME in
+      alinux*|redhat* ) export KITCHEN_EC2_USER='ec2-user';;
+      centos*         ) export KITCHEN_EC2_USER='centos';;
+      ubuntu*         ) export KITCHEN_EC2_USER='ubuntu';;
+      esac
+
+      KITCHEN_EC2_INSTANCE_ID=$(ssh -o StrictHostKeyChecking=no -i "${KITCHEN_SSH_KEY_PATH}" \
+      "${KITCHEN_EC2_USER}@${KITCHEN_INSTANCE_HOSTNAME}" '
+      TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") \
+      && curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id
+      ')
+
+      echo "EC2 instance id: ${KITCHEN_EC2_INSTANCE_ID}"
+
+      aws ec2 create-image --instance-id ${KITCHEN_EC2_INSTANCE_ID} --name pcluster-${KITCHEN_PHASE}/${KITCHEN_INSTANCE_NAME}
+
 transport:
   <% if ENV['KITCHEN_SSH_KEY_PATH'] %>
   ssh_key: <%= ENV['KITCHEN_SSH_KEY_PATH']  %>
