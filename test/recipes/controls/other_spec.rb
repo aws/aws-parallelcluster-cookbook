@@ -71,6 +71,14 @@ control 'tag:config_no_fftw_packages' do
   end
 end
 
+control 'tag:config_jq_version_new_enough' do
+  only_if { !instance.custom_ami? && !os_properties.redhat_ubi? }
+
+  describe bash("jq --argfile") do
+    its('stderr') { should match /jq: --argfile takes two parameters/ }
+  end
+end
+
 control 'tag:config_ssh_localhost' do
   only_if { instance.head_node? && !os_properties.on_docker? }
 
@@ -78,6 +86,14 @@ control 'tag:config_ssh_localhost' do
 
   describe bash("su #{node['cluster']['cluster_user']} -c 'ssh localhost hostname'") do
     its('stdout') { should eq hostname }
+  end
+end
+
+control 'tag:config_bridge_network_interface_presence' do
+  only_if { os_properties.centos? }
+
+  describe bash("[ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0") do
+    its('exit_status') { should eq 0 }
   end
 end
 

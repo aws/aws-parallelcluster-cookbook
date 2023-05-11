@@ -15,20 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-###################
-# jq
-###################
-unless node['cluster']['os'].end_with?("-custom")
-  bash 'execute jq' do
-    cwd Chef::Config[:file_cache_path]
-    code <<-JQMERGE
-      set -e
-      # Set PATH as in the UserData script of the CloudFormation template
-      export PATH="/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/aws/bin"
-      echo '{"cluster": {"region": "eu-west-3"}, "run_list": "recipe[aws-parallelcluster::slurm_config]"}' > /tmp/dna.json
-      echo '{ "cluster" : { "dcv_enabled" : "head_node" } }' > /tmp/extra.json
-      jq --argfile f1 /tmp/dna.json --argfile f2 /tmp/extra.json -n '$f1 * $f2'
-    JQMERGE
-  end
-end
 
