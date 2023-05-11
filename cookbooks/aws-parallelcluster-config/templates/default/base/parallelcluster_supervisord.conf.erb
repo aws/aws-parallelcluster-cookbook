@@ -23,7 +23,7 @@ stdout_logfile_maxbytes = 0
 <% end -%>
 <% unless node['cluster']['scheduler'] == 'awsbatch' -%>
 [program:clusterstatusmgtd]
-command = <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python /opt/parallelcluster/scripts/clusterstatusmgtd.py
+command = <%= cookbook_virtualenv_path %>/bin/python /opt/parallelcluster/scripts/clusterstatusmgtd.py
 user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 redirect_stderr = true

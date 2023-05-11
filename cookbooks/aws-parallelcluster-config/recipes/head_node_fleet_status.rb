@@ -47,7 +47,7 @@ end
 unless virtualized? || kitchen_test? && !node['interact_with_ddb']
   execute 'initialize compute fleet status in DynamoDB' do
     # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
-    command "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+    command "#{cookbook_virtualenv_path}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
             " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Data\": {\"M\": {\"status\": {\"S\": \"RUNNING\"}, \"lastStatusUpdatedTime\": {\"S\": \"#{Time.now.utc}\"}}}}'" \
             " --region #{node['cluster']['region']}"
     retries 3

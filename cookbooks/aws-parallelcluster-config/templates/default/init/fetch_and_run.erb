@@ -20,7 +20,7 @@ source /etc/parallelcluster/cfnconfig
 
 # please note that this env setup has potential independent but relevant duplication with:
 # build_env in cookbooks/aws-parallelcluster-scheduler-plugin/resources/execute_event_handler.rb
-PCLUSTER_COOKBOOK_VIRTUALENV_PATH="<%= node['cluster']['cookbook_virtualenv_path'] %>"
+PCLUSTER_COOKBOOK_VIRTUALENV_PATH="<%= cookbook_virtualenv_path %>"
 PCLUSTER_SCRIPTS_DIR="<%= node['cluster']['scripts_dir'] %>"
 PCLUSTER_CONFIG_PATH="<%= node['cluster']['cluster_config_path'] %>"
 PCLUSTER_NODE_TYPE="<%= node['cluster']['node_type'] %>"

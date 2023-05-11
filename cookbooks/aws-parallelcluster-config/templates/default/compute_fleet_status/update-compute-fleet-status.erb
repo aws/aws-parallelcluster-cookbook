@@ -43,7 +43,7 @@ main() {
     fi
 
 
-    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cluster']['scripts_dir'] %>/compute_fleet_status.py --table-name <%= node['cluster']['ddb_table'] %> --region <%= node['cluster']['region'] %> --status "${_status}" --action update
+    <%= cookbook_virtualenv_path %>/bin/python <%= node['cluster']['scripts_dir'] %>/compute_fleet_status.py --table-name <%= node['cluster']['ddb_table'] %> --region <%= node['cluster']['region'] %> --status "${_status}" --action update
 }
 
 main "$@"

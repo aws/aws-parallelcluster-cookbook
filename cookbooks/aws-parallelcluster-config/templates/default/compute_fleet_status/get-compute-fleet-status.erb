@@ -23,7 +23,7 @@ main() {
         shift
     done
 
-    <%= node['cluster']['cookbook_virtualenv_path'] %>/bin/python <%= node['cluster']['scripts_dir'] %>/compute_fleet_status.py --table-name <%= node['cluster']['ddb_table'] %> --region <%= node['cluster']['region'] %> --action get
+    <%= cookbook_virtualenv_path %>/bin/python <%= node['cluster']['scripts_dir'] %>/compute_fleet_status.py --table-name <%= node['cluster']['ddb_table'] %> --region <%= node['cluster']['region'] %> --action get
 }
 
 main "$@"

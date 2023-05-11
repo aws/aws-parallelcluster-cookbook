@@ -44,7 +44,7 @@ if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node
       source #{virtualenv_path}/bin/activate
       pip uninstall --yes aws-parallelcluster-node
       if [[ "#{node['cluster']['custom_node_package']}" =~ ^s3:// ]]; then
-        custom_package_url=$(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 presign #{node['cluster']['custom_node_package']} --region #{node['cluster']['region']})
+        custom_package_url=$(#{cookbook_virtualenv_path}/bin/aws s3 presign #{node['cluster']['custom_node_package']} --region #{node['cluster']['region']})
       else
         custom_package_url=#{node['cluster']['custom_node_package']}
       fi

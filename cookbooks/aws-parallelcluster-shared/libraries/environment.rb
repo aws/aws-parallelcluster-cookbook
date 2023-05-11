@@ -21,6 +21,22 @@ def virtualenv_path(pyenv_root:, python_version:, virtualenv_name:)
   "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_name}"
 end
 
+def cookbook_virtualenv_name
+  'cookbook_virtualenv'
+end
+
+def cookbook_python_version
+  node['cluster']['python-version']
+end
+
+def cookbook_pyenv_root
+  node['cluster']['system_pyenv_root']
+end
+
+def cookbook_virtualenv_path
+  virtualenv_path(pyenv_root: cookbook_pyenv_root, python_version: cookbook_python_version, virtualenv_name: cookbook_virtualenv_name)
+end
+
 def node_virtualenv_name
   'node_virtualenv'
 end
