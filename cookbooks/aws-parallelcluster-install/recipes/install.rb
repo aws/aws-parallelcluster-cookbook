@@ -20,33 +20,36 @@ validate_os_type
 
 return if node['conditions']['ami_bootstrapped']
 
-# == PLATFORM - BASE
-include_recipe 'aws-parallelcluster-install::base'
+include_recipe "aws-parallelcluster-platform::directories"
 
-# == PLATFORM - FEATURES
-include_recipe "aws-parallelcluster-install::nvidia"
-include_recipe "aws-parallelcluster-install::intel_mpi"
-cloudwatch 'Install amazon-cloudwatch-agent'
-arm_pl 'Install ARM Performance Library'
-include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
-efa 'Install EFA'
 
-# == ENVIRONMENT
-lustre "Install FSx options" # FSx options
-efs 'Install efs-utils'
-stunnel 'Install stunnel'
-system_authentication "Install packages required for directory service integration"
-
-# == SCHEDULER AND COMPUTE FLEET
-include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
-mysql_client 'Install mysql client'
-include_recipe 'aws-parallelcluster-slurm::install'
-include_recipe 'aws-parallelcluster-scheduler-plugin::install'
-include_recipe 'aws-parallelcluster-awsbatch::install'
-
-# == WORKSTATIONS
-# DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
-# used to build the schedulers packages
-dcv "Install DCV"
-
-node_attributes "dump node attributes"
+# # == PLATFORM - BASE
+# include_recipe 'aws-parallelcluster-install::base'
+#
+# # == PLATFORM - FEATURES
+# include_recipe "aws-parallelcluster-install::nvidia"
+# include_recipe "aws-parallelcluster-install::intel_mpi"
+# cloudwatch 'Install amazon-cloudwatch-agent'
+# arm_pl 'Install ARM Performance Library'
+# include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
+# efa 'Install EFA'
+#
+# # == ENVIRONMENT
+# lustre "Install FSx options" # FSx options
+# efs 'Install efs-utils'
+# stunnel 'Install stunnel'
+# system_authentication "Install packages required for directory service integration"
+#
+# # == SCHEDULER AND COMPUTE FLEET
+# include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
+# mysql_client 'Install mysql client'
+# include_recipe 'aws-parallelcluster-slurm::install'
+# include_recipe 'aws-parallelcluster-scheduler-plugin::install'
+# include_recipe 'aws-parallelcluster-awsbatch::install'
+#
+# # == WORKSTATIONS
+# # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
+# # used to build the schedulers packages
+# dcv "Install DCV"
+#
+# node_attributes "dump node attributes"
