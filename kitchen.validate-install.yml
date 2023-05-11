@@ -12,6 +12,7 @@ suites:
     run_list:
       - recipe[aws-parallelcluster-test::docker_mock]
       - recipe[aws-parallelcluster]
+      - recipe[aws-parallelcluster-tests::tear_down]
     verifier:
       controls:
         # We also need to test the effect some files (service config, profile config) have on the system.
