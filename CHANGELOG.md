@@ -9,7 +9,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 
 **CHANGES**
-Upgrade Slurm to version 23.02.2.
 
 **BUG FIXES**
 
@@ -27,10 +26,10 @@ Upgrade Slurm to version 23.02.2.
 - Enforce the DCV Authenticator Server to use at least `TLS-1.2` protocol when creating the SSL Socket.
 - Load kernel module [nvidia-uvm](https://developer.nvidia.com/blog/unified-memory-cuda-beginners/) by default to provide Unified Virtual Memory (UVM) functionality to the CUDA driver.
 - Install [NVIDIA Persistence Daemon](https://docs.nvidia.com/deploy/driver-persistence/index.html) as a system service.
-- Install [NVIDIA Data Center GPU Manager (DCGM)](https://developer.nvidia.com/dcgm) package on all supported OSes except for aarch64 `centos7` and `alinux2`. 
+- Install [NVIDIA Data Center GPU Manager (DCGM)](https://developer.nvidia.com/dcgm) package on all supported OSes except for aarch64 `centos7` and `alinux2`.
 
 **CHANGES**
-- Upgrade Slurm to version 23.02.1.
+- Upgrade Slurm to version 23.02.2.
 - Upgrade munge to version 0.5.15.
 - Set Slurm default `TreeWidth` to 30.
 - Set Slurm prolog and epilog configurations to target a directory, `/opt/slurm/etc/scripts/prolog.d/` and `/opt/slurm/etc/scripts/epilog.d/` respectively.
@@ -61,6 +60,7 @@ Upgrade Slurm to version 23.02.2.
 - Fix an issue that was causing misalignment of compute nodes IP on instances with multiple network interfaces.
 - Fix replacement of `StoragePass` in `slurm_parallelcluster_slurmdbd.conf` when a queue parameter update is performed and the Slurm accounting configurations are not updated.
 - Fix issue causing `cfn-hup` daemon to fail when it gets restarted.
+- Fix issue causing NVIDIA GPU compute nodes not to resume correctly after executing an `scontrol reboot` command.
 
 3.5.1
 ------
