@@ -1,11 +1,6 @@
 name: ParallelCluster Cookbook System Test Ubuntu
 
-on:
-  push:
-    branches:
-      - develop
-  pull_request:
-
+on: [workflow_dispatch]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
