@@ -103,9 +103,9 @@ platforms:
   - name: rhel8
     driver_plugin: ec2
     driver:
-      <% if ENV['KITCHEN_REDHAT8_AMI'] %>
+      <% if ENV['KITCHEN_RHEL8_AMI'] %>
       # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
+      image_id: <%= ENV['KITCHEN_RHEL8_AMI'] %>
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
@@ -154,7 +154,7 @@ platforms:
       cluster:
         base_os: centos7
         cluster_user: centos
-  - name: ubuntu1804
+  - name: ubuntu18
     driver_plugin: ec2
     driver:
       <% if ENV['KITCHEN_UBUNTU18_AMI'] %>
@@ -181,7 +181,7 @@ platforms:
       cluster:
         base_os: ubuntu1804
         cluster_user: ubuntu
-  - name: ubuntu2004
+  - name: ubuntu20
     driver_plugin: ec2
     driver:
       <% if ENV['KITCHEN_UBUNTU20_AMI'] %>
@@ -208,7 +208,7 @@ platforms:
       cluster:
         base_os: ubuntu2004
         cluster_user: ubuntu
-  - name: ubuntu2204
+  - name: ubuntu22
     driver_plugin: ec2
     driver:
       <% if ENV['KITCHEN_UBUNTU22_AMI'] %>
