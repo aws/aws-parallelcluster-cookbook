@@ -28,28 +28,6 @@ if node['cluster']['node_type'] == 'HeadNode'
 end
 
 ###################
-# Scheduler Plugin
-###################
-if node['cluster']['scheduler'] == 'plugin'
-  if node['cluster']['node_type'] == "HeadNode"
-    execute 'check artifacts are in target_source_path' do
-      command "ls #{node['cluster']['scheduler_plugin']['home']} | grep develop"
-    end
-    execute 'check handler-env.json in path' do
-      command "ls #{node['cluster']['shared_dir']}/handler-env.json"
-    end
-    execute 'check get compute fleet script is executable by plugin user' do
-      command "su #{node['cluster']['scheduler_plugin']['user']} -c 'if [[ ! -x '/usr/local/bin/get-compute-fleet-status.sh' ]]; then exit 1; fi;'"
-    end
-    execute 'check update compute fleet script is executable by plugin user' do
-      command "su #{node['cluster']['scheduler_plugin']['user']} -c 'if [[ ! -x '/usr/local/bin/update-compute-fleet-status.sh' ]]; then exit 1; fi;'"
-    end
-  end
-  execute "check scheduler plugin user doesn't have Sudo Privileges" do
-    command "(su #{node['cluster']['scheduler_plugin']['user']} -c 'sudo -ln') 2>&1 | grep 'a password is required'"
-  end
-end
-###################
 # jq
 ###################
 unless node['cluster']['os'].end_with?("-custom")
