@@ -3,9 +3,15 @@
 verifier:
   name: inspec
   inspec_tests:
-    # recipe tests will use controls from these directories
     - test/recipes
     - test/resources
+    - /tmp/cookbooks/aws-parallelcluster-platform/test
+    - /tmp/cookbooks/aws-parallelcluster-environment/test
+    - /tmp/cookbooks/aws-parallelcluster-computefleet/test
+
+lifecycle:
+  pre_verify:
+    - local: . ./kitchen.fix-inspec-deps.sh
 
 suites:
   - name: aws_parallelcluster_install

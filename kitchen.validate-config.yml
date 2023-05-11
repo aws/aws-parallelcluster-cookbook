@@ -1,8 +1,18 @@
 # Validates config recipes
 ---
 verifier:
+  inspec_tests:
+    - test/recipes
+    - test/resources
+    - /tmp/cookbooks/aws-parallelcluster-platform/test
+    - /tmp/cookbooks/aws-parallelcluster-environment/test
+    - /tmp/cookbooks/aws-parallelcluster-computefleet/test
   controls:
     - /tag:config/
+
+lifecycle:
+  pre_verify:
+    - local: . ./kitchen.fix-inspec-deps.sh
 
 _common_cluster_attributes: &_common_cluster_attributes
   stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
