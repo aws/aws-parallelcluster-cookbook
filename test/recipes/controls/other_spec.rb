@@ -18,6 +18,15 @@ control 'tag:config_enough_space_on_root_volume' do
   end
 end
 
+control 'tag:config_clusterstatusmgtd_is_running' do
+  only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' && !os_properties.on_docker? }
+
+  describe 'clusterstatusmgtd is configured to be executed by supervisord' do
+    subject { bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING") }
+    its('exit_status') { should eq 0 }
+  end
+end
+
 control 'tag:config_no_mpich_packages' do
   describe bash('ls 2>/dev/null /usr/lib64/mpich*') do
     its('stdout') { should be_empty }

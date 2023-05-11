@@ -114,11 +114,3 @@ if platform?('centos')
   end
 end
 
-###################
-# clusterstatusmgtd
-###################
-if node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
-  execute "check clusterstatusmgtd is configured to be executed by supervisord" do
-    command "#{cookbook_virtualenv_path}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING"
-  end
-end
