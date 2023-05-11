@@ -17,9 +17,8 @@ describe 'manage_raid:mount' do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['manage_raid']
-        ) do |node|
-          node.override['cluster']['cookbook_virtualenv_path'] = venv_path
-        end
+        )
+        allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(venv_path)
         runner.converge_dsl do
           manage_raid 'mount' do
             action :mount
@@ -123,9 +122,8 @@ describe 'manage_raid:unmount' do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['manage_raid']
-        ) do |node|
-          node.override['cluster']['cookbook_virtualenv_path'] = venv_path
-        end
+        )
+        allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(venv_path)
         runner.converge_dsl do
           manage_raid 'unmount' do
             action :unmount

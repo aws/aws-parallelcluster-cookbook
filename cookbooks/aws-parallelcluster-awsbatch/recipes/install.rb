@@ -36,7 +36,7 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
     code <<-CLI
       set -e
       if [[ "#{node['cluster']['custom_awsbatchcli_package']}" =~ ^s3:// ]]; then
-        custom_package_url=$(#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 presign #{node['cluster']['custom_awsbatchcli_package']} --region #{node['cluster']['region']})
+        custom_package_url=$(#{cookbook_virtualenv_path}/bin/aws s3 presign #{node['cluster']['custom_awsbatchcli_package']} --region #{node['cluster']['region']})
       else
         custom_package_url=#{node['cluster']['custom_awsbatchcli_package']}
       fi

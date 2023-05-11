@@ -81,7 +81,7 @@ bash 'make install' do
     set -e
 
     # python3 is required to build slurm >= 20.02
-    source #{node['cluster']['cookbook_virtualenv_path']}/bin/activate
+    source #{cookbook_virtualenv_path}/bin/activate
 
     tar xf #{slurm_tarball}
     cd slurm-#{slurm_tar_name}

@@ -46,7 +46,7 @@ if [ "${DEBUG}" = true ]; then
  set -x
 fi
 
-PCLUSTER_COOKBOOK_VIRTUALENV_PATH="<%= node['cluster']['cookbook_virtualenv_path'] %>"
+PCLUSTER_COOKBOOK_VIRTUALENV_PATH="<%= cookbook_virtualenv_path %>"
 PCLUSTER_SCRIPTS_DIR="<%= node['cluster']['slurm']['install_dir'] %>/etc/pcluster/.slurm_plugin/scripts"
 PCLUSTER_CONFIG_PATH="<%= node['cluster']['cluster_config_path'] %>"
 PCLUSTER_DNA_JSON_PATH="/etc/chef/dna.json"

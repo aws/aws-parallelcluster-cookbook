@@ -195,9 +195,8 @@ describe 'volume:attach' do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['volume']
-        ) do |node|
-          node.override['cluster']['cookbook_virtualenv_path'] = '/cookbook_venv'
-        end
+        )
+        allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return('/cookbook_venv')
         runner.converge_dsl do
           volume 'attach' do
             volume_id 'volumeid'
@@ -229,9 +228,8 @@ describe 'volume:detach' do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['volume']
-        ) do |node|
-          node.override['cluster']['cookbook_virtualenv_path'] = '/cookbook_venv'
-        end
+        )
+        allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return('/cookbook_venv')
         runner.converge_dsl do
           volume 'detach' do
             volume_id 'volumeid'

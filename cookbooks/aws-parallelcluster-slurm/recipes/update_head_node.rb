@@ -16,7 +16,7 @@
 # limitations under the License.
 
 execute 'stop clustermgtd' do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl stop clustermgtd"
+  command "#{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
@@ -147,7 +147,7 @@ ruby_block "replace slurm queue nodes" do
 end
 
 execute "generate_pcluster_slurm_configs" do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
+  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
           " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/" \
           " --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/" \
           " --input-file #{node['cluster']['cluster_config_path']}" \
@@ -162,7 +162,7 @@ end
 
 # Generate custom Slurm settings include files
 execute "generate_pcluster_custom_slurm_settings_include_files" do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py" \
+  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_custom_slurm_settings_include_file_generator.py" \
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
             " --input-file #{node['cluster']['cluster_config_path']}"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_bulk_custom_slurm_settings_updated? }
@@ -177,7 +177,7 @@ ruby_block "Override Custom Slurm Settings with remote file" do
 end
 
 execute "generate_pcluster_fleet_config" do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
+  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py"\
           " --output-file #{node['cluster']['slurm']['fleet_config_path']}"\
           " --input-file #{node['cluster']['cluster_config_path']}"
   not_if { ::File.exist?(node['cluster']['slurm']['fleet_config_path']) && !are_queues_updated? }
@@ -238,7 +238,7 @@ end
 chef_sleep '15'
 
 execute 'start clustermgtd' do
-  command "#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl start clustermgtd"
+  command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 

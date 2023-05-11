@@ -33,7 +33,7 @@ action :get do
     if source_url.start_with?("s3")
       Chef::Log.debug("Retrieving remote Object from #{source_url} to #{local_path} using S3 protocol")
       # download file using s3 protocol
-      fetch_command = "#{node['cluster']['cookbook_virtualenv_path']}/bin/aws s3 cp" \
+      fetch_command = "#{cookbook_virtualenv_path}/bin/aws s3 cp" \
                   " --region #{node['cluster']['region']}" \
                   " #{no_sign_request}" \
                   " #{source_url}" \

@@ -11,11 +11,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-virtualenv_name = 'cookbook_virtualenv'
-pyenv_root = node['cluster']['system_pyenv_root']
-python_version = node['cluster']['python-version']
-
-virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_name}"
+virtualenv_path = cookbook_virtualenv_path
 
 node.default['cluster']['cookbook_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
@@ -25,9 +21,9 @@ return if redhat_ubi?
 
 install_pyenv_new 'pyenv for default python version'
 
-activate_virtual_env virtualenv_name do
-  pyenv_path virtualenv_path
-  python_version python_version
+activate_virtual_env cookbook_virtualenv_name do
+  pyenv_path cookbook_virtualenv_path
+  python_version cookbook_python_version
   requirements_path "cookbook_virtualenv/requirements.txt"
-  not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
+  not_if { ::File.exist?("#{cookbook_virtualenv_path}/bin/activate") }
 end
