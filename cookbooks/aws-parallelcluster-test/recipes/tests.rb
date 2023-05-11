@@ -16,22 +16,6 @@
 # limitations under the License.
 
 ###################
-# AWS Cli
-###################
-bash 'check awscli regions' do
-  cwd Chef::Config[:file_cache_path]
-  code <<-AWSREGIONS
-    set -e
-    export PATH="/usr/local/bin:/usr/bin/:$PATH"
-    regions=($(#{cookbook_virtualenv_path}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query "Regions[].{Name:RegionName}" --output text))
-    for region in "${regions[@]}"
-    do
-      #{cookbook_virtualenv_path}/bin/aws ec2 describe-regions --region "${region}"
-    done
-  AWSREGIONS
-end
-
-###################
 # SSH client conf
 ###################
 # Test only on head node since on compute fleet an empty /home is mounted for the Kitchen tests run
