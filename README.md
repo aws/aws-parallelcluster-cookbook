@@ -77,6 +77,28 @@ export KITCHEN_SSH_KEY_PATH=/path/your-key.pem
 export KITCHEN_SECURITY_GROUP_ID=sg-your-group
 ```
 
+### Save and reuse Docker image
+When you set the environment variable `KITCHEN_SAVE_IMAGE=true`, a successful `kitchen verify` phase will lead to 
+the Docker image being committed with the tag `pcluster-${PHASE}/${INSTANCE_NAME}`.
+
+For instance, if you successfully run
+```
+./kitchen.docker.sh platform-install test directories-alinux2
+```
+an image with tag `pcluster-install/directories-alinux2:latest` will be saved.
+
+To use it in a later Kitchen test, `export KITCHEN_${PLATFORM}_IMAGE=<your_image>`.
+
+For instance, to reuse the image from the example above, set `KITCHEN_ALINUX2_IMAGE=pcluster-install/directories-alinux2`.
+
+### Save and reuse EC2 image
+The procedure described above also applies to EC2, with minor differences.
+
+1. To keep the EC2 instance running while the image is being cooked, refrain from using `kitchen test` 
+   or `kitchen destroy` commands. Opt for `kitchen verify` and destroy the instance once the AMI is ready.
+2. Set `KITCHEN_${PLATFORM}_AMI=<ami_id>` to reuse the AMI.
+   For instance, `KITCHEN_ALINUX2_AMI=ami-nnnnnnnnnnnnn`
+
 ### Kitchen lifecycle hooks
 Kitchen [lifecycle hooks](https://kitchen.ci/docs/reference/lifecycle-hooks/) allow running commands 
 before and/or after any phase of Kitchen tests (create, converge, verify, or destroy).
@@ -160,3 +182,12 @@ If you interrupt it and try to run `kitchen verify`, you see authentication fail
 
 This happens because Ubuntu22 does not accept authentication via RSA key. You need to re-create a key pair 
 using `ED25519` key type.
+
+### Known issues with Berks
+
+#### Kitchen doesn't see your changes
+
+If Kitchen doesn't detect your changes, try
+```
+berks shelf uninstall ${COOKBOOK_NAME}
+```
