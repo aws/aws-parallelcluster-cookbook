@@ -13,7 +13,7 @@ cfn_python_version = '3.7.16'
 base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
-control 'cfnbootstrap_virtualenv_created' do
+control 'tag:install_cfnbootstrap_virtualenv_created' do
   title "cfnbootstrap virtualenv should be created on #{cfn_python_version}"
   only_if { !os_properties.redhat_ubi? }
 
