@@ -27,6 +27,7 @@ package_repos 'add nvidia-repo' do
   repo_name "nvidia-repo"
   baseurl repo_uri
   gpgkey "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}"
+  disable_modularity true
 end
 
 fabric_manager 'Install Nvidia Fabric Manager'

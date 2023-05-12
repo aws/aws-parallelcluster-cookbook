@@ -17,26 +17,4 @@ provides :fabric_manager, platform: 'redhat' do |node|
 end
 
 use 'partial/_fabric_manager_common.rb'
-# Temporarely commented to enable the workaround
-# use 'partial/_fabric_manager_install_rhel.rb'
-
-# Workaround to download and install nvidia fabric_manager on redhat8 due to bug https://partners.nvidia.com/Bug/ViewBug/4056528
-# rpm_package = https://developer.download.nvidia.com/compute/cuda/repos/rhel8/x86_64/
-action :install_package do
-  rpm_package = "#{node['cluster']['nvidia']['fabricmanager']['package']}-#{node['cluster']['nvidia']['fabricmanager']['version']}-1.x86_64.rpm"
-  repo_domain = node['cluster']['region'].start_with?("cn-") ? "cn" : "com"
-  repo_uri = node['cluster']['nvidia']['cuda']['repository_uri'].gsub('_domain_', repo_domain)
-  remote_file rpm_package do
-    source "#{repo_uri}/#{rpm_package}"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
-  package rpm_package do
-    retries 3
-    retry_delay 5
-    source rpm_package
-    action %i(install lock)
-  end
-end
+use 'partial/_fabric_manager_install_rhel.rb'
