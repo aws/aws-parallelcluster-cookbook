@@ -19,10 +19,15 @@ nvidia_driver 'Install nvidia driver'
 include_recipe "aws-parallelcluster-install::cuda"
 gdrcopy 'Install Nvidia gdrcopy'
 
-# Install NVIDIA Fabric Manager
+# Add NVIDIA repo for fabric manager and datacenter-gpu-manager
 repo_domain = node['cluster']['region'].start_with?("cn-") ? "cn" : "com"
 repo_uri = node['cluster']['nvidia']['cuda']['repository_uri'].gsub('_domain_', repo_domain)
-add_package_repository("nvidia-repo", repo_uri, "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}", "/")
+package_repos 'add nvidia-repo' do
+  action :add
+  repo_name "nvidia-repo"
+  baseurl repo_uri
+  gpgkey "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}"
+end
 
 fabric_manager 'Install Nvidia Fabric Manager'
 
