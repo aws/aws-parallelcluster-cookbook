@@ -16,17 +16,24 @@
 property :repo_name, String, required: %i(add remove)
 property :baseurl, String, required: %i(add)
 property :gpgkey, String, required: %i(add)
+property :distribution, String, default: "/"
+property :disable_modularity, [true, false], default: false
 
 action :add do
   repo_name = new_resource.repo_name.dup
   baseurl = new_resource.baseurl.dup
   gpgkey = new_resource.gpgkey.dup
+  disable_modularity = new_resource.disable_modularity.dup
   yum_repository repo_name do
     baseurl baseurl
     gpgkey gpgkey
     retries 3
     retry_delay 5
   end
+
+  bash "Disable modularity" do
+    code "echo 'module_hotfixes=1' >> /etc/yum.repos.d/#{repo_name}.repo"
+  end if disable_modularity
 end
 
 action :remove do
