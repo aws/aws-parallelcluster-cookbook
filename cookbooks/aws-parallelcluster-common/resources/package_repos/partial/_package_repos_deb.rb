@@ -17,6 +17,7 @@ property :repo_name, String, required: %i(add remove)
 property :baseurl, String, required: %i(add)
 property :gpgkey, String, required: %i(add)
 property :distribution, String, default: "/"
+property :disable_modularity, [true, false], default: false
 
 action :add do
   repo_name = new_resource.repo_name.dup
