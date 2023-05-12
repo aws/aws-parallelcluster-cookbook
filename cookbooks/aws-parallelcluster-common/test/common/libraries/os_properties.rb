@@ -55,6 +55,10 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'ubuntu' && inspec.os.release == '20.04'
   end
 
+  def ubuntu2204?
+    inspec.os.name == 'ubuntu' && inspec.os.release == '22.04'
+  end
+
   def debian_family?
     inspec.os.family == 'debian'
   end
