@@ -65,7 +65,7 @@ platforms:
       image: <% if ENV['KITCHEN_UBUNTU22_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU22_IMAGE'] %> <% else %> dokken/ubuntu-22.04 <% end %>
     attributes:
       cluster:
-        base_os: ubuntu2004
+        base_os: ubuntu2204
         kernel_release: '5.15.0-1028-aws'
   - name: rhel8
     driver:

@@ -44,6 +44,9 @@
 # KITCHEN_UBUNTU20_AMI:       specific AMI to use for ubuntu20.04
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
+# KITCHEN_UBUNTU22_AMI:       specific AMI to use for ubuntu22.04
+#                             if not specified, will look for the latest suitable ParallelCluster AMI
+#
 
 source kitchen.local-yml.sh
 
