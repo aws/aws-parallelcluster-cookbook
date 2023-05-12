@@ -33,4 +33,7 @@ fabric_manager 'Install Nvidia Fabric Manager'
 
 nvidia_dcgm 'install datacenter-gpu-manager'
 
-remove_package_repository("nvidia-repo")
+package_repos 'remove nvidia-repo' do
+  action :remove
+  repo_name "nvidia-repo"
+end

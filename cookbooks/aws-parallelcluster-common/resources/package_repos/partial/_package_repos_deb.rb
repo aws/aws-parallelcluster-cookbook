@@ -13,7 +13,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-property :repo_name, String, required: %i(add)
+property :repo_name, String, required: %i(add remove)
 property :baseurl, String, required: %i(add)
 property :gpgkey, String, required: %i(add)
 property :distribution, String, default: "/"
@@ -30,8 +30,13 @@ action :add do
     retries 3
     retry_delay 5
   end
-  apt_update 'update' do
-    retries 3
-    retry_delay 5
+  action_update
+end
+
+action :remove do
+  repo_name = new_resource.repo_name.dup
+  apt_repository repo_name do
+    action :remove
   end
+  action_update
 end

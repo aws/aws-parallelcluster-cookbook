@@ -13,7 +13,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-property :repo_name, String, required: %i(add)
+property :repo_name, String, required: %i(add remove)
 property :baseurl, String, required: %i(add)
 property :gpgkey, String, required: %i(add)
 
@@ -26,5 +26,12 @@ action :add do
     gpgkey gpgkey
     retries 3
     retry_delay 5
+  end
+end
+
+action :remove do
+  repo_name = new_resource.repo_name.dup
+  yum_repository repo_name do
+    action :remove
   end
 end
