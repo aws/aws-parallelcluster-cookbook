@@ -33,6 +33,8 @@ class ComputeResourceRenderer:
         self.instance_types = get_instance_types(compute_resource_config)
         self.vcpus_count, self.threads_per_core = get_min_vcpus(self.instance_types, instance_types_info)
         self.gpu_count, self.gpu_type = get_min_gpu_count_and_type(self.instance_types, instance_types_info, log)
+        self.static_node_weight = compute_resource_config["StaticNodeWeight"]
+        self.dynamic_node_weight = compute_resource_config["DynamicNodeWeight"]
 
     def render_as_nodename(self):
         """Launch the rendering process."""
@@ -75,6 +77,7 @@ class ComputeResourceRenderer:
 
     def _definitions(self, dynamic=False):
         definitions = f" CPUs={self._vcpus()} RealMemory={self.real_memory} State=CLOUD {self._features(dynamic)}"
+        definitions += f" Weight={self.dynamic_node_weight if dynamic else self.static_node_weight}"
 
         if self.has_gpu and self.gpu_count > 0:
             definitions += f" Gres=gpu:{ self.gpu_type }:{self.gpu_count}"
