@@ -11,6 +11,8 @@ Scheduling:
                 MinCount: 1
                 Name: efa-c5n
                 SpotPrice: null
+                StaticNodeWeight: 1
+                DynamicNodeWeight: 1001
           ComputeSettings: null
           CustomActions: null
           Iam:

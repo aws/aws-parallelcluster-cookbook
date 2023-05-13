@@ -11,6 +11,8 @@ Scheduling:
                 MinCount: 5
                 Name: multiplespot-1
                 SpotPrice: null
+                StaticNodeWeight: 1
+                DynamicNodeWeight: 1001
               - DisableSimultaneousMultithreading: true
                 Efa:
                     Enabled: false
@@ -20,6 +22,8 @@ Scheduling:
                 MinCount: 5
                 Name: multiplespot-2
                 SpotPrice: 1.5
+                StaticNodeWeight: 1
+                DynamicNodeWeight: 1001
           ComputeSettings: null
           CustomActions: null
           Iam:
@@ -38,6 +42,8 @@ Scheduling:
                 MinCount: 1
                 Name: efa-c5n
                 SpotPrice: null
+                StaticNodeWeight: 1
+                DynamicNodeWeight: 1001
           ComputeSettings: null
           CustomActions: null
           Iam:
@@ -56,6 +62,8 @@ Scheduling:
                 MinCount: 1
                 Name: gpu-g38xlarge
                 SpotPrice: null
+                StaticNodeWeight: 1
+                DynamicNodeWeight: 1001
               - DisableSimultaneousMultithreading: true
                 Efa:
                     Enabled: false
@@ -65,6 +73,8 @@ Scheduling:
                 MinCount: 0
                 Name: gpu-p3dn24xlarge
                 SpotPrice: null
+                StaticNodeWeight: 1
+                DynamicNodeWeight: 1001
           ComputeSettings: null
           CustomActions: null
           Iam:
