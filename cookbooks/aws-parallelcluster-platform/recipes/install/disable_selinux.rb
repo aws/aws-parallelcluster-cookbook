@@ -1,8 +1,4 @@
 # frozen_string_literal: true
-
-#
-# Cookbook:: aws-parallelcluster
-# Recipe:: disable_selinux
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #

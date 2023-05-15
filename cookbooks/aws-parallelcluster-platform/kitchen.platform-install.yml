@@ -24,6 +24,12 @@ suites:
       controls:
         - /pcluster_directories_exist/
         - /pcluster_log_dir_is_configured/
+  - name: disable_selinux
+    run_list:
+      - recipe[aws-parallelcluster-platform::disable_selinux]
+    verifier:
+      controls:
+        - /tag:install_selinux_disabled/
   - name: disable_services
     run_list:
       - recipe[aws-parallelcluster-platform::disable_services]

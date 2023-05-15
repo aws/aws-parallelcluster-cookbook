@@ -45,7 +45,6 @@ suites:
         - c_states_kernel_configured
         - chrony_installed_and_configured
         - clusterstatusmgtd_files_created
-        - selinux_disabled
         - efa_conflicting_packages_removed
         - efa_installed
         - efa_prereq_packages_installed
