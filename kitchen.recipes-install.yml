@@ -112,16 +112,6 @@ suites:
     verifier:
       controls:
         - ami_cleanup_file_created
-  - name: license_readme
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::license_readme]
-    verifier:
-      controls:
-        - license_readme_created
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
   - name: pmix_installed
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

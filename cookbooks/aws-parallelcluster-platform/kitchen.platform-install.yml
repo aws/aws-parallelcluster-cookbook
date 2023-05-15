@@ -17,6 +17,13 @@ suites:
     verifier:
       controls:
         - /tag:install_users/
+  - name: license_readme
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::license_readme]
+    verifier:
+      controls:
+        - /license_readme_created/
   - name: directories
     run_list:
       - recipe[aws-parallelcluster-platform::directories]

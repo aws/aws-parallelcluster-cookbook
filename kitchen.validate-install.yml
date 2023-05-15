@@ -49,8 +49,6 @@ suites:
         - efa_installed
         - efa_prereq_packages_installed
         - efs_utils_installed
-        - gc_thresh_values_configured
-        - license_readme_created
         - node_attributes_created
         - /services_disabled_on_amazon_family/
         - /services_disabled_on_debian_family/

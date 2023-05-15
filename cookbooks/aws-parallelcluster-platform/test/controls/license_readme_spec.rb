@@ -9,10 +9,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'license_readme_created' do
+control 'tag:install_license_readme_created' do
   title 'Check that the license readme file has been created'
 
-  describe file("/opt/parallelcluster/licenses/AWS-ParallelCluster-License-README.txt") do
+  describe file("#{node['cluster']['license_dir']}/AWS-ParallelCluster-License-README.txt") do
     it { should exist }
     its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
