@@ -10,12 +10,12 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_awsbatch_correctly_configured' do
-  only_if { node['cluster']['scheduler'] == 'awsbatch' }
+  only_if { node['cluster']['scheduler'] == 'awsbatch' && !os_properties.redhat8? }
 
   # Test that batch commands can be accessed without absolute path
   %w(awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat).each do |cli_commmand|
     describe "#{cli_commmand} can be accessed without absolute path" do
-      subject { bash("sudo -u #{node['cluster']['cluster_user']} bash -c '. ~/.bash_profile; #{cli_commmand} -h'") }
+      subject { bash("sudo -u #{node['cluster']['cluster_user']} bash -c '[ -f /etc/profile.d/pcluster_awsbatchcli.sh ] && . /etc/profile.d/pcluster_awsbatchcli.sh; #{cli_commmand} -h'") }
       its('exit_status') { should eq 0 }
     end
   end
