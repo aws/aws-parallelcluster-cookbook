@@ -7,7 +7,7 @@ return unless platform?('ubuntu') && node['platform_version'] == "18.04"
 default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev libpam-dev net-tools libhwloc-dev dkms
                                          tcl-dev automake autoconf libtool librrd-dev libapr1-dev libconfuse-dev
                                          apache2 libboost-dev libdb-dev libncurses5-dev libpam0g-dev libxt-dev
-                                         libmotif-dev libxmu-dev libxft-dev man-db python
+                                         libmotif-dev libxmu-dev libxft-dev man-db python jq
                                          r-base libblas-dev libffi-dev libxml2-dev mdadm
                                          libgcrypt20-dev libevent-dev iproute2 python3 python3-pip
                                          libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
