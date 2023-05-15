@@ -18,7 +18,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
         cached(:node) { chef_run.node }
 
         it 'installs pyenv with default settings' do
-          is_expected.to run_install_pyenv_new('pyenv for default python version')
+          is_expected.to run_install_pyenv('pyenv for default python version')
         end
 
         it 'activates cookbook vistualenv' do

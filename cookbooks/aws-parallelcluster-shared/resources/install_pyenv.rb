@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-provides :install_pyenv_new # in order to avoid breaking existing code, a different name is temporarily assigned to the resource
+provides :install_pyenv
 unified_mode true
 
 # Resource:: to create a Python virtual environment for a given user

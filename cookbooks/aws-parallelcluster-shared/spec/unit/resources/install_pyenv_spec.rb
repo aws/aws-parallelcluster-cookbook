@@ -3,7 +3,7 @@ require 'spec_helper'
 class ConvergeInstallPyenv
   def self.run(chef_run, python_version: nil, pyenv_root: nil, user_only: nil, user: nil)
     chef_run.converge_dsl('aws-parallelcluster-shared') do
-      install_pyenv_new 'run' do
+      install_pyenv 'run' do
         action :run
         python_version python_version if python_version
         prefix pyenv_root if pyenv_root
@@ -23,7 +23,7 @@ describe 'install_pyenv:run' do
         cached(:chef_run) do
           runner = ChefSpec::Runner.new(
             platform: platform, version: version,
-            step_into: ['install_pyenv_new']
+            step_into: ['install_pyenv']
           ) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
@@ -52,7 +52,7 @@ describe 'install_pyenv:run' do
         cached(:chef_run) do
           runner = ChefSpec::Runner.new(
             platform: platform, version: version,
-            step_into: ['install_pyenv_new']
+            step_into: ['install_pyenv']
           ) do |node|
             node.override['cluster']['system_pyenv_root'] = 'default_system_pyenv_root'
             node.override['cluster']['python-version'] = 'default_python_version'
@@ -80,7 +80,7 @@ describe 'install_pyenv:run' do
           cached(:chef_run) do
             ChefSpec::Runner.new(
               platform: platform, version: version,
-              step_into: ['install_pyenv_new']
+              step_into: ['install_pyenv']
             )
           end
 
@@ -96,7 +96,7 @@ describe 'install_pyenv:run' do
           cached(:chef_run) do
             runner = ChefSpec::Runner.new(
               platform: platform, version: version,
-              step_into: ['install_pyenv_new']
+              step_into: ['install_pyenv']
             )
             ConvergeInstallPyenv.run(runner, user_only: true, user: user, python_version: python_version, pyenv_root: pyenv_root)
           end
