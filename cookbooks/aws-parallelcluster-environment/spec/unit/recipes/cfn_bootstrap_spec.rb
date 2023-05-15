@@ -20,7 +20,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
         cached(:node) { chef_run.node }
 
         it 'installs pyenv for specific python version' do
-          is_expected.to run_install_pyenv_new('pyenv for cfn_bootstrap').with_python_version(python_version)
+          is_expected.to run_install_pyenv('pyenv for cfn_bootstrap').with_python_version(python_version)
         end
 
         it 'activates cookbook vistualenv' do

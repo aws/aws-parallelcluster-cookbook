@@ -31,9 +31,8 @@ action_class do
   def install_ext_auth_virtual_env
     return if ::File.exist?("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate")
 
-    install_pyenv node['cluster']['python-version'] do
-      prefix node['cluster']['system_pyenv_root']
-    end
+    install_pyenv 'pyenv for default python version'
+
     activate_virtual_env node['cluster']['dcv']['authenticator']['virtualenv'] do
       pyenv_path node['cluster']['dcv']['authenticator']['virtualenv_path']
       python_version node['cluster']['python-version']

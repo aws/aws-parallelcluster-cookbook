@@ -23,7 +23,7 @@ node_attributes "dump node attributes"
 
 return if redhat_ubi?
 
-install_pyenv_new 'pyenv for cfn_bootstrap' do
+install_pyenv 'pyenv for cfn_bootstrap' do
   python_version python_version
 end
 

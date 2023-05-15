@@ -25,7 +25,7 @@ node_attributes "dump node attributes"
 # TODO: find a way to make this code work on ubi8
 return if redhat_ubi?
 
-install_pyenv_new 'pyenv for default python version'
+install_pyenv 'pyenv for default python version'
 
 activate_virtual_env node_virtualenv_name do
   pyenv_path node_virtualenv_path

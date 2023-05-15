@@ -14,7 +14,7 @@
 # TODO: find a way to make this code work on ubi8
 return if redhat_ubi?
 
-install_pyenv_new 'pyenv for default python version'
+install_pyenv 'pyenv for default python version'
 
 virtualenv_name = 'awsbatch_virtualenv'
 pyenv_root = node['cluster']['system_pyenv_root']
