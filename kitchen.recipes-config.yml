@@ -305,7 +305,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
-        - aws-parallelcluster-platform::cookbook_virtualenv
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
       cluster:
         config:
           Scheduling:
@@ -324,7 +324,7 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
-        - aws-parallelcluster-platform::cookbook_virtualenv
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
       cluster:
         config:
           Scheduling:
