@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Allow configuration of Slurm node weights for static and dynamic nodes in a compute resource via the ParallelCluster configuration YAML file.
 
 **CHANGES**
 
