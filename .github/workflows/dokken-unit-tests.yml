@@ -77,7 +77,6 @@ jobs:
           - chrony
           - disable-selinux
           - openssh
-          - gc-thresh-values
           - cfnconfig-mixed
           - clusterstatusmgtd-init-slurm
           - mount-shared

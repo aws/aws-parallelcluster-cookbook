@@ -16,14 +16,9 @@
 # limitations under the License.
 
 # Configure gc_thresh values to be consistent with alinux2 default values for performance at scale
-
-def configure_gc_thresh_values
-  (1..3).each do |i|
-    sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
-      value node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"]
-      action :apply
-    end
+(1..3).each do |i|
+  sysctl "net.ipv4.neigh.default.gc_thresh#{i}" do
+    value node['cluster']['sysctl']['ipv4']["gc_thresh#{i}"]
+    action :apply
   end
 end
-
-configure_gc_thresh_values

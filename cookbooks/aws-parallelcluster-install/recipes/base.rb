@@ -43,7 +43,7 @@ nfs 'install NFS daemon'
 ephemeral_drives 'install'
 ec2_udev_rules 'configure udev'
 
-include_recipe "aws-parallelcluster-install::gc_thresh_values"
+include_recipe "aws-parallelcluster-platform::gc_thresh_values"
 
 include_recipe "aws-parallelcluster-install::supervisord"
 
