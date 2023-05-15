@@ -30,6 +30,16 @@ suites:
     verifier:
       controls:
         - /services_disabled/
+  - name: openssh
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[openssh]
+    verifier:
+      controls:
+        - /openssh_installed/
+    attributes:
+      dependencies:
+        - resource:package_repos:update
   - name: cookbook_virtualenv
     run_list:
       - recipe[aws-parallelcluster-platform::cookbook_virtualenv]

@@ -32,7 +32,7 @@ include_recipe "aws-parallelcluster-environment::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-computefleet::node'
 include_recipe "aws-parallelcluster-platform::awscli"
 
-include_recipe "aws-parallelcluster-install::openssh"
+include_recipe "openssh"
 
 include_recipe "aws-parallelcluster-install::disable_selinux"
 
