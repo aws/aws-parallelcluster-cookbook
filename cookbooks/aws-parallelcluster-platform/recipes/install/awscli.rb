@@ -16,14 +16,24 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-package 'unzip'
+return if ::File.exist?("/usr/local/bin/aws") || redhat_ubi?
 
-bash "install awscli" do
-  cwd Chef::Config[:file_cache_path]
-  code <<-CLI
-    set -e
-    curl --retry 5 --retry-delay 5 "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
-    unzip awscli-bundle.zip
-    #{cookbook_virtualenv_path}/bin/python awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws
-  CLI
-end unless ::File.exist?("/usr/local/bin/aws") || redhat_ubi?
+file_cache_path = Chef::Config[:file_cache_path]
+
+remote_file 'download awscli bundle from s3' do
+  path "#{file_cache_path}/awscli-bundle.zip"
+  source 'https://s3.amazonaws.com/aws-cli/awscli-bundle.zip'
+  path
+  retries 5
+  retry_delay 5
+end
+
+archive_file 'extract awscli bundle' do
+  path "#{file_cache_path}/awscli-bundle.zip"
+  destination "#{file_cache_path}/awscli"
+  overwrite true
+end
+
+bash 'install awscli' do
+  code "#{cookbook_virtualenv_path}/bin/python #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
+end

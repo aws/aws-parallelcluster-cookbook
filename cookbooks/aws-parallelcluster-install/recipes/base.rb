@@ -30,7 +30,7 @@ include_recipe "aws-parallelcluster-environment::isolated_install"
 include_recipe "aws-parallelcluster-platform::cookbook_virtualenv"
 include_recipe "aws-parallelcluster-environment::cfn_bootstrap"
 include_recipe 'aws-parallelcluster-computefleet::node'
-include_recipe "aws-parallelcluster-install::awscli"
+include_recipe "aws-parallelcluster-platform::awscli"
 
 include_recipe "aws-parallelcluster-install::openssh"
 

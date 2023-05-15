@@ -35,7 +35,6 @@ suites:
         - node_virtualenv_created
         - supervisord_config_created
         - supervisord_service_set_up
-        - awscli_installed
         - write_common_udev_configuration_files
         - /ec2blkdev_service_installation/
         - debian_udevd_reload_configuration
