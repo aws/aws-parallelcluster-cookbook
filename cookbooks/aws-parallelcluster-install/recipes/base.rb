@@ -34,7 +34,7 @@ include_recipe "aws-parallelcluster-platform::awscli"
 
 include_recipe "openssh"
 
-include_recipe "aws-parallelcluster-install::disable_selinux"
+include_recipe "aws-parallelcluster-platform::disable_selinux"
 
 # Install LICENSE README
 include_recipe "aws-parallelcluster-install::license_readme"

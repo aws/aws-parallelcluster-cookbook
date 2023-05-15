@@ -9,10 +9,18 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'selinux_disabled' do
+control 'tag:install_selinux_disabled' do
   title 'Check if selinux is disabled'
   describe selinux do
     it { should be_disabled }
     it { should_not be_enforcing }
   end unless os_properties.redhat? || os_properties.centos? # Because it requires reboot of the instance
+end
+
+control 'tag:testami_selinux_disabled' do
+  title 'Check if selinux is disabled'
+  describe selinux do
+    it { should be_disabled }
+    it { should_not be_enforcing }
+  end
 end
