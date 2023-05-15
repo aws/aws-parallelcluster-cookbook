@@ -20,6 +20,7 @@
 #      - resource:package_repos:update
 
 node_attributes 'dump node attributes'
+include_recipe '::docker_mock'
 
 if defined?(node['dependencies']) && node['dependencies']
   node['dependencies'].each do |dep|

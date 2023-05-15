@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'openssh_installed' do
+control 'tag:install_openssh_installed' do
   title 'Check that openssh packages are installed and ssh/sshd config file exist'
 
   files = %w(/etc/ssh/ssh_config)
