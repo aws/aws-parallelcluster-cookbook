@@ -1,0 +1,16 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: install_pyenv
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /default_pyenv_installed/
+    attributes:
+      resource: install_pyenv:run
