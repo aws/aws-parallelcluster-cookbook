@@ -36,3 +36,15 @@ suites:
     verifier:
       controls:
         - /cookbook_virtualenv_created/
+  - name: awscli
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::awscli]
+    verifier:
+      controls:
+        - /awscli_installed/
+        - /awscli_can_run_as/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv

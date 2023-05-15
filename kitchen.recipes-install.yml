@@ -40,17 +40,6 @@ suites:
       controls:
         - supervisord_config_created
         - supervisord_service_set_up
-  - name: awscli
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::awscli]
-    verifier:
-      controls:
-        - awscli_installed
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - aws-parallelcluster-platform::cookbook_virtualenv
   - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

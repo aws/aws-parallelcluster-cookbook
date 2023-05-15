@@ -24,11 +24,3 @@ control 'tag:install_tag:testami_cookbook_virtualenv_created' do
     its('stdout') { should cmp >= min_pip_version }
   end
 end
-
-control 'tag:testami:awscli can be executed as root in cookbook virtualenv' do
-  virtualenv_path = node['cluster']['cookbook_virtualenv_path']
-
-  describe bash("#{virtualenv_path}/bin/aws --version") do
-    its('exit_status') { should eq 0 }
-  end
-end
