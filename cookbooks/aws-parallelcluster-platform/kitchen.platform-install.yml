@@ -17,13 +17,6 @@ suites:
     verifier:
       controls:
         - /tag:install_users/
-  - name: license_readme
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::license_readme]
-    verifier:
-      controls:
-        - /license_readme_created/
   - name: directories
     run_list:
       - recipe[aws-parallelcluster-platform::directories]
@@ -31,28 +24,12 @@ suites:
       controls:
         - /pcluster_directories_exist/
         - /pcluster_log_dir_is_configured/
-  - name: disable_selinux
-    run_list:
-      - recipe[aws-parallelcluster-platform::disable_selinux]
-    verifier:
-      controls:
-        - /tag:install_selinux_disabled/
   - name: disable_services
     run_list:
       - recipe[aws-parallelcluster-platform::disable_services]
     verifier:
       controls:
         - /services_disabled/
-  - name: openssh
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[openssh]
-    verifier:
-      controls:
-        - /openssh_installed/
-    attributes:
-      dependencies:
-        - resource:package_repos:update
   - name: cookbook_virtualenv
     run_list:
       - recipe[aws-parallelcluster-platform::cookbook_virtualenv]
@@ -71,3 +48,33 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+  - name: openssh
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[openssh]
+    verifier:
+      controls:
+        - /openssh_installed/
+    attributes:
+      dependencies:
+        - resource:package_repos:update
+  - name: disable_selinux
+    run_list:
+      - recipe[aws-parallelcluster-platform::disable_selinux]
+    verifier:
+      controls:
+        - /tag:install_selinux_disabled/
+  - name: license_readme
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::license_readme]
+    verifier:
+      controls:
+        - /license_readme_created/
+  - name: gc_thresh_values
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::gc_thresh_values]
+    verifier:
+      controls:
+        - /gc_thresh_values/
