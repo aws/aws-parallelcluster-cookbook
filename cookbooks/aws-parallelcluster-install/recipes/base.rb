@@ -37,7 +37,7 @@ include_recipe "openssh"
 include_recipe "aws-parallelcluster-platform::disable_selinux"
 
 # Install LICENSE README
-include_recipe "aws-parallelcluster-install::license_readme"
+include_recipe "aws-parallelcluster-platform::license_readme"
 
 nfs 'install NFS daemon'
 ephemeral_drives 'install'
