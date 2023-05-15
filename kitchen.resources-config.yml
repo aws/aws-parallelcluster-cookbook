@@ -99,7 +99,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
         - recipe:aws-parallelcluster-platform::directories
-        - aws-parallelcluster-platform::cookbook_virtualenv
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:cloudwatch:setup
         - resource:node_attributes
       cluster:
@@ -120,7 +120,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-test::docker_mock
         - recipe:aws-parallelcluster-platform::directories
-        - aws-parallelcluster-platform::cookbook_virtualenv
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:package_repos
         - resource:install_packages
         - recipe:aws-parallelcluster-install::nvidia
