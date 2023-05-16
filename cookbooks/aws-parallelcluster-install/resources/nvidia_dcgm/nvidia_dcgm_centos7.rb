@@ -17,3 +17,4 @@ provides :nvidia_dcgm, platform: 'centos' do |node|
 end
 
 use 'partial/_nvidia_dcgm_alinux2_centos7.rb'
+use 'partial/_nvidia_dcgm_common.rb'

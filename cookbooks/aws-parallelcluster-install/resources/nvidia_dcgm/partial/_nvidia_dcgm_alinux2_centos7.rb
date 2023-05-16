@@ -12,14 +12,8 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-unified_mode true
-default_action :setup
-
 action :setup do
   return if arm_instance? || !(node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
 
-  package 'datacenter-gpu-manager' do
-    retries 3
-    retry_delay 5
-  end
+  action_install_package
 end

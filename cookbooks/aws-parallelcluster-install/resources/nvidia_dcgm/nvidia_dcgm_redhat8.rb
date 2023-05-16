@@ -17,3 +17,9 @@ provides :nvidia_dcgm, platform: 'redhat' do |node|
 end
 
 use 'partial/_nvidia_dcgm_common.rb'
+
+action :setup do
+  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
+
+  action_install_package
+end

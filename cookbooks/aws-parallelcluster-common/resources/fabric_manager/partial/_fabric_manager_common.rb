@@ -18,7 +18,24 @@ default_action :setup
 action :setup do
   # NVIDIA Fabric Manager not present on ARM
   return if arm_instance? || !(node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+
+  # Add NVIDIA repo for fabric manager and datacenter-gpu-manager
+  repo_domain = node['cluster']['region'].start_with?("cn-") ? "cn" : "com"
+  repo_uri = node['cluster']['nvidia']['cuda']['repository_uri'].gsub('_domain_', repo_domain)
+  package_repos 'add nvidia-repo' do
+    action :add
+    repo_name "nvidia-repo"
+    baseurl repo_uri
+    gpgkey "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}"
+    disable_modularity true
+  end
+
   action_install_package
+
+  package_repos 'remove nvidia-repo' do
+    action :remove
+    repo_name "nvidia-repo"
+  end
 end
 
 action :configure do
