@@ -112,4 +112,8 @@ action_class do
   def public_key
     "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc"
   end
+
+  def filecache_mount_options
+    %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service)
+  end
 end

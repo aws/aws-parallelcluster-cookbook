@@ -18,7 +18,7 @@ property :fsx_volume_junction_path_array, Array, required: %i(mount unmount)
 
 action :mount do
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
-    fsx = FSx.new(node, new_resource, index)
+    fsx = FSx.new(node, filecache_mount_options, new_resource, index)
 
     # Create the shared directories
     directory fsx.shared_dir do
@@ -68,7 +68,7 @@ end
 
 action :unmount do
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
-    fsx = FSx.new(node, new_resource, index)
+    fsx = FSx.new(node, filecache_mount_options, new_resource, index)
 
     execute "unmount fsx #{fsx.shared_dir}" do
       command "umount -fl #{fsx.shared_dir}"
@@ -98,7 +98,7 @@ action_class do
   class FSx
     attr_accessor :type, :shared_dir, :device_name, :fstype, :mount_options, :can_change_shared_dir_permissions
 
-    def initialize(node, resource, index)
+    def initialize(node, filecache_mount_options, resource, index)
       @id = resource.fsx_fs_id_array[index]
       @type = resource.fsx_fs_type_array[index]
       @dns_name = resource.fsx_dns_name_array[index]
@@ -118,7 +118,7 @@ action_class do
         @fstype = 'lustre'
 
       elsif @type == 'FILECACHE'
-        @mount_options = %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service)
+        @mount_options = filecache_mount_options
         @device_name = "#{@dns_name}@tcp:/#{@mount_name}"
         @fstype = 'lustre'
       else

@@ -129,13 +129,19 @@ describe 'lustre:mount' do
             # .with(recursive: true) # even if we set recursive a true, the test fails
           end
 
+          mount_options = if platform == "ubuntu" && version == "22.04"
+                            %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=systemd-networkd-wait-online.service)
+                          else
+                            %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service)
+                          end
+          print(mount_options)
           it 'mounts shared dir if not already mounted' do
             is_expected.to mount_mount('/filecache_shared_dir_1')
               .with(device: 'filecache_dns_name_1@tcp:/filecache_mount_name_1')
               .with(fstype: 'lustre')
               .with(dump: 0)
               .with(pass: 0)
-              .with(options: %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service))
+              .with(options: mount_options)
               .with(retries: 10)
               .with(retry_delay: 6)
           end
@@ -146,7 +152,7 @@ describe 'lustre:mount' do
               .with(fstype: 'lustre')
               .with(dump: 0)
               .with(pass: 0)
-              .with(options: %w(defaults _netdev flock user_xattr noatime noauto x-systemd.automount x-systemd.requires=network.service))
+              .with(options: mount_options)
               .with(retries: 10)
               .with(retry_delay: 6)
           end
