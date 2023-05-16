@@ -58,7 +58,7 @@ jobs:
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
-          suite: slurm-config-head-node-x86-64
+          suite: slurm-config-head-node-x86-64-docker
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
@@ -67,4 +67,5 @@ jobs:
           KITCHEN_PHASE: config
           KITCHEN_SAVE_IMAGE: false
           KITCHEN_AWS_REGION: eu-west-1
+          KITCHEN_INSTANCE_TYPE: docker
         continue-on-error: false
