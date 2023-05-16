@@ -28,7 +28,7 @@ control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
   only_if { !os_properties.redhat_ubi? }
   virtualenv_path = node['cluster']['cookbook_virtualenv_path']
 
-  describe 'aws cli can run as cluster default user' do
+  describe "aws cli can run as cluster default user #{node['cluster']['cluster_user']}" do
     subject { bash("sudo su - #{node['cluster']['cluster_user']} -c 'aws --version'") }
     its('exit_status') { should eq 0 }
   end unless os_properties.on_docker?
