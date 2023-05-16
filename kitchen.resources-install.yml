@@ -296,3 +296,27 @@ suites:
         - recipe:aws-parallelcluster-test::docker_mock
         - resource:package_repos
       resource: lustre
+  - name: network_service_restart
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - network_service_running
+    attributes:
+      dependencies:
+        - resource:node_attributes
+        - recipe:aws-parallelcluster-test::docker_mock
+      resource: network_service
+  - name: network_service_reload
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - network_service_running
+    attributes:
+      dependencies:
+        - resource:node_attributes
+        - recipe:aws-parallelcluster-test::docker_mock
+      resource: network_service:reload
