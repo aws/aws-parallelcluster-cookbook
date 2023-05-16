@@ -70,10 +70,10 @@ export KITCHEN_SECURITY_GROUP_ID=sg-your-group
 
 # amis for eu-west-1
 export KITCHEN_ALINUX2_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_REDHAT8_AMI=ami-xxxxxxxxxxxxxxxxx
+export KITCHEN_RHEL8_AMI=ami-xxxxxxxxxxxxxxxxx
 export KITCHEN_CENTOS7_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_UBUNTU18_AMI=ami-xxxxxxxxxxxxxxxxx
-export KITCHEN_UBUNTU20_AMI=ami-xxxxxxxxxxxxxxxxx
+export KITCHEN_UBUNTU1804_AMI=ami-xxxxxxxxxxxxxxxxx
+export KITCHEN_UBUNTU2004_AMI=ami-xxxxxxxxxxxxxxxxx
 ```
 
 ### Known issues with docker

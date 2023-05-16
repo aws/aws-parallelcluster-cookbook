@@ -78,9 +78,9 @@ platforms:
   - name: rhel8
     driver_plugin: ec2
     driver:
-      <% if ENV['KITCHEN_REDHAT8_AMI'] %>
+      <% if ENV['KITCHEN_RHEL8_AMI'] %>
       # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_REDHAT8_AMI'] %>
+      image_id: <%= ENV['KITCHEN_RHEL8_AMI'] %>
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-8.7.*_HVM*<% else %><%= pcluster_prefix %>-rhel8-hvm-*<% end %>
@@ -132,9 +132,9 @@ platforms:
   - name: ubuntu1804
     driver_plugin: ec2
     driver:
-      <% if ENV['KITCHEN_UBUNTU18_AMI'] %>
+      <% if ENV['KITCHEN_UBUNTU1804_AMI'] %>
       # Use the Ubuntu 18 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_UBUNTU18_AMI'] %>
+      image_id: <%= ENV['KITCHEN_UBUNTU1804_AMI'] %>
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20221207<% else %><%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*<% end %>
@@ -159,9 +159,9 @@ platforms:
   - name: ubuntu2004
     driver_plugin: ec2
     driver:
-      <% if ENV['KITCHEN_UBUNTU20_AMI'] %>
+      <% if ENV['KITCHEN_UBUNTU2004_AMI'] %>
       # Use the Ubuntu 20 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_UBUNTU20_AMI'] %>
+      image_id: <%= ENV['KITCHEN_UBUNTU2004_AMI'] %>
       <% else %>
       image_search:
         name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-focal-20.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20230112<% else %><%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*<% end %>

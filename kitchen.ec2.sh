@@ -32,16 +32,16 @@
 # KITCHEN_ALINUX2_AMI:        specific AMI to use for alinux2
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
-# KITCHEN_REDHAT8_AMI:        specific AMI to use for redhat8
+# KITCHEN_RHEL8_AMI:        specific AMI to use for redhat8
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 # KITCHEN_CENTOS7_AMI:        specific AMI to use for centos7
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
-# KITCHEN_UBUNTU18_AMI:       specific AMI to use for ubuntu18.04
+# KITCHEN_UBUNTU1804_AMI:       specific AMI to use for ubuntu18.04
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
-# KITCHEN_UBUNTU20_AMI:       specific AMI to use for ubuntu20.04
+# KITCHEN_UBUNTU2004_AMI:       specific AMI to use for ubuntu20.04
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 
