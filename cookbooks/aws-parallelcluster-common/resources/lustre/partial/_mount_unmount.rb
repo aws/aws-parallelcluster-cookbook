@@ -61,7 +61,7 @@ action :mount do
       owner 'root'
       group 'root'
       mode '1777'
-      only_if { fsx.can_change_shared_dir_permissions }
+      only_if { fsx.can_change_shared_dir_permissions && node['cluster']['node_type'] == "HeadNode" }
     end
   end
 end
