@@ -10,8 +10,8 @@ jobs:
         os: &os-list
           - alinux2
           - centos7
-          - ubuntu18
-          - ubuntu20
+          - ubuntu1804
+          - ubuntu2004
           - rhel8
         suite:
           - setup-envars
@@ -110,8 +110,8 @@ jobs:
         os:
           - alinux2
           - centos7
-          - ubuntu18
-          - ubuntu20
+          - ubuntu1804
+          - ubuntu2004
           - rhel8
         suite:
           - fs-update
