@@ -42,37 +42,6 @@ control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
   end
 end
 
-control 'tag:install_expected_versions_of_nvidia_fabric_manager_installed' do
-  only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !os_properties.arm? && !instance.custom_ami? &&
-      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
-  end
-
-  describe package(node['cluster']['nvidia']['fabricmanager']['package']) do
-    it { should be_installed }
-    its('version') { should match /#{node['cluster']['nvidia']['fabricmanager']['version']}/ }
-  end
-
-  version_lock_check = os_properties.debian_family? ? 'apt-mark showhold | grep "nvidia-fabric.*manager"' : 'yum versionlock list | grep "nvidia-fabric.*manager"'
-  describe bash(version_lock_check) do
-    its('exit_status') { should eq 0 }
-  end
-end
-
-control 'tag:install_expected_versions_of_nvidia_gdrcopy_installed' do
-  only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !instance.custom_ami? &&
-      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
-  end
-
-  expected_gdrcopy_version = node['cluster']['nvidia']['gdrcopy']['version']
-
-  describe "gdrcopy version is expected to be #{expected_gdrcopy_version}" do
-    subject { command('modinfo -F version gdrdrv').stdout.strip() }
-    it { should eq expected_gdrcopy_version }
-  end
-end
-
 control 'tag:install_expected_nvidia_datacenter-gpu-manager_installed' do
   only_if do
     !(os_properties.centos7? && os_properties.arm?) && !(os_properties.alinux2? && os_properties.arm?) && !instance.custom_ami? &&
