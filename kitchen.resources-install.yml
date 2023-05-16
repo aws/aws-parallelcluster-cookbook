@@ -245,4 +245,54 @@ suites:
         is_official_ami_build: true
     driver:
       instance_type: t3.medium
-
+  - name: nvidia_fabric_manager
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::nvidia]
+    verifier:
+      controls:
+        - /tag:install_expected_versions_of_nvidia_fabric_manager_installed/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:node_attributes
+      cluster:
+        nvidia:
+          enabled: true
+  - name: nvidia_gdrcopy
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::nvidia]
+    verifier:
+      controls:
+        - /tag:install_expected_versions_of_nvidia_gdrcopy_installed/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:node_attributes
+      cluster:
+        nvidia:
+          enabled: true
+  - name: lustre
+    run_list:
+      - recipe[aws-parallelcluster-common::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - lustre_client_installed
+        - lnet_kernel_module_enabled
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-test::docker_mock
+        - resource:package_repos
+      resource: lustre
