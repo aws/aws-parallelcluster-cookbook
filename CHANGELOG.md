@@ -46,6 +46,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2023.0.547-1`
   - gl: `2023.0.1027-1`
   - web_viewer: `2023.0.15022-1`
+- Avoid to reset FSx and EFS shared folders permissions when mounting them in the compute nodes.
 
 **BUG FIXES**
 - Fix an issue that was causing misalignment of compute nodes IP on instances with multiple network interfaces.
