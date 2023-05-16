@@ -1,14 +1,32 @@
 name: ParallelCluster Cookbook Validation on Docker
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    types: [ opened, synchronize, reopened, labeled, unlabeled ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  systemtest:
+  check-labels:
     runs-on: ubuntu-latest
+    steps:
+      - name: Should skip system tests?
+        id: skip_system_tests
+        run: |
+          skip=$(gh api -H "Accept: application/vnd.github+json" /repos/aws/aws-parallelcluster-cookbook/issues/${{ github.event.pull_request.number }}/labels | jq -r '.[].name' | grep -q ^skip-system-tests$ && echo 'true' || echo 'false')
+          echo "Skipping System tests: $skip"
+          echo "skip=$skip" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ github.token }}
+    outputs:
+      skip_system_tests: ${{ steps.skip_system_tests.outputs.skip }}
+  systemtest:
+    needs: [check-labels]
+    runs-on: ubuntu-latest
+    if: needs.check-labels.outputs.skip_system_tests != 'true'
     strategy:
       matrix:
         os:
@@ -48,6 +66,7 @@ jobs:
           KITCHEN_SAVE_IMAGE: true
         continue-on-error: false
       - name: Set Image Id
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true'
         run: |
           PLATFORM=$(echo "${{ matrix.os }}"  | tr a-z A-Z)
           echo "PLATFORM=${PLATFORM}"
