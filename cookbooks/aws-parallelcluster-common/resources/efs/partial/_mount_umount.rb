@@ -81,6 +81,7 @@ action :mount do
       owner 'root'
       group 'root'
       mode '1777'
+      only_if { node['cluster']['node_type'] == "HeadNode" }
     end
   end
 end
