@@ -24,5 +24,3 @@ default['cluster']['scheduler_plugin']['group_id'] = default['cluster']['schedul
 
 default['cluster']['scheduler_plugin']['system_user_id_start'] = node['cluster']['reserved_base_uid'] + 10
 default['cluster']['scheduler_plugin']['system_group_id_start'] = default['cluster']['scheduler_plugin']['system_user_id_start']
-
-default['cluster']['cluster_user'] = 'ec2-user'

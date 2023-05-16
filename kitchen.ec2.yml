@@ -99,7 +99,6 @@ platforms:
     attributes:
       cluster:
         base_os: alinux2
-        cluster_user: ec2-user
   - name: rhel8
     driver_plugin: ec2
     driver:
@@ -126,7 +125,6 @@ platforms:
     attributes:
       cluster:
         base_os: rhel8
-        cluster_user: ec2-user
   - name: centos7
     driver_plugin: ec2
     driver:
@@ -153,7 +151,6 @@ platforms:
     attributes:
       cluster:
         base_os: centos7
-        cluster_user: centos
   - name: ubuntu1804
     driver_plugin: ec2
     driver:
@@ -180,7 +177,6 @@ platforms:
     attributes:
       cluster:
         base_os: ubuntu1804
-        cluster_user: ubuntu
   - name: ubuntu2004
     driver_plugin: ec2
     driver:
@@ -207,7 +203,6 @@ platforms:
     attributes:
       cluster:
         base_os: ubuntu2004
-        cluster_user: ubuntu
   - name: ubuntu2204
     driver_plugin: ec2
     driver:
@@ -234,4 +229,3 @@ platforms:
     attributes:
       cluster:
         base_os: ubuntu2204
-        cluster_user: ubuntu
