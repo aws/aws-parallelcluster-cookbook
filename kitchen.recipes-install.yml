@@ -179,9 +179,7 @@ suites:
       - recipe[aws-parallelcluster-install::nvidia]
     verifier:
       controls:
-        - /tag:install_expected_versions_of_nvidia_driver_installed/
-        - /tag:install_expected_versions_of_nvidia_cuda_installed/
-        - /tag:install_expected_nvidia_datacenter-gpu-manager_installed/
+        - /tag:install_.*nvidia/
     driver:
       # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
       instance_type: g4dn.2xlarge
@@ -190,7 +188,24 @@ suites:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
-        - resource:node_attributes
+      cluster:
+        nvidia:
+          enabled: true
+  - name: nvidia_cuda
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::cuda]
+    verifier:
+      controls:
+        - /tag:install_.*cuda/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
       cluster:
         nvidia:
           enabled: true
