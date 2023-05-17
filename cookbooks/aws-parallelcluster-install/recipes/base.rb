@@ -50,7 +50,7 @@ include_recipe "aws-parallelcluster-platform::supervisord"
 include_recipe "aws-parallelcluster-platform::ami_cleanup"
 
 # Configure cron and anacron
-include_recipe "aws-parallelcluster-install::cron"
+include_recipe "aws-parallelcluster-platform::cron"
 
 # Install Amazon Time Sync
 include_recipe "aws-parallelcluster-install::chrony" unless redhat_ubi?
