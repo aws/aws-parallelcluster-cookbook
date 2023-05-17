@@ -45,7 +45,7 @@ ec2_udev_rules 'configure udev'
 
 include_recipe "aws-parallelcluster-platform::gc_thresh_values"
 
-include_recipe "aws-parallelcluster-install::supervisord"
+include_recipe "aws-parallelcluster-platform::supervisord"
 
 include_recipe "aws-parallelcluster-install::ami_cleanup"
 

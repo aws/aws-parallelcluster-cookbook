@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'supervisord_config_created' do
+control 'tag:install_supervisord_config_created' do
   title 'supervisord configuration created under /etc'
 
   describe file('/etc/supervisord.conf') do
@@ -21,7 +21,7 @@ control 'supervisord_config_created' do
   end
 end
 
-control 'supervisord_service_set_up' do
+control 'tag:install_supervisord_service_set_up' do
   title 'supervisord is set up'
 
   describe file('/etc/systemd/system/supervisord.service') do
