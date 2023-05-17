@@ -21,5 +21,3 @@ default['cluster']['extra_packages'] = ['R3.4']
 
 default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
 default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
-
-default['cluster']['chrony']['conf'] = "/etc/chrony.conf"

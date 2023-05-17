@@ -16,8 +16,6 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh libssl-dev ncurses-dev
 
 default['cluster']['kernel_headers_pkg'] = "linux-headers-#{node['kernel']['release']}"
 
-default['cluster']['chrony']['conf'] = "/etc/chrony/chrony.conf"
-
 default['nfs']['service_provider']['idmap'] = Chef::Provider::Service::Systemd
 default['nfs']['service_provider']['portmap'] = Chef::Provider::Service::Systemd
 default['nfs']['service_provider']['lock'] = Chef::Provider::Service::Systemd

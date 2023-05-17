@@ -1,0 +1,18 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: chrony
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_chrony/
+    attributes:
+      resource: chrony:enable
+      dependencies:
+      - resource:chrony:setup

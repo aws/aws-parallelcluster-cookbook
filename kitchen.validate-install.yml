@@ -39,7 +39,6 @@ suites:
         - install_packages
         - nfs_installed_with_right_version
         - c_states_kernel_configured
-        - chrony_installed_and_configured
         - clusterstatusmgtd_files_created
         - efa_conflicting_packages_removed
         - efa_installed

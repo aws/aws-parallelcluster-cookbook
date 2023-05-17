@@ -8,8 +8,6 @@ default['cluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
 default['cluster']['moduleshome'] = "/usr/share/Modules"
 default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
 
-default['cluster']['chrony']['service'] = "chronyd"
-
 # NVIDIA
 # NVIDIA GDRCopy
 default['cluster']['nvidia']['gdrcopy']['version'] = '2.3'

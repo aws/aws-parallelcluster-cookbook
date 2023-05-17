@@ -137,16 +137,6 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - recipe:aws-parallelcluster-platform::sudo_install
-  - name: chrony_configured
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-config::chrony]
-    verifier:
-      controls:
-        - chrony_configured
-    attributes:
-      dependencies:
-        #- recipe:aws-parallelcluster-install::chrony
   - name: imds_configured
     # FIXME: breaks on Docker
     run_list:

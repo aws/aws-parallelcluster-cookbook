@@ -9,8 +9,6 @@ default['cluster']['moduleshome'] = "/usr/share/modules"
 # Config file used to set default MODULEPATH list
 default['cluster']['modulepath_config_file'] = "#{node['cluster']['moduleshome']}/init/.modulespath"
 
-default['cluster']['chrony']['service'] = "chrony"
-
 # NVIDIA
 # NVIDIA GDRCopy
 default['cluster']['nvidia']['gdrcopy']['version'] = '2.3'

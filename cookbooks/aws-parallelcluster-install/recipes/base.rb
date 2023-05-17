@@ -53,6 +53,8 @@ include_recipe "aws-parallelcluster-platform::ami_cleanup"
 include_recipe "aws-parallelcluster-platform::cron"
 
 # Install Amazon Time Sync
-include_recipe "aws-parallelcluster-install::chrony" unless redhat_ubi?
+chrony 'install chrony' do
+  action :setup
+end
 
 c_states 'disable x86_64 C states'
