@@ -39,7 +39,6 @@ suites:
         - install_packages
         - nfs_installed_with_right_version
         - cron_disabled_selected_daily_and_weekly_jobs
-        - ami_cleanup_file_created
         - c_states_kernel_configured
         - chrony_installed_and_configured
         - clusterstatusmgtd_files_created

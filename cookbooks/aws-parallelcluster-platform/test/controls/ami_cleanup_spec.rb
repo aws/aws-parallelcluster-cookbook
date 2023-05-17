@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'ami_cleanup_file_created' do
+control 'tag:install_ami_cleanup_file_created' do
   title 'Check that ami_cleanup.sh file exists'
 
   describe file("/usr/local/sbin/ami_cleanup.sh") do

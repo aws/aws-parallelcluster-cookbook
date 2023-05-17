@@ -84,3 +84,9 @@ suites:
     verifier:
       controls:
         - /tag:install_supervisord/
+  - name: ami_cleanup
+    run_list:
+      - recipe[aws-parallelcluster-platform::ami_cleanup]
+    verifier:
+      controls:
+        - /ami_cleanup/

@@ -47,7 +47,7 @@ include_recipe "aws-parallelcluster-platform::gc_thresh_values"
 
 include_recipe "aws-parallelcluster-platform::supervisord"
 
-include_recipe "aws-parallelcluster-install::ami_cleanup"
+include_recipe "aws-parallelcluster-platform::ami_cleanup"
 
 # Configure cron and anacron
 include_recipe "aws-parallelcluster-install::cron"
