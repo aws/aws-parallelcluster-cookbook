@@ -189,7 +189,7 @@ describe 'lustre:setup' do
     end
   end
 
-  [%w(193 2), %w(240 3), %w(305 4), %w(348 5), %w(372 6), %w(425 7)].each do |kernel_patch, minor_version|
+  [%w(193 2), %w(240 3), %w(305 4), %w(348 5), %w(372 6), %w(425 7), %w(477 8)].each do |kernel_patch, minor_version|
     context "on redhat with kernel from 4.18.0-#{kernel_patch}.3.1.el8 supporting lustre" do
       cached(:chef_run) do
         runner = ChefSpec::Runner.new(
