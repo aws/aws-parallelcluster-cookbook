@@ -139,7 +139,7 @@ suites:
       - recipe[aws-parallelcluster-config::test_resource]
     verifier:
       controls:
-        - /tag:config_nvidia-fabricmanager_enabled/
+        - /tag:config_.*fabricmanager/
     attributes:
       resource: fabric_manager:configure
       cluster:

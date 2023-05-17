@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
+  package 'yum-plugin-versionlock'
+
   package node['cluster']['nvidia']['fabricmanager']['package'] do
     version node['cluster']['nvidia']['fabricmanager']['version']
     action %i(install lock)
