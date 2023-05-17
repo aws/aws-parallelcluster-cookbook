@@ -43,6 +43,8 @@ control 'tag:config_supervisord_runs_as_root' do
 end
 
 control 'tag:config_supervisord_service_is_enabled' do
+  only_if { !os_properties.redhat_ubi? }
+
   describe service('supervisord') do
     it { should be_installed }
     it { should be_enabled }
