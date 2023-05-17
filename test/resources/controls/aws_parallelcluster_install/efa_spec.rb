@@ -32,7 +32,13 @@ end
 control 'efa_prereq_packages_installed' do
   title "EFA prereq packages are installed"
 
-  efa_prereq_packages = %w(environment-modules)
+  efa_prereq_packages = if os_properties.redhat8? && !os_properties.redhat_ubi?
+                          %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
+                        elsif os_properties.alinux2?
+                          %w(environment-modules libibverbs-utils librdmacm-utils)
+                        else
+                          %w(environment-modules)
+                        end
   efa_prereq_packages.each do |pkg|
     describe package(pkg) do
       it { should be_installed }
