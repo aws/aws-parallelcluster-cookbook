@@ -44,12 +44,14 @@ def find_os_minor_version
   kernel_patch_version = find_kernel_patch_version
 
   # kernel patch versions under 193 are prior to RHEL 8.2
+  # kernel patch version number can be retrieved from https://access.redhat.com/articles/3078#RHEL8
   os_minor_version = '2' if kernel_patch_version >= '193'
   os_minor_version = '3' if kernel_patch_version >= '240'
   os_minor_version = '4' if kernel_patch_version >= '305'
   os_minor_version = '5' if kernel_patch_version >= '348'
   os_minor_version = '6' if kernel_patch_version >= '372'
   os_minor_version = '7' if kernel_patch_version >= '425'
+  os_minor_version = '8' if kernel_patch_version >= '477'
 
   os_minor_version
 end
