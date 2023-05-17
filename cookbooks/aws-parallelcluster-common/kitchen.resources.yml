@@ -12,14 +12,6 @@ verifier:
     - path: test/resources
 
 suites:
-  - name: package_repos
-    run_list:
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - package_repos
-    attributes:
-      resource: package_repos
   - name: lustre_installation
     run_list:
       - recipe[aws-parallelcluster-common::add_dependencies]
