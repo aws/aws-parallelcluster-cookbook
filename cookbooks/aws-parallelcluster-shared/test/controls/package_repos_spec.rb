@@ -1,15 +1,14 @@
 # Use the name matching the resource type
-control 'package_repos' do
+control 'tag:install_package_repos' do
   # describe the resource
   title 'Configure package manager repository'
 
   # in this case, different OSes produce different outcomes, to be tested differently
   if os.redhat? # redhat includes amazon
 
-    # see https://docs.chef.io/inspec/resources/ for InSpec resources reference
-    describe yum.repo('epel') do
-      it { should exist }
-      it { should be_enabled }
+    describe bash('yum repolist') do
+      its('exit_status') { should eq 0 }
+      its('stdout')      { should match /epel / }
     end
 
     if os[:name] == 'redhat' && virtualization.system != 'docker'

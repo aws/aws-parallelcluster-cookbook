@@ -31,8 +31,9 @@ action :setup do
   end
 
   execute 'yum-config-manager-rhel' do
-    command "yum-config-manager --enable #{node['cluster']['extra_repos']}"
-  end unless virtualized?
+    # Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
+    command "yum-config-manager --enable codeready-builder-for-rhel-8-rhui-rpms"
+  end unless on_docker?
 
   execute 'yum-config-manager_skip_if_unavail' do
     command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergePackageRepos
   def self.setup(chef_run)
-    chef_run.converge_dsl('yum', 'yum-epel') do
+    chef_run.converge_dsl('aws-parallelcluster-shared') do
       package_repos 'setup' do
         action :setup
       end
@@ -17,27 +17,28 @@ describe 'package_repos:setup' do
         runner = ChefSpec::Runner.new(
           platform: platform, version: version,
           step_into: ['package_repos']
-        ) do |node|
-          node.override['cluster']['extra_repos'] = 'extra_repos'
-        end
+        )
         ConvergePackageRepos.setup(runner)
       end
 
-      if platform == 'amazon'
+      it 'sets up package repos' do
+        is_expected.to setup_package_repos('setup')
+      end
+
+      case platform
+      when 'amazon'
         it 'installs yum' do
-          expect_to_include_recipe_from_resource('yum')
-          chef_run
+          expect(chef_run).to include_recipe('yum')
         end
 
         it 'installs epel' do
           is_expected.to install_alinux_extras_topic('epel')
         end
 
-      elsif platform == 'centos'
+      when 'centos'
         it 'installs yum and epel' do
-          expect_to_include_recipe_from_resource('yum')
-          expect_to_include_recipe_from_resource('yum-epel')
-          chef_run
+          expect(chef_run).to include_recipe('yum')
+          expect(chef_run).to include_recipe('yum-epel')
         end
 
         it 'skips unavailable repos' do
@@ -45,11 +46,10 @@ describe 'package_repos:setup' do
             .with(command: 'yum-config-manager --setopt=*.skip_if_unavailable=1 --save')
         end
 
-      elsif platform == 'redhat'
+      when 'redhat'
         it 'installs yum and epel' do
-          expect_to_include_recipe_from_resource('yum')
-          expect_to_include_recipe_from_resource('yum-epel')
-          chef_run
+          expect(chef_run).to include_recipe('yum')
+          expect(chef_run).to include_recipe('yum-epel')
         end
 
         it 'installs yum-utils' do
@@ -61,12 +61,12 @@ describe 'package_repos:setup' do
             .with(command: 'yum-config-manager --setopt=*.skip_if_unavailable=1 --save')
         end
 
-        it 'configures extra repos' do
+        it 'enables rhui' do
           is_expected.to run_execute('yum-config-manager-rhel')
-            .with(command: 'yum-config-manager --enable extra_repos')
+            .with(command: 'yum-config-manager --enable codeready-builder-for-rhel-8-rhui-rpms')
         end
 
-      elsif platform == 'ubuntu'
+      when 'ubuntu'
         it 'updates apt' do
           is_expected.to periodic_apt_update('')
         end

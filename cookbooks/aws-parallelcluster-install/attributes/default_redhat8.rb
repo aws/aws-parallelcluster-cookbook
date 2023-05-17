@@ -14,9 +14,6 @@ default['cluster']['base_packages'] = %w(vim ksh tcsh zsh openssl-devel ncurses-
                                              iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
                                              coreutils moreutils curl environment-modules gcc gcc-c++ bzip2)
 
-# Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
-default['cluster']['extra_repos'] = 'codeready-builder-for-rhel-8-rhui-rpms'
-
 default['cluster']['kernel_devel_pkg']['name'] = "kernel-devel"
 default['cluster']['kernel_devel_pkg']['version'] = node['kernel']['release']
 
