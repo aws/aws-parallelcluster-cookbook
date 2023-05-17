@@ -245,41 +245,77 @@ suites:
         is_official_ami_build: true
     driver:
       instance_type: t3.medium
-  - name: nvidia_fabric_manager
+  - name: nvidia_driver
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::nvidia]
+      - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
-        - /tag:install_expected_versions_of_nvidia_fabric_manager_installed/
+        - /tag:install_.*nvidia_driver/
     driver:
       # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
       instance_type: g4dn.2xlarge
     attributes:
+      resource: nvidia_driver
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
-        - resource:node_attributes
       cluster:
         nvidia:
           enabled: true
   - name: nvidia_gdrcopy
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::nvidia]
+      - recipe[aws-parallelcluster-install::test_resource]
     verifier:
       controls:
-        - /tag:install_expected_versions_of_nvidia_gdrcopy_installed/
+        - /tag:install_.*gdrcopy/
     driver:
       # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
       instance_type: g4dn.2xlarge
     attributes:
+      resource: gdrcopy
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
-        - resource:node_attributes
+      cluster:
+        nvidia:
+          enabled: true
+  - name: nvidia_fabric_manager
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /tag:install_.*fabric_manager/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      resource: fabric_manager
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+      cluster:
+        nvidia:
+          enabled: true
+  - name: nvidia_dcgm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /tag:install_.*nvidia_datacenter-gpu-manager/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      resource: nvidia_dcgm
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
       cluster:
         nvidia:
           enabled: true

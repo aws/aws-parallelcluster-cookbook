@@ -16,16 +16,11 @@
 # limitations under the License.
 
 nvidia_driver 'Install nvidia driver'
-include_recipe "aws-parallelcluster-install::cuda"
-gdrcopy 'Install Nvidia gdrcopy'
 
-# Install NVIDIA Fabric Manager
-repo_domain = node['cluster']['region'].start_with?("cn-") ? "cn" : "com"
-repo_uri = node['cluster']['nvidia']['cuda']['repository_uri'].gsub('_domain_', repo_domain)
-add_package_repository("nvidia-repo", repo_uri, "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}", "/")
+include_recipe "aws-parallelcluster-install::cuda"
+
+gdrcopy 'Install Nvidia gdrcopy'
 
 fabric_manager 'Install Nvidia Fabric Manager'
 
 nvidia_dcgm 'install datacenter-gpu-manager'
-
-remove_package_repository("nvidia-repo")

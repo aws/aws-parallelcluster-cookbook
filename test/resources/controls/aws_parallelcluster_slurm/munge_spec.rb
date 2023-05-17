@@ -70,7 +70,7 @@ control 'munge_folders_created' do
 end unless os_properties.redhat_ubi?
 
 control 'tag:config_munge_service_enabled' do
-  only_if { node['cluster']['scheduler'] == 'slurm' }
+  only_if { node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_ubi? }
 
   describe service('munge') do
     it { should be_installed }

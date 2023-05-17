@@ -18,31 +18,9 @@
 fabric_manager 'Configure fabric manager' do
   action :configure
 end
+
 gdrcopy 'Configure gdrcopy' do
   action :configure
 end
 
-if graphic_instance? && nvidia_installed?
-  # Load kernel module Nvidia-uvm
-  kernel_module 'nvidia-uvm' do
-    action :load
-  end
-  # Make sure kernel module Nvidia-uvm is loaded at instance boot time
-  cookbook_file 'nvidia.conf' do
-    source 'nvidia/nvidia.conf'
-    path '/etc/modules-load.d/nvidia.conf'
-    owner 'root'
-    group 'root'
-    mode '0644'
-  end
-  # Install nvidia_persistenced. See https://download.nvidia.com/XFree86/Linux-x86_64/396.51/README/nvidia-persistenced.html
-  bash 'Install nvidia_persistenced' do
-    cwd '/usr/share/doc/NVIDIA_GLX-1.0/samples'
-    user 'root'
-    group 'root'
-    code <<-NVIDIA
-      tar -xf nvidia-persistenced-init.tar.bz2
-      ./nvidia-persistenced-init/install.sh
-    NVIDIA
-  end
-end
+include_recipe "aws-parallelcluster-config::nvidia_uvm"

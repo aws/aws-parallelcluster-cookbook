@@ -12,9 +12,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :package_repos, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
-end
+provides :package_repos, platform: 'amazon', platform_version: '2'
 unified_mode true
 
 use 'partial/_package_repos_rpm.rb'
@@ -23,20 +21,7 @@ default_action :setup
 
 action :setup do
   include_recipe 'yum'
-  include_recipe "yum-epel"
-
-  package 'yum-utils' do
-    retries 3
-    retry_delay 5
-  end
-
-  execute 'yum-config-manager-rhel' do
-    command "yum-config-manager --enable #{node['cluster']['extra_repos']}"
-  end unless virtualized?
-
-  execute 'yum-config-manager_skip_if_unavail' do
-    command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
-  end
+  alinux_extras_topic 'epel'
 end
 
 action :update do

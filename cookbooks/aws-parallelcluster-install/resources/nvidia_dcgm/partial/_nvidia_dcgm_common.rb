@@ -15,11 +15,25 @@
 unified_mode true
 default_action :setup
 
-action :setup do
-  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
+action :install_package do
+  # Add NVIDIA repo for fabric manager and datacenter-gpu-manager
+  repo_domain = node['cluster']['region'].start_with?("cn-") ? "cn" : "com"
+  repo_uri = node['cluster']['nvidia']['cuda']['repository_uri'].gsub('_domain_', repo_domain)
+  package_repos 'add nvidia-repo' do
+    action :add
+    repo_name "nvidia-repo"
+    baseurl repo_uri
+    gpgkey "#{repo_uri}/#{node['cluster']['nvidia']['fabricmanager']['repository_key']}"
+    disable_modularity true
+  end
 
   package 'datacenter-gpu-manager' do
     retries 3
     retry_delay 5
+  end
+
+  package_repos 'remove nvidia-repo' do
+    action :remove
+    repo_name "nvidia-repo"
   end
 end
