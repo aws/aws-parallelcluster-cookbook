@@ -52,12 +52,6 @@ def get_metadata_with_token(token, uri)
   metadata
 end
 
-# Return chrony service reload command
-# Chrony doesn't support reload but only force-reload command
-def chrony_reload_command
-  "systemctl force-reload #{node['cluster']['chrony']['service']}"
-end
-
 #
 # Check if the instance has a GPU
 #

@@ -9,8 +9,6 @@ default['cluster']['moduleshome'] = "/usr/share/Modules"
 default['cluster']['modulesconfig'] = "/etc/environment-modules"
 default['cluster']['modulepath_config_file'] = "#{node['cluster']['modulesconfig']}/modulespath"
 
-default['cluster']['chrony']['service'] = "chronyd"
-
 # NVIDIA
 # NVIDIA GDRCopy
 default['cluster']['nvidia']['gdrcopy']['version'] = '2.3'

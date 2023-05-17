@@ -122,7 +122,7 @@ jobs:
           - ephemeral-drives-mounted
           - ephemeral-drives-skipped
           - sudo-configured
-          - /chrony-configured/
+          - /tag:config_chrony/
       fail-fast: false
     steps:
       - name: Check out code

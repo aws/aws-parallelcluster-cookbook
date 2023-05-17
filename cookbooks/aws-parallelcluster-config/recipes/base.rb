@@ -29,7 +29,9 @@ include_recipe 'aws-parallelcluster-config::ephemeral_drives'
 include_recipe 'aws-parallelcluster-config::networking'
 
 # Amazon Time Sync
-include_recipe 'aws-parallelcluster-config::chrony'
+chrony 'enable chrony' do
+  action :enable
+end
 
 # Configure Nvidia driver
 include_recipe "aws-parallelcluster-config::nvidia"
