@@ -17,7 +17,7 @@
 
 # Put supervisord config in place
 cookbook_file "supervisord.conf" do
-  source "base/supervisord.conf"
+  source "supervisord.conf"
   path "/etc/supervisord.conf"
   owner "root"
   group "root"
@@ -26,9 +26,10 @@ end
 
 # Put supervisord service in place
 template "supervisord-service" do
-  source "base/supervisord-service.erb"
+  source "supervisord-service.erb"
   path "/etc/systemd/system/supervisord.service"
   owner "root"
   group "root"
   mode "0644"
+  variables(cookbook_virtualenv_path: cookbook_virtualenv_path)
 end

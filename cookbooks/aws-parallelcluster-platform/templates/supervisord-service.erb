@@ -6,9 +6,9 @@ Documentation=http://supervisord.org
 After=network.target
 
 [Service]
-ExecStart=<%= cookbook_virtualenv_path %>/bin/supervisord -n -c /etc/supervisord.conf
-ExecStop=<%= cookbook_virtualenv_path %>/bin/supervisorctl $OPTIONS shutdown
-ExecReload=<%= cookbook_virtualenv_path %>/bin/supervisorctl -c /etc/supervisord.conf $OPTIONS reload
+ExecStart=<%= @cookbook_virtualenv_path %>/bin/supervisord -n -c /etc/supervisord.conf
+ExecStop=<%= @cookbook_virtualenv_path %>/bin/supervisorctl $OPTIONS shutdown
+ExecReload=<%= @cookbook_virtualenv_path %>/bin/supervisorctl -c /etc/supervisord.conf $OPTIONS reload
 KillMode=process
 Restart=on-failure
 RestartSec=50s

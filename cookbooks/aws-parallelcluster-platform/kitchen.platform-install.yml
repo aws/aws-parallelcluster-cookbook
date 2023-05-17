@@ -78,3 +78,9 @@ suites:
     verifier:
       controls:
         - /gc_thresh_values/
+  - name: supervisord_setup
+    run_list:
+      - recipe[aws-parallelcluster-platform::supervisord]
+    verifier:
+      controls:
+        - /tag:install_supervisord/

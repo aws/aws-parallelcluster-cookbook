@@ -33,13 +33,6 @@ suites:
     verifier:
       controls:
         - awsbatch_virtualenv_created
-  - name: supervisord_setup
-    run_list:
-      - recipe[aws-parallelcluster-install::supervisord]
-    verifier:
-      controls:
-        - supervisord_config_created
-        - supervisord_service_set_up
   - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
