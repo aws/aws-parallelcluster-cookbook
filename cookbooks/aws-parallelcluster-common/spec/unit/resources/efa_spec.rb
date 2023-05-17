@@ -46,6 +46,14 @@ describe 'efa:setup' do
         end
       end
 
+      prerequisites = if platform == 'redhat'
+                        %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
+                      elsif platform == 'amazon'
+                        %w(environment-modules libibverbs-utils librdmacm-utils)
+                      else
+                        "environment-modules"
+                      end
+
       context 'when efa installed' do
         before do
           mock_efa_installed(true)
@@ -75,7 +83,7 @@ describe 'efa:setup' do
             is_expected.not_to write_log('efa installed')
             is_expected.not_to remove_package(%w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
-            is_expected.to install_package("environment-modules")
+            is_expected.to install_package(prerequisites)
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
             is_expected.not_to run_bash('install efa')
           end
@@ -97,7 +105,7 @@ describe 'efa:setup' do
             is_expected.not_to write_log('efa installed')
             is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
-            is_expected.to install_package("environment-modules")
+            is_expected.to install_package(prerequisites)
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
               .with(source: "https://efa-installer.amazonaws.com/aws-efa-installer-#{efa_version}.tar.gz")
               .with(mode: '0644')
@@ -124,7 +132,7 @@ describe 'efa:setup' do
           it 'installs EFA skipping kmod' do
             is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
-            is_expected.to install_package("environment-modules")
+            is_expected.to install_package(prerequisites)
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
               .with(source: "https://efa-installer.amazonaws.com/aws-efa-installer-#{efa_version}.tar.gz")
               .with(mode: '0644')

@@ -28,3 +28,9 @@ action_class do
     %w(libopenmpi-dev)
   end
 end
+
+action_class do
+  def prerequisites
+    %w(environment-modules)
+  end
+end
