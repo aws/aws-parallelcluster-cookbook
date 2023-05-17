@@ -27,3 +27,9 @@ action_class do
     %w(openmpi-devel openmpi)
   end
 end
+
+action_class do
+  def prerequisites
+    %w(environment-modules libibverbs-utils librdmacm-utils)
+  end
+end
