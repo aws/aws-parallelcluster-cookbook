@@ -17,8 +17,8 @@ Scheduling:
       Name: cr1
       SchedulableMemory: null
       SpotPrice: null
-      StaticNodeWeight: 1
-      DynamicNodeWeight: 1001
+      StaticNodePriority: 1
+      DynamicNodePriority: 1001
     - DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
@@ -30,8 +30,8 @@ Scheduling:
       Name: cr2
       SchedulableMemory: null
       SpotPrice: null
-      StaticNodeWeight: 1
-      DynamicNodeWeight: 1001
+      StaticNodePriority: 1
+      DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -72,8 +72,8 @@ Scheduling:
       Name: cr1
       SchedulableMemory: null
       SpotPrice: null
-      StaticNodeWeight: 1
-      DynamicNodeWeight: 1001
+      StaticNodePriority: 1
+      DynamicNodePriority: 1001
     - DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
@@ -85,8 +85,8 @@ Scheduling:
       Name: cr2
       SchedulableMemory: null
       SpotPrice: null
-      StaticNodeWeight: 1
-      DynamicNodeWeight: 1001
+      StaticNodePriority: 1
+      DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -126,8 +126,8 @@ Scheduling:
       Name: cr1
       SchedulableMemory: null
       SpotPrice: null
-      StaticNodeWeight: 1
-      DynamicNodeWeight: 1001
+      StaticNodePriority: 1
+      DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -171,8 +171,8 @@ Scheduling:
         Name: cr1
         SchedulableMemory: null
         SpotPrice: null
-        StaticNodeWeight: 1
-        DynamicNodeWeight: 1001
+        StaticNodePriority: 1
+        DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -216,8 +216,8 @@ Scheduling:
         Name: cr1
         SchedulableMemory: null
         SpotPrice: null
-        StaticNodeWeight: 1
-        DynamicNodeWeight: 1001
+        StaticNodePriority: 1
+        DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -260,8 +260,8 @@ Scheduling:
         Name: cr1
         SchedulableMemory: null
         SpotPrice: null
-        StaticNodeWeight: 1
-        DynamicNodeWeight: 1001
+        StaticNodePriority: 1
+        DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -305,8 +305,8 @@ Scheduling:
         Name: cr1
         SchedulableMemory: null
         SpotPrice: null
-        StaticNodeWeight: 1
-        DynamicNodeWeight: 1001
+        StaticNodePriority: 1
+        DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -348,8 +348,8 @@ Scheduling:
         Name: cr1
         SchedulableMemory: null
         SpotPrice: null
-        StaticNodeWeight: 1
-        DynamicNodeWeight: 1001
+        StaticNodePriority: 1
+        DynamicNodePriority: 1001
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
