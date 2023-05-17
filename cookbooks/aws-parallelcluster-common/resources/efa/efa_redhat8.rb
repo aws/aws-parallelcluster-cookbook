@@ -40,3 +40,13 @@ action_class do
     %w(openmpi-devel openmpi)
   end
 end
+
+action_class do
+  def prerequisites
+    if redhat_ubi?
+      %w(environment-modules)
+    else
+      %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
+    end
+  end
+end

@@ -42,7 +42,7 @@ action :setup do
     package_repos 'update package repos' do
       action :update
     end
-    package %w(environment-modules) do
+    package prerequisites do
       retries 3
       retry_delay 5
     end
