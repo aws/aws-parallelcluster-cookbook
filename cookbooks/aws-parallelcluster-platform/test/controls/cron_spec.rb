@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'cron_disabled_selected_daily_and_weekly_jobs' do
+control 'tag:install_cron_disabled_selected_daily_and_weekly_jobs' do
   title 'Test that selected required daily and weekly cron jobs are disabled'
 
   cron_job_deny_daily = %w(mlocate man-db.cron man-db).join("\n") << "\n"

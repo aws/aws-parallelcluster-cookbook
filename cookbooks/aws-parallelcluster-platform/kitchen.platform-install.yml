@@ -90,3 +90,13 @@ suites:
     verifier:
       controls:
         - /ami_cleanup/
+  - name: cron
+    run_list:
+#      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-platform::cron]
+    verifier:
+      controls:
+        - /tag:install_cron/
+    attributes:
+      dependencies:
+#        - recipe:aws-parallelcluster-test::docker_mock

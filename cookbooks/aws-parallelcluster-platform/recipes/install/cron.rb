@@ -1,8 +1,4 @@
 # frozen_string_literal: true
-
-#
-# Cookbook:: aws-parallelcluster-install
-# Recipe:: cron
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -15,6 +11,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
+# Create directories if not existing
+directory '/etc/cron.daily'
+directory '/etc/cron.weekly'
 
 # Disable cron/anacron jobs that may impact performance
 cookbook_file 'cron.jobs.deny.daily' do
