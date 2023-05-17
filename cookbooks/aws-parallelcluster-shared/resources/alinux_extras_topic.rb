@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-resource_name :alinux_extras_topic
 provides :alinux_extras_topic
 unified_mode true
 
