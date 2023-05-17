@@ -280,6 +280,8 @@ suites:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
+        - resource:nvidia_driver
+        - recipe:aws-parallelcluster-install::cuda
       cluster:
         nvidia:
           enabled: true

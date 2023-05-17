@@ -58,6 +58,7 @@ action :unload_blacklist_nouveau do
   end
 
   cookbook_file 'blacklist-nouveau.conf' do
+    cookbook 'aws-parallelcluster-install'
     source 'nvidia/blacklist-nouveau.conf'
     path '/etc/modprobe.d/blacklist-nouveau.conf'
     owner 'root'
