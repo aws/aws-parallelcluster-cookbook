@@ -18,7 +18,7 @@ Scheduling:
       SchedulableMemory: null
       SpotPrice: null
       StaticNodePriority: 1
-      DynamicNodePriority: 1001
+      DynamicNodePriority: 1000
     - DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
@@ -31,7 +31,7 @@ Scheduling:
       SchedulableMemory: null
       SpotPrice: null
       StaticNodePriority: 1
-      DynamicNodePriority: 1001
+      DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -73,7 +73,7 @@ Scheduling:
       SchedulableMemory: null
       SpotPrice: null
       StaticNodePriority: 1
-      DynamicNodePriority: 1001
+      DynamicNodePriority: 1000
     - DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
@@ -86,7 +86,7 @@ Scheduling:
       SchedulableMemory: null
       SpotPrice: null
       StaticNodePriority: 1
-      DynamicNodePriority: 1001
+      DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -127,7 +127,7 @@ Scheduling:
       SchedulableMemory: null
       SpotPrice: null
       StaticNodePriority: 1
-      DynamicNodePriority: 1001
+      DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -172,7 +172,7 @@ Scheduling:
         SchedulableMemory: null
         SpotPrice: null
         StaticNodePriority: 1
-        DynamicNodePriority: 1001
+        DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -217,7 +217,7 @@ Scheduling:
         SchedulableMemory: null
         SpotPrice: null
         StaticNodePriority: 1
-        DynamicNodePriority: 1001
+        DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -261,7 +261,7 @@ Scheduling:
         SchedulableMemory: null
         SpotPrice: null
         StaticNodePriority: 1
-        DynamicNodePriority: 1001
+        DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -306,7 +306,7 @@ Scheduling:
         SchedulableMemory: null
         SpotPrice: null
         StaticNodePriority: 1
-        DynamicNodePriority: 1001
+        DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
@@ -349,7 +349,7 @@ Scheduling:
         SchedulableMemory: null
         SpotPrice: null
         StaticNodePriority: 1
-        DynamicNodePriority: 1001
+        DynamicNodePriority: 1000
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null

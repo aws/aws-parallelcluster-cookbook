@@ -18,7 +18,7 @@ Scheduling:
           MaxCount: 10
           MinCount: 5
           StaticNodePriority: 1
-          DynamicNodePriority: 1001
+          DynamicNodePriority: 1000
         - DisableSimultaneousMultithreading: true
           Efa:
             Enabled: false
@@ -28,7 +28,7 @@ Scheduling:
           MinCount: 5
           Name: multiplespot-2
           StaticNodePriority: 1
-          DynamicNodePriority: 1001
+          DynamicNodePriority: 1000
     - Name: efa
       CapacityType: ONDEMAND
       CustomSlurmSettings:
@@ -47,7 +47,7 @@ Scheduling:
           MaxCount: 5
           MinCount: 1
           StaticNodePriority: 1
-          DynamicNodePriority: 1001
+          DynamicNodePriority: 1000
       ComputeSettings: null
       CustomActions: null
     - Name: gpu
@@ -70,7 +70,7 @@ Scheduling:
           MaxCount: 5
           MinCount: 1
           StaticNodePriority: 1
-          DynamicNodePriority: 1001
+          DynamicNodePriority: 1000
         - Name: gpu-p3dn24xlarge
           DisableSimultaneousMultithreading: false
           Efa:
@@ -80,7 +80,7 @@ Scheduling:
           MaxCount: 10
           MinCount: 0
           StaticNodePriority: 1
-          DynamicNodePriority: 1001
+          DynamicNodePriority: 1000
       ComputeSettings: null
       CustomActions: null
   Scheduler: slurm

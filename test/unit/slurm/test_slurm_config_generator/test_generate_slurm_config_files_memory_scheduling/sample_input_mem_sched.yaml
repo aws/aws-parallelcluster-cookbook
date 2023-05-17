@@ -12,7 +12,7 @@ Scheduling:
                 Name: multiplespot-1
                 SpotPrice: null
                 StaticNodePriority: 1
-                DynamicNodePriority: 1001
+                DynamicNodePriority: 1000
               - DisableSimultaneousMultithreading: true
                 Efa:
                     Enabled: false
@@ -24,7 +24,7 @@ Scheduling:
                 SpotPrice: 1.5
                 SchedulableMemory: 13000
                 StaticNodePriority: 1
-                DynamicNodePriority: 1001
+                DynamicNodePriority: 1000
           ComputeSettings: null
           CustomActions: null
           Iam:
@@ -44,7 +44,7 @@ Scheduling:
                 Name: efa-c5n
                 SpotPrice: null
                 StaticNodePriority: 1
-                DynamicNodePriority: 1001
+                DynamicNodePriority: 1000
           ComputeSettings: null
           CustomActions: null
           Iam:
@@ -65,7 +65,7 @@ Scheduling:
                 SpotPrice: null
                 SchedulableMemory: 248000
                 StaticNodePriority: 1
-                DynamicNodePriority: 1001
+                DynamicNodePriority: 1000
               - DisableSimultaneousMultithreading: true
                 Efa:
                     Enabled: false
@@ -76,7 +76,7 @@ Scheduling:
                 Name: gpu-p3dn24xlarge
                 SpotPrice: null
                 StaticNodePriority: 1
-                DynamicNodePriority: 1001
+                DynamicNodePriority: 1000
           ComputeSettings: null
           CustomActions: null
           Iam:

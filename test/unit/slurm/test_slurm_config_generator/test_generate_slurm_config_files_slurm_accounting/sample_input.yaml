@@ -12,7 +12,7 @@ Scheduling:
                 Name: efa-c5n
                 SpotPrice: null
                 StaticNodePriority: 1
-                DynamicNodePriority: 1001
+                DynamicNodePriority: 1000
           ComputeSettings: null
           CustomActions: null
           Iam:
