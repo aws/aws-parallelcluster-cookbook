@@ -1,0 +1,21 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: nfs
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_nfs/
+    attributes:
+      resource: nfs:configure
+      cluster:
+        nfs:
+          threads: 10
+      dependencies:
+        - resource:nfs
