@@ -14,6 +14,7 @@
 
 provides :modules, platform: 'amazon', platform_version: '2'
 
+use 'partial/_modules_common.rb'
 use 'partial/_modules_yum.rb'
 
 action_class do

@@ -16,6 +16,7 @@ provides :modules, platform: 'centos' do |node|
   node['platform_version'].to_i == 7
 end
 
+use 'partial/_modules_common.rb'
 use 'partial/_modules_yum.rb'
 
 action_class do

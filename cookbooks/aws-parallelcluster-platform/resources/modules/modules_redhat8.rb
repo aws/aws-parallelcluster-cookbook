@@ -16,10 +16,15 @@ provides :modules, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
 
+use 'partial/_modules_common.rb'
 use 'partial/_modules_yum.rb'
 
 action_class do
   def packages
     %w(environment-modules)
+  end
+
+  def modulepath_config_file
+    '/etc/environment-modules/modulespath'
   end
 end
