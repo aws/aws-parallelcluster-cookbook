@@ -16,10 +16,15 @@ provides :modules, platform: 'ubuntu' do |node|
   node['platform_version'].to_i >= 20
 end
 
+use 'partial/_modules_common.rb'
 use 'partial/_modules_apt.rb'
 
 action_class do
   def packages
     %w(environment-modules)
+  end
+
+  def modules_home
+    '/usr/share/modules'
   end
 end

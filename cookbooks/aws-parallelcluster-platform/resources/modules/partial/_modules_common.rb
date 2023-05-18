@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -13,13 +12,25 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :setup do
-  package_repos 'update package repos' do
-    action :update
+unified_mode true
+
+property :line, String, required: %i(append_to_config)
+
+default_action :setup
+
+action :append_to_config do
+  append_if_no_line new_resource.name do
+    path modulepath_config_file
+    line new_resource.line
+  end
+end
+
+action_class do
+  def modulepath_config_file
+    "#{modules_home}/init/.modulespath"
   end
 
-  package packages do
-    retries 10
-    retry_delay 5
+  def modules_home
+    "/usr/share/Modules"
   end
 end

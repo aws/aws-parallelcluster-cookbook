@@ -14,10 +14,15 @@
 
 provides :modules, platform: 'ubuntu', platform_version: '18.04'
 
+use 'partial/_modules_common.rb'
 use 'partial/_modules_apt.rb'
 
 action_class do
   def packages
     %w(tcl-dev environment-modules)
+  end
+
+  def modules_home
+    '/usr/share/modules'
   end
 end
