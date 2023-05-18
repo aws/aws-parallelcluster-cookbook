@@ -48,9 +48,9 @@ end
 control 'tag:config_chrony_service_configured' do
   title 'Check that chrony is correctly configured'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
-  chrony_service = node['cluster']['chrony']['service']
+  chrony_service = os_properties.ubuntu? ? 'chrony' : 'chronyd'
 
   describe service(chrony_service) do
     it { should be_installed }

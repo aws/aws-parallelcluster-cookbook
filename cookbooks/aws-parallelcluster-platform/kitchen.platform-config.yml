@@ -11,7 +11,7 @@ suites:
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /tag:install_chrony/
+        - /tag:config_chrony/
     attributes:
       resource: chrony:enable
       dependencies:
