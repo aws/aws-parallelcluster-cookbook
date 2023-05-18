@@ -27,13 +27,6 @@ def x86?
   node['kernel']['machine'] == 'x86_64'
 end
 
-#
-# Check if this is an ARM instance
-#
-def arm_instance?
-  node['kernel']['machine'] == 'aarch64'
-end
-
 def get_metadata_token
   # generate the token for retrieving IMDSv2 metadata
   token_uri = URI("http://169.254.169.254/latest/api/token")
