@@ -27,14 +27,6 @@ suites:
       dependencies:
         - resource:package_repos
       resource: install_packages
-  - name: c_states
-    run_list:
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - c_states_kernel_configured
-    attributes:
-      resource: c_states
   - name: ec2_udev_rules
     run_list:
       - recipe[aws-parallelcluster-install::test_resource]

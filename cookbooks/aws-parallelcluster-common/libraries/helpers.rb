@@ -23,10 +23,6 @@ def redhat_ubi?
   virtualized? && platform?('redhat')
 end
 
-def x86?
-  node['kernel']['machine'] == 'x86_64'
-end
-
 def get_metadata_token
   # generate the token for retrieving IMDSv2 metadata
   token_uri = URI("http://169.254.169.254/latest/api/token")
