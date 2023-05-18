@@ -17,6 +17,10 @@ unified_mode true
 default_action :setup
 
 action :setup do
+  package_repos 'update package repos' do
+    action :update
+  end
+
   package packages do
     retries 10
     retry_delay 5
