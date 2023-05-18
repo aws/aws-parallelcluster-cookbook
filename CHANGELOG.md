@@ -10,6 +10,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Allow configuration of static and dynamic node priorities in compute resources via the ParallelCluster configuration YAML file.
 
 **CHANGES**
+- Upgrade third-party cookbook dependencies:
+  - pyenv-4.2.1 (from pyenv-3.5.1)
 
 **BUG FIXES**
 

@@ -3,7 +3,7 @@
 ** line cookbook; version 4.5.2 -- https://github.com/sous-chefs/line
 ** NFS cookbook; version 5.0.0 -- https://github.com/atomic-penguin/cookbook-nfs
 ** openssh cookbook; version 2.10.3 -- https://github.com/sous-chefs/openssh
-** pyenv cookbook; version 3.5.1 -- https://github.com/sous-chefs/pyenv
+** pyenv cookbook; version 4.2.1 -- https://github.com/sous-chefs/pyenv
 ** SELinux cookbook; version 6.0.4 -- https://github.com/sous-chefs/selinux
 ** yum cookbook; version 7.4.0 -- https://github.com/sous-chefs/yum
 ** yum-epel cookbook; version 4.5.0 -- https://github.com/sous-chefs/yum-epel
