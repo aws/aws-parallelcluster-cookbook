@@ -61,19 +61,6 @@ suites:
       resource: dns_domain:configure
       cluster:
         dns_domain: test-domain
-  - name: nfs_configured
-    run_list:
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - nfs_configured
-    attributes:
-      resource: nfs:configure
-      cluster:
-        nfs:
-          threads: 10
-      dependencies:
-        - resource:nfs
   - name: system_authentication_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

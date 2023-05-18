@@ -19,3 +19,27 @@ suites:
     verifier:
       controls:
         - cfnbootstrap_virtualenv_created
+  - name: nfs
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_nfs/
+    attributes:
+      resource: nfs
+  # Will remove it once the AMI is built for Ubuntu22
+  - name: nfs_configured
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_nfs/
+    attributes:
+      resource: nfs:configure
+      cluster:
+        nfs:
+          threads: 10
+      dependencies:
+        - resource:nfs

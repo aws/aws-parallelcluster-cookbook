@@ -13,15 +13,26 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :configure do
-  node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
+provides :nfs, platform: 'centos' do |node|
+  node['platform_version'].to_i == 7
+end
+unified_mode true
 
-  override_server_template
+use 'partial/_install_nfs4_and_disable'
+use 'partial/_configure'
 
-  # Explicitly restart NFS server for thread setting to take effect
-  # and enable it to start at boot
-  service node['nfs']['service']['server'] do
-    action %i(restart enable)
-    supports restart: true
-  end unless virtualized?
+default_action :setup
+
+action :setup do
+  action_install_nfs4
+  action_disable_start_at_boot
+end
+
+action_class do
+  def override_server_template
+    edit_resource(:template, node['nfs']['config']['server_template']) do
+      source 'nfs/nfs.conf.erb'
+      cookbook 'aws-parallelcluster-environment'
+    end
+  end
 end

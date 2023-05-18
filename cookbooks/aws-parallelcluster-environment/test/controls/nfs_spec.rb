@@ -1,18 +1,26 @@
-# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License").
-# You may not use this file except in compliance with the License. A copy of the License is located at
-#
-# http://aws.amazon.com/apache2.0/
-#
-# or in the "LICENSE.txt" file accompanying this file.
-# This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License.
+control 'tag:install_nfs_installed_with_right_version' do
+  title 'Check NFS process is running and installed version'
 
-control 'nfs_configured' do
+  only_if { !os_properties.on_docker? }
+
+  # Check nfsd process is running
+  describe command('ps aux') do
+    its('stdout') { should match(/nfsd/) }
+  end
+
+  # Check version of NFS
+  describe "Verify installed NFS version is 4\n" do
+    nfs_version = command("rpcinfo -p localhost | awk '{print $5$2}' | grep nfs4")
+    describe nfs_version do
+      its('stdout') { should match "nfs4" }
+    end
+  end
+end
+
+control 'tag:config_nfs_configured' do
   title 'Check that nfs is configured correctly'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe 'Check nfs service is restarted'
   nfs_server = os.debian? ? 'nfs-kernel-server.service' : 'nfs-server.service'

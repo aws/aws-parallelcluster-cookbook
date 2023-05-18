@@ -13,27 +13,13 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nfs, platform: 'ubuntu'
-
-unified_mode true
-
-use 'partial/_install_nfs_debian'
-use 'partial/_install_nfs4_and_disable'
-use 'partial/_configure'
-
-default_action :setup
-
-action :setup do
-  action_install_nfs
-  action_install_nfs4
-  action_disable_start_at_boot
+action :install_nfs4 do
+  include_recipe "nfs::server4" unless on_docker?
 end
 
-action_class do
-  def override_server_template
-    edit_resource(:template, node['nfs']['config']['server_template']) do
-      source 'nfs/nfs.conf.erb'
-      cookbook 'aws-parallelcluster-common'
-    end
-  end
+action :disable_start_at_boot do
+  # Disable NFS server service start at boot
+  service node['nfs']['service']['server'] do
+    action :disable
+  end unless on_docker?
 end
