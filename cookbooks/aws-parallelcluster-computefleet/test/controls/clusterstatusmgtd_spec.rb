@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'clusterstatusmgtd_files_created' do
+control 'tag:install_clusterstatusmgtd_files_created' do
   title 'clusterstatusmgtd script and logging config are copied to the target dir'
 
   describe file('/opt/parallelcluster/scripts/clusterstatusmgtd.py') do

@@ -33,16 +33,6 @@ suites:
     verifier:
       controls:
         - awsbatch_virtualenv_created
-  - name: clusterstatusmgtd
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::clusterstatusmgtd]
-    verifier:
-      controls:
-        - clusterstatusmgtd_files_created
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
   - name: cfnconfig_mixed
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
