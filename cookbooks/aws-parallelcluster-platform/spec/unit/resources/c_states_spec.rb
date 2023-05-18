@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergeCStates
   def self.setup(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-platform') do
       c_states 'setup' do
         action :setup
       end
@@ -11,6 +11,12 @@ class ConvergeCStates
 end
 
 describe 'c_states:setup' do
+  before do
+    stubs_for_resource('c_states') do |res|
+      allow(res).to receive(:append_if_not_present_grub_cmdline)
+    end
+  end
+
   for_all_oses do |platform, version|
     context "on #{platform}#{version} x86" do
       cached(:chef_run) do
@@ -33,13 +39,14 @@ describe 'c_states:setup' do
         platform == 'ubuntu' ? '/usr/sbin/update-grub' : '/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg'
       end
 
-      before do
-        allow_any_instance_of(Object).to receive(:append_if_not_present_grub_cmdline)
+      it 'sets up c_states' do
+        is_expected.to setup_c_states('setup')
       end
 
       it 'edits /etc/default/grub' do
-        expect_any_instance_of(Object).to receive(:append_if_not_present_grub_cmdline)
-          .with(grub_cmdline_attributes, grub_variable)
+        stubs_for_resource('c_states[setup]') do |res|
+          expect(res).to receive(:append_if_not_present_grub_cmdline).with(grub_cmdline_attributes, grub_variable)
+        end
         chef_run
       end
 
@@ -60,12 +67,10 @@ describe 'c_states:setup' do
         ConvergeCStates.setup(runner)
       end
 
-      before do
-        allow_any_instance_of(Object).to receive(:append_if_not_present_grub_cmdline)
-      end
-
       it 'does not edit /etc/default/grub' do
-        expect_any_instance_of(Object).not_to receive(:append_if_not_present_grub_cmdline)
+        stubs_for_resource('c_states[setup]') do |res|
+          expect(res).not_to receive(:append_if_not_present_grub_cmdline)
+        end
         chef_run
       end
 

@@ -38,7 +38,6 @@ suites:
         - debian_udevd_reload_configuration
         - install_packages
         - nfs_installed_with_right_version
-        - c_states_kernel_configured
         - clusterstatusmgtd_files_created
         - efa_conflicting_packages_removed
         - efa_installed

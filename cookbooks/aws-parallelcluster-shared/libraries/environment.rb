@@ -59,3 +59,7 @@ end
 def arm_instance?
   node['kernel']['machine'] == 'aarch64'
 end
+
+def x86_instance?
+  node['kernel']['machine'] == 'x86_64'
+end

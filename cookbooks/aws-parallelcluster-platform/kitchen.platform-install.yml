@@ -123,3 +123,11 @@ suites:
     attributes:
       cluster:
         node_type: 'HeadNode'
+  - name: c_states
+    run_list:
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_c_states/
+    attributes:
+      resource: c_states
