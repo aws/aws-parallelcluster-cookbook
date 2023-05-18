@@ -131,19 +131,6 @@ suites:
         - recipe:aws-parallelcluster-slurm::install_jwt
         - recipe:aws-parallelcluster-slurm::install_pmix
         - resource:munge
-  - name: intel_mpi
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::intel_mpi]
-    verifier:
-      controls:
-        - /intel_mpi_installed/
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos:update
-      cluster:
-        node_type: 'HeadNode'
   - name: nvidia
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

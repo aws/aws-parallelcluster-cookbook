@@ -113,3 +113,13 @@ suites:
         - modules_installed
     attributes:
       resource: modules
+  - name: intel_mpi
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::intel_mpi]
+    verifier:
+      controls:
+        - /tag:install_.*intel_mpi/
+    attributes:
+      cluster:
+        node_type: 'HeadNode'

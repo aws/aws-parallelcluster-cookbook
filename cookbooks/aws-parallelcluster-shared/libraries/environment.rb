@@ -52,3 +52,10 @@ end
 def node_virtualenv_path
   virtualenv_path(pyenv_root: node_pyenv_root, python_version: node_python_version, virtualenv_name: node_virtualenv_name)
 end
+
+#
+# Check if this is an ARM instance
+#
+def arm_instance?
+  node['kernel']['machine'] == 'aarch64'
+end

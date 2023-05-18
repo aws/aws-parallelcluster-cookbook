@@ -15,18 +15,27 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['conditions']['intel_mpi_supported']
+intelmpi_supported = !arm_instance?
+intelmpi_version = '2021.9.0'
 
-intelmpi_installation_path = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}"
-intelmpi_modulefile = "#{intelmpi_installation_path}/modulefiles/intelmpi"
-intelmpi_installer = "l_mpi_oneapi_p_#{node['cluster']['intelmpi']['full_version']}_offline.sh"
+node.default['conditions']['intel_mpi_supported'] = intelmpi_supported
+node.default['cluster']['intelmpi']['version'] = intelmpi_version
+
+node_attributes "dump node attributes"
+
+return unless intelmpi_supported
+
+intelmpi_full_version = "#{intelmpi_version}.43482"
+intelmpi_installation_path = "/opt/intel/mpi/#{intelmpi_version}"
+intelmpi_installer = "l_mpi_oneapi_p_#{intelmpi_full_version}_offline.sh"
 intelmpi_installer_path = "#{node['cluster']['sources_dir']}/#{intelmpi_installer}"
 intelmpi_installer_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/archives/impi/#{intelmpi_installer}"
+intelmpi_qt_version = '6.4.2'
 
 # Prerequisite for module install
-package %w(environment-modules) do
-  retries 3
-  retry_delay 5
+modules 'Prerequisite: Environment modules'
+directory node['cluster']['sources_dir'] do
+  recursive true
 end
 
 # fetch intelmpi installer script
@@ -49,14 +58,17 @@ bash "install intel mpi" do
   creates intelmpi_installation_path.to_s
 end
 
-append_if_no_line "append intel modules file dir to modules conf #{node['cluster']['modulepath_config_file']}" do
-  path node['cluster']['modulepath_config_file']
+modules 'append intel modules file dir to modules conf' do
   line "#{intelmpi_installation_path}/modulefiles/"
+  action :append_to_config
 end
 
+intelmpi_modulefile_from = "#{intelmpi_installation_path}/modulefiles/mpi"
+intelmpi_modulefile_to   = "#{intelmpi_installation_path}/modulefiles/intelmpi"
+
 execute "rename intel mpi modules file name" do
-  command "mv #{node['cluster']['intelmpi']['modulefile']} #{intelmpi_modulefile}"
-  creates intelmpi_modulefile.to_s
+  command "mv #{intelmpi_modulefile_from} #{intelmpi_modulefile_to}"
+  creates intelmpi_modulefile_to.to_s
 end
 
 # Add Qt source file
@@ -65,4 +77,9 @@ template "#{intelmpi_installation_path}/qt_source_code.txt" do
   owner 'root'
   group 'root'
   mode '0644'
+  variables(
+    aws_region: node['cluster']['region'],
+    aws_domain: node['cluster']['aws_domain'],
+    intelmpi_qt_version: intelmpi_qt_version
+  )
 end

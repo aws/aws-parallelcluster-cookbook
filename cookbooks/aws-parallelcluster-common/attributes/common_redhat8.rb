@@ -4,10 +4,6 @@ return unless platform?('redhat') && node['platform_version'].to_i == 8
 
 # Modulefile Directory
 default['cluster']['modulefile_dir'] = "/usr/share/Modules/modulefiles"
-# MODULESHOME
-default['cluster']['moduleshome'] = "/usr/share/Modules"
-default['cluster']['modulesconfig'] = "/etc/environment-modules"
-default['cluster']['modulepath_config_file'] = "#{node['cluster']['modulesconfig']}/modulespath"
 
 # NVIDIA
 # NVIDIA GDRCopy

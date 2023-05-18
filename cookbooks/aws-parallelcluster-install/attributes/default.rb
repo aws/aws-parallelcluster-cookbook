@@ -1,12 +1,5 @@
 # aws-parallelcluster-install attributes
 
-# Intel MPI
-default['conditions']['intel_mpi_supported'] = !arm_instance?
-default['cluster']['intelmpi']['version'] = '2021.9.0'
-default['cluster']['intelmpi']['full_version'] = "#{node['cluster']['intelmpi']['version']}.43482"
-default['cluster']['intelmpi']['modulefile'] = "/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/mpi"
-default['cluster']['intelmpi']['qt_version'] = '6.4.2'
-
 # stunnel
 default['cluster']['stunnel']['version'] = '5.67'
 default['cluster']['stunnel']['url'] = lazy { "#{node['cluster']['artifacts_s3_url']}/stunnel/stunnel-#{node['cluster']['stunnel']['version']}.tar.gz" }
