@@ -27,7 +27,8 @@ action :setup do
   end
 
   cookbook_file 'setup-ephemeral-drives.sh' do
-    source 'base/setup-ephemeral-drives.sh'
+    source 'setup-ephemeral-drives.sh'
+    cookbook 'aws-parallelcluster-environment'
     path '/usr/local/sbin/setup-ephemeral-drives.sh'
     owner 'root'
     group 'root'
@@ -35,7 +36,8 @@ action :setup do
   end
 
   template 'setup-ephemeral.service' do
-    source 'base/setup-ephemeral.service.erb'
+    source 'setup-ephemeral.service.erb'
+    cookbook 'aws-parallelcluster-environment'
     path '/etc/systemd/system/setup-ephemeral.service'
     owner 'root'
     group 'root'

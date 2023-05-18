@@ -28,3 +28,12 @@ suites:
         - /tag:install_nfs/
     attributes:
       resource: nfs
+  - name: ephemeral_drives
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    attributes:
+      resource: ephemeral_drives
+    verifier:
+      controls:
+        - /tag:install_ephemeral/
