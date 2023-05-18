@@ -14,6 +14,6 @@ supports 'centos', '= 7.0'
 supports 'ubuntu', '>= 18.04'
 supports 'redhat', '= 8.7'
 
-depends 'pyenv', '~> 3.5.1'
+depends 'pyenv', '~> 4.2.1'
 depends 'yum', '~> 7.4.0'
 depends 'yum-epel', '~> 4.5.0'

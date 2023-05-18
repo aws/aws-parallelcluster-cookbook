@@ -41,7 +41,7 @@ system_authentication "Install packages required for directory service integrati
 include_recipe "aws-parallelcluster-install::clusterstatusmgtd"
 mysql_client 'Install mysql client'
 include_recipe 'aws-parallelcluster-slurm::install'
-include_recipe 'aws-parallelcluster-scheduler-plugin::install'
+include_recipe 'aws-parallelcluster-scheduler-plugin::install' if node['cluster']['scheduler'] == 'plugin'
 include_recipe 'aws-parallelcluster-awsbatch::install'
 
 # == WORKSTATIONS

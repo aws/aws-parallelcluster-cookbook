@@ -9,6 +9,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 
 **CHANGES**
+- Upgrade third-party cookbook dependencies:
+  - pyenv-4.2.1 (from pyenv-3.5.1)
 
 **BUG FIXES**
 
