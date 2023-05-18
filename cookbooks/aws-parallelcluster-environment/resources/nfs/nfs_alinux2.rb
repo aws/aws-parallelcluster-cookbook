@@ -13,7 +13,24 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :install_nfs do
-  # Install previous nfs::server to workaround: https://github.com/sous-chefs/nfs/issues/93
-  include_recipe "nfs::server" unless virtualized?
+provides :nfs, platform: 'amazon', platform_version: '2'
+unified_mode true
+
+use 'partial/_install_nfs4_and_disable'
+use 'partial/_configure'
+
+default_action :setup
+
+action :setup do
+  action_install_nfs4
+  action_disable_start_at_boot
+end
+
+action_class do
+  def override_server_template
+    edit_resource(:template, node['nfs']['config']['server_template']) do
+      source 'nfs/nfs.conf.erb'
+      cookbook 'aws-parallelcluster-environment'
+    end
+  end
 end

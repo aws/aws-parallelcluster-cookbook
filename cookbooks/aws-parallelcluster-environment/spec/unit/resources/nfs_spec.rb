@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergeNfs
   def self.setup(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       nfs 'setup' do
         action :setup
       end
@@ -10,7 +10,7 @@ class ConvergeNfs
   end
 
   def self.configure(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       nfs 'configure' do
         action :configure
       end
@@ -32,16 +32,20 @@ describe 'nfs:setup' do
         ConvergeNfs.setup(runner)
       end
 
+      it 'sets up nfs' do
+        is_expected.to setup_nfs('setup')
+      end
+
       if %w(amazon centos redhat).include?(platform)
         it 'installs nfs::server4' do
-          expect_to_include_recipe_from_resource('nfs::server4')
+          expect(chef_run).to include_recipe('nfs::server4')
           chef_run
         end
 
       elsif platform == 'ubuntu'
         it 'installs nfs::server and nfs:server4' do
-          expect_to_include_recipe_from_resource('nfs::server')
-          expect_to_include_recipe_from_resource('nfs::server4')
+          expect(chef_run).to include_recipe('nfs::server')
+          expect(chef_run).to include_recipe('nfs::server4')
           chef_run
         end
 
@@ -74,11 +78,15 @@ describe 'nfs:configure' do
         ConvergeNfs.configure(runner)
       end
 
+      it 'configures nfs' do
+        is_expected.to configure_nfs('configure')
+      end
+
       if %w(amazon centos ubuntu).include?(platform)
         it 'overrides nfs config with custom template' do
           is_expected.to create_template(server_template)
             .with(source: 'nfs/nfs.conf.erb')
-            .with(cookbook: 'aws-parallelcluster-common')
+            .with(cookbook: 'aws-parallelcluster-environment')
         end
 
       elsif platform == 'redhat'
