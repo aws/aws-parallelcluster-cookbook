@@ -138,15 +138,6 @@ suites:
         - dns_domain_setup
     attributes:
       resource: dns_domain
-  - name: ephemeral_drives
-    run_list:
-      - recipe[aws-parallelcluster-install::test_resource]
-    attributes:
-      resource: ephemeral_drives
-    verifier:
-      controls:
-        - /tag:install_ephemeral_drives/
-        - /tag:install_ephemeral_service/
   - name: system_authentication
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
