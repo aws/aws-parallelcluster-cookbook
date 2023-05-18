@@ -194,19 +194,6 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
-  - name: modules
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - modules_installed
-    attributes:
-      resource: modules
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos
-        - resource:node_attributes
   - name: build_tools
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

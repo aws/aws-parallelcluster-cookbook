@@ -104,3 +104,12 @@ suites:
         - /tag:install_chrony/
     attributes:
       resource: chrony:setup
+  - name: modules
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - modules_installed
+    attributes:
+      resource: modules
