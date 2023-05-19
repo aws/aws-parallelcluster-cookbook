@@ -56,4 +56,6 @@ include_recipe "aws-parallelcluster-config::sudo"
 include_recipe "aws-parallelcluster-config::fs_mount"
 
 # Intel Runtime Libraries
-include_recipe "aws-parallelcluster-config::intel"
+intel_hpc 'Configure Intel HPC' do
+  action :configure
+end

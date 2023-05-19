@@ -131,6 +131,15 @@ suites:
         - /tag:install_c_states/
     attributes:
       resource: c_states
+  - name: intel_hpc
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_intel_hpc/
+    attributes:
+      resource: intel_hpc
   - name: build_tools
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
