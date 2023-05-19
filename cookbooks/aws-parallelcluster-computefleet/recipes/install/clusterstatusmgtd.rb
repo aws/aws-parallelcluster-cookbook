@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-computefleet
-# Recipe:: clusterstatusmgtd
 #
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
