@@ -4,7 +4,7 @@ describe 'aws-parallelcluster-platform::disable_services' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
+        runner(platform: platform, version: version).converge(described_recipe)
       end
 
       it 'disables DLAMI multi eni helper' do

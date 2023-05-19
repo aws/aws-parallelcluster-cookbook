@@ -8,7 +8,7 @@ describe 'aws-parallelcluster-platform::awscli' do
       context "when awscli is not installed" do
         cached(:chef_run) do
           allow(File).to receive(:exist?).with('/usr/local/bin/aws').and_return(false)
-          ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
+          runner(platform: platform, version: version).converge(described_recipe)
         end
         cached(:node) { chef_run.node }
 
@@ -38,7 +38,7 @@ describe 'aws-parallelcluster-platform::awscli' do
       context "when awscli is not installed" do
         cached(:chef_run) do
           allow(File).to receive(:exist?).with('/usr/local/bin/aws').and_return(true)
-          ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
+          runner(platform: platform, version: version).converge(described_recipe)
         end
         cached(:node) { chef_run.node }
 

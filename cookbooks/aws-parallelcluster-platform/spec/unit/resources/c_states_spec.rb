@@ -20,10 +20,7 @@ describe 'c_states:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version} x86" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['c_states']
-        ) do |node|
+        runner = runner(platform: platform, version: version, step_into: ['c_states']) do |node|
           node.automatic['kernel']['machine'] = 'x86_64'
         end
         ConvergeCStates.setup(runner)
@@ -58,10 +55,7 @@ describe 'c_states:setup' do
 
     context "on #{platform}#{version} arm" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['c_states']
-        ) do |node|
+        runner = runner(platform: platform, version: version, step_into: ['c_states']) do |node|
           node.automatic['kernel']['machine'] = 'aarch64'
         end
         ConvergeCStates.setup(runner)
