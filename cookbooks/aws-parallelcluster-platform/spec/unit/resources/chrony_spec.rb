@@ -8,9 +8,7 @@ for_all_oses do |platform, version|
 
     describe 'aws-parallelcluster-platform::chrony setup' do
       cached(:chef_run) do
-        ChefSpec::Runner.new(
-          platform: platform, version: version, step_into: ['chrony']
-        ).converge_dsl('aws-parallelcluster-platform') do
+        runner(platform: platform, version: version, step_into: ['chrony']).converge_dsl('aws-parallelcluster-platform') do
           chrony 'setup' do
             action :setup
           end
@@ -49,9 +47,7 @@ for_all_oses do |platform, version|
 
     describe 'aws-parallelcluster-platform::chrony enable' do
       cached(:chef_run) do
-        ChefSpec::Runner.new(
-          platform: platform, version: version, step_into: ['chrony']
-        ).converge_dsl('aws-parallelcluster-platform') do
+        runner(platform: platform, version: version, step_into: ['chrony']).converge_dsl('aws-parallelcluster-platform') do
           chrony 'enable' do
             action :enable
           end

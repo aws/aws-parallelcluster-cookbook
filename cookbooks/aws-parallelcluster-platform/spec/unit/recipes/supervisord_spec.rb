@@ -6,7 +6,7 @@ describe 'aws-parallelcluster-platform::supervisord' do
       cached(:cookbook_venv_path) { 'cookbook_virtualenv_test_path' }
       cached(:chef_run) do
         allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
-        ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
+        runner(platform: platform, version: version).converge(described_recipe)
       end
       cached(:node) { chef_run.node }
 

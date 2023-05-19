@@ -4,9 +4,7 @@ for_all_oses do |platform, version|
   context "on #{platform}#{version}" do
     describe 'aws-parallelcluster-platform::modules setup' do
       cached(:chef_run) do
-        ChefSpec::Runner.new(
-          platform: platform, version: version, step_into: ['modules']
-        ).converge_dsl('aws-parallelcluster-platform') do
+        runner(platform: platform, version: version, step_into: ['modules']).converge_dsl('aws-parallelcluster-platform') do
           modules 'setup' do
             action :setup
           end
@@ -47,9 +45,7 @@ for_all_oses do |platform, version|
 
       cached(:chef_run) do
         the_line = line
-        ChefSpec::Runner.new(
-          platform: platform, version: version, step_into: ['modules']
-        ).converge_dsl('aws-parallelcluster-platform') do
+        runner(platform: platform, version: version, step_into: ['modules']).converge_dsl('aws-parallelcluster-platform') do
           modules 'append_to_config' do
             line the_line
             action :append_to_config

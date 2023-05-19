@@ -9,7 +9,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
 
       context "when cookbook virtualenv not installed yet" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
           end
@@ -37,7 +37,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
 
       context "when cookbook virtualenv already installed" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
           end
