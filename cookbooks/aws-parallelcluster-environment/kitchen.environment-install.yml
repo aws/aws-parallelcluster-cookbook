@@ -48,3 +48,12 @@ suites:
       resource: ec2_udev_rules
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+  - name: cloudwatch
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_cloudwatch/
+    attributes:
+      resource: cloudwatch

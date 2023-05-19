@@ -28,11 +28,6 @@ default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
-default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
-default['cluster']['previous_cluster_config_path'] = "#{node['cluster']['shared_dir']}/previous-cluster-config.yaml"
-default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change-set.json"
-default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
-default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 
 # Intel Packages
 default['cluster']['psxe']['version'] = '2020.4-17'
@@ -114,12 +109,10 @@ default['cluster']['postinstall'] = 'NONE'
 default['cluster']['postinstall_args'] = 'NONE'
 default['cluster']['postupdate'] = 'NONE'
 default['cluster']['postupdate_args'] = 'NONE'
-default['cluster']['scheduler'] = 'slurm'
 default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
 default['cluster']['ephemeral_dir'] = '/scratch'
 default['cluster']['proxy'] = 'NONE'
-default['cluster']['node_type'] = nil
 default['cluster']['volume'] = ''
 
 # ParallelCluster internal variables to configure active directory service
@@ -138,7 +131,6 @@ default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
 # Other ParallelCluster internal variables
 default['cluster']['ddb_table'] = nil
 default['cluster']['slurm_ddb_table'] = nil
-default['cluster']['log_group_name'] = "NONE"
 default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['efs_shared_dirs'] = ''
 default['cluster']['efs_fs_ids'] = ''
