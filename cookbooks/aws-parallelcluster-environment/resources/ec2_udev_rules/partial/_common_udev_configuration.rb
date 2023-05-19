@@ -20,22 +20,27 @@ action :create_common_udev_files do
 
   template 'ec2-volid.rules' do
     source 'ec2_udev_rules/ec2-volid.rules.erb'
+    cookbook 'aws-parallelcluster-environment'
     path '/etc/udev/rules.d/52-ec2-volid.rules'
     user 'root'
     group 'root'
     mode '0644'
+    variables(cookbook_virtualenv_path: cookbook_virtualenv_path)
   end
 
   template 'parallelcluster-ebsnvme-id' do
     source 'ec2_udev_rules/parallelcluster-ebsnvme-id.erb'
+    cookbook 'aws-parallelcluster-environment'
     path '/usr/local/sbin/parallelcluster-ebsnvme-id'
     user 'root'
     group 'root'
     mode '0744'
+    variables(cookbook_virtualenv_path: cookbook_virtualenv_path)
   end
 
   cookbook_file 'ec2_dev_2_volid.py' do
     source 'ec2_udev_rules/ec2_dev_2_volid.py'
+    cookbook 'aws-parallelcluster-environment'
     path '/sbin/ec2_dev_2_volid.py'
     user 'root'
     group 'root'
@@ -44,6 +49,7 @@ action :create_common_udev_files do
 
   cookbook_file 'ec2blkdev-init' do
     source 'ec2_udev_rules/ec2blkdev-init'
+    cookbook 'aws-parallelcluster-environment'
     path '/etc/init.d/ec2blkdev'
     user 'root'
     group 'root'
@@ -52,6 +58,7 @@ action :create_common_udev_files do
 
   cookbook_file 'manageVolume.py' do
     source 'ec2_udev_rules/manageVolume.py'
+    cookbook 'aws-parallelcluster-environment'
     path '/usr/local/sbin/manageVolume.py'
     user 'root'
     group 'root'
@@ -63,5 +70,5 @@ action :start_ec2blk do
   service "ec2blkdev" do
     supports restart: true
     action %i(enable start)
-  end unless virtualized?
+  end unless on_docker?
 end

@@ -37,3 +37,14 @@ suites:
     verifier:
       controls:
         - /tag:install_ephemeral/
+  - name: ec2_udev_rules
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_.*ec2_udev_rules/
+    attributes:
+      resource: ec2_udev_rules
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv

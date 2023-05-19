@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergeEc2UdevRules
   def self.setup(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       ec2_udev_rules 'setup' do
         action :setup
       end
@@ -14,11 +14,12 @@ describe 'ec2_udev_rules:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['ec2_udev_rules']
-        )
+        runner = runner(platform: platform, version: version, step_into: ['ec2_udev_rules'])
         ConvergeEc2UdevRules.setup(runner)
+      end
+
+      it 'sets up ec2 udev rules' do
+        is_expected.to setup_ec2_udev_rules('setup')
       end
 
       it 'creates common udev files' do
