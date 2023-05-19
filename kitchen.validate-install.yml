@@ -46,5 +46,4 @@ suites:
         - system_authentication_packages_installed
         - /nvidia_driver/
         - /fabric_manager/
-        - /^cloudwatch/
         - /tag:install/

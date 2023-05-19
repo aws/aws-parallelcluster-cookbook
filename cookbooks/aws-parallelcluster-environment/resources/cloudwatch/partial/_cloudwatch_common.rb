@@ -17,8 +17,13 @@ unified_mode true
 default_action :setup
 
 action :setup do
-  remote_file node['cluster']['cloudwatch']['public_key_local_path'] do
-    source node['cluster']['cloudwatch']['public_key_url']
+  directory node['cluster']['sources_dir'] do
+    recursive true
+  end
+
+  public_key_local_path = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
+  remote_file public_key_local_path do
+    source 'https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg'
     retries 3
     retry_delay 5
     action :create_if_missing
@@ -57,7 +62,7 @@ action :setup do
 
   # Import cloudwatch agent's public key to the keyring
   execute 'import-cloudwatch-agent-key' do
-    command "gpg --import #{node['cluster']['cloudwatch']['public_key_local_path']}"
+    command "gpg --import #{public_key_local_path}"
   end
 
   # Verify that cloudwatch agent's public key has expected fingerprint
@@ -84,6 +89,7 @@ action :configure do
   cookbook_file 'write_cloudwatch_agent_json.py' do
     action :create_if_missing
     source 'cloudwatch/write_cloudwatch_agent_json.py'
+    cookbook 'aws-parallelcluster-environment'
     path config_script_path
     user 'root'
     group 'root'
@@ -94,6 +100,7 @@ action :configure do
   cookbook_file 'cloudwatch_agent_config.json' do
     action :create_if_missing
     source 'cloudwatch/cloudwatch_agent_config.json'
+    cookbook 'aws-parallelcluster-environment'
     path config_data_path
     user 'root'
     group 'root'
@@ -104,6 +111,7 @@ action :configure do
   cookbook_file 'cloudwatch_agent_config_schema.json' do
     action :create_if_missing
     source 'cloudwatch/cloudwatch_agent_config_schema.json'
+    cookbook 'aws-parallelcluster-environment'
     path config_schema_path
     user 'root'
     group 'root'
@@ -114,18 +122,19 @@ action :configure do
   cookbook_file 'cloudwatch_agent_config_util.py' do
     action :create_if_missing
     source 'cloudwatch/cloudwatch_agent_config_util.py'
+    cookbook 'aws-parallelcluster-environment'
     path validator_script_path
     user 'root'
     group 'root'
     mode '0644'
   end
 
-  if redhat_ubi?
-    node.override!['cluster']['cookbook_virtualenv_path'] = '/usr'
-    node.override!['cluster']['node_virtualenv_path'] = '/usr'
-    node.override!['cluster']['awsbatch_virtualenv_path'] = '/usr'
-    node.override!['cluster']['cfn_bootstrap_virtualenv_path'] = '/usr'
-  end
+  # if redhat_ubi?
+  #   node.override!['cluster']['cookbook_virtualenv_path'] = '/usr'
+  #   node.override!['cluster']['node_virtualenv_path'] = '/usr'
+  #   node.override!['cluster']['awsbatch_virtualenv_path'] = '/usr'
+  #   node.override!['cluster']['cfn_bootstrap_virtualenv_path'] = '/usr'
+  # end
 
   execute "cloudwatch-config-validation" do
     user 'root'
@@ -159,10 +168,6 @@ action :configure do
     user 'root'
     timeout 300
     command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
-    not_if do
-      system("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") ||
-        node['cluster']['cw_logging_enabled'] != 'true' ||
-        virtualized?
-    end
-  end
+    not_if "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running"
+  end unless node['cluster']['cw_logging_enabled'] != 'true' || on_docker?
 end
