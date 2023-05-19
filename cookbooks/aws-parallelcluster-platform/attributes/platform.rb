@@ -5,3 +5,6 @@ default['cluster']['filehandle_limit'] = 10_000
 default['cluster']['sysctl']['ipv4']['gc_thresh1'] = 0
 default['cluster']['sysctl']['ipv4']['gc_thresh2'] = 15_360
 default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
+
+# ArmPL
+default['conditions']['arm_pl_supported'] = arm_instance?

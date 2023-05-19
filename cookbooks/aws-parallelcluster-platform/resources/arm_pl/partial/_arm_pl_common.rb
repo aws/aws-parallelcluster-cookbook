@@ -16,10 +16,9 @@
 unified_mode true
 default_action :setup
 
-property :sources_dir, String, required: %i(setup), default: node['cluster']['sources_dir']
-property :region, String, required: %i(setup), default: aws_region
-property :aws_domain, String, required: %i(setup), default: aws_domain
-property :modulefile_dir, String, required: %i(setup), default: node['cluster']['modulefile_dir']
+property :sources_dir, String
+property :region, String
+property :aws_domain, String
 
 # Find the latest version of Arm Performance Libraries (ArmPL) here:
 # https://developer.arm.com/downloads/-/arm-compiler-for-linux
@@ -39,6 +38,14 @@ end
 
 action :setup do
   return unless node['conditions']['arm_pl_supported']
+
+  new_resource.sources_dir = new_resource.sources_dir || node['cluster']['sources_dir']
+  new_resource.region = new_resource.region || node['cluster']['region']
+  new_resource.aws_domain = new_resource.aws_domain || aws_domain
+
+  directory new_resource.sources_dir do
+    recursive true
+  end
 
   modules 'Prerequisite: Environment modules'
   build_tools 'Prerequisite: build tools'
@@ -82,11 +89,12 @@ action :setup do
   end
 
   # create armpl module directory
-  directory "#{new_resource.modulefile_dir}/armpl"
+  directory "#{modulefile_dir}/armpl"
 
   # arm performance library modulefile configuration
-  template "#{new_resource.modulefile_dir}/armpl/#{armpl_version}" do
+  template "#{modulefile_dir}/armpl/#{armpl_version}" do
     source 'arm_pl/armpl_modulefile.erb'
+    cookbook 'aws-parallelcluster-platform'
     user 'root'
     group 'root'
     mode '0755'
@@ -142,6 +150,7 @@ action :setup do
   # gcc modulefile configuration
   template gcc_modulefile do
     source 'arm_pl/gcc_modulefile.erb'
+    cookbook 'aws-parallelcluster-platform'
     user 'root'
     group 'root'
     mode '0755'
@@ -161,4 +170,10 @@ action :setup do
   node.default['cluster']['armpl']['gcc']['version'] = gcc_version
 
   node_attributes "dump node attributes"
+end
+
+action_class do
+  def modulefile_dir
+    '/usr/share/Modules/modulefiles'
+  end
 end
