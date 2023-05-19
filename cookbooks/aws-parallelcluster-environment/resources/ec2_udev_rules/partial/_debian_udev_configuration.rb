@@ -27,10 +27,11 @@ action :set_udev_autoreload do
   # Disable udev network sandbox and notify udev to reload configuration
   cookbook_file 'udev-override.conf' do
     source 'ec2_udev_rules/udev-override.conf'
+    cookbook 'aws-parallelcluster-environment'
     path '/etc/systemd/system/systemd-udevd.service.d/override.conf'
     user 'root'
     group 'root'
     mode '0644'
-    notifies :run, "execute[udev-daemon-reload]", :immediately unless virtualized?
+    notifies :run, "execute[udev-daemon-reload]", :immediately unless on_docker?
   end
 end

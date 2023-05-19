@@ -191,3 +191,7 @@ If Kitchen doesn't detect your changes, try
 ```
 berks shelf uninstall ${COOKBOOK_NAME}
 ```
+
+## About python tests
+Python tests are configured in `tox.ini` file, including paths to python files.
+If you move python files around, you need to fix python path accordingly.

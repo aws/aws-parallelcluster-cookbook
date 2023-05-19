@@ -1,4 +1,4 @@
-control 'write_common_udev_configuration_files' do
+control 'tag:install_ec2_udev_rules_write_common_udev_configuration_files' do
   title "write udev configuration files for all OSes"
 
   describe file('/etc/udev/rules.d/52-ec2-volid.rules') do
@@ -29,19 +29,7 @@ control 'write_common_udev_configuration_files' do
   end
 end
 
-control 'tag:config_ec2blkdev_service_installation' do
-  title "Installation of the ec2blkdev service"
-
-  only_if { !os_properties.virtualized? }
-
-  describe service('ec2blkdev') do
-    it { should be_installed }
-    it { should be_enabled }
-    it { should be_running }
-  end
-end
-
-control 'debian_udevd_reload_configuration' do
+control 'tag:install_ec2_udev_rules_debian_udevd_reload_configuration' do
   title "Configuration to reload the udevd daemon when the override.conf changes"
 
   only_if { os.debian? }
@@ -52,5 +40,17 @@ control 'debian_udevd_reload_configuration' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
+  end
+end
+
+control 'tag:install_tag:config_ec2_udev_rules_ec2blkdev_service_installation' do
+  title "Installation of the ec2blkdev service"
+
+  only_if { !os_properties.virtualized? }
+
+  describe service('ec2blkdev') do
+    it { should be_installed }
+    it { should be_enabled }
+    it { should be_running }
   end
 end
