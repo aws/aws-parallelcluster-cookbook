@@ -26,10 +26,7 @@ describe 'activate_virtual_env:run' do
 
       context "with requirements" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['activate_virtual_env']
-          )
+          runner = runner(platform: platform, version: version, step_into: ['activate_virtual_env'])
           ConvergeActivateVirtualEnv.run(runner, pyenv_name: pyenv_name, pyenv_path: pyenv_path, python_version: python_version, user: user, requirements: requirements_path)
         end
         cached(:node) { chef_run.node }
@@ -70,10 +67,7 @@ describe 'activate_virtual_env:run' do
 
       context "without requirements" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['activate_virtual_env']
-          )
+          runner = runner(platform: platform, version: version, step_into: ['activate_virtual_env'])
           ConvergeActivateVirtualEnv.run(runner, pyenv_name: pyenv_name, pyenv_path: pyenv_path, python_version: python_version, user: user)
         end
         cached(:node) { chef_run.node }

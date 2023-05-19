@@ -11,7 +11,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
 
       context "when cfn_bootstrap virtualenv not installed yet" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['region'] = 'non_china'
           end
@@ -78,7 +78,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
 
       context "when cfn_bootstrap virtualenv already installed" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
           end
@@ -93,7 +93,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
 
       context "when run in China" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
             node.override['cluster']['region'] = 'cn-something'

@@ -21,16 +21,17 @@ describe 'install_pyenv:run' do
         cached(:python_version) { 'overridden_python_version' }
         cached(:system_pyenv_root) { 'overridden_pyenv_root' }
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['install_pyenv']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['install_pyenv']) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
           end
           ConvergeInstallPyenv.run(runner)
         end
         cached(:node) { chef_run.node }
+
+        it 'runs istall_pyenv' do
+          is_expected.to run_install_pyenv('run')
+        end
 
         it 'creates pyenv root dir' do
           is_expected.to create_directory(system_pyenv_root).with_recursive(true)
@@ -39,6 +40,10 @@ describe 'install_pyenv:run' do
         it 'installs pyenv system' do
           is_expected.to install_pyenv_system_install(python_version)
             .with_global_prefix(system_pyenv_root)
+        end
+
+        it 'deletes /etc/profile.d/pyenv.sh to avoid exposing the ParallelCluster pyenv installation to customers' do ||
+          is_expected.to delete_file('/etc/profile.d/pyenv.sh')
         end
 
         it 'installs default python version' do
@@ -50,10 +55,7 @@ describe 'install_pyenv:run' do
         cached(:python_version) { 'python_version_parameter' }
         cached(:system_pyenv_root) { 'pyenv_root_parameter' }
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['install_pyenv']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: 'install_pyenv') do |node|
             node.override['cluster']['system_pyenv_root'] = 'default_system_pyenv_root'
             node.override['cluster']['python-version'] = 'default_python_version'
           end
@@ -78,10 +80,7 @@ describe 'install_pyenv:run' do
       context "when it is a user only installation" do
         context "and user is not set" do
           cached(:chef_run) do
-            ChefSpec::Runner.new(
-              platform: platform, version: version,
-              step_into: ['install_pyenv']
-            )
+            runner(platform: platform, version: version, step_into: ['install_pyenv'])
           end
 
           it 'raises exception' do
@@ -94,10 +93,7 @@ describe 'install_pyenv:run' do
           cached(:pyenv_root) { "pyenv_root" }
           cached(:python_version) { 'python_version' }
           cached(:chef_run) do
-            runner = ChefSpec::Runner.new(
-              platform: platform, version: version,
-              step_into: ['install_pyenv']
-            )
+            runner = runner(platform: platform, version: version, step_into: ['install_pyenv'])
             ConvergeInstallPyenv.run(runner, user_only: true, user: user, python_version: python_version, pyenv_root: pyenv_root)
           end
 
@@ -105,6 +101,17 @@ describe 'install_pyenv:run' do
             is_expected.to install_pyenv_user_install(python_version).with(
               user: user,
               user_prefix: pyenv_root
+            )
+          end
+
+          it 'installs pyenv_python for user' do
+            is_expected.to install_pyenv_python(python_version).with_user(user)
+          end
+
+          it 'installs pyenv plugin virtualenv' do
+            is_expected.to install_pyenv_plugin('virtualenv').with(
+              git_url: 'https://github.com/pyenv/pyenv-virtualenv',
+              user: user
             )
           end
         end

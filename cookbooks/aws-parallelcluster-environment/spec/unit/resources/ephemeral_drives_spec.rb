@@ -15,10 +15,7 @@ describe 'ephemeral_drives:setup' do
     context "on #{platform}#{version}" do
       cached(:network_target) { platform == 'redhat' ? 'network-online.target' : 'network.target' }
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['ephemeral_drives']
-        )
+        runner = runner(platform: platform, version: version, step_into: ['ephemeral_drives'])
         ConvergeEphemeralDrives.setup(runner)
       end
 
