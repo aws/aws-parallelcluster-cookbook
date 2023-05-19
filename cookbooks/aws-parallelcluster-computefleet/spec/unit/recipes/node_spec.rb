@@ -10,7 +10,7 @@ describe 'aws-parallelcluster-computefleet::node' do
 
       context "when node virtualenv not installed yet and custom node package is not set" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
             node.override['cluster']['parallelcluster-node-version'] = node_version
@@ -45,7 +45,7 @@ describe 'aws-parallelcluster-computefleet::node' do
 
       context "when node virtualenv already installed" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
           end
@@ -61,7 +61,7 @@ describe 'aws-parallelcluster-computefleet::node' do
       context "when custom node package is specified" do
         cached(:custom_node_package) { 'custom_node_package' }
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
             node.override['cluster']['custom_node_package'] = custom_node_package
