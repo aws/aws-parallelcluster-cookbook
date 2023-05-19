@@ -20,4 +20,8 @@ action_class do
   def armpl_platform
     "Ubuntu-#{node['platform_version']}"
   end
+
+  def modulefile_dir
+    "/usr/share/modules/modulefiles"
+  end
 end
