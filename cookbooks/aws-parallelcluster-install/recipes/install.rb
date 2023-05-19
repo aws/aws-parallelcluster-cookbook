@@ -28,7 +28,7 @@ include_recipe "aws-parallelcluster-platform::nvidia_install"
 include_recipe "aws-parallelcluster-platform::intel_mpi"
 cloudwatch 'Install amazon-cloudwatch-agent'
 arm_pl 'Install ARM Performance Library'
-include_recipe "aws-parallelcluster-install::intel_hpc" # Intel HPC libraries
+intel_hpc 'Setup Intel HPC'
 efa 'Install EFA'
 
 # == ENVIRONMENT

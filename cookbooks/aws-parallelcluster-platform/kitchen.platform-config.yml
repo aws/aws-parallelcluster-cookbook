@@ -115,3 +115,18 @@ suites:
           enabled: true
     driver:
       instance_type: g4dn.2xlarge
+  - name: intel_hpc
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_intel_hpc/
+    attributes:
+      resource: intel_hpc:configure
+      dependencies:
+        - resource:package_repos:update
+        - resource:intel_hpc:setup
+      cluster:
+        enable_intel_hpc_platform: 'true'
+        node_type: HeadNode
