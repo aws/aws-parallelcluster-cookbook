@@ -129,13 +129,6 @@ action :configure do
     mode '0644'
   end
 
-  # if redhat_ubi?
-  #   node.override!['cluster']['cookbook_virtualenv_path'] = '/usr'
-  #   node.override!['cluster']['node_virtualenv_path'] = '/usr'
-  #   node.override!['cluster']['awsbatch_virtualenv_path'] = '/usr'
-  #   node.override!['cluster']['cfn_bootstrap_virtualenv_path'] = '/usr'
-  # end
-
   execute "cloudwatch-config-validation" do
     user 'root'
     timeout 300
