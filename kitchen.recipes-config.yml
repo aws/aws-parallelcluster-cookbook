@@ -75,20 +75,6 @@ suites:
     verifier:
       controls:
         - networking_configured
-  - name: ssh_target_checker
-    run_list:
-      - recipe[aws-parallelcluster-config::openssh]
-    verifier:
-      controls:
-        - ssh_target_checker_script_created
-    attributes:
-      ec2:
-        mac: mac1
-        network_interfaces_macs:
-          mac1:
-            vpc_ipv4_cidr_blocks: |
-              cidr1
-              cidr2
   - name: ephemeral_drives_mounted
     driver:
       instance_type: d3.xlarge  # instance type with ephemeral drives

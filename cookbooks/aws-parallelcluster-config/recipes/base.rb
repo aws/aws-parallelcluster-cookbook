@@ -16,7 +16,7 @@
 # limitations under the License.
 
 include_recipe "aws-parallelcluster-common::setup_envars"
-include_recipe 'aws-parallelcluster-config::openssh'
+include_recipe 'aws-parallelcluster-platform::openssh'
 
 sticky_bits "setup sticky bits"
 
