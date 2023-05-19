@@ -131,3 +131,14 @@ suites:
         - /tag:install_c_states/
     attributes:
       resource: c_states
+  - name: build_tools
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - build_tools_installed
+    attributes:
+      resource: build_tools
+      dependencies:
+        - resource:package_repos
