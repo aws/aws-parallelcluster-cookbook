@@ -14,10 +14,7 @@ describe 'package_repos:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['package_repos']
-        )
+        runner = runner(platform: platform, version: version, step_into: ['package_repos'])
         ConvergePackageRepos.setup(runner)
       end
 

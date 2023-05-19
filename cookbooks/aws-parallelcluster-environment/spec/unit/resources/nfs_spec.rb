@@ -23,10 +23,7 @@ describe 'nfs:setup' do
     context "on #{platform}#{version}" do
       cached(:disabled_service) { 'disable_service' }
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['nfs']
-        ) do |node|
+        runner = runner(platform: platform, version: version, step_into: ['nfs']) do |node|
           node.override['nfs']['service']['server'] = disabled_service
         end
         ConvergeNfs.setup(runner)
@@ -67,10 +64,7 @@ describe 'nfs:configure' do
       cached(:server_template) { 'server_template' }
       cached(:nfs_service) { 'nfs_service' }
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['nfs']
-        ) do |node|
+        runner = runner(platform: platform, version: version, step_into: ['nfs']) do |node|
           node.override['cluster']['nfs']['threads'] = threads
           node.override['nfs']['config']['server_template'] = server_template
           node.override['nfs']['service']['server'] = nfs_service
