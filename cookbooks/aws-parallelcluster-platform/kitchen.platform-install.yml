@@ -107,7 +107,7 @@ suites:
   - name: modules
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
+      - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
         - modules_installed
@@ -134,11 +134,25 @@ suites:
   - name: build_tools
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
+      - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
         - build_tools_installed
     attributes:
       resource: build_tools
+      dependencies:
+        - resource:package_repos
+  - name: arm_pl
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /^tag:install_arm_pl/
+    driver:
+      # arm_pl can be executed only on arm instance example: c6g.large
+      instance_type: c6g.large
+    attributes:
+      resource: arm_pl
       dependencies:
         - resource:package_repos
