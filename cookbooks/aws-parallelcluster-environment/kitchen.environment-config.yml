@@ -36,3 +36,15 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: efa
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - efa_debian_system_settings_configured
+    attributes:
+      resource: efa:configure
+      cluster:
+        enable_efa: compute
+        node_type: ComputeFleet
