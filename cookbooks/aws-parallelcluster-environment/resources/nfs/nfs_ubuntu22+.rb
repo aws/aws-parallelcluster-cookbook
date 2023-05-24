@@ -13,7 +13,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nfs, platform: 'ubuntu'
+provides :nfs, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
+end
 
 unified_mode true
 
@@ -27,12 +29,13 @@ action :setup do
   action_install_nfs
   action_install_nfs4
   action_disable_start_at_boot
+  node.default['nfs']['config']['server_template'] = '/etc/nfs.conf.d/parallelcluster-nfs.conf'
 end
 
 action_class do
   def override_server_template
     edit_resource(:template, node['nfs']['config']['server_template']) do
-      source 'nfs/nfs.conf.erb'
+      source 'nfs/nfs-ubuntu22+.conf.erb'
       cookbook 'aws-parallelcluster-environment'
     end
   end
