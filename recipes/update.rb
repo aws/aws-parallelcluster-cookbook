@@ -16,5 +16,5 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-common::setup_envars'
-include_recipe 'aws-parallelcluster-config::openssh'
+include_recipe 'aws-parallelcluster-platform::openssh'
 include_recipe 'aws-parallelcluster-config::update' unless node['cluster']['scheduler'] == 'awsbatch'

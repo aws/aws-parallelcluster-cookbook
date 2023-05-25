@@ -11,13 +11,14 @@
 
 control 'ssh_target_checker_script_created' do
   title 'Check that ssh_target_checker.sh is created correctly'
+  on_docker = os_properties.on_docker?
 
   describe file('/usr/bin/ssh_target_checker.sh') do
     it { should exist }
     its('mode') { should cmp '0755' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('content') { should match /VPC_CIDR_LIST=\(cidr1 cidr2\)/ }
+    its('content') { should match /VPC_CIDR_LIST=\(cidr1 cidr2\)/ } if on_docker
   end
 end
 

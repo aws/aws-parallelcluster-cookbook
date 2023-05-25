@@ -16,3 +16,17 @@ suites:
       resource: chrony:enable
       dependencies:
       - resource:chrony:setup
+  - name: ssh_target_checker
+    run_list:
+      - recipe[aws-parallelcluster-platform::openssh]
+    verifier:
+      controls:
+        - ssh_target_checker_script_created
+    attributes:
+      ec2:
+        mac: mac1
+        network_interfaces_macs:
+          mac1:
+            vpc_ipv4_cidr_blocks: |
+              cidr1
+              cidr2
