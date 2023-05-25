@@ -1,9 +1,11 @@
 require 'spec_helper'
 
 class ConvergeEfs
-  def self.install_utils(chef_run)
-    chef_run.converge_dsl do
+  def self.install_utils(chef_run, efs_utils_version:, tarball_checksum:)
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       efs 'install_utils' do
+        efs_utils_checksum tarball_checksum
+        efs_utils_version efs_utils_version
         action :install_utils
       end
     end
@@ -24,19 +26,16 @@ end
 
 describe 'efs:install_utils' do
   context "on amazon2" do
+    cached(:efs_utils_version) { '1.2.3' }
+    cached(:tarball_checksum) { 'tarball_checksum' }
     let(:chef_run) do
-      ChefSpec::Runner.new(
-        platform: 'amazon', version: '2',
-        step_into: ['efs']
-      ) do |node|
-        node.override['cluster']['efs_utils']['version'] = '1.2.3'
-      end
+      runner(platform: 'amazon', version: '2', step_into: ['efs'])
     end
 
     context "when same version of amazon-efs-utils already installed" do
       before do
-        mock_get_package_version('amazon-efs-utils', '1.2.3')
-        ConvergeEfs.install_utils(chef_run)
+        mock_get_package_version('amazon-efs-utils', efs_utils_version)
+        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
       end
 
       it 'does not install amazon-efs-utils' do
@@ -47,7 +46,7 @@ describe 'efs:install_utils' do
     context "when newer version of amazon-efs-utils already installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '1.3.2')
-        ConvergeEfs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
       end
 
       it 'does not install amazon-efs-utils' do
@@ -58,10 +57,11 @@ describe 'efs:install_utils' do
     context "when amazon-efs-utils not installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '')
-        ConvergeEfs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
       end
 
       it 'installs amazon-efs-utils' do
+        is_expected.to install_utils_efs('install_utils')
         is_expected.to install_package('amazon-efs-utils').with(retries: 3).with(retry_delay: 5)
       end
     end
@@ -69,7 +69,7 @@ describe 'efs:install_utils' do
     context "when older version of amazon-efs-utils installed" do
       before do
         mock_get_package_version('amazon-efs-utils', '1.1.4')
-        ConvergeEfs.install_utils(chef_run)
+        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
       end
 
       it 'installs amazon-efs-utils' do
@@ -81,13 +81,14 @@ describe 'efs:install_utils' do
   for_oses([
              %w(ubuntu 18.04),
              %w(ubuntu 20.04),
+             %w(ubuntu 22.04),
            ]) do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:tarball_path) { 'TARBALL PATH' }
-      cached(:tarball_url) { 'https://TARBALL/URL' }
-      cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
       cached(:source_dir) { 'SOURCE DIR' }
       cached(:utils_version) { '1.2.3' }
+      cached(:tarball_path) { "#{source_dir}/efs-utils-#{utils_version}.tar.gz" }
+      cached(:tarball_url) { "https://github.com/aws/efs-utils/archive/v#{utils_version}.tar.gz" }
+      cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
       cached(:bash_code) do
         <<-EFSUTILSINSTALL
       set -e
@@ -101,19 +102,21 @@ describe 'efs:install_utils' do
       context "utils package not yet installed" do
         cached(:chef_run) do
           mock_already_installed('amazon-efs-utils', utils_version, false)
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['efs']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
-            node.override['cluster']['efs_utils']['url'] = tarball_url
-            node.override['cluster']['efs_utils']['sha256'] = tarball_checksum
-            node.override['cluster']['efs_utils']['version'] = utils_version
             node.override['cluster']['sources_dir'] = source_dir
           end
-          ConvergeEfs.install_utils(runner)
+          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
         end
         cached(:node) { chef_run.node }
+
+        it 'creates sources dir' do
+          is_expected.to create_directory(source_dir).with_recursive(true)
+        end
+
+        it 'updates package repos' do
+          is_expected.to update_package_repos('update package repositories')
+        end
 
         it 'downloads tarball' do
           is_expected.to create_if_missing_remote_file(tarball_path)
@@ -134,17 +137,11 @@ describe 'efs:install_utils' do
       context "utils package already installed" do
         cached(:chef_run) do
           mock_already_installed('amazon-efs-utils', utils_version, true)
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['efs']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
-            node.override['cluster']['efs_utils']['url'] = tarball_url
-            node.override['cluster']['efs_utils']['sha256'] = tarball_checksum
-            node.override['cluster']['efs_utils']['version'] = utils_version
             node.override['cluster']['sources_dir'] = source_dir
           end
-          ConvergeEfs.install_utils(runner)
+          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
         end
         cached(:node) { chef_run.node }
 
@@ -164,11 +161,11 @@ describe 'efs:install_utils' do
     %w(redhat 8),
   ]) do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:tarball_path) { 'TARBALL PATH' }
-      cached(:tarball_url) { 'https://TARBALL/URL' }
-      cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
       cached(:source_dir) { 'SOURCE DIR' }
       cached(:utils_version) { '1.2.3' }
+      cached(:tarball_path) { "#{source_dir}/efs-utils-#{utils_version}.tar.gz" }
+      cached(:tarball_url) { "https://github.com/aws/efs-utils/archive/v#{utils_version}.tar.gz" }
+      cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
       cached(:bash_code) do
         <<-EFSUTILSINSTALL
       set -e
@@ -188,17 +185,19 @@ describe 'efs:install_utils' do
       context "utils package not yet installed" do
         cached(:chef_run) do
           mock_already_installed('amazon-efs-utils', utils_version, false)
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['efs']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
-            node.override['cluster']['efs_utils']['url'] = tarball_url
-            node.override['cluster']['efs_utils']['sha256'] = tarball_checksum
-            node.override['cluster']['efs_utils']['version'] = utils_version
             node.override['cluster']['sources_dir'] = source_dir
           end
-          ConvergeEfs.install_utils(runner)
+          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
+        end
+
+        it 'creates sources dir' do
+          is_expected.to create_directory(source_dir).with_recursive(true)
+        end
+
+        it 'updates package repos' do
+          is_expected.to update_package_repos('update package repositories')
         end
 
         it 'installs prerequisites' do
@@ -226,17 +225,11 @@ describe 'efs:install_utils' do
       context "utils package already installed" do
         cached(:chef_run) do
           mock_already_installed('amazon-efs-utils', utils_version, true)
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['efs']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
-            node.override['cluster']['efs_utils']['url'] = tarball_url
-            node.override['cluster']['efs_utils']['sha256'] = tarball_checksum
-            node.override['cluster']['efs_utils']['version'] = utils_version
             node.override['cluster']['sources_dir'] = source_dir
           end
-          ConvergeEfs.install_utils(runner)
+          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
         end
 
         it 'does not download tarball' do
@@ -256,10 +249,7 @@ describe 'efs:mount' do
     %w(HeadNode ComputeFleet).each do |node_type|
       context "on #{platform}#{version} and node type #{node_type}" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['efs']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['region'] = "REGION"
             node.override['cluster']['aws_domain'] = "DOMAIN"
             node.override['cluster']['node_type'] = node_type
@@ -279,6 +269,10 @@ describe 'efs:mount' do
           stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
           stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
           stub_command("mount | grep ' /shared_dir_3 '").and_return(true)
+        end
+
+        it 'mounts efs' do
+          is_expected.to mount_efs('mount')
         end
 
         it 'creates shared directory' do
@@ -342,10 +336,7 @@ describe 'efs:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['efs']
-        ) do |node|
+        runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
           node.override['cluster']['region'] = "REGION"
           node.override['cluster']['aws_domain'] = "DOMAIN"
         end
@@ -361,6 +352,10 @@ describe 'efs:unmount' do
       before do
         stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
         stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+      end
+
+      it 'unmounts efs' do
+        is_expected.to unmount_efs('unmount')
       end
 
       it 'unmounts efs only if mounted' do

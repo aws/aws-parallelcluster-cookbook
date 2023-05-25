@@ -14,9 +14,6 @@ suites:
         - /tag:config_nfs/
     attributes:
       resource: nfs:configure
-      cluster:
-        nfs:
-          threads: 10
       dependencies:
         - resource:nfs
   - name: cloudwatch

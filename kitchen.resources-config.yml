@@ -24,19 +24,6 @@ suites:
         - sticky_bits_configured
     attributes:
       resource: sticky_bits
-  - name: efs_configure
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - efs_utils_installed
-    attributes:
-      resource: efs
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos
-        - resource:install_packages
   - name: dns_domain_configured
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

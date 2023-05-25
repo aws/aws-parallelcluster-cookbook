@@ -76,11 +76,24 @@ describe 'nfs:configure' do
         is_expected.to configure_nfs('configure')
       end
 
-      if %w(amazon centos ubuntu).include?(platform)
+      if %w(amazon centos).include?(platform)
         it 'overrides nfs config with custom template' do
           is_expected.to create_template(server_template)
-            .with(source: 'nfs/nfs.conf.erb')
+            .with(source: 'nfs/default-nfs-kernel-server.conf.erb')
             .with(cookbook: 'aws-parallelcluster-environment')
+        end
+
+      elsif %w(ubuntu).include?(platform)
+        it 'overrides nfs config with custom template' do
+          if version.to_i >= 22
+            is_expected.to create_template(server_template)
+              .with(source: 'nfs/nfs-ubuntu22+.conf.erb')
+              .with(cookbook: 'aws-parallelcluster-environment')
+          else
+            is_expected.to create_template(server_template)
+              .with(source: 'nfs/default-nfs-kernel-server.conf.erb')
+              .with(cookbook: 'aws-parallelcluster-environment')
+          end
         end
 
       elsif platform == 'redhat'
