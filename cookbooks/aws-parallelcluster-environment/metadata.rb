@@ -3,7 +3,7 @@
 name 'aws-parallelcluster-environment'
 maintainer 'Amazon Web Services'
 license 'Apache-2.0'
-description 'AWS ParallelCluster node environment'
+description 'AWS ParallelCluster environment'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '~> 17'

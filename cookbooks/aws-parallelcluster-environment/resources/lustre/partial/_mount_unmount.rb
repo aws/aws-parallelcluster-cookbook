@@ -105,7 +105,7 @@ action_class do
       @shared_dir = self.class.make_absolute(resource.fsx_shared_dir_array[index])
       @volume_junction_path = self.class.make_absolute(resource.fsx_volume_junction_path_array[index])
 
-      if @dns_name.blank?
+      if @dns_name.strip.empty?
         # Region Building Note: DNS names have the default AWS domain (amazonaws.com) also in China and GovCloud.
         @dns_name = "#{@id}.fsx.#{node['cluster']['region']}.amazonaws.com"
       end
