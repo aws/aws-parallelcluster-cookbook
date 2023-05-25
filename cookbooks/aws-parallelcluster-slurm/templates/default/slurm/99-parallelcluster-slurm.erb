@@ -5,4 +5,4 @@ Cmnd_Alias SHUTDOWN = /usr/sbin/shutdown
 <%= node['cluster']['cluster_admin_user'] %> ALL = (root) NOPASSWD: SLURM_COMMANDS
 <%= node['cluster']['cluster_admin_user'] %> ALL = (root) NOPASSWD: SHUTDOWN
 
-<%= node['cluster']['slurm']['user'] %> ALL = (<%= node['cluster']['cluster_admin_user'] %>) NOPASSWD: SLURM_HOOKS_COMMANDS
+<%= node['cluster']['slurm']['user'] %> ALL = (<%= node['cluster']['cluster_admin_user'] %>) NOPASSWD:SETENV: SLURM_HOOKS_COMMANDS

@@ -11,8 +11,11 @@
 
 slurm_user = 'slurm'
 slurm_group = slurm_user
+slurm_resume_group = 'slurm-resume'
 slurm_license_path = '/opt/parallelcluster/licenses/slurm'
 slurm_library_folder = '/opt/slurm/lib/slurm'
+pcluster_admin = 'pcluster-admin'
+pcluster_admin_group = pcluster_admin
 
 control 'slurm_installed' do
   title 'Checks slurm has been installed'
@@ -35,9 +38,18 @@ control 'slurm_user_and_group_created' do
     it { should exist }
   end
 
+  describe group(slurm_resume_group) do
+    it { should exist }
+  end
+
   describe user(slurm_user) do
     it { should exist }
-    its('group') { should eq slurm_group }
+    its('groups') { should eq [slurm_group, slurm_resume_group] }
+  end
+
+  describe user(pcluster_admin) do
+    it { should exist }
+    its('groups') { should eq [pcluster_admin_group, slurm_resume_group] }
   end
 end
 
