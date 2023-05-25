@@ -57,3 +57,13 @@ suites:
         - /tag:install_cloudwatch/
     attributes:
       resource: cloudwatch
+  - name: lustre
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - lustre_client_installed
+        - lnet_kernel_module_enabled
+    attributes:
+      resource: lustre
