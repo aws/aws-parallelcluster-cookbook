@@ -10,6 +10,7 @@ cookbook "aws-parallelcluster-platform", path: "../aws-parallelcluster-platform"
 cookbook "aws-parallelcluster-environment", path: "../aws-parallelcluster-environment"
 cookbook "aws-parallelcluster-tests", path: "../aws-parallelcluster-tests"
 cookbook "aws-parallelcluster-install", path: "../aws-parallelcluster-install"
+cookbook "aws-parallelcluster-slurm", path: "../aws-parallelcluster-slurm"
 cookbook "aws-parallelcluster-common", path: "../aws-parallelcluster-common"
 cookbook "aws-parallelcluster-test", path: "../aws-parallelcluster-test"
 

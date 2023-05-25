@@ -14,6 +14,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+require 'chef/handler'
+
 module WriteChefError
   # this class is used to handle chef errors and write the errors into a certain file for slurm scheduler
   class WriteComputeFleetSlurmChefError < Chef::Handler
