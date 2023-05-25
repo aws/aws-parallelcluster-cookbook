@@ -159,7 +159,7 @@ suites:
   - name: stunnel
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
+      - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
         - /tag:install_stunnel/
