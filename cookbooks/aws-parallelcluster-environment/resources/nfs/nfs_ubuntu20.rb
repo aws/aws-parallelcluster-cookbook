@@ -13,15 +13,18 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nfs, platform: 'amazon', platform_version: '2'
+provides :nfs, platform: 'ubuntu', platform_version: '20.04'
+
 unified_mode true
 
+use 'partial/_install_nfs_debian'
 use 'partial/_install_nfs4_and_disable'
 use 'partial/_configure'
 
 default_action :setup
 
 action :setup do
+  action_install_nfs
   action_install_nfs4
   action_disable_start_at_boot
 end
