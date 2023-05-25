@@ -16,3 +16,6 @@ default['cluster']['slurm_plugin_console_logging']['sample_size'] = 1
 default["cluster"]["scheduler_compute_resource_name"] = nil
 
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
+
+# Default job information collection option
+default['cluster']['cluster_job_info_enabled'] = true
