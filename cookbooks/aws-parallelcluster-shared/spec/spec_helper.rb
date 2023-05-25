@@ -4,6 +4,7 @@ require 'chefspec/berkshelf'
 RSpec.configure do |c|
   c.before(:each) do
     allow(File).to receive(:exist?).and_call_original
+    allow(Dir).to receive(:exist?).and_call_original
     allow_any_instance_of(Object).to receive(:aws_domain).and_return("test_aws_domain")
     allow_any_instance_of(Object).to receive(:aws_region).and_return("test_region")
   end
