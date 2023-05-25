@@ -86,3 +86,12 @@ suites:
     attributes:
       resource: efs:install_utils
       dependencies:
+  - name: system_authentication
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_system_authentication/
+    attributes:
+      resource: system_authentication:setup

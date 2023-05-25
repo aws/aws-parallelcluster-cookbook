@@ -12,12 +12,17 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-unified_mode true
-default_action :setup
+action :configure do
+  execute 'Configure Directory Service' do
+    user 'root'
+    # Enable PAM mkhomedir module
+    command "pam-auth-update --enable mkhomedir"
+    sensitive true
+  end
+end
 
-action :setup do
-  package required_packages do
-    retries 3
-    retry_delay 5
+action_class do
+  def required_packages
+    %w(sssd sssd-tools sssd-ldap)
   end
 end

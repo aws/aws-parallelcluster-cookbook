@@ -37,7 +37,6 @@ suites:
         - node_attributes_created
         - /services_disabled_on_amazon_family/
         - /services_disabled_on_debian_family/
-        - system_authentication_packages_installed
         - /nvidia_driver/
         - /fabric_manager/
         - /tag:install/
