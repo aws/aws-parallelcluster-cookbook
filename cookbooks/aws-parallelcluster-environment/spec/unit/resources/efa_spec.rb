@@ -1,8 +1,13 @@
 require 'spec_helper'
 
+# parallelcluster default source dir defined in attributes
+source_dir = '/opt/parallelcluster/sources'
+efa_version = '1.22.1'
+efa_checksum = 'f90f3d5f59c031b9a964466b5401e86fd0429272408f6c207c3f9048254e9665'
+
 class ConvergeEfa
   def self.setup(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       efa 'setup' do
         action :setup
       end
@@ -11,7 +16,7 @@ class ConvergeEfa
 
   # Converge efa:configure
   def self.configure(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       efa 'configure' do
         action :configure
       end
@@ -19,22 +24,9 @@ class ConvergeEfa
   end
 end
 
-def mock_efa_installed(installed)
-  allow_any_instance_of(Object).to receive(:efa_installed?).and_return(installed)
-end
-
-def mock_efa_supported(supported)
-  allow_any_instance_of(Object).to receive(:efa_supported?).and_return(supported)
-end
-
-# parallelcluster default source dir defined in attributes
-source_dir = '/opt/parallelcluster/sources'
-
 describe 'efa:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:efa_version) { 'version' }
-      cached(:efa_checksum) { 'checksum' }
       cached(:prerequisites) do
         if platform == 'redhat'
           %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
@@ -45,24 +37,21 @@ describe 'efa:setup' do
         end
       end
       let(:chef_run) do
-        ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['efa']
-        ) do |node|
-          node.override['cluster']['efa']['installer_version'] = efa_version
-          node.override['cluster']['efa']['sha256'] = efa_checksum
+        runner(platform: platform, version: version, step_into: ['efa']) do |node|
           if platform == 'redhat'; node.automatic['platform_version'] = "8.7" end
         end
       end
 
       context 'when efa installed' do
         before do
-          mock_efa_installed(true)
+          stubs_for_provider('efa') do |resource|
+            allow(resource).to receive(:efa_installed?).and_return(true)
+          end
         end
 
         context 'and installer tarball does not exist' do
           before do
-            mock_file_exists('/opt/parallelcluster/sources/aws-efa-installer.tar.gz', false)
+            mock_file_exists("#{source_dir}/aws-efa-installer.tar.gz", false)
             ConvergeEfa.setup(chef_run)
           end
 
@@ -76,7 +65,6 @@ describe 'efa:setup' do
         context 'and installer tarball exists' do
           before do
             mock_file_exists("#{source_dir}/aws-efa-installer.tar.gz", true)
-            mock_efa_supported(true)
             ConvergeEfa.setup(chef_run)
           end
 
@@ -93,16 +81,20 @@ describe 'efa:setup' do
 
       context 'when efa not installed' do
         before do
-          mock_efa_installed(false)
+          stubs_for_provider('efa') do |resource|
+            allow(resource).to receive(:efa_installed?).and_return(false)
+          end
         end
 
         context 'when efa supported' do
           before do
-            mock_efa_supported(true)
+            allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
             ConvergeEfa.setup(chef_run)
           end
 
           it 'installs EFA without skipping kmod' do
+            is_expected.to create_directory(source_dir)
+            is_expected.to setup_efa('setup')
             is_expected.not_to write_log('efa installed')
             is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
@@ -119,33 +111,7 @@ describe 'efa:setup' do
       tar -xzf #{source_dir}/aws-efa-installer.tar.gz
       cd aws-efa-installer
       ./efa_installer.sh -y
-      rm -rf /aws-efa-installer
-))
-          end
-        end
-
-        context 'when efa not supported' do
-          before do
-            mock_efa_supported(false)
-            ConvergeEfa.setup(chef_run)
-          end
-
-          it 'installs EFA skipping kmod' do
-            is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
-            is_expected.to update_package_repos('update package repos')
-            is_expected.to install_package(prerequisites)
-            is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
-              .with(source: "https://efa-installer.amazonaws.com/aws-efa-installer-#{efa_version}.tar.gz")
-              .with(mode: '0644')
-              .with(retries: 3)
-              .with(retry_delay: 5)
-              .with(checksum: efa_checksum)
-            is_expected.to run_bash('install efa')
-              .with(code: %(      set -e
-      tar -xzf #{source_dir}/aws-efa-installer.tar.gz
-      cd aws-efa-installer
-      ./efa_installer.sh -y -k
-      rm -rf /aws-efa-installer
+      rm -rf #{source_dir}/aws-efa-installer
 ))
           end
         end
@@ -165,9 +131,26 @@ describe 'efa:setup' do
       ConvergeEfa.setup(runner)
     end
 
-    it "version" do
+    it "logs EFA not supported message" do
       is_expected.to write_log('EFA is not supported in this RHEL version 8.3, supported versions are >= 8.4').with_level(:warn)
-      is_expected.not_to update_package_repos('update package repos')
+    end
+
+    it "doesn't install EFA kmod" do
+      is_expected.to run_bash('install efa').with_code(%r{./efa_installer.sh -y -k})
+    end
+  end
+
+  context 'when centos on arm' do
+    cached(:chef_run) do
+      runner = ChefSpec::Runner.new(
+        platform: "centos", version: '7', step_into: ['efa']
+      )
+      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
+      ConvergeEfa.setup(runner)
+    end
+
+    it "doesn't install EFA kmod" do
+      is_expected.to run_bash('install efa').with_code(%r{./efa_installer.sh -y -k})
     end
   end
 end
@@ -176,15 +159,14 @@ describe 'efa:configure' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       let(:chef_run) do
-        ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['efa']
-        )
+        runner(platform: platform, version: version, step_into: ['efa'])
       end
 
       if %w(amazon centos redhat).include?(platform)
         it 'does nothing' do
           ConvergeEfa.configure(chef_run)
+          is_expected.to configure_efa('configure')
+          is_expected.to write_node_attributes('dump node attributes')
           is_expected.not_to apply_sysctl('kernel.yama.ptrace_scope')
         end
 

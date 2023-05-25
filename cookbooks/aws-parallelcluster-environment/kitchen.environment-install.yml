@@ -67,3 +67,12 @@ suites:
         - lnet_kernel_module_enabled
     attributes:
       resource: lustre
+  - name: efa_setup
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_efa/
+    attributes:
+      resource: efa:setup
