@@ -14,16 +14,25 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_utils do
+  package_repos 'update package repositories' do
+    action :update
+  end
+
   package prerequisites do
     retries 3
     retry_delay 5
   end
 
+  directory node['cluster']['sources_dir'] do
+    recursive true
+  end
+
   return if redhat_ubi?
 
   package_name = "amazon-efs-utils"
-  package_version = node['cluster']['efs_utils']['version']
-  efs_utils_tarball = node['cluster']['efs_utils']['tarball_path']
+  package_version = new_resource.efs_utils_version
+  efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
+  efs_utils_url = "https://github.com/aws/efs-utils/archive/v#{package_version}.tar.gz"
 
   # Do not install efs-utils if a same or newer version is already installed.
   return if already_installed?(package_name, package_version)
@@ -33,11 +42,11 @@ action :install_utils do
 
   # Get EFS Utils tarball
   remote_file efs_utils_tarball do
-    source node['cluster']['efs_utils']['url']
+    source efs_utils_url
     mode '0644'
     retries 3
     retry_delay 5
-    checksum node['cluster']['efs_utils']['sha256']
+    checksum new_resource.efs_utils_checksum
     action :create_if_missing
   end
 

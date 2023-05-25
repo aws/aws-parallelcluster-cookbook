@@ -16,8 +16,7 @@ provides :efs, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
 
-use '../partial/_get_package_version_rpm'
-use '../partial/_get_package_version'
+use 'partial/_get_package_version_rpm'
 use 'partial/_common'
 use 'partial/_redhat_based'
 use 'partial/_install_from_tar'
