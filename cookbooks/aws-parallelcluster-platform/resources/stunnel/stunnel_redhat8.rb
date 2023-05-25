@@ -15,9 +15,8 @@
 provides :stunnel, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
-unified_mode true
-default_action :setup
 
+use 'partial/_common'
 use 'partial/_setup' unless redhat_ubi?
 
 action :setup do
@@ -28,6 +27,6 @@ action_class do
   def dependencies
     # tcp_wrappers-devel has been deprecated in RHEL7 and deleted in RHEL8, however it is
     # an optional requirement not strictly necessary for either stunnel or efs-utils
-    %w()
+    %w(openssl-devel)
   end
 end

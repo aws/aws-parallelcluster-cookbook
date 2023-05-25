@@ -12,14 +12,15 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License
 
-provides :stunnel, platform: 'ubuntu'
-unified_mode true
-default_action :setup
+provides :stunnel, platform: 'centos' do |node|
+  node['platform_version'].to_i == 7
+end
 
+use 'partial/_common'
 use 'partial/_setup'
 
 action_class do
   def dependencies
-    %w(libwrap0-dev)
+    %w(openssl-devel tcp_wrappers-devel)
   end
 end
