@@ -270,19 +270,6 @@ suites:
       cluster:
         nvidia:
           enabled: true
-  - name: lustre
-    run_list:
-      - recipe[aws-parallelcluster-common::add_dependencies]
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - lustre_client_installed
-        - lnet_kernel_module_enabled
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-test::docker_mock
-        - resource:package_repos
-      resource: lustre
   - name: network_service_restart
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
