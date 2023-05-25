@@ -21,6 +21,8 @@ slurm_user = node['cluster']['slurm']['user']
 slurm_user_id = node['cluster']['slurm']['user_id']
 slurm_group = node['cluster']['slurm']['group']
 slurm_group_id = node['cluster']['slurm']['group_id']
+slurm_resume_program_group = node['cluster']['slurm']['resume_group']
+slurm_resume_program_group_id = node['cluster']['slurm']['resume_group_id']
 slurm_install_dir = node['cluster']['slurm']['install_dir']
 
 slurm_version = node['cluster']['slurm']['version']
@@ -51,6 +53,20 @@ user slurm_user do
   home "/home/#{slurm_user}"
   system true
   shell '/bin/bash'
+end
+
+# Setup slurm resume program group
+group slurm_resume_program_group do
+  comment 'slurm resume program group'
+  gid slurm_resume_program_group_id
+  system true
+end
+
+# add slurm user and pcluster-admin to slurm resume program group
+group slurm_resume_program_group do
+  action :modify
+  members [ slurm_user, node['cluster']['cluster_admin_user'] ]
+  append true
 end
 
 # Get slurm tarball

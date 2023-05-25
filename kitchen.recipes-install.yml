@@ -113,6 +113,7 @@ suites:
         - slurm_lua_support_libraries_compiled
     attributes:
       dependencies:
+        - recipe:aws-parallelcluster-platform::users
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages

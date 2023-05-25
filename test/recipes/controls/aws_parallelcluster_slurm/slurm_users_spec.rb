@@ -69,7 +69,7 @@ control 'tag:config_slurm_sudoers_correctly_defined' do
     its('content') { should match %r{Cmnd_Alias SLURM_COMMANDS = #{install_dir}/bin/scontrol, #{install_dir}/bin/sinfo} }
     its('content') { should match /#{node['cluster']['cluster_admin_user']} ALL = \(root\) NOPASSWD: SHUTDOWN/ }
     its('content') { should match %r{Cmnd_Alias SHUTDOWN = /usr/sbin/shutdown} }
-    its('content') { should match /#{node['cluster']['slurm']['user']} ALL = \(#{node['cluster']['cluster_admin_user']}\) NOPASSWD: SLURM_HOOKS_COMMANDS/ }
+    its('content') { should match /#{node['cluster']['slurm']['user']} ALL = \(#{node['cluster']['cluster_admin_user']}\) NOPASSWD:SETENV: SLURM_HOOKS_COMMANDS/ }
     its('content') { should match %r{Cmnd_Alias SLURM_HOOKS_COMMANDS = #{venv_bin}/slurm_suspend, #{venv_bin}/slurm_resume, #{venv_bin}/slurm_fleet_status_manager} } unless redhat_ubi
   end
 end
