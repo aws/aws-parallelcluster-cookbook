@@ -12,16 +12,29 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+provides :system_authentication, platform: 'redhat' do |node|
+  node['platform_version'].to_i == 8
+end
+
+use 'partial/_system_authentication_common'
+
 action :configure do
-  execute 'Enable PAM mkhomedir module' do
+  # oddjobd service is required for creating homedir
+  service "oddjobd" do
+    action %i(start enable)
+  end unless on_docker?
+
+  execute 'Configure Directory Service' do
     user 'root'
-    command "pam-auth-update --enable mkhomedir"
+    # Tell NSS, PAM to use SSSD for system authentication and identity information
+    # authconfig is a compatibility tool, replaced by authselect
+    command "authselect select sssd with-mkhomedir"
     sensitive true
-  end
+  end unless redhat_ubi?
 end
 
 action_class do
   def required_packages
-    %w(sssd sssd-tools sssd-ldap)
+    %w(sssd sssd-tools sssd-ldap authselect oddjob-mkhomedir)
   end
 end

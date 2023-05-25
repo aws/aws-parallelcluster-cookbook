@@ -37,19 +37,6 @@ suites:
       resource: dns_domain:configure
       cluster:
         dns_domain: test-domain
-  - name: system_authentication_configured
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - system_authentication_configured
-        - system_authentication_services_enabled
-    attributes:
-      resource: system_authentication:configure
-      dependencies:
-        - resource:package_repos
-        - resource:system_authentication
   - name: dcv_config
     # FIXME: breaks on Docker
     run_list:

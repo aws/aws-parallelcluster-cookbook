@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'system_authentication_packages_installed' do
+control 'tag:install_system_authentication_packages_installed' do
   title 'Check that system authentication packages are installed correctly'
 
   packages = %w(sssd sssd-tools sssd-ldap)
@@ -26,10 +26,10 @@ control 'system_authentication_packages_installed' do
   end unless os_properties.redhat_ubi?
 end
 
-control 'system_authentication_services_enabled' do
+control 'tag:config_system_authentication_services_enabled' do
   title 'Check that system authentication services are enabled and running'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   services = %w(sssd)
 
@@ -45,8 +45,10 @@ control 'system_authentication_services_enabled' do
   end
 end
 
-control 'system_authentication_configured' do
+control 'tag:config_system_authentication_configured' do
   title 'Check that system authentication is configured correctly'
+
+  only_if { !os_properties.on_docker? }
 
   describe 'Check NSS and PAM to use SSSD for system authentication and identity information'
   if os_properties.redhat8?

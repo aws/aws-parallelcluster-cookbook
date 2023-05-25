@@ -12,30 +12,15 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :system_authentication, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
-end
-
 unified_mode true
 default_action :setup
 
-action :configure do
-  # oddjobd service is required for creating homedir
-  service "oddjobd" do
-    action %i(start enable)
-  end unless virtualized?
-
-  execute 'Configure Directory Service' do
-    user 'root'
-    # Tell NSS, PAM to use SSSD for system authentication and identity information
-    # authconfig is a compatibility tool, replaced by authselect
-    command "authselect select sssd with-mkhomedir"
-    sensitive true
-  end unless redhat_ubi?
-end
-
 action :setup do
-  package %w(sssd sssd-tools sssd-ldap authselect oddjob-mkhomedir) do
+  package_repos 'update package repositories' do
+    action :update
+  end
+
+  package required_packages do
     retries 3
     retry_delay 5
   end unless redhat_ubi?
