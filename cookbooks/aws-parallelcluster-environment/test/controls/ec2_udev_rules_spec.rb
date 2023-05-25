@@ -46,7 +46,7 @@ end
 control 'tag:install_tag:config_ec2_udev_rules_ec2blkdev_service_installation' do
   title "Installation of the ec2blkdev service"
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe service('ec2blkdev') do
     it { should be_installed }
