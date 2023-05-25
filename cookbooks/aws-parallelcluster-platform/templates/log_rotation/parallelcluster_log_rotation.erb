@@ -70,6 +70,32 @@
   nodateext
 }
 <% end -%>
+<% if node['cluster']['scheduler'] == 'slurm' && node['cluster']['cluster_job_info_enabled'] -%>
+<%# job info log %>
+/var/log/parallelcluster/clusterjobinfomgtd {
+  missingok
+  notifempty
+  nodateext
+  size 50M
+  rotate 1
+  su root root
+  postrotate
+    pkill --signal=SIGUSR2 supervisord
+    echo 0
+  endscript
+  create 0644 root root
+}
+<%# jobinfo events log %>
+/var/log/parallelcluster/clusterjobinfomgtd.events {
+  rotate 1
+  size 10M
+  missingok
+  notifempty
+  copytruncate
+  su pcluster-admin pcluster-admin
+  nodateext
+}
+<% end -%>
 <% if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true' -%>
 <%# pam_ssh_key_generator log %>
 /var/log/parallelcluster/pam_ssh_key_generator.log {

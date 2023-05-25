@@ -39,7 +39,15 @@ command = <%= @dcv_auth_virtualenv_path %>/bin/python <%= @dcv_auth_user_home %>
 user = <%= @dcv_auth_user %>
 environment = HOME="<%= @dcv_auth_user_home %>",USER="<%= @dcv_auth_user %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 <% end -%>
-
+<% if node['cluster']['scheduler'] == 'slurm' && node['cluster']['cluster_job_info_enabled'] -%>
+[program:clusterjobinfomgtd]
+command = <%= node_virtualenv_path %>/bin/clusterjobinfomgtd
+user = <%= node['cluster']['cluster_admin_user'] %>
+environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
+redirect_stderr = true
+stdout_logfile = /var/log/parallelcluster/clusterjobinfomgtd
+stdout_logfile_maxbytes = 0
+<% end -%>
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
 <% if node['cluster']['scheduler'] == 'slurm' -%>
