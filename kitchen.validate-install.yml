@@ -34,9 +34,6 @@ suites:
         - cfnbootstrap_virtualenv_created
         - node_virtualenv_created
         - install_packages
-        - efa_conflicting_packages_removed
-        - efa_installed
-        - efa_prereq_packages_installed
         - efs_utils_installed
         - node_attributes_created
         - /services_disabled_on_amazon_family/

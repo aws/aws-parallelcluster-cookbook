@@ -60,7 +60,7 @@ end
 
 control 'lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
-  only_if { !os_properties.virtualized? && !os_properties.alinux2? }
+  only_if { !os_properties.on_docker? && !os_properties.alinux2? }
   describe kernel_module("lnet") do
     it { should be_loaded }
     it { should_not be_disabled }

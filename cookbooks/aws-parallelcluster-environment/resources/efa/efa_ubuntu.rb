@@ -17,10 +17,13 @@ provides :efa, platform: 'ubuntu'
 unified_mode true
 default_action :setup
 
-use 'partial/_setup'
+use 'partial/_common'
 use 'partial/_disable_ptrace_debian'
 
 action :configure do
+  node.default['cluster']['efa']['installer_version'] = new_resource.efa_version
+  node_attributes 'dump node attributes'
+
   action_disable_ptrace
 end
 
@@ -28,9 +31,7 @@ action_class do
   def conflicting_packages
     %w(libopenmpi-dev)
   end
-end
 
-action_class do
   def prerequisites
     %w(environment-modules)
   end

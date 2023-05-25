@@ -31,10 +31,6 @@ class Instance < Inspec.resource(1)
     !inspec.node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
   end
 
-  def efa_supported?
-    !inspec.os_properties.arm? || !inspec.node['cluster']['efa']['unsupported_aarch64_oses'].include?(inspec.node['cluster']['base_os'])
-  end
-
   def imds_token
     @imds_token = inspec.http('http://169.254.169.254/latest/api/token', method: 'PUT', headers: {
       "X-aws-ec2-metadata-token-ttl-seconds": 900,

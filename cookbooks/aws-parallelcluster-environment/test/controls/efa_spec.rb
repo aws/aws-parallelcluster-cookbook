@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'efa_conflicting_packages_removed' do
+control 'tag:install_efa_conflicting_packages_removed' do
   title 'Check packages conflicting with EFA are not installed'
 
   if os.redhat?
@@ -29,7 +29,7 @@ control 'efa_conflicting_packages_removed' do
   end
 end
 
-control 'efa_prereq_packages_installed' do
+control 'tag:install_efa_prereq_packages_installed' do
   title "EFA prereq packages are installed"
 
   efa_prereq_packages = if os_properties.redhat8? && !os_properties.redhat_ubi?
@@ -49,7 +49,7 @@ end
 control 'tag:config_efa_installed' do
   title 'Check EFA is installed'
 
-  only_if { !os_properties.virtualized? && instance.efa_supported? }
+  only_if { !os_properties.on_docker? && !(os_properties.centos7? && os_properties.arm?) }
 
   describe "Verify EFA Kernel module is available\n" do
     describe command("modinfo efa") do
@@ -64,5 +64,15 @@ control 'tag:config_efa_installed' do
       it { should exist }
       its('content') { should match /EFA installer version: #{node['cluster']['efa']['installer_version']}/ }
     end
+  end
+end
+
+control 'efa_debian_system_settings_configured' do
+  title 'Check debian system is correctly configured for EFA'
+
+  only_if { os.debian? && !os_properties.on_docker? }
+
+  describe kernel_parameter('kernel.yama.ptrace_scope') do
+    its('value') { should eq 0 }
   end
 end

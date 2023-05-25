@@ -6,14 +6,14 @@ describe 'lustre:mount' do
       context "on #{platform}#{version} and node type #{node_type}" do
         context 'for lustre' do
           cached(:chef_run) do
-            runner = ChefSpec::Runner.new(
+            runner = runner(
               platform: platform, version: version,
               step_into: ['lustre']
             ) do |node|
               node.override['cluster']['region'] = "REGION"
               node.override['cluster']['node_type'] = node_type
             end
-            runner.converge_dsl do
+            runner.converge_dsl('aws-parallelcluster-environment') do
               lustre 'mount' do
                 fsx_fs_id_array %w(lustre_id_1 lustre_id_2)
                 fsx_fs_type_array %w(LUSTRE LUSTRE)
@@ -90,14 +90,14 @@ describe 'lustre:mount' do
 
         context 'for filecache' do
           cached(:chef_run) do
-            runner = ChefSpec::Runner.new(
+            runner = runner(
               platform: platform, version: version,
               step_into: ['lustre']
             ) do |node|
               node.override['cluster']['region'] = "REGION"
               node.override['cluster']['node_type'] = node_type
             end
-            runner.converge_dsl do
+            runner.converge_dsl('aws-parallelcluster-environment') do
               lustre 'mount' do
                 fsx_fs_id_array %w(file_cache_id_1 file_cache_id_2)
                 fsx_fs_type_array %w(FILECACHE FILECACHE)
@@ -174,13 +174,13 @@ describe 'lustre:mount' do
 
         context 'for openzfs' do
           cached(:chef_run) do
-            runner = ChefSpec::Runner.new(
+            runner = runner(
               platform: platform, version: version,
               step_into: ['lustre']
             ) do |node|
               node.override['cluster']['region'] = "REGION"
             end
-            runner.converge_dsl do
+            runner.converge_dsl('aws-parallelcluster-environment') do
               lustre 'mount' do
                 fsx_fs_id_array %w(openzfs_id_1 openzfs_id_2)
                 fsx_fs_type_array %w(OPENZFS OPENZFS)
@@ -249,14 +249,14 @@ describe 'lustre:mount' do
 
         context 'for ontap' do
           cached(:chef_run) do
-            runner = ChefSpec::Runner.new(
+            runner = runner(
               platform: platform, version: version,
               step_into: ['lustre']
             ) do |node|
               node.override['cluster']['region'] = "REGION"
               node.override['cluster']['node_type'] = node_type
             end
-            runner.converge_dsl do
+            runner.converge_dsl('aws-parallelcluster-environment') do
               lustre 'mount' do
                 fsx_fs_id_array %w(ontap_id_1 ontap_id_2)
                 fsx_fs_type_array %w(ONTAP ONTAP)
@@ -340,13 +340,13 @@ describe 'lustre:unmount' do
     context "on #{platform}#{version}" do
       context 'for lustre' do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
+          runner = runner(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-          runner.converge_dsl do
+          runner.converge_dsl('aws-parallelcluster-environment') do
             lustre 'unmount' do
               fsx_fs_id_array %w(lustre_id_1 lustre_id_2)
               fsx_fs_type_array %w(LUSTRE LUSTRE)
@@ -392,13 +392,13 @@ describe 'lustre:unmount' do
 
       context 'for OPENZFS, ONTAP' do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
+          runner = runner(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
             node.override['cluster']['region'] = "REGION"
           end
-          runner.converge_dsl do
+          runner.converge_dsl('aws-parallelcluster-environment') do
             lustre 'unmount' do
               fsx_fs_id_array %w(openzfs_id_1 ontap_id_2)
               fsx_fs_type_array %w(OPENZFS ONTAP)
@@ -444,7 +444,7 @@ describe 'lustre:unmount' do
 
       context 'for FILECACHE' do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
+          runner = runner(
             platform: platform, version: version,
             step_into: ['lustre']
           ) do |node|
