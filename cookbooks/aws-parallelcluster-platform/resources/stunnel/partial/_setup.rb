@@ -14,7 +14,22 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :setup do
-  stunnel_tarball = node['cluster']['stunnel']['tarball_path']
+  stunnel_url = "#{node['cluster']['artifacts_s3_url']}/stunnel/stunnel-#{new_resource.stunnel_version}.tar.gz"
+  stunnel_tarball = "#{node['cluster']['sources_dir']}/stunnel-#{new_resource.stunnel_version}.tar.gz"
+
+  # Save stunnel version for InSpec tests
+  node.default['cluster']['stunnel']['version'] = new_resource.stunnel_version
+  node_attributes 'dump node attributes'
+
+  directory node['cluster']['sources_dir'] do
+    recursive true
+  end
+
+  package_repos 'update package repositories' do
+    action :update
+  end
+
+  build_tools 'Prerequisite: build tools'
 
   # Get dependencies of stunnel
   package dependencies do
@@ -24,20 +39,12 @@ action :setup do
 
   # Get stunnel tarball
   remote_file stunnel_tarball do
-    source node['cluster']['stunnel']['url']
+    source stunnel_url
     mode '0644'
     retries 3
     retry_delay 5
+    checksum new_resource.stunnel_checksum
     action :create_if_missing
-  end
-
-  # Verify tarball
-  ruby_block "verify stunnel checksum" do
-    block do
-      require 'digest'
-      checksum = Digest::SHA256.file(stunnel_tarball).hexdigest
-      raise "Downloaded stunnel package checksum #{checksum} does not match expected checksum #{node['cluster']['stunnel']['sha256']}" if checksum != node['cluster']['stunnel']['sha256']
-    end
   end
 
   # The installation procedure follows https://docs.aws.amazon.com/efs/latest/ug/upgrading-stunnel.html
@@ -46,7 +53,7 @@ action :setup do
     code <<-STUNNELINSTALL
       set -e
       tar xvfz #{stunnel_tarball}
-      cd stunnel-#{node['cluster']['stunnel']['version']}
+      cd stunnel-#{new_resource.stunnel_version}
       ./configure
       make
       if [[ -f /bin/stunnel ]]; then

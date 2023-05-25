@@ -104,19 +104,6 @@ suites:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
-  - name: stunnel
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - stunnel_installed
-    attributes:
-      resource: stunnel:setup
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos
-        - resource:install_packages
   - name: dns_domain_setup
     run_list:
       - recipe[aws-parallelcluster-slurm::test_resource]

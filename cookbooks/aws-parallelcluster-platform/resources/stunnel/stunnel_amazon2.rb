@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :stunnel, platform: 'amazon', platform_version: '2'
-unified_mode true
-default_action :setup
+
+use 'partial/_common'
 
 action :setup do
   # do nothing - in AL2 stunnel comes as part of the aws-efs-utils package

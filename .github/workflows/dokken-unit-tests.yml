@@ -155,7 +155,7 @@ jobs:
           - jwt-dependencies
           - efa-setup
           - munge
-          - stunnel-installed
+          - /stunnel-installed/
       fail-fast: false
     steps:
       - name: Check out code
