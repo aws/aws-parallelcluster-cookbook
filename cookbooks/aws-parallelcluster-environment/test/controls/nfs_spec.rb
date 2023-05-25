@@ -33,7 +33,7 @@ control 'tag:config_nfs_configured' do
   describe 'Check that the number of nfs threads is correct'
   describe bash("grep th /proc/net/rpc/nfsd | awk '{print $2}'") do
     its('exit_status') { should eq 0 }
-    its('stdout') { should cmp 10 }
+    its('stdout') { should cmp [[node['cpu']['cores'].to_i * 4, 8].max, 256].min }
   end
 end
 
