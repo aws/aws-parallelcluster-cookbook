@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :setup do
-  return if arm_instance? || !(node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+  return if arm_instance? || !_nvidia_enabled
 
   action_install_package
 end

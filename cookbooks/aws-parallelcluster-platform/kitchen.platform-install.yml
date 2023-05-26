@@ -197,4 +197,15 @@ suites:
       cluster:
         nvidia:
           enabled: yes
-
+  - name: nvidia_dcgm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::test_resource]
+    verifier:
+      controls:
+        - /tag:install_nvidia_dcgm/
+    attributes:
+      resource: nvidia_dcgm:setup
+      cluster:
+        nvidia:
+          enabled: yes

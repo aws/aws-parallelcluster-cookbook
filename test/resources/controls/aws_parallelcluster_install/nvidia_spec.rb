@@ -41,14 +41,3 @@ control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
     it { should eq "release #{expected_cuda_version}" }
   end
 end
-
-control 'tag:install_expected_nvidia_datacenter-gpu-manager_installed' do
-  only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !(os_properties.alinux2? && os_properties.arm?) && !instance.custom_ami? &&
-      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
-  end
-
-  describe package('datacenter-gpu-manager') do
-    it { should be_installed }
-  end
-end

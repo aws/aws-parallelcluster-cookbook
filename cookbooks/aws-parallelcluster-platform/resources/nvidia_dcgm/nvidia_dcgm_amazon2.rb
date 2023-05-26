@@ -12,12 +12,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_dcgm, platform: 'ubuntu'
+provides :nvidia_dcgm, platform: 'amazon', platform_version: '2'
 
 use 'partial/_nvidia_dcgm_common.rb'
 
-action :setup do
-  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
-
-  action_install_package
+def _nvidia_dcgm_enabled
+  !arm_instance? && _nvidia_enabled
 end
