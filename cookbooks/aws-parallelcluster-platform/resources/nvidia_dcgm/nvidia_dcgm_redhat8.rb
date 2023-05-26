@@ -18,8 +18,6 @@ end
 
 use 'partial/_nvidia_dcgm_common.rb'
 
-action :setup do
-  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
-
-  action_install_package
+def _nvidia_dcgm_enabled
+  _nvidia_enabled
 end
