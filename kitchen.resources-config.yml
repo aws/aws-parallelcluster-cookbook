@@ -63,20 +63,6 @@ suites:
           enabled: true
     driver:
       instance_type: g4dn.2xlarge
-  - name: nvidia_fabricmanager_config
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::test_resource]
-    verifier:
-      controls:
-        - /tag:config_.*fabricmanager/
-    attributes:
-      resource: fabric_manager:configure
-      cluster:
-        nvidia:
-          enabled: true
-    driver:
-      instance_type: g4dn.2xlarge
   - name: nvidia_gdrcopy_config
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

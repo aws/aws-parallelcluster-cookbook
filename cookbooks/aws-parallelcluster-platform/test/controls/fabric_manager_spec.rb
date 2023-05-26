@@ -10,10 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:install_expected_versions_of_nvidia_fabric_manager_installed' do
-  only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !os_properties.arm? && !instance.custom_ami? &&
-      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
-  end
+  only_if { !os_properties.arm? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
 
   describe package(node['cluster']['nvidia']['fabricmanager']['package']) do
     it { should be_installed }
@@ -23,5 +20,14 @@ control 'tag:install_expected_versions_of_nvidia_fabric_manager_installed' do
   version_lock_check = os_properties.debian_family? ? 'apt-mark showhold | grep "nvidia-fabric.*manager"' : 'yum versionlock list | grep "nvidia-fabric.*manager"'
   describe bash(version_lock_check) do
     its('exit_status') { should eq 0 }
+  end
+end
+
+control 'tag:config_nvidia_fabric_manager_enabled' do
+  only_if { instance.nvs_switch_enabled? }
+
+  describe service('nvidia-fabricmanager') do
+    it { should be_enabled }
+    it { should be_running }
   end
 end
