@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-#
-# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -12,21 +12,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-unified_mode true
-default_action :setup
+provides :nvidia_repo, platform: 'ubuntu'
 
-action :install_package do
-  # Add NVIDIA repo for fabric manager and datacenter-gpu-manager
-  nvidia_repo 'add nvidia repository' do
-    action :add
-  end
+use 'partial/_nvidia_repo_common.rb'
 
-  package 'datacenter-gpu-manager' do
-    retries 3
-    retry_delay 5
-  end
+def platform
+  "ubuntu#{node['platform_version'].delete('.')}"
+end
 
-  nvidia_repo 'remove nvidia repository' do
-    action :remove
-  end
+def repository_key
+  '3bf863cc.pub'
 end

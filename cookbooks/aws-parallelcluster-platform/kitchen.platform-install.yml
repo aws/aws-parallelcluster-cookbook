@@ -165,3 +165,24 @@ suites:
         - /tag:install_stunnel/
     attributes:
       resource: stunnel:setup
+  - name: nvidia_repo_add
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - nvidia_repo_added
+    attributes:
+      resource: nvidia_repo:add
+  - name: nvidia_repo_remove
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - nvidia_repo_removed
+    attributes:
+      resource: nvidia_repo:remove
+      dependencies:
+        - resource:nvidia_repo:add
+
