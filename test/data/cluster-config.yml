@@ -105,6 +105,7 @@ Scheduling:
     ComputeResources:
     - CapacityReservationTarget: null
       DisableSimultaneousMultithreading: false
+      DynamicNodePriority: 1000
       Efa:
         Enabled: false
         GdrSupport: false
@@ -120,6 +121,7 @@ Scheduling:
           Name: null
       SchedulableMemory: null
       SpotPrice: null
+      StaticNodePriority: 1
     ComputeSettings:
       LocalStorage:
         EphemeralVolume: null
