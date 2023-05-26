@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-#
-# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -12,11 +12,17 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :install_package do
-  package 'yum-plugin-versionlock'
+provides :fabric_manager, platform: 'centos' do |node|
+  node['platform_version'].to_i == 7
+end
 
-  package node['cluster']['nvidia']['fabricmanager']['package'] do
-    version node['cluster']['nvidia']['fabricmanager']['version']
-    action %i(install lock)
-  end
+use 'partial/_fabric_manager_common.rb'
+use 'partial/_fabric_manager_install_rhel.rb'
+
+def fabric_manager_package
+  'nvidia-fabric-manager'
+end
+
+def fabric_manager_version
+  _nvidia_driver_version
 end

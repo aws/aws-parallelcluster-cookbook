@@ -16,3 +16,11 @@ provides :fabric_manager, platform: 'ubuntu'
 
 use 'partial/_fabric_manager_common.rb'
 use 'partial/_fabric_manager_install_debian.rb'
+
+def fabric_manager_package
+  'nvidia-fabricmanager-470'
+end
+
+def fabric_manager_version
+  "#{_nvidia_driver_version}*"
+end

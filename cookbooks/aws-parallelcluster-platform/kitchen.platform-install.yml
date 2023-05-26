@@ -185,4 +185,16 @@ suites:
       resource: nvidia_repo:remove
       dependencies:
         - resource:nvidia_repo:add
+  - name: fabric_manager
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_.*fabric_manager/
+    attributes:
+      resource: fabric_manager
+      cluster:
+        nvidia:
+          enabled: yes
 

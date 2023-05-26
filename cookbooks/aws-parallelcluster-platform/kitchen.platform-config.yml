@@ -30,3 +30,19 @@ suites:
             vpc_ipv4_cidr_blocks: |
               cidr1
               cidr2
+  - name: fabric_manager
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*fabric_manager/
+    attributes:
+      resource: fabric_manager:configure
+      cluster:
+        nvidia:
+          enabled: true
+      dependencies:
+        - resource:fabric_manager:setup
+    driver:
+      instance_type: g4dn.2xlarge
