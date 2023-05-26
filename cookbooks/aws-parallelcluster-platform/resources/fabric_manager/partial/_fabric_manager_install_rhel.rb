@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-
-# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -12,9 +12,11 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :fabric_manager, platform: 'centos' do |node|
-  node['platform_version'].to_i == 7
-end
+action :install_package do
+  package 'yum-plugin-versionlock'
 
-use 'partial/_fabric_manager_common.rb'
-use 'partial/_fabric_manager_install_rhel.rb'
+  package fabric_manager_package do
+    version fabric_manager_version
+    action %i(install lock)
+  end
+end

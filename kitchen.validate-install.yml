@@ -38,5 +38,4 @@ suites:
         - /services_disabled_on_amazon_family/
         - /services_disabled_on_debian_family/
         - /nvidia_driver/
-        - /fabric_manager/
         - /tag:install/
