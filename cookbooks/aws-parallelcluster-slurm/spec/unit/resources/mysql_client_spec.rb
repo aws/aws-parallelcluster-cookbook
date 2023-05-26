@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergeMysqlClient
   def self.setup(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-slurm') do
       mysql_client 'setup' do
         action :setup
       end
@@ -10,7 +10,7 @@ class ConvergeMysqlClient
   end
 
   def self.validate(chef_run)
-    chef_run.converge_dsl do
+    chef_run.converge_dsl('aws-parallelcluster-slurm') do
       mysql_client 'validate' do
         action :validate
       end
@@ -32,13 +32,7 @@ describe 'mysql_client:setup' do
             'el/7/aarch64'
           elsif architecture == 'x86_64'
             if platform == 'ubuntu'
-              if version.to_i == 18
-                'ubuntu/18.04/x86_64'
-              elsif version.to_i == 20
-                'ubuntu/20.04/x86_64'
-              else
-                pending "unsupported ubuntu version #{version}"
-              end
+              "ubuntu/${version}/x86_64"
             else
               'el/7/x86_64'
             end
@@ -52,20 +46,15 @@ describe 'mysql_client:setup' do
           if platform == 'ubuntu'
             if version.to_i == 18
               %w(libmysqlclient-dev libmysqlclient20)
-            elsif version.to_i == 20
+            elsif version.to_i >= 20
               %w(libmysqlclient-dev libmysqlclient21)
-            else
-              pending "unsupported ubuntu version #{version}"
             end
           else
             %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat)
           end
         end
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['mysql_client']
-          ) do |node|
+          runner = runner(platform: platform, version: version, step_into: ['mysql_client']) do |node|
             node.automatic['kernel']['machine'] = architecture
             node.override['cluster']['sources_dir'] = source_dir
             node.override['cluster']['artifacts_s3_url'] = s3_url
@@ -74,7 +63,15 @@ describe 'mysql_client:setup' do
         end
         cached(:node) { chef_run.node }
 
+        it 'sets up mysql client' do
+          is_expected.to setup_mysql_client('setup')
+        end
+
         if %w(amazon centos redhat).include?(platform)
+          it 'logs MySQL archive URL' do
+            is_expected.to write_log("Downloading MySQL packages archive from #{package_archive}")
+          end
+
           it 'downloads and installs packages' do
             is_expected.to create_if_missing_remote_file(tarfile)
               .with(source: package_archive)
@@ -103,6 +100,10 @@ describe 'mysql_client:setup' do
           end
         else
           pending "Implement for #{platform}"
+        end
+
+        it 'creates sources directory' do
+          is_expected.to create_directory(source_dir)
         end
 
         it 'creates source link' do
