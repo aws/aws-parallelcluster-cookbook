@@ -32,3 +32,12 @@ suites:
         - network_service_running
     attributes:
       resource: network_service:reload
+  - name: dns_domain
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_dns_domain/
+    attributes:
+      resource: dns_domain

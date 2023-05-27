@@ -140,7 +140,6 @@ default['cluster']['custom_node_package'] = nil
 default['cluster']['custom_awsbatchcli_package'] = nil
 default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
-default['cluster']['dns_domain'] = nil
 default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']

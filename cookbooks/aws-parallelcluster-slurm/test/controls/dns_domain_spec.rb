@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'dns_domain_setup' do
+control 'tag:install_dns_domain_setup' do
   title "Checks that the we have everything to setup the dns domain"
 
   describe package('hostname') do
@@ -31,12 +31,12 @@ control 'dns_domain_configured' do
     its('content') do
       should match(dns_domain_string)
     end
-  end unless os_properties.virtualized?
+  end unless os_properties.on_docker?
 
   describe file("/etc/resolv.conf") do
     it { should exist }
     its('content') do
       should match(dns_domain_string)
     end
-  end unless os_properties.virtualized?
+  end unless os_properties.on_docker?
 end

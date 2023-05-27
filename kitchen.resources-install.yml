@@ -72,14 +72,6 @@ suites:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:install_packages
-  - name: dns_domain_setup
-    run_list:
-      - recipe[aws-parallelcluster-slurm::test_resource]
-    verifier:
-      controls:
-        - dns_domain_setup
-    attributes:
-      resource: dns_domain
   - name: dcv
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

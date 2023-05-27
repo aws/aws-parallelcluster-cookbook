@@ -24,19 +24,6 @@ suites:
         - sticky_bits_configured
     attributes:
       resource: sticky_bits
-  - name: dns_domain_configured
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-slurm::test_resource]
-    verifier:
-      controls:
-        - dns_domain_configured
-    attributes:
-      dependencies:
-        #- recipe:aws-parallelcluster-install::directories
-      resource: dns_domain:configure
-      cluster:
-        dns_domain: test-domain
   - name: dcv_config
     # FIXME: breaks on Docker
     run_list:
