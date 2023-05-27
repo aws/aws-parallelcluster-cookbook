@@ -24,7 +24,7 @@ return if node['conditions']['ami_bootstrapped']
 include_recipe 'aws-parallelcluster-install::base'
 
 # == PLATFORM - FEATURES
-include_recipe "aws-parallelcluster-install::nvidia"
+include_recipe "aws-parallelcluster-platform::nvidia"
 include_recipe "aws-parallelcluster-platform::intel_mpi"
 cloudwatch 'Install amazon-cloudwatch-agent'
 arm_pl 'Install ARM Performance Library'
