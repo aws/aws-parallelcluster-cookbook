@@ -20,6 +20,7 @@ if graphic_instance? && nvidia_installed?
   kernel_module 'nvidia-uvm' do
     action :load
   end
+
   # Make sure kernel module Nvidia-uvm is loaded at instance boot time
   cookbook_file 'nvidia.conf' do
     source 'nvidia/nvidia.conf'
@@ -28,6 +29,7 @@ if graphic_instance? && nvidia_installed?
     group 'root'
     mode '0644'
   end
+
   # Install nvidia_persistenced. See https://download.nvidia.com/XFree86/Linux-x86_64/396.51/README/nvidia-persistenced.html
   bash 'Install nvidia_persistenced' do
     cwd '/usr/share/doc/NVIDIA_GLX-1.0/samples'
