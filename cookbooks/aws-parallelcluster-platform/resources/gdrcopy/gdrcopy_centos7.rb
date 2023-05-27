@@ -12,31 +12,21 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :gdrcopy, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
+provides :gdrcopy, platform: 'centos' do |node|
+  node['platform_version'].to_i == 7
 end
 
 use 'partial/_gdrcopy_common.rb'
 use 'partial/_gdrcopy_common_rhel.rb'
 
-unified_mode true
-default_action :setup
-
-action :setup do
-  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
-  action_gdrcopy_installation
+def gdrcopy_enabled?
+  !arm_instance? && nvidia_enabled?
 end
 
-action_class do
-  def gdrcopy_build_dependencies
-    %w(dkms rpm-build make check check-devel subunit subunit-devel)
-  end
+def gdrcopy_platform
+  '.el7'
+end
 
-  def gdrcopy_platform
-    '.el8'
-  end
-
-  def gdrcopy_arch
-    arm_instance? ? 'aarch64' : 'x86_64'
-  end
+def gdrcopy_arch
+  arm_instance? ? 'arm64' : 'x86_64'
 end

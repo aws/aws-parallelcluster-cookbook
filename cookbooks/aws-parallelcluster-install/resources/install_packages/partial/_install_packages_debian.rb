@@ -26,5 +26,5 @@ action :install_kernel_source do
     package_name node['cluster']['kernel_headers_pkg']
     retries 3
     retry_delay 5
-  end
+  end unless on_docker?
 end
