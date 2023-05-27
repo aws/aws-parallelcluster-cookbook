@@ -61,3 +61,25 @@ suites:
           enabled: true
     driver:
       instance_type: g4dn.2xlarge
+  - name: nvidia_config
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::nvidia_config]
+    verifier:
+      controls:
+        - /nvidia-fabricmanager_enabled/
+        - /gdrcopy_enabled/
+        - /gdrcopy_disabled/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g4dn.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.xlarge
+    attributes:
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+      cluster:
+        nvidia:
+          enabled: true

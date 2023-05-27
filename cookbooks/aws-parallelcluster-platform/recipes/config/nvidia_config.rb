@@ -23,4 +23,4 @@ gdrcopy 'Configure gdrcopy' do
   action :configure
 end
 
-include_recipe "aws-parallelcluster-config::nvidia_uvm"
+include_recipe "aws-parallelcluster-platform::nvidia_uvm"

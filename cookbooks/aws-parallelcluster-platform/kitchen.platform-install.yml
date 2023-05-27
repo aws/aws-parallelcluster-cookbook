@@ -272,10 +272,10 @@ suites:
       cluster:
         nvidia:
           enabled: true
-  - name: nvidia_recipe
+  - name: nvidia_install
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::nvidia]
+      - recipe[aws-parallelcluster-platform::nvidia_install]
     verifier:
       controls:
         - /tag:install_.*nvidia/

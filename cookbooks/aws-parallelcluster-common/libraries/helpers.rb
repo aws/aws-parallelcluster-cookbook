@@ -51,15 +51,6 @@ def graphic_instance?
   !has_gpu.stdout.strip.empty?
 end
 
-#
-# Check if Nvidia driver is installed
-#
-def nvidia_installed?
-  nvidia_installed = ::File.exist?('/usr/bin/nvidia-smi')
-  Chef::Log.warn("Nvidia driver is not installed") unless nvidia_installed
-  nvidia_installed
-end
-
 def format_directory(dir)
   format_dir = dir.strip
   format_dir = "/#{format_dir}" unless format_dir.start_with?('/')

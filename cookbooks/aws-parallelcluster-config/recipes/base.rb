@@ -34,7 +34,7 @@ chrony 'enable chrony' do
 end
 
 # Configure Nvidia driver
-include_recipe "aws-parallelcluster-config::nvidia"
+include_recipe "aws-parallelcluster-platform::nvidia_config"
 
 # EFA runtime configuration
 efa 'Configure system for EFA' do
