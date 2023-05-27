@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -12,13 +12,34 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :install_packages, platform: 'ubuntu'
 unified_mode true
 default_action :setup
 
-use 'partial/_install_packages_debian.rb'
+property :packages, [String, Array],
+         default: lazy { default_packages },
+         description: 'Packages for the node'
+
+action :install_base_packages do
+  install_packages 'default' do
+    action :install
+  end unless redhat_ubi?
+end
+
+action :install_kernel_source do
+  package "install kernel packages" do
+    package_name kernel_source_package
+    version kernel_source_package_version
+    retries 3
+    retry_delay 5
+  end unless on_docker?
+end
+
+action :install_extras do
+  # nothing
+end
 
 action :setup do
   action_install_base_packages
-  action_install_kernel_source unless virtualized?
+  action_install_kernel_source
+  action_install_extras
 end

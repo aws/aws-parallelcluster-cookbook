@@ -1,5 +1,5 @@
 # Use the name matching the resource type
-control 'install_packages' do
+control 'tag:install_install_packages' do
   title 'Test installation of packages'
 
   only_if { !os_properties.redhat_ubi? }
