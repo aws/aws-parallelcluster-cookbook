@@ -17,7 +17,7 @@
 
 nvidia_driver 'Install nvidia driver'
 
-include_recipe "aws-parallelcluster-install::cuda"
+include_recipe "aws-parallelcluster-platform::cuda"
 
 gdrcopy 'Install Nvidia gdrcopy'
 
