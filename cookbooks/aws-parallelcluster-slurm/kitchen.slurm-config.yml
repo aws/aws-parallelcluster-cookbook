@@ -1,0 +1,18 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: dns_domain
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - dns_domain_configured
+    attributes:
+      resource: dns_domain:configure
+      cluster:
+        dns_domain: test-domain
