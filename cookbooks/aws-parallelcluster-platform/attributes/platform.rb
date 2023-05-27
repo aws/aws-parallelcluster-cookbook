@@ -8,3 +8,7 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 
 # ArmPL
 default['conditions']['arm_pl_supported'] = arm_instance?
+
+# NVidia
+default['cluster']['nvidia']['enabled'] = 'no'
+default['cluster']['nvidia']['driver_version'] = '470.182.03'

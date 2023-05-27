@@ -9,6 +9,20 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+control 'tag:install_expected_versions_of_nvidia_driver_installed' do
+  only_if do
+    !instance.custom_ami? && !(os_properties.centos7? && os_properties.arm?) &&
+      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+  end
+
+  expected_nvidia_driver_version = node['cluster']['nvidia']['driver_version']
+
+  describe "nvidia driver version is expected to be #{expected_nvidia_driver_version}" do
+    subject { command('modinfo -F version nvidia').stdout.strip }
+    it { should eq expected_nvidia_driver_version }
+  end
+end
+
 control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
   only_if do
     !(os_properties.centos7? && os_properties.arm?) && !instance.custom_ami? &&
