@@ -27,27 +27,6 @@ suites:
       dependencies:
         - resource:package_repos
       resource: install_packages
-  - name: ec2_udev_rules
-    run_list:
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - write_common_udev_configuration_files
-        - /ec2blkdev_service_installation/
-        - debian_udevd_reload_configuration
-    attributes:
-      resource: ec2_udev_rules
-  - name: mysql_client
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - /mysql_client/
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-      resource: mysql_client
   - name: nfs
     run_list:
       - recipe[aws-parallelcluster-common::test_resource]
@@ -112,45 +91,6 @@ suites:
         - dns_domain_setup
     attributes:
       resource: dns_domain
-  - name: system_authentication
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - system_authentication_packages_installed
-    attributes:
-      resource: system_authentication
-      dependencies:
-        - resource:package_repos
-  - name: arm_pl
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - /^tag:install_arm_pl/
-    driver:
-      # arm_pl can be executed only on arm instance example: c6g.large
-      instance_type: c6g.large
-    attributes:
-      resource: arm_pl
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos
-  - name: build_tools
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - build_tools_installed
-    attributes:
-      resource: build_tools
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos
-        - resource:node_attributes
   - name: dcv
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
