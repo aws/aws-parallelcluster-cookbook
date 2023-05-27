@@ -142,6 +142,17 @@ suites:
       resource: build_tools
       dependencies:
         - resource:package_repos
+  - name: install_packages
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_install_packages/
+    attributes:
+      dependencies:
+        - resource:package_repos
+      resource: install_packages
   - name: arm_pl
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

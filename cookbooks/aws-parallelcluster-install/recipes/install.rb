@@ -38,6 +38,7 @@ stunnel 'Install stunnel'
 system_authentication "Install packages required for directory service integration"
 
 # == SCHEDULER AND COMPUTE FLEET
+dns_domain "Install dns related packages" # resource logically belonging to slurm
 include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd"
 mysql_client 'Install mysql client'
 include_recipe 'aws-parallelcluster-slurm::install'

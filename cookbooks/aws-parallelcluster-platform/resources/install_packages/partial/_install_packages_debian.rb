@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -12,15 +13,26 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :install_packages, platform: 'centos' do |node|
-  node['platform_version'].to_i == 7
+action :install do
+  package new_resource.packages do
+    retries 10
+    retry_delay 5
+  end
 end
-unified_mode true
-default_action :setup
 
-use 'partial/_install_packages_rhel_amazon.rb'
+action :install_kernel_source do
+  package "install kernel packages" do
+    package_name kernel_source_package
+    version kernel_source_package_version
+    retries 3
+    retry_delay 5
+  end unless on_docker?
+end
 
-action :setup do
-  action_install_base_packages
-  action_install_kernel_source unless virtualized?
+def kernel_source_package
+  "linux-headers-#{node['kernel']['release']}"
+end
+
+def kernel_source_package_version
+  nil
 end
