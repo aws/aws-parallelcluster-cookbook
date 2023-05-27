@@ -8,23 +8,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :jwt_dependencies
-unified_mode true
+provides :munge, platform: 'ubuntu'
 
-default_action :setup
+use 'partial/_munge_actions'
 
-package_dependencies = value_for_platform(
-  'ubuntu' => {
-    'default' => 'libjansson-dev',
-  },
-  'default' => 'jansson-devel'
-)
+def prerequisites
+  %w(automake autoconf libtool libssl-dev)
+end
 
-action :setup do
-  package package_dependencies do
-    flush_cache({ before: true }) unless platform?('ubuntu') # not supported by apt
-
-    retries 3
-    retry_delay 5
-  end
+def munge_libdir
+  '/usr/lib'
 end

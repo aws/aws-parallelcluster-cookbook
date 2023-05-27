@@ -5,6 +5,15 @@ verifier:
     - test
 
 suites:
+  - name: munge
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_munge/
+    attributes:
+      resource: munge
   - name: mysql_client
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

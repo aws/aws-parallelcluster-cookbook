@@ -12,7 +12,7 @@
 munge_user = 'munge'
 munge_group = munge_user
 
-control 'munge_installed' do
+control 'tag:install_munge_installed' do
   title "Munge is downloaded and installed"
   describe file('/usr/sbin/munged') do
     it { should exist }
@@ -22,7 +22,7 @@ control 'munge_installed' do
   end
 end unless os_properties.redhat_ubi?
 
-control 'munge_user_and_group_created' do
+control 'tag:install_munge_user_and_group_created' do
   title 'Check munge user and group exist and are properly configured'
 
   describe group(munge_group) do
@@ -35,7 +35,7 @@ control 'munge_user_and_group_created' do
   end
 end unless os_properties.redhat_ubi?
 
-control 'munge_init_script_configured' do
+control 'tag:install_munge_init_script_configured' do
   title 'Check munge init script is configured with the proper user and group'
 
   describe file("/etc/init.d/munge") do
@@ -50,7 +50,7 @@ control 'munge_init_script_configured' do
   end unless os_properties.redhat_ubi?
 end
 
-control 'munge_folders_created' do
+control 'tag:install_munge_folders_created' do
   title 'Munge folder have been created'
 
   describe file('/var/log/munge') do
