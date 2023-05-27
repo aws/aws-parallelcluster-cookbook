@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-common::node_attributes' do
+describe 'aws-parallelcluster-shared::node_attributes' do
   context 'Sets up environment variables' do
     cached(:chef_run) do
       runner = ChefSpec::Runner.new(step_into: ['node_attributes']) do |node|
