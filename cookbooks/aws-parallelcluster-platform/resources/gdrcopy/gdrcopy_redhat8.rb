@@ -12,21 +12,21 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :gdrcopy, platform: 'ubuntu', platform_version: '18.04'
-
-use 'partial/_gdrcopy_common.rb'
-use 'partial/_gdrcopy_common_debian.rb'
-
-unified_mode true
-default_action :setup
-
-action :setup do
-  return unless node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true
-  action_gdrcopy_installation
+provides :gdrcopy, platform: 'redhat' do |node|
+  node['platform_version'].to_i == 8
 end
 
-action_class do
-  def gdrcopy_platform
-    'Ubuntu18_04'
-  end
+use 'partial/_gdrcopy_common.rb'
+use 'partial/_gdrcopy_common_rhel.rb'
+
+def gdrcopy_enabled?
+  nvidia_enabled?
+end
+
+def gdrcopy_platform
+  '.el8'
+end
+
+def gdrcopy_arch
+  arm_instance? ? 'aarch64' : 'x86_64'
 end

@@ -46,3 +46,18 @@ suites:
         - resource:fabric_manager:setup
     driver:
       instance_type: g4dn.2xlarge
+  - name: nvidia_gdrcopy
+    # doesn't work on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*gdrcopy/
+    attributes:
+      resource: gdrcopy:configure
+      cluster:
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge

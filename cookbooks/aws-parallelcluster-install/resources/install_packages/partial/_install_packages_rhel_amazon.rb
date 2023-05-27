@@ -28,5 +28,5 @@ action :install_kernel_source do
     version node['cluster']['kernel_devel_pkg']['version'].chomp('.x86_64').chomp('.aarch64')
     retries 3
     retry_delay 5
-  end
+  end unless on_docker?
 end

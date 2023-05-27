@@ -22,3 +22,24 @@ control 'tag:install_expected_versions_of_nvidia_gdrcopy_installed' do
     it { should eq expected_gdrcopy_version }
   end
 end
+
+control 'tag:config_gdrcopy_enabled_on_graphic_instances' do
+  only_if do
+    !(os_properties.centos7? && os_properties.arm?) &&
+      !instance.custom_ami? && instance.graphic?
+  end
+
+  describe 'gdrcopy service should be enabled' do
+    subject { command("systemctl is-enabled #{node['cluster']['nvidia']['gdrcopy']['service']} | grep enabled") }
+    its('exit_status') { should eq 0 }
+  end
+
+  if instance.gpudirect_rdma_supported?
+    ['sanity', 'copybw', 'copylat', 'apiperf -s 8'].each do |cmd|
+      describe "NVIDIA GDRCopy works properly with #{cmd}" do
+        subject { command(cmd) }
+        its('exit_status') { should eq 0 }
+      end
+    end
+  end
+end

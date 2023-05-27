@@ -25,6 +25,7 @@ action :set_compiler do
     end
     cookbook_file 'dkms/nvidia.conf' do
       source 'dkms/nvidia.conf'
+      cookbook 'aws-parallelcluster-install'
       path '/etc/dkms/nvidia.conf'
       owner 'root'
       group 'root'
