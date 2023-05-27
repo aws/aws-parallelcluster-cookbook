@@ -34,17 +34,6 @@ suites:
         - sticky_bits_configured
     attributes:
       resource: sticky_bits
-  - name: jwt_dependencies
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-slurm::test_resource]
-    verifier:
-      controls:
-        - jwt_dependencies_installed
-    attributes:
-      resource: jwt_dependencies
-      dependencies:
-        - resource:package_repos
   - name: dcv
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
