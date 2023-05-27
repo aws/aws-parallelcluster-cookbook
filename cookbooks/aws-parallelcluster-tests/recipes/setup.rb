@@ -27,14 +27,9 @@ if defined?(node['dependencies']) && node['dependencies']
     if dep.start_with?('recipe:')
       include_recipe dep.gsub('recipe:', '')
     else
-      # expected syntax for resources is resource:resource-name:optional-action
-      resource_item = dep.split(/:/)
-      if resource_item[2].nil?
-        declare_resource(resource_item[1], 'test')
-      else
-        declare_resource(resource_item[1], 'test') do
-          action resource_item[2]
-        end
+      descriptor = dep.gsub('resource:', '')
+      test_resource 'resource' do
+        descriptor descriptor
       end
     end
   end
