@@ -8,20 +8,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :munge
-unified_mode true
+provides :slurm_dependencies, platform: 'ubuntu'
 
-default_action :setup
+use 'partial/_slurm_dependencies_common'
 
-use 'partial/_munge_actions'
-
-action_class do
-  def munge_libdir
-    value_for_platform(
-      'ubuntu' => {
-        'default' => '/usr/lib',
-      },
-      'default' => '/usr/lib64'
-    )
-  end
+def dependencies
+  %w(libjson-c-dev libhttp-parser-dev libswitch-perl liblua5.3-dev)
 end
