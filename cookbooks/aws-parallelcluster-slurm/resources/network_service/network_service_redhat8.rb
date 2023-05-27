@@ -15,14 +15,10 @@
 provides :network_service, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
-unified_mode true
-default_action :restart
 
 use 'partial/_network_service'
 use 'partial/_network_service_redhat_based'
 
-action_class do
-  def network_service_name
-    'NetworkManager'
-  end
+def network_service_name
+  'NetworkManager'
 end

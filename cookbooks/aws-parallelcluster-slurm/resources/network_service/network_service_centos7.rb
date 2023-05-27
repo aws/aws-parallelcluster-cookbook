@@ -1,6 +1,4 @@
-
 # frozen_string_literal: true
-
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -16,14 +14,10 @@
 provides :network_service, platform: 'centos' do |node|
   node['platform_version'].to_i == 7
 end
-unified_mode true
-default_action :restart
 
 use 'partial/_network_service'
 use 'partial/_network_service_redhat_based'
 
-action_class do
-  def network_service_name
-    'network'
-  end
+def network_service_name
+  'network'
 end

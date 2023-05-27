@@ -18,4 +18,14 @@ unified_mode true
 default_action :restart
 
 use 'partial/_network_service'
-use 'partial/_network_service_debian'
+
+action :reload do
+  execute "apply network configuration" do
+    command "netplan apply"
+    timeout 60
+  end unless on_docker?
+end
+
+def network_service_name
+  'systemd-resolved'
+end

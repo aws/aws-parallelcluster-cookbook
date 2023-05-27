@@ -13,16 +13,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :reload do
-  return if virtualized?
-  execute "apply network configuration" do
-    command "netplan apply"
-    timeout 60
-  end
-end
+unified_mode true
+default_action :restart
 
-action_class do
-  def network_service_name
-    'systemd-resolved'
+action :restart do
+  log "Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'"
+
+  service network_service_name do
+    action :restart
+    ignore_failure true
   end
 end

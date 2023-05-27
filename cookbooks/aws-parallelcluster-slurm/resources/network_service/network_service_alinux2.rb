@@ -12,12 +12,11 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+provides :network_service, platform: 'amazon', platform_version: '2'
 
-action :restart do
-  log "Restarting '#{network_service_name}' service, platform #{node['platform']} '#{node['platform_version']}'"
+use 'partial/_network_service'
+use 'partial/_network_service_redhat_based'
 
-  service network_service_name do
-    action :restart
-    ignore_failure true
-  end
+def network_service_name
+  'network'
 end
