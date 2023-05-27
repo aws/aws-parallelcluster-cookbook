@@ -14,6 +14,15 @@ suites:
         - /tag:install_munge/
     attributes:
       resource: munge
+  - name: slurm_dependencies
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_slurm_dependencies/
+    attributes:
+      resource: slurm_dependencies
   - name: mysql_client
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
