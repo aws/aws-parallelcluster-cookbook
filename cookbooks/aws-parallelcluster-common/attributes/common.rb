@@ -11,12 +11,6 @@ default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 default['cluster']['ebs_shared_dirs'] = '/shared'
 default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
 
-# NVIDIA
-default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '470.182.03'
-default['cluster']['nvidia']['driver_url_architecture_id'] = arm_instance? ? 'aarch64' : 'x86_64'
-default['cluster']['nvidia']['driver_url'] = "https://us.download.nvidia.com/tesla/#{node['cluster']['nvidia']['driver_version']}/NVIDIA-Linux-#{node['cluster']['nvidia']['driver_url_architecture_id']}-#{node['cluster']['nvidia']['driver_version']}.run"
-
 # NICE DCV
 default['cluster']['dcv_port'] = 8443
 default['cluster']['dcv']['installed'] = 'yes'

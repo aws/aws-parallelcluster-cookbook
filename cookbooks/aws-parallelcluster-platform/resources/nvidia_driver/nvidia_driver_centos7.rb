@@ -16,16 +16,8 @@ provides :nvidia_driver, platform: 'centos' do |node|
   node['platform_version'].to_i == 7
 end
 
-unified_mode true
-
-return if arm_instance?
-
 use 'partial/_nvidia_driver_common.rb'
 
-action :rebuild_initramfs do
-  # do nothing
-end
-
-action :set_compiler do
-  # do nothing
+def nvidia_driver_enabled?
+  !arm_instance? && nvidia_enabled?
 end

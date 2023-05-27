@@ -12,7 +12,8 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_driver, platform: 'ubuntu'
+provides :nvidia_driver, platform: 'redhat' do |node|
+  node['platform_version'].to_i == 8
+end
 
 use 'partial/_nvidia_driver_common.rb'
-use 'partial/_nvidia_driver_debian.rb'
