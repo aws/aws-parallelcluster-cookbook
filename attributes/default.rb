@@ -47,7 +47,6 @@ default['cluster']['intelhpc']['packages'] = %w(intel-hpc-platform-core-intel-ru
                                                 intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
                                                 intel-hpc-platform-compat-hpc intel-hpc-platform-core-intel-runtime)
 default['cluster']['intelhpc']['version'] = '2018.0-7'
-default['cluster']['intelhpc']['dependencies'] = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e)
 default['cluster']['intelpython2']['version'] = '2019.4-088'
 default['cluster']['intelpython3']['version'] = '2020.2-902'
 
