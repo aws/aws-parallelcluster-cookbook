@@ -24,3 +24,6 @@ fetch_config 'Fetch and load cluster configs'
 include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-scheduler-plugin::config' if node['cluster']['scheduler'] == 'plugin'
 include_recipe 'aws-parallelcluster-awsbatch::config' if node['cluster']['scheduler'] == 'awsbatch'
+
+# ParallelCluster log rotation configuration
+include_recipe "aws-parallelcluster-config::log_rotation"
