@@ -8,7 +8,21 @@ default['cluster']['psxe']['archful_packages']['i486'] = %w(intel-tbb-runtime in
                                                             intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime)
 default['cluster']['psxe']['archful_packages']['x86_64'] = node['cluster']['psxe']['archful_packages']['i486'] + %w(intel-mpi-runtime)
 
-default['cluster']['intelhpc']['dependencies'] = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e)
+default['cluster']['intelhpc']['dependencies'] = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e
+                                                    at avahi-libs cups-client cups-libs dejavu-fonts-common dejavu-sans-fonts ed
+                                                    fontconfig fontpackages-filesystem freetype gettext gettext-libs hwdata libcroco
+                                                    libICE libgomp libSM libX11 libX11-common libXau
+                                                    libXcursor libXdamage libXext libXfixes libXft libXi libXinerama libXmu libXp
+                                                    libXrandr libXrender libXt libXtst libXxf86vm libdrm libglvnd libglvnd-glx
+                                                    libjpeg-turbo libpciaccess libpipeline libpng libpng12 libunistring libxcb
+                                                    libxshmfence m4 mailx man-db mariadb-libs mesa-libGL
+                                                    mesa-libGLU mesa-libglapi patch pax perl perl-Carp perl-Data-Dumper perl-Encode
+                                                    perl-Exporter perl-File-Path perl-File-Temp perl-Filter perl-Getopt-Long perl-HTTP-Tiny
+                                                    perl-PathTools perl-Pod-Escapes perl-Pod-Perldoc perl-Pod-Simple perl-Pod-Usage
+                                                    perl-Scalar-List-Utils perl-Socket perl-Storable perl-Text-ParseWords perl-Time-HiRes
+                                                    perl-Time-Local perl-constant perl-libs perl-macros perl-parent perl-podlators
+                                                    perl-threads perl-threads-shared postfix psmisc redhat-lsb-core redhat-lsb-submod-security
+                                                    spax tcl tcsh time)
 
 default['cluster']['intelhpc']['packages'] = %w(intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
                                                 intel-hpc-platform-core intel-hpc-platform-core-advisory intel-hpc-platform-hpc-cluster
