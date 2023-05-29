@@ -8,11 +8,6 @@ default['cluster']['psxe']['archful_packages']['i486'] = %w(intel-tbb-runtime in
                                                             intel-ipp-runtime intel-mkl-runtime intel-openmp-runtime)
 default['cluster']['psxe']['archful_packages']['x86_64'] = node['cluster']['psxe']['archful_packages']['i486'] + %w(intel-mpi-runtime)
 
-default['cluster']['intelhpc']['platform_name'] = value_for_platform(
-  'centos' => {
-    '~>7' => 'el7',
-  }
-)
 default['cluster']['intelhpc']['dependencies'] = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e)
 
 default['cluster']['intelhpc']['packages'] = %w(intel-hpc-platform-core-intel-runtime-advisory intel-hpc-platform-compat-hpc-advisory
