@@ -128,11 +128,14 @@ bash "install intel hpc platform" do
 end
 
 # create intelpython module directory
-directory "#{node['cluster']['modulefile_dir']}/intelpython"
+modulefile_dir = "/usr/share/Modules/modulefiles"
+directory "#{modulefile_dir}/intelpython" do
+  recursive true
+end
 
 cookbook_file 'intelpython2_modulefile' do
   source 'intel/intelpython2_modulefile'
-  path "#{node['cluster']['modulefile_dir']}/intelpython/2"
+  path "#{modulefile_dir}/intelpython/2"
   user 'root'
   group 'root'
   mode '0755'
@@ -140,20 +143,20 @@ end
 
 cookbook_file 'intelpython3_modulefile' do
   source 'intel/intelpython3_modulefile'
-  path "#{node['cluster']['modulefile_dir']}/intelpython/3"
+  path "#{modulefile_dir}/intelpython/3"
   user 'root'
   group 'root'
   mode '0755'
 end
 
 # Intel optimized math kernel library
-create_modulefile "#{node['cluster']['modulefile_dir']}/intelmkl" do
+create_modulefile "#{modulefile_dir}/intelmkl" do
   source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
   modulefile node['cluster']['psxe']['version']
 end
 
 # Intel psxe
-create_modulefile "#{node['cluster']['modulefile_dir']}/intelpsxe" do
+create_modulefile "#{modulefile_dir}/intelpsxe" do
   source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
   modulefile node['cluster']['psxe']['version']
 end
