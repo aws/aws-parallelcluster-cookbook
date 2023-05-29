@@ -166,12 +166,6 @@ def raise_os_not_match(current_os, specified_os)
         "setting in your configuration file to #{current_os}."
 end
 
-# Check if this platform supports intel's HPC platform
-#
-def platform_supports_intel_hpc_platform?
-  node['platform'] == 'centos'
-end
-
 def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
 end

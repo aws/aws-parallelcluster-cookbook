@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['conditions']['intel_hpc_platform_supported'] && node['cluster']['enable_intel_hpc_platform'] == 'true'
+return unless !arm_instance? && platform?('centos') && node['cluster']['enable_intel_hpc_platform'] == 'true'
 
 def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
   # S3 key prefix under which all packages to be downloaded reside
