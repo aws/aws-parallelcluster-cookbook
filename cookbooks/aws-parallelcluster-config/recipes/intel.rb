@@ -35,7 +35,7 @@ bash "install non-intel dependencies" do
   cwd node['cluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum install --cacheonly -y `ls #{node['cluster']['intelhpc']['dependencies'].map { |name| "#{name}*.rpm" }.join(' ')}`
+    yum localinstall --cacheonly -y `ls #{node['cluster']['intelhpc']['dependencies'].map { |name| "#{name}*.rpm" }.join(' ')}`
   INTEL
 end
 
@@ -93,7 +93,7 @@ when 'HeadNode'
     cwd node['cluster']['sources_dir']
     code <<-INTEL
       set -e
-      yum install --cacheonly -y #{intel_psxe_rpms_dir}/*
+      yum localinstall --cacheonly -y #{intel_psxe_rpms_dir}/*
     INTEL
   end
 
@@ -107,7 +107,7 @@ when 'HeadNode'
       cwd node['cluster']['sources_dir']
       code <<-INTEL
         set -e
-        yum install --cacheonly -y #{dest_path}
+        yum localinstall --cacheonly -y #{dest_path}
       INTEL
       not_if { ::File.exist?("/opt/intel/intelpython#{python_version}") }
     end
@@ -122,7 +122,7 @@ bash "install intel hpc platform" do
   cwd node['cluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum install --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
+    yum localinstall --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
   INTEL
   creates '/etc/intel-hpc-platform-release'
 end
