@@ -34,9 +34,6 @@ cloudwatch "Configure CloudWatch" do
   action :configure
 end
 
-# ParallelCluster log rotation configuration
-include_recipe "aws-parallelcluster-config::log_rotation"
-
 include_recipe "aws-parallelcluster-config::custom_actions_setup" unless on_docker?
 
 # Configure additional Networking Interfaces (if present)
