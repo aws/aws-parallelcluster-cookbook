@@ -20,7 +20,7 @@ return unless node['conditions']['intel_hpc_platform_supported'] && node['cluste
 def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
   # S3 key prefix under which all packages to be downloaded reside
   s3_base_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}"
-  intel_hpc_packages_dir_s3_url = "#{s3_base_url}/archives/IntelHPC/#{node['cluster']['intelhpc']['platform_name']}"
+  intel_hpc_packages_dir_s3_url = "#{s3_base_url}/archives/IntelHPC/el7"
   remote_file dest_path do
     source "#{intel_hpc_packages_dir_s3_url}/#{pkg_subdir_key}/#{package_basename}"
     mode '0744'
@@ -54,7 +54,7 @@ when 'HeadNode'
     # it permit recursive copies of 'directories' (even those containing only public artifacts).
     # It's installed on every node (as opposed to just the head node) because the resulting RPMs install
     # software to /etc which is not exported to the computes as /opt/intel is.
-    package_basename = "#{package_name}-#{node['cluster']['intelhpc']['version']}.#{node['cluster']['intelhpc']['platform_name']}.x86_64.rpm"
+    package_basename = "#{package_name}-#{node['cluster']['intelhpc']['version']}.el7.x86_64.rpm"
     download_intel_hpc_pkg_from_s3('hpc_platform_spec', package_basename, "#{intel_hpc_spec_rpms_dir}/#{package_basename}")
   end
 
