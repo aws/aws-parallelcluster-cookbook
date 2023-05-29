@@ -122,6 +122,16 @@ suites:
         - recipe:aws-parallelcluster-slurm::install_jwt
         - recipe:aws-parallelcluster-slurm::install_pmix
         - resource:munge
+  - name: intel_hpc_deps
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-install::intel_hpc]
+    verifier:
+      controls:
+        - tag:install_intel_hpc_dependencies_downloaded
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
   - name: nvidia
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
