@@ -10,7 +10,7 @@ default['cluster']['slurm']['user'] = 'slurm'
 default['cluster']['slurm']['user_id'] = node['cluster']['reserved_base_uid'] + 1
 default['cluster']['slurm']['group'] = node['cluster']['slurm']['user']
 default['cluster']['slurm']['group_id'] = node['cluster']['slurm']['user_id']
-default['cluster']['slurm']['resume_group'] = 'slurm-resume'
+default['cluster']['slurm']['resume_group'] = 'pcluster-slurm-resume'
 default['cluster']['slurm']['resume_group_id'] = node['cluster']['reserved_base_uid'] + 5
 
 # Munge
