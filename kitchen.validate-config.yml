@@ -3,7 +3,6 @@
 verifier:
   inspec_tests:
     - test/recipes
-    - test/resources
     - /tmp/cookbooks/aws-parallelcluster-platform/test
     - /tmp/cookbooks/aws-parallelcluster-environment/test
     - /tmp/cookbooks/aws-parallelcluster-computefleet/test
