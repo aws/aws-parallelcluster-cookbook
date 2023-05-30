@@ -17,10 +17,12 @@ provides :dcv, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_dcv_common'
-use 'partial/_debian_common'
+use 'partial/_ubuntu_common'
 
-action_class do
-  def dcv_sha256sum
-    return "6b4c6450bb39f31cb93082a2d1f3977da23d41d3f0646f71b2726e6ba632ea09" if x86_instance?
-  end
+def dcv_supported?
+  !arm_instance?
+end
+
+def dcv_sha256sum
+  '6b4c6450bb39f31cb93082a2d1f3977da23d41d3f0646f71b2726e6ba632ea09'
 end

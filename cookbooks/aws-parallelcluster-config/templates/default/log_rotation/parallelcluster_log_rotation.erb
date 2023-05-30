@@ -53,7 +53,7 @@
   copytruncate
   nodateext
 }
-<% if node['cluster']['dcv_enabled'] == "head_node" && node['conditions']['dcv_supported'] -%>
+<% if @dcv_configured -%>
 <%# dcv log %>
 /var/log/dcv/server.log
 /var/log/dcv/sessionlauncher.log

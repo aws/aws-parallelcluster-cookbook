@@ -29,12 +29,12 @@ action_class do
 
   # Function to install and activate a Python virtual env to run the the External authenticator daemon
   def install_ext_auth_virtual_env
-    return if ::File.exist?("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate")
+    return if ::File.exist?("#{dcvauth_virtualenv_path}/bin/activate")
 
     install_pyenv 'pyenv for default python version'
 
-    activate_virtual_env node['cluster']['dcv']['authenticator']['virtualenv'] do
-      pyenv_path node['cluster']['dcv']['authenticator']['virtualenv_path']
+    activate_virtual_env dcvauth_virtualenv do
+      pyenv_path dcvauth_virtualenv_path
       python_version node['cluster']['python-version']
     end
   end
@@ -44,7 +44,7 @@ action_class do
     # Override default GSettings to disable lock screen for all the users
     cookbook_file "/usr/share/glib-2.0/schemas/10_org.gnome.desktop.screensaver.gschema.override" do
       source 'dcv/10_org.gnome.desktop.screensaver.gschema.override'
-      cookbook 'aws-parallelcluster-common'
+      cookbook 'aws-parallelcluster-platform'
       owner 'root'
       group 'root'
       mode '0755'
@@ -54,10 +54,6 @@ action_class do
     execute 'Compile gsettings schema' do
       command "glib-compile-schemas /usr/share/glib-2.0/schemas/"
     end
-  end
-
-  def dcv_url
-    "https://d1uj6qtbmh3dt5.cloudfront.net/#{node['cluster']['dcv']['version'].split('-')[0]}/Servers/#{dcv_package}.tgz"
   end
 
   def post_install
@@ -107,17 +103,30 @@ action :setup do
   return if ::File.exist?("/etc/dcv/dcv.conf")
   return if redhat_ubi?
 
+  # share values with InSpec tests
+  node.default['conditions']['dcv_supported'] = dcv_supported?
+  node.default['cluster']['dcv']['authenticator']['virtualenv_path'] = dcvauth_virtualenv_path
+  node_attributes 'dump node attributes'
+
+  directory node['cluster']['scripts_dir'] do
+    recursive true
+  end
+
+  directory node['cluster']['sources_dir'] do
+    recursive true
+  end
+
   # Install pcluster_dcv_connect.sh script in all the OSes to use it for error handling
   cookbook_file "#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh" do
     source 'dcv/pcluster_dcv_connect.sh'
-    cookbook 'aws-parallelcluster-common'
+    cookbook 'aws-parallelcluster-platform'
     owner 'root'
     group 'root'
     mode '0755'
     action :create_if_missing
   end
 
-  if node['conditions']['dcv_supported']
+  if dcv_supported?
     # Setup dcv authenticator group
     group node['cluster']['dcv']['authenticator']['group'] do
       comment 'NICE DCV External Authenticator group'
@@ -137,8 +146,6 @@ action :setup do
       shell '/bin/bash'
     end
 
-    dcv_tarball = "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
-
     pre_install
 
     disable_lock_screen
@@ -147,18 +154,10 @@ action :setup do
     unless ::File.exist?(dcv_tarball)
       remote_file dcv_tarball do
         source dcv_url
+        checksum dcv_sha256sum
         mode '0644'
         retries 3
         retry_delay 5
-      end
-
-      # Verify checksum of dcv package
-      ruby_block "verify dcv checksum" do
-        block do
-          require 'digest'
-          checksum = Digest::SHA256.file(dcv_tarball).hexdigest
-          raise "Downloaded DCV package checksum #{checksum} does not match expected checksum #{dcv_sha256sum}" if checksum != dcv_sha256sum
-        end
       end
 
       bash 'extract dcv packages' do
@@ -189,8 +188,13 @@ action :setup do
 end
 
 action :configure do
-  if node['conditions']['dcv_supported'] && node['cluster']['node_type'] == "HeadNode"
-    if graphic_instance? && nvidia_installed? && dcv_gpu_accel_supported?
+  # share values with InSpec tests
+  node.default['conditions']['dcv_supported'] = dcv_supported?
+  node.default['cluster']['dcv']['authenticator']['virtualenv_path'] = dcvauth_virtualenv_path
+  node_attributes 'dump node attributes'
+
+  if dcv_supported? && node['cluster']['node_type'] == "HeadNode"
+    if dcv_gpu_accel_supported?
       # Enable graphic acceleration in dcv conf file for graphic instances.
       allow_gpu_acceleration
     else
@@ -209,7 +213,7 @@ action :configure do
     # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one
     cookbook_file "/etc/parallelcluster/generate_certificate.sh" do
       source 'dcv/generate_certificate.sh'
-      cookbook 'aws-parallelcluster-common'
+      cookbook 'aws-parallelcluster-platform'
       owner 'root'
       mode '0700'
     end
@@ -231,6 +235,7 @@ action :configure do
     template "/etc/dcv/dcv.conf" do
       action :create
       source 'dcv/dcv.conf.erb'
+      cookbook 'aws-parallelcluster-platform'
       owner 'root'
       group 'root'
       mode '0755'
@@ -246,7 +251,7 @@ action :configure do
     # Install DCV external authenticator
     cookbook_file "#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py" do
       source 'dcv/pcluster_dcv_authenticator.py'
-      cookbook 'aws-parallelcluster-common'
+      cookbook 'aws-parallelcluster-platform'
       owner node['cluster']['dcv']['authenticator']['user']
       mode '0700'
     end
@@ -256,4 +261,37 @@ action :configure do
       action %i(enable start)
     end
   end
+end
+
+def dcv_supported?
+  true
+end
+
+def dcv_pkg_arch
+  arm_instance? ? 'arm64' : 'amd64'
+end
+
+def dcv_url_arch
+  arm_instance? ? 'aarch64' : 'x86_64'
+end
+
+def dcv_gpu_accel_supported?
+  unsupported_gpu_accel_list = ["g5g."]
+  nvidia_installed? && !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
+end
+
+def dcv_url
+  "https://d1uj6qtbmh3dt5.cloudfront.net/#{node['cluster']['dcv']['version'].split('-')[0]}/Servers/#{dcv_package}.tgz"
+end
+
+def dcv_tarball
+  "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
+end
+
+def dcvauth_virtualenv
+  'dcv_authenticator_virtualenv'
+end
+
+def dcvauth_virtualenv_path
+  "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{dcvauth_virtualenv}"
 end

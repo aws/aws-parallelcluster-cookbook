@@ -24,29 +24,3 @@ suites:
         - sticky_bits_configured
     attributes:
       resource: sticky_bits
-  - name: dcv_config
-    # FIXME: breaks on Docker
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::test_resource]
-    verifier:
-      controls:
-        - /tag:config_.*dcv/
-    attributes:
-      resource: dcv:configure
-      dependencies:
-        - recipe:aws-parallelcluster-test::docker_mock
-        - recipe:aws-parallelcluster-platform::directories
-        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
-        - resource:package_repos
-        - resource:install_packages
-        - recipe:aws-parallelcluster-install::nvidia
-        - resource:dcv:setup
-        - resource:node_attributes
-      cluster:
-        node_type: HeadNode
-        dcv_enabled: "head_node"
-        nvidia:
-          enabled: true
-    driver:
-      instance_type: g4dn.2xlarge
