@@ -106,19 +106,6 @@ def get_1st_partition(device)
   partition
 end
 
-#
-# Get vpc-ipv4-cidr-blocks
-#
-def get_vpc_ipv4_cidr_blocks(eth0_mac)
-  vpc_ipv4_cidr_blocks = node['ec2']['network_interfaces_macs'][eth0_mac.downcase]['vpc_ipv4_cidr_blocks']
-  vpc_ipv4_cidr_blocks.split("\n")
-end
-
-def pip_install_package(package, version)
-  command = Mixlib::ShellOut.new("pip install #{package}==#{version}").run_command
-  Chef::Application.fatal!("Failed to install package #{package} #{version}", command.exitstatus) unless command.exitstatus.zero?
-end
-
 def ignore_failure(lookup)
   resource = resources(lookup)
   if resource.nil?
@@ -181,12 +168,6 @@ end
 
 def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
-end
-
-def get_system_users
-  cmd = Mixlib::ShellOut.new("cat /etc/passwd | cut -d: -f1")
-  cmd.run_command
-  cmd.stdout.split(/\n+/)
 end
 
 def run_command(command)

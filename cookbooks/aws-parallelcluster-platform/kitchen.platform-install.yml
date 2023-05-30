@@ -302,3 +302,16 @@ suites:
       cluster:
         nvidia:
           enabled: true
+  - name: dcv
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /^dcv/
+    attributes:
+      resource: dcv
+      cluster:
+        is_official_ami_build: true
+    driver:
+      instance_type: t3.medium

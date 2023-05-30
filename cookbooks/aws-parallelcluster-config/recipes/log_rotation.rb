@@ -20,4 +20,5 @@ template node['cluster']['pcluster_log_rotation_path'] do
   source 'log_rotation/parallelcluster_log_rotation.erb'
   mode '0644'
   only_if { node['cluster']['log_rotation_enabled'] == 'true' }
+  variables(dcv_configured: ::File.exist?("/etc/dcv/dcv.conf"))
 end

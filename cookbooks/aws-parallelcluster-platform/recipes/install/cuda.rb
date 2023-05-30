@@ -29,7 +29,8 @@ cuda_samples_version = '11.8'
 cuda_samples_url = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{cuda_samples_version}.tar.gz"
 
 node.default['cluster']['nvidia']['cuda']['version'] = cuda_version
-node_attributes 'Save cuda version for InSpec tests'
+node.default['cluster']['nvidia']['cuda_samples_version'] = cuda_samples_version
+node_attributes 'Save cuda and cuda samples versions for InSpec tests'
 
 # Get CUDA run file
 remote_file "/tmp/cuda.run" do

@@ -16,14 +16,14 @@ from datetime import datetime
 
 import pytest
 from assertpy import assert_that
-from dcv.pcluster_dcv_authenticator import (
+from pcluster_dcv_authenticator import (
     DCVAuthenticator,
     OneTimeTokenHandler,
     generate_random_token,
     generate_sha512_hash,
 )
 
-AUTH_MODULE_MOCK_PATH = "dcv.pcluster_dcv_authenticator."
+AUTH_MODULE_MOCK_PATH = "pcluster_dcv_authenticator."
 AUTH_CLASS_MOCK_PATH = AUTH_MODULE_MOCK_PATH + "DCVAuthenticator."
 
 
