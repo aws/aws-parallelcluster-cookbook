@@ -41,3 +41,23 @@ control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
     it { should eq "release #{expected_cuda_version}" }
   end
 end
+
+control 'tag:config_nvidia_uvm_and_persistenced_on_graphic_instances' do
+  only_if do
+    !(os_properties.centos7? && os_properties.arm?) &&
+      !instance.custom_ami? && instance.graphic?
+  end
+
+  describe kernel_module('nvidia_uvm') do
+    it { should be_loaded }
+  end
+
+  describe file('/etc/modules-load.d/nvidia.conf') do
+    its('content') { should include("uvm") }
+  end
+
+  describe service('nvidia-persistenced') do
+    it { should be_enabled }
+    it { should be_running }
+  end
+end

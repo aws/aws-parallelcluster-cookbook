@@ -69,6 +69,20 @@ suites:
           enabled: true
     driver:
       instance_type: g4dn.2xlarge
+  - name: nvidia_uvm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::nvidia_uvm]
+    verifier:
+      controls:
+        - /tag:config_.*nvidia_uvm/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      cluster:
+        nvidia:
+          enabled: true
   - name: nvidia_config
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
