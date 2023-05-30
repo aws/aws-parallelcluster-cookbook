@@ -30,6 +30,8 @@ control 'tag:config_system_authentication_services_enabled' do
   title 'Check that system authentication services are enabled and running'
 
   only_if { !os_properties.on_docker? }
+  only_if { node['cluster']["directory_service"]["enabled"] != 'false' }
+  only_if { node['cluster']['node_type'] != 'ComputeFleet' || node['cluster']['directory_service']['disabled_on_compute_nodes'] != 'true' }
 
   services = %w(sssd)
 
@@ -49,6 +51,8 @@ control 'tag:config_system_authentication_configured' do
   title 'Check that system authentication is configured correctly'
 
   only_if { !os_properties.on_docker? }
+  only_if { node['cluster']["directory_service"]["enabled"] != 'false' }
+  only_if { node['cluster']['node_type'] != 'ComputeFleet' || node['cluster']['directory_service']['disabled_on_compute_nodes'] != 'true' }
 
   describe 'Check NSS and PAM to use SSSD for system authentication and identity information'
   if os_properties.redhat8?
