@@ -30,8 +30,8 @@ module WriteChefError
         message_logs_to_check = \
           'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.'
         message_troubleshooting_link = 'Please refer to'\
-          ' https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html#troubleshooting-v3-get-logs'\
-          ' for more details on ParallelCluster logs.'
+          ' https://docs.aws.amazon.com/parallelcluster/latest/ug/troubleshooting-v3.html'\
+          ' for more details.'
 
         # get the failed action records using the chef function filtered_collection
         # reference: https://github.com/cinc-project/chef/blob/stable/cinc/lib/chef/action_collection.rb#L107
@@ -47,6 +47,12 @@ module WriteChefError
           "mount fsx" => "Failed to mount FSX.",
         }
 
+        # define a mapping from the mount-related resource name to the error message we would like to display
+        exception_message_mapping = {
+          "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning" =>
+            "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning."
+        }
+
         failed_action_collection.each do |action_record|
           # there might be multiple failed action records
           # here we only look at the outermost layer resource by setting nesting_level = 0
@@ -54,11 +60,12 @@ module WriteChefError
           next unless action_record.nesting_level == 0
           # we first check if it is a storage mounting error for EBS, RAID, EFS, or FSX,
           # otherwise we will get the recipe information
-          message_error = mount_message_mapping[action_record.new_resource.name] || "Failed to run chef recipe#{get_recipe_info(action_record)}."
+          message_error =exception_message_mapping[action_record.exception.message] ||
+            mount_message_mapping[action_record.new_resource.name] || "Failed to run chef recipe#{get_recipe_info(action_record)}."
           break
         end
 
-        # at the end, put together and store the full error message into the dedicated file
+        # at the end, put ßtogether and store the full error message into the dedicated file
         shell_out("echo '#{message_error} #{message_logs_to_check} #{message_troubleshooting_link}'> '#{error_file}'")
 
       end
