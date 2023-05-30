@@ -1,26 +1,6 @@
-class NilClass
-  def blank?
-    true
-  end
-end
-
-class String
-  def blank?
-    strip.empty?
-  end
-end
-
 def virtualized?
   # Check if we are running in a Docker System Tests
   node.include?('virtualized') and node['virtualized']
-end
-
-def redhat8?
-  platform?('redhat') && node['platform_version'].to_i == 8
-end
-
-def redhat_ubi?
-  virtualized? && platform?('redhat')
 end
 
 def get_metadata_token
