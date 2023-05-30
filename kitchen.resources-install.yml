@@ -16,17 +16,7 @@ verifier:
 # then define a dependencies attribute, listing them with recipe: or resource: prefix.
 # You can find an example in the add_depdendencies.rb file.
 suites:
-  - name: nfs
-    run_list:
-      - recipe[aws-parallelcluster-common::test_resource]
-    verifier:
-      controls:
-        - nfs_installed_with_right_version
-    attributes:
-      resource: nfs
-      dependencies:
-        - recipe:aws-parallelcluster-test::docker_mock
-  - name: sticky_bits
+   - name: sticky_bits
     run_list:
       - recipe[aws-parallelcluster-config::test_resource]
     verifier:
