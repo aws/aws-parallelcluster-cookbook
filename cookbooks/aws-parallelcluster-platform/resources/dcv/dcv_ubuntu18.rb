@@ -15,14 +15,12 @@
 provides :dcv, platform: 'ubuntu', platform_version: '18.04'
 
 use 'partial/_dcv_common'
-use 'partial/_debian_common'
+use 'partial/_ubuntu_common'
 
-action_class do
-  def dcv_sha256sum
-    if arm_instance?
-      "aba52420ead3cf05e547b410a479d920696144ddc2529ce7d562960747a6b1e5"
-    else
-      "c4390d87e3aa75cf163d1b7782d901019e7216a5a9aa466d582aa3415075b1ec"
-    end
+def dcv_sha256sum
+  if arm_instance?
+    'aba52420ead3cf05e547b410a479d920696144ddc2529ce7d562960747a6b1e5'
+  else
+    'c4390d87e3aa75cf163d1b7782d901019e7216a5a9aa466d582aa3415075b1ec'
   end
 end
