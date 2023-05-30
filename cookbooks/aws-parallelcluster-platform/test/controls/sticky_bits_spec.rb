@@ -1,4 +1,4 @@
-control 'sticky_bits_configured' do
+control 'tag:config_sticky_bits_configured' do
   title 'Check sticky bits configuration'
 
   if (os_properties.ubuntu2004? || os_properties.ubuntu2204?) && !os_properties.virtualized?

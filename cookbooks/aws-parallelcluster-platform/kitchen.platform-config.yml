@@ -5,6 +5,14 @@ verifier:
     - test
 
 suites:
+  - name: sticky_bits
+    run_list:
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:config_sticky_bits_configured
+    attributes:
+      resource: sticky_bits
   - name: chrony
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
