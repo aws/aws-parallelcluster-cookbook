@@ -317,7 +317,7 @@ suites:
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /^dcv/
+        - /tag:install_dcv/
     attributes:
       resource: dcv
       cluster:

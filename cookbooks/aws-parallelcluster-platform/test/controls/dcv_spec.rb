@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'dcv_connect_script_installed' do
+control 'tag:install_dcv_connect_script_installed' do
   title 'Check pcluster dcv connect script is installed'
 
   only_if { !os_properties.redhat_ubi? }
@@ -22,7 +22,7 @@ control 'dcv_connect_script_installed' do
   end
 end
 
-control 'dcv_authenticator_user_and_group_set_up' do
+control 'tag:install_dcv_authenticator_user_and_group_set_up' do
   title 'Check that dcv authenticator user and group have been set up'
 
   only_if { !os_properties.redhat_ubi? }
@@ -39,7 +39,7 @@ control 'dcv_authenticator_user_and_group_set_up' do
   end
 end
 
-control 'dcv_disabled_lock_screen' do
+control 'tag:install_dcv_disabled_lock_screen' do
   title 'Check that the lock screen has been disabled'
 
   only_if { !os_properties.redhat_ubi? }
@@ -55,7 +55,7 @@ control 'dcv_disabled_lock_screen' do
   end
 end
 
-control 'dcv_installed' do
+control 'tag:install_dcv_installed' do
   title 'Check dcv is installed'
 
   only_if { !os_properties.redhat_ubi? }
@@ -68,7 +68,7 @@ control 'dcv_installed' do
   end
 end
 
-control 'dcv_external_authenticator_virtualenv_created' do
+control 'tag:install_dcv_external_authenticator_virtualenv_created' do
   title 'Check dcv external authenticator virtual environment is created'
 
   only_if { !os_properties.redhat_ubi? }
@@ -79,7 +79,7 @@ control 'dcv_external_authenticator_virtualenv_created' do
   end
 end
 
-control 'dcv_debian_specific_setup' do
+control 'tag:install_dcv_debian_specific_setup' do
   title 'Check debian specific setup'
 
   only_if { os_properties.debian_family? }
@@ -101,9 +101,10 @@ control 'dcv_debian_specific_setup' do
   end
 end
 
-control 'dcv_rhel_and_centos_specific_setup' do
+control 'tag:install_dcv_rhel_and_centos_specific_setup' do
   title 'Check rhel and centos specific setup'
 
+  only_if { !os_properties.on_docker? }
   only_if { os_properties.centos? || os_properties.redhat? }
 
   describe command('gnome-shell --version') do
@@ -124,11 +125,11 @@ control 'dcv_rhel_and_centos_specific_setup' do
   end
 
   # As in the disable_selinux_spec we would need to skip testing that selinux is disabled
-  # in centos and redhat beacuse there we would need a reboot. As these are the two OSs that
+  # in centos and redhat because there we would need a reboot. As these are the two OSs that
   # we test in this control, we simply omit that check.
 end
 
-control 'dcv_alinux2_specific_setup' do
+control 'tag:install_dcv_alinux2_specific_setup' do
   title 'Check alinux2 specific setup'
 
   only_if { os_properties.alinux2? }
@@ -153,10 +154,10 @@ control 'dcv_alinux2_specific_setup' do
   end
 end
 
-control 'dcv_switch_runlevel_to_multiuser_target' do
+control 'tag:install_dcv_switch_runlevel_to_multiuser_target' do
   title 'Check that runlevel is switched to multi-user.target'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.on_docker? }
 
   describe bash('systemctl get-default') do
     its('exit_status') { should eq 0 }
