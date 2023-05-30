@@ -1,0 +1,13 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: awsbatch_virtualenv
+    run_list:
+      - recipe[aws-parallelcluster-awsbatch::awsbatch_virtualenv]
+    verifier:
+      controls:
+        - /awsbatch_virtualenv_created/
