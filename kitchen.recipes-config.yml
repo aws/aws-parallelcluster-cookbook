@@ -413,3 +413,18 @@ suites:
       cluster:
         nvidia:
           enabled: true
+  - name: intel_hpc
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-config::intel]
+    verifier:
+      controls:
+        - tag:config_intel_hpc_installed
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-install::intel_hpc
+        - resource:package_repos:update
+      cluster:
+        enable_intel_hpc_platform: 'true'
+        node_type: HeadNode

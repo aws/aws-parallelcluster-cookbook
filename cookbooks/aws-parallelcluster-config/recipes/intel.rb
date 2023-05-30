@@ -15,12 +15,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['conditions']['intel_hpc_platform_supported'] && node['cluster']['enable_intel_hpc_platform'] == 'true'
+return unless !arm_instance? && platform?('centos') && node['cluster']['enable_intel_hpc_platform'] == 'true'
 
 def download_intel_hpc_pkg_from_s3(pkg_subdir_key, package_basename, dest_path)
   # S3 key prefix under which all packages to be downloaded reside
   s3_base_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}"
-  intel_hpc_packages_dir_s3_url = "#{s3_base_url}/archives/IntelHPC/#{node['cluster']['intelhpc']['platform_name']}"
+  intel_hpc_packages_dir_s3_url = "#{s3_base_url}/archives/IntelHPC/el7"
   remote_file dest_path do
     source "#{intel_hpc_packages_dir_s3_url}/#{pkg_subdir_key}/#{package_basename}"
     mode '0744'
@@ -35,7 +35,7 @@ bash "install non-intel dependencies" do
   cwd node['cluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum install --cacheonly -y `ls #{node['cluster']['intelhpc']['dependencies'].map { |name| "#{name}*.rpm" }.join(' ')}`
+    yum localinstall --cacheonly -y `ls #{node['cluster']['intelhpc']['dependencies'].map { |name| "#{name}*.rpm" }.join(' ')}`
   INTEL
 end
 
@@ -54,7 +54,7 @@ when 'HeadNode'
     # it permit recursive copies of 'directories' (even those containing only public artifacts).
     # It's installed on every node (as opposed to just the head node) because the resulting RPMs install
     # software to /etc which is not exported to the computes as /opt/intel is.
-    package_basename = "#{package_name}-#{node['cluster']['intelhpc']['version']}.#{node['cluster']['intelhpc']['platform_name']}.x86_64.rpm"
+    package_basename = "#{package_name}-#{node['cluster']['intelhpc']['version']}.el7.x86_64.rpm"
     download_intel_hpc_pkg_from_s3('hpc_platform_spec', package_basename, "#{intel_hpc_spec_rpms_dir}/#{package_basename}")
   end
 
@@ -93,7 +93,7 @@ when 'HeadNode'
     cwd node['cluster']['sources_dir']
     code <<-INTEL
       set -e
-      yum install --cacheonly -y #{intel_psxe_rpms_dir}/*
+      yum localinstall --cacheonly -y #{intel_psxe_rpms_dir}/*
     INTEL
   end
 
@@ -107,7 +107,7 @@ when 'HeadNode'
       cwd node['cluster']['sources_dir']
       code <<-INTEL
         set -e
-        yum install --cacheonly -y #{dest_path}
+        yum localinstall --cacheonly -y #{dest_path}
       INTEL
       not_if { ::File.exist?("/opt/intel/intelpython#{python_version}") }
     end
@@ -122,17 +122,20 @@ bash "install intel hpc platform" do
   cwd node['cluster']['sources_dir']
   code <<-INTEL
     set -e
-    yum install --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
+    yum localinstall --cacheonly -y #{intel_hpc_spec_rpms_dir}/*
   INTEL
   creates '/etc/intel-hpc-platform-release'
 end
 
 # create intelpython module directory
-directory "#{node['cluster']['modulefile_dir']}/intelpython"
+modulefile_dir = "/usr/share/Modules/modulefiles"
+directory "#{modulefile_dir}/intelpython" do
+  recursive true
+end
 
 cookbook_file 'intelpython2_modulefile' do
   source 'intel/intelpython2_modulefile'
-  path "#{node['cluster']['modulefile_dir']}/intelpython/2"
+  path "#{modulefile_dir}/intelpython/2"
   user 'root'
   group 'root'
   mode '0755'
@@ -140,20 +143,20 @@ end
 
 cookbook_file 'intelpython3_modulefile' do
   source 'intel/intelpython3_modulefile'
-  path "#{node['cluster']['modulefile_dir']}/intelpython/3"
+  path "#{modulefile_dir}/intelpython/3"
   user 'root'
   group 'root'
   mode '0755'
 end
 
 # Intel optimized math kernel library
-create_modulefile "#{node['cluster']['modulefile_dir']}/intelmkl" do
+create_modulefile "#{modulefile_dir}/intelmkl" do
   source_path "/opt/intel/psxe_runtime/linux/mkl/bin/mklvars.sh"
   modulefile node['cluster']['psxe']['version']
 end
 
 # Intel psxe
-create_modulefile "#{node['cluster']['modulefile_dir']}/intelpsxe" do
+create_modulefile "#{modulefile_dir}/intelpsxe" do
   source_path "/opt/intel/psxe_runtime/linux/bin/psxevars.sh"
   modulefile node['cluster']['psxe']['version']
 end

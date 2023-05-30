@@ -13,6 +13,34 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+def dcv_sha256sum
+  if arm_instance?
+    '162396cad72bd357bd7aba8c01eeb60d4efec955cfec0bf456fbbd7c3801b79a'
+  else
+    '50eb5e645f549e8a51ff64ede2d85e0a8051c7d929295fe3319dc23ba73d5c1d'
+  end
+end
+
+def dcv_package
+  "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{dcv_url_arch}"
+end
+
+def dcv_server
+  "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
+def xdcv
+  "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
+def dcv_web_viewer
+  "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
+def dcv_gl
+  "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
 action_class do
   def pre_install
     # Install the desktop environment and the desktop manager packages
@@ -44,42 +72,14 @@ action_class do
       action %i(disable stop)
     end
 
-    # Disable selinux
-    selinux_state "SELinux Disabled" do
-      action :disabled
-      only_if 'which getenforce'
-    end
-  end
-
-  def dcv_sha256sum
-    if arm_instance?
-      "162396cad72bd357bd7aba8c01eeb60d4efec955cfec0bf456fbbd7c3801b79a"
-    else
-      "50eb5e645f549e8a51ff64ede2d85e0a8051c7d929295fe3319dc23ba73d5c1d"
-    end
-  end
-
-  def dcv_package
-    "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{node['cluster']['dcv']['url_architecture_id']}"
-  end
-
-  def dcv_server
-    "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
-  end
-
-  def xdcv
-    "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
-  end
-
-  def dcv_web_viewer
-    "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
+    include_recipe 'aws-parallelcluster-platform::disable_selinux'
   end
 
   def install_dcv_gl
-    dcv_gl = "#{node['cluster']['sources_dir']}/#{dcv_package}/nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{node['cluster']['dcv']['url_architecture_id']}.rpm"
-    package dcv_gl do
+    package = "#{node['cluster']['sources_dir']}/#{dcv_package}/#{dcv_gl}"
+    package package do
       action :install
-      source dcv_gl
+      source package
     end
   end
 end

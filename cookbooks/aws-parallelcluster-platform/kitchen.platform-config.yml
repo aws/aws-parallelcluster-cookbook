@@ -83,3 +83,27 @@ suites:
       cluster:
         nvidia:
           enabled: true
+  - name: dcv
+    # FIXME: breaks on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*dcv/
+    attributes:
+      resource: dcv:configure
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+        - resource:dcv:setup
+      cluster:
+        node_type: HeadNode
+        dcv_enabled: "head_node"
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge

@@ -17,20 +17,18 @@ provides :dcv, platform: 'amazon', platform_version: '2'
 use 'partial/_dcv_common'
 use 'partial/_rhel_common'
 
-action_class do
-  def pre_install
-    prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
+def prereq_packages
+  # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
+  # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
+  #       which is done in base_install.
+  %w(gdm gnome-session gnome-classic-session gnome-session-xsession
                          xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
                          gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
-                         gnu-free-serif-fonts glx-utils)
-    # gnome-terminal is not yet available AL2 ARM. Install mate-terminal instead
-    # NOTE: installing mate-terminal requires enabling the amazon-linux-extras epel topic
-    #       which is done in base_install.
-    if arm_instance?
-      prereq_packages.push('mate-terminal')
-    else
-      prereq_packages.push('gnome-terminal')
-    end
+                         gnu-free-serif-fonts glx-utils) + (arm_instance? ? %w(mate-terminal) : %w(gnome-terminal))
+end
+
+action_class do
+  def pre_install
     package prereq_packages do
       retries 10
       retry_delay 5
@@ -44,9 +42,5 @@ action_class do
       mode "0755"
       path "/etc/sysconfig/desktop"
     end
-  end
-
-  def post_install
-    # do nothing
   end
 end

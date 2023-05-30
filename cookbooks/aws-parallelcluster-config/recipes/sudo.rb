@@ -32,6 +32,7 @@ template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   mode '0644'
   variables(
     region: region,
-    aws_ca_bundle: region.start_with?('us-iso') ? "/etc/pki/#{region}/certs/ca-bundle.pem" : ''
+    aws_ca_bundle: region.start_with?('us-iso') ? "/etc/pki/#{region}/certs/ca-bundle.pem" : '',
+    dcv_configured: ::File.exist?("/etc/dcv/dcv.conf")
   )
 end
