@@ -8,7 +8,7 @@ control 'tag:install_package_repos' do
 
     describe bash('yum repolist') do
       its('exit_status') { should eq 0 }
-      its('stdout')      { should match /epel / }
+      its('stdout')      { should match %r{epel[/ ]} }
     end
 
     if os[:name] == 'redhat' && virtualization.system != 'docker'
