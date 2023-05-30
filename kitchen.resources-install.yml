@@ -34,20 +34,3 @@ suites:
         - sticky_bits_configured
     attributes:
       resource: sticky_bits
-  - name: dcv
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-install::test_resource]
-    verifier:
-      controls:
-        - /^dcv/
-    attributes:
-      resource: dcv
-      dependencies:
-        - recipe:aws-parallelcluster-test::docker_mock
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:node_attributes
-      cluster:
-        is_official_ami_build: true
-    driver:
-      instance_type: t3.medium

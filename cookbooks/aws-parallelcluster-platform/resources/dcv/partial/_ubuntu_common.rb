@@ -13,6 +13,26 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+def dcv_package
+  "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{dcv_url_arch}"
+end
+
+def dcv_server
+  "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{dcv_pkg_arch}.#{node['cluster']['base_os']}.deb"
+end
+
+def xdcv
+  "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{dcv_pkg_arch}.#{node['cluster']['base_os']}.deb"
+end
+
+def dcv_web_viewer
+  "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{dcv_pkg_arch}.#{node['cluster']['base_os']}.deb"
+end
+
+def dcv_gl
+  "/nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{dcv_pkg_arch}.#{node['cluster']['base_os']}.deb"
+end
+
 action_class do
   def pre_install
     apt_update
@@ -39,7 +59,7 @@ action_class do
   def install_package_list(packages)
     packages.each do |package_name|
       # apt package provider cannot handle the source property, so we explicitly using the command
-      execute 'apt install dcv package' do
+      execute "apt install dcv package #{package_name}" do
         command "apt -y install #{package_name}"
         retries 3
         retry_delay 5
@@ -47,30 +67,9 @@ action_class do
     end
   end
 
-  def package_architecture_id
-    arm_instance? ? 'arm64' : 'amd64'
-  end
-
-  def dcv_package
-    "nice-dcv-#{node['cluster']['dcv']['version']}-#{node['cluster']['base_os']}-#{node['cluster']['dcv']['url_architecture_id']}"
-  end
-
-  def dcv_server
-    "nice-dcv-server_#{node['cluster']['dcv']['server']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
-  end
-
-  def xdcv
-    "nice-xdcv_#{node['cluster']['dcv']['xdcv']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
-  end
-
-  def dcv_web_viewer
-    "nice-dcv-web-viewer_#{node['cluster']['dcv']['web_viewer']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
-  end
-
   def install_dcv_gl
-    dcv_gl = "#{node['cluster']['sources_dir']}/#{dcv_package}/nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{package_architecture_id}.#{node['cluster']['base_os']}.deb"
     execute 'apt install dcv-gl' do
-      command "apt -y install #{dcv_gl}"
+      command "apt -y install #{node['cluster']['sources_dir']}/#{dcv_package}/#{dcv_gl}"
     end
   end
 
