@@ -1,0 +1,20 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - ../aws-parallelcluster-awsbatch/test
+    - ../aws-parallelcluster-platform/test
+    - ../aws-parallelcluster-environment/test
+    - ../aws-parallelcluster-computefleet/test
+    - ../aws-parallelcluster-slurm/test
+    - ../aws-parallelcluster-shared/test
+
+suites:
+  - name: install
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-entrypoints::install]
+      - recipe[aws-parallelcluster-tests::tear_down]
+    verifier:
+      controls:
+        - /tag:install/

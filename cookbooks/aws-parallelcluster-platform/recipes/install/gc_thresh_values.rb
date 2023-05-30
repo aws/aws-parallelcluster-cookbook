@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-#
-# Cookbook:: aws-parallelcluster-install
-# Recipe:: gc_thresh_values
-#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the

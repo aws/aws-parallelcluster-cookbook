@@ -19,5 +19,4 @@ depends 'line', '~> 4.5.2'
 depends 'yum', '~> 7.4.0'
 depends 'yum-epel', '~> 4.5.0'
 
-depends 'aws-parallelcluster-test', '~> 3.7.0'
 depends 'aws-parallelcluster-shared', '~> 3.7.0'
