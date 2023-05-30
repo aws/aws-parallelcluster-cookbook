@@ -11,7 +11,7 @@
 
 slurm_user = 'slurm'
 slurm_group = slurm_user
-slurm_resume_group = 'slurm-resume'
+slurm_resume_group = 'pcluster-slurm-resume'
 slurm_license_path = '/opt/parallelcluster/licenses/slurm'
 slurm_library_folder = '/opt/slurm/lib/slurm'
 pcluster_admin = 'pcluster-admin'
