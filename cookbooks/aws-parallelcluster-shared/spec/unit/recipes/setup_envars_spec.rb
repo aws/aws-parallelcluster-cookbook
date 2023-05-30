@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-common::setup_envars' do
+describe 'aws-parallelcluster-shared::setup_envars' do
   context 'Sets up environment variables' do
     cached(:chef_run) do
-      ChefSpec::ServerRunner.new(platform: 'ubuntu').converge(described_recipe)
+      ChefSpec::ServerRunner.converge(described_recipe)
     end
 
     it 'Creates path.sh under /etc/profile.d' do
