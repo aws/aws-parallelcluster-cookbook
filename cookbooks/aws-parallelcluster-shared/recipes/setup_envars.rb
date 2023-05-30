@@ -31,6 +31,7 @@ end
 # This block configures PATH for the system
 template '/etc/profile.d/path.sh' do
   source 'profile/path.sh.erb'
+  cookbook 'aws-parallelcluster-shared'
   owner 'root'
   group 'root'
   mode '0755'

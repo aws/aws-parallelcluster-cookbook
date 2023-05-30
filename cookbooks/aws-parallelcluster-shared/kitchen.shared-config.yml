@@ -1,0 +1,14 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - test
+
+suites:
+  - name: setup_envars
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-shared::setup_envars]
+    verifier:
+      controls:
+        - /tag:config_setup_envars/
