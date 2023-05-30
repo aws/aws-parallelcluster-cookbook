@@ -108,7 +108,6 @@ jobs:
       matrix:
         cookbook:
           - cookbooks/aws-parallelcluster-common
-          - cookbooks/aws-parallelcluster-install
           - cookbooks/aws-parallelcluster-config
           - cookbooks/aws-parallelcluster-shared
           - cookbooks/aws-parallelcluster-platform
