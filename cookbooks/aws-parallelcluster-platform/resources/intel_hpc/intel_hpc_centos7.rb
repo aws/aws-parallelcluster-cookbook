@@ -27,7 +27,7 @@ property :dependencies, default: %w(compat-libstdc++-33 nscd nss-pam-ldapd opens
                                     libXcursor libXdamage libXext libXfixes libXft libXi libXinerama libXmu libXp
                                     libXrandr libXrender libXt libXtst libXxf86vm libdrm libglvnd libglvnd-glx
                                     libjpeg-turbo libpciaccess libpipeline libpng libpng12 libunistring libxcb
-                                    libxshmfence m4 mailx man-db mariadb-libs mesa-libGL
+                                    libxshmfence m4 mailx man-db mesa-libGL
                                     mesa-libGLU mesa-libglapi patch pax perl perl-Carp perl-Data-Dumper perl-Encode
                                     perl-Exporter perl-File-Path perl-File-Temp perl-Filter perl-Getopt-Long perl-HTTP-Tiny
                                     perl-PathTools perl-Pod-Escapes perl-Pod-Perldoc perl-Pod-Simple perl-Pod-Usage
