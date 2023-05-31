@@ -65,7 +65,7 @@ module WriteChefError
           break
         end
 
-        # at the end, put ßtogether and store the full error message into the dedicated file
+        # at the end, put together and store the full error message into the dedicated file
         shell_out("echo '#{message_error} #{message_logs_to_check} #{message_troubleshooting_link}'> '#{error_file}'")
 
       end
