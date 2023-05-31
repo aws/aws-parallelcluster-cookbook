@@ -56,3 +56,7 @@ suites:
       resource: system_authentication:configure
       dependencies:
         - resource:system_authentication:setup
+      cluster:
+        directory_service:
+          enabled: "true"
+        node_type: HeadNode

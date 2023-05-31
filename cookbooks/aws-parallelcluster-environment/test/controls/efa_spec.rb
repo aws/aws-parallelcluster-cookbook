@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:install_efa_conflicting_packages_removed' do
+control 'efa_conflicting_packages_removed' do
   title 'Check packages conflicting with EFA are not installed'
 
   if os.redhat?
