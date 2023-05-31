@@ -108,43 +108,6 @@ suites:
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
-  - name: ephemeral_drives_mounted
-    driver:
-      instance_type: d3.xlarge  # instance type with ephemeral drives
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-config::ephemeral_drives]
-    verifier:
-      controls:
-        - tag:config_ephemeral_drives_service_and_mount
-    attributes:
-      dependencies:
-        #- recipe:aws-parallelcluster-environment::ephemeral_drives
-        - recipe:aws-parallelcluster-test::cfnconfig_mock
-      cluster:
-        ebs_shared_dirs: test1,test2
-        efs_shared_dirs: ''
-        fsx_shared_dirs: ''
-        raid_shared_dir: ''
-        ephemeral_dir: /scratch
-  - name: ephemeral_drives_skipped
-    driver:
-      instance_type: d3.xlarge  # instance type with ephemeral drives
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-config::ephemeral_drives]
-    verifier:
-      controls:
-        - tag:config_ephemeral_drives_service_and_mount
-    attributes:
-      dependencies:
-        #- recipe:aws-parallelcluster-environment::ephemeral_drives
-      cluster:
-        ebs_shared_dirs: test1,test2
-        efs_shared_dirs: ''
-        fsx_shared_dirs: ''
-        raid_shared_dir: ''
-        ephemeral_dir: test1
   - name: sudo_configured
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
