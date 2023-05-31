@@ -69,12 +69,6 @@ suites:
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
-  - name: networking_configured
-    run_list:
-      - recipe[aws-parallelcluster-config::networking]
-    verifier:
-      controls:
-        - networking_configured
   - name: ephemeral_drives_mounted
     driver:
       instance_type: d3.xlarge  # instance type with ephemeral drives

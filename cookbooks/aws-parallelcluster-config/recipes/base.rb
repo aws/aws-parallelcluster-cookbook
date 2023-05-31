@@ -26,7 +26,7 @@ end
 
 include_recipe 'aws-parallelcluster-config::ephemeral_drives'
 
-include_recipe 'aws-parallelcluster-config::networking'
+include_recipe 'aws-parallelcluster-platform::networking'
 
 # Amazon Time Sync
 chrony 'enable chrony' do
