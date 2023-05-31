@@ -29,3 +29,20 @@ default['cluster']['dcv']['server']['version'] = '2023.0.15022-1'
 default['cluster']['dcv']['xdcv']['version'] = '2023.0.547-1'
 default['cluster']['dcv']['gl']['version'] = '2023.0.1027-1'
 default['cluster']['dcv']['web_viewer']['version'] = '2023.0.15022-1'
+
+# OpenSSH settings for AWS ParallelCluster instances
+default['openssh']['server']['protocol'] = '2'
+default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
+default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
+default['openssh']['server']['password_authentication'] = 'no'
+default['openssh']['server']['gssapi_authentication'] = 'yes'
+default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
+default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
+default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
+default['openssh']['client']['gssapi_authentication'] = 'yes'
+default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
+# Disable StrictHostKeyChecking for target host in the cluster VPC
+default['openssh']['client']['  _strict_host_key_checking'] = 'no'
+# Do not store server key in the know hosts file to avoid scaling clashing
+# that is when an new host gets the same IP of a previously terminated host
+default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'

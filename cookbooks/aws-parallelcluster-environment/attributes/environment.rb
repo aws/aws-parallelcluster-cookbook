@@ -3,3 +3,30 @@ default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 
 
 # CloudWatch
 default['cluster']['log_group_name'] = "NONE"
+
+# ParallelCluster internal variables to configure active directory service
+default['cluster']["directory_service"]["domain_name"] = nil
+default['cluster']["directory_service"]["domain_addr"] = nil
+default['cluster']["directory_service"]["password_secret_arn"] = nil
+default['cluster']["directory_service"]["domain_read_only_user"] = nil
+default['cluster']["directory_service"]["ldap_tls_ca_cert"] = nil
+default['cluster']["directory_service"]["ldap_tls_req_cert"] = nil
+default['cluster']["directory_service"]["ldap_access_filter"] = nil
+default['cluster']["directory_service"]["generate_ssh_keys_for_users"] = nil
+default['cluster']['directory_service']['additional_sssd_configs'] = nil
+default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
+
+# Other ParallelCluster internal variables
+default['cluster']['volume_fs_type'] = 'ext4'
+default['cluster']['efs_shared_dirs'] = ''
+default['cluster']['efs_fs_ids'] = ''
+default['cluster']['efs_encryption_in_transits'] = ''
+default['cluster']['efs_iam_authorizations'] = ''
+default['cluster']['fsx_shared_dirs'] = ''
+default['cluster']['fsx_fs_ids'] = ''
+default['cluster']['fsx_dns_names'] = ''
+default['cluster']['fsx_mount_names'] = ''
+default['cluster']['fsx_fs_types'] = ''
+default['cluster']['fsx_volume_junction_paths'] = ''
+default['cluster']['raid_type'] = ''
+default['cluster']['raid_vol_ids'] = ''
