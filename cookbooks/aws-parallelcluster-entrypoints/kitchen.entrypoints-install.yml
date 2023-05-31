@@ -10,7 +10,7 @@ verifier:
     - cookbooks/aws-parallelcluster-slurm/test
 
 suites:
-  - name: install
+  - name: entrypoints_install
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-entrypoints::install]
