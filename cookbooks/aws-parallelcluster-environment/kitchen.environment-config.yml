@@ -71,7 +71,7 @@ suites:
         - tag:config_ephemeral_drives_service_and_mount
     attributes:
       dependencies:
-        - recipe:aws-parallelcluster-environment::cfnconfig_mock
+        - recipe:aws-parallelcluster-environment::mock_cfnconfig
       cluster:
         ebs_shared_dirs: test1,test2
         efs_shared_dirs: ''
