@@ -1,4 +1,4 @@
-control 'lustre_client_installed' do
+control 'tag:install_lustre_client_installed' do
   title "Verify that lustre client is installed"
   minimal_lustre_client_version = '2.12'
   if (os_properties.centos? && inspec.os.release.to_f >= 7.5) || os_properties.redhat?
@@ -58,7 +58,7 @@ control 'lustre_client_installed' do
   end
 end
 
-control 'lnet_kernel_module_enabled' do
+control 'tag:install_lustre_lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
   only_if { !os_properties.on_docker? && !os_properties.alinux2? }
   describe kernel_module("lnet") do

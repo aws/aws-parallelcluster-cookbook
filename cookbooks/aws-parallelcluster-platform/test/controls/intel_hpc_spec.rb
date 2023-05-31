@@ -12,7 +12,7 @@
 control 'tag:install_intel_hpc_dependencies_downloaded' do
   title 'Checks Intel HPC dependencies have been downloaded'
 
-  only_if { os_properties.centos7? }
+  only_if { os_properties.centos7? && !os_properties.arm? }
 
   node['cluster']['intelhpc']['dependencies'].each do |package|
     # The rpm can be in the sources_dir folder or already installed as dependency of other packages
@@ -25,6 +25,7 @@ end
 control 'tag:config_intel_hpc_configured' do
   title 'Checks Intel HPC packages have been installed'
 
+  only_if { !os_properties.on_docker? }
   only_if { os_properties.centos7? && !os_properties.arm? && node['cluster']['enable_intel_hpc_platform'] == 'true' }
 
   # Verify non-intel dependencies are installed

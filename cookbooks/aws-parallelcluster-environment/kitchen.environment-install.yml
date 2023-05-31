@@ -63,8 +63,7 @@ suites:
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - lustre_client_installed
-        - lnet_kernel_module_enabled
+        - /tag:install_lustre/
     attributes:
       resource: lustre
   - name: efa_setup
