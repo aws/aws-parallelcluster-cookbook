@@ -9,10 +9,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'networking_configured' do
+control 'tag:config_networking' do
   title 'Check that networking has been configured'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe kernel_parameter('net.core.somaxconn') do
     its('value') { should eq 65_535 }
