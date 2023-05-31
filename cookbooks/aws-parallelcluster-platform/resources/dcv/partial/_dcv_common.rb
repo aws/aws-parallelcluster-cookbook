@@ -277,7 +277,7 @@ end
 
 def dcv_gpu_accel_supported?
   unsupported_gpu_accel_list = ["g5g."]
-  nvidia_installed? && !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
+  graphic_instance? && nvidia_installed? && !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
 end
 
 def dcv_url
