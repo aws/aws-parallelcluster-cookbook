@@ -167,9 +167,9 @@ describe 'dcv:dcv_gpu_accel_supported?' do
         chef_run.find_resource('dcv', 'nothing')
       end
 
-      context 'nvidia not installed' do
+      context 'when not graphic instance' do
         before do
-          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
+          allow_any_instance_of(Object).to receive(:graphic_instance?).and_return(false)
         end
 
         it 'returns false' do
@@ -177,22 +177,38 @@ describe 'dcv:dcv_gpu_accel_supported?' do
         end
       end
 
-      context 'nvidia installed' do
+      context 'when graphic instance' do
         before do
-          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+          allow_any_instance_of(Object).to receive(:graphic_instance?).and_return(true)
         end
 
-        context('and instance type is g5g') do
-          before { node.override['ec2']['instance_type'] = 'g5g.any' }
+        context 'and nvidia not installed' do
+          before do
+            allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
+          end
+
           it 'returns false' do
             expect(resource.dcv_gpu_accel_supported?).to eq(false)
           end
         end
 
-        context('and instance type is not g5g') do
-          before { node.override['ec2']['instance_type'] = 'c5c.any' }
-          it 'returns true' do
-            expect(resource.dcv_gpu_accel_supported?).to eq(true)
+        context 'and nvidia installed' do
+          before do
+            allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+          end
+
+          context('and instance type is g5g') do
+            before { node.override['ec2']['instance_type'] = 'g5g.any' }
+            it 'returns false' do
+              expect(resource.dcv_gpu_accel_supported?).to eq(false)
+            end
+          end
+
+          context('and instance type is not g5g') do
+            before { node.override['ec2']['instance_type'] = 'c5c.any' }
+            it 'returns true' do
+              expect(resource.dcv_gpu_accel_supported?).to eq(true)
+            end
           end
         end
       end
