@@ -50,7 +50,7 @@ module WriteChefError
         # define a mapping from the exception information to the error message we would like to display
         exception_message_mapping = {
           "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning" =>
-            "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning."
+            "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning.",
         }
 
         failed_action_collection.each do |action_record|
@@ -60,8 +60,9 @@ module WriteChefError
           next unless action_record.nesting_level == 0
           # we first check if it is a storage mounting error for EBS, RAID, EFS, or FSX,
           # otherwise we will get the recipe information
-          message_error =exception_message_mapping[action_record.exception.message] ||
-            mount_message_mapping[action_record.new_resource.name] || "Failed to run chef recipe#{get_recipe_info(action_record)}."
+          message_error = exception_message_mapping[
+            action_record.exception.message] || mount_message_mapping[
+            action_record.new_resource.name] || "Failed to run chef recipe#{get_recipe_info(action_record)}."
           break
         end
 
