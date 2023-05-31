@@ -47,7 +47,7 @@ module WriteChefError
           "mount fsx" => "Failed to mount FSX.",
         }
 
-        # define a mapping from the mount-related resource name to the error message we would like to display
+        # define a mapping from the exception information to the error message we would like to display
         exception_message_mapping = {
           "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning" =>
             "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning."
