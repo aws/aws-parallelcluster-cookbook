@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'pmix_installed' do
+control 'tag:install_pmix_installed' do
   title 'Checks PMIx has been installed'
 
   describe file("/opt/pmix") do
@@ -21,7 +21,7 @@ control 'pmix_installed' do
   end unless os_properties.redhat_ubi?
 end
 
-control 'pmix_library_shared' do
+control 'tag:install_pmix_library_shared' do
   title 'Checks PMIx shared library is part of the runtime search path'
 
   describe file("/etc/ld.so.conf.d/pmix.conf") do

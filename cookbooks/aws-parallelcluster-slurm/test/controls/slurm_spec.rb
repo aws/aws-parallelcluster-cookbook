@@ -11,13 +11,13 @@
 
 slurm_user = 'slurm'
 slurm_group = slurm_user
-slurm_resume_group = 'pcluster-slurm-resume'
+slurm_share_group = 'pcluster-slurm-share'
 slurm_license_path = '/opt/parallelcluster/licenses/slurm'
 slurm_library_folder = '/opt/slurm/lib/slurm'
 pcluster_admin = 'pcluster-admin'
 pcluster_admin_group = pcluster_admin
 
-control 'slurm_installed' do
+control 'tag:install_slurm_installed' do
   title 'Checks slurm has been installed'
 
   only_if { !os_properties.redhat_ubi? }
@@ -31,29 +31,29 @@ control 'slurm_installed' do
   end
 end
 
-control 'slurm_user_and_group_created' do
+control 'tag:install_slurm_user_and_group_created' do
   title 'Check slurm user and group exist and are properly configured'
 
   describe group(slurm_group) do
     it { should exist }
   end
 
-  describe group(slurm_resume_group) do
+  describe group(slurm_share_group) do
     it { should exist }
   end
 
   describe user(slurm_user) do
     it { should exist }
-    its('groups') { should eq [slurm_group, slurm_resume_group] }
+    its('groups') { should eq [slurm_group, slurm_share_group] }
   end
 
   describe user(pcluster_admin) do
     it { should exist }
-    its('groups') { should eq [pcluster_admin_group, slurm_resume_group] }
+    its('groups') { should eq [pcluster_admin_group, slurm_share_group] }
   end
 end
 
-control 'slurm_licence_configured' do
+control 'tag:install_slurm_licence_configured' do
   title 'Checks slurm licences folder has the required files'
 
   only_if { !os_properties.redhat_ubi? }
@@ -95,7 +95,7 @@ control 'slurm_licence_configured' do
   end
 end
 
-control 'slurm_shared_libraries_compiled' do
+control 'tag:install_slurm_shared_libraries_compiled' do
   title 'Checks that all required slurm shared libraries were compiled'
 
   only_if { !os_properties.redhat_ubi? }
@@ -129,7 +129,7 @@ control 'slurm_shared_libraries_compiled' do
   end
 end
 
-control 'slurm_library_shared' do
+control 'tag:install_slurm_library_shared' do
   title 'Checks slurm shared library is part of the runtime search path'
 
   only_if { !os_properties.redhat_ubi? }
@@ -145,8 +145,9 @@ control 'slurm_library_shared' do
   end
 end
 
-control 'pam_slurm_adopt_module_installed' do
+control 'tag:install_slurm_pam_slurm_adopt_module_installed' do
   title "Check that pam_slurm_adopt has been built and installed"
+  only_if { !os_properties.redhat_ubi? }
 
   lib_security_folder = '/lib/security'
   if os.redhat?
@@ -175,7 +176,7 @@ control 'pam_slurm_adopt_module_installed' do
   end
 end
 
-control 'slurm_lua_support_libraries_compiled' do
+control 'tag:install_slurm_lua_support_libraries_compiled' do
   title 'Checks that all slurm libraries required for lua were compiled'
 
   only_if { !os_properties.redhat_ubi? }

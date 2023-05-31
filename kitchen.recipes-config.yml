@@ -13,7 +13,6 @@ verifier:
   inspec_tests:
     # recipe tests will use controls from these directories
     - test/recipes
-    - test/resources
 
 lifecycle:
   <% %w(post_create pre_converge pre_destroy).each do |op| %>
@@ -27,6 +26,46 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-config::cfnconfig_mixed]
+    verifier:
+      controls:
+        - cfnconfig_file_configuration
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+  - name: clusterstatusmgtd_init_slurm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-config::clusterstatusmgtd_init_slurm]
+    verifier:
+      controls:
+        - clusterstatusmgtd_init_slurm_config
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::sudo_install
+      cluster:
+        node_type: 'HeadNode'
+  - name: mount_shared
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-config::mount_shared]
+    verifier:
+      controls:
+        - mount_shared_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-test::export_directories_mock
+      cluster:
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
   - name: fs_update
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
