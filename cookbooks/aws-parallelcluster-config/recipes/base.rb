@@ -24,7 +24,7 @@ nfs "Configure NFS" do
   action :configure
 end
 
-include_recipe 'aws-parallelcluster-config::ephemeral_drives'
+include_recipe 'aws-parallelcluster-environment::ephemeral_drives'
 
 include_recipe 'aws-parallelcluster-platform::networking'
 

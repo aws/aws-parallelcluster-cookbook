@@ -1,4 +1,4 @@
-return if virtualized?
+return if on_docker?
 
 directory '/etc/parallelcluster/'
 

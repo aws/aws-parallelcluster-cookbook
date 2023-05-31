@@ -52,3 +52,54 @@ control 'tag:install_ephemeral_service_after_network_config' do
     its('mode') { should cmp '0644' }
   end
 end
+
+control 'tag:config_ephemeral_drives_service_and_mount' do
+  title 'Check ephemeral drives service is running'
+
+  only_if { !os_properties.on_docker? }
+
+  def ephemeral_mount_collide_with_shared_storage?
+    %w(ebs efs fsx).each do |fs|
+      if node['cluster']["#{fs}_shared_dirs"].split(',').include? node['cluster']['ephemeral_dir']
+        return true
+      end
+    end
+    false
+  end
+
+  if ephemeral_mount_collide_with_shared_storage?
+    # If the ephemeral drive mount dir collide with a shared mount dir the service has to be stopped and disabled
+    describe service('setup-ephemeral') do
+      it { should be_installed }
+      it { should_not be_enabled }
+      it { should_not be_running }
+    end
+  else
+    describe service('setup-ephemeral') do
+      it { should be_installed }
+      it { should be_enabled }
+    end
+
+    ephemeral_devs = instance.get_ephemeral_devs
+
+    ephemeral_devs.each do |dev|
+      describe file("/dev/#{dev}") do
+        its('type') { should eq :block_device }
+      end
+    end
+
+    if ephemeral_devs.any?
+      describe directory(node['cluster']['ephemeral_dir']) do
+        it { should exist }
+        it { should be_writable }
+        it { should be_mounted }
+      end
+      describe mount(node['cluster']['ephemeral_dir']) do
+        it { should be_mounted }
+        its('device') { should eq '/dev/mapper/vg.01-lv_ephemeral' }
+        its('type') { should eq 'ext4' }
+        its('options') { should include 'rw' }
+      end
+    end
+  end
+end
