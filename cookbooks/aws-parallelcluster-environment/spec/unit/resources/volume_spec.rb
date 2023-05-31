@@ -11,8 +11,8 @@ describe 'volume:mount' do
     context "on #{platform}#{version}" do
       context "when not yet mounted" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version, step_into: ['volume'])
-          runner.converge_dsl do
+          runner = runner(platform: platform, version: version, step_into: ['volume'])
+          runner.converge_dsl('aws-parallelcluster-environment') do
             volume 'mount' do
               shared_dir 'SHARED_DIR'
               device 'DEVICE'
@@ -28,6 +28,10 @@ describe 'volume:mount' do
 
         before do
           stub_command("mount | grep ' /SHARED_DIR '").and_return(false)
+        end
+
+        it 'mounts volume' do
+          is_expected.to mount_volume('mount')
         end
 
         it 'creates shared directory' do
@@ -72,8 +76,8 @@ describe 'volume:mount' do
 
       context "when mounted and some properties are not set" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version, step_into: ['volume'])
-          runner.converge_dsl do
+          runner = runner(platform: platform, version: version, step_into: ['volume'])
+          runner.converge_dsl('aws-parallelcluster-environment') do
             volume 'mount' do
               shared_dir '/SHARED_DIR'
               device 'DEVICE'
@@ -120,11 +124,8 @@ describe 'volume:unmount' do
     context "on #{platform}#{version}" do
       context "when not mounted" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['volume']
-          )
-          runner.converge_dsl do
+          runner = runner(platform: platform, version: version, step_into: ['volume'])
+          runner.converge_dsl('aws-parallelcluster-environment') do
             volume 'unmount' do
               shared_dir 'SHARED_DIR'
               action :unmount
@@ -153,11 +154,8 @@ describe 'volume:unmount' do
 
       context "when mounted" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(
-            platform: platform, version: version,
-            step_into: ['volume']
-          )
-          runner.converge_dsl do
+          runner = runner(platform: platform, version: version, step_into: ['volume'])
+          runner.converge_dsl('aws-parallelcluster-environment') do
             volume 'unmount' do
               shared_dir '/SHARED_DIR'
               action :unmount
@@ -170,6 +168,7 @@ describe 'volume:unmount' do
         end
 
         it 'unmounts volume' do
+          is_expected.to unmount_volume('unmount')
           is_expected.to run_execute('unmount volume')
             .with(command: "umount -fl /SHARED_DIR")
         end
@@ -192,17 +191,18 @@ describe 'volume:attach' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['volume']
-        )
+        runner = runner(platform: platform, version: version, step_into: ['volume'])
         allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return('/cookbook_venv')
-        runner.converge_dsl do
+        runner.converge_dsl('aws-parallelcluster-environment') do
           volume 'attach' do
             volume_id 'volumeid'
             action :attach
           end
         end
+      end
+
+      it 'creates ruby block waiting for the volume' do
+        is_expected.to nothing_ruby_block('sleeping_for_volume_volumeid')
       end
 
       it 'waits for the block device to be ready to attach the volume' do
@@ -213,6 +213,7 @@ describe 'volume:attach' do
       end
 
       it 'attaches the volume' do
+        is_expected.to attach_volume('attach')
         is_expected.to run_execute('attach_volume_volumeid')
           .with(command: "/cookbook_venv/bin/python /usr/local/sbin/manageVolume.py --volume-id volumeid --attach")
           .with(creates: '/dev/disk/by-ebs-volumeid/volumeid')
@@ -225,12 +226,9 @@ describe 'volume:detach' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['volume']
-        )
+        runner = runner(platform: platform, version: version, step_into: ['volume'])
         allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return('/cookbook_venv')
-        runner.converge_dsl do
+        runner.converge_dsl('aws-parallelcluster-environment') do
           volume 'detach' do
             volume_id 'volumeid'
             action :detach
@@ -239,6 +237,7 @@ describe 'volume:detach' do
       end
 
       it 'detaches the volume' do
+        is_expected.to detach_volume('detach')
         is_expected.to run_execute('detach_volume_volumeid')
           .with(command: "/cookbook_venv/bin/python /usr/local/sbin/manageVolume.py --volume-id volumeid --detach")
       end
@@ -251,11 +250,9 @@ describe 'volume:export' do
     context "on #{platform}#{version}" do
       cached(:vpc_cidr_list) { 'vpc_cidr_list' }
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['volume']
-        )
-        runner.converge_dsl do
+        allow_any_instance_of(Object).to receive(:get_vpc_cidr_list).and_return(vpc_cidr_list)
+        runner = runner(platform: platform, version: version, step_into: ['volume'])
+        runner.converge_dsl('aws-parallelcluster-environment') do
           volume 'export' do
             shared_dir 'raid_shared_dir '
             action :export
@@ -263,8 +260,8 @@ describe 'volume:export' do
         end
       end
 
-      before do
-        allow_any_instance_of(Object).to receive(:get_vpc_cidr_list).and_return(vpc_cidr_list)
+      it 'exports volume' do
+        is_expected.to export_volume('export')
       end
 
       it 'exports shared dir' do
@@ -281,11 +278,8 @@ describe 'volume:unexport' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
-          platform: platform, version: version,
-          step_into: ['volume']
-        )
-        runner.converge_dsl do
+        runner = runner(platform: platform, version: version, step_into: ['volume'])
+        runner.converge_dsl('aws-parallelcluster-environment') do
           volume 'unexport' do
             shared_dir 'raid_shared_dir '
             action :unexport
@@ -300,6 +294,7 @@ describe 'volume:unexport' do
       end
 
       it 'unexports volume' do
+        is_expected.to unexport_volume('unexport')
         is_expected.to run_execute("unexport volume")
           .with(command: "exportfs -ra")
       end
