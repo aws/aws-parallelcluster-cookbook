@@ -137,7 +137,7 @@ control 'tag:install_dcv_alinux2_specific_setup' do
   prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
                        xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
                        gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
-                       gnu-free-serif-fonts glx-utils gnome-terminal)
+                       gnu-free-serif-fonts glx-utils) + (os_properties.arm? ? %w(mate-terminal) : %w(gnome-terminal))
 
   prereq_packages.each do |pkg|
     describe package(pkg) do
