@@ -18,4 +18,4 @@ echo "** KITCHEN_YAML: $KITCHEN_YAML"
 echo "** KITCHEN_GLOBAL_YAML: $KITCHEN_GLOBAL_YAML"
 echo "kitchen $*"
 
-cd "${KITCHEN_COOKBOOK_PATH}" && kitchen "$@"
+kitchen "$@"
