@@ -86,7 +86,7 @@ suites:
         - tag:config_ephemeral_drives_service_and_mount
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::ephemeral_drives
+        #- recipe:aws-parallelcluster-environment::ephemeral_drives
         - recipe:aws-parallelcluster-test::cfnconfig_mock
       cluster:
         ebs_shared_dirs: test1,test2
@@ -105,7 +105,7 @@ suites:
         - tag:config_ephemeral_drives_service_and_mount
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::ephemeral_drives
+        #- recipe:aws-parallelcluster-environment::ephemeral_drives
       cluster:
         ebs_shared_dirs: test1,test2
         efs_shared_dirs: ''
@@ -154,7 +154,7 @@ suites:
       iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::directories
+        #- recipe:aws-parallelcluster-platform::directories
         #- resource:package_repos
         - recipe:aws-parallelcluster-test::docker_mock
         #- resource:install_packages
@@ -205,7 +205,7 @@ suites:
       privileged: true # required to set hostname
     attributes:
       dependencies:
-        #- recipe:aws-parallelcluster-install::directories
+        #- recipe:aws-parallelcluster-platform::directories
         #- resource:dns_domain:setup
       cluster:
         node_type: HeadNode

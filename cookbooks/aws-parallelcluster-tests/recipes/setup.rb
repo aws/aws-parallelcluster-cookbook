@@ -7,8 +7,8 @@
 
 #- name: resource_with_deps
 #  run_list:
-#    - recipe[aws-parallelcluster::add_dependencies]
-#    - recipe[aws-parallelcluster-install::test_resource_or_recipe_to_test]
+#    - recipe[aws-parallelcluster-tests::setup]
+#    - recipe[aws-parallelcluster-platform::test_resource_or_recipe_to_test]
 #  verifier:
 #    controls:
 #      - resource_control_name
