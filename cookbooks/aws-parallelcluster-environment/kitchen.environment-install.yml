@@ -2,7 +2,7 @@
 verifier:
   name: inspec
   inspec_tests:
-    - test
+    - cookbooks/aws-parallelcluster-environment/test
 
 suites:
   - name: isolated

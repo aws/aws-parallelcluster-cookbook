@@ -2,12 +2,12 @@
 verifier:
   name: inspec
   inspec_tests:
-    - ../aws-parallelcluster-awsbatch/test
-    - ../aws-parallelcluster-platform/test
-    - ../aws-parallelcluster-environment/test
-    - ../aws-parallelcluster-computefleet/test
-    - ../aws-parallelcluster-slurm/test
-    - ../aws-parallelcluster-shared/test
+    - cookbooks/aws-parallelcluster-awsbatch/test
+    - cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-environment/test
+    - cookbooks/aws-parallelcluster-platform/test
+    - cookbooks/aws-parallelcluster-shared/test
+    - cookbooks/aws-parallelcluster-slurm/test
 
 suites:
   - name: install

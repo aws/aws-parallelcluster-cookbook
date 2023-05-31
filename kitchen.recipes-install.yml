@@ -13,7 +13,6 @@ verifier:
   inspec_tests:
     # recipe tests will use controls from these directories
     - test/recipes
-    - test/resources
 
 lifecycle:
   <% %w(post_create pre_converge pre_destroy).each do |op| %>
