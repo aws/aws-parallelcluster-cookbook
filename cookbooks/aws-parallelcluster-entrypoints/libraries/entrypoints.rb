@@ -15,5 +15,5 @@ def ami_bootstrapped?
     end
   end
 
-  version != '' && (node['cluster']['skip_install_recipes'] == 'yes' || node['cluster']['skip_install_recipes'] == true)
+  version != '' && !(node['cluster']['skip_install_recipes'] == 'no' || node['cluster']['skip_install_recipes'] == false)
 end
