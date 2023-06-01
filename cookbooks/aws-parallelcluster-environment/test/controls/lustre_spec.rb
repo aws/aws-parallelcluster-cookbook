@@ -38,8 +38,7 @@ control 'tag:install_lustre_client_installed' do
       its('version') { should cmp >= minimal_lustre_client_version }
     end
 
-    kernel_release = os_properties.ubuntu2004? ? '5.15.0-1028-aws' : '5.4.0-1092-aws'
-    describe package("lustre-client-modules-#{kernel_release}") do
+    describe package("lustre-client-modules-#{node['cluster']['kernel_release']}") do
       it { should be_installed }
       its('version') { should cmp >= minimal_lustre_client_version }
     end
