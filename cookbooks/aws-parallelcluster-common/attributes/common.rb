@@ -1,7 +1,5 @@
 # Common attributes shared between multiple cookbooks
 
-default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
-
 # Base dir
 
 default['cluster']['head_node_home_path'] = '/home'
