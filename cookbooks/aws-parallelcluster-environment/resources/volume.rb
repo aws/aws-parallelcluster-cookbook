@@ -48,7 +48,8 @@ action :mount do
   end
 
   # Add volume to /etc/fstab
-  mount shared_dir do
+  mount "mount #{shared_dir}" do
+    mount_point shared_dir
     device(new_resource.device)
     fstype(new_resource.fstype)
     device_type new_resource.device_type
@@ -60,7 +61,8 @@ action :mount do
     not_if "mount | grep ' #{shared_dir} '"
   end
 
-  mount shared_dir do
+  mount "enable #{shared_dir}" do
+    mount_point shared_dir
     device(new_resource.device)
     fstype(new_resource.fstype)
     device_type new_resource.device_type
@@ -69,7 +71,7 @@ action :mount do
     action :enable
     retries new_resource.retries
     retry_delay new_resource.retry_delay
-    not_if "mount | grep ' #{shared_dir} '"
+    only_if "mount | grep ' #{shared_dir} '"
   end
 
   # Make sure shared directory permissions are correct
@@ -94,7 +96,7 @@ action :unmount do
   shared_dir = format_directory(new_resource.shared_dir)
 
   # TODO: can we use mount resource to unmount and disable (see raid)
-  execute 'unmount volume' do
+  execute "unmount volume #{shared_dir}" do
     command "umount -fl #{shared_dir}"
     retries 10
     retry_delay 6
@@ -119,7 +121,7 @@ action :unexport do
   shared_dir = format_directory(new_resource.shared_dir)
 
   # unexport the volume
-  delete_lines "remove volume from /etc/exports" do
+  delete_lines "remove volume #{shared_dir} from /etc/exports" do
     path "/etc/exports"
     pattern "^#{shared_dir} *"
   end
@@ -133,4 +135,25 @@ def format_directory(dir)
   format_dir = dir.strip
   format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
   format_dir
+end
+
+#
+# Wait 60 seconds for the block device to be ready
+#
+def wait_for_block_dev(path)
+  Timeout.timeout(60) do
+    until ::File.blockdev?(path)
+      Chef::Log.info("device #{path} not ready - sleeping 5s")
+      sleep(5)
+      rescan_pci
+    end
+    Chef::Log.info("device #{path} is ready")
+  end
+end
+
+#
+# Rescan the PCI bus to discover newly added volumes.
+#
+def rescan_pci
+  shell_out("echo 1 > /sys/bus/pci/rescan")
 end
