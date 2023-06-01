@@ -39,7 +39,11 @@ end
 
 control 'tag:config_check_non_graphical_systemd_settings' do
   only_if do
-    !::File.exist?("/etc/dcv/dcv.conf") && node['conditions']['ami_bootstrapped']
+    (
+      !instance.head_node? ||
+      !node['conditions']['dcv_supported'] ||
+      node['cluster']['dcv_enabled'] != "head_node"
+    ) && node['conditions']['ami_bootstrapped']
   end
   describe 'check systemd default runlevel' do
     subject { bash("systemctl get-default | grep -i multi-user.target") }
