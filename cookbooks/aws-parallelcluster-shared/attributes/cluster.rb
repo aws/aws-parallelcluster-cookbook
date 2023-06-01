@@ -19,3 +19,6 @@ default['cluster']['scheduler'] = 'slurm'
 default['cluster']['node_type'] = nil
 
 default['cluster']["directory_service"]["enabled"] = 'false'
+
+# Default NFS mount options
+default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'

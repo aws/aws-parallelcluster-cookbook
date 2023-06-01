@@ -14,7 +14,8 @@ control 'tag:install_intel_hpc_dependencies_downloaded' do
 
   only_if { os_properties.centos7? && !os_properties.arm? }
 
-  node['cluster']['intelhpc']['dependencies'].each do |package|
+  dependencies = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e)
+  dependencies.each do |package|
     # The rpm can be in the sources_dir folder or already installed as dependency of other packages
     describe command("ls #{node['cluster']['sources_dir']}/#{package}*.rpm || rpm -qa #{package}* | grep #{package}") do
       its('exit_status') { should eq 0 }
@@ -29,7 +30,8 @@ control 'tag:config_intel_hpc_configured' do
   only_if { os_properties.centos7? && !os_properties.arm? && node['cluster']['enable_intel_hpc_platform'] == 'true' }
 
   # Verify non-intel dependencies are installed
-  node['cluster']['intelhpc']['dependencies'].each do |package|
+  dependencies = %w(compat-libstdc++-33 nscd nss-pam-ldapd openssl098e)
+  dependencies.each do |package|
     describe package(package) do
       it { should be_installed }
     end
