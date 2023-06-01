@@ -33,6 +33,33 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: directory_service
+    # FIXME: breaks on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::directory_service]
+    verifier:
+      controls:
+        - sssd_configured_correctly
+    attributes:
+      cluster:
+        node_type: HeadNode
+        directory_service:
+          enabled: 'true'
+          domain_name: corp.something.com
+          domain_addr: ldaps://corp.something.com
+          password_secret_arn: arn:aws:secretsmanager:eu-west-1:123456789:secret:a-secret-name
+          domain_read_only_user: cn=ReadOnlyUser,ou=Users,ou=CORP,dc=corp,dc=something,dc=com
+          ldap_tls_ca_cert: /path/to/domain-certificate.crt
+          ldap_tls_req_cert: never
+          ldap_access_filter: filter-string
+          generate_ssh_keys_for_users: 'true'
+          additional_sssd_configs:
+            debug_level: "0x1ff"
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:system_authentication
   - name: efa
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
