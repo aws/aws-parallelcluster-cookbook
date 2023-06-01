@@ -1,6 +1,9 @@
 # For performance, set NFS threads to min(256, max(8, num_cores * 4))
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
+# Kernel release version used to select Lustre version
+default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
+
 # CloudWatch
 default['cluster']['log_group_name'] = "NONE"
 
