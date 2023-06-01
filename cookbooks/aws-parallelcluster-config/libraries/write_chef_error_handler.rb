@@ -47,10 +47,13 @@ module WriteChefError
           "mount fsx" => "Failed to mount FSX.",
         }
 
+        protected_mode_exception =
+          "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning"
+
         # define a mapping from the exception information to the error message we would like to display
         exception_message_mapping = {
-          "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning" =>
-            "Cluster has been set to PROTECTED mode due to failures detected in static node provisioning.",
+          protected_mode_exception =>
+            protected_mode_exception + ".",
         }
 
         failed_action_collection.each do |action_record|
