@@ -1,6 +1,9 @@
 # For performance, set NFS threads to min(256, max(8, num_cores * 4))
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
+# Kernel release version used to select Lustre version
+default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
+
 # CloudWatch
 default['cluster']['log_group_name'] = "NONE"
 
@@ -18,7 +21,8 @@ default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
 
 # Other ParallelCluster internal variables
 default['cluster']['volume_fs_type'] = 'ext4'
-default['cluster']['efs_shared_dirs'] = ''
+default['cluster']['efs_shared_dirs'] = '/shared'
+default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
 default['cluster']['efs_fs_ids'] = ''
 default['cluster']['efs_encryption_in_transits'] = ''
 default['cluster']['efs_iam_authorizations'] = ''
