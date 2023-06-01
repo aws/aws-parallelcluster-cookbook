@@ -10,6 +10,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'sssd_configured_correctly' do
+  title "Check SSSd is correctly configured"
+
   describe file('/etc/sssd/sssd.conf') do
     it { should exist }
     its('owner') { should eq 'root' }
@@ -31,7 +33,7 @@ control 'sssd_configured_correctly' do
     its('content') { should match /ldap_access_filter = filter-string/ }
     # Optional properties that are meant to be set via DirectoryService/AdditionalSssdConfigs
     its('content') { should match /debug_level = 0x1ff/ }
-  end
+  end unless os_properties.on_docker?
 
   shared_dir = "/opt/parallelcluster/shared/directory_service"
   describe directory(shared_dir) do
@@ -45,7 +47,7 @@ control 'sssd_configured_correctly' do
   describe file('/etc/ssh/sshd_config') do
     it { should exist }
     its('content') { should match /PasswordAuthentication yes/ }
-  end
+  end unless os_properties.on_docker?
 
   scripts_dir = "/opt/parallelcluster/scripts"
   describe directory("#{scripts_dir}/directory_service") do

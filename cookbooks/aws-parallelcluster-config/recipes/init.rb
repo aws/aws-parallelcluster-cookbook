@@ -48,4 +48,4 @@ include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['
 include_recipe 'aws-parallelcluster-config::imds'
 
 # Active Directory Service
-include_recipe "aws-parallelcluster-config::directory_service"
+include_recipe "aws-parallelcluster-environment::directory_service"

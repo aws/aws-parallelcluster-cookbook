@@ -24,6 +24,24 @@ sssd_conf_path = "/etc/sssd/sssd.conf"
 shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_service"
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 
+# Parse an ARN.
+# ARN format: arn:PARTITION:SERVICE:REGION:ACCOUNT_ID:RESOURCE.
+# ARN examples:
+#   1. arn:aws:secretsmanager:eu-west-1:12345678910:secret:PasswordName
+#   2. arn:aws:ssm:eu-west-1:12345678910:parameter/PasswordName
+def parse_arn(arn_string)
+  parts = arn_string.nil? ? [] : arn_string.split(':', 6)
+  raise TypeError if parts.size < 6
+
+  {
+    partition: parts[1],
+    service: parts[2],
+    region: parts[3],
+    account_id: parts[4],
+    resource: parts[5],
+  }
+end
+
 if node['cluster']['node_type'] == 'HeadNode'
   region = node['cluster']['region']
   # DomainName
@@ -128,7 +146,7 @@ if node['cluster']['node_type'] == 'HeadNode'
       domain_properties: domain_properties
     )
     sensitive true
-  end
+  end unless on_docker?
 
   # Share the sssd.conf file to shared directory
   directory shared_directory_service_dir do
@@ -143,7 +161,7 @@ if node['cluster']['node_type'] == 'HeadNode'
       user 'root'
       command "cp #{sssd_conf_path} #{shared_sssd_conf_path}"
       sensitive true
-    end
+    end unless on_docker?
   end
 
   bash 'Enable SSH password authentication on head node' do
@@ -151,7 +169,7 @@ if node['cluster']['node_type'] == 'HeadNode'
     code <<-AD
       sed -ri 's/\s*PasswordAuthentication\s+no$/PasswordAuthentication yes/g' /etc/ssh/sshd_config
     AD
-  end
+  end unless on_docker?
 
   # Create directory for tools related to the directory service
   directory_service_scripts_path = "#{node['cluster']['scripts_dir']}/directory_service"
@@ -215,7 +233,7 @@ else
     user 'root'
     command "cp #{shared_sssd_conf_path} #{sssd_conf_path}"
     sensitive true
-  end
+  end unless on_docker?
 end
 
 system_authentication "Configure system authentication" do
@@ -228,4 +246,4 @@ end
     action :restart
     sensitive true
   end
-end
+end unless on_docker?
