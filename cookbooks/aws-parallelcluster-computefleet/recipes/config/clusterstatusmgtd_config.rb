@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-config
-# Recipe:: clusterstatusmgtd_init_slurm
-#
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
@@ -15,8 +12,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Cluster Status Management Demon
+# Cluster Status Management Daemon
 return unless node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
+
 # create placeholder for computefleet-status.json, so it can be written by clusterstatusmgtd which run as pcluster admin user
 file node['cluster']['computefleet_status_path'] do
   owner node['cluster']['cluster_admin_user']
@@ -24,7 +22,7 @@ file node['cluster']['computefleet_status_path'] do
   content '{}'
   mode '0755'
   action :create
-end unless on_docker?
+end
 
 # create sudoers entry to let pcluster admin user execute update compute fleet recipe
 template '/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd' do
@@ -35,7 +33,10 @@ template '/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd' do
 end
 
 # create log file for clusterstatusmgtd
-file "/var/log/parallelcluster/clusterstatusmgtd" do
+directory "#{node['cluster']['log_base_dir']}" do
+  recursive true
+end
+file "#{node['cluster']['log_base_dir']}/clusterstatusmgtd" do
   owner 'root'
   group 'root'
   mode '0640'

@@ -94,5 +94,5 @@ if node['cluster']['dcv_enabled'] == "head_node"
 end unless on_docker?
 
 unless node['cluster']['scheduler'] == 'awsbatch'
-  include_recipe 'aws-parallelcluster-config::head_node_fleet_status'
+  include_recipe 'aws-parallelcluster-computefleet::head_node_fleet_status'
 end

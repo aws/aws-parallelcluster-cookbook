@@ -36,20 +36,6 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
-  - name: clusterstatusmgtd_init_slurm
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::clusterstatusmgtd_init_slurm]
-    verifier:
-      controls:
-        - clusterstatusmgtd_init_slurm_config
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::users
-        - recipe:aws-parallelcluster-platform::directories
-        - recipe:aws-parallelcluster-platform::sudo_install
-      cluster:
-        node_type: 'HeadNode'
   - name: mount_shared
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

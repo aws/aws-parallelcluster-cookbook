@@ -39,7 +39,7 @@ include_recipe "aws-parallelcluster-config::custom_actions_setup" unless on_dock
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster-config::network_interfaces" unless on_docker?
 
-include_recipe "aws-parallelcluster-config::clusterstatusmgtd_init_slurm"
+include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_config"
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
 include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
