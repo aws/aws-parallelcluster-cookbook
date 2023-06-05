@@ -211,7 +211,7 @@ action :configure do
     optionally_disable_rnd
 
     # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one
-    cookbook_file "/etc/parallelcluster/generate_certificate.sh" do
+    cookbook_file "#{node['cluster']['etc_dir']}/generate_certificate.sh" do
       source 'dcv/generate_certificate.sh'
       cookbook 'aws-parallelcluster-platform'
       owner 'root'
@@ -224,7 +224,7 @@ action :configure do
       # * user to make owner of the two files
       # * group to make owner of the two files
       # NOTE: the last arg is hardcoded to be 'dcv' so that the dcvserver can read the files when authenticating
-      command "/etc/parallelcluster/generate_certificate.sh"\
+      command "#{node['cluster']['etc_dir']}/generate_certificate.sh"\
             " \"#{node['cluster']['dcv']['authenticator']['certificate']}\""\
             " \"#{node['cluster']['dcv']['authenticator']['private_key']}\""\
             " #{node['cluster']['dcv']['authenticator']['user']} dcv"

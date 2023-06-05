@@ -25,7 +25,7 @@ end
 
 # Install parallelcluster specific supervisord config
 region = node['cluster']['region']
-template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
+template "#{node['cluster']['etc_dir']}/parallelcluster_supervisord.conf" do
   source 'base/parallelcluster_supervisord.conf.erb'
   owner 'root'
   group 'root'

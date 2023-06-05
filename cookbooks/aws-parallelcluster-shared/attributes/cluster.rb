@@ -5,6 +5,7 @@ default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
 default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
+default['cluster']['etc_dir'] = '/etc/parallelcluster'
 
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"

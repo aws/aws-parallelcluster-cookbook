@@ -34,7 +34,7 @@ template "/usr/local/bin/get-compute-fleet-status.sh" do
   mode '0755'
 end
 
-template "/etc/parallelcluster/clusterstatusmgtd.conf" do
+template "#{node['cluster']['etc_dir']}/clusterstatusmgtd.conf" do
   source 'clusterstatusmgtd/clusterstatusmgtd.conf.erb'
   owner 'root'
   group 'root'
