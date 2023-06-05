@@ -103,7 +103,7 @@ action :setup do
   return if ::File.exist?("/etc/dcv/dcv.conf")
   return if redhat_ubi?
 
-  # share values with InSpec tests
+  # share values with InSpec tests and configuration recipes
   node.default['conditions']['dcv_supported'] = dcv_supported?
   node.default['cluster']['dcv']['authenticator']['virtualenv_path'] = dcvauth_virtualenv_path
   node_attributes 'dump node attributes'
@@ -188,7 +188,7 @@ action :setup do
 end
 
 action :configure do
-  # share values with InSpec tests
+  # share values with InSpec tests and configuration recipes
   node.default['conditions']['dcv_supported'] = dcv_supported?
   node.default['cluster']['dcv']['authenticator']['virtualenv_path'] = dcvauth_virtualenv_path
   node_attributes 'dump node attributes'
