@@ -2,7 +2,7 @@
 verifier:
   name: inspec
   inspec_tests:
-    - cookbooks/aws-parallelcluster-computefleeet/test
+    - cookbooks/aws-parallelcluster-computefleet/test
 
 suites:
   - name: node
@@ -15,7 +15,7 @@ suites:
   - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-computefleet::clusterstatusmgtd]
+      - recipe[aws-parallelcluster-computefleet::clusterstatusmgtd_install]
     verifier:
       controls:
         - /tag:install_clusterstatusmgtd/

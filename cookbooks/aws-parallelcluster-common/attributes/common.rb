@@ -12,5 +12,4 @@ default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['c
 default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node'
 default['cluster']['head_node_imds_allowed_users'].append(lazy { node['cluster']['scheduler_plugin']['user'] }) if node['cluster']['scheduler'] == 'plugin'
 
-default['cluster']['computefleet_status_path'] = "#{node['cluster']['shared_dir']}/computefleet-status.json"
 default['cluster']['head_node_private_ip'] = nil

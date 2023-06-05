@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-computefleet::clusterstatusmgtd' do
+describe 'aws-parallelcluster-computefleet::clusterstatusmgtd_install' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do

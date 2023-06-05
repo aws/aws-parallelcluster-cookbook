@@ -12,4 +12,4 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-computefleet::node'
-include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd"
+include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_install"
