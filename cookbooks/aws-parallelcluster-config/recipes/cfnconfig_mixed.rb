@@ -25,11 +25,11 @@ node.default['cluster']['instance_slots'] = case node['cluster']['scheduler_slot
                                               node['cluster']['scheduler_slots']
                                             end
 
-template '/etc/parallelcluster/cfnconfig' do
+template "#{node['cluster']['etc_dir']}/cfnconfig" do
   source 'init/cfnconfig.erb'
   mode '0644'
 end
 
-link '/opt/parallelcluster/cfnconfig' do
-  to '/etc/parallelcluster/cfnconfig'
+link "#{node['cluster']['base_dir']}/cfnconfig" do
+  to "#{node['cluster']['etc_dir']}/cfnconfig"
 end unless on_docker?

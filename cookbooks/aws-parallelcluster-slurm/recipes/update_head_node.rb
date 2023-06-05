@@ -184,7 +184,7 @@ execute "generate_pcluster_fleet_config" do
 end
 
 replace_or_add "update node replacement timeout" do
-  path "/etc/parallelcluster/slurm_plugin/parallelcluster_clustermgtd.conf"
+  path "#{node['cluster']['etc_dir']}/slurm_plugin/parallelcluster_clustermgtd.conf"
   pattern "node_replacement_timeout*"
   line "node_replacement_timeout = #{node['cluster']['compute_node_bootstrap_timeout']}"
   replace_only true
@@ -243,7 +243,7 @@ execute 'start clustermgtd' do
 end
 
 # The updated cfnconfig will be used by post update custom scripts
-template '/etc/parallelcluster/cfnconfig' do
+template "#{node['cluster']['etc_dir']}/cfnconfig" do
   source 'init/cfnconfig.erb'
   cookbook 'aws-parallelcluster-config'
   mode '0644'

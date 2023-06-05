@@ -51,13 +51,13 @@ if node['cluster']['node_type'] == 'HeadNode'
     raise "head_node_imds_secured must be 'true' or 'false', but got #{node['cluster']['head_node_imds_secured']}"
   end
 
-  iptables_rules_file = '/etc/parallelcluster/sysconfig/iptables.rules'
+  iptables_rules_file = "#{node['cluster']['etc_dir']}/sysconfig/iptables.rules"
 
   execute "Save iptables rules" do
     command "mkdir -p $(dirname #{iptables_rules_file}) && iptables-save > #{iptables_rules_file}"
   end
 
-  ip6tables_rules_file = '/etc/parallelcluster/sysconfig/ip6tables.rules'
+  ip6tables_rules_file = "#{node['cluster']['etc_dir']}/sysconfig/ip6tables.rules"
 
   execute "Save ip6tables rules" do
     command "mkdir -p $(dirname #{ip6tables_rules_file}) && ip6tables-save > #{ip6tables_rules_file}"

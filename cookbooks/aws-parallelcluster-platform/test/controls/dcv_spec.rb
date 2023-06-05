@@ -245,7 +245,7 @@ control 'tag:config_dcv_services_correctly_configured' do
     it { should be_mode 0700 }
   end
 
-  describe file("/etc/parallelcluster/generate_certificate.sh") do
+  describe file("#{node['cluster']['etc_dir']}/generate_certificate.sh") do
     it { should exist }
     it { should be_file }
     it { should be_owned_by 'root' }

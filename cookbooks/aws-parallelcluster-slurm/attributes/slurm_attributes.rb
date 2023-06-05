@@ -1,5 +1,5 @@
 # URLs to software packages used during install recipes
-default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
+default['cluster']['slurm_plugin_dir'] = "#{node['cluster']['etc_dir']}/slurm_plugin"
 default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
 
 # Slurm attributes shared between install_slurm and configure_slurm_accounting
