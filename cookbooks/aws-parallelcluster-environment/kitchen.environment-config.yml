@@ -163,3 +163,19 @@ suites:
         efs_shared_dirs: ''
         fsx_shared_dirs: ''
         raid_shared_dir: ''
+  - name: imds
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::imds]
+    verifier:
+      controls:
+        - /only_allowed_users_can_access_imds/
+        - /iptables_correctly_configured/
+    attributes:
+      dependencies:
+        - 'resource:install_packages:install_kernel_source {"packages": ["iptables"]}'
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        head_node_imds_secured: 'true'
+        head_node_imds_allowed_users: ['root', 'nobody']

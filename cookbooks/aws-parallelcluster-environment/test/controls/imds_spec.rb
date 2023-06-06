@@ -33,7 +33,7 @@ control 'tag:config_only_allowed_users_can_access_imds' do
 end
 
 control 'tag:config_parallelcluster-iptables_correctly_configured' do
-  only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' && !os_properties.virtualized? }
+  only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' && !os_properties.on_docker? }
 
   describe service('parallelcluster-iptables') do
     it { should be_installed }
@@ -55,7 +55,7 @@ control 'tag:config_parallelcluster-iptables_correctly_configured' do
     end
   end
 
-  describe file('/etc/parallelcluster/sysconfig/iptables.rules') do
+  describe file("#{node['cluster']['etc_dir']}/sysconfig/iptables.rules") do
     it { should exist }
   end
 end

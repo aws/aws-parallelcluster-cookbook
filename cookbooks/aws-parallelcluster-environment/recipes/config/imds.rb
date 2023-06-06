@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
-# Recipe:: imds
-#
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,7 +12,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if virtualized? || node['cluster']['scheduler'] == 'awsbatch'
+return if on_docker? || node['cluster']['scheduler'] == 'awsbatch'
 
 # slurm and custom schedulers will have imds access on the head node
 if node['cluster']['node_type'] == 'HeadNode'
@@ -51,14 +48,14 @@ if node['cluster']['node_type'] == 'HeadNode'
     raise "head_node_imds_secured must be 'true' or 'false', but got #{node['cluster']['head_node_imds_secured']}"
   end
 
-  iptables_rules_file = "#{node['cluster']['etc_dir']}/sysconfig/iptables.rules"
+  directory node['cluster']['etc_dir']
 
+  iptables_rules_file = "#{node['cluster']['etc_dir']}/sysconfig/iptables.rules"
   execute "Save iptables rules" do
     command "mkdir -p $(dirname #{iptables_rules_file}) && iptables-save > #{iptables_rules_file}"
   end
 
   ip6tables_rules_file = "#{node['cluster']['etc_dir']}/sysconfig/ip6tables.rules"
-
   execute "Save ip6tables rules" do
     command "mkdir -p $(dirname #{ip6tables_rules_file}) && ip6tables-save > #{ip6tables_rules_file}"
   end
