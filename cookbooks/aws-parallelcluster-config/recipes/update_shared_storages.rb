@@ -16,7 +16,16 @@
 # limitations under the License.
 MOUNT_ACTION = "mount"
 UNMOUNT_ACTION = "unmount"
-load_shared_storages_mapping
+
+# load shared storages data into node object
+ruby_block "load shared storages mapping during cluster update" do
+  block do
+    require 'yaml'
+    # regenerate the shared storages mapping file after update
+    node.default['cluster']['shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['previous_shared_storages_mapping_path']))
+    node.default['cluster']['update_shared_storages_mapping'] = YAML.safe_load(File.read(node['cluster']['shared_storages_mapping_path']))
+  end
+end
 
 ruby_block "get storage to mount and unmount" do
   block do
