@@ -1,5 +1,7 @@
 provides :test_resource
 
+unified_mode true
+
 property :descriptor, String
 
 action :use do

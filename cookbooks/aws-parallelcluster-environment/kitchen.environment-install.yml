@@ -84,7 +84,6 @@ suites:
         - /tag:install_efs/
     attributes:
       resource: efs:install_utils
-      dependencies:
   - name: system_authentication
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -94,3 +93,57 @@ suites:
         - /tag:install_system_authentication/
     attributes:
       resource: system_authentication:setup
+  - name: ebs_mount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_mounted/
+    attributes:
+      # manually create a volume (default values with 1G size are OK) and paste Volume ID below
+      # manually delete the volume after the test is concluded
+      resource: 'manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : ["vol-00ec1f3bbcef44f6d"]}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+  - name: ebs_unmount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_unmounted/
+    attributes:
+      # manually create a volume (default values with 1G size are OK) and paste Volume ID below (2 rows)
+      # manually delete the volume after the test is concluded
+      resource: 'manage_ebs:unmount {"shared_dir_array" : ["shared_dir"], "vol_array" : ["vol-079c85a76699b2ef1"]}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+        - 'resource:manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : ["vol-079c85a76699b2ef1"]} '
+  - name: ebs_export
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_exported/
+    attributes:
+      dependencies:
+        - 'resource:directory { "path" : "/shared_dir" }'
+        - resource:nfs
+      resource: 'manage_ebs:export {"shared_dir_array" : ["shared_dir"]} '
+  - name: ebs_unexport
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_unexported/
+    attributes:
+      dependencies:
+        - 'resource:directory { "path" : "/shared_dir" }'
+        - resource:nfs
+        - 'manage_ebs:export {"shared_dir_array" : ["shared_dir"]}'
+      resource: 'manage_ebs:unexport {"shared_dir_array" : ["shared_dir"]}'
