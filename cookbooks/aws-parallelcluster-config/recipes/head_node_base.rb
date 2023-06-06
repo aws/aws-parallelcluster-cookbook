@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # generate the shared storages mapping file
-include_recipe 'aws-parallelcluster-config::fs_update'
+include_recipe 'aws-parallelcluster-environment::fs_update'
 
 manage_ebs "add ebs" do
   shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')

@@ -52,48 +52,6 @@ suites:
         head_node_private_ip: '127.0.0.1'
         head_node_home_path: '/fake_headnode_home'
         shared_dir_head: '/fake_headnode_shared'
-  - name: fs_update
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::fs_update]
-    verifier:
-      controls:
-        - fs_data_file_created_correctly
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-      cluster:
-        ebs_shared_dirs: ebs1,ebs2
-        volume: volume1,volume2
-        raid_shared_dir: raid1
-        raid_type: 1
-        raid_vol_ids: volume1,volume2
-        efs_shared_dirs: efs1,efs2
-        efs_fs_ids: efs-id1,efs-id2
-        efs_encryption_in_transits: true,false
-        efs_iam_authorizations: iam1,iam2
-        fsx_shared_dirs: fsx1,fsx2
-        fsx_fs_ids: fsx-id1,fsx-id2
-        fsx_fs_types: type1,type2
-        fsx_dns_names: dns1,dns2
-        fsx_mount_names: mount1,mount2
-        fsx_volume_junction_paths: value1,value2
-  - name: fs_update_default_values
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-config::fs_update]
-    verifier:
-      controls:
-        - fs_data_file_with_default_values
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-      cluster:
-        ebs_shared_dirs: '/shared'
-        volume: ''
-        efs_shared_dirs: ''
-        fsx_shared_dirs: ''
-        raid_shared_dir: ''
   - name: sudo_configured
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

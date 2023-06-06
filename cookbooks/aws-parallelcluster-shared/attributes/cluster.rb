@@ -7,6 +7,10 @@ default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['etc_dir'] = '/etc/parallelcluster'
 
+# Attributes used by both fetch_config resource and environment recipes
+default['cluster']['shared_storages_mapping_path'] = "#{node['cluster']['etc_dir']}/shared_storages_data.yaml"
+default['cluster']['previous_shared_storages_mapping_path'] = "#{node['cluster']['etc_dir']}/previous_shared_storages_data.yaml"
+
 # plcuster-specific pyenv system installation root
 default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 
