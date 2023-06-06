@@ -44,7 +44,7 @@ unless raid_shared_dir.empty?
 end
 
 # Mount /opt/intel over NFS
-exported_intel_dir = format_directory(node['cluster']['exported_intel_dir'])
+exported_intel_dir = format_directory('/opt/intel')
 mount '/opt/intel' do
   device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_intel_dir}" })
   fstype 'nfs'
