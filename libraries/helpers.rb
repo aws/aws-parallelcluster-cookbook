@@ -17,6 +17,9 @@ require 'net/http'
 require 'timeout'
 
 #
+# TODO delete wait_for_block_dev and rescan_pci when manage_raid resource starts using volume resource
+#
+#
 # Wait 60 seconds for the block device to be ready
 #
 def wait_for_block_dev(path)
@@ -37,75 +40,6 @@ def rescan_pci
   Mixlib::ShellOut.new("echo 1 > /sys/bus/pci/rescan").run_command
 end
 
-#
-# Format a block device using the EXT4 file system if it is not already
-# formatted.
-#
-def setup_disk(path)
-  dev = ::File.readlink(path)
-  full_path = ::File.absolute_path(dev, ::File.dirname(path))
-
-  fs_type = get_fs_type(full_path)
-  if fs_type.nil?
-    Mixlib::ShellOut.new("mkfs.ext4 #{full_path}").run_command
-    fs_type = 'ext4'
-  end
-
-  fs_type
-end
-
-#
-# Checks if device is partitioned; if yes returns pt type
-#
-def get_pt_type(device)
-  fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
-  fs_check.run_command
-  match = fs_check.stdout.match(/\sPTTYPE="(.*?)"/)
-  match = '' if match.nil?
-
-  Chef::Log.info("Partition type for device #{device}: #{match[1]}")
-  match[1]
-end
-
-#
-# Check if block device has a fileystem
-#
-def get_fs_type(device)
-  fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
-  fs_check.run_command
-  match = fs_check.stdout.match(/\sTYPE="(.*?)"/)
-  match = '' if match.nil?
-
-  Chef::Log.info("File system type for device #{device}: #{match[1]}")
-  match[1]
-end
-
-#
-# Gets the uuid of a device
-#
-def get_uuid(device)
-  Chef::Log.info("Getting uuid for device: #{device}")
-  fs_check = Mixlib::ShellOut.new("blkid -c /dev/null #{device}")
-  fs_check.run_command
-  match = fs_check.stdout.match(/\sUUID="(.*?)"/)
-  match = '' if match.nil?
-  Chef::Log.info("uuid for device: #{device} is #{match[1]}")
-  match[1]
-end
-
-#
-# Returns the first partition of a device, provided via sym link
-#
-def get_1st_partition(device)
-  # Resolves the real device name (ex. /dev/sdg)
-  Chef::Log.info("Getting 1st partition for device: #{device}")
-  fs_check = Mixlib::ShellOut.new("lsblk -ln -o Name #{device}|awk 'NR==2'")
-  fs_check.run_command
-  partition = "/dev/#{fs_check.stdout.strip}"
-  Chef::Log.info("1st partition for device: #{device} is: #{partition}")
-  partition
-end
-
 def ignore_failure(lookup)
   resource = resources(lookup)
   if resource.nil?
@@ -116,6 +50,9 @@ def ignore_failure(lookup)
   end
 end
 
+#
+# TODO use os_type resource, action :validate
+#
 #
 # Check if OS type specified by the user is the same as the OS identified by Ohai
 #

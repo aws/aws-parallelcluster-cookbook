@@ -1,8 +1,30 @@
 require 'spec_helper'
 
-class Chef::Resource::RubyBlock
-  def wait_for_block_dev(_path)
-    # do nothing
+describe 'volume:format_directory' do
+  cached(:chef_run) do
+    ChefSpec::SoloRunner.new.converge_dsl do
+      volume 'nothing' do
+        action :nothing
+      end
+    end
+  end
+
+  cached(:resource) { chef_run.find_resource('volume', 'nothing') }
+
+  it 'calls volume:nothing' do
+    is_expected.to nothing_volume('nothing')
+  end
+
+  it 'adds / at the beginning if not starting with /' do
+    expect(resource.format_directory('any')).to eq('/any')
+  end
+
+  it 'does not add / at the beginning if already starting with /' do
+    expect(resource.format_directory('/any')).to eq('/any')
+  end
+
+  it 'strips whitespaces from directory' do
+    expect(resource.format_directory('  any ')).to eq('/any')
   end
 end
 
@@ -43,7 +65,8 @@ describe 'volume:mount' do
         end
 
         it 'mounts shared dir' do
-          is_expected.to mount_mount('/SHARED_DIR')
+          is_expected.to mount_mount('mount /SHARED_DIR')
+            .with(mount_point: '/SHARED_DIR')
             .with(device: 'DEVICE')
             .with(fstype: 'FSTYPE')
             .with(device_type: :uuid)
@@ -54,15 +77,8 @@ describe 'volume:mount' do
             .with(retry_delay: 200)
         end
 
-        it 'enables shared dir' do
-          is_expected.to enable_mount('/SHARED_DIR')
-            .with(device: 'DEVICE')
-            .with(fstype: 'FSTYPE')
-            .with(dump: 0)
-            .with(pass: 0)
-            .with(options: %w(option1 option2))
-            .with(retries: 100)
-            .with(retry_delay: 200)
+        it 'does not enable shared dir' do
+          is_expected.not_to enable_mount('mount /SHARED_DIR')
         end
 
         it 'changes permissions' do
@@ -100,11 +116,20 @@ describe 'volume:mount' do
         end
 
         it 'does not mount shared dir with default values' do
-          is_expected.not_to mount_mount('/SHARED_DIR')
+          is_expected.not_to mount_mount('mount /SHARED_DIR')
         end
 
         it 'enables shared dir' do
-          is_expected.not_to enable_mount('/SHARED_DIR')
+          is_expected.to enable_mount('enable /SHARED_DIR')
+            .with(mount_point: '/SHARED_DIR')
+            .with(device: 'DEVICE')
+            .with(fstype: 'FSTYPE')
+            .with(device_type: :device)
+            .with(dump: 0)
+            .with(pass: 0)
+            .with(options: %w(option1 option2))
+            .with(retries: 0)
+            .with(retry_delay: 2)
         end
 
         it 'changes permissions' do
@@ -169,7 +194,7 @@ describe 'volume:unmount' do
 
         it 'unmounts volume' do
           is_expected.to unmount_volume('unmount')
-          is_expected.to run_execute('unmount volume')
+          is_expected.to run_execute('unmount volume /SHARED_DIR')
             .with(command: "umount -fl /SHARED_DIR")
         end
 
@@ -281,16 +306,16 @@ describe 'volume:unexport' do
         runner = runner(platform: platform, version: version, step_into: ['volume'])
         runner.converge_dsl('aws-parallelcluster-environment') do
           volume 'unexport' do
-            shared_dir 'raid_shared_dir '
+            shared_dir 'shared_dir '
             action :unexport
           end
         end
       end
 
       it 'deletes shared dir from /etc/exports' do
-        is_expected.to edit_delete_lines("remove volume from /etc/exports")
+        is_expected.to edit_delete_lines("remove volume /shared_dir from /etc/exports")
           .with(path: "/etc/exports")
-          .with(pattern: "^/raid_shared_dir *")
+          .with(pattern: "^/shared_dir *")
       end
 
       it 'unexports volume' do

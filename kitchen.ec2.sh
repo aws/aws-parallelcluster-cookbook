@@ -20,7 +20,7 @@
 # KITCHEN_SECURITY_GROUP_ID:  security group to associate to the instance
 #                             if not set will use SG tagged with Kitchen=true
 #
-# KITCHEN_IAM_PROFILE:        IAM instance profile
+# KITCHEN_IAM_PROFILE:        IAM instance profile name
 #                             if not set no profile will be attached
 #
 # KITCHEN_USER_DATA_SCRIPT:   user-data script to launch on the instance
