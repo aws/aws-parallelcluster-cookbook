@@ -15,33 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if virtualized?
+return if on_docker?
 
-# Parse and get RAID shared directory info and turn into an array
-raid_shared_dir = node['cluster']['raid_shared_dir']
-
-unless raid_shared_dir.empty?
-  raid_shared_dir = format_directory(raid_shared_dir)
-  exported_raid_shared_dir = format_directory(raid_shared_dir)
-
-  # Created RAID shared mount point
-  directory raid_shared_dir do
-    mode '1777'
-    owner 'root'
-    group 'root'
-    action :create
-  end
-
-  # Mount RAID directory over NFS
-  mount raid_shared_dir do
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_raid_shared_dir}" })
-    fstype 'nfs'
-    options node['cluster']['nfs']['hard_mount_options']
-    action %i(mount enable)
-    retries 10
-    retry_delay 6
-  end
-end
+# Setup RAID array on compute node
+include_recipe 'aws-parallelcluster-environment::compute_raid'
 
 # Mount /opt/intel over NFS
 exported_intel_dir = format_directory('/opt/intel')
