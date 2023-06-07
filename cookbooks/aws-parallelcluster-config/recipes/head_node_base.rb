@@ -48,7 +48,7 @@ nfs_export "/opt/intel" do
 end unless on_docker?
 
 # Setup RAID array on head node
-include_recipe 'aws-parallelcluster-config::head_node_raid'
+include_recipe 'aws-parallelcluster-environment::head_node_raid'
 
 # Setup cluster user
 user node['cluster']['cluster_user'] do
