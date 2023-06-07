@@ -2,7 +2,7 @@ require 'spec_helper'
 
 class ConvergeNetworkService
   def self.restart(chef_run)
-    chef_run.converge_dsl('aws-parallelcluster-slurm') do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       network_service 'restart' do
         action :restart
       end
@@ -10,7 +10,7 @@ class ConvergeNetworkService
   end
 
   def self.reload(chef_run)
-    chef_run.converge_dsl('aws-parallelcluster-slurm') do
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
       network_service 'reload' do
         action :reload
       end
