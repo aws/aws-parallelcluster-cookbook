@@ -59,7 +59,7 @@ jobs:
         env:
           CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
-          KITCHEN_LOCAL_YAML: kitchen.validate-install.yml
+          KITCHEN_LOCAL_YAML: cookbooks/aws-parallelcluster-entrypoints/kitchen.entrypoints-install.yml
           KITCHEN_GLOBAL_YAML: kitchen.global.yml
           KITCHEN_PHASE: install
           KITCHEN_SAVE_IMAGE: true
@@ -69,8 +69,8 @@ jobs:
         run: |
           PLATFORM=$(echo "${{ matrix.os }}"  | tr a-z A-Z)
           echo "PLATFORM=${PLATFORM}"
-          echo "KITCHEN_${PLATFORM}_IMAGE=pcluster-install/aws-parallelcluster-install-${{ matrix.os }}"
-          echo "KITCHEN_${PLATFORM}_IMAGE=pcluster-install/aws-parallelcluster-install-${{ matrix.os }}" >> $GITHUB_ENV
+          echo "KITCHEN_${PLATFORM}_IMAGE=pcluster-install/entrypoints-install-${{ matrix.os }}"
+          echo "KITCHEN_${PLATFORM}_IMAGE=pcluster-install/entrypoints-install-${{ matrix.os }}" >> $GITHUB_ENV
       - name: Kitchen Test Config
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/test-kitchen@main

@@ -28,3 +28,32 @@ control 'tag:install_clusterstatusmgtd_files_created' do
     its('content') { should_not be_empty }
   end
 end
+
+control 'tag:config_clusterstatusmgtd' do
+  title 'Check the creation of clusterstatusmgtd files'
+
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' }
+
+  describe file('/opt/parallelcluster/shared/computefleet-status.json') do
+    it { should exist }
+    its('content') { should_not match /^""$/ }
+    its('owner') { should eq 'pcluster-admin' }
+    its('group') { should eq 'pcluster-admin' }
+    its('mode') { should cmp '0755' }
+  end
+
+  describe file('/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd') do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0600' }
+    its('content') { should match %r{Cmnd_Alias CINC_COMMAND = /usr/bin/cinc-client .*\n\npcluster-admin ALL = \(root\) NOPASSWD: CINC_COMMAND.*} }
+  end
+
+  describe file('/var/log/parallelcluster/clusterstatusmgtd') do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0640' }
+  end
+end

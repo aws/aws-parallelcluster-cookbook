@@ -24,9 +24,9 @@ nfs "Configure NFS" do
   action :configure
 end
 
-include_recipe 'aws-parallelcluster-config::ephemeral_drives'
+include_recipe 'aws-parallelcluster-environment::ephemeral_drives'
 
-include_recipe 'aws-parallelcluster-config::networking'
+include_recipe 'aws-parallelcluster-platform::networking'
 
 # Amazon Time Sync
 chrony 'enable chrony' do
@@ -45,7 +45,7 @@ case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster-config::head_node_base'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-config::compute_base'
+  include_recipe 'aws-parallelcluster-environment::compute_base'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end

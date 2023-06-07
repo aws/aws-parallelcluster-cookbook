@@ -16,7 +16,7 @@
 # limitations under the License.
 
 # generate the shared storages mapping file
-include_recipe 'aws-parallelcluster-config::fs_update'
+include_recipe 'aws-parallelcluster-environment::fs_update'
 
 manage_ebs "add ebs" do
   shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
@@ -48,7 +48,7 @@ nfs_export "/opt/intel" do
 end unless on_docker?
 
 # Setup RAID array on head node
-include_recipe 'aws-parallelcluster-config::head_node_raid'
+include_recipe 'aws-parallelcluster-environment::head_node_raid'
 
 # Setup cluster user
 user node['cluster']['cluster_user'] do
@@ -94,5 +94,5 @@ if node['cluster']['dcv_enabled'] == "head_node"
 end unless on_docker?
 
 unless node['cluster']['scheduler'] == 'awsbatch'
-  include_recipe 'aws-parallelcluster-config::head_node_fleet_status'
+  include_recipe 'aws-parallelcluster-computefleet::head_node_fleet_status'
 end

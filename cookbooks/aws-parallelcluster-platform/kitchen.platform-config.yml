@@ -144,3 +144,9 @@ suites:
       cluster:
         enable_intel_hpc_platform: 'true'
         node_type: HeadNode
+  - name: networking
+    run_list:
+      - recipe[aws-parallelcluster-platform::networking]
+    verifier:
+      controls:
+        - /tag:config_networking/

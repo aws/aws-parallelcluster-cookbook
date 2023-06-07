@@ -68,3 +68,45 @@ suites:
         - /tag:install_dns_domain/
     attributes:
       resource: dns_domain
+  - name: pmix
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_pmix]
+    verifier:
+      controls:
+        - /tag:install_pmix/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: jwt
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_jwt]
+    verifier:
+      controls:
+        - /tag:install_jwt/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: slurm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_slurm]
+    verifier:
+      controls:
+        - /tag:install_slurm/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:mysql_client
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - recipe:aws-parallelcluster-slurm::install_jwt
+        - recipe:aws-parallelcluster-slurm::install_pmix
+        - resource:munge

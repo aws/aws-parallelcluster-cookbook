@@ -71,6 +71,7 @@ provisioner:
   client_rb:
     exit_status: :enabled # Opt-in to the standardized exit codes
     client_fork: false  # Forked instances don't return the real exit code
+  log_level: info
 
 platforms:
   - name: alinux2

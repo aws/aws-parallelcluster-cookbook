@@ -16,7 +16,7 @@ set -euo pipefail
 # Disclaimer: this env setup is for *internal use only*, custom actions scripts SHOULD NOT rely on it
 
 # this is kept solely for backward compatibility, variables defined by it *SHOULD NOT* be used
-source /etc/parallelcluster/cfnconfig
+source <%= node['cluster']['etc_dir'] %>/cfnconfig
 
 # please note that this env setup has potential independent but relevant duplication with:
 # build_env in cookbooks/aws-parallelcluster-scheduler-plugin/resources/execute_event_handler.rb

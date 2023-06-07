@@ -16,7 +16,6 @@
 # limitations under the License.
 
 # ParallelCluster log dir
-default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
 
 # ParallelCluster log rotation file dir
@@ -28,91 +27,16 @@ default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
 default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
-
-# URLs to software packages used during install recipes
-default['cluster']['slurm_plugin_dir'] = '/etc/parallelcluster/slurm_plugin'
-default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plugin_dir']}/fleet-config.json"
-
-# OpenSSH settings for AWS ParallelCluster instances
-default['openssh']['server']['protocol'] = '2'
-default['openssh']['server']['syslog_facility'] = 'AUTHPRIV'
-default['openssh']['server']['permit_root_login'] = 'forced-commands-only'
-default['openssh']['server']['password_authentication'] = 'no'
-default['openssh']['server']['gssapi_authentication'] = 'yes'
-default['openssh']['server']['gssapi_clean_up_credentials'] = 'yes'
-default['openssh']['server']['ciphers'] = 'aes128-cbc,aes192-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com'
-default['openssh']['server']['m_a_cs'] = 'hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512,hmac-sha2-256'
-default['openssh']['client']['gssapi_authentication'] = 'yes'
-default['openssh']['client']['match'] = 'exec "ssh_target_checker.sh %h"'
-# Disable StrictHostKeyChecking for target host in the cluster VPC
-default['openssh']['client']['  _strict_host_key_checking'] = 'no'
-# Do not store server key in the know hosts file to avoid scaling clashing
-# that is when an new host gets the same IP of a previously terminated host
-default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
-
-# ulimit settings
-default['cluster']['filehandle_limit'] = 10_000
-default['cluster']['memory_limit'] = 'unlimited'
-
-# ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
-default['cluster']['stack_name'] = nil
-default['cluster']['preinstall'] = 'NONE'
-default['cluster']['preinstall_args'] = 'NONE'
-default['cluster']['postinstall'] = 'NONE'
-default['cluster']['postinstall_args'] = 'NONE'
-default['cluster']['postupdate'] = 'NONE'
-default['cluster']['postupdate_args'] = 'NONE'
-default['cluster']['scheduler_queue_name'] = nil
-default['cluster']['instance_slots'] = '1'
-default['cluster']['ephemeral_dir'] = '/scratch'
-default['cluster']['proxy'] = 'NONE'
-default['cluster']['volume'] = ''
-
-# ParallelCluster internal variables to configure active directory service
-default['cluster']["directory_service"]["enabled"] = 'false'
-default['cluster']["directory_service"]["domain_name"] = nil
-default['cluster']["directory_service"]["domain_addr"] = nil
-default['cluster']["directory_service"]["password_secret_arn"] = nil
-default['cluster']["directory_service"]["domain_read_only_user"] = nil
-default['cluster']["directory_service"]["ldap_tls_ca_cert"] = nil
-default['cluster']["directory_service"]["ldap_tls_req_cert"] = nil
-default['cluster']["directory_service"]["ldap_access_filter"] = nil
-default['cluster']["directory_service"]["generate_ssh_keys_for_users"] = nil
-default['cluster']['directory_service']['additional_sssd_configs'] = nil
-default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
-
-# Other ParallelCluster internal variables
-default['cluster']['ddb_table'] = nil
-default['cluster']['slurm_ddb_table'] = nil
-default['cluster']['volume_fs_type'] = 'ext4'
-default['cluster']['efs_shared_dirs'] = ''
-default['cluster']['efs_fs_ids'] = ''
-default['cluster']['efs_encryption_in_transits'] = ''
-default['cluster']['efs_iam_authorizations'] = ''
-default['cluster']['fsx_shared_dirs'] = ''
-default['cluster']['fsx_fs_ids'] = ''
-default['cluster']['fsx_dns_names'] = ''
-default['cluster']['fsx_mount_names'] = ''
-default['cluster']['fsx_fs_types'] = ''
-default['cluster']['fsx_volume_junction_paths'] = ''
-default['cluster']['custom_node_package'] = nil
-default['cluster']['custom_awsbatchcli_package'] = nil
-default['cluster']['raid_type'] = ''
-default['cluster']['raid_vol_ids'] = ''
-default['cluster']['use_private_hostname'] = 'false'
 default['cluster']['skip_install_recipes'] = 'yes'
-default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
-default['cluster']['realmemory_to_ec2memory_ratio'] = 0.95
-default['cluster']['slurm_node_reg_mem_percent'] = 75
-default['cluster']['slurmdbd_response_retries'] = 30
-default['cluster']['slurm_plugin_console_logging']['sample_size'] = 1
-default["cluster"]["scheduler_compute_resource_name"] = nil
-
 # Official ami build
 default['cluster']['is_official_ami_build'] = false
 
-# Additional instance types data
-default['cluster']['instance_types_data'] = nil
+# ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
+default['cluster']['stack_name'] = nil
+default['cluster']['scheduler_queue_name'] = nil
+default['cluster']['instance_slots'] = '1'
+default['cluster']['proxy'] = 'NONE'
+default['cluster']['volume'] = ''
 
 # Compute nodes bootstrap timeout
 default['cluster']['compute_node_bootstrap_timeout'] = 1800

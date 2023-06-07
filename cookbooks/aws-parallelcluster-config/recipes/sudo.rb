@@ -25,7 +25,7 @@ end
 
 # Install parallelcluster specific supervisord config
 region = node['cluster']['region']
-template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
+template "#{node['cluster']['etc_dir']}/parallelcluster_supervisord.conf" do
   source 'base/parallelcluster_supervisord.conf.erb'
   owner 'root'
   group 'root'
@@ -33,6 +33,6 @@ template '/etc/parallelcluster/parallelcluster_supervisord.conf' do
   variables(
     region: region,
     aws_ca_bundle: region.start_with?('us-iso') ? "/etc/pki/#{region}/certs/ca-bundle.pem" : '',
-    dcv_configured: ::File.exist?("/etc/dcv/dcv.conf")
+    dcv_configured: node['cluster']['dcv_enabled'] == "head_node" && node['conditions']['dcv_supported']
   )
 end

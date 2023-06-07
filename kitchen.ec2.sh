@@ -8,6 +8,9 @@
 # KITCHEN_ARCHITECTURE:       [x86_64|arm64];
 #                             default x86_64
 #
+# KITCHEN_INSTANCE_TYPE:      instance type to use
+#                             default t2.micro
+#
 # KITCHEN_KEY_NAME:           KeyPair to use with EC2 instances
 #                             default kitchen
 #
@@ -17,7 +20,7 @@
 # KITCHEN_SECURITY_GROUP_ID:  security group to associate to the instance
 #                             if not set will use SG tagged with Kitchen=true
 #
-# KITCHEN_IAM_PROFILE:        IAM instance profile
+# KITCHEN_IAM_PROFILE:        IAM instance profile name
 #                             if not set no profile will be attached
 #
 # KITCHEN_USER_DATA_SCRIPT:   user-data script to launch on the instance
@@ -125,6 +128,7 @@ export KITCHEN_KEY_NAME
 export KITCHEN_SSH_KEY_PATH
 export KITCHEN_AVAILABILITY_ZONE
 export KITCHEN_ARCHITECTURE
+export KITCHEN_INSTANCE_TYPE
 export KITCHEN_SUBNET_ID
 export KITCHEN_VPC_ID
 export KITCHEN_SECURITY_GROUP_ID
@@ -134,6 +138,7 @@ echo "** KITCHEN_KEY_NAME: ${KITCHEN_KEY_NAME}"
 echo "** KITCHEN_SSH_KEY_PATH: ${KITCHEN_SSH_KEY_PATH}"
 echo "** KITCHEN_AVAILABILITY_ZONE: ${KITCHEN_AVAILABILITY_ZONE}"
 echo "** KITCHEN_ARCHITECTURE: ${KITCHEN_ARCHITECTURE}"
+echo "** KITCHEN_INSTANCE_TYPE: ${KITCHEN_INSTANCE_TYPE}"
 echo "** KITCHEN_SUBNET_ID: ${KITCHEN_SUBNET_ID}"
 echo "** KITCHEN_VPC_ID: ${KITCHEN_VPC_ID}"
 echo "** KITCHEN_SECURITY_GROUP_ID: ${KITCHEN_SECURITY_GROUP_ID}"

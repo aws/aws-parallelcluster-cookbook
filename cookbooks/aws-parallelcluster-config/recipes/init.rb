@@ -23,8 +23,7 @@ validate_os_type
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd? || on_docker?
 
-include_recipe "aws-parallelcluster-config::cfnconfig_mixed"
-
+include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
 include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
 
 fetch_config 'Fetch and load cluster configs'
@@ -39,13 +38,13 @@ include_recipe "aws-parallelcluster-config::custom_actions_setup" unless on_dock
 # Configure additional Networking Interfaces (if present)
 include_recipe "aws-parallelcluster-config::network_interfaces" unless on_docker?
 
-include_recipe "aws-parallelcluster-config::clusterstatusmgtd_init_slurm"
+include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_config"
 
 include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
 include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
 
 # IMDS
-include_recipe 'aws-parallelcluster-config::imds'
+include_recipe 'aws-parallelcluster-environment::imds'
 
 # Active Directory Service
-include_recipe "aws-parallelcluster-config::directory_service"
+include_recipe "aws-parallelcluster-environment::directory_service"

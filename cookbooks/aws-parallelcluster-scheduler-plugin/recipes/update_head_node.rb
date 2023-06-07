@@ -27,7 +27,7 @@ execute_event_handler 'HeadClusterUpdate' do
 end
 
 # The updated cfnconfig will be used by post update custom scripts
-template '/etc/parallelcluster/cfnconfig' do
+template "#{node['cluster']['etc_dir']}/cfnconfig" do
   source 'init/cfnconfig.erb'
   cookbook 'aws-parallelcluster-config'
   mode '0644'

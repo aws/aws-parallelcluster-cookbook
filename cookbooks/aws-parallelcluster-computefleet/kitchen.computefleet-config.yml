@@ -1,0 +1,20 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - cookbooks/aws-parallelcluster-computefleet/test
+
+suites:
+  - name: clusterstatusmgtd
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-computefleet::clusterstatusmgtd_config]
+    verifier:
+      controls:
+        - /tag:config_clusterstatusmgtd/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-platform::sudo_install
+      cluster:
+        node_type: 'HeadNode'

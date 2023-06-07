@@ -9,7 +9,7 @@ describe 'aws-parallelcluster-platform::directories' do
       cached(:node) { chef_run.node }
 
       it 'creates parallelcluster directory' do
-        is_expected.to create_directory('/etc/parallelcluster')
+        is_expected.to create_directory(node['cluster']['etc_dir'])
       end
 
       it 'creates base directory' do
@@ -37,7 +37,7 @@ describe 'aws-parallelcluster-platform::directories' do
       end
 
       it 'creates log directory' do
-        is_expected.to create_directory('/var/log/parallelcluster/').with(
+        is_expected.to create_directory(node['cluster']['log_base_dir']).with(
           owner: 'root',
           mode: '1777',
           recursive: true

@@ -33,6 +33,52 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: compute_base
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::compute_base]
+    verifier:
+      controls:
+        - compute_base_configured
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_base
+      cluster:
+        node_type: ComputeFleet
+        cluster_user: test_user
+        raid_shared_dir: raid1
+        ebs_shared_dirs: ebs1,ebs2
+        nfs:
+          hard_mount_options: hard,_netdev,noatime
+        head_node_private_ip: '127.0.0.1'
+  - name: directory_service
+    # FIXME: breaks on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::directory_service]
+    verifier:
+      controls:
+        - sssd_configured_correctly
+    attributes:
+      cluster:
+        node_type: HeadNode
+        directory_service:
+          enabled: 'true'
+          domain_name: corp.something.com
+          domain_addr: ldaps://corp.something.com
+          password_secret_arn: arn:aws:secretsmanager:eu-west-1:123456789:secret:a-secret-name
+          domain_read_only_user: cn=ReadOnlyUser,ou=Users,ou=CORP,dc=corp,dc=something,dc=com
+          ldap_tls_ca_cert: /path/to/domain-certificate.crt
+          ldap_tls_req_cert: never
+          ldap_access_filter: filter-string
+          generate_ssh_keys_for_users: 'true'
+          additional_sssd_configs:
+            debug_level: "0x1ff"
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:system_authentication
   - name: efa
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -60,3 +106,105 @@ suites:
         directory_service:
           enabled: "true"
         node_type: HeadNode
+  - name: ephemeral_drives_mounted
+    driver:
+      instance_type: d3.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ephemeral_drives]
+    verifier:
+      controls:
+        - tag:config_ephemeral_drives_service_and_mount
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-environment::mock_cfnconfig
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: /scratch
+  - name: ephemeral_drives_skipped
+    driver:
+      instance_type: d3.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ephemeral_drives]
+    verifier:
+      controls:
+        - tag:config_ephemeral_drives_service_and_mount
+    attributes:
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: test1
+  - name: fs_update
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::fs_update]
+    verifier:
+      controls:
+        - fs_data_file_created_correctly
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+      cluster:
+        ebs_shared_dirs: ebs1,ebs2
+        volume: volume1,volume2
+        raid_shared_dir: raid1
+        raid_type: 1
+        raid_vol_ids: volume1,volume2
+        efs_shared_dirs: efs1,efs2
+        efs_fs_ids: efs-id1,efs-id2
+        efs_encryption_in_transits: true,false
+        efs_iam_authorizations: iam1,iam2
+        fsx_shared_dirs: fsx1,fsx2
+        fsx_fs_ids: fsx-id1,fsx-id2
+        fsx_fs_types: type1,type2
+        fsx_dns_names: dns1,dns2
+        fsx_mount_names: mount1,mount2
+        fsx_volume_junction_paths: value1,value2
+  - name: fs_update_default_values
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::fs_update]
+    verifier:
+      controls:
+        - fs_data_file_with_default_values
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+      cluster:
+        ebs_shared_dirs: '/shared'
+        volume: ''
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+  - name: imds
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::imds]
+    verifier:
+      controls:
+        - /only_allowed_users_can_access_imds/
+        - /iptables_correctly_configured/
+    attributes:
+      dependencies:
+        - 'resource:install_packages:install_kernel_source {"packages": ["iptables"]}'
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        head_node_imds_secured: 'true'
+        head_node_imds_allowed_users: ['root', 'nobody']
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::cfnconfig_mixed]
+    verifier:
+      controls:
+        - /tag:config_cfnconfig/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
