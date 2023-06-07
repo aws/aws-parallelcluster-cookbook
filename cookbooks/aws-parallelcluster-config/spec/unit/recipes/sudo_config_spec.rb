@@ -28,7 +28,7 @@ describe 'aws-parallelcluster-config::sudo' do
           runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
             node.override['cluster']['node_type'] = 'HeadNode'
             node.override['cluster']['dcv_enabled'] = 'head_node'
-            node.override['conditions']['dcv_supported'] = true
+            allow(File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(true)
           end
           runner.converge(described_recipe)
         end
@@ -46,7 +46,7 @@ describe 'aws-parallelcluster-config::sudo' do
             runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
               node.override['cluster']['node_type'] = 'HeadNode'
               node.override['cluster']['dcv_enabled'] = 'NONE'
-              node.override['conditions']['dcv_supported'] = true
+              allow(File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(true)
             end
             runner.converge(described_recipe)
           end
@@ -66,6 +66,8 @@ describe 'aws-parallelcluster-config::sudo' do
         cached(:chef_run) do
           runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
             node.override['cluster']['node_type'] = 'ComputeFleet'
+            node.override['cluster']['dcv_enabled'] = 'head_node'
+            allow(File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(false)
           end
           runner.converge(described_recipe)
         end
@@ -74,6 +76,9 @@ describe 'aws-parallelcluster-config::sudo' do
         it 'has the correct content' do
           is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
             .with_content("[program:computemgtd]")
+
+          is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:pcluster_dcv_authenticator]")
         end
       end
     end
