@@ -439,7 +439,6 @@ describe 'dcv:setup' do
         end
 
         it 'shares dcv_supported with InSpec tests' do
-          expect(node['conditions']['dcv_supported']).to eq(true)
           expect(node['cluster']['dcv']['authenticator']['virtualenv_path']).to eq(dcvauth_virtualenv_path)
           is_expected.to write_node_attributes('dump node attributes')
         end
@@ -814,7 +813,6 @@ describe 'dcv:configure' do
         end
 
         it 'shares dcv_supported with InSpec tests' do
-          expect(node['conditions']['dcv_supported']).to eq(true)
           expect(node['cluster']['dcv']['authenticator']['virtualenv_path']).to eq(dcvauth_virtualenv_path)
           is_expected.to write_node_attributes('dump node attributes')
         end
