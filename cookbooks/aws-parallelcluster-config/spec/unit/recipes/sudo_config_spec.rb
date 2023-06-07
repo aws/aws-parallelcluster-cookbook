@@ -28,7 +28,7 @@ describe 'aws-parallelcluster-config::sudo' do
           runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
             node.override['cluster']['node_type'] = 'HeadNode'
             node.override['cluster']['dcv_enabled'] = 'head_node'
-            allow(File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(true)
+            allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(true)
           end
           runner.converge(described_recipe)
         end
@@ -46,7 +46,7 @@ describe 'aws-parallelcluster-config::sudo' do
             runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
               node.override['cluster']['node_type'] = 'HeadNode'
               node.override['cluster']['dcv_enabled'] = 'NONE'
-              allow(File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(true)
+              allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(true)
             end
             runner.converge(described_recipe)
           end
@@ -67,7 +67,7 @@ describe 'aws-parallelcluster-config::sudo' do
           runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
             node.override['cluster']['node_type'] = 'ComputeFleet'
             node.override['cluster']['dcv_enabled'] = 'head_node'
-            allow(File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(false)
+            allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(false)
           end
           runner.converge(described_recipe)
         end
