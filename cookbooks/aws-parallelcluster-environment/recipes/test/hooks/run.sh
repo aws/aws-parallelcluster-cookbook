@@ -3,6 +3,8 @@
 export KITCHEN_HOOK=$1
 export KITCHEN_ROOT_DIR=$2
 
+[[ "${KITCHEN_INSTANCE_HOSTNAME}" = "" ]] && exit 0
+
 echo "*** Run ${KITCHEN_HOOK} for suite ${KITCHEN_SUITE_NAME} on host ${KITCHEN_INSTANCE_HOSTNAME}"
 
 THIS_DIR=$(dirname "$0")
