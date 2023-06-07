@@ -22,7 +22,7 @@ driver:
     http_put_response_hop_limit: 1
     instance_metadata_tags: 'enabled'
   iam_profile_name: <%= ENV['KITCHEN_IAM_PROFILE'] %>
-  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
   associate_public_ip: true
   user_data: <%= ENV['KITCHEN_USER_DATA_SCRIPT'] %>
   tags:
