@@ -19,6 +19,7 @@ property :efs_encryption_in_transit_array, Array, required: false
 property :efs_iam_authorization_array, Array, required: false
 
 action :mount do
+  return if on_docker?
   efs_shared_dir_array = new_resource.shared_dir_array.dup
   efs_fs_id_array = new_resource.efs_fs_id_array.dup
   efs_encryption_in_transit_array = new_resource.efs_encryption_in_transit_array.dup
@@ -26,8 +27,8 @@ action :mount do
 
   efs_fs_id_array.each_with_index do |efs_fs_id, index|
     efs_shared_dir = efs_shared_dir_array[index]
-    efs_encryption_in_transit = efs_encryption_in_transit_array[index]
-    efs_iam_authorization = efs_iam_authorization_array[index]
+    efs_encryption_in_transit = efs_encryption_in_transit_array[index] unless efs_encryption_in_transit_array.nil?
+    efs_iam_authorization = efs_iam_authorization_array[index] unless efs_iam_authorization_array.nil?
 
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
@@ -87,6 +88,7 @@ action :mount do
 end
 
 action :unmount do
+  return if on_docker?
   efs_shared_dir_array = new_resource.shared_dir_array.dup
   efs_shared_dir_array.each do |efs_shared_dir|
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
