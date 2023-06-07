@@ -163,9 +163,9 @@ def prepare_disk(device_path)
   else
     # Partitioned device, mount 1st partition
     Chef::Log.info("device #{device_path} partitioned, mounting first partition")
-    # partition_dev = get_1st_partition(device_path)
-    # Chef::Log.info("First partition for device #{device_path} is: #{partition_dev}")
-    # fs_type = get_fs_type(partition_dev)
+    partition_dev = get_1st_partition(device_path)
+    Chef::Log.info("First partition for device #{device_path} is: #{partition_dev}")
+    fs_type = get_fs_type(partition_dev)
     device_path = partition_dev
   end
   node.default['cluster']['volume_fs_type'] = fs_type
