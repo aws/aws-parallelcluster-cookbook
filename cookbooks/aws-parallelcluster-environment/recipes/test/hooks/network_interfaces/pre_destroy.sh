@@ -14,6 +14,9 @@ if [ -n "${KITCHEN_ATTACHMENT_ID}" ]; then
 fi
 
 if [ -n "${KITCHEN_ENI_ID}" ]; then
+  echo "** Waiting for ENI to be detached: ${KITCHEN_ENI_ID}"
+  aws ec2 wait network-interface-available --network-interface-ids "${KITCHEN_ENI_ID}" --region "${KITCHEN_AWS_REGION}"
+
   echo "** Deleting ENI: ${KITCHEN_ENI_ID}"
   aws ec2 delete-network-interface --network-interface-id "${KITCHEN_ENI_ID}" --region "${KITCHEN_AWS_REGION}"
 fi
