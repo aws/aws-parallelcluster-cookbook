@@ -4,6 +4,12 @@ verifier:
   inspec_tests:
     - cookbooks/aws-parallelcluster-environment/test
 
+lifecycle:
+  <% %w(post_create pre_converge pre_destroy).each do |op| %>
+  <%= op %>:
+    - local: bash ./cookbooks/aws-parallelcluster-environment/recipes/test/hooks/run.sh <%= op %> $(dirname "$0")
+  <% end %>
+
 suites:
   - name: nfs
     run_list:
@@ -208,3 +214,18 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
+  - name: network_interfaces
+    # Verifies multiple Network Interfaces recipes
+    # These recipes can be tested on EC2 on instance type with multiple network interfaces
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#network-cards
+    run_list:
+      - recipe[aws-parallelcluster-environment::network_interfaces]
+    driver:
+      instance_type: c6in.32xlarge # available in eu-west-1, all AZs
+      # availability_zone: ...
+      # subnet_id: ...
+    verifier:
+      controls:
+        - network_interfaces_configuration_script_created
+        - network_interfaces_configured
+        - multiple_network_interfaces_can_ping_gateway

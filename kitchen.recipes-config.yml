@@ -14,12 +14,6 @@ verifier:
     # recipe tests will use controls from these directories
     - test/recipes
 
-lifecycle:
-  <% %w(post_create pre_converge pre_destroy).each do |op| %>
-  <%= op %>:
-    - local: bash ./test/recipes/hooks/run.sh <%= op %> $(dirname "$0")
-  <% end %>
-
 # If you need to test a recipe with recipe/resources dependencies,
 # add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
 # then define a dependencies attribute, listing them with recipe: or resource: prefix.
@@ -144,21 +138,6 @@ suites:
         - systemd_slurmd_service
         - systemd_slurmd_service_files
         - systemd_slurmd_service_nvidia_gpu_nodes
-  - name: network_interfaces
-    # Verifies multiple Network Interfaces recipes
-    # These recipes can be tested on EC2 on instance type with multiple network interfaces
-    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#network-cards
-    run_list:
-      - recipe[aws-parallelcluster-config::network_interfaces]
-    driver:
-      instance_type: c6in.32xlarge # available in eu-west-1, all AZs
-      # availability_zone: ...
-      # subnet_id: ...
-    verifier:
-      controls:
-        - network_interfaces_configuration_script_created
-        - network_interfaces_configured
-        - multiple_network_interfaces_can_ping_gateway
   - name: custom_slurm_settings_file_via_s3
     # check that we can retrieve a custom slurm settings file using the S3 protocol
     run_list:

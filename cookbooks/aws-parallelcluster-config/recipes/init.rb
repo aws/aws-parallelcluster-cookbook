@@ -36,7 +36,7 @@ end
 include_recipe "aws-parallelcluster-config::custom_actions_setup" unless on_docker?
 
 # Configure additional Networking Interfaces (if present)
-include_recipe "aws-parallelcluster-config::network_interfaces" unless on_docker?
+include_recipe "aws-parallelcluster-environment::network_interfaces" unless on_docker?
 
 include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_config"
 

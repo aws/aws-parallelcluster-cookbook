@@ -33,3 +33,36 @@ def nvidia_installed?
   Chef::Log.warn("Nvidia driver is not installed") unless nvidia_installed
   nvidia_installed
 end
+
+#
+# Retrieve token to use to retrieve metadata
+#
+def get_metadata_token
+  # generate the token for retrieving IMDSv2 metadata
+  token_uri = URI("http://169.254.169.254/latest/api/token")
+  token_request = Net::HTTP::Put.new(token_uri)
+  token_request["X-aws-ec2-metadata-token-ttl-seconds"] = "300"
+  res = Net::HTTP.new("169.254.169.254").request(token_request)
+  res.body
+end
+
+#
+# Retrieve metadata using a given token
+#
+def get_metadata_with_token(token, uri)
+  # get IMDSv2 metadata with token
+  request = Net::HTTP::Get.new(uri)
+  request["X-aws-ec2-metadata-token"] = token
+  res = Net::HTTP.new("169.254.169.254").request(request)
+  metadata = res.body if res.code == '200'
+  metadata
+end
+
+#
+# Retrieve list of macs of network interfaces
+#
+def network_interface_macs(token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
+  res = get_metadata_with_token(token, uri)
+  res.delete("/").split("\n")
+end

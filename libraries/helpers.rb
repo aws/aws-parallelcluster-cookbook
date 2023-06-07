@@ -153,9 +153,3 @@ def is_slurm_database_updated?
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
   config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
 end
-
-def network_interface_macs(token)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs")
-  res = get_metadata_with_token(token, uri)
-  res.delete("/").split("\n")
-end
