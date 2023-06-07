@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
-# Recipe:: head_node_raid
-#
 # Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
@@ -15,7 +12,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# RAID RELATED
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cluster']['raid_shared_dir']
 manage_raid "add raid" do
