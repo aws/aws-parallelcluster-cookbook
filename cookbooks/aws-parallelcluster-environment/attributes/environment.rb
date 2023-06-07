@@ -28,7 +28,6 @@ default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
 # Other ParallelCluster internal variables
 default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['efs_shared_dirs'] = '/shared'
-default['cluster']['exported_ebs_shared_dirs'] = node['cluster']['ebs_shared_dirs']
 default['cluster']['efs_fs_ids'] = ''
 default['cluster']['efs_encryption_in_transits'] = ''
 default['cluster']['efs_iam_authorizations'] = ''

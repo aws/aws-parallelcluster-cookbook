@@ -42,12 +42,11 @@ end
 
 # Parse shared directory info and turn into an array
 shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
-exported_shared_dir_array = node['cluster']['exported_ebs_shared_dirs'].split(',')
 
 # Mount each volume with NFS
-shared_dir_array.zip(exported_shared_dir_array).each do |dir, exported_dir|
+shared_dir_array.each do |dir|
   dirname = format_directory(dir)
-  exported_dirname = format_directory(exported_dir)
+  exported_dirname = format_directory(dir)
 
   # Created shared mount point
   directory dirname do
