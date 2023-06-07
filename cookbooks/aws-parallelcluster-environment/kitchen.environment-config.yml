@@ -97,6 +97,24 @@ suites:
       cluster:
         enable_efa: compute
         node_type: ComputeFleet
+  - name: network_service_restart
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - network_service_running
+    attributes:
+      resource: network_service
+  - name: network_service_reload
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - network_service_running
+    attributes:
+      resource: network_service:reload
   - name: system_authentication
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
