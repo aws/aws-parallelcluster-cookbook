@@ -137,28 +137,6 @@ suites:
         local_hostname: dokken
         local_ipv4: 172.17.1.15
       ipaddress: 172.17.1.15
-  - name: compute_base
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-config::compute_base]
-    verifier:
-      controls:
-        - compute_base_configured
-    attributes:
-      dependencies:
-        #- resource:nfs
-        - recipe:aws-parallelcluster-test::compute_base_mock
-      cluster:
-        node_type: ComputeFleet
-        cluster_user: test_user
-        exported_intel_dir: exported_intel
-        raid_shared_dir: raid1
-        exported_raid_shared_dir: exported_raid1
-        ebs_shared_dirs: ebs1,ebs2
-        exported_ebs_shared_dirs: exported_ebs1,exported_ebs2
-        nfs:
-          hard_mount_options: hard,_netdev,noatime
-        head_node_private_ip: '127.0.0.1'
   - name: compute_slurmd_systemd
     run_list:
       - recipe[aws-parallelcluster-slurm::config_slurmd_systemd_service]

@@ -45,7 +45,7 @@ case node['cluster']['node_type']
 when 'HeadNode'
   include_recipe 'aws-parallelcluster-config::head_node_base'
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-config::compute_base'
+  include_recipe 'aws-parallelcluster-environment::compute_base'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end

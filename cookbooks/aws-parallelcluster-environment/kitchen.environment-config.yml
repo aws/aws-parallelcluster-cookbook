@@ -33,6 +33,25 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: compute_base
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::compute_base]
+    verifier:
+      controls:
+        - compute_base_configured
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_base
+      cluster:
+        node_type: ComputeFleet
+        cluster_user: test_user
+        raid_shared_dir: raid1
+        ebs_shared_dirs: ebs1,ebs2
+        nfs:
+          hard_mount_options: hard,_netdev,noatime
+        head_node_private_ip: '127.0.0.1'
   - name: directory_service
     # FIXME: breaks on Docker
     run_list:

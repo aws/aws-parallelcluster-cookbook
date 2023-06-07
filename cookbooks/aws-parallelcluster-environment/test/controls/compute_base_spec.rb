@@ -12,7 +12,7 @@
 control 'compute_base_configured' do
   title 'Check the basic configuration for compute node'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe 'Check that cluster user exist'
   describe user('test_user') do
@@ -34,7 +34,7 @@ control 'compute_base_configured' do
 
     describe mount("/#{directory}") do
       it { should be_mounted }
-      its('device') { should eq "127.0.0.1:/exported_#{directory}" }
+      its('device') { should eq "127.0.0.1:/#{directory}" }
       its('type') { should eq 'nfs4' }
       its('options') { should include 'hard' }
       its('options') { should include '_netdev' }
@@ -45,7 +45,7 @@ control 'compute_base_configured' do
   describe 'Check that /opt/intel dir has been mounted'
   describe mount("/opt/intel") do
     it { should be_mounted }
-    its('device') { should eq "127.0.0.1:/exported_intel" }
+    its('device') { should eq "127.0.0.1:/opt/intel" }
     its('type') { should eq 'nfs4' }
     its('options') { should include 'hard' }
     its('options') { should include '_netdev' }
