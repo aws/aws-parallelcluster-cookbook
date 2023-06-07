@@ -23,8 +23,7 @@ validate_os_type
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd? || on_docker?
 
-include_recipe "aws-parallelcluster-config::cfnconfig_mixed"
-
+include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
 include_recipe "aws-parallelcluster-config::mount_shared" if node['cluster']['node_type'] == "ComputeFleet"
 
 fetch_config 'Fetch and load cluster configs'

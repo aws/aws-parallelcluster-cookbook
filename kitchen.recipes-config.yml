@@ -26,16 +26,6 @@ lifecycle:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
-  - name: cfnconfig_mixed
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::cfnconfig_mixed]
-    verifier:
-      controls:
-        - cfnconfig_file_configuration
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
   - name: mount_shared
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]

@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'cfnconfig_file_configuration' do
+control 'tag:config_cfnconfig_file_configuration' do
   title 'Check the creation of cfnconfig file'
 
   describe file('/etc/parallelcluster/cfnconfig') do
@@ -21,5 +21,5 @@ control 'cfnconfig_file_configuration' do
   describe file('/opt/parallelcluster/cfnconfig') do
     it { should exist }
     its('link_path') { should eq '/etc/parallelcluster/cfnconfig' }
-  end
+  end unless os_properties.on_docker?
 end
