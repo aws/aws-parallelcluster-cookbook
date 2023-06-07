@@ -198,3 +198,13 @@ suites:
         scheduler: slurm
         head_node_imds_secured: 'true'
         head_node_imds_allowed_users: ['root', 'nobody']
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::cfnconfig_mixed]
+    verifier:
+      controls:
+        - /tag:config_cfnconfig/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories

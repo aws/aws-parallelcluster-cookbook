@@ -35,7 +35,6 @@ default['cluster']['is_official_ami_build'] = false
 default['cluster']['stack_name'] = nil
 default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
-default['cluster']['ephemeral_dir'] = '/scratch' # TODO: move to environment once cfnconfig_mixed is moved there as well
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['volume'] = ''
 

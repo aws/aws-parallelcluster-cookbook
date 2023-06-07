@@ -147,3 +147,13 @@ suites:
         - resource:nfs
         - 'manage_ebs:export {"shared_dir_array" : ["shared_dir"]}'
       resource: 'manage_ebs:unexport {"shared_dir_array" : ["shared_dir"]}'
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::cfnconfig_mixed]
+    verifier:
+      controls:
+        - /tag:install_cfnconfig/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
