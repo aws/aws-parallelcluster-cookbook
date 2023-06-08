@@ -15,3 +15,12 @@ provisioner:
       # right now tests depend on this parameter: we will try to remove the dependency later
       region: us-east-1
       parallelcluster-node-version: '3.4.1'
+
+lifecycle:
+  <% %w(pre post).each do |prefix| %>
+  <% %w(create converge verify destroy).each do |phase| %>
+  <% op = "#{prefix}_#{phase}" %>
+  <%= op %>:
+    - local: bash ./kitchen.run-hook.sh <%= op %> $(dirname "$0")
+  <% end %>
+  <% end %>
