@@ -33,6 +33,6 @@ template "#{node['cluster']['etc_dir']}/parallelcluster_supervisord.conf" do
   variables(
     region: region,
     aws_ca_bundle: region.start_with?('us-iso') ? "/etc/pki/#{region}/certs/ca-bundle.pem" : '',
-    dcv_configured: node['cluster']['dcv_enabled'] == "head_node" && node['conditions']['dcv_supported']
+    dcv_configured: node['cluster']['dcv_enabled'] == "head_node" && dcv_installed?
   )
 end

@@ -31,6 +31,10 @@ class Instance < Inspec.resource(1)
     !inspec.node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
   end
 
+  def dcv_installed?
+    ::File.exist?("/etc/dcv/dcv.conf")
+  end
+
   def imds_token
     @imds_token = inspec.http('http://169.254.169.254/latest/api/token', method: 'PUT', headers: {
       "X-aws-ec2-metadata-token-ttl-seconds": 900,

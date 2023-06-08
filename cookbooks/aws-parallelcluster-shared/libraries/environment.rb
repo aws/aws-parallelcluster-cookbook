@@ -63,3 +63,10 @@ end
 def x86_instance?
   node['kernel']['machine'] == 'x86_64'
 end
+
+#
+# Check if DCV is installed
+#
+def dcv_installed?
+  ::File.exist?("/etc/dcv/dcv.conf")
+end
