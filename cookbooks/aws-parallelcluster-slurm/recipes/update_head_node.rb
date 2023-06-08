@@ -245,6 +245,6 @@ end
 # The updated cfnconfig will be used by post update custom scripts
 template "#{node['cluster']['etc_dir']}/cfnconfig" do
   source 'init/cfnconfig.erb'
-  cookbook 'aws-parallelcluster-config'
+  cookbook 'aws-parallelcluster-environment'
   mode '0644'
 end
