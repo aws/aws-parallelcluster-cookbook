@@ -11,7 +11,7 @@
 unified_mode true
 
 property :raid_shared_dir, String, required: true
-property :raid_type, [String, Integer], required: false
+property :raid_type, [String, Integer], required: %i(mount)
 property :raid_vol_array, String, required: true
 
 action :mount do
