@@ -11,7 +11,7 @@ describe 'manage_raid:mount' do
     context "on #{platform}#{version}" do
       cached(:venv_path) { 'venv' }
       cached(:raid_superblock_version) do
-        platform == 'redhat' || "#{platform}#{version}" == 'ubuntu20.04' ? '1.2' : '0.90'
+        platform == 'redhat' || "#{platform}#{version}" == 'ubuntu20.04' || "#{platform}#{version}" == 'ubuntu22.04' ? '1.2' : '0.90'
       end
       cached(:chef_run) do
         runner = ChefSpec::Runner.new(
@@ -30,24 +30,8 @@ describe 'manage_raid:mount' do
       end
 
       it "attaches volumes" do
-        # Attach RAID EBS volume
-        is_expected.to run_execute("attach_raid_volume_0")
-          .with(command: "#{venv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id vol-0 --attach")
-          .with(creates: "/dev/disk/by-ebs-volumeid/vol-0")
-
-        is_expected.to run_execute("attach_raid_volume_1")
-          .with(command: "#{venv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id vol-1 --attach")
-          .with(creates: "/dev/disk/by-ebs-volumeid/vol-1")
-
-        block = chef_run.find_resource('ruby_block', 'sleeping_for_raid_volume_0')
-        expect(block).to receive(:wait_for_block_dev).with('/dev/disk/by-ebs-volumeid/vol-0')
-        block.block.call
-        expect(block).to subscribe_to('execute[attach_raid_volume_0]').on(:run).immediately
-
-        block = chef_run.find_resource('ruby_block', 'sleeping_for_raid_volume_1')
-        expect(block).to receive(:wait_for_block_dev).with('/dev/disk/by-ebs-volumeid/vol-1')
-        block.block.call
-        expect(block).to subscribe_to('execute[attach_raid_volume_1]').on(:run).immediately
+        is_expected.to attach_volume('attach raid volume 0').with_volume_id('vol-0')
+        is_expected.to attach_volume('attach raid volume 1').with_volume_id('vol-1')
       end
 
       it "initializes raid" do
@@ -79,36 +63,15 @@ describe 'manage_raid:mount' do
         expect(command).to subscribe_to('execute[setup_raid_disk]').on(:run).immediately
       end
 
-      it "creates the shared dir" do
-        is_expected.to create_directory('/raid_shared_dir')
-          .with(owner: 'root')
-          .with(group: 'root')
-          .with(mode: '1777')
-        # recursive do not work
-        # .with(recursive: true)
-      end
-
-      it "mounts and enables the shared dir" do
-        is_expected.to mount_mount('/raid_shared_dir')
-          .with(device: "/dev/md0")
-          .with(fstype: "ext4")
-          .with(options: %w(defaults nofail _netdev))
-          .with(retries: 10)
-          .with(retry_delay: 6)
-
-        is_expected.to enable_mount('/raid_shared_dir')
-          .with(device: "/dev/md0")
-          .with(fstype: "ext4")
-          .with(options: %w(defaults nofail _netdev))
-          .with(retries: 10)
-          .with(retry_delay: 6)
-      end
-
-      it "changes permission for the shared dir" do
-        is_expected.to create_directory('/raid_shared_dir')
-          .with(owner: 'root')
-          .with(group: 'root')
-          .with(mode: '1777')
+      it "mounts volume" do
+        is_expected.to mount_volume('mount raid volume').with(
+          shared_dir: 'raid_shared_dir',
+          device: "/dev/md0",
+          fstype: "ext4",
+          options: "defaults,nofail,_netdev",
+          retries: 10,
+          retry_delay: 6
+        )
       end
     end
   end
@@ -138,24 +101,8 @@ describe 'manage_raid:unmount' do
         allow(resource).to receive(:get_raid_devices).with("/dev/md0").and_return("device1 device2")
       end
 
-      it "unmounts and disables shared dir" do
-        is_expected.to unmount_mount("/raid_shared_dir")
-          .with(device: "/dev/md0")
-          .with(fstype: "ext4")
-          .with(options: %w(defaults nofail _netdev))
-          .with(retries: 10)
-          .with(retry_delay: 6)
-
-        is_expected.to disable_mount("/raid_shared_dir")
-          .with(device: "/dev/md0")
-          .with(fstype: "ext4")
-          .with(options: %w(defaults nofail _netdev))
-          .with(retries: 10)
-          .with(retry_delay: 6)
-      end
-
-      it "deletes shared dir" do
-        is_expected.to delete_directory("/raid_shared_dir").with(recursive: true)
+      it "unmounts volume" do
+        is_expected.to unmount_volume('unmount raid volume').with_shared_dir('raid_shared_dir')
       end
 
       it "stops RAID device" do
@@ -174,12 +121,9 @@ describe 'manage_raid:unmount' do
           .with(pattern: "ARRAY /dev/md0 *")
       end
 
-      it "detaches each volume" do
-        is_expected.to run_execute("detach_raid_volume_0")
-          .with(command: "#{venv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id vol-0 --detach")
-
-        is_expected.to run_execute("detach_raid_volume_1")
-          .with(command: "#{venv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id vol-1 --detach")
+      it "detaches volume" do
+        is_expected.to detach_volume('detach raid volume 0').with_volume_id('vol-0')
+        is_expected.to detach_volume('detach raid volume 1').with_volume_id('vol-1')
       end
     end
   end
