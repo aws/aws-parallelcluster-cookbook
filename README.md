@@ -114,6 +114,32 @@ __Example.__
 - `test/hooks/config/network_interfaces/post_create.sh`: creates ENI and attaches it to the instance
 - `test/hooks/config/network_interfaces/pre_destroy.sh`: detaches and deletes ENI.
 
+### Use variables from lifecycle hooks as resource properties
+
+In the `kitchen.global.yaml` we're configuring an [environment](https://docs.chef.io/environments/).
+
+In the environment file (i.e. `test/environments/kitchen.rb`), for every value to pass and for every OS, 
+you have to define a line like: `'<suite_name>-<variable_name>/<platform>' => 'placeholder'`. For instance:
+```
+default_attributes 'kitchen_hooks' => {
+  'ebs_mount-vol_array/alinux2' => 'placeholder',
+  ...
+}
+```
+
+These environment variables will be available to the kitchen tests as node attributes:
+`node['kitchen_hooks']['ebs_mount-vol_array/alinux2']`. 
+
+To permit to use these environment variables as parameters attributes you have to use th `FROM-HOOK`
+keyword in the test suite definition.
+e.g. `resource: 'manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : "FROM_HOOK-<suite_name>-<variable_name>"}'`
+
+This value will be automatically replaced, searching for the `<suite_name>-<variable_name>/<platform>` in the environment.
+You can find all the details of this mechanism in the `test_resource.rb`.
+
+Note: the value of the property to be replaced must be a string even if it's an array.
+It's up to the post_create script to define an array in the environment.
+
 ### Known issues with docker
 
 #### Running kitchen tests on non `amd64` architectures

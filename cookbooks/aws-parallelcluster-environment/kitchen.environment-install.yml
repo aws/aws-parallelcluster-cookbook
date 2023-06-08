@@ -130,9 +130,7 @@ suites:
       controls:
         - /ebs_mounted/
     attributes:
-      # manually create a volume (default values with 1G size are OK) and paste Volume ID below
-      # manually delete the volume after the test is concluded
-      resource: 'manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : ["vol-00ec1f3bbcef44f6d"]}'
+      resource: 'manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : "FROM_HOOK-ebs_mount-vol_array"}'
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
