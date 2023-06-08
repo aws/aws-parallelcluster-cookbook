@@ -4,12 +4,6 @@ verifier:
   inspec_tests:
     - cookbooks/aws-parallelcluster-environment/test
 
-lifecycle:
-  <% %w(post_create pre_converge pre_destroy).each do |op| %>
-  <%= op %>:
-    - local: bash ./cookbooks/aws-parallelcluster-environment/recipes/test/hooks/run.sh <%= op %> $(dirname "$0")
-  <% end %>
-
 suites:
   - name: nfs
     run_list:

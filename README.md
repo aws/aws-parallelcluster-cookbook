@@ -103,19 +103,16 @@ The procedure described above also applies to EC2, with minor differences.
 Kitchen [lifecycle hooks](https://kitchen.ci/docs/reference/lifecycle-hooks/) allow running commands 
 before and/or after any phase of Kitchen tests (create, converge, verify, or destroy).
 
-We [leverage](https://github.com/aws/aws-parallelcluster-cookbook/blob/fea76da1afe36a9e62566bb248e66d826e7af375/kitchen.recipes-config.yml#L18-L22) 
-this feature in Kitchen tests to create/destroy AWS resources. 
+We leverage this feature in Kitchen tests to create/destroy AWS resources (see `kitchen.global.yaml` file. 
 
-For each phase, a generic [run](https://github.com/aws/aws-parallelcluster-cookbook/tree/ac4698d44a6f0385dd9c4f2840562df4b4e26b77/test/recipes) 
-script executes custom `${KITCHEN_SUITE_NAME}/[pre|post]_${KITCHEN_PHASE}.sh` script, if it exists.
+For each phase, a generic run script executes custom 
+`${THIS_DIR}/${KITCHEN_COOKBOOK_PATH}/test/hooks/${KITCHEN_PHASE}/${KITCHEN_SUITE_NAME}/${KITCHEN_HOOK}.sh` script, if it exists.
 
 __Example.__ 
 
-`network_interfaces` Kitchen test suite requires a network interface to be attached to the node. 
-- [network_interfaces/post_create.sh](https://github.com/aws/aws-parallelcluster-cookbook/blob/ac4698d44a6f0385dd9c4f2840562df4b4e26b77/test/recipes/hooks/network_interfaces/post_create.sh) 
-creates ENI and attaches it to the instance
-- [network_interfaces/pre_destroy.sh](https://github.com/aws/aws-parallelcluster-cookbook/blob/ac4698d44a6f0385dd9c4f2840562df4b4e26b77/test/recipes/hooks/network_interfaces/pre_destroy.sh)
-detaches and deletes ENI.
+`network_interfaces` Kitchen test suite in the `aws-parallelcluster-environment` cookbook requires a network interface to be attached to the node. 
+- `test/hooks/config/network_interfaces/post_create.sh`: creates ENI and attaches it to the instance
+- `test/hooks/config/network_interfaces/pre_destroy.sh`: detaches and deletes ENI.
 
 ### Known issues with docker
 
