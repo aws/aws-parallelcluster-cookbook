@@ -53,7 +53,7 @@ end
 include_recipe "aws-parallelcluster-config::sudo"
 
 # Mount EFS, FSx
-include_recipe "aws-parallelcluster-config::fs_mount"
+include_recipe "aws-parallelcluster-environment::fs_mount"
 
 # Intel Runtime Libraries
 intel_hpc 'Configure Intel HPC' do
