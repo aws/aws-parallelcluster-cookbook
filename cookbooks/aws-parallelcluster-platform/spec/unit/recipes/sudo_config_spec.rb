@@ -1,14 +1,15 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-config::sudo' do
+describe 'aws-parallelcluster-platform::sudo_config' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        ChefSpec::Runner.new(platform: platform, version: version).converge(described_recipe)
+        runner(platform: platform, version: version).converge(described_recipe)
       end
 
       it 'creates the sudoers template with the correct attributes' do
         is_expected.to create_template('/etc/sudoers.d/99-parallelcluster-user-tty').with(
+          source: 'base/99-parallelcluster-user-tty.erb',
           owner: 'root',
           group: 'root',
           mode:  '0600'
@@ -17,6 +18,7 @@ describe 'aws-parallelcluster-config::sudo' do
 
       it 'creates the supervisord template with the correct attributes' do
         is_expected.to create_template('/etc/parallelcluster/parallelcluster_supervisord.conf').with(
+          source: 'base/parallelcluster_supervisord.conf.erb',
           owner: 'root',
           group: 'root',
           mode:  '0644'
@@ -25,7 +27,7 @@ describe 'aws-parallelcluster-config::sudo' do
 
       context "when head node and dcv configured" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['node_type'] = 'HeadNode'
             node.override['cluster']['dcv_enabled'] = 'head_node'
             allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(true)
@@ -36,6 +38,7 @@ describe 'aws-parallelcluster-config::sudo' do
 
         it 'has the correct content' do
           is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:clustermgtd]")
             .with_content("[program:clusterstatusmgtd]")
             .with_content("[program:pcluster_dcv_authenticator]")
             .with_content("--port 8444")
@@ -43,7 +46,7 @@ describe 'aws-parallelcluster-config::sudo' do
 
         context "when head node and dcv not configured" do
           cached(:chef_run) do
-            runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+            runner = runner(platform: platform, version: version) do |node|
               node.override['cluster']['node_type'] = 'HeadNode'
               node.override['cluster']['dcv_enabled'] = 'NONE'
               allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(true)
@@ -64,7 +67,7 @@ describe 'aws-parallelcluster-config::sudo' do
 
       context "when compute fleet" do
         cached(:chef_run) do
-          runner = ChefSpec::Runner.new(platform: platform, version: version) do |node|
+          runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['node_type'] = 'ComputeFleet'
             node.override['cluster']['dcv_enabled'] = 'head_node'
             allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(false)

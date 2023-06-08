@@ -50,7 +50,7 @@ else
   raise "node_type must be HeadNode or ComputeFleet"
 end
 
-include_recipe "aws-parallelcluster-config::sudo"
+include_recipe "aws-parallelcluster-platform::sudo_config"
 
 # Mount EFS, FSx
 include_recipe "aws-parallelcluster-environment::fs_mount"
