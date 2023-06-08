@@ -15,21 +15,15 @@ describe 'manage_raid:export' do
         runner.converge_dsl do
           manage_raid 'export' do
             action :export
-            raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
           end
         end
       end
 
-      before do
-        mock_get_vpc_cidr_list('0.0.0.0/0
-                              192.168.200.4/30')
-      end
-      it "exports shared dir" do
-        is_expected.to create_nfs_export("/raid_shared_dir")
-          .with(network: get_vpc_cidr_list)
-          .with(writeable: true)
-          .with(options: %w(no_root_squash))
+      it "exports volume" do
+        is_expected.to export_volume('export volume raid_shared_dir').with(
+          shared_dir: 'raid_shared_dir'
+        )
       end
     end
   end
@@ -46,20 +40,15 @@ describe 'manage_raid:unexport' do
         runner.converge_dsl do
           manage_raid 'unexport' do
             action :unexport
-            raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
           end
         end
       end
 
-      it "unexports raid directory via NFS" do
-        is_expected.to edit_delete_lines("remove volume from /etc/exports")
-          .with(path: "/etc/exports")
-          .with(pattern: "^/raid_shared_dir *")
-      end
-
       it "unexports volume" do
-        is_expected.to run_execute("unexport volume").with(command: "exportfs -ra")
+        is_expected.to unexport_volume('unexport volume raid_shared_dir').with(
+          shared_dir: 'raid_shared_dir'
+        )
       end
     end
   end

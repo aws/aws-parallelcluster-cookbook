@@ -16,30 +16,6 @@ require 'chef/mixin/shell_out'
 require 'net/http'
 require 'timeout'
 
-#
-# TODO delete wait_for_block_dev and rescan_pci when manage_raid resource starts using volume resource
-#
-#
-# Wait 60 seconds for the block device to be ready
-#
-def wait_for_block_dev(path)
-  Timeout.timeout(60) do
-    until ::File.blockdev?(path)
-      Chef::Log.info("device #{path} not ready - sleeping 5s")
-      sleep(5)
-      rescan_pci
-    end
-    Chef::Log.info("device #{path} is ready")
-  end
-end
-
-#
-# Rescan the PCI bus to discover newly added volumes.
-#
-def rescan_pci
-  Mixlib::ShellOut.new("echo 1 > /sys/bus/pci/rescan").run_command
-end
-
 def ignore_failure(lookup)
   resource = resources(lookup)
   if resource.nil?
