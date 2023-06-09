@@ -14,7 +14,7 @@ describe 'manage_raid:mount' do
         platform == 'redhat' || "#{platform}#{version}" == 'ubuntu20.04' || "#{platform}#{version}" == 'ubuntu22.04' ? '1.2' : '0.90'
       end
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
+        runner = runner(
           platform: platform, version: version,
           step_into: ['manage_raid']
         )
@@ -82,7 +82,7 @@ describe 'manage_raid:unmount' do
     context "on #{platform}#{version}" do
       cached(:venv_path) { 'venv' }
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
+        runner = runner(
           platform: platform, version: version,
           step_into: ['manage_raid']
         )
