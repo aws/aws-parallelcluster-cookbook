@@ -8,7 +8,7 @@ describe 'manage_raid:export' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
+        runner = runner(
           platform: platform, version: version,
           step_into: ['manage_raid']
         )
@@ -33,7 +33,7 @@ describe 'manage_raid:unexport' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner = ChefSpec::Runner.new(
+        runner = runner(
           platform: platform, version: version,
           step_into: ['manage_raid']
         )
