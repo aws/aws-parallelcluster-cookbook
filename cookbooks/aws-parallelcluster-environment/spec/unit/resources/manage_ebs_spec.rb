@@ -232,8 +232,8 @@ describe 'manage_ebs:unmount' do
       end
 
       it "unmounts volumes" do
-        is_expected.to unmount_volume('unmount volume 0').with_volume_id('vol-0').with_shared_dir('ebs_shared_dir_0')
-        is_expected.to unmount_volume('unmount volume 1').with_volume_id('vol-1').with_shared_dir('ebs_shared_dir_1')
+        is_expected.to unmount_volume('unmount volume 0').with_shared_dir('ebs_shared_dir_0')
+        is_expected.to unmount_volume('unmount volume 1').with_shared_dir('ebs_shared_dir_1')
       end
 
       it "detached volumes" do

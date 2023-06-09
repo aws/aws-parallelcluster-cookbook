@@ -68,7 +68,6 @@ action :unmount do
   return if on_docker?
   new_resource.vol_array.each_with_index do |volumeid, index|
     volume "unmount volume #{index}" do
-      volume_id volumeid
       shared_dir new_resource.shared_dir_array[index]
       action :unmount
     end

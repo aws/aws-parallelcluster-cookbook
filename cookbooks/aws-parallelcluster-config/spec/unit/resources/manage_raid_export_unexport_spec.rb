@@ -15,7 +15,7 @@ describe 'manage_raid:export' do
         runner.converge_dsl do
           manage_raid 'export' do
             action :export
-            raid_vol_array "vol-0, vol-1"
+            raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
           end
         end
@@ -46,7 +46,7 @@ describe 'manage_raid:unexport' do
         runner.converge_dsl do
           manage_raid 'unexport' do
             action :unexport
-            raid_vol_array "vol-0, vol-1"
+            raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
           end
         end

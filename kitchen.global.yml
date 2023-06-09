@@ -9,6 +9,9 @@ verifier:
 
 provisioner:
   data_path: test/data
+  environments_path: test/environments
+  client_rb:
+    environment: kitchen
   attributes:
     kitchen: true
     cluster:

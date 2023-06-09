@@ -22,7 +22,7 @@ describe 'manage_raid:mount' do
         runner.converge_dsl do
           manage_raid 'mount' do
             action :mount
-            raid_vol_array "vol-0, vol-1"
+            raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
             raid_type ' 0'
           end
@@ -127,7 +127,7 @@ describe 'manage_raid:unmount' do
         runner.converge_dsl do
           manage_raid 'unmount' do
             action :unmount
-            raid_vol_array "vol-0, vol-1"
+            raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
             raid_type ' 0'
           end
