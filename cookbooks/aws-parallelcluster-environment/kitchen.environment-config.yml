@@ -412,3 +412,19 @@ suites:
                                   "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
                                   "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
                                   "fsx_volume_junction_path_array": [""]}'
+  - name: mount_shared
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::mount_shared]
+    verifier:
+      controls:
+        - /tag:config_mount_shared/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-test::export_directories_mock
+      cluster:
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
