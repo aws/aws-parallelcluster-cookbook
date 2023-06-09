@@ -11,7 +11,7 @@ default_action :run
 
 action :run do
   Chef::Log.debug("Called fetch_config with update (#{new_resource.update})")
-  unless virtualized?
+  unless on_docker?
     if new_resource.update
       Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
       ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
