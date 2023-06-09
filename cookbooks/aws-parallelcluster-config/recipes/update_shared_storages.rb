@@ -134,7 +134,7 @@ ruby_block "get storage to mount and unmount" do
     end
     raid_shared_dir = nil
     raid_type = nil
-    raid_vol_array = nil
+    raid_vol_array = []
     unless in_shared_storages_mapping["raid"].nil?
       in_shared_storages_mapping["raid"].each do |storage|
         next unless not_in_shared_storages_mapping["raid"].nil? || !not_in_shared_storages_mapping["raid"].include?(storage)

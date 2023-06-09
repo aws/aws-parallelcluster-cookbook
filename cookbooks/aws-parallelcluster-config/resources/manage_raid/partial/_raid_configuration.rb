@@ -12,10 +12,10 @@ unified_mode true
 
 property :raid_shared_dir, String, required: true
 property :raid_type, [String, Integer], required: %i(mount)
-property :raid_vol_array, String, required: true
+property :raid_vol_array, Array, required: true
 
 action :mount do
-  raid_vol_array = new_resource.raid_vol_array.dup.split(',')
+  raid_vol_array = new_resource.raid_vol_array.dup
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = new_resource.raid_shared_dir.dup
   raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
@@ -118,7 +118,7 @@ action :export do
 end
 
 action :unmount do
-  raid_vol_array = new_resource.raid_vol_array.dup.split(',')
+  raid_vol_array = new_resource.raid_vol_array.dup
   # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = new_resource.raid_shared_dir.dup
   raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
