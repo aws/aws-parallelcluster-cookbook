@@ -13,7 +13,7 @@ control 'ebs_mounted' do
   only_if { !os_properties.on_docker? }
   describe mount('/shared_dir') do
     it { should be_mounted }
-    its('device') { should eq '/dev/nvme1n1' }
+    its('device') { should eq '/dev/xvdb' }
     its('type') { should eq 'ext4' }
     its('options') { should include '_netdev' }
   end
