@@ -17,7 +17,7 @@ raid_shared_dir = node['cluster']['raid_shared_dir']
 manage_raid "add raid" do
   raid_shared_dir raid_shared_dir
   raid_type node['cluster']['raid_type']
-  raid_vol_array node['cluster']['raid_vol_ids']
+  raid_vol_array node['cluster']['raid_vol_ids'].split(',')
   action %i(mount export)
   not_if { raid_shared_dir.empty? }
 end
