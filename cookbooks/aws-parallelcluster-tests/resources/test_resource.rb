@@ -40,7 +40,11 @@ def its_properties
         hook_key = "#{env_property}/#{node['cluster']['base_os']}"
         hook_value = node['kitchen_hooks'][hook_key]
 
-        Chef::Log.info("Hook key #{hook_key} found in the environment. Replacing FROM_HOOK value with: #{hook_value}")
+        if hook_value.nil?
+          Chef::Log.error("Hook key #{hook_key} not found in the environment. Please define it.")
+        else
+          Chef::Log.info("Hook key #{hook_key} found in the environment. Replacing FROM_HOOK value with: #{hook_value}")
+        end
         properties[key] = hook_value
         Chef::Log.debug("Modified properties are now: #{properties}")
       end
