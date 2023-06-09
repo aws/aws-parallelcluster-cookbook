@@ -14,5 +14,7 @@ echo "** Deleting EBS volume ${KITCHEN_EBS_VOLUME_ID}"
 aws ec2 detach-volume --volume-id "${KITCHEN_EBS_VOLUME_ID}" --region "${KITCHEN_AWS_REGION}"
 echo "** EBS volume ${KITCHEN_EBS_VOLUME_ID} detached"
 
+aws ec2 wait volume-available --volume-ids ${KITCHEN_EBS_VOLUME_ID} --region "${KITCHEN_AWS_REGION}"
+
 aws ec2 delete-volume --volume-id "${KITCHEN_EBS_VOLUME_ID}" --region "${KITCHEN_AWS_REGION}"
 echo "** EBS volumes ${KITCHEN_EBS_VOLUME_ID} deleted"
