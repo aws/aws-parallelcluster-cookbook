@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-config
-# Recipe:: custom_actions_setup
-#
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
@@ -16,7 +13,7 @@
 # limitations under the License.
 
 template "#{node['cluster']['scripts_dir']}/fetch_and_run" do
-  source 'init/fetch_and_run.erb'
+  source 'custom_actions/fetch_and_run.erb'
   owner "root"
   group "root"
   mode "0755"
