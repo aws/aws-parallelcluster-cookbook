@@ -12,19 +12,13 @@ unified_mode true
 
 property :raid_shared_dir, String, required: true
 property :raid_type, [String, Integer], required: %i(mount)
-property :raid_vol_array, Array, required: true
+property :raid_vol_array, Array, required: %i(mount unmount)
 
 action :mount do
   raid_vol_array = new_resource.raid_vol_array.dup
-  # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = new_resource.raid_shared_dir.dup
-  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
   # Parse and determine RAID type (cast into integer)
   raid_type = new_resource.raid_type.dup.strip.to_i
-  # Parse volume info into an array
-  raid_vol_array.each_with_index do |vol, index|
-    raid_vol_array[index] = vol.strip
-  end
 
   # Attach each volume
   raid_dev_path = []
@@ -32,18 +26,9 @@ action :mount do
     raid_dev_path[index] = "/dev/disk/by-ebs-volumeid/#{volumeid}"
 
     # Attach RAID EBS volume
-    execute "attach_raid_volume_#{index}" do
-      command "#{cookbook_virtualenv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volumeid} --attach"
-      creates raid_dev_path[index]
-    end
-
-    # wait for the drive to attach
-    ruby_block "sleeping_for_raid_volume_#{index}" do
-      block do
-        wait_for_block_dev(raid_dev_path[index])
-      end
-      action :nothing
-      subscribes :run, "execute[attach_raid_volume_#{index}]", :immediately
+    volume "attach raid volume #{index}" do
+      volume_id volumeid
+      action :attach
     end
   end
 
@@ -79,73 +64,40 @@ action :mount do
     subscribes :run, "execute[setup_raid_disk]", :immediately
   end
 
-  # Create the shared directory
-  directory raid_shared_dir do
-    owner 'root'
-    group 'root'
-    mode '1777'
-    recursive true
-    action :create
-  end
-
-  # Add volume to /etc/fstab
-  mount raid_shared_dir do
+  volume "mount raid volume" do
+    action :mount
+    shared_dir raid_shared_dir
     device raid_dev
     fstype "ext4"
     options "defaults,nofail,_netdev"
-    action %i(mount enable)
     retries 10
     retry_delay 6
-  end
-
-  # Make sure shared directory permissions are correct
-  directory raid_shared_dir do
-    owner 'root'
-    group 'root'
-    mode '1777'
   end
 end
 
 action :export do
+  return if on_docker?
+
   raid_shared_dir = new_resource.raid_shared_dir.dup
-  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
-  # Export RAID directory via nfs
-  nfs_export raid_shared_dir do
-    network get_vpc_cidr_list
-    writeable true
-    options ['no_root_squash']
+  volume "export volume #{raid_shared_dir}" do
+    shared_dir raid_shared_dir
+    action :export
   end
 end
 
 action :unmount do
+  return if on_docker?
+
   raid_vol_array = new_resource.raid_vol_array.dup
-  # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
   raid_shared_dir = new_resource.raid_shared_dir.dup
-  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
-  # Parse and determine RAID type (cast into integer)
-  # Parse volume info into an array
-  raid_vol_array.each_with_index do |vol, index|
-    raid_vol_array[index] = vol.strip
-  end
 
-  raid_dev = "/dev/md0"
-  # Unmount and remove volume from /etc/fstab
-  mount raid_shared_dir do
-    device raid_dev
-    fstype "ext4"
-    options "defaults,nofail,_netdev"
-    action %i(unmount disable)
-    retries 10
-    retry_delay 6
-  end
-
-  # Delete the shared directories
-  directory raid_shared_dir do
-    recursive true
-    action :delete
+  volume "unmount raid volume" do
+    shared_dir raid_shared_dir
+    action :unmount
   end
 
   # Get disks that are part of the RAID group.
+  raid_dev = "/dev/md0"
   devices_list = get_raid_devices(raid_dev)
 
   # Stop mdadm RAID device
@@ -167,23 +119,19 @@ action :unmount do
   # Detach each volume
   raid_vol_array.each_with_index do |volumeid, index|
     # Detach RAID EBS volume
-    execute "detach_raid_volume_#{index}" do
-      command "#{cookbook_virtualenv_path}/bin/python /usr/local/sbin/manageVolume.py --volume-id #{volumeid} --detach"
+    volume "detach raid volume #{index}" do
+      volume_id volumeid
+      action :detach
     end
   end
 end
 
 action :unexport do
+  return if on_docker?
   raid_shared_dir = new_resource.raid_shared_dir.dup
-  raid_shared_dir = "/#{raid_shared_dir}" unless raid_shared_dir.start_with?('/')
-  # Unexport RAID directory via nfs
-  delete_lines "remove volume from /etc/exports" do
-    path "/etc/exports"
-    pattern "^#{raid_shared_dir} *"
-  end
-
-  execute "unexport volume" do
-    command "exportfs -ra"
+  volume "unexport volume #{raid_shared_dir}" do
+    shared_dir raid_shared_dir
+    action :unexport
   end
 end
 

@@ -9,17 +9,17 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'ebs_mounted' do
+control 'raid_mounted' do
   only_if { !os_properties.on_docker? }
   describe mount('/shared_dir') do
     it { should be_mounted }
-    its('device') { should eq '/dev/xvdb' }
+    its('device') { should eq '/dev/md0' }
     its('type') { should eq 'ext4' }
     its('options') { should include '_netdev' }
   end
 end
 
-control 'ebs_unmounted' do
+control 'raid_unmounted' do
   only_if { !os_properties.on_docker? }
 
   describe mount('/shared_dir') do
@@ -27,7 +27,7 @@ control 'ebs_unmounted' do
   end
 end
 
-control 'ebs_exported' do
+control 'raid_exported' do
   only_if { !os_properties.on_docker? }
 
   describe bash('cat /etc/exports') do
@@ -36,7 +36,7 @@ control 'ebs_exported' do
   end
 end
 
-control 'ebs_unexported' do
+control 'raid_unexported' do
   only_if { !os_properties.on_docker? }
 
   describe bash('cat /etc/exports') do
