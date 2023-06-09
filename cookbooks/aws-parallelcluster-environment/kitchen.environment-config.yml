@@ -87,7 +87,7 @@ suites:
       controls:
         - /ebs_mounted/
     attributes:
-      resource: 'manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : "FROM_HOOK-ebs_mount-vol_array"}'
+      resource: 'manage_ebs:mount {"shared_dir_array": ["shared_dir"], "vol_array": "FROM_HOOK-ebs_mount-vol_array"}'
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
@@ -99,13 +99,11 @@ suites:
       controls:
         - /ebs_unmounted/
     attributes:
-      # manually create a volume (default values with 1G size are OK) and paste Volume ID below (2 rows)
-      # manually delete the volume after the test is concluded
-      resource: 'manage_ebs:unmount {"shared_dir_array" : ["shared_dir"], "vol_array" : ["vol-079c85a76699b2ef1"]}'
+      resource: 'manage_ebs:unmount {"shared_dir_array": ["shared_dir"], "vol_array": "FROM_HOOK-ebs_unmount-vol_array"}'
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
-        - 'resource:manage_ebs:mount {"shared_dir_array" : ["shared_dir"], "vol_array" : ["vol-079c85a76699b2ef1"]} '
+        - 'resource:manage_ebs:mount {"shared_dir_array": ["shared_dir"], "vol_array": "FROM_HOOK-ebs_unmount-vol_array"}'
   - name: ebs_export
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
