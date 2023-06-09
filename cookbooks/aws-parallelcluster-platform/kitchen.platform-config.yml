@@ -150,3 +150,14 @@ suites:
     verifier:
       controls:
         - /tag:config_networking/
+  - name: sudo
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::sudo_config]
+    verifier:
+      controls:
+        - /tag:config_sudo/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::sudo_install

@@ -36,17 +36,6 @@ suites:
         head_node_private_ip: '127.0.0.1'
         head_node_home_path: '/fake_headnode_home'
         shared_dir_head: '/fake_headnode_shared'
-  - name: sudo_configured
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::sudo]
-    verifier:
-      controls:
-        - sudo_configured
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - recipe:aws-parallelcluster-platform::sudo_install
   - name: head_node_base
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
