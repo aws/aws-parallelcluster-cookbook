@@ -30,41 +30,9 @@ include_recipe 'aws-parallelcluster-environment::shared_storage_head_node'
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-environment::raid'
 
-# Setup cluster user
-user node['cluster']['cluster_user'] do
-  manage_home true
-  comment 'AWS ParallelCluster user'
-  home "/home/#{node['cluster']['cluster_user']}"
-  shell '/bin/bash'
-end
+# Setup cluster user and SSH on head node
+include_recipe 'aws-parallelcluster-platform::cluster_user_head_node'
 
-# Setup SSH auth for cluster user
-bash "ssh-keygen" do
-  cwd "/home/#{node['cluster']['cluster_user']}"
-  code <<-KEYGEN
-    set -e
-    su - #{node['cluster']['cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
-  KEYGEN
-  not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/id_rsa") }
-end
-
-bash "copy_and_perms" do
-  cwd "/home/#{node['cluster']['cluster_user']}"
-  code <<-PERMS
-    set -e
-    su - #{node['cluster']['cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
-  PERMS
-  not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/authorized_keys_cluster") }
-end
-
-bash "ssh-keyscan" do
-  cwd "/home/#{node['cluster']['cluster_user']}"
-  code <<-KEYSCAN
-    set -e
-    su - #{node['cluster']['cluster_user']} -c \"ssh-keyscan #{node['hostname']} > ~/.ssh/known_hosts && chmod 0600 ~/.ssh/known_hosts\"
-  KEYSCAN
-  not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/known_hosts") }
-end
 
 if node['cluster']['dcv_enabled'] == "head_node"
   # Activate DCV on head node
