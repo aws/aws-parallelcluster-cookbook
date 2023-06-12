@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -27,23 +27,12 @@ when 'HeadNode'
   end
 
 when 'ComputeFleet'
-  raid_shared_dir = format_directory(raid_shared_dir)
-  exported_raid_shared_dir = format_directory(raid_shared_dir)
-
-  # Created RAID shared mount point
-  directory raid_shared_dir do
-    mode '1777'
-    owner 'root'
-    group 'root'
-    action :create
-  end
-
-  # Mount RAID directory over NFS
-  mount raid_shared_dir do
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_raid_shared_dir}" })
+  volume "mount raid volume over NFS" do
+    action :mount
+    shared_dir raid_shared_dir
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
-    action %i(mount enable)
     retries 10
     retry_delay 6
   end
