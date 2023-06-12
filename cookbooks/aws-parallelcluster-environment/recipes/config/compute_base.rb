@@ -28,30 +28,5 @@ user node['cluster']['cluster_user'] do
   shell '/bin/bash'
 end
 
-# Parse shared directory info and turn into an array
-shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
-
-# Mount each volume with NFS
-shared_dir_array.each do |dir|
-  dirname = format_directory(dir)
-  exported_dirname = format_directory(dir)
-
-  # Created shared mount point
-  directory dirname do
-    mode '1777'
-    owner 'root'
-    group 'root'
-    recursive true
-    action :create
-  end
-
-  # Mount shared volume over NFS
-  mount dirname do
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_dirname}" })
-    fstype 'nfs'
-    options node['cluster']['nfs']['hard_mount_options']
-    action %i(mount enable)
-    retries 10
-    retry_delay 6
-  end
-end
+# Mount EBS on compute node
+include_recipe 'aws-parallelcluster-environment::ebs'
