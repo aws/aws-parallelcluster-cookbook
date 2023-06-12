@@ -28,4 +28,10 @@ default_attributes 'kitchen_hooks' => {
   'raid_unmount-raid_vol_array/ubuntu1804' => '',
   'raid_unmount-raid_vol_array/ubuntu2004' => '',
   'raid_unmount-raid_vol_array/ubuntu2204' => '',
+  'lustre_mount-fsx_fs_id_array' => ["fs-0ab11b3ade43091fe"],
+  'lustre_mount-fsx_dns_name_array' => ["fs-0ab11b3ade43091fe.fsx.us-west-2.amazonaws.com"],
+  'lustre_mount-fsx_mount_name_array' => ["qz5b7bev"],
+  'lustre_unmount-fsx_fs_id_array' => '',
+  'lustre_unmount-fsx_dns_name_array' => '',
+  'lustre_unmount-fsx_mount_name_array' => '',
 }

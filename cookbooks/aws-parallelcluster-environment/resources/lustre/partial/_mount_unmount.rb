@@ -17,6 +17,7 @@ property :fsx_mount_name_array, Array, required: %i(mount unmount)
 property :fsx_volume_junction_path_array, Array, required: %i(mount unmount)
 
 action :mount do
+  return if on_docker?
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
     fsx = FSx.new(node, new_resource, index)
 
@@ -67,6 +68,7 @@ action :mount do
 end
 
 action :unmount do
+  return if on_docker?
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
     fsx = FSx.new(node, new_resource, index)
 
