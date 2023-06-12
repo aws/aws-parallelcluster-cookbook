@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-config::enable_chef_error_handler"
+include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
 
 fetch_config 'Fetch and load cluster configs'
 
