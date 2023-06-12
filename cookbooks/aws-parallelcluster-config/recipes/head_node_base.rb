@@ -22,17 +22,9 @@ include_recipe 'aws-parallelcluster-platform::cluster_user'
 include_recipe 'aws-parallelcluster-environment::fs_update'
 
 include_recipe 'aws-parallelcluster-environment::ebs'
-
 include_recipe 'aws-parallelcluster-environment::shared_storages'
-
-# Setup RAID array on head node
 include_recipe 'aws-parallelcluster-environment::raid'
 
-if node['cluster']['dcv_enabled'] == "head_node"
-  # Activate DCV on head node
-  dcv "Configure DCV" do
-    action :configure
-  end
-end unless on_docker?
+include_recipe 'aws-parallelcluster-platform::dcv'
 
 include_recipe 'aws-parallelcluster-computefleet::head_node_fleet_status'
