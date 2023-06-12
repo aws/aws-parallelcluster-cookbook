@@ -43,9 +43,24 @@ end
 
 case node['cluster']['node_type']
 when 'HeadNode'
-  include_recipe 'aws-parallelcluster-config::head_node_base'
+  include_recipe 'aws-parallelcluster-platform::cluster_user'
+
+  # generate the shared storages mapping file
+  include_recipe 'aws-parallelcluster-environment::fs_update'
+
+  include_recipe 'aws-parallelcluster-environment::ebs'
+  include_recipe 'aws-parallelcluster-environment::shared_storages'
+  include_recipe 'aws-parallelcluster-environment::raid'
+
+  include_recipe 'aws-parallelcluster-platform::dcv'
+
+  include_recipe 'aws-parallelcluster-computefleet::head_node_fleet_status'
+
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-environment::compute_base'
+  include_recipe 'aws-parallelcluster-platform::cluster_user'
+  include_recipe 'aws-parallelcluster-environment::raid'
+  include_recipe 'aws-parallelcluster-environment::shared_storages'
+  include_recipe 'aws-parallelcluster-environment::ebs'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end
