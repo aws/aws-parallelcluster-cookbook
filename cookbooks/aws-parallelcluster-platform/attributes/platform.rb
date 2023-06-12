@@ -46,3 +46,6 @@ default['openssh']['client']['  _strict_host_key_checking'] = 'no'
 # Do not store server key in the know hosts file to avoid scaling clashing
 # that is when an new host gets the same IP of a previously terminated host
 default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
+
+# ParallelCluster log rotation file dir
+default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelcluster_log_rotation"

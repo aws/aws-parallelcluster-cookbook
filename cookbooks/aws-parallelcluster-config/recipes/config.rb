@@ -25,5 +25,4 @@ include_recipe 'aws-parallelcluster-slurm::config' if node['cluster']['scheduler
 include_recipe 'aws-parallelcluster-scheduler-plugin::config' if node['cluster']['scheduler'] == 'plugin'
 include_recipe 'aws-parallelcluster-awsbatch::config' if node['cluster']['scheduler'] == 'awsbatch'
 
-# ParallelCluster log rotation configuration
-include_recipe "aws-parallelcluster-config::log_rotation"
+include_recipe "aws-parallelcluster-platform::log_rotation"
