@@ -18,9 +18,6 @@
 # ParallelCluster log dir
 default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
 
-# ParallelCluster log rotation file dir
-default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelcluster_log_rotation"
-
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
