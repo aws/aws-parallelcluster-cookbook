@@ -18,12 +18,7 @@
 # generate the shared storages mapping file
 include_recipe 'aws-parallelcluster-environment::fs_update'
 
-manage_ebs "add ebs" do
-  shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
-  vol_array node['cluster']['volume'].split(',')
-  action %i(mount export)
-  not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
-end unless on_docker?
+include_recipe 'aws-parallelcluster-environment::ebs_head_node'
 
 include_recipe 'aws-parallelcluster-environment::shared_storage_head_node'
 
