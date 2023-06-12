@@ -42,6 +42,10 @@ control 'raid_mounted' do
 
   describe 'Verify RAID is correctly mounted'
 
+  # List mounted folders and verify the RAID shared dir is in the output
+  # $ df -h -t ext4
+  # Filesystem      Size  Used Avail Use% Mounted on
+  # /dev/md0        992M  2.6M  923M   1% /shared_dir
   describe bash("df -h -t ext4 | tail -n +2 | awk '{{print $2, $6}}' | grep '/shared_dir'") do
     its('exit_status') { should eq(0) }
     its('stdout')      { should match('992M /shared_dir') }

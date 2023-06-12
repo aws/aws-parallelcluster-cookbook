@@ -20,6 +20,10 @@ control 'ebs_mounted' do
 
   describe 'Verify EBS is correctly mounted'
 
+  # List mounted folders and verify the EBS shared dir is in the output
+  # $ df -h -t ext4
+  # Filesystem      Size  Used Avail Use% Mounted on
+  # /dev/xvdb        976M  2.6M  923M   1% /shared_dir
   describe bash("df -h -t ext4 | tail -n +2 | awk '{{print $2, $6}}' | grep '/shared_dir'") do
     its('exit_status') { should eq(0) }
     its('stdout')      { should match('976M /shared_dir') }
