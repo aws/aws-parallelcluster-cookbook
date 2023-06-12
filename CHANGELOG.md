@@ -14,6 +14,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 
+3.6.1
+------
+
+**CHANGES**
+- Remove security updates step executed on cluster nodes bootstrap in US isolated regions
+  in order to reduce bootstrap time and avoid a potential point of failure.
+
 3.6.0
 ------
 
