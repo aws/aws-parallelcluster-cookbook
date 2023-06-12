@@ -391,7 +391,7 @@ class ClusterStatusManager:
             "--no-color "
             "--chef-zero-port 8889 "
             "--json-attributes /etc/chef/dna.json "
-            "--override-runlist aws-parallelcluster::update_computefleet_status"
+            "--override-runlist aws-parallelcluster-entrypoints::update_computefleet_status"
         )
         try:
             # The command being passed has been built from string literals and local variables and can be trusted.
@@ -419,7 +419,7 @@ class ClusterStatusManager:
           - STOP_REQUESTED -> STOPPING -> STOPPED
         STARTING/STOPPING states are only used to communicate that the request is being processed by clusterstatusmgtd.
         On status STARTING|STOPPING, the update event handler baked by the recipe
-        aws-parallelcluster::update_computefleet_status is called
+        aws-parallelcluster-entrypoints::update_computefleet_status is called
         """
         self._current_time = datetime.now(tz=timezone.utc)
         self._compute_fleet_status = self._get_compute_fleet_status(fallback=self._compute_fleet_status)
