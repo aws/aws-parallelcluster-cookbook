@@ -14,19 +14,14 @@
 
 return if on_docker?
 
+# Setup cluster user on compute node
+include_recipe 'aws-parallelcluster-platform::cluster_user'
+
 # Setup RAID array on compute node
 include_recipe 'aws-parallelcluster-environment::raid'
 
 # Mount shored storage on compute node
 include_recipe 'aws-parallelcluster-environment::shared_storages'
-
-# Setup cluster user
-user node['cluster']['cluster_user'] do
-  manage_home false
-  comment 'AWS ParallelCluster user'
-  home "/home/#{node['cluster']['cluster_user']}"
-  shell '/bin/bash'
-end
 
 # Mount EBS on compute node
 include_recipe 'aws-parallelcluster-environment::ebs'

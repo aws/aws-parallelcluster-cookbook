@@ -15,6 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Setup cluster user and SSH on head node
+include_recipe 'aws-parallelcluster-platform::cluster_user'
+
 # generate the shared storages mapping file
 include_recipe 'aws-parallelcluster-environment::fs_update'
 
@@ -24,10 +27,6 @@ include_recipe 'aws-parallelcluster-environment::shared_storages'
 
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-environment::raid'
-
-# Setup cluster user and SSH on head node
-include_recipe 'aws-parallelcluster-platform::cluster_user_head_node'
-
 
 if node['cluster']['dcv_enabled'] == "head_node"
   # Activate DCV on head node
