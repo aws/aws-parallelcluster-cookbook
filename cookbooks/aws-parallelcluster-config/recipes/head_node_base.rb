@@ -18,7 +18,7 @@
 # generate the shared storages mapping file
 include_recipe 'aws-parallelcluster-environment::fs_update'
 
-include_recipe 'aws-parallelcluster-environment::ebs_head_node'
+include_recipe 'aws-parallelcluster-environment::ebs'
 
 include_recipe 'aws-parallelcluster-environment::shared_storage_head_node'
 

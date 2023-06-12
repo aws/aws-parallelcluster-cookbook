@@ -12,9 +12,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-manage_ebs "add ebs" do
-  shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
-  vol_array node['cluster']['volume'].split(',')
-  action %i(mount export)
-  not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
-end unless on_docker?
+case node['cluster']['node_type']
+when 'HeadNode'
+  manage_ebs "add ebs" do
+    shared_dir_array node['cluster']['ebs_shared_dirs'].split(',')
+    vol_array node['cluster']['volume'].split(',')
+    action %i(mount export)
+    not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
+  end unless on_docker?
+end
