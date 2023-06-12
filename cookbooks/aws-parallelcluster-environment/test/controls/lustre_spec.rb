@@ -66,3 +66,19 @@ control 'tag:install_lustre_lnet_kernel_module_enabled' do
     it { should_not be_blacklisted }
   end
 end
+
+control 'lustre_mounted' do
+  only_if { !os_properties.on_docker? }
+  describe mount('/shared_dir') do
+    it { should be_mounted }
+    its('type') { should eq 'lustre' }
+  end
+end
+
+control 'lustre_unmounted' do
+  only_if { !os_properties.on_docker? }
+
+  describe mount('/shared_dir') do
+    it { should_not be_mounted }
+  end
+end

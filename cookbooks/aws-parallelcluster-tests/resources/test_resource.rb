@@ -37,11 +37,17 @@ def its_properties
 
         env_property = value.sub(/FROM_HOOK-/, '')
         # Retrieve properties from environment file (e.g. values from lifecycle hooks)
-        hook_key = "#{env_property}/#{node['cluster']['base_os']}"
-        hook_value = node['kitchen_hooks'][hook_key]
-
+        # If an os specific key exists, use it.  Otherwise use an os agnostic key
+        # If neither exists log an error
+        hook_key_os_specific = "#{env_property}/#{node['cluster']['base_os']}"
+        hook_key_os_agnostic = "#{env_property}"
+        hook_value_os_specific = node['kitchen_hooks'][hook_key_os_specific]
+        hook_value_os_agnostic = node['kitchen_hooks'][hook_key_os_agnostic]
+        hook_key = hook_value_os_specific.nil? ? hook_key_os_agnostic : hook_key_os_specific
+        hook_value = hook_value_os_specific || hook_value_os_agnostic
         if hook_value.nil?
-          Chef::Log.error("Hook key #{hook_key} not found in the environment. Please define it.")
+          Chef::Log.error("Neither an OS specific hook key: #{hook_key_os_specific} nor an OS agnostic hook key:
+                           #{hook_key_os_agnostic} was found in the environment. Please define one.")
         else
           Chef::Log.info("Hook key #{hook_key} found in the environment. Replacing FROM_HOOK value with: #{hook_value}")
         end
