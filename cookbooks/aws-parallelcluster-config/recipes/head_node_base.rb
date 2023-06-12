@@ -25,27 +25,7 @@ manage_ebs "add ebs" do
   not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
 end unless on_docker?
 
-# Export /home
-nfs_export "/home" do
-  network get_vpc_cidr_list
-  writeable true
-  options ['no_root_squash']
-end unless on_docker?
-
-# Export /opt/parallelcluster/shared
-nfs_export node['cluster']['shared_dir'] do
-  network get_vpc_cidr_list
-  writeable true
-  options ['no_root_squash']
-end unless on_docker?
-
-# Export /opt/intel if it exists
-nfs_export "/opt/intel" do
-  network get_vpc_cidr_list
-  writeable true
-  options ['no_root_squash']
-  only_if { ::File.directory?("/opt/intel") }
-end unless on_docker?
+include_recipe 'aws-parallelcluster-environment::shared_storage_head_node'
 
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-environment::raid'
