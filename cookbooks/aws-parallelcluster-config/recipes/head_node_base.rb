@@ -20,7 +20,7 @@ include_recipe 'aws-parallelcluster-environment::fs_update'
 
 include_recipe 'aws-parallelcluster-environment::ebs'
 
-include_recipe 'aws-parallelcluster-environment::shared_storage_head_node'
+include_recipe 'aws-parallelcluster-environment::shared_storages'
 
 # Setup RAID array on head node
 include_recipe 'aws-parallelcluster-environment::raid'

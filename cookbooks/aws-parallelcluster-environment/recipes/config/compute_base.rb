@@ -18,7 +18,7 @@ return if on_docker?
 include_recipe 'aws-parallelcluster-environment::raid'
 
 # Mount shored storage on compute node
-include_recipe 'aws-parallelcluster-environment::shared_storage_compute'
+include_recipe 'aws-parallelcluster-environment::shared_storages'
 
 # Setup cluster user
 user node['cluster']['cluster_user'] do
