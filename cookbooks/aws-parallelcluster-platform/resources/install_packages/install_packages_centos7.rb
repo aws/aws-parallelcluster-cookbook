@@ -27,7 +27,7 @@ def default_packages
      httpd boost-devel redhat-lsb mlocate R atlas-devel
      blas-devel libffi-devel dkms libedit-devel jq
      libical-devel postgresql-devel postgresql-server sendmail libxml2-devel libglvnd-devel
-     mdadm python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
+     python python-pip libssh2-devel libgcrypt-devel libevent-devel glibc-static bind-utils
      iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
      coreutils moreutils curl environment-modules bzip2)
 

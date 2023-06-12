@@ -26,7 +26,7 @@ def default_packages
      libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
      httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
      libffi-devel dkms libedit-devel postgresql-devel postgresql-server
-     sendmail cmake byacc libglvnd-devel mdadm libgcrypt-devel libevent-devel
+     sendmail cmake byacc libglvnd-devel libgcrypt-devel libevent-devel
      libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
      rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
      gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
