@@ -4,16 +4,16 @@ def mock_get_vpc_cidr_list(cidr)
   allow_any_instance_of(Object).to receive(:get_vpc_cidr_list).and_return(cidr)
 end
 
-describe 'manage_raid:export' do
+describe 'raid:export' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
         runner = runner(
           platform: platform, version: version,
-          step_into: ['manage_raid']
+          step_into: ['raid']
         )
         runner.converge_dsl do
-          manage_raid 'export' do
+          raid 'export' do
             action :export
             raid_shared_dir "raid_shared_dir"
           end
@@ -29,16 +29,16 @@ describe 'manage_raid:export' do
   end
 end
 
-describe 'manage_raid:unexport' do
+describe 'raid:unexport' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
         runner = runner(
           platform: platform, version: version,
-          step_into: ['manage_raid']
+          step_into: ['raid']
         )
         runner.converge_dsl do
-          manage_raid 'unexport' do
+          raid 'unexport' do
             action :unexport
             raid_shared_dir "raid_shared_dir"
           end
