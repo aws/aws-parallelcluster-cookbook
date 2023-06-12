@@ -17,6 +17,18 @@ control 'ebs_mounted' do
     its('type') { should eq 'ext4' }
     its('options') { should include '_netdev' }
   end
+
+  describe 'Verify EBS is correctly mounted'
+
+  describe bash("df -h -t ext4 | tail -n +2 | awk '{{print $2, $6}}' | grep '/shared_dir'") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match('976M /shared_dir') }
+  end
+
+  describe bash("cat /etc/fstab") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match('UUID=.* /shared_dir ext4 _netdev 0 0') }
+  end
 end
 
 control 'ebs_unmounted' do
