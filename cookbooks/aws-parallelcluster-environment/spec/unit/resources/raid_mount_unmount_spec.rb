@@ -6,7 +6,7 @@ class Chef::Resource::RubyBlock
   end
 end
 
-describe 'manage_raid:mount' do
+describe 'raid:mount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:venv_path) { 'venv' }
@@ -16,11 +16,11 @@ describe 'manage_raid:mount' do
       cached(:chef_run) do
         runner = runner(
           platform: platform, version: version,
-          step_into: ['manage_raid']
+          step_into: ['raid']
         )
         allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(venv_path)
         runner.converge_dsl do
-          manage_raid 'mount' do
+          raid 'mount' do
             action :mount
             raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
@@ -77,18 +77,18 @@ describe 'manage_raid:mount' do
   end
 end
 
-describe 'manage_raid:unmount' do
+describe 'raid:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:venv_path) { 'venv' }
       cached(:chef_run) do
         runner = runner(
           platform: platform, version: version,
-          step_into: ['manage_raid']
+          step_into: ['raid']
         )
         allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(venv_path)
         runner.converge_dsl do
-          manage_raid 'unmount' do
+          raid 'unmount' do
             action :unmount
             raid_vol_array %w(vol-0 vol-1)
             raid_shared_dir "raid_shared_dir"
@@ -97,7 +97,7 @@ describe 'manage_raid:unmount' do
         end
       end
 
-      stubs_for_provider('manage_raid') do |resource|
+      stubs_for_provider('raid') do |resource|
         allow(resource).to receive(:get_raid_devices).with("/dev/md0").and_return("device1 device2")
       end
 
