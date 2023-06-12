@@ -330,6 +330,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
+        - resource:manage_raid
   - name: raid_unmount
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -342,6 +343,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
+        - resource:manage_raid
         - 'resource:manage_raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"} '
   - name: raid_export
     run_list:

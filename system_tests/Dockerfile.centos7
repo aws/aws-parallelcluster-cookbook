@@ -19,7 +19,7 @@ RUN yum install -y kernel-modules
 RUN yum install -y vim ksh tcsh zsh libssl-dev net-tools \
                dkms tcl-dev automake autoconf libtool    \
                libconfuse-dev apache2 libboost-dev csh   \
-               man-db mdadm iproute2 python3        \
+               man-db iproute2 python3        \
                python3-pip linux-headers-aws iptables    \
                sudo pam-devel openmotif-dev libXmu-devel \
                hwloc-devel libdb-devel tcl-devel httpd   \

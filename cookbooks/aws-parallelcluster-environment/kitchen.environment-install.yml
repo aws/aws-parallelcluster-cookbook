@@ -105,3 +105,12 @@ suites:
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
+  - name: raid
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_raid/
+    attributes:
+      resource: manage_raid

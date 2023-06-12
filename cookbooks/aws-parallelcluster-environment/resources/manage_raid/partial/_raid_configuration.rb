@@ -10,9 +10,18 @@
 
 unified_mode true
 
-property :raid_shared_dir, String, required: true
+default_action :setup
+
+property :raid_shared_dir, String, required: %i(mount unmount export unexport)
 property :raid_type, [String, Integer], required: %i(mount)
 property :raid_vol_array, Array, required: %i(mount unmount)
+
+action :setup do
+  package 'mdadm' do
+    retries 3
+    retry_delay 5
+  end
+end
 
 action :mount do
   raid_vol_array = new_resource.raid_vol_array.dup
