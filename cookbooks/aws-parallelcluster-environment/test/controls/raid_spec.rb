@@ -23,6 +23,33 @@ control 'raid_mounted' do
     its('type') { should eq 'ext4' }
     its('options') { should include '_netdev' }
   end
+
+  describe 'Verify RAID is correctly configured'
+  describe bash("sudo mdadm --detail /dev/md0") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match('Raid Level : raid1') }
+    its('stdout')      { should match('Raid Devices : 2') }
+    its('stdout')      { should match('Active Devices : 2') }
+    its('stdout')      { should match('Failed Devices : 0') }
+    its('stdout')      { should match('Array Size : .*\((.*) MiB') }
+  end
+
+  describe 'Ensure that the RAID array is reassembled automatically on boot'
+  describe bash("sudo cat /etc/mdadm.conf || sudo cat /etc/mdadm/mdadm.conf | grep $(sudo mdadm --detail --scan)") do
+    its('exit_status') { should eq(0) }
+  end
+
+  describe 'Verify RAID is correctly mounted'
+
+  describe bash("df -h -t ext4 | tail -n +2 | awk '{{print $2, $6}}' | grep '/shared_dir'") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match('992M /shared_dir') }
+  end
+
+  describe bash("cat /etc/fstab") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match('/dev/md0 /shared_dir ext4 defaults,nofail,_netdev 0 0') }
+  end
 end
 
 control 'raid_unmounted' do
