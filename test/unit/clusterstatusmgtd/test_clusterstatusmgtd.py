@@ -386,7 +386,7 @@ class TestClusterStatusManager:
             "--no-color "
             "--chef-zero-port 8889 "
             "--json-attributes /etc/chef/dna.json "
-            "--override-runlist aws-parallelcluster::update_computefleet_status"
+            "--override-runlist aws-parallelcluster-entrypoints::update_computefleet_status"
         )
 
         config = SimpleNamespace(computefleet_status_path=computeflee_json_path, update_event_timeout_minutes=1)
