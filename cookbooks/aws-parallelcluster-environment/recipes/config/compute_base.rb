@@ -15,7 +15,7 @@
 return if on_docker?
 
 # Setup RAID array on compute node
-include_recipe 'aws-parallelcluster-environment::compute_raid'
+include_recipe 'aws-parallelcluster-environment::raid'
 
 # Mount /opt/intel over NFS
 exported_intel_dir = format_directory('/opt/intel')

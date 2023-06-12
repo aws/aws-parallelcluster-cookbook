@@ -18,7 +18,8 @@ ephemeral_drives 'install'
 ec2_udev_rules 'configure udev'
 cloudwatch 'Install amazon-cloudwatch-agent'
 efa 'Install EFA'
-lustre "Install FSx options" # FSx options
+raid 'Install RAID prerequisite packages'
+lustre 'Install FSx options'
 efs 'Install efs-utils'
 stunnel 'Install stunnel'
 system_authentication "Install packages required for directory service integration"

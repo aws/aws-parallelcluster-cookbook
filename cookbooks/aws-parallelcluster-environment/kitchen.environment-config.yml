@@ -326,10 +326,11 @@ suites:
       controls:
         - /raid_mounted/
     attributes:
-      resource: 'manage_raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_mount-raid_vol_array"}'
+      resource: 'raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_mount-raid_vol_array"}'
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
+        - resource:raid
   - name: raid_unmount
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -338,11 +339,12 @@ suites:
       controls:
         - /raid_unmounted/
     attributes:
-      resource: 'manage_raid:unmount {"raid_shared_dir": "shared_dir", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"}'
+      resource: 'raid:unmount {"raid_shared_dir": "shared_dir", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"}'
       dependencies:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
-        - 'resource:manage_raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"} '
+        - resource:raid
+        - 'resource:raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"} '
   - name: raid_export
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -354,7 +356,7 @@ suites:
       dependencies:
         - 'resource:directory { "path" : "/shared_dir" }'
         - resource:nfs
-      resource: 'manage_raid:export {"raid_shared_dir": "shared_dir"} '
+      resource: 'raid:export {"raid_shared_dir": "shared_dir"} '
   - name: raid_unexport
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -366,5 +368,5 @@ suites:
       dependencies:
         - 'resource:directory { "path" : "/shared_dir" }'
         - resource:nfs
-        - 'manage_raid:export {"raid_shared_dir" : "shared_dir"}'
-      resource: 'manage_raid:unexport {"raid_shared_dir" : "shared_dir"}'
+        - 'raid:export {"raid_shared_dir" : "shared_dir"}'
+      resource: 'raid:unexport {"raid_shared_dir" : "shared_dir"}'

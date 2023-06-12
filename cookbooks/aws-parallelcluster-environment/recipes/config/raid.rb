@@ -14,26 +14,29 @@
 
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cluster']['raid_shared_dir']
+return if raid_shared_dir.empty?
 
-unless raid_shared_dir.empty?
-  raid_shared_dir = format_directory(raid_shared_dir)
-  exported_raid_shared_dir = format_directory(raid_shared_dir)
-
-  # Created RAID shared mount point
-  directory raid_shared_dir do
-    mode '1777'
-    owner 'root'
-    group 'root'
-    action :create
+case node['cluster']['node_type']
+when 'HeadNode'
+  raid "add raid" do
+    raid_shared_dir raid_shared_dir
+    raid_type node['cluster']['raid_type']
+    raid_vol_array node['cluster']['raid_vol_ids'].split(',')
+    action %i(mount export)
+    not_if { raid_shared_dir.empty? }
   end
 
-  # Mount RAID directory over NFS
-  mount raid_shared_dir do
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_raid_shared_dir}" })
+when 'ComputeFleet'
+  volume "mount raid volume over NFS" do
+    action :mount
+    shared_dir raid_shared_dir
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{raid_shared_dir}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
-    action %i(mount enable)
     retries 10
     retry_delay 6
   end
+else
+
+  raise "node_type must be HeadNode or ComputeFleet"
 end

@@ -163,7 +163,7 @@ manage_ebs "add ebs" do
 end
 
 # remove raid
-manage_raid "remove raid" do
+raid "remove raid" do
   raid_shared_dir(lazy { node['cluster']['unmount_raid_shared_dir'] })
   raid_vol_array(lazy { node['cluster']['unmount_raid_vol_array'] })
   action %i(unexport unmount)
@@ -171,7 +171,7 @@ manage_raid "remove raid" do
 end
 
 # add raid
-manage_raid "add raid" do
+raid "add raid" do
   raid_shared_dir(lazy { node['cluster']['mount_raid_shared_dir'] })
   raid_type(lazy { node['cluster']['mount_raid_type'] })
   raid_vol_array(lazy { node['cluster']['mount_raid_vol_array'] })

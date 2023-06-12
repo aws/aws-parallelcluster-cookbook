@@ -1,6 +1,6 @@
-provides :manage_raid
+provides :raid
 
-use 'partial/_raid_configuration'
+use 'partial/_raid_common'
 
 action_class do
   def raid_superblock_version
