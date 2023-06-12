@@ -20,7 +20,7 @@ action :setup do
   package 'mdadm' do
     retries 3
     retry_delay 5
-  end
+  end unless redhat_ubi?
 end
 
 action :mount do
