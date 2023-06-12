@@ -17,17 +17,8 @@ return if on_docker?
 # Setup RAID array on compute node
 include_recipe 'aws-parallelcluster-environment::raid'
 
-# Mount /opt/intel over NFS
-exported_intel_dir = format_directory('/opt/intel')
-mount '/opt/intel' do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_intel_dir}" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i(mount enable)
-  retries 10
-  retry_delay 6
-  only_if { ::File.directory?("/opt/intel") }
-end
+# Mount shored storage on compute node
+include_recipe 'aws-parallelcluster-environment::shared_storage_compute'
 
 # Setup cluster user
 user node['cluster']['cluster_user'] do
