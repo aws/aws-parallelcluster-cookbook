@@ -3,7 +3,6 @@ source chef_repo: "."
 metadata
 
 cookbook "aws-parallelcluster-awsbatch", path: "../aws-parallelcluster-awsbatch"
-cookbook "aws-parallelcluster-common", path: "../aws-parallelcluster-common"
 cookbook "aws-parallelcluster-computefleet", path: "../aws-parallelcluster-computefleet"
 cookbook "aws-parallelcluster-environment", path: "../aws-parallelcluster-environment"
 cookbook "aws-parallelcluster-platform", path: "../aws-parallelcluster-platform"

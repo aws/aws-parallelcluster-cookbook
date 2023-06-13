@@ -1,7 +1,7 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
 
-require_relative '../../../cookbooks/aws-parallelcluster-common/spec/spec_helper'
+require_relative '../../../cookbooks/aws-parallelcluster-shared/spec/spec_helper'
 
 RSpec.configure do |c|
   c.before(:all) do

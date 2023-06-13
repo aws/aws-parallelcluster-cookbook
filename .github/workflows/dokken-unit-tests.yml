@@ -3,60 +3,6 @@ name: ParallelCluster Cookbook Unit Tests on Docker
 on: [workflow_dispatch]
 
 jobs:
-  dokken-common-recipes:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: &os-list
-          - alinux2
-          - centos7
-          - ubuntu1804
-          - ubuntu2004
-          - rhel8
-        suite:
-          - setup-envars
-      fail-fast: false
-    steps:
-      - name: Check out code
-        uses: actions/checkout@main
-      - name: Install Chef
-        uses: actionshub/chef-install@main
-      - name: Test-Kitchen
-        uses: actionshub/test-kitchen@main
-        with:
-          os: ${{ matrix.os }}
-          suite: ${{ matrix.suite }}
-        env:
-          CHEF_LICENSE: accept-no-persist
-          KITCHEN_YAML: kitchen.docker.yml
-          KITCHEN_LOCAL_YAML: cookbooks/aws-parallelcluster-common/kitchen.recipes.yml
-          KITCHEN_GLOBAL_YAML: kitchen.global.yml
-        continue-on-error: false
-  dokken-common-resources:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: *os-list
-        suite:
-          - package-repos
-          - lustre-installation
-      fail-fast: false
-    steps:
-      - name: Check out code
-        uses: actions/checkout@main
-      - name: Install Chef
-        uses: actionshub/chef-install@main
-      - name: Test-Kitchen
-        uses: actionshub/test-kitchen@main
-        with:
-          os: ${{ matrix.os }}
-          suite: ${{ matrix.suite }}
-        env:
-          CHEF_LICENSE: accept-no-persist
-          KITCHEN_YAML: kitchen.docker.yml
-          KITCHEN_LOCAL_YAML: cookbooks/aws-parallelcluster-common/kitchen.resources.yml
-          KITCHEN_GLOBAL_YAML: kitchen.global.yml
-        continue-on-error: false
   dokken-recipes-install:
     runs-on: ubuntu-latest
     strategy:

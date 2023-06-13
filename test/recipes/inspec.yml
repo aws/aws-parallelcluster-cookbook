@@ -6,4 +6,4 @@ license: Apache-2.0
 
 depends:
   - name: common
-    path: cookbooks/aws-parallelcluster-common/test/common
+    path: cookbooks/aws-parallelcluster-shared/test/common
