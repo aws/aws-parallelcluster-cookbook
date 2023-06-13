@@ -22,7 +22,7 @@ control 'network_interfaces_configuration_script_created' do
 end
 
 control 'multiple_network_interfaces_can_ping_gateway' do
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe bash("ip -o link | grep -v lo | wc -l") do
     its('stdout.strip') { should cmp >= 2 }
@@ -46,7 +46,7 @@ end
 control 'network_interfaces_configured' do
   title 'Check that network interfaces have been configured'
 
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   device_names = bash("ip -o link | awk '{print substr($2, 1, length($2) -1)}' | grep -v lo").stdout.split(/\n+/)
   device_names.each do |device_name|

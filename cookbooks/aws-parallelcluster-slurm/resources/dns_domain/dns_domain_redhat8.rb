@@ -18,7 +18,7 @@ use 'partial/_dns_domain_redhat'
 # Configure custom dns domain (only if defined) by appending the Route53 domain created within the cluster
 # ($CLUSTER_NAME.pcluster) and be listed as a "search" domain in the resolv.conf file.
 action :configure do
-  return if virtualized?
+  return if on_docker?
 
   # On RHEL8 dhclient is not enabled by default
   # Put pcluster version of NetworkManager.conf in place

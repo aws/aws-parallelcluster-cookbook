@@ -43,7 +43,7 @@ template "#{node['cluster']['etc_dir']}/clusterstatusmgtd.conf" do
   mode '0644'
 end
 
-unless virtualized? || kitchen_test? && !node['interact_with_ddb']
+unless on_docker? || kitchen_test? && !node['interact_with_ddb']
   execute 'initialize compute fleet status in DynamoDB' do
     # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
     command "#{cookbook_virtualenv_path}/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
