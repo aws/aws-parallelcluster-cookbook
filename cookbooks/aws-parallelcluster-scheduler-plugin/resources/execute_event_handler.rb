@@ -11,6 +11,14 @@ property :event_command, String, required: false
 
 default_action :run
 
+def raise_and_write_chef_error(raise_message, chef_error = nil)
+  unless chef_error
+    chef_error = raise_message
+  end
+  Mixlib::ShellOut.new("echo '#{chef_error}' > /var/log/parallelcluster/bootstrap_error_msg").run_command
+  raise raise_message
+end
+
 action :run do
   if new_resource.event_command.nil?
     Chef::Log.info("No command defined for Event #{new_resource.event_name}, noop")
