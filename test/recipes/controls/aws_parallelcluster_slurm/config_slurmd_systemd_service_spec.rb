@@ -11,7 +11,7 @@
 
 control 'systemd_slurmd_service' do
   title 'Check the basic configuration of the systemd slurmd service'
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe 'Check that slurmd service is defined'
   describe service('slurmd') do
@@ -35,7 +35,7 @@ end
 
 control 'systemd_slurmd_service_nvidia_gpu_nodes' do
   title 'Check the systemd slurmd service dependencies on NVIDIA GPU compute nodes'
-  only_if { !os_properties.virtualized? }
+  only_if { !os_properties.on_docker? }
 
   describe 'Check slurmd systemd "after" dependencies'
   describe command('systemctl list-dependencies --after --plain slurmd.service') do
