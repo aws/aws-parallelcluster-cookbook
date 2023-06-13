@@ -60,9 +60,10 @@ when 'HeadNode'
 
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster-platform::cluster_user'
-  include_recipe 'aws-parallelcluster-environment::raid'
-  include_recipe 'aws-parallelcluster-environment::shared_storages'
+
   include_recipe 'aws-parallelcluster-environment::ebs'
+  include_recipe 'aws-parallelcluster-environment::shared_storages'
+  include_recipe 'aws-parallelcluster-environment::raid'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end
