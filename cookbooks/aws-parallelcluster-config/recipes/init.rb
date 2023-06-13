@@ -17,8 +17,7 @@
 
 include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
 
-# Validate OS type specified by the user is the same as the OS identified by Ohai
-validate_os_type
+os_type 'Validate OS type specified by the user is the same as the OS identified by Ohai'
 
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd? || on_docker?
