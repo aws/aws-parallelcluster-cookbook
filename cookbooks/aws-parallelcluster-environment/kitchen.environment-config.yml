@@ -162,11 +162,11 @@ suites:
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - efa_debian_system_settings_configured
+        - tag:config_efa_debian_system_settings_configured
     attributes:
       resource: efa:configure
       cluster:
-        enable_efa: compute
+        enable_efa: efa
         node_type: ComputeFleet
   - name: network_service_restart
     run_list:

@@ -173,11 +173,10 @@ describe 'efa:configure' do
       elsif platform == 'ubuntu'
         context 'when efa enabled on compute node' do
           before do
-            chef_run.node.override['cluster']['enable_efa'] = 'compute'
+            chef_run.node.override['cluster']['enable_efa'] = 'efa'
             chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
             ConvergeEfa.configure(chef_run)
           end
-
           it 'disables ptrace protection on compute nodes' do
             is_expected.to apply_sysctl('kernel.yama.ptrace_scope').with(value: "0")
           end
@@ -197,7 +196,7 @@ describe 'efa:configure' do
 
         context 'when it is not a compute node' do
           before do
-            chef_run.node.override['cluster']['enable_efa'] = 'compute'
+            chef_run.node.override['cluster']['enable_efa'] = 'efa'
             chef_run.node.override['cluster']['node_type'] = 'other'
             ConvergeEfa.configure(chef_run)
           end
