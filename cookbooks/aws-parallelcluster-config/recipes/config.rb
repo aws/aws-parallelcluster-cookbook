@@ -56,7 +56,7 @@ when 'HeadNode'
 
   include_recipe 'aws-parallelcluster-platform::dcv'
 
-  include_recipe 'aws-parallelcluster-computefleet::head_node_fleet_status'
+  include_recipe 'aws-parallelcluster-computefleet::fleet_status'
 
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster-platform::cluster_user'
