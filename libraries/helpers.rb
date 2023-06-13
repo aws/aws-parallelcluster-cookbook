@@ -26,39 +26,6 @@ def ignore_failure(lookup)
   end
 end
 
-#
-# TODO use os_type resource, action :validate
-#
-#
-# Check if OS type specified by the user is the same as the OS identified by Ohai
-#
-def validate_os_type
-  case node['platform']
-  when 'ubuntu'
-    current_os = "ubuntu#{node['platform_version'].tr('.', '')}"
-    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
-  when 'amazon'
-    current_os = "alinux#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
-  when 'centos'
-    current_os = "centos#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
-  when 'redhat'
-    current_os = "rhel#{node['platform_version'].to_i}"
-    raise_os_not_match(current_os, node['cluster']['base_os']) if node['cluster']['base_os'] != current_os
-  end
-end
-
-#
-# Raise error if OS types do not match
-#
-def raise_os_not_match(current_os, specified_os)
-  raise "The custom AMI you have provided uses the #{current_os} OS. " \
-        "However, the base_os specified in your config file is #{specified_os}. " \
-        "Please either use an AMI with the #{specified_os} OS or update the base_os " \
-        "setting in your configuration file to #{current_os}."
-end
-
 def kernel_release
   ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
 end
