@@ -8,13 +8,6 @@ class OsProperties < Inspec.resource(1)
     os_properties.redhat_ubi?
   '
 
-  #
-  # Check if we are running in a virtualized environment
-  #
-  def virtualized?
-    inspec.virtualization.system == 'docker'
-  end
-
   def on_docker?
     inspec.virtualization.system == 'docker'
   end

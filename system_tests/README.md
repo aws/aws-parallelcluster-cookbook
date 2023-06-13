@@ -53,8 +53,8 @@ configuration recipes as would be done during node boot time.
 The `system_tests/test.sh` script runs the full process described above.
 
 ### Skipping tests
-A few of the tests are not setup to run in the virtual enviroment and thus can be
-skipped by checking the `is_virtualized?` condition from within the recipe.
+A few of the tests are not setup to run in Docker environment and thus can be
+skipped by checking the `on_docker?` condition from within the recipe.
 
 
 ### Testing the installation

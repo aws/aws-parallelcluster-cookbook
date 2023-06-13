@@ -1,4 +1,4 @@
-return unless virtualized?
+return unless on_docker?
 
 file '/bin/systemctl' do
   content %{

@@ -1,4 +1,4 @@
-return if virtualized?
+return if on_docker?
 
 directory '/fake_headnode_home'
 directory '/fake_headnode_shared'
