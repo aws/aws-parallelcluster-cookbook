@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-config
-# Recipe:: enable_chef_error_handler
-#
-# Copyright:: 2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2021-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,11 +12,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if node["cluster"]["node_type"] == "HeadNode"
-  chef_handler 'WriteChefError::WriteHeadNodeChefError' do
-    type exception: true
-    action :enable
-  end
+unless node['cluster']['scheduler'] == 'awsbatch'
+  load_cluster_config
 end
 
-include_recipe "aws-parallelcluster-slurm::enable_chef_error_handler" if node["cluster"]["scheduler"] == "slurm"
+include_recipe 'aws-parallelcluster-scheduler-plugin::update_computefleet_status' if node['cluster']['scheduler'] == 'plugin'
+include_recipe 'aws-parallelcluster-slurm::update_computefleet_status' if node['cluster']['scheduler'] == 'slurm'

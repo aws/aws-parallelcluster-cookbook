@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster
-# Recipe:: update_computefleet_status
-#
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -16,4 +13,4 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-shared::setup_envars'
-include_recipe 'aws-parallelcluster-config::update_computefleet_status' unless node['cluster']['scheduler'] == 'awsbatch'
+include_recipe 'aws-parallelcluster-computefleet::update_computefleet_status'

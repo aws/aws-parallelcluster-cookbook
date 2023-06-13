@@ -41,7 +41,7 @@ control 'tag:config_check_non_graphical_systemd_settings' do
   only_if do
     (
       !instance.head_node? ||
-      !node['conditions']['dcv_supported'] ||
+      !instance.dcv_installed? ||
       node['cluster']['dcv_enabled'] != "head_node"
     ) && node['conditions']['ami_bootstrapped']
   end
