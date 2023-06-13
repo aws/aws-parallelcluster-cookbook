@@ -18,3 +18,12 @@ end
 def rescan_pci
   shell_out("echo 1 > /sys/bus/pci/rescan")
 end
+
+#
+# Ensure directory has the right format (i.e. starts with `/`).
+#
+def format_directory(dir)
+  format_dir = dir.strip
+  format_dir = "/#{format_dir}" unless format_dir.start_with?('/')
+  format_dir
+end

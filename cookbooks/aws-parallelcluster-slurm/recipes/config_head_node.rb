@@ -265,7 +265,7 @@ ruby_block "Configure Slurm Accounting" do
     run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
   end
   not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
-end unless virtualized?
+end unless on_docker?
 
 service "slurmctld" do
   supports restart: false
