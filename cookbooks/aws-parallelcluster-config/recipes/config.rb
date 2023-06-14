@@ -37,7 +37,7 @@ include_recipe "aws-parallelcluster-environment::config"
 
 fetch_config 'Fetch and load cluster configs'
 
-include_recipe 'aws-parallelcluster-computefleet::fleet_status'
+include_recipe 'aws-parallelcluster-computefleet::config'
 include_recipe 'aws-parallelcluster-slurm::config'
 include_recipe 'aws-parallelcluster-scheduler-plugin::config'
 include_recipe 'aws-parallelcluster-awsbatch::config'
