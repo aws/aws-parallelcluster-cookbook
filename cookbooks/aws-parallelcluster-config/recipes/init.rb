@@ -39,8 +39,8 @@ include_recipe "aws-parallelcluster-environment::network_interfaces" unless on_d
 
 include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_config"
 
-include_recipe "aws-parallelcluster-slurm::init" if node['cluster']['scheduler'] == 'slurm'
-include_recipe "aws-parallelcluster-scheduler-plugin::init" if node['cluster']['scheduler'] == 'plugin'
+include_recipe "aws-parallelcluster-slurm::init"
+include_recipe "aws-parallelcluster-scheduler-plugin::init"
 
 # IMDS
 include_recipe 'aws-parallelcluster-environment::imds'

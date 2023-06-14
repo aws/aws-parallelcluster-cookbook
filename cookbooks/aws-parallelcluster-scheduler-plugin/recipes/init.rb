@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return unless node['cluster']['scheduler'] == 'plugin'
+
 # create system user
 include_recipe "aws-parallelcluster-scheduler-plugin::init_user"
 
