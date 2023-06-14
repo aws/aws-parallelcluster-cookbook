@@ -13,22 +13,23 @@
 
 return if on_docker?
 
-# Mount /home over NFS
-mount '/home' do
+volume "mount /home" do
+  action :mount
+  shared_dir '/home'
   device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['head_node_home_path']}" })
   fstype 'nfs'
   options node['cluster']['nfs']['hard_mount_options']
-  action %i(mount enable)
   retries 10
   retry_delay 6
 end
 
 # Mount /opt/parallelcluster/shared over NFS
-mount node['cluster']['shared_dir_compute'] do
+volume "mount #{node['cluster']['shared_dir_compute']}" do
+  action :mount
+  shared_dir node['cluster']['shared_dir_compute']
   device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir_head']}" })
-  fstype "nfs"
+  fstype 'nfs'
   options node['cluster']['nfs']['hard_mount_options']
-  action %i(mount enable)
   retries 10
   retry_delay 6
 end
