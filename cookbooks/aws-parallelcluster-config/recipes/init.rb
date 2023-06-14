@@ -34,7 +34,7 @@ include_recipe "aws-parallelcluster-platform::custom_actions_setup"
 
 include_recipe "aws-parallelcluster-environment::network_interfaces"
 
-include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_config"
+include_recipe "aws-parallelcluster-computefleet::init"
 include_recipe "aws-parallelcluster-slurm::init"
 include_recipe "aws-parallelcluster-scheduler-plugin::init"
 
