@@ -13,23 +13,25 @@
 
 return if on_docker?
 
-volume "mount /home" do
-  action :mount
-  shared_dir '/home'
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['head_node_home_path']}" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  retries 10
-  retry_delay 6
-end
+if node['cluster']['node_type'] == "ComputeFleet"
+  volume "mount /home" do
+    action :mount
+    shared_dir '/home'
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['head_node_home_path']}" })
+    fstype 'nfs'
+    options node['cluster']['nfs']['hard_mount_options']
+    retries 10
+    retry_delay 6
+  end
 
-# Mount /opt/parallelcluster/shared over NFS
-volume "mount #{node['cluster']['shared_dir_compute']}" do
-  action :mount
-  shared_dir node['cluster']['shared_dir_compute']
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir_head']}" })
-  fstype 'nfs'
-  options node['cluster']['nfs']['hard_mount_options']
-  retries 10
-  retry_delay 6
+  # Mount /opt/parallelcluster/shared over NFS
+  volume "mount #{node['cluster']['shared_dir_compute']}" do
+    action :mount
+    shared_dir node['cluster']['shared_dir_compute']
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir_head']}" })
+    fstype 'nfs'
+    options node['cluster']['nfs']['hard_mount_options']
+    retries 10
+    retry_delay 6
+  end
 end
