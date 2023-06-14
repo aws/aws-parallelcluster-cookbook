@@ -33,21 +33,7 @@ intel_hpc 'Configure Intel HPC' do
   action :configure
 end
 
-efa 'Configure system for EFA' do
-  action :configure
-end
-
-# Configure file system
-nfs "Configure NFS" do
-  action :configure
-end
-include_recipe 'aws-parallelcluster-environment::ephemeral_drives'
-# fs_update generates the shared storages mapping file so must be executed before shared storages recipes
-include_recipe 'aws-parallelcluster-environment::fs_update'
-include_recipe 'aws-parallelcluster-environment::shared_storages'
-include_recipe 'aws-parallelcluster-environment::ebs'
-include_recipe 'aws-parallelcluster-environment::raid'
-include_recipe "aws-parallelcluster-environment::fs_mount"
+include_recipe "aws-parallelcluster-environment::config"
 
 fetch_config 'Fetch and load cluster configs'
 
