@@ -17,7 +17,7 @@
 
 ruby_block "update_shared_storages" do
   block do
-    run_context.include_recipe 'aws-parallelcluster-config::update_shared_storages'
+    run_context.include_recipe 'aws-parallelcluster-environment::update_shared_storages'
   end
   only_if { are_mount_or_unmount_required? }
 end
