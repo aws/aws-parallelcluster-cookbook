@@ -11,7 +11,6 @@ cookbook "aws-parallelcluster-platform", path: "../aws-parallelcluster-platform"
 cookbook "aws-parallelcluster-computefleet", path: "../aws-parallelcluster-computefleet"
 cookbook "aws-parallelcluster-tests", path: "../aws-parallelcluster-tests"
 cookbook "aws-parallelcluster-slurm", path: "../aws-parallelcluster-slurm"
-cookbook "aws-parallelcluster-test", path: "../aws-parallelcluster-test"
 
 cookbook "apt", path: "../../third-party/apt-7.4.2"
 cookbook "iptables", path: "../../third-party/iptables-8.0.0"
