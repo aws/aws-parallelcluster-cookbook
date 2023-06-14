@@ -19,24 +19,8 @@ include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
 
 include_recipe "aws-parallelcluster-shared::setup_envars"
 
-include_recipe 'aws-parallelcluster-platform::openssh'
-include_recipe "aws-parallelcluster-platform::sudo_config"
-include_recipe 'aws-parallelcluster-platform::cluster_user'
-include_recipe 'aws-parallelcluster-platform::networking'
-include_recipe "aws-parallelcluster-platform::nvidia_config"
-sticky_bits "setup sticky bits"
-chrony 'enable Amazon Time Sync' do
-  action :enable
-end
-include_recipe 'aws-parallelcluster-platform::dcv'
-intel_hpc 'Configure Intel HPC' do
-  action :configure
-end
-
+include_recipe 'aws-parallelcluster-platform::config'
 include_recipe "aws-parallelcluster-environment::config"
-
-fetch_config 'Fetch and load cluster configs'
-
 include_recipe 'aws-parallelcluster-computefleet::config'
 include_recipe 'aws-parallelcluster-slurm::config'
 include_recipe 'aws-parallelcluster-scheduler-plugin::config'
