@@ -1,0 +1,13 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - cookbooks/aws-parallelcluster-awsbatch/test
+
+suites:
+  - name: awsbatch
+    run_list:
+      - recipe[aws-parallelcluster-awsbatch::config]
+    verifier:
+      controls:
+        - /tag:config_awsbatch/
