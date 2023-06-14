@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-platform::custom_actions_setup' do
+describe 'aws-parallelcluster-environment::custom_actions_setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:instance_id) { 'i-xxx' }

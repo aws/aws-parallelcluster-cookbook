@@ -25,10 +25,6 @@ raise "Init package #{node['init_package']} not supported." unless systemd? || o
 fetch_config 'Fetch and load cluster configs'
 
 include_recipe "aws-parallelcluster-environment::init"
-
-# Custom action setup must be executed after cfnconfig file creation
-include_recipe "aws-parallelcluster-platform::custom_actions_setup"
-
 include_recipe "aws-parallelcluster-computefleet::init"
 include_recipe "aws-parallelcluster-slurm::init"
 include_recipe "aws-parallelcluster-scheduler-plugin::init"
