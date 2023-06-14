@@ -12,6 +12,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if on_docker?
+
 template "#{node['cluster']['scripts_dir']}/fetch_and_run" do
   source 'custom_actions/fetch_and_run.erb'
   owner "root"

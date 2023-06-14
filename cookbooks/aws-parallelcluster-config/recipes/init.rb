@@ -26,24 +26,17 @@ include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
 include_recipe "aws-parallelcluster-environment::mount_shared"
 
 fetch_config 'Fetch and load cluster configs'
-
-# Install cloudwatch, write configuration and start it.
 cloudwatch "Configure CloudWatch" do
   action :configure
 end
 
-include_recipe "aws-parallelcluster-platform::custom_actions_setup" unless on_docker?
+include_recipe "aws-parallelcluster-platform::custom_actions_setup"
 
-# Configure additional Networking Interfaces (if present)
-include_recipe "aws-parallelcluster-environment::network_interfaces" unless on_docker?
+include_recipe "aws-parallelcluster-environment::network_interfaces"
 
 include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_config"
-
 include_recipe "aws-parallelcluster-slurm::init"
 include_recipe "aws-parallelcluster-scheduler-plugin::init"
 
-# IMDS
 include_recipe 'aws-parallelcluster-environment::imds'
-
-# Active Directory Service
 include_recipe "aws-parallelcluster-environment::directory_service"
