@@ -9,14 +9,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'head_node_base_configured' do
-  title 'Check the base headnode configuration'
-
-  # Check if authorized_keys_cluster has been created
-  # The command checks all the homes with globbing since the user can be different for each OS
-  describe command("sudo su -c 'ls /home/*/.ssh/authorized_keys_cluster'") do
-    its('exit_status') { should eq 0 }
-  end unless os_properties.redhat_ubi?
+control 'tag:config_fleet_status' do
+  title 'Check the headnode fleet status configuration'
+  only_if { instance.head_node? }
 
   describe file('/usr/local/bin/update-compute-fleet-status.sh') do
     it { should exist }

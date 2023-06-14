@@ -18,3 +18,17 @@ suites:
         - recipe:aws-parallelcluster-platform::sudo_install
       cluster:
         node_type: 'HeadNode'
+  - name: fleet_status
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-computefleet::fleet_status]
+    verifier:
+      controls:
+        - /tag:config_fleet_status/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-tests::docker_mock
+      cluster:
+        stack_name: "mock"
+        node_type: HeadNode
+        ddb_table: <%= ENV['DDB_TABLE'] %>

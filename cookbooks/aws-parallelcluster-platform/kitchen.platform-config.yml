@@ -5,6 +5,16 @@ verifier:
     - cookbooks/aws-parallelcluster-platform/test
 
 suites:
+  - name: cluster_user
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - /tag:config_cluster_user/
+    attributes:
+      cluster:
+        node_type: HeadNode
   - name: sticky_bits
     run_list:
       - recipe[aws-parallelcluster-tests::test_resource]
