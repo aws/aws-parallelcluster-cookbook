@@ -22,21 +22,20 @@ os_type 'Validate OS type specified by the user is the same as the OS identified
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd? || on_docker?
 
+fetch_config 'Fetch and load cluster configs'
+
 include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
 include_recipe "aws-parallelcluster-environment::mount_shared"
-
-fetch_config 'Fetch and load cluster configs'
 cloudwatch "Configure CloudWatch" do
   action :configure
 end
-
-include_recipe "aws-parallelcluster-platform::custom_actions_setup"
-
 include_recipe "aws-parallelcluster-environment::network_interfaces"
+include_recipe 'aws-parallelcluster-environment::imds'
+include_recipe "aws-parallelcluster-environment::directory_service"
+
+# Custom action setup must be executed after cfnconfig file creation
+include_recipe "aws-parallelcluster-platform::custom_actions_setup"
 
 include_recipe "aws-parallelcluster-computefleet::init"
 include_recipe "aws-parallelcluster-slurm::init"
 include_recipe "aws-parallelcluster-scheduler-plugin::init"
-
-include_recipe 'aws-parallelcluster-environment::imds'
-include_recipe "aws-parallelcluster-environment::directory_service"
