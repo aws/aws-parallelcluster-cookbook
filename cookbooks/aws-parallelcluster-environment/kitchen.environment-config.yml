@@ -423,7 +423,7 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - resource:nfs
-        - recipe:aws-parallelcluster-test::export_directories_mock
+        - recipe:aws-parallelcluster-environment::mock_export_directories
       cluster:
         head_node_private_ip: '127.0.0.1'
         head_node_home_path: '/fake_headnode_home'
