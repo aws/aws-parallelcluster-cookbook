@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-test
+# Cookbook:: aws-parallelcluster-scheduler-plugin
 # Recipe:: tests_mock
 #
 # Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
