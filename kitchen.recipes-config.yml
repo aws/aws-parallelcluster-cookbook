@@ -4,9 +4,6 @@
 # export KITCHEN_YAML=kitchen.docker.yml
 # export KITCHEN_LOCAL_YAML=kitchen.recipes.yml
 # See: https://kitchen.ci/docs/reference/configuration
-<%
-  aws_region = ENV['KITCHEN_AWS_REGION'] || ENV['AWS_DEFAULT_REGION'] || 'eu-west-1'
-%>
 ---
 verifier:
   name: inspec
@@ -20,58 +17,6 @@ verifier:
 # You can find an example in the add_depdendencies.rb file.
 
 suites:
-  - name: head_node_base
-    run_list:
-      - recipe[aws-parallelcluster::add_dependencies]
-      - recipe[aws-parallelcluster-config::head_node_base]
-    verifier:
-      controls:
-        - head_node_base_configured
-    driver:
-      privileged: true # required to set hostname
-      iam_profile_name: <%= ENV['AWS_IAM_PROFILE'] %>
-    attributes:
-      dependencies:
-        #- recipe:aws-parallelcluster-platform::directories
-        #- resource:package_repos
-        - recipe:aws-parallelcluster-test::docker_mock
-        #- resource:install_packages
-        #- resource:nfs
-        #- recipe:aws-parallelcluster-platform::cookbook_virtualenv
-        #- recipe:aws-parallelcluster-platform::users
-        - recipe:aws-parallelcluster-slurm::init_dns
-      cluster:
-        stack_name: "mock"
-        ebs_shared_dirs: ""
-        node_type: HeadNode
-        dns_domain: test-domain
-        assigned_hostname: fqn-hostname
-        assigned_short_hostname: short-hostname
-        ddb_table: <%= ENV['DDB_TABLE'] %>
-        region: <%= aws_region %>
-      ec2:
-        local_hostname: ip-10-0-0-200.eu-west-1.compute.internal
-        local_ipv4: 10.0.0.200
-        mac: 02:04:c9:66:6c:23
-        network_interfaces_macs:
-          02:04:c9:66:6c:23:
-            device_number: '0'
-            interface_id: eni-084e384b139c88340
-            ipv4-associations:
-              3.253.9.238: 10.0.0.200
-            local_hostname: ip-10-0-0-200.eu-west-1.compute.internal
-            local_ipv4s: 10.0.0.200
-            mac: 02:04:c9:66:6c:23
-            public_hostname: ec2-3-253-9-238.eu-west-1.compute.amazonaws.com
-            public_ipv4s: 3.253.9.238
-            security_group_ids: sg-0d6ed39436326b0c1
-            security_groups: Security Group kitchen
-            subnet_id: subnet-061d5d152f1ea6e1f
-            subnet_ipv4_cidr_block: 10.0.0.0/24
-            vpc_id: vpc-0f2e67ad1d48c13c6
-            vpc_ipv4_cidr_block: 10.0.0.0/16
-            vpc_ipv4_cidr_blocks: 10.0.0.0/16
-      ipaddress: 10.0.0.200
   - name: init_dns
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
