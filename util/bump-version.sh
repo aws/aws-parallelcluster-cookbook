@@ -29,7 +29,7 @@ sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VE
 
 sed -i "s/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${CURRENT_PCLUSTER_VERSION}'/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${NEW_PCLUSTER_VERSION}'/g" kitchen.ec2.yml
 
-COOKBOOKS=("aws-parallelcluster-awsbatch" "aws-parallelcluster-entrypoints" "aws-parallelcluster-scheduler-plugin" "aws-parallelcluster-slurm" "aws-parallelcluster-test" "aws-parallelcluster-platform" "aws-parallelcluster-environment" "aws-parallelcluster-computefleet" "aws-parallelcluster-shared" "aws-parallelcluster-slurm" "aws-parallelcluster-tests")
+COOKBOOKS=("aws-parallelcluster-awsbatch" "aws-parallelcluster-entrypoints" "aws-parallelcluster-scheduler-plugin" "aws-parallelcluster-slurm" "aws-parallelcluster-platform" "aws-parallelcluster-environment" "aws-parallelcluster-computefleet" "aws-parallelcluster-shared" "aws-parallelcluster-slurm" "aws-parallelcluster-tests")
 for cookbook in "${COOKBOOKS[@]}"; do
   METADATA_FILES+=("cookbooks/${cookbook}/metadata.rb")
 done

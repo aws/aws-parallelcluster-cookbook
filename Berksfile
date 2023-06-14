@@ -16,7 +16,6 @@ cookbook "pyenv", path: "./third-party/pyenv-3.5.1"
 cookbook "selinux", path: "./third-party/selinux-6.0.5"
 cookbook "yum", path: "./third-party/yum-7.4.0"
 cookbook "yum-epel", path: "./third-party/yum-epel-4.5.0"
-cookbook "aws-parallelcluster-test", path: "./cookbooks/aws-parallelcluster-test"
 
 cookbook "aws-parallelcluster-awsbatch", path: "./cookbooks/aws-parallelcluster-awsbatch"
 cookbook "aws-parallelcluster-computefleet", path: "./cookbooks/aws-parallelcluster-computefleet"
