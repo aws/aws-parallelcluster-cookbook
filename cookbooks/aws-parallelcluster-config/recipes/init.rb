@@ -24,14 +24,7 @@ raise "Init package #{node['init_package']} not supported." unless systemd? || o
 
 fetch_config 'Fetch and load cluster configs'
 
-include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
-include_recipe "aws-parallelcluster-environment::mount_shared"
-cloudwatch "Configure CloudWatch" do
-  action :configure
-end
-include_recipe "aws-parallelcluster-environment::network_interfaces"
-include_recipe 'aws-parallelcluster-environment::imds'
-include_recipe "aws-parallelcluster-environment::directory_service"
+include_recipe "aws-parallelcluster-environment::init"
 
 # Custom action setup must be executed after cfnconfig file creation
 include_recipe "aws-parallelcluster-platform::custom_actions_setup"
