@@ -15,4 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-config::config'
+include_recipe 'aws-parallelcluster-entrypoints::config'
