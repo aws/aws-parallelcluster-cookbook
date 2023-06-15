@@ -205,8 +205,7 @@ end
 
 control 'tag:config_dcv_correctly_installed' do
   only_if do
-    instance.head_node? && instance.dcv_installed? &&
-      ['yes', true].include?(node['cluster']['dcv']['installed']) && !os_properties.redhat_ubi?
+    instance.head_node? && instance.dcv_installed? && !os_properties.redhat_ubi?
   end
 
   describe bash("sudo -u #{node['cluster']['cluster_user']} dcv version") do

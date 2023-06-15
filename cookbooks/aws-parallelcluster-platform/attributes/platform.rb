@@ -23,7 +23,6 @@ default['cluster']['dcv']['authenticator']['certificate'] = "#{node['cluster']['
 default['cluster']['dcv']['authenticator']['private_key'] = "#{node['cluster']['etc_dir']}/ext-auth-private-key.pem"
 default['cluster']['dcv']['version'] = '2023.0-15022'
 default['cluster']['dcv_port'] = 8443
-default['cluster']['dcv']['installed'] = 'yes'
 
 default['cluster']['dcv']['server']['version'] = '2023.0.15022-1'
 default['cluster']['dcv']['xdcv']['version'] = '2023.0.547-1'
