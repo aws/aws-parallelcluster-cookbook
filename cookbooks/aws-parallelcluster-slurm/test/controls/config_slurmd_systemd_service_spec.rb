@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'systemd_slurmd_service' do
+control 'tag:config_systemd_slurmd_service' do
   title 'Check the basic configuration of the systemd slurmd service'
   only_if { !os_properties.on_docker? }
 
@@ -24,7 +24,7 @@ control 'systemd_slurmd_service' do
   end
 end
 
-control 'systemd_slurmd_service_files' do
+control 'tag:config_systemd_slurmd_service_files' do
   title 'Check the basic configuration of the systemd slurmd service'
 
   describe 'Check that slurmd service file exists'
@@ -33,7 +33,7 @@ control 'systemd_slurmd_service_files' do
   end
 end
 
-control 'systemd_slurmd_service_nvidia_gpu_nodes' do
+control 'tag:config_systemd_slurmd_service_nvidia_gpu_nodes' do
   title 'Check the systemd slurmd service dependencies on NVIDIA GPU compute nodes'
   only_if { !os_properties.on_docker? }
 
