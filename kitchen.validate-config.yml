@@ -2,12 +2,12 @@
 ---
 verifier:
   inspec_tests:
-    - test/recipes
     - /tmp/cookbooks/aws-parallelcluster-awsbatch/test
     - /tmp/cookbooks/aws-parallelcluster-platform/test
     - /tmp/cookbooks/aws-parallelcluster-environment/test
     - /tmp/cookbooks/aws-parallelcluster-computefleet/test
     - /tmp/cookbooks/aws-parallelcluster-shared/test
+    - /tmp/cookbooks/aws-parallelcluster-slurm/test
   controls:
     - /tag:config/
 
