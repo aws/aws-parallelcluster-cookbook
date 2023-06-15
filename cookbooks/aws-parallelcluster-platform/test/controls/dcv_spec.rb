@@ -229,84 +229,96 @@ control 'tag:config_dcv_correctly_installed' do
 end
 
 control 'tag:config_dcv_services_correctly_configured' do
-  only_if do
-    instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" &&
-      !os_properties.on_docker?
-  end
+  if instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" && !os_properties.on_docker?
 
-  describe file('/etc/dcv/dcv.conf') do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by 'root' }
-    it { should be_grouped_into 'root' }
-    it { should be_mode 0755 }
-  end
-
-  describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do
-    it { should exist }
-    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-    it { should be_mode 01733 }
-  end
-
-  describe file("#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-    it { should be_mode 0700 }
-  end
-
-  describe file("#{node['cluster']['etc_dir']}/generate_certificate.sh") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by 'root' }
-    it { should be_mode 0700 }
-  end
-
-  describe file("#{node['cluster']['dcv']['authenticator']['certificate']}") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-    it { should be_grouped_into 'dcv' }
-    it { should be_mode 0440 }
-  end
-
-  describe file("#{node['cluster']['dcv']['authenticator']['private_key']}") do
-    it { should exist }
-    it { should be_file }
-    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-    it { should be_grouped_into 'dcv' }
-    it { should be_mode 0440 }
-  end
-
-  describe service('dcvserver') do
-    it { should be_installed }
-    it { should be_enabled }
-    it { should be_running }
-  end
-
-  describe 'check systemd default runlevel' do
-    subject { command('systemctl get-default | grep -i graphical.target') }
-    its('exit_status') { should eq 0 }
-  end
-
-  if os_properties.debian_family?
-    describe file('/etc/ssl/openssl.conf') do
-      its('content') { should_not match /RANDFILE/ }
+    describe file('/etc/dcv/dcv.conf') do
+      it { should exist }
+      it { should be_file }
+      it { should be_owned_by 'root' }
+      it { should be_grouped_into 'root' }
+      it { should be_mode 0755 }
     end
-  end
 
-  if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
-    describe 'Ensure local users can access X server (dcv-gl must be installed)' do
-      subject { command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"? }
-      its('exit_status') { should eq(0) }
+    describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do
+      it { should exist }
+      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+      it { should be_mode 01733 }
     end
-  end
 
-  if os_properties.ubuntu1804? || os_properties.alinux2?
-    describe service('gdm') do
+    describe file("#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py") do
+      it { should exist }
+      it { should be_file }
+      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+      it { should be_mode 0700 }
+    end
+
+    describe file("#{node['cluster']['etc_dir']}/generate_certificate.sh") do
+      it { should exist }
+      it { should be_file }
+      it { should be_owned_by 'root' }
+      it { should be_mode 0700 }
+    end
+
+    describe file("#{node['cluster']['dcv']['authenticator']['certificate']}") do
+      it { should exist }
+      it { should be_file }
+      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+      it { should be_grouped_into 'dcv' }
+      it { should be_mode 0440 }
+    end
+
+    describe file("#{node['cluster']['dcv']['authenticator']['private_key']}") do
+      it { should exist }
+      it { should be_file }
+      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+      it { should be_grouped_into 'dcv' }
+      it { should be_mode 0440 }
+    end
+
+    describe service('dcvserver') do
       it { should be_installed }
       it { should be_enabled }
       it { should be_running }
+    end
+
+    describe 'check systemd default runlevel' do
+      subject { command('systemctl get-default | grep -i graphical.target') }
+      its('exit_status') { should eq 0 }
+    end
+
+    if os_properties.debian_family?
+      describe file('/etc/ssl/openssl.conf') do
+        its('content') { should_not match /RANDFILE/ }
+      end
+    end
+
+    if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+      describe 'Ensure local users can access X server (dcv-gl must be installed)' do
+        subject { command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"? }
+        its('exit_status') { should eq(0) }
+      end
+    end
+
+    if os_properties.ubuntu1804? || os_properties.alinux2?
+      describe service('gdm') do
+        it { should be_installed }
+        it { should be_enabled }
+        it { should be_running }
+      end
+    end
+
+  else
+    describe 'check systemd default runlevel' do
+      subject { bash("systemctl get-default | grep -i multi-user.target") }
+      its('exit_status') { should eq 0 }
+    end
+
+    if os_properties.ubuntu1804? || os_properties.alinux2?
+      describe service('gdm') do
+        it { should be_installed }
+        it { should be_enabled }
+        it { should_not be_running }
+      end
     end
   end
 end
