@@ -23,6 +23,15 @@ control 'tag:install_intel_hpc_dependencies_downloaded' do
   end
 end
 
+control 'tag:config_intel_hpc_enough_space_on_root_volume' do
+  only_if { !instance.custom_ami? }
+
+  describe 'at least 10 GB of free space on root volume' do
+    subject { bash("sudo -u #{node['cluster']['cluster_user']} df --block-size GB --output=avail / | tail -n1 | cut -d G -f1") }
+    its('stdout') { should cmp >= '10' }
+  end
+end
+
 control 'tag:config_intel_hpc_configured' do
   title 'Checks Intel HPC packages have been installed'
 
