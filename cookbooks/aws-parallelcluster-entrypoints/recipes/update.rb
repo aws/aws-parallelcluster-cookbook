@@ -24,18 +24,6 @@ include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler
 include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']['scheduler'] == 'plugin'
 
 # Update node package - useful for development purposes only
-# REMINDER: the update recipe runs only on the head node and the only supervisord daemon provided by the
-# aws-parallelcluster-node package on the head node is clustermgtd. Therefore, only this daemon is restarted.
 if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
-
-  execute 'stop clustermgtd' do
-    command "#{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd"
-  end
-
-  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
-
-  execute 'start clustermgtd' do
-    command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
-  end
-
+  include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
 end
