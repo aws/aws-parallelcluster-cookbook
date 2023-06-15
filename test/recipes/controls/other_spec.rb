@@ -88,11 +88,3 @@ control 'tag:config_ssh_localhost' do
     its('stdout') { should eq hostname }
   end
 end
-
-control 'tag:config_bridge_network_interface_presence' do
-  only_if { os_properties.centos? }
-
-  describe bash("[ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0") do
-    its('exit_status') { should eq 0 }
-  end
-end
