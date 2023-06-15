@@ -14,6 +14,29 @@ control 'tag:install_install_packages' do
     it { should be_installed }
   end
 
+  # Verify jq version is updated enough to accept 2 argfile parameters
+  describe bash("jq --argfile") do
+    its('stderr') { should match /jq: --argfile takes two parameters/ }
+  end unless instance.custom_ami?
+
+  unless os_properties.centos7?
+    # Verify fftw package is not installed
+    describe bash('ls 2>/dev/null /usr/lib64/libfftw*') do
+      its('stdout') { should be_empty }
+    end
+    describe bash('ls 2>/dev/null /usr/lib/libfftw*') do
+      its('stdout') { should be_empty }
+    end
+  end
+
+  # Verify mpich package is not installed
+  describe bash('ls 2>/dev/null /usr/lib64/mpich*') do
+    its('stdout') { should be_empty }
+  end
+  describe bash('ls 2>/dev/null /usr/lib/mpich*') do
+    its('stdout') { should be_empty }
+  end
+
   if os.redhat? # redhat includes amazon
 
     describe package('glibc-static') do
@@ -30,7 +53,6 @@ control 'tag:install_install_packages' do
         it { should be_installed }
       end
     end
-
   elsif os.debian?
 
     describe package('libssl-dev') do

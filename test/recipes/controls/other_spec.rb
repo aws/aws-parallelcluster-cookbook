@@ -27,16 +27,6 @@ control 'tag:config_clusterstatusmgtd_is_running' do
   end
 end
 
-control 'tag:config_no_mpich_packages' do
-  describe bash('ls 2>/dev/null /usr/lib64/mpich*') do
-    its('stdout') { should be_empty }
-  end
-
-  describe bash('ls 2>/dev/null /usr/lib/mpich*') do
-    its('stdout') { should be_empty }
-  end
-end
-
 control 'tag:config_check_non_graphical_systemd_settings' do
   only_if do
     (
@@ -58,25 +48,3 @@ control 'tag:config_check_non_graphical_systemd_settings' do
     end
   end
 end
-
-control 'tag:config_no_fftw_packages' do
-  only_if { !os_properties.centos7? }
-
-  describe bash('ls 2>/dev/null /usr/lib64/libfftw*') do
-    its('stdout') { should be_empty }
-  end
-
-  describe bash('ls 2>/dev/null /usr/lib/libfftw*') do
-    its('stdout') { should be_empty }
-  end
-end
-
-control 'tag:config_jq_version_new_enough' do
-  only_if { !instance.custom_ami? && !os_properties.redhat_ubi? }
-
-  describe bash("jq --argfile") do
-    its('stderr') { should match /jq: --argfile takes two parameters/ }
-  end
-end
-
-
