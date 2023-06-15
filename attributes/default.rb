@@ -17,6 +17,5 @@
 
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['stack_name'] = nil
-default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['volume'] = ''
