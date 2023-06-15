@@ -5,5 +5,5 @@ maintainer: aws-parallelcluster
 license: Apache-2.0
 
 depends:
-  - name: common
-    path: cookbooks/aws-parallelcluster-shared/test/common
+  - name: shared
+    path: cookbooks/aws-parallelcluster-shared/test
