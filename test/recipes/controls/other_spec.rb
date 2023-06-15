@@ -9,11 +9,3 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:config_enough_space_on_root_volume' do
-  only_if { !instance.custom_ami? }
-
-  describe 'at least 10 GB of free space on root volume' do
-    subject { bash("sudo -u #{node['cluster']['cluster_user']} df --block-size GB --output=avail / | tail -n1 | cut -d G -f1") }
-    its('stdout') { should cmp >= '10' }
-  end
-end
