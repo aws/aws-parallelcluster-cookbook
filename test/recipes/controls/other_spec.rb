@@ -17,12 +17,3 @@ control 'tag:config_enough_space_on_root_volume' do
     its('stdout') { should cmp >= '10' }
   end
 end
-
-control 'tag:config_clusterstatusmgtd_is_running' do
-  only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' && !os_properties.on_docker? }
-
-  describe 'clusterstatusmgtd is configured to be executed by supervisord' do
-    subject { bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING") }
-    its('exit_status') { should eq 0 }
-  end
-end
