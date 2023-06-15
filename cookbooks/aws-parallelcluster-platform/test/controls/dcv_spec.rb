@@ -124,6 +124,16 @@ control 'tag:install_dcv_rhel_and_centos_specific_setup' do
     end
   end
 
+  # Verify Bridge Network Interface is present.
+  # It's provided by libvirt-daemon, installed as requirement for gnome-boxes, included in @gnome.
+  # Open MPI does not ignore other local-only devices other than loopback:
+  # if virtual bridge interface is up, Open MPI assumes that that network is usable for MPI communications.
+  # This is incorrect and it led to MPI applications hanging when they tried to send or receive MPI messages
+  # see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
+  describe bash("[ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0") do
+    its('exit_status') { should eq 0 }
+  end
+
   # As in the disable_selinux_spec we would need to skip testing that selinux is disabled
   # in centos and redhat because there we would need a reboot. As these are the two OSs that
   # we test in this control, we simply omit that check.
