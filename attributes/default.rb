@@ -15,9 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ParallelCluster log dir
-default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
-
 # Cluster config
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
