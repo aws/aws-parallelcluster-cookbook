@@ -24,5 +24,4 @@ control 'custom_parallelcluster_node_installed' do
   describe directory("#{file_cache_path}/aws-parallelcluster-custom-node") do
     it { should exist }
   end
-
 end
