@@ -47,6 +47,3 @@ done
 # Update AWS Batch CLI version
 CURRENT_AWSBATCH_CLI_VERSION=$(sed -ne "s/^default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '\(.*\)'/\1/p" ${VERSIONS_FILE})
 sed -i "s/default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '${CURRENT_AWSBATCH_CLI_VERSION}'/default['cluster']['parallelcluster-awsbatch-cli-version'] = '${NEW_AWSBATCH_CLI_VERSION}'/g" ${VERSIONS_FILE}
-
-# Update version in systemtests mock
-sed -i "s/aws-parallelcluster-cookbook-${CURRENT_PCLUSTER_VERSION}/aws-parallelcluster-cookbook-${NEW_PCLUSTER_VERSION}/g" system_tests/systemd

@@ -1,7 +1,0 @@
-{"cluster":
-    {"base_os": "ubuntu2004",
-     "custom_awsbatchcli_package": "",
-     "custom_node_package": "",
-     "is_official_ami_build": "false",
-     "nvidia": {"enabled": "no"},
-     "region": "us-east-2"}}
