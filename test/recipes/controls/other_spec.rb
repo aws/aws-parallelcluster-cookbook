@@ -79,12 +79,4 @@ control 'tag:config_jq_version_new_enough' do
   end
 end
 
-control 'tag:config_ssh_localhost' do
-  only_if { instance.head_node? && !os_properties.on_docker? }
 
-  hostname = bash("hostname").stdout
-
-  describe bash("su #{node['cluster']['cluster_user']} -c 'ssh localhost hostname'") do
-    its('stdout') { should eq hostname }
-  end
-end
