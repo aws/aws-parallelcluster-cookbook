@@ -277,13 +277,12 @@ control 'tag:config_dcv_correctly_configured' do
 end
 
 control 'tag:config_dcv_services_correctly_configured' do
-  if instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" && !os_properties.on_docker?
-
+  if instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node"
     describe service('dcvserver') do
       it { should be_installed }
       it { should be_enabled }
       it { should be_running }
-    end
+    end unless os_properties.on_docker?
 
     describe 'check systemd default runlevel' do
       subject { command('systemctl get-default | grep -i graphical.target') }
