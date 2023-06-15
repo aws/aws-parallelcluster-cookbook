@@ -50,7 +50,6 @@ _run_list: &_run_list
   - recipe[aws-parallelcluster::config]
   - recipe[aws-parallelcluster::finalize]
   - recipe[aws-parallelcluster-tests::tear_down]
-  - recipe[aws-parallelcluster::unmount_home]
 
 provisioner:
   attributes:
