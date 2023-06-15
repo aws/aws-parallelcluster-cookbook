@@ -228,52 +228,56 @@ control 'tag:config_dcv_correctly_installed' do
   end
 end
 
+control 'tag:config_dcv_correctly_configured' do
+  only_if { instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" && !os_properties.on_docker? }
+
+  describe file('/etc/dcv/dcv.conf') do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
+    it { should be_mode 0755 }
+  end
+
+  describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do
+    it { should exist }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_mode 01733 }
+  end
+
+  describe file("#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_mode 0700 }
+  end
+
+  describe file("#{node['cluster']['etc_dir']}/generate_certificate.sh") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by 'root' }
+    it { should be_mode 0700 }
+  end
+
+  describe file("#{node['cluster']['dcv']['authenticator']['certificate']}") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_grouped_into 'dcv' }
+    it { should be_mode 0440 }
+  end
+
+  describe file("#{node['cluster']['dcv']['authenticator']['private_key']}") do
+    it { should exist }
+    it { should be_file }
+    it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
+    it { should be_grouped_into 'dcv' }
+    it { should be_mode 0440 }
+  end
+end
+
 control 'tag:config_dcv_services_correctly_configured' do
   if instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" && !os_properties.on_docker?
-
-    describe file('/etc/dcv/dcv.conf') do
-      it { should exist }
-      it { should be_file }
-      it { should be_owned_by 'root' }
-      it { should be_grouped_into 'root' }
-      it { should be_mode 0755 }
-    end
-
-    describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do
-      it { should exist }
-      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-      it { should be_mode 01733 }
-    end
-
-    describe file("#{node['cluster']['dcv']['authenticator']['user_home']}/pcluster_dcv_authenticator.py") do
-      it { should exist }
-      it { should be_file }
-      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-      it { should be_mode 0700 }
-    end
-
-    describe file("#{node['cluster']['etc_dir']}/generate_certificate.sh") do
-      it { should exist }
-      it { should be_file }
-      it { should be_owned_by 'root' }
-      it { should be_mode 0700 }
-    end
-
-    describe file("#{node['cluster']['dcv']['authenticator']['certificate']}") do
-      it { should exist }
-      it { should be_file }
-      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-      it { should be_grouped_into 'dcv' }
-      it { should be_mode 0440 }
-    end
-
-    describe file("#{node['cluster']['dcv']['authenticator']['private_key']}") do
-      it { should exist }
-      it { should be_file }
-      it { should be_owned_by "#{node['cluster']['dcv']['authenticator']['user']}" }
-      it { should be_grouped_into 'dcv' }
-      it { should be_mode 0440 }
-    end
 
     describe service('dcvserver') do
       it { should be_installed }
