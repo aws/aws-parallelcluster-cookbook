@@ -176,7 +176,7 @@ control 'tag:install_dcv_switch_runlevel_to_multiuser_target' do
 end
 
 control 'tag:config_dcv_external_authenticator_user_and_group_correctly_defined' do
-  only_if { instance.dcv_installed? && !os_properties.redhat_ubi? }
+  only_if { instance.dcv_installed? }
 
   describe user(node['cluster']['dcv']['authenticator']['user']) do
     it { should exist }
@@ -283,9 +283,9 @@ control 'tag:config_dcv_services_correctly_configured' do
       it { should be_running }
     end unless os_properties.on_docker?
 
-    describe 'check systemd default runlevel' do
-      subject { command('systemctl get-default | grep -i graphical.target') }
+    describe bash('systemctl get-default') do
       its('exit_status') { should eq 0 }
+      its('stdout') { should match /graphical.target/ }
     end
 
     if os_properties.debian_family?
@@ -310,9 +310,9 @@ control 'tag:config_dcv_services_correctly_configured' do
     end
 
   else
-    describe 'check systemd default runlevel' do
-      subject { bash("systemctl get-default | grep -i multi-user.target") }
+    describe bash('systemctl get-default') do
       its('exit_status') { should eq 0 }
+      its('stdout') { should match /multi-user.target/ }
     end
 
     if os_properties.ubuntu1804? || os_properties.alinux2?
