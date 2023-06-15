@@ -19,6 +19,7 @@ property :nvidia_driver_version, String
 
 action :setup do
   return unless nvidia_driver_enabled?
+  return if on_docker?
 
   remote_file "/tmp/nvidia.run" do
     source nvidia_driver_url

@@ -124,6 +124,16 @@ control 'tag:install_dcv_rhel_and_centos_specific_setup' do
     end
   end
 
+  # Verify Bridge Network Interface is present.
+  # It's provided by libvirt-daemon, installed as requirement for gnome-boxes, included in @gnome.
+  # Open MPI does not ignore other local-only devices other than loopback:
+  # if virtual bridge interface is up, Open MPI assumes that that network is usable for MPI communications.
+  # This is incorrect and it led to MPI applications hanging when they tried to send or receive MPI messages
+  # see https://www.open-mpi.org/faq/?category=tcp#tcp-selection for details
+  describe bash("[ $(brctl show | awk 'FNR == 2 {print $1}') ] && exit 1 || exit 0") do
+    its('exit_status') { should eq 0 }
+  end
+
   # As in the disable_selinux_spec we would need to skip testing that selinux is disabled
   # in centos and redhat because there we would need a reboot. As these are the two OSs that
   # we test in this control, we simply omit that check.
@@ -184,7 +194,7 @@ end
 control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
   only_if do
     instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" &&
-      instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+      instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported? && !os_properties.redhat_ubi?
   end
 
   describe package('nice-dcv-gl') do
@@ -195,8 +205,7 @@ end
 
 control 'tag:config_dcv_correctly_installed' do
   only_if do
-    instance.head_node? && instance.dcv_installed? &&
-      ['yes', true].include?(node['cluster']['dcv']['installed']) && !os_properties.redhat_ubi?
+    instance.head_node? && instance.dcv_installed? && !os_properties.redhat_ubi?
   end
 
   describe bash("sudo -u #{node['cluster']['cluster_user']} dcv version") do
@@ -205,7 +214,7 @@ control 'tag:config_dcv_correctly_installed' do
 
   describe bash("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/python -V") do
     its('stdout') { should match /Python #{node['cluster']['python-version']}/ }
-  end
+  end unless os_properties.on_docker?
 
   describe 'check screensaver screen lock disabled' do
     subject { bash('gsettings get org.gnome.desktop.screensaver lock-enabled') }
@@ -218,11 +227,8 @@ control 'tag:config_dcv_correctly_installed' do
   end
 end
 
-control 'tag:config_dcv_services_correctly_configured' do
-  only_if do
-    instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" &&
-      !os_properties.on_docker?
-  end
+control 'tag:config_dcv_correctly_configured' do
+  only_if { instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" && !os_properties.on_docker? }
 
   describe file('/etc/dcv/dcv.conf') do
     it { should exist }
@@ -267,36 +273,55 @@ control 'tag:config_dcv_services_correctly_configured' do
     it { should be_grouped_into 'dcv' }
     it { should be_mode 0440 }
   end
+end
 
-  describe service('dcvserver') do
-    it { should be_installed }
-    it { should be_enabled }
-    it { should be_running }
-  end
-
-  describe 'check systemd default runlevel' do
-    subject { command('systemctl get-default | grep -i graphical.target') }
-    its('exit_status') { should eq 0 }
-  end
-
-  if os_properties.debian_family?
-    describe file('/etc/ssl/openssl.conf') do
-      its('content') { should_not match /RANDFILE/ }
-    end
-  end
-
-  if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
-    describe 'Ensure local users can access X server (dcv-gl must be installed)' do
-      subject { command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"? }
-      its('exit_status') { should eq(0) }
-    end
-  end
-
-  if os_properties.ubuntu1804? || os_properties.alinux2?
-    describe service('gdm') do
+control 'tag:config_dcv_services_correctly_configured' do
+  only_if { !os_properties.redhat_ubi? }
+  if instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node"
+    describe service('dcvserver') do
       it { should be_installed }
       it { should be_enabled }
       it { should be_running }
+    end unless os_properties.on_docker?
+
+    describe bash('systemctl get-default') do
+      its('exit_status') { should eq 0 }
+      its('stdout') { should match /graphical.target/ }
+    end unless os_properties.on_docker?
+
+    if os_properties.debian_family?
+      describe file('/etc/ssl/openssl.conf') do
+        its('content') { should_not match /RANDFILE/ }
+      end
+    end
+
+    if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+      describe 'Ensure local users can access X server (dcv-gl must be installed)' do
+        subject { command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"? }
+        its('exit_status') { should eq(0) }
+      end
+    end
+
+    if os_properties.ubuntu1804? || os_properties.alinux2?
+      describe service('gdm') do
+        it { should be_installed }
+        it { should be_enabled }
+        it { should be_running }
+      end
+    end
+
+  else
+    describe bash('systemctl get-default') do
+      its('exit_status') { should eq 0 }
+      its('stdout') { should match /multi-user.target/ }
+    end
+
+    if os_properties.ubuntu1804? || os_properties.alinux2?
+      describe service('gdm') do
+        it { should be_installed }
+        it { should be_enabled }
+        it { should_not be_running }
+      end
     end
   end
 end

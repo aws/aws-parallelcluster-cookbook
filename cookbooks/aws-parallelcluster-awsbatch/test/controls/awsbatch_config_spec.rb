@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:config_awsbatch_correctly_configured' do
+control 'tag:config_awsbatch_cli_commands_available' do
   only_if { node['cluster']['scheduler'] == 'awsbatch' && !os_properties.redhat8? }
 
   # Test that batch commands can be accessed without absolute path

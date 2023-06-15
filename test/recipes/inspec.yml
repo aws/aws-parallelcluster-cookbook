@@ -1,9 +1,0 @@
----
-name: recipes unit tests
-title: Recipes unit test
-maintainer: aws-parallelcluster
-license: Apache-2.0
-
-depends:
-  - name: shared
-    path: cookbooks/aws-parallelcluster-shared/test

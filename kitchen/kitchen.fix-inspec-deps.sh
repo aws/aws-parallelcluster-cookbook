@@ -6,9 +6,11 @@ mkdir -p /tmp/cookbooks/aws-parallelcluster-platform
 mkdir -p /tmp/cookbooks/aws-parallelcluster-environment
 mkdir -p /tmp/cookbooks/aws-parallelcluster-computefleet
 mkdir -p /tmp/cookbooks/aws-parallelcluster-shared/test
+mkdir -p /tmp/cookbooks/aws-parallelcluster-slurm/test
 cp -r cookbooks/aws-parallelcluster-awsbatch/test /tmp/cookbooks/aws-parallelcluster-awsbatch
 cp -r cookbooks/aws-parallelcluster-platform/test /tmp/cookbooks/aws-parallelcluster-platform
 cp -r cookbooks/aws-parallelcluster-environment/test /tmp/cookbooks/aws-parallelcluster-environment
 cp -r cookbooks/aws-parallelcluster-computefleet/test /tmp/cookbooks/aws-parallelcluster-computefleet
 cp -r cookbooks/aws-parallelcluster-shared/test /tmp/cookbooks/aws-parallelcluster-shared
+cp -r cookbooks/aws-parallelcluster-slurm/test /tmp/cookbooks/aws-parallelcluster-slurm
 sed -i.bak "s#path: ../aws-parallelcluster#path: /tmp/cookbooks/aws-parallelcluster#g" /tmp/cookbooks/aws-parallelcluster-*/test/inspec.yml
