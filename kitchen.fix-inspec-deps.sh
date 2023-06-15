@@ -11,5 +11,4 @@ cp -r cookbooks/aws-parallelcluster-platform/test /tmp/cookbooks/aws-parallelclu
 cp -r cookbooks/aws-parallelcluster-environment/test /tmp/cookbooks/aws-parallelcluster-environment
 cp -r cookbooks/aws-parallelcluster-computefleet/test /tmp/cookbooks/aws-parallelcluster-computefleet
 cp -r cookbooks/aws-parallelcluster-shared/test /tmp/cookbooks/aws-parallelcluster-shared
-cp -r cookbooks/aws-parallelcluster-shared/test/common /tmp/cookbooks/aws-parallelcluster-shared/test
 sed -i.bak "s#path: ../aws-parallelcluster#path: /tmp/cookbooks/aws-parallelcluster#g" /tmp/cookbooks/aws-parallelcluster-*/test/inspec.yml
