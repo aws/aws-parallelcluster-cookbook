@@ -32,7 +32,7 @@ class Instance < Inspec.resource(1)
   end
 
   def dcv_installed?
-    ::File.exist?("/etc/dcv/dcv.conf")
+    inspec.file("/etc/dcv/dcv.conf").exist?
   end
 
   def imds_token
