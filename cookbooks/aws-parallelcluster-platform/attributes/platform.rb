@@ -52,3 +52,10 @@ default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelclu
 
 # error handler log file
 default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
+
+# Cluster config
+default['cluster']['cluster_s3_bucket'] = nil
+default['cluster']['cluster_config_s3_key'] = nil
+default['cluster']['cluster_config_version'] = nil
+default['cluster']['change_set_s3_key'] = nil
+default['cluster']['instance_types_data_s3_key'] = nil
