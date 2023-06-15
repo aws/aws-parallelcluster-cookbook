@@ -32,7 +32,7 @@ if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node
     command "#{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd"
   end
 
-  include_recipe 'aws-parallelcluster-shared::custom_parallelcluster_node'
+  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 
   execute 'start clustermgtd' do
     command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"

@@ -18,7 +18,7 @@ fetch_config 'Fetch and load cluster configs'
 
 if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
   # Install custom aws-parallelcluster-node package
-  include_recipe 'aws-parallelcluster-shared::custom_parallelcluster_node'
+  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 end
 
 # Restart supervisord

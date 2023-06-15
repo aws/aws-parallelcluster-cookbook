@@ -70,7 +70,7 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
         end
 
         it 'installs custom node package' do
-          is_expected.to include_recipe('aws-parallelcluster-shared::custom_parallelcluster_node')
+          is_expected.to include_recipe('aws-parallelcluster-computefleet::custom_parallelcluster_node')
         end
       end
     end
