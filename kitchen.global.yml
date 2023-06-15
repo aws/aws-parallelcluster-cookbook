@@ -21,6 +21,6 @@ lifecycle:
   <% %w(create converge verify destroy).each do |phase| %>
   <% op = "#{prefix}_#{phase}" %>
   <%= op %>:
-    - local: bash ./kitchen.run-hook.sh <%= op %> $(dirname "$0")
+    - local: bash ./kitchen/kitchen.run-hook.sh <%= op %> $(dirname "$0")
   <% end %>
   <% end %>
