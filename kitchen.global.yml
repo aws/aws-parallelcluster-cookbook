@@ -1,8 +1,5 @@
 verifier:
   name: inspec
-  inspec_tests:
-    - test/recipes
-    - test/resources
   reporter:
     - cli
     - junit2:.kitchen/inspec/results/%{platform}_%{suite}_inspec.xml
