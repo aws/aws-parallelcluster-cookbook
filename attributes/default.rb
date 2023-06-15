@@ -15,10 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-default['cluster']['skip_install_recipes'] = 'yes'
-# Official ami build
-default['cluster']['is_official_ami_build'] = false
-
 # ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
 default['cluster']['stack_name'] = nil
 default['cluster']['scheduler_queue_name'] = nil
