@@ -15,7 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# ParallelCluster internal variables (also in /etc/parallelcluster/cfnconfig)
-default['cluster']['stack_name'] = nil
-default['cluster']['proxy'] = 'NONE'
-default['cluster']['volume'] = ''
+
