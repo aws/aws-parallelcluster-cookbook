@@ -41,7 +41,9 @@ default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['raid_shared_dir'] = ''
 default['cluster']['ephemeral_dir'] = '/scratch'
+
 default['cluster']['scheduler_slots'] = 'vcpus'
+default['cluster']['scheduler_queue_name'] = nil
 
 default['cluster']['head_node_home_path'] = '/home'
 default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
