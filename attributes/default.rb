@@ -15,12 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Cluster config
-default['cluster']['cluster_s3_bucket'] = nil
-default['cluster']['cluster_config_s3_key'] = nil
-default['cluster']['cluster_config_version'] = nil
-default['cluster']['change_set_s3_key'] = nil
-default['cluster']['instance_types_data_s3_key'] = nil
 default['cluster']['skip_install_recipes'] = 'yes'
 # Official ami build
 default['cluster']['is_official_ami_build'] = false
