@@ -13,7 +13,7 @@ verifier:
 
 lifecycle:
   pre_verify:
-    - local: . ./kitchen.fix-inspec-deps.sh
+    - local: . ./kitchen/kitchen.fix-inspec-deps.sh
 
 _common_cluster_attributes: &_common_cluster_attributes
   stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
