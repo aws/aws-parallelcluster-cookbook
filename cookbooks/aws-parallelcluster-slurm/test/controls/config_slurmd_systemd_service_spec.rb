@@ -26,6 +26,7 @@ end
 
 control 'tag:config_systemd_slurmd_service_files' do
   title 'Check the basic configuration of the systemd slurmd service'
+  only_if { !os_properties.on_docker? }
 
   describe 'Check that slurmd service file exists'
   describe file('/etc/systemd/system/slurmd.service') do
