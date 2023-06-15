@@ -21,6 +21,3 @@ default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['instance_slots'] = '1'
 default['cluster']['proxy'] = 'NONE'
 default['cluster']['volume'] = ''
-
-# Compute nodes bootstrap timeout
-default['cluster']['compute_node_bootstrap_timeout'] = 1800
