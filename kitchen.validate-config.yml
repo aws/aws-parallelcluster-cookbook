@@ -46,9 +46,9 @@ _compute_node_cluster_attributes: &_compute_node_cluster_attributes
 
 _run_list: &_run_list
   - recipe[aws-parallelcluster-tests::setup]
-  - recipe[aws-parallelcluster::init]
-  - recipe[aws-parallelcluster::config]
-  - recipe[aws-parallelcluster::finalize]
+  - recipe[aws-parallelcluster-entrypoints::init]
+  - recipe[aws-parallelcluster-entrypoints::config]
+  - recipe[aws-parallelcluster-entrypoints::finalize]
   - recipe[aws-parallelcluster-tests::tear_down]
 
 provisioner:
