@@ -11,7 +11,7 @@
 
 control 'tag:config_fleet_status' do
   title 'Check the headnode fleet status configuration'
-  only_if { instance.head_node? }
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' }
 
   describe file('/usr/local/bin/update-compute-fleet-status.sh') do
     it { should exist }
