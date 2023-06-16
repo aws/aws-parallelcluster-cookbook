@@ -26,4 +26,3 @@ fetch_config 'Fetch and load cluster configs'
 
 include_recipe "aws-parallelcluster-computefleet::init"
 include_recipe "aws-parallelcluster-slurm::init"
-include_recipe "aws-parallelcluster-scheduler-plugin::init"

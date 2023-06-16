@@ -16,5 +16,4 @@ unless node['cluster']['scheduler'] == 'awsbatch'
   load_cluster_config
 end
 
-include_recipe 'aws-parallelcluster-scheduler-plugin::update_computefleet_status' if node['cluster']['scheduler'] == 'plugin'
 include_recipe 'aws-parallelcluster-slurm::update_computefleet_status' if node['cluster']['scheduler'] == 'slurm'

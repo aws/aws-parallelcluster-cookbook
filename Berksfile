@@ -22,7 +22,6 @@ cookbook "aws-parallelcluster-computefleet", path: "./cookbooks/aws-parallelclus
 cookbook "aws-parallelcluster-entrypoints", path: "./cookbooks/aws-parallelcluster-entrypoints"
 cookbook "aws-parallelcluster-environment", path: "./cookbooks/aws-parallelcluster-environment"
 cookbook "aws-parallelcluster-platform", path: "./cookbooks/aws-parallelcluster-platform"
-cookbook "aws-parallelcluster-scheduler-plugin", path: "./cookbooks/aws-parallelcluster-scheduler-plugin"
 cookbook "aws-parallelcluster-shared", path: "./cookbooks/aws-parallelcluster-shared"
 cookbook "aws-parallelcluster-slurm", path: "./cookbooks/aws-parallelcluster-slurm"
 cookbook "aws-parallelcluster-tests", path: "./cookbooks/aws-parallelcluster-tests"
