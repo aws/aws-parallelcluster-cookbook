@@ -9,10 +9,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:config_mount_shared_configured' do
+control 'mount_shared' do
   title 'Check if the home and the shared directories are mounted'
 
-  only_if { !os_properties.on_docker? }
+  only_if { !os_properties.on_docker? && instance.compute_node? }
 
   describe mount('/home') do
     it { should be_mounted }
