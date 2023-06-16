@@ -27,7 +27,7 @@ when 'ComputeFleet'
 
   # Mount each volume with NFS
   shared_dir_array.each do |dir|
-    volume "mount volume #{index}" do
+    volume "mount volume #{dir}" do
       action :mount
       shared_dir dir
       device(lazy { "#{node['cluster']['head_node_private_ip']}:#{format_directory(dir)}" })
