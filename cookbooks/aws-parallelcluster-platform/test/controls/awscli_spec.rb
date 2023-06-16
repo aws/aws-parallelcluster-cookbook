@@ -45,6 +45,7 @@ control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
 end
 
 control 'tag:config_awscli_runs_in_all_regions' do
+  only_if { node['cluster']['scheduler'] == 'awsbatch' }
   regions = bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query \"Regions[].{Name:RegionName}\" --output text")
             .stdout.split(/\n+/)
   regions.each do |region|
