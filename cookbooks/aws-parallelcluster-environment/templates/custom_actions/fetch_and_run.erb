@@ -18,8 +18,6 @@ set -euo pipefail
 # this is kept solely for backward compatibility, variables defined by it *SHOULD NOT* be used
 source <%= node['cluster']['etc_dir'] %>/cfnconfig
 
-# please note that this env setup has potential independent but relevant duplication with:
-# build_env in cookbooks/aws-parallelcluster-scheduler-plugin/resources/execute_event_handler.rb
 PCLUSTER_COOKBOOK_VIRTUALENV_PATH="<%= cookbook_virtualenv_path %>"
 PCLUSTER_SCRIPTS_DIR="<%= node['cluster']['scripts_dir'] %>"
 PCLUSTER_CONFIG_PATH="<%= node['cluster']['cluster_config_path'] %>"

@@ -26,5 +26,4 @@ service "supervisord" do
   action %i(enable start)
 end unless on_docker?
 
-include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'plugin'
 include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
