@@ -12,27 +12,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+# Helpers functions used by update recipe steps.
 require 'chef/mixin/shell_out'
 require 'net/http'
 require 'timeout'
-
-def ignore_failure(lookup)
-  resource = resources(lookup)
-  if resource.nil?
-    Chef::Log.warn("Can't find resource to ignore: #{lookup}")
-  else
-    Chef::Log.info("Ignore failure for resource: #{lookup}")
-    resource.ignore_failure(true)
-  end
-end
-
-def kernel_release
-  ENV['KERNEL_RELEASE'] || default['cluster']['kernel_release']
-end
-
-def run_command(command)
-  Mixlib::ShellOut.new(command).run_command.stdout.strip
-end
 
 # Verify if Scheduling section of cluster configuration and compute node bootstrap_timeout have been updated
 def are_queues_updated?
@@ -70,6 +53,13 @@ def is_compute_node_bootstrap_timeout_updated?(previous_config, config)
   evaluate_compute_bootstrap_timeout(previous_config) != evaluate_compute_bootstrap_timeout(config)
 end
 
+def is_slurm_database_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
+end
+
 def raise_command_error(command, cmd)
   Chef::Log.error("Error while executing command (#{command})")
   raise "#{cmd.stderr.strip}"
@@ -80,11 +70,4 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   cmd.run_command
   raise_command_error(command, cmd) if raise_on_error && cmd.error?
   cmd.stdout.strip
-end
-
-def is_slurm_database_updated?
-  require 'yaml'
-  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
-  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
-  config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
 end

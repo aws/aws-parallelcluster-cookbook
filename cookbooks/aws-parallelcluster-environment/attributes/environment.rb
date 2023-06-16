@@ -1,3 +1,7 @@
+default['cluster']['stack_name'] = nil
+
+default['cluster']['proxy'] = 'NONE'
+
 # For performance, set NFS threads to min(256, max(8, num_cores * 4))
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
@@ -26,6 +30,7 @@ default['cluster']['directory_service']['additional_sssd_configs'] = nil
 default['cluster']['directory_service']['disabled_on_compute_nodes'] = nil
 
 # Other ParallelCluster internal variables
+default['cluster']['volume'] = ''
 default['cluster']['volume_fs_type'] = 'ext4'
 default['cluster']['efs_shared_dirs'] = '/shared'
 default['cluster']['efs_fs_ids'] = ''
@@ -41,7 +46,9 @@ default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['raid_shared_dir'] = ''
 default['cluster']['ephemeral_dir'] = '/scratch'
+
 default['cluster']['scheduler_slots'] = 'vcpus'
+default['cluster']['scheduler_queue_name'] = nil
 
 default['cluster']['head_node_home_path'] = '/home'
 default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
