@@ -35,7 +35,7 @@ suites:
   - name: finalize_custom_parallelcluster_node
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-config::finalize]
+      - recipe[aws-parallelcluster-entrypoints::finalize]
     verifier:
       controls:
         - /node_virtualenv_created/
