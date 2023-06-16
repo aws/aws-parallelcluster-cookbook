@@ -19,9 +19,11 @@ os_type 'Validate OS type specified by the user is the same as the OS identified
 # Validate init system
 raise "Init package #{node['init_package']} not supported." unless systemd? || on_docker?
 
+include_recipe "aws-parallelcluster-environment::init"
+
+# Fetch config must be executed after the mount of the shared folders because the config will be saved there
 fetch_config 'Fetch and load cluster configs'
 
-include_recipe "aws-parallelcluster-environment::init"
 include_recipe "aws-parallelcluster-computefleet::init"
 include_recipe "aws-parallelcluster-slurm::init"
 include_recipe "aws-parallelcluster-scheduler-plugin::init"
