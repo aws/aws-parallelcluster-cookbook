@@ -20,7 +20,6 @@ include_recipe 'aws-parallelcluster-platform::config'
 include_recipe "aws-parallelcluster-environment::config"
 include_recipe 'aws-parallelcluster-computefleet::config'
 include_recipe 'aws-parallelcluster-slurm::config'
-include_recipe 'aws-parallelcluster-scheduler-plugin::config'
 include_recipe 'aws-parallelcluster-awsbatch::config'
 
 include_recipe "aws-parallelcluster-platform::log_rotation"

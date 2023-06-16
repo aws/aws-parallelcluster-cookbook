@@ -150,11 +150,9 @@ action :configure do
     )
     not_if { ::File.exist?('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json') }
 
-    cluster_config_path = node['cluster']['scheduler'] == 'plugin' ? "--cluster-config-path #{node['cluster']['cluster_config_path']}" : ""
-
     command "#{cookbook_virtualenv_path}/bin/python #{config_script_path} "\
         "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
-        "--scheduler $SCHEDULER --node-role $NODE_ROLE #{cluster_config_path}"
+        "--scheduler $SCHEDULER --node-role $NODE_ROLE"
   end unless redhat_ubi?
 
   execute "cloudwatch-agent-start" do
