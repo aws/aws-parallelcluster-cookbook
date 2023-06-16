@@ -11,7 +11,7 @@
 
 control 'tag:config_systemd_slurmd_service' do
   title 'Check the basic configuration of the systemd slurmd service'
-  only_if { !os_properties.on_docker? }
+  only_if { !os_properties.on_docker? && instance.compute_node? && node['cluster']['scheduler'] == 'slurm' }
 
   describe 'Check that slurmd service is defined'
   describe service('slurmd') do
@@ -26,7 +26,7 @@ end
 
 control 'tag:config_systemd_slurmd_service_files' do
   title 'Check the basic configuration of the systemd slurmd service'
-  only_if { !os_properties.on_docker? }
+  only_if { !os_properties.on_docker? && instance.compute_node? && node['cluster']['scheduler'] == 'slurm' }
 
   describe 'Check that slurmd service file exists'
   describe file('/etc/systemd/system/slurmd.service') do
@@ -36,7 +36,7 @@ end
 
 control 'tag:config_systemd_slurmd_service_nvidia_gpu_nodes' do
   title 'Check the systemd slurmd service dependencies on NVIDIA GPU compute nodes'
-  only_if { !os_properties.on_docker? }
+  only_if { !os_properties.on_docker? && instance.compute_node? && node['cluster']['scheduler'] == 'slurm' }
 
   describe 'Check slurmd systemd "after" dependencies'
   describe command('systemctl list-dependencies --after --plain slurmd.service') do
