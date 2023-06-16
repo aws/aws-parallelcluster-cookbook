@@ -33,8 +33,7 @@ activate_virtual_env node_virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
-  # Install custom aws-parallelcluster-node package
+if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 else
   pyenv_pip 'aws-parallelcluster-node' do

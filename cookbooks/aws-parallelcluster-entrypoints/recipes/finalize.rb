@@ -16,8 +16,7 @@ include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
 
 fetch_config 'Fetch and load cluster configs'
 
-if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
-  # Install custom aws-parallelcluster-node package
+if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 end
 

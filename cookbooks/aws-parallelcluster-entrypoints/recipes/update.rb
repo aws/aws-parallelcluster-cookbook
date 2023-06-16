@@ -24,6 +24,6 @@ include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler
 include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']['scheduler'] == 'plugin'
 
 # Update node package - useful for development purposes only
-if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
+if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
 end
