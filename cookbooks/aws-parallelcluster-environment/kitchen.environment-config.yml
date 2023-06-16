@@ -418,13 +418,14 @@ suites:
       - recipe[aws-parallelcluster-environment::mount_shared]
     verifier:
       controls:
-        - /tag:config_mount_shared/
+        - mount_shared
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - resource:nfs
         - recipe:aws-parallelcluster-environment::mock_export_directories
       cluster:
+        node_type: 'ComputeFleet'
         head_node_private_ip: '127.0.0.1'
         head_node_home_path: '/fake_headnode_home'
         shared_dir_head: '/fake_headnode_shared'
