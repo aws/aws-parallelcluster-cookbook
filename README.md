@@ -6,6 +6,30 @@ AWS ParallelCluster Cookbook
 
 This repo contains the AWS ParallelCluster Chef cookbook used in AWS ParallelCluster.
 
+# Code structure
+
+The root folder of the cookbook repository can be considered the main cookbook, since it contains two files: `Berksfile` and `metadata.rb`.
+These files are used by the CLI (build image time) and `user-data.sh` code to [vendor](https://docs.chef.io/workstation/berkshelf/#berks-vendor)
+the other sub-cookbooks and third party deps.
+
+The main cookbook does not contain any recipe, attribute or library. They are distributed in the functional cookbooks:
+- `aws-parallelcluster-entrypoints` is the entrypoint for the different phases (install/build-image, config, update, etc) 
+  and the recipes in this cookbook are called directly by the CLI or CI/CD
+- `aws-parallelcluster-shared` contains the resources and recipes used by multiple cookbooks, common utilities.
+- `aws-parallelcluster-platform` contains the resources and recipes strictly related to OS packages and system configuration
+- `aws-parallelcluster-environment` contains the resources and recipes related to AWS services and their configuration
+- `aws-parallelcluster-computefleet` contains the resources and recipes related to scaling logic
+- `aws-parallelcluster-awsbatch` contains the resources and recipes required to support AWS Batch as scheduler
+- `aws-parallelcluster-slurm` contains the resources and recipes required to support Slurm as scheduler
+- `aws-parallelcluster-tests` contains the resources and recipes tools used for Inspec tests
+
+The `cookbooks/third-party` folder contains cookbooks from marketplace. 
+You can find more information about them in the `cookbooks/third-party/THIRD-PARTY-LICENSES.txt` file.
+
+The `kitchen` folder contains utility files used when running Inspec tests locally.
+
+The `test` folder contains Python unit tests files and Kitchen [environment](https://docs.chef.io/environments/) files.
+
 # Development
 
 ## About kitchen tests
