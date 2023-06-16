@@ -33,29 +33,8 @@ activate_virtual_env node_virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-if !node['cluster']['custom_node_package'].nil? && !node['cluster']['custom_node_package'].empty?
-  # Install custom aws-parallelcluster-node package
-  bash "install aws-parallelcluster-node" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-NODE
-      set -e
-      [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
-      echo "PATH is $PATH"
-      source #{virtualenv_path}/bin/activate
-      pip uninstall --yes aws-parallelcluster-node
-      if [[ "#{node['cluster']['custom_node_package']}" =~ ^s3:// ]]; then
-        custom_package_url=$(#{cookbook_virtualenv_path}/bin/aws s3 presign #{node['cluster']['custom_node_package']} --region #{node['cluster']['region']})
-      else
-        custom_package_url=#{node['cluster']['custom_node_package']}
-      fi
-      curl --retry 3 -L -o aws-parallelcluster-node.tgz ${custom_package_url}
-      mkdir aws-parallelcluster-custom-node
-      tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
-      cd aws-parallelcluster-custom-node/*aws-parallelcluster-node-*
-      pip install .
-      deactivate
-    NODE
-  end
+if is_custom_node?
+  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 else
   pyenv_pip 'aws-parallelcluster-node' do
     version node['cluster']['parallelcluster-node-version']

@@ -72,3 +72,11 @@ def load_cluster_config
     only_if { node['cluster']['config'].nil? }
   end
 end
+
+#
+# Check if custom node is specified in the config
+#
+def is_custom_node?
+  custom_node_package = node['cluster']['custom_node_package']
+  !custom_node_package.nil? && !custom_node_package.empty?
+end
