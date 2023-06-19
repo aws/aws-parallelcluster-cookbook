@@ -58,10 +58,8 @@ def write_config(config, output_file):
 def add_log_group_name_params(default_log_group_name, log_group_name_map, configs):
     """Add a "log_group_name": log_group_name to every config."""
     for config in configs:
-        log_group_name = default_log_group_name
-        group_key = config.get("log_group_key")
-        if group_key:
-            log_group_name = log_group_name_map.get(group_key)
+        group_key = config.get("log_group_key", None)
+        log_group_name = log_group_name_map.get(group_key, default_log_group_name)
         config.update({"log_group_name": log_group_name})
     return configs
 
@@ -125,6 +123,7 @@ def select_configs_for_feature(configs):
             selected_configs.append(config)
     return selected_configs
 
+
 def select_configs_for_log_groups(configs, log_group_map):
     selected_configs = []
     for config in configs:
@@ -133,7 +132,6 @@ def select_configs_for_log_groups(configs, log_group_map):
             continue
         selected_configs.append(config)
     return selected_configs
-
 
 
 def select_logs(configs, log_group_map, args):
@@ -240,6 +238,7 @@ def get_dict_value(value, attributes, default=None):
             return default
     return value
 
+
 def parse_additional_log_groups_map(log_group_string):
     if not log_group_string:
         return {}
@@ -249,6 +248,7 @@ def parse_additional_log_groups_map(log_group_string):
         pair_split = pair.split("=")
         log_group_map[pair_split[0]] = pair_split[1]
     return log_group_map
+
 
 def main():
     """Create cloudwatch agent config file."""
