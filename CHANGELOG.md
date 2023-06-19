@@ -25,7 +25,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   in order to reduce bootstrap time and avoid a potential point of failure.
 
 **BUG FIXES**
-- Fix an issue that was preventing ptrace protection from being disabled on Ubuntu and allowing Cross Memory Attach (CMA) in libfabric
+- Fix an issue that was preventing ptrace protection from being disabled on Ubuntu and allowing Cross Memory Attach (CMA) in libfabric.
 
 3.6.0
 ------
