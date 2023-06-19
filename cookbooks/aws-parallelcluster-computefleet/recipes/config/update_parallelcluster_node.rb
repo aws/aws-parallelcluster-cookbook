@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 #
+# Cookbook:: aws-parallelcluster-config
+# Recipe:: update
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
@@ -12,19 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
-
-fetch_config 'Fetch and load cluster configs'
-
-if is_custom_node?
-  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
+# REMINDER: the update recipe runs only on the head node and the only supervisord daemon provided by the
+# aws-parallelcluster-node package on the head node is clustermgtd. Therefore, only this daemon is restarted.
+execute 'stop clustermgtd' do
+  command "#{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd"
 end
 
-# Restart supervisord
-service "supervisord" do
-  supports restart: true
-  action %i(enable start)
-end unless on_docker?
+include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 
-include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'plugin'
-include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
+execute 'start clustermgtd' do
+  command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
+end

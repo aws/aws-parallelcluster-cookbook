@@ -22,3 +22,8 @@ include_recipe 'aws-parallelcluster-environment::fs_update'
 include_recipe 'aws-parallelcluster-environment::directory_service'
 include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
 include_recipe 'aws-parallelcluster-scheduler-plugin::update' if node['cluster']['scheduler'] == 'plugin'
+
+# Update node package - useful for development purposes only
+if is_custom_node?
+  include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
+end
