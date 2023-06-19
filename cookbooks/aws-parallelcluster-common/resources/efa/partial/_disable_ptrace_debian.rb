@@ -15,7 +15,7 @@
 
 action :disable_ptrace do
   # Disabling ptrace protection is needed for EFA in order to use SHA transfer for intra-node communication.
-  if node['cluster']['enable_efa'] == 'compute' && node['cluster']['node_type'] == 'ComputeFleet'
+  if node['cluster']['enable_efa'] == 'efa' && node['cluster']['node_type'] == 'ComputeFleet'
     sysctl 'kernel.yama.ptrace_scope' do
       value 0
     end
