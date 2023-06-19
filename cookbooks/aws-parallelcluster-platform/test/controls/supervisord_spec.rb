@@ -33,6 +33,16 @@ control 'tag:install_supervisord_service_set_up' do
   end
 end
 
+control 'tag:config_supervisord' do
+  describe file('/etc/parallelcluster/parallelcluster_supervisord.conf') do
+    it { should exist }
+    its('mode') { should cmp '0644' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('content') { should_not be_empty }
+  end
+end
+
 control 'tag:config_supervisord_runs_as_root' do
   only_if { !os_properties.on_docker? }
 
@@ -43,7 +53,7 @@ control 'tag:config_supervisord_runs_as_root' do
 end
 
 control 'tag:config_supervisord_service_is_enabled' do
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.on_docker? }
 
   describe service('supervisord') do
     it { should be_installed }
