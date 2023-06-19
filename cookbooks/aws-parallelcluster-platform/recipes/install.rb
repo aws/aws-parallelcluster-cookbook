@@ -23,7 +23,7 @@ include_recipe "openssh"
 include_recipe "aws-parallelcluster-platform::disable_selinux"
 include_recipe "aws-parallelcluster-platform::license_readme"
 include_recipe "aws-parallelcluster-platform::gc_thresh_values"
-include_recipe "aws-parallelcluster-platform::supervisord"
+include_recipe "aws-parallelcluster-platform::supervisord_install"
 include_recipe "aws-parallelcluster-platform::ami_cleanup"
 include_recipe "aws-parallelcluster-platform::cron"
 

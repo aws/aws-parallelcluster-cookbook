@@ -19,14 +19,6 @@ control 'tag:config_sudo' do
     its('group') { should eq 'root' }
     its('content') { should_not be_empty }
   end
-
-  describe file('/etc/parallelcluster/parallelcluster_supervisord.conf') do
-    it { should exist }
-    its('mode') { should cmp '0644' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('content') { should_not be_empty }
-  end
 end
 
 control 'tag:config_cluster_user_can_sudo' do
