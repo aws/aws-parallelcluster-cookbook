@@ -32,12 +32,12 @@ stdout_logfile_maxbytes = 0
 <% end -%>
 <% if @dcv_configured -%>
 [program:pcluster_dcv_authenticator]
-command = <%= node['cluster']['dcv']['authenticator']['virtualenv_path'] %>/bin/python <%= node['cluster']['dcv']['authenticator']['user_home'] %>/pcluster_dcv_authenticator.py
-      --port <%= Integer(node['cluster']['dcv_port']) + 1 %>
-      --certificate <%= node['cluster']['dcv']['authenticator']['certificate'] %>
-      --key <%= node['cluster']['dcv']['authenticator']['private_key'] %>
-user = <%= node['cluster']['dcv']['authenticator']['user'] %>
-environment = HOME="<%= node['cluster']['dcv']['authenticator']['user_home'] %>",USER="<%= node['cluster']['dcv']['authenticator']['user'] %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
+command = <%= @dcv_virtualenv_path %>/bin/python <%= @dcv_auth_user_home %>/pcluster_dcv_authenticator.py
+      --port <%= Integer(@dcv_port) + 1 %>
+      --certificate <%= @dcv_auth_certificate %>
+      --key <%= @dcv_auth_private_key %>
+user = <%= @dcv_auth_user %>
+environment = HOME="<%= @dcv_auth_user_home %>",USER="<%= @dcv_auth_user %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
 <% end -%>
 
 <%# ComputeFleet -%>
