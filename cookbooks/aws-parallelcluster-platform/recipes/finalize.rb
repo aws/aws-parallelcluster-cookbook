@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -11,10 +11,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Ensure cluster user can sudo on SSH
-template '/etc/sudoers.d/99-parallelcluster-user-tty' do
-  source 'base/99-parallelcluster-user-tty.erb'
-  owner 'root'
-  group 'root'
-  mode '0600'
-end
+# Restart supervisord
+service "supervisord" do
+  supports restart: true
+  action %i(enable start)
+end unless on_docker?

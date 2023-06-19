@@ -20,10 +20,6 @@ if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 end
 
-# Restart supervisord
-service "supervisord" do
-  supports restart: true
-  action %i(enable start)
-end unless on_docker?
+include_recipe "aws-parallelcluster-platform::finalize"
 
 include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
