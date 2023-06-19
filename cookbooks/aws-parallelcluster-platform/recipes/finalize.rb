@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
@@ -12,15 +11,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
-
-fetch_config 'Fetch and load cluster configs'
-
-if is_custom_node?
-  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
-end
-
-include_recipe "aws-parallelcluster-platform::finalize"
-
-include_recipe 'aws-parallelcluster-scheduler-plugin::finalize' if node['cluster']['scheduler'] == 'plugin'
-include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
+# Restart supervisord
+service "supervisord" do
+  supports restart: true
+  action %i(enable start)
+end unless on_docker?
