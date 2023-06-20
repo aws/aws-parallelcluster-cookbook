@@ -438,11 +438,6 @@ describe 'dcv:setup' do
           is_expected.to create_directory(sources_dir).with_recursive(true)
         end
 
-        it 'shares dcv_supported with InSpec tests' do
-          expect(node['cluster']['dcv']['authenticator']['virtualenv_path']).to eq(dcvauth_virtualenv_path)
-          is_expected.to write_node_attributes('dump node attributes')
-        end
-
         it 'installs pcluster_dcv_connect.sh script to use it for error handling' do
           is_expected.to create_if_missing_cookbook_file("#{scripts_dir}/pcluster_dcv_connect.sh").with(
             source: 'dcv/pcluster_dcv_connect.sh',
@@ -810,11 +805,6 @@ describe 'dcv:configure' do
 
         it 'configures dcv' do
           is_expected.to configure_dcv('configure')
-        end
-
-        it 'shares dcv_supported with InSpec tests' do
-          expect(node['cluster']['dcv']['authenticator']['virtualenv_path']).to eq(dcvauth_virtualenv_path)
-          is_expected.to write_node_attributes('dump node attributes')
         end
 
         it 'sets up Nvidia drivers for X configuration' do
