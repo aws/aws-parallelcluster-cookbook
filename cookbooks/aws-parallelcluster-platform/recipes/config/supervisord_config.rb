@@ -25,7 +25,7 @@ template "#{node['cluster']['etc_dir']}/parallelcluster_supervisord.conf" do
     region: region,
     aws_ca_bundle: region.start_with?('us-iso') ? "/etc/pki/#{region}/certs/ca-bundle.pem" : '',
     dcv_configured: node['cluster']['dcv_enabled'] == "head_node" && dcv_installed?,
-    dcv_virtualenv_path: node['cluster']['dcv']['authenticator']['virtualenv_path'],
+    dcv_auth_virtualenv_path: node['cluster']['dcv']['authenticator']['virtualenv_path'],
     dcv_auth_user_home: node['cluster']['dcv']['authenticator']['user_home'],
     dcv_port: node['cluster']['dcv_port'],
     dcv_auth_certificate: node['cluster']['dcv']['authenticator']['certificate'],
