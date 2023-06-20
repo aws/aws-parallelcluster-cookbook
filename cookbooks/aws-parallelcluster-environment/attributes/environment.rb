@@ -14,8 +14,7 @@ default['cluster']['log_group_name'] = "NONE"
 # IMDS
 default['cluster']['head_node_imds_secured'] = 'true'
 default['cluster']['head_node_imds_allowed_users'] = ['root', node['cluster']['cluster_admin_user'], node['cluster']['cluster_user'] ]
-default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node'
-default['cluster']['head_node_imds_allowed_users'].append(lazy { node['cluster']['scheduler_plugin']['user'] }) if node['cluster']['scheduler'] == 'plugin'
+default['cluster']['head_node_imds_allowed_users'].append('dcv') if node['cluster']['dcv_enabled'] == 'head_node' && dcv_installed?
 
 # ParallelCluster internal variables to configure active directory service
 default['cluster']["directory_service"]["domain_name"] = nil
