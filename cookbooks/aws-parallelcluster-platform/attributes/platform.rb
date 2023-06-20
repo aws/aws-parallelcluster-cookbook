@@ -21,6 +21,8 @@ default['cluster']['dcv']['authenticator']['group_id'] = node['cluster']['dcv'][
 default['cluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cluster']['dcv']['authenticator']['user']}"
 default['cluster']['dcv']['authenticator']['certificate'] = "#{node['cluster']['etc_dir']}/ext-auth-certificate.pem"
 default['cluster']['dcv']['authenticator']['private_key'] = "#{node['cluster']['etc_dir']}/ext-auth-private-key.pem"
+default['cluster']['dcv']['authenticator']['virtualenv_name'] = "dcv_authenticator_virtualenv"
+default['cluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['dcv']['authenticator']['virtualenv_name']}"
 default['cluster']['dcv']['version'] = '2023.0-15022'
 default['cluster']['dcv_port'] = 8443
 
