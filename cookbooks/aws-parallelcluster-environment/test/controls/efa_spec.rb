@@ -32,7 +32,7 @@ end
 control 'tag:install_efa_prereq_packages_installed' do
   title "EFA prereq packages are installed"
 
-  efa_prereq_packages = if os_properties.redhat8? && !os_properties.redhat_ubi?
+  efa_prereq_packages = if os_properties.redhat8? && !os_properties.redhat_on_docker?
                           %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
                         elsif os_properties.alinux2?
                           %w(environment-modules libibverbs-utils librdmacm-utils)

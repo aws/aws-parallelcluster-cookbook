@@ -17,11 +17,11 @@ provides :stunnel, platform: 'redhat' do |node|
 end
 
 use 'partial/_common'
-use 'partial/_setup' unless redhat_ubi?
+use 'partial/_setup' unless redhat_on_docker?
 
 action :setup do
   # If on RHEL8 Docker, we don't install the base packages, so stunnel cannot be built.
-end if redhat_ubi?
+end if redhat_on_docker?
 
 action_class do
   def dependencies

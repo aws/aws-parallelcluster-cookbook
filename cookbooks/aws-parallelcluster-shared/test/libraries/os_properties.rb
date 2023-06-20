@@ -5,14 +5,14 @@ class OsProperties < Inspec.resource(1)
     Properties of an OS
   '
   example '
-    os_properties.redhat_ubi?
+    os_properties.redhat_on_docker?
   '
 
   def on_docker?
     inspec.virtualization.system == 'docker'
   end
 
-  def redhat_ubi?
+  def redhat_on_docker?
     on_docker? && inspec.os.name == 'redhat'
   end
 

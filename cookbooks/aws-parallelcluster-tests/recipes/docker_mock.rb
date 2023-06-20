@@ -56,12 +56,12 @@ if platform_family?('debian')
   %w(nfs-common nfs-kernel-server).each do |nfspkg|
     package nfspkg
   end
-elsif !redhat_ubi?
+elsif !redhat_on_docker?
   #  Rhel family except redhat
   package 'nfs-utils'
 end
 
-if redhat_ubi?
+if redhat_on_docker?
   package 'openssh-clients'
 
   # Mock python environment

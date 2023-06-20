@@ -22,7 +22,7 @@ property :packages, [String, Array],
 action :install_base_packages do
   install_packages 'default' do
     action :install
-  end unless redhat_ubi?
+  end unless redhat_on_docker?
 end
 
 action :install_kernel_source do

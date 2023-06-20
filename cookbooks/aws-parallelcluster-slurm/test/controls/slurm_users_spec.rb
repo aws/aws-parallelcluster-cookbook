@@ -58,7 +58,7 @@ control 'tag:config_slurm_sudoers_correctly_defined' do
 
   install_dir = node['cluster']['slurm']['install_dir']
   venv_bin = "#{node['cluster']['node_virtualenv_path']}/bin"
-  redhat_ubi = os_properties.redhat_ubi?
+  redhat_on_docker = os_properties.redhat_on_docker?
 
   describe file("/etc/sudoers.d/99-parallelcluster-slurm") do
     it { should exist }
@@ -70,6 +70,6 @@ control 'tag:config_slurm_sudoers_correctly_defined' do
     its('content') { should match /#{node['cluster']['cluster_admin_user']} ALL = \(root\) NOPASSWD: SHUTDOWN/ }
     its('content') { should match %r{Cmnd_Alias SHUTDOWN = /usr/sbin/shutdown} }
     its('content') { should match /#{node['cluster']['slurm']['user']} ALL = \(#{node['cluster']['cluster_admin_user']}\) NOPASSWD:SETENV: SLURM_HOOKS_COMMANDS/ }
-    its('content') { should match %r{Cmnd_Alias SLURM_HOOKS_COMMANDS = #{venv_bin}/slurm_suspend, #{venv_bin}/slurm_resume, #{venv_bin}/slurm_fleet_status_manager} } unless redhat_ubi
+    its('content') { should match %r{Cmnd_Alias SLURM_HOOKS_COMMANDS = #{venv_bin}/slurm_suspend, #{venv_bin}/slurm_resume, #{venv_bin}/slurm_fleet_status_manager} } unless redhat_on_docker
   end
 end

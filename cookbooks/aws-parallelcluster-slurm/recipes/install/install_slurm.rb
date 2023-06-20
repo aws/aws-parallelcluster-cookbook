@@ -89,7 +89,7 @@ end
 
 # Install Slurm
 bash 'make install' do
-  not_if { redhat_ubi? }
+  not_if { redhat_on_docker? }
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
@@ -130,7 +130,7 @@ end
 directory "#{node['cluster']['license_dir']}/slurm"
 
 bash 'copy license stuff' do
-  not_if { redhat_ubi? }
+  not_if { redhat_on_docker? }
   user 'root'
   group 'root'
   cwd Chef::Config[:file_cache_path]
@@ -147,7 +147,7 @@ bash 'copy license stuff' do
 end
 
 file '/etc/ld.so.conf.d/slurm.conf' do
-  not_if { redhat_ubi? }
+  not_if { redhat_on_docker? }
   content "#{slurm_install_dir}/lib/"
   mode '0744'
 end

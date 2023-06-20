@@ -18,7 +18,7 @@ control 'tag:install_pmix_installed' do
     its('mode') { should cmp '0755' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-  end unless os_properties.redhat_ubi?
+  end unless os_properties.redhat_on_docker?
 end
 
 control 'tag:install_pmix_library_shared' do
@@ -32,5 +32,5 @@ control 'tag:install_pmix_library_shared' do
     its('content') do
       should match('/opt/pmix/lib')
     end
-  end unless os_properties.redhat_ubi?
+  end unless os_properties.redhat_on_docker?
 end

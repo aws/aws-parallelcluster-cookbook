@@ -20,7 +20,7 @@ pcluster_admin_group = pcluster_admin
 control 'tag:install_slurm_installed' do
   title 'Checks slurm has been installed'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe file("/opt/slurm") do
     it { should exist }
@@ -56,7 +56,7 @@ end
 control 'tag:install_slurm_licence_configured' do
   title 'Checks slurm licences folder has the required files'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe file(slurm_license_path) do
     it { should exist }
@@ -98,7 +98,7 @@ end
 control 'tag:install_slurm_shared_libraries_compiled' do
   title 'Checks that all required slurm shared libraries were compiled'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe file("#{slurm_library_folder}/accounting_storage_mysql.so") do
     it { should exist }
@@ -132,7 +132,7 @@ end
 control 'tag:install_slurm_library_shared' do
   title 'Checks slurm shared library is part of the runtime search path'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe file("/etc/ld.so.conf.d/slurm.conf") do
     it { should exist }
@@ -147,7 +147,7 @@ end
 
 control 'tag:install_slurm_pam_slurm_adopt_module_installed' do
   title "Check that pam_slurm_adopt has been built and installed"
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   lib_security_folder = '/lib/security'
   if os.redhat?
@@ -179,7 +179,7 @@ end
 control 'tag:install_slurm_lua_support_libraries_compiled' do
   title 'Checks that all slurm libraries required for lua were compiled'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe file("#{slurm_library_folder}/burst_buffer_lua.so") do
     it { should exist }
