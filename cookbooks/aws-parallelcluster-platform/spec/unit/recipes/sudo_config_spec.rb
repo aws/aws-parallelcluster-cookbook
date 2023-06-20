@@ -9,7 +9,7 @@ describe 'aws-parallelcluster-platform::sudo_config' do
 
       it 'creates the sudoers template with the correct attributes' do
         is_expected.to create_template('/etc/sudoers.d/99-parallelcluster-user-tty').with(
-          source: 'base/99-parallelcluster-user-tty.erb',
+          source: 'sudo/99-parallelcluster-user-tty.erb',
           owner: 'root',
           group: 'root',
           mode:  '0600'

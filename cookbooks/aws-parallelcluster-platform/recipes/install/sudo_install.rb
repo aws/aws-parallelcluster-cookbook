@@ -26,7 +26,7 @@ secure_path_required_directories = %w(/usr/local/sbin /usr/local/bin /usr/sbin /
 secure_path_required_directories += %w(/snap/bin) # Additional path for Debian
 
 template '/etc/sudoers.d/99-parallelcluster-secure-path' do
-  source 'sudoers/99-parallelcluster-secure-path.erb'
+  source 'sudo/99-parallelcluster-secure-path.erb'
   owner 'root'
   group 'root'
   mode '0600'

@@ -13,7 +13,7 @@
 
 # Ensure cluster user can sudo on SSH
 template '/etc/sudoers.d/99-parallelcluster-user-tty' do
-  source 'base/99-parallelcluster-user-tty.erb'
+  source 'sudo/99-parallelcluster-user-tty.erb'
   owner 'root'
   group 'root'
   mode '0600'
