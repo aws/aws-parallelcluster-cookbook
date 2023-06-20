@@ -37,7 +37,7 @@ action_class do
   end
 
   def prerequisites
-    if redhat_ubi?
+    if redhat_on_docker?
       %w(environment-modules)
     else
       %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)

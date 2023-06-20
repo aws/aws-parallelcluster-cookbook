@@ -2,7 +2,7 @@
 control 'tag:install_install_packages' do
   title 'Test installation of packages'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   # verify package with a common name is installed
   describe package('coreutils') do

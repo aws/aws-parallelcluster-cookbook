@@ -12,7 +12,7 @@
 control 'tag:install_chrony' do
   title 'Test chrony installation and configuration'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe package('chrony') do
     it { should be_installed }
