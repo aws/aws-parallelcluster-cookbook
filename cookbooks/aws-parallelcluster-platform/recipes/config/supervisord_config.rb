@@ -17,7 +17,7 @@ directory node['cluster']['etc_dir']
 
 region = node['cluster']['region']
 template "#{node['cluster']['etc_dir']}/parallelcluster_supervisord.conf" do
-  source 'base/parallelcluster_supervisord.conf.erb'
+  source 'supervisord/parallelcluster_supervisord.conf.erb'
   owner 'root'
   group 'root'
   mode '0644'

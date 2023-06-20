@@ -26,7 +26,7 @@ end
 
 # Put supervisord service in place
 template "supervisord-service" do
-  source "supervisord-service.erb"
+  source "supervisord/supervisord-service.erb"
   path "/etc/systemd/system/supervisord.service"
   owner "root"
   group "root"

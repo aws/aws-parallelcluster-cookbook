@@ -9,7 +9,7 @@ describe 'aws-parallelcluster-platform::supervisord_config' do
 
       it 'creates the supervisord template with the correct attributes' do
         is_expected.to create_template('/etc/parallelcluster/parallelcluster_supervisord.conf').with(
-          source: 'base/parallelcluster_supervisord.conf.erb',
+          source: 'supervisord/parallelcluster_supervisord.conf.erb',
           owner: 'root',
           group: 'root',
           mode:  '0644'
