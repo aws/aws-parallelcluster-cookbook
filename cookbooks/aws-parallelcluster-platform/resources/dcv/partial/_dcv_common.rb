@@ -103,10 +103,6 @@ action :setup do
   return if dcv_installed?
   return if redhat_ubi?
 
-  # share values with InSpec tests and configuration recipes
-  node.default['cluster']['dcv']['authenticator']['virtualenv_path'] = dcvauth_virtualenv_path
-  node_attributes 'dump node attributes'
-
   directory node['cluster']['scripts_dir'] do
     recursive true
   end
@@ -187,10 +183,6 @@ action :setup do
 end
 
 action :configure do
-  # share values with InSpec tests and configuration recipes
-  node.default['cluster']['dcv']['authenticator']['virtualenv_path'] = dcvauth_virtualenv_path
-  node_attributes 'dump node attributes'
-
   if dcv_supported? && node['cluster']['node_type'] == "HeadNode"
     if dcv_gpu_accel_supported?
       # Enable graphic acceleration in dcv conf file for graphic instances.
@@ -287,9 +279,9 @@ def dcv_tarball
 end
 
 def dcvauth_virtualenv
-  'dcv_authenticator_virtualenv'
+  node['cluster']['dcv']['authenticator']['virtualenv_name']
 end
 
 def dcvauth_virtualenv_path
-  "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{dcvauth_virtualenv}"
+  node['cluster']['dcv']['authenticator']['virtualenv_path']
 end
