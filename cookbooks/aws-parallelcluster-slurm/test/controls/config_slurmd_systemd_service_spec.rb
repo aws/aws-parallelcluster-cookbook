@@ -37,6 +37,7 @@ end
 control 'tag:config_systemd_slurmd_service_nvidia_gpu_nodes' do
   title 'Check the systemd slurmd service dependencies on NVIDIA GPU compute nodes'
   only_if { !os_properties.on_docker? && instance.compute_node? && node['cluster']['scheduler'] == 'slurm' }
+  only_if { instance.graphic? && instance.nvidia_installed? }
 
   describe 'Check slurmd systemd "after" dependencies'
   describe command('systemctl list-dependencies --after --plain slurmd.service') do
