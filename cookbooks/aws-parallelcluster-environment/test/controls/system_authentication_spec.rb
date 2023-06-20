@@ -23,7 +23,7 @@ control 'tag:install_system_authentication_packages_installed' do
     describe package(pkg) do
       it { should be_installed }
     end
-  end unless os_properties.redhat_ubi?
+  end unless os_properties.redhat_on_docker?
 end
 
 control 'tag:config_system_authentication_services_enabled' do
@@ -61,7 +61,7 @@ control 'tag:config_system_authentication_configured' do
       its('exit_status') { should eq 0 }
       its('stdout') { should match /Profile ID: sssd/ }
       its('stdout') { should match /with-mkhomedir/ }
-    end unless os_properties.redhat_ubi?
+    end unless os_properties.redhat_on_docker?
 
   elsif os_properties.centos7? || os_properties.alinux2?
 

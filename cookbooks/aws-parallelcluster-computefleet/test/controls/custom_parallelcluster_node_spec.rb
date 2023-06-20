@@ -13,7 +13,7 @@ control 'custom_parallelcluster_node_installed' do
   file_cache_path = "/tmp/kitchen/cache"
 
   title "custom aws-parallelcluster-node should have been installed in the node virtualenv"
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   # Unless we fix the version of aws-parallelcluster-node to be installed, we cannot really say from pip if a custom
   # node package was installed. The only thing we can test is that the custom node recipe was triggered, which can

@@ -17,5 +17,5 @@ control 'tag:config_cluster_user' do
   # The command checks all the homes with globbing since the user can be different for each OS
   describe command("sudo su -c 'ls /home/*/.ssh/authorized_keys_cluster'") do
     its('exit_status') { should eq 0 }
-  end unless os_properties.redhat_ubi?
+  end unless os_properties.redhat_on_docker?
 end

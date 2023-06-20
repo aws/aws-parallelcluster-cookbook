@@ -18,5 +18,5 @@ control 'tag:install_jwt_installed' do
     its('mode') { should cmp '0755' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-  end unless os_properties.redhat_ubi?
+  end unless os_properties.redhat_on_docker?
 end

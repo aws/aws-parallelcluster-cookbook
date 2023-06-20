@@ -17,7 +17,7 @@ control 'tag:install_cloudwatch_installation_files' do
   # In Ubuntu >20.04 due to environment variable the keyring is placed under home of the user ubuntu with the permission of root
   ubuntu2004 = os_properties.ubuntu2004?
   keyring = (os_properties.ubuntu2004? || os_properties.ubuntu2204?) && !os_properties.on_docker? ? '--keyring /home/ubuntu/.gnupg/pubring.kbx' : ''
-  sudo = os_properties.redhat_ubi? ? '' : 'sudo'
+  sudo = os_properties.redhat_on_docker? ? '' : 'sudo'
   describe bash("#{sudo} gpg --list-keys #{keyring}") do
     # Don't check exit status for Ubuntu20 because it returns 2 when executed in the validate phase of a created AMI
     its('exit_status') { should eq 0 } unless ubuntu2004

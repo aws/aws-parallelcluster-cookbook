@@ -17,5 +17,5 @@ action :setup do
   install_packages 'install' do
     packages dependencies
     action :install
-  end unless redhat_ubi?
+  end unless redhat_on_docker?
 end

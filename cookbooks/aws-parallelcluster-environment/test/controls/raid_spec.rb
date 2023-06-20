@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:install_raid' do
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
   describe package('mdadm') do
     it { should be_installed }
   end

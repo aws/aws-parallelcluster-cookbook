@@ -27,7 +27,7 @@ action :install_utils do
     recursive true
   end
 
-  return if redhat_ubi?
+  return if redhat_on_docker?
 
   package_name = "amazon-efs-utils"
   package_version = new_resource.efs_utils_version
