@@ -144,6 +144,7 @@ class QueueRenderer:
             for compute_resource_config in queue_config["ComputeResources"]
         ]
         self.job_exclusive_allocation = queue_config.get("JobExclusiveAllocation")
+        self.nodelist = None
 
     def render_config(self):
         """Launch the rendering of the required configuration."""
@@ -154,6 +155,15 @@ class QueueRenderer:
             config += self._render_as_partition_config()
 
         return config
+
+    def get_queue_nodelist(self):
+        """Getter method that returns the nodelist used in the QueueRenderer object."""
+        if not self.nodelist:
+            nodes = []
+            for renderer in self.compute_renderers:
+                nodes.extend(renderer.render_as_nodeset_element())
+            self.nodelist = ",".join(nodes)
+        return self.nodelist
 
     def _render_as_partition_config(self):
         partition_config = "\n"
@@ -171,14 +181,7 @@ class QueueRenderer:
         return gres
 
     def _render_nodeset(self):
-        nodeset = f"NodeSet={self.name}_nodes Nodes="
-        nodes = []
-        for renderer in self.compute_renderers:
-            nodes.extend(renderer.render_as_nodeset_element())
-
-        nodeset += ",".join(nodes)
-
-        return nodeset
+        return f"NodeSet={self.name}_nodes Nodes={self.get_queue_nodelist()}"
 
     def _render_partition(self):
         partition = f"PartitionName={self.name} Nodes={self.name}_nodes MaxTime=INFINITE State=UP"

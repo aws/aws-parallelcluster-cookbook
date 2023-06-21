@@ -1,0 +1,39 @@
+Scheduling:
+  Scheduler: slurm
+  SlurmSettings:
+    ScaledownIdletime: 10
+    EnableMemoryBasedScheduling: false
+    Database: null
+  SlurmQueues:
+    - Name: queue1
+      ComputeResources:
+        - Name: t2medium
+          InstanceType: t2.medium
+          MinCount: 1
+          MaxCount: 4
+          DisableSimultaneousMultithreading: false
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+        - Name: c5xlarge
+          InstanceType: c5.xlarge
+          MinCount: 0
+          MaxCount: 10
+          DisableSimultaneousMultithreading: false
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+    - Name: queue2
+      ComputeResources:
+        - Name: c52xlarge
+          InstanceType: c5.2xlarge
+          MinCount: 0
+          MaxCount: 10
+          DisableSimultaneousMultithreading: false
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+        - Name: c5a2xlarge
+          InstanceType: c5a.2xlarge
+          MinCount: 0
+          MaxCount: 5
+          DisableSimultaneousMultithreading: false
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000

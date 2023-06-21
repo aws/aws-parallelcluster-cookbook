@@ -74,21 +74,35 @@ def generate_slurm_config_files(
     with open(instance_types_data_path, encoding="utf-8") as instance_types_input_file:
         instance_types_data = json.load(instance_types_input_file)
 
+    # Initialize partition-nodelist mapping
+    partition_nodelist_mapping = {}
+
     # Generate slurm_parallelcluster_{QueueName}_partitions.conf and slurm_parallelcluster_{QueueName}_gres.conf
     is_default_queue = True  # The first queue in the queues list is the default queue
     for queue in queues:
         for file_type in ["partition", "gres"]:
+            renderer = QueueRenderer(
+                queue,
+                no_gpu,
+                realmemory_to_ec2memory_ratio,
+                instance_types_data,
+                conf_type=file_type,
+                default=is_default_queue,
+            )
             _generate_queue_config(
                 queue["Name"],
-                queue,
-                is_default_queue,
+                renderer,
                 file_type,
                 pcluster_subdirectory,
-                realmemory_to_ec2memory_ratio,
                 dryrun,
                 no_gpu=no_gpu,
             )
+            if file_type == "partition":
+                partition_nodelist_mapping[queue["Name"]] = renderer.get_queue_nodelist()
         is_default_queue = False
+
+    # Generate partition-nodelist mapping for PC-managed partitions
+    _generate_partition_nodelist_mapping(partition_nodelist_mapping, pcluster_subdirectory)
 
     # Generate include files for slurm configuration files
     for template_name in [
@@ -137,23 +151,13 @@ def _get_head_node_private_ip():
 
 def _generate_queue_config(
     queue_name,
-    queue_config,
-    is_default_queue,
+    renderer: QueueRenderer,
     file_type,
     output_dir,
-    realmemory_to_ec2memory_ratio,
     dryrun,
     no_gpu=False,
 ):
     log.info("Generating slurm_parallelcluster_%s_%s.conf", queue_name, file_type)
-    renderer = QueueRenderer(
-        queue_config,
-        no_gpu,
-        realmemory_to_ec2memory_ratio,
-        instance_types_data,
-        conf_type=file_type,
-        default=is_default_queue,
-    )
     rendered_config = renderer.render_config()
 
     if not dryrun:
@@ -166,6 +170,13 @@ def _generate_queue_config(
             )
         else:
             _write_rendered_template_to_file(rendered_config, filename)
+
+
+def _generate_partition_nodelist_mapping(partition_nodelist_mapping, output_dir):
+    # Dump the full mapping to a file
+    filename = path.join(output_dir, "parallelcluster_partition_nodelist_mapping.json")
+    with open(filename, "w", encoding="utf-8") as mapping_file:
+        json.dump(partition_nodelist_mapping, mapping_file, indent=4)
 
 
 def _generate_slurm_parallelcluster_configs(
