@@ -69,3 +69,10 @@ platforms:
       cluster:
         base_os: rhel8
         kernel_release: '4.18.0-477.13.1.el8_7.fake-value' # Use 477 version to match 8.8 kernel version available on docker
+  - name: rocky8
+    driver:
+      image: <% if ENV['KITCHEN_ROCKY8_IMAGE'] %> <%= ENV['KITCHEN_ROCKY8_IMAGE'] %> <% else %> dokken/rockylinux-8 <% end %>
+    attributes:
+      cluster:
+        base_os: rocky8
+        kernel_release: '4.18.0-477.10.1.el8_8.x86_64'
