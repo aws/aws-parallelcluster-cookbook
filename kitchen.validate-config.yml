@@ -28,7 +28,7 @@ _common_cluster_attributes: &_common_cluster_attributes
   custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
   dcv_enabled: 'head_node'
   dcv_port: '8443'
-  enable_efa: 'compute'
+  enable_efa: 'efa'
   nvidia:
     enabled: <%= ENV['NVIDIA_ENABLED'] %>
 
