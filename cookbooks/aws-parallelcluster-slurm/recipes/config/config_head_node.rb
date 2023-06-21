@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-setup_munge_head_node unless redhat_ubi?
+setup_munge_head_node unless redhat_on_docker?
 
 # Export /opt/slurm
 nfs_export "#{node['cluster']['slurm']['install_dir']}" do
@@ -29,7 +29,7 @@ directory "#{node['cluster']['slurm']['install_dir']}" do
   user 'root'
   group 'root'
   mode '0755'
-end if redhat_ubi? # we skip slurm setup on Docker UBI because we don't install python
+end if redhat_on_docker? # we skip slurm setup on Docker UBI because we don't install python
 
 # Ensure config directory is in place
 directory "#{node['cluster']['slurm']['install_dir']}/etc" do
@@ -280,4 +280,4 @@ execute "check slurmctld status" do
   command "systemctl is-active --quiet slurmctld.service"
   retries 5
   retry_delay 2
-end unless redhat_ubi?
+end unless redhat_on_docker?

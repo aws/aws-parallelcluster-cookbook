@@ -101,7 +101,7 @@ end
 
 action :setup do
   return if dcv_installed?
-  return if redhat_ubi?
+  return if redhat_on_docker?
 
   directory node['cluster']['scripts_dir'] do
     recursive true

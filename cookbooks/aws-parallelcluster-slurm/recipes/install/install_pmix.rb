@@ -44,7 +44,7 @@ bash 'Install PMIx' do
     make -j $CORES
     make install
   PMIX
-end unless redhat_ubi?
+end unless redhat_on_docker?
 
 # Ensure directory containing PMIx shared library is part of the runtime
 # loader's search path.

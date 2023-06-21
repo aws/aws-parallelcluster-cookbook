@@ -20,7 +20,7 @@ control 'tag:install_munge_installed' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end
-end unless os_properties.redhat_ubi?
+end unless os_properties.redhat_on_docker?
 
 control 'tag:install_munge_user_and_group_created' do
   title 'Check munge user and group exist and are properly configured'
@@ -33,7 +33,7 @@ control 'tag:install_munge_user_and_group_created' do
     it { should exist }
     its('group') { should eq munge_group }
   end
-end unless os_properties.redhat_ubi?
+end unless os_properties.redhat_on_docker?
 
 control 'tag:install_munge_init_script_configured' do
   title 'Check munge init script is configured with the proper user and group'
@@ -47,7 +47,7 @@ control 'tag:install_munge_init_script_configured' do
       should match("USER=#{munge_user}")
       should match("GROUP=#{munge_group}")
     end
-  end unless os_properties.redhat_ubi?
+  end unless os_properties.redhat_on_docker?
 end
 
 control 'tag:install_munge_folders_created' do
@@ -67,10 +67,10 @@ control 'tag:install_munge_folders_created' do
     it { should exist }
     it { should be_directory }
   end
-end unless os_properties.redhat_ubi?
+end unless os_properties.redhat_on_docker?
 
 control 'tag:config_munge_service_enabled' do
-  only_if { node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_ubi? }
+  only_if { node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
 
   describe service('munge') do
     it { should be_installed }

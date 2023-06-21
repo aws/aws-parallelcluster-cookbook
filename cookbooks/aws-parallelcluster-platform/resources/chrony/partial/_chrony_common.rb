@@ -4,7 +4,7 @@ provides :chrony
 unified_mode true
 
 action :setup do
-  return if redhat_ubi?
+  return if redhat_on_docker?
 
   package_repos 'update package repositories' do
     action :update
@@ -39,7 +39,7 @@ action :enable do
     supports restart: false
     reload_command chrony_reload_command
     action %i(enable start)
-  end unless redhat_ubi?
+  end unless redhat_on_docker?
 end
 
 action_class do

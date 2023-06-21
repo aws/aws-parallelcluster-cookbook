@@ -12,7 +12,7 @@
 control 'default_pyenv_installed' do
   title 'pyenv should be installed'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe command("#{node['cluster']['system_pyenv_root']}/bin/pyenv") do
     it { should exist }

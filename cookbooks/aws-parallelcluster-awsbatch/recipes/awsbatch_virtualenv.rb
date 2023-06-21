@@ -11,8 +11,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: find a way to make this code work on ubi8
-return if redhat_ubi?
+# TODO: find a way to make this code work on RedHat UBI8 on Docker
+return if redhat_on_docker?
 
 install_pyenv 'pyenv for default python version'
 

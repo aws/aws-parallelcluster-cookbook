@@ -45,4 +45,4 @@ bash 'libjwt' do
     make -j $CORES
     sudo make install
   LIBJWT
-end unless redhat_ubi?
+end unless redhat_on_docker?

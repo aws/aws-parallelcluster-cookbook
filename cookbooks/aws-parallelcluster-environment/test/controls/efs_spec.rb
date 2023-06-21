@@ -2,7 +2,7 @@
 control 'tag:install_efs_utils_installed' do
   title 'Verify that efs_utils is installed'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe file("#{node['cluster']['sources_dir']}/efs-utils-1.34.1.tar.gz") do
     it { should exist }
