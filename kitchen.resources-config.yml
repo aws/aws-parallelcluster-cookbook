@@ -26,6 +26,7 @@ suites:
       resource: sticky_bits
   - name: efa_configure_compute
     run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
       - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
@@ -33,8 +34,24 @@ suites:
     attributes:
       resource: efa:configure
       cluster:
-        enable_efa: compute
+        enable_efa: efa
         node_type: ComputeFleet
+      dependencies:
+        - recipe:aws-parallelcluster-common::node_attributes
+  - name: efa_configure_headnode
+    run_list:
+      - recipe[aws-parallelcluster::add_dependencies]
+      - recipe[aws-parallelcluster-common::test_resource]
+    verifier:
+      controls:
+        - efa_debian_system_settings_configured
+    attributes:
+      resource: efa:configure
+      cluster:
+        enable_efa: efa
+        node_type: HeadNode
+      dependencies:
+        - recipe:aws-parallelcluster-common::node_attributes
   - name: efs_configure
     run_list:
       - recipe[aws-parallelcluster::add_dependencies]
