@@ -15,6 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Assign Slurm dynamic nodes a priority (weight) of 1000 by default. This allows Slurm to prioritize idle static nodes over idle dynamic ones.
+- Create a Slurm partition-nodelist mapping JSON file to be used by the node package daemons to recognize PC-managed Slurm partitions and nodelists.
 
 **BUG FIXES**
 
