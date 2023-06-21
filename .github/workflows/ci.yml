@@ -107,10 +107,11 @@ jobs:
       fail-fast: false
       matrix:
         cookbook:
-          - cookbooks/aws-parallelcluster-shared
-          - cookbooks/aws-parallelcluster-platform
-          - cookbooks/aws-parallelcluster-environment
+          - cookbooks/aws-parallelcluster-awsbatch
           - cookbooks/aws-parallelcluster-computefleet
+          - cookbooks/aws-parallelcluster-environment
+          - cookbooks/aws-parallelcluster-platform
+          - cookbooks/aws-parallelcluster-shared
           - cookbooks/aws-parallelcluster-slurm
     steps:
       - uses: actions/checkout@main
