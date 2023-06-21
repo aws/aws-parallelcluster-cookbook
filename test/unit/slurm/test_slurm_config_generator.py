@@ -9,6 +9,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 
 import pytest
@@ -217,8 +218,38 @@ def test_generate_slurm_config_with_job_exc_alloc(mocker, test_datadir, tmpdir):
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
+def test_generate_partition_nodelist_mapping(mocker, test_datadir, tmpdir):
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    filename = "pcluster/parallelcluster_partition_nodelist_mapping.json"
+    with open(os.path.join(tmpdir, filename), "r", encoding="utf-8") as file:
+        output_mapping = json.load(file)
+    with open(os.path.join(test_datadir, "expected_outputs", filename), "r", encoding="utf-8") as file:
+        expected_mapping = json.load(file)
+    assert_that(output_mapping).is_equal_to(expected_mapping)
+
+
 def _assert_files_are_equal(file, expected_file):
     with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
-        assert_that(f.read()).is_equal_to(expected_file_content)
+        file_content = f.read()
+        assert_that(file_content).is_equal_to(expected_file_content)
