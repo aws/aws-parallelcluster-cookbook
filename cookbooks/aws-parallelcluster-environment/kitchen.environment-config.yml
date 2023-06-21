@@ -156,7 +156,7 @@ suites:
       dependencies:
         - resource:efs
         - 'resource:efs:mount {"shared_dir_array" : ["shared_dir"], "efs_fs_id_array" : ["fs-03ad31942a4205839"]}'
-  - name: efa
+  - name: efa_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
@@ -168,6 +168,18 @@ suites:
       cluster:
         enable_efa: efa
         node_type: ComputeFleet
+  - name: efa_headnode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:config_efa_debian_system_settings_configured
+    attributes:
+      resource: efa:configure
+      cluster:
+        enable_efa: efa
+        node_type: HeadNode
   - name: network_service_restart
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
