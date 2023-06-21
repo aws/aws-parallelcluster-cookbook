@@ -21,13 +21,3 @@ control 'tag:config_intel_mpi_installed' do
     its('stdout') { should match(/Version #{node['cluster']['intelmpi']['version'].split('.')[0..1].join(".")}/) }
   end
 end
-
-control 'tag:config_intel_mpi_ptrace_protection_configured_on_ubuntu1804' do
-  only_if { node['conditions']['intel_mpi_supported'] && os_properties.ubuntu1804? }
-
-  ptrace_scope = instance.head_node? ? 1 : 0
-  describe 'check ptrace protection enabled' do
-    subject { bash("sudo -u #{node['cluster']['cluster_user']} sysctl kernel.yama.ptrace_scope") }
-    its('stdout') { should match /kernel.yama.ptrace_scope = #{ptrace_scope}/ }
-  end
-end

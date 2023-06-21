@@ -1,4 +1,4 @@
-control 'efa_debian_system_settings_configured' do
+control 'tag:config_efa_debian_system_settings_configured' do
   title 'Check debian system is correctly configured for EFA'
 
   only_if { os.debian? && !os_properties.virtualized? }

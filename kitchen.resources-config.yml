@@ -30,7 +30,7 @@ suites:
       - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
-        - efa_debian_system_settings_configured
+        - tag:config_efa_debian_system_settings_configured
     attributes:
       resource: efa:configure
       cluster:
@@ -44,7 +44,7 @@ suites:
       - recipe[aws-parallelcluster-common::test_resource]
     verifier:
       controls:
-        - efa_debian_system_settings_configured
+        - tag:config_efa_debian_system_settings_configured
     attributes:
       resource: efa:configure
       cluster:
