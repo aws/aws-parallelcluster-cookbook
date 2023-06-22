@@ -21,6 +21,6 @@ use 'partial/_cloudwatch_install_package_rhel'
 
 action_class do
   def platform_url_component
-    node['platform']
+    "redhat"
   end
 end
