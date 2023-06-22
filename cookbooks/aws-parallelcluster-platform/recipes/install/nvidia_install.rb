@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-nvidia_driver 'Install nvidia driver'
+nvidia_driver 'Install Nvidia driver'
 
 include_recipe "aws-parallelcluster-platform::cuda"
 
@@ -23,4 +23,4 @@ gdrcopy 'Install Nvidia gdrcopy'
 
 fabric_manager 'Install Nvidia Fabric Manager'
 
-nvidia_dcgm 'install datacenter-gpu-manager'
+nvidia_dcgm 'install Nvidia datacenter-gpu-manager'
