@@ -99,7 +99,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           severity: error
-          ignore_paths: third-party
+          ignore_paths: cookbooks/third-party
   rspec:
     name: ChefSpec
     runs-on: ubuntu-latest
@@ -107,11 +107,11 @@ jobs:
       fail-fast: false
       matrix:
         cookbook:
-          - cookbooks/aws-parallelcluster-config
-          - cookbooks/aws-parallelcluster-shared
-          - cookbooks/aws-parallelcluster-platform
-          - cookbooks/aws-parallelcluster-environment
+          - cookbooks/aws-parallelcluster-awsbatch
           - cookbooks/aws-parallelcluster-computefleet
+          - cookbooks/aws-parallelcluster-environment
+          - cookbooks/aws-parallelcluster-platform
+          - cookbooks/aws-parallelcluster-shared
           - cookbooks/aws-parallelcluster-slurm
     steps:
       - uses: actions/checkout@main

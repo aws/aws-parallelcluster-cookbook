@@ -20,6 +20,7 @@ default_action :setup
 
 action :setup do
   return unless gdrcopy_enabled?
+  return if on_docker?
 
   # Save gdrcopy version for InSpec tests
   node.default['cluster']['nvidia']['gdrcopy']['version'] = new_resource.gdrcopy_version
@@ -82,6 +83,7 @@ action :verify do
 end
 
 action :configure do
+  return if on_docker?
   # Save gdrcopy version for InSpec tests
   node.default['cluster']['nvidia']['gdrcopy']['version'] = new_resource.gdrcopy_version
   node.default['cluster']['nvidia']['gdrcopy']['service'] = gdrcopy_service

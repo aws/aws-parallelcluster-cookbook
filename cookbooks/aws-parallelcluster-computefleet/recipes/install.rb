@@ -11,5 +11,5 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-computefleet::node'
+include_recipe 'aws-parallelcluster-computefleet::parallelcluster_node'
 include_recipe "aws-parallelcluster-computefleet::clusterstatusmgtd_install"

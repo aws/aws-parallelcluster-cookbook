@@ -41,7 +41,6 @@ REPO_DEFINITION
 
 yum --disablerepo="*" --enablerepo="amzn2-iso" install -y "*-${REGION}"
 rm -f ${REPOSITORY_DEFINITION_FILE}
-yum --disablerepo="*" --enablerepo="amzn2-*" --security -y update
 
 echo "[INFO] Complete: installation of packages from amazon Linux 2 repository for US isolated region"
 

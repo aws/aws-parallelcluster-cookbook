@@ -8,11 +8,24 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Allow configuration of static and dynamic node priorities in compute resources via the ParallelCluster configuration YAML file.
+- Forward SLURM_RESUME_FILE to ParallelCluster resume program.
+- Allow to override aws-parallelcluster-node package at cluster creation and update time (only on the head node during update).
+  Useful for development purposes only.
 
 **CHANGES**
 - Assign Slurm dynamic nodes a priority (weight) of 1000 by default. This allows Slurm to prioritize idle static nodes over idle dynamic ones.
 
 **BUG FIXES**
+
+3.6.1
+------
+
+**CHANGES**
+- Remove security updates step executed on cluster nodes bootstrap in US isolated regions
+  in order to reduce bootstrap time and avoid a potential point of failure.
+
+**BUG FIXES**
+- Fix an issue that was preventing ptrace protection from being disabled on Ubuntu and allowing Cross Memory Attach (CMA) in libfabric.
 
 3.6.0
 ------
@@ -29,7 +42,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Load kernel module [nvidia-uvm](https://developer.nvidia.com/blog/unified-memory-cuda-beginners/) by default to provide Unified Virtual Memory (UVM) functionality to the CUDA driver.
 - Install [NVIDIA Persistence Daemon](https://docs.nvidia.com/deploy/driver-persistence/index.html) as a system service.
 - Install [NVIDIA Data Center GPU Manager (DCGM)](https://developer.nvidia.com/dcgm) package on all supported OSes except for aarch64 `centos7` and `alinux2`.
-- Forward SLURM_RESUME_FILE to ParallelCluster resume program.
 
 **CHANGES**
 - Upgrade Slurm to version 23.02.2.

@@ -15,7 +15,7 @@ control 'tag:install_jwt_dependencies_installed' do
   packages = []
   if os.redhat?
     # Skipping redhat on docker since ubi-appstream repo is not aligned with the main repo
-    packages.concat %w(jansson-devel) unless os_properties.redhat_ubi?
+    packages.concat %w(jansson-devel) unless os_properties.redhat_on_docker?
   elsif os.debian?
     packages.concat %w(libjansson-dev)
   else

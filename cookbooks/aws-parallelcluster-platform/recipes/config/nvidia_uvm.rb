@@ -15,29 +15,30 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-if graphic_instance? && nvidia_installed?
-  # Load kernel module Nvidia-uvm
-  kernel_module 'nvidia-uvm' do
-    action :load
-  end
+# Load kernel module Nvidia-uvm
+kernel_module 'nvidia-uvm' do
+  only_if { graphic_instance? && nvidia_installed? }
+  action :load
+end
 
-  # Make sure kernel module Nvidia-uvm is loaded at instance boot time
-  cookbook_file 'nvidia.conf' do
-    source 'nvidia/nvidia.conf'
-    path '/etc/modules-load.d/nvidia.conf'
-    owner 'root'
-    group 'root'
-    mode '0644'
-  end
+# Make sure kernel module Nvidia-uvm is loaded at instance boot time
+cookbook_file 'nvidia.conf' do
+  only_if { graphic_instance? && nvidia_installed? }
+  source 'nvidia/nvidia.conf'
+  path '/etc/modules-load.d/nvidia.conf'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
 
-  # Install nvidia_persistenced. See https://download.nvidia.com/XFree86/Linux-x86_64/396.51/README/nvidia-persistenced.html
-  bash 'Install nvidia_persistenced' do
-    cwd '/usr/share/doc/NVIDIA_GLX-1.0/samples'
-    user 'root'
-    group 'root'
-    code <<-NVIDIA
-      tar -xf nvidia-persistenced-init.tar.bz2
-      ./nvidia-persistenced-init/install.sh
-    NVIDIA
-  end
+# Install nvidia_persistenced. See https://download.nvidia.com/XFree86/Linux-x86_64/396.51/README/nvidia-persistenced.html
+bash 'Install nvidia_persistenced' do
+  only_if { graphic_instance? && nvidia_installed? }
+  cwd '/usr/share/doc/NVIDIA_GLX-1.0/samples'
+  user 'root'
+  group 'root'
+  code <<-NVIDIA
+    tar -xf nvidia-persistenced-init.tar.bz2
+    ./nvidia-persistenced-init/install.sh
+  NVIDIA
 end

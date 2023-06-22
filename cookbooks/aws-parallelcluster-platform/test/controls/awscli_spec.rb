@@ -12,7 +12,7 @@
 control 'tag:install_awscli_installed' do
   title 'awscli package should be installed in cookbook virtualenv'
 
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/pip list") do
     its('exit_status') { should eq(0) }
@@ -25,7 +25,7 @@ control 'tag:install_awscli_installed' do
 end
 
 control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
   virtualenv_path = node['cluster']['cookbook_virtualenv_path']
 
   describe "aws cli can run as cluster default user #{node['cluster']['cluster_user']}" do
@@ -45,6 +45,7 @@ control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
 end
 
 control 'tag:config_awscli_runs_in_all_regions' do
+  only_if { node['cluster']['scheduler'] == 'awsbatch' }
   regions = bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws ec2 describe-regions --region #{node['cluster']['region']} --query \"Regions[].{Name:RegionName}\" --output text")
             .stdout.split(/\n+/)
   regions.each do |region|

@@ -40,4 +40,11 @@ control 'tag:config_ssh_is_correctly_configured' do
   describe file('/etc/ssh/ssh_config') do
     its('content') { should match %r{Match exec "ssh_target_checker.sh %h"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null} }
   end
+
+  if instance.head_node? && !os_properties.on_docker?
+    hostname = bash("hostname").stdout
+    describe bash("su #{node['cluster']['cluster_user']} -c 'ssh localhost hostname'") do
+      its('stdout') { should eq hostname }
+    end
+  end
 end

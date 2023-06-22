@@ -14,7 +14,7 @@ control 'tag:install_stunnel_installed' do
 
   # In AL2 stunnel comes as part of the aws-efs-utils package.
   # In RHEL8 on Docker we disable the installation of base packages, so stunnel cannot be built.
-  only_if { !os_properties.alinux2? && !os_properties.redhat_ubi? }
+  only_if { !os_properties.alinux2? && !os_properties.redhat_on_docker? }
 
   stunnel_version = node['cluster']['stunnel']['version']
 

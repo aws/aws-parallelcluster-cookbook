@@ -1,7 +1,7 @@
 # This is a helper recipe to automatically add dependencies, including recipes and resources
 # This is useful if you need to test a resource with recipe/resources dependencies in the kitchen.resources/recipes.yml.
 
-# To use it add recipe[aws-parallelcluster::add_dependencies] as first item in the run_list
+# To use it add recipe[aws-parallelcluster-tests::setup] as first item in the run_list
 # then define a dependencies attribute, listing them with recipe: or resource: prefix.
 # For resources is also possible to specify the action. Example:
 

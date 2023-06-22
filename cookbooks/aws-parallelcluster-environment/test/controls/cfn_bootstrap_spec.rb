@@ -15,7 +15,7 @@ pyenv_dir = "#{base_dir}/pyenv"
 
 control 'tag:install_cfnbootstrap_virtualenv_created' do
   title "cfnbootstrap virtualenv should be created on #{cfn_python_version}"
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe directory("#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv") do
     it { should exist }

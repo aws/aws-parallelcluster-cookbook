@@ -1,14 +1,14 @@
 verifier:
   name: inspec
-  inspec_tests:
-    - test/recipes
-    - test/resources
   reporter:
     - cli
     - junit2:.kitchen/inspec/results/%{platform}_%{suite}_inspec.xml
 
 provisioner:
   data_path: test/data
+  environments_path: test/environments
+  client_rb:
+    environment: kitchen
   attributes:
     kitchen: true
     cluster:
@@ -21,6 +21,6 @@ lifecycle:
   <% %w(create converge verify destroy).each do |phase| %>
   <% op = "#{prefix}_#{phase}" %>
   <%= op %>:
-    - local: bash ./kitchen.run-hook.sh <%= op %> $(dirname "$0")
+    - local: bash ./kitchen/kitchen.run-hook.sh <%= op %> $(dirname "$0")
   <% end %>
   <% end %>

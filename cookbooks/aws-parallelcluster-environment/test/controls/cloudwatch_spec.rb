@@ -14,10 +14,10 @@ control 'tag:install_cloudwatch_installation_files' do
   end
 
   describe 'Check the presence of the cloudwatch package gpg key'
-  # In Ubuntu 20.04 due to environment variable the keyring is placed under home of the user ubuntu with the permission of root
+  # In Ubuntu >20.04 due to environment variable the keyring is placed under home of the user ubuntu with the permission of root
   ubuntu2004 = os_properties.ubuntu2004?
-  keyring = os_properties.ubuntu2004? && !os_properties.on_docker? ? '--keyring /home/ubuntu/.gnupg/pubring.kbx' : ''
-  sudo = os_properties.redhat_ubi? ? '' : 'sudo'
+  keyring = (os_properties.ubuntu2004? || os_properties.ubuntu2204?) && !os_properties.on_docker? ? '--keyring /home/ubuntu/.gnupg/pubring.kbx' : ''
+  sudo = os_properties.redhat_on_docker? ? '' : 'sudo'
   describe bash("#{sudo} gpg --list-keys #{keyring}") do
     # Don't check exit status for Ubuntu20 because it returns 2 when executed in the validate phase of a created AMI
     its('exit_status') { should eq 0 } unless ubuntu2004
@@ -38,7 +38,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/write_cloudwatch_agent_json.py') do
     it { should exist }
-    its('sha256sum') { should eq 'd7c0c151e7b2118c4684eef07463d0644c001fd835d968fa0f9c4e67c55879ab' }
+    its('sha256sum') { should eq '4fc20cdb5f3e08f23192842bcf96a8e44bf269bf8d1b6121d225ecc999db433e' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
@@ -54,7 +54,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/etc/cloudwatch_agent_config_schema.json') do
     it { should exist }
-    its('sha256sum') { should eq '3380ee721f26c31ac629e5e8573f6e034f890f37d55f46849ada175902815b0c' }
+    its('sha256sum') { should eq '27ebc3dc858094d6cb4454ce8ca230e0828716b50c2d2b1199eb9150fec0a04a' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }

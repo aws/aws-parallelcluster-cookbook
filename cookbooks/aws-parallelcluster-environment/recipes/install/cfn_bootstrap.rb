@@ -21,7 +21,7 @@ virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_na
 node.default['cluster']['cfn_bootstrap_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
 
-return if redhat_ubi?
+return if redhat_on_docker?
 
 install_pyenv 'pyenv for cfn_bootstrap' do
   python_version python_version

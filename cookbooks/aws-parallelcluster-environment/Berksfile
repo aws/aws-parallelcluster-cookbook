@@ -4,12 +4,12 @@ metadata
 
 cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
 
-cookbook "nfs", path: "../../third-party/nfs-5.0.0"
+cookbook "nfs", path: "../third-party/nfs-5.0.0"
 
 # dependency od nfs
-cookbook "line", path: "../../third-party/line-4.5.2"
+cookbook "line", path: "../third-party/line-4.5.2"
 
 # for shared cookbook
-cookbook "pyenv", path: "../../third-party/pyenv-3.5.1"
-cookbook "yum", path: "../../third-party/yum-7.4.0"
-cookbook "yum-epel", path: "../../third-party/yum-epel-4.5.0"
+cookbook "pyenv", path: "../third-party/pyenv-3.5.1"
+cookbook "yum", path: "../third-party/yum-7.4.0"
+cookbook "yum-epel", path: "../third-party/yum-epel-4.5.0"

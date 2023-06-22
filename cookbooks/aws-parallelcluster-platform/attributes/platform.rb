@@ -21,9 +21,10 @@ default['cluster']['dcv']['authenticator']['group_id'] = node['cluster']['dcv'][
 default['cluster']['dcv']['authenticator']['user_home'] = "/home/#{node['cluster']['dcv']['authenticator']['user']}"
 default['cluster']['dcv']['authenticator']['certificate'] = "#{node['cluster']['etc_dir']}/ext-auth-certificate.pem"
 default['cluster']['dcv']['authenticator']['private_key'] = "#{node['cluster']['etc_dir']}/ext-auth-private-key.pem"
+default['cluster']['dcv']['authenticator']['virtualenv_name'] = "dcv_authenticator_virtualenv"
+default['cluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['dcv']['authenticator']['virtualenv_name']}"
 default['cluster']['dcv']['version'] = '2023.0-15022'
 default['cluster']['dcv_port'] = 8443
-default['cluster']['dcv']['installed'] = 'yes'
 
 default['cluster']['dcv']['server']['version'] = '2023.0.15022-1'
 default['cluster']['dcv']['xdcv']['version'] = '2023.0.547-1'
@@ -46,3 +47,16 @@ default['openssh']['client']['  _strict_host_key_checking'] = 'no'
 # Do not store server key in the know hosts file to avoid scaling clashing
 # that is when an new host gets the same IP of a previously terminated host
 default['openssh']['client']['  _user_known_hosts_file'] = '/dev/null'
+
+# ParallelCluster log rotation file dir
+default['cluster']['pcluster_log_rotation_path'] = "/etc/logrotate.d/parallelcluster_log_rotation"
+
+# error handler log file
+default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}/bootstrap_error_msg"
+
+# Cluster config
+default['cluster']['cluster_s3_bucket'] = nil
+default['cluster']['cluster_config_s3_key'] = nil
+default['cluster']['cluster_config_version'] = nil
+default['cluster']['change_set_s3_key'] = nil
+default['cluster']['instance_types_data_s3_key'] = nil

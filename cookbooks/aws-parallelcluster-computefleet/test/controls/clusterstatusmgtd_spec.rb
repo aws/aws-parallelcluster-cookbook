@@ -56,4 +56,9 @@ control 'tag:config_clusterstatusmgtd' do
     its('group') { should eq 'root' }
     its('mode') { should cmp '0640' }
   end
+
+  describe 'clusterstatusmgtd is configured to be executed by supervisord' do
+    subject { bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/supervisorctl status clusterstatusmgtd | grep RUNNING") }
+    its('exit_status') { should eq 0 }
+  end unless os_properties.on_docker?
 end

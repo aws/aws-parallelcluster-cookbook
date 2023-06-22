@@ -15,39 +15,35 @@ fi
 
 NEW_PCLUSTER_VERSION=$1
 NEW_AWSBATCH_CLI_VERSION=$2
+VERSIONS_FILE="cookbooks/aws-parallelcluster-shared/attributes/versions.rb"
 
-CURRENT_PCLUSTER_VERSION=$(sed -ne "s/default\['cluster'\]\['parallelcluster-version'\] = '\(.*\)'/\1/p" cookbooks/aws-parallelcluster-common/attributes/common.rb)
+CURRENT_PCLUSTER_VERSION=$(sed -ne "s/default\['cluster'\]\['parallelcluster-version'\] = '\(.*\)'/\1/p" ${VERSIONS_FILE})
 
 NEW_PCLUSTER_VERSION_SHORT=$(echo ${NEW_PCLUSTER_VERSION} | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+")
 CURRENT_PCLUSTER_VERSION_SHORT=$(echo ${CURRENT_PCLUSTER_VERSION} | grep -Eo "[0-9]+\.[0-9]+\.[0-9]+")
 
-sed -i "s/default\['cluster'\]\['parallelcluster-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-version'] = '${NEW_PCLUSTER_VERSION}'/g" cookbooks/aws-parallelcluster-shared/attributes/versions.rb
-sed -i "s/default\['cluster'\]\['parallelcluster-cookbook-version'\] = '$CURRENT_PCLUSTER_VERSION'/default['cluster']['parallelcluster-cookbook-version'] = '${NEW_PCLUSTER_VERSION}'/g" cookbooks/aws-parallelcluster-shared/attributes/versions.rb
-sed -i "s/default\['cluster'\]\['parallelcluster-node-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-node-version'] = '${NEW_PCLUSTER_VERSION}'/g" cookbooks/aws-parallelcluster-shared/attributes/versions.rb
+sed -i "s/default\['cluster'\]\['parallelcluster-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-version'] = '${NEW_PCLUSTER_VERSION}'/g" ${VERSIONS_FILE}
+sed -i "s/default\['cluster'\]\['parallelcluster-cookbook-version'\] = '$CURRENT_PCLUSTER_VERSION'/default['cluster']['parallelcluster-cookbook-version'] = '${NEW_PCLUSTER_VERSION}'/g" ${VERSIONS_FILE}
+sed -i "s/default\['cluster'\]\['parallelcluster-node-version'\] = '${CURRENT_PCLUSTER_VERSION}'/default['cluster']['parallelcluster-node-version'] = '${NEW_PCLUSTER_VERSION}'/g" ${VERSIONS_FILE}
 sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
 
 sed -i "s/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${CURRENT_PCLUSTER_VERSION}'/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${NEW_PCLUSTER_VERSION}'/g" kitchen.ec2.yml
 
-# Update dependencies version in main cookbook metadata
-COOKBOOKS=("aws-parallelcluster-common" "aws-parallelcluster-awsbatch" "aws-parallelcluster-config" "aws-parallelcluster-entrypoints" "aws-parallelcluster-scheduler-plugin" "aws-parallelcluster-slurm" "aws-parallelcluster-test" "aws-parallelcluster-platform" "aws-parallelcluster-environment" "aws-parallelcluster-computefleet" "aws-parallelcluster-shared" "aws-parallelcluster-tests")
-for COOKBOOK in ${COOKBOOKS[*]}
-do
-  sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
+COOKBOOKS=("aws-parallelcluster-awsbatch" "aws-parallelcluster-entrypoints" "aws-parallelcluster-slurm" "aws-parallelcluster-platform" "aws-parallelcluster-environment" "aws-parallelcluster-computefleet" "aws-parallelcluster-shared" "aws-parallelcluster-slurm" "aws-parallelcluster-tests")
+for cookbook in "${COOKBOOKS[@]}"; do
+  METADATA_FILES+=("cookbooks/${cookbook}/metadata.rb")
 done
 
-# Update version in specific(install, config, ecc...) cookbook metadata
-FILES=("cookbooks/aws-parallelcluster-common/metadata.rb" "cookbooks/aws-parallelcluster-awsbatch/metadata.rb" "cookbooks/aws-parallelcluster-config/metadata.rb" "cookbooks/aws-parallelcluster-entrypoints/metadata.rb" "cookbooks/aws-parallelcluster-scheduler-plugin/metadata.rb" "cookbooks/aws-parallelcluster-slurm/metadata.rb" "cookbooks/aws-parallelcluster-test/metadata.rb" "cookbooks/aws-parallelcluster-platform/metadata.rb" "cookbooks/aws-parallelcluster-environment/metadata.rb" "cookbooks/aws-parallelcluster-computefleet/metadata.rb" "cookbooks/aws-parallelcluster-shared/metadata.rb" "cookbooks/aws-parallelcluster-tests/metadata.rb")
-sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
+# Update version in specific cookbook metadata
+sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" ${METADATA_FILES[*]}
 
-# Update dependencies version in specific(install, config, ecc...) cookbook metadata
-FILES=("cookbooks/aws-parallelcluster-common/metadata.rb" "cookbooks/aws-parallelcluster-awsbatch/metadata.rb" "cookbooks/aws-parallelcluster-config/metadata.rb" "cookbooks/aws-parallelcluster-entrypoints/metadata.rb" "cookbooks/aws-parallelcluster-scheduler-plugin/metadata.rb" "cookbooks/aws-parallelcluster-slurm/metadata.rb" "cookbooks/aws-parallelcluster-test/metadata.rb" "cookbooks/aws-parallelcluster-platform/metadata.rb" "cookbooks/aws-parallelcluster-environment/metadata.rb" "cookbooks/aws-parallelcluster-computefleet/metadata.rb" "cookbooks/aws-parallelcluster-shared/metadata.rb" "cookbooks/aws-parallelcluster-tests/metadata.rb")
-sed -i "s/depends 'aws-parallelcluster-common', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-common', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
-sed -i "s/depends 'aws-parallelcluster-shared', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-shared', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
-sed -i "s/depends 'aws-parallelcluster-test', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends 'aws-parallelcluster-test', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${FILES[*]}
+for COOKBOOK in ${COOKBOOKS[*]}; do
+  # Update dependencies version in main cookbook metadata
+  sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
+  # Update dependencies version in specific cookbook metadata
+  sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${METADATA_FILES[*]}
+done
 
-CURRENT_AWSBATCH_CLI_VERSION=$(sed -ne "s/^default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '\(.*\)'/\1/p" cookbooks/aws-parallelcluster-common/attributes/common.rb)
-
-sed -i "s/default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '${CURRENT_AWSBATCH_CLI_VERSION}'/default['cluster']['parallelcluster-awsbatch-cli-version'] = '${NEW_AWSBATCH_CLI_VERSION}'/g" cookbooks/aws-parallelcluster-common/attributes/common.rb
-
-# Update version in systemtests mock
-sed -i "s/aws-parallelcluster-cookbook-${CURRENT_PCLUSTER_VERSION}/aws-parallelcluster-cookbook-${NEW_PCLUSTER_VERSION}/g" system_tests/systemd
+# Update AWS Batch CLI version
+CURRENT_AWSBATCH_CLI_VERSION=$(sed -ne "s/^default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '\(.*\)'/\1/p" ${VERSIONS_FILE})
+sed -i "s/default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '${CURRENT_AWSBATCH_CLI_VERSION}'/default['cluster']['parallelcluster-awsbatch-cli-version'] = '${NEW_AWSBATCH_CLI_VERSION}'/g" ${VERSIONS_FILE}

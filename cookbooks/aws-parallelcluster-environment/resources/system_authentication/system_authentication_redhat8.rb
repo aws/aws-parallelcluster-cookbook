@@ -30,7 +30,7 @@ action :configure do
     # authconfig is a compatibility tool, replaced by authselect
     command "authselect select sssd with-mkhomedir"
     sensitive true
-  end unless redhat_ubi?
+  end unless redhat_on_docker?
 end
 
 action_class do

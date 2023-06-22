@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-computefleet::node' do
+describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:node_version) { 'node_version' }
@@ -70,9 +70,7 @@ describe 'aws-parallelcluster-computefleet::node' do
         end
 
         it 'installs custom node package' do
-          is_expected.to run_bash('install aws-parallelcluster-node')
-            .with_code(/custom_package_url=.*#{custom_node_package}/)
-            .with_code(%r{source #{virtualenv_path}/bin/activate})
+          is_expected.to include_recipe('aws-parallelcluster-computefleet::custom_parallelcluster_node')
         end
       end
     end

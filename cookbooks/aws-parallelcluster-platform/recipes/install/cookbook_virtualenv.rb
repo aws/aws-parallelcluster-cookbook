@@ -17,7 +17,7 @@ node.default['cluster']['cookbook_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
 
 # TODO: find a way to make this code work on ubi8
-return if redhat_ubi?
+return if redhat_on_docker?
 
 install_pyenv 'pyenv for default python version'
 

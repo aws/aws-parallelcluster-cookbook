@@ -7,6 +7,9 @@ default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['etc_dir'] = '/etc/parallelcluster'
 
+# Slurm_plugin_dir is used by slurm cookbook and custom_actions recipe
+default['cluster']['slurm_plugin_dir'] = "#{node['cluster']['etc_dir']}/slurm_plugin"
+
 # Attributes used by both fetch_config resource and environment recipes
 default['cluster']['shared_storages_mapping_path'] = "#{node['cluster']['etc_dir']}/shared_storages_data.yaml"
 default['cluster']['previous_shared_storages_mapping_path'] = "#{node['cluster']['etc_dir']}/previous_shared_storages_data.yaml"
@@ -17,7 +20,6 @@ default['cluster']['system_pyenv_root'] = "#{node['cluster']['base_dir']}/pyenv"
 default['cluster']['cluster_config_path'] = "#{node['cluster']['shared_dir']}/cluster-config.yaml"
 default['cluster']['previous_cluster_config_path'] = "#{node['cluster']['shared_dir']}/previous-cluster-config.yaml"
 default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change-set.json"
-default['cluster']['launch_templates_config_path'] = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
 
 default['cluster']['scheduler'] = 'slurm'
