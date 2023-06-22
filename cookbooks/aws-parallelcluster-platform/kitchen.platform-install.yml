@@ -205,7 +205,7 @@ suites:
       resource: nvidia_repo:remove
       dependencies:
         - resource:nvidia_repo:add
-  - name: fabric_manager
+  - name: nvidia_fabric_manager
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
@@ -284,25 +284,6 @@ suites:
       instance_type: g4dn.2xlarge
     attributes:
       resource: nvidia_driver
-      dependencies:
-        - resource:package_repos
-        - resource:install_packages:install_kernel_source
-        - 'resource:package { "package_name": "dkms" }'
-        - resource:build_tools
-      cluster:
-        nvidia:
-          enabled: true
-  - name: nvidia_install
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::nvidia_install]
-    verifier:
-      controls:
-        - /tag:install_.*nvidia/
-    driver:
-      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
-      instance_type: g4dn.2xlarge
-    attributes:
       dependencies:
         - resource:package_repos
         - resource:install_packages:install_kernel_source

@@ -48,7 +48,7 @@ suites:
             vpc_ipv4_cidr_blocks: |
               cidr1
               cidr2
-  - name: fabric_manager
+  - name: nvidia_fabric_manager
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
@@ -56,14 +56,19 @@ suites:
       controls:
         - /tag:config_.*fabric_manager/
     attributes:
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
       resource: fabric_manager:configure
       cluster:
         nvidia:
           enabled: true
-      dependencies:
-        - resource:fabric_manager:setup
     driver:
-      instance_type: g4dn.2xlarge
+      # The only instance type that supports this test is p4d.24xlarge, skipped otherwise
+      instance_type: p4d.24xlarge
   - name: nvidia_gdrcopy
     # doesn't work on Docker
     run_list:
@@ -73,6 +78,12 @@ suites:
       controls:
         - /tag:config_.*gdrcopy/
     attributes:
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
       resource: gdrcopy:configure
       cluster:
         nvidia:
@@ -82,7 +93,6 @@ suites:
   - name: nvidia_uvm
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::nvidia_uvm]
     verifier:
       controls:
         - /tag:config_.*nvidia_uvm/
@@ -93,28 +103,13 @@ suites:
       cluster:
         nvidia:
           enabled: true
-  - name: nvidia_config
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::nvidia_config]
-    verifier:
-      controls:
-        - /nvidia-fabricmanager_enabled/
-        - /gdrcopy_enabled/
-        - /gdrcopy_disabled/
-    driver:
-      # nvidia_driver can be executed only on a graphic EC2 instance example: g4dn.xlarge(x86_86) or g5g.xlarge(aarm64)
-      instance_type: g4dn.xlarge
-    attributes:
       dependencies:
         - resource:package_repos
         - resource:install_packages:install_kernel_source
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
-      cluster:
-        nvidia:
-          enabled: true
+        - recipe:aws-parallelcluster-platform::nvidia_uvm
   - name: dcv
     # FIXME: breaks on Docker
     run_list:
