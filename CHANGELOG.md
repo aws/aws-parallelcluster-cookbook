@@ -32,6 +32,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Add support for Rocky Linux 8.
 - Allow configuration of static and dynamic node priorities in compute resources via the ParallelCluster configuration YAML file.
 - Forward SLURM_RESUME_FILE to ParallelCluster resume program.
 - Allow to override aws-parallelcluster-node package at cluster creation and update time (only on the head node during update).
