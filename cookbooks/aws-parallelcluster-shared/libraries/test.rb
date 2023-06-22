@@ -6,3 +6,7 @@ end
 def redhat_on_docker?
   on_docker? && platform?('redhat')
 end
+
+def rocky_on_docker?
+  on_docker? && platform?('rocky')
+end
