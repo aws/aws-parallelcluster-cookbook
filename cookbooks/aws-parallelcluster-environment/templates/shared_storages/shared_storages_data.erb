@@ -12,7 +12,7 @@ raid:
 <% unless raid_shared_dir.empty? -%>
   - raid_shared_dir: <%= node['cluster']['raid_shared_dir'] %>
     raid_type: <%= node['cluster']['raid_type'] %>
-    raid_vol_array: <%= node['cluster']['raid_vol_ids'] %>
+    raid_vol_array: <%= node['cluster']['raid_vol_ids'].split(',') %>
 <% end -%>
 <%# EFS %>
 <% efs_fs_ids_array = node['cluster']['efs_fs_ids'].split(',') -%>
