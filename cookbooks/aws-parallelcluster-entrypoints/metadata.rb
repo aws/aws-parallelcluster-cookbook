@@ -6,7 +6,7 @@ license 'Apache-2.0'
 description 'AWS ParallelCluster cookbooks entrypoints'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
-chef_version '~> 17'
+chef_version '>= 17'
 version '3.7.0'
 
 supports 'amazon', '= 2.0'
