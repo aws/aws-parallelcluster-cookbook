@@ -28,6 +28,14 @@ when 'HeadNode'
     options ['no_root_squash']
   end unless on_docker?
 
+  # Export /opt/parallelcluster/shared_login_nodes
+  # TODO restrict this share to login nodes only
+  nfs_export node['cluster']['shared_login_nodes_dir'] do
+    network get_vpc_cidr_list
+    writeable true
+    options ['no_root_squash']
+  end unless on_docker?
+
   # Export /opt/intel if it exists
   nfs_export "/opt/intel" do
     network get_vpc_cidr_list
@@ -36,7 +44,7 @@ when 'HeadNode'
     only_if { ::File.directory?("/opt/intel") }
   end unless on_docker?
 
-when 'ComputeFleet'
+when 'ComputeFleet', 'LoginNode'
   # Mount /opt/intel over NFS
   exported_intel_dir = format_directory('/opt/intel')
   mount '/opt/intel' do
