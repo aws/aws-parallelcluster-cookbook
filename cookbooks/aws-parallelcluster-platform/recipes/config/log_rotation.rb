@@ -24,7 +24,10 @@ when 'HeadNode'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster-platform::log_rotation_compute_fleet'
 
+when 'LoginNode'
+  Chef::Log.info("Log rotation not yet implemented for LoginNodes")
+
 else
-  raise "node_type must be HeadNode or ComputeFleet"
+  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
 
 end
