@@ -21,7 +21,7 @@ when 'HeadNode'
     not_if { node['cluster']['ebs_shared_dirs'].split(',').empty? }
   end unless on_docker?
 
-when 'ComputeFleet'
+when 'ComputeFleet', 'LoginNode'
   # Parse shared directory info and turn into an array
   shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',')
 
@@ -39,5 +39,5 @@ when 'ComputeFleet'
   end
 
 else
-  raise "node_type must be HeadNode or ComputeFleet"
+  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
 end
