@@ -12,49 +12,44 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if on_docker?
+
 case node['cluster']['node_type']
 when 'HeadNode'
-  # Export /home
-  nfs_export "/home" do
-    network get_vpc_cidr_list
-    writeable true
-    options ['no_root_squash']
-  end unless on_docker?
+  volume "export /home" do
+    shared_dir "/home"
+    action :export
+  end
 
   # Export /opt/parallelcluster/shared
-  nfs_export node['cluster']['shared_dir'] do
-    network get_vpc_cidr_list
-    writeable true
-    options ['no_root_squash']
-  end unless on_docker?
+  volume "export #{node['cluster']['shared_dir']}" do
+    shared_dir node['cluster']['shared_dir']
+    action :export
+  end
 
   # Export /opt/parallelcluster/shared_login_nodes
-  # TODO restrict this share to login nodes only
-  nfs_export node['cluster']['shared_login_nodes_dir'] do
-    network get_vpc_cidr_list
-    writeable true
-    options ['no_root_squash']
-  end unless on_docker?
+  volume "export #{node['cluster']['shared_dir_login_nodes']}" do
+    shared_dir node['cluster']['shared_dir_login_nodes']
+    action :export
+  end
 
-  # Export /opt/intel if it exists
-  nfs_export "/opt/intel" do
-    network get_vpc_cidr_list
-    writeable true
-    options ['no_root_squash']
-    only_if { ::File.directory?("/opt/intel") }
-  end unless on_docker?
+  # Export /opt/intel
+  volume "export /opt/intel" do
+    shared_dir "/opt/intel"
+    action :export
+  end
 
 when 'ComputeFleet', 'LoginNode'
   # Mount /opt/intel over NFS
   exported_intel_dir = format_directory('/opt/intel')
-  mount '/opt/intel' do
+  volume "mount /opt/intel" do
+    action :mount
+    shared_dir '/opt/intel'
     device(lazy { "#{node['cluster']['head_node_private_ip']}:#{exported_intel_dir}" })
     fstype 'nfs'
     options node['cluster']['nfs']['hard_mount_options']
-    action %i(mount enable)
     retries 10
     retry_delay 6
-    only_if { ::File.directory?("/opt/intel") }
   end
 
 else

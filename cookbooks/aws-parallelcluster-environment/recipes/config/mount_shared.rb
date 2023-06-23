@@ -13,7 +13,9 @@
 
 return if on_docker?
 
-if node['cluster']['node_type'] == "ComputeFleet"
+case node['cluster']['node_type']
+when 'ComputeFleet'
+  # TODO Extract as subrecipe
   volume "mount /home" do
     action :mount
     shared_dir '/home'
@@ -34,4 +36,31 @@ if node['cluster']['node_type'] == "ComputeFleet"
     retries 10
     retry_delay 6
   end
+
+when 'LoginNode'
+  # TODO Extract as subrecipe
+  volume "mount /home" do
+    action :mount
+    shared_dir '/home'
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['head_node_home_path']}" })
+    fstype 'nfs'
+    options node['cluster']['nfs']['hard_mount_options']
+    retries 10
+    retry_delay 6
+  end
+
+  # Mount /opt/parallelcluster/shared_login_nodes over NFS
+  volume "mount #{node['cluster']['shared_dir_login']}" do
+    action :mount
+    shared_dir node['cluster']['shared_dir_login']
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir_login']}" })
+    fstype 'nfs'
+    options node['cluster']['nfs']['hard_mount_options']
+    retries 10
+    retry_delay 6
+  end
+when 'HeadNode'
+  Chef::Log.info("Nothing to mount in the HeadNode")
+else
+  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
 end
