@@ -4,6 +4,7 @@ default['cluster']['scripts_dir'] = "#{node['cluster']['base_dir']}/scripts"
 default['cluster']['license_dir'] = "#{node['cluster']['base_dir']}/licenses"
 default['cluster']['configs_dir'] = "#{node['cluster']['base_dir']}/configs"
 default['cluster']['shared_dir'] = "#{node['cluster']['base_dir']}/shared"
+default['cluster']['shared_login_nodes_dir'] = "#{node['cluster']['base_dir']}/shared_login_nodes"
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['etc_dir'] = '/etc/parallelcluster'
 
