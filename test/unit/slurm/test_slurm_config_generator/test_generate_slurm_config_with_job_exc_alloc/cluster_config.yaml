@@ -1,0 +1,36 @@
+Scheduling:
+  SlurmQueues:
+    - Name: queue_jls_enabled
+      JobExclusiveAllocation: true
+      ComputeResources:
+        - Name: cr_1
+          DisableSimultaneousMultithreading: false
+          InstanceType: c4.xlarge
+          MaxCount: 10
+          MinCount: 0
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+    - Name: queue_jls_disabled
+      JobExclusiveAllocation: false
+      ComputeResources:
+        - Name: cr_1
+          DisableSimultaneousMultithreading: true
+          InstanceType: c4.xlarge
+          MaxCount: 10
+          MinCount: 0
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+    - Name: queue_jls_default
+      ComputeResources:
+        - Name: cr_1
+          DisableSimultaneousMultithreading: true
+          InstanceType: c4.xlarge
+          MaxCount: 10
+          MinCount: 0
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+  Scheduler: slurm
+  SlurmSettings:
+    ScaledownIdletime: 10
+    EnableMemoryBasedScheduling: false
+    Database: null
