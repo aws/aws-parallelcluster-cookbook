@@ -15,16 +15,7 @@ return if on_docker?
 
 case node['cluster']['node_type']
 when 'ComputeFleet'
-  # TODO Extract as subrecipe
-  volume "mount /home" do
-    action :mount
-    shared_dir '/home'
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['head_node_home_path']}" })
-    fstype 'nfs'
-    options node['cluster']['nfs']['hard_mount_options']
-    retries 10
-    retry_delay 6
-  end
+  include_recipe 'aws-parallelcluster-environment::mount_home'
 
   # Mount /opt/parallelcluster/shared over NFS
   volume "mount #{node['cluster']['shared_dir_compute']}" do
@@ -38,16 +29,7 @@ when 'ComputeFleet'
   end
 
 when 'LoginNode'
-  # TODO Extract as subrecipe
-  volume "mount /home" do
-    action :mount
-    shared_dir '/home'
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['head_node_home_path']}" })
-    fstype 'nfs'
-    options node['cluster']['nfs']['hard_mount_options']
-    retries 10
-    retry_delay 6
-  end
+  include_recipe 'aws-parallelcluster-environment::mount_home'
 
   # Mount /opt/parallelcluster/shared_login_nodes over NFS
   volume "mount #{node['cluster']['shared_dir_login']}" do
