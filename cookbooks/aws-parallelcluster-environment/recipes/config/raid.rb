@@ -26,7 +26,7 @@ when 'HeadNode'
     not_if { raid_shared_dir.empty? }
   end
 
-when 'ComputeFleet'
+when 'ComputeFleet', 'LoginNode'
   volume "mount raid volume over NFS" do
     action :mount
     shared_dir raid_shared_dir
@@ -38,5 +38,5 @@ when 'ComputeFleet'
   end
 else
 
-  raise "node_type must be HeadNode or ComputeFleet"
+  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
 end
