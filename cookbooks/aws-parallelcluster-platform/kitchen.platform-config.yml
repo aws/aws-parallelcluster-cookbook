@@ -115,10 +115,21 @@ suites:
       - recipe[aws-parallelcluster-platform::cluster_user]
     verifier:
       controls:
-        - cluster_user_compute
+        - cluster_user_compute_and_login
     attributes:
       cluster:
         node_type: ComputeFleet
+        cluster_user: test_user
+  - name: cluster_user_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - cluster_user_compute_and_login
+    attributes:
+      cluster:
+        node_type: LoginNode
         cluster_user: test_user
   - name: cluster_user_head
     run_list:
