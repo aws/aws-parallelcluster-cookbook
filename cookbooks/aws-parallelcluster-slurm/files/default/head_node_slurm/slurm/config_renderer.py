@@ -143,6 +143,7 @@ class QueueRenderer:
             ComputeResourceRenderer(self.name, compute_resource_config, no_gpu, memory_ratio, instance_types_info)
             for compute_resource_config in queue_config["ComputeResources"]
         ]
+        self.job_exclusive_allocation = queue_config.get("JobExclusiveAllocation")
 
     def render_config(self):
         """Launch the rendering of the required configuration."""
@@ -183,6 +184,9 @@ class QueueRenderer:
         partition = f"PartitionName={self.name} Nodes={self.name}_nodes MaxTime=INFINITE State=UP"
         if self.is_default:
             partition += " Default=YES"
+
+        if self.job_exclusive_allocation:
+            partition += " OverSubscribe=NO"
 
         partition += f"{self._custom_settings()}"
         return partition
