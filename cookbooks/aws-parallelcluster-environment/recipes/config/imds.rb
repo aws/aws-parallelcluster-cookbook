@@ -15,7 +15,7 @@
 return if on_docker? || node['cluster']['scheduler'] == 'awsbatch'
 
 # slurm and custom schedulers will have imds access on the head node
-if node['cluster']['node_type'] == 'HeadNode'
+if %w(HeadNode LoginNode).include? node['cluster']['node_type']
 
   directory "#{node['cluster']['scripts_dir']}/imds" do
     owner 'root'
