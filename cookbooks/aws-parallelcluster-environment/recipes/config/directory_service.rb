@@ -22,7 +22,9 @@ return if node['cluster']['node_type'] == 'ComputeFleet' && node['cluster']['dir
 
 sssd_conf_path = "/etc/sssd/sssd.conf"
 shared_directory_service_dir = "#{node['cluster']['shared_dir']}/directory_service"
+login_node_shared_directory_service_dir = "#{node['cluster']['shared_dir_login_nodes']}/directory_service"
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
+login_node_shared_sssd_conf_path = "#{login_node_shared_directory_service_dir}/sssd.conf"
 
 # Parse an ARN.
 # ARN format: arn:PARTITION:SERVICE:REGION:ACCOUNT_ID:RESOURCE.
@@ -42,7 +44,8 @@ def parse_arn(arn_string)
   }
 end
 
-if node['cluster']['node_type'] == 'HeadNode'
+case node['cluster']['node_type']
+when 'HeadNode'
   region = node['cluster']['region']
   # DomainName
   # We can assume that DomainName can only be a FQDN or the domain section in a LDAP Distinguished Name.
@@ -164,6 +167,20 @@ if node['cluster']['node_type'] == 'HeadNode'
     end unless on_docker?
   end
 
+  # Share the sssd.conf file with login nodes
+  directory login_node_shared_directory_service_dir do
+    owner 'root'
+    group 'root'
+    mode '0600'
+    recursive true
+  end
+
+  execute 'Copy sssd.conf from head node to the shared folder' do
+    user 'root'
+    command "cp #{sssd_conf_path} #{login_node_shared_sssd_conf_path}"
+    sensitive true
+  end unless on_docker?
+
   bash 'Enable SSH password authentication on head node' do
     user 'root'
     code <<-AD
@@ -193,47 +210,34 @@ if node['cluster']['node_type'] == 'HeadNode'
     sensitive true
   end
 
-  pam_services = %w(sudo su sshd)
-  pam_config_dir = "/etc/pam.d"
-  generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
-  ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
-  if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
-    template generate_ssh_key_path do
-      source 'directory_service/generate_ssh_key.sh.erb'
-      owner 'root'
-      group 'root'
-      mode '0755'
-    end
-    pam_services.each do |pam_service|
-      pam_config_file = "#{pam_config_dir}/#{pam_service}"
-      append_if_no_line "Ensure PAM service #{pam_service} is configured to call SSH key generation script" do
-        path pam_config_file
-        line ssh_key_generator_pam_config_line
-      end
-    end
-  else
-    # Remove script used to generate key if it exists and ensure PAM is not configured to try to call it
-    file generate_ssh_key_path do
-      action :delete
-      only_if { ::File.exist? generate_ssh_key_path }
-    end
+  include_recipe 'aws-parallelcluster-environment::configure_pam_ssh_keygen'
 
-    pam_services.each do |pam_service|
-      pam_config_file = "#{pam_config_dir}/#{pam_service}"
-      delete_lines "Ensure PAM service #{pam_service} is not configured to call SSH key generation script" do
-        path pam_config_file
-        pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
-        ignore_missing true
-      end
-    end
-  end
-else
+when 'LoginNode'
+  # Login nodes copy sssd.conf from nodes_shared_dir.
+  execute 'Copy sssd.conf from the shared folder to the login node' do
+    user 'root'
+    command "cp #{login_node_shared_sssd_conf_path} #{sssd_conf_path}"
+    sensitive true
+  end unless on_docker?
+
+  bash 'Enable SSH password authentication on login node' do
+    user 'root'
+    code <<-AD
+      sed -ri 's/\s*PasswordAuthentication\s+no$/PasswordAuthentication yes/g' /etc/ssh/sshd_config
+    AD
+  end unless on_docker?
+
+  include_recipe 'aws-parallelcluster-environment::configure_pam_ssh_keygen'
+
+when 'ComputeFleet'
   # Compute nodes copy sssd.conf from shared dir.
   execute 'Copy sssd.conf from the shared folder to the compute node' do
     user 'root'
     command "cp #{shared_sssd_conf_path} #{sssd_conf_path}"
     sensitive true
   end unless on_docker?
+else
+  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
 end
 
 system_authentication "Configure system authentication" do
