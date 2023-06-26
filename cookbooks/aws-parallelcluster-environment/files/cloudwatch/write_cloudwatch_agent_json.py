@@ -30,6 +30,17 @@ def parse_args():
         help="Role this node plays in the cluster " "(i.e., is it a compute node or the head node?)",
     )
     parser.add_argument("--scheduler", required=True, choices=["slurm", "awsbatch"], help="Scheduler")
+    parser.add_argument(
+        "--additional-log-groups",
+        required=False,
+        help="format: <key-1>=<log-group-name-1>,<key-2>=<log-group-name-2>,<key-3>=<log-group-name-3>,...",
+    )
+    parser.add_argument(
+        "--output-path",
+        required=False,
+        default=AWS_CLOUDWATCH_CFG_PATH,
+        help="Overwrite the default output path",
+    )
     return parser.parse_args()
 
 
@@ -38,15 +49,19 @@ def gethostname():
     return socket.gethostname().split(".")[0]
 
 
-def write_config(config):
-    """Write config to AWS_CLOUDWATCH_CFG_PATH."""
-    with open(AWS_CLOUDWATCH_CFG_PATH, "w+", encoding="utf-8") as output_config_file:
+def write_config(config, output_file):
+    """Write config to output_file."""
+    with open(output_file, "w+", encoding="utf-8") as output_config_file:
         json.dump(config, output_config_file, indent=4)
 
 
-def add_log_group_name_params(log_group_name, configs):
+def add_log_group_name_params(default_log_group_name, log_group_name_map, configs):
     """Add a "log_group_name": log_group_name to every config."""
     for config in configs:
+        log_group_name = default_log_group_name
+        group_key = config.get("log_group_key")
+        if group_key:
+            log_group_name = log_group_name_map.get(group_key)
         config.update({"log_group_name": log_group_name})
     return configs
 
@@ -110,13 +125,24 @@ def select_configs_for_feature(configs):
             selected_configs.append(config)
     return selected_configs
 
+def select_configs_for_log_groups(configs, log_group_map):
+    selected_configs = []
+    for config in configs:
+        condition = config.get("log_group_key", None)
+        if condition and condition not in log_group_map.keys():
+            continue
+        selected_configs.append(config)
+    return selected_configs
 
-def select_logs(configs, args):
+
+
+def select_logs(configs, log_group_map, args):
     """Select the appropriate set of log configs."""
     selected_configs = select_configs_for_scheduler(configs, args.scheduler)
     selected_configs = select_configs_for_node_role(selected_configs, args.node_role)
     selected_configs = select_configs_for_platform(selected_configs, args.platform)
     selected_configs = select_configs_for_feature(selected_configs)
+    selected_configs = select_configs_for_log_groups(selected_configs, log_group_map)
     return selected_configs
 
 
@@ -214,20 +240,30 @@ def get_dict_value(value, attributes, default=None):
             return default
     return value
 
+def parse_additional_log_groups_map(log_group_string):
+    if not log_group_string:
+        return {}
+    pairs = log_group_string.split(",")
+    log_group_map = {}
+    for pair in pairs:
+        pair_split = pair.split("=")
+        log_group_map[pair_split[0]] = pair_split[1]
+    return log_group_map
 
 def main():
     """Create cloudwatch agent config file."""
     args = parse_args()
     config_data = read_data(args.config)
-    log_configs = select_logs(config_data["log_configs"], args)
+    log_group_map = parse_additional_log_groups_map(args.additional_log_groups)
+    log_configs = select_logs(config_data["log_configs"], log_group_map, args)
     log_configs = add_timestamps(log_configs, config_data["timestamp_formats"])
-    log_configs = add_log_group_name_params(args.log_group, log_configs)
+    log_configs = add_log_group_name_params(args.log_group, log_group_map, log_configs)
     log_configs = add_instance_log_stream_prefixes(log_configs)
     log_configs = filter_output_fields(log_configs)
     metric_configs = select_metrics(config_data["metric_configs"], args)
     metric_configs = add_append_dimensions(metric_configs, config_data["metric_configs"])
     metric_configs = add_aggregation_dimensions(metric_configs, config_data["metric_configs"])
-    write_config(create_config(log_configs, metric_configs))
+    write_config(create_config(log_configs, metric_configs), args.output_path)
 
 
 if __name__ == "__main__":

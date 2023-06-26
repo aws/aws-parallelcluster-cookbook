@@ -195,6 +195,25 @@
     },
     {
       "timestamp_format_key": "json",
+      "file_path": "/var/log/parallelcluster/clustermgtd.nodemap",
+      "log_stream_name": "clustermgtd_nodemap",
+      "log_group_key": "job_info",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "ubuntu"
+      ],
+      "node_roles": [
+        "HeadNode"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "json",
       "file_path": "/var/log/parallelcluster/slurm_resume.events",
       "log_stream_name": "slurm_resume_events",
       "schedulers": [
