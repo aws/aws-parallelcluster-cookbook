@@ -30,6 +30,7 @@ action :configure do
     # authconfig is a compatibility tool, replaced by authselect
     command "authselect select sssd with-mkhomedir"
     sensitive true
+    default_env true
   end unless redhat_on_docker?
 end
 
