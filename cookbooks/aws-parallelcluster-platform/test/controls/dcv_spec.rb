@@ -11,7 +11,7 @@
 
 control 'tag:install_dcv_connect_script_installed' do
   title 'Check pcluster dcv connect script is installed'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.redhat_on_docker? }
 
   describe file("#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh") do
@@ -24,7 +24,7 @@ end
 
 control 'tag:install_dcv_authenticator_user_and_group_set_up' do
   title 'Check that dcv authenticator user and group have been set up'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
 
   describe group(node['cluster']['dcv']['authenticator']['group']) do
@@ -41,7 +41,7 @@ end
 
 control 'tag:install_dcv_disabled_lock_screen' do
   title 'Check that the lock screen has been disabled'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
 
   describe bash('gsettings get org.gnome.desktop.lockdown disable-lock-screen') do
@@ -57,7 +57,7 @@ end
 
 control 'tag:install_dcv_installed' do
   title 'Check dcv is installed'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
 
   pkgs = %W(nice-dcv-server nice-xdcv nice-dcv-web-viewer)
@@ -70,7 +70,7 @@ end
 
 control 'tag:install_dcv_external_authenticator_virtualenv_created' do
   title 'Check dcv external authenticator virtual environment is created'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
 
   describe file("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate") do
@@ -81,7 +81,7 @@ end
 
 control 'tag:install_dcv_debian_specific_setup' do
   title 'Check debian specific setup'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { os_properties.debian_family? && !(os_properties.ubuntu2004? && os_properties.arm?) }
 
   pkgs = %W(whoopsie ubuntu-desktop mesa-utils)
@@ -103,7 +103,6 @@ end
 
 control 'tag:install_dcv_rhel_and_centos_specific_setup' do
   title 'Check rhel and centos specific setup'
-
   only_if { !os_properties.on_docker? }
   only_if { os_properties.centos? || os_properties.redhat? }
 
@@ -166,7 +165,7 @@ end
 
 control 'tag:install_dcv_switch_runlevel_to_multiuser_target' do
   title 'Check that runlevel is switched to multi-user.target'
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.on_docker? }
 
   describe bash('systemctl get-default') do
@@ -177,7 +176,7 @@ end
 
 control 'tag:config_dcv_external_authenticator_user_and_group_correctly_defined' do
   only_if { instance.dcv_installed? && !os_properties.redhat_on_docker? }
-
+  only_if { !os_properties.ubuntu2204? }
   describe user(node['cluster']['dcv']['authenticator']['user']) do
     it { should exist }
     its('uid') { should eq node['cluster']['dcv']['authenticator']['user_id'] }
@@ -192,6 +191,7 @@ control 'tag:config_dcv_external_authenticator_user_and_group_correctly_defined'
 end
 
 control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
+  only_if { !os_properties.ubuntu2204? }
   only_if do
     instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" &&
       instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported? && !os_properties.redhat_on_docker?
@@ -204,6 +204,7 @@ control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
 end
 
 control 'tag:config_dcv_correctly_installed' do
+  only_if { !os_properties.ubuntu2204? }
   only_if do
     instance.head_node? && instance.dcv_installed? && !os_properties.redhat_on_docker?
   end
@@ -228,6 +229,7 @@ control 'tag:config_dcv_correctly_installed' do
 end
 
 control 'tag:config_dcv_correctly_configured' do
+  only_if { !os_properties.ubuntu2204? }
   only_if { instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" && !os_properties.on_docker? }
 
   describe file('/etc/dcv/dcv.conf') do
@@ -276,6 +278,7 @@ control 'tag:config_dcv_correctly_configured' do
 end
 
 control 'tag:config_dcv_services_correctly_configured' do
+  only_if { !os_properties.ubuntu2204? }
   only_if { !os_properties.redhat_on_docker? }
   if instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node"
     describe service('dcvserver') do
