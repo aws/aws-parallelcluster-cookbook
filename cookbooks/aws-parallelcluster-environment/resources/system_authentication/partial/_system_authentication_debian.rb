@@ -17,6 +17,7 @@ action :configure do
     user 'root'
     # Enable PAM mkhomedir module
     command "pam-auth-update --enable mkhomedir"
+    default_env true
     sensitive true
   end
 end

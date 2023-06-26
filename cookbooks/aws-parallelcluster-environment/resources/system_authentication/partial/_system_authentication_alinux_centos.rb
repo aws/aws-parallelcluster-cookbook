@@ -17,6 +17,7 @@ action :configure do
     user 'root'
     # Tell NSS, PAM to use SSSD for system authentication and identity information
     command "authconfig --enablemkhomedir --enablesssdauth --enablesssd --updateall"
+    default_env true
     sensitive true
   end
 end
