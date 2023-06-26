@@ -46,13 +46,6 @@ platforms:
       cluster:
         base_os: centos7
         kernel_release: '3.10.0-1160.76.1.el7.x86_64'
-  - name: ubuntu1804
-    driver:
-      image: <% if ENV['KITCHEN_UBUNTU1804_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU1804_IMAGE'] %> <% else %> dokken/ubuntu-18.04 <% end %>
-    attributes:
-      cluster:
-        base_os: ubuntu1804
-        kernel_release: '5.4.0-1092-aws'
   - name: ubuntu2004
     driver:
       image: <% if ENV['KITCHEN_UBUNTU2004_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU2004_IMAGE'] %> <% else %> dokken/ubuntu-20.04 <% end %>

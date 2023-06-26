@@ -41,9 +41,6 @@
 # KITCHEN_CENTOS7_AMI:        specific AMI to use for centos7
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
-# KITCHEN_UBUNTU1804_AMI:       specific AMI to use for ubuntu18.04
-#                             if not specified, will look for the latest suitable ParallelCluster AMI
-#
 # KITCHEN_UBUNTU2004_AMI:       specific AMI to use for ubuntu20.04
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
