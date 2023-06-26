@@ -128,5 +128,6 @@ action :unexport do
 
   execute "unexport volume" do
     command "exportfs -ra"
+    default_env true
   end
 end
