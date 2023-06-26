@@ -12,17 +12,18 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :package_repos, platform: 'ubuntu'
-unified_mode true
-
-use 'partial/_package_repos_deb.rb'
-
-default_action :setup
-
-action :setup do
-  action_update
+provides :arm_pl, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
 end
 
-action :update do
-  apt_update
+use 'partial/_arm_pl_common.rb'
+
+action_class do
+  def armpl_platform
+    "Ubuntu-#{node['platform_version']}"
+  end
+
+  def modulefile_dir
+    "/usr/share/modules/modulefiles"
+  end
 end

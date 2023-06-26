@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -12,16 +13,13 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :arm_pl, platform: 'ubuntu'
-
-use 'partial/_arm_pl_common.rb'
-
-action_class do
-  def armpl_platform
-    "Ubuntu-#{node['platform_version']}"
-  end
-
-  def modulefile_dir
-    "/usr/share/modules/modulefiles"
-  end
+provides :lustre, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
 end
+
+unified_mode true
+
+use 'partial/_install_lustre_debian'
+use 'partial/_mount_unmount'
+
+default_action :setup

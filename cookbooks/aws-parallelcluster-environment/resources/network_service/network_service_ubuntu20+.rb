@@ -12,16 +12,22 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License
-provides :ec2_udev_rules, platform: 'ubuntu'
+provides :network_service, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
+end
 
 unified_mode true
-use 'partial/_common_udev_configuration'
-use 'partial/_debian_udev_configuration'
+default_action :restart
 
-default_action :setup
+use 'partial/_network_service'
 
-action :setup do
-  action_create_common_udev_files
-  action_set_udev_autoreload
-  action_start_ec2blk
+action :reload do
+  execute "apply network configuration" do
+    command "netplan apply"
+    timeout 60
+  end unless on_docker?
+end
+
+def network_service_name
+  'systemd-resolved'
 end
