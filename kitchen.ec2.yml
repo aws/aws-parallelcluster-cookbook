@@ -60,7 +60,6 @@ transport:
   name: speedy_ssh
 
 provisioner:
-  name: cinc
   product_name: cinc
   product_version: 17.2.29
   install_strategy: once
