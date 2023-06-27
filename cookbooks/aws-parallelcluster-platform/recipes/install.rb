@@ -31,5 +31,7 @@ chrony 'install Amazon Time Sync'
 c_states 'disable x86_64 C states'
 include_recipe "aws-parallelcluster-platform::nvidia_install"
 include_recipe "aws-parallelcluster-platform::intel_mpi"
-arm_pl 'Install ARM Performance Library'
+arm_pl 'Install ARM Performance Library' do
+  not_if { platform?('ubuntu') && node['platform_version'].to_i == 22 }
+end
 intel_hpc 'Setup Intel HPC'
