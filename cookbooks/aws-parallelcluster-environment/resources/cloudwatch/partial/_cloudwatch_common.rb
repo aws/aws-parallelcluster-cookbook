@@ -152,7 +152,8 @@ action :configure do
 
     command "#{cookbook_virtualenv_path}/bin/python #{config_script_path} "\
         "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
-        "--scheduler $SCHEDULER --node-role $NODE_ROLE"
+        "--scheduler $SCHEDULER --node-role $NODE_ROLE "\
+        "--additional-log-groups job-info=$LOG_GROUP_NAME"
   end unless redhat_on_docker?
 
   execute "cloudwatch-agent-start" do
