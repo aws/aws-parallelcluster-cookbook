@@ -17,7 +17,7 @@ if [ -e "${SCRIPT}" ]; then
   if [ "${KITCHEN_DRIVER}" = "ec2" ]; then
 
     if [ -n "${KITCHEN_INSTANCE_HOSTNAME}" ]; then
-      echo "*** Retrieve EC2 instance id using key ${KITCHEN_SSH_KEY_PATH}"
+      echo "Retrieve EC2 instance id using key ${KITCHEN_SSH_KEY_PATH}"
 
       case $KITCHEN_PLATFORM_NAME in
         alinux*|redhat* ) export KITCHEN_EC2_USER='ec2-user';;
@@ -31,8 +31,7 @@ if [ -e "${SCRIPT}" ]; then
         && curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id
       ')
 
-      echo "EC2 instance id: ${KITCHEN_EC2_INSTANCE_ID}"
-
+      [ -n "${KITCHEN_EC2_INSTANCE_ID}" ] && echo "EC2 instance id: ${KITCHEN_EC2_INSTANCE_ID}" || echo "Unable to retrieve instance id."
       export KITCHEN_EC2_INSTANCE_ID
     fi
   fi
