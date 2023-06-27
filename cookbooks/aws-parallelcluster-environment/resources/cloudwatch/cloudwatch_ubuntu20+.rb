@@ -11,12 +11,10 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations under the License
+provides :cloudwatch, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
+end
 
-provides :efs, platform: 'ubuntu'
-
-use 'partial/_get_package_version_dpkg'
-use 'partial/_common'
-use 'partial/_debian'
-use 'partial/_install_from_tar'
-use 'partial/_mount_umount'
+use 'partial/_cloudwatch_common'
+use 'partial/_cloudwatch_install_package_debian'

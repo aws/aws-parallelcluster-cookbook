@@ -302,7 +302,7 @@ control 'tag:config_dcv_services_correctly_configured' do
       end
     end
 
-    if os_properties.ubuntu1804? || os_properties.alinux2?
+    if os_properties.alinux2?
       describe service('gdm') do
         it { should be_installed }
         it { should be_enabled }
@@ -316,7 +316,7 @@ control 'tag:config_dcv_services_correctly_configured' do
       its('stdout') { should match /multi-user.target/ }
     end
 
-    if os_properties.ubuntu1804? || os_properties.alinux2?
+    if os_properties.alinux2?
       describe service('gdm') do
         it { should be_installed }
         it { should be_enabled }

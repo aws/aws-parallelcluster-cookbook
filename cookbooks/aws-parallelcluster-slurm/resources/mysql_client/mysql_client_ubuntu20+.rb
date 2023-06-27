@@ -18,9 +18,3 @@ end
 
 use 'partial/_common'
 use 'partial/_setup_ubuntu'
-
-action_class do
-  def repository_packages
-    %w(libmysqlclient-dev libmysqlclient21)
-  end
-end
