@@ -112,11 +112,13 @@ action :unmount do
   # Stop mdadm RAID device
   execute "Deactivate array, releasing all resources" do
     command "mdadm --stop #{raid_dev}"
+    default_env true
   end
 
   # Remove the Superblocks
   execute "Erase the MD superblock from a device" do
     command "mdadm --zero-superblock #{devices_list}"
+    default_env true
   end
 
   # Remove RAID from /etc/mdadm.conf
