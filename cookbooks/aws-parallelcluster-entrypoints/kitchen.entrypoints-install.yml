@@ -18,3 +18,6 @@ suites:
     verifier:
       controls:
         - /tag:install/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
