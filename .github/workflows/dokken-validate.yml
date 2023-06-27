@@ -14,7 +14,6 @@ jobs:
         os:
           - alinux2
           - centos7
-          - ubuntu1804
           - ubuntu2004
           - rhel8
         suite:

@@ -12,7 +12,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :c_states, platform: 'ubuntu'
+provides :ephemeral_drives, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
+end
 
-use 'partial/_c_states_common'
-use 'partial/_c_states_debian'
+use 'partial/_ephemeral_drives_common.rb'
+
+action_class do
+  def network_target
+    'network.target'
+  end
+end

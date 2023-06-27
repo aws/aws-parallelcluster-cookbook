@@ -159,7 +159,6 @@ describe 'gdrcopy:setup' do
           'amazon2' => 'unknown_distro',
           'centos7' => '.el8',
           'rhel8' => '.el7',
-          'ubuntu18.04' => 'Ubuntu18_04',
           'ubuntu20.04' => 'Ubuntu20_04',
           'ubuntu22.04' => 'Ubuntu22_04',
         }

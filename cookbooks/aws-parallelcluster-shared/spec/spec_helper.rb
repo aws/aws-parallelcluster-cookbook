@@ -40,7 +40,6 @@ def for_all_oses
     # The only Centos7 version supported by ChefSpec
     # See the complete list here: https://github.com/chefspec/fauxhai/blob/main/PLATFORMS.md
     %w(centos 7.8.2003),
-    %w(ubuntu 18.04),
     %w(ubuntu 20.04),
     %w(ubuntu 22.04),
     %w(redhat 8),
