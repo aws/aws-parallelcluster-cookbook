@@ -9,6 +9,7 @@ RESOURCE_NAME=raid_mount-raid_vol_array
 
 KITCHEN_EBS_VOLUME_ID1=$(cat "${KITCHEN_ROOT_DIR}/test/environments/kitchen.rb" | sed -n -e "s/.*'${RESOURCE_NAME}\/${KITCHEN_PLATFORM_NAME}' => %w(\(.*\) \(.*\)),/\1/p")
 KITCHEN_EBS_VOLUME_ID2=$(cat "${KITCHEN_ROOT_DIR}/test/environments/kitchen.rb" | sed -n -e "s/.*'${RESOURCE_NAME}\/${KITCHEN_PLATFORM_NAME}' => %w(\(.*\) \(.*\)),/\2/p")
+[ -z "${KITCHEN_EBS_VOLUME_ID1}" ] && [ -z "${KITCHEN_EBS_VOLUME_ID2}" ] && echo "Volumes not available. Skipping pre_destroy hook." && exit 0
 
 echo "** Deleting EBS volumes ${KITCHEN_EBS_VOLUME_ID1} ${KITCHEN_EBS_VOLUME_ID2}"
 
