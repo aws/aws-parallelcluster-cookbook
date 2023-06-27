@@ -3,6 +3,7 @@
 echo "**** pre_destroy"
 
 [[ "${KITCHEN_DRIVER}" = "ec2" ]] || return
+[ -z "${KITCHEN_EC2_INSTANCE_ID}" ] && echo "EC2 instance not available. Skipping pre_destroy hook." && exit 0
 
 read KITCHEN_ENI_ID KITCHEN_ATTACHMENT_ID <<< "$(aws ec2 describe-instances --instance-ids "${KITCHEN_EC2_INSTANCE_ID}" \
     --query "Reservations[0].Instances[0].NetworkInterfaces[?Attachment.DeviceIndex==\`1\`].[NetworkInterfaceId, Attachment.AttachmentId]" \
