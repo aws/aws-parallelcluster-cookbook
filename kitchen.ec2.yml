@@ -60,8 +60,10 @@ transport:
   name: speedy_ssh
 
 provisioner:
-  name: chef_zero
-  require_chef_omnibus: 17.2.29
+  name: cinc
+  product_name: cinc
+  product_version: 17.2.29
+  install_strategy: once
   chef_omnibus_url: https://omnitruck.cinc.sh/install.sh
   chef_omnibus_root: /opt/cinc
   retry_on_exit_code:
