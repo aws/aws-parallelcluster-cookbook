@@ -11,7 +11,7 @@ version '3.7.0'
 
 supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
-supports 'ubuntu', '>= 18.04'
+supports 'ubuntu', '>= 20.04'
 
 depends 'apt', '~> 7.4.2'
 depends 'iptables', '~> 8.0.0'
