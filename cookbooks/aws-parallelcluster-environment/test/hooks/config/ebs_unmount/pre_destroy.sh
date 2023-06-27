@@ -8,6 +8,7 @@ echo "**** pre_destroy"
 RESOURCE_NAME=ebs_unmount-vol_array
 
 KITCHEN_EBS_VOLUME_ID=$(cat "${KITCHEN_ROOT_DIR}/test/environments/kitchen.rb" | sed -n -e "s/.*'${RESOURCE_NAME}\/${KITCHEN_PLATFORM_NAME}' => %w(\(.*\)),/\1/p")
+[ -z "${KITCHEN_EBS_VOLUME_ID}" ] && echo "Volume not available. Skipping pre_destroy hook." && exit 0
 
 echo "** Deleting EBS volume ${KITCHEN_EBS_VOLUME_ID}"
 
