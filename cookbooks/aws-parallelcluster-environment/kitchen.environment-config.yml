@@ -33,22 +33,53 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
-  - name: compute_base
+  - name: ebs_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::compute_base]
+      - recipe[aws-parallelcluster-environment::ebs]
     verifier:
       controls:
-        - compute_base_configured
+        - ebs_compute
     attributes:
       dependencies:
         - resource:nfs
         - recipe:aws-parallelcluster-environment::mock_compute_base
       cluster:
         node_type: ComputeFleet
-        cluster_user: test_user
-        raid_shared_dir: raid1
         ebs_shared_dirs: ebs1,ebs2
+        nfs:
+          hard_mount_options: hard,_netdev,noatime
+        head_node_private_ip: '127.0.0.1'
+  - name: raid_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::raid]
+    verifier:
+      controls:
+        - raid_compute
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_base
+      cluster:
+        node_type: ComputeFleet
+        raid_shared_dir: raid1
+        nfs:
+          hard_mount_options: hard,_netdev,noatime
+        head_node_private_ip: '127.0.0.1'
+  - name: shared_storages_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::shared_storages]
+    verifier:
+      controls:
+        - shared_storages_compute
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_base
+      cluster:
+        node_type: ComputeFleet
         nfs:
           hard_mount_options: hard,_netdev,noatime
         head_node_private_ip: '127.0.0.1'
