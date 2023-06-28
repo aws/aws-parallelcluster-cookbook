@@ -10,37 +10,40 @@ property :update, [true, false],
 default_action :run
 
 action :run do
+  return if on_docker?
   Chef::Log.debug("Called fetch_config with update (#{new_resource.update})")
+
   case node['cluster']['node_type']
   when 'HeadNode'
-    unless on_docker?
-      if new_resource.update
-        Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
-        ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
-        fetch_cluster_config(node['cluster']['cluster_config_path'])
-        fetch_change_set
-        fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
-        Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
-        ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
-      else
-        fetch_cluster_config(node['cluster']['cluster_config_path']) unless ::File.exist?(node['cluster']['cluster_config_path'])
-        fetch_instance_type_data unless ::File.exist?(node['cluster']['instance_types_data_path'])
-      end
-
-      # ensure config is shared also with login nodes
-      share_config_with_login_nodes
+    if new_resource.update
+      Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
+      ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
+      fetch_cluster_config(node['cluster']['cluster_config_path'])
+      fetch_change_set
+      fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
+      Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
+      ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
+    else
+      fetch_cluster_config(node['cluster']['cluster_config_path']) unless ::File.exist?(node['cluster']['cluster_config_path'])
+      fetch_instance_type_data unless ::File.exist?(node['cluster']['instance_types_data_path'])
     end
 
+    # ensure config is shared also with login nodes
+    share_config_with_login_nodes
+
+    # load cluster config into a node object
+    load_cluster_config(node['cluster']['cluster_config_path'])
   when 'ComputeFleet'
     raise "Cluster config not found in #{node['cluster']['cluster_config_path']}" unless ::File.exist?(node['cluster']['cluster_config_path'])
+    # load cluster config into a node object
+    load_cluster_config(node['cluster']['cluster_config_path'])
   when 'LoginNode'
     raise "Cluster config not found in #{node['cluster']['login_cluster_config_path']}" unless ::File.exist?(node['cluster']['login_cluster_config_path'])
+    # load cluster config into a node object
+    load_cluster_config(node['cluster']['login_cluster_config_path'])
   else
     raise "node_type must be HeadNode, LoginNode or ComputeFleet"
   end
-
-  # For all node-types load cluster config into a node object
-  load_cluster_config
 end
 
 action_class do # rubocop:disable Metrics/BlockLength
@@ -87,9 +90,9 @@ action_class do # rubocop:disable Metrics/BlockLength
     ::FileUtils.cp_r(node['cluster']['cluster_config_path'],
                      node['cluster']['login_cluster_config_path'],
                      remove_destination: true) unless !::File.exist?(node['cluster']['cluster_config_path'])
-     ::FileUtils.cp_r(node['cluster']['previous_cluster_config_path'],
-                      node['cluster']['login_previous_cluster_config_path'],
-                      remove_destination: true) unless !::File.exist?(node['cluster']['previous_cluster_config_path'])
+    ::FileUtils.cp_r(node['cluster']['previous_cluster_config_path'],
+                     node['cluster']['login_previous_cluster_config_path'],
+                     remove_destination: true) unless !::File.exist?(node['cluster']['previous_cluster_config_path'])
   end
 
   def fetch_instance_type_data
