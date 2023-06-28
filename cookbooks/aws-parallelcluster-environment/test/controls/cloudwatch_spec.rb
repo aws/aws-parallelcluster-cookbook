@@ -40,7 +40,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/write_cloudwatch_agent_json.py') do
     it { should exist }
-    its('sha256sum') { should eq '4fc20cdb5f3e08f23192842bcf96a8e44bf269bf8d1b6121d225ecc999db433e' }
+    its('sha256sum') { should eq 'cf304d5c8fa3dd6b5866b28d4a866d5190d7282adeda3adbb39b8bed116ab30c' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
