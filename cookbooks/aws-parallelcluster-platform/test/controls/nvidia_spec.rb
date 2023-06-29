@@ -56,7 +56,7 @@ control 'tag:config_nvidia_uvm_and_persistenced_on_graphic_instances' do
     its('content') { should include("uvm") }
   end
 
-  describe service('nvidia-persistenced') do
+  describe service('parallelcluster_nvidia') do
     it { should be_enabled }
     it { should be_running }
   end
