@@ -28,10 +28,10 @@ control 'systemd_slurmd_service_nvidia_gpu_nodes' do
 
   describe 'Check slurmd systemd "after" dependencies'
   describe command('systemctl list-dependencies --after --plain slurmd.service') do
-    its('stdout') { should include "nvidia-persistenced.service" }
+    its('stdout') { should include "parallelcluster_nvidia.service" }
   end
   describe 'Check slurmd systemd requirement dependencies'
   describe command('systemctl list-dependencies --plain slurmd.service') do
-    its('stdout') { should include "nvidia-persistenced.service" }
+    its('stdout') { should include "parallelcluster_nvidia.service" }
   end
 end
