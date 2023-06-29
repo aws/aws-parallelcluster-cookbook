@@ -4,6 +4,18 @@ export KITCHEN_HOOK=$1
 KITCHEN_ROOT_DIR=$(readlink -f $2)
 export KITCHEN_ROOT_DIR
 THIS_DIR=$(dirname "$0")
+
+# Run OS specific hooks from kitchen/hooks folder
+SCRIPT="${THIS_DIR}/hooks/${KITCHEN_PLATFORM_NAME}/${KITCHEN_HOOK}.sh"
+if [ -e "${SCRIPT}" ]; then
+
+  echo "*** Run ${KITCHEN_HOOK} on host ${KITCHEN_INSTANCE_HOSTNAME}"
+  echo "**** Script: ${SCRIPT}"
+  # shellcheck disable=SC1090
+  source "${SCRIPT}"
+fi
+
+# Run test specific hooks from cookbooks/aws-parallelcluster-*/test/hooks folder
 SCRIPT="${THIS_DIR}/../${KITCHEN_COOKBOOK_PATH}/test/hooks/${KITCHEN_PHASE}/${KITCHEN_SUITE_NAME}/${KITCHEN_HOOK}.sh"
 if [ -e "${SCRIPT}" ]; then
   echo "*** Run ${KITCHEN_HOOK} for cookbook ${KITCHEN_COOKBOOK_PATH} suite ${KITCHEN_SUITE_NAME} on host ${KITCHEN_INSTANCE_HOSTNAME}"
