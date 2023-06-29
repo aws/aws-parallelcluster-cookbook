@@ -47,8 +47,6 @@ suites:
       cluster:
         node_type: ComputeFleet
         ebs_shared_dirs: ebs1,ebs2
-        nfs:
-          hard_mount_options: hard,_netdev,noatime
         head_node_private_ip: '127.0.0.1'
   - name: raid_compute
     run_list:
@@ -64,8 +62,6 @@ suites:
       cluster:
         node_type: ComputeFleet
         raid_shared_dir: raid1
-        nfs:
-          hard_mount_options: hard,_netdev,noatime
         head_node_private_ip: '127.0.0.1'
   - name: shared_storages_compute
     run_list:
@@ -80,8 +76,6 @@ suites:
         - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
       cluster:
         node_type: ComputeFleet
-        nfs:
-          hard_mount_options: hard,_netdev,noatime
         head_node_private_ip: '127.0.0.1'
   - name: directory_service
     # FIXME: breaks on Docker
