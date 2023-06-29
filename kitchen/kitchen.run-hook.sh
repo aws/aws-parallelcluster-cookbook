@@ -3,27 +3,21 @@
 export KITCHEN_HOOK=$1
 KITCHEN_ROOT_DIR=$(readlink -f $2)
 export KITCHEN_ROOT_DIR
-
-echo "*** Run ${KITCHEN_HOOK} for cookbook ${KITCHEN_COOKBOOK_PATH} suite ${KITCHEN_SUITE_NAME} on host ${KITCHEN_INSTANCE_HOSTNAME}"
-
 THIS_DIR=$(dirname "$0")
 SCRIPT="${THIS_DIR}/../${KITCHEN_COOKBOOK_PATH}/test/hooks/${KITCHEN_PHASE}/${KITCHEN_SUITE_NAME}/${KITCHEN_HOOK}.sh"
-echo "${SCRIPT}"
-
 if [ -e "${SCRIPT}" ]; then
-
+  echo "*** Run ${KITCHEN_HOOK} for cookbook ${KITCHEN_COOKBOOK_PATH} suite ${KITCHEN_SUITE_NAME} on host ${KITCHEN_INSTANCE_HOSTNAME}"
   echo "**** Script: ${SCRIPT}"
 
   if [ "${KITCHEN_DRIVER}" = "ec2" ]; then
 
     if [ -n "${KITCHEN_INSTANCE_HOSTNAME}" ]; then
-      echo "Retrieve EC2 instance id using key ${KITCHEN_SSH_KEY_PATH}"
-
-      case $KITCHEN_PLATFORM_NAME in
+      case ${KITCHEN_PLATFORM_NAME} in
         alinux*|redhat* ) export KITCHEN_EC2_USER='ec2-user';;
         centos*         ) export KITCHEN_EC2_USER='centos';;
         ubuntu*         ) export KITCHEN_EC2_USER='ubuntu';;
       esac
+      echo "Retrieve EC2 instance id using key ${KITCHEN_SSH_KEY_PATH}"
 
       KITCHEN_EC2_INSTANCE_ID=$(ssh -o StrictHostKeyChecking=no -i "${KITCHEN_SSH_KEY_PATH}" \
         "${KITCHEN_EC2_USER}@${KITCHEN_INSTANCE_HOSTNAME}" '
