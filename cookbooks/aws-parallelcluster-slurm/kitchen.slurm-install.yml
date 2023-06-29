@@ -5,24 +5,17 @@ verifier:
     - cookbooks/aws-parallelcluster-slurm/test
 
 suites:
-  - name: munge
+
+# Resources
+  - name: dns_domain
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /tag:install_munge/
+        - /tag:install_dns_domain/
     attributes:
-      resource: munge
-  - name: slurm_dependencies
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:install_slurm_dependencies/
-    attributes:
-      resource: slurm_dependencies
+      resource: dns_domain
   - name: jwt_dependencies
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -41,27 +34,26 @@ suites:
         - /mysql_client/
     attributes:
       resource: mysql_client
-  - name: dns_domain
+  - name: munge
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /tag:install_dns_domain/
+        - /tag:install_munge/
     attributes:
-      resource: dns_domain
-  - name: pmix
+      resource: munge
+  - name: slurm_dependencies
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-slurm::install_pmix]
+      - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /tag:install_pmix/
+        - /tag:install_slurm_dependencies/
     attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:package_repos
-        - resource:install_packages
+      resource: slurm_dependencies
+
+# Recipes
   - name: jwt
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -69,6 +61,18 @@ suites:
     verifier:
       controls:
         - /tag:install_jwt/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: pmix
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_pmix]
+    verifier:
+      controls:
+        - /tag:install_pmix/
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories

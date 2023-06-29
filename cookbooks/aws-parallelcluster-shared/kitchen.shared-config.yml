@@ -5,6 +5,8 @@ verifier:
     - cookbooks/aws-parallelcluster-shared/test
 
 suites:
+
+# Recipes
   - name: setup_envars
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

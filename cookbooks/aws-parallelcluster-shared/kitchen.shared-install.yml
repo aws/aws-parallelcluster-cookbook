@@ -5,6 +5,8 @@ verifier:
     - cookbooks/aws-parallelcluster-shared/test
 
 suites:
+
+# Resources
   - name: install_pyenv
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
