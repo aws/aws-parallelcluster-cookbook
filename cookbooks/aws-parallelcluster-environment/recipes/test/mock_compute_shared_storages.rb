@@ -10,6 +10,6 @@ dirs_to_export.each do |dir|
   nfs_export dir do
     network '127.0.0.1/32'
     writeable true
-    options node['cluster']['nfs']['hard_mount_options'].split(",")
+    options ['no_root_squash']
   end
 end
