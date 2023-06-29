@@ -12,6 +12,10 @@ action :setup do
 end
 
 action_class do
+  def repository_packages
+    %w(libmysqlclient-dev libmysqlclient21)
+  end
+
   def package_platform
     if arm_instance?
       'el/7/aarch64'

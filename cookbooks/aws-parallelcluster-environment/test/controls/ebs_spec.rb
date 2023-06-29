@@ -60,3 +60,30 @@ control 'ebs_unexported' do
     its('stdout') { should_not match %r{^/shared_dir } }
   end
 end
+
+control 'ebs_compute' do
+  title 'Check the ebs configuration for compute node'
+
+  only_if { !os_properties.on_docker? && instance.compute_node? }
+
+  describe 'Check that ebs dirs have been created and mounted'
+  directories = %w(ebs1 ebs2)
+  directories.each do |directory|
+    describe directory("/#{directory}") do
+      it { should exist }
+      it { should be_mounted }
+      its('owner') { should eq 'root' }
+      its('group') { should eq 'root' }
+      its('mode') { should cmp '01777' }
+    end
+
+    describe mount("/#{directory}") do
+      it { should be_mounted }
+      its('device') { should eq "127.0.0.1:/#{directory}" }
+      its('type') { should eq 'nfs4' }
+      its('options') { should include 'hard' }
+      its('options') { should include '_netdev' }
+      its('options') { should include 'noatime' }
+    end
+  end
+end

@@ -19,3 +19,16 @@ control 'tag:config_cluster_user' do
     its('exit_status') { should eq 0 }
   end unless os_properties.redhat_on_docker?
 end
+
+control 'cluster_user_compute' do
+  title 'Check the cluster user configuration for compute node'
+
+  only_if { !os_properties.on_docker? && instance.compute_node? }
+
+  describe 'Check that cluster user exist'
+  describe user('test_user') do
+    it { should exist }
+    its('home') { should eq '/home/test_user' }
+    its('shell') { should eq '/bin/bash' }
+  end
+end

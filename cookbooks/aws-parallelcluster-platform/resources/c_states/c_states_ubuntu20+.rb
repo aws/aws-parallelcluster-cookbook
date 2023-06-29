@@ -12,13 +12,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :mysql_client, platform: 'ubuntu', platform_version: '18.04'
-
-use 'partial/_common'
-use 'partial/_setup_ubuntu'
-
-action_class do
-  def repository_packages
-    %w(libmysqlclient-dev libmysqlclient20)
-  end
+provides :c_states, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
 end
+
+use 'partial/_c_states_common'
+use 'partial/_c_states_debian'

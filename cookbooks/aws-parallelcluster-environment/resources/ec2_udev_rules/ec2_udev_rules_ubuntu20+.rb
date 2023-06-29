@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -10,19 +11,19 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations under the License
+provides :ec2_udev_rules, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
+end
 
-provides :modules, platform: 'ubuntu', platform_version: '18.04'
+unified_mode true
+use 'partial/_common_udev_configuration'
+use 'partial/_debian_udev_configuration'
 
-use 'partial/_modules_common.rb'
-use 'partial/_modules_apt.rb'
+default_action :setup
 
-action_class do
-  def packages
-    %w(tcl-dev environment-modules)
-  end
-
-  def modules_home
-    '/usr/share/modules'
-  end
+action :setup do
+  action_create_common_udev_files
+  action_set_udev_autoreload
+  action_start_ec2blk
 end

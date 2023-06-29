@@ -40,10 +40,6 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
   end
 
-  def ubuntu1804?
-    inspec.os.name == 'ubuntu' && inspec.os.release == '18.04'
-  end
-
   def ubuntu2004?
     inspec.os.name == 'ubuntu' && inspec.os.release == '20.04'
   end

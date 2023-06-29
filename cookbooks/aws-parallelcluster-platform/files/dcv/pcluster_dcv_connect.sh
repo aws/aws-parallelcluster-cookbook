@@ -112,7 +112,7 @@ main() {
     os=$(< /etc/chef/dna.json jq -r .cluster.base_os)
     _log "Input parameters: user: ${user}, OS: ${os}, shared_folder_path: ${shared_folder_path}."
 
-    if ! [[ "${os}" =~ ^(alinux2|ubuntu1804|ubuntu2004|centos[7-8]|rhel8)$ ]]; then
+    if ! [[ "${os}" =~ ^(alinux2|ubuntu2004|centos[7-8]|rhel8)$ ]]; then
         _fail "OS not supported."
     fi
 

@@ -12,10 +12,19 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_dcgm, platform: 'ubuntu'
+provides :package_repos, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
+end
+unified_mode true
 
-use 'partial/_nvidia_dcgm_common.rb'
+use 'partial/_package_repos_deb.rb'
 
-def _nvidia_dcgm_enabled
-  _nvidia_enabled
+default_action :setup
+
+action :setup do
+  action_update
+end
+
+action :update do
+  apt_update
 end
