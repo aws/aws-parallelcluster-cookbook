@@ -48,8 +48,16 @@ class OsProperties < Inspec.resource(1)
     centos? && inspec.os.release.to_i == 7
   end
 
+  def alinux?
+    inspec.os.name == 'amazon'
+  end
+
   def alinux2?
-    inspec.os.name == 'amazon' && inspec.os.release.to_i == 2
+    alinux? && inspec.os.release.to_i == 2
+  end
+
+  def alinux2023?
+    alinux? && inspec.os.release.to_i == 2023
   end
 
   def ubuntu2004?
