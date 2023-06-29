@@ -29,15 +29,50 @@ describe 'aws-parallelcluster-platform::nvidia_config' do
       )
     end
 
-    it 'installs nvidia_persistenced' do
-      is_expected.to run_bash('Install nvidia_persistenced')
-        .with(
-         cwd: '/usr/share/doc/NVIDIA_GLX-1.0/samples',
-         user: 'root',
-         group: 'root'
-       )
-        .with_code(/tar -xf nvidia-persistenced-init.tar.bz2/)
-        .with_code(%r{./nvidia-persistenced-init/install.sh})
+    it 'creates the parallelcluster nvidia template with the correct attributes' do
+      is_expected.to create_template('/etc/systemd/system/parallelcluster_nvidia.service').with(
+        source: 'nvidia/parallelcluster_nvidia_service.erb',
+        owner: 'root',
+        group: 'root',
+        mode:  '0644',
+        variables: { is_nvidia_persistenced_running: is_process_running('nvidia-persistenced') }
+      )
+    end
+
+    it 'starts parallelcluster_nvidia service' do
+      is_expected.to enable_service('parallelcluster_nvidia').with_action(%i(enable start))
+    end
+
+    context 'when nvidia-peristenced process is running' do
+      before do
+        allow_any_instance_of(Object).to receive(:is_process_running?).and_return(true)
+      end
+
+      it 'creates the parallelcluster nvidia template with the correct attributes' do
+        is_expected.to create_template('/etc/systemd/system/parallelcluster_nvidia.service').with(
+          source: 'nvidia/parallelcluster_nvidia_service.erb',
+          owner: 'root',
+          group: 'root',
+          mode:  '0644',
+          variables: { is_nvidia_persistenced_running: is_process_running('nvidia-persistenced') }
+        )
+      end
+    end
+
+    context 'when nvidia-peristenced process is not running' do
+      before do
+        allow_any_instance_of(Object).to receive(:is_process_running?).and_return(false)
+      end
+
+      it 'creates the parallelcluster nvidia template with the correct attributes' do
+        is_expected.to create_template('/etc/systemd/system/parallelcluster_nvidia.service').with(
+          source: 'nvidia/parallelcluster_nvidia_service.erb',
+          owner: 'root',
+          group: 'root',
+          mode:  '0644',
+          variables: { is_nvidia_persistenced_running: is_process_running('nvidia-persistenced') }
+        )
+      end
     end
   end
 
@@ -50,7 +85,8 @@ describe 'aws-parallelcluster-platform::nvidia_config' do
     it 'does not configure uvm' do
       is_expected.not_to load_kernel_module('nvidia-uvm')
       is_expected.not_to create_cookbook_file('nvidia.conf')
-      is_expected.not_to run_bash('Install nvidia_persistenced')
+      is_expected.not_to create_template('/etc/systemd/system/parallelcluster_nvidia.service')
+      is_expected.not_to enable_service('parallelcluster_nvidia')
     end
   end
 
@@ -63,7 +99,8 @@ describe 'aws-parallelcluster-platform::nvidia_config' do
     it 'does not configure uvm' do
       is_expected.not_to load_kernel_module('nvidia-uvm')
       is_expected.not_to create_cookbook_file('nvidia.conf')
-      is_expected.not_to run_bash('Install nvidia_persistenced')
+      is_expected.not_to create_template('/etc/systemd/system/parallelcluster_nvidia.service')
+      is_expected.not_to enable_service('parallelcluster_nvidia')
     end
   end
 end
