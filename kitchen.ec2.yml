@@ -102,6 +102,32 @@ platforms:
     attributes:
       cluster:
         base_os: alinux2
+  - name: alinux-2023  # We are adding a "-" in the name to avoid having alinux2 as prefix of alinux2023 and be able to distinguish them on Inspec
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_ALINUX2023_AMI'] %>
+      # Use the Alinux 2023 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_ALINUX2023_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>al2023-ami-2023*<% else %><%= pcluster_prefix %>-alinux2023-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/xvda
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp3
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: ec2-user
+    attributes:
+      cluster:
+        base_os: alinux2023
   - name: rhel8
     driver_plugin: ec2
     driver:
