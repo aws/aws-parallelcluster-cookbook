@@ -5,13 +5,15 @@ verifier:
     - cookbooks/aws-parallelcluster-computefleet/test
 
 suites:
-  - name: node
+
+# Recipes
+  - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-computefleet::parallelcluster_node]
+      - recipe[aws-parallelcluster-computefleet::clusterstatusmgtd_install]
     verifier:
       controls:
-        - /node_virtualenv_created/
+        - /tag:install_clusterstatusmgtd/
   - name: custom_parallelcluster_node
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -23,10 +25,10 @@ suites:
     attributes:
       cluster:
         custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
-  - name: clusterstatusmgtd
+  - name: node
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-computefleet::clusterstatusmgtd_install]
+      - recipe[aws-parallelcluster-computefleet::parallelcluster_node]
     verifier:
       controls:
-        - /tag:install_clusterstatusmgtd/
+        - /node_virtualenv_created/

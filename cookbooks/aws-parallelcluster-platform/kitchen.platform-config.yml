@@ -5,35 +5,8 @@ verifier:
     - cookbooks/aws-parallelcluster-platform/test
 
 suites:
-  - name: cluster_user_head
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::cluster_user]
-    verifier:
-      controls:
-        - /tag:config_cluster_user/
-    attributes:
-      cluster:
-        node_type: HeadNode
-  - name: cluster_user_compute
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::cluster_user]
-    verifier:
-      controls:
-        - cluster_user_compute
-    attributes:
-      cluster:
-        node_type: ComputeFleet
-        cluster_user: test_user
-  - name: sticky_bits
-    run_list:
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - tag:config_sticky_bits_configured
-    attributes:
-      resource: sticky_bits
+
+# Resources
   - name: chrony
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -44,21 +17,31 @@ suites:
     attributes:
       resource: chrony:enable
       dependencies:
-      - resource:chrony:setup
-  - name: ssh_target_checker
+        - resource:chrony:setup
+  - name: dcv
+    # FIXME: breaks on Docker
     run_list:
-      - recipe[aws-parallelcluster-platform::openssh]
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - ssh_target_checker_script_created
+        - /tag:config_.*dcv/
     attributes:
-      ec2:
-        mac: mac1
-        network_interfaces_macs:
-          mac1:
-            vpc_ipv4_cidr_blocks: |
-              cidr1
-              cidr2
+      resource: dcv:configure
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+        - resource:dcv:setup
+      cluster:
+        node_type: HeadNode
+        dcv_enabled: "head_node"
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge
   - name: nvidia_fabric_manager
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -101,6 +84,58 @@ suites:
           enabled: true
     driver:
       instance_type: g4dn.2xlarge
+  - name: intel_hpc
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_intel_hpc/
+    attributes:
+      resource: intel_hpc:configure
+      dependencies:
+        - resource:package_repos:update
+        - resource:intel_hpc:setup
+      cluster:
+        enable_intel_hpc_platform: 'true'
+        node_type: HeadNode
+  - name: sticky_bits
+    run_list:
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:config_sticky_bits_configured
+    attributes:
+      resource: sticky_bits
+
+  # Recipes
+  - name: cluster_user_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - cluster_user_compute
+    attributes:
+      cluster:
+        node_type: ComputeFleet
+        cluster_user: test_user
+  - name: cluster_user_head
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - /tag:config_cluster_user/
+    attributes:
+      cluster:
+        node_type: HeadNode
+  - name: networking
+    run_list:
+      - recipe[aws-parallelcluster-platform::networking]
+    verifier:
+      controls:
+        - /tag:config_networking/
   - name: nvidia_uvm
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -121,51 +156,20 @@ suites:
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
         - recipe:aws-parallelcluster-platform::nvidia_uvm
-  - name: dcv
-    # FIXME: breaks on Docker
+  - name: ssh_target_checker
     run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
+      - recipe[aws-parallelcluster-platform::openssh]
     verifier:
       controls:
-        - /tag:config_.*dcv/
+        - ssh_target_checker_script_created
     attributes:
-      resource: dcv:configure
-      dependencies:
-        - resource:package_repos
-        - resource:install_packages:install_kernel_source
-        - 'resource:package { "package_name": "dkms" }'
-        - resource:build_tools
-        - recipe:aws-parallelcluster-platform::nvidia_install
-        - resource:dcv:setup
-      cluster:
-        node_type: HeadNode
-        dcv_enabled: "head_node"
-        nvidia:
-          enabled: true
-    driver:
-      instance_type: g4dn.2xlarge
-  - name: intel_hpc
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:config_intel_hpc/
-    attributes:
-      resource: intel_hpc:configure
-      dependencies:
-        - resource:package_repos:update
-        - resource:intel_hpc:setup
-      cluster:
-        enable_intel_hpc_platform: 'true'
-        node_type: HeadNode
-  - name: networking
-    run_list:
-      - recipe[aws-parallelcluster-platform::networking]
-    verifier:
-      controls:
-        - /tag:config_networking/
+      ec2:
+        mac: mac1
+        network_interfaces_macs:
+          mac1:
+            vpc_ipv4_cidr_blocks: |
+              cidr1
+              cidr2
   - name: sudo
     run_list:
       - recipe[aws-parallelcluster-platform::sudo_config]

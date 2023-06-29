@@ -5,6 +5,8 @@ verifier:
     - cookbooks/aws-parallelcluster-awsbatch/test
 
 suites:
+
+# Recipes
   - name: awsbatch_virtualenv
     run_list:
       - recipe[aws-parallelcluster-awsbatch::awsbatch_virtualenv]

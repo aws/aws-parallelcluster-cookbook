@@ -5,6 +5,8 @@ verifier:
     - cookbooks/aws-parallelcluster-computefleet/test
 
 suites:
+
+# Recipes
   - name: clusterstatusmgtd
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -18,6 +20,19 @@ suites:
         - recipe:aws-parallelcluster-platform::sudo_install
       cluster:
         node_type: 'HeadNode'
+  - name: finalize_custom_parallelcluster_node
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-entrypoints::finalize]
+    verifier:
+      controls:
+        - /node_virtualenv_created/
+        - custom_parallelcluster_node_installed
+    attributes:
+      cluster:
+        custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
+        python-version: 3.9.16
+        node_virtualenv_path: /opt/parallelcluster/pyenv/versions/node_virtualenv
   - name: fleet_status
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -32,16 +47,4 @@ suites:
         stack_name: "mock"
         node_type: HeadNode
         ddb_table: <%= ENV['DDB_TABLE'] %>
-  - name: finalize_custom_parallelcluster_node
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-entrypoints::finalize]
-    verifier:
-      controls:
-        - /node_virtualenv_created/
-        - custom_parallelcluster_node_installed
-    attributes:
-      cluster:
-        custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
-        python-version: 3.9.16
-        node_virtualenv_path: /opt/parallelcluster/pyenv/versions/node_virtualenv
+

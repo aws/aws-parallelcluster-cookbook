@@ -5,163 +5,8 @@ verifier:
     - cookbooks/aws-parallelcluster-platform/test
 
 suites:
-  - name: sudo
-    run_list:
-      - recipe[aws-parallelcluster-platform::sudo_install]
-    verifier:
-      controls:
-        - /tag:install_sudo/
-  - name: users
-    run_list:
-      - recipe[aws-parallelcluster-platform::users]
-    verifier:
-      controls:
-        - /tag:install_users/
-  - name: directories
-    run_list:
-      - recipe[aws-parallelcluster-platform::directories]
-    verifier:
-      controls:
-        - /pcluster_directories_exist/
-        - /pcluster_log_dir_is_configured/
-  - name: disable_services
-    run_list:
-      - recipe[aws-parallelcluster-platform::disable_services]
-    verifier:
-      controls:
-        - /services_disabled/
-  - name: cookbook_virtualenv
-    run_list:
-      - recipe[aws-parallelcluster-platform::cookbook_virtualenv]
-    verifier:
-      controls:
-        - /cookbook_virtualenv_created/
-  - name: awscli
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::awscli]
-    verifier:
-      controls:
-        - /awscli_installed/
-        - /awscli_can_run_as/
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
-  - name: openssh
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[openssh]
-    verifier:
-      controls:
-        - /openssh_installed/
-    attributes:
-      dependencies:
-        - resource:package_repos:update
-  - name: disable_selinux
-    run_list:
-      - recipe[aws-parallelcluster-platform::disable_selinux]
-    verifier:
-      controls:
-        - /tag:install_selinux_disabled/
-  - name: license_readme
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::license_readme]
-    verifier:
-      controls:
-        - /license_readme_created/
-  - name: gc_thresh_values
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::gc_thresh_values]
-    verifier:
-      controls:
-        - /gc_thresh_values/
-  - name: supervisord
-    run_list:
-      - recipe[aws-parallelcluster-platform::supervisord_install]
-    verifier:
-      controls:
-        - /tag:install_supervisord/
-  - name: ami_cleanup
-    run_list:
-      - recipe[aws-parallelcluster-platform::ami_cleanup]
-    verifier:
-      controls:
-        - /ami_cleanup/
-  - name: cron
-    run_list:
-      - recipe[aws-parallelcluster-platform::cron]
-    verifier:
-      controls:
-        - /tag:install_cron/
-  - name: chrony
-    run_list:
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:install_chrony/
-    attributes:
-      resource: chrony:setup
-  - name: modules
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - modules_installed
-    attributes:
-      resource: modules
-  - name: intel_mpi
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::intel_mpi]
-    verifier:
-      controls:
-        - /tag:install_.*intel_mpi/
-    attributes:
-      cluster:
-        node_type: 'HeadNode'
-  - name: c_states
-    run_list:
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:install_c_states/
-    attributes:
-      resource: c_states
-  - name: intel_hpc
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:install_intel_hpc/
-    attributes:
-      resource: intel_hpc
-  - name: build_tools
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - build_tools_installed
-    attributes:
-      resource: build_tools
-      dependencies:
-        - resource:package_repos
-  - name: install_packages
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:install_install_packages/
-    attributes:
-      dependencies:
-        - resource:package_repos
-      resource: install_packages
+
+# Resources
   - name: arm_pl
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -176,47 +21,66 @@ suites:
       resource: arm_pl
       dependencies:
         - resource:package_repos
-  - name: stunnel
+  - name: build_tools
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /tag:install_stunnel/
+        - build_tools_installed
     attributes:
-      resource: stunnel:setup
-  - name: nvidia_repo_add
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - nvidia_repo_added
-    attributes:
-      resource: nvidia_repo:add
-  - name: nvidia_repo_remove
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - nvidia_repo_removed
-    attributes:
-      resource: nvidia_repo:remove
+      resource: build_tools
       dependencies:
-        - resource:nvidia_repo:add
-  - name: nvidia_fabric_manager
+        - resource:package_repos
+  - name: c_states
+    run_list:
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_c_states/
+    attributes:
+      resource: c_states
+  - name: chrony
+    run_list:
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_chrony/
+    attributes:
+      resource: chrony:setup
+  - name: dcv
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - /tag:install_.*fabric_manager/
+        - /tag:install_dcv/
     attributes:
-      resource: fabric_manager
+      resource: dcv
       cluster:
-        nvidia:
-          enabled: yes
+        is_official_ami_build: true
+    driver:
+      instance_type: t3.medium
+  - name: install_packages
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_install_packages/
+    attributes:
+      dependencies:
+        - resource:package_repos
+      resource: install_packages
+  - name: intel_hpc
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_intel_hpc/
+    attributes:
+      resource: intel_hpc
   - name: nvidia_dcgm
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -226,6 +90,39 @@ suites:
         - /tag:install_nvidia_dcgm/
     attributes:
       resource: nvidia_dcgm:setup
+      cluster:
+        nvidia:
+          enabled: yes
+  - name: nvidia_driver
+    # doesn't work on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_.*nvidia_driver/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      resource: nvidia_driver
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+      cluster:
+        nvidia:
+          enabled: true
+  - name: nvidia_fabric_manager
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_.*fabric_manager/
+    attributes:
+      resource: fabric_manager
       cluster:
         nvidia:
           enabled: yes
@@ -252,6 +149,119 @@ suites:
       cluster:
         nvidia:
           enabled: true
+  - name: nvidia_repo_add
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - nvidia_repo_added
+    attributes:
+      resource: nvidia_repo:add
+  - name: nvidia_repo_remove
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - nvidia_repo_removed
+    attributes:
+      resource: nvidia_repo:remove
+      dependencies:
+        - resource:nvidia_repo:add
+  - name: modules
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - modules_installed
+    attributes:
+      resource: modules
+  - name: stunnel
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_stunnel/
+    attributes:
+      resource: stunnel:setup
+
+# Recipes
+  - name: ami_cleanup
+    run_list:
+      - recipe[aws-parallelcluster-platform::ami_cleanup]
+    verifier:
+      controls:
+        - /ami_cleanup/
+  - name: awscli
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::awscli]
+    verifier:
+      controls:
+        - /awscli_installed/
+        - /awscli_can_run_as/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+  - name: cookbook_virtualenv
+    run_list:
+      - recipe[aws-parallelcluster-platform::cookbook_virtualenv]
+    verifier:
+      controls:
+        - /cookbook_virtualenv_created/
+  - name: cron
+    run_list:
+      - recipe[aws-parallelcluster-platform::cron]
+    verifier:
+      controls:
+        - /tag:install_cron/
+  - name: directories
+    run_list:
+      - recipe[aws-parallelcluster-platform::directories]
+    verifier:
+      controls:
+        - /pcluster_directories_exist/
+        - /pcluster_log_dir_is_configured/
+  - name: disable_selinux
+    run_list:
+      - recipe[aws-parallelcluster-platform::disable_selinux]
+    verifier:
+      controls:
+        - /tag:install_selinux_disabled/
+  - name: disable_services
+    run_list:
+      - recipe[aws-parallelcluster-platform::disable_services]
+    verifier:
+      controls:
+        - /services_disabled/
+  - name: gc_thresh_values
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::gc_thresh_values]
+    verifier:
+      controls:
+        - /gc_thresh_values/
+  - name: license_readme
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::license_readme]
+    verifier:
+      controls:
+        - /license_readme_created/
+  - name: intel_mpi
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::intel_mpi]
+    verifier:
+      controls:
+        - /tag:install_.*intel_mpi/
+    attributes:
+      cluster:
+        node_type: 'HeadNode'
   - name: nvidia_cuda
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -271,37 +281,31 @@ suites:
       cluster:
         nvidia:
           enabled: true
-  - name: nvidia_driver
-    # doesn't work on Docker
+  - name: openssh
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
+      - recipe[openssh]
     verifier:
       controls:
-        - /tag:install_.*nvidia_driver/
-    driver:
-      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
-      instance_type: g4dn.2xlarge
+        - /openssh_installed/
     attributes:
-      resource: nvidia_driver
       dependencies:
-        - resource:package_repos
-        - resource:install_packages:install_kernel_source
-        - 'resource:package { "package_name": "dkms" }'
-        - resource:build_tools
-      cluster:
-        nvidia:
-          enabled: true
-  - name: dcv
+        - resource:package_repos:update
+  - name: sudo
     run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
+      - recipe[aws-parallelcluster-platform::sudo_install]
     verifier:
       controls:
-        - /tag:install_dcv/
-    attributes:
-      resource: dcv
-      cluster:
-        is_official_ami_build: true
-    driver:
-      instance_type: t3.medium
+        - /tag:install_sudo/
+  - name: supervisord
+    run_list:
+      - recipe[aws-parallelcluster-platform::supervisord_install]
+    verifier:
+      controls:
+        - /tag:install_supervisord/
+  - name: users
+    run_list:
+      - recipe[aws-parallelcluster-platform::users]
+    verifier:
+      controls:
+        - /tag:install_users/
