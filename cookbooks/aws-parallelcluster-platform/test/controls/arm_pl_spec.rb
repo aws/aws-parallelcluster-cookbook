@@ -11,7 +11,7 @@
 
 control 'tag:install_arm_pl_installed' do
   title "Check ARM Performance libraries installation"
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { os_properties.arm? && !os_properties.on_docker? }
 
   armpl_major_minor_version = node['cluster']['armpl']['major_minor_version']
@@ -63,7 +63,7 @@ end
 
 control 'tag:install_arm_pl_gcc_installed' do
   title "Check ARM Performance libraries installation"
-
+  only_if { !os_properties.ubuntu2204? }
   only_if { os_properties.arm? && !os_properties.on_docker? }
 
   gcc_major_minor_version = node['cluster']['armpl']['gcc']['major_minor_version']
