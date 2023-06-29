@@ -185,7 +185,7 @@ suites:
         - network_service_running
     attributes:
       resource: network_service:reload
-  - name: nfs
+  - name: nfs_headnode
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
@@ -196,6 +196,21 @@ suites:
       resource: nfs:configure
       dependencies:
         - resource:nfs
+      cluster:
+        node_type: HeadNode
+  - name: nfs_computefleet
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_nfs/
+    attributes:
+      resource: nfs:configure
+      dependencies:
+        - resource:nfs
+      cluster:
+        node_type: ComputeFleet
   - name: raid_mount
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

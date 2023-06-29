@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :configure do
+  return if node['cluster']['node_type'] != "HeadNode"
   node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
 
   override_server_template

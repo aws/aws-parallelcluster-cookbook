@@ -17,10 +17,10 @@ control 'tag:install_nfs_installed_with_right_version' do
   end
 end
 
-control 'tag:config_nfs_configured' do
+control 'tag:config_nfs_configured_on_head_node' do
   title 'Check that nfs is configured correctly'
 
-  only_if { !os_properties.on_docker? }
+  only_if { instance.head_node? && !os_properties.on_docker? }
 
   describe 'Check nfs service is restarted'
   nfs_server = os.debian? ? 'nfs-kernel-server.service' : 'nfs-server.service'
@@ -35,14 +35,14 @@ control 'tag:config_nfs_configured' do
     its('exit_status') { should eq 0 }
     its('stdout') { should cmp [[node['cpu']['cores'].to_i * 4, 8].max, 256].min }
   end
-end
-
-control 'tag:config_nfs_correctly_installed_on_head_node' do
-  only_if { instance.head_node? && !os_properties.on_docker? }
 
   describe 'check for nfs server protocol' do
     subject { command "sudo -u #{node['cluster']['cluster_user']} rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs" }
     its('exit_status') { should eq 0 }
+  end
+
+  describe bash("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'") do
+    its('stdout') { should cmp node['cluster']['nfs']['threads'] }
   end
 end
 
@@ -50,15 +50,7 @@ control 'tag:config_nfs_correctly_installed_on_compute_node' do
   only_if { instance.compute_node? && !os_properties.on_docker? }
 
   describe 'check for nfs server protocol' do
-    subject { command "sudo -u #{node['cluster']['cluster_user']} nfsstat -m | grep vers=4" }
+    subject { command "sudo -u #{node['cluster']['cluster_user']} rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs" }
     its('exit_status') { should eq 0 }
-  end
-end
-
-control 'tag:config_nfs_has_correct_number_of_threads' do
-  only_if { !os_properties.on_docker? }
-
-  describe bash("cat /proc/net/rpc/nfsd | grep th | awk '{print$2}'") do
-    its('stdout') { should cmp node['cluster']['nfs']['threads'] }
   end
 end
