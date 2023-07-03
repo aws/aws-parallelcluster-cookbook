@@ -23,7 +23,7 @@ end
 control 'cluster_user_compute_and_login' do
   title 'Check the cluster user configuration for compute node and login nodes'
 
-  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?)}
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
 
   describe 'Check that cluster user exist'
   describe user('test_user') do
