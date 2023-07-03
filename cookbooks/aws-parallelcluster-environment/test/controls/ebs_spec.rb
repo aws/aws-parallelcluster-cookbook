@@ -61,10 +61,10 @@ control 'ebs_unexported' do
   end
 end
 
-control 'ebs_compute' do
+control 'ebs_compute_and_login' do
   title 'Check the ebs configuration for compute node'
 
-  only_if { !os_properties.on_docker? && instance.compute_node? }
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
 
   describe 'Check that ebs dirs have been created and mounted'
   directories = %w(ebs1 ebs2)
