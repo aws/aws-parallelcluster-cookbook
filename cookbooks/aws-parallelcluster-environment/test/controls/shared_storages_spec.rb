@@ -9,10 +9,10 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'shared_storages_compute' do
+control 'shared_storages_compute_and_login' do
   title 'Check the shared storages configuration for compute node'
 
-  only_if { !os_properties.on_docker? && instance.compute_node? }
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
 
   describe 'Check that /opt/intel dir has been mounted'
   describe mount("/opt/intel") do
