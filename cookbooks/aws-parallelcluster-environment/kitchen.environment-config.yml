@@ -454,13 +454,14 @@ suites:
         scheduler: slurm
         head_node_imds_secured: 'true'
         head_node_imds_allowed_users: ['root', 'nobody']
-  - name: mount_shared
+  - name: mount_shared_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-environment::mount_shared]
     verifier:
       controls:
-        - mount_shared
+        - mount_home
+        - mount_shared_compute
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
@@ -468,6 +469,24 @@ suites:
         - recipe:aws-parallelcluster-environment::mock_export_directories
       cluster:
         node_type: 'ComputeFleet'
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
+  - name: mount_shared_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::mount_shared]
+    verifier:
+      controls:
+        - mount_home
+        - mount_shared_login
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_export_directories
+      cluster:
+        node_type: 'LoginNode'
         head_node_private_ip: '127.0.0.1'
         head_node_home_path: '/fake_headnode_home'
         shared_dir_head: '/fake_headnode_shared'
