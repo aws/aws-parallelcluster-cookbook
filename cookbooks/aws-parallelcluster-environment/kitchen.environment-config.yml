@@ -338,13 +338,28 @@ suites:
       - recipe[aws-parallelcluster-environment::ebs]
     verifier:
       controls:
-        - ebs_compute
+        - ebs_compute_and_login
     attributes:
       dependencies:
         - resource:nfs
         - recipe:aws-parallelcluster-environment::mock_compute_ebs
       cluster:
         node_type: ComputeFleet
+        ebs_shared_dirs: ebs1,ebs2
+        head_node_private_ip: '127.0.0.1'
+  - name: ebs_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ebs]
+    verifier:
+      controls:
+        - ebs_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_ebs
+      cluster:
+        node_type: LoginNode
         ebs_shared_dirs: ebs1,ebs2
         head_node_private_ip: '127.0.0.1'
   - name: ephemeral_drives_mounted
