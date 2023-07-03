@@ -83,10 +83,10 @@ control 'raid_unexported' do
   end
 end
 
-control 'raid_compute' do
-  title 'Check the raid configuration for compute node'
+control 'raid_compute_and_login' do
+  title 'Check the raid configuration for compute node and login nodes'
 
-  only_if { !os_properties.on_docker? && instance.compute_node? }
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
 
   describe 'Check that raid dirs have been created and mounted'
   directories = %w(raid1)

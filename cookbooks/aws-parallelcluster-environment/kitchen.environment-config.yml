@@ -477,13 +477,28 @@ suites:
       - recipe[aws-parallelcluster-environment::raid]
     verifier:
       controls:
-        - raid_compute
+        - raid_compute_and_login
     attributes:
       dependencies:
         - resource:nfs
         - recipe:aws-parallelcluster-environment::mock_compute_raid
       cluster:
         node_type: ComputeFleet
+        raid_shared_dir: raid1
+        head_node_private_ip: '127.0.0.1'
+  - name: raid_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::raid]
+    verifier:
+      controls:
+        - raid_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_raid
+      cluster:
+        node_type: LoginNode
         raid_shared_dir: raid1
         head_node_private_ip: '127.0.0.1'
   - name: shared_storages_compute
