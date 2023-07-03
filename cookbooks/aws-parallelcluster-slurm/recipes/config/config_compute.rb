@@ -24,16 +24,7 @@ directory '/var/spool/slurmd' do
   mode '0700'
 end
 
-# Mount /opt/slurm over NFS
-# Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
-mount "#{node['cluster']['slurm']['install_dir']}" do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['slurm']['install_dir']}" })
-  fstype "nfs"
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i(mount enable)
-  retries 10
-  retry_delay 6
-end
+include_recipe 'aws-parallelcluster-slurm::mount_slurm_dir'
 
 # Check to see if is GPU instance with Nvidia installed
 Chef::Log.warn("GPU instance but no Nvidia drivers found") if graphic_instance? && !nvidia_installed?

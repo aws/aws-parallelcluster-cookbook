@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-#
-# Cookbook:: aws-parallelcluster-slurm
-# Recipe:: config_compute
-#
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
@@ -15,7 +11,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO: rename, find a better name that include login nodes
-setup_munge_compute_node
-
-include_recipe 'aws-parallelcluster-slurm::mount_slurm_dir'
+# Mount /opt/slurm over NFS
+# Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
+mount "#{node['cluster']['slurm']['install_dir']}" do
+  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['slurm']['install_dir']}" })
+  fstype "nfs"
+  options node['cluster']['nfs']['hard_mount_options']
+  action %i(mount enable)
+  retries 10
+  retry_delay 6
+end
