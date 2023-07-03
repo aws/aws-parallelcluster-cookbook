@@ -25,8 +25,7 @@ def default_packages
   %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
      libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
      httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
-     libffi-devel dkms libedit-devel postgresql-devel postgresql-server
-     sendmail cmake byacc libglvnd-devel libgcrypt-devel libevent-devel
+     libffi-devel dkms libedit-devel sendmail cmake byacc libglvnd-devel libgcrypt-devel libevent-devel
      libxml2-devel perl-devel tar gzip bison flex gcc gcc-c++ patch
      rpm-build rpm-sign system-rpm-config cscope ctags diffstat doxygen elfutils
      gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
