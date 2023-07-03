@@ -507,11 +507,25 @@ suites:
       - recipe[aws-parallelcluster-environment::shared_storages]
     verifier:
       controls:
-        - shared_storages_compute
+        - shared_storages_compute_and_login
     attributes:
       dependencies:
         - resource:nfs
         - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
       cluster:
         node_type: ComputeFleet
+        head_node_private_ip: '127.0.0.1'
+  - name: shared_storages_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::shared_storages]
+    verifier:
+      controls:
+        - shared_storages_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
+      cluster:
+        node_type: LoginNode
         head_node_private_ip: '127.0.0.1'
