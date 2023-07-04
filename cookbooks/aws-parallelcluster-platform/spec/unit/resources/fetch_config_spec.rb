@@ -60,5 +60,4 @@ describe 'fetch_config:run' do
       end
     end
   end
-
 end
