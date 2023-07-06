@@ -13,7 +13,12 @@
 # limitations under the License.
 
 unless node['cluster']['scheduler'] == 'awsbatch'
-  load_cluster_config
+  case node['cluster']['node_type']
+  when 'HeadNode'
+    load_cluster_config(node['cluster']['cluster_config_path'])
+  else
+    raise "node_type must be HeadNode"
+  end
 end
 
 include_recipe 'aws-parallelcluster-slurm::update_computefleet_status' if node['cluster']['scheduler'] == 'slurm'
