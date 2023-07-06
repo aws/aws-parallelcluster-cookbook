@@ -24,6 +24,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Remove security updates step executed on cluster nodes bootstrap in US isolated regions
   in order to reduce bootstrap time and avoid a potential point of failure.
+- Replace `nvidia-persistenced` service with `parallelcluster_nvidia` service to avoid conflicts with DLAMI.
 
 **BUG FIXES**
 - Fix an issue that was preventing ptrace protection from being disabled on Ubuntu and allowing Cross Memory Attach (CMA) in libfabric.
