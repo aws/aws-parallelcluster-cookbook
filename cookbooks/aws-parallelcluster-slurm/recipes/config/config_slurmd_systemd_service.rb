@@ -24,7 +24,7 @@ template '/etc/systemd/system/slurmd.service' do
   action :create
 end
 
-# Add systemd dependency between slurmd and nvidia-persistenced for NVIDIA GPU nodes
+# Add systemd dependency between slurmd and parallelcluster_nvidia for NVIDIA GPU nodes
 if graphic_instance? && nvidia_installed?
   directory '/etc/systemd/system/slurmd.service.d' do
     user 'root'
