@@ -1,0 +1,20 @@
+# This systemd service file, designed to trigger the creation device block file /dev/nvidia0
+# The service start nvidia-persistenced if it is not already started or execute the command nvidia-smi.
+
+[Unit]
+Description=ParallelCluster NVIDIA Daemon
+Wants=syslog.target
+
+[Service]
+<% if @is_nvidia_persistenced_running -%>
+  Type=simple
+  ExecStart=/usr/bin/nvidia-smi
+  RemainAfterExit=yes
+<% else %>
+  Type=forking
+  ExecStart=/usr/bin/nvidia-persistenced --user root
+  ExecStopPost=/bin/rm -rf /var/run/nvidia-persistenced
+<% end %>
+
+[Install]
+WantedBy=multi-user.target

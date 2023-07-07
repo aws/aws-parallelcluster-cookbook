@@ -189,7 +189,7 @@ class QueueRenderer:
             partition += " Default=YES"
 
         if self.job_exclusive_allocation:
-            partition += " OverSubscribe=NO"
+            partition += " OverSubscribe=EXCLUSIVE"
 
         partition += f"{self._custom_settings()}"
         return partition

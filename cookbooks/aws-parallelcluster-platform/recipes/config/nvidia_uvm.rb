@@ -31,14 +31,23 @@ cookbook_file 'nvidia.conf' do
   mode '0644'
 end
 
-# Install nvidia_persistenced. See https://download.nvidia.com/XFree86/Linux-x86_64/396.51/README/nvidia-persistenced.html
-bash 'Install nvidia_persistenced' do
+# Install ParallelCluster nvidia service.
+# The service ensures the creation of the block devices /dev/nvidia0 after reboot and it is needed by the slurmd service
+# cookbooks/aws-parallelcluster-slurm/templates/default/slurm/compute/slurmd_nvidia_persistenced.conf.erb
+#
+# The service starts the nvidia-persistenced or run nvidia-smi to avoid race condition with other services
+template '/etc/systemd/system/parallelcluster_nvidia.service' do
   only_if { graphic_instance? && nvidia_installed? }
-  cwd '/usr/share/doc/NVIDIA_GLX-1.0/samples'
-  user 'root'
+  source 'nvidia/parallelcluster_nvidia_service.erb'
+  owner 'root'
   group 'root'
-  code <<-NVIDIA
-    tar -xf nvidia-persistenced-init.tar.bz2
-    ./nvidia-persistenced-init/install.sh
-  NVIDIA
+  mode '0644'
+  action :create
+  variables(is_nvidia_persistenced_running: is_process_running('nvidia-persistenced'))
+end
+
+service "parallelcluster_nvidia" do
+  only_if { graphic_instance? && nvidia_installed? }
+  supports restart: false
+  action %i(enable start)
 end
