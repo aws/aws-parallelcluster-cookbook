@@ -15,6 +15,12 @@ control 'tag:install_efs_utils_installed' do
   describe package('amazon-efs-utils') do
     it { should be_installed }
   end
+
+  describe file("/etc/amazon/efs/efs-utils.conf") do
+    its('content') do
+      should match('poll_interval_sec = 10')
+    end
+  end
 end
 
 control 'efs_mounted' do

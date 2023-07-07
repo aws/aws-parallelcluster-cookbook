@@ -55,4 +55,5 @@ action :install_utils do
     cwd node['cluster']['sources_dir']
     code install_script_code(efs_utils_tarball, package_name, package_version)
   end
+  action_increase_poll_interval
 end
