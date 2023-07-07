@@ -1,0 +1,10 @@
+<%# Logrotate file for bootstrap error log %>
+/var/log/parallelcluster/bootstrap_error_msg {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    copytruncate
+    su root root
+    nodateext
+}

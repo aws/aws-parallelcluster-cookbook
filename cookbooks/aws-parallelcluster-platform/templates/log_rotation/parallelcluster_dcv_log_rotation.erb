@@ -1,0 +1,16 @@
+<%# Logrotate file for logs managed by ParallelCluster %>
+<%# dcv log %>
+/var/log/dcv/server.log
+/var/log/dcv/sessionlauncher.log
+/var/log/dcv/agent.*.log
+/var/log/dcv/dcv-xsession.*.log
+/var/log/dcv/Xdcv.*.log
+{
+    missingok
+    notifempty
+    size 10M
+    copytruncate
+    rotate 5
+    su dcv dcv
+    nodateext
+}

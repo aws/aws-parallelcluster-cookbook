@@ -1,0 +1,9 @@
+<%# Logrotate file for chef-client log %>
+/var/log/chef-client.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    copytruncate
+    nodateext
+}
