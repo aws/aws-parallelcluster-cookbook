@@ -71,7 +71,7 @@ control 'sssd_configured_correctly' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
-    its('content') { should match /ssh-keygen -q -t rsa/ }
+    its('content') { should match /ssh-keygen -q -t ed25519/ }
   end
 
   pam_services = %w(sudo su sshd)

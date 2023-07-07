@@ -27,16 +27,16 @@ when 'HeadNode'
     cwd "/home/#{node['cluster']['cluster_user']}"
     code <<-KEYGEN
       set -e
-      su - #{node['cluster']['cluster_user']} -c \"ssh-keygen -q -t rsa -f ~/.ssh/id_rsa -N ''\"
+      su - #{node['cluster']['cluster_user']} -c \"ssh-keygen -q -t ed25519 -f ~/.ssh/id_ed25519 -N ''\"
     KEYGEN
-    not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/id_rsa") }
+    not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/id_ed25519") }
   end
 
   bash "copy_and_perms" do
     cwd "/home/#{node['cluster']['cluster_user']}"
     code <<-PERMS
       set -e
-      su - #{node['cluster']['cluster_user']} -c \"cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
+      su - #{node['cluster']['cluster_user']} -c \"cat ~/.ssh/id_ed25519.pub >> ~/.ssh/authorized_keys && chmod 0600 ~/.ssh/authorized_keys && touch ~/.ssh/authorized_keys_cluster\"
     PERMS
     not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/authorized_keys_cluster") }
   end
