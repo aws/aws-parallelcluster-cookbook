@@ -17,3 +17,13 @@ def get_package_version(package_name)
   end
   version
 end
+
+action :increase_poll_interval do
+  # An interval too short could affect HPC workload performance
+  replace_or_add "increase EFS-utils watchdog poll interval" do
+    path "/etc/amazon/efs/efs-utils.conf"
+    pattern "poll_interval_sec = 1$"
+    line "poll_interval_sec = 10"
+    replace_only true
+  end
+end

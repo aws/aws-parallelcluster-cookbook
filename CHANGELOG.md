@@ -18,6 +18,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Assign Slurm dynamic nodes a priority (weight) of 1000 by default. This allows Slurm to prioritize idle static nodes over idle dynamic ones.
 - Create a Slurm partition-nodelist mapping JSON file to be used by the node package daemons to recognize PC-managed Slurm partitions and nodelists.
 - Upgrade NVIDIA driver to version 470.199.02.
+- Increase EFS-utils watchdog poll interval to 10 seconds. Note: This change is meaningful only if [EncryptionInTransit](https://docs.aws.amazon.com/parallelcluster/latest/ug/SharedStorage-v3.html#yaml-SharedStorage-EfsSettings-EncryptionInTransit) is set to `true`, because watchdog does not run otherwise.
 
 **BUG FIXES**
 
