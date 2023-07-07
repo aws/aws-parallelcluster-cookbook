@@ -19,6 +19,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Create a Slurm partition-nodelist mapping JSON file to be used by the node package daemons to recognize PC-managed Slurm partitions and nodelists.
 - Upgrade NVIDIA driver to version 470.199.02.
 - Increase EFS-utils watchdog poll interval to 10 seconds. Note: This change is meaningful only if [EncryptionInTransit](https://docs.aws.amazon.com/parallelcluster/latest/ug/SharedStorage-v3.html#yaml-SharedStorage-EfsSettings-EncryptionInTransit) is set to `true`, because watchdog does not run otherwise.
+- Upgrade EFA installer to `1.24.0`
+  - Efa-driver: `efa-2.4.1-1`
+  - Efa-config: `efa-config-1.15-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.18.0-1`
+  - Rdma-core: `rdma-core-46.0-1`
+  - Open MPI: `openmpi40-aws-4.1.5-1`
 
 **BUG FIXES**
 
