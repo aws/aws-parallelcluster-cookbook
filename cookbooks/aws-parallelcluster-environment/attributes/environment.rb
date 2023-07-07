@@ -52,5 +52,6 @@ default['cluster']['scheduler_queue_name'] = nil
 default['cluster']['head_node_home_path'] = '/home'
 default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
 default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
+default['cluster']['shared_dir_login'] = node['cluster']['shared_dir_login_nodes']
 
 default['cluster']['head_node_private_ip'] = nil

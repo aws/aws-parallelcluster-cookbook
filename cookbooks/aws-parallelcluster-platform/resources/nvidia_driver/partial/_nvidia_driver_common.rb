@@ -17,11 +17,13 @@ default_action :setup
 
 property :nvidia_driver_version, String
 
+tmp_nvidia_run = '/tmp/nvidia.run'
+
 action :setup do
   return unless nvidia_driver_enabled?
   return if on_docker?
 
-  remote_file "/tmp/nvidia.run" do
+  remote_file tmp_nvidia_run do
     source nvidia_driver_url
     mode '0755'
     retries 3

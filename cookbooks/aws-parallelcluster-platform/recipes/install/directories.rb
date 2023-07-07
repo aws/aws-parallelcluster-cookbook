@@ -21,6 +21,7 @@ directory node['cluster']['scripts_dir']
 directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
 directory node['cluster']['shared_dir']
+directory node['cluster']['shared_dir_login_nodes']
 
 # Create ParallelCluster log folder
 directory node['cluster']['log_base_dir'] do

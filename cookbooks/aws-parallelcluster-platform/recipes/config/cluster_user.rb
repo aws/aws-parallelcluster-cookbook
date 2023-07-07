@@ -50,7 +50,7 @@ when 'HeadNode'
     not_if { ::File.exist?("/home/#{node['cluster']['cluster_user']}/.ssh/known_hosts") }
   end
 
-when 'ComputeFleet'
+when 'ComputeFleet', 'LoginNode'
 
   # Setup cluster user
   user node['cluster']['cluster_user'] do
@@ -60,5 +60,5 @@ when 'ComputeFleet'
     shell '/bin/bash'
   end
 else
-  raise "node_type must be HeadNode or ComputeFleet"
+  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
 end
