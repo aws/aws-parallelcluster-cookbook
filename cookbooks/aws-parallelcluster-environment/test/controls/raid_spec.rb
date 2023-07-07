@@ -83,10 +83,10 @@ control 'raid_unexported' do
   end
 end
 
-control 'raid_compute' do
-  title 'Check the raid configuration for compute node'
+control 'raid_compute_and_login' do
+  title 'Check the raid configuration for compute node and login nodes'
 
-  only_if { !os_properties.on_docker? && instance.compute_node? }
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
 
   describe 'Check that raid dirs have been created and mounted'
   directories = %w(raid1)
@@ -100,11 +100,12 @@ control 'raid_compute' do
     end
 
     describe mount("/#{directory}") do
+      # The _netdev option is ignored in mount(8) by default. The options is used by initscripts only.
+      # It is not reported in /etc/mtab for raid volumes
       it { should be_mounted }
       its('device') { should eq "127.0.0.1:/#{directory}" }
       its('type') { should eq 'nfs4' }
       its('options') { should include 'hard' }
-      its('options') { should include '_netdev' }
       its('options') { should include 'noatime' }
     end
   end

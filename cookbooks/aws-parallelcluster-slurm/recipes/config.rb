@@ -22,6 +22,8 @@ when 'HeadNode'
   include_recipe 'aws-parallelcluster-slurm::config_head_node'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster-slurm::config_compute'
+when 'LoginNode'
+  include_recipe 'aws-parallelcluster-slurm::config_login'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end

@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Allow to override aws-parallelcluster-node package at cluster creation and update time (only on the head node during update).
   Useful for development purposes only.
 - Avoid to start NFS server on compute nodes.
+- Add support for Login Nodes.
 
 **CHANGES**
 - Assign Slurm dynamic nodes a priority (weight) of 1000 by default. This allows Slurm to prioritize idle static nodes over idle dynamic ones.
