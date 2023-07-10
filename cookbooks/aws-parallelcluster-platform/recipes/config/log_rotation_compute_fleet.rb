@@ -14,26 +14,24 @@
 
 # TODO: move the logrotate configuration of the various services to the corresponding recipes/cookbooks.
 logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
+logrotate_template_dir = 'log_rotation/'
 
-template logrotate_conf_dir + 'parallelcluster_cloud_init_output_log_rotation' do
-  source 'log_rotation/parallelcluster_cloud_init_output_log_rotation.erb'
-  mode '0644'
-end
+config_files = %w(
+    parallelcluster_cloud_init_output_log_rotation
+  )
 
 if node['cluster']['scheduler'] == 'slurm'
-
-  config_files = %w(
+  config_files += %w(
     parallelcluster_computemgtd_log_rotation
     parallelcluster_slurmd_log_rotation
   )
+end
 
-  config_files.each do | config_file |
-    output_file = logrotate_conf_dir + config_file
-    template_file = 'log_rotation/' + config_file + '.erb'
-    template output_file do
-      source template_file
-      mode '0644'
-    end
+config_files.each do | config_file |
+  output_file = logrotate_conf_dir + config_file
+  template_file = logrotate_template_dir + config_file + '.erb'
+  template output_file do
+    source template_file
+    mode '0644'
   end
-
 end

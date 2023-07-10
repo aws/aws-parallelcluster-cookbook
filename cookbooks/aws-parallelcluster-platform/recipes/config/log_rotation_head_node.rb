@@ -14,32 +14,27 @@
 
 # TODO: move the logrotate configuration of the various services to the corresponding recipes/cookbooks.
 logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
+logrotate_template_dir = 'log_rotation/'
 
-template logrotate_conf_dir + 'parallelcluster_cfn_init_log_rotation' do
-  source 'log_rotation/parallelcluster_cfn_init_log_rotation.erb'
-  mode '0644'
+config_files = %w(
+  parallelcluster_cfn_init_log_rotation
+  parallelcluster_chef_client_log_rotation
+)
+
+if node['cluster']['dcv_enabled'] == "head_node" && dcv_installed?
+  config_files += %w(
+    parallelcluster_dcv_log_rotation
+  )
 end
 
-template logrotate_conf_dir + 'parallelcluster_chef_client_log_rotation' do
-  source 'log_rotation/parallelcluster_chef_client_log_rotation.erb'
-  mode '0644'
-end
-
-template logrotate_conf_dir + 'parallelcluster_dcv_log_rotation' do
-  source 'log_rotation/parallelcluster_dcv_log_rotation.erb'
-  mode '0644'
-  only_if { node['cluster']['dcv_enabled'] == "head_node" && dcv_installed? }
-end
-
-template logrotate_conf_dir + 'parallelcluster_pam_ssh_key_generator_log_rotation' do
-  source 'log_rotation/parallelcluster_pam_ssh_key_generator_log_rotation.erb'
-  mode '0644'
-  only_if {node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true' }
+if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
+  config_files += %w(
+    parallelcluster_pam_ssh_key_generator_log_rotation
+  )
 end
 
 if node['cluster']['scheduler'] == 'slurm'
-
-  config_files = %w(
+  config_files += %w(
     parallelcluster_clustermgtd_log_rotation
     parallelcluster_clusterstatusmgtd_log_rotation
     parallelcluster_slurm_fleet_status_manager_log_rotation
@@ -51,14 +46,13 @@ if node['cluster']['scheduler'] == 'slurm'
     parallelcluster_clustermgtd_events_log_rotation
     parallelcluster_slurm_resume_events_log_rotation
   )
+end
 
-  config_files.each do | config_file |
-    output_file = logrotate_conf_dir + config_file
-    template_file = 'log_rotation/' + config_file + '.erb'
-    template output_file do
-      source template_file
-      mode '0644'
-    end
+config_files.each do | config_file |
+  output_file = logrotate_conf_dir + config_file
+  template_file = logrotate_template_dir + config_file + '.erb'
+  template output_file do
+    source template_file
+    mode '0644'
   end
-
 end

@@ -18,20 +18,21 @@ return if node['cluster']['log_rotation_enabled'] != 'true'
 
 # Here are general logrotate configuration present in all types of nodes
 logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
+logrotate_template_dir = 'log_rotation/'
 
-template logrotate_conf_dir + 'parallelcluster_cloud_init_log_rotation' do
-  source 'log_rotation/parallelcluster_cloud_init_log_rotation.erb'
-  mode '0644'
-end
+config_files = %w(
+  parallelcluster_cloud_init_log_rotation
+  parallelcluster_supervisord_log_rotation
+  parallelcluster_bootstrap_error_msg_log_rotation
+)
 
-template logrotate_conf_dir + 'parallelcluster_supervisord_log_rotation' do
-  source 'log_rotation/parallelcluster_supervisord_log_rotation.erb'
-  mode '0644'
-end
-
-template logrotate_conf_dir + 'parallelcluster_bootstrap_error_msg_log_rotation' do
-  source 'log_rotation/parallelcluster_bootstrap_error_msg_log_rotation.erb'
-  mode '0644'
+config_files.each do | config_file |
+  output_file = logrotate_conf_dir + config_file
+  template_file = logrotate_template_dir + (config_file + '.erb')
+  template output_file do
+    source template_file
+    mode '0644'
+  end
 end
 
 # Here are logrotate configuration specific only to some types of nodes
