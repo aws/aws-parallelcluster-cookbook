@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'aws-parallelcluster-platform::log_rotation' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:log_rotation_path) { "/etc/logrotate.d/parallelcluster_log_rotation" }
+      cached(:log_rotation_path) { "/etc/logrotate.d/" }
 
       context "in the head node when log_rotation enabled and dcv enabled and slurm" do
         cached(:chef_run) do
@@ -19,24 +19,47 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         end
         cached(:node) { chef_run.node }
 
-        it 'creates the template with the correct attributes' do
-          is_expected.to create_template(log_rotation_path).with(
-            source: 'log_rotation/parallelcluster_log_rotation.erb',
-            mode:  '0644',
-            variables: { dcv_configured: true }
-          )
+        expected_config_files = %w(
+          parallelcluster_cloud_init_log_rotation
+          parallelcluster_supervisord_log_rotation
+          parallelcluster_bootstrap_error_msg_log_rotation
+          parallelcluster_cfn_init_log_rotation
+          parallelcluster_chef_client_log_rotation
+          parallelcluster_dcv_log_rotation
+          parallelcluster_pam_ssh_key_generator_log_rotation
+          parallelcluster_clustermgtd_log_rotation
+          parallelcluster_clusterstatusmgtd_log_rotation
+          parallelcluster_slurm_fleet_status_manager_log_rotation
+          parallelcluster_slurm_resume_log_rotation
+          parallelcluster_slurm_suspend_log_rotation
+          parallelcluster_slurmctld_log_rotation
+          parallelcluster_slurmdbd_log_rotation
+          parallelcluster_compute_console_output_log_rotation
+          parallelcluster_clustermgtd_events_log_rotation
+          parallelcluster_slurm_resume_events_log_rotation
+        )
+        unexpected_config_files = %w(
+          parallelcluster_cloud_init_output_log_rotation
+          parallelcluster_computemgtd_log_rotation
+          parallelcluster_slurmd_log_rotation
+        )
+
+        it 'creates the correct logrotate config files' do
+          expected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            template_file = 'log_rotation/' + config_file + '.erb'
+            is_expected.to create_template(output_file).with(
+              source: template_file,
+              mode:  '0644',
+              )
+          end
         end
 
-        it 'has the correct content' do
-          is_expected.to render_file(log_rotation_path)
-            .with_content("/var/log/cloud-init.log")
-            .with_content("/var/log/cfn-init.log")
-            .with_content("/var/log/dcv/server.log")
-            .with_content("/var/log/parallelcluster/pam_ssh_key_generator.log")
-
-          is_expected.to_not render_file(log_rotation_path)
-            .with_content("/var/log/cloud-init-output.log")
-            .with_content("/var/log/parallelcluster/computemgtd")
+        it 'does not create unexpected logrotate config files' do
+          unexpected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            is_expected.to_not create_template(output_file)
+          end
         end
       end
 
@@ -52,16 +75,50 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         end
         cached(:node) { chef_run.node }
 
-        it 'has the correct content' do
-          is_expected.to render_file(log_rotation_path)
-            .with_content("/var/log/cloud-init.log")
-            .with_content("/var/log/cloud-init-output.log")
-            .with_content("/var/log/parallelcluster/computemgtd")
+        expected_config_files = %w(
+          parallelcluster_cloud_init_log_rotation
+          parallelcluster_supervisord_log_rotation
+          parallelcluster_bootstrap_error_msg_log_rotation
+          parallelcluster_cloud_init_output_log_rotation
+          parallelcluster_computemgtd_log_rotation
+          parallelcluster_slurmd_log_rotation
+        )
 
-          is_expected.to_not render_file(log_rotation_path)
-            .with_content("/var/log/cfn-init.log")
-            .with_content("/var/log/dcv/server.log")
+        unexpected_config_files = %w(
+          parallelcluster_cfn_init_log_rotation
+          parallelcluster_chef_client_log_rotation
+          parallelcluster_dcv_log_rotation
+          parallelcluster_pam_ssh_key_generator_log_rotation
+          parallelcluster_clustermgtd_log_rotation
+          parallelcluster_clusterstatusmgtd_log_rotation
+          parallelcluster_slurm_fleet_status_manager_log_rotation
+          parallelcluster_slurm_resume_log_rotation
+          parallelcluster_slurm_suspend_log_rotation
+          parallelcluster_slurmctld_log_rotation
+          parallelcluster_slurmdbd_log_rotation
+          parallelcluster_compute_console_output_log_rotation
+          parallelcluster_clustermgtd_events_log_rotation
+          parallelcluster_slurm_resume_events_log_rotation
+        )
+
+        it 'creates the correct logrotate config files' do
+          expected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            template_file = 'log_rotation/' + config_file + '.erb'
+            is_expected.to create_template(output_file).with(
+              source: template_file,
+              mode:  '0644',
+              )
+          end
         end
+
+        it 'does not create unexpected logrotate config files' do
+          unexpected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            is_expected.to_not create_template(output_file)
+          end
+        end
+
       end
 
       context "in the head node when log_rotation enabled and dcv not enabled and awsbatch" do
@@ -78,16 +135,49 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         end
         cached(:node) { chef_run.node }
 
-        it 'has the correct content' do
-          is_expected.to render_file(log_rotation_path)
-            .with_content("/var/log/cloud-init.log")
+        expected_config_files = %w(
+          parallelcluster_cloud_init_log_rotation
+          parallelcluster_supervisord_log_rotation
+          parallelcluster_bootstrap_error_msg_log_rotation
+          parallelcluster_cfn_init_log_rotation
+          parallelcluster_chef_client_log_rotation
+        )
+        unexpected_config_files = %w(
+          parallelcluster_cloud_init_output_log_rotation
+          parallelcluster_computemgtd_log_rotation
+          parallelcluster_slurmd_log_rotation
+          parallelcluster_pam_ssh_key_generator_log_rotation
+          parallelcluster_dcv_log_rotation
+          parallelcluster_clustermgtd_log_rotation
+          parallelcluster_clusterstatusmgtd_log_rotation
+          parallelcluster_slurm_fleet_status_manager_log_rotation
+          parallelcluster_slurm_resume_log_rotation
+          parallelcluster_slurm_suspend_log_rotation
+          parallelcluster_slurmctld_log_rotation
+          parallelcluster_slurmdbd_log_rotation
+          parallelcluster_compute_console_output_log_rotation
+          parallelcluster_clustermgtd_events_log_rotation
+          parallelcluster_slurm_resume_events_log_rotation
+        )
 
-          is_expected.to_not render_file(log_rotation_path)
-            .with_content("/var/log/dcv/server.log")
-            .with_content("/var/log/cfn-init.log")
-            .with_content("/var/log/parallelcluster/computemgtd")
-            .with_content("/var/log/parallelcluster/pam_ssh_key_generator.log")
+        it 'creates the correct logrotate config files' do
+          expected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            template_file = 'log_rotation/' + config_file + '.erb'
+            is_expected.to create_template(output_file).with(
+              source: template_file,
+              mode:  '0644',
+              )
+          end
         end
+
+        it 'does not create unexpected logrotate config files' do
+          unexpected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            is_expected.to_not create_template(output_file)
+          end
+        end
+
       end
 
       context "when log_rotation disabled" do
@@ -99,10 +189,40 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         end
         cached(:node) { chef_run.node }
 
-        it 'has the correct content' do
-          is_expected.to_not render_file(log_rotation_path)
+        unexpected_config_files = %w(
+          parallelcluster_cloud_init_log_rotation
+          parallelcluster_supervisord_log_rotation
+          parallelcluster_bootstrap_error_msg_log_rotation
+          parallelcluster_cfn_init_log_rotation
+          parallelcluster_chef_client_log_rotation
+          parallelcluster_cloud_init_output_log_rotation
+          parallelcluster_computemgtd_log_rotation
+          parallelcluster_slurmd_log_rotation
+          parallelcluster_pam_ssh_key_generator_log_rotation
+          parallelcluster_dcv_log_rotation
+          parallelcluster_clustermgtd_log_rotation
+          parallelcluster_clusterstatusmgtd_log_rotation
+          parallelcluster_slurm_fleet_status_manager_log_rotation
+          parallelcluster_slurm_resume_log_rotation
+          parallelcluster_slurm_suspend_log_rotation
+          parallelcluster_slurmctld_log_rotation
+          parallelcluster_slurmdbd_log_rotation
+          parallelcluster_compute_console_output_log_rotation
+          parallelcluster_clustermgtd_events_log_rotation
+          parallelcluster_slurm_resume_events_log_rotation
+        )
+
+        it 'does not create unexpected logrotate config files' do
+          unexpected_config_files.each do |config_file |
+            output_file = log_rotation_path + config_file
+            is_expected.to_not create_template(output_file)
+          end
         end
+
       end
+
     end
+
   end
+
 end
