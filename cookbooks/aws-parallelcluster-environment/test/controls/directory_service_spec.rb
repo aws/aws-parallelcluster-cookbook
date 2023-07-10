@@ -90,3 +90,36 @@ control 'sssd_configured_correctly' do
     end
   end
 end
+
+control 'sssd_configured_correctly_in_login_nodes' do
+  title "Check SSSd in LoginNode is correct"
+
+  describe file('/etc/sssd/sssd.conf') do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0600' }
+  end unless os_properties.redhat_on_docker?
+
+  desc 'Check SSH password authentication is enabled on head node'
+  describe file('/etc/ssh/sshd_config') do
+    it { should exist }
+    its('content') { should match /PasswordAuthentication yes/ }
+  end unless os_properties.on_docker?
+
+  pam_services = %w(sudo su sshd)
+  pam_services.each do |pam_service|
+    describe file("/etc/pam.d/#{pam_service}") do
+      it { should exist }
+      its('content') { should match %r{session\s+optional\s+pam_exec\.so\s+seteuid\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log} }
+    end
+  end
+
+  %w(sssd sshd).each do |daemon|
+    describe service(daemon) do
+      it { should be_installed }
+      it { should be_enabled }
+      it { should be_running }
+    end
+  end
+end
