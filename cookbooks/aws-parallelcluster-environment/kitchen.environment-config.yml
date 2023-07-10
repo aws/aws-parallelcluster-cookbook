@@ -332,6 +332,25 @@ suites:
         - recipe:aws-parallelcluster-platform::directories
         - resource:package_repos
         - resource:system_authentication
+  - name: directory_service_login_nodes
+    # FIXME: breaks on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::directory_service]
+    verifier:
+      controls:
+        - sssd_configured_correctly_login_nodes
+    attributes:
+      cluster:
+        node_type: LoginNode
+        directory_service:
+          enabled: 'true'
+          generate_ssh_keys_for_users: 'true'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:system_authentication
+        - recipe:aws-parallelcluster-environment::mock_directory_service_login
   - name: ebs_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
