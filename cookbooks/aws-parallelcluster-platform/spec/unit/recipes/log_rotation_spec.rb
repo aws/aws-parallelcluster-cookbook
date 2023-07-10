@@ -45,18 +45,18 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         )
 
         it 'creates the correct logrotate config files' do
-          expected_config_files.each do |config_file |
+          expected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             template_file = 'log_rotation/' + config_file + '.erb'
             is_expected.to create_template(output_file).with(
               source: template_file,
-              mode:  '0644',
-              )
+              mode:  '0644'
+            )
           end
         end
 
         it 'does not create unexpected logrotate config files' do
-          unexpected_config_files.each do |config_file |
+          unexpected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             is_expected.to_not create_template(output_file)
           end
@@ -102,23 +102,22 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         )
 
         it 'creates the correct logrotate config files' do
-          expected_config_files.each do |config_file |
+          expected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             template_file = 'log_rotation/' + config_file + '.erb'
             is_expected.to create_template(output_file).with(
               source: template_file,
-              mode:  '0644',
-              )
+              mode:  '0644'
+            )
           end
         end
 
         it 'does not create unexpected logrotate config files' do
-          unexpected_config_files.each do |config_file |
+          unexpected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             is_expected.to_not create_template(output_file)
           end
         end
-
       end
 
       context "in the head node when log_rotation enabled and dcv not enabled and awsbatch" do
@@ -161,23 +160,22 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         )
 
         it 'creates the correct logrotate config files' do
-          expected_config_files.each do |config_file |
+          expected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             template_file = 'log_rotation/' + config_file + '.erb'
             is_expected.to create_template(output_file).with(
               source: template_file,
-              mode:  '0644',
-              )
+              mode:  '0644'
+            )
           end
         end
 
         it 'does not create unexpected logrotate config files' do
-          unexpected_config_files.each do |config_file |
+          unexpected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             is_expected.to_not create_template(output_file)
           end
         end
-
       end
 
       context "when log_rotation disabled" do
@@ -213,16 +211,12 @@ describe 'aws-parallelcluster-platform::log_rotation' do
         )
 
         it 'does not create unexpected logrotate config files' do
-          unexpected_config_files.each do |config_file |
+          unexpected_config_files.each do |config_file|
             output_file = log_rotation_path + config_file
             is_expected.to_not create_template(output_file)
           end
         end
-
       end
-
     end
-
   end
-
 end

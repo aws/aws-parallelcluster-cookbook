@@ -26,7 +26,7 @@ config_files = %w(
   parallelcluster_bootstrap_error_msg_log_rotation
 )
 
-config_files.each do | config_file |
+config_files.each do |config_file|
   output_file = logrotate_conf_dir + config_file
   template_file = logrotate_template_dir + (config_file + '.erb')
   template output_file do

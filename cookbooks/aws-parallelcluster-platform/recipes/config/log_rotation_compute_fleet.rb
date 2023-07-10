@@ -27,7 +27,7 @@ if node['cluster']['scheduler'] == 'slurm'
   )
 end
 
-config_files.each do | config_file |
+config_files.each do |config_file|
   output_file = logrotate_conf_dir + config_file
   template_file = logrotate_template_dir + config_file + '.erb'
   template output_file do
