@@ -17,6 +17,9 @@ logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
 logrotate_template_dir = 'log_rotation/'
 
 config_files = %w(
+  parallelcluster_cloud_init_log_rotation
+  parallelcluster_supervisord_log_rotation
+  parallelcluster_bootstrap_error_msg_log_rotation
   parallelcluster_cfn_init_log_rotation
   parallelcluster_chef_client_log_rotation
 )

@@ -16,19 +16,6 @@ return if node['cluster']['log_rotation_enabled'] != 'true'
 
 # TODO: move the logrotate configuration of the various services to the corresponding recipes/cookbooks.
 
-# Here are general logrotate configuration present in all types of nodes
-logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
-logrotate_template_dir = 'log_rotation/'
-
-config_files = %w(
-  parallelcluster_cloud_init_log_rotation
-  parallelcluster_supervisord_log_rotation
-  parallelcluster_bootstrap_error_msg_log_rotation
-)
-
-generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)
-
-# Here are logrotate configuration specific only to some types of nodes
 case node['cluster']['node_type']
 
 when 'HeadNode'

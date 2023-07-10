@@ -17,8 +17,11 @@ logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
 logrotate_template_dir = 'log_rotation/'
 
 config_files = %w(
-    parallelcluster_cloud_init_output_log_rotation
-  )
+  parallelcluster_cloud_init_log_rotation
+  parallelcluster_supervisord_log_rotation
+  parallelcluster_bootstrap_error_msg_log_rotation
+  parallelcluster_cloud_init_output_log_rotation
+)
 
 if node['cluster']['scheduler'] == 'slurm'
   config_files += %w(
