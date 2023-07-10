@@ -33,14 +33,15 @@ when 'HeadNode'
     action :export
   end
 
-  # Export /opt/intel
+  # Export /opt/intel only if exists
   volume "export /opt/intel" do
     shared_dir "/opt/intel"
+    only_if { ::File.directory?("/opt/intel") }
     action :export
   end
 
 when 'ComputeFleet', 'LoginNode'
-  # Mount /opt/intel over NFS
+  # Mount /opt/intel over NFS only if it exists
   exported_intel_dir = format_directory('/opt/intel')
   volume "mount /opt/intel" do
     action :mount
@@ -50,6 +51,7 @@ when 'ComputeFleet', 'LoginNode'
     options node['cluster']['nfs']['hard_mount_options']
     retries 10
     retry_delay 6
+    only_if { ::File.directory?("/opt/intel") }
   end
 
 else
