@@ -26,14 +26,7 @@ config_files = %w(
   parallelcluster_bootstrap_error_msg_log_rotation
 )
 
-config_files.each do |config_file|
-  output_file = logrotate_conf_dir + config_file
-  template_file = logrotate_template_dir + (config_file + '.erb')
-  template output_file do
-    source template_file
-    mode '0644'
-  end
-end
+generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)
 
 # Here are logrotate configuration specific only to some types of nodes
 case node['cluster']['node_type']

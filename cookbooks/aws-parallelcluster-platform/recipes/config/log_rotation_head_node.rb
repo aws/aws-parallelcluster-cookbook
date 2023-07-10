@@ -48,11 +48,4 @@ if node['cluster']['scheduler'] == 'slurm'
   )
 end
 
-config_files.each do |config_file|
-  output_file = logrotate_conf_dir + config_file
-  template_file = logrotate_template_dir + config_file + '.erb'
-  template output_file do
-    source template_file
-    mode '0644'
-  end
-end
+generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)
