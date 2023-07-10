@@ -200,7 +200,7 @@ when 'LoginNode'
     user 'root'
     command "cp #{login_node_shared_sssd_conf_path} #{sssd_conf_path}"
     sensitive true
-  end unless on_docker?
+  end unless redhat_on_docker?
 
   bash 'Enable SSH password authentication on login node' do
     user 'root'
