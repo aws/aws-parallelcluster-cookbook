@@ -12,22 +12,20 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['cluster']['log_rotation_enabled'] != 'true'
-
 # TODO: move the logrotate configuration of the various services to the corresponding recipes/cookbooks.
+logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
+logrotate_template_dir = 'log_rotation/'
 
-case node['cluster']['node_type']
+config_files = %w(
+  parallelcluster_cloud_init_log_rotation
+  parallelcluster_cloud_init_output_log_rotation
+  parallelcluster_supervisord_log_rotation
+)
 
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-platform::log_rotation_head_node'
-
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-platform::log_rotation_compute_fleet'
-
-when 'LoginNode'
-  include_recipe 'aws-parallelcluster-platform::log_rotation_login_node'
-
-else
-  raise "node_type must be HeadNode, LoginNode or ComputeFleet"
-
+if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
+  config_files += %w(
+    parallelcluster_pam_ssh_key_generator_log_rotation
+  )
 end
+
+generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)
