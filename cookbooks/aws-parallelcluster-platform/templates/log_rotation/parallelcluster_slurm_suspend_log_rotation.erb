@@ -1,0 +1,13 @@
+<%# Logrotate file for slurm_suspend log %>
+/var/log/parallelcluster/slurm_suspend.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    postrotate
+        pkill --signal=SIGUSR2 slurmctld
+        echo 0
+    endscript
+    su pcluster-admin pcluster-admin
+    nodateext
+}

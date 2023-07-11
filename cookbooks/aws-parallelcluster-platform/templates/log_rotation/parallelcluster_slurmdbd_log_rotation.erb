@@ -1,0 +1,12 @@
+<%# Logrotate file for slurmdbd log %>
+/var/log/slurmdbd.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    postrotate
+        pkill -x --signal SIGUSR2 slurmdbd
+        exit 0
+    endscript
+    nodateext
+}

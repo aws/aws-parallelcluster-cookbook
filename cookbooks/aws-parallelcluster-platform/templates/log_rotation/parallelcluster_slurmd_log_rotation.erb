@@ -1,0 +1,12 @@
+<%# Logrotate file for slurmd log %>
+/var/log/slurmd.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    postrotate
+        pkill --signal=SIGUSR2 slurmd
+        echo 0
+    endscript
+    nodateext
+}

@@ -1,0 +1,14 @@
+<%# Logrotate file for computemgtd log %>
+/var/log/parallelcluster/computemgtd {
+    missingok
+    notifempty
+    nodateext
+    size 10M
+    rotate 1
+    su root root
+    postrotate
+        pkill --signal=SIGUSR2 supervisord
+        echo 0
+    endscript
+    create 0644 root root
+}

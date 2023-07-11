@@ -12,19 +12,22 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['cluster']['log_rotation_enabled'] != 'true'
-
 # TODO: move the logrotate configuration of the various services to the corresponding recipes/cookbooks.
+logrotate_conf_dir = node['cluster']['logrotate_conf_dir']
+logrotate_template_dir = 'log_rotation/'
 
-case node['cluster']['node_type']
+config_files = %w(
+  parallelcluster_cloud_init_log_rotation
+  parallelcluster_supervisord_log_rotation
+  parallelcluster_bootstrap_error_msg_log_rotation
+  parallelcluster_cloud_init_output_log_rotation
+)
 
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-platform::log_rotation_head_node'
-
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-platform::log_rotation_compute_fleet'
-
-else
-  raise "node_type must be HeadNode or ComputeFleet"
-
+if node['cluster']['scheduler'] == 'slurm'
+  config_files += %w(
+    parallelcluster_computemgtd_log_rotation
+    parallelcluster_slurmd_log_rotation
+  )
 end
+
+generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)

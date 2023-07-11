@@ -1,0 +1,9 @@
+<%# Logrotate file for cloud-init-output.log %>
+/var/log/cloud-init-output.log {
+    missingok
+    notifempty
+    nodateext
+    size 10M
+    rotate 1
+    copytruncate
+}
