@@ -36,7 +36,7 @@ def dynamodb_info(aws_connection_timeout_seconds: 30, aws_read_timeout_seconds: 
                                 user: 'root',
                                 timeout: shell_timout_seconds).run_command.stdout.strip
 
-  raise "Failed when retrieving Compute info from DynamoDB" if output == "None"
+  raise "Failed when retrieving Compute info from DynamoDB" if output.nil? || output.empty? || output == "None"
 
   slurm_nodename = output
 
