@@ -1,0 +1,10 @@
+<%# Logrotate file for compute_console_output log %>
+/var/log/parallelcluster/compute_console_output.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    copytruncate
+    su pcluster-admin pcluster-admin
+    nodateext
+}

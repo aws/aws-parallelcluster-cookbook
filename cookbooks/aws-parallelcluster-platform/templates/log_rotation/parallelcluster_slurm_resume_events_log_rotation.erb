@@ -1,0 +1,10 @@
+<%# Logrotate file for slurm resume events log %>
+/var/log/parallelcluster/slurm_resume.events {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    copytruncate
+    su pcluster-admin pcluster-admin
+    nodateext
+}
