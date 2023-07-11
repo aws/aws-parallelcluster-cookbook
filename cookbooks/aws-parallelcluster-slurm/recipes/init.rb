@@ -31,6 +31,8 @@ end
 if node['cluster']['node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
+    retries 12
+    retry_delay 10
     block do
       slurm_nodename = dynamodb_info
       node.force_default['cluster']['slurm_nodename'] = slurm_nodename
