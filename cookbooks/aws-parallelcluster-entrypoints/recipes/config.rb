@@ -18,6 +18,12 @@ include_recipe "aws-parallelcluster-shared::setup_envars"
 
 include_recipe 'aws-parallelcluster-platform::config'
 include_recipe "aws-parallelcluster-environment::config"
+
+# Intel HPC must be configured after the setup of the shared folder (i.e. /opt/intel)
+intel_hpc 'Configure Intel HPC' do
+  action :configure
+end
+
 include_recipe 'aws-parallelcluster-computefleet::config'
 include_recipe 'aws-parallelcluster-slurm::config'
 include_recipe 'aws-parallelcluster-awsbatch::config'

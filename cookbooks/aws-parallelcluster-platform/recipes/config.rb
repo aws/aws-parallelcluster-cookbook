@@ -21,9 +21,6 @@ chrony 'enable Amazon Time Sync' do
   action :enable
 end
 include_recipe 'aws-parallelcluster-platform::dcv'
-intel_hpc 'Configure Intel HPC' do
-  action :configure
-end
 # Supervisord configuration must be executed after DCV because dcv external authenticator is part of it
 include_recipe 'aws-parallelcluster-platform::supervisord_config'
 fetch_config 'Fetch and load cluster configs'
