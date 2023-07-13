@@ -50,7 +50,7 @@ control 'tag:config_nfs_correctly_installed_on_compute_node' do
   only_if { instance.compute_node? && !os_properties.on_docker? }
 
   describe 'check for nfs server protocol' do
-    subject { command "sudo -u #{node['cluster']['cluster_user']} rpcinfo -p localhost | awk '{print $2$5}' | grep 4nfs" }
+    subject { command "sudo -u #{node['cluster']['cluster_user']} systemctl status #{node['nfs']['service']['server']} | grep inactive" }
     its('exit_status') { should eq 0 }
   end
 end
