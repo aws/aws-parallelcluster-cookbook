@@ -33,3 +33,4 @@ include_recipe "aws-parallelcluster-platform::nvidia_install"
 include_recipe "aws-parallelcluster-platform::intel_mpi"
 arm_pl 'Install ARM Performance Library'
 intel_hpc 'Setup Intel HPC'
+spack 'install Spack'
