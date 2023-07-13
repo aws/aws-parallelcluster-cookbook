@@ -56,7 +56,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/etc/cloudwatch_agent_config_schema.json') do
     it { should exist }
-    its('sha256sum') { should eq '27ebc3dc858094d6cb4454ce8ca230e0828716b50c2d2b1199eb9150fec0a04a' }
+    its('sha256sum') { should eq '9019c9235fe54091db4c225fe6be552b229c958ab8a87fa94b5a875545bbfd87' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
@@ -76,4 +76,59 @@ control 'tag:config_cloudwatch_configured' do
       its('exit_status') { should eq 0 }
     end
   end
+
+  describe file('/etc/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0644' }
+  end unless os_properties.on_docker?
+end
+
+control 'cloudwatch_logfiles_configuration_loginnode' do
+  title "Check CloudWatch configuration generated on login nodes"
+
+  # TODO: add directory service enablement in the context of the test and add the corresponding log files.
+  expected_log_files = %w(
+    /var/log/cloud-init.log
+    /var/log/cloud-init-output.log
+    /var/log/supervisord.log
+  )
+  unexpected_log_files = %w(
+    /var/log/messages
+    /var/log/syslog
+    /var/log/cfn-init.log
+    /var/log/chef-client.log
+    /var/log/parallelcluster/bootstrap_error_msg
+    /var/log/parallelcluster/clustermgtd
+    /var/log/parallelcluster/clustermgtd.events
+    /var/log/parallelcluster/slurm_resume.events
+    /var/log/parallelcluster/compute_console_output.log
+    /var/log/parallelcluster/computemgtd
+    /var/log/parallelcluster/slurm_resume.log
+    /var/log/parallelcluster/slurm_suspend.log
+    /var/log/parallelcluster/slurm_fleet_status_manager.log
+    /var/log/slurmd.log
+    /var/log/slurmctld.log
+    /var/log/slurmdbd.log
+    /var/log/parallelcluster/pcluster_dcv_authenticator.log
+    /var/log/parallelcluster/pcluster_dcv_connect.log
+    /var/log/dcv/server.log
+    /var/log/dcv/sessionlauncher.log
+    /var/log/dcv/agent.*.log
+    /var/log/dcv/dcv-xsession.*.log
+    /var/log/dcv/Xdcv.*.log
+    /var/log/parallelcluster/slurm_health_check.log
+    /var/log/parallelcluster/slurm_health_check.events
+    /var/log/parallelcluster/clusterstatusmgtd
+  )
+
+  describe file('/etc/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
+    expected_log_files.each do |log_file|
+      its('content') { should include(log_file) }
+    end
+    unexpected_log_files.each do |log_file|
+      its('content') { should_not include(log_file) }
+    end
+  end unless os_properties.on_docker?
 end

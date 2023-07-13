@@ -24,6 +24,24 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: cloudwatch-loginnode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_cloudwatch/
+        - cloudwatch_logfiles_configuration_loginnode
+    attributes:
+      resource: cloudwatch:configure
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:cloudwatch:setup
+      cluster:
+        node_type: LoginNode
+        scheduler: slurm
+        cw_logging_enabled: "true"
+        log_group_name: test
   - name: ebs_mount
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -133,8 +151,8 @@ suites:
       controls:
         - /lustre_mounted/
     attributes:
-      resource: 'lustre:mount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array", 
-                               "fsx_fs_type_array": ["LUSTRE"], 
+      resource: 'lustre:mount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array",
+                               "fsx_fs_type_array": ["LUSTRE"],
                                "fsx_shared_dir_array": ["shared_dir"],
                                "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
                                "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
@@ -151,8 +169,8 @@ suites:
       controls:
         - /lustre_unmounted/
     attributes:
-      resource: 'lustre:unmount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array", 
-                                 "fsx_fs_type_array": ["LUSTRE"], 
+      resource: 'lustre:unmount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array",
+                                 "fsx_fs_type_array": ["LUSTRE"],
                                  "fsx_shared_dir_array": ["shared_dir"],
                                  "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
                                  "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
@@ -161,8 +179,8 @@ suites:
         - recipe:aws-parallelcluster-platform::cookbook_virtualenv
         - resource:ec2_udev_rules
         - resource:lustre
-        - 'resource:lustre:mount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array", 
-                                  "fsx_fs_type_array": ["LUSTRE"], 
+        - 'resource:lustre:mount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array",
+                                  "fsx_fs_type_array": ["LUSTRE"],
                                   "fsx_shared_dir_array": ["shared_dir"],
                                   "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
                                   "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
