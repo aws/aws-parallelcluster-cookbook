@@ -1,0 +1,15 @@
+modules:
+  default:
+    enable:
+      - tcl
+    tcl:
+      projections:
+        all: '{name}/{version}-{compiler.name}-{compiler.version}'
+      all:
+        conflict:
+          - '{name}'
+        environment:
+          set:
+            '{name}_ROOT': '{prefix}'
+        # Automatically load dependencies
+        autoload: all

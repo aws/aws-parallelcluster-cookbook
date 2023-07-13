@@ -35,3 +35,5 @@ arm_pl 'Install ARM Performance Library' do
   not_if { platform?('ubuntu') && node['platform_version'].to_i == 22 }
 end
 intel_hpc 'Setup Intel HPC'
+spack 'install Spack'
+

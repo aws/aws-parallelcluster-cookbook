@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   Useful for development purposes only.
 - Avoid to start NFS server on compute nodes.
 - Add support for Login Nodes.
+- Install [Spack](https://spack.io) by default in the cluster user's home directory.
 
 **CHANGES**
 - Assign Slurm dynamic nodes a priority (weight) of 1000 by default. This allows Slurm to prioritize idle static nodes over idle dynamic ones.
