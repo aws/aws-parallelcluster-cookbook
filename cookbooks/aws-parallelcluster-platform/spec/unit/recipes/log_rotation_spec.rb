@@ -273,7 +273,6 @@ describe 'aws-parallelcluster-platform::log_rotation' do
           end
         end
       end
-
     end
   end
 end
