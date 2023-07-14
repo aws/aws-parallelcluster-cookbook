@@ -19,6 +19,7 @@ cloudwatch "Configure CloudWatch" do
 end
 include_recipe "aws-parallelcluster-environment::network_interfaces"
 include_recipe 'aws-parallelcluster-environment::imds'
+include_recipe "aws-parallelcluster-environment::login_nodes_keys"
 include_recipe "aws-parallelcluster-environment::directory_service"
 
 # Custom action setup must be executed after cfnconfig file creation
