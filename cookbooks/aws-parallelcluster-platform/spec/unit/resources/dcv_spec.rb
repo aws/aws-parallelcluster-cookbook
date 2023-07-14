@@ -834,7 +834,7 @@ describe 'dcv:configure' do
           is_expected.to run_execute('Wait for X to start').with(
             user: 'root',
             command: "pidof X || pidof Xorg",
-            retries: 5,
+            retries: 10,
             retry_delay: 5
           )
         end
