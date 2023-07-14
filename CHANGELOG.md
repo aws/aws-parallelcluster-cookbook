@@ -28,6 +28,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.5-1`
 
 **BUG FIXES**
+- Fix cluster creation failure with Ubuntu Deep Learning AMI on GPU instances and DCV enabled.
 
 3.6.1
 ------
