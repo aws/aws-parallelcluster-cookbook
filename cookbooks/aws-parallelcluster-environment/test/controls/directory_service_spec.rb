@@ -35,12 +35,21 @@ control 'sssd_configured_correctly' do
     its('content') { should match /debug_level = 0x1ff/ }
   end unless os_properties.on_docker?
 
-  shared_dir = "/opt/parallelcluster/shared/directory_service"
-  describe directory(shared_dir) do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('mode') { should cmp '0600' }
+  shared_dirs = %w(shared shared_login_nodes)
+  shared_dirs.each do |shared|
+    describe directory("/opt/parallelcluster/#{shared}/directory_service") do
+      it { should exist }
+      its('owner') { should eq 'root' }
+      its('group') { should eq 'root' }
+      its('mode') { should cmp '0600' }
+    end
+
+    describe file("/opt/parallelcluster/#{shared}/directory_service/sssd.conf") do
+      it { should exist }
+      its('owner') { should eq 'root' }
+      its('group') { should eq 'root' }
+      its('mode') { should cmp '0600' }
+    end unless os_properties.on_docker?
   end
 
   desc 'Check SSH password authentication is enabled on head node'
@@ -57,6 +66,7 @@ control 'sssd_configured_correctly' do
     its('mode') { should cmp '0744' }
   end
 
+  shared_dir = "/opt/parallelcluster/shared/directory_service"
   describe file("#{scripts_dir}/directory_service/update_directory_service_password.sh") do
     it { should exist }
     its('owner') { should eq 'root' }
