@@ -89,7 +89,7 @@ action_class do
     execute 'Wait for X to start' do
       user 'root'
       command "pidof X || pidof Xorg"
-      retries 5
+      retries 10
       retry_delay 5
     end
   end
