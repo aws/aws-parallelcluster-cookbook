@@ -1,0 +1,33 @@
+#!/bin/bash
+
+DEFAULT_USER=''
+OS=$(cat /etc/os-release | grep '^ID=' | cut -f2 -d'"')
+TERMINATION_MESSAGE=$1
+GRACETIME_PERIOD=$2
+
+if [[ $OS == "amzn" ]]; then
+    DEFAULT_USER='ec2-user'
+elif [[ $OS == "centos" ]]; then
+    DEFAULT_USER='centos'
+elif [[ $OS == "ubuntu" ]]; then
+    DEFAULT_USER='ubuntu'
+elif [[ $OS == "rhel" ]]; then
+    DEFAULT_USER='ec2-user'
+fi
+
+# Prevent further login/SSH attempts by updating ssh config
+echo "AllowUsers $DEFAULT_USER" >> /etc/ssh/sshd_config
+
+# Reload the ssh configuration
+systemctl reload sshd
+
+# Broadcast a message to all logged in users using the wall command
+wall "$TERMINATION_MESSAGE"
+
+# Sleep for the gracetime period
+sleep $((GRACETIME_PERIOD*60))
+
+# Broadcast a final message
+wall "System is now going down for termination!"
+
+exit 0

@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Load configuration file
+CONFIG_PATH="<%= node['cluster']['shared_dir'] %>/login_nodes_daemon_config.json"
+CONFIG_JSON=$(cat $CONFIG_PATH)
+TERMINATION_SCRIPT_PATH=$(echo $CONFIG_JSON | jq -r .termination_script_path)
+TERMINATION_MESSAGE=$(echo $CONFIG_JSON | jq -r .termination_message)
+GRACETIME_PERIOD=$1
+
+IMDS_TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+while true; do
+  INSTANCE_LIFECYCLE_STATE=$(curl -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" -v http://169.254.169.254/latest/meta-data/instance-life-cycle)
+  if [[ "$INSTANCE_LIFECYCLE_STATE" == "Terminated" ]]; then
+    break
+  fi
+  sleep 60
+done
+
+bash $TERMINATION_SCRIPT_PATH $TERMINATION_MESSAGE $GRACETIME_PERIOD
