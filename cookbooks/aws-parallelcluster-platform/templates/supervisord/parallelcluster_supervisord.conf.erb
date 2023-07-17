@@ -52,4 +52,13 @@ stdout_logfile = /var/log/parallelcluster/computemgtd
 stdout_logfile_maxbytes = 0
 <% end -%>
 
+<%# LoginNode -%>
+<% when 'LoginNode' -%>
+[program:loginmgtd]
+command = <%= node['cluster']['shared_dir_login_nodes'] %>/loginmgtd.sh
+autorestart = unexpected
+exitcodes = 0
+redirect_stderr = true
+stdout_logfile = /var/log/parallelcluster/loginmgtd.log
+stdout_logfile_maxbytes = 1MB
 <% end -%>
