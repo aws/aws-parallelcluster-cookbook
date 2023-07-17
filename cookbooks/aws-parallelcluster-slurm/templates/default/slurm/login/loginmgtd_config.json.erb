@@ -1,0 +1,5 @@
+{
+  "termination_script_path": "<%= node['cluster']['shared_dir_login_nodes'] %>/loginmgtd_on_termination.sh",
+  "termination_message": "The system will be terminated within <%= @gracetime_period %> minutes.",
+  "gracetime_period": "<%= @gracetime_period %>"
+}

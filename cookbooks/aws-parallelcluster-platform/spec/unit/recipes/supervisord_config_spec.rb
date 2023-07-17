@@ -75,6 +75,25 @@ describe 'aws-parallelcluster-platform::supervisord_config' do
             .with_content("[program:pcluster_dcv_authenticator]")
         end
       end
+      context "when login node" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            node.override['cluster']['node_type'] = 'LoginNode'
+            node.override['cluster']['dcv_enabled'] = 'head_node'
+            allow_any_instance_of(Object).to receive(:dcv_installed?).and_return(false)
+          end
+          runner.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'has the correct content' do
+          is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:loginmgtd]")
+
+          is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:pcluster_dcv_authenticator]")
+        end
+      end
     end
   end
 end

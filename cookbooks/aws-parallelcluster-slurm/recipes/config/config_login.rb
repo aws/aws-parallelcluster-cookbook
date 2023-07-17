@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster-slurm
-# Recipe:: config_compute
+# Recipe:: config_login
 #
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -19,3 +19,5 @@
 setup_munge_compute_node
 
 include_recipe 'aws-parallelcluster-slurm::mount_slurm_dir'
+
+include_recipe 'aws-parallelcluster-slurm::login_nodes_daemon_service'
