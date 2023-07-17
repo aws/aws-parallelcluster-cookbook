@@ -260,8 +260,6 @@ end
 
 include_recipe 'aws-parallelcluster-slurm::config_health_check'
 
-include_recipe 'aws-parallelcluster-slurm::login_nodes_daemon_service'
-
 ruby_block "Configure Slurm Accounting" do
   block do
     run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
@@ -283,3 +281,5 @@ execute "check slurmctld status" do
   retries 5
   retry_delay 2
 end unless redhat_on_docker?
+
+include_recipe 'aws-parallelcluster-slurm::login_nodes_daemon_service'

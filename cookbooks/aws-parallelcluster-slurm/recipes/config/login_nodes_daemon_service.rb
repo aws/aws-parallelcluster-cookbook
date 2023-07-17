@@ -2,7 +2,6 @@ require 'yaml'
 config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
 GRACETIME_PERIOD = config["LoginNodes"]["Pools"][0]["GRACETIME_PERIOD"]
 
-
 # Create configuration file
 template "#{node['cluster']['shared_dir']}/login_nodes_daemon_config.json" do
   source 'login_nodes_daemon_service/login_nodes_daemon_config.json.erb'
@@ -11,11 +10,10 @@ template "#{node['cluster']['shared_dir']}/login_nodes_daemon_config.json" do
   mode '0644'
   variables(
     {
-      GRACETIME_PERIOD: GRACETIME_PERIOD
+      GRACETIME_PERIOD: GRACETIME_PERIOD,
     }
   )
 end
-
 
 # Create on_termination_script.sh
 template "#{node['cluster']['shared_dir']}/login_nodes_on_termination_script.sh" do
