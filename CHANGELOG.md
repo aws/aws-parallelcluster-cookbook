@@ -26,6 +26,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.18.0-1`
   - Rdma-core: `rdma-core-46.0-1`
   - Open MPI: `openmpi40-aws-4.1.5-1`
+- Upgrade Slurm to version 23.02.3.
 
 **BUG FIXES**
 - Fix cluster creation failure with Ubuntu Deep Learning AMI on GPU instances and DCV enabled.
