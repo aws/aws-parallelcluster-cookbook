@@ -25,7 +25,7 @@ template "#{node['cluster']['shared_dir_login_nodes']}/login_nodes_daemon.sh" do
   mode '0744'
 end
 
-# Start daemon service
-execute 'start login_nodes_daemon_service' do
-  command "#{node['cookbook_virtualenv_path']}/bin/supervisorctl start login_nodes_daemon_service"
-end
+# # Start daemon service
+# execute 'start login_nodes_daemon_service' do
+#   command "#{node['cookbook_virtualenv_path']}/bin/supervisorctl start login_nodes_daemon_service"
+# end

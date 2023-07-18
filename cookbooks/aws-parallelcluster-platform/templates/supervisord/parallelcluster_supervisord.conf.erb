@@ -41,16 +41,16 @@ environment = HOME="<%= @dcv_auth_user_home %>",USER="<%= @dcv_auth_user %>"<% i
 <% end -%>
 
 <%# LoginNode -%>
-<% when 'LoginNode' -%>
-[program:login_nodes_daemon_service]
-command = <%= node['cluster']['shared_dir_login_nodes'] %>/login_nodes_daemon.sh
-user = <%= node['cluster']['cluster_admin_user'] %>
-redirect_stderr = true
-stdout_logfile = /var/log/parallelcluster/login_nodes_daemon.log
-autorestart = true
-redirect_stderr = true
-stdout_logfile_maxbytes = 1MB
-exitcodes = 0
+<%# when 'LoginNode' -%>
+<!--[program:login_nodes_daemon_service]-->
+<!--command = <%#= node['cluster']['shared_dir_login_nodes'] %>/login_nodes_daemon.sh-->
+<!--user = <%#= node['cluster']['cluster_admin_user'] %>-->
+<!--redirect_stderr = true-->
+<!--stdout_logfile = /var/log/parallelcluster/login_nodes_daemon.log-->
+<!--autorestart = true-->
+<!--redirect_stderr = true-->
+<!--stdout_logfile_maxbytes = 1MB-->
+<!--exitcodes = 0-->
 
 <%# ComputeFleet -%>
 <% when 'ComputeFleet' -%>
