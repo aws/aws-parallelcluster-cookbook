@@ -1,5 +1,3 @@
-GRACETIME_PERIOD = lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :GracetimePeriod) }
-
 # Create configuration file
 template "#{node['cluster']['shared_dir_login_nodes']}/login_nodes_daemon_config.json" do
   source 'slurm/login/login_nodes_daemon_config.json.erb'
@@ -7,7 +5,7 @@ template "#{node['cluster']['shared_dir_login_nodes']}/login_nodes_daemon_config
   group 'root'
   mode '0644'
   variables(
-    GRACETIME_PERIOD: GRACETIME_PERIOD,
+    GRACETIME_PERIOD: lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :GracetimePeriod) }
   )
 end
 
