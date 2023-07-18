@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# This script is used to handle the termination of login nodes instances within an AWS cluster.
+# It restricts SSH access to a default user, notifies logged-in users of the upcoming termination,
+# waits for a given "grace period", then notifies of the imminent shutdown.
+# It is invoked with two parameters: a termination message and a gracetime period in minutes.
+# The termination message will be broadcast to all logged in users, and the grace period defines
+# how long the script should wait before the final system shutdown.
+
+DEFAULT_USER=<%= node['cluster']['cluster_user'] %>
+TERMINATION_MESSAGE=$1
+GRACETIME_PERIOD=$2
+
+echo "AllowUsers $DEFAULT_USER" >> /etc/ssh/sshd_config
+systemctl reload sshd
+wall "$TERMINATION_MESSAGE"
+sleep $((GRACETIME_PERIOD*60))
+wall "System is now going down for termination!"

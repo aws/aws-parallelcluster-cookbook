@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# This script monitors the lifecycle state of the current AWS EC2 instance and triggers
+# a termination script when the instance state is set to "Terminated".
+# The script uses the AWS Instance Metadata Service (IMDS) to determine the state of the instance.
+# The termination script to be triggered and the termination message are read from a config JSON file.
+# The script expects a grace period in minutes as an argument, which it passes to the termination script.
+# The script runs in an infinite loop, checking the instance state every 60 seconds.
+
+CONFIG_PATH="<%= node['cluster']['shared_dir'] %>/login_nodes_daemon_config.json"
+CONFIG_JSON=$(cat $CONFIG_PATH)
+TERMINATION_SCRIPT_PATH=$(echo $CONFIG_JSON | jq -r .termination_script_path)
+TERMINATION_MESSAGE=$(echo $CONFIG_JSON | jq -r .termination_message)
+DAEMON_SLEEP_SECONDS=60
+GRACETIME_PERIOD=$(echo $CONFIG_JSON | jq -r .gracetime_period)
+
+while true; do
+  IMDS_TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600")
+
+  INSTANCE_LIFECYCLE_STATE=$(curl -H "X-aws-ec2-metadata-token: $IMDS_TOKEN" -v http://169.254.169.254/latest/meta-data/autoscaling/instance-life-cycle)
+  if [[ "$INSTANCE_LIFECYCLE_STATE" == "Terminated" ]]; then
+    break
+  fi
+  sleep $DAEMON_SLEEP_SECONDS
+done
+
+bash $TERMINATION_SCRIPT_PATH $TERMINATION_MESSAGE $GRACETIME_PERIOD
