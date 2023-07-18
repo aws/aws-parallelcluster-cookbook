@@ -281,5 +281,3 @@ execute "check slurmctld status" do
   retries 5
   retry_delay 2
 end unless redhat_on_docker?
-
-include_recipe 'aws-parallelcluster-slurm::login_nodes_daemon_service'

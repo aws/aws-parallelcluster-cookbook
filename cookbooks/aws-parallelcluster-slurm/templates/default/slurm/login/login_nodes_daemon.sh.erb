@@ -1,4 +1,5 @@
 #!/bin/bash
+set -ex
 
 # This script monitors the lifecycle state of the current AWS EC2 instance and triggers
 # a termination script when the instance state is set to "Terminated".
@@ -24,4 +25,4 @@ while true; do
   sleep $DAEMON_SLEEP_SECONDS
 done
 
-bash $TERMINATION_SCRIPT_PATH $TERMINATION_MESSAGE $GRACETIME_PERIOD
+bash "$TERMINATION_SCRIPT_PATH" "$TERMINATION_MESSAGE" "$GRACETIME_PERIOD"
