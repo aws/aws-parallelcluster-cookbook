@@ -115,7 +115,8 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": []
     },
@@ -133,7 +134,8 @@
         "ubuntu"
       ],
       "node_roles": [
-        "ComputeFleet"
+        "ComputeFleet",
+        "LoginNode"
       ],
       "feature_conditions": []
     },
@@ -153,7 +155,8 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": []
     },
@@ -445,7 +448,8 @@
         "amazon"
       ],
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
