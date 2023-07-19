@@ -33,6 +33,10 @@ def dcv_gl
   "/nice-dcv-gl_#{node['cluster']['dcv']['gl']['version']}_#{dcv_pkg_arch}.#{node['cluster']['base_os']}.deb"
 end
 
+def dcv_supported?
+  !arm_instance?
+end
+
 action_class do
   def pre_install
     apt_update
