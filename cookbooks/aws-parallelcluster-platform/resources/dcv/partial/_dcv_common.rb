@@ -199,7 +199,8 @@ action :configure do
     end
 
     optionally_disable_rnd
-
+    # Ensure the directory exists
+    directory node['cluster']['etc_dir']
     # Install utility file to generate HTTPs certificates for the DCV external authenticator and generate a new one
     cookbook_file "#{node['cluster']['etc_dir']}/generate_certificate.sh" do
       source 'dcv/generate_certificate.sh'

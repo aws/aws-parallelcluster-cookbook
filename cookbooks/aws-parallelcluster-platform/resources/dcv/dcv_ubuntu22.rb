@@ -13,16 +13,12 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License
 provides :dcv, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+  node['platform_version'].to_i == 22
 end
 
 use 'partial/_dcv_common'
 use 'partial/_ubuntu_common'
 
-def dcv_supported?
-  !arm_instance?
-end
-
 def dcv_sha256sum
-  '6b4c6450bb39f31cb93082a2d1f3977da23d41d3f0646f71b2726e6ba632ea09'
+  '03ff0ed5a9772a655f9435ffc15cddcfddf5925a83b2df38e946280b3daf633d'
 end
