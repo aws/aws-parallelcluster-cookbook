@@ -1,0 +1,3 @@
+Cmnd_Alias LOGINMGTD_HOOKS_COMMANDS = <%= node['cluster']['shared_dir_login_nodes'] %>/loginmgtd_on_termination.sh
+
+<%= node['cluster']['cluster_admin_user'] %> ALL = (root) NOPASSWD: LOGINMGTD_HOOKS_COMMANDS
