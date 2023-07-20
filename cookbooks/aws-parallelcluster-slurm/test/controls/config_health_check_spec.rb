@@ -52,7 +52,7 @@ control 'tag:config_gpu_health_check_execution' do
 
   if instance.graphic?
     if instance.dcgmi_gpu_accel_supported?
-      if os_properties.arm? && (os_properties.centos7? || os_properties.alinux2?)
+      if (os_properties.arm? && (os_properties.centos7? || os_properties.alinux2?)) || (os_properties.alinux2? && node['cluster']['nvidia']['enabled'] == 'no')
         describe command("#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
           its('exit_status') { should eq 0 }
           its('stdout') { should match /The GPU Health Check has been executed but the NVIDIA DCGM Diagnostic tool is not available in this system/ }
