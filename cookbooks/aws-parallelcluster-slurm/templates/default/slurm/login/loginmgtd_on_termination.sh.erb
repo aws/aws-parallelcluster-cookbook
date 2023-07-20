@@ -7,6 +7,8 @@ set -ex
 # It is invoked with two parameters: a termination message and a gracetime period in minutes.
 # The termination message will be broadcast to all logged in users, and the grace period defines
 # how long the script should wait before the final system shutdown.
+#
+# This script must be executed as root.
 
 DEFAULT_USER=<%= node['cluster']['cluster_user'] %>
 TERMINATION_MESSAGE=$1

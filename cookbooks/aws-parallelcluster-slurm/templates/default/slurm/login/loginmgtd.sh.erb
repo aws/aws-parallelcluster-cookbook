@@ -7,6 +7,9 @@ set -ex
 # The termination script to be triggered and the termination message are read from a config JSON file.
 # The script expects a grace period in minutes as an argument, which it passes to the termination script.
 # The script runs in an infinite loop, checking the instance state every 60 seconds.
+#
+# This script must be executed as <%= node['cluster']['cluster_admin_user'] %> because
+# because only this user has sudoers privileges to execute the termination hook.
 
 CONFIG_PATH="<%= node['cluster']['shared_dir_login_nodes'] %>/loginmgtd_config.json"
 CONFIG_JSON=$(cat $CONFIG_PATH)
@@ -27,4 +30,4 @@ while true; do
   sleep $DAEMON_SLEEP_SECONDS
 done
 
-bash "$TERMINATION_SCRIPT_PATH" "$TERMINATION_MESSAGE" "$GRACETIME_PERIOD"
+sudo "$TERMINATION_SCRIPT_PATH" "$TERMINATION_MESSAGE" "$GRACETIME_PERIOD"
