@@ -77,12 +77,16 @@ control 'tag:config_cloudwatch_configured' do
     end
   end
 
-  describe file('/etc/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('mode') { should cmp '0644' }
-  end unless os_properties.on_docker?
+  # TODO: this check is correct according to the specification of the control we have in
+  #  `kitchen.environment-config.yaml`, but we run this control with different cluster attributes in the daily
+  #  kitchen tests, and here we do not start the CloudWatch Agent service that would create this file.
+  #
+  # describe file('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
+  #   it { should exist }
+  #   its('owner') { should eq 'root' }
+  #   its('group') { should eq 'root' }
+  #   its('mode') { should cmp '0644' }
+  # end unless os_properties.on_docker?
 end
 
 control 'cloudwatch_logfiles_configuration_loginnode' do
@@ -123,6 +127,8 @@ control 'cloudwatch_logfiles_configuration_loginnode' do
     /var/log/parallelcluster/clusterstatusmgtd
   )
 
+  # This checks a file under the `/etc/amazon/amazon-cloudwatch-agent` path, which is created by the CW agent service
+  # when it starts up. This check requires the agent to be actually started on the node.
   describe file('/etc/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
     expected_log_files.each do |log_file|
       its('content') { should include(log_file) }
