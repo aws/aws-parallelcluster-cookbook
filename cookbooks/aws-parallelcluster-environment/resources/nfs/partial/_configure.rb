@@ -24,6 +24,8 @@ action :configure do
     service node['nfs']['service']['server'] do
       action %i(restart enable)
       supports restart: true
+      retries 5
+      retry_delay 10
     end unless on_docker?
   else
     service node['nfs']['service']['server'] do
