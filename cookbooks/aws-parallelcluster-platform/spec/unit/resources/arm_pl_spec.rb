@@ -15,8 +15,20 @@ describe 'arm_pl:setup' do
     context "on #{platform}#{version} x86" do
       cached(:aws_region) { 'test_region' }
       cached(:aws_domain) { 'test_domain' }
-      cached(:armpl_major_minor_version) { '21.0' }
-      cached(:armpl_patch_version) { '0' }
+      cached(:armpl_major_minor_version) do
+        if platform == 'ubuntu' && version == '22.04'
+          '23.04'
+        else
+          '21.0'
+        end
+      end
+      cached(:armpl_patch_version) do
+        if platform == 'ubuntu' && version == '22.04'
+          '1'
+        else
+          '0'
+        end
+      end
 
       cached(:armpl_platform) do
         case platform
@@ -29,7 +41,14 @@ describe 'arm_pl:setup' do
         end
       end
 
-      cached(:gcc_major_minor_version) { '9.3' }
+      cached(:gcc_major_minor_version) do
+        if platform == 'ubuntu' && version == '22.04'
+          '11.3'
+        else
+          '9.3'
+        end
+      end
+
       cached(:gcc_patch_version) { '0' }
       cached(:sources_dir) { 'sources_test_dir' }
       cached(:modulefile_dir) { platform == 'ubuntu' ? '/usr/share/modules/modulefiles' : '/usr/share/Modules/modulefiles' }
@@ -116,6 +135,11 @@ describe 'arm_pl:setup' do
         end
 
         it 'creates arm performance library modulefile configuration' do
+          armpl_license_dir = if armpl_major_minor_version == "21.0"
+                                "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_major_minor_version}_gcc-#{gcc_major_minor_version}/license_terms"
+                              else
+                                "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_version}_gcc-#{gcc_major_minor_version}/license_terms"
+                              end
           is_expected.to create_template("#{modulefile_dir}/armpl/#{armpl_version}").with(
             source: 'arm_pl/armpl_modulefile.erb',
             user: 'root',
@@ -124,6 +148,7 @@ describe 'arm_pl:setup' do
             variables: {
               armpl_version: armpl_version,
               armpl_major_minor_version: armpl_major_minor_version,
+              armpl_license_dir: armpl_license_dir,
               gcc_major_minor_version: gcc_major_minor_version,
             }
           )
