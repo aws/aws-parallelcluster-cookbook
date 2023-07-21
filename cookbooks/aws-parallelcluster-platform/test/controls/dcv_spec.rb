@@ -23,7 +23,7 @@ end
 
 control 'tag:install_dcv_authenticator_user_and_group_set_up' do
   title 'Check that dcv authenticator user and group have been set up'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
+  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) }
 
   describe group(node['cluster']['dcv']['authenticator']['group']) do
     it { should exist }
@@ -39,7 +39,7 @@ end
 
 control 'tag:install_dcv_disabled_lock_screen' do
   title 'Check that the lock screen has been disabled'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
+  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) }
 
   describe bash('gsettings get org.gnome.desktop.lockdown disable-lock-screen') do
     its('exit_status') { should eq 0 }
@@ -54,7 +54,7 @@ end
 
 control 'tag:install_dcv_installed' do
   title 'Check dcv is installed'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
+  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) }
 
   pkgs = %W(nice-dcv-server nice-xdcv nice-dcv-web-viewer)
   pkgs.each do |pkg|
@@ -66,7 +66,7 @@ end
 
 control 'tag:install_dcv_external_authenticator_virtualenv_created' do
   title 'Check dcv external authenticator virtual environment is created'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu2004? && os_properties.arm?) }
+  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) }
 
   describe file("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate") do
     it { should be_file }
@@ -76,7 +76,7 @@ end
 
 control 'tag:install_dcv_debian_specific_setup' do
   title 'Check debian specific setup'
-  only_if { os_properties.debian_family? && !(os_properties.ubuntu2004? && os_properties.arm?) }
+  only_if { os_properties.debian_family? && !(os_properties.ubuntu? && os_properties.arm?) }
 
   pkgs = %W(whoopsie ubuntu-desktop mesa-utils)
   pkgs.each do |pkg|
