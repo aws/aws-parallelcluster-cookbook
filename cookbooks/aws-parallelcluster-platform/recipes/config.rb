@@ -24,3 +24,5 @@ include_recipe 'aws-parallelcluster-platform::dcv'
 # Supervisord configuration must be executed after DCV because dcv external authenticator is part of it
 include_recipe 'aws-parallelcluster-platform::supervisord_config'
 fetch_config 'Fetch and load cluster configs'
+
+include_recipe 'aws-parallelcluster-platform::config_login' if node['cluster']['node_type'] == 'LoginNode'
