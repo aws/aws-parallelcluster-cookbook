@@ -91,6 +91,12 @@ action :setup do
   # create armpl module directory
   directory "#{modulefile_dir}/armpl"
 
+  armpl_license_dir = if new_resource.armpl_major_minor_version == "21.0"
+                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{new_resource.armpl_major_minor_version}_gcc-#{new_resource.gcc_major_minor_version}/license_terms"
+                      else
+                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_version}_gcc-#{new_resource.gcc_major_minor_version}/license_terms"
+                      end
+
   # arm performance library modulefile configuration
   template "#{modulefile_dir}/armpl/#{armpl_version}" do
     source 'arm_pl/armpl_modulefile.erb'
@@ -101,6 +107,7 @@ action :setup do
     variables(
       armpl_version: armpl_version,
       armpl_major_minor_version: new_resource.armpl_major_minor_version,
+      armpl_license_dir: armpl_license_dir,
       gcc_major_minor_version: new_resource.gcc_major_minor_version
     )
   end

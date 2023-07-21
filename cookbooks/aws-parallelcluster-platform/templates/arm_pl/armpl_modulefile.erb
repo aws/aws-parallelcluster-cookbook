@@ -28,7 +28,7 @@ puts stderr "At compile time add '-I<armpl_include>' and at link time"
   }
 
   # Add license path
-  setenv ARM_LICENSE_DIR $root/arm-performance-libraries_${major_minor_version}_gcc-${gcc_version}/license_terms
+  setenv ARM_LICENSE_DIR <%= @armpl_license_dir %>
 
   # Load the pre-installed gcc module
   module load $root/modulefiles/armpl/gcc-${gcc_version}
