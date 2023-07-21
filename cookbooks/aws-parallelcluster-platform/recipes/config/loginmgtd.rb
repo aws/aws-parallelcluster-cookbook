@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-slurm
-# Recipe:: login_nodes_daemon_service.rb
+# Cookbook:: aws-parallelcluster-platform
+# Recipe:: loginmgtd.rb
 #
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -19,7 +19,7 @@ load_cluster_config(node['cluster']['login_cluster_config_path'])
 
 # Create the configuration file for loginmgtd
 template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd_config.json" do
-  source 'slurm/login/loginmgtd_config.json.erb'
+  source 'loginmgtd/loginmgtd_config.json.erb'
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
   mode '0644'
@@ -30,7 +30,7 @@ end
 
 # Create the termination hook for loginmgtd
 template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd_on_termination.sh" do
-  source 'slurm/login/loginmgtd_on_termination.sh.erb'
+  source 'loginmgtd/loginmgtd_on_termination.sh.erb'
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
   mode '0744'
@@ -38,7 +38,7 @@ end
 
 # Create the script to run loginmgtd
 template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd.sh" do
-  source 'slurm/login/loginmgtd.sh.erb'
+  source 'loginmgtd/loginmgtd.sh.erb'
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
   mode '0744'
@@ -46,7 +46,7 @@ end
 
 # Create sudoers entry to let pcluster-admin user execute loginmgtd privileged actions
 template '/etc/sudoers.d/99-parallelcluster-loginmgtd' do
-  source 'slurm/login/99-parallelcluster-loginmgtd.erb'
+  source 'loginmgtd/99-parallelcluster-loginmgtd.erb'
   owner 'root'
   group 'root'
   mode '0600'
