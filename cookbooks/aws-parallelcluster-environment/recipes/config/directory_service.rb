@@ -26,24 +26,6 @@ login_node_shared_directory_service_dir = "#{node['cluster']['shared_dir_login_n
 shared_sssd_conf_path = "#{shared_directory_service_dir}/sssd.conf"
 login_node_shared_sssd_conf_path = "#{login_node_shared_directory_service_dir}/sssd.conf"
 
-# Parse an ARN.
-# ARN format: arn:PARTITION:SERVICE:REGION:ACCOUNT_ID:RESOURCE.
-# ARN examples:
-#   1. arn:aws:secretsmanager:eu-west-1:12345678910:secret:PasswordName
-#   2. arn:aws:ssm:eu-west-1:12345678910:parameter/PasswordName
-def parse_arn(arn_string)
-  parts = arn_string.nil? ? [] : arn_string.split(':', 6)
-  raise TypeError if parts.size < 6
-
-  {
-    partition: parts[1],
-    service: parts[2],
-    region: parts[3],
-    account_id: parts[4],
-    resource: parts[5],
-  }
-end
-
 case node['cluster']['node_type']
 when 'HeadNode'
   region = node['cluster']['region']
