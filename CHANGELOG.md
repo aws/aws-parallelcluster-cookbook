@@ -3,6 +3,15 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.8.0
+------
+
+**ENHANCEMENTS**
+
+**CHANGES**
+
+**BUG FIXES**
+
 3.7.0
 ------
 
