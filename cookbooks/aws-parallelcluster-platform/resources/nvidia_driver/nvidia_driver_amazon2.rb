@@ -20,3 +20,7 @@ def set_compiler?
   # Amazon linux 2 with Kernel 5 need to set CC to /usr/bin/gcc10-gcc using dkms override
   node['kernel']['release'].split('.')[0].to_i == 5
 end
+
+def compiler_version
+  'CC=/usr/bin/gcc10-gcc'
+end
