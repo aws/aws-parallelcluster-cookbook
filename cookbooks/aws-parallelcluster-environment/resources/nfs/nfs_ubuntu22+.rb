@@ -29,11 +29,11 @@ action :setup do
   action_install_nfs
   action_install_nfs4
   action_disable_start_at_boot
-  node.default['nfs']['config']['server_template'] = '/etc/nfs.conf.d/parallelcluster-nfs.conf'
 end
 
 action_class do
   def override_server_template
+    node.default['nfs']['config']['server_template'] = '/etc/nfs.conf.d/parallelcluster-nfs.conf'
     edit_resource(:template, node['nfs']['config']['server_template']) do
       source 'nfs/nfs-ubuntu22+.conf.erb'
       cookbook 'aws-parallelcluster-environment'
