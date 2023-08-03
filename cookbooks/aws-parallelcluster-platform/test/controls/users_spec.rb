@@ -18,6 +18,9 @@ control 'tag:install_users_ulimit_configured' do
   describe limits_conf("/etc/security/limits.d/00_all_limits.conf") do
     its('*') { should include ['-', 'nofile', "10000"] }
   end
+  describe bash("sudo -u #{user} bash -c 'ulimit -Sn'") do
+    its('stdout') { should cmp >= '8192' }
+  end
 end
 
 control 'tag:config_admin_user_and_group_correctly_defined' do
@@ -31,13 +34,5 @@ control 'tag:config_admin_user_and_group_correctly_defined' do
   describe group(node['cluster']['cluster_admin_group']) do
     it { should exist }
     its('gid') { should eq node['cluster']['cluster_admin_group_id'] }
-  end
-end
-
-control 'tag:config_ulimit_is_not_lower_than_8192' do
-  only_if { !instance.custom_ami? }
-
-  describe bash("ulimit -Sn") do
-    its('stdout') { should cmp >= '8192' }
   end
 end
