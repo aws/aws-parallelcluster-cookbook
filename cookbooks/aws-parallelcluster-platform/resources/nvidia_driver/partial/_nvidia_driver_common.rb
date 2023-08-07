@@ -61,13 +61,14 @@ action :setup do
   end
 
   # Install driver
+  # TODO remove --no-cc-version-check when we can update ubuntu 22 images
   bash 'nvidia.run advanced' do
     user 'root'
     group 'root'
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      ./nvidia.run --silent --dkms --disable-nouveau
+      ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
