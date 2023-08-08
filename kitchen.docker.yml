@@ -3,7 +3,7 @@ driver:
   name: dokken
   platform: linux/amd64
   pull_platform_image: false # Use the local images, prevent pull of docker images from Docker Hub,
-  chef_version: 17 # Chef version aligned with the one used to build the images
+  chef_version: 18 # Chef version aligned with the one used to build the images
   chef_image: cincproject/cinc
   env:
     # Since the kernel version of the docker images is not in the expected pattern,
