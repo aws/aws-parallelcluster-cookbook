@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade third-party cookbook dependencies:
   - apt-7.5.14 (from apt-7.4.0)
+  - line-4.5.13 (from line-4.5.2)
 
 **BUG FIXES**
 
@@ -260,7 +261,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Move `SelectTypeParameters` and `ConstrainRAMSpace` to the `parallelcluster_slurm*.conf` include files.
 - Upgrade third-party cookbook dependencies:
   - apt-7.4.2 (from apt-7.4.0)
-  - line-4.5.2 (from line-4.0.1)
+  - line-4.5.13 (from line-4.0.1)
   - openssh-2.10.3 (from openssh-2.9.1)
   - pyenv-3.5.1 (from pyenv-3.4.2)
   - selinux-6.0.4 (from selinux-3.1.1)

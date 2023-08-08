@@ -15,7 +15,7 @@ supports 'ubuntu', '>= 20.04'
 
 depends 'apt', '~> 7.5.14'
 depends 'iptables', '~> 8.0.0'
-depends 'line', '~> 4.5.2'
+depends 'line', '~> 4.5.13'
 depends 'nfs', '~> 5.0.0'
 depends 'openssh', '~> 2.10.3'
 depends 'pyenv', '~> 3.5.1'
