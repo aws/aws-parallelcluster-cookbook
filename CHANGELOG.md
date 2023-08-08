@@ -15,6 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - openssh-2.11.3 (from openssh-2.10.3)
   - pyenv-4.2.3 (from pyenv-3.5.1)
   - selinux-6.1.12 (from selinux-6.0.5)
+  - yum-7.4.13 (from yum-7.4.0)
 
 **BUG FIXES**
 
@@ -52,6 +53,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
     - pyenv-4.2.3 (from pyenv-3.5.1)
     - selinux-6.1.12 (from selinux-6.0.5)
     - yum-7.4.13 (from yum-7.4.0)
+    - yum-epel-5.0.2 (from yum-epel-4.5.0)
 
 **BUG FIXES**
 - Fix cluster creation failure with Ubuntu Deep Learning AMI on GPU instances and DCV enabled.
