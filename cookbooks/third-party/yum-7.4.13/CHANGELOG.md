@@ -2,6 +2,55 @@
 
 This file is used to list changes made in each version of the yum cookbook.
 
+## 7.4.13 - *2023-04-17*
+
+## 7.4.12 - *2023-04-07*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 7.4.11 - *2023-04-01*
+
+## 7.4.10 - *2023-04-01*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 7.4.9 - *2023-03-20*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 7.4.8 - *2023-03-18*
+
+- Update gaurav-nelson/github-action-markdown-link-check action to v1.0.15
+- Fix yaml
+
+## 7.4.7 - *2023-03-15*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 7.4.6 - *2023-02-27*
+
+- remove circleci
+
+## 7.4.5 - *2023-02-23*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 7.4.4 - *2023-02-16*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 7.4.3 - *2023-02-15*
+
+- Update Actions
+
+## 7.4.2 - *2023-02-15*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 7.4.1 - *2022-12-08*
+
+- Standardise files with files in sous-chefs/repo-management
+
 ## 7.4.0 - *2022-05-09*
 
 - Add support for DNF property `best`
