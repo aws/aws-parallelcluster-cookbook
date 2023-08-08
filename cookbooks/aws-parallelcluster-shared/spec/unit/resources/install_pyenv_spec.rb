@@ -38,8 +38,7 @@ describe 'install_pyenv:run' do
         end
 
         it 'installs pyenv system' do
-          is_expected.to install_pyenv_system_install(python_version)
-            .with_global_prefix(system_pyenv_root)
+          is_expected.to install_pyenv_install('system').with_prefix(system_pyenv_root)
         end
 
         it 'deletes /etc/profile.d/pyenv.sh to avoid exposing the ParallelCluster pyenv installation to customers' do ||
@@ -68,8 +67,7 @@ describe 'install_pyenv:run' do
         end
 
         it 'installs pyenv system' do
-          is_expected.to install_pyenv_system_install(python_version)
-            .with_global_prefix(system_pyenv_root)
+          is_expected.to install_pyenv_install('system').with_prefix(system_pyenv_root)
         end
 
         it 'installs default python version' do
@@ -98,9 +96,9 @@ describe 'install_pyenv:run' do
           end
 
           it 'installs pyenv for user' do
-            is_expected.to install_pyenv_user_install(python_version).with(
+            is_expected.to install_pyenv_install('user').with(
               user: user,
-              user_prefix: pyenv_root
+              prefix: pyenv_root
             )
           end
 
