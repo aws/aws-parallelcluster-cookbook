@@ -12,4 +12,4 @@ cookbook "line", path: "../third-party/line-4.5.13"
 # for shared cookbook
 cookbook "pyenv", path: "../third-party/pyenv-4.2.3"
 cookbook "yum", path: "../third-party/yum-7.4.13"
-cookbook "yum-epel", path: "../third-party/yum-epel-4.5.0"
+cookbook "yum-epel", path: "../third-party/yum-epel-5.0.2"
