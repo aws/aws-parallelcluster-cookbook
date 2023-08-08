@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - apt-7.5.14 (from apt-7.4.0)
   - line-4.5.13 (from line-4.5.2)
   - openssh-2.11.3 (from openssh-2.10.3)
+  - pyenv-4.2.3 (from pyenv-3.5.1)
 
 **BUG FIXES**
 
