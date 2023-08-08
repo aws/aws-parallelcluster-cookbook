@@ -15,5 +15,5 @@ supports 'ubuntu', '>= 20.04'
 supports 'redhat', '= 8.7'
 
 depends 'pyenv', '~> 4.2.3'
-depends 'yum', '~> 7.4.0'
+depends 'yum', '~> 7.4.13'
 depends 'yum-epel', '~> 4.5.0'
