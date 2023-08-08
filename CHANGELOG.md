@@ -9,6 +9,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 
 **CHANGES**
+- Upgrade third-party cookbook dependencies:
+  - apt-7.5.14 (from apt-7.4.0)
 
 **BUG FIXES**
 
