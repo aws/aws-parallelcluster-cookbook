@@ -6,7 +6,7 @@ cookbook "aws-parallelcluster-computefleet", path: "../aws-parallelcluster-compu
 cookbook "aws-parallelcluster-environment", path: "../aws-parallelcluster-environment"
 cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
 
-cookbook "apt", path: "../third-party/apt-7.4.2"
+cookbook "apt", path: "../third-party/apt-7.5.14"
 cookbook "iptables", path: "../third-party/iptables-8.0.0"
 cookbook "line", path: "../third-party/line-4.5.2"
 cookbook "nfs", path: "../third-party/nfs-5.0.0"
