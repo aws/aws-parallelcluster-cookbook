@@ -2,6 +2,73 @@
 
 This file is used to list changes made in each version of the openssh cookbook.
 
+## 2.11.3 - *2023-08-05*
+
+- resolved cookstyle error: attributes/default.rb:120:58 refactor: `Chef/RedundantCode/MultiplePlatformChecks`
+## 2.11.2 - *2023-08-04*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.11.1 - *2023-08-04*
+
+- Disable PAM option on Windows
+
+## 2.11.0 - *2023-08-01*
+
+- Add Windows Support
+
+## 2.10.18 - *2023-07-10*
+
+## 2.10.17 - *2023-05-16*
+
+## 2.10.16 - *2023-04-17*
+
+## 2.10.15 - *2023-04-07*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.14 - *2023-04-01*
+
+## 2.10.13 - *2023-04-01*
+
+## 2.10.12 - *2023-04-01*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.11 - *2023-03-20*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.10 - *2023-03-15*
+
+Standardise files with files in sous-chefs/repo-management
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.9 - *2023-02-23*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.8 - *2023-02-23*
+
+Remove delivery
+
+## 2.10.7 - *2023-02-16*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.6 - *2023-02-14*
+
+## 2.10.5 - *2023-02-14*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.10.4 - *2022-12-08*
+
+Standardise files with files in sous-chefs/repo-management
+
+Standardise files with files in sous-chefs/repo-management
+
 ## 2.10.3 - *2022-02-10*
 
 - Standardise files with files in sous-chefs/repo-management
