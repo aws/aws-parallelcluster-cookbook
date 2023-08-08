@@ -1,0 +1,62 @@
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_infra
+  deprecations_as_errors: true
+  chef_license: accept-no-persist
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: almalinux-8
+  - name: amazonlinux-2
+  - name: centos-7
+  - name: centos-stream-8
+  - name: oraclelinux-7
+  - name: oraclelinux-8
+  - name: rockylinux-8
+
+suites:
+  - name: default
+    run_list:
+      - recipe[yum-epel::default]
+  - name: all
+    run_list:
+      - recipe[yum-epel::default]
+    attributes:
+      yum:
+        epel-debuginfo:
+          managed: true
+          enabled: true
+        epel-next:
+          managed: true
+          enabled: true
+        epel-next-debuginfo:
+          managed: true
+          enabled: true
+        epel-next-source:
+          managed: true
+          enabled: true
+        epel-next-testing:
+          managed: true
+          enabled: true
+        epel-next-testing-debuginfo:
+          managed: true
+          enabled: true
+        epel-next-testing-source:
+          managed: true
+          enabled: true
+        epel-source:
+          managed: true
+          enabled: true
+        epel-testing:
+          managed: true
+          enabled: true
+        epel-testing-debuginfo:
+          managed: true
+          enabled: true
+        epel-testing-source:
+          managed: true
+          enabled: true
