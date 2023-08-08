@@ -15,6 +15,6 @@ supports 'ubuntu', '>= 20.04'
 supports 'redhat', '= 8.7'
 
 depends 'line', '~> 4.5.13'
-depends 'selinux', '~> 6.0.5'
+depends 'selinux', '~> 6.1.12'
 
 depends 'aws-parallelcluster-shared', '~> 3.8.0'
