@@ -9,7 +9,7 @@ metadata
 
 cookbook "apt", path: "./cookbooks/third-party/apt-7.5.14"
 cookbook "iptables", path: "./cookbooks/third-party/iptables-8.0.0"
-cookbook "line", path: "./cookbooks/third-party/line-4.5.2"
+cookbook "line", path: "./cookbooks/third-party/line-4.5.13"
 cookbook "nfs", path: "./cookbooks/third-party/nfs-5.0.0"
 cookbook "openssh", path: "./cookbooks/third-party/openssh-2.10.3"
 cookbook "pyenv", path: "./cookbooks/third-party/pyenv-3.5.1"

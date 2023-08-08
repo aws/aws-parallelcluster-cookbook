@@ -4,7 +4,7 @@ maintainer_email 'help@sous-chefs.org'
 license          'Apache-2.0'
 description      'Provides line editing resources for use by recipes'
 
-version          '4.5.2'
+version          '4.5.13'
 
 source_url       'https://github.com/sous-chefs/line'
 issues_url       'https://github.com/sous-chefs/line/issues'

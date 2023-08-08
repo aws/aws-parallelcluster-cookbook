@@ -4,6 +4,40 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 4.5.13 - *2023-07-10*
+
+## 4.5.12 - *2023-05-16*
+
+## 4.5.11 - *2023-04-26*
+
+Update CI test matrix
+
+## 4.5.10 - *2023-04-17*
+
+## 4.5.9 - *2023-04-11*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 4.5.8 - *2023-04-01*
+
+## 4.5.7 - *2023-02-23*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 4.5.6 - *2023-02-16*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 4.5.5 - *2023-02-15*
+
+## 4.5.4 - *2023-02-15*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 4.5.3 - *2022-12-09*
+
+Standardise files with files in sous-chefs/repo-management
+
 ## 4.5.2 - *2022-06-08*
 
 - StanzaSlash add some stanza filter unit tests to fill in the checks
@@ -211,8 +245,8 @@ Standardise files with files in sous-chefs/repo-management
 
 ## [2.0.0] - 2018-05-19
 
-- _Breaking change_ - Files are processed in memory instead of line by line. It's possible that large files that were previously updated by the line cookbook will not be able to be processed.
-- _Breaking change_ - Drop Chef 12 support
+- **Breaking change** - Files are processed in memory instead of line by line. It's possible that large files that were previously updated by the line cookbook will not be able to be processed.
+- **Breaking change** - Drop Chef 12 support
 - Use template files instead of `cookbook_file` so that we get platform sensitive line endings written for testing.
 - Add windows support to `add_to_list`, `append_if_no_line`, `delete_from_list`, `delete_lines`, `replace_or_add`.
 - Make the processing of missing target files consistent. Add the `ignore_missing` property to the resources to allow a missing file to raise an error.
