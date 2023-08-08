@@ -1,0 +1,36 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  product_name: chef
+  product_version: <%= ENV['CHEF_VERSION'] || "latest" %>
+  install_strategy: once
+  deprecations_as_errors: true
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: amazonlinux2
+    driver_config:
+      box: mvbcoding/awslinux
+  - name: debian-10
+  - name: debian-11
+  - name: centos-7
+  - name: centos-8
+  - name: oracle-7
+  - name: fedora-29
+  - name: ubuntu-18.04
+  - name: ubuntu-20.04
+  - name: ubuntu-22.04
+  - name: opensuse-leap-15
+
+suites:
+  - name: system_install
+    run_list:
+      - recipe[test::system_install]
+  - name: user_install
+    run_list:
+      - recipe[test::dokken]
+      - recipe[test::user_install]
