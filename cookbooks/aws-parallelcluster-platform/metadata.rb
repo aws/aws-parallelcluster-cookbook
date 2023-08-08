@@ -14,7 +14,7 @@ supports 'centos', '= 7.0'
 supports 'ubuntu', '>= 20.04'
 supports 'redhat', '= 8.7'
 
-depends 'line', '~> 4.5.2'
+depends 'line', '~> 4.5.13'
 depends 'selinux', '~> 6.0.5'
 
 depends 'aws-parallelcluster-shared', '~> 3.7.0'

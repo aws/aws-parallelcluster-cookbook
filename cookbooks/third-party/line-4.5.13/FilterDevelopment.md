@@ -1,4 +1,4 @@
-Checklist for adding a new filter
+# Checklist for adding a new filter
 
 README.md
     Note new filter
