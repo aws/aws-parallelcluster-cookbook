@@ -39,6 +39,8 @@ action :enable do
     supports restart: false
     reload_command chrony_reload_command
     action %i(enable start)
+    retries 5
+    retry_delay 10
   end unless redhat_on_docker?
 end
 
