@@ -32,6 +32,7 @@ jobs:
           - alinux2
           - centos7
           - ubuntu2004
+          - ubuntu2204
           - rhel8
       fail-fast: false
     steps:
