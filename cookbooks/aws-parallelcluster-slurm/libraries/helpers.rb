@@ -60,6 +60,8 @@ def enable_munge_service
   service "munge" do
     supports restart: true
     action %i(enable start)
+    retries 5
+    retry_delay 10
   end
 end
 
@@ -111,6 +113,8 @@ def setup_munge_compute_node
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     COMPUTE_MUNGE_KEY
+    retries 5
+    retry_delay 10
   end
 
   enable_munge_service
