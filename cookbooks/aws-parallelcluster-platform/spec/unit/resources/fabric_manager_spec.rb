@@ -167,7 +167,7 @@ describe 'fabric_manager:setup' do
 
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-470' : 'nvidia-fabric-manager' }
+      cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-535' : 'nvidia-fabric-manager' }
       cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}*" : nvidia_driver_version }
 
       context 'when fabric manager is to install' do
@@ -218,7 +218,7 @@ describe 'fabric_manager:configure' do
 
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-470' : 'nvidia-fabric-manager' }
+      cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-535' : 'nvidia-fabric-manager' }
       cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}*" : nvidia_driver_version }
 
       context('when nvswithes are > 1') do

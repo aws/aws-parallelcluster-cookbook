@@ -203,22 +203,32 @@ describe 'nvidia_driver:setup' do
             mode: '0644'
           )
         end
+        it 'installs nvidia driver' do
+          is_expected.to run_bash('nvidia.run advanced')
+            .with(
+              user: 'root',
+              group: 'root',
+              cwd: '/tmp',
+              creates: '/usr/bin/nvidia-smi'
+            )
+            .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check})
+            .with_code(%r{rm -f /tmp/nvidia.run})
+        end
       else
         it "doesn't install gcc10" do
           is_expected.not_to install_package('gcc10')
         end
-      end
-
-      it 'installs nvidia driver' do
-        is_expected.to run_bash('nvidia.run advanced')
-          .with(
-            user: 'root',
-            group: 'root',
-            cwd: '/tmp',
-            creates: '/usr/bin/nvidia-smi'
-          )
-          .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau})
-          .with_code(%r{rm -f /tmp/nvidia.run})
+        it 'installs nvidia driver' do
+          is_expected.to run_bash('nvidia.run advanced')
+            .with(
+              user: 'root',
+              group: 'root',
+              cwd: '/tmp',
+              creates: '/usr/bin/nvidia-smi'
+            )
+            .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check})
+            .with_code(%r{rm -f /tmp/nvidia.run})
+        end
       end
 
       if platform == 'ubuntu'

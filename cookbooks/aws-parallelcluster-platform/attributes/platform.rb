@@ -11,7 +11,7 @@ default['conditions']['arm_pl_supported'] = arm_instance?
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '470.199.02'
+default['cluster']['nvidia']['driver_version'] = '535.54.03'
 
 # DCV
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
