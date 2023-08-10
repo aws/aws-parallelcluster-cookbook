@@ -117,7 +117,8 @@ jobs:
       - uses: actions/checkout@main
       - uses: actionshub/chef-install@main
         with:
-          version: 22.10.1013
+          omnitruckUrl: omnitruck.cinc.sh
+          project: cinc-workstation
       - name: Run ChefSpec on ${{ matrix.cookbook }}
         run: |
           cd ${{ matrix.cookbook }}

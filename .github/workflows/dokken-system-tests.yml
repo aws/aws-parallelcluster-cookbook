@@ -51,6 +51,9 @@ jobs:
       - name: Install Chef
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/chef-install@main
+        with:
+          omnitruckUrl: omnitruck.cinc.sh
+          project: cinc-workstation
       - name: Kitchen Test Install
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/test-kitchen@main
