@@ -44,7 +44,7 @@ main() {
     _check_param "${group}" "Group required"
 
     # Generate a new certificate and a new RSA private key
-    openssl req -newkey rsa:2048 -sha256 -x509 -days 1825 -subj "/CN=localhost" -out "${certificatePath}" -nodes -keyout "${privateKeyPath}"
+    openssl req -newkey ed25519 -x509 -days 1825 -subj "/CN=localhost" -out "${certificatePath}" -nodes -keyout "${privateKeyPath}"
     chmod 440 "${certificatePath}" "${privateKeyPath}"
     chown "${user}":"${group}" "${certificatePath}" "${privateKeyPath}"
 }
