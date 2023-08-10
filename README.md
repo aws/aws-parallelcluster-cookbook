@@ -61,6 +61,10 @@ They are automatically executed as GitHub actions, see definition in `.github/ci
 Kitchen is used to automatically test cookbooks across any combination of platforms and test suites.
 It requires cinc-workstation to be installed on your environment:
 
+`brew install --cask cinc-workstation` on MacOS
+
+or
+
 `curl -L https://omnitruck.cinc.sh/install.sh | sudo bash -s -- -P cinc-workstation -v 23`
 
 Make sure you have set a locale in your local shell environment, by exporting the `LC_ALL` and `LANG` variables, 
