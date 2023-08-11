@@ -23,13 +23,13 @@ default['cluster']['dcv']['authenticator']['certificate'] = "#{node['cluster']['
 default['cluster']['dcv']['authenticator']['private_key'] = "#{node['cluster']['etc_dir']}/ext-auth-private-key.pem"
 default['cluster']['dcv']['authenticator']['virtualenv_name'] = "dcv_authenticator_virtualenv"
 default['cluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['dcv']['authenticator']['virtualenv_name']}"
-default['cluster']['dcv']['version'] = '2023.0-15022'
+default['cluster']['dcv']['version'] = '2023.0-15487'
 default['cluster']['dcv_port'] = 8443
 
-default['cluster']['dcv']['server']['version'] = '2023.0.15022-1'
-default['cluster']['dcv']['xdcv']['version'] = '2023.0.547-1'
-default['cluster']['dcv']['gl']['version'] = '2023.0.1027-1'
-default['cluster']['dcv']['web_viewer']['version'] = '2023.0.15022-1'
+default['cluster']['dcv']['server']['version'] = '2023.0.15487-1'
+default['cluster']['dcv']['xdcv']['version'] = '2023.0.551-1'
+default['cluster']['dcv']['gl']['version'] = '2023.0.1039-1'
+default['cluster']['dcv']['web_viewer']['version'] = '2023.0.15487-1'
 
 # OpenSSH settings for AWS ParallelCluster instances
 default['openssh']['server']['protocol'] = '2'

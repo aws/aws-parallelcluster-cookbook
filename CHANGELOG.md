@@ -54,6 +54,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
     - selinux-6.1.12 (from selinux-6.0.5)
     - yum-7.4.13 (from yum-7.4.0)
     - yum-epel-5.0.2 (from yum-epel-4.5.0)
+- Upgrade NICE DCV to version `2023.0-15487`.
+  - server: `2023.0.15487-1`
+  - xdcv: `2023.0.551-1`
+  - gl: `2023.0.1039-1`
+  - web_viewer: `2023.0.15487-1`
 
 **BUG FIXES**
 - Fix cluster creation failure with Ubuntu Deep Learning AMI on GPU instances and DCV enabled.
