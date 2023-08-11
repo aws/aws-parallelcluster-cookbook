@@ -15,9 +15,9 @@
 
 def dcv_sha256sum
   if arm_instance?
-    '162396cad72bd357bd7aba8c01eeb60d4efec955cfec0bf456fbbd7c3801b79a'
+    '37aaaabfe1b8dde83254c738aa562b7eb7b1663cea09a53cedf9dabe5ddbb184'
   else
-    '50eb5e645f549e8a51ff64ede2d85e0a8051c7d929295fe3319dc23ba73d5c1d'
+    'e82e434a3f0c5d1a48d7cda2b6100ce51ae250d93b6a17b2fb81ba0fda463b3b'
   end
 end
 
