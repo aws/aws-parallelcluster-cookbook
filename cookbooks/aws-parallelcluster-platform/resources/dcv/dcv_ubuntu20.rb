@@ -20,5 +20,5 @@ use 'partial/_dcv_common'
 use 'partial/_ubuntu_common'
 
 def dcv_sha256sum
-  '6b4c6450bb39f31cb93082a2d1f3977da23d41d3f0646f71b2726e6ba632ea09'
+  'd944cff02c00d34a56701594b0b2cbbcf9e9f126b4fcbf8de6351d9ac8f38991'
 end
