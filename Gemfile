@@ -15,7 +15,7 @@ group :test do
   gem 'chefspec', '~> 9.3.0'
   gem 'kitchen-vagrant', '~> 1.12.0'
   gem 'safe_yaml', '~> 1.0.5'
-  gem 'test-kitchen', '~> 3.0.0'
+  gem 'test-kitchen', '~> 3.5.0'
 end
 
 group :aws do
