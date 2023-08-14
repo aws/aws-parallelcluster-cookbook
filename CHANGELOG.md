@@ -3,22 +3,6 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.8.0
-------
-
-**ENHANCEMENTS**
-
-**CHANGES**
-- Upgrade third-party cookbook dependencies:
-  - apt-7.5.14 (from apt-7.4.0)
-  - line-4.5.13 (from line-4.5.2)
-  - openssh-2.11.3 (from openssh-2.10.3)
-  - pyenv-4.2.3 (from pyenv-3.5.1)
-  - selinux-6.1.12 (from selinux-6.0.5)
-  - yum-7.4.13 (from yum-7.4.0)
-
-**BUG FIXES**
-
 3.7.0
 ------
 
@@ -54,6 +38,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
     - selinux-6.1.12 (from selinux-6.0.5)
     - yum-7.4.13 (from yum-7.4.0)
     - yum-epel-5.0.2 (from yum-epel-4.5.0)
+- Upgrade NICE DCV to version `2023.0-15487`.
+  - server: `2023.0.15487-1`
+  - xdcv: `2023.0.551-1`
+  - gl: `2023.0.1039-1`
+  - web_viewer: `2023.0.15487-1`
 
 **BUG FIXES**
 - Fix cluster creation failure with Ubuntu Deep Learning AMI on GPU instances and DCV enabled.
