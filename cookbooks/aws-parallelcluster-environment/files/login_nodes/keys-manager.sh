@@ -36,9 +36,7 @@ function create_keys() {
   info "Creating host keys"
   ssh-keygen -t ecdsa -f "$FOLDER_PATH/ssh_host_ecdsa_key" -q -P ""
   ssh-keygen -t ed25519 -f "$FOLDER_PATH/ssh_host_ed25519_key" -q -P ""
-  if is_not_alinux; then
-      ssh-keygen -t rsa -f "$FOLDER_PATH/ssh_host_rsa_key" -q -P ""
-  fi
+  ssh-keygen -t rsa -f "$FOLDER_PATH/ssh_host_rsa_key" -q -P ""
   if is_ubuntu; then
     ssh-keygen -t dsa -f "$FOLDER_PATH/ssh_host_dsa_key" -q -P ""
   fi
@@ -49,9 +47,7 @@ function import_keys() {
   rm -f /etc/ssh/ssh_host_*
   cp "$FOLDER_PATH/ssh_host_ecdsa"* /etc/ssh/
   cp "$FOLDER_PATH/ssh_host_ed25519"* /etc/ssh/
-  if is_not_alinux; then
-      cp "$FOLDER_PATH/ssh_host_rsa"* /etc/ssh/
-  fi
+  cp "$FOLDER_PATH/ssh_host_rsa"* /etc/ssh/
   if is_ubuntu; then
     cp "$FOLDER_PATH/ssh_host_dsa"* /etc/ssh/
     chown root:root /etc/ssh/ssh_host_*
@@ -61,13 +57,6 @@ function import_keys() {
     chmod 640 /etc/ssh/ssh_host_*_key
   fi
   chmod 644 /etc/ssh/ssh_host_*_key.pub
-}
-
-function is_not_alinux() {
-  if grep -q "Amazon" <<< "$OS"; then
-    return 1
-  fi
-  return 0
 }
 
 function is_ubuntu() {

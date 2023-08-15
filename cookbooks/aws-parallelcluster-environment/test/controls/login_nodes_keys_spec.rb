@@ -10,12 +10,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 keys_manager_script_dir = "/opt/parallelcluster/scripts/login_nodes"
-key_types = %w(ecdsa ed25519)
-is_not_amazon = !os_properties.amazon_family?
+key_types = %w(ecdsa ed25519 rsa)
 is_ubuntu = os_properties.ubuntu?
-if is_not_amazon
-  key_types << 'rsa'
-end
 if is_ubuntu
   key_types << 'dsa'
 end
