@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Install [Spack](https://spack.io) by default in cluster user's home directory.
 
 **CHANGES**
 
