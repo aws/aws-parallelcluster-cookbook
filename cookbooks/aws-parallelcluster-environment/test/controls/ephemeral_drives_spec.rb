@@ -88,7 +88,8 @@ control 'tag:config_ephemeral_drives_service_and_mount' do
       end
     end
 
-    if ephemeral_devs.any?
+    if ephemeral_devs.any? && !instance.custom_ami?
+      # In custom AMIs the LVM can be already formatted and mounted on another folder (e.g. /opt/dlami/nvme)
       describe directory(node['cluster']['ephemeral_dir']) do
         it { should exist }
         it { should be_writable }
