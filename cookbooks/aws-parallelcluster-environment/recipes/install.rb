@@ -23,3 +23,4 @@ lustre 'Install FSx options'
 efs 'Install efs-utils'
 stunnel 'Install stunnel'
 system_authentication "Install packages required for directory service integration"
+spack 'Install Spack'
