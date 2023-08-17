@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 
 **BUG FIXES**
+- Fixed usage of instance types data file during rollback.
 
 3.7.0
 ------
