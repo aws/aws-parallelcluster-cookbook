@@ -37,7 +37,7 @@ action :install_spack do
   end
 
   template '/etc/profile.d/spack.sh' do
-    cookbook 'aws-parallelcluster-platform'
+    cookbook 'aws-parallelcluster-environment'
     source 'spack/spack.sh.erb'
     owner 'root'
     group 'root'
@@ -61,7 +61,7 @@ action :install_spack do
   # Pull architecture dependent package config
   begin
     template "#{spack_configs_dir}/packages.yaml" do
-      cookbook 'aws-parallelcluster-platform'
+      cookbook 'aws-parallelcluster-environment'
       source "spack/packages-#{arch_target}.yaml.erb"
       owner new_resource.spack_user
       group new_resource.spack_user
@@ -72,7 +72,7 @@ action :install_spack do
   end
 
   cookbook_file "#{spack_configs_dir}/modules.yaml" do
-    cookbook 'aws-parallelcluster-platform'
+    cookbook 'aws-parallelcluster-environment'
     source 'spack/modules.yaml'
     owner new_resource.spack_user
     group new_resource.spack_user
