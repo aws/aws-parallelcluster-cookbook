@@ -19,13 +19,17 @@ action :run do
       Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
       ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
       fetch_cluster_config(node['cluster']['cluster_config_path'])
+
+      Chef::Log.info("Backing up old instance types data from (#{node['cluster']['instance_types_data_path']}) to (#{node['cluster']['previous_instance_types_data_path']})")
+      ::FileUtils.cp_r(node['cluster']['instance_types_data_path'], node['cluster']['previous_instance_types_data_path'], remove_destination: true)
+
       fetch_change_set
-      fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
+      fetch_instance_type_data(node['cluster']['instance_types_data_path']) unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
       Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
       ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
     else
       fetch_cluster_config(node['cluster']['cluster_config_path']) unless ::File.exist?(node['cluster']['cluster_config_path'])
-      fetch_instance_type_data unless ::File.exist?(node['cluster']['instance_types_data_path'])
+      fetch_instance_type_data(node['cluster']['instance_types_data_path']) unless ::File.exist?(node['cluster']['instance_types_data_path'])
     end
 
     # ensure config is shared also with login nodes
@@ -95,7 +99,7 @@ action_class do # rubocop:disable Metrics/BlockLength
                      remove_destination: true) unless !::File.exist?(node['cluster']['previous_cluster_config_path'])
   end
 
-  def fetch_instance_type_data
+  def fetch_instance_type_data(instance_type_path)
     if kitchen_test? && !node['interact_with_s3']
       remote_file "copy fake instance type data" do
         path node['cluster']['instance_types_data_path']
@@ -103,7 +107,8 @@ action_class do # rubocop:disable Metrics/BlockLength
       end
     else
       # Copy instance type infos file from S3 URI
-      fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'])
+      version_id = node['cluster']['cluster_config_version'] unless node['cluster']['cluster_instance_types_data_version'].nil?
+      fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], instance_type_path, version_id)
     end
   end
 end
