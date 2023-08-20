@@ -1,0 +1,33 @@
+{
+    "name": "AWS ParallelCluster Cookbook Developer Environment",
+    "dockerFile": "Dockerfile",
+    "context": "../",
+
+    "customizations": {
+      "vscode": {
+        "settings": {
+          "terminal.integrated.defaultProfile.linux": "bash",
+
+          // Ensure that Python autocomplete works out of the box
+          "python.autoComplete.extraPaths": [
+            "/usr/local/lib/python3.8/site-packages"
+          ],
+          "python.analysis.extraPaths": [
+            "/usr/local/lib/python3.8/site-packages"
+          ]
+        },
+        // Note to Flux Developers! We can add extensions here that you like
+        "extensions": [
+          "ms-python.python", // Python support
+          "GitHub.vscode-pull-request-github" // manage and review PRs
+        ]
+      }
+    },
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    }
+  },
+  // Needed for git security feature (this assumes you locally cloned to flux-core)
+  "postStartCommand": "git config --global --add safe.directory /workspaces/aws-parallelcluster-cookbook"
+}
