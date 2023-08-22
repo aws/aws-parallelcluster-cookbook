@@ -84,10 +84,12 @@ suites:
         - /gpu_health_check_execution/
     driver:
       instance_type: g4dn.xlarge
+#      instance_type: p5.48xlarge
     attributes:
       dependencies:
         - recipe:aws-parallelcluster-slurm::mock_slurm
         - resource:node_attributes
+#        - resource:fabric_manager:configure # Needed for Multi-gpu instance like p5.48xlarge
       cluster:
         node_type: HeadNode
         scheduler: 'slurm'
