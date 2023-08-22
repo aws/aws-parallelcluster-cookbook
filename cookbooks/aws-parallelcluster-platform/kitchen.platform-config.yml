@@ -78,12 +78,14 @@ suites:
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
+#        - resource:fabric_manager:configure # Needed for Multi-gpu instance like p5.48xlarge
       resource: gdrcopy:configure
       cluster:
         nvidia:
           enabled: true
     driver:
       instance_type: g4dn.2xlarge
+#      instance_type: p5.48xlarge
   - name: intel_hpc
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
