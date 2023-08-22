@@ -21,7 +21,7 @@ module WriteChefError
       extend Chef::Mixin::ShellOut
       error_file = node['cluster']['bootstrap_error_path']
 
-    # delete unless File.exist?(error_file) to add error msg everytime
+      #delete unless File.exist?(error_file) to add error msg everytime
       message_error = 'Failed to run chef recipe.'
       message_logs_to_check = \
         'Please check /var/log/chef-client.log in the head node, or check the chef-client.log in CloudWatch logs.'
@@ -67,7 +67,6 @@ module WriteChefError
 
       # at the end, put together and store the full error message into the dedicated file
       shell_out("echo '#{message_error} #{message_logs_to_check} #{message_troubleshooting_link}'> '#{error_file}'")
-
     end
 
     def get_recipe_info(action_record)
