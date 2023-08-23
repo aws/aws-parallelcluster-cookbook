@@ -5,6 +5,7 @@ describe 'fetch_config:run' do
     cached(:cluster_config_path) { 'cluster_config_path' }
     cached(:previous_cluster_config_path) { 'previous_cluster_config_path' }
     cached(:instance_types_data_path) { 'instance_types_data_path' }
+    cached(:previous_instance_types_data_path) { 'previous_instance_types_data_path' }
     cached(:chef_run) do
       runner = ChefSpec::Runner.new(
         platform: 'ubuntu', step_into: %w(fetch_config)
@@ -13,6 +14,7 @@ describe 'fetch_config:run' do
         node.override['cluster']['cluster_config_path'] = cluster_config_path
         node.override['cluster']['previous_cluster_config_path'] = previous_cluster_config_path
         node.override['cluster']['instance_types_data_path'] = instance_types_data_path
+        node.override['cluster']['previous_instance_types_data_path'] = previous_instance_types_data_path
         node.override['cluster']['node_type'] = 'HeadNode'
       end
       runner.converge_dsl do
@@ -38,6 +40,7 @@ describe 'fetch_config:run' do
       cached(:cluster_config_path) { 'cluster_config_path' }
       cached(:previous_cluster_config_path) { 'previous_cluster_config_path' }
       cached(:instance_types_data_path) { 'instance_types_data_path' }
+      cached(:previous_instance_types_data_path) { 'previous_instance_types_data_path' }
       cached(:chef_run) do
         runner = ChefSpec::Runner.new(
           platform: 'ubuntu', step_into: %w(fetch_config)
