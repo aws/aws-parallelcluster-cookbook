@@ -19,6 +19,10 @@ action :run do
       Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
       ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
       fetch_cluster_config(node['cluster']['cluster_config_path'])
+
+      Chef::Log.info("Backing up old instance types data from (#{node['cluster']['instance_types_data_path']}) to (#{node['cluster']['previous_instance_types_data_path']})")
+      ::FileUtils.cp_r(node['cluster']['instance_types_data_path'], node['cluster']['previous_instance_types_data_path'], remove_destination: true)
+
       fetch_change_set
       fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
       Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
@@ -103,7 +107,8 @@ action_class do # rubocop:disable Metrics/BlockLength
       end
     else
       # Copy instance type infos file from S3 URI
-      fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'])
+      instance_version_id = node['cluster']['instance_types_data_version'] unless node['cluster']['instance_types_data_version'].nil?
+      fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'], instance_version_id)
     end
   end
 end
