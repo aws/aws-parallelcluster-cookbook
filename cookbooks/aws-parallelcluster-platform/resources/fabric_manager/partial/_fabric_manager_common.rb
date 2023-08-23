@@ -63,8 +63,10 @@ end
 
 # Get number of nv switches
 def get_nvswitches
-  # NVSwitch device id is 10de:1af1
-  nvswitch_check = Mixlib::ShellOut.new("lspci -d 10de:1af1 | wc -l")
-  nvswitch_check.run_command
-  nvswitch_check.stdout.strip.to_i
+  #  A100 (P4) and H100(P5) systems have NVSwitches
+  # NVSwitch device id is 10de:1af1 for P4 instance
+  # NVSwitch device id is 10de:22a3 for P5 instance
+  nvswitch_check_p4 = shell_out("lspci -d 10de:1af1 | wc -l")
+  nvswitch_check_p5 = shell_out("lspci -d 10de:22a3 | wc -l")
+  nvswitch_check_p4.stdout.strip.to_i + nvswitch_check_p5.stdout.strip.to_i
 end
