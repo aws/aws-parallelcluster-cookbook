@@ -63,29 +63,29 @@ suites:
     driver:
       # The only instance type that supports this test is p4d.24xlarge, skipped otherwise
       instance_type: p4d.24xlarge
-  - name: nvidia_gdrcopy
-    # doesn't work on Docker
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:config_.*gdrcopy/
-    attributes:
-      dependencies:
-        - resource:package_repos
-        - resource:install_packages:install_kernel_source
-        - 'resource:package { "package_name": "dkms" }'
-        - resource:build_tools
-        - recipe:aws-parallelcluster-platform::nvidia_install
-#        - resource:fabric_manager:configure # Needed for Multi-gpu instance like p5.48xlarge
-      resource: gdrcopy:configure
-      cluster:
-        nvidia:
-          enabled: true
-    driver:
-      instance_type: g4dn.2xlarge
-#      instance_type: p5.48xlarge
+    - name: nvidia_gdrcopy
+      # doesn't work on Docker
+      run_list:
+        - recipe[aws-parallelcluster-tests::setup]
+        - recipe[aws-parallelcluster-tests::test_resource]
+      verifier:
+        controls:
+          - /tag:config_.*gdrcopy/
+      attributes:
+        dependencies:
+          - resource:package_repos
+          - resource:install_packages:install_kernel_source
+          - 'resource:package { "package_name": "dkms" }'
+          - resource:build_tools
+          - recipe:aws-parallelcluster-platform::nvidia_install
+#          - resource:fabric_manager:configure # Needed for Multi-gpu instance like p5.48xlarge
+#          - recipe:aws-parallelcluster-platform::nvidia_uvm # Needed for running Sanity checks in Multi-gpu instance like p5.48xlarge
+        resource: gdrcopy:configure
+        cluster:
+          nvidia:
+            enabled: true
+      driver:
+        instance_type: g4dn.2xlarge
   - name: intel_hpc
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
