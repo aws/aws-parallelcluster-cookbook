@@ -1,5 +1,19 @@
-#!/bin/sh
-# WARNING: REQUIRES /bin/sh
+#!/bin/bash
+# WARNING: this file is a modified version of the installer from https://cinc.sh/download/
+#
+# Notable changes are:
+# - changed format from sh to bash;
+# - installer downloaded from ParallelCluster S3 bucket rather than from omnitruck website;
+# - custom functions to retrieve AWS region and domain;
+# - new -b option to permit to pass an optional bucket for downloading a custom Cinc installer;
+# - unused options -c, -p, -n, setting the unused $channel variable has been removed;
+# - added custom case to manage download of ubuntu packages from S3.
+# - improvement in the dpkg installation to avoid conflicts with other running installations.
+#
+# When updating this modified file, please remember to bump the version and reference it in the CI/CD.
+# - cinc-install.sh v1.2.0
+#
+# WARNING: REQUIRES /bin/bash
 #
 # - must run on /bin/sh on solaris 9
 # - must run on /bin/sh on AIX 6.x
@@ -259,6 +273,27 @@ do_download() {
   unable_to_retrieve_package
 }
 
+# WARNING: Custom function added on top of the original installer to retrieve AWS region
+# get_region INSTANCE_METADATA_FILE
+# get region from metadata
+get_region() {
+  if exists curl; then
+    echo "Trying curl to get region with IMDSv2 ..."
+    token=$(curl -s --connect-timeout 5 --max-time 5 --retry 3 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+    region=$(curl -s -H "X-aws-ec2-metadata-token: ${token}" http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}')
+  elif exists python; then
+    echo "Trying python to get region with IMDSv2 ..."
+    token=$(python -c "import sys,requests; sys.stdout.write(requests.put('http://169.254.169.254/latest/api/token', headers={'X-aws-ec2-metadata-token-ttl-seconds': '300', 'User-Agent': 'mixlib-install/3.11.27'}).content)")
+    region=$(python -c "import sys,requests,json; sys.stdout.write(json.loads(requests.get('http://169.254.169.254/latest/dynamic/instance-identity/document', headers={ 'X-aws-ec2-metadata-token': '${token}', 'User-Agent': 'mixlib-install/3.11.27' }).content.decode())['region'])")
+  fi
+
+  if test "x$region" = "x"; then
+    echo "Unable to get region with IMDSv2, trying with IMDSv1 ..."
+    do_download "http://169.254.169.254/latest/dynamic/instance-identity/document" $1
+    region=$(cat $1 | awk '$1 =="\"region\"" {print $3}' | sed 's/"//g; s/,//g')
+  fi
+}
+
 # install_file TYPE FILENAME
 # TYPE is "rpm", "deb", "solaris", "sh", etc.
 install_file() {
@@ -275,7 +310,8 @@ install_file() {
       ;;
     "deb")
       echo "installing with dpkg..."
-      dpkg -i "$2"
+      # WARNING: Custom fix to avoid hangs when another installation is running
+      flock $(apt-config shell StateDir Dir::State/d | sed -r "s/.*'(.*)'$/\1/")daily_lock dpkg -i "$2"
       ;;
     "bff")
       echo "installing with installp..."
@@ -342,7 +378,6 @@ tmp_dir="$tmp/install.sh.$$"
 #
 # Outputs:
 # $version: Requested version to be installed.
-# $channel: Channel to install the product from
 # $project: Project to be installed
 # $cmdline_filename: Name of the package downloaded on local disk.
 # $cmdline_dl_dir: Name of the directory downloaded package will be saved to on local disk.
@@ -352,17 +387,14 @@ tmp_dir="$tmp/install.sh.$$"
 ############
 
 # Defaults
-channel="stable"
 project="cinc"
 
-while getopts pnv:c:f:P:d:s:l:a opt
+while getopts v:b:f:P:d:s:l:a opt
 do
   case "$opt" in
 
     v)  version="$OPTARG";;
-    c)  channel="$OPTARG";;
-    p)  channel="current";; # compat for prerelease option
-    n)  channel="current";; # compat for nightlies option
+    b)  bucket="$OPTARG";; # WARNING: custom option, to override default bucket for downloading CINC client
     f)  cmdline_filename="$OPTARG";;
     P)  project="$OPTARG";;
     d)  cmdline_dl_dir="$OPTARG";;
@@ -371,7 +403,7 @@ do
     a)  checksum="$OPTARG";;
     \?)   # unknown flag
       echo >&2 \
-      "usage: $0 [-P project] [-c release_channel] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum]"
+      "usage: $0 [-P project] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum] [-b bucket]"
       exit 1;;
   esac
 done
@@ -572,6 +604,22 @@ case $machine in
     ;;
 esac
 
+# WARNING: Custom case to manage download of ubuntu packages from S3.
+# This is not required when downloading from omnitruck because the url to use is in the metadata file.
+if test "$platform" = "ubuntu"; then
+  case $machine in
+    "arm64"|"aarch64")
+      machine="arm64"
+      ;;
+    "x86_64"|"amd64"|"x64")
+      machine="amd64"
+      ;;
+    "i386"|"i86pc"|"x86"|"i686")
+      machine="i386"
+      ;;
+  esac
+fi
+
 if test "x$platform_version" = "x"; then
   echo "Unable to determine platform version!"
   report_bug
@@ -584,7 +632,23 @@ if test "x$platform" = "xsolaris2"; then
   export PATH
 fi
 
-echo "$platform $platform_version $machine"
+# WARNING: Custom code to detect AWS Region
+instance_metadata_file=$tmp_dir/instance_metadata
+get_region instance_metadata_file
+
+# WARNING: Custom code to detect AWS S3 Domain
+if [[ ${region} == cn-* ]]; then
+  download_domain="amazonaws.com.cn"
+elif [[ ${region} == us-iso-* ]]; then
+  download_domain="c2s.ic.gov"
+elif [[ ${region} == us-isob-* ]]; then
+  download_domain="sc2s.sgov.gov"
+else
+  download_domain="amazonaws.com"
+fi
+
+# WARNING: echo modified to return the region in the output
+echo "${platform} ${platform_version} ${machine} ${region}"
 
 ############
 # end of platform_detection.sh
@@ -629,13 +693,14 @@ if test "x$no_proxy" != "x"; then
 fi
 
 
-# fetch_metadata.sh
+# create_download_url.sh
 ############
-# This section calls omnitruck to get the information about the build to be
-#   installed.
+# WARNING: This is a modified version of the original fetch_metadata.sh section,
+# the changes will permit to download cinc installer from S3 rather than from omintruck website.
+#
+# This section creates the url of the package to download.
 #
 # Inputs:
-# $channel:
 # $project:
 # $version:
 # $platform:
@@ -648,30 +713,35 @@ fi
 # $sha256:
 ############
 
+if test "x$bucket" = "x"; then
+  # Use official bucket if not specified
+  bucket="${region}-aws-parallelcluster"
+fi
+
+bucket_url="https://${bucket}.s3.${region}.${download_domain}/archives/${project}/${platform}/${platform_version}/"
+
+if test "x$build" = "x"; then
+  # Build version set to 1 by default if not specified
+  build=1
+fi
+
 if test "x$download_url_override" = "x"; then
-  echo "Getting information for $project $channel $version for $platform..."
+  case "$platform" in
+  "debian"|"ubuntu")
+    package_file="${project}_${version}-${build}_${machine}.deb"
+    ;;
+  *)
+    package_file="${project}-${version}-${build}.${platform}${platform_version}.${machine}.rpm"
+    ;;
+  esac
 
-  metadata_filename="$tmp_dir/metadata.txt"
-  metadata_url="https://omnitruck.cinc.sh/$channel/$project/metadata?v=$version&p=$platform&pv=$platform_version&m=$machine"
+  download_url=${bucket_url}${package_file}
+  checksum_url="${download_url}.sha256"
 
-  do_download "$metadata_url"  "$metadata_filename"
-
-  cat "$metadata_filename"
-
-  echo ""
-  # check that all the mandatory fields in the downloaded metadata are there
-  if grep '^url' $metadata_filename > /dev/null && grep '^sha256' $metadata_filename > /dev/null; then
-    echo "downloaded metadata file looks valid..."
-  else
-    echo "downloaded metadata file is corrupted or an uncaught error was encountered in downloading the file..."
-    # this generally means one of the download methods downloaded a 404 or something like that and then reported a successful exit code,
-    # and this should be fixed in the function that was doing the download.
-    report_bug
-    exit 1
-  fi
-
-  download_url=`awk '$1 == "url" { print $2 }' "$metadata_filename"`
-  sha256=`awk '$1 == "sha256" { print $2 }' "$metadata_filename"`
+  # Extracting sha256 checksum
+  checksum_file=${tmp_dir}/${package_file}.sha256
+  do_download "${checksum_url}" ${checksum_file}
+  sha256=$(awk '{print $1}' ${checksum_file})
 else
   download_url=$download_url_override
   # Set sha256 to empty string if checksum not set
@@ -679,7 +749,7 @@ else
 fi
 
 ############
-# end of fetch_metadata.sh
+# end of create_download_url.sh
 ############
 
 
@@ -699,7 +769,8 @@ fi
 # $filetype: Type of the file downloaded.
 ############
 
-filename=`echo $download_url | sed -e 's/?.*//' | sed -e 's/^.*\///'`
+# WARNING: modified sed to be able to retrieve file name from S3 download url
+filename=`echo $download_url | sed -e 's/^.*\///'`
 filetype=`echo $filename | sed -e 's/^.*\.//'`
 
 # use either $tmp_dir, the provided directory (-d) or the provided filename (-f)
