@@ -21,13 +21,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 12.2.0.
 - Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-535`
 - Increase EFS-utils watchdog poll interval to 10 seconds. Note: This change is meaningful only if [EncryptionInTransit](https://docs.aws.amazon.com/parallelcluster/latest/ug/SharedStorage-v3.html#yaml-SharedStorage-EfsSettings-EncryptionInTransit) is set to `true`, because watchdog does not run otherwise.
-- Upgrade EFA installer to `1.25.0`
+- Upgrade EFA installer to `1.25.1`
   - Efa-driver: `efa-2.5.0-1`
   - Efa-config: `efa-config-1.15-1`
   - Efa-profile: `efa-profile-1.5-1`
   - Libfabric-aws: `libfabric-aws-1.18.1-1`
   - Rdma-core: `rdma-core-46.0-1`
-  - Open MPI: `openmpi40-aws-4.1.5-3`
+  - Open MPI: `openmpi40-aws-4.1.5-4`
 - Upgrade Slurm to version 23.02.4.
 - Upgrade ARM PL to version 23.04.1 for Ubuntu 22.04 only.
 - Upgrade third-party cookbook dependencies:
