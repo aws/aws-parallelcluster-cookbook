@@ -2,18 +2,14 @@
 ---
 verifier:
   inspec_tests:
-    - /tmp/cookbooks/aws-parallelcluster-awsbatch/test
-    - /tmp/cookbooks/aws-parallelcluster-platform/test
-    - /tmp/cookbooks/aws-parallelcluster-environment/test
-    - /tmp/cookbooks/aws-parallelcluster-computefleet/test
-    - /tmp/cookbooks/aws-parallelcluster-shared/test
-    - /tmp/cookbooks/aws-parallelcluster-slurm/test
+    - cookbooks/aws-parallelcluster-awsbatch/test
+    - cookbooks/aws-parallelcluster-platform/test
+    - cookbooks/aws-parallelcluster-environment/test
+    - cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-shared/test
+    - cookbooks/aws-parallelcluster-slurm/test
   controls:
     - /tag:config/
-
-lifecycle:
-  pre_verify:
-    - local: . ./kitchen/kitchen.fix-inspec-deps.sh
 
 _common_cluster_attributes: &_common_cluster_attributes
   stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
