@@ -171,21 +171,23 @@ describe 'lustre:setup' do
     end
   end
 
-  context "on redhat with kernel 4.18.0-425.3.1.el8" do
-    cached(:chef_run) do
-      runner = runner(
-        platform: 'redhat', version: '8',
-        step_into: ['lustre']
-      ) do |node|
-        node.automatic['platform_version'] = "8.2"
-        node.override['cluster']['kernel_release'] = "anything 4.18.0-425.3.1.el8 something"
+  [%w(8.7 4.18.0-425.3.1.el8.x86_64), %w(8.7 4.18.0-425.13.1.el8_7.x86_64)].each do |platform_version, kernel_version|
+    context "on redhat #{platform_version} with kernel #{kernel_version}" do
+      cached(:chef_run) do
+        runner = runner(
+          platform: 'redhat', version: '8',
+          step_into: ['lustre']
+        ) do |node|
+          node.automatic['platform_version'] = platform_version
+          node.override['cluster']['kernel_release'] = kernel_version
+        end
+        Lustre.setup(runner)
       end
-      Lustre.setup(runner)
-    end
 
-    it 'can not install lustre' do
-      is_expected.to write_log("FSx for Lustre is not supported in kernel version 4.18.0-425.3.1.el8 of RHEL, please update the kernel version")
-        .with(level: :warn)
+      it 'can not install lustre' do
+        is_expected.to write_log("FSx for Lustre is not supported in kernel version #{kernel_version} of RHEL #{platform_version}, please update the kernel version")
+          .with(level: :warn)
+      end
     end
   end
 
