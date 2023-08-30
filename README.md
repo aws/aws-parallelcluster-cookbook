@@ -215,10 +215,10 @@ controls matching the `/tag:config/` regex.
 ```
 verifier:
   inspec_tests:
-    - /tmp/cookbooks/aws-parallelcluster-awsbatch/test
-    - /tmp/cookbooks/aws-parallelcluster-platform/test
-    - /tmp/cookbooks/aws-parallelcluster-environment/test
-    - /tmp/cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-awsbatch/test
+    - cookbooks/aws-parallelcluster-platform/test
+    - cookbooks/aws-parallelcluster-environment/test
+    - cookbooks/aws-parallelcluster-computefleet/test
     ...
   controls:
     - /tag:config/
