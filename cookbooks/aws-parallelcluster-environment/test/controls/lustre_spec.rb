@@ -1,7 +1,7 @@
 control 'tag:install_lustre_client_installed' do
   title "Verify that lustre client is installed"
   minimal_lustre_client_version = '2.12'
-  if (os_properties.centos? && inspec.os.release.to_f >= 7.5) || os_properties.redhat?
+  if os_properties.centos? && inspec.os.release.to_f >= 7.5
     describe package('kmod-lustre-client') do
       it { should be_installed }
     end
@@ -10,7 +10,33 @@ control 'tag:install_lustre_client_installed' do
       it { should be_installed }
     end
 
-    if (os_properties.centos? && inspec.os.release.to_f >= 7.7) || os_properties.redhat?
+    if os_properties.centos? && inspec.os.release.to_f >= 7.7
+      describe package('kmod-lustre-client') do
+        its('version') { should cmp >= minimal_lustre_client_version }
+      end
+
+      describe package('lustre-client') do
+        its('version') { should cmp >= minimal_lustre_client_version }
+      end
+
+      describe yum.repo('aws-fsx') do
+        it { should exist }
+        it { should be_enabled }
+        its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
+      end
+    end
+  end
+
+  if os_properties.redhat? && inspec.os.release.to_f >= 8.2
+    unless inspec.os.release.to_f == 8.7 && (node['cluster']['kernel_release'].include?("4.18.0-425.3.1.el8") || node['cluster']['kernel_release'].include?("4.18.0-425.13.1.el8_7"))
+      describe package('kmod-lustre-client') do
+        it { should be_installed }
+      end
+
+      describe package('lustre-client') do
+        it { should be_installed }
+      end
+
       describe package('kmod-lustre-client') do
         its('version') { should cmp >= minimal_lustre_client_version }
       end
@@ -60,10 +86,12 @@ end
 control 'tag:install_lustre_lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
   only_if { !os_properties.on_docker? && !os_properties.alinux2? }
-  describe kernel_module("lnet") do
-    it { should be_loaded }
-    it { should_not be_disabled }
-    it { should_not be_blacklisted }
+  unless os_properties.redhat? && inspec.os.release.to_f == 8.7 && (node['cluster']['kernel_release'].include?("4.18.0-425.3.1.el8") || node['cluster']['kernel_release'].include?("4.18.0-425.13.1.el8_7"))
+    describe kernel_module("lnet") do
+      it { should be_loaded }
+      it { should_not be_disabled }
+      it { should_not be_blacklisted }
+    end
   end
 end
 
