@@ -38,14 +38,14 @@ platforms:
     attributes:
       cluster:
         base_os: alinux2
-        kernel_release: '5.10.157-139.675.amzn2.x86_64'
+        kernel_release: '5.10.157-139.675.amzn2.fake-value'
   - name: centos7
     driver:
       image: <% if ENV['KITCHEN_CENTOS7_IMAGE'] %> <%= ENV['KITCHEN_CENTOS7_IMAGE'] %> <% else %> dokken/centos-7 <% end %>
     attributes:
       cluster:
         base_os: centos7
-        kernel_release: '3.10.0-1160.76.1.el7.x86_64'
+        kernel_release: '3.10.0-1160.76.1.el7.fake-value'
   - name: ubuntu2004
     driver:
       image: <% if ENV['KITCHEN_UBUNTU2004_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU2004_IMAGE'] %> <% else %> dokken/ubuntu-20.04 <% end %>
@@ -68,4 +68,4 @@ platforms:
     attributes:
       cluster:
         base_os: rhel8
-        kernel_release: '4.18.0-477.13.1.el8_7.x86_64' # Use 477 version to match 8.8 kernel version available on docker
+        kernel_release: '4.18.0-477.13.1.el8_7.fake-value' # Use 477 version to match 8.8 kernel version available on docker
