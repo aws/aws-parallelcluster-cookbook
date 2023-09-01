@@ -66,10 +66,10 @@ def enable_munge_service
 end
 
 def setup_munge_head_node
-  munge_key_arn_value = node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn)
-
   munge_key_manager 'manage_munge_key' do
-    munge_key_secret_arn munge_key_arn_value
+    munge_key_secret_arn lazy {
+      node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn)
+    }
   end
 
   enable_munge_service
