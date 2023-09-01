@@ -7,6 +7,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Add support for installing Intel OneAPI Base Toolkit and HPC Toolkit, and Intel Python.
+  - Intel OneAPI Base Toolkits: 2023.2.0
+  - Intel OneAPI HPC Toolkits: 2023.2.0
+  - Intel Python: 2023.2.0
+  - Critical Update for Intel oneAPI DPC++/C++ Compiler: 2023.2.1
+  - Critical Update for Intel Fortran Compiler & Intel Fortran Compiler Classic: 2023.2.1
 
 **CHANGES**
 - Upgrade third-party cookbook dependencies:
