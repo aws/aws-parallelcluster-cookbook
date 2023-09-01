@@ -66,38 +66,10 @@ def enable_munge_service
 end
 
 def setup_munge_head_node
-  munge_key_secret_arn = lazy { node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn) }
+  munge_key_arn_value = node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn)
 
-  # Fetch and decode munge key from Secrets Manager if munge_key_secret_arn is present
-  bash 'fetch_and_decode_munge_key' do
-    only_if { munge_key_secret_arn }  # only execute this if munge_key_secret_arn is set
-    user 'root'  # AWS CLI operations typically need root permissions
-    cwd '/tmp'
-    code <<-FETCH_AND_DECODE
-      # Get the Base64 encoded munge key from Secrets Manager
-      encoded_key=$(aws secretsmanager get-secret-value --secret-id #{munge_key_secret_arn} --query 'SecretString' --output text)
-      
-      # Decode the munge key and save it to /etc/munge/munge.key
-      echo $encoded_key | base64 -d > /etc/munge/munge.key
-      
-      # Set the required permissions
-      chmod 0600 /etc/munge/munge.key
-    FETCH_AND_DECODE
-  end
-
-  # If munge_key_secret_arn is not provided, generate a munge key
-  bash 'generate_munge_key' do
-    not_if { ::File.exist?('/etc/munge/munge.key') }  # Don't execute this if a munge key already exists
-    user node['cluster']['munge']['user']
-    group node['cluster']['munge']['group']
-    cwd '/tmp'
-    code <<-HEAD_CREATE_MUNGE_KEY
-      set -e
-      # Generates munge key in /etc/munge/munge.key
-      /usr/sbin/mungekey --verbose
-      # Enforce correct permission on the key
-      chmod 0600 /etc/munge/munge.key
-    HEAD_CREATE_MUNGE_KEY
+  munge_key_manager 'manage_munge_key' do
+    munge_key_secret_arn munge_key_arn_value
   end
 
   enable_munge_service
