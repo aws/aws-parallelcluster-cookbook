@@ -41,17 +41,7 @@ def validate_device_name(device_name):
     return True
 
 
-def main():
-    syslog.syslog("Starting ec2_dev_2_volid.py script")
-    # Get dev
-    try:
-        dev = str(sys.argv[1])
-        validate_device_name(dev)
-        syslog.syslog(f"Input block device is {dev}")
-    except IndexError:
-        syslog.syslog(syslog.LOG_ERR, "Provide block device i.e. xvdf")
-
-    # Convert dev to mapping format
+def adapt_device_name(dev):
     if "nvme" in dev:
         # For newer instances which expose EBS volumes as NVMe devices, translate the
         # device name so boto can discover it.
@@ -70,26 +60,10 @@ def main():
     else:
         dev = dev.replace("xvd", "sd")
         dev = "/dev/" + dev
+    return dev
 
-    # Get IMDSv2 token
-    token = get_imdsv2_token()
 
-    # Get instance ID
-    instance_id = requests.get(
-        "http://169.254.169.254/latest/meta-data/instance-id",
-        headers=token,
-        timeout=METADATA_REQUEST_TIMEOUT,
-    ).text
-
-    # Get region
-    region = requests.get(
-        "http://169.254.169.254/latest/meta-data/placement/availability-zone",
-        headers=token,
-        timeout=METADATA_REQUEST_TIMEOUT,
-    ).text
-    region = region[:-1]
-
-    # Parse configuration file to read proxy settings
+def parse_proxy_config():
     config = configparser.RawConfigParser()
     config.read("/etc/boto.cfg")
     proxy_config = Config()
@@ -97,18 +71,10 @@ def main():
         proxy = config.get("Boto", "proxy")
         proxy_port = config.get("Boto", "proxy_port")
         proxy_config = Config(proxies={"https": f"{proxy}:{proxy_port}"})
+    return proxy_config
 
-    # Configure the AWS CA bundle.
-    # In US isolated regions the dedicated CA bundle will be used.
-    # In any other region, the default bundle will be used (None stands for the default settings).
-    # Note: We want to apply a more general solution that applies to every region,
-    # but for the time being this is enough to support US isolated regions without
-    # impacting the other ones.
-    ca_bundle = f"/etc/pki/{region}/certs/ca-bundle.pem" if region.startswith("us-iso") else None
 
-    # Connect to AWS using boto
-    ec2 = boto3.client("ec2", region_name=region, config=proxy_config, verify=ca_bundle)
-
+def get_device_volume_id(ec2, dev, instance_id):
     # Poll for blockdevicemapping
     devices = ec2.describe_instance_attribute(InstanceId=instance_id, Attribute="blockDeviceMapping").get(
         "BlockDeviceMappings"
@@ -127,8 +93,48 @@ def main():
         dev_map = dict((d.get("DeviceName"), d) for d in devices)
         loop_count += 1
 
-    # Return volume ID
-    volume_id = dev_map.get(dev).get("Ebs").get("VolumeId")
+    return dev_map.get(dev).get("Ebs").get("VolumeId")
+
+
+def get_metadata_value(token, metadata_path):
+    return requests.get(
+        metadata_path,
+        headers=token,
+        timeout=METADATA_REQUEST_TIMEOUT,
+    ).text
+
+
+def main():
+    syslog.syslog("Starting ec2_dev_2_volid.py script")
+    try:
+        dev = str(sys.argv[1])
+        validate_device_name(dev)
+        syslog.syslog(f"Input block device is {dev}")
+    except IndexError:
+        syslog.syslog(syslog.LOG_ERR, "Provide block device i.e. xvdf")
+
+    dev = adapt_device_name(dev)
+
+    token = get_imdsv2_token()
+
+    instance_id = get_metadata_value(token, "http://169.254.169.254/latest/meta-data/instance-id")
+
+    region = get_metadata_value(token, "http://169.254.169.254/latest/meta-data/placement/availability-zone")
+    region = region[:-1]
+
+    proxy_config = parse_proxy_config()
+
+    # Configure the AWS CA bundle.
+    # In US isolated regions the dedicated CA bundle will be used.
+    # In any other region, the default bundle will be used (None stands for the default settings).
+    # Note: We want to apply a more general solution that applies to every region,
+    # but for the time being this is enough to support US isolated regions without
+    # impacting the other ones.
+    ca_bundle = f"/etc/pki/{region}/certs/ca-bundle.pem" if region.startswith("us-iso") else None
+
+    ec2 = boto3.client("ec2", region_name=region, config=proxy_config, verify=ca_bundle)
+
+    volume_id = get_device_volume_id(ec2, dev, instance_id)
     print(volume_id)
 
 
