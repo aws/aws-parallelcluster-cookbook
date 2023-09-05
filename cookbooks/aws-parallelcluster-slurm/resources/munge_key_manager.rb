@@ -21,9 +21,9 @@ unified_mode true
 
 property :munge_key_secret_arn, String
 
-default_action :manage
+default_action :setup_munge_key
 
-action :manage do
+action :setup_munge_key do
   if new_resource.munge_key_secret_arn
     # This block will fetch the munge key from Secrets Manager
     bash 'fetch_and_decode_munge_key' do
@@ -31,9 +31,22 @@ action :manage do
       group 'root'
       cwd '/tmp'
       code <<-FETCH_AND_DECODE
-        # Get encoded munge key from secrets manager and decode it
+        # Get encoded munge key from secrets manager
         encoded_key=$(aws secretsmanager get-secret-value --secret-id #{new_resource.munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
-        echo $encoded_key | base64 -d > /etc/munge/munge.key
+        # If encoded_key doesn't have a value, error and exit
+        if [ -z "$encoded_key" ]; then
+          echo "Error fetching munge key from Secrets Manager or the key is empty"
+          exit 1
+        fi
+
+        # Decode munge key and write to /etc/munge/munge.key
+        decoded_key=$(echo $encoded_key | base64 -d)
+        if [ $? -ne 0 ]; then
+          echo "Error decoding the munge key with base64"
+          exit 1
+        fi
+        echo "$decoded_key" > /etc/munge/munge.key
+
         # Set ownership on the key
         chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
         # Enforce correct permission on the key
