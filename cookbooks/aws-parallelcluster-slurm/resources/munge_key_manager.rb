@@ -32,7 +32,7 @@ action :manage do
       cwd '/tmp'
       code <<-FETCH_AND_DECODE
         # Get encoded munge key from secrets manager and decode it
-        encoded_key=$(aws secretsmanager get-secret-value --secret-id #{new_resource.munge_key_secret_arn} --query 'SecretString' --output text)
+        encoded_key=$(aws secretsmanager get-secret-value --secret-id #{new_resource.munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
         echo $encoded_key | base64 -d > /etc/munge/munge.key
         # Set ownership on the key
         chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
