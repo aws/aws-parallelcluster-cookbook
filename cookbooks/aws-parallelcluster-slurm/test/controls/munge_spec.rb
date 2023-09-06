@@ -97,3 +97,12 @@ control 'tag:check_munge_key_content' do
     its('content') { should_not be_empty }
   end
 end unless os_properties.redhat_on_docker?
+
+control 'tag:check_munge_key_error_messages' do
+  title 'Check for error messages related to munge key'
+
+  describe file('/var/log/chef-client.log') do
+    its('content') { should_not match /Error fetching munge key/ }
+    its('content') { should_not match /Error decoding the munge key/ }
+  end
+end unless os_properties.redhat_on_docker?
