@@ -2,7 +2,6 @@ mock
 pytest
 pytest-cov
 pytest-datadir
-pytest-html
 pytest-mock
 assertpy
 jsonschema
