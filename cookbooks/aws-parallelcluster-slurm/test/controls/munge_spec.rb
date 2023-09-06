@@ -78,3 +78,22 @@ control 'tag:config_munge_service_enabled' do
     it { should be_running }
   end
 end
+
+control 'tag:check_munge_key_exists' do
+  title 'Check if the munge key exists'
+
+  describe file('/etc/munge/munge.key') do
+    it { should exist }
+    its('mode') { should cmp '0600' }
+    its('owner') { should eq node['cluster']['munge']['user'] }
+    its('group') { should eq node['cluster']['munge']['group'] }
+  end
+end unless os_properties.redhat_on_docker?
+
+control 'tag:check_munge_key_content' do
+  title 'Check if the munge key content is not empty'
+
+  describe file('/etc/munge/munge.key') do
+    its('content') { should_not be_empty }
+  end
+end unless os_properties.redhat_on_docker?
