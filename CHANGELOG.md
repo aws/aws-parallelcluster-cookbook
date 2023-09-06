@@ -346,6 +346,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for multiple users cluster environments by integrating with Active Directory (AD) domains managed via AWS Directory Service.
 - Install NVIDIA drivers and CUDA library for ARM.
+- Build Slurm with `slurmrestd` support.
 
 **CHANGES**
 - Upgrade Slurm to version 21.08.5.
