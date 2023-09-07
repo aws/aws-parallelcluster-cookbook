@@ -45,6 +45,12 @@ action :setup_munge_key do
           echo "Error decoding the munge key with base64"
           exit 1
         fi
+
+        # Check if /etc/munge/munge.key exists and remove it
+        if [ -f "/etc/munge/munge.key" ]; then
+          rm -f /etc/munge/munge.key
+        fi
+
         echo "$decoded_key" > /etc/munge/munge.key
 
         # Set ownership on the key
