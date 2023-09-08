@@ -15,15 +15,26 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-resource_name :munge_key_manager
-provides :munge_key_manager
+resource_name :munge_key_update_manager
+provides :munge_key_update_manager
 unified_mode true
 
 property :munge_key_secret_arn, String
 
-default_action :setup_munge_key
+default_action :update_munge_key
 
-action :setup_munge_key do
+action :update_munge_key do
+  bash 'remove_current_munge_key' do
+    user 'root'
+    group 'root'
+    cwd '/tmp'
+    code <<-REMOVE_CURRENT_MUNGE_KEY
+      if [ -f "/etc/munge/munge.key" ]; then
+        rm -f /etc/munge/munge.key
+      fi
+    REMOVE_CURRENT_MUNGE_KEY
+  end
+
   if new_resource.munge_key_secret_arn
     # This block will fetch the munge key from Secrets Manager
     bash 'fetch_and_decode_munge_key' do
@@ -57,7 +68,6 @@ action :setup_munge_key do
   else
     # This block will generate a munge key if it doesn't exist
     bash 'generate_munge_key' do
-      not_if { ::File.exist?('/etc/munge/munge.key') }
       user node['cluster']['munge']['user']
       group node['cluster']['munge']['group']
       cwd '/tmp'

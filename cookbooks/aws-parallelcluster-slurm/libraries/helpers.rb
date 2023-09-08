@@ -66,14 +66,18 @@ def enable_munge_service
 end
 
 def setup_munge_head_node
-  munge_key_manager 'manage_munge_key' do
-    munge_key_secret_arn lazy {
-      node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn)
-    }
-  end
+  ruby_block 'setup_munge_key' do
+    block do
+      munge_key_secret_arn = node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn)
 
-  enable_munge_service
-  share_munge_head_node
+      munge_key_manager 'manage_munge_key' do
+        munge_key_secret_arn munge_key_secret_arn
+      end
+
+      enable_munge_service
+      share_munge_head_node
+    end
+  end
 end
 
 def share_munge_head_node

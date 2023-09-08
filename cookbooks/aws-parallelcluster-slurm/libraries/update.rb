@@ -71,3 +71,11 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   raise_command_error(command, cmd) if raise_on_error && cmd.error?
   cmd.stdout.strip
 end
+
+# Verify if MungeKeySecretArn in SlurmSetting section of cluster configuration has been updated
+def is_custom_munge_key_updated?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  config["DevSettings"]["SlurmSettings"]["MungeKeySecretArn"] != previous_config["DevSettings"]["SlurmSettings"]["MungeKeySecretArn"]
+end
