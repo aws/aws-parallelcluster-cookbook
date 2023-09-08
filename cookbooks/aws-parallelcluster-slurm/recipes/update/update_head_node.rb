@@ -216,11 +216,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
 end
 
-munge_key_update_manager 'update_munge_key' do
-  munge_key_secret_arn lazy { node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn) }
-  action :update_munge_key
-  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
-end
+update_munge_head_node
 
 # The previous execute "generate_pcluster_slurm_configs" block resource may have overridden the slurmdbd password in
 # slurm_parallelcluster_slurmdbd.conf with a default value, so if it has run and Slurm accounting

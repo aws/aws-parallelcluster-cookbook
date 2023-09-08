@@ -48,4 +48,12 @@ else
   exit 1
 fi
 
+# Enable and restart munge service
+systemctl enable munge
+systemctl restart munge || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; }
+
+# Share munge key
+mkdir -p /home/${CLUSTER_USER}/.munge
+cp /etc/munge/munge.key /home/${CLUSTER_USER}/.munge/.munge.key
+
 exit 0
