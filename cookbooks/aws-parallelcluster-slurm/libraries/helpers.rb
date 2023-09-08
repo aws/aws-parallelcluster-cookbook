@@ -81,10 +81,10 @@ def update_munge_head_node
     munge_key_secret_arn lazy { node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn) }
     action :update_munge_key
     only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
-
-    enable_munge_service
-    share_munge_head_node
   end
+  
+  enable_munge_service
+  share_munge_head_node
 end
 
 def share_munge_head_node
