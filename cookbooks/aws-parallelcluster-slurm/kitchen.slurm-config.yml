@@ -176,3 +176,17 @@ suites:
       cluster:
         node_type: ComputeFleet
         head_node_private_ip: '127.0.0.1'
+
+    - name: config_head_node_munge
+      run_list:
+        - recipe[aws-parallelcluster-tests::setup]
+        - recipe[aws-parallelcluster-slurm::config::config_head_node]
+      verifier:
+        controls:
+          - munge
+      attributes:
+        cluster:
+          config:
+            DevSettings:
+              SlurmSettings:
+                MungeKeySecretArn: 'arn:aws:secretsmanager:us-east-2:249582277112:secret:TestMungeKey-jDtnqi'

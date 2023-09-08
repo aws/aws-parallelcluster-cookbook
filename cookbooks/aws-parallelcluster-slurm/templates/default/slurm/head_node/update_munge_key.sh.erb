@@ -44,10 +44,8 @@ if [ -n "${SECRET_ARN}" ]; then
   chmod 0600 ${MUNGE_KEY_FILE}
 
 else
-  # Generate a munge key if it doesn't exist
-  echo "Generating new munge key"
-  /usr/sbin/mungekey --verbose
-  chmod 0600 ${MUNGE_KEY_FILE}
+  echo "MUNGE KEY SECRET ARN isn't provided"
+  exit 1
 fi
 
 exit 0

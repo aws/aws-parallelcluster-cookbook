@@ -36,7 +36,6 @@ action :update_munge_key do
   end
 
   if new_resource.munge_key_secret_arn
-    # This block will fetch the munge key from Secrets Manager
     bash 'fetch_and_decode_munge_key' do
       user 'root'
       group 'root'
@@ -66,7 +65,6 @@ action :update_munge_key do
       FETCH_AND_DECODE
     end
   else
-    # This block will generate a munge key if it doesn't exist
     bash 'generate_munge_key' do
       user node['cluster']['munge']['user']
       group node['cluster']['munge']['group']
