@@ -283,7 +283,7 @@ execute "check slurmctld status" do
 end unless redhat_on_docker?
 
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
-  source 'update_munge_key.sh.erb'
+  source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'
   group 'root'
   mode '0700'
