@@ -65,6 +65,15 @@ def enable_munge_service
   end
 end
 
+def restart_munge_service
+  service "munge" do
+    supports restart: true
+    action :restart
+    retries 5
+    retry_delay 10
+  end
+end
+
 def setup_munge_head_node
   munge_key_manager 'manage_munge_key' do
     munge_key_secret_arn lazy {
@@ -82,8 +91,8 @@ def update_munge_head_node
     action :update_munge_key
     only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
   end
-  
-  enable_munge_service
+
+  restart_munge_service
   share_munge_head_node
 end
 
