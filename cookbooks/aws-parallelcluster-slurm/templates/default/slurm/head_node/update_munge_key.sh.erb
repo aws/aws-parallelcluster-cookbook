@@ -13,6 +13,7 @@ SECRET_ARN="<%= @munge_key_secret_arn %>"
 REGION="<%= @region %>"
 MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
+CLUSTER_USER="<%= @cluster_user %>"
 
 # Remove current munge key if exists
 if [ -f "${MUNGE_KEY_FILE}" ]; then

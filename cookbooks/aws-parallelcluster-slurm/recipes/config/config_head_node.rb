@@ -291,6 +291,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
     munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn) },
     region: node['cluster']['region'],
     munge_user: node['cluster']['munge']['user'],
-    munge_group: node['cluster']['munge']['group']
+    munge_group: node['cluster']['munge']['group'],
+    cluster_user: node['cluster']['cluster_user']
   )
 end
