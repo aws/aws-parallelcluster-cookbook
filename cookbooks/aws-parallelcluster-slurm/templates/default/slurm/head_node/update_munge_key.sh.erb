@@ -15,13 +15,13 @@ MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
 CLUSTER_USER="<%= @cluster_user %>"
 
-# Remove current munge key if exists
-if [ -f "${MUNGE_KEY_FILE}" ]; then
-  rm -f ${MUNGE_KEY_FILE}
-fi
-
 # If SECRET_ARN is provided, fetch the munge key from Secrets Manager
 if [ -n "${SECRET_ARN}" ]; then
+  # Remove current munge key if exists
+  if [ -f "${MUNGE_KEY_FILE}" ]; then
+    rm -f ${MUNGE_KEY_FILE}
+  fi
+
   echo "Fetching munge key from AWS Secrets Manager: ${SECRET_ARN}"
   encoded_key=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query 'SecretString' --output text --region ${REGION})
 
