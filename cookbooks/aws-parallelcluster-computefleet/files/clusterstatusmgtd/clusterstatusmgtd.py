@@ -68,7 +68,7 @@ def log_exception(
 ):
     def decorator_log_exception(function):
         @functools.wraps(function)
-        def wrapper_log_expection(*args, **kwargs):  # pylint: disable=R1710
+        def wrapper_log_exception(*args, **kwargs):  # pylint: disable=R1710
             try:
                 return function(*args, **kwargs)
             except catch_exception as e:
@@ -77,8 +77,9 @@ def log_exception(
                     if exception_to_raise:
                         raise exception_to_raise
                     raise
+                return None
 
-        return wrapper_log_expection
+        return wrapper_log_exception
 
     return decorator_log_exception
 

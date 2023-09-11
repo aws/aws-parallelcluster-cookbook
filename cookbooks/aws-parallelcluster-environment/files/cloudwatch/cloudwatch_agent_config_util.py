@@ -158,6 +158,7 @@ def remove_backup():
     try:
         os.remove(LOG_CONFIGS_BAK_PATH)
     except FileNotFoundError:
+        # No need to remove the file, as the file isn't found anyway
         pass
 
 
