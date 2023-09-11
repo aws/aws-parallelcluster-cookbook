@@ -182,7 +182,7 @@ suites:
     - recipe[aws-parallelcluster-slurm::config_head_node]
     verifier:
     controls:
-      - /tag:config_/
+      - /tag:config_munge/
     attributes:
       node_type: HeadNode
       scheduler: 'slurm'

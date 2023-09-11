@@ -79,7 +79,7 @@ control 'tag:config_munge_service_enabled' do
   end
 end
 
-control 'tag:config_check_munge_key_exists' do
+control 'tag:config_munge_check_munge_key_exists' do
   title 'Check if the munge key exists'
 
   describe file('/etc/munge/munge.key') do
@@ -90,7 +90,7 @@ control 'tag:config_check_munge_key_exists' do
   end
 end unless os_properties.redhat_on_docker?
 
-control 'tag:config_check_munge_key_content' do
+control 'tag:config_munge_check_munge_key_content' do
   title 'Check if the munge key content is not empty'
 
   describe file('/etc/munge/munge.key') do
@@ -98,7 +98,7 @@ control 'tag:config_check_munge_key_content' do
   end
 end unless os_properties.redhat_on_docker?
 
-control 'tag:config_check_munge_key_error_messages' do
+control 'tag:config_munge_check_munge_key_error_messages' do
   title 'Check for error messages related to munge key'
 
   describe file('/var/log/chef-client.log') do
