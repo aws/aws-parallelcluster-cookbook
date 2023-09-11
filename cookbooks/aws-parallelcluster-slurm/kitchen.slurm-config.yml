@@ -184,10 +184,11 @@ suites:
     controls:
       - /tag:config_/
     attributes:
-    node_type: HeadNode
-    scheduler: 'slurm'
-    cluster:
-      config:
-        DevSettings:
-          SlurmSettings:
-            MungeKeySecretArn: 'arn:aws:secretsmanager:us-east-2:249582277112:secret:TestMungeKey-jDtnqi'
+      node_type: HeadNode
+      scheduler: 'slurm'
+      cluster:
+        region: 'us-east-2'
+        config:
+          DevSettings:
+            SlurmSettings:
+              MungeKeySecretArn: 'arn:aws:secretsmanager:us-east-2:249582277112:secret:TestMungeKey-jDtnqi'
