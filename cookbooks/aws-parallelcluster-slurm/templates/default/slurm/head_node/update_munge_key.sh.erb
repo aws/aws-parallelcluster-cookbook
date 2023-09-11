@@ -17,11 +17,6 @@ CLUSTER_USER="<%= @cluster_user %>"
 
 # If SECRET_ARN is provided, fetch the munge key from Secrets Manager
 if [ -n "${SECRET_ARN}" ]; then
-  # Remove current munge key if exists
-  if [ -f "${MUNGE_KEY_FILE}" ]; then
-    rm -f ${MUNGE_KEY_FILE}
-  fi
-
   echo "Fetching munge key from AWS Secrets Manager: ${SECRET_ARN}"
   encoded_key=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query 'SecretString' --output text --region ${REGION})
 
@@ -35,6 +30,11 @@ if [ -n "${SECRET_ARN}" ]; then
   if [ $? -ne 0 ]; then
     echo "Error decoding the munge key with base64"
     exit 1
+  fi
+
+  # Remove current munge key if exists
+  if [ -f "${MUNGE_KEY_FILE}" ]; then
+    rm -f ${MUNGE_KEY_FILE}
   fi
 
   echo "${decoded_key}" > ${MUNGE_KEY_FILE}
@@ -51,10 +51,14 @@ fi
 
 # Enable and restart munge service
 systemctl enable munge
+echo "Start to Restart munge service"
 systemctl restart munge || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; }
+echo "Restart munge service completed"
 
 # Share munge key
+echo "Start to Share munge key"
 mkdir -p /home/${CLUSTER_USER}/.munge
 cp /etc/munge/munge.key /home/${CLUSTER_USER}/.munge/.munge.key
+echo "Share munge key completed"
 
 exit 0
