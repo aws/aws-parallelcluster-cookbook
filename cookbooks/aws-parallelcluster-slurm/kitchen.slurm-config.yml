@@ -179,7 +179,7 @@ suites:
   - name: config_head_node_munge
     run_list:
     - recipe[aws-parallelcluster-tests::setup]
-    - recipe[aws-parallelcluster-slurm::config_head_node]
+    - recipe[aws-parallelcluster-slurm::config_munge_key]
     verifier:
     controls:
       - /tag:config_munge/
