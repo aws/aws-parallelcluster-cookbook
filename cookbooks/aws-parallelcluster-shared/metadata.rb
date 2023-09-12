@@ -7,7 +7,7 @@ description 'AWS ParallelCluster shared cookbook code'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '>= 17'
-version '3.7.0'
+version '3.7.1'
 
 supports 'amazon', '= 2.0'
 supports 'centos', '= 7.0'

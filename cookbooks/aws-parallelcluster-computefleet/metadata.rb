@@ -7,11 +7,11 @@ description 'AWS ParallelCluster compute fleet management'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '>= 17'
-version '3.7.0'
+version '3.7.1'
 
 supports 'amazon', '= 2.0'
 supports 'centos', '= 7.0'
 supports 'ubuntu', '>= 20.04'
 supports 'redhat', '= 8.7'
 
-depends 'aws-parallelcluster-shared', '~> 3.7.0'
+depends 'aws-parallelcluster-shared', '~> 3.7.1'
