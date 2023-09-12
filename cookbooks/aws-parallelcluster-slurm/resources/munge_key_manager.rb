@@ -31,6 +31,7 @@ action :setup_munge_key do
       group 'root'
       cwd '/tmp'
       code <<-FETCH_AND_DECODE
+        set -e
         # Get encoded munge key from secrets manager
         encoded_key=$(aws secretsmanager get-secret-value --secret-id #{new_resource.munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
         # If encoded_key doesn't have a value, error and exit
