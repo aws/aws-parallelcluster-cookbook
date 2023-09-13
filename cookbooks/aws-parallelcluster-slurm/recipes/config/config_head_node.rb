@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-setup_munge_head_node unless redhat_on_docker?
+include_recipe 'aws-parallelcluster-slurm::config_munge_key'
 
 # Export /opt/slurm
 nfs_export "#{node['cluster']['slurm']['install_dir']}" do
