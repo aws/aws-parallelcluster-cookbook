@@ -32,7 +32,7 @@ def validate_device_name(device_name):
     return True
 
 
-def convert_dev(dev):
+def adapt_device_name(dev):
     # Translate the device name as provided by the OS to the one used by EC2
     # FIXME This approach could be broken in some OS variants, see  # pylint: disable=fixme
     # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/nvme-ebs-volumes.html#identify-nvme-ebs-device
@@ -91,7 +91,7 @@ def get_imdsv2_token():
 
 def attach_volume(volume_id, instance_id, ec2):
     # Generate a list of system paths minus the root path
-    paths = [convert_dev(device) for device in get_all_devices()]
+    paths = [adapt_device_name(device) for device in get_all_devices()]
 
     # List of possible block devices
     block_devices = [
@@ -175,7 +175,6 @@ def detach_volume(volume_id, ec2):
 
 
 def parse_proxy_config():
-    """Parse configuration file to read proxy settings."""
     config = configparser.RawConfigParser()
     config.read("/etc/boto.cfg")
     proxy_config = Config()
@@ -186,38 +185,33 @@ def parse_proxy_config():
     return proxy_config
 
 
+def get_metadata_value(token, metadata_path):
+    return requests.get(
+        metadata_path,
+        headers=token,
+        timeout=METADATA_REQUEST_TIMEOUT,
+    ).text
+
+
 def handle_volume(volume_id, attach, detach):
-    # Get IMDSv2 token
     token = get_imdsv2_token()
 
-    # Get instance ID
-    instance_id = requests.get(
-        "http://169.254.169.254/latest/meta-data/instance-id",
-        headers=token,
-        timeout=METADATA_REQUEST_TIMEOUT,
-    ).text
+    instance_id = get_metadata_value(token, "http://169.254.169.254/latest/meta-data/instance-id")
 
-    # Get region
-    region = requests.get(
-        "http://169.254.169.254/latest/meta-data/placement/availability-zone",
-        headers=token,
-        timeout=METADATA_REQUEST_TIMEOUT,
-    ).text
+    region = get_metadata_value(token, "http://169.254.169.254/latest/meta-data/placement/availability-zone")
     region = region[:-1]
 
-    # Parse configuration file to read proxy settings
     proxy_config = parse_proxy_config()
 
-    # Connect to AWS using boto
     ec2 = boto3.client("ec2", region_name=region, config=proxy_config)
 
-    if attach and is_volume_avaialble(ec2, volume_id):
+    if attach and is_volume_available(ec2, volume_id):
         attach_volume(volume_id, instance_id, ec2)
     elif detach and is_volume_attached(ec2, volume_id):
         detach_volume(volume_id, ec2)
 
 
-def is_volume_avaialble(ec2, volume_id):
+def is_volume_available(ec2, volume_id):
     try:
         state = ec2.describe_volumes(VolumeIds=[volume_id]).get("Volumes")[0].get("State")
         if state == "available":

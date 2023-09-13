@@ -75,19 +75,11 @@ def restart_munge_service
 end
 
 def setup_munge_head_node
-  # Generate munge key
-  bash 'generate_munge_key' do
-    not_if { ::File.exist?('/etc/munge/munge.key') }
-    user node['cluster']['munge']['user']
-    group node['cluster']['munge']['group']
-    cwd '/tmp'
-    code <<-HEAD_CREATE_MUNGE_KEY
-      set -e
-      # Generates munge key in /etc/munge/munge.key
-      /usr/sbin/mungekey --verbose
-      # Enforce correct permission on the key
-      chmod 0600 /etc/munge/munge.key
-    HEAD_CREATE_MUNGE_KEY
+  # Generate munge key or get it's value from secrets manager
+  munge_key_manager 'manage_munge_key' do
+    munge_key_secret_arn lazy {
+      node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn)
+    }
   end
 
   enable_munge_service
