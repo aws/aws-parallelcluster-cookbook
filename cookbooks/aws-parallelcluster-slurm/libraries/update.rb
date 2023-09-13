@@ -72,7 +72,7 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   cmd.stdout.strip
 end
 
-# Verify if MungeKeySecretArn in SlurmSetting section of cluster configuration has been updated
+# Verify if MungeKeySecretArn in SlurmSettings section of cluster configuration has been updated
 def is_custom_munge_key_updated?
   require 'yaml'
   config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
