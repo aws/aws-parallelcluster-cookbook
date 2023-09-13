@@ -185,7 +185,6 @@ suites:
         - /tag:config_munge/
     attributes:
       cluster:
-        region: 'us-east-2'
         node_type: HeadNode
         scheduler: 'slurm'
         config:
