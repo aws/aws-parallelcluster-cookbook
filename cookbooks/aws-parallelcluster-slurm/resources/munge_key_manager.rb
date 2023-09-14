@@ -72,17 +72,6 @@ action :setup_munge_key do
 end
 
 action :update_munge_key do
-  bash 'remove_current_munge_key' do
-    user 'root'
-    group 'root'
-    cwd '/tmp'
-    code <<-REMOVE_CURRENT_MUNGE_KEY
-      if [ -f "/etc/munge/munge.key" ]; then
-        rm -f /etc/munge/munge.key
-      fi
-    REMOVE_CURRENT_MUNGE_KEY
-  end
-
   if new_resource.munge_key_secret_arn
     bash 'fetch_and_decode_munge_key' do
       user 'root'

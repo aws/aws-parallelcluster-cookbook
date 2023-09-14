@@ -53,11 +53,18 @@ def is_compute_node_bootstrap_timeout_updated?(previous_config, config)
   evaluate_compute_bootstrap_timeout(previous_config) != evaluate_compute_bootstrap_timeout(config)
 end
 
-def is_slurm_database_updated?
+def config_parameter_changed?(param)
+  # Compares previous cluster config with the current one for changes in a parameter
+  # Parameters:
+  # - `param`: An array representing the sequence of nested keys to the parameter to be checked
   require 'yaml'
   config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
-  config["Scheduling"]["SlurmSettings"]["Database"] != previous_config["Scheduling"]["SlurmSettings"]["Database"]
+  config.dig(*param) != previous_config.dig(*param)
+end
+
+def is_slurm_database_updated?
+  config_parameter_changed?(%w[Scheduling SlurmSettings Database])
 end
 
 def raise_command_error(command, cmd)
@@ -74,8 +81,5 @@ end
 
 # Verify if MungeKeySecretArn in SlurmSettings section of cluster configuration has been updated
 def is_custom_munge_key_updated?
-  require 'yaml'
-  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
-  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
-  config["DevSettings"]["SlurmSettings"]["MungeKeySecretArn"] != previous_config["DevSettings"]["SlurmSettings"]["MungeKeySecretArn"]
+  config_parameter_changed?(%w[DevSettings SlurmSettings MungeKeySecretArn])
 end
