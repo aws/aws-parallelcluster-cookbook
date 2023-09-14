@@ -64,7 +64,7 @@ def config_parameter_changed?(param)
 end
 
 def is_slurm_database_updated?
-  config_parameter_changed?(%w[Scheduling SlurmSettings Database])
+  config_parameter_changed?(%w(Scheduling SlurmSettings Database))
 end
 
 def raise_command_error(command, cmd)
@@ -81,5 +81,5 @@ end
 
 # Verify if MungeKeySecretArn in SlurmSettings section of cluster configuration has been updated
 def is_custom_munge_key_updated?
-  config_parameter_changed?(%w[DevSettings SlurmSettings MungeKeySecretArn])
+  config_parameter_changed?(%w(DevSettings SlurmSettings MungeKeySecretArn))
 end
