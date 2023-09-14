@@ -32,11 +32,6 @@ if [ -n "${SECRET_ARN}" ]; then
     exit 1
   fi
 
-  # Remove current munge key if exists
-  if [ -f "${MUNGE_KEY_FILE}" ]; then
-    rm -f ${MUNGE_KEY_FILE}
-  fi
-
   echo "${decoded_key}" > ${MUNGE_KEY_FILE}
 
   # Set ownership on the key
@@ -51,14 +46,24 @@ fi
 
 # Enable and restart munge service
 systemctl enable munge
-echo "Start to Restart munge service"
-systemctl restart munge || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; } || { sleep 10; systemctl restart munge; }
-echo "Restart munge service completed"
+echo "Restarting munge service"
+systemctl restart munge
+
+# Wait for a short period
+sleep 5
+
+# Check if munge service is running
+if systemctl --quiet is-active munge; then
+  echo "Munge service is active"
+else
+  echo "Failed to restart munge service"
+  exit 1
+fi
 
 # Share munge key
-echo "Start to Share munge key"
+echo "Sharing munge key"
 mkdir -p /home/${CLUSTER_USER}/.munge
 cp /etc/munge/munge.key /home/${CLUSTER_USER}/.munge/.munge.key
-echo "Share munge key completed"
+echo "Shared munge key"
 
 exit 0
