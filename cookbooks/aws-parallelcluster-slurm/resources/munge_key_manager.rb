@@ -24,7 +24,7 @@ property :munge_key_secret_arn, String
 default_action :setup_munge_key
 
 def fetch_and_decode_munge_key
-  bash 'fetch_and_decode_munge_key' do
+  declare_resource(:bash, 'fetch_and_decode_munge_key') do
     user 'root'
     group 'root'
     cwd '/tmp'
@@ -56,7 +56,7 @@ def fetch_and_decode_munge_key
 end
 
 def generate_munge_key
-  bash 'generate_munge_key' do
+  declare_resource(:bash, 'generate_munge_key') do
     user node['cluster']['munge']['user']
     group node['cluster']['munge']['group']
     cwd '/tmp'
