@@ -110,8 +110,6 @@ action :update_munge_key do
         chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
         # Enforce correct permission on the key
         chmod 0600 /etc/munge/munge.key
-        encoded_key=$(aws secretsmanager get-secret-value --secret-id arn:aws:secretsmanager:us-east-2:249582277112:secret:TestMungeKey-xxxxxx --query 'SecretString' --output text --region #{node['cluster']['region']})
-        exit 1
       FETCH_AND_DECODE
     end
   else
