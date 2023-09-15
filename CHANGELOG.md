@@ -57,15 +57,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.5-4`
 - Upgrade Slurm to version 23.02.4.
 - Upgrade ARM PL to version 23.04.1 for Ubuntu 22.04 only.
-- Upgrade Cinc Client to version 18.2.7.
 - Upgrade third-party cookbook dependencies:
-  - apt-7.5.14 (from apt-7.4.0)
-  - line-4.5.13 (from line-4.5.2)
-  - openssh-2.11.3 (from openssh-2.10.3)
-  - pyenv-4.2.3 (from pyenv-3.5.1)
-  - selinux-6.1.12 (from selinux-6.0.5)
-  - yum-7.4.13 (from yum-7.4.0)
-  - yum-epel-5.0.2 (from yum-epel-4.5.0)
+    - apt-7.5.14 (from apt-7.4.0)
+    - line-4.5.13 (from line-4.5.2)
+    - openssh-2.11.3 (from openssh-2.10.3)
+    - pyenv-4.2.3 (from pyenv-3.5.1)
+    - selinux-6.1.12 (from selinux-6.0.5)
+    - yum-7.4.13 (from yum-7.4.0)
+    - yum-epel-5.0.2 (from yum-epel-4.5.0)
 - Upgrade NICE DCV to version `2023.0-15487`.
   - server: `2023.0.15487-1`
   - xdcv: `2023.0.551-1`
@@ -362,7 +361,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for multiple users cluster environments by integrating with Active Directory (AD) domains managed via AWS Directory Service.
 - Install NVIDIA drivers and CUDA library for ARM.
-- Build Slurm with `slurmrestd` support.
 
 **CHANGES**
 - Upgrade Slurm to version 21.08.5.
