@@ -9,6 +9,42 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+control 'mount_home' do
+  title 'Check if the home directory in mounted'
+
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
+
+  describe mount('/home') do
+    it { should be_mounted }
+    its('type') { should eq 'nfs4' }
+    its('options') { should include 'rw' }
+  end
+end
+
+control 'mount_shared_compute' do
+  title 'Check if the shared directory is mounted'
+
+  only_if { !os_properties.on_docker? && instance.compute_node? }
+
+  describe mount('/opt/parallelcluster/shared') do
+    it { should be_mounted }
+    its('type') { should eq 'nfs4' }
+    its('options') { should include 'rw' }
+  end
+end
+
+control 'mount_shared_login' do
+  title 'Check if the shared directory is mounted'
+
+  only_if { !os_properties.on_docker? && instance.login_node? }
+
+  describe mount('/opt/parallelcluster/shared_login_nodes') do
+    it { should be_mounted }
+    its('type') { should eq 'nfs4' }
+    its('options') { should include 'rw' }
+  end
+end
+
 control 'shared_storages_compute_and_login' do
   title 'Check the shared storages configuration for compute node'
 
