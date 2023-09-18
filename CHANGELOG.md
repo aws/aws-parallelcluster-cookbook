@@ -10,7 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Slurm to 23.02.5 (from 23.02.4).
   - Upgrade Pmix to 4.2.6 (from 3.2.3).
   - Upgrade libjwt to 1.15.3 (from 1.12.0).
-- Upgrade EFA installer to `1.26.1`
+- Upgrade EFA installer to `1.26.1`. This release handles RNRs from RDMA writedata, thus improving EFA on P5 instance type.
   - Efa-driver: `efa-2.5.0-1`
   - Efa-config: `efa-config-1.15-1`
   - Efa-profile: `efa-profile-1.5-1`
