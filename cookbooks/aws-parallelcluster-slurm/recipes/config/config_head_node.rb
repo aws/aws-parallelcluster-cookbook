@@ -281,3 +281,17 @@ execute "check slurmctld status" do
   retries 5
   retry_delay 2
 end unless redhat_on_docker?
+
+template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
+  source 'slurm/head_node/update_munge_key.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn) },
+    region: node['cluster']['region'],
+    munge_user: node['cluster']['munge']['user'],
+    munge_group: node['cluster']['munge']['group'],
+    cluster_user: node['cluster']['cluster_user']
+  )
+end
