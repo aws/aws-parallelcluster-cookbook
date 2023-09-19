@@ -24,6 +24,7 @@ default['cluster']['login_cluster_config_path'] = "#{node['cluster']['shared_dir
 default['cluster']['login_previous_cluster_config_path'] = "#{node['cluster']['shared_dir_login_nodes']}/previous-cluster-config.yaml"
 default['cluster']['change_set_path'] = "#{node['cluster']['shared_dir']}/change-set.json"
 default['cluster']['instance_types_data_path'] = "#{node['cluster']['shared_dir']}/instance-types-data.json"
+default['cluster']['previous_instance_types_data_path'] = "#{node['cluster']['shared_dir']}/previous-instance-types-data.json"
 
 default['cluster']['scheduler'] = 'slurm'
 default['cluster']['node_type'] = nil

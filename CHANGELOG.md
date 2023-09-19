@@ -12,6 +12,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 
 **BUG FIXES**
+- Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.
+
+3.7.1
+------
+**CHANGES**
+- Upgrade Slurm to 23.02.5 (from 23.02.4).
+  - Upgrade Pmix to 4.2.6 (from 3.2.3).
+  - Upgrade libjwt to 1.15.3 (from 1.12.0).
 
 3.7.0
 ------
@@ -31,15 +39,16 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA library to version 12.2.0.
 - Upgrade NVIDIA Fabric manager to `nvidia-fabricmanager-535`
 - Increase EFS-utils watchdog poll interval to 10 seconds. Note: This change is meaningful only if [EncryptionInTransit](https://docs.aws.amazon.com/parallelcluster/latest/ug/SharedStorage-v3.html#yaml-SharedStorage-EfsSettings-EncryptionInTransit) is set to `true`, because watchdog does not run otherwise.
-- Upgrade EFA installer to `1.25.0`
+- Upgrade EFA installer to `1.25.1`
   - Efa-driver: `efa-2.5.0-1`
   - Efa-config: `efa-config-1.15-1`
   - Efa-profile: `efa-profile-1.5-1`
   - Libfabric-aws: `libfabric-aws-1.18.1-1`
   - Rdma-core: `rdma-core-46.0-1`
-  - Open MPI: `openmpi40-aws-4.1.5-3`
+  - Open MPI: `openmpi40-aws-4.1.5-4`
 - Upgrade Slurm to version 23.02.4.
 - Upgrade ARM PL to version 23.04.1 for Ubuntu 22.04 only.
+- Upgrade Cinc Client to version 18.2.7.
 - Upgrade third-party cookbook dependencies:
   - apt-7.5.14 (from apt-7.4.0)
   - line-4.5.13 (from line-4.5.2)
@@ -344,6 +353,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for multiple users cluster environments by integrating with Active Directory (AD) domains managed via AWS Directory Service.
 - Install NVIDIA drivers and CUDA library for ARM.
+- Build Slurm with `slurmrestd` support.
 
 **CHANGES**
 - Upgrade Slurm to version 21.08.5.

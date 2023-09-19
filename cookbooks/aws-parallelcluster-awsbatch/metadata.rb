@@ -6,7 +6,7 @@ license 'Apache-2.0'
 description 'Manages AWS Batch in AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
-chef_version '>= 17'
+chef_version '>= 18'
 version '3.8.0'
 
 supports 'amazon', '>= 2.0'

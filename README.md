@@ -215,10 +215,10 @@ controls matching the `/tag:config/` regex.
 ```
 verifier:
   inspec_tests:
-    - /tmp/cookbooks/aws-parallelcluster-awsbatch/test
-    - /tmp/cookbooks/aws-parallelcluster-platform/test
-    - /tmp/cookbooks/aws-parallelcluster-environment/test
-    - /tmp/cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-awsbatch/test
+    - cookbooks/aws-parallelcluster-platform/test
+    - cookbooks/aws-parallelcluster-environment/test
+    - cookbooks/aws-parallelcluster-computefleet/test
     ...
   controls:
     - /tag:config/
@@ -348,7 +348,7 @@ driver:
   name: dokken
   platform: linux/amd64
   pull_platform_image: false # Use the local images, prevent pull of docker images from Docker Hub,
-  chef_version: 17 # Chef version aligned with the one used to build the images
+  chef_version: 18 # Chef version aligned with the one used to build the images
   chef_image: cincproject/cinc
 ...
 ```

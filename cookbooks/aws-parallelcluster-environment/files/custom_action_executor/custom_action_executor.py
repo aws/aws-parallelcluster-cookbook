@@ -12,6 +12,7 @@
 
 import argparse
 import asyncio
+import hashlib
 import json
 import logging
 import os
@@ -191,8 +192,20 @@ class ScriptRunner:
             *[self._download_script(script, idx) for idx, script in enumerate(scripts, 1)]
         )
         for script in downloaded_scripts:
+            logging.info("The hash of script %s is: %s", script.url, self._hash_of_file(script.path))
             await self._execute_script(script)
             os.unlink(script.path)
+
+    @staticmethod
+    def _hash_of_file(path):
+        hash_sha256 = hashlib.sha256()
+        with open(path, "rb") as file:
+            while True:
+                data = file.read(1024)
+                if not data:
+                    break
+                hash_sha256.update(data)
+        return hash_sha256.hexdigest()
 
     async def _download_script(self, script: ScriptDefinition, step_num=0) -> ExecutableScript:
         exe_script = self._build_exe_script(script, step_num, None)

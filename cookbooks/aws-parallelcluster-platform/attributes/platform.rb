@@ -58,5 +58,6 @@ default['cluster']['bootstrap_error_path'] = "#{node['cluster']['log_base_dir']}
 default['cluster']['cluster_s3_bucket'] = nil
 default['cluster']['cluster_config_s3_key'] = nil
 default['cluster']['cluster_config_version'] = nil
+default['cluster']['instance_types_data_version'] = nil
 default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil

@@ -78,6 +78,8 @@ suites:
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
+#          - resource:fabric_manager:configure # Needed for Multi-gpu instance like p5.48xlarge
+#          - recipe:aws-parallelcluster-platform::nvidia_uvm # Needed for running Sanity checks in Multi-gpu instance like p5.48xlarge
       resource: gdrcopy:configure
       cluster:
         nvidia:

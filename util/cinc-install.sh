@@ -1,7 +1,19 @@
 #!/bin/bash
-# WARNING: REQUIRES /bin/bash
+# WARNING: this file is a modified version of the installer from https://cinc.sh/download/
 #
-# - cinc-install.sh v1.1.0
+# Notable changes are:
+# - changed format from sh to bash;
+# - installer downloaded from ParallelCluster S3 bucket rather than from omnitruck website;
+# - custom functions to retrieve AWS region and domain;
+# - new -b option to permit to pass an optional bucket for downloading a custom Cinc installer;
+# - unused options -c, -p, -n, setting the unused $channel variable has been removed;
+# - added custom case to manage download of ubuntu packages from S3.
+# - improvement in the dpkg installation to avoid conflicts with other running installations.
+#
+# When updating this modified file, please remember to bump the version and reference it in the CI/CD.
+# - cinc-install.sh v1.2.0
+#
+# WARNING: REQUIRES /bin/bash
 #
 # - must run on /bin/sh on solaris 9
 # - must run on /bin/sh on AIX 6.x
@@ -89,7 +101,7 @@ http_404_error() {
   echo "In order to test the version parameter, adventurous users may take the Metadata URL"
   echo "below and modify the '&v=<number>' parameter until you successfully get a URL that"
   echo "does not 404 (e.g. via curl or wget).  You should be able to use '&v=11' or '&v=12'"
-  echo "succesfully."
+  echo "successfully."
   echo ""
   echo "If you cannot fix this problem by setting the bootstrap_version, it probably means"
   echo "that $platform is not supported."
@@ -117,7 +129,7 @@ capture_tmp_stderr() {
 # do_wget URL FILENAME
 do_wget() {
   echo "trying wget..."
-  wget --user-agent="User-Agent: mixlib-install/3.11.27" -O "$2" "$1" 2>$tmp_dir/stderr
+  wget --user-agent="User-Agent: mixlib-install/3.12.27" -O "$2" "$1" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "ERROR 404" $tmp_dir/stderr 2>&1 >/dev/null
@@ -138,7 +150,7 @@ do_wget() {
 # do_curl URL FILENAME
 do_curl() {
   echo "trying curl..."
-  curl -A "User-Agent: mixlib-install/3.11.27" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
+  curl -A "User-Agent: mixlib-install/3.12.27" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
   rc=$?
   # check for 404
   grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null
@@ -159,7 +171,7 @@ do_curl() {
 # do_fetch URL FILENAME
 do_fetch() {
   echo "trying fetch..."
-  fetch --user-agent="User-Agent: mixlib-install/3.11.27" -o "$2" "$1" 2>$tmp_dir/stderr
+  fetch --user-agent="User-Agent: mixlib-install/3.12.27" -o "$2" "$1" 2>$tmp_dir/stderr
   # check for bad return status
   test $? -ne 0 && return 1
   return 0
@@ -189,7 +201,7 @@ do_perl() {
 # do_python URL FILENAME
 do_python() {
   echo "trying python..."
-  python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.11.27' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
+  python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.12.27' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "HTTP Error 404" $tmp_dir/stderr 2>&1 >/dev/null
@@ -217,7 +229,7 @@ do_checksum() {
     checksum=`shasum -a 256 $1 | awk '{ print $1 }'`
     return `test "x$checksum" = "x$2"`
   else
-    echo "WARNING: could not find a valid checksum program, pre-install shasum or sha256sum in your O/S image to get valdation..."
+    echo "WARNING: could not find a valid checksum program, pre-install shasum or sha256sum in your O/S image to get validation..."
     return 0
   fi
 }
@@ -261,6 +273,7 @@ do_download() {
   unable_to_retrieve_package
 }
 
+# WARNING: Custom function added on top of the original installer to retrieve AWS region
 # get_region INSTANCE_METADATA_FILE
 # get region from metadata
 get_region() {
@@ -297,6 +310,7 @@ install_file() {
       ;;
     "deb")
       echo "installing with dpkg..."
+      # WARNING: Custom fix to avoid hangs when another installation is running
       flock $(apt-config shell StateDir Dir::State/d | sed -r "s/.*'(.*)'$/\1/")daily_lock dpkg -i "$2"
       ;;
     "bff")
@@ -364,7 +378,6 @@ tmp_dir="$tmp/install.sh.$$"
 #
 # Outputs:
 # $version: Requested version to be installed.
-# $channel: Channel to install the product from
 # $project: Project to be installed
 # $cmdline_filename: Name of the package downloaded on local disk.
 # $cmdline_dl_dir: Name of the directory downloaded package will be saved to on local disk.
@@ -374,18 +387,14 @@ tmp_dir="$tmp/install.sh.$$"
 ############
 
 # Defaults
-channel="stable"
 project="cinc"
 
-while getopts pnv:b:c:f:P:d:s:l:a opt
+while getopts v:b:f:P:d:s:l:a opt
 do
   case "$opt" in
 
     v)  version="$OPTARG";;
-    b)  bucket="$OPTARG";; # bucket name to overide default bucket for downloading CINC client
-    c)  channel="$OPTARG";;
-    p)  channel="current";; # compat for prerelease option
-    n)  channel="current";; # compat for nightlies option
+    b)  bucket="$OPTARG";; # WARNING: custom option, to override default bucket for downloading CINC client
     f)  cmdline_filename="$OPTARG";;
     P)  project="$OPTARG";;
     d)  cmdline_dl_dir="$OPTARG";;
@@ -394,7 +403,7 @@ do
     a)  checksum="$OPTARG";;
     \?)   # unknown flag
       echo >&2 \
-      "usage: $0 [-P project] [-c release_channel] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum] [-b bucket]"
+      "usage: $0 [-P project] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum] [-b bucket]"
       exit 1;;
   esac
 done
@@ -460,7 +469,7 @@ elif test -f "/etc/redhat-release"; then
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
 
   if test "$platform" = "xenserver"; then
-    # Current XenServer 6.2 is based on CentOS 5, platform is not reset to "el" server should hanlde response
+    # Current XenServer 6.2 is based on CentOS 5, platform is not reset to "el" server should handle response
     platform="xenserver"
   else
     # FIXME: use "redhat"
@@ -471,29 +480,28 @@ elif test -f "/etc/system-release"; then
   platform=`sed 's/^\(.\+\) release.\+/\1/' /etc/system-release | tr '[A-Z]' '[a-z]'`
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/system-release | tr '[A-Z]' '[a-z]'`
   case $platform in amazon*) # sh compat method of checking for a substring
-    platform="el"
-
     . /etc/os-release
     platform_version=$VERSION_ID
-    if test "$platform_version" = "2"; then
+
+    if test "$platform_version" = "2022"; then
+      platform="amazon"
+      platform_version="2022"
+    elif test "$platform_version" = "2"; then
+      platform="el"
       platform_version="7"
     else
+      platform="el"
+
       # VERSION_ID will match YYYY.MM for Amazon Linux AMIs
       platform_version="6"
     fi
   esac
 
-# Apple OS X
+# Apple macOS
 elif test -f "/usr/bin/sw_vers"; then
   platform="mac_os_x"
   # Matching the tab-space with sed is error-prone
   platform_version=`sw_vers | awk '/^ProductVersion:/ { print $2 }' | cut -d. -f1,2`
-
-  # x86_64 Apple hardware often runs 32-bit kernels (see OHAI-63)
-  x86_64=`sysctl -n hw.optional.x86_64`
-  if test $x86_64 -eq 1; then
-    machine="x86_64"
-  fi
 elif test -f "/etc/release"; then
   machine=`/usr/bin/uname -p`
   if grep SmartOS /etc/release >/dev/null; then
@@ -508,7 +516,7 @@ elif test -f "/etc/SuSE-release"; then
   then
       platform="sles"
       platform_version=`awk '/^VERSION/ {V = $3}; /^PATCHLEVEL/ {P = $3}; END {print V "." P}' /etc/SuSE-release`
-  else
+  else # opensuse 43 only. 15 ships with /etc/os-release only
       platform="opensuseleap"
       platform_version=`awk '/^VERSION =/ { print $3 }' /etc/SuSE-release`
   fi
@@ -526,7 +534,14 @@ elif test -f "/etc/os-release"; then
   fi
 
   platform=$ID
-  platform_version=$VERSION
+
+  # VERSION_ID is always the preferred variable to use, but not
+  # every distro has it so fallback to VERSION
+  if test "x$VERSION_ID" != "x"; then
+    platform_version=$VERSION_ID
+  else
+    platform_version=$VERSION
+  fi
 fi
 
 if test "x$platform" = "x"; then
@@ -575,6 +590,9 @@ esac
 
 # normalize the architecture we detected
 case $machine in
+  "arm64"|"aarch64")
+    machine="aarch64"
+    ;;
   "x86_64"|"amd64"|"x64")
     machine="x86_64"
     ;;
@@ -586,6 +604,8 @@ case $machine in
     ;;
 esac
 
+# WARNING: Custom case to manage download of ubuntu packages from S3.
+# This is not required when downloading from omnitruck because the url to use is in the metadata file.
 if test "$platform" = "ubuntu"; then
   case $machine in
     "arm64"|"aarch64")
@@ -612,11 +632,11 @@ if test "x$platform" = "xsolaris2"; then
   export PATH
 fi
 
-# Region detection
+# WARNING: Custom code to detect AWS Region
 instance_metadata_file=$tmp_dir/instance_metadata
 get_region instance_metadata_file
 
-# Download domain detection
+# WARNING: Custom code to detect AWS S3 Domain
 if [[ ${region} == cn-* ]]; then
   download_domain="amazonaws.com.cn"
 elif [[ ${region} == us-iso-* ]]; then
@@ -627,6 +647,7 @@ else
   download_domain="amazonaws.com"
 fi
 
+# WARNING: echo modified to return the region in the output
 echo "${platform} ${platform_version} ${machine} ${region}"
 
 ############
@@ -674,10 +695,12 @@ fi
 
 # create_download_url.sh
 ############
+# WARNING: This is a modified version of the original fetch_metadata.sh section,
+# the changes will permit to download cinc installer from S3 rather than from omintruck website.
+#
 # This section creates the url of the package to download.
 #
 # Inputs:
-# $channel:
 # $project:
 # $version:
 # $platform:
@@ -746,6 +769,7 @@ fi
 # $filetype: Type of the file downloaded.
 ############
 
+# WARNING: modified sed to be able to retrieve file name from S3 download url
 filename=`echo $download_url | sed -e 's/^.*\///'`
 filetype=`echo $filename | sed -e 's/^.*\.//'`
 
@@ -836,7 +860,7 @@ if test "x$version" = "x" -a "x$CI" != "xtrue"; then
   echo "You are installing a package without a version pin.  If you are installing"
   echo "on production servers via an automated process this is DANGEROUS and you will"
   echo "be upgraded without warning on new releases, even to new major releases."
-  echo "Letting the version float is only appropriate in desktop, test, development or"
+  echo "Letting the version float is only appropriate in test, development or"
   echo "CI/CD environments."
   echo
   echo "WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING"

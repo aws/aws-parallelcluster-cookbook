@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-setup_munge_head_node unless redhat_on_docker?
+include_recipe 'aws-parallelcluster-slurm::config_munge_key'
 
 # Export /opt/slurm
 nfs_export "#{node['cluster']['slurm']['install_dir']}" do
@@ -281,3 +281,17 @@ execute "check slurmctld status" do
   retries 5
   retry_delay 2
 end unless redhat_on_docker?
+
+template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
+  source 'slurm/head_node/update_munge_key.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :SlurmSettings, :MungeKeySecretArn) },
+    region: node['cluster']['region'],
+    munge_user: node['cluster']['munge']['user'],
+    munge_group: node['cluster']['munge']['group'],
+    cluster_user: node['cluster']['cluster_user']
+  )
+end
