@@ -24,6 +24,11 @@ property :munge_key_secret_arn, String
 default_action :setup_munge_key
 
 def fetch_and_decode_munge_key
+  munge_key_secret_arn_local = new_resource.munge_key_secret_arn
+  region_local = node['cluster']['region']
+  munge_user_local = node['cluster']['munge']['user']
+  munge_group_local = node['cluster']['munge']['group']
+
   declare_resource(:bash, 'fetch_and_decode_munge_key') do
     user 'root'
     group 'root'
@@ -31,7 +36,7 @@ def fetch_and_decode_munge_key
     code <<-FETCH_AND_DECODE
       set -e
       # Get encoded munge key from secrets manager
-      encoded_key=$(aws secretsmanager get-secret-value --secret-id #{new_resource.munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
+      encoded_key=$(aws secretsmanager get-secret-value --secret-id #{munge_key_secret_arn_local} --query 'SecretString' --output text --region #{region_local})
       # If encoded_key doesn't have a value, error and exit
       if [ -z "$encoded_key" ]; then
         echo "Error fetching munge key from Secrets Manager or the key is empty"
@@ -48,7 +53,7 @@ def fetch_and_decode_munge_key
       echo "$decoded_key" > /etc/munge/munge.key
 
       # Set ownership on the key
-      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
+      chown #{munge_user_local}:#{munge_group_local} /etc/munge/munge.key
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
     FETCH_AND_DECODE
