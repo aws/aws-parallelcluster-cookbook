@@ -70,8 +70,10 @@ end
 
 action :setup_munge_key do
   if new_resource.munge_key_secret_arn
+    # This block will fetch the munge key from Secrets Manager
     fetch_and_decode_munge_key(new_resource.munge_key_secret_arn)
   else
+    # This block will randomly generate a munge key
     generate_munge_key
   end
 end
