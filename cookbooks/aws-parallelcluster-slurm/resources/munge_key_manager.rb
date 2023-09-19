@@ -57,12 +57,13 @@ end
 
 def generate_munge_key
   declare_resource(:bash, 'generate_munge_key') do
-    user node['cluster']['munge']['user']
-    group node['cluster']['munge']['group']
+    user 'root'
+    group 'root'
     cwd '/tmp'
     code <<-GENERATE_KEY
       set -e
       /usr/sbin/mungekey --verbose
+      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
       chmod 0600 /etc/munge/munge.key
     GENERATE_KEY
   end
