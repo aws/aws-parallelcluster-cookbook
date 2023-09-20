@@ -57,17 +57,12 @@ end
 
 def generate_munge_key
   declare_resource(:bash, 'generate_munge_key') do
-    user 'root'
-    group 'root'
+    user node['cluster']['munge']['user']
+    group node['cluster']['munge']['group']
     cwd '/tmp'
     code <<-GENERATE_KEY
       set -e
-      # If the /etc/munge/munge.key already exists, the /usr/sbin/mungekey --verbose command will report an error
-      if [ -f /etc/munge/munge.key ]; then
-        rm -f /etc/munge/munge.key
-      fi
-      /usr/sbin/mungekey --verbose
-      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
+      /usr/sbin/mungekey --verbose --force
       chmod 0600 /etc/munge/munge.key
     GENERATE_KEY
   end
