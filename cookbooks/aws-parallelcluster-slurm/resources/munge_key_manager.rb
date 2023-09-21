@@ -23,7 +23,7 @@ property :munge_key_secret_arn, String
 
 default_action :setup_munge_key
 
-def fetch_and_decode_munge_key
+def fetch_and_decode_munge_key(munge_key_secret_arn)
   declare_resource(:bash, 'fetch_and_decode_munge_key') do
     user 'root'
     group 'root'
@@ -31,7 +31,7 @@ def fetch_and_decode_munge_key
     code <<-FETCH_AND_DECODE
       set -e
       # Get encoded munge key from secrets manager
-      encoded_key=$(aws secretsmanager get-secret-value --secret-id #{new_resource.munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
+      encoded_key=$(aws secretsmanager get-secret-value --secret-id #{munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
       # If encoded_key doesn't have a value, error and exit
       if [ -z "$encoded_key" ]; then
         echo "Error fetching munge key from Secrets Manager or the key is empty"
@@ -61,9 +61,9 @@ def generate_munge_key
     group node['cluster']['munge']['group']
     cwd '/tmp'
     code <<-GENERATE_KEY
-        set -e
-        /usr/sbin/mungekey --verbose
-        chmod 0600 /etc/munge/munge.key
+      set -e
+      /usr/sbin/mungekey --verbose --force
+      chmod 0600 /etc/munge/munge.key
     GENERATE_KEY
   end
 end
@@ -71,7 +71,7 @@ end
 action :setup_munge_key do
   if new_resource.munge_key_secret_arn
     # This block will fetch the munge key from Secrets Manager
-    fetch_and_decode_munge_key
+    fetch_and_decode_munge_key(new_resource.munge_key_secret_arn)
   else
     # This block will randomly generate a munge key
     generate_munge_key
@@ -81,7 +81,7 @@ end
 action :update_munge_key do
   if new_resource.munge_key_secret_arn
     # This block will fetch the munge key from Secrets Manager and replace the previous munge key
-    fetch_and_decode_munge_key
+    fetch_and_decode_munge_key(new_resource.munge_key_secret_arn)
   else
     # This block will randomly generate a munge key and replace the previous munge key
     generate_munge_key
