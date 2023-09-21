@@ -212,7 +212,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
     region: node['cluster']['region'],
     munge_user: node['cluster']['munge']['user'],
     munge_group: node['cluster']['munge']['group'],
-    cluster_user: node['cluster']['cluster_user']
+    shared_directory: node['cluster']['shared_dir']
   )
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
 end

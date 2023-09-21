@@ -292,6 +292,6 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
     region: node['cluster']['region'],
     munge_user: node['cluster']['munge']['user'],
     munge_group: node['cluster']['munge']['group'],
-    cluster_user: node['cluster']['cluster_user']
+    shared_directory: node['cluster']['shared_dir']
   )
 end

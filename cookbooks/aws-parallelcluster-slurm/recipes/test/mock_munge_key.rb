@@ -1,4 +1,4 @@
-munge_user_dir = "/home/#{node['cluster']['cluster_user']}/.munge"
+munge_user_dir = "#{node['cluster']['shared_dir']}/.munge"
 directory munge_user_dir do
   mode '1777'
 end

@@ -104,9 +104,11 @@ def share_munge_head_node
     group 'root'
     code <<-HEAD_SHARE_MUNGE_KEY
       set -e
-      mkdir -p /home/#{node['cluster']['cluster_user']}/.munge
+      mkdir -p #{node['cluster']['shared_dir']}/.munge
       # Copy key to shared dir
-      cp /etc/munge/munge.key /home/#{node['cluster']['cluster_user']}/.munge/.munge.key
+      cp /etc/munge/munge.key #{node['cluster']['shared_dir']}/.munge/.munge.key
+      chmod 0600 #{node['cluster']['shared_dir']}/.munge
+      chmod 0600 #{node['cluster']['shared_dir']}/.munge/.munge.key
     HEAD_SHARE_MUNGE_KEY
   end
 end
@@ -119,7 +121,7 @@ def setup_munge_compute_node
     code <<-COMPUTE_MUNGE_KEY
       set -e
       # Copy munge key from shared dir
-      cp /home/#{node['cluster']['cluster_user']}/.munge/.munge.key /etc/munge/munge.key
+      cp #{node['cluster']['shared_dir']}/.munge/.munge.key /etc/munge/munge.key
       # Set ownership on the key
       chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
       # Enforce correct permission on the key

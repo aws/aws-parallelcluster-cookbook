@@ -13,7 +13,7 @@ SECRET_ARN="<%= @munge_key_secret_arn %>"
 REGION="<%= @region %>"
 MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
-CLUSTER_USER="<%= @cluster_user %>"
+SHARED_DIRECTORY="<%= @shared_directory %>"
 
 # If SECRET_ARN is provided, fetch the munge key from Secrets Manager
 if [ -n "${SECRET_ARN}" ]; then
@@ -62,8 +62,10 @@ fi
 
 # Share munge key
 echo "Sharing munge key"
-mkdir -p /home/${CLUSTER_USER}/.munge
-cp /etc/munge/munge.key /home/${CLUSTER_USER}/.munge/.munge.key
+mkdir -p ${SHARED_DIRECTORY}/.munge
+cp /etc/munge/munge.key ${SHARED_DIRECTORY}/.munge/.munge.key
+chmod 0600 ${SHARED_DIRECTORY}/.munge
+chmod 0600 ${SHARED_DIRECTORY}/.munge/.munge.key
 echo "Shared munge key"
 
 exit 0
