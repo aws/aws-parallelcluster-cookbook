@@ -162,6 +162,20 @@ suites:
         local_hostname: dokken
         local_ipv4: 172.17.1.15
       ipaddress: 172.17.1.15
+  - name: mount_slurm_dir
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::mount_slurm_dir]
+    verifier:
+      controls:
+        - mount_slurm_dir
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-slurm::mock_slurm_dir
+      cluster:
+        node_type: ComputeFleet
+        head_node_private_ip: '127.0.0.1'
   - name: config_head_node_munge
     run_list:
     - recipe[aws-parallelcluster-tests::setup]

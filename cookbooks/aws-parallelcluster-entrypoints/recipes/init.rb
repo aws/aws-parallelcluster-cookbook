@@ -24,6 +24,5 @@ include_recipe "aws-parallelcluster-environment::init"
 # Fetch config must be executed after the mount of the shared folders because the config will be saved there
 fetch_config 'Fetch and load cluster configs'
 
-# Compute fleet init requires shared dirs
 include_recipe "aws-parallelcluster-computefleet::init"
 include_recipe "aws-parallelcluster-slurm::init"
