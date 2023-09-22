@@ -97,40 +97,51 @@ def update_munge_head_node
   share_munge_head_node
 end
 
-def share_munge_head_node
-  # Share munge key
+def share_munge_key_to_dir(shared_dir)
   bash 'share_munge_key' do
     user 'root'
     group 'root'
-    code <<-HEAD_SHARE_MUNGE_KEY
+    code <<-SHARE_MUNGE_KEY
       set -e
-      mkdir -p #{node['cluster']['shared_dir']}/.munge
+      mkdir -p #{shared_dir}/.munge
       # Copy key to shared dir
-      cp /etc/munge/munge.key #{node['cluster']['shared_dir']}/.munge/.munge.key
-      chmod 0600 #{node['cluster']['shared_dir']}/.munge
-      chmod 0600 #{node['cluster']['shared_dir']}/.munge/.munge.key
-    HEAD_SHARE_MUNGE_KEY
+      cp /etc/munge/munge.key #{shared_dir}/.munge/.munge.key
+      chmod 0600 #{shared_dir}/.munge
+      chmod 0600 #{shared_dir}/.munge/.munge.key
+    SHARE_MUNGE_KEY
   end
 end
 
-def setup_munge_compute_node
-  # Get munge key
+def share_munge_head_node
+  share_munge_key_to_dir(node['cluster']['shared_dir'])
+  share_munge_key_to_dir(node['cluster']['shared_dir_login'])
+end
+
+def setup_munge_key(shared_dir)
   bash 'get_munge_key' do
     user 'root'
     group 'root'
-    code <<-COMPUTE_MUNGE_KEY
+    code <<-MUNGE_KEY
       set -e
       # Copy munge key from shared dir
-      cp #{node['cluster']['shared_dir']}/.munge/.munge.key /etc/munge/munge.key
+      cp #{shared_dir}/.munge/.munge.key /etc/munge/munge.key
       # Set ownership on the key
       chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
       # Enforce correct permission on the key
       chmod 0600 /etc/munge/munge.key
-    COMPUTE_MUNGE_KEY
+    MUNGE_KEY
     retries 5
     retry_delay 10
   end
+end
 
+def setup_munge_compute_node
+  setup_munge_key(node['cluster']['shared_dir'])
+  enable_munge_service
+end
+
+def setup_munge_login_node
+  setup_munge_key(node['cluster']['shared_dir_login'])
   enable_munge_service
 end
 

@@ -5,6 +5,14 @@
 #
 # Usage: ./update_munge_key.sh
 # #
+function share_munge_key {
+    local shared_directory=$1
+    echo "Sharing munge key to ${shared_directory}"
+    mkdir -p ${shared_directory}/.munge
+    cp /etc/munge/munge.key ${shared_directory}/.munge/.munge.key
+    chmod 0600 ${shared_directory}/.munge
+    chmod 0600 ${shared_directory}/.munge/.munge.key
+}
 
 set -e
 
@@ -14,6 +22,7 @@ REGION="<%= @region %>"
 MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
 SHARED_DIRECTORY="<%= @shared_directory %>"
+SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
 
 # If SECRET_ARN is provided, fetch the munge key from Secrets Manager
 if [ -n "${SECRET_ARN}" ]; then
@@ -66,6 +75,11 @@ mkdir -p ${SHARED_DIRECTORY}/.munge
 cp /etc/munge/munge.key ${SHARED_DIRECTORY}/.munge/.munge.key
 chmod 0600 ${SHARED_DIRECTORY}/.munge
 chmod 0600 ${SHARED_DIRECTORY}/.munge/.munge.key
+
+mkdir -p ${SHARED_DIRECTORY_LOGIN}/.munge
+cp /etc/munge/munge.key ${SHARED_DIRECTORY_LOGIN}/.munge/.munge.key
+chmod 0600 ${SHARED_DIRECTORY_LOGIN}/.munge
+chmod 0600 ${SHARED_DIRECTORY_LOGIN}/.munge/.munge.key
 echo "Shared munge key"
 
 exit 0
