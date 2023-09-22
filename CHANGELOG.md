@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install [Spack](https://spack.io) by default in cluster user's home directory.
 
 **CHANGES**
+- Remove the NFS exports from the head node root volume and use Amazon EFS storage instead for intra-cluster shared ParallelCluster, Intel, Slurm, and Login Node data. 
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.
@@ -20,6 +21,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Slurm to 23.02.5 (from 23.02.4).
   - Upgrade Pmix to 4.2.6 (from 3.2.3).
   - Upgrade libjwt to 1.15.3 (from 1.12.0).
+- Upgrade EFA installer to `1.26.1`, fixing RDMA writedata issue in P5.
+  - Efa-driver: `efa-2.5.0-1`
+  - Efa-config: `efa-config-1.15-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.18.2-1`
+  - Rdma-core: `rdma-core-46.0-1`
+  - Open MPI: `openmpi40-aws-4.1.5-4`
 
 3.7.0
 ------
