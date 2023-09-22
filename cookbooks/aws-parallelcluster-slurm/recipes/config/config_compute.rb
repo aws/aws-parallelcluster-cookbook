@@ -24,6 +24,8 @@ directory '/var/spool/slurmd' do
   mode '0700'
 end
 
+include_recipe 'aws-parallelcluster-slurm::mount_slurm_dir'
+
 # Check to see if is GPU instance with Nvidia installed
 Chef::Log.warn("GPU instance but no Nvidia drivers found") if graphic_instance? && !nvidia_installed?
 

@@ -13,18 +13,12 @@
 #
 
 include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
+include_recipe "aws-parallelcluster-environment::mount_shared"
 cloudwatch "Configure CloudWatch" do
   action :configure
 end
-include_recipe "aws-parallelcluster-environment::update_fs_mapping"
-include_recipe "aws-parallelcluster-environment::backup_internal_use_shared_data"
-include_recipe "aws-parallelcluster-environment::mount_internal_use_fs"
-include_recipe "aws-parallelcluster-environment::restore_internal_use_shared_data"
-
 include_recipe "aws-parallelcluster-environment::network_interfaces"
 include_recipe 'aws-parallelcluster-environment::imds'
-
-# login nodes keys and directory service require shared storage
 include_recipe "aws-parallelcluster-environment::login_nodes_keys"
 include_recipe "aws-parallelcluster-environment::directory_service"
 

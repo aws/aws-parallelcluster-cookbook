@@ -17,3 +17,5 @@
 
 # TODO: rename, find a better name that include login nodes
 setup_munge_compute_node
+
+include_recipe 'aws-parallelcluster-slurm::mount_slurm_dir'
