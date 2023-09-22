@@ -10,7 +10,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install [Spack](https://spack.io) by default in cluster user's home directory.
 
 **CHANGES**
-- Remove the NFS exports from the head node root volume and use Amazon EFS storage instead for intra-cluster shared ParallelCluster, Intel, Slurm, and Login Node data. 
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.

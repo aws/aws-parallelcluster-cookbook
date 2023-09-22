@@ -17,6 +17,13 @@
 
 include_recipe 'aws-parallelcluster-slurm::config_munge_key'
 
+# Export /opt/slurm
+nfs_export "#{node['cluster']['slurm']['install_dir']}" do
+  network get_vpc_cidr_list
+  writeable true
+  options ['no_root_squash']
+end unless on_docker?
+
 # Ensure config directory is in place
 directory "#{node['cluster']['slurm']['install_dir']}" do
   user 'root'
