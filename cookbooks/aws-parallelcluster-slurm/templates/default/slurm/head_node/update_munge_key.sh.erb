@@ -5,14 +5,6 @@
 #
 # Usage: ./update_munge_key.sh
 # #
-function share_munge_key {
-    local shared_directory=$1
-    echo "Sharing munge key to ${shared_directory}"
-    mkdir -p ${shared_directory}/.munge
-    cp /etc/munge/munge.key ${shared_directory}/.munge/.munge.key
-    chmod 0600 ${shared_directory}/.munge
-    chmod 0600 ${shared_directory}/.munge/.munge.key
-}
 
 set -e
 
