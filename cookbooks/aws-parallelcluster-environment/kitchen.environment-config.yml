@@ -414,10 +414,10 @@ suites:
         fsx_shared_dirs: ''
         raid_shared_dir: ''
         ephemeral_dir: test1
-  - name: fs_update
+  - name: update_fs_mapping
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::fs_update]
+      - recipe[aws-parallelcluster-environment::update_fs_mapping]
     verifier:
       controls:
         - fs_data_file_created_correctly
@@ -440,10 +440,10 @@ suites:
         fsx_dns_names: dns1,dns2
         fsx_mount_names: mount1,mount2
         fsx_volume_junction_paths: value1,value2
-  - name: fs_update_default_values
+  - name: update_fs_mapping_default_values
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::fs_update]
+      - recipe[aws-parallelcluster-environment::update_fs_mapping]
     verifier:
       controls:
         - fs_data_file_with_default_values
@@ -472,42 +472,43 @@ suites:
         scheduler: slurm
         head_node_imds_secured: 'true'
         head_node_imds_allowed_users: ['root', 'nobody']
-  - name: mount_shared_compute
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::mount_shared]
-    verifier:
-      controls:
-        - mount_home
-        - mount_shared_compute
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:nfs
-        - recipe:aws-parallelcluster-environment::mock_export_directories
-      cluster:
-        node_type: 'ComputeFleet'
-        head_node_private_ip: '127.0.0.1'
-        head_node_home_path: '/fake_headnode_home'
-        shared_dir_head: '/fake_headnode_shared'
-  - name: mount_shared_login
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::mount_shared]
-    verifier:
-      controls:
-        - mount_home
-        - mount_shared_login
-    attributes:
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:nfs
-        - recipe:aws-parallelcluster-environment::mock_export_directories
-      cluster:
-        node_type: 'LoginNode'
-        head_node_private_ip: '127.0.0.1'
-        head_node_home_path: '/fake_headnode_home'
-        shared_dir_head: '/fake_headnode_shared'
+# TODO replacement for the mount_internal_use_fs recipe since it uses shared storage
+#  - name: mount_shared_compute
+#    run_list:
+#      - recipe[aws-parallelcluster-tests::setup]
+#      - recipe[aws-parallelcluster-environment::mount_shared]
+#    verifier:
+#      controls:
+#        - mount_home
+#        - mount_shared_compute
+#    attributes:
+#      dependencies:
+#        - recipe:aws-parallelcluster-platform::directories
+#        - resource:nfs
+#        - recipe:aws-parallelcluster-environment::mock_export_directories
+#      cluster:
+#        node_type: 'ComputeFleet'
+#        head_node_private_ip: '127.0.0.1'
+#        head_node_home_path: '/fake_headnode_home'
+#        shared_dir_head: '/fake_headnode_shared'
+#  - name: mount_shared_login
+#    run_list:
+#      - recipe[aws-parallelcluster-tests::setup]
+#      - recipe[aws-parallelcluster-environment::mount_shared]
+#    verifier:
+#      controls:
+#        - mount_home
+#        - mount_shared_login
+#    attributes:
+#      dependencies:
+#        - recipe:aws-parallelcluster-platform::directories
+#        - resource:nfs
+#        - recipe:aws-parallelcluster-environment::mock_export_directories
+#      cluster:
+#        node_type: 'LoginNode'
+#        head_node_private_ip: '127.0.0.1'
+#        head_node_home_path: '/fake_headnode_home'
+#        shared_dir_head: '/fake_headnode_shared'
   - name: raid_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -541,7 +542,7 @@ suites:
   - name: shared_storages_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::shared_storages]
+      - recipe[aws-parallelcluster-environment::efs]
     verifier:
       controls:
         - shared_storages_compute_and_login
@@ -555,7 +556,7 @@ suites:
   - name: shared_storages_login
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::shared_storages]
+      - recipe[aws-parallelcluster-environment::efs]
     verifier:
       controls:
         - shared_storages_compute_and_login
