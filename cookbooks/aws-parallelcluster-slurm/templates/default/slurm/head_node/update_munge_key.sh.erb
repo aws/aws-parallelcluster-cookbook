@@ -32,6 +32,13 @@ if [ -n "${SECRET_ARN}" ]; then
     exit 1
   fi
 
+  # Check munge key size
+  key_size=$(echo "${decoded_key}" | wc -c)
+  if [ $key_size -lt 32 ] || [ $key_size -gt 1024 ]; then
+    echo "Fetched munge key size is out of valid range [256-8192 bits]."
+    exit 1
+  fi
+
   echo "${decoded_key}" > ${MUNGE_KEY_FILE}
 
   # Set ownership on the key
