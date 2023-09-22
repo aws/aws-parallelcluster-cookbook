@@ -15,6 +15,13 @@ MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
 CLUSTER_USER="<%= @cluster_user %>"
 
+# Check compute fleet status
+compute_fleet_status=$(get-compute-fleet-status.sh)
+if ! echo "$compute_fleet_status" | grep -q '"status": "STOPPED"'; then
+    echo "Compute fleet is not stopped. Please stop it before updating the munge key."
+    exit 1
+fi
+
 # If SECRET_ARN is provided, fetch the munge key from Secrets Manager
 if [ -n "${SECRET_ARN}" ]; then
   echo "Fetching munge key from AWS Secrets Manager: ${SECRET_ARN}"
