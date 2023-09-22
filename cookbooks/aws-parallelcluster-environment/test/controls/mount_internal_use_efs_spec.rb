@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'mount_home' do
-  title 'Check if the home and the shared directories are mounted'
+  title 'Check if the home directory in mounted'
 
   only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
 
@@ -22,7 +22,7 @@ control 'mount_home' do
 end
 
 control 'mount_shared_compute' do
-  title 'Check if the home and the shared directories are mounted'
+  title 'Check if the shared directory is mounted'
 
   only_if { !os_properties.on_docker? && instance.compute_node? }
 
@@ -34,7 +34,7 @@ control 'mount_shared_compute' do
 end
 
 control 'mount_shared_login' do
-  title 'Check if the home and the shared directories are mounted'
+  title 'Check if the shared directory is mounted'
 
   only_if { !os_properties.on_docker? && instance.login_node? }
 
@@ -42,5 +42,21 @@ control 'mount_shared_login' do
     it { should be_mounted }
     its('type') { should eq 'nfs4' }
     its('options') { should include 'rw' }
+  end
+end
+
+control 'shared_storages_compute_and_login' do
+  title 'Check the shared storages configuration for compute node'
+
+  only_if { !os_properties.on_docker? && (instance.compute_node? or instance.login_node?) }
+
+  describe 'Check that /opt/intel dir has been mounted'
+  describe mount("/opt/intel") do
+    it { should be_mounted }
+    its('device') { should eq "127.0.0.1:/opt/intel" }
+    its('type') { should eq 'nfs4' }
+    its('options') { should include 'hard' }
+    its('options') { should include '_netdev' }
+    its('options') { should include 'noatime' }
   end
 end

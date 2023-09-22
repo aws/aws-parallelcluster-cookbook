@@ -12,17 +12,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-fetch_config 'Fetch and load cluster configs' do
-  update true
-end
+return if on_docker?
 
-# generate the updated shared storages mapping file
-include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
-
-include_recipe 'aws-parallelcluster-environment::directory_service'
-include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
-
-# Update node package - useful for development purposes only
-if is_custom_node?
-  include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
+case node['cluster']['node_type']
+when 'HeadNode'
+  volume "export /home" do
+    shared_dir "/home"
+    action :export
+  end
+when 'ComputeFleet', 'LoginNode'
+  Chef::Log.info("Export only from the HeadNode")
+else
+  raise "node_type must be HeadNode, ComputeFleet, or LoginNode"
 end

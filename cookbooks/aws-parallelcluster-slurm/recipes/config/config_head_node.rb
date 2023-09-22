@@ -22,6 +22,7 @@ nfs_export "#{node['cluster']['slurm']['install_dir']}" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
+  only_if { node['cluster']['internal_shared_storage_type'] == 'ebs' }
 end unless on_docker?
 
 # Ensure config directory is in place

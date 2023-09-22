@@ -16,30 +16,7 @@ return if on_docker?
 
 case node['cluster']['node_type']
 when 'HeadNode'
-  volume "export /home" do
-    shared_dir "/home"
-    action :export
-  end
-
-  # Export /opt/parallelcluster/shared
-  volume "export #{node['cluster']['shared_dir']}" do
-    shared_dir node['cluster']['shared_dir']
-    action :export
-  end
-
-  # Export /opt/parallelcluster/shared_login_nodes
-  volume "export #{node['cluster']['shared_dir_login_nodes']}" do
-    shared_dir node['cluster']['shared_dir_login_nodes']
-    action :export
-  end
-
-  # Export /opt/intel only if exists
-  volume "export /opt/intel" do
-    shared_dir "/opt/intel"
-    only_if { ::File.directory?("/opt/intel") }
-    action :export
-  end
-
+  Chef::Log.info("Mount only on the ComputeFleet and LoginNodes")
 when 'ComputeFleet', 'LoginNode'
   # Mount /opt/intel over NFS only if it exists
   exported_intel_dir = format_directory('/opt/intel')
