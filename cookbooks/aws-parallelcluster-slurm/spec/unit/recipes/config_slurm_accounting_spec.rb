@@ -61,7 +61,6 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
       it "bootstraps the Slurm database idempotently" do
         is_expected.to run_bash("bootstrap slurm database")
       end
-
     end
   end
 end
