@@ -191,3 +191,29 @@ suites:
           DevSettings:
             MungeKeySettings:
               MungeKeySecretArn: null
+  - name: config_slurm_accounting
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::config_slurm_accounting]
+    verifier:
+      controls:
+        - slurm_accounting_configured
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-slurm::slurm_users
+        - recipe:aws-parallelcluster-slurm::mock_slurm
+        - recipe:aws-parallelcluster-slurm::mock_scripts_dir
+      cluster:
+        node_type: HeadNode
+        scheduler: 'slurm'
+        #slurm:
+        #  user: 'slurm'
+        #  group: 'slurm'
+        config:
+          Scheduling:
+            SlurmSettings:
+              Database:
+                Uri: test-slurm-database.cluster-abcdefghijkl.us-east-1.rds.amazonaws.com:3306
+                UserName: clusteradmin
+                PasswordSecretArn: arn:aws:secretsmanager:us-east-1:123456789012:secret:TestSecret:abcdefghijkl-ABCDEF
