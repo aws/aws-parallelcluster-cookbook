@@ -361,13 +361,17 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         # TODO change this method if DCV updates his behaviour.
         """
         logger.info("Verifying NICE DCV session validity..")
+
+        # Query by uid rather than username to avoid truncation by ps command
+        uid = subprocess.check_output(["id", "-u", user]).decode("utf-8").strip()
+
         # Remove the first and the last because they are the heading and empty, respectively
         # All commands and arguments in this subprocess call are built as literals
-        processes = subprocess.check_output(["/bin/ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec B603
+        processes = subprocess.check_output(["/bin/ps", "aunx"]).decode("utf-8").split("\n")[1:-1]  # nosec B603
 
         # Check the filter is empty
         if not next(
-            filter(lambda process: DCVAuthenticator.check_dcv_process(process, user, session_id), processes), None
+            filter(lambda process: DCVAuthenticator.check_dcv_process(process, uid, session_id), processes), None
         ):
             raise DCVAuthenticator.IncorrectRequestError("The given session does not exists")
         logger.info("The NICE DCV session is valid.")
@@ -377,21 +381,21 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         retry(DCVAuthenticator._is_session_valid, func_args=[user, session_id], attempts=20, wait=1)
 
     @staticmethod
-    def check_dcv_process(row, user, session_id):
+    def check_dcv_process(row, uid, session_id):
         """Check if there is a dcvagent process running for the given user and for the given session_id."""
         # row example:
-        # centos 63 0.0 0.0 4348844 3108   ??  Ss   23Jul19   2:32.46  /usr/libexec/dcv/dcvagent --mode full \
+        # 1000 63 0.0 0.0 4348844 3108   ??  Ss   23Jul19   2:32.46  /usr/libexec/dcv/dcvagent --mode full \
         #     --session-id mysession
-        # ubuntu 2949 0.3 0.4 860568 34328 ? Sl 20:10 0:18 /usr/lib/x86_64-linux-gnu/dcv/dcvagent --mode full \
+        # 2000 2949 0.3 0.4 860568 34328 ? Sl 20:10 0:18 /usr/lib/x86_64-linux-gnu/dcv/dcvagent --mode full \
         #     --session-id mysession
         fields = row.split()
         command_index = 10
         session_name_index = 14
-        user_index = 0
+        uid_index = 0
 
         return (
             fields[command_index].endswith("/dcv/dcvagent")
-            and fields[user_index] == user
+            and fields[uid_index] == uid
             and fields[session_name_index] == session_id
         )
 
