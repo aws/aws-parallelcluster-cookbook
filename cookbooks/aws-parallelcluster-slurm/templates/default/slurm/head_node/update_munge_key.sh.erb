@@ -76,16 +76,16 @@ else
 fi
 
 # Share munge key
-echo "Sharing munge key"
-mkdir -p ${SHARED_DIRECTORY}/.munge
-cp /etc/munge/munge.key ${SHARED_DIRECTORY}/.munge/.munge.key
-chmod 0600 ${SHARED_DIRECTORY}/.munge
-chmod 0600 ${SHARED_DIRECTORY}/.munge/.munge.key
+SHARED_DIRECTORIES=(${SHARED_DIRECTORY} ${SHARED_DIRECTORY_LOGIN})
 
-mkdir -p ${SHARED_DIRECTORY_LOGIN}/.munge
-cp /etc/munge/munge.key ${SHARED_DIRECTORY_LOGIN}/.munge/.munge.key
-chmod 0600 ${SHARED_DIRECTORY_LOGIN}/.munge
-chmod 0600 ${SHARED_DIRECTORY_LOGIN}/.munge/.munge.key
+for dir in "${SHARED_DIRECTORIES[@]}"; do
+    echo "Sharing munge key to $dir"
+    mkdir -p "$dir/.munge"
+    cp /etc/munge/munge.key "$dir/.munge/.munge.key"
+    chmod 0700 "$dir/.munge"
+    chmod 0600 "$dir/.munge/.munge.key"
+done
+
 echo "Shared munge key"
 
 exit 0

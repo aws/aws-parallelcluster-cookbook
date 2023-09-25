@@ -106,7 +106,7 @@ def share_munge_key_to_dir(shared_dir)
       mkdir -p #{shared_dir}/.munge
       # Copy key to shared dir
       cp /etc/munge/munge.key #{shared_dir}/.munge/.munge.key
-      chmod 0600 #{shared_dir}/.munge
+      chmod 0700 #{shared_dir}/.munge
       chmod 0600 #{shared_dir}/.munge/.munge.key
     SHARE_MUNGE_KEY
   end
