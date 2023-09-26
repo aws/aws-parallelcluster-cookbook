@@ -219,6 +219,24 @@ execute "check slurmctld status" do
   retry_delay 2
 end unless redhat_on_docker?
 
+template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_status.sh" do
+  source 'slurm/head_node/check_login_nodes_status.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  variables(
+    stack_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
+    login_nodes_pool_name: lazy do
+      if lazy { node['cluster']['config']['LoginNodes'].nil? }
+        nil
+      else
+        lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name) }
+      end
+    end,
+    region: node['cluster']['region']
+  )
+end
+
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'
