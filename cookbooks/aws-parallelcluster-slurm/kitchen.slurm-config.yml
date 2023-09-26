@@ -189,5 +189,5 @@ suites:
         scheduler: 'slurm'
         config:
           DevSettings:
-            SlurmSettings:
+            MungeKeySettings:
               MungeKeySecretArn: null
