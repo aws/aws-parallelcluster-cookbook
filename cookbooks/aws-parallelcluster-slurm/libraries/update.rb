@@ -79,7 +79,7 @@ def execute_command(command, user = "root", timeout = 300, raise_on_error = true
   cmd.stdout.strip
 end
 
-# Verify if MungeKeySecretArn in SlurmSettings section of cluster configuration has been updated
+# Verify if MungeKeySecretArn in MungeKeySettings section of cluster configuration has been updated
 def is_custom_munge_key_updated?
-  config_parameter_changed?(%w(DevSettings SlurmSettings MungeKeySecretArn))
+  config_parameter_changed?(%w(DevSettings MungeKeySettings MungeKeySecretArn))
 end
