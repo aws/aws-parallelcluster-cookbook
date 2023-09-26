@@ -227,11 +227,10 @@ template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_status.sh" d
   variables(
     stack_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
     login_nodes_pool_name: lazy do
-      if lazy { node['cluster']['config']['LoginNodes'].nil? }
-        nil
-      else
-        lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name) }
-      end
+      # rubocop:disable Style/SingleArgumentDig
+      login_nodes_config = node['cluster']['config'].dig(:LoginNodes)
+      # rubocop:enable Style/SingleArgumentDig
+      login_nodes_config ? login_nodes_config.dig(:Pools, 0, :Name) : nil
     end,
     region: node['cluster']['region']
   )
