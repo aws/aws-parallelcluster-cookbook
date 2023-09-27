@@ -207,9 +207,6 @@ suites:
       cluster:
         node_type: HeadNode
         scheduler: 'slurm'
-        #slurm:
-        #  user: 'slurm'
-        #  group: 'slurm'
         config:
           Scheduling:
             SlurmSettings:
