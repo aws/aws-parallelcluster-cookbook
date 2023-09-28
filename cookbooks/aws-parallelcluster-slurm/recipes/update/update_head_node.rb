@@ -201,7 +201,26 @@ ruby_block "Update Slurm Accounting" do
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
 end unless on_docker?
 
-# Update rotation script to update secret arn
+# Update check login nodes status script to update pool name
+template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_status.sh" do
+  source 'slurm/head_node/check_login_nodes_status.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+  variables(
+    stack_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
+    login_nodes_pool_name: lazy do
+      # rubocop:disable Style/SingleArgumentDig
+      login_nodes_config = node['cluster']['config'].dig(:LoginNodes)
+      # rubocop:enable Style/SingleArgumentDig
+      login_nodes_config ? login_nodes_config.dig(:Pools, 0, :Name) : nil
+    end,
+    region: node['cluster']['region']
+  )
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_login_nodes_pool_name_updated? }
+end
+
+# Update munge key rotation script to update secret arn
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'

@@ -17,44 +17,18 @@ if [[ -z "${LOGIN_NODES_POOL_NAME}" ]]; then
     exit 0
 fi
 
-# List all Load Balancers
-load_balancers=$(aws elbv2 describe-load-balancers --region ${REGION})
-
-# Iterate over Load Balancers to find the one with matching tags
-load_balancer_arn=''
-for arn in $(echo "${load_balancers}" | jq -r '.LoadBalancers[].LoadBalancerArn'); do
-    # Get tags for the current Load Balancer
-    tags=$(aws elbv2 describe-tags --resource-arns "${arn}" --region ${REGION})
-
-    # Check if the tags match the desired stack name and login nodes pool name
-    stack_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:cluster-name" --arg value "${STACK_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
-    login_nodes_pool_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:login-nodes-pool" --arg value "${LOGIN_NODES_POOL_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
-
-    # If both tags are found, store the ARN and break the loop
-    if [[ -n "${stack_name_match}" && -n "${login_nodes_pool_name_match}" ]]; then
-        load_balancer_arn="${arn}"
-        break
-    fi
-done
-
-# Output result
-if [[ -n "${load_balancer_arn}" ]]; then
-    echo "Load Balancer ARN found: ${load_balancer_arn}"
-else
-    echo "No Load Balancer found for the specified stack and login nodes pool."
-    exit 1
-fi
-
 # Get Target Group ARN associated with the Load Balancer
 target_group_arn=$(aws elbv2 describe-target-groups \
-    --load-balancer-arn $load_balancer_arn \
+    --names "${STACK_NAME}-${LOGIN_NODES_POOL_NAME}-TargetGroup" \
     --query "TargetGroups[0].TargetGroupArn" \
     --output text \
     --region ${REGION})
 
 # Exit if Target Group is not found
-if [[ -z $target_group_arn ]]; then
-    echo "No Target Group found for the specified Load Balancer."
+if [[ -n "${target_group_arn}" ]]; then
+    echo "TargetGroup ARN found: ${target_group_arn}"
+else
+    echo "No Target Group found for the specified stack and login nodes pool."
     exit 1
 fi
 

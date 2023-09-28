@@ -15,6 +15,21 @@ MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
 SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
 SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
+CHECK_LOGIN_NODES_SCRIPT_PATH="<%= node['cluster']['scripts_dir'] %>/slurm/check_login_nodes_status.sh"
+
+# Create a temporary file to store the output
+TEMP_FILE=$(mktemp)
+
+# Check if login nodes are running
+$CHECK_LOGIN_NODES_SCRIPT_PATH > $TEMP_FILE
+if grep -q "Login nodes are running." $TEMP_FILE; then
+    echo "Login nodes are running. Please stop them before updating the munge key."
+    rm $TEMP_FILE  # Clean up the temporary file
+    exit 1
+fi
+
+# Clean up the temporary file
+rm $TEMP_FILE
 
 # Check compute fleet status
 compute_fleet_status=$(get-compute-fleet-status.sh)
