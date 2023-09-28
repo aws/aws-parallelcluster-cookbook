@@ -85,5 +85,5 @@ def is_custom_munge_key_updated?
 end
 
 def is_login_nodes_pool_name_updated?
-  config_parameter_changed?(%w(LoginNodes Pools 0 Name))
+  config_parameter_changed?(['LoginNodes', 'Pools', 0, 'Name'])
 end
