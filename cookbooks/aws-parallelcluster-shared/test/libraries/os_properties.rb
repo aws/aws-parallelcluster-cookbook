@@ -20,6 +20,14 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'redhat'
   end
 
+  def rocky?
+    inspec.os.name == 'rocky'
+  end
+
+  def rocky_on_docker?
+    on_docker? && rocky?
+  end
+
   def centos?
     inspec.os.name == 'centos'
   end
@@ -30,6 +38,10 @@ class OsProperties < Inspec.resource(1)
 
   def redhat8?
     redhat? && inspec.os.release.to_i == 8
+  end
+
+  def rocky8?
+    rocky? && inspec.os.release.to_i == 8
   end
 
   def centos7?

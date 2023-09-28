@@ -201,6 +201,25 @@ ruby_block "Update Slurm Accounting" do
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
 end unless on_docker?
 
+# Update rotation script to update secret arn
+template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
+  source 'slurm/head_node/update_munge_key.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn) },
+    region: node['cluster']['region'],
+    munge_user: node['cluster']['munge']['user'],
+    munge_group: node['cluster']['munge']['group'],
+    shared_directory_compute: node['cluster']['shared_dir'],
+    shared_directory_login: node['cluster']['shared_dir_login']
+  )
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
+end
+
+update_munge_head_node
+
 # The previous execute "generate_pcluster_slurm_configs" block resource may have overridden the slurmdbd password in
 # slurm_parallelcluster_slurmdbd.conf with a default value, so if it has run and Slurm accounting
 # is enabled we must pull the database password from Secrets Manager once again.

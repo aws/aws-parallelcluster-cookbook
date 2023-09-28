@@ -17,12 +17,6 @@
 
 slurm_dependencies 'Install slurm dependencies'
 
-slurm_user = node['cluster']['slurm']['user']
-slurm_user_id = node['cluster']['slurm']['user_id']
-slurm_group = node['cluster']['slurm']['group']
-slurm_group_id = node['cluster']['slurm']['group_id']
-cluster_admin_slurm_share_group = node['cluster']['cluster_admin_slurm_share_group']
-cluster_admin_slurm_share_group_id = node['cluster']['cluster_admin_slurm_share_group_id']
 slurm_install_dir = node['cluster']['slurm']['install_dir']
 
 slurm_version = node['cluster']['slurm']['version']
@@ -36,38 +30,7 @@ slurm_tarball = "#{node['cluster']['sources_dir']}/#{slurm_tar_name}.tar.gz"
 slurm_url = "https://github.com/SchedMD/slurm/archive/#{slurm_tar_name}.tar.gz"
 slurm_sha256 = node['cluster']['slurm']['sha256']
 
-# Setup slurm group
-group slurm_group do
-  comment 'slurm group'
-  gid slurm_group_id
-  system true
-end
-
-# Setup slurm user
-user slurm_user do
-  comment 'slurm user'
-  uid slurm_user_id
-  gid slurm_group_id
-  # home is mounted from the head node
-  manage_home ['HeadNode', nil].include?(node['cluster']['node_type'])
-  home "/home/#{slurm_user}"
-  system true
-  shell '/bin/bash'
-end
-
-# Setup cluster admin slurm share group
-group cluster_admin_slurm_share_group do
-  comment 'slurm resume program group'
-  gid cluster_admin_slurm_share_group_id
-  system true
-end
-
-# add slurm user and pcluster-admin to share group
-group cluster_admin_slurm_share_group do
-  action :modify
-  members [ slurm_user, node['cluster']['cluster_admin_user'] ]
-  append true
-end
+include_recipe 'aws-parallelcluster-slurm::slurm_users'
 
 # Get slurm tarball
 remote_file slurm_tarball do

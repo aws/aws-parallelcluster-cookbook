@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster-slurm
 # Recipe:: config_head_node
 #
-# Copyright:: 2013-2022 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -46,12 +46,12 @@ execute "update Slurm database password" do
   user 'root'
   group 'root'
   command "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh"
-end
+end unless on_docker?
 
 service "slurmdbd" do
   supports restart: false
   action %i(enable start)
-end
+end unless on_docker?
 
 # After starting slurmdbd the database may not be fully responsive yet and
 # its bootstrapping may fail. We need to wait for sacctmgr to successfully
@@ -60,7 +60,7 @@ execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
   retries node['cluster']['slurmdbd_response_retries']
   retry_delay 10
-end
+end unless on_docker?
 
 bash "bootstrap slurm database" do
   user 'root'
@@ -91,4 +91,4 @@ bash "bootstrap slurm database" do
     # This is not important for the scope of this script, so we return 0.
     exit 0
   BOOTSTRAP
-end
+end unless on_docker?

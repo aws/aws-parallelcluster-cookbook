@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:config_awsbatch_cli_commands_available' do
-  only_if { node['cluster']['scheduler'] == 'awsbatch' && !os_properties.redhat8? }
+  only_if { node['cluster']['scheduler'] == 'awsbatch' && !os_properties.redhat8? && !os_properties.rocky8? }
 
   # Test that batch commands can be accessed without absolute path
   %w(awsbkill awsbqueues awsbsub awsbhosts awsbout awsbstat).each do |cli_commmand|
