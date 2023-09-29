@@ -26,6 +26,7 @@ if [ -e "${SCRIPT}" ]; then
     if [ -n "${KITCHEN_INSTANCE_HOSTNAME}" ]; then
       case ${KITCHEN_PLATFORM_NAME} in
         alinux*|redhat* ) export KITCHEN_EC2_USER='ec2-user';;
+        rocky*          ) export KITCHEN_EC2_USER='rocky';;
         centos*         ) export KITCHEN_EC2_USER='centos';;
         ubuntu*         ) export KITCHEN_EC2_USER='ubuntu';;
       esac

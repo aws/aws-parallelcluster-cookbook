@@ -102,14 +102,36 @@ def test_generate_slurm_config_files_memory_scheduling(
 
 
 @pytest.mark.parametrize(
-    "slurm_accounting",
-    [(False), (True)],
+    "input_config, expected_outputs",
+    [
+        pytest.param(
+            "sample_input.yaml",
+            [
+                "slurm_parallelcluster.conf",
+                "slurm_parallelcluster_slurmdbd.conf",
+            ],
+            id="Case without Slurm Accounting",
+        ),
+        pytest.param(
+            "sample_input_slurm_accounting.yaml",
+            [
+                "slurm_parallelcluster_slurm_accounting.conf",
+                "slurm_parallelcluster_slurmdbd_slurm_accounting.conf",
+            ],
+            id="Case with Slurm Accounting",
+        ),
+        pytest.param(
+            "sample_input_slurm_accounting_dbname.yaml",
+            [
+                "slurm_parallelcluster_slurm_accounting_dbname.conf",
+                "slurm_parallelcluster_slurmdbd_slurm_accounting_dbname.conf",
+            ],
+            id="Case with Slurm Accounting passing DatabaseName",
+        ),
+    ],
 )
-def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, slurm_accounting):
-    if slurm_accounting:
-        input_file = str(test_datadir / "sample_input_slurm_accounting.yaml")
-    else:
-        input_file = str(test_datadir / "sample_input.yaml")
+def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, input_config, expected_outputs):
+    input_file = str(test_datadir / input_config)
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
     _mock_head_node_config(mocker)
@@ -127,11 +149,12 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
         cluster_name="test-cluster",
     )
 
-    for file_type in ["", "_slurmdbd"]:
-        file_name = f"slurm_parallelcluster{file_type}.conf"
-        postfix = "_slurm_accounting" if slurm_accounting else ""
-        output_file_name = f"slurm_parallelcluster{file_type}{postfix}.conf"
-        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+    generated_outputs = ["slurm_parallelcluster.conf", "slurm_parallelcluster_slurmdbd.conf"]
+
+    for item in zip(generated_outputs, expected_outputs):
+        generated_file = str(tmpdir / item[0])
+        expected_file = str(test_datadir / "expected_outputs" / item[1])
+        _assert_files_are_equal(generated_file, expected_file)
 
 
 def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):

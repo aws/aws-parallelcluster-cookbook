@@ -20,14 +20,17 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Create the cloudwatch agent config file")
     parser.add_argument("--config", help="Path to JSON file describing logs that should be monitored", required=True)
     parser.add_argument(
-        "--platform", help="OS family of this instance", choices=["amazon", "centos", "ubuntu", "redhat"], required=True
+        "--platform",
+        help="OS family of this instance",
+        choices=["amazon", "centos", "ubuntu", "redhat", "rocky"],
+        required=True,
     )
     parser.add_argument("--log-group", help="Name of the log group", required=True)
     parser.add_argument(
         "--node-role",
         required=True,
         choices=["HeadNode", "ComputeFleet", "LoginNode"],
-        help="Role this node plays in the cluster " "(i.e., is it a compute node or the head node?)",
+        help="Role this node plays in the cluster (i.e., is it a compute node or the head node?)",
     )
     parser.add_argument("--scheduler", required=True, choices=["slurm", "awsbatch"], help="Scheduler")
     return parser.parse_args()

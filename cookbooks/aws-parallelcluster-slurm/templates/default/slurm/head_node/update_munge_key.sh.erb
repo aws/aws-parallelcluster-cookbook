@@ -13,7 +13,8 @@ SECRET_ARN="<%= @munge_key_secret_arn %>"
 REGION="<%= @region %>"
 MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
-CLUSTER_USER="<%= @cluster_user %>"
+SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
+SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
 
 # Check compute fleet status
 compute_fleet_status=$(get-compute-fleet-status.sh)
@@ -75,9 +76,16 @@ else
 fi
 
 # Share munge key
-echo "Sharing munge key"
-mkdir -p /home/${CLUSTER_USER}/.munge
-cp /etc/munge/munge.key /home/${CLUSTER_USER}/.munge/.munge.key
+SHARED_DIRECTORIES=(${SHARED_DIRECTORY_COMPUTE} ${SHARED_DIRECTORY_LOGIN})
+
+for dir in "${SHARED_DIRECTORIES[@]}"; do
+    echo "Sharing munge key to $dir"
+    mkdir -p "$dir/.munge"
+    cp /etc/munge/munge.key "$dir/.munge/.munge.key"
+    chmod 0700 "$dir/.munge"
+    chmod 0600 "$dir/.munge/.munge.key"
+done
+
 echo "Shared munge key"
 
 exit 0
