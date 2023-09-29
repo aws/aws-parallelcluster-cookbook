@@ -29,8 +29,8 @@ def fetch_and_decode_munge_key
   declare_resource(:execute, 'fetch_and_decode_munge_key') do
     user 'root'
     group 'root'
-    cwd File.dirname(script_path)
-    command "./#{File.basename(script_path)} --c True"
+    cwd ::File.dirname(script_path)
+    command "./#{::File.basename(script_path)} --c True"
   end
 end
 
