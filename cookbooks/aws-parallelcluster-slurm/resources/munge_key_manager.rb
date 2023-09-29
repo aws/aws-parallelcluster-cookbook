@@ -30,7 +30,7 @@ def fetch_and_decode_munge_key
     user 'root'
     group 'root'
     cwd ::File.dirname(script_path)
-    command "./#{::File.basename(script_path)} --c True"
+    command "./#{::File.basename(script_path)} -c True"
   end
 end
 
