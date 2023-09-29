@@ -26,7 +26,7 @@ default_action :setup_munge_key
 def fetch_and_decode_munge_key
   script_path = "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh"
 
-  execute 'fetch_and_decode_munge_key' do
+  declare_resource(:execute, 'fetch_and_decode_munge_key') do
     user 'root'
     group 'root'
     cwd File.dirname(script_path)
