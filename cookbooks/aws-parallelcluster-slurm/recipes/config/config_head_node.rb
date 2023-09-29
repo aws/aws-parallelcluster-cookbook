@@ -15,6 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copy pcluster config generator and templates
+remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
+  source 'head_node_slurm/slurm'
+  mode '0755'
+  action :create
+  recursive true
+end
+
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'
@@ -72,14 +80,6 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
   owner 'root'
   group 'root'
   mode '0644'
-end
-
-# Copy pcluster config generator and templates
-remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
-  source 'head_node_slurm/slurm'
-  mode '0755'
-  action :create
-  recursive true
 end
 
 unless on_docker?
