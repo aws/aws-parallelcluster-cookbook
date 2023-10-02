@@ -363,7 +363,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         logger.info("Verifying NICE DCV session validity..")
 
         # Query by uid rather than username to avoid truncation by ps command
-        uid = subprocess.check_output(["id", "-u", user]).decode("utf-8").strip()
+        uid = subprocess.check_output(["/usr/bin/id", "-u", user]).decode("utf-8").strip()  # nosec B603
 
         # Remove the first and the last because they are the heading and empty, respectively
         # All commands and arguments in this subprocess call are built as literals
