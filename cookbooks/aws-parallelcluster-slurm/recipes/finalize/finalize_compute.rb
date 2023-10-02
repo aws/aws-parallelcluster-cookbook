@@ -24,7 +24,7 @@ end
 directory '/etc/sysconfig' do
   user 'root'
   group 'root'
-  mode '0644'
+  mode '0755'
 end
 
 template "/etc/sysconfig/slurmd" do
