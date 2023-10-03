@@ -38,6 +38,9 @@ action :run do
     # load cluster config into a node object
     load_cluster_config(node['cluster']['cluster_config_path'])
   when 'ComputeFleet'
+    if kitchen_test?
+      fetch_cluster_config(node['cluster']['cluster_config_path']) unless ::File.exist?(node['cluster']['cluster_config_path'])
+    end
     raise "Cluster config not found in #{node['cluster']['cluster_config_path']}" unless ::File.exist?(node['cluster']['cluster_config_path'])
     # load cluster config into a node object
     load_cluster_config(node['cluster']['cluster_config_path'])
