@@ -19,7 +19,7 @@ DISABLE_RESOURCE_CHECK=false
 
 while getopts "d" opt; do
   case $opt in
-    c) DISABLE_RESOURCE_CHECK=true;;
+    d) DISABLE_RESOURCE_CHECK=true;;
     *)
       echo "Usage: $0 [-d]" >&2
       exit 1
