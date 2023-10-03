@@ -57,7 +57,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.5-4`
 - Upgrade Slurm to version 23.02.4.
 - Upgrade ARM PL to version 23.04.1 for Ubuntu 22.04 only.
-- Upgrade Cinc Client to version 18.2.7.
 - Upgrade third-party cookbook dependencies:
   - apt-7.5.14 (from apt-7.4.0)
   - line-4.5.13 (from line-4.5.2)
