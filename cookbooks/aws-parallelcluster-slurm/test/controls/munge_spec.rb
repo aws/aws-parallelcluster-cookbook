@@ -80,7 +80,7 @@ control 'tag:config_munge_service_enabled' do
 end
 
 control 'tag:config_munge_check_munge_key_exists' do
-  only_if { node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
 
   title 'Check if the munge key exists'
   describe file('/etc/munge/munge.key') do
@@ -89,23 +89,23 @@ control 'tag:config_munge_check_munge_key_exists' do
     its('owner') { should eq node['cluster']['munge']['user'] }
     its('group') { should eq node['cluster']['munge']['group'] }
   end
-end unless os_properties.redhat_on_docker?
+end
 
 control 'tag:config_munge_check_munge_key_content' do
-  only_if { node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
 
   title 'Check if the munge key content is not empty'
   describe file('/etc/munge/munge.key') do
     its('content') { should_not be_empty }
   end
-end unless os_properties.redhat_on_docker?
+end
 
 control 'tag:config_munge_check_munge_key_error_messages' do
-  only_if { node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.redhat_on_docker? }
 
   title 'Check for error messages related to munge key'
   describe file('/var/log/chef-client.log') do
     its('content') { should_not match /Error fetching munge key/ }
     its('content') { should_not match /Error decoding the munge key/ }
   end
-end unless os_properties.redhat_on_docker?
+end
