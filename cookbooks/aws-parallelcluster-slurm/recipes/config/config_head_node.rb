@@ -14,6 +14,7 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+# rubocop:disable Style/SingleArgumentDig
 
 include_recipe 'aws-parallelcluster-slurm::config_munge_key'
 
@@ -219,21 +220,19 @@ execute "check slurmctld status" do
   retry_delay 2
 end unless redhat_on_docker?
 
-template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_status.sh" do
-  source 'slurm/head_node/check_login_nodes_status.sh.erb'
+template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_stopped.sh" do
+  source 'slurm/head_node/check_login_nodes_stopped.sh.erb'
   owner 'root'
   group 'root'
-  mode '0755'
+  mode '0700'
   variables(
-    stack_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
-    login_nodes_pool_name: lazy do
-      # rubocop:disable Style/SingleArgumentDig
-      login_nodes_config = node['cluster']['config'].dig(:LoginNodes)
-      # rubocop:enable Style/SingleArgumentDig
-      login_nodes_config ? login_nodes_config.dig(:Pools, 0, :Name) : nil
-    end,
+    cluster_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
+    login_nodes_pool_name: lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name) },
     region: node['cluster']['region']
   )
+  only_if do
+    node['cluster']['config'].dig(:LoginNodes)
+  end
 end
 
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do

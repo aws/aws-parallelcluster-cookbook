@@ -9,15 +9,9 @@
 
 set -e
 
-STACK_NAME="<%= @stack_name %>"
+CLUSTER_NAME="<%= @cluster_name %>"
 LOGIN_NODES_POOL_NAME="<%= @login_nodes_pool_name %>"
 REGION="<%= @region %>"
-
-# Check if LOGIN_NODES_POOL_NAME is empty
-if [[ -z "${LOGIN_NODES_POOL_NAME}" ]]; then
-    echo "No LoginNodes are specified. Please refer to ParallelCluster official documentation for more information."
-    exit 0
-fi
 
 # List all Load Balancers
 load_balancers=$(aws elbv2 describe-load-balancers --region ${REGION})
@@ -29,11 +23,12 @@ for arn in $(echo "${load_balancers}" | jq -r '.LoadBalancers[].LoadBalancerArn'
     tags=$(aws elbv2 describe-tags --resource-arns "${arn}" --region ${REGION})
 
     # Check if the tags match the desired stack name and login nodes pool name
-    stack_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:cluster-name" --arg value "${STACK_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
+    cluster_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:cluster-name" --arg value "${CLUSTER_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
     login_nodes_pool_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:login-nodes-pool" --arg value "${LOGIN_NODES_POOL_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
 
     # If both tags are found, store the ARN and break the loop
-    if [[ -n "${stack_name_match}" && -n "${login_nodes_pool_name_match}" ]]; then
+    # For now, there's only one pool of login nodes per cluster.
+    if [[ -n "${cluster_name_match}" && -n "${login_nodes_pool_name_match}" ]]; then
         load_balancer_arn="${arn}"
         break
     fi
@@ -43,7 +38,7 @@ done
 if [[ -n "${load_balancer_arn}" ]]; then
     echo "Load Balancer ARN found: ${load_balancer_arn}"
 else
-    echo "No Load Balancer found for the specified stack and login nodes pool."
+    echo "No Load Balancer found for the cluster ${CLUSTER_NAME} and login nodes pool ${LOGIN_NODES_POOL_NAME}."
     exit 1
 fi
 
@@ -58,7 +53,7 @@ target_group_arn=$(aws elbv2 describe-target-groups \
 if [[ -n "${target_group_arn}" ]]; then
     echo "TargetGroup ARN found: ${target_group_arn}"
 else
-    echo "No Target Group found for the specified Load Balancer."
+    echo "No Target Group found for the specified Load Balancer ${load_balancer_arn}."
     exit 1
 fi
 
@@ -73,7 +68,9 @@ unhealthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | se
 # Check if there are running login nodes
 total_nodes=$((healthy_count + unhealthy_count))
 if [[ $total_nodes -gt 0 ]]; then
-    echo "Login nodes are running."
-else
-    echo "Login nodes are stopped."
+    echo "Login nodes are running. Please stop them before updating the munge key."
+    exit 1
 fi
+
+echo "Login nodes are stopped."
+exit 0
