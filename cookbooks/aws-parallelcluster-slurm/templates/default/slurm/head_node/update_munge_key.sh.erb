@@ -15,25 +15,19 @@ MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
 SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
 SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
-CONFIG_PROCESS="False"
+DISABLE_RESOURCE_CHECK=false
 
-while getopts "c:" opt; do
+while getopts "d" opt; do
   case $opt in
-    c)
-      if [[ $OPTARG != "True" && $OPTARG != "False" ]]; then
-        echo "Invalid value for -c: $OPTARG. Expected 'True' or 'False'."
-        exit 1
-      fi
-      CONFIG_PROCESS=$OPTARG
-      ;;
+    c) DISABLE_RESOURCE_CHECK=true;;
     *)
-      echo "Usage: $0 [-c True/False]" >&2
+      echo "Usage: $0 [-d]" >&2
       exit 1
       ;;
   esac
 done
 
-if [ "$CONFIG_PROCESS" == "False" ]; then
+if ! $DISABLE_RESOURCE_CHECK; then
   # Check compute fleet status
   compute_fleet_status=$(get-compute-fleet-status.sh)
   if ! echo "$compute_fleet_status" | grep -q '"status": "STOPPED"'; then
@@ -78,35 +72,33 @@ else
   exit 1
 fi
 
-if [ "$CONFIG_PROCESS" == "False" ]; then
-  # Enable and restart munge service
-  systemctl enable munge
-  echo "Restarting munge service"
-  systemctl restart munge
+# Enable and restart munge service
+systemctl enable munge
+echo "Restarting munge service"
+systemctl restart munge
 
-  # Wait for a short period
-  sleep 5
+# Wait for a short period
+sleep 5
 
-  # Check if munge service is running
-  if systemctl --quiet is-active munge; then
-    echo "Munge service is active"
-  else
-    echo "Failed to restart munge service"
-    exit 1
-  fi
-
-  # Share munge key
-  SHARED_DIRECTORIES=(${SHARED_DIRECTORY_COMPUTE} ${SHARED_DIRECTORY_LOGIN})
-
-  for dir in "${SHARED_DIRECTORIES[@]}"; do
-      echo "Sharing munge key to $dir"
-      mkdir -p "$dir/.munge"
-      cp /etc/munge/munge.key "$dir/.munge/.munge.key"
-      chmod 0700 "$dir/.munge"
-      chmod 0600 "$dir/.munge/.munge.key"
-  done
-
-  echo "Shared munge key"
+# Check if munge service is running
+if systemctl --quiet is-active munge; then
+  echo "Munge service is active"
+else
+  echo "Failed to restart munge service"
+  exit 1
 fi
+
+# Share munge key
+SHARED_DIRECTORIES=(${SHARED_DIRECTORY_COMPUTE} ${SHARED_DIRECTORY_LOGIN})
+
+for dir in "${SHARED_DIRECTORIES[@]}"; do
+    echo "Sharing munge key to $dir"
+    mkdir -p "$dir/.munge"
+    cp /etc/munge/munge.key "$dir/.munge/.munge.key"
+    chmod 0700 "$dir/.munge"
+    chmod 0600 "$dir/.munge/.munge.key"
+done
+
+echo "Shared munge key"
 
 exit 0

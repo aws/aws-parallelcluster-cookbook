@@ -65,15 +65,6 @@ def enable_munge_service
   end
 end
 
-def restart_munge_service
-  service "munge" do
-    supports restart: true
-    action :restart
-    retries 5
-    retry_delay 10
-  end
-end
-
 def setup_munge_head_node
   # Generate munge key or get it's value from secrets manager
   munge_key_manager 'manage_munge_key' do
@@ -81,9 +72,6 @@ def setup_munge_head_node
       node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn)
     }
   end
-
-  enable_munge_service
-  share_munge_head_node
 end
 
 def update_munge_head_node
@@ -92,29 +80,6 @@ def update_munge_head_node
     action :update_munge_key
     only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
   end
-
-  restart_munge_service
-  share_munge_head_node
-end
-
-def share_munge_key_to_dir(shared_dir)
-  bash 'share_munge_key' do
-    user 'root'
-    group 'root'
-    code <<-SHARE_MUNGE_KEY
-      set -e
-      mkdir -p #{shared_dir}/.munge
-      # Copy key to shared dir
-      cp /etc/munge/munge.key #{shared_dir}/.munge/.munge.key
-      chmod 0700 #{shared_dir}/.munge
-      chmod 0600 #{shared_dir}/.munge/.munge.key
-    SHARE_MUNGE_KEY
-  end
-end
-
-def share_munge_head_node
-  share_munge_key_to_dir(node['cluster']['shared_dir'])
-  share_munge_key_to_dir(node['cluster']['shared_dir_login'])
 end
 
 def setup_munge_key(shared_dir)
