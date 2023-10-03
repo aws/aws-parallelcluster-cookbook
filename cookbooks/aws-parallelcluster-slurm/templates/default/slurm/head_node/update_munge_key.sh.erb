@@ -17,9 +17,12 @@ SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
 SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
 CHECK_LOGIN_NODES_SCRIPT_PATH="<%= node['cluster']['scripts_dir'] %>/slurm/check_login_nodes_stopped.sh"
 
-# Check if login nodes are running
-if ! $CHECK_LOGIN_NODES_SCRIPT_PATH; then
-    exit 1
+# Check if the script exists
+if [ -f "$CHECK_LOGIN_NODES_SCRIPT_PATH" ]; then
+    # Check if login nodes are running
+    if ! $CHECK_LOGIN_NODES_SCRIPT_PATH; then
+        exit 1
+    fi
 fi
 
 # Check compute fleet status
