@@ -1,6 +1,10 @@
 # pylint: disable=C0103
 # pylint: disable=W0719
 # This file should name manage_volume.py by convention
+
+# FIXME: Fix Code Duplication
+# pylint: disable=R0801
+
 import argparse
 import configparser
 import os
