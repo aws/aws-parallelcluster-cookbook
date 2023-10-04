@@ -15,10 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-jwt_version = '1.12.0'
+jwt_version = '1.15.3'
 jwt_url = "https://github.com/benmcollins/libjwt/archive/refs/tags/v#{jwt_version}.tar.gz"
 jwt_tarball = "#{node['cluster']['sources_dir']}/libjwt-#{jwt_version}.tar.gz"
-jwt_sha256 = 'eaf5d8b31d867c02dde767efa2cf494840885a415a3c9a62680bf870a4511bee'
+jwt_sha256 = 'cb2fd95123689e7d209a3a8c060e02f68341c9a5ded524c0cd881a8cd20d711f'
 
 remote_file jwt_tarball do
   source jwt_url
@@ -37,7 +37,7 @@ bash 'libjwt' do
   cwd Chef::Config[:file_cache_path]
   code <<-LIBJWT
     set -e
-    tar xf #{jwt_tarball}
+    tar xf #{jwt_tarball} --no-same-owner
     cd libjwt-#{jwt_version}
     autoreconf --force --install
     ./configure --prefix=/opt/libjwt
