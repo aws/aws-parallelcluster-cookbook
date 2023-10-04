@@ -62,7 +62,8 @@ disable=raw-checker-failed,
         unused-import, # handled by flake8
         no-else-return, # A complete if else block can improve readability even with returns in the body
         wrong-import-order,
-        protected-access
+        protected-access,
+        fixme
 
 
 # Enable the message, report, category or checker with the given id(s). You can
@@ -380,4 +381,3 @@ min-public-methods=2
 # Exceptions that will emit a warning when being caught. Defaults to
 # "Exception".
 overgeneral-exceptions=Exception
-
