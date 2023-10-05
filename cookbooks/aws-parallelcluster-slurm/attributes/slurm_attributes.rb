@@ -3,6 +3,7 @@ default['cluster']['slurm']['fleet_config_path'] = "#{node['cluster']['slurm_plu
 
 # Slurm attributes shared between install_slurm and configure_slurm_accounting
 default['cluster']['slurm']['commit'] = ''
+default['cluster']['slurm']['branch'] = ''
 default['cluster']['slurm']['sha256'] = '4fee743a34514d8fe487080048256f5ee032374ed5f42d0eae342110dcd59edf'
 default['cluster']['slurm']['install_dir'] = '/opt/slurm'
 
