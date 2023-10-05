@@ -16,9 +16,9 @@
 # limitations under the License.
 
 # PMIx software
-pmix_version = '3.2.3'
+pmix_version = '4.2.6'
 pmix_url = "https://github.com/openpmix/openpmix/releases/download/v#{pmix_version}/pmix-#{pmix_version}.tar.gz"
-pmix_sha256 = '1325a1355d0794196bb47665053fdbc588f9183aa5385f3581b668427316306e'
+pmix_sha256 = '2085615d1b8d72d944b4580cfd0ec958ce9050f9c7585081351ddaf1d63fe201'
 pmix_tarball = "#{node['cluster']['sources_dir']}/pmix-#{pmix_version}.tar.gz"
 
 remote_file pmix_tarball do
@@ -36,7 +36,7 @@ bash 'Install PMIx' do
   cwd Chef::Config[:file_cache_path]
   code <<-PMIX
     set -e
-    tar xf #{pmix_tarball}
+    tar xf #{pmix_tarball} --no-same-owner
     cd pmix-#{pmix_version}
     ./autogen.pl
     ./configure --prefix=/opt/pmix

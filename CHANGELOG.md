@@ -18,6 +18,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 3.7.1
 ------
+
 **CHANGES**
 - Upgrade Slurm to 23.02.5 (from 23.02.4).
   - Upgrade Pmix to 4.2.6 (from 3.2.3).
