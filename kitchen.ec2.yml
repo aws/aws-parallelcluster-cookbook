@@ -1,5 +1,5 @@
 <%
-  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.7.1'
+  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.7.2'
   pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
 %>
 ---
