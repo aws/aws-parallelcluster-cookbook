@@ -21,14 +21,19 @@ slurm_install_dir = node['cluster']['slurm']['install_dir']
 
 slurm_version = node['cluster']['slurm']['version']
 slurm_commit = node['cluster']['slurm']['commit']
-slurm_tar_name = if slurm_commit.empty?
-                   "slurm-#{slurm_version}"
-                 else
+slurm_branch = node['cluster']['slurm']['branch']
+slurm_tar_name = if !slurm_commit.empty?
                    "#{slurm_commit}"
+                 elsif !slurm_branch.empty?
+                   "#{slurm_branch}"
+                 else
+                   "slurm-#{slurm_version}"
                  end
 slurm_tarball = "#{node['cluster']['sources_dir']}/#{slurm_tar_name}.tar.gz"
 slurm_url = "https://github.com/SchedMD/slurm/archive/#{slurm_tar_name}.tar.gz"
-slurm_sha256 = node['cluster']['slurm']['sha256']
+slurm_sha256 = if slurm_branch.empty?
+                 node['cluster']['slurm']['sha256']
+               end
 
 include_recipe 'aws-parallelcluster-slurm::slurm_users'
 
