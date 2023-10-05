@@ -26,7 +26,8 @@ else
   raise "internal_shared_storage_type must be ebs or efs"
 end
 
-include_recipe "aws-parallelcluster-environment::mount_home" if %w(ComputeFleet LoginNode).include? node['cluster']['node_type']
+# Mount the home directory to all nodes if it is shared, otherwise mount the NFS share to compute and login nodes
+include_recipe "aws-parallelcluster-environment::mount_home"
 
 include_recipe "aws-parallelcluster-environment::network_interfaces"
 include_recipe 'aws-parallelcluster-environment::imds'
