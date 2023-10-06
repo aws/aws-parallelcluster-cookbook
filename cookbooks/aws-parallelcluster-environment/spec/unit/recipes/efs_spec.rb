@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-environment::fs_mount' do
+describe 'aws-parallelcluster-environment::efs' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
@@ -13,11 +13,8 @@ describe 'aws-parallelcluster-environment::fs_mount' do
       end
       cached(:node) { chef_run.node }
 
-      describe 'call the efs for mounting' do
+      describe 'call efs for mounting' do
         it { is_expected.to mount_efs('mount efs') }
-      end
-      describe 'call the lustre for mounting' do
-        it { is_expected.to mount_lustre("mount fsx") }
       end
     end
   end

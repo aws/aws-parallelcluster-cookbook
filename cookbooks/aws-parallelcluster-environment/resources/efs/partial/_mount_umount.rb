@@ -13,10 +13,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+# This is the local system directory at which we want to mount the EFS mount point
 property :shared_dir_array, Array, required: %i(mount unmount)
 property :efs_fs_id_array, Array, required: %i(mount unmount)
 property :efs_encryption_in_transit_array, Array, required: false
 property :efs_iam_authorization_array, Array, required: false
+# This is the mount point on the EFS itself, as opposed to the local system directory, defaults to "/"
+property :efs_mount_point_array, Array, required: false
+property :efs_unmount_forced_array, Array, required: false
 
 action :mount do
   return if on_docker?
@@ -24,6 +28,7 @@ action :mount do
   efs_fs_id_array = new_resource.efs_fs_id_array.dup
   efs_encryption_in_transit_array = new_resource.efs_encryption_in_transit_array.dup
   efs_iam_authorization_array = new_resource.efs_iam_authorization_array.dup
+  efs_mount_point_array = new_resource.efs_mount_point_array.dup
 
   efs_fs_id_array.each_with_index do |efs_fs_id, index|
     efs_shared_dir = efs_shared_dir_array[index]
@@ -41,6 +46,7 @@ action :mount do
         mount_options += ",iam"
       end
     end
+    mount_point = efs_mount_point_array.nil? ? "/" : efs_mount_point_array[index]
 
     # Create the EFS shared directory
     directory efs_shared_dir do
@@ -49,11 +55,11 @@ action :mount do
       mode '1777'
       recursive true
       action :create
-    end
+    end unless ::File.directory?(efs_shared_dir)
 
     # Mount EFS over NFS
     mount efs_shared_dir do
-      device "#{efs_fs_id}:/"
+      device "#{efs_fs_id}:#{mount_point}"
       fstype 'efs'
       options mount_options
       dump 0
@@ -64,8 +70,9 @@ action :mount do
       not_if "mount | grep ' #{efs_shared_dir} '"
     end
 
+    # Enable the mount dir
     mount efs_shared_dir do
-      device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:/"
+      device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:#{mount_point}"
       fstype 'efs'
       options mount_options
       dump 0
