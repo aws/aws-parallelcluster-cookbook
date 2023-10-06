@@ -13,12 +13,25 @@
 #
 
 include_recipe "aws-parallelcluster-environment::cfnconfig_mixed"
-include_recipe "aws-parallelcluster-environment::mount_shared"
 cloudwatch "Configure CloudWatch" do
   action :configure
 end
+
+case node['cluster']['internal_shared_storage_type']
+when 'efs'
+  include_recipe "aws-parallelcluster-environment::mount_internal_use_efs"
+when 'ebs'
+  include_recipe "aws-parallelcluster-environment::mount_internal_use_ebs"
+else
+  raise "internal_shared_storage_type must be ebs or efs"
+end
+
+include_recipe "aws-parallelcluster-environment::mount_home" if %w(ComputeFleet LoginNode).include? node['cluster']['node_type']
+
 include_recipe "aws-parallelcluster-environment::network_interfaces"
 include_recipe 'aws-parallelcluster-environment::imds'
+
+# login nodes keys and directory service require shared storage
 include_recipe "aws-parallelcluster-environment::login_nodes_keys"
 include_recipe "aws-parallelcluster-environment::directory_service"
 
