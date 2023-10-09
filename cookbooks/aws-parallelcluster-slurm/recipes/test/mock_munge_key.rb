@@ -6,6 +6,7 @@ munge_dirs.each do |munge_dir|
   end
 
   file "#{munge_dir}/.munge.key" do
+    mode '0600'
     content 'munge-key'
     owner node['cluster']['munge']['user']
     group node['cluster']['munge']['group']

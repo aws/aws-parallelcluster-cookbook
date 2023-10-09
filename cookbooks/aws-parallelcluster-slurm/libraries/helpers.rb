@@ -101,6 +101,10 @@ def setup_munge_key(shared_dir)
 end
 
 def setup_munge_compute_node
+  if kitchen_test?
+    # FIXME: Mock munge key in shared directory.
+    include_recipe 'aws-parallelcluster-slurm::mock_munge_key'
+  end
   setup_munge_key(node['cluster']['shared_dir'])
   enable_munge_service
 end
