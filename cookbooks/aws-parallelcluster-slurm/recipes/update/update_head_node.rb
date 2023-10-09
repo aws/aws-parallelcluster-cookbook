@@ -14,7 +14,6 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-# rubocop:disable Style/SingleArgumentDig
 
 execute 'stop clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd"
@@ -203,21 +202,8 @@ ruby_block "Update Slurm Accounting" do
 end unless on_docker?
 
 # Update check login nodes status script to update pool name
-template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_stopped.sh" do
-  source 'slurm/head_node/check_login_nodes_stopped.sh.erb'
-  owner 'root'
-  group 'root'
-  mode '0700'
-  variables(
-    cluster_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
-    login_nodes_pool_name: lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name) },
-    region: node['cluster']['region']
-  )
-  only_if do
-    node['cluster']['config'].dig(:LoginNodes) &&
-      ::File.exist?(node['cluster']['previous_cluster_config_path']) &&
-      is_login_nodes_pool_name_updated?
-  end
+if ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_login_nodes_pool_name_updated?
+  include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
 end
 
 file "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_stopped.sh" do
