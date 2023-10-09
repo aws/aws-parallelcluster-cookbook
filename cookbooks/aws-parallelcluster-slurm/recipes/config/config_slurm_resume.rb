@@ -51,6 +51,6 @@ template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.co
     head_node_hostname: on_docker? ? 'local_hostname' : node['ec2']['local_hostname'],
     clustermgtd_heartbeat_file_path: "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat",
     instance_id: on_docker? ? 'instance_id' : node['ec2']['instance_id'],
-    scaling_strategy: node['cluster']['config'].dig(:Scheduling, :ScalingStrategy)
+    scaling_strategy: lazy { node['cluster']['config'].dig(:Scheduling, :ScalingStrategy) }
   )
 end
