@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -11,12 +11,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# This recipe mounts the NFS exports from the head node on compute nodes and login nodes
+# when a customer has chosen to use ebs as the internal shared storage type
+
 return if on_docker?
 
 case node['cluster']['node_type']
 when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-environment::mount_home'
-
   # Mount /opt/parallelcluster/shared over NFS
   volume "mount #{node['cluster']['shared_dir_compute']}" do
     action :mount
@@ -29,8 +30,6 @@ when 'ComputeFleet'
   end
 
 when 'LoginNode'
-  include_recipe 'aws-parallelcluster-environment::mount_home'
-
   # Mount /opt/parallelcluster/shared_login_nodes over NFS
   volume "mount #{node['cluster']['shared_dir_login']}" do
     action :mount
