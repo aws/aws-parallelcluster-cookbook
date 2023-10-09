@@ -201,7 +201,9 @@ ruby_block "Update Slurm Accounting" do
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
 end unless on_docker?
 
-# Update check login nodes status script to update pool name
+# Cover the following two scenarios:
+# - a cluster without login nodes is updated to have login nodes;
+# - a cluster with login nodes is updated to use another pool name.
 if ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_login_nodes_pool_name_updated?
   include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
 end
