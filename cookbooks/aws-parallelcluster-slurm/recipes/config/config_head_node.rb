@@ -34,7 +34,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
     munge_user: node['cluster']['munge']['user'],
     munge_group: node['cluster']['munge']['group'],
     shared_directory_compute: node['cluster']['shared_dir'],
-    shared_directory_login: node['cluster']['shared_dir_login']
+    shared_directory_login: node['cluster']['shared_dir_login_nodes']
   )
 end
 

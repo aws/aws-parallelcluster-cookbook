@@ -47,9 +47,9 @@ def share_munge_key_to_dir(shared_dir)
   end
 end
 
-def share_munge_head_node
+def share_munge
   share_munge_key_to_dir(node['cluster']['shared_dir'])
-  share_munge_key_to_dir(node['cluster']['shared_dir_login'])
+  share_munge_key_to_dir(node['cluster']['shared_dir_login_nodes'])
 end
 
 def fetch_and_decode_munge_key
@@ -76,7 +76,7 @@ def generate_munge_key
   end
 
   restart_munge_service
-  share_munge_head_node
+  share_munge
 end
 
 action :setup_munge_key do
