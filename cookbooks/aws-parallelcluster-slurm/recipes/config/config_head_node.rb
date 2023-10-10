@@ -219,6 +219,8 @@ execute "check slurmctld status" do
   retry_delay 2
 end unless redhat_on_docker?
 
+include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
+
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'

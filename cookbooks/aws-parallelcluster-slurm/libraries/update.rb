@@ -11,6 +11,7 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+# rubocop:disable Style/SingleArgumentDig
 
 # Helpers functions used by update recipe steps.
 require 'chef/mixin/shell_out'
@@ -82,4 +83,15 @@ end
 # Verify if MungeKeySecretArn in MungeKeySettings section of cluster configuration has been updated
 def is_custom_munge_key_updated?
   config_parameter_changed?(%w(DevSettings MungeKeySettings MungeKeySecretArn))
+end
+
+def is_login_nodes_pool_name_updated?
+  config_parameter_changed?(['LoginNodes', 'Pools', 0, 'Name'])
+end
+
+def is_login_nodes_removed?
+  require 'yaml'
+  config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  previous_config.dig("LoginNodes") and !config.dig("LoginNodes")
 end
