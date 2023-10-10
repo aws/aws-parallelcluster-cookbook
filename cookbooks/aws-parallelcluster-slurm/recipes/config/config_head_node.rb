@@ -16,12 +16,7 @@
 # limitations under the License.
 
 # Copy pcluster config generator and templates
-remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
-  source 'head_node_slurm/slurm'
-  mode '0755'
-  action :create
-  recursive true
-end
+include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
 
 include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
 
@@ -49,8 +44,6 @@ nfs_export "#{node['cluster']['slurm']['install_dir']}" do
   options ['no_root_squash']
   only_if { node['cluster']['internal_shared_storage_type'] == 'ebs' }
 end unless on_docker?
-
-include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
 
 template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf" do
   source 'slurm/slurm.conf.erb'

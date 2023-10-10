@@ -52,14 +52,12 @@ def share_munge
   share_munge_key_to_dir(node['cluster']['shared_dir_login_nodes'])
 end
 
+# TODO: Consider renaming 'generate_munge_key' and 'fetch_and_decode_munge_key' to more descriptive names that better convey their functionalities.
 def fetch_and_decode_munge_key
-  script_path = "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh"
-
   declare_resource(:execute, 'fetch_and_decode_munge_key') do
     user 'root'
     group 'root'
-    cwd ::File.dirname(script_path)
-    command "./#{::File.basename(script_path)} -d"
+    command "/#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh -d"
   end
 end
 
@@ -75,6 +73,12 @@ def generate_munge_key
     GENERATE_KEY
   end
 
+  # This function randomly generates a new munge key.
+  # After generating the key, it is essential to restart the munge service so that it starts using the new key.
+  # Moreover, the new key has to be shared across relevant directories to ensure consistent authentication across the cluster.
+  # We're restarting the munge service and sharing the munge key here within the `generate_munge_key` method,
+  #  and not within the `fetch_and_decode_munge_key` method because the `update_munge_key.sh` script,
+  #  which is called by `fetch_and_decode_munge_key`, already includes these two operations.
   restart_munge_service
   share_munge
 end
