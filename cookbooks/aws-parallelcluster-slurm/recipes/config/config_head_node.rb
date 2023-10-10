@@ -23,6 +23,8 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
   recursive true
 end
 
+include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
+
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'
