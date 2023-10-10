@@ -72,6 +72,8 @@ platforms:
   - name: rocky8
     driver:
       image: <% if ENV['KITCHEN_ROCKY8_IMAGE'] %> <%= ENV['KITCHEN_ROCKY8_IMAGE'] %> <% else %> dokken/rockylinux-8 <% end %>
+      intermediate_instructions:
+        - RUN chmod +t /tmp
     attributes:
       cluster:
         base_os: rocky8
