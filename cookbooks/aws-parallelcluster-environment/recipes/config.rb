@@ -18,9 +18,9 @@ nfs "Configure NFS" do
   action :configure
 end
 include_recipe 'aws-parallelcluster-environment::ephemeral_drives'
-# update_fs_mapping generates the shared storages mapping file so must be executed before shared storages recipes
+# update_fs_mapping generates the shared storage mapping file, so it must be executed before shared storage recipes
 include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
-# Export home dir from the head node
+# Export the home dir from the head node when using ebs
 include_recipe 'aws-parallelcluster-environment::export_home'
 
 if node['cluster']['internal_shared_storage_type'] == 'ebs'
@@ -32,16 +32,5 @@ end
 
 include_recipe 'aws-parallelcluster-environment::ebs'
 include_recipe 'aws-parallelcluster-environment::raid'
-include_recipe "aws-parallelcluster-environment::efs"
-
-# Mount FSx directory with manage_fsx resource
-lustre "mount fsx" do
-  fsx_fs_id_array node['cluster']['fsx_fs_ids'].split(',')
-  fsx_fs_type_array node['cluster']['fsx_fs_types'].split(',')
-  fsx_shared_dir_array node['cluster']['fsx_shared_dirs'].split(',')
-  fsx_dns_name_array node['cluster']['fsx_dns_names'].split(',')
-  fsx_mount_name_array node['cluster']['fsx_mount_names'].split(',')
-  fsx_volume_junction_path_array node['cluster']['fsx_volume_junction_paths'].split(',')
-  action :mount
-  not_if { node['cluster']['fsx_fs_ids'].split(',').empty? }
-end
+include_recipe 'aws-parallelcluster-environment::efs'
+include_recipe 'aws-parallelcluster-environment::fsx'
