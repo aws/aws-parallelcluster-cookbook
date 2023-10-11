@@ -24,6 +24,11 @@ verifier:
   name: inspec
 
 lifecycle:
+  pre_create:
+  - local: |
+      echo "Kitchen Daemon"
+      echo "$(cat ${HOME}/.docker/daemon.json)"
+      docker system prune -f
   post_verify:
   - local: |
       echo "KITCHEN_SAVE_IMAGE=${KITCHEN_SAVE_IMAGE}"
