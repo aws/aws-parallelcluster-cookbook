@@ -35,8 +35,8 @@ _head_node_cluster_attributes: &_head_node_cluster_attributes
   ddb_table: <%= ENV['DDB_TABLE'] %>
   slurm_ddb_table: <%= ENV['DDB_TABLE'] %>
   config:
-    DevSettings:
-      MungeKeySettings:
+    Scheduling:
+      SlurmSettings:
         MungeKeySecretArn: null
 
 _compute_node_cluster_attributes: &_compute_node_cluster_attributes
