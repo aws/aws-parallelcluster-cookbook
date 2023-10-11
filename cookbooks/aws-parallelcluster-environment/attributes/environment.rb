@@ -60,3 +60,5 @@ default['cluster']['internal_shared_dirs'] = [node['cluster']['shared_dir'], nod
 default['cluster']['internal_initial_shared_dir'] = "#{node['cluster']['base_dir']}/init_shared"
 
 default['cluster']['head_node_private_ip'] = nil
+
+default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"

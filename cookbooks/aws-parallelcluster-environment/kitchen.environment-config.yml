@@ -684,3 +684,18 @@ suites:
         efs_shared_dirs: '/opt/parallelcluster/init_shared'
         efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
         ebs_shared_dirs: ''
+  - name: spack
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_spack/
+    attributes:
+      resource: spack:configure
+      cluster:
+        enable_efa: efa
+        node_type: HeadNode
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:spack:setup
