@@ -9,10 +9,11 @@ export KITCHEN_DRIVER=dokken
 
 # Export DOCKER_HOST variable when using Colima
 if [[ $(command -v colima) ]]; then
-  colima status || colima start
+  colima status || colima start --disk 40
   export DOCKER_HOST=unix://${HOME}/.colima/default/docker.sock
 fi
-
+echo "======="
+echo "$(cat ${HOME}/.docker/daemon.json)"
 echo "** KITCHEN_LOCAL_YAML: $KITCHEN_LOCAL_YAML"
 echo "** KITCHEN_YAML: $KITCHEN_YAML"
 echo "** KITCHEN_GLOBAL_YAML: $KITCHEN_GLOBAL_YAML"
