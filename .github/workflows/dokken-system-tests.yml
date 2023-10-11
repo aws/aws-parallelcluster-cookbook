@@ -49,6 +49,11 @@ jobs:
             !CHANGELOG.md
             !**/aws-parallelcluster-*/spec
             !**/aws-parallelcluster-*/test
+      - name: Get Docker Details
+        run: |
+          echo "In system.yml"
+          echo "$(cat ${HOME}/.docker/daemon.json)"
+          docker system prune -a --force
       - name: Install Chef
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/chef-install@main
