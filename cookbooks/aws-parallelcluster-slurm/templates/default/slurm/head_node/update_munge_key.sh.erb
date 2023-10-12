@@ -15,21 +15,37 @@ MUNGE_USER="<%= @munge_user %>"
 MUNGE_GROUP="<%= @munge_group %>"
 SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
 SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
-CHECK_LOGIN_NODES_SCRIPT_PATH="<%= node['cluster']['scripts_dir'] %>/slurm/check_login_nodes_stopped.sh"
 
-# Check if the script exists
-if [ -f "$CHECK_LOGIN_NODES_SCRIPT_PATH" ]; then
-    # Check if login nodes are running
-    if ! $CHECK_LOGIN_NODES_SCRIPT_PATH; then
-        exit 1
-    fi
-fi
+DISABLE_RESOURCE_CHECK=false
 
-# Check compute fleet status
-compute_fleet_status=$(get-compute-fleet-status.sh)
-if ! echo "$compute_fleet_status" | grep -q '"status": "STOPPED"'; then
-    echo "Compute fleet is not stopped. Please stop it before updating the munge key."
-    exit 1
+while getopts "d" opt; do
+  case $opt in
+    d) DISABLE_RESOURCE_CHECK=true;;
+    *)
+      echo "Usage: $0 [-d]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if ! $DISABLE_RESOURCE_CHECK; then
+  # Check compute fleet status
+  compute_fleet_status=$(get-compute-fleet-status.sh)
+  if ! echo "$compute_fleet_status" | grep -q '"status": "STOPPED"'; then
+      echo "Compute fleet is not stopped. Please stop it before updating the munge key."
+      exit 1
+  fi
+  
+  # Check LoginNodes status
+  CHECK_LOGIN_NODES_SCRIPT_PATH="<%= node['cluster']['scripts_dir'] %>/slurm/check_login_nodes_stopped.sh"
+
+  # Check if the script exists
+  if [ -f "$CHECK_LOGIN_NODES_SCRIPT_PATH" ]; then
+      # Check if login nodes are running
+      if ! $CHECK_LOGIN_NODES_SCRIPT_PATH; then
+          exit 1
+      fi
+  fi
 fi
 
 # If SECRET_ARN is provided, fetch the munge key from Secrets Manager
