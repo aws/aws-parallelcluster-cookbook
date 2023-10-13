@@ -69,14 +69,14 @@ def setup_munge_head_node
   # Generate munge key or get it's value from secrets manager
   munge_key_manager 'manage_munge_key' do
     munge_key_secret_arn lazy {
-      node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn)
+      node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn)
     }
   end
 end
 
 def update_munge_head_node
   munge_key_manager 'update_munge_key' do
-    munge_key_secret_arn lazy { node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn) }
+    munge_key_secret_arn lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) }
     action :update_munge_key
     only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
   end

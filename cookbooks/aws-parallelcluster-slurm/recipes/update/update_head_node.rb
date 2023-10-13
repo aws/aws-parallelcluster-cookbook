@@ -220,7 +220,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   group 'root'
   mode '0700'
   variables(
-    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn) },
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) },
     region: node['cluster']['region'],
     munge_user: node['cluster']['munge']['user'],
     munge_group: node['cluster']['munge']['group'],
