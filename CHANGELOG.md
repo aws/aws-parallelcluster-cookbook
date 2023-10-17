@@ -14,6 +14,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Allow for mounting `home` as an EFS or FSx external shared storage via the `SharedStorage` section of the config file.
 
 **CHANGES**
+- Upgrade `aws-cfn-bootstrap` to version 2.0-28.
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.
