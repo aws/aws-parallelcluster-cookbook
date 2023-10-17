@@ -32,6 +32,15 @@ def restart_munge_service
   end
 end
 
+def enable_munge_service
+  declare_resource(:service, "munge") do
+    supports restart: true
+    action :enable
+    retries 5
+    retry_delay 10
+  end
+end
+
 def share_munge_key_to_dir(shared_dir)
   declare_resource(:bash, 'share_munge_key') do
     user 'root'
@@ -80,6 +89,7 @@ def generate_munge_key
   #  and not within the `fetch_and_decode_munge_key` method because the `update_munge_key.sh` script,
   #  which is called by `fetch_and_decode_munge_key`, already includes these two operations.
   restart_munge_service
+  enable_munge_service
   share_munge
 end
 

@@ -1,5 +1,5 @@
 # Python Version
-default['cluster']['python-version'] = '3.9.16'
+default['cluster']['python-version'] = '3.9.17'
 
 # ParallelCluster versions
 default['cluster']['parallelcluster-version'] = '3.8.0'
