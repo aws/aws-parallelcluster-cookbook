@@ -33,7 +33,7 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-cfnbootstrap_version = '2.0-24'
+cfnbootstrap_version = '2.0-28'
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']
