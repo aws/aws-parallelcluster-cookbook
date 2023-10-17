@@ -18,9 +18,19 @@ nfs "Configure NFS" do
   action :configure
 end
 include_recipe 'aws-parallelcluster-environment::ephemeral_drives'
-# fs_update generates the shared storages mapping file so must be executed before shared storages recipes
-include_recipe 'aws-parallelcluster-environment::fs_update'
-include_recipe 'aws-parallelcluster-environment::shared_storages'
+# update_fs_mapping generates the shared storage mapping file, so it must be executed before shared storage recipes
+include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
+# Export the home dir from the head node when using ebs
+include_recipe 'aws-parallelcluster-environment::export_home'
+
+if node['cluster']['internal_shared_storage_type'] == 'ebs'
+  # Export internal use dirs from the head node
+  include_recipe 'aws-parallelcluster-environment::export_internal_use_ebs'
+  # Mount intel on compute and login nodes
+  include_recipe 'aws-parallelcluster-environment::mount_intel_dir'
+end
+
 include_recipe 'aws-parallelcluster-environment::ebs'
 include_recipe 'aws-parallelcluster-environment::raid'
-include_recipe "aws-parallelcluster-environment::fs_mount"
+include_recipe 'aws-parallelcluster-environment::efs'
+include_recipe 'aws-parallelcluster-environment::fsx'

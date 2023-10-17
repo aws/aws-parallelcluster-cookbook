@@ -14,7 +14,7 @@
 
 # Parse and get RAID shared directory info and turn into an array
 raid_shared_dir = node['cluster']['raid_shared_dir']
-return if raid_shared_dir.empty?
+return if raid_shared_dir.empty? || raid_shared_dir == '/home' || raid_shared_dir == 'home'
 
 case node['cluster']['node_type']
 when 'HeadNode'

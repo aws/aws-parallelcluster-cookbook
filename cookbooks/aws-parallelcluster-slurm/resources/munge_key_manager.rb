@@ -23,35 +23,50 @@ property :munge_key_secret_arn, String
 
 default_action :setup_munge_key
 
-def fetch_and_decode_munge_key(munge_key_secret_arn)
-  declare_resource(:bash, 'fetch_and_decode_munge_key') do
+def restart_munge_service
+  declare_resource(:service, "munge") do
+    supports restart: true
+    action :restart
+    retries 5
+    retry_delay 10
+  end
+end
+
+def enable_munge_service
+  declare_resource(:service, "munge") do
+    supports restart: true
+    action :enable
+    retries 5
+    retry_delay 10
+  end
+end
+
+def share_munge_key_to_dir(shared_dir)
+  declare_resource(:bash, 'share_munge_key') do
     user 'root'
     group 'root'
-    cwd '/tmp'
-    code <<-FETCH_AND_DECODE
+    code <<-SHARE_MUNGE_KEY
       set -e
-      # Get encoded munge key from secrets manager
-      encoded_key=$(aws secretsmanager get-secret-value --secret-id #{munge_key_secret_arn} --query 'SecretString' --output text --region #{node['cluster']['region']})
-      # If encoded_key doesn't have a value, error and exit
-      if [ -z "$encoded_key" ]; then
-        echo "Error fetching munge key from Secrets Manager or the key is empty"
-        exit 1
-      fi
+      mkdir -p #{shared_dir}/.munge
+      # Copy key to shared dir
+      cp /etc/munge/munge.key #{shared_dir}/.munge/.munge.key
+      chmod 0700 #{shared_dir}/.munge
+      chmod 0600 #{shared_dir}/.munge/.munge.key
+    SHARE_MUNGE_KEY
+  end
+end
 
-      # Decode munge key and write to /etc/munge/munge.key
-      decoded_key=$(echo $encoded_key | base64 -d)
-      if [ $? -ne 0 ]; then
-        echo "Error decoding the munge key with base64"
-        exit 1
-      fi
+def share_munge
+  share_munge_key_to_dir(node['cluster']['shared_dir'])
+  share_munge_key_to_dir(node['cluster']['shared_dir_login_nodes'])
+end
 
-      echo "$decoded_key" > /etc/munge/munge.key
-
-      # Set ownership on the key
-      chown #{node['cluster']['munge']['user']}:#{node['cluster']['munge']['group']} /etc/munge/munge.key
-      # Enforce correct permission on the key
-      chmod 0600 /etc/munge/munge.key
-    FETCH_AND_DECODE
+# TODO: Consider renaming 'generate_munge_key' and 'fetch_and_decode_munge_key' to more descriptive names that better convey their functionalities.
+def fetch_and_decode_munge_key
+  declare_resource(:execute, 'fetch_and_decode_munge_key') do
+    user 'root'
+    group 'root'
+    command "/#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh -d"
   end
 end
 
@@ -66,12 +81,22 @@ def generate_munge_key
       chmod 0600 /etc/munge/munge.key
     GENERATE_KEY
   end
+
+  # This function randomly generates a new munge key.
+  # After generating the key, it is essential to restart the munge service so that it starts using the new key.
+  # Moreover, the new key has to be shared across relevant directories to ensure consistent authentication across the cluster.
+  # We're restarting the munge service and sharing the munge key here within the `generate_munge_key` method,
+  #  and not within the `fetch_and_decode_munge_key` method because the `update_munge_key.sh` script,
+  #  which is called by `fetch_and_decode_munge_key`, already includes these two operations.
+  restart_munge_service
+  enable_munge_service
+  share_munge
 end
 
 action :setup_munge_key do
   if new_resource.munge_key_secret_arn
     # This block will fetch the munge key from Secrets Manager
-    fetch_and_decode_munge_key(new_resource.munge_key_secret_arn)
+    fetch_and_decode_munge_key
   else
     # This block will randomly generate a munge key
     generate_munge_key
@@ -81,7 +106,7 @@ end
 action :update_munge_key do
   if new_resource.munge_key_secret_arn
     # This block will fetch the munge key from Secrets Manager and replace the previous munge key
-    fetch_and_decode_munge_key(new_resource.munge_key_secret_arn)
+    fetch_and_decode_munge_key
   else
     # This block will randomly generate a munge key and replace the previous munge key
     generate_munge_key

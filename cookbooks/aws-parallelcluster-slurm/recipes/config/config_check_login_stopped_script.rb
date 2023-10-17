@@ -10,15 +10,18 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
-
-# Mount /opt/slurm over NFS
-# Computemgtd config is under /opt/slurm/etc/pcluster; all compute nodes share a config
-mount "#{node['cluster']['slurm']['install_dir']}" do
-  device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['slurm']['install_dir']}" })
-  fstype "nfs"
-  options node['cluster']['nfs']['hard_mount_options']
-  action %i(mount enable)
-  retries 10
-  retry_delay 6
-  only_if { node['cluster']['internal_shared_storage_type'] == 'ebs' }
+# rubocop:disable Style/SingleArgumentDig
+template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_stopped.sh" do
+  source 'slurm/head_node/check_login_nodes_stopped.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    cluster_name: node['cluster']['cluster_name'] || node['cluster']['stack_name'],
+    login_nodes_pool_name: lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name) },
+    region: node['cluster']['region']
+  )
+  only_if do
+    node['cluster']['config'].dig(:LoginNodes)
+  end
 end

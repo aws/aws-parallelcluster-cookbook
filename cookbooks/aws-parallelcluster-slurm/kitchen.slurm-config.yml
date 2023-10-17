@@ -176,6 +176,7 @@ suites:
       cluster:
         node_type: ComputeFleet
         head_node_private_ip: '127.0.0.1'
+        internal_shared_storage_type: ebs
   - name: config_head_node_munge
     run_list:
     - recipe[aws-parallelcluster-tests::setup]
@@ -188,8 +189,8 @@ suites:
         node_type: HeadNode
         scheduler: 'slurm'
         config:
-          DevSettings:
-            MungeKeySettings:
+          Scheduling:
+            SlurmSettings:
               MungeKeySecretArn: null
   - name: config_slurm_accounting
     run_list:
@@ -214,3 +215,23 @@ suites:
                 Uri: test-slurm-database.cluster-abcdefghijkl.us-east-1.rds.amazonaws.com:3306
                 UserName: clusteradmin
                 PasswordSecretArn: arn:aws:secretsmanager:us-east-1:123456789012:secret:TestSecret:abcdefghijkl-ABCDEF
+  - name: config_slurm_resume
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::config_slurm_resume]
+    verifier:
+      controls:
+        - config_slurm_resume
+    attributes:
+      cluster:
+        config:
+          Scheduling:
+            ScalingStrategy: test-strategy
+      dependencies:
+        - resource:nfs # This is required only for mock_slurm_dir that makes a fake export
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-slurm::slurm_users
+        - recipe:aws-parallelcluster-slurm::config_head_node_directories
+        - recipe:aws-parallelcluster-slurm::mock_slurm_dir
+

@@ -201,19 +201,31 @@ ruby_block "Update Slurm Accounting" do
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
 end unless on_docker?
 
-# Update rotation script to update secret arn
+# Cover the following two scenarios:
+# - a cluster without login nodes is updated to have login nodes;
+# - a cluster with login nodes is updated to use another pool name.
+if ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_login_nodes_pool_name_updated?
+  include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
+end
+
+file "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_stopped.sh" do
+  action :delete
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_login_nodes_removed? }
+end
+
+# Update munge key rotation script to update secret arn
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'
   group 'root'
   mode '0700'
   variables(
-    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn) },
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) },
     region: node['cluster']['region'],
     munge_user: node['cluster']['munge']['user'],
     munge_group: node['cluster']['munge']['group'],
     shared_directory_compute: node['cluster']['shared_dir'],
-    shared_directory_login: node['cluster']['shared_dir_login']
+    shared_directory_login: node['cluster']['shared_dir_login_nodes']
   )
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
 end

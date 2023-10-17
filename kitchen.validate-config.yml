@@ -21,12 +21,12 @@ _common_cluster_attributes: &_common_cluster_attributes
   cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
   instance_types_data_s3_key: <%= ENV['INSTANCE_TYPES_DATA_S3_KEY'] %>
   os: <%= ENV['OS'] %>
-  custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
   dcv_enabled: 'head_node'
   dcv_port: '8443'
   enable_efa: 'efa'
   nvidia:
     enabled: <%= ENV['NVIDIA_ENABLED'] %>
+  internal_shared_storage_type: ebs
 
 _head_node_cluster_attributes: &_head_node_cluster_attributes
   << : *_common_cluster_attributes
@@ -34,8 +34,8 @@ _head_node_cluster_attributes: &_head_node_cluster_attributes
   ddb_table: <%= ENV['DDB_TABLE'] %>
   slurm_ddb_table: <%= ENV['DDB_TABLE'] %>
   config:
-    DevSettings:
-      MungeKeySettings:
+    Scheduling:
+      SlurmSettings:
         MungeKeySecretArn: null
 
 _compute_node_cluster_attributes: &_compute_node_cluster_attributes

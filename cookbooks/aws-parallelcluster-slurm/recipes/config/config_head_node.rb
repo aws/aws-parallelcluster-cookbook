@@ -15,6 +15,26 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Copy pcluster config generator and templates
+include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
+
+include_recipe 'aws-parallelcluster-slurm::config_check_login_stopped_script'
+
+template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
+  source 'slurm/head_node/update_munge_key.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) },
+    region: node['cluster']['region'],
+    munge_user: node['cluster']['munge']['user'],
+    munge_group: node['cluster']['munge']['group'],
+    shared_directory_compute: node['cluster']['shared_dir'],
+    shared_directory_login: node['cluster']['shared_dir_login_nodes']
+  )
+end
+
 include_recipe 'aws-parallelcluster-slurm::config_munge_key'
 
 # Export /opt/slurm
@@ -22,28 +42,8 @@ nfs_export "#{node['cluster']['slurm']['install_dir']}" do
   network get_vpc_cidr_list
   writeable true
   options ['no_root_squash']
+  only_if { node['cluster']['internal_shared_storage_type'] == 'ebs' }
 end unless on_docker?
-
-# Ensure config directory is in place
-directory "#{node['cluster']['slurm']['install_dir']}" do
-  user 'root'
-  group 'root'
-  mode '0755'
-end if redhat_on_docker? # we skip slurm setup on Docker UBI because we don't install python
-
-# Ensure config directory is in place
-directory "#{node['cluster']['slurm']['install_dir']}/etc" do
-  user 'root'
-  group 'root'
-  mode '0755'
-end
-
-# Create directory configured as StateSaveLocation
-directory '/var/spool/slurm.state' do
-  user node['cluster']['slurm']['user']
-  group node['cluster']['slurm']['group']
-  mode '0700'
-end
 
 template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf" do
   source 'slurm/slurm.conf.erb'
@@ -57,14 +57,6 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
   owner 'root'
   group 'root'
   mode '0644'
-end
-
-# Copy pcluster config generator and templates
-remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
-  source 'head_node_slurm/slurm'
-  mode '0755'
-  action :create
-  recursive true
 end
 
 unless on_docker?
@@ -159,44 +151,7 @@ template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_fleet_sta
   mode '0644'
 end
 
-template "#{node['cluster']['scripts_dir']}/slurm/slurm_resume" do
-  source 'slurm/resume_program.erb'
-  owner node['cluster']['slurm']['user']
-  group node['cluster']['slurm']['group']
-  mode '0744'
-end
-
-file "/var/log/parallelcluster/slurm_resume.log" do
-  owner node['cluster']['cluster_admin_user']
-  group node['cluster']['cluster_admin_group']
-  mode '0644'
-end
-
-file "/var/log/parallelcluster/slurm_resume.events" do
-  owner node['cluster']['cluster_admin_user']
-  group node['cluster']['cluster_admin_group']
-  mode '0644'
-end
-
-template "#{node['cluster']['slurm_plugin_dir']}/parallelcluster_slurm_resume.conf" do
-  source 'slurm/parallelcluster_slurm_resume.conf.erb'
-  owner node['cluster']['cluster_admin_user']
-  group node['cluster']['cluster_admin_group']
-  mode '0644'
-  variables(
-    cluster_name: node['cluster']['stack_name'],
-    region: node['cluster']['region'],
-    proxy: node['cluster']['proxy'],
-    dynamodb_table: node['cluster']['slurm_ddb_table'],
-    hosted_zone: node['cluster']['hosted_zone'],
-    dns_domain: node['cluster']['dns_domain'],
-    use_private_hostname: node['cluster']['use_private_hostname'],
-    head_node_private_ip: on_docker? ? 'local_ipv4' : node['ec2']['local_ipv4'],
-    head_node_hostname: on_docker? ? 'local_hostname' : node['ec2']['local_hostname'],
-    clustermgtd_heartbeat_file_path: "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/clustermgtd_heartbeat",
-    instance_id: on_docker? ? 'instance_id' : node['ec2']['instance_id']
-  )
-end
+include_recipe 'aws-parallelcluster-slurm::config_slurm_resume'
 
 template "#{node['cluster']['scripts_dir']}/slurm/slurm_suspend" do
   source 'slurm/suspend_program.erb'
@@ -281,18 +236,3 @@ execute "check slurmctld status" do
   retries 5
   retry_delay 2
 end unless redhat_on_docker?
-
-template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
-  source 'slurm/head_node/update_munge_key.sh.erb'
-  owner 'root'
-  group 'root'
-  mode '0700'
-  variables(
-    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:DevSettings, :MungeKeySettings, :MungeKeySecretArn) },
-    region: node['cluster']['region'],
-    munge_user: node['cluster']['munge']['user'],
-    munge_group: node['cluster']['munge']['group'],
-    shared_directory_compute: node['cluster']['shared_dir'],
-    shared_directory_login: node['cluster']['shared_dir_login']
-  )
-end

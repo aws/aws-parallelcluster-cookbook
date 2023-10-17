@@ -12,17 +12,19 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-fetch_config 'Fetch and load cluster configs' do
-  update true
-end
+return if on_docker?
 
-# generate the updated shared storages mapping file
-include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
-
-include_recipe 'aws-parallelcluster-environment::directory_service'
-include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
-
-# Update node package - useful for development purposes only
-if is_custom_node?
-  include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
+if node['cluster']['node_type'] == 'HeadNode'
+  # For each, backup the data to a temp location
+  # This is necessary to preserve any data in these directories that was
+  # generated during the build of ParallelCluster AMIs after converting to
+  # shared storage
+  bash "Backup /home" do
+    user 'root'
+    group 'root'
+    code <<-EOH
+      mkdir -p /tmp/home
+      rsync -a /home/ /tmp/home
+    EOH
+  end
 end
