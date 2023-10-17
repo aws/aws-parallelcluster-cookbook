@@ -178,6 +178,7 @@ def test_is_session_valid(mocker):
     with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._is_session_valid("myuser", "wrongsession")
 
+
 def test_get_request_token(mocker):
     """Verify the first step of the authentication process, the retrieval of the Request Token."""
     # A nosec comment is appended to the following line in order to disable the B105 check.
