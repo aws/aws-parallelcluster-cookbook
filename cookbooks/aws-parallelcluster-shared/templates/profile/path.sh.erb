@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
-PATH_REQUIRED_DIRECTORIES=(<%= @path_required_directories.join(' ') %>)
+PATH_REQUIRED_DIRECTORIES="<%= @path_required_directories.join(' ') %>"
 
-for directory in "${PATH_REQUIRED_DIRECTORIES[@]}"; do
-    [[ ":$PATH:" == *":$directory:"* ]] || PATH="${PATH:+"$PATH:"}$directory"
+for directory in ${PATH_REQUIRED_DIRECTORIES}; do
+    [ ":$PATH:" = *":$directory:"* ] || PATH="${PATH:+"$PATH:"}$directory"
 done
 
 export PATH
