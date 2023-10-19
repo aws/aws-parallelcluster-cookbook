@@ -112,7 +112,7 @@ suites:
       - recipe[aws-parallelcluster-environment::cfn_bootstrap]
     verifier:
       controls:
-        - cfnbootstrap_virtualenv_created
+        - tag:install_cfnbootstrap_virtualenv_created
   - name: cfnconfig_mixed
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -130,4 +130,3 @@ suites:
     verifier:
       controls:
         - /patch_isolated_instance_script_created/
-
