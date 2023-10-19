@@ -9,12 +9,17 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'custom_parallelcluster_node_installed' do
-  title "custom aws-parallelcluster-node should have been installed in the node virtualenv"
+control 'custom_awsbatchcli_package_installed' do
+  title "custom aws-parallelcluster-awsbatch-cli should have been installed in the virtualenv"
   only_if { !os_properties.redhat_on_docker? }
 
-  describe command("#{node['cluster']['node_virtualenv_path']}/bin/pip freeze | grep aws-parallelcluster-node") do
+  describe command("#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip freeze | grep aws-parallelcluster-awsbatch-cli") do
     its('exit_status') { should eq(0) }
-    its('stdout') { should match "aws-parallelcluster-node" }
+    its('stdout') { should match "aws-parallelcluster-awsbatch-cli" }
+  end
+
+  describe command("#{node['cluster']['awsbatch_virtualenv_path']}/bin/awsbsub --help") do
+    its('exit_status') { should eq(0) }
+    its('stdout') { should match "usage: awsbsub" }
   end
 end
