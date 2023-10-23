@@ -16,6 +16,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade `aws-cfn-bootstrap` to version 2.0-28.
 - Upgrade Python to 3.9.17.
+- Use OpenRM as NVIDIA kernel module for Linux instead of NVIDIA closed source module.
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.

@@ -16,10 +16,22 @@ control 'tag:install_expected_versions_of_nvidia_driver_installed' do
   end
 
   expected_nvidia_driver_version = node['cluster']['nvidia']['driver_version']
+  expected_nvidia_kernel_license = 'Dual MIT/GPL'
+  expected_nvidia_kernel_module = "NVRM version: NVIDIA UNIX Open Kernel Module"
 
   describe "nvidia driver version is expected to be #{expected_nvidia_driver_version}" do
     subject { command('modinfo -F version nvidia').stdout.strip }
     it { should eq expected_nvidia_driver_version }
+  end
+
+  describe "nvidia kernel module is expected to be licensed as #{expected_nvidia_kernel_license}" do
+    subject { command('modinfo -F license nvidia').stdout.strip }
+    it { should eq expected_nvidia_kernel_license }
+  end
+
+  describe "nvidia kernel module is expected to be #{expected_nvidia_kernel_module}" do
+    subject { command('cat /proc/driver/nvidia/version').stdout.strip }
+    it { should include expected_nvidia_kernel_module }
   end
 end
 
