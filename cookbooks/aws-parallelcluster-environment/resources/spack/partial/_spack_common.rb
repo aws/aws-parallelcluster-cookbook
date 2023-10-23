@@ -30,10 +30,37 @@ action :install_spack do
     action :install
   end
 
-  git new_resource.spack_root do
-    repository 'https://github.com/spack/spack'
+  # Get Spack tarball
+  spack_version = node['cluster']['spack']['version']
+  spack_tar_name = "spack-#{spack_version}"
+  spack_tarball = "#{node['cluster']['sources_dir']}/#{spack_tar_name}.tar.gz"
+  spack_url = "https://github.com/spack/spack/archive/refs/tags/v#{spack_version}.tar.gz"
+  spack_sha256 = node['cluster']['spack']['sha256']
+  remote_file spack_tarball do
+    source spack_url
     user new_resource.spack_user
     group new_resource.spack_user
+    mode '0644'
+    retries 3
+    retry_delay 5
+    checksum spack_sha256
+    action :create_if_missing
+  end
+
+  directory new_resource.spack_root do
+    user new_resource.spack_user
+    group new_resource.spack_user
+    mode '0755'
+    recursive true
+  end
+
+  bash 'Extract spack' do
+    user new_resource.spack_user
+    group new_resource.spack_user
+    code <<-SCRIPT
+    set -e
+    tar -xf #{spack_tarball} --directory #{new_resource.spack_root} --strip-components 1
+    SCRIPT
   end
 
   template '/etc/profile.d/spack.sh' do
