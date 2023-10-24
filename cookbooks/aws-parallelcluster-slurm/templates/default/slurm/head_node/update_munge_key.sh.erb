@@ -59,6 +59,7 @@ if [ -n "${SECRET_ARN}" ]; then
   fi
 
   # Decode munge key and write to munge.key file
+  decoded_key=$(printf "%s" "${encoded_key}" | base64 -d)
   if [ $? -ne 0 ]; then
     echo "Error decoding the munge key with base64"
     exit 1
