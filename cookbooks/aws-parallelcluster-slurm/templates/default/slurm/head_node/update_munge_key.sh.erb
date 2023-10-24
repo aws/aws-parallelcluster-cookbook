@@ -66,13 +66,13 @@ if [ -n "${SECRET_ARN}" ]; then
   fi
 
   # Check munge key size
-  key_size=$(printf "%s" "${decoded_key}" | wc -c)
+  key_size=$(printf "%s" "${encoded_key}" | base64 -d | wc -c)
   if [ $key_size -lt 32 ] || [ $key_size -gt 1024 ]; then
     echo "Fetched munge key size is out of valid range [256-8192 bits]."
     exit 1
   fi
 
-  printf "%s" "${decoded_key}" > ${MUNGE_KEY_FILE}
+  printf "%s" "${encoded_key}" | base64 -d > ${MUNGE_KEY_FILE}
 
   # Set ownership on the key
   chown ${MUNGE_USER}:${MUNGE_GROUP} ${MUNGE_KEY_FILE}
