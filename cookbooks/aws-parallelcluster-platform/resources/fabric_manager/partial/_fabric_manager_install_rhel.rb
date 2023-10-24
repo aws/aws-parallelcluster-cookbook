@@ -14,9 +14,14 @@
 
 action :install_package do
   package 'yum-plugin-versionlock'
-
-  package fabric_manager_package do
-    version fabric_manager_version
-    action %i(install lock)
+  bash "Install #{fabric_manager_package}" do
+    user 'root'
+    code <<-FABRIC_MANAGER_INSTALL
+    set -e
+    yum install -y #{fabric_manager_package}-#{fabric_manager_version}
+    yum versionlock #{fabric_manager_package}
+    FABRIC_MANAGER_INSTALL
+    retries 3
+    retry_delay 5
   end
 end
