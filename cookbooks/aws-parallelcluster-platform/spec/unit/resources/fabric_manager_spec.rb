@@ -203,9 +203,14 @@ describe 'fabric_manager:setup' do
           end
 
           it 'installs fabric manager' do
-            is_expected.to install_package(fabric_manager_package)
-              .with_version(fabric_manager_version)
-              .with_action(%i(install lock))
+            is_expected.to run_bash("Install nvidia-fabric-manager")
+              .with(user: 'root')
+              .with_retries(3)
+              .with_retry_delay(5)
+              .with(code: %(    set -e
+    yum install -y #{fabric_manager_package}-#{fabric_manager_version}
+    yum versionlock #{fabric_manager_package}
+))
           end
         end
       end
