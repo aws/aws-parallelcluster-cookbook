@@ -16,14 +16,14 @@ control 'tag:install_spack_correctly_installed' do
 
   describe directory(node['cluster']['spack']['root']) do
     it { should exist }
-    it { should be_owned_by (node['cluster']['spack']['user']).to_s }
-    it { should be_grouped_into (node['cluster']['spack']['user']).to_s }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
   end
 
   describe directory("#{node['cluster']['spack']['root']}/share/spack") do
     it { should exist }
-    it { should be_owned_by (node['cluster']['spack']['user']).to_s }
-    it { should be_grouped_into (node['cluster']['spack']['user']).to_s }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
   end
 
   describe file('/etc/profile.d/spack.sh') do
@@ -34,8 +34,8 @@ control 'tag:install_spack_correctly_installed' do
 
   describe file("#{node['cluster']['spack']['root']}/etc/spack/compilers.yaml") do
     it { should exist }
-    it { should be_owned_by (node['cluster']['spack']['user']).to_s }
-    it { should be_grouped_into (node['cluster']['spack']['user']).to_s }
+    it { should be_owned_by 'root' }
+    it { should be_grouped_into 'root' }
   end
 
   spack = "#{node['cluster']['spack']['root']}/bin/spack"
