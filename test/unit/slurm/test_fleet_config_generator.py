@@ -29,7 +29,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
         (
             {"Scheduling": {"SlurmQueues": [{"Name": "q1"}]}},
             CriticalError,
-            "Unable to find key 'CapacityType' in the configuration of queue: q1",
+            "Unable to find key 'ComputeResources' in the configuration of queue: q1",
         ),
         (
             {"Scheduling": {"SlurmQueues": [{"Name": "q1", "CapacityType": "ONDEMAND"}]}},
@@ -191,6 +191,37 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
             },
             CriticalError,
             "Unable to find key 'SubnetIds' in the configuration of queue: q1, compute resource: cr1",
+        ),
+        (
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {
+                                    "Name": "cr1",
+                                    "Instances": [{"InstanceType": "test"}],
+                                    "CapacityReservationTarget": {
+                                        "CapacityReservationResourceGroupArn": "arn",
+                                    },
+                                },
+                                {
+                                    "Name": "cr2",
+                                    "Instances": [{"InstanceType": "test"}],
+                                    "CapacityReservationTarget": {
+                                        "CapacityReservationId": "id",
+                                    },
+                                },
+                            ],
+                            "Networking": {"SubnetIds": ["123"]},
+                        }
+                    ]
+                }
+            },
+            None,
+            None,
         ),
     ],
 )
