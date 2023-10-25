@@ -17,6 +17,7 @@
 
 dns_domain "Install dns related packages"
 mysql_client 'Install mysql client'
+mysql_repo 'Configure mysql repository'
 include_recipe 'aws-parallelcluster-slurm::install_jwt'
 include_recipe 'aws-parallelcluster-slurm::install_pmix'
 munge 'Install munge' do

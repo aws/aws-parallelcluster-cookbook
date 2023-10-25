@@ -34,6 +34,15 @@ suites:
         - /mysql_client/
     attributes:
       resource: mysql_client
+  - name: mysql_repo_add
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - mysql_repo_added
+    attributes:
+      resource: mysql_repo:add
   - name: munge
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
