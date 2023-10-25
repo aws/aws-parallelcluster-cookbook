@@ -35,8 +35,8 @@ action :install_spack do
   spack_sha256 = node['cluster']['spack']['sha256']
   remote_file spack_tarball do
     source spack_url
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     mode '0644'
     retries 3
     retry_delay 5
@@ -45,15 +45,15 @@ action :install_spack do
   end
 
   directory new_resource.spack_root do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     mode '0755'
     recursive true
   end
 
   bash 'Extract spack' do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     code <<-SCRIPT
     set -e
     tar -xf #{spack_tarball} --directory #{new_resource.spack_root} --strip-components 1
