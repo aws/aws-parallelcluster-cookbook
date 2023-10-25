@@ -14,9 +14,6 @@
 unified_mode true
 default_action :setup
 
-property :spack_user, String, required: false,
-         default: node['cluster']['cluster_user']
-
 property :spack_root, String, required: false,
          default: "/home/#{node['cluster']['cluster_user']}/spack"
 
@@ -38,8 +35,8 @@ action :install_spack do
   spack_sha256 = node['cluster']['spack']['sha256']
   remote_file spack_tarball do
     source spack_url
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     mode '0644'
     retries 3
     retry_delay 5
@@ -48,15 +45,15 @@ action :install_spack do
   end
 
   directory new_resource.spack_root do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     mode '0755'
     recursive true
   end
 
   bash 'Extract spack' do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     code <<-SCRIPT
     set -e
     tar -xf #{spack_tarball} --directory #{new_resource.spack_root} --strip-components 1
@@ -90,8 +87,8 @@ action :install_spack do
     template "#{spack_configs_dir}/packages.yaml" do
       cookbook 'aws-parallelcluster-environment'
       source "spack/packages-#{arch_target}.yaml.erb"
-      owner new_resource.spack_user
-      group new_resource.spack_user
+      owner 'root'
+      group 'root'
       variables(libfabric_version: libfabric_version)
     end
   rescue Chef::Exceptions::FileNotFound
@@ -101,14 +98,14 @@ action :install_spack do
   cookbook_file "#{spack_configs_dir}/modules.yaml" do
     cookbook 'aws-parallelcluster-environment'
     source 'spack/modules.yaml'
-    owner new_resource.spack_user
-    group new_resource.spack_user
+    owner 'root'
+    group 'root'
     mode '0755'
   end
 
   bash 'setup Spack' do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     code <<-SPACK
       source #{new_resource.spack_root}/share/spack/setup-env.sh
 
@@ -124,7 +121,7 @@ action :install_spack do
     SPACK
   end
 
-  node.default['cluster']['spack']['user'] = new_resource.spack_user
+  node.default['cluster']['spack']['user'] = 'root'
   node.default['cluster']['spack']['root'] = new_resource.spack_root
   node.default['cluster']['libfabric_version'] = libfabric_version
   node_attributes 'dump node attributes'
@@ -141,8 +138,8 @@ action :add_binaries do
   spack = "#{new_resource.spack_root}/bin/spack"
 
   bash 'add binaries' do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     code <<-SPACK
       [ -z "${CI_PROJECT_DIR}" ] && #{spack} mirror add --scope site "aws-pcluster" "https://binaries.spack.io/develop/aws-pcluster-$(spack arch -t | sed -e 's?_avx512??1')" || true
       #{spack} buildcache keys --install --trust
