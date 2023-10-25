@@ -1,10 +1,16 @@
 Scheduling:
   Scheduler: slurm
   SlurmQueues:
+    # queue ondemand with single subnet and capacity reservation Arn on queue leve and id on cr level
   - AllocationStrategy: lowest-price
+    CapacityReservationTarget:
+      CapacityReservationResourceGroupArn: arn
     CapacityType: ONDEMAND
     ComputeResources:
-    - DisableSimultaneousMultithreading: false
+      # compute resource with single instance type
+    - CapacityReservationTarget:
+        CapacityReservationId: cr-234567
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: false
         GdrSupport: false
@@ -14,7 +20,9 @@ Scheduling:
       Name: single
       SchedulableMemory: null
       SpotPrice: null
-    - DisableSimultaneousMultithreading: false
+      # compute resource with multiple instance types
+    - CapacityReservationTarget: null
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
         GdrSupport: false
@@ -54,10 +62,14 @@ Scheduling:
       SecurityGroups: null
       SubnetIds:
       - subnet-0230367ab0e5123a4
+    # queue ondemand without capacity reservations and with multiple subnets
   - AllocationStrategy: lowest-price
+    CapacityReservationTarget: null
     CapacityType: ONDEMAND
     ComputeResources:
-    - DisableSimultaneousMultithreading: false
+      # single instance type
+    - CapacityReservationTarget: null
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: false
         GdrSupport: false
@@ -67,7 +79,9 @@ Scheduling:
       Name: single
       SchedulableMemory: null
       SpotPrice: null
-    - DisableSimultaneousMultithreading: false
+      # multiple instance types
+    - CapacityReservationTarget: null
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
         GdrSupport: false
@@ -107,10 +121,15 @@ Scheduling:
       SubnetIds:
       - subnet-0230367ab0e5123a4
       - subnet-0b903123096649662
+    # queue spot
   - AllocationStrategy: capacity-optimized
+    CapacityReservationTarget: null
     CapacityType: SPOT
     ComputeResources:
-    - DisableSimultaneousMultithreading: false
+      # compute resource with multiple instance types and capacity reservation and spot price
+    - CapacityReservationTarget:
+        CapacityReservationId: cr-345678
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
         GdrSupport: false
@@ -120,7 +139,8 @@ Scheduling:
       Name: single
       SchedulableMemory: null
       SpotPrice: null
-    - DisableSimultaneousMultithreading: false
+    - CapacityReservationTarget: null
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
         GdrSupport: false
@@ -131,7 +151,9 @@ Scheduling:
       Name: fleet-price
       SchedulableMemory: null
       SpotPrice: 10
-    - DisableSimultaneousMultithreading: false
+      # compute resource with single instance type and no spot price
+    - CapacityReservationTarget: null
+      DisableSimultaneousMultithreading: false
       Efa:
         Enabled: true
         GdrSupport: false
@@ -169,6 +191,65 @@ Scheduling:
       SecurityGroups: null
       SubnetIds:
       - subnet-0230367ab0e5123a4
+    # queue for capacity-block
+  - CapacityReservationTarget:
+      CapacityReservationId: cr-987654
+    CapacityType: CAPACITY_BLOCK
+    ComputeResources:
+        # compute resource with different reservation id, single instance type
+      - CapacityReservationTarget:
+          CapacityReservationId: cr-876543
+        DisableSimultaneousMultithreading: false
+        Efa:
+          Enabled: true
+          GdrSupport: false
+        InstanceType: c5n.18xlarge
+        MaxCount: 10
+        MinCount: 1
+        Name: single-res
+        SchedulableMemory: null
+        SpotPrice: null
+        # compute resource with multiple instance types
+      - CapacityReservationTarget: null
+        DisableSimultaneousMultithreading: false
+        Efa:
+          Enabled: true
+          GdrSupport: false
+        Instances:
+          - InstanceType: c5n.4xlarge
+          - InstanceType: r5.4xlarge
+        MaxCount: 10
+        MinCount: 1
+        Name: fleet-no-res
+        SchedulableMemory: null
+        SpotPrice: null
+    ComputeSettings:
+      LocalStorage:
+        EphemeralVolume: null
+        RootVolume:
+          Encrypted: true
+          Iops: 3000
+          Size: null
+          Throughput: 125
+          VolumeType: gp3
+    CustomActions: null
+    Iam:
+      AdditionalIamPolicies: []
+      InstanceProfile: null
+      InstanceRole: null
+      S3Access: null
+    Image: null
+    Name: capacity-block-mixed
+    Networking:
+      AdditionalSecurityGroups: null
+      AssignPublicIp: null
+      PlacementGroup:
+        Enabled: true
+        Id: null
+      Proxy: null
+      SecurityGroups: null
+      SubnetIds:
+        - subnet-0230367ab0e5123a4
   SlurmSettings:
     Dns:
       DisableManagedDns: false

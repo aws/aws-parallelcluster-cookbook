@@ -40,63 +40,105 @@ def generate_fleet_config_file(output_file, input_file):
         "my-queue": {
             "fleet-compute-resource": {
                 "Api": "create-fleet",
-                "CapacityType": "on-demand|spot",
-                "AllocationStrategy": "lowest-price"
+                "CapacityType": "on-demand|spot|capacity-block",
+                "AllocationStrategy": "lowest-price|capacity-optimized",
                 "Instances": [
-                    { "InstanceType": ... }
+                    { "InstanceType": "p4d.24xlarge" }
                 ],
-                "MaxPrice": ...
+                "MaxPrice": "",
                 "Networking": {
-                    "SubnetIds": [...]
-                }
+                    "SubnetIds": ["subnet-123456"]
+                },
+                "CapacityReservationId": "id"
             }
             "single-compute-resource": {
                 "Api": "run-instances",
+                "CapacityType": "on-demand|spot|capacity-block",
+                "AllocationStrategy": "lowest-price|capacity-optimized",
                 "Instances": [
                     { "InstanceType": ... }
                 ],
+                "CapacityReservationId": "id"
             }
         }
     }
     """
+    capacity_type_map = {
+        "ONDEMAND": "on-demand",
+        "SPOT": "spot",
+        "CAPACITY_BLOCK": "capacity-block",
+    }
+
     cluster_config = _load_cluster_config(input_file)
     queue, compute_resource = None, None
     try:
         fleet_config = {}
         for queue_config in cluster_config["Scheduling"]["SlurmQueues"]:
             queue = queue_config["Name"]
-            capacity_type = "on-demand" if queue_config["CapacityType"] == "ONDEMAND" else "spot"
-            allocation_strategy = queue_config.get("AllocationStrategy", "lowest-price")
+
+            # Retrieve capacity info from the queue, if there
+            queue_capacity_type = capacity_type_map.get(queue_config.get("CapacityType", "ONDEMAND"))
+            queue_allocation_strategy = queue_config.get("AllocationStrategy")
+            queue_capacity_reservation_target = queue_config.get("CapacityReservationTarget", {})
+            queue_capacity_reservation = (
+                queue_capacity_reservation_target.get("CapacityReservationId")
+                if queue_capacity_reservation_target
+                else None
+            )
+
             fleet_config[queue] = {}
 
             for compute_resource_config in queue_config["ComputeResources"]:
                 compute_resource = compute_resource_config["Name"]
-                fleet_config[queue][compute_resource] = {}
+
+                # Override capacity info from the compute resource.
+                # CapacityReservationTarget can be specified on both queue and compute resource level.
+                # CapacityType and AllocationStrategy are not yet supported at compute resource level from the CLI,
+                # but this code is ready to use them.
+                capacity_type = capacity_type_map.get(compute_resource_config.get("CapacityType"), queue_capacity_type)
+                allocation_strategy = compute_resource_config.get("AllocationStrategy", queue_allocation_strategy)
+                capacity_reservation_target = compute_resource_config.get("CapacityReservationTarget", {})
+                capacity_reservation = (
+                    capacity_reservation_target.get("CapacityReservationId", queue_capacity_reservation)
+                    if capacity_reservation_target
+                    else queue_capacity_reservation
+                )
+
+                config_for_fleet = {"CapacityType": capacity_type}
+                if capacity_reservation:
+                    config_for_fleet.update({"CapacityReservationId": capacity_reservation})
 
                 if compute_resource_config.get("Instances"):
-                    fleet_config[queue][compute_resource] = {
-                        "Api": "create-fleet",
-                        "CapacityType": capacity_type,
-                        "AllocationStrategy": allocation_strategy,
-                        "Instances": copy.deepcopy(compute_resource_config["Instances"]),
-                    }
+                    # multiple instance types, create-fleet api
+                    config_for_fleet.update(
+                        {
+                            "Api": "create-fleet",
+                            "Instances": copy.deepcopy(compute_resource_config["Instances"]),
+                            "Networking": {"SubnetIds": queue_config["Networking"]["SubnetIds"]},
+                        }
+                    )
+                    if allocation_strategy:
+                        config_for_fleet.update({"AllocationStrategy": allocation_strategy})
                     if capacity_type == "spot" and compute_resource_config["SpotPrice"]:
-                        fleet_config[queue][compute_resource]["MaxPrice"] = compute_resource_config["SpotPrice"]
-                    fleet_config[queue][compute_resource]["Networking"] = {
-                        "SubnetIds": queue_config["Networking"]["SubnetIds"]
-                    }
+                        config_for_fleet.update({"MaxPrice": compute_resource_config["SpotPrice"]})
 
                 elif compute_resource_config.get("InstanceType"):
-                    fleet_config[queue][compute_resource] = {
-                        "Api": "run-instances",
-                        "Instances": [{"InstanceType": compute_resource_config["InstanceType"]}],
-                    }
+                    # single instance type, run-instances api
+                    config_for_fleet.update(
+                        {
+                            "Api": "run-instances",
+                            "Instances": [{"InstanceType": compute_resource_config["InstanceType"]}],
+                        }
+                    )
 
                 else:
                     raise ConfigurationFieldNotFoundError(
                         "Instances or InstanceType field not found "
                         f"in queue: {queue}, compute resource: {compute_resource} configuration"
                     )
+
+                fleet_config[queue][compute_resource] = config_for_fleet
+
     except KeyError as e:
         message = f"Unable to find key {e} in the configuration"
         message += f" of queue: {queue}" if queue else " file"

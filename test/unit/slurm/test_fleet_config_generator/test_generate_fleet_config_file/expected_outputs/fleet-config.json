@@ -1,6 +1,8 @@
 {
     "ondemand-mixed": {
         "single": {
+            "CapacityType": "on-demand",
+            "CapacityReservationId": "cr-234567",
             "Api": "run-instances",
             "Instances": [
                 {
@@ -9,9 +11,8 @@
             ]
         },
         "fleet": {
-            "Api": "create-fleet",
             "CapacityType": "on-demand",
-            "AllocationStrategy": "lowest-price",
+            "Api": "create-fleet",
             "Instances": [
                 {
                     "InstanceType": "c5n.4xlarge"
@@ -27,11 +28,13 @@
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4"
                 ]
-            }
+            },
+            "AllocationStrategy": "lowest-price"
         }
     },
     "multiple-subnets": {
         "single": {
+            "CapacityType": "on-demand",
             "Api": "run-instances",
             "Instances": [
                 {
@@ -40,9 +43,8 @@
             ]
         },
         "fleet": {
-            "Api": "create-fleet",
             "CapacityType": "on-demand",
-            "AllocationStrategy": "lowest-price",
+            "Api": "create-fleet",
             "Instances": [
                 {
                     "InstanceType": "c5n.4xlarge"
@@ -56,11 +58,14 @@
                     "subnet-0230367ab0e5123a4",
                     "subnet-0b903123096649662"
                 ]
-            }
+            },
+            "AllocationStrategy": "lowest-price"
         }
     },
     "spot-mixed": {
         "single": {
+            "CapacityType": "spot",
+            "CapacityReservationId": "cr-345678",
             "Api": "run-instances",
             "Instances": [
                 {
@@ -69,28 +74,58 @@
             ]
         },
         "fleet-price": {
-            "Api": "create-fleet",
             "CapacityType": "spot",
-            "AllocationStrategy": "capacity-optimized",
+            "Api": "create-fleet",
             "Instances": [
                 {
                     "InstanceType": "c5n.18xlarge"
                 }
             ],
-            "MaxPrice": 10,
             "Networking": {
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4"
                 ]
-            }
+            },
+            "AllocationStrategy": "capacity-optimized",
+            "MaxPrice": 10
         },
         "fleet-noprice": {
-            "Api": "create-fleet",
             "CapacityType": "spot",
-            "AllocationStrategy": "capacity-optimized",
+            "Api": "create-fleet",
             "Instances": [
                 {
                     "InstanceType": "c5n.18xlarge"
+                }
+            ],
+            "Networking": {
+                "SubnetIds": [
+                    "subnet-0230367ab0e5123a4"
+                ]
+            },
+            "AllocationStrategy": "capacity-optimized"
+        }
+    },
+    "capacity-block-mixed": {
+        "single-res": {
+            "CapacityType": "capacity-block",
+            "CapacityReservationId": "cr-876543",
+            "Api": "run-instances",
+            "Instances": [
+                {
+                    "InstanceType": "c5n.18xlarge"
+                }
+            ]
+        },
+        "fleet-no-res": {
+            "CapacityType": "capacity-block",
+            "CapacityReservationId": "cr-987654",
+            "Api": "create-fleet",
+            "Instances": [
+                {
+                    "InstanceType": "c5n.4xlarge"
+                },
+                {
+                    "InstanceType": "r5.4xlarge"
                 }
             ],
             "Networking": {
