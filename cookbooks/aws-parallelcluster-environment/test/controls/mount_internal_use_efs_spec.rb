@@ -31,6 +31,12 @@ control 'mount_shared_compute_efs' do
     its('type') { should eq 'nfs4' }
     its('options') { should include 'rw' }
   end
+
+  if instance.compute_node?
+    describe mount('/opt/parallelcluster/shared_login_nodes') do
+      it { should_not be_mounted }
+    end
+  end
 end
 
 control 'mount_shared_login_efs' do
@@ -42,6 +48,12 @@ control 'mount_shared_login_efs' do
     it { should be_mounted }
     its('type') { should eq 'nfs4' }
     its('options') { should include 'rw' }
+  end
+
+  if instance.login_node?
+    describe mount('/opt/parallelcluster/shared') do
+      it { should_not be_mounted }
+    end
   end
 end
 

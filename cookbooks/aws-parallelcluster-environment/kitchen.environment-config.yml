@@ -629,9 +629,9 @@ suites:
   - name: shared_internal_storage_headnode
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::backup_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
       - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
-      - recipe[aws-parallelcluster-environment::restore_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
     verifier:
       controls:
         - mount_shared_compute_efs
@@ -649,9 +649,9 @@ suites:
   - name: shared_internal_storage_compute
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::backup_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
       - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
-      - recipe[aws-parallelcluster-environment::restore_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
     verifier:
       controls:
         - mount_shared_compute_efs
@@ -668,9 +668,9 @@ suites:
   - name: shared_internal_storage_login
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-environment::backup_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
       - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
-      - recipe[aws-parallelcluster-environment::restore_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
     verifier:
       controls:
         - mount_shared_login_efs
