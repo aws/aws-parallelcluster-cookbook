@@ -9,7 +9,6 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-keys_manager_script_dir = "/opt/parallelcluster/scripts/login_nodes"
 key_types = %w(ecdsa ed25519 rsa)
 is_ubuntu = os_properties.ubuntu?
 if is_ubuntu
@@ -18,25 +17,20 @@ end
 
 control 'head_node_directory_initialized' do
   only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' }
-  describe directory(keys_manager_script_dir) do
+  describe directory("#{node['cluster']['shared_dir_login_nodes']}/scripts") do
     it { should exist }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0744' }
   end
 
-  describe bash('cat /etc/exports') do
-    its('exit_status') { should eq(0) }
-    its('stdout') { should match /^#{keys_manager_script_dir} / }
-  end
-
   key_types.each do |type|
-    describe file('/opt/shared_login_nodes/ssh_host_' + type + '_key') do
+    describe file('/opt/parallelcluster/shared_login_nodes/ssh_host_' + type + '_key') do
       it { should exist }
       its('content') { should_not be_empty }
     end
 
-    describe file('/opt/shared_login_nodes/ssh_host_' + type + '_key.pub') do
+    describe file('/opt/parallelcluster/shared_login_nodes/ssh_host_' + type + '_key.pub') do
       it { should exist }
       its('content') { should_not be_empty }
     end
@@ -45,20 +39,6 @@ end
 
 control 'login_node_configuration_initialized' do
   only_if { instance.login_node? && node['cluster']['scheduler'] != 'awsbatch' }
-
-  describe mount('/opt/parallelcluster/scripts/utils') do
-    it { should be_mounted }
-    its('device') { should eq "127.0.0.1:/opt/parallelcluster/scripts/login_nodes" }
-    its('type') { should eq 'nfs4' }
-    its('options') { should include 'hard' }
-    its('options') { should include '_netdev' }
-    its('options') { should include 'noatime' }
-  end
-
-  describe bash('cat /etc/exports') do
-    its('exit_status') { should eq(0) }
-    its('stdout') { should match /^#{keys_manager_script_dir} / }
-  end
 
   key_types.each do |type|
     describe file('/etc/ssh/ssh_host_' + type + '_key') do

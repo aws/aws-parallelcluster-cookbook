@@ -18,60 +18,35 @@
 return if on_docker? || node['cluster']['scheduler'] == 'awsbatch'
 
 script_name = "keys-manager.sh"
-head_node_keys_manager_script_dir = "#{node['cluster']['scripts_dir']}/login_nodes"
 keys_dir = "#{node['cluster']['shared_dir_login_nodes']}"
+script_dir = "#{keys_dir}/scripts"
 
 case node['cluster']['node_type']
 when 'ComputeFleet'
   # Do nothing
 when 'HeadNode'
-
-  directory head_node_keys_manager_script_dir do
+  directory script_dir do
     owner 'root'
     group 'root'
     mode '0744'
     recursive true
   end
 
-  cookbook_file head_node_keys_manager_script_dir + '/' + script_name do
+  cookbook_file script_dir + '/' + script_name do
     source 'login_nodes/keys-manager.sh'
     owner 'root'
     group 'root'
     mode '0744'
   end
 
-  volume "export keys_manager_script_dir" do
-    shared_dir "#{head_node_keys_manager_script_dir}"
-    action :export
-  end
-
   execute 'Initialize Login Nodes keys' do
-    command "bash #{head_node_keys_manager_script_dir}/#{script_name} --create --folder-path #{keys_dir}"
+    command "bash #{script_dir}/#{script_name} --create --folder-path #{keys_dir}"
     user 'root'
   end
 
 when 'LoginNode'
-  keys_manager_script_dir = "#{node['cluster']['scripts_dir']}/utils"
-
-  directory keys_manager_script_dir do
-    owner 'root'
-    group 'root'
-    mode '0744'
-    recursive true
-  end
-
-  volume "mount keys_manager_script_dir" do
-    action :mount
-    shared_dir "#{keys_manager_script_dir}"
-    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{head_node_keys_manager_script_dir}" })
-    fstype 'nfs'
-    options node['cluster']['nfs']['hard_mount_options']
-    retries 10
-    retry_delay 6
-  end
-
   execute 'Import Login Nodes keys' do
-    command "bash #{keys_manager_script_dir}/#{script_name} --import --folder-path #{keys_dir}"
+    command "bash #{script_dir}/#{script_name} --import --folder-path #{keys_dir}"
     user 'root'
   end
 else
