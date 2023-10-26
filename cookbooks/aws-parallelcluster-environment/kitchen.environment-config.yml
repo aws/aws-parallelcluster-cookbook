@@ -608,7 +608,7 @@ suites:
       cluster:
         node_type: 'HeadNode'
         scheduler: 'slurm'
-        shared_dir_login_nodes: '/opt/shared_login_nodes'
+        shared_dir_login_nodes: '/opt/parallelcluster/shared_login_nodes'
   - name: login_nodes_keys_configuration
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
