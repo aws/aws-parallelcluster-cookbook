@@ -11,7 +11,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 # rubocop:disable Style/SingleArgumentDig
-# ... 其他 Chef 代码 ...
 
 require 'digest'
 
