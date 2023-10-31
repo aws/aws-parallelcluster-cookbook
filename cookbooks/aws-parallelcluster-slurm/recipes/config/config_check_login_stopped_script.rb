@@ -17,7 +17,6 @@ require 'digest'
 cluster_name = node['cluster']['cluster_name'] || node['cluster']['stack_name']
 pool_name = lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name) }
 
-# 定义函数，模拟 Python 的 get_target_group_name 函数
 def get_target_group_name(cluster_name, pool_name)
   partial_cluster_name = cluster_name[0..6]
   partial_pool_name = pool_name[0..6]
