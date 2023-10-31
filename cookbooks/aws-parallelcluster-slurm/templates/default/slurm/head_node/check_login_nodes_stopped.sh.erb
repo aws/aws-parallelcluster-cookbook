@@ -13,7 +13,7 @@ REGION="<%= @region %>"
 
 # Get Target Group ARN
 target_group_arn=$(aws elbv2 describe-target-groups \
-    --name ${TARGET_GROUP_NAME} \
+    --names ${TARGET_GROUP_NAME} \
     --query "TargetGroups[0].TargetGroupArn" \
     --output text \
     --region ${REGION})
