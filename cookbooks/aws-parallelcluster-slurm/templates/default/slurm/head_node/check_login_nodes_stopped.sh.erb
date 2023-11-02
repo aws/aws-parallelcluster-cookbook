@@ -1,50 +1,19 @@
 #!/bin/bash
 # This script checks whether there are running login nodes in a specified AWS ParallelCluster stack and login nodes pool.
-# It first retrieves the ARN of the Load Balancer associated with the specified stack and login nodes pool.
-# If a Load Balancer is found, it then retrieves the ARN of the Target Group associated with the Load Balancer.
-# Lastly, it checks the health of the targets in the Target Group to determine the number of healthy and unhealthy login nodes.
+# It first retrieves the ARN of the Target Group associated with the LoginNodes Network Load Balancer.
+# Then, it checks the health of the targets in the Target Group to determine the number of healthy and unhealthy login nodes.
 # If there are any healthy or unhealthy nodes found, it concludes that there are running login nodes.
 #
 # Usage: ./check_if_has_running_login_nodes.sh
 
 set -e
 
-CLUSTER_NAME="<%= @cluster_name %>"
-LOGIN_NODES_POOL_NAME="<%= @login_nodes_pool_name %>"
+TARGET_GROUP_NAME="<%= @target_group_name %>"
 REGION="<%= @region %>"
 
-# List all Load Balancers
-load_balancers=$(aws elbv2 describe-load-balancers --region ${REGION})
-
-# Iterate over Load Balancers to find the one with matching tags
-load_balancer_arn=''
-for arn in $(echo "${load_balancers}" | jq -r '.LoadBalancers[].LoadBalancerArn'); do
-    # Get tags for the current Load Balancer
-    tags=$(aws elbv2 describe-tags --resource-arns "${arn}" --region ${REGION})
-
-    # Check if the tags match the desired stack name and login nodes pool name
-    cluster_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:cluster-name" --arg value "${CLUSTER_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
-    login_nodes_pool_name_match=$(echo "${tags}" | jq -r --arg key "parallelcluster:login-nodes-pool" --arg value "${LOGIN_NODES_POOL_NAME}" '.TagDescriptions[] | select(.Tags[]? | (.Key == $key and .Value == $value))')
-
-    # If both tags are found, store the ARN and break the loop
-    # For now, there's only one pool of login nodes per cluster.
-    if [[ -n "${cluster_name_match}" && -n "${login_nodes_pool_name_match}" ]]; then
-        load_balancer_arn="${arn}"
-        break
-    fi
-done
-
-# Output result
-if [[ -n "${load_balancer_arn}" ]]; then
-    echo "Load Balancer ARN found: ${load_balancer_arn}"
-else
-    echo "No Load Balancer found for the cluster ${CLUSTER_NAME} and login nodes pool ${LOGIN_NODES_POOL_NAME}."
-    exit 1
-fi
-
-# Get Target Group ARN associated with the Load Balancer
+# Get Target Group ARN
 target_group_arn=$(aws elbv2 describe-target-groups \
-    --load-balancer-arn $load_balancer_arn \
+    --names ${TARGET_GROUP_NAME} \
     --query "TargetGroups[0].TargetGroupArn" \
     --output text \
     --region ${REGION})
