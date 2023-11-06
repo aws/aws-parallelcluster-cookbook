@@ -44,6 +44,22 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
+            "Unable to find key 'Networking' in the configuration file. Queue: q1",
+        ),
+        (
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "SPOT",
+                            "ComputeResources": [{"Instances": []}],
+                            "Networking": {"SubnetIds": ["123"]},
+                        }
+                    ]
+                }
+            },
+            CriticalError,
             "Unable to find key 'Name' in the configuration file. Queue: q1",
         ),
         (
@@ -137,7 +153,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'SpotPrice' in the configuration file. Queue: q1 Compute resource: cr1",
+            "Unable to find key 'SpotPrice' in the configuration file. Queue: q1, Compute resource: cr1",
         ),
         (
             {
@@ -172,7 +188,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'Networking' in the configuration file. Queue: q1 Compute resource: cr1",
+            "Unable to find key 'Networking' in the configuration file. Queue: q1",
         ),
         (
             {
@@ -190,7 +206,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'SubnetIds' in the configuration file. Queue: q1 Compute resource: cr1",
+            "Unable to find key 'SubnetIds' in the configuration file. Queue: q1",
         ),
         (
             {
