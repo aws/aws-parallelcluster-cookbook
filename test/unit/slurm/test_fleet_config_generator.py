@@ -29,12 +29,12 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
         (
             {"Scheduling": {"SlurmQueues": [{"Name": "q1"}]}},
             CriticalError,
-            "Unable to find key 'ComputeResources' in the configuration of queue: q1",
+            "Unable to find key 'ComputeResources' in the configuration file. Queue: q1",
         ),
         (
             {"Scheduling": {"SlurmQueues": [{"Name": "q1", "CapacityType": "ONDEMAND"}]}},
             CriticalError,
-            "Unable to find key 'ComputeResources' in the configuration of queue: q1",
+            "Unable to find key 'ComputeResources' in the configuration file. Queue: q1",
         ),
         ({"Scheduling": {"SlurmQueues": [{"Name": "q1", "CapacityType": "SPOT", "ComputeResources": []}]}}, None, None),
         (
@@ -44,7 +44,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'Name' in the configuration of queue: q1",
+            "Unable to find key 'Name' in the configuration file. Queue: q1",
         ),
         (
             {
@@ -137,7 +137,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'SpotPrice' in the configuration of queue: q1, compute resource: cr1",
+            "Unable to find key 'SpotPrice' in the configuration file. Queue: q1 Compute resource: cr1",
         ),
         (
             {
@@ -172,7 +172,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'Networking' in the configuration of queue: q1, compute resource: cr1",
+            "Unable to find key 'Networking' in the configuration file. Queue: q1 Compute resource: cr1",
         ),
         (
             {
@@ -190,7 +190,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'SubnetIds' in the configuration of queue: q1, compute resource: cr1",
+            "Unable to find key 'SubnetIds' in the configuration file. Queue: q1 Compute resource: cr1",
         ),
         (
             {
