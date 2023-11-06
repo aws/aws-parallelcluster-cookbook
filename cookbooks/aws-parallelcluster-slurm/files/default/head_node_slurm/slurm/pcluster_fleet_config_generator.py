@@ -13,6 +13,7 @@ import argparse
 import copy
 import json
 import logging
+import traceback
 
 import yaml
 
@@ -139,11 +140,13 @@ def generate_fleet_config_file(output_file, input_file):
 
                 fleet_config[queue][compute_resource] = config_for_fleet
 
-    except KeyError as e:
-        message = f"Unable to find key {e} in the configuration"
-        message += f" of queue: {queue}" if queue else " file"
-        message += f", compute resource: {compute_resource}" if compute_resource else ""
-
+    except (KeyError, AttributeError) as e:
+        if isinstance(e, KeyError):
+            message = f"Unable to find key {e} in the configuration file."
+        else:
+            message = f"Error parsing configuration file. {e}. {traceback.format_exc()}."
+        message += f" Queue: {queue}" if queue else ""
+        message += f" Compute resource: {compute_resource}" if compute_resource else ""
         log.error(message)
         raise CriticalError(message)
 
