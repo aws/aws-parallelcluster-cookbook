@@ -40,7 +40,7 @@ suites:
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - mysql_repo_added
+        - tag:install_mysql_repo_added
     attributes:
       resource: mysql_repo:add
   - name: munge
