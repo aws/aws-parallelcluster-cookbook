@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'mysql_repo_added' do
+control 'tag:install_mysql_repo_added' do
   if os_properties.ubuntu?
     describe file('/etc/apt/sources.list.d/mysql.list') do
       it { should exist }
