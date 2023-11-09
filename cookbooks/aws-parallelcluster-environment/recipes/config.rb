@@ -34,6 +34,7 @@ include_recipe 'aws-parallelcluster-environment::ebs'
 include_recipe 'aws-parallelcluster-environment::raid'
 include_recipe 'aws-parallelcluster-environment::efs'
 include_recipe 'aws-parallelcluster-environment::fsx'
-spack 'Configure Spack Packages' do
-  action :configure
-end
+# TODO: Disable Spack until the feature is complete
+# spack 'Configure Spack Packages' do
+#   action :configure
+# end
