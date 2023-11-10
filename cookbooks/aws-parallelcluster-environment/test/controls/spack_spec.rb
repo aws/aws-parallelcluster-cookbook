@@ -11,7 +11,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-control 'tag:install_spack_correctly_installed' do
+control 'install_spack_correctly_installed' do
   only_if { !os_properties.on_docker? }
 
   describe directory(node['cluster']['spack']['root']) do
@@ -50,7 +50,7 @@ control 'tag:install_spack_correctly_installed' do
   end
 end
 
-control 'tag:install_spack_can_install_packages' do
+control 'install_spack_can_install_packages' do
   only_if { !os_properties.on_docker? }
   spack = "#{node['cluster']['spack']['root']}/bin/spack"
 
