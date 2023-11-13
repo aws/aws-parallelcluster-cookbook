@@ -18,7 +18,7 @@
 pam_services = %w(sudo su sshd)
 pam_config_dir = "/etc/pam.d"
 generate_ssh_key_path = "#{node['cluster']['scripts_dir']}/generate_ssh_key.sh"
-ssh_key_generator_pam_config_line = "session    optional     pam_exec.so log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
+ssh_key_generator_pam_config_line = "session    optional     pam_exec.so seteuid log=/var/log/parallelcluster/pam_ssh_key_generator.log #{generate_ssh_key_path}"
 if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
   template generate_ssh_key_path do
     source 'directory_service/generate_ssh_key.sh.erb'
@@ -44,7 +44,7 @@ else
     pam_config_file = "#{pam_config_dir}/#{pam_service}"
     delete_lines "Ensure PAM service #{pam_service} is not configured to call SSH key generation script" do
       path pam_config_file
-      pattern %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
+      pattern %r{session\s+optional\s+pam_exec\.so\s+seteuid\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log}
       ignore_missing true
     end
   end
