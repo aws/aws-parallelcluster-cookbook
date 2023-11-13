@@ -20,6 +20,8 @@ import shutil
 import sys
 
 import jsonschema
+from jinja2 import FileSystemLoader
+from jinja2.sandbox import SandboxedEnvironment
 
 DEFAULT_SCHEMA_PATH = os.path.realpath(os.path.join(os.path.curdir, "cloudwatch_agent_config_schema.json"))
 SCHEMA_PATH = os.environ.get("CW_LOGS_CONFIGS_SCHEMA_PATH", DEFAULT_SCHEMA_PATH)
@@ -47,6 +49,15 @@ def parse_args():
     return parser.parse_args()
 
 
+def render_jinja_template(template_file_path, **kwargs):
+    file_loader = FileSystemLoader(str(os.path.dirname(template_file_path)))
+    env = SandboxedEnvironment(loader=file_loader)
+    rendered_template = env.get_template(os.path.basename(template_file_path)).render(**kwargs)
+    with open(template_file_path, "w", encoding="utf-8") as f:
+        f.write(rendered_template)
+    return template_file_path
+
+
 def get_input_json(args):
     """Either load the input JSON data from a file, or returned the JSON parsed on the CLI."""
     if args.input_file:
@@ -59,7 +70,10 @@ def get_input_json(args):
 def _read_json_at(path):
     """Read the JSON file at path."""
     try:
-        with open(path, encoding="utf-8") as input_file:
+        config_args = {
+            "default_platforms": ["amazon", "centos", "redhat", "rocky", "ubuntu"],
+        }
+        with open(render_jinja_template(path, **config_args), encoding="utf-8") as input_file:
             return json.load(input_file)
     except FileNotFoundError:
         _fail(f"No file exists at {path}")
