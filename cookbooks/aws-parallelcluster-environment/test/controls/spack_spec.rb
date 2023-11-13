@@ -65,7 +65,7 @@ control 'install_spack_can_install_packages' do
   end
 end
 
-control 'tag:config_spack_packages_config_exist' do
+control 'config_spack_packages_config_exist' do
   title 'Check that spack has packages.yaml'
 
   only_if { !os_properties.on_docker? && instance.head_node? }
