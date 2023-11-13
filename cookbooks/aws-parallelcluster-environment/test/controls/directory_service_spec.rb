@@ -78,7 +78,7 @@ control 'sssd_configured_correctly' do
   pam_services.each do |pam_service|
     describe file("/etc/pam.d/#{pam_service}") do
       it { should exist }
-      its('content') { should match %r{session\s+optional\s+pam_exec\.so\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log} }
+      its('content') { should match %r{session\s+optional\s+pam_exec\.so\s+seteuid\s+log=/var/log/parallelcluster/pam_ssh_key_generator\.log} }
     end
   end
 
