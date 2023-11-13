@@ -11,6 +11,9 @@ import json
 import os
 import socket
 
+from jinja2 import FileSystemLoader
+from jinja2.sandbox import SandboxedEnvironment
+
 AWS_CLOUDWATCH_CFG_PATH = "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 DEFAULT_METRICS_COLLECTION_INTERVAL = 60
 
@@ -61,9 +64,21 @@ def add_instance_log_stream_prefixes(configs):
     return configs
 
 
+def render_jinja_template(template_file_path, **kwargs):
+    file_loader = FileSystemLoader(str(os.path.dirname(template_file_path)))
+    env = SandboxedEnvironment(loader=file_loader)
+    rendered_template = env.get_template(os.path.basename(template_file_path)).render(**kwargs)
+    with open(template_file_path, "w", encoding="utf-8") as f:
+        f.write(rendered_template)
+    return template_file_path
+
+
 def read_data(config_path):
     """Read in log configuration data from config_path."""
-    with open(config_path, encoding="utf-8") as infile:
+    config_args = {
+        "default_platforms": ["amazon", "centos", "redhat", "rocky", "ubuntu"],
+    }
+    with open(render_jinja_template(config_path, **config_args), encoding="utf-8") as infile:
         return json.load(infile)
 
 
