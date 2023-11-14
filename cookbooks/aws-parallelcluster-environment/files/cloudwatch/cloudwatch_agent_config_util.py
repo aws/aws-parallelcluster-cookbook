@@ -70,6 +70,18 @@ def get_input_json(args):
 def _read_json_at(path):
     """Read the JSON file at path."""
     try:
+        with open(path, encoding="utf-8") as input_file:
+            return json.load(input_file)
+    except FileNotFoundError:
+        _fail(f"No file exists at {path}")
+    except ValueError:
+        _fail(f"File at {path} contains invalid JSON")
+    return None
+
+
+def _read_jinja_template_at(path):
+    """Read the JSON file at path."""
+    try:
         config_args = {
             "default_platforms": ["amazon", "centos", "redhat", "rocky", "ubuntu"],
         }
@@ -89,7 +101,7 @@ def _read_schema():
 
 def _read_log_configs():
     """Read the current version of the CloudWatch log configs file, cloudwatch_agent_config.json."""
-    return _read_json_at(LOG_CONFIGS_PATH)
+    return _read_jinja_template_at(LOG_CONFIGS_PATH)
 
 
 def _validate_json_schema(input_json):

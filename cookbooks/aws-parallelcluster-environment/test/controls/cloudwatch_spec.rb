@@ -64,7 +64,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/cloudwatch_agent_config_util.py') do
     it { should exist }
-    its('sha256sum') { should eq '321b1a5e4886588a6f5501e4b1fe00b506ecab54640e529cfb9f407ad03dd289' }
+    its('sha256sum') { should eq '767896cff89142865397757f970cf73e7453982ffdc584bfadc788c77991e82b' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
