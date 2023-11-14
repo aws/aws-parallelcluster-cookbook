@@ -129,6 +129,17 @@ action :configure do
     mode '0644'
   end
 
+  common_module_path = '/usr/local/bin/cloudwatch_agent_common_utils.py'
+  cookbook_file 'cloudwatch_agent_common_utils.py' do
+    action :create_if_missing
+    source 'cloudwatch/cloudwatch_agent_common_utils.py'
+    cookbook 'aws-parallelcluster-environment'
+    path common_module_path
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
   execute "cloudwatch-config-validation" do
     user 'root'
     timeout 300
