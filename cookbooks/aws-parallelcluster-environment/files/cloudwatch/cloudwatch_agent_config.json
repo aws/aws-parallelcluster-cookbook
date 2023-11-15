@@ -52,7 +52,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -66,7 +72,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -79,7 +91,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "ComputeFleet"
       ],
@@ -93,7 +111,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "ComputeFleet",
         "HeadNode",
@@ -108,7 +132,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "ComputeFleet",
         "LoginNode"
@@ -123,7 +153,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "ComputeFleet",
         "HeadNode",
@@ -138,7 +174,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -151,7 +193,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -164,7 +212,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -177,7 +231,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -190,7 +250,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "ComputeFleet"
       ],
@@ -203,7 +269,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -216,7 +288,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -229,7 +307,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -242,7 +326,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "ComputeFleet"
       ],
@@ -255,7 +345,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -268,7 +364,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "amazon",
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -282,7 +384,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -300,7 +408,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -321,7 +435,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -342,7 +462,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode",
         "LoginNode"
@@ -365,7 +491,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -384,7 +516,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -403,7 +541,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -422,7 +566,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -441,7 +591,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -460,7 +616,13 @@
         "awsbatch",
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
@@ -478,7 +640,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "ComputeFleet"
       ],
@@ -491,7 +659,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "ComputeFleet"
       ],
@@ -504,7 +678,13 @@
       "schedulers": [
         "slurm"
       ],
-      "platforms": {{ default_platforms | tojson}},
+      "platforms": [
+        "centos",
+        "redhat",
+        "rocky",
+        "ubuntu",
+        "amazon"
+      ],
       "node_roles": [
         "HeadNode"
       ],
