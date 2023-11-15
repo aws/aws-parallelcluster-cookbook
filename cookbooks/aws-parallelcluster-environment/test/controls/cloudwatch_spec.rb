@@ -40,7 +40,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/write_cloudwatch_agent_json.py') do
     it { should exist }
-    its('sha256sum') { should eq 'e528db6e875ed28e1ed0caf5e2e4cb9542e744ce9ebfadafa594272542fe7ea2' }
+    its('sha256sum') { should eq '54239b52d8cbae4b9da0efb3a73f06160e30b3580d9eba8e970fe2b81b973737' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
@@ -64,7 +64,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/cloudwatch_agent_config_util.py') do
     it { should exist }
-    its('sha256sum') { should eq '55125b14b8b5dba4b694b07f2ece008a6607ceb24ce0ae784a92affe34bd78bd' }
+    its('sha256sum') { should eq 'd50da5d7f6bdda90b41e18f713432c6eff8e03c6efe32f024b1c214cd9bb3eb8' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
@@ -75,7 +75,7 @@ control 'tag:config_cloudwatch_configured' do
     its('sha256sum') { should eq 'b65d53caf3d69f723324c4339f44cd8662a5c63ad8796118640738d7f6a63381' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('mode') { should cmp '0644' }
+    its('mode') { should cmp '0755' }
   end
 
   describe 'Check the cloudwatch service'

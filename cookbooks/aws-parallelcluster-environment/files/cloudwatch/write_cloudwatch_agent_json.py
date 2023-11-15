@@ -64,7 +64,7 @@ def add_instance_log_stream_prefixes(configs):
 
 
 def read_data(config_path):
-    """Read in log configuration data from config_path."""
+    """Read in and render jinja template of the log configuration data from config_path."""
     with open(render_jinja_template(config_path), encoding="utf-8") as infile:
         return json.load(infile)
 

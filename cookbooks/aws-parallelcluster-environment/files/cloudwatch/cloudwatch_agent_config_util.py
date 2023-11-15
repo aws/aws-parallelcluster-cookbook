@@ -70,7 +70,7 @@ def _read_json_at(path):
 
 
 def _read_jinja_template_at(path):
-    """Read the JSON file at path."""
+    """Read the JSON file at path as a Jinja template."""
     try:
         with open(render_jinja_template(path), encoding="utf-8") as input_file:
             return json.load(input_file)
