@@ -11,7 +11,7 @@ import json
 import os
 import socket
 
-from cloudwatch_agent_common_utils import render_jinja_template
+from cloudwatch_agent_common_utils import read_jinja_template_at
 
 AWS_CLOUDWATCH_CFG_PATH = "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 DEFAULT_METRICS_COLLECTION_INTERVAL = 60
@@ -61,12 +61,6 @@ def add_instance_log_stream_prefixes(configs):
     for config in configs:
         config["log_stream_name"] = f"{gethostname()}.{{instance_id}}.{config['log_stream_name']}"
     return configs
-
-
-def read_data(config_path):
-    """Read in and render jinja template of the log configuration data from config_path."""
-    with open(render_jinja_template(config_path), encoding="utf-8") as infile:
-        return json.load(infile)
 
 
 def select_configs_for_scheduler(configs, scheduler):
@@ -223,7 +217,7 @@ def get_dict_value(value, attributes, default=None):
 def main():
     """Create cloudwatch agent config file."""
     args = parse_args()
-    config_data = read_data(args.config)
+    config_data = read_jinja_template_at(args.config)
     log_configs = select_logs(config_data["log_configs"], args)
     log_configs = add_timestamps(log_configs, config_data["timestamp_formats"])
     log_configs = add_log_group_name_params(args.log_group, log_configs)

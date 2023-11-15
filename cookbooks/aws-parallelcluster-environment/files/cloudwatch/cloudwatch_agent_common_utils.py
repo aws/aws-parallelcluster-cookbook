@@ -1,4 +1,6 @@
+import json
 import os
+import sys
 
 from jinja2 import FileSystemLoader
 from jinja2.sandbox import SandboxedEnvironment
@@ -15,3 +17,20 @@ def render_jinja_template(template_file_path):
     with open(template_file_path, "w", encoding="utf-8") as f:
         f.write(rendered_template)
     return template_file_path
+
+
+def read_jinja_template_at(path):
+    """Read the JSON file at path as a Jinja template."""
+    try:
+        with open(render_jinja_template(path), encoding="utf-8") as input_file:
+            return json.load(input_file)
+    except FileNotFoundError:
+        fail(f"No file exists at {path}")
+    except ValueError:
+        fail(f"File at {path} contains invalid JSON")
+    return None
+
+
+def fail(message):
+    """Exit nonzero with the given error message."""
+    sys.exit(message)
