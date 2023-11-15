@@ -17,6 +17,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Do not wait for static nodes in maintenance to signal CFN that the head node initialization is complete.
 - Upgrade `aws-cfn-bootstrap` to version 2.0-28.
 - Upgrade Python to 3.9.17.
+- Use OpenRM as NVIDIA kernel module for Linux instead of NVIDIA closed source module.
+- Upgrade EFA installer to `1.29.0`.
+  - Efa-driver: `efa-2.6.0-1`
+  - Efa-config: `efa-config-1.15-1`
+  - Efa-profile: `efa-profile-1.5-1`
+  - Libfabric-aws: `libfabric-aws-1.19.0-1`
+  - Rdma-core: `rdma-core-46.0-1`
+  - Open MPI: `openmpi40-aws-4.1.6-1`
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.
