@@ -14,11 +14,8 @@
 unified_mode true
 default_action :setup
 
-property :spack_user, String, required: false,
-         default: node['cluster']['cluster_user']
-
 property :spack_root, String, required: false,
-         default: "/home/#{node['cluster']['cluster_user']}/spack"
+         default: node['cluster']['spack_shared_dir']
 
 action :install_spack do
   return if on_docker?
@@ -30,10 +27,37 @@ action :install_spack do
     action :install
   end
 
-  git new_resource.spack_root do
-    repository 'https://github.com/spack/spack'
-    user new_resource.spack_user
-    group new_resource.spack_user
+  # Get Spack tarball
+  spack_version = node['cluster']['spack']['version']
+  spack_tar_name = "spack-#{spack_version}"
+  spack_tarball = "#{node['cluster']['sources_dir']}/#{spack_tar_name}.tar.gz"
+  spack_url = "https://github.com/spack/spack/archive/refs/tags/v#{spack_version}.tar.gz"
+  spack_sha256 = node['cluster']['spack']['sha256']
+  remote_file spack_tarball do
+    source spack_url
+    user 'root'
+    group 'root'
+    mode '0644'
+    retries 3
+    retry_delay 5
+    checksum spack_sha256
+    action :create_if_missing
+  end
+
+  directory new_resource.spack_root do
+    user 'root'
+    group 'root'
+    mode '0755'
+    recursive true
+  end
+
+  bash 'Extract spack' do
+    user 'root'
+    group 'root'
+    code <<-SCRIPT
+    set -e
+    tar -xf #{spack_tarball} --directory #{new_resource.spack_root} --strip-components 1
+    SCRIPT
   end
 
   template '/etc/profile.d/spack.sh' do
@@ -47,41 +71,18 @@ action :install_spack do
 
   spack = "#{new_resource.spack_root}/bin/spack"
   spack_configs_dir = "#{new_resource.spack_root}/etc/spack"
-  arch_target = `#{spack} arch -t`.strip
-
-  # Find libfabric version to be used in package configs
-  libfabric_version = nil
-  ::File.open(libfabric_path).each do |line|
-    if line.include?('Version:')
-      libfabric_version = line.split[1].strip
-      break
-    end
-  end
-
-  # Pull architecture dependent package config
-  begin
-    template "#{spack_configs_dir}/packages.yaml" do
-      cookbook 'aws-parallelcluster-environment'
-      source "spack/packages-#{arch_target}.yaml.erb"
-      owner new_resource.spack_user
-      group new_resource.spack_user
-      variables(libfabric_version: libfabric_version)
-    end
-  rescue Chef::Exceptions::FileNotFound
-    Chef::Log.warn "Could not find template for #{arch_target}"
-  end
 
   cookbook_file "#{spack_configs_dir}/modules.yaml" do
     cookbook 'aws-parallelcluster-environment'
     source 'spack/modules.yaml'
-    owner new_resource.spack_user
-    group new_resource.spack_user
+    owner 'root'
+    group 'root'
     mode '0755'
   end
 
   bash 'setup Spack' do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     code <<-SPACK
       source #{new_resource.spack_root}/share/spack/setup-env.sh
 
@@ -97,9 +98,7 @@ action :install_spack do
     SPACK
   end
 
-  node.default['cluster']['spack']['user'] = new_resource.spack_user
   node.default['cluster']['spack']['root'] = new_resource.spack_root
-  node.default['cluster']['libfabric_version'] = libfabric_version
   node_attributes 'dump node attributes'
 end
 
@@ -114,12 +113,48 @@ action :add_binaries do
   spack = "#{new_resource.spack_root}/bin/spack"
 
   bash 'add binaries' do
-    user new_resource.spack_user
-    group new_resource.spack_user
+    user 'root'
+    group 'root'
     code <<-SPACK
       [ -z "${CI_PROJECT_DIR}" ] && #{spack} mirror add --scope site "aws-pcluster" "https://binaries.spack.io/develop/aws-pcluster-$(spack arch -t | sed -e 's?_avx512??1')" || true
       #{spack} buildcache keys --install --trust
     SPACK
+  end
+end
+
+action :configure do
+  return if on_docker?
+
+  case node['cluster']['node_type']
+  when 'HeadNode'
+
+    # Find libfabric version to be used in package configs
+    libfabric_version = nil
+    ::File.open(libfabric_path).each do |line|
+      if line.include?('Version:')
+        libfabric_version = line.split[1].strip
+        break
+      end
+    end
+
+    spack = "#{new_resource.spack_root}/bin/spack"
+    spack_configs_dir = "#{new_resource.spack_root}/etc/spack"
+
+    arch_target = `#{spack} arch -t`.strip
+    Chef::Log.info "The processor family is #{arch_target}"
+    # Pull architecture dependent package config
+    template "#{spack_configs_dir}/packages.yaml" do
+      cookbook 'aws-parallelcluster-environment'
+      source "spack/packages-#{arch_target}.yaml.erb"
+      owner 'root'
+      group 'root'
+      variables(libfabric_version: libfabric_version)
+      only_if { run_context.has_template_in_cookbook?('aws-parallelcluster-environment', "spack/packages-#{arch_target}.yaml.erb") && spack_installed? }
+    end
+
+    node.default['cluster']['libfabric_version'] = libfabric_version
+    node_attributes 'dump node attributes'
+
   end
 end
 

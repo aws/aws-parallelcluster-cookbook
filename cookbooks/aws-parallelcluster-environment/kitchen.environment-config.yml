@@ -608,8 +608,7 @@ suites:
       cluster:
         node_type: 'HeadNode'
         scheduler: 'slurm'
-        shared_dir_login_nodes: '/opt/shared_login_nodes'
-
+        shared_dir_login_nodes: '/opt/parallelcluster/shared_login_nodes'
   - name: login_nodes_keys_configuration
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -627,3 +626,76 @@ suites:
         scheduler: 'slurm'
         head_node_private_ip: '127.0.0.1'
         shared_dir_login_nodes: '/opt/parallelcluster/shared_login_nodes'
+  - name: shared_internal_storage_headnode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
+    verifier:
+      controls:
+        - mount_shared_compute_efs
+        - mount_shared_login_efs
+        - mount_intel_efs
+        - mount_slurm_efs
+    attributes:
+      cluster:
+        node_type: 'HeadNode'
+        scheduler: 'slurm'
+        internal_shared_storage_type: 'efs'
+        efs_shared_dirs: '/opt/parallelcluster/init_shared'
+        efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
+        ebs_shared_dirs: ''
+  - name: shared_internal_storage_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
+    verifier:
+      controls:
+        - mount_shared_compute_efs
+        - mount_intel_efs
+        - mount_slurm_efs
+    attributes:
+      cluster:
+        node_type: 'ComputeFleet'
+        scheduler: 'slurm'
+        internal_shared_storage_type: 'efs'
+        efs_shared_dirs: '/opt/parallelcluster/init_shared'
+        efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
+        ebs_shared_dirs: ''
+  - name: shared_internal_storage_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
+    verifier:
+      controls:
+        - mount_shared_login_efs
+        - mount_intel_efs
+        - mount_slurm_efs
+    attributes:
+      cluster:
+        node_type: 'LoginNode'
+        scheduler: 'slurm'
+        internal_shared_storage_type: 'efs'
+        efs_shared_dirs: '/opt/parallelcluster/init_shared'
+        efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
+        ebs_shared_dirs: ''
+  - name: spack
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_spack/
+    attributes:
+      resource: spack:configure
+      cluster:
+        enable_efa: efa
+        node_type: HeadNode
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:spack:setup

@@ -13,3 +13,12 @@ suites:
     verifier:
       controls:
         - /awsbatch_virtualenv_created/
+  - name: custom_awsbatchcli_package
+    run_list:
+      - recipe[aws-parallelcluster-awsbatch::install]
+    verifier:
+      controls:
+        - /custom_awsbatchcli_package_installed/
+    attributes:
+      cluster:
+        custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/develop.tar.gz

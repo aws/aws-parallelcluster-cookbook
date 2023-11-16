@@ -92,18 +92,18 @@ suites:
         - /tag:install_system_authentication/
     attributes:
       resource: system_authentication:setup
-  - name: spack
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:install_spack/
-    attributes:
-      resource: spack
-      dependencies:
-        - recipe:aws-parallelcluster-platform::directories
-        - resource:efa
+#  - name: spack
+#    run_list:
+#      - recipe[aws-parallelcluster-tests::setup]
+#      - recipe[aws-parallelcluster-tests::test_resource]
+#    verifier:
+#      controls:
+#        - /tag:install_spack/
+#    attributes:
+#      resource: spack
+#      dependencies:
+#        - recipe:aws-parallelcluster-platform::directories
+#        - resource:efa
 
 # Recipes
   - name: cfn_bootstrap
@@ -112,7 +112,7 @@ suites:
       - recipe[aws-parallelcluster-environment::cfn_bootstrap]
     verifier:
       controls:
-        - cfnbootstrap_virtualenv_created
+        - tag:install_cfnbootstrap_virtualenv_created
   - name: cfnconfig_mixed
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -130,4 +130,3 @@ suites:
     verifier:
       controls:
         - /patch_isolated_instance_script_created/
-

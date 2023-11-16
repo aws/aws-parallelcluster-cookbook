@@ -38,6 +38,28 @@ jobs:
       fail-fast: false
     steps:
       - uses: actions/checkout@main
+      - name: Free disk space
+        id: free-disk-space
+        run: |
+          df -h /
+          echo "Removing tool cache"
+          # Ref https://github.com/orgs/community/discussions/25678
+          sudo rm -rf /opt/hostedtoolcache
+          echo "Removing docker images"
+          sudo docker image prune --all --force || true
+          echo "Removing large packages" 
+          # Ref https://github.com/apache/flink/blob/master/tools/azure-pipelines/free_disk_space.sh
+          sudo apt-get remove -y '^aspnetcore-.*'
+          sudo apt-get remove -y '^dotnet-.*' --fix-missing
+          sudo apt-get remove -y 'php.*' --fix-missing
+          sudo apt-get remove -y '^mongodb-.*' --fix-missing
+          sudo apt-get remove -y '^mysql-.*' --fix-missing
+          sudo apt-get remove -y azure-cli google-chrome-stable firefox powershell mono-devel libgl1-mesa-dri --fix-missing
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          echo "Removing large directories"
+          rm -rf /usr/share/dotnet/
+          df -h /
       - name: Get changed files
         id: changed-files-excluding-tests
         uses: tj-actions/changed-files@v35.6.0
