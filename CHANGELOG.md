@@ -39,6 +39,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.
+- Fix users SSH keys generation when switching users without root privilege in clusters integrated with an external LDAP server through cluster configuration files.
 
 3.7.2
 ------
