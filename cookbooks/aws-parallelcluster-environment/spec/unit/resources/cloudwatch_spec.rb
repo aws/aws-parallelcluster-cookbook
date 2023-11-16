@@ -141,6 +141,7 @@ describe 'cloudwatch:configure' do
       cached(:config_schema_path) { '/usr/local/etc/cloudwatch_agent_config_schema.json' }
       cached(:config_data_path) { '/usr/local/etc/cloudwatch_agent_config.json' }
       cached(:validator_script_path) { '/usr/local/bin/cloudwatch_agent_config_util.py' }
+      cached(:common_module_path) { '/usr/local/bin/cloudwatch_agent_common_utils.py' }
       cached(:cookbook_venv_path) { 'cookbook/virtual/env/path' }
       cached(:log_group_name) { 'test_log_group_name' }
       cached(:scheduler) { 'test_scheduler' }
@@ -170,6 +171,16 @@ describe 'cloudwatch:configure' do
           is_expected.to create_if_missing_cookbook_file('/usr/local/bin/write_cloudwatch_agent_json.py').with(
             source: 'cloudwatch/write_cloudwatch_agent_json.py',
             path: '/usr/local/bin/write_cloudwatch_agent_json.py',
+            user: 'root',
+            group: 'root',
+            mode: '0755'
+          )
+        end
+
+        it 'creates cloudwatch_agent_common_utils.py' do
+          is_expected.to create_if_missing_cookbook_file('/usr/local/bin/cloudwatch_agent_common_utils.py').with(
+            source: 'cloudwatch/cloudwatch_agent_common_utils.py',
+            path: '/usr/local/bin/cloudwatch_agent_common_utils.py',
             user: 'root',
             group: 'root',
             mode: '0755'
