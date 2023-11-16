@@ -2,6 +2,63 @@
 
 This file is used to list changes made in each version of the nfs cookbook.
 
+## 5.1.2 - *2023-09-14*
+
+- Remove custom Dokken configuration
+  Fixes CI failures
+
+## 5.1.1 - *2023-09-13*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.1.0 - *2023-09-13*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.0.10 - *2023-09-04*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.0.9 - *2023-07-10*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.0.8 - *2023-05-31*
+
+- Fix changelog and issue a proper release
+
+## 5.0.7 - *2023-05-17*
+
+- Update sous-chefs/.github action to v2.0.4 (#137)
+
+## 5.0.6 - *2023-05-03*
+
+- Update sous-chefs/.github action to v2.0.2 (#136)
+
+## 5.0.5 - *2023-04-01*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.0.4 - *2023-02-14*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.0.3 - *2023-02-13*
+
+- Standardise files with files in sous-chefs/repo-management
+
+## 5.0.2 - *2022-12-20*
+
+- Enable Ubuntu 22.04 server vagrant testing
+
+## 5.0.1 - *2022-12-20*
+
+- Add support for Ubuntu 22.04
+- Remove EOL platforms: CentOS 8, Debian 9
+- Convert from delivery to newer CI workflow
+- MDL fixes
+- Switch to using MacOS 12 runners for VM CI tests
+
 ## 5.0.0 - *2021-11-01*
 
 - Sous Chefs adoption
@@ -17,36 +74,36 @@ This file is used to list changes made in each version of the nfs cookbook.
 This release adds support for Chef 17 and modernizes syntax and tooling.
 
 - **BREAKING**
-  - Drop support for Chef version < 15.3
+   - Drop support for Chef version < 15.3
 - Chef 17 compatibility
-  - Enable unified_mode for custom resources
+   - Enable unified_mode for custom resources
 - Cookbook Cleanup
-  - Cookstyle fixes
-  - LWRP -> custom resource conversion
-  - Update to new spec test format
-  - Move test cookbook to standard location
-  - Move kitchen files to standard location
-  - Convert integration testing to InSpec
+   - Cookstyle fixes
+   - LWRP -> custom resource conversion
+   - Update to new spec test format
+   - Move test cookbook to standard location
+   - Move kitchen files to standard location
+   - Convert integration testing to InSpec
 
 ## 3.0.0 - *2020-11-04*
 
 This release unifies systemd based NFS systems. Much of the platform branching has been removed dropping support for System V initialized NFS servers.
 
 - **BREAKING**
-  - Added
-    - Debian 10
-    - Ubuntu 18.04
-    - Ubuntu 20.04
-    - CentOS/RHEL 8
-  - Dropped
-    - Debian 8
-    - Debian 9
-    - CentOS/RHEL 5
-    - CentOS/RHEL 6
-    - Ubuntu 14.04
-  - Iffy (not supported)
-    - SUSE
-    - FreeBSD
+   - Added
+      - Debian 10
+      - Ubuntu 18.04
+      - Ubuntu 20.04
+      - CentOS/RHEL 8
+   - Dropped
+      - Debian 8
+      - Debian 9
+      - CentOS/RHEL 5
+      - CentOS/RHEL 6
+      - Ubuntu 14.04
+   - Iffy (not supported)
+      - SUSE
+      - FreeBSD
 
 - @rexcsn - corrected nfs-idmap service name
 - Set default_env so exportfs can be found under Chef 14.2+
@@ -112,7 +169,7 @@ This release unifies systemd based NFS systems. Much of the platform branching h
 ## 2.2.12 - *2016-10-07*
 
 - @nunukim
-  - fix invalid /etc/defaults/nfs-kernel-server on Debian
+   - fix invalid /etc/defaults/nfs-kernel-server on Debian
 
 ## 2.2.11 - *2016-09-22*
 
@@ -122,19 +179,19 @@ This release unifies systemd based NFS systems. Much of the platform branching h
 ## 2.2.10 - *2016-08-11*
 
 - Fix #69 - Logical condition error on CentOS 7
-  - reported by @dougalb
+   - reported by @dougalb
 
 ## 2.2.9 - *2016-08-11*
 
 - @sspans
-  - prevent resource duplication for shared configs
-  - Rubocop fix-ups
+   - prevent resource duplication for shared configs
+   - Rubocop fix-ups
 
 - @hrak
-  - Use systemd provider for Ubuntu >= 15.04
+   - Use systemd provider for Ubuntu >= 15.04
 
 - @rlanore
-  - Add knob to disable nfs v4
+   - Add knob to disable nfs v4
 
 ## 2.2.8 - *2016-04-27*
 
@@ -143,11 +200,11 @@ This release unifies systemd based NFS systems. Much of the platform branching h
 ## 2.2.7 - *2016-04-21*
 
 - @gsreynolds
-  - Add explicit service provider attributes for Debian, including Debian 8.
+   - Add explicit service provider attributes for Debian, including Debian 8.
 
 - @hrak
-  - Use package portmap instead of rpcbind on Ubuntu <=13.04
-  - Correct service name for Ubuntu <=13.04 = 'portmap', >=13.10 = 'rpcbind'
+   - Use package portmap instead of rpcbind on Ubuntu <=13.04
+   - Correct service name for Ubuntu <=13.04 = 'portmap', >=13.10 = 'rpcbind'
 
 ## 2.2.6 - *2015-10-14*
 
@@ -156,7 +213,7 @@ This release unifies systemd based NFS systems. Much of the platform branching h
 ## 2.2.5 - *2015-08-11*
 
 - @yoshiwaan - improved Amazon Linux platform support.
-  - Also added tests, and example .kitchen.yml.aws file.
+   - Also added tests, and example .kitchen.yml.aws file.
 
 ## 2.2.4 - *2015-07-09*
 
@@ -172,7 +229,7 @@ This release unifies systemd based NFS systems. Much of the platform branching h
 ## 2.2.2 - *2015-07-01*
 
 - Make service_provider edge cases an Ubuntu-specific hack.
-  - More feedback may be needed on Debian platforms/versions
+   - More feedback may be needed on Debian platforms/versions
 - CentOS platforms seem to detect service_provider fine, without explicitly setting one.
 - Remove windows/solaris guard regression, because this should not be needed without overriding the service provider
 
@@ -192,9 +249,9 @@ This release unifies systemd based NFS systems. Much of the platform branching h
 - @StFS added EL7 service names. closes #39 #41 #49
 - @stevenolen remove installation of nfs-kernel-server for debian platform. closes #43
 - ChefSpec fixups
-  - Runner deprecated.
-  - Generic chefspec 0.6.1 platform has no service providers (i.e. sysvinit) in Chef.
-  - FreeBSD mapping broken chef/chef#2383.
+   - Runner deprecated.
+   - Generic chefspec 0.6.1 platform has no service providers (i.e. sysvinit) in Chef.
+   - FreeBSD mapping broken chef/chef#2383.
 
 ## 2.0.0 - *2014-06-14*
 
@@ -221,17 +278,17 @@ Support for some versions of Ubuntu support unverified.  Please help cookbook ma
 - @gswallow added an `nfs['threads']` attribute
 - @brint added array support for network LWRP parameter
 - Tests
-  - @stuart12 added debian to kitchen.ci platforms
-  - Chefspec unit test coverage
-  - BATS integration  tests
-  - Rubocop linting
+   - @stuart12 added debian to kitchen.ci platforms
+   - Chefspec unit test coverage
+   - BATS integration  tests
+   - Rubocop linting
 
 ## 0.5.0 - *2013-09-06*
 
 - @CloCkWeRX - LWRP multi-line fix
 - @walbenzi - toggle-able nfs protocol level 2, or 3
-  - defer to default proto level, and default behavior according to installed kernel
-  - Add attributes to README
+   - defer to default proto level, and default behavior according to installed kernel
+   - Add attributes to README
 
 - @ranxxerox & @reoring - Debian wheezy support added
 
@@ -257,20 +314,20 @@ Support for some versions of Ubuntu support unverified.  Please help cookbook ma
 - Correct LWRP behavior for empty exports file via @bryanwb
 - Corrected lint warnings:
 
-  - FC043: Prefer new notification syntax: ./recipes/default.rb:40
-  - FC043: Prefer new notification syntax: ./recipes/server.rb:35
+   - FC043: Prefer new notification syntax: ./recipes/default.rb:40
+   - FC043: Prefer new notification syntax: ./recipes/server.rb:35
 
 ## 0.3.0 - *2012-12-10*
 
 @someara exports LWRP refactor
 
 - **Breaking changes**
-  - Deprecated ~nfs['exports']~ attribute
-  - remove exports recipe hack
+   - Deprecated ~nfs['exports']~ attribute
+   - remove exports recipe hack
 - refactored provider to execute in new run_context
 - update notification timings on exports resources
 - add service status to recipes
-- dependency and integration with [line](http://ckbk.it/line) editing cookbook
+- dependency and integration with [line](https://github.com/sous-chefs/line) cookbook
 
 ## 0.2.8 - *2012-11-28*
 
@@ -280,8 +337,8 @@ Support for some versions of Ubuntu support unverified.  Please help cookbook ma
 ## 0.2.7 - *2012-09-26*
 
 - Documentation corrections
-  - correct node.nfs.port references
-  - correct run_list symtax
+   - correct node.nfs.port references
+   - correct run_list symtax
 
 ## 0.2.6 - *2012-08-14*
 

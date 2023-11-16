@@ -12,19 +12,24 @@ provisioner:
   deprecations_as_errors: true
   chef_license: accept-no-persist
 
+# TODO(ramereth): Remove on the next release of chef-workstation - 12/20/2022
+transport:
+  name: ssh
+  username: vagrant
+  password: vagrant
+
 verifier:
   name: inspec
 
 platforms:
   - name: centos-7
-  - name: centos-8
   - name: centos-stream-8
-  - name: debian-9
   - name: debian-10
   - name: debian-11
   - name: fedora-latest
   - name: ubuntu-18.04
   - name: ubuntu-20.04
+  - name: ubuntu-22.04
 
 suites:
   - name: default

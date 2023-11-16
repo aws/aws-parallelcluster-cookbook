@@ -15,6 +15,6 @@ supports 'ubuntu', '>= 20.04'
 supports 'redhat', '= 8.7'
 
 depends 'line', '~> 4.5.13'
-depends 'nfs', '~> 5.0.0'
+depends 'nfs', '~> 5.1.2'
 
 depends 'aws-parallelcluster-shared', '~> 3.9.0'
