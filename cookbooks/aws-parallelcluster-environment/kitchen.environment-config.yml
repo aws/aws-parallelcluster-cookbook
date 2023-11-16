@@ -642,7 +642,7 @@ suites:
       cluster:
         node_type: 'HeadNode'
         scheduler: 'slurm'
-        internal_shared_storage_type: 'efs'
+        shared_storage_type: 'efs'
         efs_shared_dirs: '/opt/parallelcluster/init_shared'
         efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
         ebs_shared_dirs: ''
@@ -661,7 +661,7 @@ suites:
       cluster:
         node_type: 'ComputeFleet'
         scheduler: 'slurm'
-        internal_shared_storage_type: 'efs'
+        shared_storage_type: 'efs'
         efs_shared_dirs: '/opt/parallelcluster/init_shared'
         efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
         ebs_shared_dirs: ''
@@ -680,7 +680,7 @@ suites:
       cluster:
         node_type: 'LoginNode'
         scheduler: 'slurm'
-        internal_shared_storage_type: 'efs'
+        shared_storage_type: 'efs'
         efs_shared_dirs: '/opt/parallelcluster/init_shared'
         efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
         ebs_shared_dirs: ''

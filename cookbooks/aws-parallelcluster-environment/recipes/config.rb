@@ -23,7 +23,7 @@ include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
 # Export the home dir from the head node when using ebs
 include_recipe 'aws-parallelcluster-environment::export_home'
 
-if node['cluster']['internal_shared_storage_type'] == 'ebs'
+if node['cluster']['shared_storage_type'] == 'ebs'
   # Export internal use dirs from the head node
   include_recipe 'aws-parallelcluster-environment::export_internal_use_ebs'
   # Mount intel on compute and login nodes

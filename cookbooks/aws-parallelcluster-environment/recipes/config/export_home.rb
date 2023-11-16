@@ -17,7 +17,7 @@ return if on_docker?
 # Check if home is a shared filesystem and return if it is because there is nothing to export
 shared_storage = node['cluster']['efs_shared_dirs'].split(',') + node['cluster']['fsx_shared_dirs'].split(',') +
                  node['cluster']['ebs_shared_dirs'].split(',') + node['cluster']['raid_shared_dir'].split(',')
-return if shared_storage.include?('/home') || shared_storage.include?('home')
+return if shared_storage.include?('/home') || shared_storage.include?('home') || node['cluster']['shared_storage_type'] == 'efs'
 
 case node['cluster']['node_type']
 when 'HeadNode'

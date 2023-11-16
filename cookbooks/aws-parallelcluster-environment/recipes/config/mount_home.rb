@@ -22,6 +22,7 @@ shared_storage = { 'efs' => node['cluster']['efs_shared_dirs'].split(','),
 
 # Check if home is a shared filesystem
 shared_home = 'none'
+shared_home = 'internal' if node['cluster']['shared_storage_type'] == 'efs'
 shared_storage.each do |type, dirs|
   next unless dirs.include?('/home') || dirs.include?('home')
   shared_home = type
@@ -51,6 +52,19 @@ else
   include_recipe "aws-parallelcluster-environment::update_fs_mapping"
   include_recipe "aws-parallelcluster-environment::backup_home_shared_data"
   case shared_home
+  when 'internal'
+    shared_storage['efs'].each_with_index do |dir, index|
+      next unless dir == node['cluster']['internal_initial_shared_dir']
+      efs "mount internal shared efs home" do
+        shared_dir_array ['/home']
+        efs_fs_id_array [node['cluster']['efs_fs_ids'].split(',')[index]]
+        efs_encryption_in_transit_array [node['cluster']['efs_encryption_in_transits'].split(',')[index]]
+        efs_iam_authorization_array [node['cluster']['efs_iam_authorizations'].split(',')[index]]
+        efs_mount_point_array ['/home']
+        action :mount
+      end
+      break
+    end
   when 'efs'
     shared_storage['efs'].each_with_index do |dir, index|
       next unless dir == "/home" || dir == 'home'
