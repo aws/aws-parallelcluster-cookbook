@@ -11,6 +11,8 @@ import json
 import os
 import socket
 
+from cloudwatch_agent_common_utils import render_jinja_template
+
 AWS_CLOUDWATCH_CFG_PATH = "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 DEFAULT_METRICS_COLLECTION_INTERVAL = 60
 
@@ -63,7 +65,7 @@ def add_instance_log_stream_prefixes(configs):
 
 def read_data(config_path):
     """Read in log configuration data from config_path."""
-    with open(config_path, encoding="utf-8") as infile:
+    with open(render_jinja_template(config_path), encoding="utf-8") as infile:
         return json.load(infile)
 
 

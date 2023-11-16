@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-#
-# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-action :install_package do
-  package 'yum-plugin-versionlock'
-  bash "Install #{fabric_manager_package}" do
-    user 'root'
-    code <<-FABRIC_MANAGER_INSTALL
-    set -e
-    yum install -y #{fabric_manager_package}-#{fabric_manager_version}
-    yum versionlock #{fabric_manager_package}
-    FABRIC_MANAGER_INSTALL
-    retries 3
-    retry_delay 5
-  end
+provides :mysql_repo, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 20
+end
+
+use 'partial/_mysql_repo_deb.rb'
+
+def md5_signature
+  '42048ccae58835e40e37b68a3f8b91fb'
+end
+
+def file_name
+  'mysql-apt-config_0.8.26-1_all.deb'
 end

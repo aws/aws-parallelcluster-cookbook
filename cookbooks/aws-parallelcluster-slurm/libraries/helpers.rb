@@ -15,6 +15,9 @@
 #
 # Retrieve compute nodename from file
 #
+
+require 'digest'
+
 def slurm_nodename
   slurm_nodename_file = "#{node['cluster']['slurm_plugin_dir']}/slurm_nodename"
 
@@ -136,4 +139,27 @@ def get_primary_ip
   end
 
   primary_ip
+end
+
+def get_target_group_name(cluster_name, pool_name)
+  partial_cluster_name = cluster_name[0..6]
+  partial_pool_name = pool_name[0..6]
+  combined_name = cluster_name + pool_name
+  hash_value = Digest::SHA256.hexdigest(combined_name)[0..15]
+  "#{partial_cluster_name}-#{partial_pool_name}-#{hash_value}"
+end
+
+def validate_file_hash(file_path, expected_hash)
+  hash_function = yield
+  checksum = hash_function.file(file_path).hexdigest
+  if checksum != expected_hash
+    raise "Downloaded file #{file_path} checksum #{checksum} does not match expected checksum #{expected_hash}"
+  end
+end
+
+def validate_file_md5_hash(file_path, expected_hash)
+  validate_file_hash(file_path, expected_hash) do
+    require 'digest'
+    Digest::MD5
+  end
 end

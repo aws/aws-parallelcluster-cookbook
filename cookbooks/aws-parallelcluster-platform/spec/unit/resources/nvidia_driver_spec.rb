@@ -211,7 +211,7 @@ describe 'nvidia_driver:setup' do
               cwd: '/tmp',
               creates: '/usr/bin/nvidia-smi'
             )
-            .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check})
+            .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=kernel-open})
             .with_code(%r{rm -f /tmp/nvidia.run})
         end
       else
@@ -226,7 +226,7 @@ describe 'nvidia_driver:setup' do
               cwd: '/tmp',
               creates: '/usr/bin/nvidia-smi'
             )
-            .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check})
+            .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=kernel-open})
             .with_code(%r{rm -f /tmp/nvidia.run})
         end
       end
