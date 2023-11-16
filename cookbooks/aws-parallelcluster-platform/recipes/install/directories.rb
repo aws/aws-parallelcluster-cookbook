@@ -14,16 +14,17 @@
 # limitations under the License.
 
 # Setup directories
-directory '/etc/parallelcluster'
+directory node['cluster']['etc_dir']
 directory node['cluster']['base_dir']
 directory node['cluster']['sources_dir']
 directory node['cluster']['scripts_dir']
 directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']
 directory node['cluster']['shared_dir']
+directory node['cluster']['shared_dir_login_nodes']
 
 # Create ParallelCluster log folder
-directory '/var/log/parallelcluster/' do
+directory node['cluster']['log_base_dir'] do
   owner 'root'
   mode '1777'
   recursive true

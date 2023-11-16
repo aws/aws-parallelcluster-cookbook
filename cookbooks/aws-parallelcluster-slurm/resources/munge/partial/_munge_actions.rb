@@ -16,6 +16,9 @@
 # limitations under the License.
 
 # Munge
+unified_mode true
+default_action :setup
+
 munge_version = node['cluster']['munge']['munge_version']
 munge_url = "https://github.com/dun/munge/archive/munge-#{munge_version}.tar.gz"
 munge_tarball = "#{node['cluster']['sources_dir']}/munge-#{munge_version}.tar.gz"
@@ -25,6 +28,21 @@ munge_group = node['cluster']['munge']['group']
 munge_group_id = node['cluster']['munge']['group_id']
 
 action :setup do
+  directory node['cluster']['sources_dir'] do
+    recursive true
+  end
+
+  package_repos 'update package repos' do
+    action :update
+  end
+
+  build_tools 'Prerequisite: build tools'
+
+  install_packages 'prerequisites' do
+    packages prerequisites
+    action :install
+  end
+
   actions = lambda {
     action_purge_packages
     action_download_source_code
@@ -33,7 +51,7 @@ action :setup do
     action_set_user_and_group
     action_create_required_directories
   }
-  actions.call unless redhat_ubi?
+  actions.call unless redhat_on_docker?
 end
 
 action :purge_packages do

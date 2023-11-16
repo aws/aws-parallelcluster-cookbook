@@ -12,7 +12,7 @@
 control 'tag:testami_tag:config_services_disabled_on_debian_family' do
   title 'Test that DLAMI multi eni helper is disabled and masked on debian family'
 
-  only_if { os_properties.debian_family? && !os_properties.virtualized? }
+  only_if { os_properties.debian_family? && !os_properties.on_docker? }
 
   describe service('aws-ubuntu-eni-helper') do
     it { should_not be_enabled }
@@ -28,7 +28,7 @@ end
 control 'tag:testami_tag:config_services_disabled_on_amazon_family' do
   title 'Test that log4j-cve-2021-44228-hotpatch is disabled and masked on amazon family'
 
-  only_if { os_properties.amazon_family? && !os_properties.virtualized? }
+  only_if { os_properties.amazon_family? && !os_properties.on_docker? }
 
   describe service('log4j-cve-2021-44228-hotpatch') do
     it { should_not be_enabled }

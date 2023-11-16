@@ -15,13 +15,13 @@
 virtualenv_name = 'cfn_bootstrap_virtualenv'
 pyenv_root = node['cluster']['system_pyenv_root']
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-python_version = '3.7.16'
+python_version = '3.9.17'
 virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_name}"
 
 node.default['cluster']['cfn_bootstrap_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
 
-return if redhat_ubi?
+return if redhat_on_docker?
 
 install_pyenv 'pyenv for cfn_bootstrap' do
   python_version python_version
@@ -33,7 +33,7 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-cfnbootstrap_version = '2.0-24'
+cfnbootstrap_version = '2.0-28'
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']

@@ -9,13 +9,13 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-cfn_python_version = '3.7.16'
+cfn_python_version = '3.9.17'
 base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
 control 'tag:install_cfnbootstrap_virtualenv_created' do
   title "cfnbootstrap virtualenv should be created on #{cfn_python_version}"
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe directory("#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv") do
     it { should exist }

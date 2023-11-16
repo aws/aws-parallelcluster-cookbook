@@ -8,6 +8,10 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+
+# FIXME: Fix Code Duplication
+# pylint: disable=R0801
+
 import os
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
@@ -386,7 +390,7 @@ class TestClusterStatusManager:
             "--no-color "
             "--chef-zero-port 8889 "
             "--json-attributes /etc/chef/dna.json "
-            "--override-runlist aws-parallelcluster::update_computefleet_status"
+            "--override-runlist aws-parallelcluster-entrypoints::update_computefleet_status"
         )
 
         config = SimpleNamespace(computefleet_status_path=computeflee_json_path, update_event_timeout_minutes=1)

@@ -1,13 +1,32 @@
 # This is a helper recipe executing an action of the resource
-# which type was set as `resource` attribute during the test execution.
-# Expected syntax for the resource attribute is resource-name:optional-action
+# Usage:
+#   - name: <suite_name>
+#     run_list:
+#       - recipe[aws-parallelcluster-tests::test_resource]
+#     attributes:
+#       resource: '<resource_name>[:<resource_action>] [{"resource_property_1_name" : "<resource_property_1_value>", "<resource_property_2_name>": "<resource_property_2_value>"}]'
+#
+# Examples
+#
+#   - name: resource_with_defaults
+#     run_list:
+#       - recipe[aws-parallelcluster-tests::test_resource]
+#     attributes:
+#       resource: resource_name
+#
+#   - name: resource_with_action
+#     run_list:
+#       - recipe[aws-parallelcluster-tests::test_resource]
+#     attributes:
+#       resource: resource_name:action
+#
+#   - name: resource_with_properties
+#     run_list:
+#       - recipe[aws-parallelcluster-tests::test_resource]
+#     attributes:
+#       resource: 'resource_name {"property1": "x", "property2": "y"}'
+#
 
-resource_item = node['resource'].split(/:/)
-if resource_item[1].nil?
-  # default action
-  declare_resource(resource_item[0], 'test')
-else
-  declare_resource(resource_item[0], 'test') do
-    action resource_item[1]
-  end
+test_resource 'resource' do
+  descriptor node['resource']
 end

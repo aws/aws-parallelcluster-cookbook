@@ -1,0 +1,45 @@
+#!/bin/bash
+# This script checks whether there are running login nodes in a specified AWS ParallelCluster stack and login nodes pool.
+# It first retrieves the ARN of the Target Group associated with the LoginNodes Network Load Balancer.
+# Then, it checks the health of the targets in the Target Group to determine the number of healthy and unhealthy login nodes.
+# If there are any healthy or unhealthy nodes found, it concludes that there are running login nodes.
+#
+# Usage: ./check_if_has_running_login_nodes.sh
+
+set -e
+
+TARGET_GROUP_NAME="<%= @target_group_name %>"
+REGION="<%= @region %>"
+
+# Get Target Group ARN
+target_group_arn=$(aws elbv2 describe-target-groups \
+    --names ${TARGET_GROUP_NAME} \
+    --query "TargetGroups[0].TargetGroupArn" \
+    --output text \
+    --region ${REGION})
+
+# Exit if Target Group is not found
+if [[ -n "${target_group_arn}" ]]; then
+    echo "TargetGroup ARN found: ${target_group_arn}"
+else
+    echo "No Target Group found for the specified Load Balancer ${load_balancer_arn}."
+    exit 1
+fi
+
+# Get the number of healthy and unhealthy targets
+target_healths=$(aws elbv2 describe-target-health \
+    --target-group-arn $target_group_arn \
+    --region ${REGION})
+
+healthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | select(.TargetHealth.State == "healthy") | .Target.Id' | wc -l)
+unhealthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | select(.TargetHealth.State != "healthy") | .Target.Id' | wc -l)
+
+# Check if there are running login nodes
+total_nodes=$((healthy_count + unhealthy_count))
+if [[ $total_nodes -gt 0 ]]; then
+    echo "Login nodes are running. Please stop them before updating the munge key."
+    exit 1
+fi
+
+echo "Login nodes are stopped."
+exit 0

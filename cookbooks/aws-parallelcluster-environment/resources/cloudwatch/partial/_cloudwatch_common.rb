@@ -129,6 +129,17 @@ action :configure do
     mode '0644'
   end
 
+  common_module_path = '/usr/local/bin/cloudwatch_agent_common_utils.py'
+  cookbook_file 'cloudwatch_agent_common_utils.py' do
+    action :create_if_missing
+    source 'cloudwatch/cloudwatch_agent_common_utils.py'
+    cookbook 'aws-parallelcluster-environment'
+    path common_module_path
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
   execute "cloudwatch-config-validation" do
     user 'root'
     timeout 300
@@ -137,7 +148,7 @@ action :configure do
       'CW_LOGS_CONFIGS_PATH' => config_data_path
     )
     command "#{cookbook_virtualenv_path}/bin/python #{validator_script_path}"
-  end unless redhat_ubi?
+  end unless redhat_on_docker?
 
   execute "cloudwatch-config-creation" do
     user 'root'
@@ -150,12 +161,10 @@ action :configure do
     )
     not_if { ::File.exist?('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json') }
 
-    cluster_config_path = node['cluster']['scheduler'] == 'plugin' ? "--cluster-config-path #{node['cluster']['cluster_config_path']}" : ""
-
     command "#{cookbook_virtualenv_path}/bin/python #{config_script_path} "\
         "--platform #{node['platform']} --config $CONFIG_DATA_PATH --log-group $LOG_GROUP_NAME "\
-        "--scheduler $SCHEDULER --node-role $NODE_ROLE #{cluster_config_path}"
-  end unless redhat_ubi?
+        "--scheduler $SCHEDULER --node-role $NODE_ROLE"
+  end unless redhat_on_docker?
 
   execute "cloudwatch-agent-start" do
     user 'root'

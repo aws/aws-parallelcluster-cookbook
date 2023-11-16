@@ -2,9 +2,11 @@
 verifier:
   name: inspec
   inspec_tests:
-    - test
+    - cookbooks/aws-parallelcluster-platform/test
 
 suites:
+
+# Resources
   - name: chrony
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -15,4 +17,182 @@ suites:
     attributes:
       resource: chrony:enable
       dependencies:
-      - resource:chrony:setup
+        - resource:chrony:setup
+  - name: dcv
+    # FIXME: breaks on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*dcv/
+    attributes:
+      resource: dcv:configure
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+        - resource:dcv:setup
+      cluster:
+        node_type: HeadNode
+        dcv_enabled: "head_node"
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge
+  - name: nvidia_fabric_manager
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*fabric_manager/
+    attributes:
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+      resource: fabric_manager:configure
+      cluster:
+        nvidia:
+          enabled: true
+    driver:
+      # The only instance type that supports this test is p4d.24xlarge, skipped otherwise
+      instance_type: p4d.24xlarge
+  - name: nvidia_gdrcopy
+    # doesn't work on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_.*gdrcopy/
+    attributes:
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+#          - resource:fabric_manager:configure # Needed for Multi-gpu instance like p5.48xlarge
+#          - recipe:aws-parallelcluster-platform::nvidia_uvm # Needed for running Sanity checks in Multi-gpu instance like p5.48xlarge
+      resource: gdrcopy:configure
+      cluster:
+        nvidia:
+          enabled: true
+    driver:
+      instance_type: g4dn.2xlarge
+  - name: intel_hpc
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_intel_hpc/
+    attributes:
+      resource: intel_hpc:configure
+      dependencies:
+        - resource:package_repos:update
+        - resource:intel_hpc:setup
+      cluster:
+        enable_intel_hpc_platform: 'true'
+        node_type: HeadNode
+  - name: sticky_bits
+    run_list:
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:config_sticky_bits_configured
+    attributes:
+      resource: sticky_bits
+
+  # Recipes
+  - name: cluster_user_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - cluster_user_compute_and_login
+    attributes:
+      cluster:
+        node_type: ComputeFleet
+        cluster_user: test_user
+  - name: cluster_user_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - cluster_user_compute_and_login
+    attributes:
+      cluster:
+        node_type: LoginNode
+        cluster_user: test_user
+  - name: cluster_user_head
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::cluster_user]
+    verifier:
+      controls:
+        - /tag:config_cluster_user/
+    attributes:
+      cluster:
+        node_type: HeadNode
+  - name: networking
+    run_list:
+      - recipe[aws-parallelcluster-platform::networking]
+    verifier:
+      controls:
+        - /tag:config_networking/
+  - name: nvidia_uvm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+    verifier:
+      controls:
+        - /tag:config_.*nvidia_uvm/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge
+    attributes:
+      cluster:
+        nvidia:
+          enabled: true
+      dependencies:
+        - resource:package_repos
+        - resource:install_packages:install_kernel_source
+        - 'resource:package { "package_name": "dkms" }'
+        - resource:build_tools
+        - recipe:aws-parallelcluster-platform::nvidia_install
+        - recipe:aws-parallelcluster-platform::nvidia_uvm
+  - name: ssh_target_checker
+    run_list:
+      - recipe[aws-parallelcluster-platform::openssh]
+    verifier:
+      controls:
+        - ssh_target_checker_script_created
+    attributes:
+      ec2:
+        mac: mac1
+        network_interfaces_macs:
+          mac1:
+            vpc_ipv4_cidr_blocks: |
+              cidr1
+              cidr2
+  - name: sudo
+    run_list:
+      - recipe[aws-parallelcluster-platform::sudo_config]
+    verifier:
+      controls:
+        - /tag:config_sudo/
+  - name: supervisord
+    run_list:
+      - recipe[aws-parallelcluster-platform::supervisord_config]
+      - recipe[aws-parallelcluster-platform::finalize]  # supervisord service start
+    verifier:
+      controls:
+        - /tag:config_supervisord/

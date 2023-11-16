@@ -15,6 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return unless node['cluster']['scheduler'] == 'slurm'
+
 # Ensure slurm plugin directory is in place
 # Directory will contain slurm_nodename file used to identify current compute node in computemgtd
 directory node['cluster']['slurm_plugin_dir'] do
@@ -29,6 +31,8 @@ end
 if node['cluster']['node_type'] == "ComputeFleet"
 
   ruby_block "retrieve compute node info" do
+    retries 30
+    retry_delay 10
     block do
       slurm_nodename = dynamodb_info
       node.force_default['cluster']['slurm_nodename'] = slurm_nodename

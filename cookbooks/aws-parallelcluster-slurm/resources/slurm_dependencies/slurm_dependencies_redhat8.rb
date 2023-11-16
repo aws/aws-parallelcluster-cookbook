@@ -12,15 +12,8 @@ provides :slurm_dependencies, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
 
-unified_mode true
+use 'partial/_slurm_dependencies_common'
 
-default_action :setup
-
-action :setup do
-  package %w(json-c-devel http-parser-devel perl-Switch lua-devel) do
-    flush_cache({ before: true })
-
-    retries 3
-    retry_delay 5
-  end unless redhat_ubi?
+def dependencies
+  %w(json-c-devel http-parser-devel perl-Switch lua-devel)
 end

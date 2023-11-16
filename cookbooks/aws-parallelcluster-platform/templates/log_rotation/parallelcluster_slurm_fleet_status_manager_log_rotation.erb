@@ -1,0 +1,10 @@
+<%# Logrotate file for slurm_fleet_status_manager log %>
+/var/log/parallelcluster/slurm_fleet_status_manager.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    su pcluster-admin pcluster-admin
+    copytruncate
+    nodateext
+}

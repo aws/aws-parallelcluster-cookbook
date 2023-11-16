@@ -1,0 +1,116 @@
+#!/bin/bash
+# This script updates the munge key used in the system.
+# It fetches the key from AWS Secrets Manager or generates one if it doesn't exist.
+# The script does not require any argument.
+#
+# Usage: ./update_munge_key.sh
+# #
+
+set -e
+
+MUNGE_KEY_FILE="/etc/munge/munge.key"
+SECRET_ARN="<%= @munge_key_secret_arn %>"
+REGION="<%= @region %>"
+MUNGE_USER="<%= @munge_user %>"
+MUNGE_GROUP="<%= @munge_group %>"
+SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
+SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
+
+DISABLE_RESOURCE_CHECK=false
+
+while getopts "d" opt; do
+  case $opt in
+    d) DISABLE_RESOURCE_CHECK=true;;
+    *)
+      echo "Usage: $0 [-d]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+if ! $DISABLE_RESOURCE_CHECK; then
+  # Check compute fleet status
+  compute_fleet_status=$(get-compute-fleet-status.sh)
+  if ! echo "$compute_fleet_status" | grep -q '"status": "STOPPED"'; then
+      echo "Compute fleet is not stopped. Please stop it before updating the munge key."
+      exit 1
+  fi
+  
+  # Check LoginNodes status
+  CHECK_LOGIN_NODES_SCRIPT_PATH="<%= node['cluster']['scripts_dir'] %>/slurm/check_login_nodes_stopped.sh"
+
+  # Check if the script exists
+  if [ -f "$CHECK_LOGIN_NODES_SCRIPT_PATH" ]; then
+      # Check if login nodes are running
+      if ! $CHECK_LOGIN_NODES_SCRIPT_PATH; then
+          exit 1
+      fi
+  fi
+fi
+
+# If SECRET_ARN is provided, fetch the munge key from Secrets Manager
+if [ -n "${SECRET_ARN}" ]; then
+  echo "Fetching munge key from AWS Secrets Manager: ${SECRET_ARN}"
+  encoded_key=$(aws secretsmanager get-secret-value --secret-id ${SECRET_ARN} --query 'SecretString' --output text --region ${REGION})
+
+  if [ -z "${encoded_key}" ]; then
+    echo "Error fetching munge key from Secrets Manager or the key is empty"
+    exit 1
+  fi
+
+  # Decode munge key and write to munge.key file
+  decoded_key=$(printf "%s" "${encoded_key}" | base64 -d)
+  if [ $? -ne 0 ]; then
+    echo "Error decoding the munge key with base64"
+    exit 1
+  fi
+
+  # Check munge key size
+  key_size=$(printf "%s" "${encoded_key}" | base64 -d | wc -c)
+  if [ $key_size -lt 32 ] || [ $key_size -gt 1024 ]; then
+    echo "Fetched munge key size is out of valid range [256-8192 bits]."
+    exit 1
+  fi
+
+  printf "%s" "${encoded_key}" | base64 -d > ${MUNGE_KEY_FILE}
+
+  # Set ownership on the key
+  chown ${MUNGE_USER}:${MUNGE_GROUP} ${MUNGE_KEY_FILE}
+  # Enforce correct permission on the key
+  chmod 0600 ${MUNGE_KEY_FILE}
+
+else
+  echo "MUNGE KEY SECRET ARN isn't provided"
+  exit 1
+fi
+
+# Enable and restart munge service
+systemctl enable munge
+echo "Restarting munge service"
+systemctl restart munge
+
+# Wait for a short period
+sleep 5
+
+# Check if munge service is running
+if systemctl --quiet is-active munge; then
+  echo "Munge service is active"
+else
+  echo "Failed to restart munge service"
+  exit 1
+fi
+
+# Share munge key
+SHARED_DIRECTORIES=(${SHARED_DIRECTORY_COMPUTE} ${SHARED_DIRECTORY_LOGIN})
+
+for dir in "${SHARED_DIRECTORIES[@]}"; do
+    echo "Sharing munge key to $dir"
+    mkdir -p "$dir/.munge"
+    cp /etc/munge/munge.key "$dir/.munge/.munge.key"
+    chmod 0700 "$dir/.munge"
+    chmod 0600 "$dir/.munge/.munge.key"
+done
+
+echo "Shared munge key"
+
+exit 0

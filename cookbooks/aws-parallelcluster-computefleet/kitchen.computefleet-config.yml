@@ -1,0 +1,49 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - cookbooks/aws-parallelcluster-computefleet/test
+
+suites:
+
+# Recipes
+  - name: clusterstatusmgtd
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-computefleet::clusterstatusmgtd_config]
+    verifier:
+      controls:
+        - /tag:config_clusterstatusmgtd/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-platform::sudo_install
+      cluster:
+        node_type: 'HeadNode'
+  - name: finalize_custom_parallelcluster_node
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-entrypoints::finalize]
+    verifier:
+      controls:
+        - /node_virtualenv_created/
+        - custom_parallelcluster_node_installed
+    attributes:
+      cluster:
+        custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
+        python-version: 3.9.17
+        node_virtualenv_path: /opt/parallelcluster/pyenv/versions/node_virtualenv
+  - name: fleet_status
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-computefleet::fleet_status]
+    verifier:
+      controls:
+        - /tag:config_fleet_status/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-tests::docker_mock
+      cluster:
+        stack_name: "mock"
+        node_type: HeadNode
+        ddb_table: <%= ENV['DDB_TABLE'] %>

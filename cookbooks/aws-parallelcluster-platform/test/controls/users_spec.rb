@@ -37,7 +37,7 @@ end
 control 'tag:config_ulimit_is_not_lower_than_8192' do
   only_if { !instance.custom_ami? }
 
-  describe bash("ulimit -Sn") do
+  describe bash("sudo -u #{user} bash -c 'ulimit -Sn'") do
     its('stdout') { should cmp >= '8192' }
   end
 end

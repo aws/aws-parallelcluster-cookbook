@@ -2,23 +2,11 @@
 verifier:
   name: inspec
   inspec_tests:
-    - test
+    - cookbooks/aws-parallelcluster-environment/test
 
 suites:
-  - name: nfs
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - /tag:config_nfs/
-    attributes:
-      resource: nfs:configure
-      cluster:
-        nfs:
-          threads: 10
-      dependencies:
-        - resource:nfs
+
+# Resources
   - name: cloudwatch
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
@@ -36,15 +24,678 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
-  - name: efa
+  - name: cloudwatch-loginnode
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - efa_debian_system_settings_configured
+        - /tag:config_cloudwatch/
+        - cloudwatch_logfiles_configuration_loginnode
+    attributes:
+      resource: cloudwatch:configure
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:cloudwatch:setup
+      cluster:
+        node_type: LoginNode
+        scheduler: slurm
+        cw_logging_enabled: "true"
+        log_group_name: test
+  - name: ebs_mount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_mounted/
+    attributes:
+      resource: 'manage_ebs:mount {"shared_dir_array": ["shared_dir"], "vol_array": "FROM_HOOK-ebs_mount-vol_array"}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+  - name: ebs_unmount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_unmounted/
+    attributes:
+      resource: 'manage_ebs:unmount {"shared_dir_array": ["shared_dir"], "vol_array": "FROM_HOOK-ebs_unmount-vol_array"}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+        - 'resource:manage_ebs:mount {"shared_dir_array": ["shared_dir"], "vol_array": "FROM_HOOK-ebs_unmount-vol_array"}'
+  - name: ebs_export
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_exported/
+    attributes:
+      dependencies:
+        - 'resource:directory { "path" : "/shared_dir" }'
+        - resource:nfs
+      resource: 'manage_ebs:export {"shared_dir_array" : ["shared_dir"]} '
+  - name: ebs_unexport
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /ebs_unexported/
+    attributes:
+      dependencies:
+        - 'resource:directory { "path" : "/shared_dir" }'
+        - resource:nfs
+        - 'manage_ebs:export {"shared_dir_array" : ["shared_dir"]}'
+      resource: 'manage_ebs:unexport {"shared_dir_array" : ["shared_dir"]}'
+  - name: efa_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:config_efa_debian_system_settings_configured
     attributes:
       resource: efa:configure
       cluster:
-        enable_efa: compute
+        enable_efa: efa
         node_type: ComputeFleet
+  - name: efa_headnode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:config_efa_debian_system_settings_configured
+    attributes:
+      resource: efa:configure
+      cluster:
+        enable_efa: efa
+        node_type: HeadNode
+  - name: efs_mount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /efs_mounted/
+    attributes:
+      # manually create a volume (default values with 1G size are OK) and paste Volume ID below
+      # manually delete the volume after the test is concluded
+      resource: 'efs:mount {"shared_dir_array" : ["shared_dir"], "efs_fs_id_array" : ["fs-03ad31942a4205839"]}'
+      dependencies:
+        - resource:efs
+  - name: efs_unmount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /efs_unmounted/
+    attributes:
+      # manually create a volume (default values with 1G size are OK) and paste Volume ID below (2 rows)
+      # manually delete the volume after the test is concluded
+      resource: 'efs:unmount {"shared_dir_array" : ["shared_dir"], "efs_fs_id_array" : ["fs-03ad31942a4205839"]}'
+      dependencies:
+        - resource:efs
+        - 'resource:efs:mount {"shared_dir_array" : ["shared_dir"], "efs_fs_id_array" : ["fs-03ad31942a4205839"]}'
+  - name: lustre_mount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /lustre_mounted/
+    attributes:
+      resource: 'lustre:mount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array",
+                               "fsx_fs_type_array": ["LUSTRE"],
+                               "fsx_shared_dir_array": ["shared_dir"],
+                               "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
+                               "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
+                               "fsx_volume_junction_path_array": [""]}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+        - resource:lustre
+  - name: lustre_unmount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /lustre_unmounted/
+    attributes:
+      resource: 'lustre:unmount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array",
+                                 "fsx_fs_type_array": ["LUSTRE"],
+                                 "fsx_shared_dir_array": ["shared_dir"],
+                                 "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
+                                 "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
+                                 "fsx_volume_junction_path_array": [""]}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+        - resource:lustre
+        - 'resource:lustre:mount {"fsx_fs_id_array": "FROM_HOOK-lustre_mount-fsx_fs_id_array",
+                                  "fsx_fs_type_array": ["LUSTRE"],
+                                  "fsx_shared_dir_array": ["shared_dir"],
+                                  "fsx_dns_name_array": "FROM_HOOK-lustre_mount-fsx_dns_name_array",
+                                  "fsx_mount_name_array": "FROM_HOOK-lustre_mount-fsx_mount_name_array",
+                                  "fsx_volume_junction_path_array": [""]}'
+  - name: network_service_restart
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - network_service_running
+    attributes:
+      resource: network_service
+  - name: network_service_reload
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - network_service_running
+    attributes:
+      resource: network_service:reload
+  - name: nfs_headnode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_nfs/
+    attributes:
+      resource: nfs:configure
+      dependencies:
+        - resource:nfs
+      cluster:
+        node_type: HeadNode
+  - name: nfs_computefleet
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_nfs/
+    attributes:
+      resource: nfs:configure
+      dependencies:
+        - resource:nfs
+      cluster:
+        node_type: ComputeFleet
+  - name: raid_mount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /raid_mounted/
+    attributes:
+      resource: 'raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_mount-raid_vol_array"}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+        - resource:raid
+  - name: raid_unmount
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /raid_unmounted/
+    attributes:
+      resource: 'raid:unmount {"raid_shared_dir": "shared_dir", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"}'
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:ec2_udev_rules
+        - resource:raid
+        - 'resource:raid:mount {"raid_shared_dir": "shared_dir", "raid_type": "1", "raid_vol_array": "FROM_HOOK-raid_unmount-raid_vol_array"} '
+  - name: raid_export
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /raid_exported/
+    attributes:
+      dependencies:
+        - 'resource:directory { "path" : "/shared_dir" }'
+        - resource:nfs
+      resource: 'raid:export {"raid_shared_dir": "shared_dir"} '
+  - name: raid_unexport
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /raid_unexported/
+    attributes:
+      dependencies:
+        - 'resource:directory { "path" : "/shared_dir" }'
+        - resource:nfs
+        - 'raid:export {"raid_shared_dir" : "shared_dir"}'
+      resource: 'raid:unexport {"raid_shared_dir" : "shared_dir"}'
+  - name: system_authentication
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_system_authentication/
+    attributes:
+      resource: system_authentication:configure
+      dependencies:
+        - resource:system_authentication:setup
+      cluster:
+        directory_service:
+          enabled: "true"
+        node_type: HeadNode
+
+# Recipes
+  - name: cfnconfig_mixed
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::cfnconfig_mixed]
+    verifier:
+      controls:
+        - /tag:config_cfnconfig/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+  - name: network_interfaces
+    # Verifies multiple Network Interfaces recipes
+    # These recipes can be tested on EC2 on instance type with multiple network interfaces
+    # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#network-cards
+    run_list:
+      - recipe[aws-parallelcluster-environment::network_interfaces]
+    driver:
+      instance_type: c6in.32xlarge # available in eu-west-1, all AZs
+      # availability_zone: ...
+      # subnet_id: ...
+    verifier:
+      controls:
+        - network_interfaces_configuration_script_created
+        - network_interfaces_configured
+        - multiple_network_interfaces_can_ping_gateway
+  - name: directory_service
+    # FIXME: breaks on Docker
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::directory_service]
+    verifier:
+      controls:
+        - sssd_configured_correctly
+    attributes:
+      cluster:
+        node_type: HeadNode
+        directory_service:
+          enabled: 'true'
+          domain_name: corp.something.com
+          domain_addr: ldaps://corp.something.com
+          password_secret_arn: arn:aws:secretsmanager:eu-west-1:123456789:secret:a-secret-name
+          domain_read_only_user: cn=ReadOnlyUser,ou=Users,ou=CORP,dc=corp,dc=something,dc=com
+          ldap_tls_ca_cert: /path/to/domain-certificate.crt
+          ldap_tls_req_cert: never
+          ldap_access_filter: filter-string
+          generate_ssh_keys_for_users: 'true'
+          additional_sssd_configs:
+            debug_level: "0x1ff"
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:system_authentication
+  - name: ebs_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ebs]
+    verifier:
+      controls:
+        - ebs_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_ebs
+      cluster:
+        node_type: ComputeFleet
+        ebs_shared_dirs: ebs1,ebs2
+        head_node_private_ip: '127.0.0.1'
+  - name: ebs_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ebs]
+    verifier:
+      controls:
+        - ebs_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_ebs
+      cluster:
+        node_type: LoginNode
+        ebs_shared_dirs: ebs1,ebs2
+        head_node_private_ip: '127.0.0.1'
+  - name: ephemeral_drives_mounted
+    driver:
+      instance_type: d3.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ephemeral_drives]
+    verifier:
+      controls:
+        - tag:config_ephemeral_drives_service_and_mount
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-environment::mock_cfnconfig
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: /scratch
+  - name: ephemeral_drives_skipped
+    driver:
+      instance_type: d3.xlarge  # instance type with ephemeral drives
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::ephemeral_drives]
+    verifier:
+      controls:
+        - tag:config_ephemeral_drives_service_and_mount
+    attributes:
+      cluster:
+        ebs_shared_dirs: test1,test2
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+        ephemeral_dir: test1
+  - name: update_fs_mapping
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::update_fs_mapping]
+    verifier:
+      controls:
+        - fs_data_file_created_correctly
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+      cluster:
+        ebs_shared_dirs: ebs1,ebs2
+        volume: volume1,volume2
+        raid_shared_dir: raid1
+        raid_type: 1
+        raid_vol_ids: volume1,volume2
+        efs_shared_dirs: efs1,efs2
+        efs_fs_ids: efs-id1,efs-id2
+        efs_encryption_in_transits: true,false
+        efs_iam_authorizations: iam1,iam2
+        fsx_shared_dirs: fsx1,fsx2
+        fsx_fs_ids: fsx-id1,fsx-id2
+        fsx_fs_types: type1,type2
+        fsx_dns_names: dns1,dns2
+        fsx_mount_names: mount1,mount2
+        fsx_volume_junction_paths: value1,value2
+  - name: update_fs_mapping_default_values
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::update_fs_mapping]
+    verifier:
+      controls:
+        - fs_data_file_with_default_values
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+      cluster:
+        ebs_shared_dirs: '/shared'
+        volume: ''
+        efs_shared_dirs: ''
+        fsx_shared_dirs: ''
+        raid_shared_dir: ''
+  - name: imds
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::imds]
+    verifier:
+      controls:
+        - /only_allowed_users_can_access_imds/
+        - /iptables_correctly_configured/
+    attributes:
+      dependencies:
+        - 'resource:install_packages:install_kernel_source {"packages": ["iptables"]}'
+      cluster:
+        node_type: HeadNode
+        scheduler: slurm
+        head_node_imds_secured: 'true'
+        head_node_imds_allowed_users: ['root', 'nobody']
+  - name: mount_shared_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_ebs]
+    verifier:
+      controls:
+        - mount_home
+        - mount_shared_compute
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_export_directories
+      cluster:
+        node_type: 'ComputeFleet'
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
+  - name: mount_shared_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_ebs]
+    verifier:
+      controls:
+        - mount_home
+        - mount_shared_login
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_export_directories
+      cluster:
+        node_type: 'LoginNode'
+        head_node_private_ip: '127.0.0.1'
+        head_node_home_path: '/fake_headnode_home'
+        shared_dir_head: '/fake_headnode_shared'
+  - name: raid_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::raid]
+    verifier:
+      controls:
+        - raid_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_raid
+      cluster:
+        node_type: ComputeFleet
+        raid_shared_dir: raid1
+        head_node_private_ip: '127.0.0.1'
+  - name: raid_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::raid]
+    verifier:
+      controls:
+        - raid_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_raid
+      cluster:
+        node_type: LoginNode
+        raid_shared_dir: raid1
+        head_node_private_ip: '127.0.0.1'
+  - name: shared_storages_compute_efs
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::efs]
+    verifier:
+      controls:
+        - shared_storages_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
+      cluster:
+        node_type: ComputeFleet
+        head_node_private_ip: '127.0.0.1'
+  - name: shared_storages_login_efs
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::efs]
+    verifier:
+      controls:
+        - shared_storages_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
+      cluster:
+        node_type: LoginNode
+        head_node_private_ip: '127.0.0.1'
+  - name: shared_storages_compute_ebs
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::mount_intel_dir]
+    verifier:
+      controls:
+        - shared_storages_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
+      cluster:
+        node_type: ComputeFleet
+        head_node_private_ip: '127.0.0.1'
+  - name: shared_storages_login_ebs
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::mount_intel_dir]
+    verifier:
+      controls:
+        - shared_storages_compute_and_login
+    attributes:
+      dependencies:
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_compute_shared_storages
+      cluster:
+        node_type: LoginNode
+        head_node_private_ip: '127.0.0.1'
+  - name: login_nodes_headnode_keys_configuration
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::login_nodes_keys]
+    verifier:
+      controls:
+        - head_node_directory_initialized
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+      cluster:
+        node_type: 'HeadNode'
+        scheduler: 'slurm'
+        shared_dir_login_nodes: '/opt/parallelcluster/shared_login_nodes'
+  - name: login_nodes_keys_configuration
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::login_nodes_keys]
+    verifier:
+      controls:
+        - login_node_configuration_initialized
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:nfs
+        - recipe:aws-parallelcluster-environment::mock_login_node_keys
+      cluster:
+        node_type: 'LoginNode'
+        scheduler: 'slurm'
+        head_node_private_ip: '127.0.0.1'
+        shared_dir_login_nodes: '/opt/parallelcluster/shared_login_nodes'
+  - name: shared_internal_storage_headnode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
+    verifier:
+      controls:
+        - mount_shared_compute_efs
+        - mount_shared_login_efs
+        - mount_intel_efs
+        - mount_slurm_efs
+    attributes:
+      cluster:
+        node_type: 'HeadNode'
+        scheduler: 'slurm'
+        internal_shared_storage_type: 'efs'
+        efs_shared_dirs: '/opt/parallelcluster/init_shared'
+        efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
+        ebs_shared_dirs: ''
+  - name: shared_internal_storage_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
+    verifier:
+      controls:
+        - mount_shared_compute_efs
+        - mount_intel_efs
+        - mount_slurm_efs
+    attributes:
+      cluster:
+        node_type: 'ComputeFleet'
+        scheduler: 'slurm'
+        internal_shared_storage_type: 'efs'
+        efs_shared_dirs: '/opt/parallelcluster/init_shared'
+        efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
+        ebs_shared_dirs: ''
+  - name: shared_internal_storage_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::backup_internal_use_shared_data]
+      - recipe[aws-parallelcluster-environment::mount_internal_use_efs]
+      - recipe[aws-parallelcluster-environment::restore_internal_use_shared_data]
+    verifier:
+      controls:
+        - mount_shared_login_efs
+        - mount_intel_efs
+        - mount_slurm_efs
+    attributes:
+      cluster:
+        node_type: 'LoginNode'
+        scheduler: 'slurm'
+        internal_shared_storage_type: 'efs'
+        efs_shared_dirs: '/opt/parallelcluster/init_shared'
+        efs_fs_ids: 'fs-03ad31942a4205839' # Existing FS, needs to be set when running the test
+        ebs_shared_dirs: ''
+  - name: spack
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_spack/
+    attributes:
+      resource: spack:configure
+      cluster:
+        enable_efa: efa
+        node_type: HeadNode
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:spack:setup

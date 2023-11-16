@@ -1,2 +1,13 @@
 #!/bin/bash
-sudo -u <%= node['cluster']['cluster_admin_user'] %> <%= node_virtualenv_path %>/bin/slurm_resume "$@"
+# ResumeProgram should read SLURM_RESUME_FILE within ten seconds of starting to guarantee that it still exists.
+# ref https://slurm.schedmd.com/power_save.html#tolerance
+
+trap "rm -f ${SLURM_RESUME_FILE_TMP}" EXIT
+
+SLURM_RESUME_FILE_TMP=$(mktemp)
+cp ${SLURM_RESUME_FILE} ${SLURM_RESUME_FILE_TMP}
+
+chgrp <%= node['cluster']['cluster_admin_slurm_share_group'] %> ${SLURM_RESUME_FILE_TMP}
+chmod g+r ${SLURM_RESUME_FILE_TMP}
+
+sudo -u <%= node['cluster']['cluster_admin_user'] %> SLURM_RESUME_FILE=${SLURM_RESUME_FILE_TMP} <%= node_virtualenv_path %>/bin/slurm_resume  "$@"

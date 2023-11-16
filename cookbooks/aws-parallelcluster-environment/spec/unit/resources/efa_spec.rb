@@ -2,8 +2,8 @@ require 'spec_helper'
 
 # parallelcluster default source dir defined in attributes
 source_dir = '/opt/parallelcluster/sources'
-efa_version = '1.22.1'
-efa_checksum = 'f90f3d5f59c031b9a964466b5401e86fd0429272408f6c207c3f9048254e9665'
+efa_version = '1.29.0'
+efa_checksum = '836655f87015547e733e7d9f7c760e4e24697f8bbc261bb5f3560abd4206bc36'
 
 class ConvergeEfa
   def self.setup(chef_run)
@@ -173,11 +173,10 @@ describe 'efa:configure' do
       elsif platform == 'ubuntu'
         context 'when efa enabled on compute node' do
           before do
-            chef_run.node.override['cluster']['enable_efa'] = 'compute'
+            chef_run.node.override['cluster']['enable_efa'] = 'efa'
             chef_run.node.override['cluster']['node_type'] = 'ComputeFleet'
             ConvergeEfa.configure(chef_run)
           end
-
           it 'disables ptrace protection on compute nodes' do
             is_expected.to apply_sysctl('kernel.yama.ptrace_scope').with(value: "0")
           end
@@ -197,7 +196,7 @@ describe 'efa:configure' do
 
         context 'when it is not a compute node' do
           before do
-            chef_run.node.override['cluster']['enable_efa'] = 'compute'
+            chef_run.node.override['cluster']['enable_efa'] = 'efa'
             chef_run.node.override['cluster']['node_type'] = 'other'
             ConvergeEfa.configure(chef_run)
           end

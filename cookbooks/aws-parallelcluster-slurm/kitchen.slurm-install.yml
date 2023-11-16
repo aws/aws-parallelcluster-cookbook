@@ -1,0 +1,107 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - cookbooks/aws-parallelcluster-slurm/test
+
+suites:
+
+# Resources
+  - name: dns_domain
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_dns_domain/
+    attributes:
+      resource: dns_domain
+  - name: jwt_dependencies
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_jwt_dependencies/
+    attributes:
+      resource: jwt_dependencies
+  - name: mysql_client
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /mysql_client/
+    attributes:
+      resource: mysql_client
+  - name: mysql_repo_add
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - tag:install_mysql_repo_added
+    attributes:
+      resource: mysql_repo:add
+  - name: munge
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_munge/
+    attributes:
+      resource: munge
+  - name: slurm_dependencies
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:install_slurm_dependencies/
+    attributes:
+      resource: slurm_dependencies
+
+# Recipes
+  - name: jwt
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_jwt]
+    verifier:
+      controls:
+        - /tag:install_jwt/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: pmix
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_pmix]
+    verifier:
+      controls:
+        - /tag:install_pmix/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+  - name: slurm
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-slurm::install_slurm]
+    verifier:
+      controls:
+        - /tag:install_slurm/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::users
+        - recipe:aws-parallelcluster-platform::directories
+        - resource:package_repos
+        - resource:install_packages
+        - resource:mysql_client
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - recipe:aws-parallelcluster-slurm::install_jwt
+        - recipe:aws-parallelcluster-slurm::install_pmix
+        - resource:munge

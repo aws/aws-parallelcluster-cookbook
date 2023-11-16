@@ -15,7 +15,7 @@ control 'tag:install_tag:testami_node_virtualenv_created' do
   min_pip_version = '19.3'
 
   title "node virtualenv should be created on #{python_version}"
-  only_if { !os_properties.redhat_ubi? }
+  only_if { !os_properties.redhat_on_docker? }
 
   describe directory(virtualenv_path) do
     it { should exist }

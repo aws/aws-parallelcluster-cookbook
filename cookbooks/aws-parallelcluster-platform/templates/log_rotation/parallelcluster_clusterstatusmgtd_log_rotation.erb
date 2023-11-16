@@ -1,0 +1,14 @@
+<%# Logrotate file for clusterstatusmgtd log %>
+/var/log/parallelcluster/clusterstatusmgtd {
+    missingok
+    notifempty
+    nodateext
+    size 10M
+    rotate 1
+    su root root
+    postrotate
+        pkill --signal=SIGUSR2 supervisord
+        echo 0
+    endscript
+    create 0640 root root
+}

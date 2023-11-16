@@ -9,12 +9,18 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import os
 
 import pytest
 from assertpy import assert_that
 from config_utils import get_template_folder
 from pcluster_slurm_config_generator import generate_slurm_config_files
+
+
+def _mock_head_node_config(mocker):
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
 
 
 @pytest.mark.parametrize(
@@ -25,8 +31,7 @@ def test_generate_slurm_config_files_nogpu(mocker, test_datadir, tmpdir, no_gpu)
     input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    _mock_head_node_config(mocker)
     template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
@@ -66,8 +71,7 @@ def test_generate_slurm_config_files_memory_scheduling(
         input_file = str(test_datadir / "sample_input.yaml")
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    _mock_head_node_config(mocker)
     template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
@@ -98,18 +102,39 @@ def test_generate_slurm_config_files_memory_scheduling(
 
 
 @pytest.mark.parametrize(
-    "slurm_accounting",
-    [(False), (True)],
+    "input_config, expected_outputs",
+    [
+        pytest.param(
+            "sample_input.yaml",
+            [
+                "slurm_parallelcluster.conf",
+                "slurm_parallelcluster_slurmdbd.conf",
+            ],
+            id="Case without Slurm Accounting",
+        ),
+        pytest.param(
+            "sample_input_slurm_accounting.yaml",
+            [
+                "slurm_parallelcluster_slurm_accounting.conf",
+                "slurm_parallelcluster_slurmdbd_slurm_accounting.conf",
+            ],
+            id="Case with Slurm Accounting",
+        ),
+        pytest.param(
+            "sample_input_slurm_accounting_dbname.yaml",
+            [
+                "slurm_parallelcluster_slurm_accounting_dbname.conf",
+                "slurm_parallelcluster_slurmdbd_slurm_accounting_dbname.conf",
+            ],
+            id="Case with Slurm Accounting passing DatabaseName",
+        ),
+    ],
 )
-def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, slurm_accounting):
-    if slurm_accounting:
-        input_file = str(test_datadir / "sample_input_slurm_accounting.yaml")
-    else:
-        input_file = str(test_datadir / "sample_input.yaml")
+def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, input_config, expected_outputs):
+    input_file = str(test_datadir / input_config)
     instance_types_data = str(test_datadir / "sample_instance_types_data.json")
 
-    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    _mock_head_node_config(mocker)
     template_directory = get_template_folder()
     generate_slurm_config_files(
         tmpdir,
@@ -124,16 +149,16 @@ def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpd
         cluster_name="test-cluster",
     )
 
-    for file_type in ["", "_slurmdbd"]:
-        file_name = f"slurm_parallelcluster{file_type}.conf"
-        postfix = "_slurm_accounting" if slurm_accounting else ""
-        output_file_name = f"slurm_parallelcluster{file_type}{postfix}.conf"
-        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+    generated_outputs = ["slurm_parallelcluster.conf", "slurm_parallelcluster_slurmdbd.conf"]
+
+    for item in zip(generated_outputs, expected_outputs):
+        generated_file = str(tmpdir / item[0])
+        expected_file = str(test_datadir / "expected_outputs" / item[1])
+        _assert_files_are_equal(generated_file, expected_file)
 
 
 def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, tmpdir):
-    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    _mock_head_node_config(mocker)
 
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
@@ -165,8 +190,7 @@ def test_generating_slurm_config_flexible_instance_types(mocker, test_datadir, t
 
 
 def test_generate_slurm_config_with_custom_settings(mocker, test_datadir, tmpdir):
-    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
-    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+    _mock_head_node_config(mocker)
 
     input_file = os.path.join(test_datadir, "sample_input.yaml")
     instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
@@ -191,8 +215,64 @@ def test_generate_slurm_config_with_custom_settings(mocker, test_datadir, tmpdir
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
+def test_generate_slurm_config_with_job_exc_alloc(mocker, test_datadir, tmpdir):
+    _mock_head_node_config(mocker)
+
+    input_file = os.path.join(test_datadir, "cluster_config.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    for queue in ["queue_jls_enabled", "queue_jls_disabled", "queue_jls_default"]:
+        file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        output_file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
+def test_generate_partition_nodelist_mapping(mocker, test_datadir, tmpdir):
+    mocker.patch("pcluster_slurm_config_generator.gethostname", return_value="ip-1-0-0-0", autospec=True)
+    mocker.patch("pcluster_slurm_config_generator._get_head_node_private_ip", return_value="ip.1.0.0.0", autospec=True)
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    filename = "pcluster/parallelcluster_partition_nodelist_mapping.json"
+    with open(os.path.join(tmpdir, filename), "r", encoding="utf-8") as file:
+        output_mapping = json.load(file)
+    with open(os.path.join(test_datadir, "expected_outputs", filename), "r", encoding="utf-8") as file:
+        expected_mapping = json.load(file)
+    assert_that(output_mapping).is_equal_to(expected_mapping)
+
+
 def _assert_files_are_equal(file, expected_file):
     with open(file, "r", encoding="utf-8") as f, open(expected_file, "r", encoding="utf-8") as exp_f:
         expected_file_content = exp_f.read()
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
-        assert_that(f.read()).is_equal_to(expected_file_content)
+        file_content = f.read()
+        assert_that(file_content).is_equal_to(expected_file_content)

@@ -11,14 +11,10 @@
 provides :munge, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
-unified_mode true
-
-default_action :setup
 
 use 'partial/_munge_actions'
+use 'partial/_munge_rhel'
 
-action_class do
-  def munge_libdir
-    '/usr/lib64'
-  end
+def munge_libdir
+  '/usr/lib64'
 end

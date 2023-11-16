@@ -1,6 +1,0 @@
-AllCops:
-  TargetChefVersion: 17.latest
-Chef/Modernize/FoodcriticComments:
-  Enabled: true
-Chef/Style/CopyrightCommentFormat:
-  Enabled: true

@@ -14,11 +14,15 @@ control 'tag:install_cloudwatch_installation_files' do
   end
 
   describe 'Check the presence of the cloudwatch package gpg key'
-  # In Ubuntu 20.04 due to environment variable the keyring is placed under home of the user ubuntu with the permission of root
-  keyring = os_properties.ubuntu2004? && !os_properties.virtualized? ? '--keyring /home/ubuntu/.gnupg/pubring.kbx' : ''
-  sudo = os_properties.redhat_ubi? ? '' : 'sudo'
+  # In Ubuntu >20.04 due to environment variable the keyring is placed under home of the user ubuntu with the permission of root
+  ubuntu2004 = os_properties.ubuntu2004?
+  ubuntu2204 = os_properties.ubuntu2204?
+  keyring = (ubuntu2004 || ubuntu2204) && !os_properties.on_docker? ? '--keyring /home/ubuntu/.gnupg/pubring.kbx' : ''
+  sudo = os_properties.redhat_on_docker? ? '' : 'sudo'
   describe bash("#{sudo} gpg --list-keys #{keyring}") do
-    its('exit_status') { should eq 0 }
+    # Don't check exit status for Ubuntu20 because it returns 2 when executed in the validate phase of a created AMI
+    # os_properties cannot be used in the describe block level.  It can be used within an it{} block
+    its('exit_status') { should eq 0 } unless ubuntu2004 || ubuntu2204
     its('stdout') { should match /3B789C72/ }
     its('stdout') { should match /Amazon CloudWatch Agent/ }
   end
@@ -36,7 +40,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/write_cloudwatch_agent_json.py') do
     it { should exist }
-    its('sha256sum') { should eq 'd7c0c151e7b2118c4684eef07463d0644c001fd835d968fa0f9c4e67c55879ab' }
+    its('sha256sum') { should eq 'e528db6e875ed28e1ed0caf5e2e4cb9542e744ce9ebfadafa594272542fe7ea2' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
@@ -52,7 +56,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/etc/cloudwatch_agent_config_schema.json') do
     it { should exist }
-    its('sha256sum') { should eq '3380ee721f26c31ac629e5e8573f6e034f890f37d55f46849ada175902815b0c' }
+    its('sha256sum') { should eq '902aab6974f296b6da757159edf4210b3e4674ba4aea96c9cd1662bcbc987cb4' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
@@ -60,16 +64,85 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/cloudwatch_agent_config_util.py') do
     it { should exist }
-    its('sha256sum') { should eq '980b0ba6e5922fe2983d3e866ac970622f59a26a4829b8262466739582176525' }
+    its('sha256sum') { should eq '55125b14b8b5dba4b694b07f2ece008a6607ceb24ce0ae784a92affe34bd78bd' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0644' }
+  end
+
+  describe file('/usr/local/bin/cloudwatch_agent_common_utils.py') do
+    it { should exist }
+    its('sha256sum') { should eq 'b65d53caf3d69f723324c4339f44cd8662a5c63ad8796118640738d7f6a63381' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
   end
 
   describe 'Check the cloudwatch service'
-  if node['cluster']['cw_logging_enabled'] == 'true' && !os_properties.virtualized?
+  if node['cluster']['cw_logging_enabled'] == 'true' && !os_properties.on_docker?
     describe bash("/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a status | grep status | grep running") do
       its('exit_status') { should eq 0 }
     end
   end
+
+  # TODO: this check is correct according to the specification of the control we have in
+  #  `kitchen.environment-config.yaml`, but we run this control with different cluster attributes in the daily
+  #  kitchen tests, and here we do not start the CloudWatch Agent service that would create this file.
+  #
+  # describe file('/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
+  #   it { should exist }
+  #   its('owner') { should eq 'root' }
+  #   its('group') { should eq 'root' }
+  #   its('mode') { should cmp '0644' }
+  # end unless os_properties.on_docker?
+end
+
+control 'cloudwatch_logfiles_configuration_loginnode' do
+  title "Check CloudWatch configuration generated on login nodes"
+
+  # TODO: add directory service enablement in the context of the test and add the corresponding log files.
+  expected_log_files = %w(
+    /var/log/cloud-init.log
+    /var/log/cloud-init-output.log
+    /var/log/supervisord.log
+  )
+  unexpected_log_files = %w(
+    /var/log/messages
+    /var/log/syslog
+    /var/log/cfn-init.log
+    /var/log/chef-client.log
+    /var/log/parallelcluster/bootstrap_error_msg
+    /var/log/parallelcluster/clustermgtd
+    /var/log/parallelcluster/clustermgtd.events
+    /var/log/parallelcluster/slurm_resume.events
+    /var/log/parallelcluster/compute_console_output.log
+    /var/log/parallelcluster/computemgtd
+    /var/log/parallelcluster/slurm_resume.log
+    /var/log/parallelcluster/slurm_suspend.log
+    /var/log/parallelcluster/slurm_fleet_status_manager.log
+    /var/log/slurmd.log
+    /var/log/slurmctld.log
+    /var/log/slurmdbd.log
+    /var/log/parallelcluster/pcluster_dcv_authenticator.log
+    /var/log/parallelcluster/pcluster_dcv_connect.log
+    /var/log/dcv/server.log
+    /var/log/dcv/sessionlauncher.log
+    /var/log/dcv/agent.*.log
+    /var/log/dcv/dcv-xsession.*.log
+    /var/log/dcv/Xdcv.*.log
+    /var/log/parallelcluster/slurm_health_check.log
+    /var/log/parallelcluster/slurm_health_check.events
+    /var/log/parallelcluster/clusterstatusmgtd
+  )
+
+  # This checks a file under the `/etc/amazon/amazon-cloudwatch-agent` path, which is created by the CW agent service
+  # when it starts up. This check requires the agent to be actually started on the node.
+  describe file('/etc/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
+    expected_log_files.each do |log_file|
+      its('content') { should include(log_file) }
+    end
+    unexpected_log_files.each do |log_file|
+      its('content') { should_not include(log_file) }
+    end
+  end unless os_properties.on_docker?
 end

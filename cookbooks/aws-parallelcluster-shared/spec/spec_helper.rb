@@ -4,6 +4,7 @@ require 'chefspec/berkshelf'
 RSpec.configure do |c|
   c.before(:each) do
     allow(File).to receive(:exist?).and_call_original
+    allow(Dir).to receive(:exist?).and_call_original
     allow_any_instance_of(Object).to receive(:aws_domain).and_return("test_aws_domain")
     allow_any_instance_of(Object).to receive(:aws_region).and_return("test_region")
   end
@@ -39,7 +40,6 @@ def for_all_oses
     # The only Centos7 version supported by ChefSpec
     # See the complete list here: https://github.com/chefspec/fauxhai/blob/main/PLATFORMS.md
     %w(centos 7.8.2003),
-    %w(ubuntu 18.04),
     %w(ubuntu 20.04),
     %w(ubuntu 22.04),
     %w(redhat 8),

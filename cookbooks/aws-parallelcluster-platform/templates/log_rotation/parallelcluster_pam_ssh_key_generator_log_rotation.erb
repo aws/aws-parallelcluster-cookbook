@@ -1,0 +1,10 @@
+<%# Logrotate file for pam_ssh_key_generator log %>
+/var/log/parallelcluster/pam_ssh_key_generator.log {
+    rotate 1
+    size 10M
+    missingok
+    notifempty
+    su root root
+    copytruncate
+    nodateext
+}

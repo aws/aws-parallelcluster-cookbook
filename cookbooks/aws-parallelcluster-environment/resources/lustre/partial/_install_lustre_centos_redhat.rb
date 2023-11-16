@@ -33,7 +33,7 @@ action :install_lustre do
     retry_delay 5
   end
 
-  kernel_module 'lnet' unless redhat_ubi?
+  kernel_module 'lnet' unless redhat_on_docker? || rocky_on_docker?
 end
 
 def find_kernel_patch_version

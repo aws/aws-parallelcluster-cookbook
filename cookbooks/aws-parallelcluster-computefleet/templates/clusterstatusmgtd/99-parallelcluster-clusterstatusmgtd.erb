@@ -1,0 +1,3 @@
+Cmnd_Alias CINC_COMMAND = /usr/bin/cinc-client --local-mode --config /etc/chef/client.rb --log_level auto --logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist  aws-parallelcluster-entrypoints\:\:update_computefleet_status
+
+<%= node['cluster']['cluster_admin_user'] %> ALL = (root) NOPASSWD: CINC_COMMAND

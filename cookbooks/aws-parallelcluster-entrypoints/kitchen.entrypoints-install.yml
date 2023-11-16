@@ -1,0 +1,31 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - cookbooks/aws-parallelcluster-awsbatch/test
+    - cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-environment/test
+    - cookbooks/aws-parallelcluster-platform/test
+    - cookbooks/aws-parallelcluster-shared/test
+    - cookbooks/aws-parallelcluster-slurm/test
+
+provisioner:
+  attributes:
+    cluster:
+      # The following parameters are required when running install recipes on system tests
+      region: us-east-1
+      custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
+      custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/develop.tar.gz
+
+suites:
+  - name: entrypoints_install
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-entrypoints::install]
+      - recipe[aws-parallelcluster-tests::tear_down]
+    verifier:
+      controls:
+        - /tag:install/
+    driver:
+      # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
+      instance_type: g4dn.2xlarge

@@ -11,7 +11,7 @@ import json
 import os
 import socket
 
-import yaml
+from cloudwatch_agent_common_utils import render_jinja_template
 
 AWS_CLOUDWATCH_CFG_PATH = "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
 DEFAULT_METRICS_COLLECTION_INTERVAL = 60
@@ -22,21 +22,19 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Create the cloudwatch agent config file")
     parser.add_argument("--config", help="Path to JSON file describing logs that should be monitored", required=True)
     parser.add_argument(
-        "--platform", help="OS family of this instance", choices=["amazon", "centos", "ubuntu", "redhat"], required=True
+        "--platform",
+        help="OS family of this instance",
+        choices=["amazon", "centos", "ubuntu", "redhat", "rocky"],
+        required=True,
     )
     parser.add_argument("--log-group", help="Name of the log group", required=True)
     parser.add_argument(
         "--node-role",
         required=True,
-        choices=["HeadNode", "ComputeFleet"],
-        help="Role this node plays in the cluster " "(i.e., is it a compute node or the head node?)",
+        choices=["HeadNode", "ComputeFleet", "LoginNode"],
+        help="Role this node plays in the cluster (i.e., is it a compute node or the head node?)",
     )
-    parser.add_argument("--scheduler", required=True, choices=["slurm", "awsbatch", "plugin"], help="Scheduler")
-    parser.add_argument(
-        "--cluster-config-path",
-        required=False,
-        help="Cluster configuration path",
-    )
+    parser.add_argument("--scheduler", required=True, choices=["slurm", "awsbatch"], help="Scheduler")
     return parser.parse_args()
 
 
@@ -67,7 +65,7 @@ def add_instance_log_stream_prefixes(configs):
 
 def read_data(config_path):
     """Read in log configuration data from config_path."""
-    with open(config_path, encoding="utf-8") as infile:
+    with open(render_jinja_template(config_path), encoding="utf-8") as infile:
         return json.load(infile)
 
 
@@ -130,39 +128,6 @@ def select_logs(configs, args):
 def get_node_roles(scheudler_plugin_node_roles):
     node_type_roles_map = {"ALL": ["ComputeFleet", "HeadNode"], "HEAD": ["HeadNode"], "COMPUTE": ["ComputeFleet"]}
     return node_type_roles_map.get(scheudler_plugin_node_roles)
-
-
-def load_config(cluster_config_path):
-    with open(cluster_config_path, encoding="utf-8") as input_file:
-        return yaml.load(input_file, Loader=yaml.SafeLoader)
-
-
-def add_scheduler_plugin_log(config_data, cluster_config_path):
-    """Add custom log files to config data if log files specified in scheduler plugin."""
-    cluster_config = load_config(cluster_config_path)
-    if (
-        get_dict_value(cluster_config, "Scheduling.SchedulerSettings.SchedulerDefinition.Monitoring.Logs.Files")
-        and get_dict_value(cluster_config, "Scheduling.Scheduler") == "plugin"
-    ):
-        log_files = get_dict_value(
-            cluster_config, "Scheduling.SchedulerSettings.SchedulerDefinition.Monitoring.Logs.Files"
-        )
-        for log_file in log_files:
-            # Add log config
-            log_config = {
-                "timestamp_format_key": log_file.get("LogStreamName"),
-                "file_path": log_file.get("FilePath"),
-                "log_stream_name": log_file.get("LogStreamName"),
-                "schedulers": ["plugin"],
-                "platforms": ["centos", "ubuntu", "amazon", "redhat"],
-                "node_roles": get_node_roles(log_file.get("NodeType")),
-                "feature_conditions": [],
-            }
-            config_data["log_configs"].append(log_config)
-
-            # Add timestamp formats
-            config_data["timestamp_formats"][log_file.get("LogStreamName")] = log_file.get("TimestampFormat")
-    return config_data
 
 
 def add_timestamps(configs, timestamps_dict):
@@ -259,8 +224,6 @@ def main():
     """Create cloudwatch agent config file."""
     args = parse_args()
     config_data = read_data(args.config)
-    if args.cluster_config_path:
-        config_data = add_scheduler_plugin_log(config_data, args.cluster_config_path)
     log_configs = select_logs(config_data["log_configs"], args)
     log_configs = add_timestamps(log_configs, config_data["timestamp_formats"])
     log_configs = add_log_group_name_params(args.log_group, log_configs)

@@ -1,0 +1,16 @@
+---
+verifier:
+  name: inspec
+  inspec_tests:
+    - cookbooks/aws-parallelcluster-shared/test
+
+suites:
+
+# Recipes
+  - name: setup_envars
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-shared::setup_envars]
+    verifier:
+      controls:
+        - /tag:config_setup_envars/

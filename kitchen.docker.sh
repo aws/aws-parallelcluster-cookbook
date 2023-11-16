@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source kitchen.local-yml.sh
+source kitchen/kitchen.local-yml.sh
 
 THIS_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export KITCHEN_YAML="${THIS_DIR}/kitchen.docker.yml"
@@ -18,4 +18,4 @@ echo "** KITCHEN_YAML: $KITCHEN_YAML"
 echo "** KITCHEN_GLOBAL_YAML: $KITCHEN_GLOBAL_YAML"
 echo "kitchen $*"
 
-cd "${KITCHEN_COOKBOOK_PATH}" && kitchen "$@"
+kitchen "$@"

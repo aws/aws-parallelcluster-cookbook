@@ -12,15 +12,4 @@ provides :jwt_dependencies, platform: 'redhat' do |node|
   node['platform_version'].to_i == 8
 end
 
-unified_mode true
-
-default_action :setup
-
-action :setup do
-  package 'jansson-devel' do
-    flush_cache({ before: true })
-
-    retries 3
-    retry_delay 5
-  end unless redhat_ubi?
-end
+use 'partial/_jwt_dependencies_common'

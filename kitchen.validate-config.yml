@@ -2,17 +2,14 @@
 ---
 verifier:
   inspec_tests:
-    - test/recipes
-    - test/resources
-    - /tmp/cookbooks/aws-parallelcluster-platform/test
-    - /tmp/cookbooks/aws-parallelcluster-environment/test
-    - /tmp/cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-awsbatch/test
+    - cookbooks/aws-parallelcluster-platform/test
+    - cookbooks/aws-parallelcluster-environment/test
+    - cookbooks/aws-parallelcluster-computefleet/test
+    - cookbooks/aws-parallelcluster-shared/test
+    - cookbooks/aws-parallelcluster-slurm/test
   controls:
     - /tag:config/
-
-lifecycle:
-  pre_verify:
-    - local: . ./kitchen.fix-inspec-deps.sh
 
 _common_cluster_attributes: &_common_cluster_attributes
   stack_name: <%= ENV['AWS_STACK_NAME'] || 'fake_stack' %>
@@ -24,18 +21,22 @@ _common_cluster_attributes: &_common_cluster_attributes
   cluster_config_s3_key: <%= ENV['CLUSTER_CONFIG_S3_KEY'] %>
   instance_types_data_s3_key: <%= ENV['INSTANCE_TYPES_DATA_S3_KEY'] %>
   os: <%= ENV['OS'] %>
-  custom_node_package: <%= ENV['PARALLELCLUSTER_NODE_URL'] %>
   dcv_enabled: 'head_node'
   dcv_port: '8443'
-  enable_efa: 'compute'
+  enable_efa: 'efa'
   nvidia:
     enabled: <%= ENV['NVIDIA_ENABLED'] %>
+  internal_shared_storage_type: ebs
 
 _head_node_cluster_attributes: &_head_node_cluster_attributes
   << : *_common_cluster_attributes
   node_type: 'HeadNode'
   ddb_table: <%= ENV['DDB_TABLE'] %>
   slurm_ddb_table: <%= ENV['DDB_TABLE'] %>
+  config:
+    Scheduling:
+      SlurmSettings:
+        MungeKeySecretArn: null
 
 _compute_node_cluster_attributes: &_compute_node_cluster_attributes
   << : *_common_cluster_attributes
@@ -44,19 +45,18 @@ _compute_node_cluster_attributes: &_compute_node_cluster_attributes
   head_node_private_ip: <%= ENV['HEAD_NODE_PRIVATE_IP'] %>
 
 _run_list: &_run_list
-  - recipe[aws-parallelcluster::add_dependencies]
-  - recipe[aws-parallelcluster::init]
-  - recipe[aws-parallelcluster::config]
-  - recipe[aws-parallelcluster::finalize]
+  - recipe[aws-parallelcluster-tests::setup]
+  - recipe[aws-parallelcluster-entrypoints::init]
+  - recipe[aws-parallelcluster-entrypoints::config]
+  - recipe[aws-parallelcluster-entrypoints::finalize]
   - recipe[aws-parallelcluster-tests::tear_down]
-  - recipe[aws-parallelcluster::unmount_home]
 
 provisioner:
   attributes:
     kitchen: true
 
 suites:
-  - name: slurm-config-head-node-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  - name: slurm-config-head-node-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: &attributes_slurm_config_HeadNode
       cluster:
@@ -64,11 +64,11 @@ suites:
         scheduler: 'slurm'
         enable_intel_hpc_platform: "<%= ENV['ENABLE_INTEL_HPC_PLATFORM'] || false %>"
 
-  - name: slurm-config-head-node-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  - name: slurm-config-head-node-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: *attributes_slurm_config_HeadNode
 
-  - name: awsbatch-config-head-node-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  - name: awsbatch-config-head-node-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: &attributes_awsbatch_config_HeadNode
       cluster:
@@ -76,11 +76,11 @@ suites:
         scheduler: 'awsbatch'
         custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
 
-  - name: awsbatch-config-head-node-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  - name: awsbatch-config-head-node-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: *attributes_awsbatch_config_HeadNode
 
-  - name: slurm-config-compute-fleet-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  - name: slurm-config-compute-fleet-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: &attributes_slurm_config_ComputeFleet
       cluster:
@@ -88,6 +88,6 @@ suites:
         scheduler: 'slurm'
         slurm_nodename: 'fake-dy-compute-1'
 
-  - name: slurm-config-compute-fleet-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  - name: slurm-config-compute-fleet-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: *attributes_slurm_config_ComputeFleet

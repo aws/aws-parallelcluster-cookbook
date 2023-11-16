@@ -1,5 +1,5 @@
 <%
-  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.7.0'
+  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.9.0'
   pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
 %>
 ---
@@ -22,7 +22,7 @@ driver:
     http_put_response_hop_limit: 1
     instance_metadata_tags: 'enabled'
   iam_profile_name: <%= ENV['KITCHEN_IAM_PROFILE'] %>
-  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 't2.micro' %>
+  instance_type: <%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
   associate_public_ip: true
   user_data: <%= ENV['KITCHEN_USER_DATA_SCRIPT'] %>
   tags:
@@ -38,6 +38,7 @@ lifecycle:
 
       case $KITCHEN_PLATFORM_NAME in
       alinux*|redhat* ) export KITCHEN_EC2_USER='ec2-user';;
+      rocky*          ) export KITCHEN_EC2_USER='rocky';;
       centos*         ) export KITCHEN_EC2_USER='centos';;
       ubuntu*         ) export KITCHEN_EC2_USER='ubuntu';;
       esac
@@ -60,8 +61,9 @@ transport:
   name: speedy_ssh
 
 provisioner:
-  name: chef_zero
-  require_chef_omnibus: 17.2.29
+  product_name: cinc
+  product_version: 18.2.7
+  install_strategy: once
   chef_omnibus_url: https://omnitruck.cinc.sh/install.sh
   chef_omnibus_root: /opt/cinc
   retry_on_exit_code:
@@ -71,6 +73,7 @@ provisioner:
   client_rb:
     exit_status: :enabled # Opt-in to the standardized exit codes
     client_fork: false  # Forked instances don't return the real exit code
+  log_level: info
 
 platforms:
   - name: alinux2
@@ -87,7 +90,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -113,7 +116,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -125,6 +128,32 @@ platforms:
     attributes:
       cluster:
         base_os: rhel8
+  - name: rocky8
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_ROCKY8_AMI'] %>
+      # Use the Rocky Linux 8 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_ROCKY8_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>Rocky-8-EC2-Base-8*<% else %><%= pcluster_prefix %>-rocky8-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: rocky
+    attributes:
+      cluster:
+        base_os: rocky8
   - name: centos7
     driver_plugin: ec2
     driver:
@@ -139,7 +168,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -151,32 +180,6 @@ platforms:
     attributes:
       cluster:
         base_os: centos7
-  - name: ubuntu1804
-    driver_plugin: ec2
-    driver:
-      <% if ENV['KITCHEN_UBUNTU1804_AMI'] %>
-      # Use the Ubuntu 18 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_UBUNTU1804_AMI'] %>
-      <% else %>
-      image_search:
-        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20221207<% else %><%= pcluster_prefix %>-ubuntu-1804-lts-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
-      <% end %>
-      block_device_mappings:
-        - device_name: /dev/sda1
-          ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
-            volume_type: gp2
-            delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
-        - device_name: /dev/xvdb<%= c %>
-          virtual_name: ephemeral<%= i %>
-      <% end %>
-    transport:
-      username: ubuntu
-    attributes:
-      cluster:
-        base_os: ubuntu1804
   - name: ubuntu2004
     driver_plugin: ec2
     driver:
@@ -191,7 +194,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -211,13 +214,13 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU2204_AMI'] %>
       <% else %>
       image_search:
-        name: ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20230106
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-20230106<% else %><%= pcluster_prefix %>-ubuntu-2204-lts-hvm-*<% end %>
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 35 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>

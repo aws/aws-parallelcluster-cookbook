@@ -1,0 +1,44 @@
+<%# EBS %>
+<%  shared_dir_array = node['cluster']['ebs_shared_dirs'].split(',') -%>
+<% vol_array = node['cluster']['volume'].split(',') -%>
+ebs:
+<% vol_array.each_with_index do |volumeid, index| -%>
+  - volume_id: <%= volumeid %>
+    mount_dir: <%= shared_dir_array[index] %>
+<% end -%>
+<%# RAID %>
+raid:
+<% raid_shared_dir = node['cluster']['raid_shared_dir'] -%>
+<% unless raid_shared_dir.empty? -%>
+  - raid_shared_dir: <%= node['cluster']['raid_shared_dir'] %>
+    raid_type: <%= node['cluster']['raid_type'] %>
+    raid_vol_array: <%= node['cluster']['raid_vol_ids'].split(',') %>
+<% end -%>
+<%# EFS %>
+<% efs_fs_ids_array = node['cluster']['efs_fs_ids'].split(',') -%>
+<% efs_shared_dir_array = node['cluster']['efs_shared_dirs'].split(',') -%>
+<% efs_encryption_in_transit_array = node['cluster']['efs_encryption_in_transits'].split(',') -%>
+<% efs_iam_authorization_array = node['cluster']['efs_iam_authorizations'].split(',') -%>
+efs:
+<% efs_fs_ids_array.each_with_index do |efs_fs_id, index| -%>
+  - efs_fs_id: <%= efs_fs_id %>
+    mount_dir: <%= efs_shared_dir_array[index] %>
+    efs_encryption_in_transit: <%= efs_encryption_in_transit_array[index] %>
+    efs_iam_authorization: <%= efs_iam_authorization_array[index] %>
+<% end -%>
+<%# FSX %>
+<% fsx_fs_id_array = node['cluster']['fsx_fs_ids'].split(',') -%>
+<% fsx_fs_type_array = node['cluster']['fsx_fs_types'].split(',') -%>
+<% fsx_shared_dir_array = node['cluster']['fsx_shared_dirs'].split(',') -%>
+<% fsx_dns_name_array = node['cluster']['fsx_dns_names'].split(',') -%>
+<% fsx_mount_name_array = node['cluster']['fsx_mount_names'].split(',') -%>
+<% fsx_volume_junction_path_array = node['cluster']['fsx_volume_junction_paths'].split(',') -%>
+fsx:
+<% fsx_fs_id_array.each_with_index do |fsx_fs_id, index| -%>
+  - fsx_fs_id: <%= fsx_fs_id %>
+    mount_dir: <%= fsx_shared_dir_array[index] %>
+    fsx_fs_type: <%= fsx_fs_type_array[index] %>
+    fsx_dns_name: <%= if fsx_dns_name_array[index]; fsx_dns_name_array[index] else "null" end%>
+    fsx_mount_name: <%= fsx_mount_name_array[index] %>
+    fsx_volume_junction_path: <%= if fsx_dns_name_array[index]; fsx_volume_junction_path_array[index] else "null" end%>
+<% end -%>

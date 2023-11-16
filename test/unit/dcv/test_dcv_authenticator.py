@@ -9,6 +9,10 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+
+# FIXME: Fix Code Duplication
+# pylint: disable=R0801
+
 import json
 import string
 import time
@@ -16,14 +20,14 @@ from datetime import datetime
 
 import pytest
 from assertpy import assert_that
-from dcv.pcluster_dcv_authenticator import (
+from pcluster_dcv_authenticator import (
     DCVAuthenticator,
     OneTimeTokenHandler,
     generate_random_token,
     generate_sha512_hash,
 )
 
-AUTH_MODULE_MOCK_PATH = "dcv.pcluster_dcv_authenticator."
+AUTH_MODULE_MOCK_PATH = "pcluster_dcv_authenticator."
 AUTH_CLASS_MOCK_PATH = AUTH_MODULE_MOCK_PATH + "DCVAuthenticator."
 
 

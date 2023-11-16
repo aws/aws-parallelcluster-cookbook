@@ -14,14 +14,22 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :configure do
-  node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
+  if node['cluster']['node_type'] == "HeadNode"
+    node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
 
-  override_server_template
+    override_server_template
 
-  # Explicitly restart NFS server for thread setting to take effect
-  # and enable it to start at boot
-  service node['nfs']['service']['server'] do
-    action %i(restart enable)
-    supports restart: true
-  end unless on_docker?
+    # Explicitly restart NFS server for thread setting to take effect
+    # and enable it to start at boot
+    service node['nfs']['service']['server'] do
+      action %i(restart enable)
+      supports restart: true
+      retries 5
+      retry_delay 10
+    end unless on_docker?
+  else
+    service node['nfs']['service']['server'] do
+      action %i(stop disable)
+    end unless on_docker?
+  end
 end

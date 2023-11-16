@@ -12,15 +12,15 @@
           "log_stream_name": {"type": "string"},
           "schedulers": {
             "type": "array",
-            "items": {"type": "string", "enum": ["awsbatch", "slurm", "plugin"]}
+            "items": {"type": "string", "enum": ["awsbatch", "slurm"]}
           },
           "platforms": {
             "type": "array",
-            "items": {"type": "string", "enum": ["amazon", "centos", "ubuntu", "redhat"]}
+            "items": {"type": "string", "enum": ["amazon", "centos", "ubuntu", "redhat", "rocky"]}
           },
           "node_roles": {
             "type": "array",
-            "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet"]}
+            "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet", "LoginNode"]}
           },
           "feature_conditions": {
             "type": "array",
