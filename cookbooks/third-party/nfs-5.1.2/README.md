@@ -23,43 +23,43 @@ This cookbook depends on the [`line` cookbook](https://github.com/sous-chefs/lin
 ### Attributes
 
 - `nfs['packages']`
-  - Case switch in attributes to choose NFS client packages dependent on platform.
+   - Case switch in attributes to choose NFS client packages dependent on platform.
 
 - `nfs['service']`
-  - `['config']` - only set on Debian/Ubuntu to work around loose systemd dependencies on this platform family - debian:
+   - `['config']` - only set on Debian/Ubuntu to work around loose systemd dependencies on this platform family - debian:
     `nfs-config.service`
-  - `['portmap']` - the rpcbind service - default: `nfs-client.target`
-  - `['lock']` - the rpc-statd service - default: `nfs-client.target`, debian: `rpc-statd.service`
-  - `['server']` - the server component, - default: `nfs-server.service`, debian: `nfs-kernel-server.service`
-  - `['idmap']` - the NFSv4 idmap component
+   - `['portmap']` - the rpcbind service - default: `nfs-client.target`
+   - `['lock']` - the rpc-statd service - default: `nfs-client.target`, debian: `rpc-statd.service`
+   - `['server']` - the server component, - default: `nfs-server.service`, debian: `nfs-kernel-server.service`
+   - `['idmap']` - the NFSv4 idmap component
 
 - `nfs['config']`
-  - `client_templates` - templates to iterate through on client systems, chosen by platform
-  - `server_template` - Per-platform case switch in common nfs.erb template. This string should be set to where the main
+   - `client_templates` - templates to iterate through on client systems, chosen by platform
+   - `server_template` - Per-platform case switch in common nfs.erb template. This string should be set to where the main
      NFS server configuration file should be placed.
-  - `idmap_template` - Path to idmapd.conf used in `nfs::client4` and `nfs::server4` recipes.
+   - `idmap_template` - Path to idmapd.conf used in `nfs::client4` and `nfs::server4` recipes.
 
 - `nfs['threads']` - Number of nfsd threads to run. Default 8 on Linux, 24 on FreeBSD. Set to 0, to disable.
 
 - `nfs['port']`
-  - `['statd']` = Listen port for statd, default 32765
-  - `['statd_out']` = Outgoing port for statd, default 32766
-  - `['mountd']` = Listen port for mountd, default 32767
-  - `['lockd']` = Listen port for lockd, default 32768
+   - `['statd']` = Listen port for statd, default 32765
+   - `['statd_out']` = Outgoing port for statd, default 32766
+   - `['mountd']` = Listen port for mountd, default 32767
+   - `['lockd']` = Listen port for lockd, default 32768
 
 - `nfs['v2']`, `nfs['v3']`, `nfs['v4']`
-  - Set to `yes` or `no` to turn on/off NFS protocol level v2, or v3.
-  - Defaults to nil, deferring to the default behavior provided by running kernel.
+   - Set to `yes` or `no` to turn on/off NFS protocol level v2, or v3.
+   - Defaults to nil, deferring to the default behavior provided by running kernel.
 
 - `nfs['mountd_flags']` - BSD launch options for mountd.
 - `nfs['server_flags']` - BSD launch options for nfsd.
 
 - `nfs['idmap']`
-  - Attributes specific to idmap template and service.
-  - `['domain']` - Domain for idmap service, defaults to `node['domain']`
-  - `['pipefs_directory']` - platform-specific location of `Pipefs-Directory`
-  - `['user']` - effective user for idmap service, default `nobody`.
-  - `['group']` - effective group for idmap service, default `nogroup`.
+   - Attributes specific to idmap template and service.
+   - `['domain']` - Domain for idmap service, defaults to `node['domain']`
+   - `['pipefs_directory']` - platform-specific location of `Pipefs-Directory`
+   - `['user']` - effective user for idmap service, default `nobody`.
+   - `['group']` - effective group for idmap service, default `nogroup`.
 
 ## Usage
 
@@ -106,35 +106,35 @@ end
 The default parameters for the `nfs_export` LWRP are as follows
 
 - directory
-  - directory you wish to export
-  - defaults to resource name
+   - directory you wish to export
+   - defaults to resource name
 
 - network
-  - a CIDR, IP address, or wildcard (\*)
-  - requires an option
-  - can be a string for a single address or an array of networks
+   - a CIDR, IP address, or wildcard (\*)
+   - requires an option
+   - can be a string for a single address or an array of networks
 
 - writeable
-  - ro/rw export option
-  - defaults to false
+   - ro/rw export option
+   - defaults to false
 
 - sync
-  - synchronous/asynchronous export option
-  - defaults to true
+   - synchronous/asynchronous export option
+   - defaults to true
 
 - anonuser
-  - user mapping for anonymous users
-  - the user's UID will be retrieved from /etc/passwd for the anonuid=x option
-  - defaults to nil (no mapping)
+   - user mapping for anonymous users
+   - the user's UID will be retrieved from /etc/passwd for the anonuid=x option
+   - defaults to nil (no mapping)
 
 - anongroup
-  - group mapping for anonymous users
-  - the group's GID will be retrieved from /etc/group for the anongid=x option
-  - defaults to nil (no mapping)
+   - group mapping for anonymous users
+   - the group's GID will be retrieved from /etc/group for the anongid=x option
+   - defaults to nil (no mapping)
 
 - options
-  - additional export options as an array, excluding the parameterized sync/async, ro/rw options, and anoymous mappings
-  - defaults to `root_squash`
+   - additional export options as an array, excluding the parameterized sync/async, ro/rw options, and anoymous mappings
+   - defaults to `root_squash`
 
 ## nfs::default recipe
 

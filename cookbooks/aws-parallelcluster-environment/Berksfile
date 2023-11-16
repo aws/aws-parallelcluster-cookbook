@@ -4,7 +4,7 @@ metadata
 
 cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
 
-cookbook "nfs", path: "../third-party/nfs-5.0.0"
+cookbook "nfs", path: "../third-party/nfs-5.1.2"
 
 # dependency od nfs
 cookbook "line", path: "../third-party/line-4.5.13"

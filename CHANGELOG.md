@@ -3,6 +3,17 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.9.0
+------
+
+**ENHANCEMENTS**
+
+**CHANGES**
+- Upgrade third-party cookbook dependencies:
+  - nfs-5.1.2 (from nfs-5.0.0)
+
+**BUG FIXES**
+
 3.8.0
 ------
 
