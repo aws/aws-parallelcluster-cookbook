@@ -3,6 +3,9 @@
 #
 # This is a general configuration for the
 # NFS daemons and tools
+[general]
+pipefs-directory=<%= node['nfs']['idmap']['pipefs_directory'] %>
+
 [gssd]
 use-gss-proxy=1
 

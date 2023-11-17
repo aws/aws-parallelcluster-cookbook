@@ -49,10 +49,7 @@ def for_all_oses
 end
 
 def runner(platform:, version:, step_into: [])
-  path = '../aws-parallelcluster-shared/spec/ubuntu.22.json' if "#{platform}#{version}" == 'ubuntu22.04'
-  ChefSpec::SoloRunner.new(
-    platform: platform, version: version, step_into: step_into, path: path
-  ) do |node|
+  ChefSpec::SoloRunner.new(platform: platform, version: version, step_into: step_into) do |node|
     yield node if block_given?
   end
 end
