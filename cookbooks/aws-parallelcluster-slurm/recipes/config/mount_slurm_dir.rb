@@ -20,5 +20,5 @@ mount "#{node['cluster']['slurm']['install_dir']}" do
   action %i(mount enable)
   retries 10
   retry_delay 6
-  only_if { node['cluster']['internal_shared_storage_type'] == 'ebs' }
+  only_if { node['cluster']['shared_storage_type'] == 'ebs' }
 end

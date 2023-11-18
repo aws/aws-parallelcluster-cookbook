@@ -176,7 +176,7 @@ suites:
       cluster:
         node_type: ComputeFleet
         head_node_private_ip: '127.0.0.1'
-        internal_shared_storage_type: ebs
+        shared_storage_type: ebs
   - name: config_head_node_munge
     run_list:
     - recipe[aws-parallelcluster-tests::setup]
