@@ -26,7 +26,7 @@ _common_cluster_attributes: &_common_cluster_attributes
   enable_efa: 'efa'
   nvidia:
     enabled: <%= ENV['NVIDIA_ENABLED'] %>
-  internal_shared_storage_type: ebs
+  shared_storage_type: ebs
 
 _head_node_cluster_attributes: &_head_node_cluster_attributes
   << : *_common_cluster_attributes

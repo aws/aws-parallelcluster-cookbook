@@ -17,13 +17,13 @@ cloudwatch "Configure CloudWatch" do
   action :configure
 end
 
-case node['cluster']['internal_shared_storage_type']
+case node['cluster']['shared_storage_type']
 when 'efs'
   include_recipe "aws-parallelcluster-environment::mount_internal_use_efs"
 when 'ebs'
   include_recipe "aws-parallelcluster-environment::mount_internal_use_ebs"
 else
-  raise "internal_shared_storage_type must be ebs or efs"
+  raise "shared_storage_type must be ebs or efs"
 end
 
 # Mount the home directory to all nodes if it is shared, otherwise mount the NFS share to compute and login nodes
