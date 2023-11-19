@@ -65,7 +65,7 @@ def add_instance_log_stream_prefixes(configs):
 
 def read_data(config_path):
     """Read in log configuration data from config_path."""
-    with open(render_jinja_template(config_path), encoding="utf-8") as infile:
+    with open(config_path, encoding="utf-8") as infile:
         return json.load(infile)
 
 
@@ -223,7 +223,7 @@ def get_dict_value(value, attributes, default=None):
 def main():
     """Create cloudwatch agent config file."""
     args = parse_args()
-    config_data = read_data(args.config)
+    config_data = read_data(render_jinja_template(args.config))
     log_configs = select_logs(config_data["log_configs"], args)
     log_configs = add_timestamps(log_configs, config_data["timestamp_formats"])
     log_configs = add_log_group_name_params(args.log_group, log_configs)
