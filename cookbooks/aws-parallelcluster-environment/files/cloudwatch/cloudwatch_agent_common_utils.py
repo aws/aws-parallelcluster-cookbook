@@ -9,6 +9,7 @@ CONFIG_ARGS = {
 
 
 def render_jinja_template(template_file_path):
+    """Override the file at template_file_path with the rendered json file."""
     file_loader = FileSystemLoader(str(os.path.dirname(template_file_path)))
     env = SandboxedEnvironment(loader=file_loader)
     rendered_template = env.get_template(os.path.basename(template_file_path)).render(**CONFIG_ARGS)

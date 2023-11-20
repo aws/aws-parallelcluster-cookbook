@@ -57,6 +57,17 @@ if node['cluster']['node_type'] == 'HeadNode'
     end
   end unless initial_shared_dir_array.empty?
 
+  # Add the mount point for home.  If users decide to use a shared home via the managed EFS
+  # either on creation or update then this directory will be needed.  If users don't need it, it will stay empty
+  # on the managed FS and be invisible to users
+  directory "#{node['cluster']['internal_initial_shared_dir']}/home" do
+    user 'root'
+    group 'root'
+    mode '0755'
+    action :create
+    recursive true
+  end
+
   # Unmount the root of the EFS after creating the shared directories
   # TODO this doesn't seem to unmount the EFS
   efs "unmount internal efs" do

@@ -57,7 +57,11 @@ default['nfs']['service']['server'] = if platform_family?('debian')
 # Client config defaults
 default['nfs']['config']['client_templates'] =
   if platform_family?('debian')
-    %w(/etc/default/nfs-common)
+    if platform?('ubuntu') && node['platform_version'].to_f >= 22.04
+      %w(/etc/nfs.conf)
+    else
+      %w(/etc/default/nfs-common)
+    end
   elsif platform_family?('rhel') && node['platform_version'].to_i >= 8
     %w(/etc/nfs.conf)
   elsif platform_family?('fedora')
@@ -69,7 +73,11 @@ default['nfs']['config']['client_templates'] =
 # Sever config defaults
 default['nfs']['config']['server_template'] =
   if platform_family?('debian')
-    '/etc/default/nfs-kernel-server'
+    if platform?('ubuntu') && node['platform_version'].to_f >= 22.04
+      '/etc/nfs.conf'
+    else
+      '/etc/default/nfs-kernel-server'
+    end
   elsif platform_family?('rhel') && node['platform_version'].to_i >= 8
     '/etc/nfs.conf'
   elsif platform_family?('fedora')
