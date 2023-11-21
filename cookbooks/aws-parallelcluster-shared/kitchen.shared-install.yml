@@ -24,3 +24,12 @@ suites:
         - /tag:install_package_repos/
     attributes:
       resource: package_repos
+  - name: node_attributes
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /node_attributes_created/
+    attributes:
+      resource: node_attributes
