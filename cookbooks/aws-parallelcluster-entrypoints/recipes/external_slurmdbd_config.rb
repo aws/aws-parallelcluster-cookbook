@@ -18,9 +18,51 @@ node.default['cluster']['slurm']['group'] = 'slurm'
 node.default['cluster']['scripts_dir'] = '/opt/parallelcluster/scripts'
 node.default['cluster']['region'] = node['region']
 node.default['cluster']['slurmdbd_response_retries'] = 30
-# TODO: attributes for stack name
+node.default['cluster']['stack_name'] = node['stack_name']
+node.default['cluster']['munge']['user'] = 'munge'
+node.default['cluster']['munge']['group'] = node['cluster']['munge']['user']
+
+if platform?('amazon') && node['platform_version'] == "2"
+  node.default['cluster']['cluster_user'] = 'ec2-user'
+elsif platform?('centos') && node['platform_version'].to_i == 7
+  node.default['cluster']['cluster_user'] = 'centos'
+elsif platform?('redhat')
+  node.default['cluster']['cluster_user'] = 'ec2-user'
+elsif platform?('rocky')
+  node.default['cluster']['cluster_user'] = 'rocky'
+elsif platform?('ubuntu')
+  node.default['cluster']['cluster_user'] = 'ubuntu'
+end
+
+# TODO: move this template to a separate recipe
+template '/etc/systemd/system/slurmdbd.service' do
+  source 'slurm/head_node/slurmdbd.service.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+end
 
 include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
 
-# TODO: modify logic in config_slurm_accounting or create a new recipe for external slurmdbd
-#   to use parameter in dna.json instead of digging ARN from config
+
+# TODO: move this template to a separate recipe
+# TODO: add a logic in update_munge_key.sh.erb to skip sharing munge key to shared dir
+template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
+  source 'slurm/head_node/update_munge_key.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    munge_key_secret_arn: lazy { node['munge_key_secret_arn'] || node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) },
+    region: node['cluster']['region'],
+    munge_user: node['cluster']['munge']['user'],
+    munge_group: node['cluster']['munge']['group'],
+    # TODO: modify these two shared_directory
+    shared_directory_compute: node['cluster']['shared_dir'],
+    shared_directory_login: node['cluster']['shared_dir_login_nodes']
+  )
+end
+
+# TODO: add a logic in munge_key_manager to skip sharing munge key to shared dir
+include_recipe 'aws-parallelcluster-slurm::config_munge_key'
