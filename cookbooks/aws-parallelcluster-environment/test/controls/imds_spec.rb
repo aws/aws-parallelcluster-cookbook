@@ -13,7 +13,7 @@ control 'tag:config_only_allowed_users_can_access_imds' do
   only_if { !os_properties.on_docker? }
 
   allowed_users =
-    if node['cluster']['node_type'] == 'HeadNode' &&
+    if (%w(HeadNode LoginNode).include? node['cluster']['node_type']) &&
        node['cluster']['scheduler'] != 'awsbatch' &&
        node['cluster']['head_node_imds_secured'] == 'true'
       node['cluster']['head_node_imds_allowed_users']
@@ -33,7 +33,7 @@ control 'tag:config_only_allowed_users_can_access_imds' do
 end
 
 control 'tag:config_parallelcluster-iptables_correctly_configured' do
-  only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' && !os_properties.on_docker? }
+  only_if { (instance.head_node? || instance.login_node?) && node['cluster']['scheduler'] != 'awsbatch' && !os_properties.on_docker? }
 
   describe service('parallelcluster-iptables') do
     it { should be_installed }
