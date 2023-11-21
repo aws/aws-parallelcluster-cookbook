@@ -72,7 +72,7 @@ def setup_munge_head_node
   # Generate munge key or get it's value from secrets manager
   munge_key_manager 'manage_munge_key' do
     munge_key_secret_arn lazy {
-      node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn)
+      node['munge_key_secret_arn'] || node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn)
     }
   end
 end
