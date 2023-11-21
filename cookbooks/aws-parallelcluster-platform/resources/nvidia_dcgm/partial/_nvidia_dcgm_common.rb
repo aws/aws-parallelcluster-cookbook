@@ -28,6 +28,7 @@ action :setup do
   package 'datacenter-gpu-manager' do
     retries 3
     retry_delay 5
+    version package_version
   end
 
   nvidia_repo 'remove nvidia repository' do
@@ -37,4 +38,8 @@ end
 
 def _nvidia_enabled
   nvidia_enabled.nil? ? ['yes', true].include?(node['cluster']['nvidia']['enabled']) : nvidia_enabled
+end
+
+def package_version
+  node['cluster']['nvidia']['dcgm_version']
 end

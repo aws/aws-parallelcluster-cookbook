@@ -21,3 +21,7 @@ use 'partial/_nvidia_dcgm_common.rb'
 def _nvidia_dcgm_enabled
   _nvidia_enabled
 end
+
+def package_version
+  "1:#{node['cluster']['nvidia']['dcgm_version']}" # The single digit "1" is epoch version. Without the "1", package install fails because version does not exist. See details here: https://askubuntu.com/questions/441879/why-do-some-packages-have-extra-numbers-before-a-colon-on-the-front-of-their-ver
+end
