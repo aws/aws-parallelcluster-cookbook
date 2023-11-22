@@ -86,12 +86,10 @@ end
 control 'tag:install_lustre_lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
   only_if { !os_properties.on_docker? && !os_properties.alinux2? }
-  unless os_properties.redhat? && inspec.os.release.to_f == 8.7 && (node['cluster']['kernel_release'].include?("4.18.0-425.3.1.el8") || node['cluster']['kernel_release'].include?("4.18.0-425.13.1.el8_7"))
-    describe kernel_module("lnet") do
-      it { should be_loaded }
-      it { should_not be_disabled }
-      it { should_not be_blacklisted }
-    end
+  describe kernel_module("lnet") do
+    it { should be_loaded }
+    it { should_not be_disabled }
+    it { should_not be_blacklisted }
   end
 end
 
