@@ -166,8 +166,10 @@ describe 'lustre:setup' do
     end
 
     it 'can not install lustre' do
-      is_expected.to write_log("FSx for Lustre is not supported in this RHEL version 8.1, supported versions are >= 8.2")
-        .with(level: :warn)
+      expect { chef_run }.to(raise_error do |error|
+        expect(error).to be_a(Exception)
+        expect(error.message).to include("FSx for Lustre is not supported in this RHEL version 8.1, supported versions are >= 8.2")
+      end)
     end
   end
 
@@ -185,8 +187,10 @@ describe 'lustre:setup' do
       end
 
       it 'can not install lustre' do
-        is_expected.to write_log("FSx for Lustre is not supported in kernel version #{kernel_version} of RHEL #{platform_version}, please update the kernel version")
-          .with(level: :warn)
+        expect { chef_run }.to(raise_error do |error|
+          expect(error).to be_a(Exception)
+          expect(error.message).to include("FSx for Lustre is not supported in kernel version #{kernel_version} of RHEL #{platform_version}, please update the kernel version")
+        end)
       end
     end
   end
