@@ -54,6 +54,7 @@ def find_os_minor_version
   os_minor_version = '6' if kernel_patch_version >= '372'
   os_minor_version = '7' if kernel_patch_version >= '425'
   os_minor_version = '8' if kernel_patch_version >= '477'
+  os_minor_version = '9' if kernel_patch_version >= '513'
 
   os_minor_version
 end
