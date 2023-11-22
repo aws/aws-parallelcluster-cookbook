@@ -31,7 +31,7 @@ action :setup do
   elsif version.to_f == 8.7 && (node['cluster']['kernel_release'].include?("4.18.0-425.3.1.el8") || node['cluster']['kernel_release'].include?("4.18.0-425.13.1.el8_7"))
     # Rhel8.7 kernel 4.18.0-425.3.1.el8 and 4.18.0-425.13.1.el8_7 has broken kABI compat
     # See https://access.redhat.com/solutions/6985596 and https://github.com/openzfs/zfs/issues/14724
-    raise "FSx for Lustre is not supported in kernel version #{node['cluster']['kernel_release']} of Rocky Linux, please update the kernel version"
+    raise "FSx for Lustre is not supported in kernel version #{node['cluster']['kernel_release']} of Rocky Linux #{version}, please update the kernel version"
   else
     action_install_lustre
   end
