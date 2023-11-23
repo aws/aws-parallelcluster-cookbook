@@ -31,7 +31,7 @@ def installation_code
   CUDA=/usr/local/cuda ./build-deb-packages.sh
   dpkg -i gdrdrv-dkms_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
   dpkg -i libgdrapi_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
-  dpkg -i gdrcopy-tests_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
+  dpkg -i gdrcopy-tests_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}+cuda*.deb
   dpkg -i gdrcopy_#{gdrcopy_version_extended}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb
   COMMAND
 end

@@ -22,7 +22,7 @@ def gdrcopy_enabled?
 end
 
 def gdrcopy_platform
-  'unknown_distro'
+  'amzn-2'
 end
 
 def gdrcopy_arch
