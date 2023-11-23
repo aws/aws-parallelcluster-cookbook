@@ -27,6 +27,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.19.0-1`
   - Rdma-core: `rdma-core-46.0-1`
   - Open MPI: `openmpi40-aws-4.1.6-1`
+- Upgrade GDRCopy to version 2.4.
 
 **BUG FIXES**
 - Fix inconsistent scaling configuration after cluster update rollback when modifying the list of instance types declared in the Compute Resources.

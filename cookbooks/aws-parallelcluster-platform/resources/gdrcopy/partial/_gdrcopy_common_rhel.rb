@@ -23,8 +23,8 @@ end
 def installation_code
   <<~COMMAND
   CUDA=/usr/local/cuda ./build-rpm-packages.sh
-  rpm -q gdrcopy-kmod-#{gdrcopy_version_extended}dkms || rpm -i gdrcopy-kmod-#{gdrcopy_version_extended}dkms.noarch#{gdrcopy_platform}.rpm
-  rpm -q gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_arch} || rpm -i gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_arch}#{gdrcopy_platform}.rpm
-  rpm -q gdrcopy-devel-#{gdrcopy_version_extended}.noarch || rpm -i gdrcopy-devel-#{gdrcopy_version_extended}.noarch#{gdrcopy_platform}.rpm
+  rpm -q gdrcopy-kmod-#{gdrcopy_version_extended}dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version_extended}dkms.#{gdrcopy_platform}.noarch.rpm
+  rpm -q gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_arch} || rpm -Uvh gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_platform}.#{gdrcopy_arch}.rpm
+  rpm -q gdrcopy-devel-#{gdrcopy_version_extended}.noarch || rpm -Uvh gdrcopy-devel-#{gdrcopy_version_extended}.#{gdrcopy_platform}.noarch.rpm
   COMMAND
 end
