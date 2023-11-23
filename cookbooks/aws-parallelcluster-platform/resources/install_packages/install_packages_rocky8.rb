@@ -19,6 +19,17 @@ end
 use 'partial/_install_packages_common.rb'
 use 'partial/_install_packages_rhel_amazon.rb'
 
+action :install_kernel_source do
+  bash "Install kernel source" do
+    user 'root'
+    code <<-INSTALL_KERNEL_SOURCE
+    set -e
+    dnf install -y #{kernel_source_package}-#{kernel_source_package_version} --releasever #{node['platform_version']}
+    dnf clean all
+    INSTALL_KERNEL_SOURCE
+  end
+end
+
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # iptables needed for IMDS setup
