@@ -203,6 +203,7 @@ describe 'lustre:setup' do
             platform: platform, version: '8',
             step_into: ['lustre']
           ) do |node|
+            node.automatic['platform_version'] = "8.#{minor_version}"
             node.override['cluster']['kernel_release'] = "4.18.0-#{kernel_patch}.9.1.el8"
           end
           Lustre.setup(runner)
@@ -224,26 +225,6 @@ describe 'lustre:setup' do
 
           is_expected.to install_kernel_module("lnet")
         end
-      end
-    end
-
-    context "kernel release does not match expected format" do
-      cached(:chef_run) do
-        runner = runner(
-          platform: platform, version: '8',
-          step_into: ['lustre']
-        ) do |node|
-          node.automatic['platform_version'] = "8.2"
-          node.override['cluster']['kernel_release'] = 'unexpected.format'
-        end
-        Lustre.setup(runner)
-      end
-
-      it 'raises error' do
-        expect { chef_run }.to(raise_error do |error|
-          expect(error).to be_a(Exception)
-          expect(error.message).to include("Unable to retrieve the kernel patch version from unexpected.format.")
-        end)
       end
     end
   end

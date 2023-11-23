@@ -104,6 +104,13 @@ def find_centos_minor_version
   os_minor_version
 end
 
+def find_kernel_patch_version
+  # kernel release is in the form 3.10.0-1127.8.2.el7.x86_64
+  kernel_patch_version = node['cluster']['kernel_release'].match(/^\d+\.\d+\.\d+-(\d+)\..*$/)
+  raise "Unable to retrieve the kernel patch version from #{node['cluster']['kernel_release']}." unless kernel_patch_version
+  kernel_patch_version[1]
+end
+
 action_class do
   def base_url
     "https://fsx-lustre-client-repo.s3.amazonaws.com/#{base_url_prefix(arm_instance?)}/7.#{find_centos_minor_version}/#{node['kernel']['machine']}/"
