@@ -27,7 +27,7 @@ action :install_kernel_source do
     dnf install -y #{kernel_source_package}-#{kernel_source_package_version} --releasever #{node['platform_version']}
     dnf clean all
     INSTALL_KERNEL_SOURCE
-  end
+  end unless on_docker?
 end
 
 def default_packages
