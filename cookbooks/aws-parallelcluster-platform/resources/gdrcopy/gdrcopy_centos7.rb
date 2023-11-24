@@ -24,7 +24,7 @@ def gdrcopy_enabled?
 end
 
 def gdrcopy_platform
-  '.el7'
+  'el7'
 end
 
 def gdrcopy_arch
