@@ -35,6 +35,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Do not wait for static nodes in maintenance to signal CFN that the head node initialization is complete.
 - Upgrade `aws-cfn-bootstrap` to version 2.0-28.
 - Upgrade Python to 3.9.17.
+- Upgrade NVIDIA driver to version 535.129.03.
+- Upgrade CUDA Toolkit to version 12.2.2
 - Use OpenRM as NVIDIA kernel module for Linux instead of NVIDIA closed source module.
 - Upgrade EFA installer to `1.29.0`.
   - Efa-driver: `efa-2.6.0-1`
