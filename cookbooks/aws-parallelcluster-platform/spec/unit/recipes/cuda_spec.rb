@@ -2,9 +2,9 @@ require 'spec_helper'
 
 describe 'aws-parallelcluster-platform::cuda' do
   cached(:cuda_version) { '12.2' }
-  cached(:cuda_patch) { '0' }
+  cached(:cuda_patch) { '2' }
   cached(:cuda_complete_version) { "#{cuda_version}.#{cuda_patch}" }
-  cached(:cuda_version_suffix) { '535.54.03' }
+  cached(:cuda_version_suffix) { '535.104.05' }
 
   context 'when nvidia not enabled' do
     cached(:chef_run) do
