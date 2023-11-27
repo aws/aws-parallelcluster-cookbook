@@ -28,10 +28,12 @@ action :install_lustre do
     command "yum-config-manager --setopt=\*.skip_if_unavailable=1 --save"
   end
 
+  # TODO: restore installation on docker when Lustre is available for RH8.9
+  # See: https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
   package %w(kmod-lustre-client lustre-client dracut) do
     retries 3
     retry_delay 5
-  end
+  end unless redhat_on_docker? || rocky_on_docker?
 
   kernel_module 'lnet' unless redhat_on_docker? || rocky_on_docker?
 end
