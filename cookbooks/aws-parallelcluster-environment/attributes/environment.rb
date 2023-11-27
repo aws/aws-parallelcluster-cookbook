@@ -6,6 +6,8 @@ default['cluster']['proxy'] = 'NONE'
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
 # Kernel release version used to select Lustre version
+# This is a mechanism used to mock kernel release on docker system-tests, see kitchen.docker.yml:
+# when kernel_release is defined, it will be used, otherwise the release version will be taken from ohai.
 default['cluster']['kernel_release'] = node['kernel']['release'] unless default['cluster'].key?('kernel_release')
 
 # CloudWatch
