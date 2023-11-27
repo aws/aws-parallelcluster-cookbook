@@ -157,8 +157,9 @@ describe 'gdrcopy:setup' do
       cached(:gdrcopy_platform) do
         platforms = {
           'amazon2' => 'amzn-2',
-          'centos7' => '.el8',
-          'rhel8' => '.el7',
+          'centos7' => 'el7',
+          'rhel8' => 'el8',
+          'rocky8' => 'el8',
           'ubuntu20.04' => 'Ubuntu20_04',
           'ubuntu22.04' => 'Ubuntu22_04',
         }
