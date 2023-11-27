@@ -294,10 +294,7 @@ end
 describe 'lustre:find_centos_minor_version' do
   context "centos version is not 7" do
     cached(:chef_run) do
-      runner = runner(
-        platform: 'centos', version: '7',
-        step_into: ['lustre']
-      ) do |node|
+      runner = runner(platform: 'centos', version: '7', step_into: ['lustre']) do |node|
         node.automatic['platform_version'] = "8"
       end
       Lustre.setup(runner)
