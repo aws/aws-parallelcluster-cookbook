@@ -217,6 +217,11 @@ describe 'gdrcopy:setup' do
           expect(installation_code).to match(/dpkg -i libgdrapi_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
           expect(installation_code).to match(/dpkg -i gdrcopy-tests_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}\+cuda\*.deb/)
           expect(installation_code).to match(/dpkg -i gdrcopy_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+        elsif platform == 'centos'
+          expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-rpm-packages.sh})
+          expect(installation_code).to match(/rpm -q gdrcopy-kmod-#{gdrcopy_version}-1dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version}-1dkms.noarch.#{gdrcopy_platform}.rpm/)
+          expect(installation_code).to match(/rpm -q gdrcopy-#{gdrcopy_version}-1.#{gdrcopy_arch} || rpm -Uvh gdrcopy-#{gdrcopy_version}-1.#{gdrcopy_arch}.#{gdrcopy_platform}.rpm/)
+          expect(installation_code).to match(/rpm -q gdrcopy-devel-#{gdrcopy_version}-1.noarch || rpm -Uvh gdrcopy-devel-#{gdrcopy_version}-1.noarch.#{gdrcopy_platform}.rpm/)
         else
           expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-rpm-packages.sh})
           expect(installation_code).to match(/rpm -q gdrcopy-kmod-#{gdrcopy_version}-1dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version}-1dkms.#{gdrcopy_platform}.noarch.rpm/)
