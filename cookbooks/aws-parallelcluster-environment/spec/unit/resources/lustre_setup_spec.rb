@@ -8,6 +8,15 @@ class Lustre
       end
     end
   end
+
+  def self.nothing(chef_run)
+    chef_run.converge_dsl('aws-parallelcluster-environment') do
+      # This is a way to load the resource code and unit test function defined on it
+      lustre 'nothing' do
+        action :nothing
+      end
+    end
+  end
 end
 
 describe 'lustre:setup' do
@@ -258,6 +267,25 @@ describe 'lustre:setup' do
           .with(retry_delay: 5)
 
         is_expected.to install_kernel_module("lnet")
+      end
+    end
+  end
+end
+
+describe 'lustre:find_kernel_patch_version' do
+  [%w(3.10.0-1127.8.2.el7.x86_64 1127), %w(4.18.0-477.13.1.el8_7.x86_64 477)].each do |kernel_version, expected_patch_version|
+    context "parsing #{kernel_version}" do
+      cached(:chef_run) do
+        runner = runner(platform: 'centos', version: '7', step_into: ['lustre']) do |node|
+          node.override['cluster']['kernel_release'] = kernel_version
+        end
+        Lustre.nothing(runner)
+      end
+      # Mechanism to retrieve resource and then unit test find_kernel_patch_version function
+      cached(:resource) { chef_run.find_resource('lustre', 'nothing') }
+
+      it "should retrieve #{expected_patch_version} patch version" do
+        expect(resource.find_kernel_patch_version).to eq(expected_patch_version)
       end
     end
   end
