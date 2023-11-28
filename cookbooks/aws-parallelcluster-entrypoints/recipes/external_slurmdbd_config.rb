@@ -12,6 +12,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Mock necessary attributes to reuse the recipes from ParallelCluster.
 node.default['cluster']['slurm']['install_dir'] = '/opt/slurm'
 node.default['cluster']['slurm']['user'] = 'slurm'
 node.default['cluster']['slurm']['group'] = 'slurm'
@@ -22,6 +23,7 @@ node.default['cluster']['stack_name'] = node['stack_name']
 node.default['cluster']['munge']['user'] = 'munge'
 node.default['cluster']['munge']['group'] = node['cluster']['munge']['user']
 
+# rubocop:disable Lint/DuplicateBranch
 if platform?('amazon') && node['platform_version'] == "2"
   node.default['cluster']['cluster_user'] = 'ec2-user'
 elsif platform?('centos') && node['platform_version'].to_i == 7
@@ -33,6 +35,7 @@ elsif platform?('rocky')
 elsif platform?('ubuntu')
   node.default['cluster']['cluster_user'] = 'ubuntu'
 end
+# rubocop:enable Lint/DuplicateBranch
 
 # TODO: move this template to a separate recipe
 template '/etc/systemd/system/slurmdbd.service' do
@@ -43,7 +46,7 @@ template '/etc/systemd/system/slurmdbd.service' do
   action :create
 end
 
-include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+# TODO: configuration of munge systemd service;
 
 # TODO: move this template to a separate recipe
 # TODO: add a logic in update_munge_key.sh.erb to skip sharing munge key to shared dir
@@ -65,3 +68,5 @@ end
 
 # TODO: add a logic in munge_key_manager to skip sharing munge key to shared dir
 include_recipe 'aws-parallelcluster-slurm::config_munge_key'
+
+include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"

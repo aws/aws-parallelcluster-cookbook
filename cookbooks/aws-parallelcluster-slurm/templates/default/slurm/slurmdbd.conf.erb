@@ -4,8 +4,8 @@ DbdPort=6819
 SlurmUser=<%= node['cluster']['slurm']['user'] %>
 StorageType=accounting_storage/mysql
 
-# Conditional inclusion based on 'if_external_slurmdbd' attribute
-<% if node['if_external_slurmdbd'] %>
+# Conditional inclusion based on 'is_external_slurmdbd' attribute
+<% if node['is_external_slurmdbd'] %>
   # WARNING!!! The slurm_external_slurmdbd.conf file included below can be updated by the pcluster process.
   # Please do not edit it.
   include slurm_external_slurmdbd.conf
