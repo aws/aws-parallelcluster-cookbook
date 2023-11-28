@@ -18,6 +18,7 @@ from write_cloudwatch_agent_json import (
     add_timestamps,
     create_config,
     filter_output_fields,
+    gethostname,
     select_configs_for_feature,
     select_configs_for_node_role,
     select_configs_for_platform,
@@ -77,7 +78,6 @@ METRIC_CONFIGS = {
 }
 
 
-@pytest.mark.asyncio
 def test_add_log_group_name_params():
     configs = add_log_group_name_params("test", CONFIGS)
     for config in configs:
@@ -85,41 +85,28 @@ def test_add_log_group_name_params():
         assert_that(config["log_group_name"]).is_equal_to("test")
 
 
-@pytest.mark.asyncio
-def test_add_instance_log_stream_prefixes(mocker):
-    instance_id = "i-0096test"
-    mocker.patch(
-        "write_cloudwatch_agent_json.gethostname",
-        return_value=instance_id,
-    )
-
+def test_add_instance_log_stream_prefixes():
     configs = add_instance_log_stream_prefixes(CONFIGS)
     for config in configs:
-        assert_that(config["log_stream_name"]).contains(instance_id)
+        assert_that(config["log_stream_name"]).contains(gethostname())
 
 
-@pytest.mark.asyncio
-def test_select_configs_for_scheduler():
-    configs = select_configs_for_scheduler(CONFIGS, "slurm")
-    assert_that(len(configs)).is_equal_to(2)
-    configs = select_configs_for_scheduler(CONFIGS, "awsbatch")
-    assert_that(len(configs)).is_equal_to(3)
-
-
-@pytest.mark.asyncio
-def test_select_configs_for_node_role():
-    configs = select_configs_for_node_role(CONFIGS, "ComputeFleet")
-    assert_that(len(configs)).is_equal_to(2)
-    configs = select_configs_for_node_role(CONFIGS, "HeadNode")
-    assert_that(len(configs)).is_equal_to(3)
-
-
-@pytest.mark.asyncio
-def test_select_configs_for_platform():
-    configs = select_configs_for_platform(CONFIGS, "amazon")
-    assert_that(len(configs)).is_equal_to(2)
-    configs = select_configs_for_platform(CONFIGS, "ubuntu")
-    assert_that(len(configs)).is_equal_to(2)
+@pytest.mark.parametrize(
+    "dimensions",
+    [
+        {"platform": "amazon", "length": 2},
+        {"platform": "ubuntu", "length": 2},
+        {"scheduler": "slurm", "length": 2},
+        {"scheduler": "awsbatch", "length": 3},
+    ],
+)
+def test_select_configs_for_dimesion(dimensions):
+    if "platform" in dimensions.keys():
+        configs = select_configs_for_platform(CONFIGS, dimensions["platform"])
+        assert_that(len(configs)).is_equal_to(dimensions["length"])
+    else:
+        configs = select_configs_for_scheduler(CONFIGS, dimensions["scheduler"])
+        assert_that(len(configs)).is_equal_to(dimensions["length"])
 
 
 @pytest.mark.parametrize(
@@ -140,7 +127,6 @@ def test_select_configs_for_feature(mocker, info):
     assert_that(len(selected_configs)).is_equal_to(info["length"])
 
 
-@pytest.mark.asyncio
 def test_add_timestamps():
     timestamp_formats = {"month_first": "%b %-d %H:%M:%S", "default": "%Y-%m-%d %H:%M:%S,%f"}
     configs = add_timestamps(CONFIGS, timestamp_formats)
@@ -149,7 +135,6 @@ def test_add_timestamps():
         assert_that(config["timestamp_format"]).is_equal_to(timestamp_format)
 
 
-@pytest.mark.asyncio
 def test_filter_output_fields():
     desired_keys = ["log_stream_name", "file_path", "timestamp_format", "log_group_name"]
     configs = filter_output_fields(CONFIGS)
@@ -158,22 +143,14 @@ def test_filter_output_fields():
             assert_that(desired_keys).contains(key)
 
 
-@pytest.mark.asyncio
-def test_create_config(mocker):
-    instance_id = "i-0096test"
-    mocker.patch(
-        "write_cloudwatch_agent_json.gethostname",
-        return_value=instance_id,
-    )
-
+def test_create_config():
     cw_agent_config = create_config(CONFIGS, METRIC_CONFIGS)
 
     assert_that(len(cw_agent_config)).is_equal_to(2)
     assert_that(len(cw_agent_config["logs"]["logs_collected"]["files"]["collect_list"])).is_equal_to(3)
-    assert_that(cw_agent_config["logs"]["log_stream_name"]).contains(instance_id)
+    assert_that(cw_agent_config["logs"]["log_stream_name"]).contains(gethostname())
 
 
-@pytest.mark.asyncio
 def test_select_metrics(mocker):
     mocker.patch(
         "write_cloudwatch_agent_json.select_configs_for_node_role",
@@ -187,23 +164,31 @@ def test_select_metrics(mocker):
         assert_that(metric_configs["metrics_collected"][key]).does_not_contain_key("node_roles")
 
 
-@pytest.mark.asyncio
-def test_add_append_dimensions():
+@pytest.mark.parametrize(
+    "node",
+    [
+        {"role": "ComputeFleet", "length": 2},
+        {"role": "HeadNode", "length": 3},
+    ],
+)
+def test_select_configs_for_node_role(node):
+    configs = select_configs_for_node_role(CONFIGS, node["role"])
+    assert_that(len(configs)).is_equal_to(node["length"])
+
+
+@pytest.mark.parametrize(
+    "dimension",
+    [{"name": "append", "type": dict}, {"name": "aggregation", "type": list}],
+)
+def test_add_dimensions(dimension):
     metrics = {"metrics_collected": METRIC_CONFIGS["metrics_collected"]}
-    metrics = add_append_dimensions(metrics, METRIC_CONFIGS)
+    if dimension["name"] == "append":
+        metrics = add_append_dimensions(metrics, METRIC_CONFIGS)
+        output = metrics["append_dimensions"]
+    else:
+        metrics = add_aggregation_dimensions(metrics, METRIC_CONFIGS)
+        output = metrics["aggregation_dimensions"][0]
 
     assert_that(len(metrics)).is_equal_to(2)
-    assert_that(metrics["append_dimensions"]).is_type_of(dict)
-    assert_that(metrics["append_dimensions"]).contains_key("InstanceId")
-
-
-@pytest.mark.asyncio
-def test_add_aggregation_dimensions():
-    metrics = {"metrics_collected": METRIC_CONFIGS["metrics_collected"]}
-    metrics = add_aggregation_dimensions(metrics, METRIC_CONFIGS)
-
-    assert_that(len(metrics)).is_equal_to(2)
-    assert_that(len(metrics["aggregation_dimensions"])).is_equal_to(1)
-    assert_that(metrics["aggregation_dimensions"][0]).is_type_of(list)
-    assert_that(metrics["aggregation_dimensions"][0]).contains("InstanceId")
-    assert_that(metrics["aggregation_dimensions"][0]).contains("path")
+    assert_that(output).is_type_of(dimension["type"])
+    assert_that(output).contains("InstanceId")

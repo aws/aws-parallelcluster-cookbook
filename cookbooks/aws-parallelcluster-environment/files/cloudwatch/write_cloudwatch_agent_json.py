@@ -125,11 +125,6 @@ def select_logs(configs, args):
     return selected_configs
 
 
-def get_node_roles(scheudler_plugin_node_roles):
-    node_type_roles_map = {"ALL": ["ComputeFleet", "HeadNode"], "HEAD": ["HeadNode"], "COMPUTE": ["ComputeFleet"]}
-    return node_type_roles_map.get(scheudler_plugin_node_roles)
-
-
 def add_timestamps(configs, timestamps_dict):
     """For each config, set its timestamp_format field based on its timestamp_format_key field."""
     for config in configs:
@@ -156,8 +151,6 @@ def create_metrics_collected(selected_configs):
         # initial dict with default key-value pairs
         collected = {"metrics_collection_interval": DEFAULT_METRICS_COLLECTION_INTERVAL}
         collected.update({key: metric_config[key] for key in desired_keys if key in metric_config})
-        if "append_dimensions" in metric_config and "ClusterName" in metric_config["append_dimensions"]:
-            collected.update({"append_dimensions": {"ClusterName": get_node_info().get("stack_name")}})
         return collected
 
     return {
@@ -209,15 +202,6 @@ def create_config(log_configs, metric_configs):
     if metric_configs["metrics_collected"]:
         cw_agent_config["metrics"] = metric_configs
     return cw_agent_config
-
-
-def get_dict_value(value, attributes, default=None):
-    """Get key value from dictionary and return default if the key does not exist."""
-    for key in attributes.split("."):
-        value = value.get(key, None)
-        if value is None:
-            return default
-    return value
 
 
 def main():

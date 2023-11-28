@@ -40,7 +40,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/write_cloudwatch_agent_json.py') do
     it { should exist }
-    its('sha256sum') { should eq 'f24283f824072456394ab01cd014d37a977fc63fe951c9dd4a7df982bf6e5a82' }
+    its('sha256sum') { should eq '29ac1f73e0403095f40a4217e737d58d3786962a2c5427eb9c690627841ae17a' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
@@ -64,7 +64,7 @@ control 'tag:config_cloudwatch_configured' do
 
   describe file('/usr/local/bin/cloudwatch_agent_config_util.py') do
     it { should exist }
-    its('sha256sum') { should eq '57a69fe5ceebeb98c067ab5975bf566e610659a4751810da18f441f583791c07' }
+    its('sha256sum') { should eq 'e7ba2d332d3e96ff6099bb420e841bde23d303aecaf2a5109ad712216be1042d' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
