@@ -12,8 +12,13 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-property :gdrcopy_version, String, default: node['gdrcopy_version'] || '2.4'
-property :gdrcopy_checksum, String, default: node['gdrcopy_checksum'] || '39e74d505ca16160567f109cc23478580d157da897f134989df1d563e55f7a5b'
+def gdrcopy_version
+  '2.4'
+end
+
+def gdrcopy_checksum
+  '39e74d505ca16160567f109cc23478580d157da897f134989df1d563e55f7a5b'
+end
 
 unified_mode true
 default_action :setup
@@ -23,11 +28,11 @@ action :setup do
   return if on_docker?
 
   # Save gdrcopy version for InSpec tests
-  node.default['cluster']['nvidia']['gdrcopy']['version'] = new_resource.gdrcopy_version
+  node.default['cluster']['nvidia']['gdrcopy']['version'] = gdrcopy_version
   node.default['cluster']['nvidia']['gdrcopy']['service'] = gdrcopy_service
   node_attributes 'dump node attributes'
 
-  gdrcopy_tarball = "#{node['cluster']['sources_dir']}/gdrcopy-#{new_resource.gdrcopy_version}.tar.gz"
+  gdrcopy_tarball = "#{node['cluster']['sources_dir']}/gdrcopy-#{gdrcopy_version}.tar.gz"
 
   directory node['cluster']['sources_dir'] do
     recursive true
@@ -38,7 +43,7 @@ action :setup do
     mode '0644'
     retries 3
     retry_delay 5
-    checksum new_resource.gdrcopy_checksum
+    checksum gdrcopy_checksum
     action :create_if_missing
   end
 
@@ -58,7 +63,7 @@ action :setup do
     code <<-GDRCOPY_INSTALL
     set -e
     tar -xf #{gdrcopy_tarball}
-    cd gdrcopy-#{new_resource.gdrcopy_version}/packages
+    cd gdrcopy-#{gdrcopy_version}/packages
     #{installation_code}
     GDRCOPY_INSTALL
   end
@@ -85,7 +90,7 @@ end
 action :configure do
   return if on_docker?
   # Save gdrcopy version for InSpec tests
-  node.default['cluster']['nvidia']['gdrcopy']['version'] = new_resource.gdrcopy_version
+  node.default['cluster']['nvidia']['gdrcopy']['version'] = gdrcopy_version
   node.default['cluster']['nvidia']['gdrcopy']['service'] = gdrcopy_service
   node_attributes 'dump node attributes'
 
