@@ -16,11 +16,16 @@ provides :gdrcopy, platform: 'centos' do |node|
   node['platform_version'].to_i == 7
 end
 
-node.default['gdrcopy_version'] = '2.3.1'
-node.default['gdrcopy_checksum'] = '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
-
 use 'partial/_gdrcopy_common.rb'
 use 'partial/_gdrcopy_common_rhel.rb'
+
+def gdrcopy_version
+  '2.3.1'
+end
+
+def gdrcopy_checksum
+  '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
+end
 
 # The installation code must be overridden in Centos7
 # because it has GDRCopy pinned to v2.3.1.
