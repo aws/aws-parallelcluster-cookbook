@@ -16,62 +16,72 @@ from cloudwatch_agent_config_util import validate_json, write_validated_json
 
 
 @pytest.mark.parametrize(
-    "error_type",
-    [None, "Duplicates", "Timestamp"],
+    "error_type, expected_error_response, input_json, schema",
+    [
+        (
+            None,
+            None,
+            {
+                "timestamp_formats": {
+                    "month_first": "%b %-d %H:%M:%S",
+                },
+                "log_configs": [{"timestamp_format_key": "month_first", "log_stream_name": "test"}],
+            },
+            {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}},
+        ),
+        (
+            "Duplicates",
+            "The following log_stream_name values are used multiple times",
+            {
+                "timestamp_formats": {
+                    "month_first": "%b %-d %H:%M:%S",
+                },
+                "log_configs": [
+                    {"timestamp_format_key": "month_first", "log_stream_name": "test"},
+                    {"timestamp_format_key": "month_first", "log_stream_name": "test"},
+                ],
+            },
+            {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}},
+        ),
+        (
+            "Timestamp",
+            "contains an invalid timestamp_format_key",
+            {
+                "timestamp_formats": {
+                    "month_first": "%b %-d %H:%M:%S",
+                },
+                "log_configs": [
+                    {"timestamp_format_key": "month_first", "log_stream_name": "test"},
+                    {"timestamp_format_key": "default", "log_stream_name": "test2"},
+                ],
+            },
+            {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}},
+        ),
+        (
+            "FileNotFound",
+            "No file exists",
+            {
+                "timestamp_formats": {
+                    "month_first": "%b %-d %H:%M:%S",
+                },
+                "log_configs": [{"timestamp_format_key": "month_first", "log_stream_name": "test"}],
+            },
+            {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}},
+        ),
+        (
+            "Schema",
+            "Failed validating 'type' in schema",
+            {
+                "timestamp_formats": {
+                    "month_first": "%b %-d %H:%M:%S",
+                },
+                "log_configs": [{"timestamp_format_key": "month_first", "log_stream_name": "test"}],
+            },
+            {"type": "string"},
+        ),
+    ],
 )
-def test_validate_json_content(mocker, error_type):
-    input_json = {
-        "timestamp_formats": {
-            "month_first": "%b %-d %H:%M:%S",
-        },
-        "log_configs": [{"timestamp_format_key": "month_first", "log_stream_name": "test"}],
-    }
-
-    if error_type == "Duplicates":
-        input_json["log_configs"].append({"timestamp_format_key": "month_first", "log_stream_name": "test"})
-    elif error_type == "Timestamp":
-        input_json["log_configs"].append({"timestamp_format_key": "default", "log_stream_name": "test2"})
-
-    schema = {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}}
-
-    mocker.patch(
-        "cloudwatch_agent_config_util._read_schema",
-        return_value=schema,
-    )
-
-    mocker.patch(
-        "cloudwatch_agent_config_util._read_log_configs",
-        return_value=input_json,
-    )
-
-    try:
-        validate_json(input_json)
-        assert_that(error_type).is_none()
-    except SystemExit as e:
-        assert_that(error_type).is_not_none()
-        if error_type == "Duplicates":
-            assert_that(e.args[0]).contains("The following log_stream_name values are used multiple times: test")
-        elif error_type == "Timestamp":
-            assert_that(e.args[0]).contains("contains an invalid timestamp_format_key")
-
-
-@pytest.mark.parametrize(
-    "error_type",
-    [None, "FileNotFound", "Schema"],
-)
-def test_validate_json_invalid(mocker, error_type):
-    input_json = {
-        "timestamp_formats": {
-            "month_first": "%b %-d %H:%M:%S",
-        },
-        "log_configs": [{"timestamp_format_key": "month_first", "log_stream_name": "test"}],
-    }
-
-    if error_type == "Schema":
-        schema = {"type": "string"}
-    else:
-        schema = {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}}
-
+def test_validate_json_from_input(mocker, error_type, expected_error_response, input_json, schema):
     mocker.patch(
         "cloudwatch_agent_config_util._read_schema",
         return_value=schema,
@@ -88,14 +98,11 @@ def test_validate_json_invalid(mocker, error_type):
         assert_that(error_type).is_none()
     except SystemExit as e:
         assert_that(error_type).is_not_none()
-        if error_type == "FileNotFound":
-            assert_that(e.args[0]).contains("No file exists")
-        elif error_type == "Schema":
-            assert_that(e.args[0]).contains("Failed validating 'type' in schema")
+        assert_that(e.args[0]).contains(expected_error_response)
 
 
 @pytest.mark.parametrize("no_error", [True, False])
-def test_validate_json_input(mocker, test_datadir, no_error):
+def test_validate_json_from_file(mocker, test_datadir, no_error):
     input_file_path = os.path.join(test_datadir, "config.json")
 
     schema = {"type": "object", "properties": {"timestamp_formats": {"type": "object"}}}

@@ -136,12 +136,12 @@ def _write_log_configs(log_configs):
 def write_validated_json(input_json):
     """Write validated JSON back to the CloudWatch log configs file."""
     log_configs = _read_log_configs()
-    input_json["log_configs"].extend(log_configs.get("log_configs"))
+    log_configs["log_configs"].extend(input_json.get("log_configs"))
 
     # NOTICE: the input JSON's timestamp_formats dict is the one that is
     # updated, so that those defined in the original config aren't clobbered.
-    input_json["timestamp_formats"].update(log_configs.get("timestamp_formats"))
-    _write_log_configs(input_json)
+    log_configs["timestamp_formats"] = input_json["timestamp_formats"].update(log_configs.get("timestamp_formats"))
+    _write_log_configs(log_configs)
 
 
 def create_backup():

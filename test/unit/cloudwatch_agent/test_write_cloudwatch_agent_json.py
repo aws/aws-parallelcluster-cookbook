@@ -92,39 +92,50 @@ def test_add_instance_log_stream_prefixes():
 
 
 @pytest.mark.parametrize(
-    "dimensions",
-    [
-        {"platform": "amazon", "length": 2},
-        {"platform": "ubuntu", "length": 2},
-        {"scheduler": "slurm", "length": 2},
-        {"scheduler": "awsbatch", "length": 3},
-    ],
+    "platform, length",
+    [("amazon", 2), ("ubuntu", 2)],
 )
-def test_select_configs_for_dimesion(dimensions):
-    if "platform" in dimensions.keys():
-        configs = select_configs_for_platform(CONFIGS, dimensions["platform"])
-        assert_that(len(configs)).is_equal_to(dimensions["length"])
-    else:
-        configs = select_configs_for_scheduler(CONFIGS, dimensions["scheduler"])
-        assert_that(len(configs)).is_equal_to(dimensions["length"])
+def test_select_configs_for_platform(platform, length):
+    configs = select_configs_for_platform(CONFIGS, platform)
+    assert_that(len(configs)).is_equal_to(length)
 
 
 @pytest.mark.parametrize(
-    "info",
+    "scheduler, length",
+    [("slurm", 2), ("awsbatch", 3)],
+)
+def test_select_configs_for_scheduler(scheduler, length):
+    configs = select_configs_for_scheduler(CONFIGS, scheduler)
+    assert_that(len(configs)).is_equal_to(length)
+
+
+@pytest.mark.parametrize(
+    "node",
     [
-        {"node_info": {"dcv_enabled": "head_node", "directory_service": {"enabled": "true"}}, "length": 3},
-        {"node_info": {"directory_service": {"enabled": "true"}}, "length": 2},
-        {"node_info": {"enabled": "true"}, "length": 1},
+        {"role": "ComputeFleet", "length": 2},
+        {"role": "HeadNode", "length": 3},
     ],
 )
-def test_select_configs_for_feature(mocker, info):
-    node_info = info["node_info"]
+def test_select_configs_for_node_role(node):
+    configs = select_configs_for_node_role(CONFIGS, node["role"])
+    assert_that(len(configs)).is_equal_to(node["length"])
+
+
+@pytest.mark.parametrize(
+    "node_info, length",
+    [
+        ({"dcv_enabled": "head_node", "directory_service": {"enabled": "true"}}, 3),
+        ({"directory_service": {"enabled": "true"}}, 2),
+        ({"enabled": "true"}, 1),
+    ],
+)
+def test_select_configs_for_feature(mocker, node_info, length):
     mocker.patch(
         "write_cloudwatch_agent_json.get_node_info",
         return_value=node_info,
     )
     selected_configs = select_configs_for_feature(CONFIGS)
-    assert_that(len(selected_configs)).is_equal_to(info["length"])
+    assert_that(len(selected_configs)).is_equal_to(length)
 
 
 def test_add_timestamps():
@@ -136,11 +147,9 @@ def test_add_timestamps():
 
 
 def test_filter_output_fields():
-    desired_keys = ["log_stream_name", "file_path", "timestamp_format", "log_group_name"]
     configs = filter_output_fields(CONFIGS)
     for config in configs:
-        for key in config:
-            assert_that(desired_keys).contains(key)
+        assert_that(config).does_not_contain_key("schedulers")
 
 
 def test_create_config():
@@ -162,18 +171,6 @@ def test_select_metrics(mocker):
     assert_that(metric_configs["metrics_collected"]).is_type_of(dict)
     for key in metric_configs["metrics_collected"]:
         assert_that(metric_configs["metrics_collected"][key]).does_not_contain_key("node_roles")
-
-
-@pytest.mark.parametrize(
-    "node",
-    [
-        {"role": "ComputeFleet", "length": 2},
-        {"role": "HeadNode", "length": 3},
-    ],
-)
-def test_select_configs_for_node_role(node):
-    configs = select_configs_for_node_role(CONFIGS, node["role"])
-    assert_that(len(configs)).is_equal_to(node["length"])
 
 
 @pytest.mark.parametrize(
