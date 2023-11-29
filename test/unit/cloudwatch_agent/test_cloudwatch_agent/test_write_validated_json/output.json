@@ -1,0 +1,13 @@
+{
+  "timestamp_formats": null,
+  "log_configs": [
+    {
+      "timestamp_format_key": "month_first",
+      "log_stream_name": "test"
+    },
+    {
+      "timestamp_format_key": "month_first",
+      "log_stream_name": "test2"
+    }
+  ]
+}
