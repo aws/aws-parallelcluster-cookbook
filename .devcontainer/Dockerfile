@@ -1,4 +1,4 @@
-FROM ruby:2.7
+FROM public.ecr.aws/docker/library/ruby:2.7
 
 LABEL maintainer="Amazon Web Services"
 
