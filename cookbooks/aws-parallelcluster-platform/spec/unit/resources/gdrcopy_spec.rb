@@ -1,11 +1,9 @@
 require 'spec_helper'
 
 class ConvergeGdrcopy
-  def self.setup(chef_run, gdrcopy_version: nil, gdrcopy_checksum: nil)
+  def self.setup(chef_run)
     chef_run.converge_dsl('aws-parallelcluster-platform') do
       gdrcopy 'setup' do
-        gdrcopy_version gdrcopy_version
-        gdrcopy_checksum gdrcopy_checksum
         action :setup
       end
     end
@@ -40,7 +38,7 @@ describe 'gdrcopy:gdrcopy_enabled?' do
         end
       end
       cached(:resource) do
-        ConvergeGdrcopy.setup(chef_run, gdrcopy_version: gdrcopy_version)
+        ConvergeGdrcopy.setup(chef_run)
         chef_run.find_resource('gdrcopy', 'setup')
       end
 
@@ -122,6 +120,54 @@ describe 'gdrcopy:gdrcopy_arch' do
   end
 end
 
+describe 'gdrcopy:gdrcopy_version' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(false)
+        runner = runner(platform: platform, version: version, step_into: ['gdrcopy'])
+        ConvergeGdrcopy.setup(runner)
+      end
+      cached(:resource) do
+        chef_run.find_resource('gdrcopy', 'setup')
+      end
+
+      it 'returns the expected gdrcopy version' do
+        expected_gdrcopy_version = if platform == "centos"
+                                     "2.3.1"
+                                   else
+                                     "2.4"
+                                   end
+        expect(resource.gdrcopy_version).to eq(expected_gdrcopy_version)
+      end
+    end
+  end
+end
+
+describe 'gdrcopy:gdrcopy_checksum' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(false)
+        runner = runner(platform: platform, version: version, step_into: ['gdrcopy'])
+        ConvergeGdrcopy.setup(runner)
+      end
+      cached(:resource) do
+        chef_run.find_resource('gdrcopy', 'setup')
+      end
+
+      it 'returns the expected gdrcopy checksum' do
+        expected_gdrcopy_checksum = if platform == "centos"
+                                      "59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8"
+                                    else
+                                      "39e74d505ca16160567f109cc23478580d157da897f134989df1d563e55f7a5b"
+                                    end
+        expect(resource.gdrcopy_checksum).to eq(expected_gdrcopy_checksum)
+      end
+    end
+  end
+end
+
 describe 'gdrcopy:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version} when gdrcopy not enabled" do
@@ -140,8 +186,14 @@ describe 'gdrcopy:setup' do
 
     context "on #{platform}#{version} when gdrcopy enabled" do
       cached(:sources_dir) { 'sources_dir' }
-      cached(:gdrcopy_version) { 'gdrcopy_version' }
-      cached(:gdrcopy_checksum) { 'gdrcopy_checksum' }
+      cached(:gdrcopy_version) { platform == 'centos' ? '2.3.1' : '2.4' }
+      cached(:gdrcopy_checksum) do
+        if platform == 'centos'
+          '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
+        else
+          '39e74d505ca16160567f109cc23478580d157da897f134989df1d563e55f7a5b'
+        end
+      end
       cached(:gdrcopy_service) { platform == 'ubuntu' ? 'gdrdrv' : 'gdrcopy' }
       cached(:gdrcopy_tarball) { "#{sources_dir}/gdrcopy-#{gdrcopy_version}.tar.gz" }
       cached(:gdrcopy_url) { "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v#{gdrcopy_version}.tar.gz" }
@@ -173,7 +225,7 @@ describe 'gdrcopy:setup' do
         runner = runner(platform: platform, version: version, step_into: ['gdrcopy']) do |node|
           node.override['cluster']['sources_dir'] = sources_dir
         end
-        ConvergeGdrcopy.setup(runner, gdrcopy_version: gdrcopy_version, gdrcopy_checksum: gdrcopy_checksum)
+        ConvergeGdrcopy.setup(runner)
       end
       cached(:node) { chef_run.node }
 
@@ -217,6 +269,11 @@ describe 'gdrcopy:setup' do
           expect(installation_code).to match(/dpkg -i libgdrapi_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
           expect(installation_code).to match(/dpkg -i gdrcopy-tests_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}\+cuda\*.deb/)
           expect(installation_code).to match(/dpkg -i gdrcopy_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+        elsif platform == 'centos'
+          expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-rpm-packages.sh})
+          expect(installation_code).to match(/rpm -q gdrcopy-kmod-#{gdrcopy_version}-1dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version}-1dkms.noarch.#{gdrcopy_platform}.rpm/)
+          expect(installation_code).to match(/rpm -q gdrcopy-#{gdrcopy_version}-1.#{gdrcopy_arch} || rpm -Uvh gdrcopy-#{gdrcopy_version}-1.#{gdrcopy_arch}.#{gdrcopy_platform}.rpm/)
+          expect(installation_code).to match(/rpm -q gdrcopy-devel-#{gdrcopy_version}-1.noarch || rpm -Uvh gdrcopy-devel-#{gdrcopy_version}-1.noarch.#{gdrcopy_platform}.rpm/)
         else
           expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-rpm-packages.sh})
           expect(installation_code).to match(/rpm -q gdrcopy-kmod-#{gdrcopy_version}-1dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version}-1dkms.#{gdrcopy_platform}.noarch.rpm/)

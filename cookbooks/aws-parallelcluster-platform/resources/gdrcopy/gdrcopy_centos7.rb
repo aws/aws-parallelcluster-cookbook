@@ -19,6 +19,25 @@ end
 use 'partial/_gdrcopy_common.rb'
 use 'partial/_gdrcopy_common_rhel.rb'
 
+def gdrcopy_version
+  '2.3.1'
+end
+
+def gdrcopy_checksum
+  '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
+end
+
+# The installation code must be overridden in Centos7
+# because it has GDRCopy pinned to v2.3.1.
+def installation_code
+  <<~COMMAND
+  CUDA=/usr/local/cuda ./build-rpm-packages.sh
+  rpm -q gdrcopy-kmod-#{gdrcopy_version_extended}dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version_extended}dkms.noarch.#{gdrcopy_platform}.rpm
+  rpm -q gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_arch} || rpm -Uvh gdrcopy-#{gdrcopy_version_extended}.#{gdrcopy_arch}.#{gdrcopy_platform}.rpm
+  rpm -q gdrcopy-devel-#{gdrcopy_version_extended}.noarch || rpm -Uvh gdrcopy-devel-#{gdrcopy_version_extended}.noarch.#{gdrcopy_platform}.rpm
+  COMMAND
+end
+
 def gdrcopy_enabled?
   !arm_instance? && nvidia_enabled?
 end
