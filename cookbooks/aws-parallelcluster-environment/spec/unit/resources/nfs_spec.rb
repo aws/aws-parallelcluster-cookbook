@@ -97,7 +97,7 @@ describe 'nfs:configure' do
           end
         end
 
-      elsif platform == 'redhat'
+      elsif %(redhat rocky).include?(platform)
         it 'uses nfs config template shipped with nfs cookbook' do
           is_expected.to create_template(server_template)
             .with(source: "#{server_template}.erb")

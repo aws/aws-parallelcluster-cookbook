@@ -25,7 +25,7 @@ describe 'system_authentication:setup' do
         case platform
         when 'amazon', 'centos'
           %w(sssd sssd-tools sssd-ldap authconfig)
-        when 'redhat'
+        when 'redhat', 'rocky'
           %w(sssd sssd-tools sssd-ldap authselect oddjob-mkhomedir)
         else
           %w(sssd sssd-tools sssd-ldap)
