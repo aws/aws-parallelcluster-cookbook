@@ -86,7 +86,7 @@ describe 'nvidia_repo:add' do
         case platform
         when 'amazon', 'centos'
           'rhel7'
-        when 'redhat'
+        when 'redhat', 'rocky'
           'rhel8'
         when 'ubuntu'
           "ubuntu#{version.delete('.')}"

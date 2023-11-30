@@ -36,7 +36,7 @@ for_all_oses do |platform, version|
         case platform
         when 'ubuntu'
           "/usr/share/modules/init/.modulespath"
-        when 'redhat'
+        when 'redhat', 'rocky'
           '/etc/environment-modules/modulespath'
         else
           "/usr/share/Modules/init/.modulespath"
