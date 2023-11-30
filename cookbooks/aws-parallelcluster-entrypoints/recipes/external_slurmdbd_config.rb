@@ -47,6 +47,8 @@ template '/etc/systemd/system/slurmdbd.service' do
   action :create
 end
 
+include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
+
 # TODO: configuration of munge systemd service;
 
 # TODO: move this template to a separate recipe
