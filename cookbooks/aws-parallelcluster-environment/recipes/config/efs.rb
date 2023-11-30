@@ -18,7 +18,7 @@ iam_array = node['cluster']['efs_iam_authorizations'].split(',')
 
 # Identify the previously mounted filesystems and remove them from the set of filesystems to mount
 shared_dir_array.each_with_index do |dir, index|
-  next unless node['cluster']['internal_shared_dirs'].include?(dir) || dir == "/home" || dir == "home"
+  next unless node['cluster']['internal_shared_dirs'].include?(dir) || dir == "/home" || dir == "home" || dir == node['cluster']['internal_initial_shared_dir']
   shared_dir_array.delete(dir)
   id_array.delete_at(index)
   encryption_array.delete_at(index)
