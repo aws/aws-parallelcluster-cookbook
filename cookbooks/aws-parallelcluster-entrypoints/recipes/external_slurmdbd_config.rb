@@ -39,6 +39,7 @@ end
 
 # TODO: move this template to a separate recipe
 template '/etc/systemd/system/slurmdbd.service' do
+  cookbook 'aws-parallelcluster-slurm'
   source 'slurm/head_node/slurmdbd.service.erb'
   owner 'root'
   group 'root'
@@ -46,11 +47,14 @@ template '/etc/systemd/system/slurmdbd.service' do
   action :create
 end
 
+include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
+
 # TODO: configuration of munge systemd service;
 
 # TODO: move this template to a separate recipe
 # TODO: add a logic in update_munge_key.sh.erb to skip sharing munge key to shared dir
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
+  cookbook 'aws-parallelcluster-slurm'
   source 'slurm/head_node/update_munge_key.sh.erb'
   owner 'root'
   group 'root'
