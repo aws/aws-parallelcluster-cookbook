@@ -68,6 +68,29 @@ describe 'package_repos:setup' do
           is_expected.to periodic_apt_update('')
         end
 
+      when 'rocky'
+        it 'installs yum' do
+          expect(chef_run).to include_recipe('yum')
+        end
+
+        it 'installs yum-epel' do
+          is_expected.to include_recipe('yum-epel')
+        end
+
+        it 'installs yum-utils' do
+          is_expected.to install_package('yum-utils').with(retries: 3).with(retry_delay: 5)
+        end
+
+        it 'enables powertools' do
+          is_expected.to run_execute('yum-config-manager-powertools')
+            .with(command: 'yum-config-manager --enable powertools')
+        end
+
+        it 'skips unavailable repos' do
+          is_expected.to run_execute('yum-config-manager_skip_if_unavail')
+            .with(command: 'yum-config-manager --setopt=*.skip_if_unavailable=1 --save')
+        end
+
       else
         pending "Implement for #{platform}"
       end

@@ -24,6 +24,8 @@ describe 'os_type:validate' do
           "centos#{version.to_i}"
         when 'redhat'
           "rhel#{version.to_i}"
+        when 'rocky'
+          "rocky#{version.to_i}"
         else
           raise "Unsupported OS #{platform}"
         end

@@ -30,7 +30,7 @@ action :setup do
     retry_delay 5
   end
 
-  execute 'yum-config-manager-rhel' do
+  execute 'yum-config-manager-powertools' do
     # Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
     command "yum-config-manager --enable powertools"
   end
