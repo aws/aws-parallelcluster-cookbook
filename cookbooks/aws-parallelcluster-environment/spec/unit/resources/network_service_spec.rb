@@ -31,6 +31,7 @@ describe 'network_service:restart' do
           'amazon' => 'network',
           'centos' => 'network',
           'redhat' => 'NetworkManager',
+          'rocky' => 'NetworkManager',
           'ubuntu' => 'systemd-resolved',
         }[platform]
       end
@@ -59,6 +60,7 @@ describe 'network_service:reload' do
           'amazon' => 'network',
           'centos' => 'network',
           'redhat' => 'NetworkManager',
+          'rocky' => 'NetworkManager',
           'ubuntu' => 'systemd-resolved',
         }[platform]
       end

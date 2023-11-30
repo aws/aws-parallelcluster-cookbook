@@ -33,7 +33,16 @@ describe 'cloudwatch:setup' do
       cached(:signature_path) { "#{package_path}.sig" }
 
       context "when not on arm" do
-        cached(:platform_url_component) { platform == 'amazon' ? 'amazon_linux' : platform }
+        cached(:platform_url_component) do
+          case platform
+          when 'amazon'
+            'amazon_linux'
+          when 'rocky'
+            'redhat'
+          else
+            platform
+          end
+        end
         cached(:package_url) { "#{package_url_prefix}/#{platform_url_component}/amd64/latest/amazon-cloudwatch-agent.#{package_extension}" }
         cached(:chef_run) do
           runner = runner(platform: platform, version: version, step_into: ['cloudwatch']) do |node|
@@ -105,7 +114,7 @@ describe 'cloudwatch:setup' do
           case platform
           when 'amazon'
             'amazon_linux'
-          when 'centos'
+          when 'centos', 'rocky'
             'redhat'
           else
             platform

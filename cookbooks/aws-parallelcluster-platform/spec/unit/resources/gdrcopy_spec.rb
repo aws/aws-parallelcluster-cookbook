@@ -93,7 +93,7 @@ describe 'gdrcopy:gdrcopy_arch' do
       context 'on arm instance' do
         cached(:expected_arch) do
           case platform
-          when 'amazon', 'redhat'
+          when 'amazon', 'redhat', 'rocky'
             'aarch64'
           else
             'arm64'
