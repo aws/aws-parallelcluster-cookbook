@@ -297,7 +297,7 @@ describe 'efs:mount' do
 
         it 'enables shared dir mount if already mounted' do
           is_expected.to enable_mount('/shared_dir_2')
-            .with(device: 'id_2.efs.REGION.DOMAIN:/')
+            .with(device: 'id_2:/')
             .with(fstype: 'efs')
             .with(dump: 0)
             .with(pass: 0)
@@ -306,7 +306,7 @@ describe 'efs:mount' do
             .with(retry_delay: 6)
 
           is_expected.to enable_mount('/shared_dir_3')
-            .with(device: 'id_3.efs.REGION.DOMAIN:/')
+            .with(device: 'id_3:/')
             .with(fstype: 'efs')
             .with(dump: 0)
             .with(pass: 0)

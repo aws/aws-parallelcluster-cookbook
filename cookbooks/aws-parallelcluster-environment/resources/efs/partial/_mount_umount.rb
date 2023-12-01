@@ -72,7 +72,7 @@ action :mount do
 
     # Enable the mount dir
     mount efs_shared_dir do
-      device "#{efs_fs_id}.efs.#{node['cluster']['region']}.#{node['cluster']['aws_domain']}:#{mount_point}"
+      device "#{efs_fs_id}:#{mount_point}"
       fstype 'efs'
       options mount_options
       dump 0
