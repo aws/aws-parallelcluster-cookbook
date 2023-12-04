@@ -384,5 +384,5 @@ Scheduling:
       UseEc2Hostnames: false
     EnableMemoryBasedScheduling: false
     QueueUpdateStrategy: COMPUTE_FLEET_STOP
-    ScaledownIdletime: 10
+    ScaledownIdletime: -1
     Database: null
