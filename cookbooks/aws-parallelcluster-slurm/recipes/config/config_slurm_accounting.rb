@@ -37,7 +37,8 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password
   mode '0700'
   variables(
     secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database, :PasswordSecretArn) },
-    region: node['cluster']['region']
+    region: node['cluster']['region'],
+    slurm_install_dir: node['cluster']['slurm']['install_dir']
   )
   sensitive true
 end
