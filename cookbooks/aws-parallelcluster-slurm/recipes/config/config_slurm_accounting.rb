@@ -78,7 +78,7 @@ execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
   retries node['cluster']['slurmdbd_response_retries']
   retry_delay 10
-end unless on_docker?
+end unless on_docker? || node['is_external_slurmdbd']
 
 bash "bootstrap slurm database" do
   user 'root'
@@ -109,4 +109,4 @@ bash "bootstrap slurm database" do
     # This is not important for the scope of this script, so we return 0.
     exit 0
   BOOTSTRAP
-end unless on_docker?
+end unless on_docker? || node['is_external_slurmdbd']
