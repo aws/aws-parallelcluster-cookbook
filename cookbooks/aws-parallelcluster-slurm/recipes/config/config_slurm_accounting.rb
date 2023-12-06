@@ -24,6 +24,23 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
   action :create_if_missing
 end
 
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_external_slurmdbd.conf" do
+  source 'slurm/external_slurmdbd/slurm_external_slurmdbd.conf.erb'
+  owner "#{node['cluster']['slurm']['user']}"
+  group "#{node['cluster']['slurm']['group']}"
+  mode '0600'
+  action :create_if_missing
+  variables(
+    dbd_host: "localhost",
+    storage_host: node['dbms_uri'],
+    # TODO: expose additional CFN Parameter in template
+    storage_port: 3306,
+    storage_loc: node['dbms_database_name'],
+    storage_user: node['dbms_username']
+  )
+  only_if { node['is_external_slurmdbd'] }
+end
+
 file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
   owner "#{node['cluster']['slurm']['user']}"
   group "#{node['cluster']['slurm']['group']}"
