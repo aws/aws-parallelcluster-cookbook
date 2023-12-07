@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Intel Python: 2023.2.0
   - Critical Update for Intel oneAPI DPC++/C++ Compiler: 2023.2.1
   - Critical Update for Intel Fortran Compiler & Intel Fortran Compiler Classic: 2023.2.1
+- Add support for external slurmdbd in Slurm cluster configuration.
 
 **CHANGES**
 - Upgrade Slurm to 23.11.0 (from 23.02.6).
