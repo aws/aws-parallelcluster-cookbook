@@ -55,6 +55,25 @@ remote_directory "#{node['cluster']['sources_dir']}/slurm_patches" do
   recursive true
 end
 
+# Copy Slurm patches from S3 if passed via dna.json
+if !node['cluster']['slurm_patches_s3_archive'].nil? && !node['cluster']['slurm_patches_s3_archive'].empty?
+  remote_object 'Retrieve Custom Slurm Settings' do
+    url node['cluster']['slurm_patches_s3_archive']
+    destination "#{node['cluster']['sources_dir']}/slurm_patches_from_s3.tar.gz"
+    sensitive true
+  end
+
+  bash 'extract Slurm patches from archive' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['sources_dir']}/slurm_patches"
+    code <<-UNTAR
+    set -e
+    tar xf #{node['cluster']['sources_dir']}/slurm_patches_from_s3.tar.gz
+    UNTAR
+  end
+end
+
 # Install Slurm
 bash 'make install' do
   not_if { redhat_on_docker? }
