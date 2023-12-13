@@ -14,6 +14,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Allow for mounting `home` as an EFS or FSx external shared storage via the `SharedStorage` section of the config file.
 
 **CHANGES**
+- Upgrade Slurm to 23.02.7 (from 23.02.6).
 - Do not wait for static nodes in maintenance to signal CFN that the head node initialization is complete.
 - Upgrade `aws-cfn-bootstrap` to version 2.0-28.
 - Upgrade Python to 3.9.17.
