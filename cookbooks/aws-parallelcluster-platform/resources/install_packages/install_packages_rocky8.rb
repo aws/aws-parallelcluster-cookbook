@@ -33,12 +33,15 @@ action :install_kernel_source do
       # Previous releases are moved into a vault area once a new minor release version is available for at least a week.
       # https://wiki.rockylinux.org/rocky/repo/#notes-on-devel
       set -e
-      wget https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/$(uname -m)/os/Packages/k/${package}.rpm
-      dnf install -y ./${package}.rpm
+      dnf install -y https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/#{node['kernel']['machine']}/os/Packages/k/${package}.rpm
     fi
     dnf clean all
     INSTALL_KERNEL_SOURCE
   end unless on_docker?
+end
+
+def kernel_source_package_version
+  node['kernel']['release']
 end
 
 def default_packages
