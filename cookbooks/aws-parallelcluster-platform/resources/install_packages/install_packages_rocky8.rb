@@ -28,15 +28,18 @@ action :install_kernel_source do
     # try to install kernel source for a specific release version
     dnf install -y ${package} --releasever #{node['platform_version']}
     if [ $? -ne 0 ]; then
-      set -e
       # Previous releases are moved into a vault area once a new minor release version is available for at least a week.
       # https://wiki.rockylinux.org/rocky/repo/#notes-on-devel
-      wget https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/$(uname -m)/os/Packages/k/${package}.rpm
-      dnf install -y ./${package}.rpm
+      set -e
+      dnf -y install https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/#{node['kernel']['machine']}/os/Packages/k/${package}.rpm
     fi
     dnf clean all
     INSTALL_KERNEL_SOURCE
   end unless on_docker?
+end
+
+def kernel_source_package_version
+  node['kernel']['release']
 end
 
 def default_packages
