@@ -23,12 +23,12 @@ action :install_kernel_source do
   bash "Install kernel source" do
     user 'root'
     code <<-INSTALL_KERNEL_SOURCE
-    set -e
     package="#{kernel_source_package}-#{kernel_source_package_version}"
 
     # try to install kernel source for a specific release version
     dnf install -y ${package} --releasever #{node['platform_version']}
     if [ $? -ne 0 ]; then
+      set -e
       # Previous releases are moved into a vault area once a new minor release version is available for at least a week.
       # https://wiki.rockylinux.org/rocky/repo/#notes-on-devel
       wget https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/$(uname -m)/os/Packages/k/${package}.rpm
