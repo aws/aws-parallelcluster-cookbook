@@ -17,8 +17,8 @@
 # EFA setup: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html
 #
 
-property :efa_version, String, default: '1.29.0'
-property :efa_checksum, String, default: '836655f87015547e733e7d9f7c760e4e24697f8bbc261bb5f3560abd4206bc36'
+property :efa_version, String, default: '1.29.1'
+property :efa_checksum, String, default: '178b263b8c25845b63dc93b25bcdff5870df5204ec509af26f43e8d283488744'
 
 action :setup do
   if efa_installed? && !::File.exist?(efa_tarball)
