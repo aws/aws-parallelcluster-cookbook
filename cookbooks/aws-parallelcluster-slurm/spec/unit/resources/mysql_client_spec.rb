@@ -28,13 +28,18 @@ describe 'mysql_client:setup' do
         cached(:package_filename) { "mysql-community-client-#{package_version}.tar.gz" }
         cached(:s3_url) { 's3://url' }
         cached(:package_platform) do
+          platform_version = if version.to_i == 2
+                               7
+                             else
+                               version.to_i
+                             end
           if architecture == 'aarch64'
-            'el/7/aarch64'
+            "el/#{platform_version}/aarch64"
           elsif architecture == 'x86_64'
             if platform == 'ubuntu'
               "ubuntu/${version}/x86_64"
             else
-              'el/7/x86_64'
+              "el/#{platform_version}/x86_64"
             end
           else
             pending "unsupported architecture #{architecture}"

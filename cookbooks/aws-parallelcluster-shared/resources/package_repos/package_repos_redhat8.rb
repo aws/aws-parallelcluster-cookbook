@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :package_repos, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 unified_mode true
 
@@ -32,7 +32,7 @@ action :setup do
 
   execute 'yum-config-manager-rhel' do
     # Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
-    command "yum-config-manager --enable codeready-builder-for-rhel-8-rhui-rpms"
+    command "yum-config-manager --enable codeready-builder-for-rhel-#{node['platform_version'].to_i}-rhui-rpms"
   end unless on_docker?
 
   execute 'yum-config-manager_skip_if_unavail' do

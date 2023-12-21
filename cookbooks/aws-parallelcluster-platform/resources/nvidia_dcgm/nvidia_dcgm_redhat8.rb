@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :nvidia_dcgm, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 
 use 'partial/_nvidia_dcgm_common.rb'

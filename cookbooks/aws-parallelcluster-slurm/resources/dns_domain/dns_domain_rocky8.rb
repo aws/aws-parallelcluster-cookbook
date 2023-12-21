@@ -9,7 +9,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :dns_domain, platform: 'rocky' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 
 use 'partial/_dns_domain_common'

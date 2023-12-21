@@ -87,7 +87,7 @@ describe 'nvidia_repo:add' do
         when 'amazon', 'centos'
           'rhel7'
         when 'redhat', 'rocky'
-          'rhel8'
+          "rhel#{version.to_i}"
         when 'ubuntu'
           "ubuntu#{version.delete('.')}"
         end
@@ -127,7 +127,7 @@ describe 'nvidia_repo:remove' do
         when 'amazon', 'centos'
           'rhel7'
         when 'redhat'
-          'rhel8'
+          "rhel#{version}"
         when 'ubuntu'
           "ubuntu#{version.delete('.')}"
         end

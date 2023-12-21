@@ -15,30 +15,56 @@
 
 def dcv_sha256sum
   if arm_instance?
-    '37aaaabfe1b8dde83254c738aa562b7eb7b1663cea09a53cedf9dabe5ddbb184'
+    case el_string
+    when "el7"
+      '37aaaabfe1b8dde83254c738aa562b7eb7b1663cea09a53cedf9dabe5ddbb184'
+    when "el8"
+      'c5366bde8fb49bb41f2bb04e3390e5bda9aa668c0122e4fbf663e9a18c049edf'
+    when "el9"
+      '07148327f30dae656b338e24102945830601e85df4e135029b624df1e9ee3c2e'
+    else
+      ''
+    end
   else
-    'e82e434a3f0c5d1a48d7cda2b6100ce51ae250d93b6a17b2fb81ba0fda463b3b'
+    case el_string
+    when "el7"
+      'e82e434a3f0c5d1a48d7cda2b6100ce51ae250d93b6a17b2fb81ba0fda463b3b'
+    when "el8"
+      '28a15bb557f59580f3b58d9bf99430d27d98efbaa9007ab3b2eca46e1a51fa4f'
+    when "el9"
+      'eb906f41b0a064005499ab6a1be42c8d218a3fbaf9444cb907990aa6171bdea4'
+    else
+      ''
+    end
+  end
+end
+
+def el_string
+  if platform?('amazon')
+    "el7"
+  else
+    "el#{node['platform_version'].to_i}"
   end
 end
 
 def dcv_package
-  "nice-dcv-#{node['cluster']['dcv']['version']}-el7-#{dcv_url_arch}"
+  "nice-dcv-#{node['cluster']['dcv']['version']}-#{el_string}-#{dcv_url_arch}"
 end
 
 def dcv_server
-  "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{dcv_url_arch}.rpm"
+  "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.#{el_string}.#{dcv_url_arch}.rpm"
 end
 
 def xdcv
-  "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{dcv_url_arch}.rpm"
+  "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.#{el_string}.#{dcv_url_arch}.rpm"
 end
 
 def dcv_web_viewer
-  "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{dcv_url_arch}.rpm"
+  "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.#{el_string}.#{dcv_url_arch}.rpm"
 end
 
 def dcv_gl
-  "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{dcv_url_arch}.rpm"
+  "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.#{el_string}.#{dcv_url_arch}.rpm"
 end
 
 action_class do

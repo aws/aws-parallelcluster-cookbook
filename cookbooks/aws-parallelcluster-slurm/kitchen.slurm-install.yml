@@ -25,6 +25,8 @@ suites:
         - /tag:install_jwt_dependencies/
     attributes:
       resource: jwt_dependencies
+      dependencies:
+        - resource:package_repos
   - name: mysql_client
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

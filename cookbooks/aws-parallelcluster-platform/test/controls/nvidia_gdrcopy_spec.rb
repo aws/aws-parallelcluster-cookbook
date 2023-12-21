@@ -52,7 +52,7 @@ control 'tag:config_gdrcopy_disabled_on_non_graphic_instances' do
   end
 
   describe 'gdrcopy service should be disabled' do
-    subject { command("systemctl is-enabled #{node['cluster']['nvidia']['gdrcopy']['service']} | grep disabled") }
-    its('exit_status') { should eq 0 }
+    subject { command("systemctl is-enabled #{node['cluster']['nvidia']['gdrcopy']['service']}") }
+    its('exit_status') { should eq 1 }
   end
 end
