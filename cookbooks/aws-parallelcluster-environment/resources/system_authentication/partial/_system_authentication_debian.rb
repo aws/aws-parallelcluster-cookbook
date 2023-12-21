@@ -15,6 +15,7 @@
 action :configure do
   execute 'Configure Directory Service' do
     user 'root'
+    environment 'DEBIAN_FRONTEND' => 'noninteractive'
     # Enable PAM mkhomedir module
     command "pam-auth-update --enable mkhomedir"
     default_env true
