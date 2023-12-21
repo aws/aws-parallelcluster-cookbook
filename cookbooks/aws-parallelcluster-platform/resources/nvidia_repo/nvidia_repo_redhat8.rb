@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :nvidia_repo, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 
 use 'partial/_nvidia_repo_common.rb'
 
 def platform
-  'rhel8'
+  "rhel#{node['platform_version'].to_i}"
 end
 
 def repository_key

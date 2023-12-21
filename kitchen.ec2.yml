@@ -154,6 +154,58 @@ platforms:
     attributes:
       cluster:
         base_os: rocky8
+  - name: rhel9
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_RHEL9_AMI'] %>
+      # Use the RedHat 8 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_RHEL9_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>RHEL-9.3.*_HVM*<% else %><%= pcluster_prefix %>-rhel9-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: ec2-user
+    attributes:
+      cluster:
+        base_os: rhel9
+  - name: rocky9
+    driver_plugin: ec2
+    driver:
+      <% if ENV['KITCHEN_ROCKY9_AMI'] %>
+      # Use the Rocky Linux 8 AMI most similar to the base AMI used to build the ParallelCluster image
+      image_id: <%= ENV['KITCHEN_ROCKY9_AMI'] %>
+      <% else %>
+      image_search:
+        name: <% if ENV['KITCHEN_PHASE']=='install' %>Rocky-9-EC2-Base-9.3*<% else %><%= pcluster_prefix %>-rocky9-hvm-*<% end %>
+        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
+      <% end %>
+      block_device_mappings:
+        - device_name: /dev/sda1
+          ebs:
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_type: gp2
+            delete_on_termination: true
+      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
+        - device_name: /dev/xvdb<%= c %>
+          virtual_name: ephemeral<%= i %>
+      <% end %>
+    transport:
+      username: rocky
+    attributes:
+      cluster:
+        base_os: rocky9
   - name: centos7
     driver_plugin: ec2
     driver:

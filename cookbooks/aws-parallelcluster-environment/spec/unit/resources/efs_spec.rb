@@ -158,6 +158,9 @@ describe 'efs:install_utils' do
   for_oses([
     %w(centos 7),
     %w(redhat 8),
+    %w(rocky 8),
+    %w(redhat 9),
+    %w(rocky 9),
   ]) do |platform, version|
     context "on #{platform}#{version}" do
       cached(:source_dir) { 'SOURCE DIR' }
@@ -178,6 +181,7 @@ describe 'efs:install_utils' do
         {
           "centos" => 'rpm-build',
           "redhat" => %w(rpm-build make),
+          "rocky" => %w(rpm-build make),
         }
       end
 

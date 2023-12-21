@@ -60,7 +60,7 @@ describe 'package_repos:setup' do
 
         it 'enables rhui' do
           is_expected.to run_execute('yum-config-manager-rhel')
-            .with(command: 'yum-config-manager --enable codeready-builder-for-rhel-8-rhui-rpms')
+            .with(command: "yum-config-manager --enable codeready-builder-for-rhel-#{version.to_i}-rhui-rpms")
         end
 
       when 'ubuntu'
@@ -82,8 +82,14 @@ describe 'package_repos:setup' do
         end
 
         it 'enables powertools' do
+          case version
+          when '8'
+            powertool_name = "powertools"
+          when '9'
+            powertool_name = "crb"
+          end
           is_expected.to run_execute('yum-config-manager-powertools')
-            .with(command: 'yum-config-manager --enable powertools')
+            .with(command: "yum-config-manager --enable #{powertool_name}")
         end
 
         it 'skips unavailable repos' do

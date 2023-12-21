@@ -35,6 +35,8 @@ jobs:
           - ubuntu2204
           - rhel8
           - rocky8
+          - rhel9
+          - rocky9
       fail-fast: false
     steps:
       - uses: actions/checkout@main
