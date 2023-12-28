@@ -15,5 +15,5 @@ end
 use 'partial/_slurm_dependencies_common'
 
 def dependencies
-  %w(json-c-devel http-parser-devel perl-Switch lua-devel)
+  %w(json-c-devel http-parser-devel lua-devel perl dbus-devel)
 end

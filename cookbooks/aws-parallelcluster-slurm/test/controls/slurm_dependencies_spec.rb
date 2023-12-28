@@ -24,8 +24,12 @@ control 'tag:install_slurm_dependencies_installed' do
 
   packages = []
   if os.redhat?
-    # Skipping redhat on docker since ubi-appstream repo is not aligned with the main repo
-    packages.concat %w(json-c-devel http-parser-devel perl-Switch) unless os_properties.redhat_on_docker?
+    if os_properties.alinux2? || os_properties.centos7?
+      # Skipping redhat on docker since ubi-appstream repo is not aligned with the main repo
+      packages.concat %w(json-c-devel http-parser-devel perl-Switch) unless os_properties.redhat_on_docker?
+    else
+      packages.concat %w(json-c-devel http-parser-devel perl dbus-devel) unless os_properties.redhat_on_docker?
+    end
   elsif os.debian?
     packages.concat %w(libjson-c-dev libhttp-parser-dev libswitch-perl)
   else
