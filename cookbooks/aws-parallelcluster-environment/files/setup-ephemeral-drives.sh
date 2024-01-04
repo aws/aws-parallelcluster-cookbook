@@ -17,11 +17,10 @@ LVM_PATH="/dev/${LVM_VG_NAME}/${LVM_NAME}"
 LVM_ACTIVE_STATE="a"
 FS_TYPE="ext4"
 MOUNT_OPTIONS="noatime,nodiratime"
-# cfn_ephemeral_dir is set in the environment by cfnconfig sourcing
+# shellcheck disable=SC2154 # cfn_ephemeral_dir is set in the environment by cfnconfig sourcing
 INPUT_MOUNTPOINT="${cfn_ephemeral_dir}"
 
 function log {
-  SCRIPT=$(basename "$0")
   MESSAGE="$1"
   echo "ParallelCluster - ${MESSAGE}"
 }
@@ -73,7 +72,7 @@ function print_block_device_mapping {
 function check_instance_store {
   if ls /dev/nvme* >& /dev/null; then
     IS_NVME=1
-    MAPPINGS=$(realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "*Instance_Storage*" | uniq)
+    MAPPINGS=$(realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "Instance_Storage" | uniq)
   else
     IS_NVME=0
     set_imds_token

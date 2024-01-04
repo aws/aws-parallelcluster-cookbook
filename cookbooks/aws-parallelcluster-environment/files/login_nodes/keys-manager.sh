@@ -18,7 +18,8 @@ function info() {
 }
 
 function help() {
-  local -- cmd=$(basename "$0")
+  local -- cmd
+  cmd=$(basename "$0")
   cat <<EOF
 
   Usage: ${cmd} [OPTION]...
