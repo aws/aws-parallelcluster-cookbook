@@ -47,15 +47,6 @@ action :create_common_udev_files do
     mode '0744'
   end
 
-  cookbook_file 'ec2blkdev-init' do
-    source 'ec2_udev_rules/ec2blkdev-init'
-    cookbook 'aws-parallelcluster-environment'
-    path '/etc/init.d/ec2blkdev'
-    user 'root'
-    group 'root'
-    mode '0744'
-  end
-
   cookbook_file 'manageVolume.py' do
     source 'ec2_udev_rules/manageVolume.py'
     cookbook 'aws-parallelcluster-environment'
@@ -67,8 +58,7 @@ action :create_common_udev_files do
 end
 
 action :start_ec2blk do
-  service "ec2blkdev" do
-    supports restart: true
-    action %i(enable start)
+  execute "Refresh UdevAdmin" do
+    command "udevadm trigger --action=change --subsystem-match=block"
   end unless on_docker?
 end

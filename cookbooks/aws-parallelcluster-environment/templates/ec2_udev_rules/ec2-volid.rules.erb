@@ -1,4 +1,4 @@
-KERNEL=="xvd*", ENV{DEVTYPE}=="disk", PROGRAM="<%= @cookbook_virtualenv_path %>/bin/python /sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c"
-KERNEL=="xvd*", ENV{DEVTYPE}=="partition", PROGRAM="<%= @cookbook_virtualenv_path %>/bin/python /sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c-p%n"
+KERNEL=="xvd*", KERNEL!="xvda*", ENV{DEVTYPE}=="disk", PROGRAM="<%= @cookbook_virtualenv_path %>/bin/python /sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c"
+KERNEL=="xvd*", KERNEL!="xvda*",  ENV{DEVTYPE}=="partition", PROGRAM="<%= @cookbook_virtualenv_path %>/bin/python /sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c-p%n"
 KERNEL=="nvme*", ENV{DEVTYPE}=="disk", PROGRAM="<%= @cookbook_virtualenv_path %>/bin/python /sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c"
 KERNEL=="nvme*", ENV{DEVTYPE}=="partition", PROGRAM="<%= @cookbook_virtualenv_path %>/bin/python /sbin/ec2_dev_2_volid.py %k", SYMLINK+="disk/by-ebs-volumeid/%c-p%n"
