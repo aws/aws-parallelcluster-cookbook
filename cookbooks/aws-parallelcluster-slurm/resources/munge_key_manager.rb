@@ -29,7 +29,7 @@ def restart_munge_service
     action :restart
     retries 5
     retry_delay 10
-  end
+  end unless on_docker?
 end
 
 def enable_munge_service
@@ -38,7 +38,7 @@ def enable_munge_service
     action :enable
     retries 5
     retry_delay 10
-  end
+  end unless on_docker?
 end
 
 def share_munge_key_to_dir(shared_dir)

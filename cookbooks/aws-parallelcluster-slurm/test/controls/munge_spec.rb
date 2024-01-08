@@ -35,21 +35,6 @@ control 'tag:install_munge_user_and_group_created' do
   end
 end unless os_properties.redhat_on_docker?
 
-control 'tag:install_munge_init_script_configured' do
-  title 'Check munge init script is configured with the proper user and group'
-
-  describe file("/etc/init.d/munge") do
-    it { should exist }
-    its('mode') { should cmp '0755' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('content') do
-      should match("USER=#{munge_user}")
-      should match("GROUP=#{munge_group}")
-    end
-  end unless os_properties.redhat_on_docker?
-end
-
 control 'tag:install_munge_folders_created' do
   title 'Munge folder have been created'
 

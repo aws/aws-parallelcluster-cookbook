@@ -48,7 +48,6 @@ action :setup do
     action_purge_packages
     action_download_source_code
     action_compile_and_install
-    action_update_init_script
     action_set_user_and_group
     action_create_required_directories
   }
@@ -90,19 +89,6 @@ action :compile_and_install do
       make install
     MUNGE
     not_if "/usr/sbin/munged --version | grep -q munge-#{munge_version} && ls #{munge_libdir}/libmunge*"
-  end
-end
-
-action :update_init_script do
-  # Updated munge init script for Amazon Linux
-  template '/etc/init.d/munge' do
-    source 'munge/munge-init.erb'
-    cookbook 'aws-parallelcluster-slurm'
-    owner 'root'
-    group 'root'
-    variables(munge_user: munge_user,
-              munge_group: munge_group)
-    mode '0755'
   end
 end
 
