@@ -117,6 +117,8 @@ def test_attach_volume(mocker, volume_response, state, message, ec2_mock, capsys
     mocker.patch("time.sleep", return_value=None)
     mocker.patch("os.popen", mocker.mock_open(read_data="sdf"))
     mocker.patch("subprocess.check_output", return_value="xvda")
+    mocker.patch("os.makedirs")
+    mocker.patch("builtins.open", mocker.mock_open())
 
     volume_response["State"] = state
     ec2_mock.attach_volume.return_value = volume_response

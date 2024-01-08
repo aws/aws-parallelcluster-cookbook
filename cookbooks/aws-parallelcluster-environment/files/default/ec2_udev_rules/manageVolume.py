@@ -7,6 +7,7 @@
 
 import argparse
 import configparser
+import json
 import os
 import re
 import subprocess  # nosec B404
@@ -132,6 +133,17 @@ def attach_volume(volume_id, instance_id, ec2):
     # Attach the volume
     dev = available_devices[0]
     response = ec2.attach_volume(VolumeId=volume_id, InstanceId=instance_id, Device=dev)
+
+    mapping_file_path = "/dev/disk/by-ebs-volumeid/parallelcluster_dev_id_mapping"
+    if os.path.isfile(mapping_file_path):
+        with open(mapping_file_path, "r", encoding="utf-8") as mapping_file:
+            mapping = json.load(mapping_file)
+    else:
+        mapping = {}
+    mapping[dev] = volume_id
+    os.makedirs(os.path.dirname(mapping_file_path), exist_ok=True)
+    with open(mapping_file_path, "w", encoding="utf-8") as mapping_file:
+        json.dump(mapping, mapping_file)
 
     # Poll for volume to attach
     state = response.get("State")
