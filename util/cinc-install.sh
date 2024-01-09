@@ -75,8 +75,6 @@ checksum_mismatch() {
 unable_to_retrieve_package() {
   echo "Unable to retrieve a valid package!"
   report_bug
-  # shellcheck disable=SC2154
-  echo "Metadata URL: $metadata_url"
   if test "x$download_url" != "x"; then
     echo "Download URL: $download_url"
   fi
@@ -108,7 +106,6 @@ http_404_error() {
   echo "that $platform is not supported."
   echo ""
   # deliberately do not call report_bug to suppress bug report noise.
-  echo "Metadata URL: $metadata_url"
   if test "x$download_url" != "x"; then
     echo "Download URL: $download_url"
   fi

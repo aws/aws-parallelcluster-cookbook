@@ -72,7 +72,7 @@ function print_block_device_mapping {
 function check_instance_store {
   if ls /dev/nvme* >& /dev/null; then
     IS_NVME=1
-    MAPPINGS=$(realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "Instance_Storage" | uniq)
+    MAPPINGS=$(realpath --relative-to=/dev/ -P /dev/disk/by-id/nvme*Instance_Storage* | grep -v "\*Instance_Storage\*" | uniq)
   else
     IS_NVME=0
     set_imds_token
