@@ -23,9 +23,5 @@ Scheduling:
     Scheduler: slurm
     SlurmSettings:
         ScaledownIdletime: 10
-        Database:
-            Uri: test.databaseserver.com
-            UserName: test_admin
-            PasswordSecretArn: arn:aws:secretsmanager:us-east-1:111111111111:secret:Secret-xxxxxxxx-xxxxx
-            DatabaseName: test_database
-            ExternalSlurmdbd: null
+        ExternalSlurmdbd: test.slurmdbd.host
+        Database: null
