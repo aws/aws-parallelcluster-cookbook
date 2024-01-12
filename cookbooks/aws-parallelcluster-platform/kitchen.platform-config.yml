@@ -199,3 +199,19 @@ suites:
     verifier:
       controls:
         - /tag:config_supervisord/
+  - name: sudo_access
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_sudo_access/
+    attributes:
+      resource: sudo_access:setup
+      cluster:
+##       Test to check if sudo access for default user is disabled (Disable Action) 
+##       The test runs with default user, it will fail to check the files content as it does not have sudo access anymore if we don't override with pcluster-admin 
+        cluster_user: 'pcluster-admin'
+        disable_sudo_access_for_default_user: 'true'
+#        Test to check if sudo access for default user is enabled (Enable Action) 
+#        disable_sudo_access_for_default_user: 'false'

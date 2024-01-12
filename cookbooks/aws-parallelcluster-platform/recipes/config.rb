@@ -14,6 +14,7 @@
 include_recipe 'aws-parallelcluster-platform::openssh'
 include_recipe 'aws-parallelcluster-platform::sudo_config'
 include_recipe 'aws-parallelcluster-platform::cluster_user'
+sudo_access "Setup Sudo Access of Default User"
 include_recipe 'aws-parallelcluster-platform::networking'
 include_recipe 'aws-parallelcluster-platform::nvidia_config'
 sticky_bits 'setup sticky bits'
@@ -24,5 +25,4 @@ include_recipe 'aws-parallelcluster-platform::dcv'
 # Supervisord configuration must be executed after DCV because dcv external authenticator is part of it
 include_recipe 'aws-parallelcluster-platform::supervisord_config'
 fetch_config 'Fetch and load cluster configs'
-
 include_recipe 'aws-parallelcluster-platform::config_login' if node['cluster']['node_type'] == 'LoginNode'
