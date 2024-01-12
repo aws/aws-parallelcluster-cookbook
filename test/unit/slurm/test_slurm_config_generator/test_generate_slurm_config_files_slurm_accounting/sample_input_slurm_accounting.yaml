@@ -28,3 +28,4 @@ Scheduling:
             UserName: test_admin
             PasswordSecretArn: arn:aws:secretsmanager:us-east-1:111111111111:secret:Secret-xxxxxxxx-xxxxx
             DatabaseName: null
+            ExternalSlurmdbd: null

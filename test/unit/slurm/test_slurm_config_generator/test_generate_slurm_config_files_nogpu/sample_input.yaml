@@ -86,3 +86,4 @@ Scheduling:
     SlurmSettings:
         ScaledownIdletime: 10
         Database: null
+        ExternalSlurmdbd: null
