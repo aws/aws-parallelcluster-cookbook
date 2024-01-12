@@ -386,3 +386,4 @@ Scheduling:
     QueueUpdateStrategy: COMPUTE_FLEET_STOP
     ScaledownIdletime: -1
     Database: null
+    ExternalSlurmdbd: null
