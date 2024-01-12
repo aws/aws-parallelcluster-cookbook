@@ -752,3 +752,39 @@ suites:
       dependencies:
         - recipe:aws-parallelcluster-platform::directories
         - resource:spack:setup
+  - name: default_user_local_home_head_node
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::config_default_user_home]
+    verifier:
+      controls:
+        - local_default_user_home
+    attributes:
+      cluster:
+        node_type: 'HeadNode'
+        scheduler: 'slurm'
+        default_user_home: 'local'
+  - name: default_user_local_home_compute
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::config_default_user_home]
+    verifier:
+      controls:
+        - local_default_user_home
+    attributes:
+      cluster:
+        node_type: 'ComputeFleet'
+        scheduler: 'slurm'
+        default_user_home: 'local'
+  - name: default_user_local_home_login
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-environment::config_default_user_home]
+    verifier:
+      controls:
+        - local_default_user_home
+    attributes:
+      cluster:
+        node_type: 'LoginNode'
+        scheduler: 'slurm'
+        default_user_home: 'local'
