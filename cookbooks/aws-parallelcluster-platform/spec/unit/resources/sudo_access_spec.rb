@@ -13,7 +13,7 @@ end
 describe 'sudo_access:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:default_user) { 'ec2-user' }
+      cached(:default_user) { 'ubuntu' }
       let(:chef_run) do
         runner(platform: platform, version: version, step_into: ['sudo_access']) do |node|
           node.override['cluster']['cluster_user'] = default_user
@@ -33,6 +33,16 @@ describe 'sudo_access:setup' do
             line: "",
             remove_duplicates: true,
             replace_only: true
+          )
+          is_expected.to create_template("/etc/sudoers.d/99-parallelcluster-revoke-sudo-access").with(
+            source: 'sudo_access/99-parallelcluster-revoke-sudo.erb',
+            cookbook: 'aws-parallelcluster-platform',
+            user: 'root',
+            group: 'root',
+            mode: '0600',
+            variables: {
+              user_name: default_user,
+            }
           )
         end
       end
