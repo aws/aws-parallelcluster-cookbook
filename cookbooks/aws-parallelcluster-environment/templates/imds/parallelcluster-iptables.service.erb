@@ -1,0 +1,10 @@
+[Unit]
+Description=Backup and restore iptables rules (both for IPv4 and IPv6)
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/sbin/restore_tables.sh
+ExecStop=/usr/local/sbin/save_tables.sh
+
+[Install]
+WantedBy=multi-user.target

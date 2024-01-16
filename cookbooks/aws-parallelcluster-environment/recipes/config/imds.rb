@@ -60,8 +60,8 @@ if %w(HeadNode LoginNode).include? node['cluster']['node_type']
     command "mkdir -p $(dirname #{ip6tables_rules_file}) && ip6tables-save > #{ip6tables_rules_file}"
   end
 
-  template '/etc/init.d/parallelcluster-iptables' do
-    source 'imds/parallelcluster-iptables.erb'
+  template '/usr/local/sbin/restore_tables.sh' do
+    source 'imds/restore_tables.sh.erb'
     user 'root'
     group 'root'
     mode '0744'
@@ -69,6 +69,25 @@ if %w(HeadNode LoginNode).include? node['cluster']['node_type']
       iptables_rules_file: iptables_rules_file,
       ip6tables_rules_file: ip6tables_rules_file
     )
+  end
+
+  template '/usr/local/sbin/save_tables.sh' do
+    source 'imds/save_tables.sh.erb'
+    user 'root'
+    group 'root'
+    mode '0744'
+    variables(
+      iptables_rules_file: iptables_rules_file,
+      ip6tables_rules_file: ip6tables_rules_file
+    )
+  end
+
+  template '/etc/systemd/system/parallelcluster-iptables.service' do
+    source 'imds/parallelcluster-iptables.service.erb'
+    cookbook 'aws-parallelcluster-environment'
+    owner 'root'
+    group 'root'
+    mode '0644'
   end
 
   service "parallelcluster-iptables" do
