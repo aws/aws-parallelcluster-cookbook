@@ -42,7 +42,7 @@ control 'tag:config_sudo_access_enabled_action' do
 
   describe file('/etc/sudoers.d/90-cloud-init-users') do
     it { should exist }
-    its('content') { should match /^[\-#\.,\:\+\w\s]*(rocky ALL=\(ALL\) NOPASSWD:ALL)/ }
+    its('content') { should match /^[\-#\.,\:\+\w\s]*(#{node['cluster']['cluster_user']} ALL=\(ALL\) NOPASSWD:ALL)/ }
   end unless os_properties.on_docker?
 
   describe bash("sudo -l -U #{node['cluster']['cluster_user']} | tail -1 | awk '{$1=$1};1'") do

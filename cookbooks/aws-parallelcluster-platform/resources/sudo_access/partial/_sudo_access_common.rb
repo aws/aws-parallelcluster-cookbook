@@ -15,13 +15,14 @@
 unified_mode true
 default_action :setup
 
-property :sudo_access, String
+property :user_name, String, default: node['cluster']['cluster_user']
 
 action :setup do
   node['cluster']['disable_sudo_access_for_default_user'] == 'true' ? action_disable : action_enable
 end
 
 action :enable do
+  Chef::Log.info("Enabling Sudo Access for #{new_resource.user_name}")
   # Enable sudo access for default user
   template '/etc/sudoers.d/99-parallelcluster-revoke-sudo-access' do
     only_if { ::File.exist? "/etc/sudoers.d/99-parallelcluster-revoke-sudo-access" }
@@ -32,9 +33,10 @@ action :enable do
 end
 
 action :disable do
-  replace_or_add "Disable Sudo Access for #{node['cluster']['cluster_user']}" do
+  Chef::Log.info("Disabling Sudo Access for #{new_resource.user_name}")
+  replace_or_add "Disable Sudo Access for #{new_resource.user_name}" do
     path "/etc/sudoers"
-    pattern "^#{node['cluster']['cluster_user']}*"
+    pattern "^#{new_resource.user_name}*"
     line ""
     remove_duplicates true
     replace_only true
@@ -47,6 +49,9 @@ action :disable do
     owner 'root'
     group 'root'
     mode '0600'
+    variables(
+      user_name: new_resource.user_name
+    )
     action :create
   end
 end

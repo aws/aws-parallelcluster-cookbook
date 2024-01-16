@@ -31,3 +31,5 @@ include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
 end
+
+sudo_access "Update Sudo Access" if node['cluster']['scheduler'] == 'slurm'
