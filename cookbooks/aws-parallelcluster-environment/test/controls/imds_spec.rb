@@ -38,21 +38,6 @@ control 'tag:config_parallelcluster-iptables_correctly_configured' do
   describe service('parallelcluster-iptables') do
     it { should be_installed }
     it { should be_enabled }
-    it { should be_running }
-  end
-
-  %w(1 2 3 4 5).each do |level|
-    describe "Check parallelcluster-iptables run level #{level} on" do
-      subject { bash("ls /etc/rc#{level}.d/ | egrep '^S[0-9]+parallelcluster-iptables$'") }
-      its('exit_status') { should eq(0) }
-    end
-  end
-
-  %w(0 6).each do |level|
-    describe "Check parallelcluster-iptables run level #{level} off" do
-      subject { bash("ls /etc/rc#{level}.d/ | egrep '^K[0-9]+parallelcluster-iptables$'") }
-      its('exit_status') { should eq(0) }
-    end
   end
 
   describe file("#{node['cluster']['etc_dir']}/sysconfig/iptables.rules") do

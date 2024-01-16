@@ -56,9 +56,19 @@ describe 'aws-parallelcluster-environment::imds' do
           is_expected.to run_execute("Save ip6tables rules").with(command: /ip6tables-save/)
         end
 
-        it 'creates iptables init.d file' do
-          is_expected.to create_template("/etc/init.d/parallelcluster-iptables")
-            .with(source: 'imds/parallelcluster-iptables.erb')
+        it 'creates iptables systemd unit file' do
+          is_expected.to create_template("/etc/systemd/system/parallelcluster-iptables.service")
+            .with(source: 'imds/parallelcluster-iptables.service.erb')
+        end
+
+        it 'creates restore table script' do
+          is_expected.to create_template("/usr/local/sbin/restore_tables.sh")
+            .with(source: 'imds/restore_tables.sh.erb')
+        end
+
+        it 'creates save table script' do
+          is_expected.to create_template("/usr/local/sbin/save_tables.sh")
+            .with(source: 'imds/save_tables.sh.erb')
         end
 
         it 'starts parallelcluster-iptables service' do
