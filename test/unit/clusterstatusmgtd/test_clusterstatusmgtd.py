@@ -228,7 +228,7 @@ class TestClusterstatusmgtdConfig:
         """Test config_parsing method."""
         sync_config = ClusterstatusmgtdConfig(test_datadir / config_file)
         for key in expected_attributes:
-            assert_that(sync_config.__dict__.get(key)).is_equal_to(expected_attributes.get(key))
+            assert_that(sync_config.__dict__.get(key)).is_equal_to(expected_attributes.get(key))  # noqa: B038
 
     def test_config_comparison(self, test_datadir):
         """Test configs comparison."""

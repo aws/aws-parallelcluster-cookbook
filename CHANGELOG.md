@@ -40,7 +40,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA Toolkit to version 12.2.2.
 - Use Open Source NVIDIA GPU drivers (OpenRM) as NVIDIA kernel module for Linux instead of NVIDIA closed source module.
 - Do not wait for static nodes in maintenance to signal CFN that the head node initialization is complete.
-- Upgrade EFA installer to `1.29.0`.
+- Upgrade EFA installer to `1.29.1`.
   - Efa-driver: `efa-2.6.0-1`
   - Efa-config: `efa-config-1.15-1`
   - Efa-profile: `efa-profile-1.5-1`
