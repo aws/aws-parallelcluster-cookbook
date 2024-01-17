@@ -95,6 +95,26 @@ describe 'nvidia_driver:nvidia_driver_enabled?' do
   end
 end
 
+describe 'nvidia_driver:nvidia_kernel_module' do
+  [%w(false kernel), %w(true kernel-open)].each do |kernel_open, kernel_module|
+    context "node['cluster']['nvidia']['kernel_open'] is #{kernel_open}" do
+      cached(:chef_run) do
+        ChefSpec::SoloRunner.new(step_into: ['nvidia_driver']) do |node|
+          node.override['cluster']['nvidia']['kernel_open'] = kernel_open
+        end
+      end
+      cached(:resource) do
+        ConvergeNvidiaDriver.setup(chef_run)
+        chef_run.find_resource('nvidia_driver', 'setup')
+      end
+      it "is #{kernel_module}" do
+        allow_any_instance_of(Object).to receive(:nvidia_kernel_module).and_return(kernel_module)
+        expect(resource.nvidia_kernel_module).to eq(kernel_module)
+      end
+    end
+  end
+end
+
 describe 'nvidia_driver:nvidia_arch' do
   cached(:chef_run) do
     ChefSpec::SoloRunner.new(step_into: ['nvidia_driver'])
@@ -123,6 +143,7 @@ end
 describe 'nvidia_driver:setup' do
   for_all_oses do |platform, version|
     cached(:nvidia_arch) { 'nvidia_arch' }
+    cached(:nvidia_kernel_module) { 'nvidia_kernel_module' }
     cached(:nvidia_driver_version) { 'nvidia_driver_version' }
     cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
 
@@ -140,104 +161,108 @@ describe 'nvidia_driver:setup' do
       end
     end
 
-    context "on #{platform}#{version} when nvidia_driver enabled" do
-      cached(:nvidia_arch) { 'nvidia_arch' }
-      cached(:nvidia_driver_version) { 'nvidia_driver_version' }
-      cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
+    [%w(false kernel), %w(true kernel-open)].each do |kernel_open, kernel_module|
+      context "on #{platform}#{version} when nvidia_driver enabled and node['cluster']['nvidia']['kernel_open'] is #{kernel_open}" do
+        cached(:nvidia_arch) { 'nvidia_arch' }
+        cached(:nvidia_driver_version) { 'nvidia_driver_version' }
+        cached(:nvidia_kernel_module) { 'nvidia_kernel_module' }
+        cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
 
-      cached(:chef_run) do
-        stubs_for_resource('nvidia_driver') do |res|
-          allow(res).to receive(:nvidia_driver_enabled?).and_return(true)
-          allow(res).to receive(:nvidia_arch).and_return(nvidia_arch)
+        cached(:chef_run) do
+          stubs_for_resource('nvidia_driver') do |res|
+            allow(res).to receive(:nvidia_driver_enabled?).and_return(true)
+            allow(res).to receive(:nvidia_arch).and_return(nvidia_arch)
+            allow(res).to receive(:nvidia_kernel_module).and_return(kernel_module)
+          end
+
+          stub_command("lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau").and_return(true)
+          allow(::File).to receive(:exist?).with('/usr/bin/nvidia-smi').and_return(false)
+
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_driver']) do |node|
+            node.automatic['kernel']['release'] = '5.anything'
+          end
+
+          ConvergeNvidiaDriver.setup(runner, nvidia_driver_version: nvidia_driver_version)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'sets up nvidia_driver' do
+          is_expected.to setup_nvidia_driver('setup')
         end
 
-        stub_command("lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau").and_return(true)
-        allow(::File).to receive(:exist?).with('/usr/bin/nvidia-smi').and_return(false)
-
-        runner = runner(platform: platform, version: version, step_into: ['nvidia_driver']) do |node|
-          node.automatic['kernel']['release'] = '5.anything'
+        it 'downloads nvidia driver' do
+          is_expected.to create_remote_file('/tmp/nvidia.run').with(
+            source: nvidia_driver_url,
+            mode: '0755',
+            retries: 3,
+            retry_delay: 5
+          )
         end
 
-        ConvergeNvidiaDriver.setup(runner, nvidia_driver_version: nvidia_driver_version)
-      end
-      cached(:node) { chef_run.node }
-
-      it 'sets up nvidia_driver' do
-        is_expected.to setup_nvidia_driver('setup')
-      end
-
-      it 'downloads nvidia driver' do
-        is_expected.to create_remote_file('/tmp/nvidia.run').with(
-          source: nvidia_driver_url,
-          mode: '0755',
-          retries: 3,
-          retry_delay: 5
-        )
-      end
-
-      it 'uninstalls kernel module nouveau' do
-        is_expected.to uninstall_kernel_module('nouveau')
-      end
-
-      it 'creates file blacklist-nouveau.conf' do
-        is_expected.to create_cookbook_file('blacklist-nouveau.conf').with(
-          source: 'nvidia/blacklist-nouveau.conf',
-          path: '/etc/modprobe.d/blacklist-nouveau.conf',
-          owner: 'root',
-          group: 'root',
-          mode: '0644'
-        )
-      end
-
-      if platform == 'amazon'
-        it 'installs gcc10' do
-          is_expected.to install_package('gcc10').with_retries(10).with_retry_delay(5)
+        it 'uninstalls kernel module nouveau' do
+          is_expected.to uninstall_kernel_module('nouveau')
         end
 
-        it 'creates dkms/nvidia.conf' do
-          is_expected.to create_cookbook_file('dkms/nvidia.conf').with(
-            source: 'dkms/nvidia.conf',
-            path: '/etc/dkms/nvidia.conf',
+        it 'creates file blacklist-nouveau.conf' do
+          is_expected.to create_cookbook_file('blacklist-nouveau.conf').with(
+            source: 'nvidia/blacklist-nouveau.conf',
+            path: '/etc/modprobe.d/blacklist-nouveau.conf',
             owner: 'root',
             group: 'root',
             mode: '0644'
           )
         end
-        it 'installs nvidia driver' do
-          is_expected.to run_bash('nvidia.run advanced')
-            .with(
-              user: 'root',
-              group: 'root',
-              cwd: '/tmp',
-              creates: '/usr/bin/nvidia-smi'
-            )
-            .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=kernel-open})
-            .with_code(%r{rm -f /tmp/nvidia.run})
-        end
-      else
-        it "doesn't install gcc10" do
-          is_expected.not_to install_package('gcc10')
-        end
-        it 'installs nvidia driver' do
-          is_expected.to run_bash('nvidia.run advanced')
-            .with(
-              user: 'root',
-              group: 'root',
-              cwd: '/tmp',
-              creates: '/usr/bin/nvidia-smi'
-            )
-            .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=kernel-open})
-            .with_code(%r{rm -f /tmp/nvidia.run})
-        end
-      end
 
-      if platform == 'ubuntu'
-        it 'executes initramfs to remove nouveau' do
-          is_expected.to run_execute('initramfs to remove nouveau').with_command('update-initramfs -u')
+        if platform == 'amazon'
+          it 'installs gcc10' do
+            is_expected.to install_package('gcc10').with_retries(10).with_retry_delay(5)
+          end
+
+          it 'creates dkms/nvidia.conf' do
+            is_expected.to create_cookbook_file('dkms/nvidia.conf').with(
+              source: 'dkms/nvidia.conf',
+              path: '/etc/dkms/nvidia.conf',
+              owner: 'root',
+              group: 'root',
+              mode: '0644'
+            )
+          end
+          it 'installs nvidia driver' do
+            is_expected.to run_bash('nvidia.run advanced')
+              .with(
+                user: 'root',
+                group: 'root',
+                cwd: '/tmp',
+                creates: '/usr/bin/nvidia-smi'
+              )
+              .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
+              .with_code(%r{rm -f /tmp/nvidia.run})
+          end
+        else
+          it "doesn't install gcc10" do
+            is_expected.not_to install_package('gcc10')
+          end
+          it 'installs nvidia driver' do
+            is_expected.to run_bash('nvidia.run advanced')
+              .with(
+                user: 'root',
+                group: 'root',
+                cwd: '/tmp',
+                creates: '/usr/bin/nvidia-smi'
+              )
+              .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
+              .with_code(%r{rm -f /tmp/nvidia.run})
+          end
         end
-      else
-        it 'does not execute initramfs to remove nouveau' do
-          is_expected.not_to run_execute('initramfs to remove nouveau').with_command('update-initramfs -u')
+
+        if platform == 'ubuntu'
+          it 'executes initramfs to remove nouveau' do
+            is_expected.to run_execute('initramfs to remove nouveau').with_command('update-initramfs -u')
+          end
+        else
+          it 'does not execute initramfs to remove nouveau' do
+            is_expected.not_to run_execute('initramfs to remove nouveau').with_command('update-initramfs -u')
+          end
         end
       end
     end
@@ -247,6 +272,7 @@ describe 'nvidia_driver:setup' do
         stubs_for_resource('nvidia_driver') do |res|
           allow(res).to receive(:nvidia_driver_enabled?).and_return(true)
           allow(res).to receive(:nvidia_arch).and_return(nvidia_arch)
+          allow(res).to receive(:nvidia_kernel_module).and_return(nvidia_kernel_module)
         end
         runner(platform: platform, version: version, step_into: ['nvidia_driver'])
       end

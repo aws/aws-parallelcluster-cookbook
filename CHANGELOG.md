@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.8.1
+------
+
+**ENHANCEMENTS**
+- Add possibility to choose between Open and Closed Source Nvidia Drivers when building an AMI, through the ```['cluster']['nvidia']['kernel_open']``` cookbook node attribute.
+
 3.8.0
 ------
 
