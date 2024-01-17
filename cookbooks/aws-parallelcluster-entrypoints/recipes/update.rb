@@ -19,11 +19,6 @@ end
 # generate the updated shared storages mapping file
 include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
 
-if node["cluster"]["node_type"] == "ComputeFleet"
-  Chef::Log.info("Dummy log line to prove that update is triggered on compute node")
-  return
-end
-
 include_recipe 'aws-parallelcluster-environment::directory_service'
 include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
 
