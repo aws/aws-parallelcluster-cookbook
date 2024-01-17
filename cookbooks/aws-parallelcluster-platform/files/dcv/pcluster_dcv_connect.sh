@@ -53,7 +53,7 @@ _validate_json() {
   if [[ -z "${json_param}" ]]; then
       _fail "${message}. Empty JSON."
   fi
-  if ! $(jq -e . >/dev/null 2>&1 <<<"${json_param}"); then
+  if ! jq -e . >/dev/null 2>&1 <<<"${json_param}"; then
       _fail "${message}. Wrong JSON."
   fi
 }

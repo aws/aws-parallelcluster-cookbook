@@ -98,7 +98,7 @@ jobs:
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@master
         with:
-          severity: error
+          severity: warning
           ignore_paths: cookbooks/third-party
   rspec:
     name: ChefSpec

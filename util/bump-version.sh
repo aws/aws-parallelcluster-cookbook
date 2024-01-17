@@ -8,7 +8,7 @@ if [ "$(uname)" == "Darwin" ]; then
   PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 fi
 
-if [ -z "$1" -o -z "$2" ]; then
+if [ -z "$1" ] || [ -z "$2" ]; then
     echo "New version not specified. Usage: bump-version.sh NEW_PCLUSTER_VERSION NEW_AWSBATCH_CLI_VERSION"
     exit 1
 fi
@@ -35,13 +35,13 @@ for cookbook in "${COOKBOOKS[@]}"; do
 done
 
 # Update version in specific cookbook metadata
-sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" ${METADATA_FILES[*]}
+sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VERSION_SHORT}'/g" "${METADATA_FILES[@]}"
 
-for COOKBOOK in ${COOKBOOKS[*]}; do
+for COOKBOOK in "${COOKBOOKS[@]}"; do
   # Update dependencies version in main cookbook metadata
   sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" metadata.rb
   # Update dependencies version in specific cookbook metadata
-  sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" ${METADATA_FILES[*]}
+  sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" "${METADATA_FILES[@]}"
 done
 
 # Update AWS Batch CLI version

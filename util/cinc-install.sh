@@ -75,7 +75,6 @@ checksum_mismatch() {
 unable_to_retrieve_package() {
   echo "Unable to retrieve a valid package!"
   report_bug
-  echo "Metadata URL: $metadata_url"
   if test "x$download_url" != "x"; then
     echo "Download URL: $download_url"
   fi
@@ -107,7 +106,6 @@ http_404_error() {
   echo "that $platform is not supported."
   echo ""
   # deliberately do not call report_bug to suppress bug report noise.
-  echo "Metadata URL: $metadata_url"
   if test "x$download_url" != "x"; then
     echo "Download URL: $download_url"
   fi
@@ -132,7 +130,7 @@ do_wget() {
   wget --user-agent="User-Agent: mixlib-install/3.12.27" -O "$2" "$1" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
-  grep "ERROR 404" $tmp_dir/stderr 2>&1 >/dev/null
+  grep "ERROR 404" $tmp_dir/stderr >/dev/null 2>&1
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -153,7 +151,7 @@ do_curl() {
   curl -A "User-Agent: mixlib-install/3.12.27" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
   rc=$?
   # check for 404
-  grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null
+  grep "404 Not Found" $tmp_dir/stderr >/dev/null 2>&1
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -183,7 +181,7 @@ do_perl() {
   perl -e 'use LWP::Simple; getprint($ARGV[0]);' "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
-  grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null
+  grep "404 Not Found" $tmp_dir/stderr >/dev/null 2>&1
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -204,7 +202,7 @@ do_python() {
   python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.12.27' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
-  grep "HTTP Error 404" $tmp_dir/stderr 2>&1 >/dev/null
+  grep "HTTP Error 404" $tmp_dir/stderr >/dev/null 2>&1
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -222,12 +220,12 @@ do_python() {
 do_checksum() {
   if exists sha256sum; then
     echo "Comparing checksum with sha256sum..."
-    checksum=`sha256sum $1 | awk '{ print $1 }'`
-    return `test "x$checksum" = "x$2"`
+    checksum=$(sha256sum $1 | awk '{ print $1 }')
+    return "$(test "x$checksum" = "x$2")"
   elif exists shasum; then
     echo "Comparing checksum with shasum..."
-    checksum=`shasum -a 256 $1 | awk '{ print $1 }'`
-    return `test "x$checksum" = "x$2"`
+    checksum=$(shasum -a 256 $1 | awk '{ print $1 }')
+    return "$(test "x$checksum" = "x$2")"
   else
     echo "WARNING: could not find a valid checksum program, pre-install shasum or sha256sum in your O/S image to get validation..."
     return 0
@@ -311,7 +309,7 @@ install_file() {
     "deb")
       echo "installing with dpkg..."
       # WARNING: Custom fix to avoid hangs when another installation is running
-      flock $(apt-config shell StateDir Dir::State/d | sed -r "s/.*'(.*)'$/\1/")daily_lock dpkg -i "$2"
+      flock "$(apt-config shell StateDir Dir::State/d | sed -r "s/.*'(.*)'$/\1/")daily_lock" dpkg -i "$2"
       ;;
     "bff")
       echo "installing with installp..."
@@ -333,7 +331,7 @@ install_file() {
       echo "installing dmg file..."
       hdiutil detach "/Volumes/cinc_project" >/dev/null 2>&1 || true
       hdiutil attach "$2" -mountpoint "/Volumes/cinc_project"
-      cd / && /usr/sbin/installer -pkg `find "/Volumes/cinc_project" -name \*.pkg` -target /
+      cd / && /usr/sbin/installer -pkg "$(find "/Volumes/cinc_project" -name \*.pkg)" -target /
       hdiutil detach "/Volumes/cinc_project"
       ;;
     "sh" )
@@ -408,7 +406,7 @@ do
   esac
 done
 
-shift `expr $OPTIND - 1`
+shift "$(expr $OPTIND - 1)"
 
 
 if test -d "/opt/$project" && test "x$install_strategy" = "xonce"; then
@@ -530,6 +528,7 @@ elif test "x$os" = "xAIX"; then
 elif test -f "/etc/os-release"; then
   . /etc/os-release
   if test "x$CISCO_RELEASE_INFO" != "x"; then
+    # shellcheck source=/dev/null
     . $CISCO_RELEASE_INFO
   fi
 
@@ -633,6 +632,7 @@ if test "x$platform" = "xsolaris2"; then
 fi
 
 # WARNING: Custom code to detect AWS Region
+# shellcheck disable=SC2034 # instance_metadata_file is used below
 instance_metadata_file=$tmp_dir/instance_metadata
 get_region instance_metadata_file
 

@@ -10,7 +10,8 @@ _info() {
 }
 
 _help() {
-    local -- _cmd=$(basename "$0")
+    local -- _cmd
+    _cmd=$(basename "$0")
 
     cat <<EOF
 
@@ -84,11 +85,11 @@ main() {
 
     # Create archive and md5
     _cwd=$(pwd)
-    pushd "${_srcdir}" > /dev/null
+    pushd "${_srcdir}" > /dev/null || exit
     _stashName=$(git stash create)
     git archive --format tar --prefix="aws-parallelcluster-cookbook-${_version}/" "${_stashName:-HEAD}" | gzip > "${_cwd}/aws-parallelcluster-cookbook-${_version}.tgz"
     #tar zcvf "${_cwd}/aws-parallelcluster-cookbook-${_version}.tgz" --transform "s,^aws-parallelcluster-cookbook/,aws-parallelcluster-cookbook-${_version}/," ../aws-parallelcluster-cookbook
-    popd > /dev/null
+    popd > /dev/null || exit
     md5sum aws-parallelcluster-cookbook-${_version}.tgz > aws-parallelcluster-cookbook-${_version}.md5
 
     # upload packages
