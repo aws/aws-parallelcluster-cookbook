@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster-slurm
 # Recipe:: finalize_compute
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2013-2024 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -59,3 +59,5 @@ execute 'resume_node' do
   # Only resume static nodes
   only_if { is_static_node?(node.run_state['slurm_compute_nodename']) }
 end
+
+save_instance_config_version_to_dynamodb
