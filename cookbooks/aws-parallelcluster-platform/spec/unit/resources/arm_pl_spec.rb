@@ -16,18 +16,7 @@ describe 'arm_pl:setup' do
       cached(:aws_region) { 'test_region' }
       cached(:aws_domain) { 'test_domain' }
       cached(:armpl_major_minor_version) do
-        if platform == 'ubuntu' && version == '22.04'
-          '23.04'
-        else
-          '21.0'
-        end
-      end
-      cached(:armpl_patch_version) do
-        if platform == 'ubuntu' && version == '22.04'
-          '1'
-        else
-          '0'
-        end
+        '23.10'
       end
 
       cached(:armpl_platform) do
@@ -36,13 +25,15 @@ describe 'arm_pl:setup' do
           'RHEL-7'
         when 'ubuntu'
           "Ubuntu-#{version}"
+        when 'amazon'
+          "AmazonLinux-2"
         else
-          'RHEL-8'
+          "RHEL-#{version}"
         end
       end
 
       cached(:gcc_major_minor_version) do
-        if platform == 'ubuntu' && version == '22.04'
+        if platform == 'ubuntu' && version == '22.04' || version == '9'
           '11.3'
         else
           '9.3'
@@ -52,7 +43,7 @@ describe 'arm_pl:setup' do
       cached(:gcc_patch_version) { '0' }
       cached(:sources_dir) { 'sources_test_dir' }
       cached(:modulefile_dir) { platform == 'ubuntu' ? '/usr/share/modules/modulefiles' : '/usr/share/Modules/modulefiles' }
-      cached(:armpl_version) { "#{armpl_major_minor_version}.#{armpl_patch_version}" }
+      cached(:armpl_version) { "#{armpl_major_minor_version}" }
       cached(:armpl_tarball_name) { "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{gcc_major_minor_version}.tar" }
       cached(:armpl_url) { "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.#{aws_domain}/archives/armpl/#{armpl_platform}/#{armpl_tarball_name}" }
       cached(:armpl_installer) { "#{sources_dir}/#{armpl_tarball_name}" }
@@ -187,7 +178,6 @@ describe 'arm_pl:setup' do
 
         it 'sets node attributes' do
           expect(node['cluster']['armpl']['major_minor_version']).to eq(armpl_major_minor_version)
-          expect(node['cluster']['armpl']['patch_version']).to eq(armpl_patch_version)
           expect(node['cluster']['armpl']['version']).to eq(armpl_version)
           expect(node['cluster']['armpl']['gcc']['major_minor_version']).to eq(gcc_major_minor_version)
           expect(node['cluster']['armpl']['gcc']['patch_version']).to eq(gcc_patch_version)
