@@ -26,4 +26,8 @@ action_class do
   def modulefile_dir
     "/usr/share/modules/modulefiles"
   end
+
+  def gcc_major_minor_version
+    '9.3'
+  end
 end

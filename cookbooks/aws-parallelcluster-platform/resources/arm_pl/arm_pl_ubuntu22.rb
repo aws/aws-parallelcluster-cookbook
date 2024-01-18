@@ -18,11 +18,6 @@ end
 
 use 'partial/_arm_pl_common.rb'
 
-property :armpl_major_minor_version, String, default: '23.04'
-property :armpl_patch_version, String, default: '1'
-property :gcc_major_minor_version, String, default: '11.3'
-property :gcc_patch_version, String, default: '0'
-
 action_class do
   def armpl_platform
     "Ubuntu-#{node['platform_version']}"
@@ -30,5 +25,9 @@ action_class do
 
   def modulefile_dir
     "/usr/share/modules/modulefiles"
+  end
+
+  def gcc_major_minor_version
+    '11.3'
   end
 end
