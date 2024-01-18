@@ -68,7 +68,7 @@ action :setup do
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      #{compiler_version} ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=kernel-open
+      #{compiler_version} ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{nvidia_kernel_module}
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
@@ -106,4 +106,12 @@ end
 
 def compiler_version
   ""
+end
+
+def nvidia_kernel_module
+  if node['cluster']['nvidia']['kernel_open'] == "false"
+    "kernel"
+  else
+    "kernel-open"
+  end
 end
