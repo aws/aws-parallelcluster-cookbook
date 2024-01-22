@@ -32,6 +32,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_external_slurmdbd
   action :create_if_missing
   variables(
     dbd_host: "localhost",
+    dbd_addr: node['slurmdbd_ip'],
     storage_host: node['dbms_uri'],
     # TODO: expose additional CFN Parameter in template
     storage_port: 3306,
@@ -74,6 +75,8 @@ end unless on_docker?
 # After starting slurmdbd the database may not be fully responsive yet and
 # its bootstrapping may fail. We need to wait for sacctmgr to successfully
 # query the database before proceeding.
+# In case of an external slurmdbd the Slurm commands do not work, so this
+# check cannot be executed.
 execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
   retries node['cluster']['slurmdbd_response_retries']
