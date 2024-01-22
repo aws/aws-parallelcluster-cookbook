@@ -49,8 +49,6 @@ end
 
 include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
 
-# TODO: configuration of munge systemd service;
-
 # TODO: move this template to a separate recipe
 # TODO: add a logic in update_munge_key.sh.erb to skip sharing munge key to shared dir
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
