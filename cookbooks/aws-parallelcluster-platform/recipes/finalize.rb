@@ -14,5 +14,5 @@
 # Restart supervisord
 service "supervisord" do
   supports restart: true
-  action %i(enable start restart)
+  action %i(enable restart)
 end unless on_docker?
