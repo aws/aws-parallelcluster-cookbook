@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :c_states, platform: 'rocky' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i == 9
 end
 
 use 'partial/_c_states_common'
-use 'partial/_c_states_redhat_based'
+use 'partial/_c_states_redhat_9_based'
