@@ -11,6 +11,9 @@ class ConvergeCStates
 end
 
 describe 'c_states:setup' do
+  stubs_for_provider("c_states[setup]") do |provider|
+    allow(provider).to receive_shell_out("grubby --update-kernel=ALL --args=\"intel_idle.max_cstate=1 processor.max_cstate=1\"")
+  end
   before do
     stubs_for_resource('c_states') do |res|
       allow(res).to receive(:append_if_not_present_grub_cmdline)
@@ -40,16 +43,18 @@ describe 'c_states:setup' do
         is_expected.to setup_c_states('setup')
       end
 
-      it 'edits /etc/default/grub' do
-        stubs_for_resource('c_states[setup]') do |res|
-          expect(res).to receive(:append_if_not_present_grub_cmdline).with(grub_cmdline_attributes, grub_variable)
+      if version.to_i != 9
+        it 'edits /etc/default/grub' do
+          stubs_for_resource('c_states[setup]') do |res|
+            expect(res).to receive(:append_if_not_present_grub_cmdline).with(grub_cmdline_attributes, grub_variable)
+          end
+          chef_run
         end
-        chef_run
-      end
 
-      it 'regenerate grub boot menus' do
-        is_expected.to run_execute('Regenerate grub boot menu')
-          .with(command: regenerate_grub_boot_menu_command)
+        it 'regenerate grub boot menus' do
+          is_expected.to run_execute('Regenerate grub boot menu')
+            .with(command: regenerate_grub_boot_menu_command)
+        end
       end
     end
 
