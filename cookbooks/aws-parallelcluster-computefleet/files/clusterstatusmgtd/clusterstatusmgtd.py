@@ -156,11 +156,11 @@ class ComputeFleetStatus(Enum):
     @staticmethod
     def _transform_compute_fleet_data(compute_fleet_data):
         try:
-            compute_fleet_data[
-                ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE
-            ] = ComputeFleetStatus.EVENT_HANDLER_STATUS_MAPPING.value.get(
-                compute_fleet_data.get(ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE),
-                str(ComputeFleetStatus.UNKNOWN),
+            compute_fleet_data[ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE] = (
+                ComputeFleetStatus.EVENT_HANDLER_STATUS_MAPPING.value.get(
+                    compute_fleet_data.get(ComputeFleetStatusManager.COMPUTE_FLEET_STATUS_ATTRIBUTE),
+                    str(ComputeFleetStatus.UNKNOWN),
+                )
             )
             return compute_fleet_data
         except AttributeError as e:
