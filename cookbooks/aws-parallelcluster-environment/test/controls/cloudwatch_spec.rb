@@ -97,6 +97,64 @@ control 'tag:config_cloudwatch_configured' do
   # end unless os_properties.on_docker?
 end
 
+control 'cloudwatch_logfiles_configuration_computenode' do
+  title "Check CloudWatch configuration generated on compute nodes"
+
+  expected_log_files = %w(
+    /var/log/messages
+    /var/log/chef-client.log
+    /var/log/parallelcluster/bootstrap_error_msg
+    /var/log/cloud-init.log
+    /var/log/cloud-init-output.log
+    /var/log/supervisord.log
+    /var/log/parallelcluster/computemgtd
+    /var/log/slurmd.log
+    /var/log/parallelcluster/slurm_health_check.log
+    /var/log/parallelcluster/slurm_health_check.events
+  )
+
+  unexpected_log_files = %w(
+    /var/log/cfn-init.log
+    /var/log/parallelcluster/clustermgtd
+    /var/log/parallelcluster/clustermgtd.events
+    /var/log/parallelcluster/slurm_resume.events
+    /var/log/parallelcluster/compute_console_output.log
+    /var/log/parallelcluster/slurm_resume.log
+    /var/log/parallelcluster/slurm_suspend.log
+    /var/log/parallelcluster/slurm_fleet_status_manager.log
+    /var/log/slurmctld.log
+    /var/log/slurmdbd.log
+    /var/log/parallelcluster/pcluster_dcv_authenticator.log
+    /var/log/parallelcluster/pcluster_dcv_connect.log
+    /var/log/dcv/server.log
+    /var/log/dcv/sessionlauncher.log
+    /var/log/dcv/agent.*.log
+    /var/log/dcv/dcv-xsession.*.log
+    /var/log/dcv/Xdcv.*.log
+    /var/log/parallelcluster/clusterstatusmgtd
+  )
+
+  ubuntu_expected_log_files = %w(/var/log/syslog)
+  ubuntu_unexpected_log_files = %w(/var/log/messages)
+
+  if os_properties.ubuntu?
+    expected_log_files += ubuntu_expected_log_files
+    expected_log_files -= ubuntu_unexpected_log_files
+    unexpected_log_files += ubuntu_unexpected_log_files
+  end
+
+  # This checks a file under the `/etc/amazon/amazon-cloudwatch-agent` path, which is created by the CW agent service
+  # when it starts up. This check requires the agent to be actually started on the node.
+  describe file('/etc/amazon/amazon-cloudwatch-agent/amazon-cloudwatch-agent.d/file_amazon-cloudwatch-agent.json') do
+    expected_log_files.each do |log_file|
+      its('content') { should include(log_file) }
+    end
+    unexpected_log_files.each do |log_file|
+      its('content') { should_not include(log_file) }
+    end
+  end unless os_properties.on_docker?
+end
+
 control 'cloudwatch_logfiles_configuration_loginnode' do
   title "Check CloudWatch configuration generated on login nodes"
 

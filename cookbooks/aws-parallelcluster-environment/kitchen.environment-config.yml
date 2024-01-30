@@ -24,6 +24,24 @@ suites:
         scheduler: slurm
         cw_logging_enabled: "true"
         log_group_name: test
+  - name: cloudwatch-computenode
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_cloudwatch/
+        - cloudwatch_logfiles_configuration_computenode
+    attributes:
+      resource: cloudwatch:configure
+      dependencies:
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
+        - resource:cloudwatch:setup
+      cluster:
+        node_type: ComputeFleet
+        scheduler: slurm
+        cw_logging_enabled: "true"
+        log_group_name: test
   - name: cloudwatch-loginnode
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
