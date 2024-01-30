@@ -13,6 +13,8 @@ action :run do
   return if on_docker?
   Chef::Log.debug("Called fetch_config with update (#{new_resource.update})")
 
+  sync_file = "#{node['cluster']['shared_dir']}/cluster-config-version"
+
   case node['cluster']['node_type']
   when 'HeadNode'
     if new_resource.update
@@ -37,11 +39,32 @@ action :run do
 
     # load cluster config into a node object
     load_cluster_config(node['cluster']['cluster_config_path'])
+
+    # Write config version file to signal other cluster nodes that all configuration files within the shared folder
+    # are aligned with the latest config version.
+    write_config_version_file(sync_file)
   when 'ComputeFleet'
     if kitchen_test?
       fetch_cluster_config(node['cluster']['cluster_config_path']) unless ::File.exist?(node['cluster']['cluster_config_path'])
+      write_config_version_file(sync_file)
     end
-    raise "Cluster config not found in #{node['cluster']['cluster_config_path']}" unless ::File.exist?(node['cluster']['cluster_config_path'])
+
+    if new_resource.update
+      # Wait for the head node to write the config version file, which is the signal that
+      # all configuration files within the shared folder are aligned with the latest config version.
+      # This is required only on update because on create it is guaranteed that this recipe is executed on compute node
+      # only after it has completed on head node.
+      wait_cluster_config_file(sync_file)
+
+      # TODO: If the shared storage mapping files contain cluster-wide information and not node-specific data,
+      #  then make the head node write the shared storage mapping files in the shared folder
+      #  and let compute node consume them.
+      Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
+      ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
+    else
+      raise "Cluster config not found in #{node['cluster']['cluster_config_path']}" unless ::File.exist?(node['cluster']['cluster_config_path'])
+    end
+
     # load cluster config into a node object
     load_cluster_config(node['cluster']['cluster_config_path'])
   when 'LoginNode'
@@ -112,6 +135,29 @@ action_class do # rubocop:disable Metrics/BlockLength
       # Copy instance type infos file from S3 URI
       instance_version_id = node['cluster']['instance_types_data_version'] unless node['cluster']['instance_types_data_version'].nil?
       fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'], instance_version_id)
+    end
+  end
+
+  def write_config_version_file(path)
+    # Write the cluster config version into the specified file.
+    # This file is used as a synchronization point between the head node and the other cluster nodes.
+    # In particular, the head node uses this file to signal to other cluster nodes that all files
+    # in the shared folder related to the cluster config have been updated with the current config version.
+    file path do
+      content node['cluster']['cluster_config_version']
+      mode '0644'
+      owner 'root'
+      group 'root'
+    end
+  end
+
+  def wait_cluster_config_file(path)
+    # Wait for the config version file to contain the current cluster config version.
+    execute "Wait cluster config files to be updated by the head node" do
+      command "[[ \"$(cat #{path})\" == \"#{node['cluster']['cluster_config_version']}\" ]]"
+      retries 30
+      retry_delay 10
+      timeout 5
     end
   end
 end
