@@ -31,7 +31,7 @@ def parse_args():
     parser.add_argument(
         "--node-role",
         required=True,
-        choices=["HeadNode", "ComputeFleet", "LoginNode"],
+        choices=["HeadNode", "ComputeFleet", "LoginNode", "ExternalSlurmDbd"],
         help="Role this node plays in the cluster (i.e., is it a compute node or the head node?)",
     )
     parser.add_argument("--scheduler", required=True, choices=["slurm", "awsbatch"], help="Scheduler")
