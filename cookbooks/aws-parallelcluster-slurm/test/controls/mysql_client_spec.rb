@@ -32,7 +32,7 @@ control 'tag:install_mysql_client_installed' do
   mysql_packages.each do |pkg|
     describe package(pkg) do
       it { should be_installed }
-      its('version') { should match /^8.0.31-/ } unless ubuntu
+      its('version') { should match /^8.0.36-/ } unless ubuntu
     end
   end
 end
@@ -48,7 +48,7 @@ control 'tag:install_mysql_client_source_code_created' do
     its('content') do
       should eq %(You can get MySQL source code here:
 
-https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.amazonaws.com/archives/source/mysql-8.0.31.tar.gz
+https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.amazonaws.com/archives/source/mysql-8.0.36.tar.gz
 )
     end
   end

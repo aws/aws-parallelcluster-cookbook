@@ -23,8 +23,8 @@ describe 'mysql_client:setup' do
     %w(x86_64 aarch64).each do |architecture|
       context "on #{platform}#{version} #{architecture}" do
         cached(:source_dir) { 'SOURCE_DIR' }
-        cached(:package_source_version) { '8.0.31' }
-        cached(:package_version) { '8.0.31-1' }
+        cached(:package_source_version) { '8.0.36' }
+        cached(:package_version) { '8.0.36-1' }
         cached(:package_filename) { "mysql-community-client-#{package_version}.tar.gz" }
         cached(:s3_url) { 's3://url' }
         cached(:package_platform) do
