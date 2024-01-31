@@ -20,7 +20,7 @@
           },
           "node_roles": {
             "type": "array",
-            "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet", "LoginNode"]}
+            "items": {"type": "string", "enum": ["HeadNode", "ComputeFleet", "LoginNode", "ExternalSlurmDbd"]}
           },
           "feature_conditions": {
             "type": "array",
