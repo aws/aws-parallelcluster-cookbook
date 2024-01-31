@@ -22,6 +22,9 @@ node.default['cluster']['slurmdbd_response_retries'] = 30
 node.default['cluster']['stack_name'] = node['stack_name']
 node.default['cluster']['munge']['user'] = 'munge'
 node.default['cluster']['munge']['group'] = node['cluster']['munge']['user']
+node.default['cluster']['node_type'] = 'ExternalSlurmDbd' # force node_type to ExternalSlurmDbd to configure CW agent
+node.default['cluster']['cw_logging_enabled'] = 'true' # enable CW agent logging
+node.default['cluster']['log_group_name'] = node['log_group_name'] # map the `log_group_name` coming from the dna.json to the proper variable expected by the recipes
 
 # rubocop:disable Lint/DuplicateBranch
 if platform?('amazon') && node['platform_version'] == "2"
@@ -66,6 +69,10 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
     shared_directory_compute: node['cluster']['shared_dir'],
     shared_directory_login: node['cluster']['shared_dir_login_nodes']
   )
+end
+
+cloudwatch "Configure CloudWatch" do
+  action :configure
 end
 
 # TODO: add a logic in munge_key_manager to skip sharing munge key to shared dir
