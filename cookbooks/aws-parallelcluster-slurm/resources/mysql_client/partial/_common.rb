@@ -35,11 +35,11 @@ end
 
 action_class do
   def package_version
-    "8.0.31-1"
+    "8.0.36-1"
   end
 
   def package_source_version
-    "8.0.31"
+    "8.0.36"
   end
 
   def package_filename
