@@ -68,7 +68,8 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "ComputeFleet"
       ],
       "feature_conditions": []
     },

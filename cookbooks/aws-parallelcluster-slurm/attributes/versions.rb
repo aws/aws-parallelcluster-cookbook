@@ -1,8 +1,8 @@
 # Slurm
-default['cluster']['slurm']['version'] = '23-11-1-1'
+default['cluster']['slurm']['version'] = '23-11-3-1'
 default['cluster']['slurm']['commit'] = ''
 default['cluster']['slurm']['branch'] = ''
-default['cluster']['slurm']['sha256'] = '31506df24c6d24e0ea0329cac1395ab9b645bbde1518f5c469f7711df5e22c11'
+default['cluster']['slurm']['sha256'] = '149eaa9b18f269bfb21f5a1f5c9ccac1aaea49612a7c96ec74f96562ac551ff7'
 default['cluster']['slurm']['base_url'] = "https://github.com/SchedMD/slurm/archive"
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.15'

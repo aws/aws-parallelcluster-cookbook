@@ -16,9 +16,16 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Add possibility to choose between Open and Closed Source Nvidia Drivers when building an AMI, through the ```['cluster']['nvidia']['kernel_open']``` cookbook node attribute.
 
 **CHANGES**
-- Upgrade Slurm to 23.11.1 (from 23.02.7).
+- Upgrade Slurm to 23.11.3 (from 23.02.7).
 - Upgrade third-party cookbook dependencies:
   - nfs-5.1.2 (from nfs-5.0.0)
+- Upgrade EFA installer to `1.30.0`.
+  - Efa-driver: `efa-2.6.0-1`
+  - Efa-config: `efa-config-1.15-1`
+  - Efa-profile: `efa-profile-1.6-1`
+  - Libfabric-aws: `libfabric-aws-1.19.0`
+  - Rdma-core: `rdma-core-46.0-1`
+  - Open MPI: `openmpi40-aws-4.1.6-2` and `openmpi50-aws-5.0.0-11`
 
 **BUG FIXES**
 
