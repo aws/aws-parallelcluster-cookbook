@@ -43,3 +43,12 @@ remote_directory "#{node['cluster']['scripts_dir']}/slurm" do
   action :create
   recursive true
 end
+
+# Copy pcluster scripts to execute cluster health checks
+remote_directory "#{node['cluster']['scripts_dir']}/head_node_checks" do
+  source 'head_node_checks'
+  mode '0755'
+  owner 'root'
+  group 'root'
+  recursive true
+end
