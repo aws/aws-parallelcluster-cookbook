@@ -23,3 +23,5 @@ when 'ComputeFleet'
 else
   raise "node_type must be HeadNode or ComputeFleet"
 end
+
+sudo_access "Update Sudo Access"
