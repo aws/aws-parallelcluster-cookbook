@@ -163,3 +163,17 @@ def validate_file_md5_hash(file_path, expected_hash)
     Digest::MD5
   end
 end
+
+def wait_cluster_ready
+  return if on_docker? || kitchen_test? && !node['interact_with_ddb']
+  execute "Check cluster readiness" do
+    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/head_node_checks/check_cluster_ready.py" \
+              " --cluster-name #{node['cluster']['stack_name']}" \
+              " --table-name parallelcluster-#{node['cluster']['stack_name']}" \
+              " --config-version #{node['cluster']['cluster_config_version']}" \
+              " --region #{node['cluster']['region']}"
+    timeout 30
+    retries 5
+    retry_delay 180
+  end
+end

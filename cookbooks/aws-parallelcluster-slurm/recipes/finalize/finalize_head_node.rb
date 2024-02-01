@@ -67,3 +67,5 @@ ruby_block "wait for static fleet capacity" do
     Chef::Log.info("Static fleet capacity is ready")
   end
 end
+
+wait_cluster_ready

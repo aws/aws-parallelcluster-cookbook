@@ -279,3 +279,5 @@ template "#{node['cluster']['etc_dir']}/cfnconfig" do
   cookbook 'aws-parallelcluster-environment'
   mode '0644'
 end
+
+wait_cluster_ready
