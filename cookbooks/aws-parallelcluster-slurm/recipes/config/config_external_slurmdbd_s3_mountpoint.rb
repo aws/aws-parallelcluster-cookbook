@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster-slurm
-# Recipe:: config_head_node
+# Recipe:: config_external_slurmdbd_s3_mountpoint
 #
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
