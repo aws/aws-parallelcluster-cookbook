@@ -14,6 +14,11 @@
 
 return if on_docker?
 
+def device_number(mac, token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
+  get_metadata_with_token(token, uri)
+end
+
 def device_name(mac)
   cmd = Mixlib::ShellOut.new("ip -o link | grep #{mac} | awk '{print substr($2, 1, length($2) -1)}'")
   cmd.run_command
@@ -61,8 +66,9 @@ if macs.length > 1
   end
 
   # Configure nw interfaces
-  macs.each_with_index do |mac, device_number|
+  macs.each do |mac|
     device_name = device_name(mac)
+    device_number = device_number(mac, token)
     gw_ip_address = gateway_address
     device_ip_address = device_ip(mac, token)
     cidr_prefix_length = cidr_prefix_length(mac, token)
