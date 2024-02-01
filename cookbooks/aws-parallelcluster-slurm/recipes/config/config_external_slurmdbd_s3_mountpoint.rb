@@ -15,6 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# WARNING: Mountpoint for Amazon S3 is a tool that allows you to mount an S3 bucket as a file system.
+# This is now GA, but it is still hosted on the AWS Labs repositories (https://github.com/awslabs/mountpoint-s3).
+# This is considered fine for the external slurmdbd stack.
+# A deeper evaluation would be required for further uses of this tool in AWS ParallelCluster.
+
 ext = platform?('ubuntu') ? "deb" : "rpm"
 subtree = arm? ? "arm64" : "x86_64"
 mount_s3_url = "https://s3.amazonaws.com/mountpoint-s3-release/latest/#{subtree}/mount-s3.#{ext}"
