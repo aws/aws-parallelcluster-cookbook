@@ -2,7 +2,7 @@
 
 #
 # Cookbook:: aws-parallelcluster-slurm
-# Recipe:: config_external_slurmdbd_s3_mountpoint
+# Recipe:: retrieve_slurmdbd_config_from_s3
 #
 # Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
@@ -20,31 +20,20 @@
 # This is considered fine for the external slurmdbd stack.
 # A deeper evaluation would be required for further uses of this tool in AWS ParallelCluster.
 
-ext = platform?('ubuntu') ? "deb" : "rpm"
-subtree = arm? ? "arm64" : "x86_64"
-mount_s3_url = "https://s3.amazonaws.com/mountpoint-s3-release/latest/#{subtree}/mount-s3.#{ext}"
-download_path = "/tmp/mount-s3.#{ext}"
+bucket_name = node['slurmdbd_conf_bucket']
+config_files = ["slurmdbd.conf", "slurm_external_slurmdbd.conf"]
 
-remote_file 'download mountpoint-s3' do
-  source mount_s3_url
-  path download_path
-  retries 3
-  retry_delay 5
-  action :create_if_missing
-end
-
-if platform?('ubuntu')
-  # The Chef apt_package resource does not support the source attribute, so we use the dpkg_package resource instead.
-  dpkg_package "Install mountpoint-s3" do
-    source download_path
+config_files.each do |config_file|
+  remote_object config_file do
+    url "s3://#{bucket_name}/#{config_file}"
+    destination "#{node['cluster']['slurm']['install_dir']}/etc/#{config_file}"
+    sensitive true
+    ignore_failure true
   end
-else
-  package "Install mountpoint-s3" do
-    source download_path
-  end
-end
 
-execute 'mount slurmdbd configuration via S3' do
-  command "mount-s3 --allow-delete --uid $(id -u slurm) --gid $(id -g slurm) --dir-mode 0755 --file-mode 0600 #{node['slurmdbd_conf_bucket']} /opt/slurm/etc/"
-  user 'root'
+  file "#{node['cluster']['slurm']['install_dir']}/etc/#{config_file}" do
+    mode '0600'
+    owner node['cluster']['slurm']['user']
+    group node['cluster']['slurm']['group']
+  end
 end
