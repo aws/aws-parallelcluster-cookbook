@@ -52,8 +52,6 @@ end
 
 include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
 
-include_recipe 'aws-parallelcluster-slurm::config_external_slurmdbd_s3_mountpoint'
-
 # TODO: move this template to a separate recipe
 # TODO: add a logic in update_munge_key.sh.erb to skip sharing munge key to shared dir
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
@@ -79,5 +77,7 @@ end
 
 # TODO: add a logic in munge_key_manager to skip sharing munge key to shared dir
 include_recipe 'aws-parallelcluster-slurm::config_munge_key'
+
+include_recipe 'aws-parallelcluster-slurm::retrieve_slurmdbd_config_from_s3'
 
 include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
