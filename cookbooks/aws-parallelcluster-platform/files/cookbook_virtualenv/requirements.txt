@@ -6,3 +6,5 @@ jsonschema
 jinja2
 requests
 PyYAML
+retrying
+click

@@ -41,6 +41,50 @@ describe 'aws-parallelcluster-slurm::update_compute' do
         runner.converge(described_recipe)
       end
 
+      context "when mount/unmount is not required" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
+            allow_any_instance_of(Object).to receive(:dig).and_return(true)
+            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+
+            node.override['cluster']['node_type'] = 'ComputeFleet'
+            # node.override['kitchen'] = true
+            # node.override['interact_with_ddb'] = false
+            node.override['ec2']['instance_id'] = instance_id
+            node.override['cluster']['cluster_config_version'] = cluster_config_version
+          end
+          runner.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'does not update the shared storage' do
+          is_expected.not_to run_ruby_block("update_shared_storages")
+        end
+      end
+
+      context "when mount/unmount is required" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(true)
+            allow_any_instance_of(Object).to receive(:dig).and_return(true)
+            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+
+            node.override['cluster']['node_type'] = 'ComputeFleet'
+            # node.override['kitchen'] = true
+            # node.override['interact_with_ddb'] = false
+            node.override['ec2']['instance_id'] = instance_id
+            node.override['cluster']['cluster_config_version'] = cluster_config_version
+          end
+          runner.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'updates the shared storage' do
+          is_expected.to run_ruby_block("update_shared_storages")
+        end
+      end
+
       it 'saves the cluster config version to dynamodb' do
         expected_command = "#{cookbook_venv_path}/bin/aws dynamodb put-item" \
           " --table-name parallelcluster-#{cluster_name}"\
@@ -70,7 +114,7 @@ describe 'aws-parallelcluster-slurm::update_compute' do
         end
         cached(:node) { chef_run.node }
 
-        it 'does not saves the cluster config version to dynamodb' do
+        it 'does not save the cluster config version to dynamodb' do
           is_expected.not_to run_execute("Save cluster config version to DynamoDB")
         end
       end
