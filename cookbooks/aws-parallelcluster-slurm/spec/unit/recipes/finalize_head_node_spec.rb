@@ -35,6 +35,10 @@ describe 'aws-parallelcluster-slurm::finalize_head_node' do
         runner.converge(described_recipe)
       end
 
+      it 'checks that the static fleet is running' do
+        is_expected.to run_ruby_block("wait for static fleet capacity")
+      end
+
       it 'checks cluster readiness' do
         expected_command = "#{cookbook_venv_path}/bin/python #{scripts_dir}/head_node_checks/check_cluster_ready.py" \
           " --cluster-name #{cluster_name}" \
