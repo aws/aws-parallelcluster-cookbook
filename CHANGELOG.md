@@ -17,6 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Upgrade Slurm to 23.11.3 (from 23.02.7).
+- Upgrade NVIDIA driver to version 535.154.05.
 - Upgrade third-party cookbook dependencies:
   - nfs-5.1.2 (from nfs-5.0.0)
 - Upgrade EFA installer to `1.30.0`.
