@@ -9,3 +9,5 @@ jinja2
 PyYAML
 requests
 boto3
+retrying
+click
