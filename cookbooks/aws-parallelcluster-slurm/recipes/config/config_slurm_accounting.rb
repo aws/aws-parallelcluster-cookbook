@@ -15,6 +15,15 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+template '/etc/systemd/system/slurmdbd.service' do
+  source 'slurm/head_node/slurmdbd.service.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create
+end
+
 template "#{node['cluster']['slurm']['install_dir']}/etc/slurmdbd.conf" do
   source 'slurm/slurmdbd.conf.erb'
   owner "#{node['cluster']['slurm']['user']}"
@@ -32,6 +41,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_external_slurmdbd
   action :create_if_missing
   variables(
     dbd_host: "localhost",
+    dbd_port: node['slurmdbd_port'],
     dbd_addr: node['slurmdbd_ip'],
     storage_host: node['dbms_uri'],
     # TODO: expose additional CFN Parameter in template
@@ -65,7 +75,7 @@ execute "update Slurm database password" do
   user 'root'
   group 'root'
   command "#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh"
-end unless on_docker?
+end unless kitchen_test?
 
 service "slurmdbd" do
   supports restart: false
@@ -81,7 +91,7 @@ execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
   retries node['cluster']['slurmdbd_response_retries']
   retry_delay 10
-end unless on_docker? || node['is_external_slurmdbd']
+end unless kitchen_test? || node['is_external_slurmdbd']
 
 bash "bootstrap slurm database" do
   user 'root'
@@ -112,4 +122,4 @@ bash "bootstrap slurm database" do
     # This is not important for the scope of this script, so we return 0.
     exit 0
   BOOTSTRAP
-end unless on_docker? || node['is_external_slurmdbd']
+end unless kitchen_test? || node['is_external_slurmdbd']

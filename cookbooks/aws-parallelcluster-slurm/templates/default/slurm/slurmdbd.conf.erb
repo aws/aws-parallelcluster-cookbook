@@ -1,6 +1,8 @@
 AuthType=auth/munge
 LogFile=/var/log/slurmdbd.log
+<% if !node['is_external_slurmdbd'] %>
 DbdPort=6819
+<% end %>
 SlurmUser=<%= node['cluster']['slurm']['user'] %>
 StorageType=accounting_storage/mysql
 
