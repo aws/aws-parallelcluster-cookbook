@@ -205,14 +205,6 @@ template '/etc/systemd/system/slurmctld.service' do
   action :create
 end
 
-template '/etc/systemd/system/slurmdbd.service' do
-  source 'slurm/head_node/slurmdbd.service.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
-end
-
 include_recipe 'aws-parallelcluster-slurm::config_health_check'
 
 ruby_block "Configure Slurm Accounting" do
