@@ -2,9 +2,9 @@
 
 #
 # Cookbook:: aws-parallelcluster-slurm
-# Recipe:: update
+# Recipe:: update_login_node
 #
-# Copyright:: 2013-2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2024 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,13 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-case node['cluster']['node_type']
-when 'HeadNode'
-  include_recipe 'aws-parallelcluster-slurm::update_head_node'
-when 'ComputeFleet'
-  include_recipe 'aws-parallelcluster-slurm::update_compute'
-when 'LoginNode'
-  include_recipe 'aws-parallelcluster-slurm::update_login_node'
-else
-  raise "node_type must be HeadNode, ComputeFleet or LoginNode"
-end
+save_instance_config_version_to_dynamodb

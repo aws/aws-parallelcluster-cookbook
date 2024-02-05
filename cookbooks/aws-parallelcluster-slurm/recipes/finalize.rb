@@ -20,4 +20,6 @@ when 'HeadNode'
   include_recipe 'aws-parallelcluster-slurm::finalize_head_node'
 when 'ComputeFleet'
   include_recipe 'aws-parallelcluster-slurm::finalize_compute'
+when 'LoginNode'
+  include_recipe 'aws-parallelcluster-slurm::finalize_login_node'
 end

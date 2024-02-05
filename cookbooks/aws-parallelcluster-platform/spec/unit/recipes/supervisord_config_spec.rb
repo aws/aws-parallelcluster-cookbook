@@ -90,10 +90,10 @@ describe 'aws-parallelcluster-platform::supervisord_config' do
 
         it 'has the correct content' do
           is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:cfn-hup]")
             .with_content("[program:loginmgtd]")
 
           is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
-            .with_content("[program:cfn-hup]")
             .with_content("[program:pcluster_dcv_authenticator]")
         end
       end
