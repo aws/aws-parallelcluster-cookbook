@@ -40,16 +40,6 @@ elsif platform?('ubuntu')
 end
 # rubocop:enable Lint/DuplicateBranch
 
-# TODO: move this template to a separate recipe
-template '/etc/systemd/system/slurmdbd.service' do
-  cookbook 'aws-parallelcluster-slurm'
-  source 'slurm/head_node/slurmdbd.service.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
-end
-
 include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
 
 include_recipe 'aws-parallelcluster-slurm::external_slurmdbd_disable_unrequired_services'
