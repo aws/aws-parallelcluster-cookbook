@@ -14,8 +14,8 @@
 
 return if on_docker?
 
-def device_number(mac, token)
-  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
+def network_card_index(mac, token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
   get_metadata_with_token(token, uri)
 end
 
@@ -68,13 +68,13 @@ if macs.length > 1
   # Configure nw interfaces
   macs.each do |mac|
     device_name = device_name(mac)
-    device_number = device_number(mac, token)
+    network_card_index = network_card_index(mac, token)
     gw_ip_address = gateway_address
     device_ip_address = device_ip(mac, token)
     cidr_prefix_length = cidr_prefix_length(mac, token)
     netmask = cidr_to_netmask(cidr_prefix_length)
     cidr_block = subnet_cidr_block(mac, token)
-    log "device_number: #{device_number}, device_name: #{device_name}, device_ip_address: #{device_ip_address}"
+    log "network_card_index: #{network_card_index}, device_name: #{device_name}, device_ip_address: #{device_ip_address}"
 
     execute 'configure_nw_interface' do
       user 'root'
@@ -82,7 +82,7 @@ if macs.length > 1
       cwd "/tmp"
       environment(
         'DEVICE_NAME' => device_name,
-        'DEVICE_NUMBER' => "#{device_number}",
+        'DEVICE_NUMBER' => "#{network_card_index}", # in configure_nw_interface DEVICE_NUMBER actually means network card index
         'GW_IP_ADDRESS' => gw_ip_address,
         'DEVICE_IP_ADDRESS' => device_ip_address,
         'CIDR_PREFIX_LENGTH' => cidr_prefix_length,
