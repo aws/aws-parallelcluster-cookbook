@@ -23,5 +23,7 @@ Scheduling:
     Scheduler: slurm
     SlurmSettings:
         ScaledownIdletime: 10
-        ExternalSlurmdbd: test.slurmdbd.host
+        ExternalSlurmdbd:
+          Host: test.slurmdbd.host
+          Port: 12345
         Database: null
