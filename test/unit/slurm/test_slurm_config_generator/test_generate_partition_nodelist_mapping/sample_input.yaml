@@ -4,6 +4,7 @@ Scheduling:
     ScaledownIdletime: 10
     EnableMemoryBasedScheduling: false
     Database: null
+    ExternalSlurmdbd: null
   SlurmQueues:
     - Name: queue1
       ComputeResources:
