@@ -15,7 +15,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 template '/etc/systemd/system/slurmdbd.service' do
   source 'slurm/head_node/slurmdbd.service.erb'
   owner 'root'
