@@ -88,3 +88,4 @@ Scheduling:
     ScaledownIdletime: 10
     EnableMemoryBasedScheduling: false
     Database: null
+    ExternalSlurmdbd: null
