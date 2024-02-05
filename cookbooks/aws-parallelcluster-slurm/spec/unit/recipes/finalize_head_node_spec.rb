@@ -1,6 +1,19 @@
+# frozen_string_literal: true
+
+# Copyright:: 2024 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
+# License. A copy of the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
 require 'spec_helper'
 
-describe 'aws-parallelcluster-slurm::update_head_node' do
+describe 'aws-parallelcluster-slurm::finalize_head_node' do
   for_all_oses do |platform, version|
     cookbook_venv_path = "MOCK_COOKBOOK_VENV_PATH"
     cluster_name = "MOCK_CLUSTER_NAME"
@@ -11,8 +24,6 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
     context "on #{platform}#{version}" do
       cached(:chef_run) do
         runner = runner(platform: platform, version: version) do |node|
-          allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
-          allow_any_instance_of(Object).to receive(:dig).and_return(true)
           allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
           RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
@@ -22,14 +33,6 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
           node.override['cluster']['scripts_dir'] = scripts_dir
         end
         runner.converge(described_recipe)
-      end
-
-      it 'creates the template cfnconfig' do
-        is_expected.to create_template('/etc/parallelcluster/cfnconfig').with(
-          source: 'init/cfnconfig.erb',
-          cookbook: 'aws-parallelcluster-environment',
-          mode:  '0644'
-        )
       end
 
       it 'checks that the static fleet is running' do
