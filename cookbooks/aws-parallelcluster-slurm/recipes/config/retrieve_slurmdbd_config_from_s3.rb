@@ -29,9 +29,6 @@ config_files.each do |config_file|
     destination "#{node['cluster']['slurm']['install_dir']}/etc/#{config_file}"
     sensitive true
     ignore_failure true
-  end
-
-  file "#{node['cluster']['slurm']['install_dir']}/etc/#{config_file}" do
     mode '0600'
     owner node['cluster']['slurm']['user']
     group node['cluster']['slurm']['group']
