@@ -70,54 +70,89 @@ def _mocked_request_batch_get_items(table_name: str, compute_nodes: [str], ddb_r
 
 
 @pytest.mark.parametrize(
-    "compute_nodes, ddb_records, expected_error",
+    "compute_nodes, login_nodes, ddb_records, expected_error",
     [
         pytest.param(
             [],
+            [],
             {},
             None,
-            id="Create request with no compute nodes",
+            id="Check with no compute or login nodes",
         ),
         pytest.param(
-            ["i-123456789"],
+            ["i-cmp123456789"],
+            ["i-lgn123456789"],
             {},
             "Check failed due to the following erroneous records:\n"
-            "  * missing records (1): ['i-123456789']\n"
+            "  * missing records (2): ['i-cmp123456789', 'i-lgn123456789']\n"
             "  * incomplete records (0): []\n"
             "  * wrong records (0): []",
-            id="Create request with missing DDB records",
+            id="Check with missing DDB records",
         ),
         pytest.param(
-            ["i-123456789"],
-            {"i-123456789": {"UNEXPECTED_KEY": {"S": "UNEXPECTED_KEY_VALUE"}}},
+            ["i-cmp123456789"],
+            ["i-lgn123456789"],
+            {
+                "i-cmp123456789": {"UNEXPECTED_KEY_A": {"S": "UNEXPECTED_KEY_VALUE_A"}},
+                "i-lgn123456789": {"UNEXPECTED_KEY_B": {"S": "UNEXPECTED_KEY_VALUE_B"}},
+            },
             "Check failed due to the following erroneous records:\n"
             "  * missing records (0): []\n"
-            "  * incomplete records (1): ['i-123456789']\n"
+            "  * incomplete records (2): ['i-cmp123456789', 'i-lgn123456789']\n"
             "  * wrong records (0): []",
-            id="Create request with malformed DDB records",
+            id="Check with malformed DDB records",
         ),
         pytest.param(
-            ["i-123456789"],
-            {"i-123456789": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION"}}},
+            ["i-cmp123456789"],
+            ["i-lgn123456789"],
+            {
+                "i-cmp123456789": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_A"}},
+                "i-lgn123456789": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_B"}},
+            },
             "Check failed due to the following erroneous records:\n"
             "  * missing records (0): []\n"
             "  * incomplete records (0): []\n"
-            "  * wrong records (1): [('i-123456789', 'WRONG_CLUSTER_CONFIG_VERSION')]",
-            id="Create request with wrong cluster config version",
+            "  * wrong records (2): [('i-cmp123456789', 'WRONG_CLUSTER_CONFIG_VERSION_A'), "
+            "('i-lgn123456789', 'WRONG_CLUSTER_CONFIG_VERSION_B')]",
+            id="Check with wrong cluster config version",
         ),
         pytest.param(
-            ["i-123456789"],
-            {"i-123456789": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}}},
+            ["i-cmp1234567891", "i-cmp1234567892", "i-cmp1234567893", "i-cmp1234567894"],
+            ["i-lgn1234567891", "i-lgn1234567892", "i-lgn1234567893", "i-lgn1234567894"],
+            {
+                "i-cmp1234567891": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+                "i-lgn1234567891": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+                "i-cmp1234567892": {"UNEXPECTED_KEY_A": {"S": "UNEXPECTED_KEY_VALUE_A"}},
+                "i-lgn1234567892": {"UNEXPECTED_KEY_B": {"S": "UNEXPECTED_KEY_VALUE_B"}},
+                "i-cmp1234567893": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_A"}},
+                "i-lgn1234567893": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_B"}},
+            },
+            "Check failed due to the following erroneous records:\n"
+            "  * missing records (2): ['i-cmp1234567894', 'i-lgn1234567894']\n"
+            "  * incomplete records (2): ['i-cmp1234567892', 'i-lgn1234567892']\n"
+            "  * wrong records (2): [('i-cmp1234567893', 'WRONG_CLUSTER_CONFIG_VERSION_A'), "
+            "('i-lgn1234567893', 'WRONG_CLUSTER_CONFIG_VERSION_B')]",
+            id="Check with mixed errors",
+        ),
+        pytest.param(
+            ["i-cmp123456789"],
+            ["i-lgn123456789"],
+            {
+                "i-cmp123456789": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+                "i-lgn123456789": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+            },
             None,
-            id="Create request with correct cluster config version",
+            id="Check with correct cluster config version",
         ),
     ],
 )
-def test_check_cluster_ready(boto3_stubber, compute_nodes, ddb_records, expected_error):
-    boto3_stubber("ec2", [_mocked_request_describe_instances("CLUSTER_NAME", ["Compute"], compute_nodes)])
+def test_check_cluster_ready(boto3_stubber, compute_nodes, login_nodes, ddb_records, expected_error):
+    all_nodes = compute_nodes + login_nodes
+
+    boto3_stubber("ec2", [_mocked_request_describe_instances("CLUSTER_NAME", ["Compute", "LoginNode"], all_nodes)])
 
     boto3_stubber(
-        "dynamodb", [_mocked_request_batch_get_items("TABLE_NAME", compute_nodes, ddb_records)] if compute_nodes else []
+        "dynamodb", [_mocked_request_batch_get_items("TABLE_NAME", all_nodes, ddb_records)] if all_nodes else []
     )
 
     if expected_error is not None:

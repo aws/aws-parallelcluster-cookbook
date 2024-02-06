@@ -72,11 +72,11 @@ def _check_cluster_config_items(instance_ids: [str], items: [{}], expected_confi
     return missing, incomplete, wrong
 
 
-def check_compute_nodes_config_version(cluster_name: str, table_name: str, expected_config_version: str, region: str):
+def check_deployed_config_version(cluster_name: str, table_name: str, expected_config_version: str, region: str):
     """
-    Verify that every compute node in the cluster has deployed the expected config version.
+    Verify that every compute/login node in the cluster has deployed the expected config version.
 
-    The verification is made by checking the config version reported by compute nodes on the cluster DDB table.
+    The verification is made by checking the config version reported by compute/login nodes on the cluster DDB table.
     A RuntimeError exception is raised if the check fails.
     The function is retried and the wait time is expected to be in the interval (cfn_hup_time, 2*cfn_hup_time),
     where cfn_hup_time is the wait time for the cfn-hup daemon (as of today it is 120 seconds).
@@ -88,24 +88,24 @@ def check_compute_nodes_config_version(cluster_name: str, table_name: str, expec
     :return: None
     """
     logger.info(
-        "Checking that cluster configuration deployed on compute nodes for cluster %s is %s",
+        "Checking that cluster configuration deployed on cluster nodes for cluster %s is %s",
         cluster_name,
         expected_config_version,
     )
 
     for instance_ids in list_cluster_instance_ids_iterator(
         cluster_name=cluster_name,
-        node_type=["Compute"],
+        node_type=["Compute", "LoginNode"],
         instance_state=["running"],
         region=region,
     ):
         n_instance_ids = len(instance_ids)
 
         if not n_instance_ids:
-            logger.warning("Found empty batch of compute nodes: nothing to check")
+            logger.warning("Found empty batch of cluster nodes: nothing to check")
             continue
 
-        logger.info("Found batch of %s compute node(s): %s", n_instance_ids, instance_ids)
+        logger.info("Found batch of %s cluster node(s): %s", n_instance_ids, instance_ids)
 
         items = get_cluster_config_records(table_name, instance_ids, region)
         logger.info("Retrieved %s DDB item(s): %s", len(items), items)
@@ -119,7 +119,7 @@ def check_compute_nodes_config_version(cluster_name: str, table_name: str, expec
                 f"  * incomplete records ({len(incomplete)}): {incomplete}\n"
                 f"  * wrong records ({len(wrong)}): {wrong}"
             )
-        logger.info("Verified cluster configuration for instance(s) %s", instance_ids)
+        logger.info("Verified cluster configuration for cluster node(s) %s", instance_ids)
 
 
 @click.command(help="Verify that the cluster has completed the deployment of the expected cluster configuration.")
@@ -137,7 +137,7 @@ def check_cluster_ready(cluster_name: str, table_name: str, config_version: str,
     )
 
     try:
-        check_compute_nodes_config_version(cluster_name, table_name, config_version, region)
+        check_deployed_config_version(cluster_name, table_name, config_version, region)
     except CheckFailedError as e:
         logger.error("Some cluster readiness checks failed: %s", e)
         raise e
