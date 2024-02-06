@@ -13,12 +13,10 @@
 # limitations under the License.
 
 case node['cluster']['node_type']
-when 'HeadNode', 'ComputeFleet'
+when 'HeadNode'
   # generate the shared storages mapping file
   template node['cluster']['shared_storages_mapping_path'] do
     source 'shared_storages/shared_storages_data.erb'
-    owner 'root'
-    group 'root'
     mode '0644'
   end
 end
