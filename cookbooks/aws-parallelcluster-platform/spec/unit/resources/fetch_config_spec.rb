@@ -3,6 +3,7 @@ require 'spec_helper'
 describe 'fetch_config:run' do
   context "when running a HeadNode from kitchen" do
     cached(:cluster_shared_dir) { '/cluster_shared_dir' }
+    cached(:cluster_shared_dir_login_nodes) { '/shared_dir_login_nodes' }
     cached(:cluster_config_path) { 'cluster_config_path' }
     cached(:previous_cluster_config_path) { 'previous_cluster_config_path' }
     cached(:cluster_config_version) { 'cluster_config_version' }
@@ -14,6 +15,7 @@ describe 'fetch_config:run' do
       ) do |node|
         node.override['kitchen'] = true
         node.override['cluster']['shared_dir'] = cluster_shared_dir
+        node.override['cluster']['shared_dir_login_nodes'] = cluster_shared_dir_login_nodes
         node.override['cluster']['cluster_config_path'] = cluster_config_path
         node.override['cluster']['previous_cluster_config_path'] = previous_cluster_config_path
         node.override['cluster']['cluster_config_version'] = cluster_config_version
@@ -38,8 +40,17 @@ describe 'fetch_config:run' do
         .with(source: "file://#{kitchen_instance_types_data_path}")
     end
 
-    it "writes the cluster config version file" do
+    it "writes the cluster config version file for compute nodes" do
       is_expected.to create_file("/cluster_shared_dir/cluster-config-version").with(
+        content: cluster_config_version,
+        mode: '0644',
+        owner: 'root',
+        group: 'root'
+      )
+    end
+
+    it "writes the cluster config version file for login nodes" do
+      is_expected.to create_file("/shared_dir_login_nodes/cluster-config-version").with(
         content: cluster_config_version,
         mode: '0644',
         owner: 'root',
@@ -65,10 +76,11 @@ describe 'fetch_config:run' do
         ) do |node|
           node.override['kitchen'] = true
           node.override['cluster']['cluster_config_path'] = cluster_config_path
-          node.override['cluster']['login_cluster_config_path'] = cluster_config_path
+          node.override['cluster']['login_cluster_config_path'] = login_cluster_config_path
           node.override['cluster']['node_type'] = node_type
         end
         allow(File).to receive(:exist?).with(cluster_config_path).and_return(true)
+        allow(File).to receive(:exist?).with(login_cluster_config_path).and_return(true)
         runner.converge_dsl do
           fetch_config 'run' do
             action :run
@@ -90,7 +102,9 @@ describe 'fetch_config:run' do
   %w(ComputeFleet LoginNode).each do |node_type|
     context "when running a #{node_type} from kitchen on update" do
       cached(:cluster_shared_dir) { '/cluster_shared_dir' }
+      cached(:cluster_shared_dir_login_nodes) { '/shared_dir_login_nodes' }
       cached(:cluster_config_path) { 'cluster_config_path' }
+      cached(:login_cluster_config_path) { 'login_cluster_config_path' }
       cached(:previous_cluster_config_path) { 'previous_cluster_config_path' }
       cached(:cluster_config_version) { 'cluster_config_version' }
       cached(:cluster_shared_storages_mapping_path) { '/cluster_shared_storages_mapping_path' }
@@ -107,7 +121,8 @@ describe 'fetch_config:run' do
           node.override['cluster']['cluster_config_version'] = cluster_config_version
           node.override['cluster']['shared_storages_mapping_path'] = cluster_shared_storages_mapping_path
           node.override['cluster']['previous_shared_storages_mapping_path'] = cluster_previous_shared_storages_mapping_path
-          node.override['cluster']['login_cluster_config_path'] = cluster_config_path
+          node.override['cluster']['login_cluster_config_path'] = login_cluster_config_path
+          node.override['cluster']['shared_dir_login_nodes'] = cluster_shared_dir_login_nodes
           node.override['cluster']['node_type'] = node_type
         end
         allow(File).to receive(:exist?).with(cluster_config_path).and_return(true)
@@ -122,19 +137,21 @@ describe 'fetch_config:run' do
         end
       end
 
-      if node_type == "ComputeFleet"
-        it "waits for cluster config version file" do
-          is_expected.to run_bash("Wait cluster config files to be updated by the head node").with(
-            code: "[[ \"$(cat /cluster_shared_dir/cluster-config-version)\" == \"cluster_config_version\" ]] || exit 1",
-            retries: 30,
-            retry_delay: 10,
-            timeout: 5
-          )
-        end
-      else
-        it "does not wait for cluster config version file" do
-          is_expected.not_to run_bash("Wait cluster config files to be updated by the head node")
-        end
+      it "waits for cluster config version file" do
+        config_version_file = case node_type
+                              when "ComputeFleet"
+                                "/cluster_shared_dir/cluster-config-version"
+                              when "LoginNode"
+                                "/shared_dir_login_nodes/cluster-config-version"
+                              else
+                                raise "Unsupported node_type #{node_type}"
+                              end
+        is_expected.to run_bash("Wait cluster config files to be updated by the head node").with(
+          code: "[[ \"$(cat #{config_version_file})\" == \"cluster_config_version\" ]] || exit 1",
+          retries: 30,
+          retry_delay: 10,
+          timeout: 5
+        )
       end
 
       it "reads config from shared folder" do
