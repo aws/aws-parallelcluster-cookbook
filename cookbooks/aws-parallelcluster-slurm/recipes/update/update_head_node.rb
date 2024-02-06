@@ -280,6 +280,4 @@ template "#{node['cluster']['etc_dir']}/cfnconfig" do
   mode '0644'
 end
 
-wait_static_fleet_running
-
 wait_cluster_ready
