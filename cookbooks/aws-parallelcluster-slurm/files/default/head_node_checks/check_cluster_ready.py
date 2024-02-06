@@ -95,7 +95,7 @@ def check_compute_nodes_config_version(cluster_name: str, table_name: str, expec
 
     for instance_ids in list_cluster_instance_ids_iterator(
         cluster_name=cluster_name,
-        node_type=["Compute"],
+        node_type=["Compute", "LoginNode"],
         instance_state=["running"],
         region=region,
     ):
