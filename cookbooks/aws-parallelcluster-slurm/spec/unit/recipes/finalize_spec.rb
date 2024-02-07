@@ -55,6 +55,28 @@ describe 'aws-parallelcluster-slurm::finalize' do
           is_expected.to include_recipe('aws-parallelcluster-slurm::finalize_compute')
         end
       end
+
+      context "when login node" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
+            allow_any_instance_of(Object).to receive(:dig).and_return(true)
+            allow_any_instance_of(Object).to receive(:is_static_node?).and_return(false)
+            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+
+            node.override['cluster']['node_type'] = 'LoginNode'
+            node.override['interact_with_ddb'] = true
+            node.override['ec2']['instance_id'] = "MOCK_INSTANCE_ID"
+            node.override['cluster']['cluster_config_version'] = "MOCK_CLUSTER_CONFIG_VERSION"
+          end
+          runner.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'includes the recipe to update the compute node' do
+          is_expected.to include_recipe('aws-parallelcluster-slurm::finalize_login_node')
+        end
+      end
     end
   end
 end

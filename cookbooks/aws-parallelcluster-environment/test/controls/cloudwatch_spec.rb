@@ -160,6 +160,7 @@ control 'cloudwatch_logfiles_configuration_loginnode' do
 
   # TODO: add directory service enablement in the context of the test and add the corresponding log files.
   expected_log_files = %w(
+    /var/log/chef-client.log
     /var/log/cloud-init.log
     /var/log/cloud-init-output.log
     /var/log/supervisord.log
@@ -168,7 +169,6 @@ control 'cloudwatch_logfiles_configuration_loginnode' do
     /var/log/messages
     /var/log/syslog
     /var/log/cfn-init.log
-    /var/log/chef-client.log
     /var/log/parallelcluster/bootstrap_error_msg
     /var/log/parallelcluster/clustermgtd
     /var/log/parallelcluster/clustermgtd.events
