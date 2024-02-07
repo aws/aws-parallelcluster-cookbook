@@ -6,9 +6,11 @@ efa_version = '1.30.0'
 efa_checksum = '876ab9403e07a0c3c91a1a34685a52eced890ae052df94857f6081c5f6c78a0a'
 
 class ConvergeEfa
-  def self.setup(chef_run)
+  def self.setup(chef_run, efa_version: nil, efa_checksum: nil)
     chef_run.converge_dsl('aws-parallelcluster-environment') do
       efa 'setup' do
+        efa_version efa_version
+        efa_checksum efa_checksum
         action :setup
       end
     end
@@ -20,6 +22,29 @@ class ConvergeEfa
       efa 'configure' do
         action :configure
       end
+    end
+  end
+end
+
+describe 'efa:property' do
+  cached(:old_efa_version) { 'old_efa_version' }
+  cached(:old_efa_checksum) { 'old_efa_checksum' }
+  cached(:chef_run) do
+    ChefSpec::SoloRunner.new(step_into: ['efa']) do |node|
+      node.override['cluster']['efa']['version'] = old_efa_version
+      node.override['cluster']['efa']['sha256'] = old_efa_checksum
+    end
+  end
+
+  context 'when efa version and checksum property is overriden' do
+    cached(:resource) do
+      ConvergeEfa.setup(chef_run, efa_version: old_efa_version, efa_checksum: old_efa_checksum)
+      chef_run.find_resource('efa', 'setup')
+    end
+
+    it 'takes the value from efa property' do
+      expect(resource.efa_version).to eq(old_efa_version)
+      expect(resource.efa_checksum).to eq(old_efa_checksum)
     end
   end
 end
@@ -39,6 +64,9 @@ describe 'efa:setup' do
       let(:chef_run) do
         runner(platform: platform, version: version, step_into: ['efa']) do |node|
           if platform == 'redhat'; node.automatic['platform_version'] = "8.7" end
+          node.override['cluster']['efa']['version'] = efa_version
+          node.override['cluster']['efa']['sha256'] = efa_checksum
+          node.override['cluster']['sources_dir'] = source_dir
         end
       end
 
