@@ -153,8 +153,8 @@ action_class do # rubocop:disable Metrics/BlockLength
 
   def wait_cluster_config_file(path)
     # Wait for the config version file to contain the current cluster config version.
-    execute "Wait cluster config files to be updated by the head node" do
-      command "[[ \"$(cat #{path})\" == \"#{node['cluster']['cluster_config_version']}\" ]]"
+    bash "Wait cluster config files to be updated by the head node" do
+      code "[[ \"$(cat #{path})\" == \"#{node['cluster']['cluster_config_version']}\" ]] || exit 1"
       retries 30
       retry_delay 10
       timeout 5

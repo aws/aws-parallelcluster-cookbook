@@ -55,6 +55,7 @@ describe 'fetch_config:run' do
   %w(ComputeFleet LoginNode).each do |node_type|
     context "when running a #{node_type} from kitchen on create" do
       cached(:cluster_config_path) { 'cluster_config_path' }
+      cached(:login_cluster_config_path) { 'login_cluster_config_path' }
       cached(:previous_cluster_config_path) { 'previous_cluster_config_path' }
       cached(:instance_types_data_path) { 'instance_types_data_path' }
       cached(:previous_instance_types_data_path) { 'previous_instance_types_data_path' }
@@ -123,8 +124,8 @@ describe 'fetch_config:run' do
 
       if node_type == "ComputeFleet"
         it "waits for cluster config version file" do
-          is_expected.to run_execute("Wait cluster config files to be updated by the head node").with(
-            command: "[[ \"$(cat /cluster_shared_dir/cluster-config-version)\" == \"cluster_config_version\" ]]",
+          is_expected.to run_bash("Wait cluster config files to be updated by the head node").with(
+            code: "[[ \"$(cat /cluster_shared_dir/cluster-config-version)\" == \"cluster_config_version\" ]] || exit 1",
             retries: 30,
             retry_delay: 10,
             timeout: 5
@@ -132,7 +133,7 @@ describe 'fetch_config:run' do
         end
       else
         it "does not wait for cluster config version file" do
-          is_expected.not_to run_execute("Wait cluster config files to be updated by the head node")
+          is_expected.not_to run_bash("Wait cluster config files to be updated by the head node")
         end
       end
 
