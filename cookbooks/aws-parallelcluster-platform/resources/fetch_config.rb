@@ -22,11 +22,14 @@ action :run do
       Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
       ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
       fetch_cluster_config(node['cluster']['cluster_config_path'])
+      Chef::Log.info("Cluster config is:\n#{::File.read(node['cluster']['cluster_config_path'])}")
 
       Chef::Log.info("Backing up old instance types data from (#{node['cluster']['instance_types_data_path']}) to (#{node['cluster']['previous_instance_types_data_path']})")
       ::FileUtils.cp_r(node['cluster']['instance_types_data_path'], node['cluster']['previous_instance_types_data_path'], remove_destination: true)
 
       fetch_change_set
+      Chef::Log.info("Changeset is:\n#{::File.read(node['cluster']['change_set_path'])}")
+
       fetch_instance_type_data unless ::FileUtils.identical?(node['cluster']['previous_cluster_config_path'], node['cluster']['cluster_config_path'])
       Chef::Log.info("Backing up old shared storages data from (#{node['cluster']['shared_storages_mapping_path']}) to (#{node['cluster']['previous_shared_storages_mapping_path']})")
       ::FileUtils.cp_r(node['cluster']['shared_storages_mapping_path'], node['cluster']['previous_shared_storages_mapping_path'], remove_destination: true)
