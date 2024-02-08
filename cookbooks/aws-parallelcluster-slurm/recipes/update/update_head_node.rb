@@ -93,15 +93,25 @@ ruby_block "replace slurm queue nodes" do
   end
 
   def get_queues_with_changes(config)
-    # Load change set and find queue with changes
+    # Load change set and find queue with changes that require nodes to be updated.
+    # If the changeset contains only changes that support live updates, returns an an empty set of queues.
+    # If the changeset is empty, returns an an empty set of queues.
     queues = Set.new
     change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
-    Chef::Log.debug("Loaded change set (#{change_set})")
-    if are_mount_or_unmount_required? # Changes with SHARED_STORAGE_UPDATE_POLICY require all queues to update
+    changes = change_set["changeSet"]
+
+    if changes.empty?
+      Chef::Log.info("Changeset is empty: queues do not need updates")
+      return queues
+    end
+
+    # Changes to the shared storage are applied to all queues,
+    # but only changes not supporting live updates will be considered to update the queues.
+    if are_mount_or_unmount_required? && !storage_change_supports_live_update?(changes)
       queues = get_all_queues(config)
       Chef::Log.info("All queues will be updated in order to update shared storages")
     else
-      change_set["changeSet"].each do |change|
+      changes.each do |change|
         next unless change["updatePolicy"] == "QUEUE_UPDATE_STRATEGY"
         queue = change["parameter"][/Scheduling\.SlurmQueues\[([^\]]*)\]/, 1]
         Chef::Log.info("Adding queue (#{queue}) to list of queue to be updated")
@@ -134,9 +144,9 @@ ruby_block "replace slurm queue nodes" do
       # Act based on queue update strategy value
       case queue_update_strategy
       when "COMPUTE_FLEET_STOP"
-        Chef::Log.info("Queue update strategy is (#{queue_update_strategy}), doing nothing")
+        Chef::Log.info("Queue update strategy is #{queue_update_strategy}, doing nothing")
       when "DRAIN", "TERMINATE"
-        Chef::Log.info("Queue update strategy is (#{queue_update_strategy})")
+        Chef::Log.info("Queue update strategy is #{queue_update_strategy}")
         queues = get_queues_with_changes(config)
         update_nodes_in_queue(queue_update_strategy, queues)
       else
