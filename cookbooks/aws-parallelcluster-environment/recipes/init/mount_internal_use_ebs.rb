@@ -30,6 +30,17 @@ when 'ComputeFleet'
   end
 
 when 'LoginNode'
+  # Mount /opt/parallelcluster/shared over NFS
+  volume "mount #{node['cluster']['shared_dir']}" do
+    action :mount
+    shared_dir node['cluster']['shared_dir']
+    device(lazy { "#{node['cluster']['head_node_private_ip']}:#{node['cluster']['shared_dir_head']}" })
+    fstype 'nfs'
+    options node['cluster']['nfs']['hard_mount_options']
+    retries 10
+    retry_delay 6
+  end
+
   # Mount /opt/parallelcluster/shared_login_nodes over NFS
   volume "mount #{node['cluster']['shared_dir_login']}" do
     action :mount
