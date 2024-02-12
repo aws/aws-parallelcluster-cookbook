@@ -17,6 +17,9 @@ cloudwatch "Configure CloudWatch" do
   action :configure
 end
 
+# move the default user dir out of /home if the config param is set to 'local'
+include_recipe "aws-parallelcluster-environment::config_default_user_home"
+
 case node['cluster']['shared_storage_type']
 when 'efs'
   include_recipe "aws-parallelcluster-environment::mount_internal_use_efs"

@@ -27,6 +27,7 @@ _common_cluster_attributes: &_common_cluster_attributes
   nvidia:
     enabled: <%= ENV['NVIDIA_ENABLED'] %>
   shared_storage_type: ebs
+  default_user_home: shared
 
 _head_node_cluster_attributes: &_head_node_cluster_attributes
   << : *_common_cluster_attributes

@@ -18,3 +18,6 @@ default['cluster']['munge']['user'] = 'munge'
 default['cluster']['munge']['user_id'] = node['cluster']['reserved_base_uid'] + 2
 default['cluster']['munge']['group'] = node['cluster']['munge']['user']
 default['cluster']['munge']['group_id'] = node['cluster']['munge']['user_id']
+
+default['cluster']['cluster_user_home'] = "/home/#{node['cluster']['cluster_user']}"
+default['cluster']['cluster_user_local_home'] = "/local#{node['cluster']['cluster_user_home']}"
