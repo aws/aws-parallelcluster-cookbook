@@ -278,6 +278,8 @@ end
 
 chef_sleep '15'
 
+wait_cluster_ready
+
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
@@ -289,7 +291,3 @@ template "#{node['cluster']['etc_dir']}/cfnconfig" do
   cookbook 'aws-parallelcluster-environment'
   mode '0644'
 end
-
-wait_static_fleet_running
-
-wait_cluster_ready
