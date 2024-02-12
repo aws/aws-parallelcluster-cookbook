@@ -137,31 +137,3 @@ control 'tag:config_intel_hpc_configured' do
     its('mode') { should cmp '0755' }
   end
 end
-
-control 'tag:intel_one_api_toolkits_configured' do
-  # TODO: Enable this test in daily run. This test requires larger root volume size.
-  # TODO: After increasing the root volume size, config_intel_hpc_enough_space_on_root_volume needs to be ajusted.
-  title 'Checks Intel OneApi Toolkits have been installed'
-
-  only_if { !os_properties.on_docker? }
-  only_if { !os_properties.centos7? && !os_properties.arm? }
-
-  intel_directory = "/opt/intel"
-
-  if node['cluster']['install_intel_base_toolkit'] == 'true'
-    %w(advisor ccl compiler dal dnnl dpl ipp ippcp mkl vtune).each do |software|
-      describe directory("#{intel_directory}/#{software}") do
-        it { should exist }
-      end
-    end
-  end
-
-  modulefile_dir = "/usr/share/Modules/modulefiles"
-  # Intel PSXE module file
-  describe file("#{modulefile_dir}/intel") do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('mode') { should cmp '0755' }
-  end
-end
