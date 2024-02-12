@@ -163,11 +163,12 @@ describe 'nvidia_driver:setup' do
 
     [%w(false kernel), %w(true kernel-open)].each do |kernel_open, kernel_module|
       context "on #{platform}#{version} when nvidia_driver enabled and node['cluster']['nvidia']['kernel_open'] is #{kernel_open}" do
-        cached(:nvidia_arch) { 'nvidia_arch' }
-        cached(:nvidia_driver_version) { 'nvidia_driver_version' }
-        cached(:nvidia_kernel_module) { 'nvidia_kernel_module' }
+        if platform == 'centos'
+          cached(:nvidia_driver_version) { '535.129.03' }
+        else
+          cached(:nvidia_driver_version) { 'nvidia_driver_version' }
+        end
         cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
-
         cached(:chef_run) do
           stubs_for_resource('nvidia_driver') do |res|
             allow(res).to receive(:nvidia_driver_enabled?).and_return(true)
