@@ -12,9 +12,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-fetch_config 'Fetch and load cluster configs' do
-  update true
-end
+# Fetch and load cluster configs
+include_recipe 'aws-parallelcluster-platform::update'
 
 # generate the updated shared storages mapping file
 include_recipe 'aws-parallelcluster-environment::update_fs_mapping'
@@ -26,5 +25,3 @@ include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
 end
-
-sudo_access "Update Sudo Access" if node['cluster']['scheduler'] == 'slurm'
