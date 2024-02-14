@@ -16,9 +16,9 @@
 # limitations under the License.
 
 # PMIx software
-pmix_version = '4.2.6'
+pmix_version = node['cluster']['pmix']['version']
 pmix_url = "https://github.com/openpmix/openpmix/releases/download/v#{pmix_version}/pmix-#{pmix_version}.tar.gz"
-pmix_sha256 = '2085615d1b8d72d944b4580cfd0ec958ce9050f9c7585081351ddaf1d63fe201'
+pmix_sha256 = node['cluster']['pmix']['sha256']
 pmix_tarball = "#{node['cluster']['sources_dir']}/pmix-#{pmix_version}.tar.gz"
 
 remote_file pmix_tarball do
