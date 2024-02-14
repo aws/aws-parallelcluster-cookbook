@@ -18,12 +18,10 @@ end
 
 unified_mode true
 use 'partial/_common_udev_configuration'
-use 'partial/_debian_udev_configuration'
 
 default_action :setup
 
 action :setup do
   action_create_common_udev_files
-  action_set_udev_autoreload
   action_start_ec2blk
 end

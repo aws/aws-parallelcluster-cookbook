@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :gdrcopy, platform: 'rocky' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 
 use 'partial/_gdrcopy_common.rb'
@@ -24,7 +24,7 @@ def gdrcopy_enabled?
 end
 
 def gdrcopy_platform
-  'el8'
+  "el#{node['platform_version'].to_i}"
 end
 
 def gdrcopy_arch

@@ -13,9 +13,19 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :package_repos, platform: 'rocky' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 unified_mode true
+
+def powertool_name
+  # See details here: https://wiki.rockylinux.org/rocky/repo/#base-repositories
+  case node['platform_version'].to_i
+  when 8
+    "powertools"
+  when 9
+    "crb"
+  end
+end
 
 use 'partial/_package_repos_rpm.rb'
 
@@ -32,7 +42,7 @@ action :setup do
 
   execute 'yum-config-manager-powertools' do
     # Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
-    command "yum-config-manager --enable powertools"
+    command "yum-config-manager --enable #{powertool_name}"
   end
 
   execute 'yum-config-manager_skip_if_unavail' do

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :install_packages, platform: 'redhat' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 
 use 'partial/_install_packages_common.rb'
@@ -24,11 +24,11 @@ def default_packages
   # Removed libssh2-devel from base_packages since is not shipped by RedHat 8 and in conflict with package libssh-0.9.6-3.el8.x86_64
   # iptables needed for IMDS setup
   %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-     libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-     httpd boost-devel redhat-lsb mlocate R atlas-devel
+     libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf libtool
+     httpd boost-devel mlocate R atlas-devel
      blas-devel libffi-devel dkms libedit-devel jq
      libical-devel sendmail libxml2-devel libglvnd-devel
-     python2 python2-pip libgcrypt-devel libevent-devel glibc-static bind-utils
+     libgcrypt-devel libevent-devel glibc-static bind-utils
      iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
      coreutils moreutils curl environment-modules gcc gcc-c++ bzip2)
 end

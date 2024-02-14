@@ -13,13 +13,22 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :arm_pl, platform: 'rocky' do |node|
-  node['platform_version'].to_i == 8
+  node['platform_version'].to_i >= 8
 end
 
 use 'partial/_arm_pl_common.rb'
 
 action_class do
   def armpl_platform
-    'RHEL-8'
+    "RHEL-#{node['platform_version'].to_i}"
+  end
+
+  def gcc_major_minor_version
+    case node['platform_version'].to_i
+    when 8
+      '9.3'
+    else
+      '11.3'
+    end
   end
 end

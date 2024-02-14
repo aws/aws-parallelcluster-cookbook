@@ -27,9 +27,7 @@ property :aws_domain, String
 # We upload ArmPL to a ParallelCluster bucket (account for it in scope of the upgrade) and download it from there
 # to install ArmPL on the AMI.
 # We download gcc directly from gnu.org repository to install correct gcc version on the AMI.
-property :armpl_major_minor_version, String, default: '21.0'
-property :armpl_patch_version, String, default: '0'
-property :gcc_major_minor_version, String, default: '9.3'
+property :armpl_major_minor_version, String, default: '23.10'
 property :gcc_patch_version, String, default: '0'
 
 action :arm_pl_prerequisite do
@@ -53,8 +51,8 @@ action :setup do
 
   action_arm_pl_prerequisite
 
-  armpl_version = "#{new_resource.armpl_major_minor_version}.#{new_resource.armpl_patch_version}"
-  armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{new_resource.gcc_major_minor_version}.tar"
+  armpl_version = "#{new_resource.armpl_major_minor_version}"
+  armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{gcc_major_minor_version}.tar"
 
   armpl_url = %W(
     https://#{new_resource.region}-aws-parallelcluster.s3.#{new_resource.region}.#{new_resource.aws_domain}
@@ -92,9 +90,9 @@ action :setup do
   directory "#{modulefile_dir}/armpl"
 
   armpl_license_dir = if new_resource.armpl_major_minor_version == "21.0"
-                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{new_resource.armpl_major_minor_version}_gcc-#{new_resource.gcc_major_minor_version}/license_terms"
+                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{new_resource.armpl_major_minor_version}_gcc-#{gcc_major_minor_version}/license_terms"
                       else
-                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_version}_gcc-#{new_resource.gcc_major_minor_version}/license_terms"
+                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_version}_gcc-#{gcc_major_minor_version}/license_terms"
                       end
 
   # arm performance library modulefile configuration
@@ -108,11 +106,11 @@ action :setup do
       armpl_version: armpl_version,
       armpl_major_minor_version: new_resource.armpl_major_minor_version,
       armpl_license_dir: armpl_license_dir,
-      gcc_major_minor_version: new_resource.gcc_major_minor_version
+      gcc_major_minor_version: gcc_major_minor_version
     )
   end
 
-  gcc_version = "#{new_resource.gcc_major_minor_version}.#{new_resource.gcc_patch_version}"
+  gcc_version = "#{gcc_major_minor_version}.#{new_resource.gcc_patch_version}"
   gcc_url = "https://ftp.gnu.org/gnu/gcc/gcc-#{gcc_version}/gcc-#{gcc_version}.tar.gz"
   gcc_tarball = "#{new_resource.sources_dir}/gcc-#{gcc_version}.tar.gz"
 
@@ -152,7 +150,7 @@ action :setup do
     creates '/opt/arm/armpl/gcc'
   end
 
-  gcc_modulefile = "/opt/arm/armpl/#{armpl_version}/modulefiles/armpl/gcc-#{new_resource.gcc_major_minor_version}"
+  gcc_modulefile = "/opt/arm/armpl/#{armpl_version}/modulefiles/armpl/gcc-#{gcc_major_minor_version}"
 
   # gcc modulefile configuration
   template gcc_modulefile do
@@ -170,9 +168,8 @@ action :setup do
   # to dependencies (for instance, test code)
   # Complete versions are intentionally redundant.
   node.default['cluster']['armpl']['major_minor_version'] = new_resource.armpl_major_minor_version
-  node.default['cluster']['armpl']['patch_version'] = new_resource.armpl_patch_version
   node.default['cluster']['armpl']['version'] = armpl_version
-  node.default['cluster']['armpl']['gcc']['major_minor_version'] = new_resource.gcc_major_minor_version
+  node.default['cluster']['armpl']['gcc']['major_minor_version'] = gcc_major_minor_version
   node.default['cluster']['armpl']['gcc']['patch_version'] = new_resource.gcc_patch_version
   node.default['cluster']['armpl']['gcc']['version'] = gcc_version
 

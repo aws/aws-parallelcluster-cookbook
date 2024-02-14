@@ -65,7 +65,7 @@ def enable_munge_service
     action %i(enable start)
     retries 5
     retry_delay 10
-  end
+  end unless on_docker?
 end
 
 def setup_munge_head_node

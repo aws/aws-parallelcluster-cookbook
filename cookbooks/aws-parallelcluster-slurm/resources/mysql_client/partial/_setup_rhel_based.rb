@@ -46,7 +46,11 @@ end
 
 action_class do
   def package_platform
-    arm_instance? ? "el/7/aarch64" : "el/7/x86_64"
+    platform_version = node['platform_version'].to_i
+    if platform_version == 2
+      platform_version = 7
+    end
+    arm_instance? ? "el/#{platform_version}/aarch64" : "el/#{platform_version}/x86_64"
   end
 
   def repository_packages

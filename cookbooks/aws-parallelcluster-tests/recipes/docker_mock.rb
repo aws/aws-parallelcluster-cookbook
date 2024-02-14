@@ -28,15 +28,10 @@ file '/sbin/chkconfig' do
 #!/bin/bash
 echo "service         0:off   1:off   2:on    3:on    4:on    5:on    6:off"
 )
+  mode '0744'
 end
 
 %w(
-  /etc/init.d/rpc-statd
-  /etc/init.d/rpc-statd.service
-  /etc/init.d/nfs-idmapd
-  /etc/init.d/nfs-client.target
-  /etc/init.d/nfs-config.service
-  /etc/init.d/nfs-kernel-server.service
   /sbin/service
   /usr/local/bin/udevadm
   /usr/local/sbin/sysctl
@@ -63,6 +58,8 @@ end
 
 if redhat_on_docker?
   package 'openssh-clients'
+  package 'python3'
+  package 'python3-pip'
 
   # Mock python environment
   package 'python39'
