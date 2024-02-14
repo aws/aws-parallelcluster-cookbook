@@ -12,7 +12,7 @@ control 'tag:install_package_repos' do
     end
 
     if os[:name] == 'redhat' && virtualization.system != 'docker'
-      describe yum.repo('codeready-builder-for-rhel-8-rhui-rpms') do
+      describe yum.repo("codeready-builder-for-rhel-#{os[:release].to_i}-rhui-rpms") do
         it { should exist }
         it { should be_enabled }
       end

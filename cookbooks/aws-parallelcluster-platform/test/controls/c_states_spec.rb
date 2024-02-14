@@ -9,7 +9,7 @@ control 'tag:install_c_states_kernel_configured' do
     its('content') { should match(/intel_idle.max_cstate=1/) }
   end
 
-  if os.redhat8? || os.alinux2? || os.centos7? || os.rocky8?
+  if os_properties.redhat8? || os_properties.alinux2? || os_properties.centos7? || os_properties.rocky8?
 
     describe file('/boot/grub2/grub.cfg') do
       it { should exist }
