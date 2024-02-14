@@ -21,3 +21,8 @@ use 'partial/_nvidia_driver_common.rb'
 def nvidia_driver_enabled?
   !arm_instance? && nvidia_enabled?
 end
+
+# Pinning the Nvidia Driver version for centos7 due to incompatibility with Gdrcopy 2.3.1
+def _nvidia_driver_version
+  '535.129.03'
+end
