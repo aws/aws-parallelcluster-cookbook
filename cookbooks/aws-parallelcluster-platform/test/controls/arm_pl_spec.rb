@@ -18,7 +18,7 @@ control 'tag:install_arm_pl_installed' do
   gcc_major_minor_version = node['cluster']['armpl']['gcc']['major_minor_version']
 
   armpl_module_general_name = "armpl/#{armpl_version}"
-  armpl_module_name = "armpl/#{armpl_version}_gcc-#{gcc_major_minor_version}"
+  armpl_module_name = "armpl/#{armpl_version}.0_gcc-#{gcc_major_minor_version}"
   gcc_module_name = "armpl/gcc-#{gcc_major_minor_version}"
 
   if os_properties.ubuntu2204?
