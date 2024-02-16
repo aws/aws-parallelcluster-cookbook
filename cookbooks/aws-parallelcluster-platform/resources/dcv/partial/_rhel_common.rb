@@ -17,22 +17,28 @@ def dcv_sha256sum
   if arm_instance?
     case el_string
     when "el7"
-      '37aaaabfe1b8dde83254c738aa562b7eb7b1663cea09a53cedf9dabe5ddbb184'
+      # ALINUX2 and Centos7
+      'e5a8549b35b2c45d960a2b22a521542cb97458c2c7c7d0c2bf0c4045f4f7f974'
     when "el8"
-      'c5366bde8fb49bb41f2bb04e3390e5bda9aa668c0122e4fbf663e9a18c049edf'
+      # RHEL and Rocky8
+      'f0c8ebf9d240846004b5e321d48d90f7d9d2d36a769b9dacf59ea37d51cc5ceb'
     when "el9"
-      '07148327f30dae656b338e24102945830601e85df4e135029b624df1e9ee3c2e'
+      # RHEL and Rocky9
+      'b13e92991427bea4ecdbcf472a64c875abfc08f15e63bc3d935d603ac971975a'
     else
       ''
     end
   else
     case el_string
     when "el7"
-      'e82e434a3f0c5d1a48d7cda2b6100ce51ae250d93b6a17b2fb81ba0fda463b3b'
+      # ALINUX2 and Centos7
+      '400691a92f23c59492896ad4906c5a4a827cdbce53fa6291f5bad43fd47ebd1a'
     when "el8"
-      '28a15bb557f59580f3b58d9bf99430d27d98efbaa9007ab3b2eca46e1a51fa4f'
+      # RHEL and Rocky8
+      'a0d17663c2f8597e329ccbc2edf30fbb04ef4ba7dfefe9cb57badde8b964da7c'
     when "el9"
-      'eb906f41b0a064005499ab6a1be42c8d218a3fbaf9444cb907990aa6171bdea4'
+      # RHEL and Rocky9
+      'b8cb9a398bb2da666426f607627fa2da5173dc4ca93f6180f872cc05ad6fff7a'
     else
       ''
     end

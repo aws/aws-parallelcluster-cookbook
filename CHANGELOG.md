@@ -25,6 +25,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.19.0`
   - Rdma-core: `rdma-core-46.0-1`
   - Open MPI: `openmpi40-aws-4.1.6-2` and `openmpi50-aws-5.0.0-11`
+- Upgrade NICE DCV to version `2023.1-16388`.
+  - server: `2023.1.16388-1`
+  - xdcv: `2023.1.565-1`
+  - gl: `2023.1.1047-1`
+  - web_viewer: `2023.1.16388-1`
 
 **BUG FIXES**
 
