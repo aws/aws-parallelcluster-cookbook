@@ -14,6 +14,20 @@
 
 return if node['cluster']['default_user_home'] == 'shared'
 
+# Stop sshd and close all connections
+service 'sshd' do
+  action :stop
+  sensitive true
+end
+bash "Close ssh connections to perform a default user move" do
+  user 'root'
+  group 'root'
+  returns [0, 1]
+  code <<-EOH
+    pkill --signal HUP sshd
+  EOH
+end
+
 # Backup the cluster user's default home directory
 bash "Backup #{node['cluster']['cluster_user_home']}" do
   user 'root'
@@ -46,3 +60,9 @@ bash "Move #{node['cluster']['cluster_user_home']}" do
 end
 
 node.override['cluster']['cluster_user_home'] = node['cluster']['cluster_user_local_home']
+
+# Start the sshd service again once the move is complete
+service 'sshd' do
+  action :start
+  sensitive true
+end
