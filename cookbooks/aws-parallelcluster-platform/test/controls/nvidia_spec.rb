@@ -15,7 +15,11 @@ control 'tag:install_expected_versions_of_nvidia_driver_installed' do
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
-  expected_nvidia_driver_version = node['cluster']['nvidia']['driver_version']
+  expected_nvidia_driver_version = if os_properties.centos7?
+                                     '535.129.03'
+                                   else
+                                     node['cluster']['nvidia']['driver_version']
+                                   end
   expected_nvidia_kernel_license = 'Dual MIT/GPL'
   expected_nvidia_kernel_module = "NVRM version: NVIDIA UNIX Open Kernel Module"
 
