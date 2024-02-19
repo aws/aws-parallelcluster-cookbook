@@ -51,6 +51,12 @@ def for_all_oses
   end
 end
 
+def for_all_node_types
+  %w(HeadNode ComputeFleet LoginNode).each do |node_type|
+    yield(node_type)
+  end
+end
+
 def runner(platform:, version:, step_into: [])
   ChefSpec::SoloRunner.new(platform: platform, version: version, step_into: step_into) do |node|
     yield node if block_given?
