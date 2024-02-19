@@ -24,6 +24,7 @@ _help() {
   --profile <aws-profile>       AWS profile name to use for the upload
                                 (optional, default is AWS_PROFILE env variable or "default")
   --region <aws-region>         Region to use for AWSCli commands (optional, default is "us-east-1")
+  --scope <string>              Disambiguation string used in the S3 path to avoid collisions (default is empty)
   -h, --help                    Print this help message
 EOF
 }
@@ -40,6 +41,8 @@ main() {
             --profile=*)        _profile="${1#*=}";;
             --region)           _region="$2"; shift;;
             --region=*)         _region="${1#*=}";;
+            --scope)            _scope="$2"; shift;;
+            --scope=*)          _scope="${1#*=}";;
             -h|--help|help)     _help; exit 0;;
             *)                  _help; echo "[error] Unrecognized option '$1'"; exit 1;;
         esac
@@ -65,6 +68,10 @@ main() {
     if [ -z "${_region}" ]; then
         _info "--region parameter not specified, using 'us-east-1'"
         _region="us-east-1"
+    fi
+    if [ -z "${_scope}" ]; then
+        _info "--scope parameter not specified, no scope will be used"
+        _scope=""
     fi
 
     # check bucket or create it
@@ -94,6 +101,9 @@ main() {
 
     # upload packages
     _key_path="parallelcluster/${_version}/cookbooks"
+    if [ -n "${_scope}" ]; then
+        _key_path="${_key_path}/${_scope}"
+    fi
     aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.tgz s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz || _error_exit 'Failed to push cookbook to S3'
     aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.md5 s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
     aws ${_profile} --region "${_region}" s3api head-object --bucket ${_bucket} --key ${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz --output text --query LastModified > aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to fetch LastModified date'
