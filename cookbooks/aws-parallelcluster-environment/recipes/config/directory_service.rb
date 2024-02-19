@@ -233,13 +233,3 @@ end
     sensitive true
   end
 end unless on_docker?
-
-if %w(HeadNode LoginNode).include? node['cluster']['node_type']
-  read_only_user = domain_service_read_only_user_name(node['cluster']['directory_service']['domain_read_only_user'])
-
-  execute 'Check AD connection and sync user data with remote directory service' do
-    command "getent passwd #{read_only_user}"
-    user 'root'
-    ignore_failure true
-  end
-end
