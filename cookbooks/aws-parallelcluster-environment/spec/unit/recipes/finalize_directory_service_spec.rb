@@ -38,8 +38,7 @@ describe 'aws-parallelcluster-environment::finalize_directory_service' do
               is_expected.to run_execute('Fetch user data from remote directory service').with(
                 command: "sudo -u #{cluster_user} getent passwd #{domain_read_only_user}",
                 user: 'root',
-                retries: 10,
-                retry_delay: 3
+                ignore_failure: true
               )
             end
           else
