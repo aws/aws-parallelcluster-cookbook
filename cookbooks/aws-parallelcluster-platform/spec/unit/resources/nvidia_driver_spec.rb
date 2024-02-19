@@ -187,6 +187,10 @@ describe 'nvidia_driver:setup' do
         end
         cached(:node) { chef_run.node }
 
+        it 'dumps nodes attribues' do
+          is_expected.to write_node_attributes('Save Nvidia driver version for Inspec tests')
+        end
+
         it 'sets up nvidia_driver' do
           is_expected.to setup_nvidia_driver('setup')
         end

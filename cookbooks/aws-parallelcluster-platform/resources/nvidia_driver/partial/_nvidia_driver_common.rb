@@ -23,6 +23,10 @@ action :setup do
   return unless nvidia_driver_enabled?
   return if on_docker?
 
+  # Share nvidia driver version with InSpec tests
+  node.default['cluster']['nvidia']['driver_version'] = _nvidia_driver_version
+  node_attributes "Save Nvidia driver version for Inspec tests"
+
   remote_file tmp_nvidia_run do
     source nvidia_driver_url
     mode '0755'
