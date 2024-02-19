@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add support for RHEL9.
 - Add support for Rocky Linux 9 as `CustomAmi` created through `build-image` process. No public official ParallelCluster Rocky9 Linux AMI is made available at this time.
 - Add the configuration parameter `DeploymentSettings/DefaultUserHome` to allow users to move the default user's home directory to `/local/home` instead of `/home` (default).
+  - SSH connections will be closed and rejected while the user's home directory is being moved during the bootstrapping process.
 - Add possibility to choose between Open and Closed Source Nvidia Drivers when building an AMI, through the ```['cluster']['nvidia']['kernel_open']``` cookbook node attribute.
 
 **CHANGES**
@@ -24,8 +25,16 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.19.0`
   - Rdma-core: `rdma-core-46.0-1`
   - Open MPI: `openmpi40-aws-4.1.6-2` and `openmpi50-aws-5.0.0-11`
+- Upgrade NICE DCV to version `2023.1-16388`.
+  - server: `2023.1.16388-1`
+  - xdcv: `2023.1.565-1`
+  - gl: `2023.1.1047-1`
+  - web_viewer: `2023.1.16388-1`
 
 **BUG FIXES**
+- Fix issue making job fail when submitted as active directory user from login nodes. 
+  The issue was caused by an incomplete configuration of the integration with the external Active Directory on the head node.
+  This fix comes with a breaking change: now cluster creation/update would fail if the integration with the Active Directory does not work.
 
 3.8.0
 ------

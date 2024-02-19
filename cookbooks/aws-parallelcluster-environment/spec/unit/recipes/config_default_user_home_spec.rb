@@ -15,9 +15,12 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
         cached(:node) { chef_run.node }
 
         it 'runs the recipe' do
+          is_expected.to stop_service("sshd")
+          is_expected.to run_bash("Close ssh connections to perform a default user move")
           is_expected.to run_bash("Backup /home/user")
           is_expected.to run_bash("Move /home/user")
           expect(chef_run.node['cluster']['cluster_user_home']).to eq('/local/home/user')
+          is_expected.to start_service("sshd")
         end
       end
       context 'when shared' do
