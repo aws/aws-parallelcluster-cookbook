@@ -15,4 +15,4 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-save_instance_config_version_to_dynamodb
+save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:DEPLOYED])

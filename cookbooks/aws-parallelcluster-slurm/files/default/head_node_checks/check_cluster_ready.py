@@ -108,7 +108,7 @@ def check_deployed_config_version(cluster_name: str, table_name: str, expected_c
         logger.info("Found batch of %s cluster node(s): %s", n_instance_ids, instance_ids)
 
         items = get_cluster_config_records(table_name, instance_ids, region)
-        logger.info("Retrieved %s DDB item(s): %s", len(items), items)
+        logger.info("Retrieved %s DDB item(s):\n\t%s", len(items), "\n\t".join([str(i) for i in items]))
 
         missing, incomplete, wrong = _check_cluster_config_items(instance_ids, items, expected_config_version)
 
