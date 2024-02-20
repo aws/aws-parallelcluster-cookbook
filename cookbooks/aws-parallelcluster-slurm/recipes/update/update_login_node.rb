@@ -15,6 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+unless lambda { is_live_update_required? }.call
+  save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:SKIPPED_LIVE_UPDATE])
+  return
+end
+
 # TODO: Move the only_if decision to the update_shared_storage recipe for better definition of responsibilities
 #  and to facilitate unit testing.
 ruby_block "update_shared_storages" do
@@ -24,4 +29,4 @@ ruby_block "update_shared_storages" do
   only_if { are_mount_or_unmount_required? }
 end
 
-save_instance_config_version_to_dynamodb
+save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:DEPLOYED])

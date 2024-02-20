@@ -95,3 +95,26 @@ def is_login_nodes_removed?
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
   previous_config.dig("LoginNodes") and !config.dig("LoginNodes")
 end
+
+def is_live_update_required?
+  require 'json'
+
+  change_set_path = node['cluster']['change_set_path']
+
+  return false unless File.exist?(change_set_path)
+
+  change_set = JSON.load_file("#{node['cluster']['change_set_path']}")
+  changes = change_set["changeSet"]
+
+  case node["cluster"]["node_type"]
+  when 'HeadNode'
+    # The head node supports live updates regardless the content of the changeset.
+    return true
+  when 'ComputeFleet','LoginNode'
+    # The compute and login nodes support live updates only in specific cases:
+    #   * changeset  contains only shared storage changes that support live updates
+    return storage_change_supports_live_update?(changes)
+  else
+    raise "node_type must be HeadNode, LoginNode or ComputeFleet"
+  end
+end

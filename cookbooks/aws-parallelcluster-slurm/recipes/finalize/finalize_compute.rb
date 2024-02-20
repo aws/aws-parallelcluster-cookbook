@@ -60,4 +60,4 @@ execute 'resume_node' do
   only_if { is_static_node?(node.run_state['slurm_compute_nodename']) }
 end
 
-save_instance_config_version_to_dynamodb
+save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:DEPLOYED])

@@ -14,13 +14,24 @@
 # Saves on the DynamoDB table 'parallelcluster-$CLUSTERNAME' the correspondence between
 # the instance id and the cluster config version deployed on that instance.
 # This is done to understand what is the deployed cluster config in each node, for example, during a CFN Stack update.
-def save_instance_config_version_to_dynamodb
+
+
+DDB_CONFIG_STATUS = {
+  DEPLOYED: "DEPLOYED",
+  SKIPPED_LIVE_UPDATE: "SKIPPED_LIVE_UPDATE"
+}
+
+def save_instance_config_version_to_dynamodb(status)
   unless on_docker? || kitchen_test? && !node['interact_with_ddb']
     # TODO: the table name should be read from a dedicated node attribute,
     #   but it is currently missing in the dna.json for compute nodes.
     table_name = "parallelcluster-#{node['cluster']['cluster_name']}"
     item_id = "CLUSTER_CONFIG.#{node['ec2']['instance_id']}"
-    item_data = "{\"cluster_config_version\": {\"S\": \"#{node['cluster']['cluster_config_version']}\"}, \"lastUpdateTime\": {\"S\": \"#{Time.now.utc}\"}}"
+    node_type = node['cluster']['node_type']
+    config_version = node['cluster']['cluster_config_version']
+    last_update_time = Time.now.utc
+
+    item_data = "{\"cluster_config_version\": {\"S\": \"#{config_version}\"}, \"status\": {\"S\": \"#{status}\"}, \"node_type\": {\"S\": \"#{node_type}\"}, \"lastUpdateTime\": {\"S\": \"#{last_update_time}\"}}"
     item = "{\"Id\": {\"S\": \"#{item_id}\"}, \"Data\": {\"M\": #{item_data}}}"
 
     execute "Save cluster config version to DynamoDB" do

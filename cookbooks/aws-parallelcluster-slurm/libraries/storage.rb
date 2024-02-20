@@ -104,7 +104,7 @@ def storage_change_supports_live_update?(changes)
 
   if storage_changes.empty?
     Chef::Log.info("No shared storage change found: assuming live update is supported")
-    return true
+    return false
   end
 
   storage_changes.each do |change|
