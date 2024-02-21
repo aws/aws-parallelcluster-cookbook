@@ -41,8 +41,8 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
         is_expected.to run_execute("Check cluster readiness").with(
           command: expected_command,
           timeout: 30,
-          retries: 5,
-          retry_delay: 180
+          retries: 10,
+          retry_delay: 90
         )
       end
     end
