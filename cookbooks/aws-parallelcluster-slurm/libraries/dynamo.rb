@@ -15,11 +15,10 @@
 # the instance id and the cluster config version deployed on that instance.
 # This is done to understand what is the deployed cluster config in each node, for example, during a CFN Stack update.
 
-
 DDB_CONFIG_STATUS = {
   DEPLOYED: "DEPLOYED",
-  SKIPPED_LIVE_UPDATE: "SKIPPED_LIVE_UPDATE"
-}
+  SKIPPED_LIVE_UPDATE: "SKIPPED_LIVE_UPDATE",
+}.freeze
 
 def save_instance_config_version_to_dynamodb(status)
   unless on_docker? || kitchen_test? && !node['interact_with_ddb']

@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-unless lambda { is_live_update_required? }.call
+unless -> { is_live_update_required? }.call
   save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:SKIPPED_LIVE_UPDATE])
   return
 end
