@@ -212,6 +212,8 @@ describe 'gdrcopy:setup' do
           'centos7' => 'el7',
           'rhel8' => 'el8',
           'rocky8' => 'el8',
+          'rhel9' => 'el9',
+          'rocky9' => 'el9',
           'ubuntu20.04' => 'Ubuntu20_04',
           'ubuntu22.04' => 'Ubuntu22_04',
         }

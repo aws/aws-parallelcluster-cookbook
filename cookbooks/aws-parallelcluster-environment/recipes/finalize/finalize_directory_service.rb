@@ -22,10 +22,13 @@ if %w(HeadNode LoginNode).include? node['cluster']['node_type']
   read_only_user = domain_service_read_only_user_name(node['cluster']['directory_service']['domain_read_only_user'])
 
   execute 'Fetch user data from remote directory service' do
-    # The switch-user (sudo -u) is necessary to trigger the fetching of AD data
+    # The switch-user (sudo -u) is necessary to trigger the fetching of AD data.
+    # Failures are ignored because we experimentally verified that a MsAD backend
+    # may take long time to become available.
+    # So, we prefer to execute this step in best effort mode.
+    # Once we will reintroduce the failures, we should consider 30 retries with 10 seconds delay.
     command "sudo -u #{default_user} getent passwd #{read_only_user}"
     user 'root'
-    retries 10 # Retries are just a safe guard in case the node is still fetching data from the AD
-    retry_delay 3
+    ignore_failure true
   end
 end
