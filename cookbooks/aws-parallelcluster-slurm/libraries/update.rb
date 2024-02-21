@@ -101,20 +101,29 @@ def is_live_update_required?
 
   change_set_path = node['cluster']['change_set_path']
 
-  return false unless File.exist?(change_set_path)
+  Chef::Log.info("Evaluating if a live update is required according to the changeset at #{change_set_path}")
+
+  unless File.exist?(change_set_path)
+    Chef::Log.info("Changeset not found: live update is not required")
+    return false
+  end
 
   change_set = JSON.load_file("#{node['cluster']['change_set_path']}")
   changes = change_set["changeSet"]
 
-  case node["cluster"]["node_type"]
+  Chef::Log.info("Changeset found: evaluating changes #{changes}")
+
+  outcome = case node["cluster"]["node_type"]
   when 'HeadNode'
     # The head node supports live updates regardless the content of the changeset.
-    return true
+    true
   when 'ComputeFleet','LoginNode'
     # The compute and login nodes support live updates only in specific cases:
     #   * changeset  contains only shared storage changes that support live updates
-    return storage_change_supports_live_update?(changes)
+    storage_change_supports_live_update?(changes)
   else
     raise "node_type must be HeadNode, LoginNode or ComputeFleet"
   end
+
+  Chef::Log.info("Live update required: #{outcome}")
 end
