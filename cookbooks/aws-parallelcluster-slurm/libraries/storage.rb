@@ -96,15 +96,15 @@ end
 # @return [Boolean] true if the change supports live updates; false, otherwise.
 def storage_change_supports_live_update?(changes)
   if changes.nil? || changes.empty?
-    Chef::Log.info("No change found: assuming live update is supported")
+    Chef::Log.info("No change found: live update is supported")
     return true
   end
 
   storage_changes = changes.select { |change| change["parameter"] == "SharedStorage" }
 
   if storage_changes.empty?
-    Chef::Log.info("No shared storage change found: assuming live update is supported")
-    return false
+    Chef::Log.info("No shared storage change found: live update is supported")
+    return true
   end
 
   storage_changes.each do |change|
