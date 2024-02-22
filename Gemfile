@@ -7,7 +7,7 @@ gem 'berkshelf'
 group :style do
   gem 'cookstyle', '~> 7.25.9'
   gem 'rake', '~> 13.0.1'
-  gem 'rubocop', '~> 1.22.3'
+  gem 'rubocop', '~> 1.23.0'
   gem 'rubocop-gitlab-security', '~> 0.1.1'
 end
 
