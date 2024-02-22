@@ -38,3 +38,4 @@ include_recipe 'aws-parallelcluster-environment::fsx'
 # spack 'Configure Spack Packages' do
 #   action :configure
 # end
+include_recipe 'aws-parallelcluster-environment::config_cfn_hup'
