@@ -113,14 +113,22 @@ def is_live_update_required?
 
   Chef::Log.info("Changeset found: evaluating changes #{changes}")
 
+  if changes.nil? || changes.empty?
+    Chef::Log.info("No change found in changeset: live update is not required")
+    return false
+  end
+
   outcome = case node["cluster"]["node_type"]
             when 'HeadNode'
-              # The head node supports live updates regardless the content of the changeset.
+              # The head node supports live updates regardless the content of the changeset,
+              # because we assume here that the CLI permitted only the submission of an update with changes
+              # that can be handled by a live update on the head node.
               true
             when 'ComputeFleet', 'LoginNode'
               # The compute and login nodes support live updates only in specific cases:
-              #   * changeset  contains only shared storage changes that support live updates
-              storage_change_supports_live_update?(changes)
+              #   * changeset contains only shared storage changes that support live updates
+              only_shared_storage_change = changes.all? { |change| change["parameter"] == "SharedStorage" }
+              only_shared_storage_change && storage_change_supports_live_update?(changes)
             else
               raise "node_type must be HeadNode, LoginNode or ComputeFleet"
             end
