@@ -134,4 +134,6 @@ def is_live_update_required?
             end
 
   Chef::Log.info("Live update required: #{outcome}")
+
+  outcome
 end
