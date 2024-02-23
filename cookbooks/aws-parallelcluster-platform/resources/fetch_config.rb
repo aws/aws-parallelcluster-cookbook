@@ -180,7 +180,7 @@ action_class do # rubocop:disable Metrics/BlockLength
     bash "Wait cluster config files to be updated by the head node" do
       code "[[ \"$(cat #{path})\" == \"#{node['cluster']['cluster_config_version']}\" ]] || exit 1"
       retries 30
-      retry_delay 10
+      retry_delay 15
       timeout 5
     end
   end
