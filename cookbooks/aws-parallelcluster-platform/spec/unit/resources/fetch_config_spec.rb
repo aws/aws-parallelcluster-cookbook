@@ -149,7 +149,7 @@ describe 'fetch_config:run' do
         is_expected.to run_bash("Wait cluster config files to be updated by the head node").with(
           code: "[[ \"$(cat #{config_version_file})\" == \"cluster_config_version\" ]] || exit 1",
           retries: 30,
-          retry_delay: 10,
+          retry_delay: 15,
           timeout: 5
         )
       end
