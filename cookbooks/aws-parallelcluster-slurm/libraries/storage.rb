@@ -32,7 +32,7 @@ class SharedStorageChangeInfo
   #                         "EfsSettings": {
   #                           "FileSystemId": "fs-123456789"
   #                         },
-  #                       "currentValue": "-"
+  #                       "currentValue": nil
   #                      }
   def initialize(change)
     old_value = change["currentValue"]
@@ -74,36 +74,26 @@ class SharedStorageChangeInfo
   end
 end
 
-# Checks if the given changes provided by a change-set support live updates.
+# Checks if all the shared storage changes in the change-set (if any) support live updates.
 # With live updates we refer to in-place updates that do not required node replacement.
 # The decision on the support is demanded to SharedStorageChangeInfo.
 # If the changes are nil, empty or they do not contain any shared storage change,
 # we assume that a live update is supported.
-# Example of a change:
-#   {
-#     "parameter": "SharedStorage",
-#     "requestedValue": {
-#       "MountDir": "/opt/shared/efs/managed/1",
-#       "Name": "shared-efs-managed-1",
-#       "StorageType": "Efs",
-#       "EfsSettings": {
-#         "FileSystemId": "fs-123456789"
-#       },
-#     "currentValue": "-"
-#    }
 #
-# @param [List[change]] changes the list fo changes provided by a change-set.
 # @return [Boolean] true if the change supports live updates; false, otherwise.
-def storage_change_supports_live_update?(changes)
+def storage_change_supports_live_update?
+  change_set = JSON.load_file("#{node['cluster']['change_set_path']}")
+  changes = change_set["changeSet"]
+
   if changes.nil? || changes.empty?
-    Chef::Log.info("No change found: live update is supported")
+    Chef::Log.info("Changeset is empty: live update is supported")
     return true
   end
 
   storage_changes = changes.select { |change| change["parameter"] == "SharedStorage" }
 
   if storage_changes.empty?
-    Chef::Log.info("No shared storage change found: live update is supported")
+    Chef::Log.info("Changeset does not contain shared storage changes: live update is supported")
     return true
   end
 
@@ -112,7 +102,7 @@ def storage_change_supports_live_update?(changes)
     change_info = SharedStorageChangeInfo.new(change)
     Chef::Log.info("Generated shared storage change info: #{change_info}")
     supported = change_info.support_live_updates?
-    Chef::Log.info("Change #{change} #{'does not ' unless supported}support live updates")
+    Chef::Log.info("Change #{change} #{'does not ' unless supported}support live update")
     return false unless supported
   end
   Chef::Log.info("All shared storage changes support live update.")

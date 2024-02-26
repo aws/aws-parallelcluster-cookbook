@@ -24,117 +24,52 @@ describe 'aws-parallelcluster-slurm::update_login_node' do
     time_now = "2024-01-16 15:30:45 UTC"
 
     context "on #{platform}#{version}" do
-      cached(:chef_run) do
-        runner = runner(platform: platform, version: version) do |node|
-          allow_any_instance_of(Object).to receive(:is_live_update_required?).and_return(false)
-          allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
-          allow_any_instance_of(Object).to receive(:dig).and_return(true)
-          allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
-          allow(Time).to receive(:now).and_return(Time.parse(time_now))
-          RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+      [true, false].each do |are_mount_or_unmount_required|
+        context "when mount/unmount is #{'not ' unless are_mount_or_unmount_required}required" do
+          [true, false].each do |storage_change_supports_live_update|
+            context "when storage change does #{'not ' unless storage_change_supports_live_update}support live update" do
+              cached(:chef_run) do
+                runner = runner(platform: platform, version: version) do |node|
+                  allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(are_mount_or_unmount_required)
+                  allow_any_instance_of(Object).to receive(:storage_change_supports_live_update?).and_return(storage_change_supports_live_update)
+                  allow_any_instance_of(Object).to receive(:dig).and_return(true)
+                  allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
+                  allow(Time).to receive(:now).and_return(Time.parse(time_now))
+                  RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
-          node.override['cluster']['node_type'] = node_type
-          node.override['cluster']['cluster_name'] = cluster_name
-          node.override['cluster']['region'] = region
-          node.override['ec2']['instance_id'] = instance_id
-          node.override['cluster']['cluster_config_version'] = cluster_config_version
-        end
-        runner.converge(described_recipe)
-      end
+                  node.override['cluster']['node_type'] = node_type
+                  node.override['cluster']['cluster_name'] = cluster_name
+                  node.override['cluster']['region'] = region
+                  node.override['ec2']['instance_id'] = instance_id
+                  node.override['cluster']['cluster_config_version'] = cluster_config_version
+                end
+                runner.converge(described_recipe)
+              end
 
-      context "when live update is not required" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            allow_any_instance_of(Object).to receive(:is_live_update_required?).and_return(false)
-            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
-            allow_any_instance_of(Object).to receive(:dig).and_return(true)
-            allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
-            allow(Time).to receive(:now).and_return(Time.parse(time_now))
-            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+              if are_mount_or_unmount_required && storage_change_supports_live_update
+                it 'updates the shared storage' do
+                  is_expected.to run_ruby_block("update_shared_storages")
+                end
+              else
+                it 'does not update the shared storage' do
+                  is_expected.not_to run_ruby_block("update_shared_storages")
+                end
+              end
 
-            node.override['cluster']['node_type'] = node_type
-            node.override['cluster']['cluster_name'] = cluster_name
-            node.override['cluster']['region'] = region
-            node.override['ec2']['instance_id'] = instance_id
-            node.override['cluster']['cluster_config_version'] = cluster_config_version
+              status = "DEPLOYED"
+              it "saves the cluster config version to dynamodb with status #{status}" do
+                expected_command = "#{cookbook_venv_path}/bin/aws dynamodb put-item" \
+                  " --table-name parallelcluster-#{cluster_name}"\
+                  " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG.#{instance_id}\"}, \"Data\": {\"M\": {\"cluster_config_version\": {\"S\": \"#{cluster_config_version}\"}, \"status\": {\"S\": \"#{status}\"}, \"node_type\": {\"S\": \"#{node_type}\"}, \"lastUpdateTime\": {\"S\": \"#{time_now}\"}}}}'" \
+                  " --region #{region}"
+                is_expected.to run_execute("Save cluster config version to DynamoDB").with(
+                  command: expected_command,
+                  retries: 3,
+                  retry_delay: 5
+                )
+              end
+            end
           end
-          runner.converge(described_recipe)
-        end
-        cached(:node) { chef_run.node }
-
-        status = "SKIPPED_LIVE_UPDATE"
-        it "saves the cluster config version to dynamodb with status #{status}" do
-          expected_command = "#{cookbook_venv_path}/bin/aws dynamodb put-item" \
-            " --table-name parallelcluster-#{cluster_name}"\
-            " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG.#{instance_id}\"}, \"Data\": {\"M\": {\"cluster_config_version\": {\"S\": \"#{cluster_config_version}\"}, \"status\": {\"S\": \"#{status}\"}, \"node_type\": {\"S\": \"#{node_type}\"}, \"lastUpdateTime\": {\"S\": \"#{time_now}\"}}}}'" \
-            " --region #{region}"
-          is_expected.to run_execute("Save cluster config version to DynamoDB").with(
-            command: expected_command,
-            retries: 3,
-            retry_delay: 5
-          )
-        end
-
-        it 'does not update the shared storage' do
-          is_expected.not_to run_ruby_block("update_shared_storages")
-        end
-      end
-
-      context "when live update is required" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            allow_any_instance_of(Object).to receive(:is_live_update_required?).and_return(true)
-            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(true)
-            allow_any_instance_of(Object).to receive(:dig).and_return(true)
-            allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
-            allow(Time).to receive(:now).and_return(Time.parse(time_now))
-            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
-
-            node.override['cluster']['node_type'] = node_type
-            node.override['cluster']['cluster_name'] = cluster_name
-            node.override['cluster']['region'] = region
-            node.override['ec2']['instance_id'] = instance_id
-            node.override['cluster']['cluster_config_version'] = cluster_config_version
-          end
-          runner.converge(described_recipe)
-        end
-        cached(:node) { chef_run.node }
-
-        it 'updates the shared storage' do
-          is_expected.to run_ruby_block("update_shared_storages")
-        end
-
-        status = "DEPLOYED"
-        it "saves the cluster config version to dynamodb with status #{status}" do
-          expected_command = "#{cookbook_venv_path}/bin/aws dynamodb put-item" \
-            " --table-name parallelcluster-#{cluster_name}"\
-            " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG.#{instance_id}\"}, \"Data\": {\"M\": {\"cluster_config_version\": {\"S\": \"#{cluster_config_version}\"}, \"status\": {\"S\": \"#{status}\"}, \"node_type\": {\"S\": \"#{node_type}\"}, \"lastUpdateTime\": {\"S\": \"#{time_now}\"}}}}'" \
-            " --region #{region}"
-          is_expected.to run_execute("Save cluster config version to DynamoDB").with(
-            command: expected_command,
-            retries: 3,
-            retry_delay: 5
-          )
-        end
-      end
-
-      context "when interaction with ddb is disabled during kitchen tests" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            allow_any_instance_of(Object).to receive(:is_live_update_required?).and_return(true)
-            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(true)
-            allow_any_instance_of(Object).to receive(:dig).and_return(true)
-            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
-
-            node.override['kitchen'] = true
-            node.override['interact_with_ddb'] = false
-          end
-          runner.converge(described_recipe)
-        end
-        cached(:node) { chef_run.node }
-
-        it 'does not save the cluster config version to dynamodb' do
-          is_expected.not_to run_execute("Save cluster config version to DynamoDB")
         end
       end
     end

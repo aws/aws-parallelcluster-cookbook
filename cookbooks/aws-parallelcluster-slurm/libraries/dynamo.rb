@@ -18,14 +18,6 @@
 DDB_CONFIG_STATUS = {
   # The node successfully deployed the cluster configuration.
   DEPLOYED: "DEPLOYED",
-
-  # The node evaluated the cluster configuration and concluded that a live update should be skipped because:
-  #   1. not supported: the changeset contains changes that cannot be applied with a live update
-  #                   and may instead require a node replacement.
-  #                   Example: mounting a managed EBS.
-  #   2. not required:  the changeset contains changes that could lead to an empty live update.
-  #                   Example: changing the number of static nodes.
-  SKIPPED_LIVE_UPDATE: "SKIPPED_LIVE_UPDATE",
 }.freeze
 
 def save_instance_config_version_to_dynamodb(status)
