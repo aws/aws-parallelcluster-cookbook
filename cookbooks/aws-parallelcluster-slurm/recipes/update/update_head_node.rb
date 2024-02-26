@@ -100,14 +100,9 @@ ruby_block "replace slurm queue nodes" do
     change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
     changes = change_set["changeSet"]
 
-    if changes.empty?
-      Chef::Log.info("Changeset is empty: queues do not need updates")
-      return queues
-    end
-
     # Changes to the shared storage are applied to all queues,
     # but only changes not supporting live updates will be considered to update the queues.
-    if are_mount_or_unmount_required? && !storage_change_supports_live_update?(changes)
+    if are_mount_or_unmount_required? && !storage_change_supports_live_update?
       queues = get_all_queues(config)
       Chef::Log.info("All queues will be updated in order to update shared storages")
     else
