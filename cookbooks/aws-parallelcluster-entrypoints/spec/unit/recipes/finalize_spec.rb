@@ -14,34 +14,60 @@
 require 'spec_helper'
 
 describe 'aws-parallelcluster-entrypoints::finalize' do
+  before do
+    @included_recipes = []
+    %w(
+      aws-parallelcluster-platform::enable_chef_error_handler
+      aws-parallelcluster-computefleet::custom_parallelcluster_node
+      aws-parallelcluster-platform::finalize
+      aws-parallelcluster-slurm::finalize
+      aws-parallelcluster-environment::finalize
+    ).each do |recipe_name|
+      allow_any_instance_of(Chef::Recipe).to receive(:include_recipe).with(recipe_name) do
+        @included_recipes << recipe_name
+      end
+    end
+  end
+
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       for_all_node_types do |node_type|
         context "when #{node_type}" do
-          cached(:chef_run) do
-            runner = runner(platform: platform, version: version) do |node|
-              allow_any_instance_of(Object).to receive(:fetch_config).and_return(OpenStruct.new)
-              allow_any_instance_of(Object).to receive(:is_custom_node?).and_return(true)
+          [true, false].each do |is_custom_node|
+            context "and does #{'not ' unless is_custom_node}use a custom node package" do
+              cached(:chef_run) do
+                runner = runner(platform: platform, version: version) do |node|
+                  allow_any_instance_of(Object).to receive(:fetch_config).and_return(OpenStruct.new)
 
-              node.override['cluster']['node_type'] = node_type
-              node.override['cluster']['scheduler'] = 'slurm'
-            end
-            runner.converge(described_recipe)
-          end
-          cached(:node) { chef_run.node }
+                  node.override['cluster']['node_type'] = node_type
+                  node.override['cluster']['scheduler'] = 'slurm'
+                  node.override['cluster']['custom_node_package'] = "CUSTOM_NODE_PACKAGE" if is_custom_node
+                end
+                runner.converge(described_recipe)
+              end
+              cached(:node) { chef_run.node }
 
-          %w(
-            aws-parallelcluster-platform::enable_chef_error_handler
-            aws-parallelcluster-computefleet::custom_parallelcluster_node
-            aws-parallelcluster-platform::finalize aws-parallelcluster-environment::finalize
-            aws-parallelcluster-slurm::finalize
-          ).each do |recipe_name|
-            it "includes the recipe #{recipe_name}" do
-              # TODO: This assertion requires to refactor all the resources having properties
-              #  aws_region and aws_domain because they are overwriting existing methods
-              #  defined in the aws-parallelcluster-shared cookbook, making the test compilation to fail.
-              #  We must re-enable this assertion once the refactoring has been done.
-              # is_expected.to include_recipe(recipe_name)
+              expected_recipes = if is_custom_node
+                                   %w(
+                                    aws-parallelcluster-platform::enable_chef_error_handler
+                                    aws-parallelcluster-computefleet::custom_parallelcluster_node
+                                    aws-parallelcluster-platform::finalize
+                                    aws-parallelcluster-slurm::finalize
+                                    aws-parallelcluster-environment::finalize
+                                  )
+                                 else
+                                   %w(
+                                     aws-parallelcluster-platform::enable_chef_error_handler
+                                     aws-parallelcluster-platform::finalize
+                                     aws-parallelcluster-slurm::finalize
+                                     aws-parallelcluster-environment::finalize
+                                   )
+                                 end
+
+              it "includes the recipes in the right order" do
+                chef_run
+                expect(@included_recipes).to eq(expected_recipes)
+              end
             end
           end
         end
