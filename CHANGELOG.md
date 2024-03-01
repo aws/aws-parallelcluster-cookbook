@@ -12,6 +12,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add the configuration parameter `DeploymentSettings/DefaultUserHome` to allow users to move the default user's home directory to `/local/home` instead of `/home` (default).
   - SSH connections will be closed and rejected while the user's home directory is being moved during the bootstrapping process.
 - Add possibility to choose between Open and Closed Source Nvidia Drivers when building an AMI, through the ```['cluster']['nvidia']['kernel_open']``` cookbook node attribute.
+- Permit to update the external shared storage of type Efs, FsxLustre, FsxOntap, FsxOpenZfs and FileCache
+  without replacing the compute and login fleet.
 
 **CHANGES**
 - Upgrade Slurm to 23.11.4 (from 23.02.7).
