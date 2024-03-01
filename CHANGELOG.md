@@ -36,6 +36,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix issue making job fail when submitted as active directory user from login nodes. 
   The issue was caused by an incomplete configuration of the integration with the external Active Directory on the head node.
+- Fix issue making login nodes fail to bootstrap when the head node takes more time than expected in writing keys. 
 
 3.8.0
 ------
