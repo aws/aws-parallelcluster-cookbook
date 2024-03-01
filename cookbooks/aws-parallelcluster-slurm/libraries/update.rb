@@ -36,7 +36,12 @@ end
 
 def are_mount_or_unmount_required?
   require 'json'
-  change_set = JSON.load_file("#{node['cluster']['shared_dir']}/change-set.json")
+
+  change_set_path = node["cluster"]["change_set_path"]
+
+  return false unless ::File.exist?(change_set_path)
+
+  change_set = JSON.load_file(change_set_path)
   change_set["changeSet"].each do |change|
     next unless change["updatePolicy"] == "SHARED_STORAGE_UPDATE_POLICY"
 
