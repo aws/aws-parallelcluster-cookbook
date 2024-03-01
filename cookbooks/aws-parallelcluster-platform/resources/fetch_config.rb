@@ -80,7 +80,8 @@ action :run do
 
     if new_resource.update
       # Wait for the head node to write the config version file, which is the signal that
-      # all configuration files within the shared folder are aligned with the latest config version.
+      # all configuration files (cluster config, change-set, ...) have been written on the shared folder
+      # and are aligned with the latest config version.
       # This is required only on update because on create it is guaranteed that this recipe is executed on compute node
       # only after it has completed on head node.
       wait_cluster_config_file(sync_file_login_nodes)
