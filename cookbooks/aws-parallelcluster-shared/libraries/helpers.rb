@@ -81,3 +81,29 @@ def is_custom_node?
   custom_node_package = node['cluster']['custom_node_package']
   !custom_node_package.nil? && !custom_node_package.empty?
 end
+
+def write_sync_file(path)
+  # Write a synchronization file containing the current cluster config version.
+  # Synchronization files are used as a synchronization point between cluster nodes
+  # to signal that a group of actions have been completed.
+  file path do
+    content node["cluster"]["cluster_config_version"]
+    mode "0644"
+    owner "root"
+    group "root"
+  end
+end
+
+def wait_sync_file(path)
+  # Wait for a synchronization file to be written for the current cluster config version.
+  # Synchronization files are used as a synchronization point between cluster nodes
+  # to signal that a group of actions have been completed.
+  cluster_config_version = node["cluster"]["cluster_config_version"]
+  # Wait for the config version file to contain the current cluster config version.
+  bash "Wait for synchronization file at #{path} to be written for version #{cluster_config_version}" do
+    code "[[ \"$(cat #{path})\" == \"#{cluster_config_version}\" ]] || exit 1"
+    retries 30
+    retry_delay 10
+    timeout 5
+  end
+end
