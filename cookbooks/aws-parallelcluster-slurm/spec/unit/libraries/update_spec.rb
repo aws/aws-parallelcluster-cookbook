@@ -1,7 +1,7 @@
 require 'spec_helper'
 
-describe "aws-parallelcluster-slurm:libraries:are_mount_unmount_required" do
-  CHANGE_SET_PATH = "/CHANGE_SET_PATH"
+describe "aws-parallelcluster-slurm:libraries:are_mount_or_unmount_required" do
+  CHANGE_SET_PATH = "/CHANGE_SET_PATH".freeze
 
   let(:node) do
     {
