@@ -95,13 +95,12 @@ def write_sync_file(path)
 end
 
 def wait_sync_file(path)
-  # Wait for a synchronization file to be written for the current cluster config version.
+  # Wait for a synchronization file to exist.
   # Synchronization files are used as a synchronization point between cluster nodes
   # to signal that a group of actions have been completed.
-  cluster_config_version = node["cluster"]["cluster_config_version"]
   # Wait for the config version file to contain the current cluster config version.
-  bash "Wait for synchronization file at #{path} to be written for version #{cluster_config_version}" do
-    code "[[ \"$(cat #{path})\" == \"#{cluster_config_version}\" ]] || exit 1"
+  bash "Wait for synchronization file at #{path} to exist" do
+    code "[[ -e #{path} ]] || exit 1"
     retries 30
     retry_delay 10
     timeout 5

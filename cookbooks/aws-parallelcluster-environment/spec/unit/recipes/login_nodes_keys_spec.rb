@@ -93,9 +93,9 @@ describe 'aws-parallelcluster-environment::login_nodes_keys' do
         end
         cached(:node) { chef_run.node }
 
-        it "waits for cluster config version file" do
-          is_expected.to run_bash("Wait for synchronization file at #{SYNC_FILE} to be written for version #{CLUSTER_CONFIG_VERSION}").with(
-            code: "[[ \"$(cat #{SYNC_FILE})\" == \"#{CLUSTER_CONFIG_VERSION}\" ]] || exit 1",
+        it "Wait for sync file to exist" do
+          is_expected.to run_bash("Wait for synchronization file at #{SYNC_FILE} to exist").with(
+            code: "[[ -e #{SYNC_FILE} ]] || exit 1",
             retries: 30,
             retry_delay: 10,
             timeout: 5
