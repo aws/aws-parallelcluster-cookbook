@@ -82,28 +82,28 @@ def is_custom_node?
   !custom_node_package.nil? && !custom_node_package.empty?
 end
 
-def write_sync_file(path)
-  # Write a synchronization file containing the current cluster config version.
-  # Synchronization files are used as a synchronization point between cluster nodes
-  # to signal that a group of actions have been completed.
+def write_config_version_file(path)
+  # Write the cluster config version into the specified file.
+  # This file is used as a synchronization point between the head node and the other cluster nodes.
+  # In particular, the head node uses this file to signal to other cluster nodes that all files
+  # in the shared folder related to the cluster config have been updated with the current config version.
   file path do
-    content node["cluster"]["cluster_config_version"]
-    mode "0644"
-    owner "root"
-    group "root"
+    content node['cluster']['cluster_config_version']
+    mode '0644'
+    owner 'root'
+    group 'root'
   end
 end
 
-def wait_sync_file(path)
+def wait_cluster_config_file(path)
   # Wait for a synchronization file to be written for the current cluster config version.
   # Synchronization files are used as a synchronization point between cluster nodes
   # to signal that a group of actions have been completed.
-  cluster_config_version = node["cluster"]["cluster_config_version"]
   # Wait for the config version file to contain the current cluster config version.
-  bash "Wait for synchronization file at #{path} to be written for version #{cluster_config_version}" do
-    code "[[ \"$(cat #{path})\" == \"#{cluster_config_version}\" ]] || exit 1"
+  bash "Wait for file at #{path} to be updated by the head node" do
+    code "[[ \"$(cat #{path})\" == \"#{node['cluster']['cluster_config_version']}\" ]] || exit 1"
     retries 30
-    retry_delay 10
+    retry_delay 15
     timeout 5
   end
 end
