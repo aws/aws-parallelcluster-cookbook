@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe 'aws-parallelcluster-environment::login_nodes_keys' do
   SHARED_DIR_LOGIN_NODES = "/SHARED_DIR_LOGIN_NODES".freeze
-  SYNC_FILE = "#{SHARED_DIR_LOGIN_NODES}/.login_nodes_keys_sync_file".freeze
+  SYNC_FILE = "#{SHARED_DIR_LOGIN_NODES}/cluster-config-version".freeze
   CLUSTER_CONFIG_VERSION = "CLUSTER_CONFIG_VERSION".freeze
 
   for_all_oses do |platform, version|
@@ -94,10 +94,10 @@ describe 'aws-parallelcluster-environment::login_nodes_keys' do
         cached(:node) { chef_run.node }
 
         it "waits for cluster config version file" do
-          is_expected.to run_bash("Wait for synchronization file at #{SYNC_FILE} to be written for version #{CLUSTER_CONFIG_VERSION}").with(
+          is_expected.to run_bash("Wait for file at #{SYNC_FILE} to be updated by the head node").with(
             code: "[[ \"$(cat #{SYNC_FILE})\" == \"#{CLUSTER_CONFIG_VERSION}\" ]] || exit 1",
             retries: 30,
-            retry_delay: 10,
+            retry_delay: 15,
             timeout: 5
           )
         end

@@ -59,7 +59,7 @@ describe 'fetch_config:run' do
     end
 
     it "does not wait for cluster config version file" do
-      is_expected.not_to run_execute("Wait cluster config files to be updated by the head node")
+      is_expected.not_to run_execute("Wait for file at /shared_dir_login_nodes/cluster-config-version to be updated by the head node")
     end
   end
 
@@ -90,7 +90,7 @@ describe 'fetch_config:run' do
       end
 
       it "does not wait for cluster config version file" do
-        is_expected.not_to run_execute("Wait cluster config files to be updated by the head node")
+        is_expected.not_to run_execute("Wait for file at #{cluster_config_path} to be updated by the head node")
       end
 
       it "reads config from shared folder" do
@@ -146,7 +146,7 @@ describe 'fetch_config:run' do
                               else
                                 raise "Unsupported node_type #{node_type}"
                               end
-        is_expected.to run_bash("Wait cluster config files to be updated by the head node").with(
+        is_expected.to run_bash("Wait for file at #{config_version_file} to be updated by the head node").with(
           code: "[[ \"$(cat #{config_version_file})\" == \"cluster_config_version\" ]] || exit 1",
           retries: 30,
           retry_delay: 15,

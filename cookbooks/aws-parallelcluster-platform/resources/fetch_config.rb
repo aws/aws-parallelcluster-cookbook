@@ -162,27 +162,4 @@ action_class do # rubocop:disable Metrics/BlockLength
       fetch_s3_object("copy_instance_type_data_from_s3", node['cluster']['instance_types_data_s3_key'], node['cluster']['instance_types_data_path'], instance_version_id)
     end
   end
-
-  def write_config_version_file(path)
-    # Write the cluster config version into the specified file.
-    # This file is used as a synchronization point between the head node and the other cluster nodes.
-    # In particular, the head node uses this file to signal to other cluster nodes that all files
-    # in the shared folder related to the cluster config have been updated with the current config version.
-    file path do
-      content node['cluster']['cluster_config_version']
-      mode '0644'
-      owner 'root'
-      group 'root'
-    end
-  end
-
-  def wait_cluster_config_file(path)
-    # Wait for the config version file to contain the current cluster config version.
-    bash "Wait cluster config files to be updated by the head node" do
-      code "[[ \"$(cat #{path})\" == \"#{node['cluster']['cluster_config_version']}\" ]] || exit 1"
-      retries 30
-      retry_delay 15
-      timeout 5
-    end
-  end
 end
