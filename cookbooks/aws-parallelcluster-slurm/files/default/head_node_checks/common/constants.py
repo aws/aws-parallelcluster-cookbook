@@ -12,7 +12,7 @@ from botocore.config import Config
 
 # BOTO
 BOTO_CONFIG = Config(retries={"max_attempts": 60})
-BOTO_PAGINATION_CONFIG = {"PageSize": 500}
+BOTO_PAGINATION_CONFIG = {"PageSize": 100}
 
 # TAGS
 CLUSTER_NAME_TAG = "parallelcluster:cluster-name"

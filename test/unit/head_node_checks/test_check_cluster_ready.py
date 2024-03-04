@@ -41,7 +41,7 @@ def _mocked_request_describe_instances(cluster_name: str, node_types: [str], com
                 {"Name": "tag:parallelcluster:node-type", "Values": node_types},
                 {"Name": "instance-state-name", "Values": ["running"]},
             ],
-            "MaxResults": 500,
+            "MaxResults": 100,
         },
         generate_error=False,
         error_code=None,
