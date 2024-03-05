@@ -21,7 +21,7 @@ keys_dir = "#{node['cluster']['shared_dir_login_nodes']}"
 script_dir = "#{keys_dir}/scripts"
 script_path = "#{script_dir}/keys-manager.sh"
 
-sync_file_path = "#{keys_dir}/.login_nodes_keys_sync_file"
+sync_file_path = "#{node['cluster']['shared_login_nodes_keys_sync_file']}"
 
 case node['cluster']['node_type']
 when 'ComputeFleet'
