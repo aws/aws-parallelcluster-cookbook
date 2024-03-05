@@ -55,6 +55,7 @@ default['cluster']['head_node_home_path'] = '/home'
 default['cluster']['shared_dir_compute'] = node['cluster']['shared_dir']
 default['cluster']['shared_dir_head'] = node['cluster']['shared_dir']
 default['cluster']['shared_dir_login'] = node['cluster']['shared_dir_login_nodes']
+default['cluster']['shared_login_nodes_keys_sync_file'] = "#{node['cluster']['shared_dir_login_nodes']}/.login_nodes_keys_sync_file"
 # Since this is a shared directory, it needs to be defined here first instead of in the dependent cookbook for slurm
 default['cluster']['slurm']['install_dir'] = '/opt/slurm'
 
