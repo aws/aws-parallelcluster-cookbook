@@ -13,10 +13,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - SSH connections will be closed and rejected while the user's home directory is being moved during the bootstrapping process.
 - Add possibility to choose between Open and Closed Source Nvidia Drivers when building an AMI, through the ```['cluster']['nvidia']['kernel_open']``` cookbook node attribute.
 - Permit to update the external shared storage of type Efs, FsxLustre, FsxOntap, FsxOpenZfs and FileCache
-  without replacing the compute and login fleet.
+  without replacing compute and login fleet.
+- Add configuration parameter `DeploymentSettings/DisableSudoAccessForDefaultUser` to disable sudo access of default user in supported OSes.
 
 **CHANGES**
 - Upgrade Slurm to 23.11.4 (from 23.02.7).
+  - Upgrade Pmix to 4.2.9 (from 4.2.6).
 - Upgrade NVIDIA driver to version 535.154.05.
 - Upgrade third-party cookbook dependencies:
   - nfs-5.1.2 (from nfs-5.0.0)
@@ -32,6 +34,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2023.1.565-1`
   - gl: `2023.1.1047-1`
   - web_viewer: `2023.1.16388-1`
+- Upgrade ARM PL to version 23.10.
 
 **BUG FIXES**
 - Fix issue making job fail when submitted as active directory user from login nodes. 
