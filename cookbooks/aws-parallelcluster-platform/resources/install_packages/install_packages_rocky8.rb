@@ -44,6 +44,14 @@ def kernel_source_package_version
   node['kernel']['release']
 end
 
+def python_packages_names
+  if node['platform_version'].to_i == 8
+    %w(python39 python39-pip)
+  elsif node['platform_version'].to_i > 8
+    %w(python3 python3-pip)
+  end
+end
+
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # iptables needed for IMDS setup
@@ -53,8 +61,8 @@ def default_packages
      blas-devel libffi-devel dkms libedit-devel jq
      libical-devel sendmail libxml2-devel libglvnd-devel
      libgcrypt-devel libevent-devel glibc-static bind-utils
-     iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     moreutils curl environment-modules gcc gcc-c++ bzip2)
+     iproute NetworkManager-config-routing-rules iptables libcurl-devel yum-plugin-versionlock
+     moreutils curl environment-modules gcc gcc-c++ bzip2) + python_packages_names
   packages.append("coreutils") unless on_docker?  # on docker image coreutils conflict with coreutils-single, already installed on it
   packages
 end
