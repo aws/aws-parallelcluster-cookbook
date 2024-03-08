@@ -19,6 +19,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade Slurm to 23.11.4 (from 23.02.7).
   - Upgrade Pmix to 4.2.9 (from 4.2.6).
+- Upgrade the default FSx Lustre server version managed by ParallelCluster to 2.15.
 - Upgrade NVIDIA driver to version 535.154.05.
 - Upgrade EFA installer to `1.30.0`.
   - Efa-driver: `efa-2.6.0-1`
