@@ -163,6 +163,26 @@ def test_get_request_token_parameter(parameters, keys, result):
             DCVAuthenticator._extract_parameters_values(parameters, keys)
 
 
+def test_is_session_valid(mocker):
+    ps_aunx_output = (
+        b"USER   PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND\n"
+        b"1000 63 0.0 0.0 4 3108 ?? Ss 23Jul19 2:32.46 /dcv/dcvagent --mode full --session-id sid\n"
+        b"2000 2949 0.3 0.4 8 34328 ? Sl 20:10 0:18 /dcv/dcvagent --mode full --session-id sid\n"
+    )
+    # Mock subprocess.check_output with realistic responses for `/usr/bin/id` and `/bin/ps aunx`
+    mocker.patch(AUTH_MODULE_MOCK_PATH + "subprocess.check_output", side_effect=[b"1000", ps_aunx_output])
+
+    # Test that the session is valid
+    DCVAuthenticator._is_session_valid("myuser", "sid")
+
+    # Mock subprocess.check_output with realistic responses for `/usr/bin/id` and `/bin/ps aunx`
+    mocker.patch(AUTH_MODULE_MOCK_PATH + "subprocess.check_output", side_effect=[b"1000", ps_aunx_output])
+
+    # Test that the session is not valid
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
+        DCVAuthenticator._is_session_valid("myuser", "wrongsession")
+
+
 def test_get_request_token(mocker):
     """Verify the first step of the authentication process, the retrieval of the Request Token."""
     # A nosec comment is appended to the following line in order to disable the B105 check.
