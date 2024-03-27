@@ -23,7 +23,8 @@
       ],
       "node_roles": [
         "ComputeFleet",
-        "HeadNode"
+        "HeadNode",
+        "ExternalSlurmDbd"
       ],
       "feature_conditions": []
     },
@@ -54,7 +55,8 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "ExternalSlurmDbd"
       ],
       "feature_conditions": []
     },
@@ -70,7 +72,8 @@
       "node_roles": [
         "HeadNode",
         "ComputeFleet",
-        "LoginNode"
+        "LoginNode",
+        "ExternalSlurmDbd"
       ],
       "feature_conditions": []
     },
@@ -99,7 +102,8 @@
       "node_roles": [
         "ComputeFleet",
         "HeadNode",
-        "LoginNode"
+        "LoginNode",
+        "ExternalSlurmDbd"
       ],
       "feature_conditions": []
     },
@@ -113,7 +117,8 @@
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
         "ComputeFleet",
-        "LoginNode"
+        "LoginNode",
+        "ExternalSlurmDbd"
       ],
       "feature_conditions": []
     },
@@ -272,7 +277,8 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "ExternalSlurmDbd"
       ],
       "feature_conditions": []
     },
