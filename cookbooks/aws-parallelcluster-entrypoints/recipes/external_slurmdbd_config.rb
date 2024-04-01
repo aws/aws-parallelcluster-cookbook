@@ -44,8 +44,6 @@ include_recipe 'aws-parallelcluster-slurm::config_head_node_directories'
 
 include_recipe 'aws-parallelcluster-slurm::external_slurmdbd_disable_unrequired_services'
 
-# TODO: move this template to a separate recipe
-# TODO: add a logic in update_munge_key.sh.erb to skip sharing munge key to shared dir
 template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   cookbook 'aws-parallelcluster-slurm'
   source 'slurm/head_node/update_munge_key.sh.erb'
@@ -53,13 +51,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   group 'root'
   mode '0700'
   variables(
-    munge_key_secret_arn: lazy { node['munge_key_secret_arn'] || node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) },
-    region: node['cluster']['region'],
-    munge_user: node['cluster']['munge']['user'],
-    munge_group: node['cluster']['munge']['group'],
-    # TODO: modify these two shared_directory
-    shared_directory_compute: node['cluster']['shared_dir'],
-    shared_directory_login: node['cluster']['shared_dir_login_nodes']
+    munge_key_secret_arn: lazy { node['munge_key_secret_arn'] }
   )
 end
 
@@ -67,7 +59,6 @@ cloudwatch "Configure CloudWatch" do
   action :configure
 end
 
-# TODO: add a logic in munge_key_manager to skip sharing munge key to shared dir
 include_recipe 'aws-parallelcluster-slurm::config_munge_key'
 
 include_recipe 'aws-parallelcluster-slurm::retrieve_slurmdbd_config_from_s3'
