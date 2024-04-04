@@ -20,6 +20,10 @@ use 'partial/_arm_pl_common.rb'
 
 action_class do
   def armpl_platform
-    'RHEL-8'
+    'RHEL-9'
+  end
+
+  def gcc_major_minor_version
+    '11.3'
   end
 end
