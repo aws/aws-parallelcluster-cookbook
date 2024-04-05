@@ -21,17 +21,6 @@ default_action :setup
 use 'partial/_common'
 
 action_class do
-  def efa_supported?
-    if node['platform_version'].to_f < 8.4
-      log "EFA is not supported in this Amazon Linux version #{node['platform_version']}, supported versions are >= 8.4" do
-        level :warn
-      end
-      false
-    else
-      true
-    end
-  end
-
   def conflicting_packages
     %w(openmpi-devel openmpi)
   end
