@@ -23,12 +23,18 @@ def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # Removed libssh2-devel from base_packages since is not shipped by RedHat 8 and in conflict with package libssh-0.9.6-3.el8.x86_64
   # iptables needed for IMDS setup
-  %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-     libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
-     httpd boost-devel redhat-lsb mlocate R atlas-devel
+  # Removed curl since curl-minimal-8.5.0-1.amzn2023* is already shipped and conficts
+  %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools
+     libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf libtool
+     httpd boost-devel mlocate R atlas-devel
      blas-devel libffi-devel dkms libedit-devel jq
      libical-devel sendmail libxml2-devel libglvnd-devel
-     python2 python2-pip libgcrypt-devel libevent-devel glibc-static bind-utils
-     iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     coreutils moreutils curl environment-modules gcc gcc-c++ bzip2)
+     libgcrypt-devel libevent-devel glibc-static bind-utils
+     iproute python3 python3-pip libcurl-devel
+     coreutils environment-modules gcc gcc-c++ bzip2)
+end
+
+def unsupported_packages
+  # Using `sudo dnf supportinfo --pkg <PACKAGE_NAME>` to find if packages are available
+  %w(vim openmotif-devel redhat-lsb python2 python2-pip NetworkManager-config-routing-rules iptables yum-plugin-versionlock moreutils)
 end
