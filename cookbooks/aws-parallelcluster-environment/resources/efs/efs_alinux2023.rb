@@ -18,10 +18,18 @@ end
 
 use 'partial/_get_package_version_rpm'
 use 'partial/_common'
-use 'partial/_redhat_based'
-use 'partial/_install_from_tar'
 use 'partial/_mount_umount'
 
-def prerequisites
-  %w(rpm-build make)
+action :install_utils do
+  package_name = "amazon-efs-utils"
+
+  # Do not install efs-utils if a same or newer version is already installed.
+  return if already_installed?(package_name, new_resource.efs_utils_version)
+
+  # On Amazon Linux 2, amazon-efs-utils and stunnel are installed from OS repo.
+  package package_name do
+    retries 3
+    retry_delay 5
+  end
+  action_increase_poll_interval
 end
