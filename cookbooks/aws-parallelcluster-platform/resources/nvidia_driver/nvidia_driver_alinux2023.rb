@@ -17,3 +17,21 @@ provides :nvidia_driver, platform: 'amazon' do |node|
 end
 
 use 'partial/_nvidia_driver_common.rb'
+
+def set_compiler?
+  # Amazon linux 2 with Kernel 5 need to set CC to /usr/bin/gcc10-gcc using dkms override
+  node['kernel']['release'].split('.')[0].to_i == 6
+end
+
+def compiler_version
+  # gcc 11.4.1 is the default version installed
+  'gcc'
+end
+
+def compiler_path
+  'CC=/usr/bin/gcc'
+end
+
+def extra_packages
+  %w(kernel-modules-extra kernel-modules-extra-common)
+end
