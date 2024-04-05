@@ -20,6 +20,6 @@ use 'partial/_ephemeral_drives_common.rb'
 
 action_class do
   def network_target
-    'network-online.target'
+    'network.target'
   end
 end
