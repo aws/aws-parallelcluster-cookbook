@@ -14,7 +14,7 @@ control 'tag:install_selinux_disabled' do
   describe selinux do
     it { should be_disabled }
     it { should_not be_enforcing }
-  end unless os_properties.redhat? || os_properties.rocky? || os_properties.centos? # Because it requires reboot of the instance
+  end unless os_properties.alinux2023? || os_properties.redhat? || os_properties.rocky? || os_properties.centos? # Because it requires reboot of the instance
 end
 
 control 'tag:testami_selinux_disabled' do
