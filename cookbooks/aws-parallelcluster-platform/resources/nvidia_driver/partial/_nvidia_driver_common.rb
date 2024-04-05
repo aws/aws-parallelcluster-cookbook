@@ -50,17 +50,24 @@ action :setup do
   end
 
   if set_compiler?
-    package "gcc10" do
+    package compiler_version do
       retries 10
       retry_delay 5
     end
-    cookbook_file 'dkms/nvidia.conf' do
-      source 'dkms/nvidia.conf'
+    package extra_packages do
+      retries 10
+      retry_delay 5
+    end
+
+    template '/etc/dkms/nvidia.conf' do
+      source 'nvidia/amazon/dkms/nvidia.conf.erb'
       cookbook 'aws-parallelcluster-platform'
-      path '/etc/dkms/nvidia.conf'
       owner 'root'
       group 'root'
       mode '0644'
+      variables(
+        compiler_path: compiler_path
+      )
     end
   end
 
@@ -72,7 +79,7 @@ action :setup do
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      #{compiler_version} ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{nvidia_kernel_module}
+      #{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{nvidia_kernel_module}
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
@@ -108,7 +115,7 @@ def set_compiler?
   false
 end
 
-def compiler_version
+def compiler_path
   ""
 end
 

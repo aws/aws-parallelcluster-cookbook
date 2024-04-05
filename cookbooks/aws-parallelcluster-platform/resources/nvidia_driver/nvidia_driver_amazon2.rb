@@ -22,5 +22,13 @@ def set_compiler?
 end
 
 def compiler_version
+  'gcc10'
+end
+
+def compiler_version
   'CC=/usr/bin/gcc10-gcc'
+end
+
+def extra_packages
+  ""
 end
