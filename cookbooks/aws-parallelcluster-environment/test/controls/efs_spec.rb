@@ -10,7 +10,7 @@ control 'tag:install_efs_utils_installed' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
-  end unless os_properties.alinux2?
+  end unless os_properties.alinux?
 
   describe package('amazon-efs-utils') do
     it { should be_installed }
