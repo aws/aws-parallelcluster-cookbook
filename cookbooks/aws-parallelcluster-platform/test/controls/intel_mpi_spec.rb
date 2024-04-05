@@ -17,7 +17,7 @@ control 'tag:install_intel_mpi_modules_file_dir_is_appended_to_modules_conf' do
   only_if { node['conditions']['intel_mpi_supported'] && instance.head_node? }
 
   modules_home = os_properties.ubuntu? ? "/usr/share/modules" : "/usr/share/Modules"
-  modulepath_config_file = os_properties.redhat? ? '/etc/environment-modules/modulespath' : "#{modules_home}/init/.modulespath"
+  modulepath_config_file = (os_properties.redhat? || os_properties.alinux2023?) ? '/etc/environment-modules/modulespath' : "#{modules_home}/init/.modulespath"
 
   describe file(modulepath_config_file) do
     it { should exist }
