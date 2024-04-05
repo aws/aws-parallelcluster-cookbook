@@ -72,12 +72,14 @@ control 'tag:install_lustre_client_installed' do
     end
   end
 
-  if os_properties.alinux2?
+  if os_properties.alinux?
     describe package('lustre-client') do
       it { should be_installed }
       its('version') { should cmp >= minimal_lustre_client_version }
     end
+  end  
 
+  if os_properties.alinux2?
     describe yum.repo('amzn2extra-lustre') do
       it { should exist }
       it { should be_enabled }
@@ -87,7 +89,7 @@ end
 
 control 'tag:install_lustre_lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
-  only_if { !os_properties.on_docker? && !os_properties.alinux2? }
+  only_if { !os_properties.on_docker? && !os_properties.alinux? }
   describe kernel_module("lnet") do
     it { should be_loaded }
     it { should_not be_disabled }

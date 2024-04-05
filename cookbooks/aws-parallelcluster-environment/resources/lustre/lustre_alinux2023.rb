@@ -18,51 +18,13 @@ provides :lustre, platform: 'amazon' do |node|
 end
 unified_mode true
 
-use 'partial/_install_lustre_centos_redhat'
 use 'partial/_mount_unmount'
 
 default_action :setup
 
 action :setup do
-  version = node['platform_version']
-  if version.to_f < 8.2
-    log "FSx for Lustre is not supported in this RHEL version #{version}, supported versions are >= 8.2" do
-      level :warn
-    end
-    # rhel8 kernel 4.18.0-425.3.1.el8 has broken kABI compat https://github.com/openzfs/zfs/issues/14724
-  elsif node['cluster']['kernel_release'].include? "4.18.0-425.3.1.el8"
-    log "FSx for Lustre is not supported in kernel version 4.18.0-425.3.1.el8 of RHEL, please update the kernel version" do
-      level :warn
-    end
-  else
-    action_install_lustre
-  end
-end
-
-def find_os_minor_version
-  os_minor_version = ''
-  kernel_patch_version = find_kernel_patch_version
-
-  # kernel patch versions under 193 are prior to RHEL 8.2
-  # kernel patch version number can be retrieved from https://access.redhat.com/articles/3078#RHEL8
-  os_minor_version = '2' if kernel_patch_version >= '193'
-  os_minor_version = '3' if kernel_patch_version >= '240'
-  os_minor_version = '4' if kernel_patch_version >= '305'
-  os_minor_version = '5' if kernel_patch_version >= '348'
-  os_minor_version = '6' if kernel_patch_version >= '372'
-  os_minor_version = '7' if kernel_patch_version >= '425'
-  os_minor_version = '8' if kernel_patch_version >= '477'
-
-  os_minor_version
-end
-
-action_class do
-  def base_url
-    # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html#lustre-client-rhel
-    "https://fsx-lustre-client-repo.s3.amazonaws.com/el/8.#{find_os_minor_version}/$basearch"
-  end
-
-  def public_key
-    "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc"
+  package 'lustre-client' do
+    retries 3
+    retry_delay 5
   end
 end
