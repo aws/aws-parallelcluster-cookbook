@@ -19,9 +19,6 @@ end
 use 'partial/_common'
 use 'partial/_setup'
 
-action :setup do
-  # If on RHEL8 Docker, we don't install the base packages, so stunnel cannot be built.
-end
 
 action_class do
   def dependencies
