@@ -23,8 +23,12 @@ def gdrcopy_enabled?
   nvidia_enabled?
 end
 
+def gdrcopy_build_dependencies
+  %w(dkms rpm-build make check check-devel) #Subunit is not available in Al2023
+end
+
 def gdrcopy_platform
-  '.el8'
+  'amzn-2023'
 end
 
 def gdrcopy_arch
