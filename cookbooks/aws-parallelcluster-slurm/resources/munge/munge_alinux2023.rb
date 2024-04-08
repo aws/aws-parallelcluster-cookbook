@@ -14,7 +14,3 @@ end
 
 use 'partial/_munge_actions'
 use 'partial/_munge_rhel'
-
-def munge_libdir
-  '/usr/lib64'
-end
