@@ -16,10 +16,16 @@
 unified_mode true
 default_action :setup
 
+action :cloudwatch_prerequisite do
+  # Do nothing
+end
+
 action :setup do
   directory node['cluster']['sources_dir'] do
     recursive true
   end
+
+  action_cloudwatch_prerequisite
 
   public_key_local_path = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
   remote_file public_key_local_path do

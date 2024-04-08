@@ -19,6 +19,14 @@ end
 use 'partial/_cloudwatch_common'
 use 'partial/_cloudwatch_install_package_rhel'
 
+action :cloudwatch_prerequisite do
+  package "gnupg2-full" do
+    options '--allowerasing'
+    retries 3
+    retry_delay 5
+  end
+end
+
 action_class do
   def platform_url_component
     'amazon_linux'
