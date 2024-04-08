@@ -13,6 +13,11 @@ control 'tag:install_cloudwatch_installation_files' do
     it { should exist }
   end
 
+  describe bash("gpg-agent --version") do
+    its('exit_status') { should eq 0 }
+    its('stdout') { should match /gpg-agent (GnuPG)*/}
+  end
+
   describe 'Check the presence of the cloudwatch package gpg key'
   # In Ubuntu >20.04 due to environment variable the keyring is placed under home of the user ubuntu with the permission of root
   ubuntu2004 = os_properties.ubuntu2004?
