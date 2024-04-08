@@ -23,7 +23,8 @@ def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # Removed libssh2-devel from base_packages since is not shipped by RedHat 8 and in conflict with package libssh-0.9.6-3.el8.x86_64
   # iptables needed for IMDS setup
-  # Removed curl since curl-minimal-8.5.0-1.amzn2023* is already shipped and conficts
+  # Removed curl since curl-minimal-8.5.0-1.amzn2023* is already shipped and conficts.
+  # Or we can use full-featured curl if needed by running dnf install --allowerasing curl-full libcurl-full (https://docs.aws.amazon.com/linux/al2023/release-notes/relnotes-2022.0.20220824.html#major-changes-20220824)
   %w(ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools
      libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf libtool
      httpd boost-devel mlocate R atlas-devel
