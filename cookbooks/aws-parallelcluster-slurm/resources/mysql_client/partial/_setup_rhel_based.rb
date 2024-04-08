@@ -49,6 +49,8 @@ action_class do
     platform_version = node['platform_version'].to_i
     if platform_version == 2
       platform_version = 7
+    elsif platform_version == 2023
+      platform_version = 9
     end
     arm_instance? ? "el/#{platform_version}/aarch64" : "el/#{platform_version}/x86_64"
   end
