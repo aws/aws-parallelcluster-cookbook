@@ -18,4 +18,10 @@ action :setup do
     packages dependencies
     action :install
   end unless redhat_on_docker?
+
+  action_install_extra_dependencies
+end
+
+action :install_extra_dependencies do
+  # Do Nothing
 end

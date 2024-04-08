@@ -15,5 +15,20 @@ end
 use 'partial/_slurm_dependencies_common'
 
 def dependencies
-  %w(json-c-devel http-parser-devel perl-Switch lua-devel)
+  %w(json-c-devel perl perl-Switch lua-devel dbus-devel)
+end
+
+action :install_extra_dependencies do
+  # http parser is no longer maintained, therefore Amazon Linux 2023 does have have the package in OS repos
+  # https://docs.aws.amazon.com/linux/al2023/release-notes/removed-AL2023.4-AL2.html
+  # Following https://slurm.schedmd.com/related_software.html#jwt for Installing Http-parser
+  bash 'Install http-parser' do
+    code <<-HTTP_PARSER
+    set -e
+    git clone --depth 1 --single-branch -b v2.9.4 https://github.com/nodejs/http-parser.git http_parser
+    cd http_parser
+    make
+    make install
+    HTTP_PARSER
+  end
 end
