@@ -351,6 +351,8 @@ describe 'efs:unmount' do
       before do
         stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
         stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+        allow(Dir).to receive(:empty?).with("/shared_dir_1").and_return(true)
+        allow(Dir).to receive(:empty?).with("/shared_dir_2").and_return(false)
       end
 
       it 'unmounts efs' do
@@ -374,10 +376,13 @@ describe 'efs:unmount' do
             .with(path: "/etc/fstab")
             .with(pattern: " #{shared_dir} ")
         end
+      end
 
-        it "deletes shared dir #{shared_dir}" do
-          is_expected.to delete_directory(shared_dir)
-        end
+      it "deletes shared dir only if empty" do
+        is_expected.to delete_directory('/shared_dir_1')
+          .with(recursive: false)
+
+        is_expected.not_to delete_directory('/shared_dir_2')
       end
     end
   end
