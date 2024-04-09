@@ -25,7 +25,7 @@ def compiler_version
   'gcc10'
 end
 
-def compiler_version
+def compiler_path
   'CC=/usr/bin/gcc10-gcc'
 end
 
