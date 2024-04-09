@@ -8,7 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix an issue that may cause data loss when a shared storage is unmounted as part of a cluster update
-  while it is in use and with no backup strategy in place.
+  and no backup strategy is in place.
 
 3.9.0
 ------
