@@ -132,22 +132,30 @@ describe 'volume:unmount' do
           end
         end
 
-        before do
-          stub_command("mount | grep ' /SHARED_DIR '").and_return(false)
-        end
+            before do
+              stub_command("mount | grep ' /SHARED_DIR '").and_return(false)
+              allow(Dir).to receive(:empty?).with("/SHARED_DIR").and_return(is_dir_empty)
+            end
 
-        it 'does not unmount volume' do
-          is_expected.not_to run_execute('unmount volume')
-        end
+            it 'does not unmount volume' do
+              is_expected.not_to run_execute('unmount volume')
+            end
 
-        it "removes volume /SHARED_DIR from /etc/fstab" do
-          is_expected.to edit_delete_lines("remove volume /SHARED_DIR from /etc/fstab")
-            .with(path: "/etc/fstab")
-            .with(pattern: " /SHARED_DIR ")
-        end
+            it "removes volume /SHARED_DIR from /etc/fstab" do
+              is_expected.to edit_delete_lines("remove volume /SHARED_DIR from /etc/fstab")
+                .with(path: "/etc/fstab")
+                .with(pattern: " /SHARED_DIR ")
+            end
 
-        it "deletes shared dir /SHARED_DIR" do
-          is_expected.to delete_directory('/SHARED_DIR')
+            it "deletes shared dir only if empty" do
+              if is_dir_empty
+                is_expected.to delete_directory('/SHARED_DIR')
+                  .with(recursive: false)
+              else
+                is_expected.not_to delete_directory('/SHARED_DIR')
+              end
+            end
+          end
         end
       end
 
@@ -165,23 +173,31 @@ describe 'volume:unmount' do
           end
         end
 
-        before do
-          stub_command("mount | grep ' /SHARED_DIR '").and_return(true)
-        end
+            before do
+              stub_command("mount | grep ' /SHARED_DIR '").and_return(true)
+              allow(Dir).to receive(:empty?).with("/SHARED_DIR").and_return(is_dir_empty)
+            end
 
         it 'unmounts volume' do
           is_expected.to run_execute('unmount volume')
             .with(command: "umount -fl /SHARED_DIR")
         end
 
-        it "removes volume /SHARED_DIR from /etc/fstab" do
-          is_expected.to edit_delete_lines("remove volume /SHARED_DIR from /etc/fstab")
-            .with(path: "/etc/fstab")
-            .with(pattern: " /SHARED_DIR ")
-        end
+            it "removes volume /SHARED_DIR from /etc/fstab" do
+              is_expected.to edit_delete_lines("remove volume /SHARED_DIR from /etc/fstab")
+                .with(path: "/etc/fstab")
+                .with(pattern: " /SHARED_DIR ")
+            end
 
-        it "deletes shared dir /SHARED_DIR" do
-          is_expected.to delete_directory('/SHARED_DIR')
+            it "deletes shared dir only if empty" do
+              if is_dir_empty
+                is_expected.to delete_directory('/SHARED_DIR')
+                  .with(recursive: false)
+              else
+                is_expected.not_to delete_directory('/SHARED_DIR')
+              end
+            end
+          end
         end
       end
     end
