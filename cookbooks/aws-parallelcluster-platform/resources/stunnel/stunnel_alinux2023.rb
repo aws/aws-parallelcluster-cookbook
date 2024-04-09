@@ -19,7 +19,6 @@ end
 use 'partial/_common'
 use 'partial/_setup'
 
-
 action_class do
   def dependencies
     # tcp_wrappers-devel has been deprecated in RHEL7 and deleted in RHEL8, however it is
