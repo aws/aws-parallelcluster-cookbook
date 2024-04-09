@@ -30,6 +30,7 @@ jobs:
       matrix:
         os:
           - alinux2
+          - alinux-2023
           - centos7
           - ubuntu2004
           - ubuntu2204
