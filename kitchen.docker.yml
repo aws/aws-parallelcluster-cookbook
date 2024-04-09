@@ -38,6 +38,12 @@ platforms:
     attributes:
       cluster:
         base_os: alinux2
+  - name: alinux-2023
+    driver:
+      image: <% if ENV['KITCHEN_ALINUX2023_IMAGE'] %> <%= ENV['KITCHEN_ALINUX2023_IMAGE'] %> <% else %> dokken/amazonlinux-2023 <% end %>
+    attributes:
+      cluster:
+        base_os: alinux2023
   - name: centos7
     driver:
       image: <% if ENV['KITCHEN_CENTOS7_IMAGE'] %> <%= ENV['KITCHEN_CENTOS7_IMAGE'] %> <% else %> dokken/centos-7 <% end %>
