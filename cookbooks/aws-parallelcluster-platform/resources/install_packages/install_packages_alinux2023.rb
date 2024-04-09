@@ -19,6 +19,16 @@ end
 use 'partial/_install_packages_common.rb'
 use 'partial/_install_packages_rhel_amazon.rb'
 
+action :install do
+  package new_resource.packages do
+    # TODO: Installing the full version using option
+    options '--allowerasing'
+    retries 10
+    retry_delay 5
+    flush_cache({ before: true })
+  end
+end
+
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # Removed libssh2-devel from base_packages since is not shipped by RedHat 8 and in conflict with package libssh-0.9.6-3.el8.x86_64
