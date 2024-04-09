@@ -19,7 +19,6 @@ end
 use 'partial/_dcv_common'
 use 'partial/_rhel_common'
 
-
 # DCV is not supported for AL2023
 def dcv_supported?
   false

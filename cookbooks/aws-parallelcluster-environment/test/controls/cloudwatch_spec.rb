@@ -15,7 +15,7 @@ control 'tag:install_cloudwatch_installation_files' do
 
   describe bash("gpg-agent --version") do
     its('exit_status') { should eq 0 }
-    its('stdout') { should match /gpg-agent (GnuPG)*/}
+    its('stdout') { should match /gpg-agent (GnuPG)*/ }
   end
 
   describe 'Check the presence of the cloudwatch package gpg key'

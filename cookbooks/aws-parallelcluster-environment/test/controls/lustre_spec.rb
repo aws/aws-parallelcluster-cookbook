@@ -77,7 +77,7 @@ control 'tag:install_lustre_client_installed' do
       it { should be_installed }
       its('version') { should cmp >= minimal_lustre_client_version }
     end
-  end  
+  end
 
   if os_properties.alinux2?
     describe yum.repo('amzn2extra-lustre') do
