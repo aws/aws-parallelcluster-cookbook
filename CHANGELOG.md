@@ -13,6 +13,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
 
+3.9.1
+------
+
+**BUG FIXES**
+- Fix an issue that may cause data loss when a shared storage is unmounted as part of a cluster update
+  while it is in use and with no backup strategy in place.
+
 3.9.0
 ------
 
