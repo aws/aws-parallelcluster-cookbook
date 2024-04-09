@@ -25,10 +25,10 @@ action :setup do
   include_recipe 'yum'
   # include_recipe "yum-epel"
 
-  package 'yum-utils' do
-    retries 3
-    retry_delay 5
-  end
+  # package 'yum-utils' do
+  #   retries 3
+  #   retry_delay 5
+  # end
 
   # execute 'yum-config-manager-rhel' do
   #   # Needed by hwloc-devel blas-devel libedit-devel and glibc-static packages
