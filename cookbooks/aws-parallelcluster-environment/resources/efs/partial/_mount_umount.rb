@@ -118,8 +118,9 @@ action :unmount do
       owner 'root'
       group 'root'
       mode '1777'
-      recursive true
+      recursive false
       action :delete
+      only_if { Dir.empty?(efs_shared_dir.to_s) }
     end
   end
 end
