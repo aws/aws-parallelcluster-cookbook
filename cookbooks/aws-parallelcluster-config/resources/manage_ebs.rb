@@ -170,8 +170,9 @@ action :unmount do
 
     # Delete the shared directories
     directory shared_dir_array[index] do
-      recursive true
+      recursive false
       action :delete
+      only_if { Dir.exist?(shared_dir_array[index]) && Dir.empty?(shared_dir_array[index]) }
     end
   end
 end
