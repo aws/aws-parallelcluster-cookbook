@@ -134,6 +134,7 @@ describe 'volume:unmount' do
 
             before do
               stub_command("mount | grep ' /SHARED_DIR '").and_return(false)
+              allow(Dir).to receive(:exist?).with("/SHARED_DIR").and_return(true)
               allow(Dir).to receive(:empty?).with("/SHARED_DIR").and_return(is_dir_empty)
             end
 
@@ -147,7 +148,7 @@ describe 'volume:unmount' do
                 .with(pattern: " /SHARED_DIR ")
             end
 
-            it "deletes shared dir only if empty" do
+            it "deletes shared dir only if it exists and it is empty" do
               if is_dir_empty
                 is_expected.to delete_directory('/SHARED_DIR')
                   .with(recursive: false)
@@ -174,6 +175,7 @@ describe 'volume:unmount' do
 
             before do
               stub_command("mount | grep ' /SHARED_DIR '").and_return(true)
+              allow(Dir).to receive(:exist?).with("/SHARED_DIR").and_return(true)
               allow(Dir).to receive(:empty?).with("/SHARED_DIR").and_return(is_dir_empty)
             end
 
@@ -189,7 +191,7 @@ describe 'volume:unmount' do
                 .with(pattern: " /SHARED_DIR ")
             end
 
-            it "deletes shared dir only if empty" do
+            it "deletes shared dir only if it exists and it is empty" do
               if is_dir_empty
                 is_expected.to delete_directory('/SHARED_DIR')
                   .with(recursive: false)
