@@ -92,7 +92,7 @@ action :unmount do
       mode '1777'
       recursive false
       action :delete
-      only_if { Dir.empty?(fsx.shared_dir) }
+      only_if { Dir.exist?(fsx.shared_dir) && Dir.empty?(fsx.shared_dir) }
     end
   end
 end
