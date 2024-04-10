@@ -111,7 +111,7 @@ action :unmount do
       mode '1777'
       recursive false
       action :delete
-      only_if { Dir.empty?(efs_shared_dir.to_s) }
+      only_if { Dir.exist?(efs_shared_dir.to_s) && Dir.empty?(efs_shared_dir.to_s) }
     end
   end
 end

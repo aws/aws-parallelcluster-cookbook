@@ -112,7 +112,7 @@ action :unmount do
   directory shared_dir do
     recursive false
     action :delete
-    only_if { Dir.empty?(shared_dir) }
+    only_if { Dir.exist?(shared_dir) && Dir.empty?(shared_dir) }
   end
 end
 
