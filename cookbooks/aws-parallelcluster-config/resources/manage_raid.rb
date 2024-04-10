@@ -149,8 +149,9 @@ action :unmount do
 
   # Delete the shared directories
   directory raid_shared_dir do
-    recursive true
+    recursive false
     action :delete
+    only_if { Dir.exist?(raid_shared_dir.to_s) && Dir.empty?(raid_shared_dir.to_s) }
   end
 
   # Get disks that are part of the RAID group.

@@ -195,8 +195,9 @@ action :unmount do
       owner 'root'
       group 'root'
       mode '1777'
-      recursive true
+      recursive false
       action :delete
+      only_if { Dir.exist?(fsx_shared_dir) && Dir.empty?(fsx_shared_dir) }
     end
   end
 end
