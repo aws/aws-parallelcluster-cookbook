@@ -362,7 +362,9 @@ describe 'lustre:unmount' do
         before do
           stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
           stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+          allow(Dir).to receive(:exist?).with("/shared_dir_1").and_return(true)
           allow(Dir).to receive(:empty?).with("/shared_dir_1").and_return(true)
+          allow(Dir).to receive(:exist?).with("/shared_dir_2").and_return(true)
           allow(Dir).to receive(:empty?).with("/shared_dir_2").and_return(false)
         end
 
@@ -386,7 +388,7 @@ describe 'lustre:unmount' do
             .with(pattern: "lustre_id_2.fsx.REGION.amazonaws.com@tcp:/mount_name_2 *")
         end
 
-        it 'deletes shared dir only if empty' do
+        it 'deletes shared dir only if it exists and it is empty' do
           is_expected.to delete_directory('/shared_dir_1')
             .with(recursive: false)
           is_expected.not_to delete_directory('/shared_dir_2')
@@ -417,7 +419,9 @@ describe 'lustre:unmount' do
         before do
           stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
           stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+          allow(Dir).to receive(:exist?).with("/shared_dir_1").and_return(true)
           allow(Dir).to receive(:empty?).with("/shared_dir_1").and_return(true)
+          allow(Dir).to receive(:exist?).with("/shared_dir_2").and_return(true)
           allow(Dir).to receive(:empty?).with("/shared_dir_2").and_return(false)
         end
 
@@ -441,7 +445,7 @@ describe 'lustre:unmount' do
             .with(pattern: "ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 *")
         end
 
-        it 'deletes shared dir only if empty' do
+        it 'deletes shared dir only if it exists and it is empty' do
           is_expected.to delete_directory('/shared_dir_1')
             .with(recursive: false)
           is_expected.not_to delete_directory('/shared_dir_2')
@@ -472,7 +476,9 @@ describe 'lustre:unmount' do
         before do
           stub_command("mount | grep ' /filecache_dir_1 '").and_return(false)
           stub_command("mount | grep ' /filecache_dir_2 '").and_return(true)
+          allow(Dir).to receive(:exist?).with("/filecache_dir_1").and_return(true)
           allow(Dir).to receive(:empty?).with("/filecache_dir_1").and_return(true)
+          allow(Dir).to receive(:exist?).with("/filecache_dir_2").and_return(true)
           allow(Dir).to receive(:empty?).with("/filecache_dir_2").and_return(false)
         end
 
@@ -496,7 +502,7 @@ describe 'lustre:unmount' do
             .with(pattern: "filecache_dns_name_2@tcp:/filecache_mount_name_2 *")
         end
 
-        it 'deletes shared dir only if empty' do
+        it 'deletes shared dir only if it exists and it is empty' do
           is_expected.to delete_directory('/filecache_dir_1')
             .with(recursive: false)
           is_expected.not_to delete_directory('/filecache_dir_2')
