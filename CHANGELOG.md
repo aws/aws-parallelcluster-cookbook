@@ -17,8 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **BUG FIXES**
-- Fix an issue that may cause data loss when a shared storage is unmounted as part of a cluster update
-  while it is in use and with no backup strategy in place.
+- Remove recursive deletion of shared storage mountdir when unmounting filesystems as part of update-cluster operation.
 
 3.9.0
 ------
