@@ -17,6 +17,12 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
         slurm_install_dir = "#{node['cluster']['slurm']['install_dir']}"
         slurm_user  = "#{node['cluster']['slurm']['user']}"
         slurm_group = "#{node['cluster']['slurm']['group']}"
+        is_expected.to create_template("/etc/systemd/system/slurmdbd.service").with(
+          source: 'slurm/head_node/slurmdbd.service.erb',
+          user: 'root',
+          group: 'root',
+          mode:  '0644'
+        )
         is_expected.to create_template_if_missing("#{slurm_install_dir}/etc/slurmdbd.conf").with(
           source: 'slurm/slurmdbd.conf.erb',
           user: slurm_user,
