@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Allow custom actions on login nodes.
 - Allow DCV connection on login nodes.
+- Disable unused background services wpa_supplicant and cups to improve security.
 
 **BUG FIXES**
 - Fix EFA kmod installation with RHEL 8.10 or newer.

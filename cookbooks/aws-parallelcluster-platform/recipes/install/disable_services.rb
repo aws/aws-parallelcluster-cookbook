@@ -27,3 +27,13 @@ end unless on_docker?
 service 'log4j-cve-2021-44228-hotpatch' do
   action %i(disable stop mask)
 end unless on_docker?
+
+# Necessary on Ubuntu and Amazon Linux 2
+service 'cups' do
+  action %i(disable stop mask)
+end unless on_docker?
+
+# Necessary on Ubuntu 22
+service 'wpa_supplicant' do
+  action %i(disable stop mask)
+end unless on_docker?
