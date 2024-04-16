@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Disable unused background services wpa_supplicant and cups to improve security.
 
 **CHANGES**
 
