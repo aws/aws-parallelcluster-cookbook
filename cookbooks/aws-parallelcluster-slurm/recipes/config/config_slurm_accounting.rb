@@ -38,7 +38,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_external_slurmdbd
   group "#{node['cluster']['slurm']['group']}"
   mode '0600'
   action :create_if_missing
-  only_if { node['is_external_slurmdbd'] }
+  only_if { node['cluster']['node_type'] == "ExternalSlurmDbd" }
 end
 
 file "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_slurmdbd.conf" do
@@ -80,7 +80,7 @@ execute "wait for slurm database" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
   retries node['cluster']['slurmdbd_response_retries']
   retry_delay 10
-end unless kitchen_test? || node['is_external_slurmdbd']
+end unless kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
 
 bash "bootstrap slurm database" do
   user 'root'
@@ -111,4 +111,4 @@ bash "bootstrap slurm database" do
     # This is not important for the scope of this script, so we return 0.
     exit 0
   BOOTSTRAP
-end unless kitchen_test? || node['is_external_slurmdbd']
+end unless kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
