@@ -1,13 +1,13 @@
 AuthType=auth/munge
 LogFile=/var/log/slurmdbd.log
-<% if !node['is_external_slurmdbd'] %>
+<% if node['cluster']['node_type'] != "ExternalSlurmDbd" %>
 DbdPort=6819
 <% end %>
 SlurmUser=<%= node['cluster']['slurm']['user'] %>
 StorageType=accounting_storage/mysql
 
-# Conditional inclusion based on 'is_external_slurmdbd' attribute
-<% if node['is_external_slurmdbd'] %>
+# Conditional inclusion based on 'node['cluster']['node_type']' attribute
+<% if node['cluster']['node_type'] == "ExternalSlurmDbd" %>
 # WARNING!!! The slurm_external_slurmdbd.conf file included below can be updated by the pcluster process.
 # Please do not edit it.
 include slurm_external_slurmdbd.conf
