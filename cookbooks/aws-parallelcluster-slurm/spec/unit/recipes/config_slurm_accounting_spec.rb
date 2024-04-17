@@ -13,6 +13,20 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
       end
       cached(:node) { chef_run.node }
 
+      it 'creates the service definition for slurmdbd' do
+        is_expected.to create_template('/etc/systemd/system/slurmdbd.service').with(
+          source: 'slurm/head_node/slurmdbd.service.erb',
+          owner: 'root',
+          group: 'root',
+          mode:  '0644'
+        )
+      end
+
+      it 'creates the service definition for slurmdbd with the correct settings' do
+        is_expected.to render_file('/etc/systemd/system/slurmdbd.service')
+          .with_content("After=network-online.target munge.service mysql.service mysqld.service mariadb.service remote-fs.target")
+      end
+
       it 'creates the slurmdbd configuration files' do
         slurm_install_dir = "#{node['cluster']['slurm']['install_dir']}"
         slurm_user  = "#{node['cluster']['slurm']['user']}"

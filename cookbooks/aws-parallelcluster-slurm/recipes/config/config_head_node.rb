@@ -192,14 +192,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/
   mode '0644'
 end
 
-template '/etc/systemd/system/slurmctld.service' do
-  source 'slurm/head_node/slurmctld.service.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
-end
-
+include_recipe 'aws-parallelcluster-slurm::config_slurmctld_systemd_service'
 include_recipe 'aws-parallelcluster-slurm::config_health_check'
 
 ruby_block "Configure Slurm Accounting" do
