@@ -1,0 +1,13 @@
+# slurm_external_slurmdbd.conf is managed by external configuration.
+# Do not modify.
+# Please add user-specific slurmdbd configuration options in slurmdbd.conf
+DbdHost=localhost
+DbdPort=<%= node['slurmdbd_port'] %>
+DbdAddr=<%= node['slurmdbd_ip'] %>
+StorageHost=<%= node['dbms_uri'] %>
+StoragePort=3306
+StorageLoc=<%= node['dbms_database_name'] %>
+StorageUser=<%= node['dbms_username'] %>
+StoragePass=dummy
+DebugLevel=verbose
+DebugFlags=Network
