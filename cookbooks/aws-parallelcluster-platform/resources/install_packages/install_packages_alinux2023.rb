@@ -42,10 +42,10 @@ def default_packages
      libical-devel sendmail libxml2-devel libglvnd-devel
      libgcrypt-devel libevent-devel glibc-static bind-utils
      iproute python3 python3-pip libcurl-devel
-     coreutils environment-modules gcc gcc-c++ bzip2)
+     coreutils environment-modules gcc gcc-c++ bzip2 iptables vim yum-plugin-versionlock)
 end
 
 def unsupported_packages
   # Using `sudo dnf supportinfo --pkg <PACKAGE_NAME>` to find if packages are available
-  %w(vim openmotif-devel redhat-lsb python2 python2-pip NetworkManager-config-routing-rules iptables yum-plugin-versionlock moreutils)
+  %w(openmotif-devel redhat-lsb python2 python2-pip NetworkManager-config-routing-rules moreutils)
 end
