@@ -55,6 +55,7 @@ action :setup do
       retry_delay 5
     end
     package extra_packages do
+      only_if { extra_packages.any? }
       retries 10
       retry_delay 5
     end

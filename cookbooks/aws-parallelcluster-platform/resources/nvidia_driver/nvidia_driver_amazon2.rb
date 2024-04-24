@@ -30,5 +30,5 @@ def compiler_path
 end
 
 def extra_packages
-  ""
+  %w()
 end
