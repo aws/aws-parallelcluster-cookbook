@@ -37,6 +37,10 @@ if [ -e "${SCRIPT}" ]; then
         TOKEN=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600") \
         && curl -H "X-aws-ec2-metadata-token: $TOKEN" -v http://169.254.169.254/latest/meta-data/instance-id
       ')
+      echo "Install libxcrypt-compat dmidecode package by using SSH key: ${KITCHEN_SSH_KEY_PATH}"
+      
+      ssh -o StrictHostKeyChecking=no -i "${KITCHEN_SSH_KEY_PATH}" \
+      "${KITCHEN_EC2_USER}@${KITCHEN_INSTANCE_HOSTNAME}" 'sudo yum install -y libxcrypt-compat dmidecode'
 
       [ -n "${KITCHEN_EC2_INSTANCE_ID}" ] && echo "EC2 instance id: ${KITCHEN_EC2_INSTANCE_ID}" || echo "Unable to retrieve instance id."
       export KITCHEN_EC2_INSTANCE_ID
