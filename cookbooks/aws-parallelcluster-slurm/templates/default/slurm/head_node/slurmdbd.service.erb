@@ -10,6 +10,7 @@ EnvironmentFile=-/etc/sysconfig/slurmdbd
 ExecStart=<%= node['cluster']['slurm']['install_dir'] %>/sbin/slurmdbd -D -s $SLURMDBD_OPTIONS
 ExecReload=/bin/kill -HUP $MAINPID
 LimitNOFILE=65536
+TimeoutStartSec=5000
 
 [Install]
 WantedBy=multi-user.target
