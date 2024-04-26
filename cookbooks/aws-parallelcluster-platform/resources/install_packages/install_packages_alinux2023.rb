@@ -42,7 +42,7 @@ def default_packages
      libical-devel sendmail libxml2-devel libglvnd-devel
      libgcrypt-devel libevent-devel glibc-static bind-utils
      iproute python3 python3-pip libcurl-devel
-     coreutils environment-modules gcc gcc-c++ bzip2 iptables vim yum-plugin-versionlock)
+     coreutils environment-modules gcc gcc-c++ bzip2 iptables vim yum-plugin-versionlock rsyslog)
 end
 
 def unsupported_packages
