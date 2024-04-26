@@ -17,25 +17,10 @@ provides :system_authentication, platform: 'amazon' do |node|
 end
 
 use 'partial/_system_authentication_common'
-
-action :configure do
-  # oddjobd service is required for creating homedir
-  service "oddjobd" do
-    action %i(start enable)
-  end unless on_docker?
-
-  execute 'Configure Directory Service' do
-    user 'root'
-    # Tell NSS, PAM to use SSSD for system authentication and identity information
-    # authconfig is a compatibility tool, replaced by authselect
-    command "authselect select sssd with-mkhomedir"
-    sensitive true
-    default_env true
-  end
-end
+use 'partial/_system_authentication_alinux_centos'
 
 action_class do
   def required_packages
-    %w(sssd sssd-tools sssd-ldap authselect oddjob-mkhomedir)
+    %w(sssd sssd-tools sssd-ldap authconfig)
   end
 end
