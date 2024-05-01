@@ -59,7 +59,12 @@ default['cluster']['shared_login_nodes_keys_sync_file'] = "#{node['cluster']['sh
 # Since this is a shared directory, it needs to be defined here first instead of in the dependent cookbook for slurm
 default['cluster']['slurm']['install_dir'] = '/opt/slurm'
 
-default['cluster']['internal_shared_dirs'] = [node['cluster']['shared_dir'], node['cluster']['shared_dir_login_nodes'], node['cluster']['slurm']['install_dir'], "/opt/intel"]
+default['cluster']['internal_shared_dirs'] = if x86_instance?
+                                               [node['cluster']['shared_dir'], node['cluster']['shared_dir_login_nodes'], node['cluster']['slurm']['install_dir'], "/opt/intel"]
+                                             else
+                                               [node['cluster']['shared_dir'], node['cluster']['shared_dir_login_nodes'], node['cluster']['slurm']['install_dir']]
+                                             end
+
 default['cluster']['internal_initial_shared_dir'] = "#{node['cluster']['base_dir']}/init_shared"
 
 default['cluster']['head_node_private_ip'] = nil
