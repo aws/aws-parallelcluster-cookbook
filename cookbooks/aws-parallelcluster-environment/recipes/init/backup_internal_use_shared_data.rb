@@ -19,6 +19,7 @@ if node['cluster']['node_type'] == 'HeadNode'
   # This is necessary to preserve any data in these directories that was
   # generated during the build of ParallelCluster AMIs after converting to
   # shared storage
+  Chef::Log.info("Backup internal dirs #{node['cluster']['internal_shared_dirs']}")
   node['cluster']['internal_shared_dirs'].each do |dir|
     bash "Backup #{dir}" do
       user 'root'
