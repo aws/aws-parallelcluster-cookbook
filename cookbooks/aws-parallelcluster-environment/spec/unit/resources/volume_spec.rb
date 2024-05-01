@@ -142,6 +142,11 @@ describe 'volume:unmount' do
               is_expected.not_to run_execute('unmount volume')
             end
 
+            it 'checks active processes' do
+              is_expected.to check_active_processes_file_utils('check active processes on /SHARED_DIR')
+                .with(file: '/SHARED_DIR')
+            end
+
             it "removes volume /SHARED_DIR from /etc/fstab" do
               is_expected.to edit_delete_lines("remove volume /SHARED_DIR from /etc/fstab")
                 .with(path: "/etc/fstab")
@@ -177,6 +182,11 @@ describe 'volume:unmount' do
               stub_command("mount | grep ' /SHARED_DIR '").and_return(true)
               allow(Dir).to receive(:exist?).with("/SHARED_DIR").and_return(true)
               allow(Dir).to receive(:empty?).with("/SHARED_DIR").and_return(is_dir_empty)
+            end
+
+            it 'checks active processes' do
+              is_expected.to check_active_processes_file_utils('check active processes on /SHARED_DIR')
+                .with(file: '/SHARED_DIR')
             end
 
             it 'unmounts volume' do

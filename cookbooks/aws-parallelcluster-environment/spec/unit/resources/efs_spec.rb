@@ -95,7 +95,7 @@ describe 'efs:install_utils' do
       cd efs-utils-#{utils_version}
       ./build-deb.sh
       apt-get -y install ./build/amazon-efs-utils*deb
-      EFSUTILSINSTALL
+        EFSUTILSINSTALL
       end
 
       context "utils package not yet installed" do
@@ -363,6 +363,13 @@ describe 'efs:unmount' do
 
       it 'unmounts efs' do
         is_expected.to unmount_efs('unmount')
+      end
+
+      it 'checks active processes' do
+        is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_1')
+          .with(file: '/shared_dir_1')
+        is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_2')
+          .with(file: '/shared_dir_2')
       end
 
       it 'unmounts efs only if mounted' do
