@@ -17,4 +17,4 @@ default['cluster']['pmix']['version'] = '4.2.9'
 default['cluster']['pmix']['sha256'] = '00ddb36fb81c31519972079a218c3cdd903510fc3910abaf4d484068fa29e884'
 
 # Slurmdbd
-default['cluster']['slurmdbd_service_enabled'] == "true"
+default['cluster']['slurmdbd_service_enabled'] = "true"
