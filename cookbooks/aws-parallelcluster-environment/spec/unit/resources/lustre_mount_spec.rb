@@ -370,7 +370,9 @@ describe 'lustre:unmount' do
 
         it 'unmounts fsx only if mounted' do
           is_expected.not_to run_execute('unmount fsx /shared_dir_1')
-
+          is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_1')
+          is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_2')
+            .with(file: '/shared_dir_2')
           is_expected.to run_execute('unmount fsx /shared_dir_2')
             .with(command: "umount -fl /shared_dir_2")
             .with(retries: 10)

@@ -71,7 +71,10 @@ action :unmount do
   return if on_docker?
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
     fsx = FSx.new(node, new_resource, index)
-
+    file_utils "check active processes on #{fsx.shared_dir}" do
+      file fsx.shared_dir
+      action :check_active_processes
+    end
     execute "unmount fsx #{fsx.shared_dir}" do
       command "umount -fl #{fsx.shared_dir}"
       retries 10
