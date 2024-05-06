@@ -24,5 +24,6 @@ action :check_active_processes do
     timeout 10
     live_stream true
     command "fuser -mv #{file}"
+    only_if { ::Dir.exist?(file) || ::File.exist?(file) }
   end
 end
