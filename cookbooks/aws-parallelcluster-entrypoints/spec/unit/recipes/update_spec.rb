@@ -12,6 +12,7 @@
 # limitations under the License.
 
 require 'spec_helper'
+require 'ostruct'
 
 describe 'aws-parallelcluster-entrypoints::update' do
   before do
