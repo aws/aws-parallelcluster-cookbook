@@ -18,8 +18,13 @@ jobs:
   recursive-deletion-check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check PR
+      - name: Check PR (recursive true)
         uses: francesco-giordano/gh-pr-content-checker@v1.0.0
         with:
-          diffDoesNotContainRegex: "\\brecursive: true|\\brm -rf\\b"
+          diffDoesNotContainRegex: "recursive true"
+          skipLabels: skip-recursive-deletion-check
+      - name: Check PR (rm -rf)
+        uses: francesco-giordano/gh-pr-content-checker@v1.0.0
+        with:
+          diffDoesNotContainRegex: "rm -rf"
           skipLabels: skip-recursive-deletion-check
