@@ -13,3 +13,13 @@ jobs:
       with:
         diffDoesNotContainRegex: "\\bnosec\\b|\\bnosemgrep\\b"
         skipLabels: skip-security-exclusions-check
+
+  # Prevent the use of recursive deletion.
+  recursive-deletion-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR
+        uses: francesco-giordano/gh-pr-content-checker@v1.0.0
+        with:
+          diffDoesNotContainRegex: "\\brecursive: true|\\brm -rf\\b"
+          skipLabels: skip-recursive-deletion-check
