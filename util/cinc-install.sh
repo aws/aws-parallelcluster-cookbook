@@ -220,12 +220,14 @@ do_python() {
 do_checksum() {
   if exists sha256sum; then
     echo "Comparing checksum with sha256sum..."
-    checksum=$(sha256sum $1 | awk '{ print $1 }')
-    return "$(test "x$checksum" = "x$2")"
+    checksum=`sha256sum $1 | awk '{ print $1 }'`
+    # shellcheck disable=SC2046
+    return `test "x$checksum" = "x$2"`
   elif exists shasum; then
     echo "Comparing checksum with shasum..."
-    checksum=$(shasum -a 256 $1 | awk '{ print $1 }')
-    return "$(test "x$checksum" = "x$2")"
+    checksum=`shasum -a 256 $1 | awk '{ print $1 }'`
+    # shellcheck disable=SC2046
+    return `test "x$checksum" = "x$2"`
   else
     echo "WARNING: could not find a valid checksum program, pre-install shasum or sha256sum in your O/S image to get validation..."
     return 0
@@ -331,7 +333,8 @@ install_file() {
       echo "installing dmg file..."
       hdiutil detach "/Volumes/cinc_project" >/dev/null 2>&1 || true
       hdiutil attach "$2" -mountpoint "/Volumes/cinc_project"
-      cd / && /usr/sbin/installer -pkg "$(find "/Volumes/cinc_project" -name \*.pkg)" -target /
+      # shellcheck disable=SC2046
+      cd / && /usr/sbin/installer -pkg `find "/Volumes/cinc_project" -name \*.pkg` -target /
       hdiutil detach "/Volumes/cinc_project"
       ;;
     "sh" )
