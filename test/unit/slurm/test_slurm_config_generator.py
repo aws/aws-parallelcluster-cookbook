@@ -128,6 +128,15 @@ def test_generate_slurm_config_files_memory_scheduling(
             ],
             id="Case with Slurm Accounting passing DatabaseName",
         ),
+        pytest.param(
+            "sample_input_externaldbd.yaml",
+            # Here we don't care about the include file for the slurmdbd.conf, because slurmdbd is not going
+            # to be launched on the PC cluster (even if our current recipes may still generate it empty).
+            [
+                "slurm_parallelcluster_externaldbd.conf",
+            ],
+            id="Case with Slurmdbd daemon external to the cluster",
+        ),
     ],
 )
 def test_generate_slurm_config_files_slurm_accounting(mocker, test_datadir, tmpdir, input_config, expected_outputs):

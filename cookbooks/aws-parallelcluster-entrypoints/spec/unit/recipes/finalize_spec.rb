@@ -12,12 +12,14 @@
 # limitations under the License.
 
 require 'spec_helper'
+require 'ostruct'
 
 describe 'aws-parallelcluster-entrypoints::finalize' do
   before do
     @included_recipes = []
     %w(
       aws-parallelcluster-platform::enable_chef_error_handler
+      aws-parallelcluster-shared::setup_envars
       aws-parallelcluster-computefleet::custom_parallelcluster_node
       aws-parallelcluster-platform::finalize
       aws-parallelcluster-slurm::finalize
@@ -50,6 +52,7 @@ describe 'aws-parallelcluster-entrypoints::finalize' do
               expected_recipes = if is_custom_node
                                    %w(
                                     aws-parallelcluster-platform::enable_chef_error_handler
+                                    aws-parallelcluster-shared::setup_envars
                                     aws-parallelcluster-computefleet::custom_parallelcluster_node
                                     aws-parallelcluster-platform::finalize
                                     aws-parallelcluster-slurm::finalize
@@ -58,6 +61,7 @@ describe 'aws-parallelcluster-entrypoints::finalize' do
                                  else
                                    %w(
                                      aws-parallelcluster-platform::enable_chef_error_handler
+                                     aws-parallelcluster-shared::setup_envars
                                      aws-parallelcluster-platform::finalize
                                      aws-parallelcluster-slurm::finalize
                                      aws-parallelcluster-environment::finalize

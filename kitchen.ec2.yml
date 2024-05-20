@@ -62,7 +62,7 @@ transport:
 
 provisioner:
   product_name: cinc
-  product_version: 18.2.7
+  product_version: 18.4.12
   install_strategy: once
   chef_omnibus_url: https://omnitruck.cinc.sh/install.sh
   chef_omnibus_root: /opt/cinc

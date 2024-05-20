@@ -26,12 +26,7 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   group 'root'
   mode '0700'
   variables(
-    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) },
-    region: node['cluster']['region'],
-    munge_user: node['cluster']['munge']['user'],
-    munge_group: node['cluster']['munge']['group'],
-    shared_directory_compute: node['cluster']['shared_dir'],
-    shared_directory_login: node['cluster']['shared_dir_login_nodes']
+    munge_key_secret_arn: lazy { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :MungeKeySecretArn) }
   )
 end
 
@@ -197,22 +192,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/pcluster/.slurm_plugin/
   mode '0644'
 end
 
-template '/etc/systemd/system/slurmctld.service' do
-  source 'slurm/head_node/slurmctld.service.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
-end
-
-template '/etc/systemd/system/slurmdbd.service' do
-  source 'slurm/head_node/slurmdbd.service.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  action :create
-end
-
+include_recipe 'aws-parallelcluster-slurm::config_slurmctld_systemd_service'
 include_recipe 'aws-parallelcluster-slurm::config_health_check'
 
 ruby_block "Configure Slurm Accounting" do

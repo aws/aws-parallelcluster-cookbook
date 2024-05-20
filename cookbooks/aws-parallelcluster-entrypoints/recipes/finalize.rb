@@ -14,6 +14,8 @@
 
 include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
 
+include_recipe "aws-parallelcluster-shared::setup_envars"
+
 fetch_config 'Fetch and load cluster configs'
 
 if is_custom_node?

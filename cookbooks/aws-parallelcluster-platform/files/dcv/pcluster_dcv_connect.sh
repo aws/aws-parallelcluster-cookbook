@@ -144,7 +144,7 @@ main() {
 
     # Retrieve Request Token and Access File name
     _log "Retrieving Request Token and Access File name.."
-    user_token_request=$(curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=requestToken -d authUser="${user}" -d sessionID="${sessionid}")
+    user_token_request=$(/usr/bin/curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=requestToken -d authUser="${user}" -d sessionID="${sessionid}")
     _validate_json "${user_token_request}" "Unable to obtain the Request Token from the NICE DCV external authenticator."
     request_token=$(echo "${user_token_request}" | jq -r .requestToken)
     access_file=$(echo "${user_token_request}" | jq -r .accessFile)
@@ -159,7 +159,7 @@ main() {
 
     # Retrieve Session Token
     _log "Retrieving Session Token.."
-    session_token_request=$(curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=sessionToken -d requestToken="${request_token}")
+    session_token_request=$(/usr/bin/curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=sessionToken -d requestToken="${request_token}")
     _validate_json "${session_token_request}" "Unable to obtain the Session Token from the NICE DCV external authenticator."
     session_token=$(echo "${session_token_request}" | jq -r .sessionToken)
     _log "Session Token obtained successfully."

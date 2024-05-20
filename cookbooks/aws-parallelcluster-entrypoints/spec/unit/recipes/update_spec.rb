@@ -12,11 +12,13 @@
 # limitations under the License.
 
 require 'spec_helper'
+require 'ostruct'
 
 describe 'aws-parallelcluster-entrypoints::update' do
   before do
     @included_recipes = []
     %w(
+      aws-parallelcluster-shared::setup_envars
       aws-parallelcluster-platform::update
       aws-parallelcluster-environment::update
       aws-parallelcluster-slurm::update
@@ -47,6 +49,7 @@ describe 'aws-parallelcluster-entrypoints::update' do
               cached(:node) { chef_run.node }
 
               expected_recipes = %w(
+                                  aws-parallelcluster-shared::setup_envars
                                   aws-parallelcluster-platform::update
                                   aws-parallelcluster-environment::update
                                   aws-parallelcluster-slurm::update

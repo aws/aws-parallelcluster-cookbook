@@ -10,11 +10,11 @@ set -e
 
 MUNGE_KEY_FILE="/etc/munge/munge.key"
 SECRET_ARN="<%= @munge_key_secret_arn %>"
-REGION="<%= @region %>"
-MUNGE_USER="<%= @munge_user %>"
-MUNGE_GROUP="<%= @munge_group %>"
-SHARED_DIRECTORY_COMPUTE="<%= @shared_directory_compute %>"
-SHARED_DIRECTORY_LOGIN="<%= @shared_directory_login %>"
+REGION="<%= node['cluster']['region'] %>"
+MUNGE_USER="<%= node['cluster']['munge']['user'] %>"
+MUNGE_GROUP="<%= node['cluster']['munge']['group'] %>"
+SHARED_DIRECTORY_COMPUTE="<%= node['cluster']['shared_dir'] %>"
+SHARED_DIRECTORY_LOGIN="<%= node['cluster']['shared_dir_login_nodes'] %>"
 
 DISABLE_RESOURCE_CHECK=false
 
@@ -100,6 +100,7 @@ else
   exit 1
 fi
 
+<% if node["cluster"]["node_type"] != "ExternalSlurmDbd" -%>
 # Share munge key
 SHARED_DIRECTORIES=(${SHARED_DIRECTORY_COMPUTE} ${SHARED_DIRECTORY_LOGIN})
 
@@ -113,4 +114,5 @@ done
 
 echo "Shared munge key"
 
+<% end -%>
 exit 0

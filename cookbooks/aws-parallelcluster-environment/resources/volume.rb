@@ -94,7 +94,10 @@ end
 
 action :unmount do
   shared_dir = format_directory(new_resource.shared_dir)
-
+  file_utils "check active processes on #{shared_dir}" do
+    file shared_dir
+    action :check_active_processes
+  end
   # TODO: can we use mount resource to unmount and disable (see raid)
   execute "unmount volume #{shared_dir}" do
     command "umount -fl #{shared_dir}"
@@ -112,8 +115,9 @@ action :unmount do
 
   # Delete the shared directories
   directory shared_dir do
-    recursive true
+    recursive false
     action :delete
+    only_if { Dir.exist?(shared_dir) && Dir.empty?(shared_dir) }
   end
 end
 

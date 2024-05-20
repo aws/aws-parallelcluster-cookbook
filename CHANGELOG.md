@@ -3,23 +3,43 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.10.0
+------
+
+**ENHANCEMENTS**
+- Add support for external Slurmdbd.
+
+**CHANGES**
+- Upgrade Cinc Client to version to 18.4.12 from 18.2.7.
+
+**BUG FIXES**
+- Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
+- Fixed an issue that prevented slurmctld and slurmdbd services from restarting on head node reboot when
+  EFS is used for shared internal data. 
+
+3.9.1
+------
+
+**BUG FIXES**
+- Remove recursive deletion of shared storage mountdir when unmounting filesystems as part of update-cluster operation.
+
 3.9.0
 ------
 
 **ENHANCEMENTS**
+- Permit to update the external shared storage of type Efs, FsxLustre, FsxOntap, FsxOpenZfs and FileCache
+  without replacing compute and login fleet.
 - Add support for RHEL9.
 - Add support for Rocky Linux 9 as `CustomAmi` created through `build-image` process. No public official ParallelCluster Rocky9 Linux AMI is made available at this time.
 - Add the configuration parameter `DeploymentSettings/DefaultUserHome` to allow users to move the default user's home directory to `/local/home` instead of `/home` (default).
   - SSH connections will be closed and rejected while the user's home directory is being moved during the bootstrapping process.
 - Add possibility to choose between Open and Closed Source Nvidia Drivers when building an AMI, through the ```['cluster']['nvidia']['kernel_open']``` cookbook node attribute.
-- Permit to update the external shared storage of type Efs, FsxLustre, FsxOntap, FsxOpenZfs and FileCache
-  without replacing the compute and login fleet.
+- Add configuration parameter `DeploymentSettings/DisableSudoAccessForDefaultUser` to disable sudo access of default user in supported OSes.
 
 **CHANGES**
 - Upgrade Slurm to 23.11.4 (from 23.02.7).
+  - Upgrade Pmix to 4.2.9 (from 4.2.6).
 - Upgrade NVIDIA driver to version 535.154.05.
-- Upgrade third-party cookbook dependencies:
-  - nfs-5.1.2 (from nfs-5.0.0)
 - Upgrade EFA installer to `1.30.0`.
   - Efa-driver: `efa-2.6.0-1`
   - Efa-config: `efa-config-1.15-1`
@@ -32,6 +52,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2023.1.565-1`
   - gl: `2023.1.1047-1`
   - web_viewer: `2023.1.16388-1`
+- Upgrade ARM PL to version 23.10.
+- Upgrade third-party cookbook dependencies:
+  - nfs-5.1.2 (from nfs-5.0.0)
 
 **BUG FIXES**
 - Fix issue making job fail when submitted as active directory user from login nodes. 

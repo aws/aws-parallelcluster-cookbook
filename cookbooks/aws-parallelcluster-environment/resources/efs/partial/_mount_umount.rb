@@ -101,6 +101,10 @@ action :unmount do
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
     # Unmount EFS
+    file_utils "check active processes on #{efs_shared_dir}" do
+      file efs_shared_dir
+      action :check_active_processes
+    end
     execute 'unmount efs' do
       command "umount -fl #{efs_shared_dir}"
       retries 10
@@ -118,8 +122,9 @@ action :unmount do
       owner 'root'
       group 'root'
       mode '1777'
-      recursive true
+      recursive false
       action :delete
+      only_if { Dir.exist?(efs_shared_dir.to_s) && Dir.empty?(efs_shared_dir.to_s) }
     end
   end
 end

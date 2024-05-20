@@ -95,7 +95,7 @@ describe 'efs:install_utils' do
       cd efs-utils-#{utils_version}
       ./build-deb.sh
       apt-get -y install ./build/amazon-efs-utils*deb
-      EFSUTILSINSTALL
+        EFSUTILSINSTALL
       end
 
       context "utils package not yet installed" do
@@ -355,10 +355,21 @@ describe 'efs:unmount' do
       before do
         stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
         stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
+        allow(Dir).to receive(:exist?).with("/shared_dir_1").and_return(true)
+        allow(Dir).to receive(:empty?).with("/shared_dir_1").and_return(true)
+        allow(Dir).to receive(:exist?).with("/shared_dir_2").and_return(true)
+        allow(Dir).to receive(:empty?).with("/shared_dir_2").and_return(false)
       end
 
       it 'unmounts efs' do
         is_expected.to unmount_efs('unmount')
+      end
+
+      it 'checks active processes' do
+        is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_1')
+          .with(file: '/shared_dir_1')
+        is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_2')
+          .with(file: '/shared_dir_2')
       end
 
       it 'unmounts efs only if mounted' do
@@ -378,10 +389,13 @@ describe 'efs:unmount' do
             .with(path: "/etc/fstab")
             .with(pattern: " #{shared_dir} ")
         end
+      end
 
-        it "deletes shared dir #{shared_dir}" do
-          is_expected.to delete_directory(shared_dir)
-        end
+      it "deletes shared dir only if it exists and it is empty" do
+        is_expected.to delete_directory('/shared_dir_1')
+          .with(recursive: false)
+
+        is_expected.not_to delete_directory('/shared_dir_2')
       end
     end
   end

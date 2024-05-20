@@ -113,6 +113,7 @@ jobs:
           - cookbooks/aws-parallelcluster-platform
           - cookbooks/aws-parallelcluster-shared
           - cookbooks/aws-parallelcluster-slurm
+          - cookbooks/aws-parallelcluster-entrypoints
     steps:
       - uses: actions/checkout@main
       - uses: actionshub/chef-install@main

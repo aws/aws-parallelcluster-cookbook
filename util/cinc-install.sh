@@ -11,7 +11,7 @@
 # - improvement in the dpkg installation to avoid conflicts with other running installations.
 #
 # When updating this modified file, please remember to bump the version and reference it in the CI/CD.
-# - cinc-install.sh v1.2.0
+# - cinc-install.sh v1.3.0
 #
 # WARNING: REQUIRES /bin/bash
 #
@@ -127,7 +127,7 @@ capture_tmp_stderr() {
 # do_wget URL FILENAME
 do_wget() {
   echo "trying wget..."
-  wget --user-agent="User-Agent: mixlib-install/3.12.27" -O "$2" "$1" 2>$tmp_dir/stderr
+  wget --user-agent="User-Agent: mixlib-install/3.12.30" -O "$2" "$1" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "ERROR 404" $tmp_dir/stderr >/dev/null 2>&1
@@ -148,7 +148,7 @@ do_wget() {
 # do_curl URL FILENAME
 do_curl() {
   echo "trying curl..."
-  curl -A "User-Agent: mixlib-install/3.12.27" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
+  curl -A "User-Agent: mixlib-install/3.12.30" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
   rc=$?
   # check for 404
   grep "404 Not Found" $tmp_dir/stderr >/dev/null 2>&1
@@ -169,7 +169,7 @@ do_curl() {
 # do_fetch URL FILENAME
 do_fetch() {
   echo "trying fetch..."
-  fetch --user-agent="User-Agent: mixlib-install/3.12.27" -o "$2" "$1" 2>$tmp_dir/stderr
+  fetch --user-agent="User-Agent: mixlib-install/3.12.30" -o "$2" "$1" 2>$tmp_dir/stderr
   # check for bad return status
   test $? -ne 0 && return 1
   return 0
@@ -199,7 +199,7 @@ do_perl() {
 # do_python URL FILENAME
 do_python() {
   echo "trying python..."
-  python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.12.27' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
+  python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.12.30' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
   grep "HTTP Error 404" $tmp_dir/stderr >/dev/null 2>&1
@@ -220,12 +220,14 @@ do_python() {
 do_checksum() {
   if exists sha256sum; then
     echo "Comparing checksum with sha256sum..."
-    checksum=$(sha256sum $1 | awk '{ print $1 }')
-    return "$(test "x$checksum" = "x$2")"
+    checksum=`sha256sum $1 | awk '{ print $1 }'`
+    # shellcheck disable=SC2046
+    return `test "x$checksum" = "x$2"`
   elif exists shasum; then
     echo "Comparing checksum with shasum..."
-    checksum=$(shasum -a 256 $1 | awk '{ print $1 }')
-    return "$(test "x$checksum" = "x$2")"
+    checksum=`shasum -a 256 $1 | awk '{ print $1 }'`
+    # shellcheck disable=SC2046
+    return `test "x$checksum" = "x$2"`
   else
     echo "WARNING: could not find a valid checksum program, pre-install shasum or sha256sum in your O/S image to get validation..."
     return 0
@@ -281,8 +283,8 @@ get_region() {
     region=$(curl -s -H "X-aws-ec2-metadata-token: ${token}" http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}')
   elif exists python; then
     echo "Trying python to get region with IMDSv2 ..."
-    token=$(python -c "import sys,requests; sys.stdout.write(requests.put('http://169.254.169.254/latest/api/token', headers={'X-aws-ec2-metadata-token-ttl-seconds': '300', 'User-Agent': 'mixlib-install/3.11.27'}).content)")
-    region=$(python -c "import sys,requests,json; sys.stdout.write(json.loads(requests.get('http://169.254.169.254/latest/dynamic/instance-identity/document', headers={ 'X-aws-ec2-metadata-token': '${token}', 'User-Agent': 'mixlib-install/3.11.27' }).content.decode())['region'])")
+    token=$(python -c "import sys,requests; sys.stdout.write(requests.put('http://169.254.169.254/latest/api/token', headers={'X-aws-ec2-metadata-token-ttl-seconds': '300', 'User-Agent': 'mixlib-install/3.12.30'}).content)")
+    region=$(python -c "import sys,requests,json; sys.stdout.write(json.loads(requests.get('http://169.254.169.254/latest/dynamic/instance-identity/document', headers={ 'X-aws-ec2-metadata-token': '${token}', 'User-Agent': 'mixlib-install/3.12.30' }).content.decode())['region'])")
   fi
 
   if test "x$region" = "x"; then
@@ -331,7 +333,8 @@ install_file() {
       echo "installing dmg file..."
       hdiutil detach "/Volumes/cinc_project" >/dev/null 2>&1 || true
       hdiutil attach "$2" -mountpoint "/Volumes/cinc_project"
-      cd / && /usr/sbin/installer -pkg "$(find "/Volumes/cinc_project" -name \*.pkg)" -target /
+      # shellcheck disable=SC2046
+      cd / && /usr/sbin/installer -pkg `find "/Volumes/cinc_project" -name \*.pkg` -target /
       hdiutil detach "/Volumes/cinc_project"
       ;;
     "sh" )
@@ -481,18 +484,22 @@ elif test -f "/etc/system-release"; then
     . /etc/os-release
     platform_version=$VERSION_ID
 
-    if test "$platform_version" = "2022"; then
-      platform="amazon"
-      platform_version="2022"
-    elif test "$platform_version" = "2"; then
-      platform="el"
-      platform_version="7"
-    else
-      platform="el"
+    case $platform_version in
+      "2022"|"2023")
+        platform="amazon"
+        platform_version=$platform_version
+      ;;
+      "2")
+        platform="el"
+        platform_version="7"
+        ;;
+      *)
+        platform="el"
 
-      # VERSION_ID will match YYYY.MM for Amazon Linux AMIs
-      platform_version="6"
-    fi
+        # VERSION_ID will match YYYY.MM for Amazon Linux AMIs
+        platform_version="6"
+        ;;
+    esac
   esac
 
 # Apple macOS
