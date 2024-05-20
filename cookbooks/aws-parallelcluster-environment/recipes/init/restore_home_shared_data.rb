@@ -28,11 +28,11 @@ if node['cluster']['node_type'] == 'HeadNode'
     group 'root'
     code <<-EOH
       rsync -a --ignore-existing /tmp/home/ /home
-      diff -r /tmp/home/ /home
+      diff_output=$(diff -r /tmp/home/ /home)
       if [ $? -eq 0 ]; then
         rm -rf /tmp/home/
       else
-        echo "Data integrity check failed for /home"
+        echo "Data integrity check failed comparing /home and /tmp/home: $diff_output"
         exit 1
       fi
     EOH
