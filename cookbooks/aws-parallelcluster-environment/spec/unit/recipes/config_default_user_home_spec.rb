@@ -34,12 +34,12 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
     rsync -a /tmp#{user_home}/ #{user_local_home}
     usermod -d #{user_local_home} #{cluster_user}
     chown -R #{cluster_user}: #{user_local_home}
-    diff_output=$(diff -r /tmp#{user_home} #{user_local_home})
+    diff_output=$(diff -r #{user_home} #{user_local_home})
     if [ $? -eq 0 ]; then
       rm -rf /tmp#{user_home}
       rm -rf #{user_home}
     else
-      echo "Data integrity check failed comparing #{user_home} and /tmp#{user_home}: $diff_output"
+      echo "Data integrity check failed comparing #{user_local_home} and #{user_home}: $diff_output" >&2
       systemctl start sshd
       exit 1
     fi
