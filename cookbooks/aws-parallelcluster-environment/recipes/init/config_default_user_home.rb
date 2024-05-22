@@ -50,22 +50,31 @@ end
 # 2. Copies the data from the temporary backup directory (/tmp/cluster_user_home) to the new local home directory.
 # 3. Updates the cluster user's home directory path to the new local home directory.
 # 4. Changes the ownership of the new local home directory to the cluster user.
-# 5. Verifies data integrity by comparing the temporary backup directory and the new local home directory.
-# 6. If the data integrity check passes, it removes both the temporary backup directory and the original home directory.
-# 7. If the data integrity check fails, it outputs an error message, restart sshd service and exits with an error code.
-# 8. Unhappy Path Manually test passed successfully:
-#    Simulate a failure in the data integrity check by creating expected `node['cluster']['cluster_user_local_home']`
-#    Modify files in the expected directory to differ from the original.
-#    Manually run `config_default_user_home` recipe.
-#    Verified that the script fails and outputs the correct error message in chef-client.log.
 bash "Move #{node['cluster']['cluster_user_home']}" do
   user 'root'
   group 'root'
   code <<-EOH
+    set -e
     mkdir -p #{node['cluster']['cluster_user_local_home']}
     rsync -a /tmp#{node['cluster']['cluster_user_home']}/ #{node['cluster']['cluster_user_local_home']}
     usermod -d #{node['cluster']['cluster_user_local_home']} #{node['cluster']['cluster_user']}
     chown -R #{node['cluster']['cluster_user']}: #{node['cluster']['cluster_user_local_home']}
+  EOH
+end
+
+# Data integrity check
+# 1. Verifies data integrity by comparing the temporary backup directory and the new local home directory.
+# 2. If the data integrity check passes, it removes both the temporary backup directory and the original home directory.
+# 3. If the data integrity check fails, it outputs an error message and exits with an error code 1.
+# 4. Unhappy Path Manually test passed successfully:
+#    Simulate a failure in the data integrity check by creating expected `node['cluster']['cluster_user_local_home']`
+#    Modify files in the expected directory to differ from the original.
+#    Manually run `config_default_user_home` recipe.
+#    Verified that the script fails and outputs the correct error message in chef-client.log.
+bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
+  user 'root'
+  group 'root'
+  code <<-EOH
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
     diff_exit_code=$?
     if [ $diff_exit_code -eq 0 ]; then

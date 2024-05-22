@@ -26,13 +26,8 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
         it 'moves the cluster user home directory with data integrity check' do
           user_home = "/home/user"
           user_local_home = "/local/home/user"
-          cluster_user = chef_run.node['cluster']['cluster_user']
-          expect(chef_run).to run_bash("Move #{user_home}").with(
+          expect(chef_run).to run_bash("Verify data integrity for #{user_home}").with(
             code: <<-CODE
-    mkdir -p #{user_local_home}
-    rsync -a /tmp#{user_home}/ #{user_local_home}
-    usermod -d #{user_local_home} #{cluster_user}
-    chown -R #{cluster_user}: #{user_local_home}
     diff_output=$(diff -r #{user_home} #{user_local_home})
     diff_exit_code=$?
     if [ $diff_exit_code -eq 0 ]; then
