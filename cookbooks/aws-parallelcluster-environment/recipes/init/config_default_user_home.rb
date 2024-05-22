@@ -52,7 +52,12 @@ end
 # 4. Changes the ownership of the new local home directory to the cluster user.
 # 5. Verifies data integrity by comparing the temporary backup directory and the new local home directory.
 # 6. If the data integrity check passes, it removes both the temporary backup directory and the original home directory.
-# 7. If the data integrity check fails, it outputs an error message and exits with an error code.
+# 7. If the data integrity check fails, it outputs an error message, restart sshd service and exits with an error code.
+# 8. Unhappy Path Manually test passed successfully:
+#    Simulate a failure in the data integrity check by creating expected `node['cluster']['cluster_user_local_home']`
+#    Modify files in the expected directory to differ from the original.
+#    Manually run `config_default_user_home` recipe.
+#    Verified that the script fails and outputs the correct error message in chef-client.log.
 bash "Move #{node['cluster']['cluster_user_home']}" do
   user 'root'
   group 'root'
@@ -67,7 +72,8 @@ bash "Move #{node['cluster']['cluster_user_home']}" do
       rm -rf /tmp#{node['cluster']['cluster_user_home']}
       rm -rf #{node['cluster']['cluster_user_home']}
     else
-      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_home']} and /tmp#{node['cluster']['cluster_user_home']}: $diff_output"
+      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_home']} and /tmp#{node['cluster']['cluster_user_home']}: $diff_output" >&2
+      systemctl start sshd
       exit 1
     fi
   EOH

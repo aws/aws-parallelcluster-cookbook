@@ -40,6 +40,7 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
       rm -rf #{user_home}
     else
       echo "Data integrity check failed comparing #{user_home} and /tmp#{user_home}: $diff_output"
+      systemctl start sshd
       exit 1
     fi
             CODE
