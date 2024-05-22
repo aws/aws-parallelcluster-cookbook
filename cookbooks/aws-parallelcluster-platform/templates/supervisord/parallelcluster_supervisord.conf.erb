@@ -10,7 +10,7 @@ redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/cfn-hup-runner.log
 stdout_logfile_maxbytes = 1MB
 <% if @region.start_with?('us-iso') -%>
-  environment = AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"
+environment = AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"
 <% end -%>
 <% end -%>
 
