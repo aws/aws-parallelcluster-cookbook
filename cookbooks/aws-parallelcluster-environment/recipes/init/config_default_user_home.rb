@@ -62,18 +62,17 @@ bash "Move #{node['cluster']['cluster_user_home']}" do
   user 'root'
   group 'root'
   code <<-EOH
-    set -e
     mkdir -p #{node['cluster']['cluster_user_local_home']}
     rsync -a /tmp#{node['cluster']['cluster_user_home']}/ #{node['cluster']['cluster_user_local_home']}
     usermod -d #{node['cluster']['cluster_user_local_home']} #{node['cluster']['cluster_user']}
     chown -R #{node['cluster']['cluster_user']}: #{node['cluster']['cluster_user_local_home']}
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
-    if [ $? -eq 0 ]; then
+    diff_exit_code=$?
+    if [ $diff_exit_code -eq 0 ]; then
       rm -rf /tmp#{node['cluster']['cluster_user_home']}
       rm -rf #{node['cluster']['cluster_user_home']}
     else
       echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}: $diff_output" >&2
-      systemctl start sshd
       exit 1
     fi
   EOH
