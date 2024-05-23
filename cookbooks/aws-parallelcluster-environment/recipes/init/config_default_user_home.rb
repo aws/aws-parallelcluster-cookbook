@@ -76,8 +76,7 @@ bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
   group 'root'
   code <<-EOH
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
-    diff_exit_code=$?
-    if [ $diff_exit_code -eq 0 ]; then
+    if [ $? -eq 0 ]; then
       rm -rf /tmp#{node['cluster']['cluster_user_home']}
       rm -rf #{node['cluster']['cluster_user_home']}
     else

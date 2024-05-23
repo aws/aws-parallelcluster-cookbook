@@ -29,8 +29,7 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
           expect(chef_run).to run_bash("Verify data integrity for #{user_home}").with(
             code: <<-CODE
     diff_output=$(diff -r #{user_home} #{user_local_home})
-    diff_exit_code=$?
-    if [ $diff_exit_code -eq 0 ]; then
+    if [ $? -eq 0 ]; then
       rm -rf /tmp#{user_home}
       rm -rf #{user_home}
     else
