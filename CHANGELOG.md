@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.9.2
+------
+
+**CHANGES**
+- Upgrade Slurm to 23.11.7 (from 23.11.4).
+
 3.9.1
 ------
 
