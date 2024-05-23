@@ -113,7 +113,7 @@ def compiler_version
 end
 
 def nvidia_kernel_module
-  if node['cluster']['nvidia']['kernel_open'] == "false"
+  if ['false', 'no', false].include?(node['cluster']['nvidia']['kernel_open'])
     "kernel"
   else
     "kernel-open"
