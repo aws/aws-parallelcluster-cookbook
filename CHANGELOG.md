@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Upgrade Cinc Client to version to 18.4.12 from 18.2.7.
+- Upgrade Slurm to 23.11.7 (from 23.11.4).
 
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
