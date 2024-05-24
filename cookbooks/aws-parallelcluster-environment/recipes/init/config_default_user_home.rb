@@ -76,6 +76,7 @@ bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
       rm -rf #{node['cluster']['cluster_user_home']}
     else
       echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}: $diff_output" >&2
+      systemctl start sshd
       exit 1
     fi
   EOH
