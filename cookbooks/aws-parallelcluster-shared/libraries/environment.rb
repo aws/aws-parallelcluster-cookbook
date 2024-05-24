@@ -2,17 +2,22 @@ def aws_region
   node['cluster']['region']
 end
 
+CLASSIC_AWS_DOMAIN = "amazonaws.com".freeze
+CHINA_AWS_DOMAIN = "amazonaws.com.cn".freeze
+US_ISO_AWS_DOMAIN = "c2s.ic.gov".freeze
+US_ISOB_AWS_DOMAIN = "sc2s.sgov.gov".freeze
+
 def aws_domain
   # Get the aws domain name
   region = aws_region
   if region.start_with?("cn-")
-    "amazonaws.com.cn"
+    CHINA_AWS_DOMAIN
   elsif region.start_with?("us-iso-")
-    "c2s.ic.gov"
+    US_ISO_AWS_DOMAIN
   elsif region.start_with?("us-isob-")
-    "sc2s.sgov.gov"
+    US_ISOB_AWS_DOMAIN
   else
-    "amazonaws.com"
+    CLASSIC_AWS_DOMAIN
   end
 end
 
