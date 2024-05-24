@@ -29,6 +29,7 @@ describe 'lustre:mount' do
           before do
             stub_command("mount | grep ' /lustre_shared_dir_with_no_mount '").and_return(false)
             stub_command("mount | grep ' /lustre_shared_dir_with_mount '").and_return(true)
+            allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
           end
 
           it 'creates_shared_dir' do
@@ -58,7 +59,7 @@ describe 'lustre:mount' do
 
           it 'enables shared dir mount if already mounted' do
             is_expected.to enable_mount('/lustre_shared_dir_with_mount')
-              .with(device: 'lustre_id_2.fsx.REGION.amazonaws.com@tcp:/lustre_mount_name_2')
+              .with(device: 'lustre_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX@tcp:/lustre_mount_name_2')
               .with(fstype: 'lustre')
               .with(dump: 0)
               .with(pass: 0)
@@ -113,6 +114,7 @@ describe 'lustre:mount' do
           before do
             stub_command("mount | grep ' /filecache_shared_dir_1 '").and_return(false)
             stub_command("mount | grep ' /filecache_shared_dir_2 '").and_return(true)
+            allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
           end
 
           it 'creates_shared_dir' do
@@ -196,6 +198,7 @@ describe 'lustre:mount' do
           before do
             stub_command("mount | grep ' /openzfs_shared_dir_1 '").and_return(false)
             stub_command("mount | grep ' /openzfs_shared_dir_2 '").and_return(true)
+            allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
           end
 
           it 'creates_shared_dir' do
@@ -225,7 +228,7 @@ describe 'lustre:mount' do
 
           it 'enables shared dir mount if already mounted' do
             is_expected.to enable_mount('/openzfs_shared_dir_2')
-              .with(device: 'openzfs_id_2.fsx.REGION.amazonaws.com:/junction_path_2')
+              .with(device: 'openzfs_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX:/junction_path_2')
               .with(fstype: 'nfs')
               .with(dump: 0)
               .with(pass: 0)
@@ -272,6 +275,7 @@ describe 'lustre:mount' do
           before do
             stub_command("mount | grep ' /ontap_shared_dir_1 '").and_return(false)
             stub_command("mount | grep ' /ontap_shared_dir_2 '").and_return(true)
+            allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
           end
 
           it 'creates_shared_dir' do
@@ -301,7 +305,7 @@ describe 'lustre:mount' do
 
           it 'enables shared dir mount if already mounted' do
             is_expected.to enable_mount('/ontap_shared_dir_2')
-              .with(device: 'ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2')
+              .with(device: 'ontap_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX:/junction_path_2')
               .with(fstype: 'nfs')
               .with(dump: 0)
               .with(pass: 0)
@@ -366,6 +370,7 @@ describe 'lustre:unmount' do
           allow(Dir).to receive(:empty?).with("/shared_dir_1").and_return(true)
           allow(Dir).to receive(:exist?).with("/shared_dir_2").and_return(true)
           allow(Dir).to receive(:empty?).with("/shared_dir_2").and_return(false)
+          allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
         end
 
         it 'unmounts fsx only if mounted' do
@@ -383,9 +388,9 @@ describe 'lustre:unmount' do
             .with(path: "/etc/fstab")
             .with(pattern: "dns_name@tcp:/mount_name_1 *")
 
-          is_expected.to edit_delete_lines('remove volume lustre_id_2.fsx.REGION.amazonaws.com@tcp:/mount_name_2 from /etc/fstab')
+          is_expected.to edit_delete_lines('remove volume lustre_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX@tcp:/mount_name_2 from /etc/fstab')
             .with(path: "/etc/fstab")
-            .with(pattern: "lustre_id_2.fsx.REGION.amazonaws.com@tcp:/mount_name_2 *")
+            .with(pattern: "lustre_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX@tcp:/mount_name_2 *")
         end
 
         it 'deletes shared dir only if it exists and it is empty' do
@@ -423,6 +428,7 @@ describe 'lustre:unmount' do
           allow(Dir).to receive(:empty?).with("/shared_dir_1").and_return(true)
           allow(Dir).to receive(:exist?).with("/shared_dir_2").and_return(true)
           allow(Dir).to receive(:empty?).with("/shared_dir_2").and_return(false)
+          allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
         end
 
         it 'unmounts fsx only if mounted' do
@@ -440,9 +446,9 @@ describe 'lustre:unmount' do
             .with(path: "/etc/fstab")
             .with(pattern: "dns_name:/junction_path_1 *")
 
-          is_expected.to edit_delete_lines('remove volume ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 from /etc/fstab')
+          is_expected.to edit_delete_lines('remove volume ontap_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX:/junction_path_2 from /etc/fstab')
             .with(path: "/etc/fstab")
-            .with(pattern: "ontap_id_2.fsx.REGION.amazonaws.com:/junction_path_2 *")
+            .with(pattern: "ontap_id_2.fsx.REGION.AWS_DOMAIN_FOR_FSX:/junction_path_2 *")
         end
 
         it 'deletes shared dir only if it exists and it is empty' do
@@ -480,6 +486,7 @@ describe 'lustre:unmount' do
           allow(Dir).to receive(:empty?).with("/filecache_dir_1").and_return(true)
           allow(Dir).to receive(:exist?).with("/filecache_dir_2").and_return(true)
           allow(Dir).to receive(:empty?).with("/filecache_dir_2").and_return(false)
+          allow_any_instance_of(Object).to receive(:aws_domain_for_fsx).and_return("AWS_DOMAIN_FOR_FSX")
         end
 
         it 'unmounts fsx only if mounted' do
