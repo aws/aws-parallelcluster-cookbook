@@ -109,8 +109,8 @@ action_class do
       @volume_junction_path = self.class.make_absolute(resource.fsx_volume_junction_path_array[index])
 
       if @dns_name.blank?
-        # Region Building Note: DNS names have the default AWS domain (amazonaws.com) also in China and GovCloud.
-        @dns_name = "#{@id}.fsx.#{node['cluster']['region']}.amazonaws.com"
+        region = node['cluster']['region']
+        @dns_name = "#{@id}.fsx.#{region}.#{aws_domain_for_fsx(region)}"
       end
 
       @mount_name = resource.fsx_mount_name_array[index]
