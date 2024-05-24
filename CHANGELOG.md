@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for external Slurmdbd.
+- Add support for FSx Lustre in US isolated regions.
 
 **CHANGES**
 - Upgrade Cinc Client to version to 18.4.12 from 18.2.7.
