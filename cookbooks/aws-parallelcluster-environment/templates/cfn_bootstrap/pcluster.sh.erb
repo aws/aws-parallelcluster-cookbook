@@ -2,6 +2,7 @@
 # pcluster.sh:
 #   Setup ParallelCluster environment variables
 #
-PATH=<%= @cfn_bootstrap_virtualenv_path %>/bin:$PATH
+
+PATH=$PATH:<%= @cfn_bootstrap_virtualenv_path %>/bin
 
 export PATH

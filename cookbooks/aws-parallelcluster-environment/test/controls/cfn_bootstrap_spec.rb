@@ -36,12 +36,6 @@ control 'tag:install_cfnbootstrap_virtualenv_created' do
     its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('content') { should match "PATH=#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv/bin:\\$PATH" }
+    its('content') { should match "PATH=\\$PATH:#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv/bin" }
   end
-
-  desc "cfn-init needs to be from the cfnbootstrap virtualenv"
-  describe bash("sudo -u #{node['cluster']['cluster_user']} -i which cfn-init") do
-    its('exit_status') { should eq(0) }
-    its('stdout') { should match("#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv/bin/cfn-init") }
-  end unless os_properties.on_docker?
 end
