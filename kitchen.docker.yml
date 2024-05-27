@@ -64,7 +64,7 @@ platforms:
         kernel_release: '5.15.0-1028-aws'
   - name: rhel8
     driver:
-      image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi <% end %>
+      image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi:8.9 <% end %>
       intermediate_instructions:
         - RUN chmod +t /tmp
     attributes:
