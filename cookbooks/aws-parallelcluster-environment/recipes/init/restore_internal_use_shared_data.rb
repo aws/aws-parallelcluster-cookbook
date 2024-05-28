@@ -19,14 +19,23 @@ if node['cluster']['node_type'] == 'HeadNode'
   # This is necessary to preserve any data in these directories that was
   # generated during the build of ParallelCluster AMIs after converting to
   # shared storage and backed up to a temporary location previously
-  # Remove the backup after the copy is done
+  # Before removing the backup, ensure the data in the new directory is the same
+  # as the original to avoid any data loss or inconsistency. This is done
+  # by using rsync to copy the data and diff to check for differences.
+  # Remove the backup after the copy is done and the data integrity is verified.
   node['cluster']['internal_shared_dirs'].each do |dir|
     bash "Restore #{dir}" do
       user 'root'
       group 'root'
       code <<-EOH
         rsync -a --ignore-existing /tmp#{dir}/ #{dir}
-        rm -rf /tmp#{dir}/
+        diff_output=$(diff -r /tmp#{dir}/ #{dir})
+        if [ $? -eq 0 ]; then
+          rm -rf /tmp#{dir}/
+        else
+          echo "Data integrity check failed comparing #{dir} and /tmp#{dir}: $diff_output"
+          exit 1
+        fi
       EOH
     end
   end

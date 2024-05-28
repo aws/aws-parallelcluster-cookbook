@@ -22,7 +22,26 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
           expect(chef_run.node['cluster']['cluster_user_home']).to eq('/local/home/user')
           is_expected.to start_service("sshd")
         end
+
+        it 'moves the cluster user home directory with data integrity check' do
+          user_home = "/home/user"
+          user_local_home = "/local/home/user"
+          expect(chef_run).to run_bash("Verify data integrity for #{user_home}").with(
+            code: <<-CODE
+    diff_output=$(diff -r #{user_home} #{user_local_home})
+    if [ $? -eq 0 ]; then
+      rm -rf /tmp#{user_home}
+      rm -rf #{user_home}
+    else
+      echo "Data integrity check failed comparing #{user_local_home} and #{user_home}: $diff_output" >&2
+      systemctl start sshd
+      exit 1
+    fi
+            CODE
+          )
+        end
       end
+
       context 'when shared' do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
