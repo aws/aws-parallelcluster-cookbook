@@ -35,6 +35,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   EFS is used for shared internal data. 
 - On Ubuntu systems, remove default logrotate configuration for cloud-init log files that clashed with the
   configuration coming from Parallelcluster.
+- Removing `/etc/profile.d/pcluster.sh` so that it's not executed at every user login and 
+  `cfn_bootstrap_virtualenv` is not added in PATH environment variable.
 
 3.9.1
 ------

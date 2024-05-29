@@ -30,12 +30,12 @@ control 'tag:install_cfnbootstrap_virtualenv_created' do
     its('stdout')      { should match('aws-cfn-bootstrap') }
   end
 
-  desc "cfnbootstrap virtualenv bin dir should be added to the PATH"
-  describe file('/etc/profile.d/pcluster.sh') do
+  desc "cfnbootstrap virtualenv bin dir should be added to cookbook PATH"
+  describe file('/etc/parallelcluster/pcluster_cookbook_environment.sh') do
     it { should exist }
     its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('content') { should match "PATH=\\$PATH:#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv/bin" }
+    its('content') { should match "CFN_BOOTSTRAP_VIRTUALENV_PATH=\\#{pyenv_dir}/versions/#{cfn_python_version}/envs/cfn_bootstrap_virtualenv/bin" }
   end
 end
