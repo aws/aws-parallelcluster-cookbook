@@ -20,5 +20,4 @@ control 'tag:config_log_rotation_all_nodes' do
     subject { command("sudo logrotate /etc/logrotate.conf") }
     its('exit_status') { should eq 0 }
   end
-
 end
