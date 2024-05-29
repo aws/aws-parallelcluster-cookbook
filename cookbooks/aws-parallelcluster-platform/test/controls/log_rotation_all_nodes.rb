@@ -13,6 +13,9 @@
 control 'tag:config_log_rotation_all_nodes' do
   title 'Check that log rotation has been properly configured'
 
+  # Docker images do not have logrotate
+  only_if { !os_properties.on_docker? }
+
   # This should be enough at least to verify that the logrotate overall configuration is valid.
   # WARNING: do not use the `--force` option, because running multiple times the command with the
   # `--force` option will cause the command to fail (defeating the purpose of the test)
