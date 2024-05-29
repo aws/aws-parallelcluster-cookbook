@@ -32,8 +32,16 @@ action :install_kernel_source do
     if [ $? -ne 0 ]; then
       # Previous releases are moved into a vault area once a new minor release version is available for at least a week.
       # https://wiki.rockylinux.org/rocky/repo/#notes-on-devel
+      base_os_package_url="https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/#{node['kernel']['machine']}/os/Packages/k/${package}.rpm"
+      appstream_package_url="https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/AppStream/#{node['kernel']['machine']}/os/Packages/k/${package}.rpm"
+      base_os_status_code=$(curl --write-out '%{http_code}' --silent --output /dev/null ${base_os_package_url})
+      appstream_status_code=$(curl --write-out '%{http_code}' --silent --output /dev/null ${appstream_package_url})
       set -e
-      dnf install -y https://dl.rockylinux.org/vault/rocky/#{node['platform_version']}/BaseOS/#{node['kernel']['machine']}/os/Packages/k/${package}.rpm
+      if [ $base_os_status_code != 404 ]; then
+        dnf install -y ${base_os_package_url}
+      elif [ $appstream_status_code != 404 ]; then
+        dnf install -y ${appstream_package_url}
+      fi
     fi
     dnf clean all
     INSTALL_KERNEL_SOURCE
