@@ -12,7 +12,7 @@ cookbook "aws-parallelcluster-computefleet", path: "../aws-parallelcluster-compu
 cookbook "aws-parallelcluster-tests", path: "../aws-parallelcluster-tests"
 cookbook "aws-parallelcluster-slurm", path: "../aws-parallelcluster-slurm"
 
-cookbook "apt", path: "../third-party/apt-7.5.14"
+cookbook "apt", path: "../third-party/apt-7.5.22"
 cookbook "iptables", path: "../third-party/iptables-8.0.0"
 cookbook "line", path: "../third-party/line-4.5.13"
 cookbook "nfs", path: "../third-party/nfs-5.1.2"
