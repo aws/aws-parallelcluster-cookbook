@@ -13,7 +13,7 @@ supports 'amazon', '>= 2.0'
 supports 'centos', '>= 7.0'
 supports 'ubuntu', '>= 20.04'
 
-depends 'apt', '~> 7.5.14'
+depends 'apt', '~> 7.5.22'
 depends 'iptables', '~> 8.0.0'
 depends 'nfs', '~> 5.1.2'
 depends 'line', '~> 4.5.13'
