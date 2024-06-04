@@ -1,7 +1,0 @@
----
-name: enforcing
-title: Enforcing suite tests for the SELinux cookbook
-
-depends:
-  - name: common
-    path: test/integration/common
