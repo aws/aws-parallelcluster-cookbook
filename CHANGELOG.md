@@ -15,6 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Slurm to 23.11.7 (from 23.11.4).
 - Upgrade third-party cookbook dependencies:
   - apt-7.5.22 (from apt-7.5.14)
+  - openssh-2.11.12 (from openssh-2.11.3)
 
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.

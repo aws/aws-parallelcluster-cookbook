@@ -2,9 +2,34 @@
 
 This file is used to list changes made in each version of the openssh cookbook.
 
+## 2.11.12 - *2024-05-23*
+
+Standardise files with files in sous-chefs/repo-management
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.11.11 - *2024-05-03*
+
+## 2.11.10 - *2024-05-03*
+
+## 2.11.9 - *2024-03-18*
+
+## 2.11.8 - *2024-03-17*
+
+## 2.11.7 - *2024-03-12*
+
+- fix sshd-keygen command location for Amazon Linux 2023
+
+## 2.11.6 - *2023-12-21*
+
+## 2.11.5 - *2023-09-29*
+
+## 2.11.4 - *2023-09-11*
+
 ## 2.11.3 - *2023-08-05*
 
 - resolved cookstyle error: attributes/default.rb:120:58 refactor: `Chef/RedundantCode/MultiplePlatformChecks`
+
 ## 2.11.2 - *2023-08-04*
 
 Standardise files with files in sous-chefs/repo-management
