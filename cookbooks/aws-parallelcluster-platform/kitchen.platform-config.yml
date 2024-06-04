@@ -143,6 +143,47 @@ suites:
     attributes:
       cluster:
         node_type: HeadNode
+  - name: log_rotation_head_node
+    run_list:
+      - recipe[aws-parallelcluster-platform::log_rotation]
+    verifier:
+      controls:
+        - /tag:config_log_rotation_all_nodes/
+    attributes:
+      # Add attributes so that all possible logrotate configuration files are generated
+      cluster:
+        log_rotation_enabled: 'true'
+        node_type: 'HeadNode'
+        dcv_enabled: "head_node"
+        directory_service:
+          generate_ssh_keys_for_users: 'true'
+        scheduler: 'slurm'
+  - name: log_rotation_compute_fleet
+    run_list:
+      - recipe[aws-parallelcluster-platform::log_rotation]
+    verifier:
+      controls:
+        - /tag:config_log_rotation_all_nodes/
+    attributes:
+      # Add attributes so that all possible logrotate configuration files are generated
+      cluster:
+        log_rotation_enabled: 'true'
+        node_type: 'ComputeFleet'
+        scheduler: 'slurm'
+  - name: log_rotation_login_node
+    run_list:
+      - recipe[aws-parallelcluster-platform::log_rotation]
+    verifier:
+      controls:
+        - /tag:config_log_rotation_all_nodes/
+    attributes:
+      # Add attributes so that all possible logrotate configuration files are generated
+      cluster:
+        log_rotation_enabled: 'true'
+        node_type: 'LoginNode'
+        directory_service:
+          generate_ssh_keys_for_users: 'true'
+        scheduler: 'slurm'
   - name: networking
     run_list:
       - recipe[aws-parallelcluster-platform::networking]

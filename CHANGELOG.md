@@ -18,6 +18,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
 - Fixed an issue that prevented slurmctld and slurmdbd services from restarting on head node reboot when
   EFS is used for shared internal data. 
+- On Ubuntu systems, remove default logrotate configuration for cloud-init log files that clashed with the
+  configuration coming from Parallelcluster.
 
 3.9.1
 ------
