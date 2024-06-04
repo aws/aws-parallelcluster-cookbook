@@ -11,6 +11,7 @@
 
 control 'tag:install_openssh_installed' do
   title 'Check that openssh packages are installed and ssh/sshd config file exist'
+  only_if { !os_properties.alinux2023_on_docker? }
 
   files = %w(/etc/ssh/ssh_config)
   files.each do |file|
