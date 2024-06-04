@@ -1,7 +1,0 @@
----
-name: fcontext
-title: Fcontext suite tests for the SELinux cookbook
-
-depends:
-  - name: common
-    path: test/integration/common
