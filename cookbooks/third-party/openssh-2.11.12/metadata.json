@@ -1,0 +1,50 @@
+{
+  "name": "openssh",
+  "description": "Installs and configures OpenSSH client and daemon",
+  "long_description": "",
+  "maintainer": "Sous Chefs",
+  "maintainer_email": "help@sous-chefs.org",
+  "license": "Apache-2.0",
+  "platforms": {
+    "aix": ">= 0.0.0",
+    "amazon": ">= 0.0.0",
+    "arch": ">= 0.0.0",
+    "centos": ">= 0.0.0",
+    "fedora": ">= 0.0.0",
+    "freebsd": ">= 0.0.0",
+    "opensuseleap": ">= 0.0.0",
+    "oracle": ">= 0.0.0",
+    "redhat": ">= 0.0.0",
+    "scientific": ">= 0.0.0",
+    "smartos": ">= 0.0.0",
+    "suse": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0",
+    "windows": ">= 0.0.0",
+    "zlinux": ">= 0.0.0"
+  },
+  "dependencies": {
+    "iptables": ">= 7.0"
+  },
+  "providing": {
+
+  },
+  "recipes": {
+
+  },
+  "version": "2.11.12",
+  "source_url": "https://github.com/sous-chefs/openssh",
+  "issues_url": "https://github.com/sous-chefs/openssh/issues",
+  "privacy": false,
+  "chef_versions": [
+    [
+      ">= 12.15"
+    ]
+  ],
+  "ohai_versions": [
+
+  ],
+  "gems": [
+
+  ],
+  "eager_load_libraries": true
+}
