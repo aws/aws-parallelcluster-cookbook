@@ -46,6 +46,7 @@ directory '/etc/cron.daily'
 directory '/etc/cron.weekly'
 
 directory '/etc/chef'
+directory '/etc/parallelcluster'
 
 if platform_family?('debian')
   %w(nfs-common nfs-kernel-server).each do |nfspkg|
