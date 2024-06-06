@@ -5,7 +5,6 @@ metadata
 cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
 
 cookbook "line", path: "../third-party/line-4.5.13"
-cookbook "selinux", path: "../third-party/selinux-6.1.18"
 
 # for shared cookbook
 cookbook "pyenv", path: "../third-party/pyenv-4.2.3"
