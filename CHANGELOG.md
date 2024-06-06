@@ -17,6 +17,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - apt-7.5.22 (from apt-7.5.14)
   - openssh-2.11.12 (from openssh-2.11.3)
 - Remove third-party cookbook: selinux-6.1.12.
+- Upgrade EFA installer to `1.32.0`.
+  - Efa-driver: `efa-2.8.0-1`
+  - Efa-config: `efa-config-1.16-1`
+  - Efa-profile: `efa-profile-1.7-1`
+  - Libfabric-aws: `libfabric-aws-1.21.0-1`
+  - Rdma-core: `rdma-core-50.0-1`
+  - Open MPI: `openmpi40-aws-4.1.6-3` and `openmpi50-aws-5.0.2-12`
 
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
