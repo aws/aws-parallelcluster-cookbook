@@ -121,7 +121,7 @@ control 'tag:install_slurm_shared_libraries_compiled' do
     its('group') { should eq 'root' }
   end
 
-  describe file("#{slurm_library_folder}/mpi_pmix_v4.so") do
+  describe file("#{slurm_library_folder}/mpi_pmix_v5.so") do
     it { should exist }
     its('mode') { should cmp '0755' }
     its('owner') { should eq 'root' }
