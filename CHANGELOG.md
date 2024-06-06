@@ -27,6 +27,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Rdma-core: `rdma-core-50.0-1`
   - Open MPI: `openmpi40-aws-4.1.6-3` and `openmpi50-aws-5.0.2-12`
 - Upgrade NVIDIA driver to version 535.183.01 (from 535.154.05).
+- Upgrade Python to 3.9.19 (from 3.9.17).
 
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.

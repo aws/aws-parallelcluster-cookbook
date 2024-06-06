@@ -9,7 +9,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-python_version = '3.9.17'
+python_version = '3.9.19'
 base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 

@@ -31,7 +31,7 @@ suites:
     attributes:
       cluster:
         custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
-        python-version: 3.9.17
+        python-version: 3.9.19
         node_virtualenv_path: /opt/parallelcluster/pyenv/versions/node_virtualenv
   - name: fleet_status
     run_list:
