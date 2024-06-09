@@ -31,10 +31,8 @@ if node['cluster']['node_type'] == 'HeadNode'
     user 'root'
     group 'root'
     code <<-EOH
-      # Sleep 1 min waiting for files generation in /home
-      sleep 60
-      # Generate a list of existing files in /home before the sync
-      find /home -type f > /tmp/home_existing_files.txt
+      # Generate a list of existing files and dirs in /home before the sync
+      find /home -mindepth 1 > /tmp/home_existing_files.txt
 
       # Initialize an empty set for exclude options and directories to exclude
       exclude_options=""
