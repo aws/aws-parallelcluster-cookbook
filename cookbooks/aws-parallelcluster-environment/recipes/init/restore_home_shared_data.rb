@@ -52,7 +52,7 @@ if node['cluster']['node_type'] == 'HeadNode'
         for part in "${parts[@]}"; do
           current_path="$current_path/$part"
           if [ ! -e "$current_path" ]; then
-            # If the path does not exist in /tmp/home, add the top-level directory to the exclude list
+            # If the path does not exist in /tmp/home, add the last part of path to the exclude list
             if [ -z "${exclude_dirs[$part]}" ]; then
               exclude_dirs[$part]=1
               exclude_options="$exclude_options --exclude=$part"
