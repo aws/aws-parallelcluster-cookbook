@@ -47,5 +47,6 @@ end
 
 def unsupported_packages
   # Using `sudo dnf supportinfo --pkg <PACKAGE_NAME>` to find if packages are available
-  %w(openmotif-devel redhat-lsb python2 python2-pip NetworkManager-config-routing-rules moreutils)
+  # The list here is a record of what packages are absent on Amazon Linux 2023. This list is not used in the code.
+  %w(openmotif-devel moreutils)
 end
