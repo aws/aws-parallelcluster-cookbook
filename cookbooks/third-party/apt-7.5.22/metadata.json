@@ -1,0 +1,37 @@
+{
+  "name": "apt",
+  "description": "Configures apt and apt caching.",
+  "long_description": "",
+  "maintainer": "Sous Chefs",
+  "maintainer_email": "help@sous-chefs.org",
+  "license": "Apache-2.0",
+  "platforms": {
+    "debian": ">= 0.0.0",
+    "ubuntu": ">= 0.0.0"
+  },
+  "dependencies": {
+
+  },
+  "providing": {
+
+  },
+  "recipes": {
+
+  },
+  "version": "7.5.22",
+  "source_url": "https://github.com/sous-chefs/apt",
+  "issues_url": "https://github.com/sous-chefs/apt/issues",
+  "privacy": false,
+  "chef_versions": [
+    [
+      ">= 13.3"
+    ]
+  ],
+  "ohai_versions": [
+
+  ],
+  "gems": [
+
+  ],
+  "eager_load_libraries": true
+}

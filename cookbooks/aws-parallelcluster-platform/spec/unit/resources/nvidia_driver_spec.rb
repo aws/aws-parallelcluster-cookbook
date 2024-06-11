@@ -96,7 +96,7 @@ describe 'nvidia_driver:nvidia_driver_enabled?' do
 end
 
 describe 'nvidia_driver:nvidia_kernel_module' do
-  [%w(false kernel), %w(true kernel-open)].each do |kernel_open, kernel_module|
+  [%w(false kernel), [false, 'kernel'], %w(no kernel), %w(true kernel-open), [true, 'kernel-open'], %w(yes kernel-open)].each do |kernel_open, kernel_module|
     context "node['cluster']['nvidia']['kernel_open'] is #{kernel_open}" do
       cached(:chef_run) do
         ChefSpec::SoloRunner.new(step_into: ['nvidia_driver']) do |node|

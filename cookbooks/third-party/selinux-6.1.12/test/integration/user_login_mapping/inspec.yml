@@ -1,7 +1,0 @@
----
-name: user_login_mapping
-title: User and login mapping suite tests for the SELinux cookbook
-
-depends:
-  - name: common
-    path: test/integration/common

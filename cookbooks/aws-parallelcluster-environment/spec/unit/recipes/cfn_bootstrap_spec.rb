@@ -5,7 +5,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
     context "on #{platform}#{version}" do
       cached(:cfnbootstrap_version) { '2.0-28' }
       cached(:cfnbootstrap_package) { "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz" }
-      cached(:python_version) { '3.9.17' }
+      cached(:python_version) { '3.9.19' }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
       cached(:virtualenv_path) { "system_pyenv_root/versions/#{python_version}/envs/cfn_bootstrap_virtualenv" }
 
@@ -51,9 +51,9 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
           )
         end
 
-        it 'adds cfn_bootstrap virtualenv to default path' do
-          is_expected.to create_template("/etc/profile.d/pcluster.sh").with(
-            source: "cfn_bootstrap/pcluster.sh.erb",
+        it 'adds cfn_bootstrap virtualenv to a cookbook profile' do
+          is_expected.to create_template("#{node['cluster']['etc_dir']}/pcluster_cookbook_environment.sh").with(
+            source: "cfn_bootstrap/pcluster_cookbook_environment.sh.erb",
             owner: 'root',
             group: 'root',
             mode: '0644',

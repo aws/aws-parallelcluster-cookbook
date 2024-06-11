@@ -7,13 +7,12 @@ source chef_repo: "."
 
 metadata
 
-cookbook "apt", path: "./cookbooks/third-party/apt-7.5.14"
+cookbook "apt", path: "./cookbooks/third-party/apt-7.5.22"
 cookbook "iptables", path: "./cookbooks/third-party/iptables-8.0.0"
 cookbook "line", path: "./cookbooks/third-party/line-4.5.13"
 cookbook "nfs", path: "./cookbooks/third-party/nfs-5.1.2"
-cookbook "openssh", path: "./cookbooks/third-party/openssh-2.11.3"
+cookbook "openssh", path: "./cookbooks/third-party/openssh-2.11.12"
 cookbook "pyenv", path: "./cookbooks/third-party/pyenv-4.2.3"
-cookbook "selinux", path: "./cookbooks/third-party/selinux-6.1.12"
 cookbook "yum", path: "./cookbooks/third-party/yum-7.4.13"
 cookbook "yum-epel", path: "./cookbooks/third-party/yum-epel-5.0.2"
 

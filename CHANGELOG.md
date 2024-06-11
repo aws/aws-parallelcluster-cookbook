@@ -8,14 +8,35 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for external Slurmdbd.
+- Add support for FSx Lustre in US isolated regions.
 
 **CHANGES**
 - Upgrade Cinc Client to version to 18.4.12 from 18.2.7.
+- Upgrade Slurm to 23.11.7 (from 23.11.4).
+- Upgrade munge to version 0.5.16 (from 0.5.15).
+- Upgrade Pmix to 5.0.2 (from 4.2.9).
+- Upgrade third-party cookbook dependencies:
+  - apt-7.5.22 (from apt-7.5.14)
+  - openssh-2.11.12 (from openssh-2.11.3)
+- Remove third-party cookbook: selinux-6.1.12.
+- Upgrade EFA installer to `1.32.0`.
+  - Efa-driver: `efa-2.8.0-1`
+  - Efa-config: `efa-config-1.16-1`
+  - Efa-profile: `efa-profile-1.7-1`
+  - Libfabric-aws: `libfabric-aws-1.21.0-1`
+  - Rdma-core: `rdma-core-50.0-1`
+  - Open MPI: `openmpi40-aws-4.1.6-3` and `openmpi50-aws-5.0.2-12`
+- Upgrade NVIDIA driver to version 535.183.01 (from 535.154.05).
+- Upgrade Python to 3.9.19 (from 3.9.17).
 
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
 - Fixed an issue that prevented slurmctld and slurmdbd services from restarting on head node reboot when
   EFS is used for shared internal data. 
+- On Ubuntu systems, remove default logrotate configuration for cloud-init log files that clashed with the
+  configuration coming from Parallelcluster.
+- Removing `/etc/profile.d/pcluster.sh` so that it's not executed at every user login and 
+  `cfn_bootstrap_virtualenv` is not added in PATH environment variable.
 
 3.9.1
 ------

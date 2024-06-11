@@ -14,6 +14,13 @@
 
 return if node['cluster']['log_rotation_enabled'] != 'true'
 
+if platform?('ubuntu')
+  # Ubuntu recently pushed a default logrotate configuration for cloud-init that clashes with the ParallelCluster one.
+  file '/etc/logrotate.d/cloud-init' do
+    action :delete
+  end
+end
+
 # TODO: move the logrotate configuration of the various services to the corresponding recipes/cookbooks.
 
 case node['cluster']['node_type']

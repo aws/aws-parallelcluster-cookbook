@@ -15,7 +15,7 @@
 virtualenv_name = 'cfn_bootstrap_virtualenv'
 pyenv_root = node['cluster']['system_pyenv_root']
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-python_version = '3.9.17'
+python_version = '3.9.19'
 virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_name}"
 
 node.default['cluster']['cfn_bootstrap_virtualenv_path'] = virtualenv_path
@@ -53,9 +53,9 @@ bash "Install CloudFormation helpers from #{cfnbootstrap_package}" do
   creates "#{virtualenv_path}/bin/cfn-hup"
 end
 
-# Add cfn_bootstrap virtualenv to default path
-template "/etc/profile.d/pcluster.sh" do
-  source "cfn_bootstrap/pcluster.sh.erb"
+# Add cfn_bootstrap virtualenv to a profile to be used only for cookbook
+template "#{node['cluster']['etc_dir']}/pcluster_cookbook_environment.sh" do
+  source "cfn_bootstrap/pcluster_cookbook_environment.sh.erb"
   owner 'root'
   group 'root'
   mode '0644'

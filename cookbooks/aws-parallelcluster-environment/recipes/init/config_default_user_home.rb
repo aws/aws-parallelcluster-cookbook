@@ -44,7 +44,12 @@ bash "Backup #{node['cluster']['cluster_user_home']}" do
   EOH
 end
 
-# move the cluster user's default home directory
+# Move the cluster user's default home directory
+# This script performs the following actions:
+# 1. Creates the new local home directory for the cluster user if it doesn't already exist.
+# 2. Copies the data from the temporary backup directory (/tmp/cluster_user_home) to the new local home directory.
+# 3. Updates the cluster user's home directory path to the new local home directory.
+# 4. Changes the ownership of the new local home directory to the cluster user.
 bash "Move #{node['cluster']['cluster_user_home']}" do
   user 'root'
   group 'root'
@@ -54,8 +59,26 @@ bash "Move #{node['cluster']['cluster_user_home']}" do
     rsync -a /tmp#{node['cluster']['cluster_user_home']}/ #{node['cluster']['cluster_user_local_home']}
     usermod -d #{node['cluster']['cluster_user_local_home']} #{node['cluster']['cluster_user']}
     chown -R #{node['cluster']['cluster_user']}: #{node['cluster']['cluster_user_local_home']}
-    rm -rf /tmp#{node['cluster']['cluster_user_home']}
-    rm -rf #{node['cluster']['cluster_user_home']}
+  EOH
+end
+
+# Data integrity check and cleanup for temporary backup and original home directory
+# 1. Verifies data integrity by comparing the temporary backup directory and the new local home directory.
+# 2. If the data integrity check passes, it removes both the temporary backup directory and the original home directory.
+# 3. If the data integrity check fails, it outputs an error message and exits with an error code 1.
+bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
+  user 'root'
+  group 'root'
+  code <<-EOH
+    diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
+    if [ $? -eq 0 ]; then
+      rm -rf /tmp#{node['cluster']['cluster_user_home']}
+      rm -rf #{node['cluster']['cluster_user_home']}
+    else
+      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}: $diff_output" >&2
+      systemctl start sshd
+      exit 1
+    fi
   EOH
 end
 
