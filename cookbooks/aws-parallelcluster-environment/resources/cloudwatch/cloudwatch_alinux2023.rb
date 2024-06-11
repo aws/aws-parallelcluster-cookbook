@@ -25,6 +25,17 @@ action :cloudwatch_prerequisite do
     retries 3
     retry_delay 5
   end
+  # on alinux2023, install and enable ryslog: https://repost.aws/knowledge-center/ec2-linux-al2023-find-log-files
+  package "rsyslog" do
+    retries 3
+    retry_delay 5
+  end
+  service 'rsyslog' do
+    supports restart: true
+    action %i(enable start)
+    retries 5
+    retry_delay 10
+  end unless on_docker?
 end
 
 action_class do
