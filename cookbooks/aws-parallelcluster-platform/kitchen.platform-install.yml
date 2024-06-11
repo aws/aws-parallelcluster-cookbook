@@ -309,13 +309,3 @@ suites:
     verifier:
       controls:
         - /tag:install_users/
-  - name: enable_services
-    run_list:
-      - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::enable_services]
-    verifier:
-      controls:
-        - /install_service_is_enabled/
-    attributes:
-      dependencies:
-        - resource:install_packages:install_base_packages
