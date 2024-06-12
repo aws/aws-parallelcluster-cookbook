@@ -17,6 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix issue with `SharedStorageType: Efs` not bootstrapping on ARM instances.
+- Remove `cloud_dns` from the `SlurmctldParameters` in the Slurm config to avoid Slurm fanout issues.  This is also not required since we set the IP addresses on instance launch
 
 3.9.1
 ------
