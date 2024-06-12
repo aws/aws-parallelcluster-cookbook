@@ -38,6 +38,15 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Removing `/etc/profile.d/pcluster.sh` so that it's not executed at every user login and 
   `cfn_bootstrap_virtualenv` is not added in PATH environment variable.
 
+3.9.2
+------
+
+**CHANGES**
+- Upgrade Slurm to 23.11.7 (from 23.11.4).
+
+**BUG FIXES**
+- Fix issue with `SharedStorageType: Efs` not bootstrapping on ARM instances.
+
 3.9.1
 ------
 
