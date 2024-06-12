@@ -29,7 +29,7 @@ LaunchParameters=enable_nss_slurm
 SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>
 TreeWidth=65533
 <% else -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,cloud_dns,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>
+SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>
 TreeWidth=30
 <% end -%>
 SuspendProgram=<%= node['cluster']['scripts_dir'] %>/slurm/slurm_suspend
