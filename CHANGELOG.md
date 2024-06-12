@@ -8,7 +8,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for external Slurmdbd.
-- Add support for FSx Lustre in US isolated regions.
 
 **CHANGES**
 - Upgrade Cinc Client to version to 18.4.12 from 18.2.7.
@@ -37,6 +36,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   configuration coming from Parallelcluster.
 - Removing `/etc/profile.d/pcluster.sh` so that it's not executed at every user login and 
   `cfn_bootstrap_virtualenv` is not added in PATH environment variable.
+
+3.9.3
+------
+
+**ENHANCEMENTS**
+- Add support for FSx Lustre as a shared storage type in us-iso-east-1.
 
 3.9.2
 ------
