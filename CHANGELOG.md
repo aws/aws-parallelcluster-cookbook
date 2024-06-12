@@ -6,8 +6,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.9.3
 ------
 
-**CHANGES**
-- Add support for FSx Lustre in us-iso-east-1.
+**ENHANCEMENTS**
+- Add support for FSx Lustre as a shared storage type in us-iso-east-1.
 
 3.9.2
 ------
