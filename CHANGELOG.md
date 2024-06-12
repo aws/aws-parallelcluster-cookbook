@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.9.3
+------
+
+**CHANGES**
+- Add support for FSx Lustre in us-iso-east-1.
+
 3.9.2
 ------
 
