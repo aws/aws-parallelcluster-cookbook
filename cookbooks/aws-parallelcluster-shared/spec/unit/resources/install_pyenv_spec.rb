@@ -37,16 +37,22 @@ describe 'install_pyenv:run' do
           is_expected.to create_directory(system_pyenv_root).with_recursive(true)
         end
 
-        it 'installs pyenv system' do
-          is_expected.to install_pyenv_install('system').with_prefix(system_pyenv_root)
+        it 'downloads python tarball' do
+          is_expected.to create_if_missing_remote_file("#{node['cluster']['system_pyenv_root']}/Python-#{python_version}.tgz").with(
+            source: "#{node['cluster']['artifacts_s3_url']}/dependencies/python/Python-#{python_version}.tgz",
+            mode: '0644',
+            retries: 3,
+            retry_delay: 5
+          )
         end
 
-        it 'deletes /etc/profile.d/pyenv.sh to avoid exposing the ParallelCluster pyenv installation to customers' do ||
-          is_expected.to delete_file('/etc/profile.d/pyenv.sh')
-        end
-
-        it 'installs default python version' do
-          is_expected.to install_pyenv_python(python_version)
+        it 'installs python' do
+          is_expected.to run_bash("install python #{python_version}").with(
+            user: 'root',
+            group: 'root',
+            cwd: "#{node['cluster']['system_pyenv_root']}"
+          ).with_code(/tar -xzf Python-#{python_version}.tgz/)
+           .with_code(%r{./configure --prefix=#{node['cluster']['system_pyenv_root']}/versions/#{python_version}})
         end
       end
 
@@ -66,12 +72,21 @@ describe 'install_pyenv:run' do
           is_expected.to create_directory(system_pyenv_root).with_recursive(true)
         end
 
-        it 'installs pyenv system' do
-          is_expected.to install_pyenv_install('system').with_prefix(system_pyenv_root)
+        it 'downloads python tarball' do
+          is_expected.to create_if_missing_remote_file("#{system_pyenv_root}/Python-#{python_version}.tgz").with(
+            source: "https://www.python.org/ftp/python/#{python_version}/Python-#{python_version}.tgz",
+            mode: '0644',
+            retries: 3,
+            retry_delay: 5
+          )
         end
 
-        it 'installs default python version' do
-          is_expected.to install_pyenv_python(python_version)
+        it 'installs python' do
+          is_expected.to run_bash("install python #{python_version}").with(
+            user: 'root',
+            group: 'root',
+            cwd: "#{system_pyenv_root}"
+          )
         end
       end
 
@@ -91,19 +106,28 @@ describe 'install_pyenv:run' do
           cached(:pyenv_root) { "pyenv_root" }
           cached(:python_version) { 'python_version' }
           cached(:chef_run) do
-            runner = runner(platform: platform, version: version, step_into: ['install_pyenv'])
+            runner = runner(platform: platform, version: version, step_into: ['install_pyenv']) do |node|
+              node.override['cluster']['python-version'] = python_version
+              node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.#{aws_domain}/archives"
+            end
             ConvergeInstallPyenv.run(runner, user_only: true, user: user, python_version: python_version, pyenv_root: pyenv_root)
           end
 
-          it 'installs pyenv for user' do
-            is_expected.to install_pyenv_install('user').with(
-              user: user,
-              prefix: pyenv_root
+          it 'downloads python tarball' do
+            is_expected.to create_if_missing_remote_file("#{pyenv_root}/Python-#{python_version}.tgz").with(
+              source: "https://www.python.org/ftp/python/#{python_version}/Python-#{python_version}.tgz",
+              mode: '0644',
+              retries: 3,
+              retry_delay: 5
             )
           end
 
-          it 'installs pyenv_python for user' do
-            is_expected.to install_pyenv_python(python_version).with_user(user)
+          it 'installs python' do
+            is_expected.to run_bash("install python #{python_version}").with(
+              user: user,
+              group: 'root',
+              cwd: "#{pyenv_root}"
+            )
           end
 
           it 'installs pyenv plugin virtualenv' do

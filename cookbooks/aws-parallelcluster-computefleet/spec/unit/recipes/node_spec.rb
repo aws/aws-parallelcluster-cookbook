@@ -36,10 +36,7 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
         end
 
         it 'installs official node package' do
-          is_expected.to install_pyenv_pip('aws-parallelcluster-node').with(
-            version: node_version,
-            virtualenv: virtualenv_path
-          )
+          is_expected.to run_bash('install official aws-parallelcluster-node')
         end
       end
 

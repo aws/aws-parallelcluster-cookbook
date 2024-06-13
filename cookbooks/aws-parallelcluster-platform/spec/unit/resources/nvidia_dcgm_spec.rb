@@ -146,7 +146,7 @@ describe 'nvidia_dcgm:setup' do
         cached(:node) { chef_run.node }
 
         it 'does not install datacenter gpu manager' do
-          is_expected.not_to install_package('datacenter-gpu-manager')
+          is_expected.not_to run_bash('Install datacenter-gpu-manager')
         end
       end
 
@@ -166,11 +166,11 @@ describe 'nvidia_dcgm:setup' do
 
           if %w(centos amazon).include?(platform)
             it 'does not install datacenter gpu manager' do
-              is_expected.not_to install_package('datacenter-gpu-manager')
+              is_expected.not_to run_bash('Install datacenter-gpu-manager')
             end
           else
             it 'installs datacenter gpu manager' do
-              is_expected.to install_package('datacenter-gpu-manager')
+              is_expected.to run_bash('Install datacenter-gpu-manager')
             end
           end
         end

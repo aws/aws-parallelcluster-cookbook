@@ -164,6 +164,7 @@ end
 
 describe 'fabric_manager:setup' do
   cached(:nvidia_driver_version) { 'nvidia_driver_version' }
+  cached(:aws_region) { 'test_region' }
 
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
@@ -195,7 +196,7 @@ describe 'fabric_manager:setup' do
             is_expected.to run_execute('install_fabricmanager_for_ubuntu')
               .with_retries(3)
               .with_retry_delay(5)
-              .with_command("apt -y install #{fabric_manager_package}=#{fabric_manager_version} && apt-mark hold #{fabric_manager_package}")
+              .with_command("apt -y install #{fabric_manager_package}-#{fabric_manager_version}.deb && apt-mark hold #{fabric_manager_package}")
           end
         else
           it 'installs yum-plugin-versionlock' do
@@ -208,7 +209,8 @@ describe 'fabric_manager:setup' do
               .with_retries(3)
               .with_retry_delay(5)
               .with(code: %(    set -e
-    yum install -y #{fabric_manager_package}-#{fabric_manager_version}
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/nvidia_fabric/#{platform}/#{fabric_manager_package}-#{fabric_manager_version}-1.x86_64.rpm #{fabric_manager_package}-#{fabric_manager_version}.rpm --region test_region
+    yum install -y #{fabric_manager_package}-#{fabric_manager_version}.rpm
     yum versionlock #{fabric_manager_package}
 ))
           end

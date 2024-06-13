@@ -196,7 +196,7 @@ describe 'gdrcopy:setup' do
       end
       cached(:gdrcopy_service) { platform == 'ubuntu' ? 'gdrdrv' : 'gdrcopy' }
       cached(:gdrcopy_tarball) { "#{sources_dir}/gdrcopy-#{gdrcopy_version}.tar.gz" }
-      cached(:gdrcopy_url) { "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v#{gdrcopy_version}.tar.gz" }
+      cached(:gdrcopy_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{gdrcopy_version}.tar.gz" }
       cached(:gdrcopy_dependencies) do
         case platform
         when 'ubuntu'
