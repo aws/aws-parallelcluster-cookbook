@@ -41,7 +41,7 @@ describe 'activate_virtual_env:run' do
             group: 'root',
             cwd: "#{node['cluster']['system_pyenv_root']}"
           ).with_code(%r{source pyenv_path/bin/activate})
-          end
+        end
       end
 
       context "without requirements" do

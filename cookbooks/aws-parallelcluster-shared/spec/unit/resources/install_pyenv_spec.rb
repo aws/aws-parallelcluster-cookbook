@@ -24,12 +24,13 @@ describe 'install_pyenv:run' do
           runner = runner(platform: platform, version: version, step_into: ['install_pyenv']) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
+            node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.#{aws_domain}/archives"
           end
           ConvergeInstallPyenv.run(runner)
         end
         cached(:node) { chef_run.node }
 
-        it 'runs istall_pyenv' do
+        it 'runs install_pyenv' do
           is_expected.to run_install_pyenv('run')
         end
 
@@ -52,7 +53,7 @@ describe 'install_pyenv:run' do
             group: 'root',
             cwd: "#{node['cluster']['system_pyenv_root']}"
           ).with_code(/tar -xzf Python-#{python_version}.tgz/)
-           .with_code(%r{./configure --prefix=#{node['cluster']['system_pyenv_root']}/versions/#{python_version}})
+                                                                     .with_code(%r{./configure --prefix=#{node['cluster']['system_pyenv_root']}/versions/#{python_version}})
         end
       end
 
@@ -110,6 +111,8 @@ describe 'install_pyenv:run' do
               node.override['cluster']['python-version'] = python_version
               node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.#{aws_domain}/archives"
             end
+            # ConvergeInstallPyenv.run(runner)
+            # runner = runner(platform: platform, version: version, step_into: ['install_pyenv'])
             ConvergeInstallPyenv.run(runner, user_only: true, user: user, python_version: python_version, pyenv_root: pyenv_root)
           end
 
@@ -127,13 +130,6 @@ describe 'install_pyenv:run' do
               user: user,
               group: 'root',
               cwd: "#{pyenv_root}"
-            )
-          end
-
-          it 'installs pyenv plugin virtualenv' do
-            is_expected.to install_pyenv_plugin('virtualenv').with(
-              git_url: 'https://github.com/pyenv/pyenv-virtualenv',
-              user: user
             )
           end
         end

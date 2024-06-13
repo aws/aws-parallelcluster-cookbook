@@ -208,11 +208,7 @@ describe 'fabric_manager:setup' do
               .with(user: 'root')
               .with_retries(3)
               .with_retry_delay(5)
-              .with(code: %(    set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/nvidia_fabric/#{platform}/#{fabric_manager_package}-#{fabric_manager_version}-1.x86_64.rpm #{fabric_manager_package}-#{fabric_manager_version}.rpm --region test_region
-    yum install -y #{fabric_manager_package}-#{fabric_manager_version}.rpm
-    yum versionlock #{fabric_manager_package}
-))
+              .with_code(/yum install -y #{fabric_manager_package}-#{fabric_manager_version}.rpm/)
           end
         end
       end

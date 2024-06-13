@@ -21,7 +21,6 @@ action :setup do
   return unless _nvidia_dcgm_enabled
 
   action_install_package
-
 end
 
 def _nvidia_enabled

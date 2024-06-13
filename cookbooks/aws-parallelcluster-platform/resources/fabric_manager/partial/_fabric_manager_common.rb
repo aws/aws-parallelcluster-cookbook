@@ -27,7 +27,6 @@ action :setup do
   node_attributes "dump node attributes"
 
   action_install_package
-
 end
 
 action :configure do

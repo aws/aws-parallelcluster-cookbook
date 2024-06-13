@@ -97,7 +97,7 @@ def _nvidia_driver_version
 end
 
 def nvidia_driver_url
-  "https://us.download.nvidia.com/tesla/#{_nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{_nvidia_driver_version}.run"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver/NVIDIA-Linux-#{nvidia_arch}-#{_nvidia_driver_version}.run"
 end
 
 def nvidia_driver_enabled?
