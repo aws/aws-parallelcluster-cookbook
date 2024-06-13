@@ -53,9 +53,9 @@ bash "Install CloudFormation helpers from #{cfnbootstrap_package}" do
   creates "#{virtualenv_path}/bin/cfn-hup"
 end
 
-# Add cfn_bootstrap virtualenv to default path
-template "/etc/profile.d/pcluster.sh" do
-  source "cfn_bootstrap/pcluster.sh.erb"
+# Add cfn_bootstrap virtualenv to a profile to be used only for cookbook
+template "#{node['cluster']['etc_dir']}/pcluster_cookbook_environment.sh" do
+  source "cfn_bootstrap/pcluster_cookbook_environment.sh.erb"
   owner 'root'
   group 'root'
   mode '0644'

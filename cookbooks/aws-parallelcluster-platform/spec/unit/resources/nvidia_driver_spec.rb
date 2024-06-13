@@ -219,17 +219,19 @@ describe 'nvidia_driver:setup' do
         end
 
         if platform == 'amazon'
+          compiler_path = version == 2023 ? 'CC=/usr/bin/gcc' : 'CC=/usr/bin/gcc10-gcc'
           it 'installs gcc10' do
             is_expected.to install_package('gcc10').with_retries(10).with_retry_delay(5)
           end
 
           it 'creates dkms/nvidia.conf' do
-            is_expected.to create_cookbook_file('dkms/nvidia.conf').with(
-              source: 'dkms/nvidia.conf',
-              path: '/etc/dkms/nvidia.conf',
+            is_expected.to create_template('/etc/dkms/nvidia.conf').with(
+              source: 'nvidia/amazon/dkms/nvidia.conf.erb',
+              cookbook: 'aws-parallelcluster-platform',
               owner: 'root',
               group: 'root',
-              mode: '0644'
+              mode: '0644',
+              variables: { compiler_path: compiler_path }
             )
           end
           it 'installs nvidia driver' do

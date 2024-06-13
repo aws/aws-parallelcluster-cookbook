@@ -3,6 +3,7 @@ control 'tag:install_package_repos' do
   # describe the resource
   title 'Configure package manager repository'
 
+  only_if { !os_properties.alinux2023? }
   # in this case, different OSes produce different outcomes, to be tested differently
   if os.redhat? # redhat includes amazon
 

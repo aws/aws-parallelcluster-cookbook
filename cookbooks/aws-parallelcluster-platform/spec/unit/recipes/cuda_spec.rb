@@ -55,7 +55,9 @@ describe 'aws-parallelcluster-platform::cuda' do
           group: 'root',
           cwd: '/tmp',
           creates: "/usr/local/cuda-#{cuda_version}")
-        .with_code(%r{./cuda.run --silent --toolkit --samples})
+        .with_code(%r{mkdir /cuda-install})
+        .with_code(%r{./cuda.run --silent --toolkit --samples --tmpdir=/cuda-install})
+        .with_code(%r{rm -rf /cuda-install})
         .with_code(%r{rm -f /tmp/cuda.run})
     end
 

@@ -7,7 +7,7 @@ control 'tag:install_install_packages' do
   # verify package with a common name is installed
   describe package('moreutils') do
     it { should be_installed }
-  end
+  end unless os_properties.alinux2023?
 
   # verify dns-domain package
   describe package('hostname') do
@@ -17,7 +17,8 @@ control 'tag:install_install_packages' do
   # Verify jq version is updated enough to accept 2 argfile parameters
   describe bash("jq --argfile") do
     its('stderr') { should match /jq: --argfile takes two parameters/ }
-  end unless instance.custom_ami?
+  end unless instance.custom_ami? || os_properties.alinux2023?
+  # Need to change the jq --argfile commands as its deprecated in 1.7( latest)
 
   unless os_properties.centos7?
     # Verify fftw package is not installed

@@ -51,9 +51,9 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
           )
         end
 
-        it 'adds cfn_bootstrap virtualenv to default path' do
-          is_expected.to create_template("/etc/profile.d/pcluster.sh").with(
-            source: "cfn_bootstrap/pcluster.sh.erb",
+        it 'adds cfn_bootstrap virtualenv to a cookbook profile' do
+          is_expected.to create_template("#{node['cluster']['etc_dir']}/pcluster_cookbook_environment.sh").with(
+            source: "cfn_bootstrap/pcluster_cookbook_environment.sh.erb",
             owner: 'root',
             group: 'root',
             mode: '0644',

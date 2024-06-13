@@ -35,7 +35,7 @@ control 'tag:config_system_authentication_services_enabled' do
 
   services = %w(sssd)
 
-  if os_properties.redhat8?
+  if os.redhat?
     services.append("oddjobd")
   end
 
@@ -55,8 +55,7 @@ control 'tag:config_system_authentication_configured' do
   only_if { node['cluster']['node_type'] != 'ComputeFleet' || node['cluster']['directory_service']['disabled_on_compute_nodes'] != 'true' }
 
   describe 'Check NSS and PAM to use SSSD for system authentication and identity information'
-  if os_properties.redhat8?
-
+  if os_properties.redhat?
     describe bash("authselect current") do
       its('exit_status') { should eq 0 }
       its('stdout') { should match /Profile ID: sssd/ }
