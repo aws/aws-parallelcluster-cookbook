@@ -17,8 +17,7 @@ return if on_docker?
 if node['cluster']['node_type'] == 'HeadNode'
   # Restore the shared storage home data if it doesn't already exist
   # This is necessary to preserve any data in these directories that was
-  # generated during the build of ParallelCluster AMIs after converting to
-  # shared storage and backed up to a temporary location previously.
+  # generated during the node bootstrap after converting to shared storage.
   # Before removing the backup, ensure the data in the new home is the same
   # as the original to avoid any data loss or inconsistency. This is done
   # by using rsync to copy the data and diff to check for differences.
@@ -35,15 +34,12 @@ if node['cluster']['node_type'] == 'HeadNode'
       find /home -mindepth 1 > /tmp/home_existing_files.txt
 
       # Initialize an empty set for exclude options and directories to exclude
-      exclude_options=""
       declare -A exclude_dirs
 
-      # Process each file in the list
+      # Process each file and directory in the list to determine which paths should be excluded from the diff check
       while IFS= read -r file; do
         # Remove the /home/ prefix
         relative_path=${file#/home/}
-
-        # Initialize current path
         current_path="/tmp/home"
 
         # Split the relative path by /
@@ -55,13 +51,13 @@ if node['cluster']['node_type'] == 'HeadNode'
             # If the path does not exist in /tmp/home, add the last part of path to the exclude list
             if [ -z "${exclude_dirs[$part]}" ]; then
               exclude_dirs[$part]=1
-              exclude_options="$exclude_options --exclude=$part"
+              echo $part >> /tmp/exclude_options.txt
             fi
             break
           else
             if [ -f "$current_path" ]; then
               # If the path is a file, add it to the exclude list
-              exclude_options="$exclude_options --exclude=$part"
+              echo $part >> /tmp/exclude_options.txt
               break
             fi
             # If the path is a directory, continue checking subdirectories
@@ -73,10 +69,11 @@ if node['cluster']['node_type'] == 'HeadNode'
       rsync -a --ignore-existing /tmp/home/ /home
 
       # Perform the diff check, excluding the original files
-      diff_output=$(eval diff -r $exclude_options /tmp/home /home)
+      diff_output=$(diff -r --exclude-from=/tmp/exclude_options.txt /tmp/home /home)
       if [ $? -eq 0 ]; then
         rm -rf /tmp/home/
         rm -rf /tmp/home_existing_files.txt
+        rm -rf /tmp/exclude_options.txt
       else
         echo "Data integrity check failed comparing /home and /tmp/home: $diff_output"
         exit 1
