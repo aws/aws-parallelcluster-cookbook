@@ -38,6 +38,12 @@ bash "install custom aws-parallelcluster-node" do
     mkdir aws-parallelcluster-custom-node
     tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
     cd aws-parallelcluster-custom-node/*aws-parallelcluster-node-*
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/PyPi/#{node['kernel']['machine']}/node-dependencies.tgz node-dependencies.tgz --region #{node['cluster']['region']}
+    tar xzf node-dependencies.tgz
+    cd node
+    #{node_virtualenv_path}/bin/pip install * -f ./ --no-index
+    cd ..
+
     pip install .
     deactivate
   NODE

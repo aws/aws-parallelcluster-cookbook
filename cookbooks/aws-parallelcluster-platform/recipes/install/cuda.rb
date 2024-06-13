@@ -24,9 +24,9 @@ cuda_patch = '2'
 cuda_complete_version = "#{cuda_version}.#{cuda_patch}"
 cuda_version_suffix = '535.104.05'
 cuda_arch = arm_instance? ? 'linux_sbsa' : 'linux'
-cuda_url = "https://developer.download.nvidia.com/compute/cuda/#{cuda_complete_version}/local_installers/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run"
+cuda_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run"
 cuda_samples_version = '12.2'
-cuda_samples_url = "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{cuda_samples_version}.tar.gz"
+cuda_samples_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples/v#{cuda_samples_version}.tar.gz"
 tmp_cuda_run = '/tmp/cuda.run'
 tmp_cuda_sample_archive = '/tmp/cuda-sample.tar.gz'
 

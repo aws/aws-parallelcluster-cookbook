@@ -26,16 +26,8 @@ action :setup do
   node.default['cluster']['nvidia']['fabricmanager']['version'] = fabric_manager_version
   node_attributes "dump node attributes"
 
-  # Add NVIDIA repo for fabric manager and datacenter-gpu-manager
-  nvidia_repo 'add nvidia repository' do
-    action :add
-  end
-
   action_install_package
 
-  nvidia_repo 'remove nvidia repository' do
-    action :remove
-  end
 end
 
 action :configure do

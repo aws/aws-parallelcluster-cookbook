@@ -25,7 +25,6 @@ virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_na
 activate_virtual_env virtualenv_name do
   pyenv_path virtualenv_path
   python_version python_version
-  not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
 node.default['cluster']['awsbatch_virtualenv_path'] = virtualenv_path

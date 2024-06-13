@@ -13,24 +13,30 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
-  package 'yum-plugin-versionlock'
-  bash "Install #{fabric_manager_package}" do
+  bash "Install #{dcgm_package}" do
     user 'root'
-    code <<-FABRIC_MANAGER_INSTALL
+    code <<-DCGM_INSTALL
     set -e
-    aws s3 cp #{fabric_manager_url} #{fabric_manager_package}-#{fabric_manager_version}.rpm --region #{node['cluster']['region']}
-    yum install -y #{fabric_manager_package}-#{fabric_manager_version}.rpm
-    yum versionlock #{fabric_manager_package}
-    FABRIC_MANAGER_INSTALL
+    aws s3 cp #{dcgm_url} #{dcgm_package}-#{package_version}.deb --region #{node['cluster']['region']}
+    apt -y install #{dcgm_package}-#{package_version}.deb
+    DCGM_INSTALL
     retries 3
     retry_delay 5
   end
 end
 
-def arch_suffix
-  arm_instance? ? 'aarch64' : 'x86_64'
+def dcgm_url
+  "#{node['cluster']['artifacts_build_url']}/nvidia_dcgm/#{platform}/#{dcgm_package}_#{package_version}_#{arch_suffix}.deb"
 end
 
-def fabric_manager_url
-  "#{node['cluster']['artifacts_build_url']}/nvidia_fabric/#{platform}/#{fabric_manager_package}-#{fabric_manager_version}-1.#{arch_suffix}.rpm"
+def dcgm_package
+  'datacenter-gpu-manager'
+end
+
+def arch_suffix
+  arm_instance? ? 'arm64' : 'amd64'
+end
+
+def package_version
+  node['cluster']['nvidia']['dcgm_version']
 end

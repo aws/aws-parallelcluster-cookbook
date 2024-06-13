@@ -21,3 +21,7 @@ use 'partial/_nvidia_dcgm_common.rb'
 def _nvidia_dcgm_enabled
   _nvidia_enabled
 end
+
+def platform
+  'rhel9'
+end

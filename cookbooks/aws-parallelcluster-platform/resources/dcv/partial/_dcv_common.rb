@@ -272,7 +272,7 @@ def dcv_gpu_accel_supported?
 end
 
 def dcv_url
-  "https://d1uj6qtbmh3dt5.cloudfront.net/#{node['cluster']['dcv']['version'].split('-')[0]}/Servers/#{dcv_package}.tgz"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/dcv/#{dcv_package}.tgz"
 end
 
 def dcv_tarball

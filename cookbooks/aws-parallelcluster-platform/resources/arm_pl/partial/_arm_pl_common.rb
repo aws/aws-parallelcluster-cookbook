@@ -55,8 +55,8 @@ action :setup do
   armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{gcc_major_minor_version}.tar"
 
   armpl_url = %W(
-    https://#{new_resource.region}-aws-parallelcluster.s3.#{new_resource.region}.#{new_resource.aws_domain}
-    archives/armpl/#{armpl_platform}
+    #{node['cluster']['artifacts_s3_url']}
+    armpl/#{armpl_platform}
     #{armpl_tarball_name}
   ).join('/')
 
@@ -111,7 +111,7 @@ action :setup do
   end
 
   gcc_version = "#{gcc_major_minor_version}.#{new_resource.gcc_patch_version}"
-  gcc_url = "https://ftp.gnu.org/gnu/gcc/gcc-#{gcc_version}/gcc-#{gcc_version}.tar.gz"
+  gcc_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/gcc/gcc-#{gcc_version}.tar.gz"
   gcc_tarball = "#{new_resource.sources_dir}/gcc-#{gcc_version}.tar.gz"
 
   # Get gcc tarball
@@ -137,7 +137,7 @@ action :setup do
         tar -xf #{gcc_tarball}
         cd gcc-#{gcc_version}
         # Patch the download_prerequisites script to download over https and not ftp. This works better in China regions.
-        sed -i "s#ftp://gcc\.gnu\.org#https://gcc.gnu.org#g" ./contrib/download_prerequisites
+        sed -i "s#ftp://gcc\.gnu\.org##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
         ./contrib/download_prerequisites
         mkdir build && cd build
         ../configure --prefix=/opt/arm/armpl/gcc/#{gcc_version} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib

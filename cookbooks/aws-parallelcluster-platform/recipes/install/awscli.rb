@@ -35,5 +35,5 @@ archive_file 'extract awscli bundle' do
 end
 
 bash 'install awscli' do
-  code "#{cookbook_virtualenv_path}/bin/python #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
+  code "#{cookbook_virtualenv_path}/bin/python#{node['cluster']['python-major-minor-version']} #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
 end

@@ -29,8 +29,19 @@ action :run do
       recursive true
     end
 
-    pyenv_install 'system' do
-      prefix prefix
+    bash "install python #{python_version}" do
+      user 'root'
+      group 'root'
+      cwd "#{prefix}"
+      code <<-VENV
+      set -e
+      aws s3 cp #{node['cluster']['artifacts_build_url']}/python/Python-#{python_version}.tgz Python-#{python_version}.tgz --region #{node['cluster']['region']}
+      tar -xzf Python-#{python_version}.tgz
+      cd Python-#{python_version}
+      ./configure --prefix=#{prefix}/versions/#{python_version}
+      make
+      make install
+      VENV
     end
 
     # Remove the profile.d script that the pyenv cookbook writes.
