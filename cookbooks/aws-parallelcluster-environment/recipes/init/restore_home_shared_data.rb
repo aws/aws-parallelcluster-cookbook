@@ -35,7 +35,7 @@ if node['cluster']['node_type'] == 'HeadNode'
 
       # Initialize an empty set for exclude options and directories to exclude
       declare -A exclude_dirs
-      
+
       touch /tmp/exclude_options.txt
 
       # Process each file and directory in the list to determine which paths should be excluded from the diff check
