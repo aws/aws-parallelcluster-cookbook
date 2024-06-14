@@ -15,7 +15,7 @@
 virtualenv_name = 'cfn_bootstrap_virtualenv'
 pyenv_root = node['cluster']['system_pyenv_root']
 # FIXME: Python Version cfn_bootstrap_virtualenv due to a bug with cfn-hup
-python_version = '3.9.17'
+python_version = '3.9.19'
 virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/#{virtualenv_name}"
 
 node.default['cluster']['cfn_bootstrap_virtualenv_path'] = virtualenv_path

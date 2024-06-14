@@ -5,7 +5,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
     context "on #{platform}#{version}" do
       cached(:cfnbootstrap_version) { '2.0-28' }
       cached(:cfnbootstrap_package) { "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz" }
-      cached(:python_version) { '3.9.17' }
+      cached(:python_version) { '3.9.19' }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
       cached(:virtualenv_path) { "system_pyenv_root/versions/#{python_version}/envs/cfn_bootstrap_virtualenv" }
 
