@@ -71,11 +71,13 @@ bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
   group 'root'
   code <<-EOH
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
-    if [ $? -eq 0 ]; then
+    if [[ $diff_output != *"Only in #{node['cluster']['cluster_user_home']}"* ]]; then
       rm -rf /tmp#{node['cluster']['cluster_user_home']}
       rm -rf #{node['cluster']['cluster_user_home']}
     else
-      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}: $diff_output" >&2
+      only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{node['cluster']['cluster_user_home']}")
+      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}. Differences:"
+      echo "$only_in_cluster_user_home"
       systemctl start sshd
       exit 1
     fi

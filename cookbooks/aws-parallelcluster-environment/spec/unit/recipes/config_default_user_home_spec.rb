@@ -29,11 +29,13 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
           expect(chef_run).to run_bash("Verify data integrity for #{user_home}").with(
             code: <<-CODE
     diff_output=$(diff -r #{user_home} #{user_local_home})
-    if [ $? -eq 0 ]; then
+    if [[ $diff_output != *"Only in #{user_home}"* ]]; then
       rm -rf /tmp#{user_home}
       rm -rf #{user_home}
     else
-      echo "Data integrity check failed comparing #{user_local_home} and #{user_home}: $diff_output" >&2
+      only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{user_home}")
+      echo "Data integrity check failed comparing #{user_local_home} and #{user_home}. Differences:"
+      echo "$only_in_cluster_user_home"
       systemctl start sshd
       exit 1
     fi

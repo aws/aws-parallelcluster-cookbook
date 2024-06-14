@@ -30,10 +30,12 @@ if node['cluster']['node_type'] == 'HeadNode'
       code <<-EOH
         rsync -a --ignore-existing /tmp#{dir}/ #{dir}
         diff_output=$(diff -r /tmp#{dir}/ #{dir})
-        if [ $? -eq 0 ]; then
+        if [[ $diff_output != *"Only in /tmp#{dir}"* ]]; then
           rm -rf /tmp#{dir}/
         else
-          echo "Data integrity check failed comparing #{dir} and /tmp#{dir}: $diff_output"
+          only_in_tmp=$(echo "$diff_output" | grep "Only in /tmp#{dir}")
+          echo "Data integrity check failed comparing #{dir} and /tmp#{dir}. Differences:"
+          echo "$only_in_tmp"
           exit 1
         fi
       EOH
