@@ -15,29 +15,14 @@ property :user, String
 default_action :run
 
 action :run do
-  pyenv_script "pyenv virtualenv #{new_resource.pyenv_name}" do
-    code "pyenv virtualenv #{new_resource.python_version} #{new_resource.pyenv_name}"
-    user new_resource.user if new_resource.user
-  end
-
-  pyenv_pip "pip" do
-    virtualenv new_resource.pyenv_path
-    user new_resource.user if new_resource.user
-    action :upgrade
-  end
-
-  unless new_resource.requirements_path.empty?
-    # Copy requirements file
-    cookbook_file "#{new_resource.pyenv_path}/requirements.txt" do
-      source new_resource.requirements_path
-      mode '0755'
-    end
-
-    # Install given requirements in the virtual environment
-    pyenv_pip "#{new_resource.pyenv_path}/requirements.txt" do
-      virtualenv new_resource.pyenv_path
-      user new_resource.user if new_resource.user
-      requirement true
-    end
+  bash 'create venv' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['system_pyenv_root']}"
+    code <<-VENV
+    set -e
+    versions/#{new_resource.python_version}/bin/python#{node['cluster']['python-major-minor-version']} -m venv #{new_resource.pyenv_path}
+    source #{new_resource.pyenv_path}/bin/activate
+    VENV
   end
 end

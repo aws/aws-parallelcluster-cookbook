@@ -20,6 +20,14 @@
 # TODO: once the pyenv Chef resource supports installing packages from a path (e.g. `pip install .`), convert the
 # bash block to a recipe that uses the pyenv resource.
 
+remote_file "#{Chef::Config[:file_cache_path]}/node-dependencies.tgz" do
+  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/node-dependencies.tgz"
+  mode '0644'
+  retries 3
+  retry_delay 5
+  action :create_if_missing
+end
+
 bash "install custom aws-parallelcluster-node" do
   cwd Chef::Config[:file_cache_path]
   code <<-NODE

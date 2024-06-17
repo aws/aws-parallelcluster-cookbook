@@ -30,6 +30,14 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
           )
         end
 
+        it 'installs python packages' do
+          is_expected.to run_bash("pip install").with(
+            user: 'root',
+            group: 'root',
+            cwd: "#{node['cluster']['base_dir']}"
+          )
+        end
+
         it 'sets virtualenv path' do
           expect(node.default['cluster']['cfn_bootstrap_virtualenv_path']).to eq(virtualenv_path)
           is_expected.to write_node_attributes('dump node attributes')

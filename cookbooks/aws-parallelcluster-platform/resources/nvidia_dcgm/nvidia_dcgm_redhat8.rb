@@ -17,7 +17,12 @@ provides :nvidia_dcgm, platform: 'redhat' do |node|
 end
 
 use 'partial/_nvidia_dcgm_common.rb'
+use 'partial/_nvidia_dcgm_rhel.rb'
 
 def _nvidia_dcgm_enabled
   _nvidia_enabled
+end
+
+def platform
+  "rhel#{node['platform_version'].to_i}"
 end

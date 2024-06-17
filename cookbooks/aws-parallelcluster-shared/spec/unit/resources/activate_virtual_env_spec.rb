@@ -35,33 +35,12 @@ describe 'activate_virtual_env:run' do
           is_expected.to run_activate_virtual_env('run')
         end
 
-        it 'runs pyenv script' do
-          is_expected.to run_pyenv_script("pyenv virtualenv #{pyenv_name}").with(
-            code: "pyenv virtualenv #{python_version} #{pyenv_name}",
-            user: user
-          )
-        end
-
-        it 'upgrades pyenv pip' do
-          is_expected.to upgrade_pyenv_pip("pip").with(
-            virtualenv: pyenv_path,
-            user: user
-          )
-        end
-
-        it 'copies requirements file' do
-          is_expected.to create_cookbook_file("#{pyenv_path}/requirements.txt").with(
-            source: requirements_path,
-            mode: '0755'
-          )
-        end
-
-        it 'installs requirements in the virtual environment' do
-          is_expected.to install_pyenv_pip("#{pyenv_path}/requirements.txt").with(
-            virtualenv: pyenv_path,
-            user: user,
-            requirement: true
-          )
+        it 'creates venv' do
+          is_expected.to run_bash("create venv").with(
+            user: 'root',
+            group: 'root',
+            cwd: "#{node['cluster']['system_pyenv_root']}"
+          ).with_code(%r{source pyenv_path/bin/activate})
         end
       end
 
@@ -74,7 +53,6 @@ describe 'activate_virtual_env:run' do
 
         it 'does not install requirements' do
           is_expected.not_to create_cookbook_file("#{pyenv_path}/requirements.txt")
-          is_expected.not_to install_pyenv_pip("#{pyenv_path}/requirements.txt")
         end
       end
     end

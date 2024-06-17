@@ -13,31 +13,38 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
-  # For ubuntu, CINC17 apt-package resources need full versions for `version`
-  remote_file "#{node['cluster']['sources_dir']}/#{fabric_manager_package}-#{fabric_manager_version}.deb" do
-    source "#{fabric_manager_url}"
+  remote_file "#{node['cluster']['sources_dir']}/#{dcgm_package}-#{package_version}.deb" do
+    source "#{dcgm_url}"
     mode '0644'
     retries 3
     retry_delay 5
     action :create_if_missing
   end
 
-  bash "install_fabricmanager_for_ubuntu" do
+  bash "Install #{dcgm_package}" do
     user 'root'
     cwd node['cluster']['sources_dir']
-    code <<-FABRIC_MANAGER
+    code <<-DCGM_INSTALL
     set -e
-    dpkg -i #{fabric_manager_package}-#{fabric_manager_version}.deb && apt-mark hold #{fabric_manager_package}
-    FABRIC_MANAGER
+    dpkg -i #{dcgm_package}-#{package_version}.deb
+    DCGM_INSTALL
     retries 3
     retry_delay 5
   end
+end
+
+def dcgm_url
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm/#{platform}/#{dcgm_package}_#{package_version}_#{arch_suffix}.deb"
+end
+
+def dcgm_package
+  'datacenter-gpu-manager'
 end
 
 def arch_suffix
   arm_instance? ? 'arm64' : 'amd64'
 end
 
-def fabric_manager_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_fabric/#{platform}/#{fabric_manager_package}_#{fabric_manager_version}-1_#{arch_suffix}.deb"
+def package_version
+  node['cluster']['nvidia']['dcgm_version']
 end

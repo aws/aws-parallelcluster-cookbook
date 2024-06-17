@@ -112,5 +112,5 @@ def gdrcopy_version_extended
 end
 
 def gdrcopy_url
-  "https://github.com/NVIDIA/gdrcopy/archive/refs/tags/v#{gdrcopy_version}.tar.gz"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{gdrcopy_version}.tar.gz"
 end

@@ -239,7 +239,7 @@ describe 'dcv:dcv_url' do
       end
 
       it 'returns dcv_url' do
-        expect(resource.dcv_url).to eq("https://d1uj6qtbmh3dt5.cloudfront.net/#{dcv_major_minor}/Servers/#{dcv_package}.tgz")
+        expect(resource.dcv_url).to eq("#{node['cluster']['artifacts_s3_url']}/dependencies/dcv/#{dcv_package}.tgz")
       end
     end
   end
