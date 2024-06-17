@@ -24,6 +24,7 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
         end
 
         it 'moves the cluster user home directory with data integrity check' do
+          # To avoid any confusion, user_home is the original dir, user_local_home is the new replaced dir
           user_home = "/home/user"
           user_local_home = "/local/home/user"
           expect(chef_run).to run_bash("Verify data integrity for #{user_home}").with(
