@@ -36,7 +36,7 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
         end
 
         it 'installs official node package' do
-          is_expected.to run_bash('install official aws-parallelcluster-node')
+          is_expected.to run_execute('install official aws-parallelcluster-node')
         end
       end
 

@@ -33,13 +33,6 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
           is_expected.to write_node_attributes('dump node attributes')
         end
 
-        it 'copies requirements file' do
-          is_expected.to create_cookbook_file("#{virtualenv_path}/requirements.txt").with(
-            source: "cookbook_virtualenv/requirements.txt",
-            mode: '0755'
-          )
-        end
-
         it 'installs python packages' do
           is_expected.to run_bash("pip install").with(
             user: 'root',

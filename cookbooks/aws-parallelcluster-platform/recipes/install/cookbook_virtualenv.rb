@@ -24,11 +24,7 @@ install_pyenv 'pyenv for default python version'
 activate_virtual_env cookbook_virtualenv_name do
   pyenv_path cookbook_virtualenv_path
   python_version cookbook_python_version
-end
-
-cookbook_file "#{virtualenv_path}/requirements.txt" do
-  source "cookbook_virtualenv/requirements.txt"
-  mode '0755'
+  not_if { ::File.exist?("#{cookbook_virtualenv_path}/bin/activate") }
 end
 
 remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do

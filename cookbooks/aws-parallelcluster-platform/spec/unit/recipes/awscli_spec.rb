@@ -31,7 +31,7 @@ describe 'aws-parallelcluster-platform::awscli' do
 
         it 'installs awscli into cookbook virtualev path' do
           is_expected.to run_bash('install awscli')
-            .with_code "#{cookbook_virtualenv_path}/bin/python#{node['cluster']['python-major-minor-version']} #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
+            .with_code "#{cookbook_virtualenv_path}/bin/python #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
         end
       end
 

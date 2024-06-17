@@ -30,7 +30,7 @@ action :run do
   end
 
   remote_file "#{prefix}/Python-#{python_version}.tgz" do
-    source "#{python_url}"
+    source python_url
     mode '0644'
     retries 3
     retry_delay 5
@@ -52,5 +52,4 @@ action :run do
     make install
     VENV
   end
-
 end

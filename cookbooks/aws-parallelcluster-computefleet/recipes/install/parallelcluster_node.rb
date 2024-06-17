@@ -36,27 +36,7 @@ end
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 else
-  bash "install official aws-parallelcluster-node" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-NODE
-    set -e
-    [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
-    echo "PATH is $PATH"
-    source #{node_virtualenv_path}/bin/activate
-    pip uninstall --yes aws-parallelcluster-node
-    node_url=#{node['cluster']['artifacts_build_url']}/node/aws-parallelcluster-node.tgz
-    aws s3 cp ${node_url} aws-parallelcluster-node.tgz --region #{node['cluster']['region']}
-    rm -fr aws-parallelcluster-node
-    mkdir aws-parallelcluster-node
-    tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-node
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/PyPi/#{node['kernel']['machine']}/node-dependencies.tgz node-dependencies.tgz --region #{node['cluster']['region']}
-    tar xzf node-dependencies.tgz
-    cd node
-    #{node_virtualenv_path}/bin/pip install * -f ./ --no-index
-    cd ..
-    cd aws-parallelcluster-node/*aws-parallelcluster-node-*
-    pip install .
-    deactivate
-  NODE
+  execute "install official aws-parallelcluster-node" do
+    command "#{virtualenv_path}/bin/pip install aws-parallelcluster-node==#{node['cluster']['parallelcluster-node-version']}"
   end
 end

@@ -17,6 +17,7 @@ provides :nvidia_dcgm, platform: 'amazon' do |node|
 end
 
 use 'partial/_nvidia_dcgm_common.rb'
+use 'partial/_nvidia_dcgm_rhel.rb'
 
 def _nvidia_dcgm_enabled
   _nvidia_enabled
