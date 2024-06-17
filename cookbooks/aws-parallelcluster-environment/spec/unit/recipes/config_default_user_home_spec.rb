@@ -32,7 +32,6 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
     diff_output=$(diff -r #{original_user_home} #{destination_user_local_home})
     if [[ $diff_output != *"Only in #{original_user_home}"* ]]; then
       rm -rf /tmp#{original_user_home}
-      rm -rf #{original_user_home}
     else
       only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{original_user_home}")
       echo "Data integrity check failed comparing #{destination_user_local_home} and #{original_user_home}. Differences:"
