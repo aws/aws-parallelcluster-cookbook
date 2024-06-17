@@ -66,8 +66,8 @@ end
 # 1. Verifies data integrity by comparing the original home directory and the new local home directory.
 # 2. If the data integrity check passes, it removes both the temporary backup directory and the original home directory.
 # 3. If the data integrity check fails, it outputs an error message and exits with an error code 1.
-# To avoid any confusion, ['cluster_user_home'] is the original dir, ['cluster_user_local_home'] is the new replaced dir
-bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
+# To avoid any confusion, ['cluster_user_home'] is the original dir, ['cluster_user_local_home'] is the destination dir.
+bash "Verify data integrity for #{node['cluster']['cluster_user_local_home']}" do
   user 'root'
   group 'root'
   code <<-EOH
