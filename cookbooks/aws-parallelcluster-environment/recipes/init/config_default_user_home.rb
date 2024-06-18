@@ -62,20 +62,24 @@ bash "Move #{node['cluster']['cluster_user_home']}" do
   EOH
 end
 
-# Data integrity check and cleanup for temporary backup and original home directory
-# 1. Verifies data integrity by comparing the temporary backup directory and the new local home directory.
+# Data integrity check and cleanup for temporary backup directory
+# 1. Verifies data integrity by comparing the original home directory and the new local home directory.
 # 2. If the data integrity check passes, it removes both the temporary backup directory and the original home directory.
 # 3. If the data integrity check fails, it outputs an error message and exits with an error code 1.
-bash "Verify data integrity for #{node['cluster']['cluster_user_home']}" do
+# To avoid any confusion, ['cluster_user_home'] is the original dir, ['cluster_user_local_home'] is the destination dir.
+# To avoid any potential file system data loss risks, we decided to keep node['cluster']['cluster_user_home'].
+bash "Verify data integrity for #{node['cluster']['cluster_user_local_home']}" do
   user 'root'
   group 'root'
   code <<-EOH
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
-    if [ $? -eq 0 ]; then
+    if [[ $diff_output != *"Only in #{node['cluster']['cluster_user_home']}"* ]]; then
+      echo "Data integrity check succeeded, removing temporary directory /tmp#{node['cluster']['cluster_user_home']}"
       rm -rf /tmp#{node['cluster']['cluster_user_home']}
-      rm -rf #{node['cluster']['cluster_user_home']}
     else
-      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}: $diff_output" >&2
+      only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{node['cluster']['cluster_user_home']}")
+      echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}. Differences:"
+      echo "$only_in_cluster_user_home"
       systemctl start sshd
       exit 1
     fi
