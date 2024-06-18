@@ -168,7 +168,7 @@ describe 'nvidia_driver:setup' do
         else
           cached(:nvidia_driver_version) { 'nvidia_driver_version' }
         end
-        cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
+        cached(:nvidia_driver_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
         cached(:chef_run) do
           stubs_for_resource('nvidia_driver') do |res|
             allow(res).to receive(:nvidia_driver_enabled?).and_return(true)

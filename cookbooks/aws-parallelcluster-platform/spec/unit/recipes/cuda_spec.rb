@@ -19,9 +19,9 @@ describe 'aws-parallelcluster-platform::cuda' do
 
   context 'when on arm' do
     cached(:cuda_arch) { 'linux_sbsa' }
-    cached(:cuda_url) { "https://developer.download.nvidia.com/compute/cuda/#{cuda_complete_version}/local_installers/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
+    cached(:cuda_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
     cached(:cuda_samples_version) { '12.2' }
-    cached(:cuda_samples_url) { "https://github.com/NVIDIA/cuda-samples/archive/refs/tags/v#{cuda_samples_version}.tar.gz" }
+    cached(:cuda_samples_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples/v#{cuda_samples_version}.tar.gz" }
 
     cached(:chef_run) do
       allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
@@ -83,7 +83,7 @@ describe 'aws-parallelcluster-platform::cuda' do
 
   context 'when not on arm' do
     cached(:cuda_arch) { 'linux' }
-    cached(:cuda_url) { "https://developer.download.nvidia.com/compute/cuda/#{cuda_complete_version}/local_installers/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
+    cached(:cuda_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
 
     cached(:chef_run) do
       allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)

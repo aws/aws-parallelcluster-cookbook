@@ -17,7 +17,7 @@
 
 # PMIx software
 pmix_version = node['cluster']['pmix']['version']
-pmix_url = "https://github.com/openpmix/openpmix/releases/download/v#{pmix_version}/pmix-#{pmix_version}.tar.gz"
+pmix_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/pmix/pmix-#{pmix_version}.tar.gz"
 pmix_sha256 = node['cluster']['pmix']['sha256']
 pmix_tarball = "#{node['cluster']['sources_dir']}/pmix-#{pmix_version}.tar.gz"
 

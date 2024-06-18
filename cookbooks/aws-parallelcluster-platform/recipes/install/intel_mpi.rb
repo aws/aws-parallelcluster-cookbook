@@ -29,7 +29,7 @@ intelmpi_full_version = "#{intelmpi_version}.43482"
 intelmpi_installation_path = "/opt/intel/mpi/#{intelmpi_version}"
 intelmpi_installer = "l_mpi_oneapi_p_#{intelmpi_full_version}_offline.sh"
 intelmpi_installer_path = "#{node['cluster']['sources_dir']}/#{intelmpi_installer}"
-intelmpi_installer_url = "https://#{node['cluster']['region']}-aws-parallelcluster.s3.#{node['cluster']['region']}.#{aws_domain}/archives/impi/#{intelmpi_installer}"
+intelmpi_installer_url = "#{node['cluster']['artifacts_s3_url']}/impi/#{intelmpi_installer}"
 intelmpi_qt_version = '6.4.2'
 
 # Prerequisite for module install

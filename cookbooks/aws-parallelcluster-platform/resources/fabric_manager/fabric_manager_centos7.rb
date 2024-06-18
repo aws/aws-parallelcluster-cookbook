@@ -26,3 +26,7 @@ end
 def fabric_manager_version
   _nvidia_driver_version
 end
+
+def platform
+  'rhel7'
+end

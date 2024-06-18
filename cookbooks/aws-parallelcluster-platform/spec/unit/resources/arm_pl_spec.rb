@@ -45,11 +45,11 @@ describe 'arm_pl:setup' do
       cached(:modulefile_dir) { platform == 'ubuntu' ? '/usr/share/modules/modulefiles' : '/usr/share/Modules/modulefiles' }
       cached(:armpl_version) { "#{armpl_major_minor_version}" }
       cached(:armpl_tarball_name) { "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{gcc_major_minor_version}.tar" }
-      cached(:armpl_url) { "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.#{aws_domain}/archives/armpl/#{armpl_platform}/#{armpl_tarball_name}" }
+      cached(:armpl_url) { "https://bucket.s3.amazonaws.com/archives/armpl/#{armpl_platform}/#{armpl_tarball_name}" }
       cached(:armpl_installer) { "#{sources_dir}/#{armpl_tarball_name}" }
       cached(:armpl_name) { "arm-performance-libraries_#{armpl_version}_#{armpl_platform}" }
       cached(:gcc_version) { "#{gcc_major_minor_version}.#{gcc_patch_version}" }
-      cached(:gcc_url) { "https://ftp.gnu.org/gnu/gcc/gcc-#{gcc_version}/gcc-#{gcc_version}.tar.gz" }
+      cached(:gcc_url) { "https://bucket.s3.amazonaws.com/archives/dependencies/gcc/gcc-#{gcc_version}.tar.gz" }
       cached(:gcc_tarball) { "#{sources_dir}/gcc-#{gcc_version}.tar.gz" }
       cached(:gcc_modulefile) { "/opt/arm/armpl/#{armpl_version}/modulefiles/armpl/gcc-#{gcc_major_minor_version}" }
 
@@ -57,6 +57,7 @@ describe 'arm_pl:setup' do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version, step_into: ['arm_pl']) do |node|
             node.override['conditions']['arm_pl_supported'] = false
+            node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.amazonaws.com/archives"
           end
           ConvergeArmPl.setup(runner)
         end
@@ -73,6 +74,7 @@ describe 'arm_pl:setup' do
             node.override['conditions']['arm_pl_supported'] = true
             node.override['cluster']['sources_dir'] = sources_dir
             node.override['cluster']['region'] = aws_region
+            node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.amazonaws.com/archives"
           end
           allow_any_instance_of(Object).to receive(:aws_domain).and_return(aws_domain)
           ConvergeArmPl.setup(runner)

@@ -164,11 +164,12 @@ end
 
 describe 'fabric_manager:setup' do
   cached(:nvidia_driver_version) { 'nvidia_driver_version' }
+  cached(:aws_region) { 'test_region' }
 
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-535' : 'nvidia-fabric-manager' }
-      cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}*" : nvidia_driver_version }
+      cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}" : nvidia_driver_version }
 
       context 'when fabric manager is to install' do
         cached(:chef_run) do
@@ -192,10 +193,10 @@ describe 'fabric_manager:setup' do
 
         if platform == 'ubuntu'
           it 'installs fabric manager for ubuntu' do
-            is_expected.to run_execute('install_fabricmanager_for_ubuntu')
+            is_expected.to run_bash('install_fabricmanager_for_ubuntu')
               .with_retries(3)
               .with_retry_delay(5)
-              .with_command("apt -y install #{fabric_manager_package}=#{fabric_manager_version} && apt-mark hold #{fabric_manager_package}")
+              .with_code(/dpkg -i #{fabric_manager_package}-#{fabric_manager_version}.deb && apt-mark hold #{fabric_manager_package}/)
           end
         else
           it 'installs yum-plugin-versionlock' do
@@ -207,10 +208,7 @@ describe 'fabric_manager:setup' do
               .with(user: 'root')
               .with_retries(3)
               .with_retry_delay(5)
-              .with(code: %(    set -e
-    yum install -y #{fabric_manager_package}-#{fabric_manager_version}
-    yum versionlock #{fabric_manager_package}
-))
+              .with_code(/yum install -y #{fabric_manager_package}-#{fabric_manager_version}.rpm/)
           end
         end
       end
@@ -224,7 +222,7 @@ describe 'fabric_manager:configure' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-535' : 'nvidia-fabric-manager' }
-      cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}*" : nvidia_driver_version }
+      cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}" : nvidia_driver_version }
 
       context('when nvswithes are > 1') do
         cached(:chef_run) do
