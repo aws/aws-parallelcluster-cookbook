@@ -30,6 +30,7 @@ if node['cluster']['node_type'] == 'HeadNode'
       rsync -a --ignore-existing /tmp/home/ /home
       diff_output=$(diff -r /tmp/home/ /home)
       if [[ $diff_output != *"Only in /tmp/home"* ]]; then
+        echo "Data integrity check succeeded, removing temporary directory /tmp/home"
         rm -rf /tmp/home/
       else
         only_in_tmp=$(echo "$diff_output" | grep "Only in /tmp/home")

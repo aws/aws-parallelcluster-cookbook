@@ -38,7 +38,8 @@ describe 'aws-parallelcluster-environment::mount_internal_use_efs' do
         rsync -a --ignore-existing /tmp#{dir}/ #{dir}
         diff_output=$(diff -r /tmp#{dir}/ #{dir})
         if [[ $diff_output != *"Only in /tmp#{dir}"* ]]; then
-          rm -rf /tmp#{dir}/
+          echo "Data integrity check succeeded, removing temporary directory /tmp#{dir}"
+          rm -rf /tmp#{dir}
         else
           only_in_tmp=$(echo "$diff_output" | grep "Only in /tmp#{dir}")
           echo "Data integrity check failed comparing #{dir} and /tmp#{dir}. Differences:"

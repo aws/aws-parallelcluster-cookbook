@@ -31,6 +31,7 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
             code: <<-CODE
     diff_output=$(diff -r #{original_user_home} #{destination_user_local_home})
     if [[ $diff_output != *"Only in #{original_user_home}"* ]]; then
+      echo "Data integrity check succeeded, removing temporary directory /tmp#{original_user_home}"
       rm -rf /tmp#{original_user_home}
     else
       only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{original_user_home}")

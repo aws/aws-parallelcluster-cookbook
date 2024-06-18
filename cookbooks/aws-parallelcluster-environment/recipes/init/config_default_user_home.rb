@@ -74,6 +74,7 @@ bash "Verify data integrity for #{node['cluster']['cluster_user_local_home']}" d
   code <<-EOH
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
     if [[ $diff_output != *"Only in #{node['cluster']['cluster_user_home']}"* ]]; then
+      echo "Data integrity check succeeded, removing temporary directory /tmp#{node['cluster']['cluster_user_home']}"
       rm -rf /tmp#{node['cluster']['cluster_user_home']}
     else
       only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{node['cluster']['cluster_user_home']}")
