@@ -20,8 +20,8 @@ describe 'aws-parallelcluster-platform::intel_mpi' do
   end
 
   it 'fetches intel mpi installer script' do
-    is_expected.to create_remote_file("#{source_dir}/l_mpi_oneapi_p_2021.9.0.43482_offline.sh").with(
-      source: "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.test_aws_domain/archives/impi/l_mpi_oneapi_p_2021.9.0.43482_offline.sh",
+    is_expected.to create_remote_file("#{source_dir}/l_mpi_oneapi_p_2021.12.1.8_offline.sh").with(
+      source: "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.test_aws_domain/archives/impi/l_mpi_oneapi_p_2021.12.1.8_offline.sh",
       mode: '0744',
       retries: 3,
       retry_delay: 5
@@ -31,25 +31,25 @@ describe 'aws-parallelcluster-platform::intel_mpi' do
   it 'installs intel mpi' do
     is_expected.to run_bash('install intel mpi').with(
       cwd: source_dir,
-      creates: '/opt/intel/mpi/2021.9.0'
-    ).with_code(%r{chmod +x l_mpi_oneapi_p_2021.9.0.43482_offline.sh --remove-extracted-files yes -a --silent --eula accept --install-dir /opt/intel})
-                                                .with_code(/rm -f l_mpi_oneapi_p_2021.9.0.43482_offline.sh/)
+      creates: '/opt/intel/mpi/2021.12'
+    ).with_code(%r{chmod +x l_mpi_oneapi_p_2021.12.1.8_offline.sh --remove-extracted-files yes -a --silent --eula accept --install-dir /opt/intel})
+                                                .with_code(/rm -f l_mpi_oneapi_p_2021.12.1.8_offline.sh/)
   end
 
   it 'appends intel module file dir to modules config' do
     is_expected.to append_to_config_modules('append intel modules file dir to modules conf')
-      .with_line('/opt/intel/mpi/2021.9.0/modulefiles/')
+      .with_line('/opt/intel/mpi/2021.12/etc/modulefiles/')
   end
 
   it 'renames intel mpi module' do
     is_expected.to run_execute('rename intel mpi modules file name').with(
-      command: "mv /opt/intel/mpi/2021.9.0/modulefiles/mpi /opt/intel/mpi/2021.9.0/modulefiles/intelmpi",
-      creates: '/opt/intel/mpi/2021.9.0/modulefiles/intelmpi'
+      command: "mv /opt/intel/mpi/2021.12/etc/modulefiles/mpi /opt/intel/mpi/2021.12/etc/modulefiles/intelmpi",
+      creates: '/opt/intel/mpi/2021.12/etc/modulefiles/intelmpi'
     )
   end
 
   it 'adds Qt source file' do
-    is_expected.to create_template("/opt/intel/mpi/2021.9.0/qt_source_code.txt").with(
+    is_expected.to create_template("/opt/intel/mpi/2021.12/qt_source_code.txt").with(
       source: 'intel_mpi/qt_source_code.erb',
       owner: 'root',
       group: 'root',
@@ -57,7 +57,7 @@ describe 'aws-parallelcluster-platform::intel_mpi' do
       variables: {
         aws_region: aws_region,
         aws_domain: 'test_aws_domain',
-        intelmpi_qt_version: '6.4.2',
+        intelmpi_qt_version: '6.5.3',
       }
     )
   end
