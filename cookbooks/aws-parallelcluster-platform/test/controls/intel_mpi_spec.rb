@@ -21,7 +21,7 @@ control 'tag:install_intel_mpi_modules_file_dir_is_appended_to_modules_conf' do
 
   describe file(modulepath_config_file) do
     it { should exist }
-    its('content') { should match %r{/opt/intel/mpi/#{node['cluster']['intelmpi']['version']}/modulefiles/} }
+    its('content') { should match %r{/opt/intel/oneapi/mpi/#{node['cluster']['intelmpi']['version']}/etc/modulefiles/} }
   end
 end
 
@@ -34,6 +34,6 @@ control 'tag:install_tag:config_intel_mpi_installed' do
 
   describe bash("unset MODULEPATH && source /etc/profile.d/modules.sh && module load intelmpi && mpirun --help") do
     its('exit_status') { should eq(0) }
-    its('stdout') { should match(/Version #{node['cluster']['intelmpi']['version'].split('.')[0..1].join(".")}/) }
+    its('stdout') { should match(/Version #{node['cluster']['intelmpi']['version']}/) }
   end
 end

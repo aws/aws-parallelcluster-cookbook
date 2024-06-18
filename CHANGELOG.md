@@ -28,6 +28,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.6-3` and `openmpi50-aws-5.0.2-12`
 - Upgrade NVIDIA driver to version 535.183.01 (from 535.154.05).
 - Upgrade Python to 3.9.19 (from 3.9.17).
+- Upgrade Intel MPI Library to 2021.12.1.8 (from 2021.9.0.43482).
 
 **BUG FIXES**
 - Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.

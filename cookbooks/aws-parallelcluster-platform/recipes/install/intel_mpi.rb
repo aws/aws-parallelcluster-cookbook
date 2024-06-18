@@ -16,7 +16,7 @@
 # limitations under the License.
 
 intelmpi_supported = !arm_instance?
-intelmpi_version = '2021.9.0'
+intelmpi_version = '2021.12'
 
 node.default['conditions']['intel_mpi_supported'] = intelmpi_supported
 node.default['cluster']['intelmpi']['version'] = intelmpi_version
@@ -25,12 +25,12 @@ node_attributes "dump node attributes"
 
 return unless intelmpi_supported
 
-intelmpi_full_version = "#{intelmpi_version}.43482"
+intelmpi_full_version = "#{intelmpi_version}.1.8"
 intelmpi_installation_path = "/opt/intel/mpi/#{intelmpi_version}"
 intelmpi_installer = "l_mpi_oneapi_p_#{intelmpi_full_version}_offline.sh"
 intelmpi_installer_path = "#{node['cluster']['sources_dir']}/#{intelmpi_installer}"
 intelmpi_installer_url = "#{node['cluster']['artifacts_s3_url']}/impi/#{intelmpi_installer}"
-intelmpi_qt_version = '6.4.2'
+intelmpi_qt_version = '6.5.3'
 
 # Prerequisite for module install
 modules 'Prerequisite: Environment modules'
@@ -59,12 +59,12 @@ bash "install intel mpi" do
 end
 
 modules 'append intel modules file dir to modules conf' do
-  line "#{intelmpi_installation_path}/modulefiles/"
+  line "#{intelmpi_installation_path}/etc/modulefiles/"
   action :append_to_config
 end
 
-intelmpi_modulefile_from = "#{intelmpi_installation_path}/modulefiles/mpi"
-intelmpi_modulefile_to   = "#{intelmpi_installation_path}/modulefiles/intelmpi"
+intelmpi_modulefile_from = "#{intelmpi_installation_path}/etc/modulefiles/mpi"
+intelmpi_modulefile_to   = "#{intelmpi_installation_path}/etc/modulefiles/intelmpi"
 
 execute "rename intel mpi modules file name" do
   command "mv #{intelmpi_modulefile_from} #{intelmpi_modulefile_to}"
