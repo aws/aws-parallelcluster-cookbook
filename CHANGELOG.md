@@ -31,13 +31,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Intel MPI Library to 2021.12.1.8 (from 2021.9.0.43482).
 
 **BUG FIXES**
-- Fixed an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
-- Fixed an issue that prevented slurmctld and slurmdbd services from restarting on head node reboot when
+- Fix an issue that prevented cluster updates from including EFS filesystems with encryption in transit.
+- Fix an issue that prevented slurmctld and slurmdbd services from restarting on head node reboot when
   EFS is used for shared internal data. 
 - On Ubuntu systems, remove default logrotate configuration for cloud-init log files that clashed with the
   configuration coming from Parallelcluster.
 - Removing `/etc/profile.d/pcluster.sh` so that it's not executed at every user login and 
   `cfn_bootstrap_virtualenv` is not added in PATH environment variable.
+- Fix image build failure with RHEL 8.10 or newer.
 
 3.9.3
 ------
