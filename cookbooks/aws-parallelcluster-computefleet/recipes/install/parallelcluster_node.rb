@@ -36,8 +36,7 @@ end
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 else
-  pyenv_pip 'aws-parallelcluster-node' do
-    version node['cluster']['parallelcluster-node-version']
-    virtualenv virtualenv_path
+  execute "install official aws-parallelcluster-node" do
+    command "#{virtualenv_path}/bin/pip install aws-parallelcluster-node==#{node['cluster']['parallelcluster-node-version']}"
   end
 end

@@ -24,5 +24,9 @@ def fabric_manager_package
 end
 
 def fabric_manager_version
-  "#{_nvidia_driver_version}*"
+  "#{_nvidia_driver_version}"
+end
+
+def platform
+  "ubuntu#{node['platform_version'].delete('.')}"
 end

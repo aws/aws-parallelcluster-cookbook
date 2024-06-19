@@ -24,8 +24,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
         it 'activates cookbook vistualenv' do
           is_expected.to run_activate_virtual_env('cookbook_virtualenv').with(
             pyenv_path: virtualenv_path,
-            python_version: python_version,
-            requirements_path: "cookbook_virtualenv/requirements.txt"
+            python_version: python_version
           )
         end
 
@@ -33,20 +32,13 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
           expect(node.default['cluster']['cookbook_virtualenv_path']).to eq(virtualenv_path)
           is_expected.to write_node_attributes('dump node attributes')
         end
-      end
 
-      context "when cookbook virtualenv already installed" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            node.override['cluster']['system_pyenv_root'] = system_pyenv_root
-            node.override['cluster']['python-version'] = python_version
-          end
-          allow(File).to receive(:exist?).with("#{virtualenv_path}/bin/activate").and_return(true)
-          runner.converge(described_recipe)
-        end
-
-        it 'does not activate cookbook virtualenv' do
-          is_expected.not_to run_activate_virtual_env('cookbook_virtualenv')
+        it 'installs python packages' do
+          is_expected.to run_bash("pip install").with(
+            user: 'root',
+            group: 'root',
+            cwd: "#{node['cluster']['base_dir']}"
+          ).with_code(/tar xzf cookbook-dependencies.tgz/)
         end
       end
     end

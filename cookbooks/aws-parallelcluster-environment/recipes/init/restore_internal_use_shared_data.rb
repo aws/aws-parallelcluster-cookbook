@@ -19,7 +19,7 @@ if node['cluster']['node_type'] == 'HeadNode'
   # This is necessary to preserve any data in these directories that was
   # generated during the build of ParallelCluster AMIs after converting to
   # shared storage and backed up to a temporary location previously
-  # Before removing the backup, ensure the data in the new directory is the same
+  # Before removing the backup, ensure the new data in the new directory is the same
   # as the original to avoid any data loss or inconsistency. This is done
   # by using rsync to copy the data and diff to check for differences.
   # Remove the backup after the copy is done and the data integrity is verified.
@@ -30,10 +30,13 @@ if node['cluster']['node_type'] == 'HeadNode'
       code <<-EOH
         rsync -a --ignore-existing /tmp#{dir}/ #{dir}
         diff_output=$(diff -r /tmp#{dir}/ #{dir})
-        if [ $? -eq 0 ]; then
-          rm -rf /tmp#{dir}/
+        if [[ $diff_output != *"Only in /tmp#{dir}"* ]]; then
+          echo "Data integrity check succeeded, removing temporary directory /tmp#{dir}"
+          rm -rf /tmp#{dir}
         else
-          echo "Data integrity check failed comparing #{dir} and /tmp#{dir}: $diff_output"
+          only_in_tmp=$(echo "$diff_output" | grep "Only in /tmp#{dir}")
+          echo "Data integrity check failed comparing #{dir} and /tmp#{dir}. Differences:"
+          echo "$only_in_tmp"
           exit 1
         fi
       EOH
