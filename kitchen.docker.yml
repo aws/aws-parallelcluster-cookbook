@@ -70,7 +70,7 @@ platforms:
         kernel_release: '5.15.0-1028-aws'
   - name: rhel8
     driver:
-      image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi:8.9 <% end %>
+      image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi <% end %>
       intermediate_instructions:
         - RUN chmod +t /tmp
     attributes:
@@ -81,7 +81,7 @@ platforms:
         kernel_release: '4.18.0-477.13.1.el8_7.fake-value' # Use 477 version to match 8.8 kernel version available on docker
   - name: rocky8
     driver:
-      image: <% if ENV['KITCHEN_ROCKY8_IMAGE'] %> <%= ENV['KITCHEN_ROCKY8_IMAGE'] %> <% else %> dokken/rockylinux-8:sha-f885abd <% end %>
+      image: <% if ENV['KITCHEN_ROCKY8_IMAGE'] %> <%= ENV['KITCHEN_ROCKY8_IMAGE'] %> <% else %> dokken/rockylinux-8 <% end %>
     attributes:
       cluster:
         base_os: rocky8
