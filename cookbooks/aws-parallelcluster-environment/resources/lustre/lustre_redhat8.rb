@@ -36,6 +36,8 @@ action :setup do
     else
       action_install_lustre
     end
+  else
+    action_install_lustre
   end
 end
 
