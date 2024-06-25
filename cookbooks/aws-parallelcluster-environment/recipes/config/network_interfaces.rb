@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # amazon-ec2-net-utils is pre-installed in AL2023 and handles multi-nics instances properly
-return if on_docker? || platform?('amazon') && node['platform_version'].to_i == 2023
+return if on_docker?
 
 def network_card_index(mac, token)
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
@@ -82,13 +82,15 @@ if macs.length > 1
       group 'root'
       cwd "/tmp"
       environment(
+        # TODO: The variables are a superset of what's required by individual scripts. Consider simplification.
         'DEVICE_NAME' => device_name,
         'DEVICE_NUMBER' => "#{network_card_index}", # in configure_nw_interface DEVICE_NUMBER actually means network card index
         'GW_IP_ADDRESS' => gw_ip_address,
         'DEVICE_IP_ADDRESS' => device_ip_address,
         'CIDR_PREFIX_LENGTH' => cidr_prefix_length,
         'NETMASK' => netmask,
-        'CIDR_BLOCK' => cidr_block
+        'CIDR_BLOCK' => cidr_block,
+        'MAC' => mac
       )
 
       command 'sh /tmp/configure_nw_interface.sh'
