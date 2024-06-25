@@ -90,4 +90,6 @@ append_if_no_line "Append primary ip to /etc/hosts" do
   path "/etc/hosts"
   line(lazy { "#{get_primary_ip} #{node['cluster']['assigned_hostname'].chomp('.')} #{node['cluster']['assigned_short_hostname']}" })
   notifies :reload, "ohai[reload_hostname]"
+  retries 20
+  retry_delay 5
 end

@@ -17,7 +17,25 @@ provides :network_service, platform: 'amazon' do |node|
 end
 
 use 'partial/_network_service'
+use 'partial/_network_service_redhat_based'
 
 def network_service_name
-  'systemd-resolved'
+  'systemd-networkd'
+end
+
+action :restart do
+  log "Restarting 'systemd-networkd systemd-resolved' service, platform #{node['platform']} '#{node['platform_version']}'"
+
+  execute "Reload system configuration files before restarting services" do
+    command "systemctl daemon-reload"
+  end
+
+  %w(systemd-networkd systemd-resolved).each do |service_name|
+    # Restart systemd-networkd to load configuration about NICs.
+    # Restart systemd-resolved to load configuration about DNS.
+    service service_name do
+      action :restart
+      ignore_failure true
+    end
+  end
 end
