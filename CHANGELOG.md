@@ -15,10 +15,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add support for external Slurmdbd.
 - Allow build-image to be run in an isolated network.
+- Add support for Amazon Linux 2023.
 
 **CHANGES**
 - Upgrade Cinc Client to version to 18.4.12 from 18.2.7.
-- Upgrade Slurm to 23.11.7 (from 23.11.4).
 - Upgrade munge to version 0.5.16 (from 0.5.15).
 - Upgrade Pmix to 5.0.2 (from 4.2.9).
 - Upgrade third-party cookbook dependencies:
