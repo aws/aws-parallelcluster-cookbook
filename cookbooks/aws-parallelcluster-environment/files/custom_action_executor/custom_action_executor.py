@@ -331,7 +331,7 @@ class CustomLogger(ABC):
 
     @abstractmethod
     def error_exit_with_bootstrap_error(
-            self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
+        self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
     ):
         """
         Log error message and exit with a bootstrap error.
@@ -387,7 +387,7 @@ class CustomLogger(ABC):
                 "step": step,
                 "stage": stage,
                 "error": error,
-            }
+            },
         }
 
 
@@ -517,7 +517,7 @@ class LoginNodesLogger(CustomLogger):
         super().__init__(conf)
 
     def error_exit_with_bootstrap_error(
-            self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
+        self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
     ):
         """Log error message and exit with a bootstrap error."""
         self._log_message(f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {msg} {ERROR_MSG_SUFFIX}")
@@ -619,10 +619,11 @@ class ConfigLoader:
             elif node_type == "LoginNode":
                 script_data = next(
                     (
-                        pool for pool in cluster_config["LoginNodes"]["Pools"]
+                        pool
+                        for pool in cluster_config["LoginNodes"]["Pools"]
                         if pool["Name"] == pool_name and pool["CustomActions"]
                     ),
-                    None
+                    None,
                 )["CustomActions"][event_name]
             else:
                 script_data = next(
@@ -735,7 +736,8 @@ class ActionRunner:
         except (KeyError, ClientError, botocore.exceptions.ParamValidationError) as e:
             logging.debug(e)
             self.custom_logger.error_exit(
-                "Failed to get the stack status, check the HeadNode instance profile's IAM policies"
+                f"Node of type: '{self.conf.node_type}' failed to get the stack status. "
+                f"Check the {self.conf.node_type} instance profile's IAM policies"
             )
         return stack_status
 
@@ -914,4 +916,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

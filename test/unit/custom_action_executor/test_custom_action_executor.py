@@ -470,63 +470,64 @@ def test_log_without_url(mocker):
             ],
         ),
         (
-                {
-                    LegacyEventName.ON_NODE_CONFIGURED.value: True,
-                    "node_type": "LoginNode",
-                    "pool_name": "pool2",
-                },
-                {
-                    "LoginNodes": {
-                        "Pools": [
-                            {
-                                "CustomActions": {
-                                    "OnNodeConfigured": {
-                                        "Script": "https://example.com/script1.sh",
-                                        "Args": ["arg1", "arg2"]}
-                                },
-                                "Name": "pool1",
+            {
+                LegacyEventName.ON_NODE_CONFIGURED.value: True,
+                "node_type": "LoginNode",
+                "pool_name": "pool2",
+            },
+            {
+                "LoginNodes": {
+                    "Pools": [
+                        {
+                            "CustomActions": {
+                                "OnNodeConfigured": {
+                                    "Script": "https://example.com/script1.sh",
+                                    "Args": ["arg1", "arg2"],
+                                }
                             },
-                            {
-                                "CustomActions": {
-                                    "OnNodeConfigured": {
-                                        "Script": "https://example.com/script2.sh",
-                                        "Args": ["arg1", "arg2"],
-                                    }
-                                },
-                                "Name": "pool2",
+                            "Name": "pool1",
+                        },
+                        {
+                            "CustomActions": {
+                                "OnNodeConfigured": {
+                                    "Script": "https://example.com/script2.sh",
+                                    "Args": ["arg1", "arg2"],
+                                }
                             },
-                        ]
-                    }
-                },
-                [ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2"])],
+                            "Name": "pool2",
+                        },
+                    ]
+                }
+            },
+            [ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2"])],
         ),
         (
-                {
-                    LegacyEventName.ON_NODE_UPDATED.value: True,
-                    "node_type": "LoginNode",
-                    "pool_name": "pool1",
-                },
-                {
-                    "LoginNodes": {
-                        "Pools": [
-                            {
-                                "CustomActions": {
-                                    "OnNodeUpdated": {
-                                        "Sequence": [
-                                            {"Script": "https://example.com/script1.sh", "Args": ["arg1", "arg2"]},
-                                            {"Script": "https://example.com/script2.sh", "Args": ["arg1", "arg2", "args3"]},
-                                        ]
-                                    }
-                                },
-                                "Name": "pool1",
-                            }
-                        ]
-                    }
-                },
-                [
-                    ScriptDefinition(url="https://example.com/script1.sh", args=["arg1", "arg2"]),
-                    ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2", "args3"]),
-                ],
+            {
+                LegacyEventName.ON_NODE_UPDATED.value: True,
+                "node_type": "LoginNode",
+                "pool_name": "pool1",
+            },
+            {
+                "LoginNodes": {
+                    "Pools": [
+                        {
+                            "CustomActions": {
+                                "OnNodeUpdated": {
+                                    "Sequence": [
+                                        {"Script": "https://example.com/script1.sh", "Args": ["arg1", "arg2"]},
+                                        {"Script": "https://example.com/script2.sh", "Args": ["arg1", "arg2", "args3"]},
+                                    ]
+                                }
+                            },
+                            "Name": "pool1",
+                        }
+                    ]
+                }
+            },
+            [
+                ScriptDefinition(url="https://example.com/script1.sh", args=["arg1", "arg2"]),
+                ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2", "args3"]),
+            ],
         ),
     ],
 )
@@ -727,32 +728,33 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
     error_exit_mock.assert_called_once_with("hello url")
     sleep_mock.assert_called_once_with(5)
 
+
 @pytest.mark.parametrize(
     "action, expected_event",
     [
         (
-                "OnNodeStart",
-                {
-                    "datetime": r".*",
-                    "version": 0,
-                    "scheduler": "slurm",
-                    "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
-                    "node-role": "LoginNode",
-                    "component": "custom-action",
-                    "level": "ERROR",
+            "OnNodeStart",
+            {
+                "datetime": r".*",
+                "version": 0,
+                "scheduler": "slurm",
+                "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
+                "node-role": "LoginNode",
+                "component": "custom-action",
+                "level": "ERROR",
+                "instance-id": "i-instance",
+                "login": {
+                    "pool-name": "pool1",
                     "instance-id": "i-instance",
-                    "login": {
-                        "pool-name": "pool1",
-                        "instance-id": "i-instance",
-                        "instance-type": "c5.xlarge",
-                        "availability-zone": "us-east-1c",
-                        "address": "127.0.0.1",
-                        "hostname": "host",
-                    },
-                    "event-type": "custom-action-error",
-                    "message": "hello",
-                    "detail": {"action": "OnNodeStart", "step": 1, "stage": "executing", "error": {"a": 1, "b": "error"}},
+                    "instance-type": "c5.xlarge",
+                    "availability-zone": "us-east-1c",
+                    "address": "127.0.0.1",
+                    "hostname": "host",
                 },
+                "event-type": "custom-action-error",
+                "message": "hello",
+                "detail": {"action": "OnNodeStart", "step": 1, "stage": "executing", "error": {"a": 1, "b": "error"}},
+            },
         ),
     ],
 )
