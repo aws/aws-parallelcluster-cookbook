@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.11.0
+------
+
+**ENHANCEMENTS**
+- Allow custom actions on Login Nodes.
+
 3.10.0
 ------
 
