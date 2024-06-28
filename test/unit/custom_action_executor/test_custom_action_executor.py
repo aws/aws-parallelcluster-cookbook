@@ -86,6 +86,31 @@ def create_persistent_tmp_file(additional_content: str = "") -> str:
         return f.name
 
 
+def _assert_valid_logger(mocker, config, expected_event):
+
+    def write_handler(**kwargs):
+        received_events.append(kwargs.get("message"))
+
+    received_events = []
+
+    logger = LoginNodesLogger(config) if config.node_type == "LoginNode" else ComputeFleetLogger(config)
+
+    logger._write_bootstrap_error = write_handler
+    error_exit_mock = mocker.patch("custom_action_executor.CustomLogger.error_exit")
+    sleep_mock = mocker.patch("time.sleep")
+
+    logger.error_exit_with_bootstrap_error(
+        "hello url", "hello", step=1, stage="executing", error={"a": 1, "b": "error"}
+    )
+
+    assert_that(received_events).is_length(1)
+    actual_event = json.loads(received_events[0])
+    assert_that(actual_event).is_equal_to(expected_event, ignore="datetime")
+
+    error_exit_mock.assert_called_once_with("hello url")
+    sleep_mock.assert_called_once_with(5)
+
+
 @pytest.mark.asyncio
 async def test_download_s3_script(script_runner, s3_script, mocker):
     #  Mock the s3 download of file_contents via s3 resource mocking
@@ -705,28 +730,8 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
             return node_name
         raise ValueError()
 
-    def write_handler(**kwargs):
-        received_events.append(kwargs.get("message"))
-
-    received_events = []
-
     ComputeFleetLogger._read_node_name = name_reader
-
-    fleet_logger = ComputeFleetLogger(config)
-    fleet_logger._write_bootstrap_error = write_handler
-    error_exit_mock = mocker.patch("custom_action_executor.CustomLogger.error_exit")
-    sleep_mock = mocker.patch("time.sleep")
-    fleet_logger.error_exit_with_bootstrap_error(
-        "hello url", "hello", step=1, stage="executing", error={"a": 1, "b": "error"}
-    )
-
-    assert_that(received_events).is_length(1)
-    actual_event = json.loads(received_events[0])
-
-    assert_that(actual_event).is_equal_to(expected_event, ignore="datetime")
-
-    error_exit_mock.assert_called_once_with("hello url")
-    sleep_mock.assert_called_once_with(5)
+    _assert_valid_logger(mocker, config, expected_event)
 
 
 @pytest.mark.parametrize(
@@ -776,23 +781,4 @@ def test_login_nodes_logger(mocker, action, expected_event):
         dry_run=False,
     )
 
-    def write_handler(**kwargs):
-        received_events.append(kwargs.get("message"))
-
-    received_events = []
-
-    logger = LoginNodesLogger(config)
-    logger._write_bootstrap_error = write_handler
-    error_exit_mock = mocker.patch("custom_action_executor.CustomLogger.error_exit")
-    sleep_mock = mocker.patch("time.sleep")
-
-    logger.error_exit_with_bootstrap_error(
-        "hello url", "hello", step=1, stage="executing", error={"a": 1, "b": "error"}
-    )
-
-    assert_that(received_events).is_length(1)
-    actual_event = json.loads(received_events[0])
-    assert_that(actual_event).is_equal_to(expected_event, ignore="datetime")
-
-    error_exit_mock.assert_called_once_with("hello url")
-    sleep_mock.assert_called_once_with(5)
+    _assert_valid_logger(mocker, config, expected_event)

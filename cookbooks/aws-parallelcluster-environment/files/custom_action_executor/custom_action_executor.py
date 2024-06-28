@@ -512,6 +512,39 @@ class ComputeFleetLogger(CustomLogger):
 
 
 class LoginNodesLogger(CustomLogger):
+    """
+    Logs using the same logic as the legacy bash script.
+
+    Could be changed to a standard logger when error signaling is more testable.
+
+    Example Event:
+    {
+        "datetime": now,
+        "version": 0,
+        "scheduler": "slurm",
+        "cluster-name": self.conf.cluster_name,
+        "node-role": self.conf.node_type,
+        "component": "custom-action",
+        "level": "ERROR",
+        "instance-id": self.conf.instance_id,
+        "event-type": "custom-action-error",
+        "message": message,
+        "detail": {
+            "action": self.conf.event_name,
+            "step": step,
+            "stage": stage,
+            "error": error,
+        },
+        "login": {
+            "pool-name": self.conf.pool_name,
+            "instance-id": self.conf.instance_id,
+            "instance-type": self.conf.instance_type,
+            "availability-zone": self.conf.availability_zone,
+            "address": self.conf.ip_address,
+            "hostname": self.conf.hostname,
+        }
+    }
+    """
 
     def __init__(self, conf: CustomActionsConfig):
         super().__init__(conf)
