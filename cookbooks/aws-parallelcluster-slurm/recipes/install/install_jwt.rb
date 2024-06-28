@@ -16,17 +16,19 @@
 # limitations under the License.
 
 jwt_version = '1.15.3'
-jwt_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/jwt/v#{jwt_version}.tar.gz"
 jwt_tarball = "#{node['cluster']['sources_dir']}/libjwt-#{jwt_version}.tar.gz"
-jwt_sha256 = 'cb2fd95123689e7d209a3a8c060e02f68341c9a5ded524c0cd881a8cd20d711f'
 
-remote_file jwt_tarball do
-  source jwt_url
-  mode '0644'
+bash 'get jwt from s3' do
+  user 'root'
+  group 'root'
+  cwd "#{node['cluster']['sources_dir']}"
+  code <<-JWT
+    set -e
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/jwt/v#{jwt_version}.tar.gz #{jwt_tarball} --region #{node['cluster']['region']}
+    chmod 644 #{jwt_tarball}
+    JWT
   retries 3
   retry_delay 5
-  checksum jwt_sha256
-  action :create_if_missing
 end
 
 jwt_dependencies 'Install jwt dependencies'

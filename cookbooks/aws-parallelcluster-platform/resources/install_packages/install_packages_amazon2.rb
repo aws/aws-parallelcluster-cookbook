@@ -31,7 +31,7 @@ def default_packages
      gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
      jq wget python-pip NetworkManager-config-routing-rules
      python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     coreutils moreutils environment-modules bzip2)
+     coreutils environment-modules bzip2)
 end
 
 action :install_extras do

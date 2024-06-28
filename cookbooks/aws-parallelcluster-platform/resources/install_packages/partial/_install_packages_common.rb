@@ -39,7 +39,7 @@ action :install_extras do
 end
 
 action :setup do
+  action_install_extras
   action_install_kernel_source
   action_install_base_packages
-  action_install_extras
 end

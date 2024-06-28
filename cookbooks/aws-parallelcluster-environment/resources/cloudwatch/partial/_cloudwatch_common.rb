@@ -29,7 +29,7 @@ action :setup do
 
   public_key_local_path = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
   remote_file public_key_local_path do
-    source 'https://s3.amazonaws.com/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg'
+    source "https://s3.#{aws_region}.#{aws_domain}/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
     retries 3
     retry_delay 5
     action :create_if_missing

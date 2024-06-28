@@ -21,13 +21,17 @@ pmix_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/pmix/pmix-#{pmix
 pmix_sha256 = node['cluster']['pmix']['sha256']
 pmix_tarball = "#{node['cluster']['sources_dir']}/pmix-#{pmix_version}.tar.gz"
 
-remote_file pmix_tarball do
-  source pmix_url
-  mode '0644'
+bash 'get pmix from s3' do
+  user 'root'
+  group 'root'
+  cwd "#{node['cluster']['sources_dir']}"
+  code <<-PMIX
+    set -e
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/pmix/pmix-#{pmix_version}.tar.gz #{pmix_tarball} --region #{node['cluster']['region']}
+    chmod 644 #{pmix_tarball}
+    PMIX
   retries 3
   retry_delay 5
-  checksum pmix_sha256
-  action :create_if_missing
 end
 
 bash 'Install PMIx' do

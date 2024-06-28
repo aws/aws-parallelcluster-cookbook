@@ -147,10 +147,15 @@ action :setup do
 
     # Extract DCV packages
     unless ::File.exist?(dcv_tarball)
-      remote_file dcv_tarball do
-        source dcv_url
-        checksum dcv_sha256sum
-        mode '0644'
+      bash 'get dcv from s3' do
+        user 'root'
+        group 'root'
+        cwd "#{node['cluster']['sources_dir']}"
+        code <<-DCV
+        set -e
+        aws s3 cp #{dcv_url} #{dcv_tarball} --region #{node['cluster']['region']}
+        chmod 644 #{dcv_tarball}
+        DCV
         retries 3
         retry_delay 5
       end
@@ -276,7 +281,7 @@ def dcv_url
 end
 
 def dcv_tarball
-  "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
+  "#{node['cluster']['artifacts_build_url']}/dcv/#{dcv_package}.tgz"
 end
 
 def dcvauth_virtualenv

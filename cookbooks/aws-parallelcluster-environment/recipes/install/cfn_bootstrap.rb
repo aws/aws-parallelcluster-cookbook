@@ -33,20 +33,13 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
-  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cfn-dependencies.tgz"
-  mode '0644'
-  retries 3
-  retry_delay 5
-  action :create_if_missing
-end
-
 bash 'pip install' do
   user 'root'
   group 'root'
   cwd "#{node['cluster']['base_dir']}"
   code <<-REQ
     set -e
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/PyPi/#{node['kernel']['machine']}/cfn-dependencies.tgz cfn-dependencies.tgz --region #{node['cluster']['region']}
     tar xzf cfn-dependencies.tgz
     cd cfn
     #{virtualenv_path}/bin/pip install * -f ./ --no-index
@@ -57,7 +50,7 @@ cfnbootstrap_version = '2.0-28'
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']
-bucket = region.start_with?('cn-') ? 's3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster' : "s3.amazonaws.com"
+bucket = region.start_with?('cn-') ? 's3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster' : "s3.#{aws_region}.#{aws_domain}"
 
 remote_file "/tmp/#{cfnbootstrap_package}" do
   source "https://#{bucket}/cloudformation-examples/#{cfnbootstrap_package}"

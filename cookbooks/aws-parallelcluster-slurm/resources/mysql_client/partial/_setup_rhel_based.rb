@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :setup do
-  mysql_archive_url = package_archive(node['cluster']['artifacts_s3_url'])
+  mysql_archive_url = package_archive("#{node['cluster']['base_build_url']}/archives")
   mysql_tar_file = "/tmp/#{package_filename}"
 
   log "Downloading MySQL packages archive from #{mysql_archive_url}"
@@ -22,12 +22,17 @@ action :setup do
   # Add MySQL source file
   action_create_source_link
 
-  remote_file mysql_tar_file do
-    source mysql_archive_url
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
+  bash 'get mysql from s3' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['sources_dir']}"
+    code <<-MYSQL
+    set -e
+    aws s3 cp #{mysql_archive_url} #{mysql_tar_file} --region #{node['cluster']['region']}
+    chmod 644 #{mysql_tar_file}
+    MYSQL
+    retries 5
+    retry_delay 10
   end
 
   bash 'Install MySQL packages' do

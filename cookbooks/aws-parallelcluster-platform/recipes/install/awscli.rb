@@ -17,12 +17,18 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 return if ::File.exist?("/usr/local/bin/aws") || redhat_on_docker?
+return if platform?('amazon')
 
 file_cache_path = Chef::Config[:file_cache_path]
+region = aws_region
+awscli_url = "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
+if region.start_with?("us-iso")
+  awscli_url ="https://aws-sdk-common-infra-dca-prod-deployment-bucket.s3.#{aws_region}.#{aws_domain}/aws-cli-v2/linux/x86_64/awscli-exe-linux-x86_64.zip"
+end
 
 remote_file 'download awscli bundle from s3' do
   path "#{file_cache_path}/awscli-bundle.zip"
-  source 'https://s3.amazonaws.com/aws-cli/awscli-bundle.zip'
+  source awscli_url
   path
   retries 5
   retry_delay 5
@@ -34,6 +40,12 @@ archive_file 'extract awscli bundle' do
   overwrite true
 end
 
-bash 'install awscli' do
-  code "#{cookbook_virtualenv_path}/bin/python #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
+if region.start_with?("us-iso")
+  bash 'install awscli' do
+    code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin/aws"
+  end
+else
+  bash 'install awscli' do
+    code "#{cookbook_virtualenv_path}/bin/python#{node['cluster']['python-major-minor-version']} #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
+  end
 end

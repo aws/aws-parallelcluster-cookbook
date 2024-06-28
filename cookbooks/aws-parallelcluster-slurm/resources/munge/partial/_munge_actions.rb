@@ -20,13 +20,11 @@ unified_mode true
 default_action :setup
 
 munge_version = node['cluster']['munge']['munge_version']
-munge_url = "#{node['cluster']['munge']['base_url']}/munge-#{munge_version}.tar.gz"
 munge_tarball = "#{node['cluster']['sources_dir']}/munge-#{munge_version}.tar.gz"
 munge_user = node['cluster']['munge']['user']
 munge_user_id = node['cluster']['munge']['user_id']
 munge_group = node['cluster']['munge']['group']
 munge_group_id = node['cluster']['munge']['group_id']
-munge_sha256 = node['cluster']['munge']['sha256']
 
 action :setup do
   directory node['cluster']['sources_dir'] do
@@ -62,13 +60,17 @@ end
 
 action :download_source_code do
   # Get munge tarball
-  remote_file munge_tarball do
-    source munge_url
-    mode '0644'
+  bash 'get munge from s3' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['sources_dir']}"
+    code <<-MUNGE
+    set -e
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/munge/munge-#{munge_version}.tar.gz #{munge_tarball} --region #{node['cluster']['region']}
+    chmod 644 #{munge_tarball}
+    MUNGE
     retries 3
     retry_delay 5
-    checksum munge_sha256
-    action :create_if_missing
   end
 end
 
