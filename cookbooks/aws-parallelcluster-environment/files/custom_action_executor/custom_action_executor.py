@@ -104,6 +104,7 @@ class CustomActionsConfig:
     region_name: str
     node_type: str
     queue_name: str
+    pool_name: str
     resource_name: str
     instance_id: str
     instance_type: str
@@ -367,6 +368,28 @@ class CustomLogger(ABC):
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(f"{message}\n")
 
+    def _get_event(self, message: str, step: int = None, stage: str = None, error: any = None):
+        now = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
+
+        return {
+            "datetime": now,
+            "version": 0,
+            "scheduler": "slurm",
+            "cluster-name": self.conf.cluster_name,
+            "node-role": self.conf.node_type,
+            "component": "custom-action",
+            "level": "ERROR",
+            "instance-id": self.conf.instance_id,
+            "event-type": "custom-action-error",
+            "message": message,
+            "detail": {
+                "action": self.conf.event_name,
+                "step": step,
+                "stage": stage,
+                "error": error,
+            },
+        }
+
 
 class HeadNodeLogger(CustomLogger):
     """
@@ -436,34 +459,13 @@ class ComputeFleetLogger(CustomLogger):
         self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
     ):
         """Log error message and exit with a bootstrap error."""
-        event = self._get_event(msg_without_url if msg_without_url else msg)
-        detail = event.setdefault("detail", {})
-        detail.update(
-            {
-                "action": self.conf.event_name,
-                "step": step,
-                "stage": stage,
-                "error": error,
-            }
-        )
-        self._write_bootstrap_error(message=json.dumps(event))
-        # Need to give CloudWatch Agent time to publish the error log
-        time.sleep(5)
-        self.error_exit(msg)
+        message = msg_without_url if msg_without_url else msg
+        event = self._get_event(message, step, stage, error)
 
-    def _get_event(self, message: str):
-        now = datetime.now(timezone.utc).isoformat(timespec="milliseconds")
         node_spec = self._get_node_spec()
-        return {
-            "datetime": now,
-            "version": 0,
-            "scheduler": "slurm",
-            "cluster-name": self.conf.cluster_name,
-            "node-role": self.conf.node_type,
-            "component": "custom-action",
-            "level": "ERROR",
-            "instance-id": self.conf.instance_id,
-            "compute": {
+        compute = event.setdefault("compute", {})
+        compute.update(
+            {
                 "name": node_spec.get("name"),
                 "instance-id": self.conf.instance_id,
                 "instance-type": self.conf.instance_type,
@@ -473,11 +475,13 @@ class ComputeFleetLogger(CustomLogger):
                 "queue-name": self.conf.queue_name,
                 "compute-resource": self.conf.resource_name,
                 "node-type": node_spec.get("type"),
-            },
-            "event-type": "custom-action-error",
-            "message": message,
-            "detail": {},
-        }
+            }
+        )
+
+        self._write_bootstrap_error(message=json.dumps(event))
+        # Need to give CloudWatch Agent time to publish the error log
+        time.sleep(5)
+        self.error_exit(msg)
 
     def _get_node_spec(self) -> Dict[str, str]:
         if self.conf.node_spec_file:
@@ -507,6 +511,69 @@ class ComputeFleetLogger(CustomLogger):
             return node_spec_file.read().strip()
 
 
+class LoginNodesLogger(CustomLogger):
+    """
+    Logs using the same logic as the legacy bash script.
+
+    Could be changed to a standard logger when error signaling is more testable.
+
+    Example Event:
+    {
+        "datetime": now,
+        "version": 0,
+        "scheduler": "slurm",
+        "cluster-name": self.conf.cluster_name,
+        "node-role": self.conf.node_type,
+        "component": "custom-action",
+        "level": "ERROR",
+        "instance-id": self.conf.instance_id,
+        "event-type": "custom-action-error",
+        "message": message,
+        "detail": {
+            "action": self.conf.event_name,
+            "step": step,
+            "stage": stage,
+            "error": error,
+        },
+        "login": {
+            "pool-name": self.conf.pool_name,
+            "instance-id": self.conf.instance_id,
+            "instance-type": self.conf.instance_type,
+            "availability-zone": self.conf.availability_zone,
+            "address": self.conf.ip_address,
+            "hostname": self.conf.hostname,
+        }
+    }
+    """
+
+    def __init__(self, conf: CustomActionsConfig):
+        super().__init__(conf)
+
+    def error_exit_with_bootstrap_error(
+        self, msg: str, msg_without_url: str = None, step: int = None, stage: str = None, error: any = None
+    ):
+        """Log error message and exit with a bootstrap error."""
+        self._log_message(f"{SCRIPT_LOG_NAME_FETCH_AND_RUN} - {msg} {ERROR_MSG_SUFFIX}")
+        message = msg_without_url if msg_without_url else msg
+        event = self._get_event(message, step, stage, error)
+
+        login = event.setdefault("login", {})
+        login.update(
+            {
+                "pool-name": self.conf.pool_name,
+                "instance-id": self.conf.instance_id,
+                "instance-type": self.conf.instance_type,
+                "availability-zone": self.conf.availability_zone,
+                "address": self.conf.ip_address,
+                "hostname": self.conf.hostname,
+            }
+        )
+
+        self._write_bootstrap_error(message=json.dumps(event))
+        time.sleep(5)
+        self.error_exit(msg)
+
+
 class ConfigLoader:
     """
     Encapsulates configuration handling logic.
@@ -530,6 +597,7 @@ class ConfigLoader:
         """
         node_type = args.node_type
         queue_name = args.queue_name
+        pool_name = args.pool_name
 
         cluster_config = self._load_cluster_config(args.cluster_configuration)
         logging.debug(cluster_config)
@@ -540,7 +608,7 @@ class ConfigLoader:
         for event in LegacyEventName:
             current_event_name = event.map_to_current_name()
             script_sequences_per_event[event] = self._deserialize_script_sequences(
-                cluster_config, current_event_name, node_type, queue_name
+                cluster_config, current_event_name, node_type, queue_name, pool_name
             )
             if getattr(args, event.value):
                 legacy_event = event
@@ -553,6 +621,7 @@ class ConfigLoader:
             node_type=node_type,
             queue_name=queue_name,
             event_name=event_name,
+            pool_name=args.pool_name,
             region_name=args.region,
             stack_name=args.stack_name,
             cluster_name=args.cluster_name,
@@ -575,11 +644,20 @@ class ConfigLoader:
 
         return conf
 
-    def _deserialize_script_sequences(self, cluster_config, event_name, node_type, queue_name):
+    def _deserialize_script_sequences(self, cluster_config, event_name, node_type, queue_name, pool_name):
         # this is a good candidate for sharing logic with pcluster as library on the nodes
         try:
             if node_type == "HeadNode":
                 script_data = cluster_config["HeadNode"]["CustomActions"][event_name]
+            elif node_type == "LoginNode":
+                script_data = next(
+                    (
+                        pool
+                        for pool in cluster_config["LoginNodes"]["Pools"]
+                        if pool["Name"] == pool_name and pool["CustomActions"]
+                    ),
+                    None,
+                )["CustomActions"][event_name]
             else:
                 script_data = next(
                     (
@@ -691,7 +769,8 @@ class ActionRunner:
         except (KeyError, ClientError, botocore.exceptions.ParamValidationError) as e:
             logging.debug(e)
             self.custom_logger.error_exit(
-                "Failed to get the stack status, check the HeadNode instance profile's IAM policies"
+                f"Node of type: '{self.conf.node_type}' failed to get the stack status. "
+                f"Check the {self.conf.node_type} instance profile's IAM policies"
             )
         return stack_status
 
@@ -755,6 +834,13 @@ def _parse_cli_args():
         default=os.getenv("PCLUSTER_SCHEDULER_QUEUE_NAME", None),
         required=False,
         help="the scheduler queue name, defaults to PCLUSTER_SCHEDULER_QUEUE_NAME env variable",
+    )
+    parser.add_argument(
+        "-p",
+        "--pool-name",
+        default=os.getenv("PCLUSTER_LOGIN_NODES_POOL_NAME", None),
+        required=False,
+        help="the login node pool name, defaults to PCLUSTER_LOGIN_NODES_POOL_NAME env variable",
     )
     parser.add_argument(
         "-c",
@@ -822,6 +908,7 @@ def _parse_cli_args():
 CUSTOM_LOGGER = {
     "HeadNode": HeadNodeLogger,
     "ComputeFleet": ComputeFleetLogger,
+    "LoginNode": LoginNodesLogger,
 }
 
 

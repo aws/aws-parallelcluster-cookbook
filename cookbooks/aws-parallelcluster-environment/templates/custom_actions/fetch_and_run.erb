@@ -23,6 +23,7 @@ PCLUSTER_SCRIPTS_DIR="<%= node['cluster']['scripts_dir'] %>"
 PCLUSTER_CONFIG_PATH="<%= node['cluster']['cluster_config_path'] %>"
 PCLUSTER_NODE_TYPE="<%= node['cluster']['node_type'] %>"
 PCLUSTER_SCHEDULER_QUEUE_NAME="<%= node['cluster']['scheduler_queue_name'] %>"
+PCLUSTER_LOGIN_NODES_POOL_NAME="<%= node['cluster']['pool_name'] %>"
 PCLUSTER_STACK_NAME="<%= node['cluster']['stack_name'] %>"
 PCLUSTER_REGION="<%= node['cluster']['region'] %>"
 
@@ -34,6 +35,7 @@ PCLUSTER_REGION="<%= node['cluster']['region'] %>"
   --cluster-name "<%= @cluster_name %>" \
   --node-type "${PCLUSTER_NODE_TYPE}" \
   --queue-name "${PCLUSTER_SCHEDULER_QUEUE_NAME}" \
+  --pool-name "${PCLUSTER_LOGIN_NODES_POOL_NAME}" \
   --cluster-configuration "${PCLUSTER_CONFIG_PATH}" \
   --instance-id "<%= @instance_id %>" \
   --instance-type "<%= @instance_type %>" \

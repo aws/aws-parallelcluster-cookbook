@@ -30,6 +30,7 @@ from custom_action_executor import (
     ExecutableScript,
     HeadNodeLogger,
     LegacyEventName,
+    LoginNodesLogger,
     ScriptDefinition,
     ScriptRunner,
     main,
@@ -83,6 +84,31 @@ def create_persistent_tmp_file(additional_content: str = "") -> str:
         f.write(b"#!/bin/bash\n")
         f.write(additional_content.encode())
         return f.name
+
+
+def _assert_valid_logger(mocker, config, expected_event):
+
+    def write_handler(**kwargs):
+        received_events.append(kwargs.get("message"))
+
+    received_events = []
+
+    logger = LoginNodesLogger(config) if config.node_type == "LoginNode" else ComputeFleetLogger(config)
+
+    logger._write_bootstrap_error = write_handler
+    error_exit_mock = mocker.patch("custom_action_executor.CustomLogger.error_exit")
+    sleep_mock = mocker.patch("time.sleep")
+
+    logger.error_exit_with_bootstrap_error(
+        "hello url", "hello", step=1, stage="executing", error={"a": 1, "b": "error"}
+    )
+
+    assert_that(received_events).is_length(1)
+    actual_event = json.loads(received_events[0])
+    assert_that(actual_event).is_equal_to(expected_event, ignore="datetime")
+
+    error_exit_mock.assert_called_once_with("hello url")
+    sleep_mock.assert_called_once_with(5)
 
 
 @pytest.mark.asyncio
@@ -468,6 +494,66 @@ def test_log_without_url(mocker):
                 ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2", "args3"]),
             ],
         ),
+        (
+            {
+                LegacyEventName.ON_NODE_CONFIGURED.value: True,
+                "node_type": "LoginNode",
+                "pool_name": "pool2",
+            },
+            {
+                "LoginNodes": {
+                    "Pools": [
+                        {
+                            "CustomActions": {
+                                "OnNodeConfigured": {
+                                    "Script": "https://example.com/script1.sh",
+                                    "Args": ["arg1", "arg2"],
+                                }
+                            },
+                            "Name": "pool1",
+                        },
+                        {
+                            "CustomActions": {
+                                "OnNodeConfigured": {
+                                    "Script": "https://example.com/script2.sh",
+                                    "Args": ["arg1", "arg2"],
+                                }
+                            },
+                            "Name": "pool2",
+                        },
+                    ]
+                }
+            },
+            [ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2"])],
+        ),
+        (
+            {
+                LegacyEventName.ON_NODE_UPDATED.value: True,
+                "node_type": "LoginNode",
+                "pool_name": "pool1",
+            },
+            {
+                "LoginNodes": {
+                    "Pools": [
+                        {
+                            "CustomActions": {
+                                "OnNodeUpdated": {
+                                    "Sequence": [
+                                        {"Script": "https://example.com/script1.sh", "Args": ["arg1", "arg2"]},
+                                        {"Script": "https://example.com/script2.sh", "Args": ["arg1", "arg2", "args3"]},
+                                    ]
+                                }
+                            },
+                            "Name": "pool1",
+                        }
+                    ]
+                }
+            },
+            [
+                ScriptDefinition(url="https://example.com/script1.sh", args=["arg1", "arg2"]),
+                ScriptDefinition(url="https://example.com/script2.sh", args=["arg1", "arg2", "args3"]),
+            ],
+        ),
     ],
 )
 def test_config_loader(mocker, args, conf_file_content, scripts_sequence):
@@ -644,25 +730,55 @@ def test_compute_fleet_logger(mocker, node_name, action, expected_event):
             return node_name
         raise ValueError()
 
-    def write_handler(**kwargs):
-        received_events.append(kwargs.get("message"))
-
-    received_events = []
-
     ComputeFleetLogger._read_node_name = name_reader
+    _assert_valid_logger(mocker, config, expected_event)
 
-    fleet_logger = ComputeFleetLogger(config)
-    fleet_logger._write_bootstrap_error = write_handler
-    error_exit_mock = mocker.patch("custom_action_executor.CustomLogger.error_exit")
-    sleep_mock = mocker.patch("time.sleep")
-    fleet_logger.error_exit_with_bootstrap_error(
-        "hello url", "hello", step=1, stage="executing", error={"a": 1, "b": "error"}
+
+@pytest.mark.parametrize(
+    "action, expected_event",
+    [
+        (
+            "OnNodeStart",
+            {
+                "datetime": r".*",
+                "version": 0,
+                "scheduler": "slurm",
+                "cluster-name": "integ-tests-j3v1lgb0rx4uvt5y",
+                "node-role": "LoginNode",
+                "component": "custom-action",
+                "level": "ERROR",
+                "instance-id": "i-instance",
+                "login": {
+                    "pool-name": "pool1",
+                    "instance-id": "i-instance",
+                    "instance-type": "c5.xlarge",
+                    "availability-zone": "us-east-1c",
+                    "address": "127.0.0.1",
+                    "hostname": "host",
+                },
+                "event-type": "custom-action-error",
+                "message": "hello",
+                "detail": {"action": "OnNodeStart", "step": 1, "stage": "executing", "error": {"a": 1, "b": "error"}},
+            },
+        ),
+    ],
+)
+def test_login_nodes_logger(mocker, action, expected_event):
+    config = SimpleNamespace(
+        event_name=action,
+        stack_name="integ-tests-j3v1lgb0rx4uvt5y-1234",
+        cluster_name="integ-tests-j3v1lgb0rx4uvt5y",
+        node_type="LoginNode",
+        instance_id="i-instance",
+        instance_type="c5.xlarge",
+        availability_zone="us-east-1c",
+        ip_address="127.0.0.1",
+        hostname="host",
+        queue_name="partition-1",
+        pool_name="pool1",
+        resource_name="compute-a",
+        node_spec_file="/opt/parallelcluster/slurm_nodename",
+        dry_run=False,
     )
 
-    assert_that(received_events).is_length(1)
-    actual_event = json.loads(received_events[0])
-
-    assert_that(actual_event).is_equal_to(expected_event, ignore="datetime")
-
-    error_exit_mock.assert_called_once_with("hello url")
-    sleep_mock.assert_called_once_with(5)
+    _assert_valid_logger(mocker, config, expected_event)
