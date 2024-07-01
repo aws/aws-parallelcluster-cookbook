@@ -50,7 +50,13 @@ cfnbootstrap_version = '2.0-28'
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']
-bucket = region.start_with?('cn-') ? 's3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster' : "s3.#{aws_region}.#{aws_domain}"
+bucket = "s3.amazonaws.com"
+
+if region.start_with?('cn-')
+  bucket = 's3.cn-north-1.amazonaws.com.cn/cn-north-1-aws-parallelcluster'
+elsif region.start_with?("us-iso")
+  bucket = "s3.#{aws_region}.#{aws_domain}"
+end
 
 remote_file "/tmp/#{cfnbootstrap_package}" do
   source "https://#{bucket}/cloudformation-examples/#{cfnbootstrap_package}"

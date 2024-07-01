@@ -22,6 +22,16 @@ default_action :setup
 action :setup do
   include_recipe 'yum'
   alinux_extras_topic 'epel'
+  if aws_region.start_with?("us-iso")
+      bash "Disable epel repo" do
+        user 'root'
+        group 'root'
+        code <<-EPEL
+        set -e
+        yum-config-manager --disable epel
+        EPEL
+      end
+    end
 end
 
 action :update do

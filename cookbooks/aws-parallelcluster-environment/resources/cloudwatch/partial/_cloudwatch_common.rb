@@ -27,9 +27,16 @@ action :setup do
 
   action_cloudwatch_prerequisite
 
+  region = node['cluster']['region']
+  key_path = "/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
+  cloudwatch_key_url = "https://s3.amazonaws.com/#{key_path}"
+  if region.start_with?("us-iso")
+    cloudwatch_key_url = "https://s3.#{aws_region}.#{aws_domain}/#{key_path}"
+  end
+
   public_key_local_path = "#{node['cluster']['sources_dir']}/amazon-cloudwatch-agent.gpg"
   remote_file public_key_local_path do
-    source "https://s3.#{aws_region}.#{aws_domain}/amazoncloudwatch-agent/assets/amazon-cloudwatch-agent.gpg"
+    source cloudwatch_key_url
     retries 3
     retry_delay 5
     action :create_if_missing

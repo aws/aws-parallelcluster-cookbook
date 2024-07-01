@@ -277,11 +277,11 @@ def dcv_gpu_accel_supported?
 end
 
 def dcv_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/dcv/#{dcv_package}.tgz"
+  "#{node['cluster']['artifacts_build_url']}/dcv/#{dcv_package}.tgz"
 end
 
 def dcv_tarball
-  "#{node['cluster']['artifacts_build_url']}/dcv/#{dcv_package}.tgz"
+  "#{node['cluster']['sources_dir']}/dcv-#{node['cluster']['dcv']['version']}.tgz"
 end
 
 def dcvauth_virtualenv
