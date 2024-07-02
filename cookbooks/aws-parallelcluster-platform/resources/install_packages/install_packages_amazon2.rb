@@ -40,4 +40,16 @@ action :install_extras do
   ['R3.4'].each do |topic|
     alinux_extras_topic topic
   end
+
+  bash 'yum install missing deps' do
+    user 'root'
+    group 'root'
+    code <<-REQ
+    set -e
+    aws s3 cp #{node['cluster']['artifacts_build_url']}/epel/rhel7/#{node['kernel']['machine']}/epel_deps.tar.gz epel_deps.tar.gz --region #{node['cluster']['region']}
+    tar xzf epel_deps.tar.gz
+    cd epel
+    yum install -y * 2>/dev/null
+    REQ
+  end
 end
