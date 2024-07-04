@@ -7,7 +7,7 @@ description 'AWS ParallelCluster shared cookbook code'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '>= 18'
-version '3.10.0'
+version '3.10.1'
 
 depends 'pyenv', '~> 4.2.3'
 depends 'yum', '~> 7.4.13'
