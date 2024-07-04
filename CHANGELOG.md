@@ -9,6 +9,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Allow custom actions on Login Nodes.
 
+3.10.1
+------
+
+**CHANGES**
+- There were no changes for this version.
+
 3.10.0
 ------
 
