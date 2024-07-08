@@ -68,4 +68,12 @@ exitcodes = 0
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/loginmgtd.log
 stdout_logfile_maxbytes = 1MB
+<% if @dcv_configured -%>[program:pcluster_dcv_authenticator]
+command = <%= @dcv_auth_virtualenv_path %>/bin/python <%= @dcv_auth_user_home %>/pcluster_dcv_authenticator.py
+      --port <%= Integer(@dcv_port) + 1 %>
+      --certificate <%= @dcv_auth_certificate %>
+      --key <%= @dcv_auth_private_key %>
+user = <%= @dcv_auth_user %>
+environment = HOME="<%= @dcv_auth_user_home %>",USER="<%= @dcv_auth_user %>"<% if @region.start_with?('us-iso') -%>,AWS_CA_BUNDLE="<%= @aws_ca_bundle %>"<% end -%>
+<% end -%>
 <% end -%>
