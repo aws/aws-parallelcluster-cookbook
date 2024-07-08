@@ -22,6 +22,12 @@ config_files = %w(
   parallelcluster_supervisord_log_rotation
 )
 
+if node['cluster']['dcv_enabled'] == "login_node" && dcv_installed?
+  config_files += %w(
+    parallelcluster_dcv_log_rotation
+  )
+end
+
 if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
   config_files += %w(
     parallelcluster_pam_ssh_key_generator_log_rotation
