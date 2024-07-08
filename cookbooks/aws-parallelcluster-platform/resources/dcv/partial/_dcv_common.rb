@@ -183,7 +183,7 @@ action :setup do
 end
 
 action :configure do
-  if dcv_supported? && node['cluster']['node_type'] == "HeadNode"
+  if dcv_supported? && (node['cluster']['node_type'] == "HeadNode" || node['cluster']['node_type'] == "LoginNode")
     if dcv_gpu_accel_supported?
       # Enable graphic acceleration in dcv conf file for graphic instances.
       allow_gpu_acceleration
