@@ -102,36 +102,4 @@ describe 'package_repos:setup' do
       end
     end
   end
-
-  context 'on centos' do
-    let(:chef_run) do
-      ChefSpec::Runner.new(
-        platform: 'centos', version: '7',
-        step_into: ['package_repos']
-      )
-    end
-    let(:node) { chef_run.node }
-
-    context 'on arm' do
-      before do
-        node.automatic['kernel']['machine'] = 'aarch64'
-        ConvergePackageRepos.setup(chef_run)
-      end
-
-      it 'installs epel-release' do
-        is_expected.to install_package('epel-release')
-      end
-    end
-
-    context 'not on arm' do
-      before do
-        node.automatic['kernel']['machine'] = 'not aarch64'
-        ConvergePackageRepos.setup(chef_run)
-      end
-
-      it 'does not install epel-release' do
-        is_expected.not_to install_package('epel-release')
-      end
-    end
-  end
 end
