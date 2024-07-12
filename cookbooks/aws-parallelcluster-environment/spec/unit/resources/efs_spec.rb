@@ -156,7 +156,6 @@ describe 'efs:install_utils' do
   end
 
   for_oses([
-    %w(centos 7),
     %w(redhat 8),
     %w(rocky 8),
     %w(redhat 9),
@@ -179,7 +178,6 @@ describe 'efs:install_utils' do
       end
       cached(:required_packages) do
         {
-          "centos" => 'rpm-build',
           "redhat" => %w(rpm-build make),
           "rocky" => %w(rpm-build make),
         }

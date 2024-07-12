@@ -17,7 +17,7 @@ def dcv_sha256sum
   if arm_instance?
     case el_string
     when "el7"
-      # ALINUX2 and Centos7
+      # ALINUX2
       'f921c50a1f98fc945ac0f740f4181a52fb66b4b70bf13c1b2321823a9ec7e95a'
     when "el8"
       # RHEL and Rocky8
@@ -31,7 +31,7 @@ def dcv_sha256sum
   else
     case el_string
     when "el7"
-      # ALINUX2 and Centos7
+      # ALINUX2
       '31230edd66242038a95986c9207fc0f800986a94ee43bfc901e43521f4eb72a6'
     when "el8"
       # RHEL and Rocky8

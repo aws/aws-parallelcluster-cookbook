@@ -82,7 +82,7 @@ HeadNode:
 Iam: null
 Image:
   CustomAmi: null
-  Os: centos7
+  Os: alinux2023
 Imds:
   ImdsSupport: v2.0
 Monitoring:
