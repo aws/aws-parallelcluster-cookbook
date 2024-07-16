@@ -22,8 +22,11 @@ return if platform?('amazon')
 file_cache_path = Chef::Config[:file_cache_path]
 region = aws_region
 awscli_url = "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
-if region.start_with?("us-iso")
+
+if region.start_with?("us-iso-")
   awscli_url ="https://aws-sdk-common-infra-dca-prod-deployment-bucket.s3.#{aws_region}.#{aws_domain}/aws-cli-v2/linux/x86_64/awscli-exe-linux-x86_64.zip"
+elsif region.start_with?("us-isob-")
+  awscli_url ="https://aws-sdk-common-infra-lck-prod-deployment-bucket.s3.#{aws_region}.#{aws_domain}/aws-cli-v2/linux/x86_64/awscli-exe-linux-x86_64.zip"
 end
 
 remote_file 'download awscli bundle from s3' do

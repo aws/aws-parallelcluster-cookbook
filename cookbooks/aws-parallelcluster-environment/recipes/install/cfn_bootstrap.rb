@@ -33,13 +33,20 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
+remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
+  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cfn-dependencies.tgz"
+  mode '0644'
+  retries 3
+  retry_delay 5
+  action :create_if_missing
+end
+
 bash 'pip install' do
   user 'root'
   group 'root'
   cwd "#{node['cluster']['base_dir']}"
   code <<-REQ
     set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/PyPi/#{node['kernel']['machine']}/cfn-dependencies.tgz cfn-dependencies.tgz --region #{node['cluster']['region']}
     tar xzf cfn-dependencies.tgz
     cd cfn
     #{virtualenv_path}/bin/pip install * -f ./ --no-index

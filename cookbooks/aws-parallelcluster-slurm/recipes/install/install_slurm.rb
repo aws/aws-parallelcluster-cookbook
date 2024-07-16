@@ -38,17 +38,13 @@ slurm_sha256 = if slurm_branch.empty?
 include_recipe 'aws-parallelcluster-slurm::slurm_users'
 
 # Get slurm tarball
-bash 'get slurm from s3' do
-  user 'root'
-  group 'root'
-  cwd "#{node['cluster']['sources_dir']}"
-  code <<-SLURM
-    set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/slurm/#{slurm_tar_name}.tar.gz #{slurm_tarball} --region #{node['cluster']['region']}
-    chmod 644 #{slurm_tarball}
-    SLURM
+remote_file slurm_tarball do
+  source slurm_url
+  mode '0644'
   retries 3
   retry_delay 5
+  checksum slurm_sha256
+  action :create_if_missing
 end
 
 # Copy Slurm patches

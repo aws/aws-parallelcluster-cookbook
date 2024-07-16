@@ -13,11 +13,19 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
+  remote_file "#{node['cluster']['sources_dir']}/#{dcgm_package}-#{package_version}.rpm" do
+    source "#{dcgm_url}"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
+
   bash "Install #{dcgm_package}" do
     user 'root'
+    cwd node['cluster']['sources_dir']
     code <<-DCGM_INSTALL
     set -e
-    aws s3 cp #{dcgm_url} #{dcgm_package}-#{package_version}.rpm --region #{node['cluster']['region']}
     yum install -y #{dcgm_package}-#{package_version}.rpm
     DCGM_INSTALL
     retries 3
@@ -26,7 +34,7 @@ action :install_package do
 end
 
 def dcgm_url
-  "#{node['cluster']['artifacts_build_url']}/nvidia_dcgm/#{platform}/#{dcgm_package}-#{package_version}-1-#{arch_suffix}.rpm"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm/#{platform}/#{dcgm_package}-#{package_version}-1-#{arch_suffix}.rpm"
 end
 
 def dcgm_package

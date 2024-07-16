@@ -23,7 +23,7 @@ default_action :setup
 
 action :setup do
   include_recipe 'yum'
-  include_recipe "yum-epel"
+  # include_recipe "yum-epel"
 
   package 'yum-utils' do
     retries 3

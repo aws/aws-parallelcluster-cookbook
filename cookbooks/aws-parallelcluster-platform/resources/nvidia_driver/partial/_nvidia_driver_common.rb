@@ -27,17 +27,12 @@ action :setup do
   node.default['cluster']['nvidia']['driver_version'] = _nvidia_driver_version
   node_attributes "Save Nvidia driver version for Inspec tests"
 
-  bash 'get nvidia driver from s3' do
-    user 'root'
-    group 'root'
-    cwd "#{node['cluster']['sources_dir']}"
-    code <<-NVIDIA
-    set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/nvidia_driver/NVIDIA-Linux-#{nvidia_arch}-#{_nvidia_driver_version}.run #{tmp_nvidia_run} --region #{node['cluster']['region']}
-    chmod 755 #{tmp_nvidia_run}
-    NVIDIA
+  remote_file tmp_nvidia_run do
+    source nvidia_driver_url
+    mode '0755'
     retries 3
     retry_delay 5
+    not_if { ::File.exist?('/usr/bin/nvidia-smi') }
   end
 
   # Make sure nouveau kernel module is unloaded, otherwise installation of NVIDIA driver fails
@@ -71,9 +66,6 @@ action :setup do
       owner 'root'
       group 'root'
       mode '0644'
-      variables(
-        compiler_path: compiler_path
-      )
     end
   end
 

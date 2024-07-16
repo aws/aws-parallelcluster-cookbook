@@ -41,12 +41,19 @@ action :install_extras do
     alinux_extras_topic topic
   end
 
+  remote_file "epel_deps.tar.gz" do
+    source "#{node['cluster']['artifacts_s3_url']}/dependencies/epel/rhel7/#{node['kernel']['machine']}/epel_deps.tar.gz"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
+
   bash 'yum install missing deps' do
     user 'root'
     group 'root'
     code <<-REQ
     set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/epel/rhel7/#{node['kernel']['machine']}/epel_deps.tar.gz epel_deps.tar.gz --region #{node['cluster']['region']}
     tar xzf epel_deps.tar.gz
     cd epel
     yum install -y * 2>/dev/null

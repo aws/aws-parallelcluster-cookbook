@@ -147,15 +147,10 @@ action :setup do
 
     # Extract DCV packages
     unless ::File.exist?(dcv_tarball)
-      bash 'get dcv from s3' do
-        user 'root'
-        group 'root'
-        cwd "#{node['cluster']['sources_dir']}"
-        code <<-DCV
-        set -e
-        aws s3 cp #{dcv_url} #{dcv_tarball} --region #{node['cluster']['region']}
-        chmod 644 #{dcv_tarball}
-        DCV
+      remote_file dcv_tarball do
+        source dcv_url
+        checksum dcv_sha256sum
+        mode '0644'
         retries 3
         retry_delay 5
       end
@@ -277,7 +272,7 @@ def dcv_gpu_accel_supported?
 end
 
 def dcv_url
-  "#{node['cluster']['artifacts_build_url']}/dcv/#{dcv_package}.tgz"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/dcv/#{dcv_package}.tgz"
 end
 
 def dcv_tarball

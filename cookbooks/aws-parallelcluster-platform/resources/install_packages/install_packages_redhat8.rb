@@ -23,12 +23,41 @@ def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # Removed libssh2-devel from base_packages since is not shipped by RedHat 8 and in conflict with package libssh-0.9.6-3.el8.x86_64
   # iptables needed for IMDS setup
-  %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
-     libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf libtool
-     httpd boost-devel mlocate R atlas-devel
-     blas-devel libffi-devel dkms libedit-devel jq
+  # %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+  #    libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf libtool
+  #    httpd boost-devel mlocate R atlas-devel
+  #    blas-devel libffi-devel dkms libedit-devel jq
+  #    libical-devel sendmail libxml2-devel libglvnd-devel
+  #    libgcrypt-devel libevent-devel glibc-static bind-utils
+  #    iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
+  #    coreutils moreutils curl environment-modules gcc gcc-c++ bzip2) R
+  %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools
+     libXmu-devel libdb-devel tcl-devel automake autoconf libtool
+     httpd boost-devel mlocate atlas-devel
+     libffi-devel jq
      libical-devel sendmail libxml2-devel libglvnd-devel
-     libgcrypt-devel libevent-devel glibc-static bind-utils
-     iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     coreutils moreutils curl environment-modules gcc gcc-c++ bzip2)
+     libgcrypt-devel libevent-devel bind-utils
+     iproute python3 python3-pip iptables libcurl-devel
+     coreutils curl environment-modules gcc gcc-c++ bzip2)
+end
+
+action :install_extras do
+  remote_file "epel_deps.tar.gz" do
+    source "#{node['cluster']['artifacts_s3_url']}/dependencies/epel/rhel8/x86_64/epel_deps.tar.gz"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
+
+  bash 'yum install missing deps' do
+    user 'root'
+    group 'root'
+    code <<-REQ
+    set -e
+    tar xzf epel_deps.tar.gz
+    cd epel
+    yum install -y * 2>/dev/null
+    REQ
+  end
 end

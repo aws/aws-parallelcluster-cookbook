@@ -38,17 +38,13 @@ action :setup do
     recursive true
   end
 
-  bash 'get gdrcopy from s3' do
-    user 'root'
-    group 'root'
-    cwd "#{node['cluster']['sources_dir']}"
-    code <<-GDR
-    set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/gdr_copy/v#{gdrcopy_version}.tar.gz #{gdrcopy_tarball} --region #{node['cluster']['region']}
-    chmod 644 #{gdrcopy_tarball}
-    GDR
+  remote_file gdrcopy_tarball do
+    source gdrcopy_url
+    mode '0644'
     retries 3
     retry_delay 5
+    checksum gdrcopy_checksum
+    action :create_if_missing
   end
 
   package_repos 'update package repos' do

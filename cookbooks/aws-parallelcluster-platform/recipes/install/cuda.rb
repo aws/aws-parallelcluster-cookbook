@@ -24,8 +24,10 @@ cuda_patch = '2'
 cuda_complete_version = "#{cuda_version}.#{cuda_patch}"
 cuda_version_suffix = '535.104.05'
 cuda_arch = arm_instance? ? 'linux_sbsa' : 'linux'
+cuda_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run"
 cuda_samples_version = '12.2'
 tmp_cuda_run = '/tmp/cuda.run'
+cuda_samples_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples/v#{cuda_samples_version}.tar.gz"
 tmp_cuda_sample_archive = '/tmp/cuda-sample.tar.gz'
 
 node.default['cluster']['nvidia']['cuda']['version'] = cuda_version
@@ -33,17 +35,12 @@ node.default['cluster']['nvidia']['cuda_samples_version'] = cuda_samples_version
 node_attributes 'Save cuda and cuda samples versions for InSpec tests'
 
 # Get CUDA run file
-bash 'Get CUDA run file from s3' do
-  user 'root'
-  group 'root'
-  cwd "#{node['cluster']['sources_dir']}"
-  code <<-CUDA
-    set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run #{tmp_cuda_run} --region #{node['cluster']['region']}
-    chmod 755 #{tmp_cuda_run}
-    CUDA
+remote_file tmp_cuda_run do
+  source cuda_url
+  mode '0755'
   retries 3
   retry_delay 5
+  not_if { ::File.exist?("/usr/local/cuda-#{cuda_version}") }
 end
 
 # Install CUDA driver
@@ -62,17 +59,12 @@ bash 'cuda.run advanced' do
 end
 
 # Get CUDA Sample Files
-bash 'get CUDA Sample Files from s3' do
-  user 'root'
-  group 'root'
-  cwd "#{node['cluster']['sources_dir']}"
-  code <<-CUDA
-    set -e
-    aws s3 cp #{node['cluster']['artifacts_build_url']}/cuda/samples/v#{cuda_samples_version}.tar.gz #{tmp_cuda_sample_archive} --region #{node['cluster']['region']}
-    chmod 644 #{tmp_cuda_sample_archive}
-    CUDA
+remote_file tmp_cuda_sample_archive do
+  source cuda_samples_url
+  mode '0644'
   retries 3
   retry_delay 5
+  not_if { ::File.exist?("/usr/local/cuda-#{cuda_version}/samples") }
 end
 
 # Unpack CUDA Samples
