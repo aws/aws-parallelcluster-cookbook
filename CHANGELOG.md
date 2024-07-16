@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Allow custom actions on Login Nodes.
 
+**BUG FIXES**
+- Fix EFA kmod installation with RHEL 8.10 or newer.
+
 3.10.1
 ------
 

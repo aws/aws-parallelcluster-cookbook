@@ -22,11 +22,7 @@ use 'partial/_common'
 
 action_class do
   def efa_supported?
-    require 'rubygems'
-    minver = Gem::Version.new("8.4")
-    ourver = Gem::Version.new(node['platform_version'])
-
-    if ourver < minver
+    if Gem::Version.new(node['platform_version']) < Gem::Version.new("8.4")
       log "EFA is not supported in this RHEL version #{node['platform_version']}, supported versions are >= 8.4" do
         level :warn
       end
