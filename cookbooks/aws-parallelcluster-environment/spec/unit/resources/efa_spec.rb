@@ -167,20 +167,6 @@ describe 'efa:setup' do
       is_expected.to run_bash('install efa').with_code(%r{./efa_installer.sh -y -k})
     end
   end
-
-  context 'when centos on arm' do
-    cached(:chef_run) do
-      runner = ChefSpec::Runner.new(
-        platform: "centos", version: '7', step_into: ['efa']
-      )
-      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
-      ConvergeEfa.setup(runner)
-    end
-
-    it "doesn't install EFA kmod" do
-      is_expected.to run_bash('install efa').with_code(%r{./efa_installer.sh -y -k})
-    end
-  end
 end
 
 describe 'efa:configure' do
