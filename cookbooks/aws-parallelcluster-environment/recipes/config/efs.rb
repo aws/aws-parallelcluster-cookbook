@@ -15,14 +15,16 @@ shared_dir_array = node['cluster']['efs_shared_dirs'].split(',')
 id_array = node['cluster']['efs_fs_ids'].split(',')
 encryption_array = node['cluster']['efs_encryption_in_transits'].split(',')
 iam_array = node['cluster']['efs_iam_authorizations'].split(',')
+accesspoint_id_array = node['cluster']['efs_accesspoint_ids'].split(',')
 
 # Identify the previously mounted filesystems and remove them from the set of filesystems to mount
 shared_dir_array.each_with_index do |dir, index|
-  next unless node['cluster']['internal_shared_dirs'].include?(dir) || dir == "/home" || dir == "home" || dir == node['cluster']['internal_initial_shared_dir']
+  next unless node['cluster']['internal_shared_dirs'].include?(dir) || dir == node['cluster']['internal_initial_shared_dir']
   shared_dir_array.delete(dir)
   id_array.delete_at(index)
   encryption_array.delete_at(index)
   iam_array.delete_at(index)
+  accesspoint_id_array.delete_at(index)
 end
 
 # Mount EFS directories with the efs resource
@@ -31,6 +33,7 @@ efs "mount efs" do
   efs_fs_id_array id_array
   efs_encryption_in_transit_array encryption_array
   efs_iam_authorization_array iam_array
+  efs_accesspoint_id_array accesspoint_id_array
   action :mount
   not_if { shared_dir_array.empty? }
 end
