@@ -68,7 +68,8 @@ exitcodes = 0
 redirect_stderr = true
 stdout_logfile = /var/log/parallelcluster/loginmgtd.log
 stdout_logfile_maxbytes = 1MB
-<% if @dcv_configured -%>[program:pcluster_dcv_authenticator]
+<% if @dcv_configured -%>
+[program:pcluster_dcv_authenticator]
 command = <%= @dcv_auth_virtualenv_path %>/bin/python <%= @dcv_auth_user_home %>/pcluster_dcv_authenticator.py
       --port <%= Integer(@dcv_port) + 1 %>
       --certificate <%= @dcv_auth_certificate %>
