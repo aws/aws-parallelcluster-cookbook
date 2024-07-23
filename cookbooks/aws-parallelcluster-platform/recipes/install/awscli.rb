@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 return if ::File.exist?("/usr/local/bin/aws") || redhat_on_docker?
-return if platform?('amazon')
 
 file_cache_path = Chef::Config[:file_cache_path]
 region = aws_region
@@ -45,7 +44,20 @@ end
 
 if region.start_with?("us-iso")
   bash 'install awscli' do
-    code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin/aws"
+    code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
+  end
+
+  cookbook_file "#{node['cluster']['scripts_dir']}/iso-ca-bundle-config.sh" do
+    source 'isolated/iso-ca-bundle-config.sh'
+    cookbook 'aws-parallelcluster-platform'
+    owner 'root'
+    group 'root'
+    mode '0755'
+    action :create_if_missing
+  end
+
+  execute "patch ca bundle" do
+    command "sh #{node['cluster']['scripts_dir']}/iso-ca-bundle-config.sh"
   end
 else
   bash 'install awscli' do
