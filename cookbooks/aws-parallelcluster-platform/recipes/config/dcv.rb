@@ -20,4 +20,11 @@ when 'HeadNode'
       action :configure
     end
   end unless on_docker?
+when 'LoginNode'
+  if node['cluster']['dcv_enabled'] == "login_node"
+    # Activate DCV on login node
+    dcv "Configure DCV" do
+      action :configure
+    end
+  end unless on_docker?
 end

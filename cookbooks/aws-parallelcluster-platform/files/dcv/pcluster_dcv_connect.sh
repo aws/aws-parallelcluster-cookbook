@@ -122,7 +122,7 @@ main() {
 
     # Create a session with session storage enabled.
     mkdir -p "${DCV_SESSION_FOLDER}"
-    dcv_session_file="${DCV_SESSION_FOLDER}/dcv_session"
+    dcv_session_file="${DCV_SESSION_FOLDER}/dcv_session_$(hostname)"
     if [[ ! -e ${dcv_session_file} ]]; then
         sessionid=$(_create_dcv_session "${dcv_session_file}" "${shared_folder_path}")
     else

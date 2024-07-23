@@ -296,12 +296,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },
@@ -379,12 +380,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },
@@ -398,12 +400,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },
@@ -417,12 +420,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },
@@ -436,12 +440,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },
@@ -455,12 +460,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },
@@ -474,12 +480,13 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "HeadNode"
+        "HeadNode",
+        "LoginNode"
       ],
       "feature_conditions": [
         {
           "dna_key": "dcv_enabled",
-          "satisfying_values": ["head_node"]
+          "satisfying_values": ["head_node", "login_node"]
         }
       ]
     },

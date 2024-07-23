@@ -181,6 +181,7 @@ suites:
       cluster:
         log_rotation_enabled: 'true'
         node_type: 'LoginNode'
+        dcv_enabled: "login_node"
         directory_service:
           generate_ssh_keys_for_users: 'true'
         scheduler: 'slurm'
