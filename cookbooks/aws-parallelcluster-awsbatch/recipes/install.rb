@@ -28,6 +28,9 @@ end
 
 # Check whether install a custom aws-parallelcluster-awsbatch-cli package or the standard one
 # Install awsbatch cli into awsbatch virtual env
+if aws_region.start_with?("us-iso") && !node['cluster']['custom_awsbatchcli_package'].empty?
+  node.default['cluster']['custom_awsbatchcli_package'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/awsbatch/aws-parallelcluster.tgz"
+end
 if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['custom_awsbatchcli_package'].empty?
   # Install custom aws-parallelcluster package
   bash "install aws-parallelcluster-awsbatch-cli" do

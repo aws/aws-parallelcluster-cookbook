@@ -33,6 +33,10 @@ activate_virtual_env node_virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
+if aws_region.start_with?("us-iso") && !is_custom_node?
+  node.default['cluster']['custom_node_package'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/node/aws-parallelcluster-node.tgz"
+end
+
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 else

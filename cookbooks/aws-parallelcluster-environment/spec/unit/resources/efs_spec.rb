@@ -86,7 +86,7 @@ describe 'efs:install_utils' do
       cached(:source_dir) { 'SOURCE DIR' }
       cached(:utils_version) { '1.2.3' }
       cached(:tarball_path) { "#{source_dir}/efs-utils-#{utils_version}.tar.gz" }
-      cached(:tarball_url) { "https://github.com/aws/efs-utils/archive/v#{utils_version}.tar.gz" }
+      cached(:tarball_url) { "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.test_aws_domain/archives/dependencies/efs/v#{utils_version}.tar.gz" }
       cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
       cached(:bash_code) do
         <<-EFSUTILSINSTALL
@@ -104,6 +104,7 @@ describe 'efs:install_utils' do
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
             node.override['cluster']['sources_dir'] = source_dir
+            node.override['cluster']['region'] = aws_region
           end
           ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
         end
@@ -166,7 +167,7 @@ describe 'efs:install_utils' do
       cached(:source_dir) { 'SOURCE DIR' }
       cached(:utils_version) { '1.2.3' }
       cached(:tarball_path) { "#{source_dir}/efs-utils-#{utils_version}.tar.gz" }
-      cached(:tarball_url) { "https://github.com/aws/efs-utils/archive/v#{utils_version}.tar.gz" }
+      cached(:tarball_url) { "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.test_aws_domain/archives/dependencies/efs/v#{utils_version}.tar.gz" }
       cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
       cached(:bash_code) do
         <<-EFSUTILSINSTALL
@@ -191,6 +192,7 @@ describe 'efs:install_utils' do
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
             node.override['cluster']['sources_dir'] = source_dir
+            node.override['cluster']['region'] = aws_region
           end
           ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
         end

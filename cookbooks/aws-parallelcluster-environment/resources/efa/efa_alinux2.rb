@@ -24,6 +24,10 @@ action_class do
   end
 
   def prerequisites
-    %w(environment-modules libibverbs-utils librdmacm-utils)
+    if aws_region.start_with?("us-iso")
+      %w(libibverbs-utils librdmacm-utils)
+    else
+      %w(environment-modules libibverbs-utils librdmacm-utils)
+    end
   end
 end

@@ -23,7 +23,10 @@ default_action :setup
 
 action :setup do
   include_recipe 'yum'
-  include_recipe "yum-epel"
+
+  unless aws_region.start_with?("us-iso")
+    include_recipe "yum-epel"
+  end
 
   package 'yum-utils' do
     retries 3

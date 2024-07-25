@@ -25,6 +25,14 @@ def gdrcopy_platform
   'amzn-2'
 end
 
+def gdrcopy_build_dependencies
+  if aws_region.start_with?("us-iso")
+    %w(dkms rpm-build make check check-devel)
+  else
+    %w(dkms rpm-build make check check-devel subunit subunit-devel)
+  end
+end
+
 def gdrcopy_arch
   arm_instance? ? 'aarch64' : 'x86_64'
 end

@@ -32,7 +32,7 @@ action :install_utils do
   package_name = "amazon-efs-utils"
   package_version = new_resource.efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-  efs_utils_url = "https://github.com/aws/efs-utils/archive/v#{package_version}.tar.gz"
+  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
 
   # Do not install efs-utils if a same or newer version is already installed.
   return if already_installed?(package_name, package_version)

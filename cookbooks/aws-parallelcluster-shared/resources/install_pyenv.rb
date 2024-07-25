@@ -4,17 +4,19 @@ provides :install_pyenv
 unified_mode true
 
 # Resource:: to create a Python virtual environment for a given user
-property :user_only, [true, false], default: false
-property :user, String
+
 property :python_version, String
 property :prefix, String
+property :user_only, [true, false], default: false
+property :user, String
+
 default_action :run
 
 action :run do
   python_version = new_resource.python_version || node['cluster']['python-version']
   python_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/python/Python-#{python_version}.tgz"
 
-  if new_resource.python_version
+  if !aws_region.start_with?("us-iso") && new_resource.python_version
     python_url = "https://www.python.org/ftp/python/#{python_version}/Python-#{python_version}.tgz"
   end
 

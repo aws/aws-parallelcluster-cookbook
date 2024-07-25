@@ -22,7 +22,7 @@ use 'partial/_install_packages_rhel_amazon.rb'
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # iptables needed for IMDS setup
-  %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+  packages = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
      libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
      httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
      libffi-devel dkms libedit-devel sendmail cmake byacc libglvnd-devel libgcrypt-devel libevent-devel
@@ -31,7 +31,13 @@ def default_packages
      gcc-gfortran git indent intltool patchutils rcs subversion swig systemtap curl
      jq wget python-pip NetworkManager-config-routing-rules
      python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     coreutils moreutils environment-modules bzip2)
+     coreutils environment-modules bzip2)
+
+  if aws_region.start_with?("us-iso")
+    packages -= %w(moreutils)
+  end
+
+  packages
 end
 
 action :install_extras do
@@ -39,5 +45,26 @@ action :install_extras do
   # Install R via amazon linux extras
   ['R3.4'].each do |topic|
     alinux_extras_topic topic
+  end
+
+  if aws_region.start_with?("us-iso")
+    remote_file "epel_deps.tar.gz" do
+      source "#{node['cluster']['artifacts_s3_url']}/dependencies/epel/rhel7/#{node['kernel']['machine']}/epel_deps.tar.gz"
+      mode '0644'
+      retries 3
+      retry_delay 5
+      action :create_if_missing
+    end
+
+    bash 'yum install missing deps' do
+      user 'root'
+      group 'root'
+      code <<-REQ
+      set -e
+      tar xzf epel_deps.tar.gz
+      cd epel
+      yum install -y * 2>/dev/null
+      REQ
+    end
   end
 end

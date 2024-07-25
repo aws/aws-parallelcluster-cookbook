@@ -14,7 +14,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for external Slurmdbd.
-- Allow build-image to be run in an isolated network.
+- Add support for build-image to be run in an isolated network and ADC regions
 - Add support for Amazon Linux 2023.
 
 **CHANGES**
