@@ -15,5 +15,11 @@ end
 use 'partial/_slurm_dependencies_common'
 
 def dependencies
-  %w(json-c-devel perl dbus-devel)
+  packages = %w(json-c-devel http-parser-devel lua-devel perl dbus-devel)
+
+  if aws_region.start_with?("us-iso")
+    packages -= %w(http-parser-devel lua-devel)
+  end
+
+  packages
 end

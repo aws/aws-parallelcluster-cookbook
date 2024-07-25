@@ -16,6 +16,10 @@ action :run do
   python_version = new_resource.python_version || node['cluster']['python-version']
   python_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/python/Python-#{python_version}.tgz"
 
+  if !aws_region.start_with?("us-iso") && new_resource.python_version
+    python_url = "https://www.python.org/ftp/python/#{python_version}/Python-#{python_version}.tgz"
+  end
+
   if new_resource.user_only
     raise "user property is required for resource install_pyenv when user_only is set to true" unless new_resource.user
     prefix = new_resource.prefix || "#{::File.expand_path("~#{user}")}/.pyenv"
@@ -50,5 +54,4 @@ action :run do
     make install
     VENV
   end
-
 end

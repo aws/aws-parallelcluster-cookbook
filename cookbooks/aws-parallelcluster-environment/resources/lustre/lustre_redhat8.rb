@@ -44,8 +44,18 @@ end
 action_class do
   def base_url
     # https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html#lustre-client-rhel
-    "https://fsx-lustre-client-repo.s3.#{aws_region}.#{aws_domain}/el/#{node['platform_version']}/$basearch"  end
+    if aws_region.start_with?("us-iso")
+      "https://fsx-lustre-client-repo.s3.#{aws_region}.#{aws_domain}/el/#{node['platform_version']}/$basearch"
+    else
+      "https://fsx-lustre-client-repo.s3.amazonaws.com/el/#{node['platform_version']}/$basearch"
+    end
+  end
 
   def public_key
-    "https://fsx-lustre-client-repo-public-keys.s3.#{aws_region}.#{aws_domain}/fsx-rpm-public-key.asc"  end
+    if aws_region.start_with?("us-iso")
+      "https://fsx-lustre-client-repo-public-keys.s3.#{aws_region}.#{aws_domain}/fsx-rpm-public-key.asc"
+    else
+      "https://fsx-lustre-client-repo-public-keys.s3.amazonaws.com/fsx-rpm-public-key.asc"
+    end
+  end
 end

@@ -33,51 +33,14 @@ activate_virtual_env node_virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-remote_file "#{node['cluster']['base_dir']}/node-dependencies.tgz" do
-  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/node-dependencies.tgz"
-  mode '0644'
-  retries 3
-  retry_delay 5
-  action :create_if_missing
-end
-
-bash 'pip install' do
-  user 'root'
-  group 'root'
-  cwd "#{node['cluster']['base_dir']}"
-  code <<-REQ
-    set -e
-    tar xzf node-dependencies.tgz
-    cd node
-    #{virtualenv_path}/bin/pip install * -f ./ --no-index
-    REQ
+if aws_region.start_with?("us-iso") && !is_custom_node?
+  node.default['cluster']['custom_node_package'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/node/aws-parallelcluster-node.tgz"
 end
 
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 else
-  remote_file "#{Chef::Config[:file_cache_path]}/aws-parallelcluster-node.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/node/aws-parallelcluster-node.tgz"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
-
-  bash "install official aws-parallelcluster-node" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-NODE
-    set -e
-    [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
-    echo "PATH is $PATH"
-    source #{node_virtualenv_path}/bin/activate
-    pip uninstall --yes aws-parallelcluster-node
-    rm -fr aws-parallelcluster-node
-    mkdir aws-parallelcluster-node
-    tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-node
-    cd aws-parallelcluster-node/*aws-parallelcluster-node-*
-    pip install .
-    deactivate
-  NODE
+  execute "install official aws-parallelcluster-node" do
+    command "#{virtualenv_path}/bin/pip install aws-parallelcluster-node==#{node['cluster']['parallelcluster-node-version']}"
   end
 end

@@ -26,8 +26,8 @@ cuda_version_suffix = '535.104.05'
 cuda_arch = arm_instance? ? 'linux_sbsa' : 'linux'
 cuda_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run"
 cuda_samples_version = '12.2'
-tmp_cuda_run = '/tmp/cuda.run'
 cuda_samples_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples/v#{cuda_samples_version}.tar.gz"
+tmp_cuda_run = '/tmp/cuda.run'
 tmp_cuda_sample_archive = '/tmp/cuda-sample.tar.gz'
 
 node.default['cluster']['nvidia']['cuda']['version'] = cuda_version

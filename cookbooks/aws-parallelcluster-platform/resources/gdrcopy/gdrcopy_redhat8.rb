@@ -24,7 +24,11 @@ def gdrcopy_enabled?
 end
 
 def gdrcopy_build_dependencies
-  %w(rpm-build make check check-devel)
+  if aws_region.start_with?("us-iso")
+    %w(rpm-build make check check-devel)
+  else
+    %w(dkms rpm-build make check check-devel subunit subunit-devel)
+  end
 end
 
 def gdrcopy_platform

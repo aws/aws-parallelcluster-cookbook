@@ -28,6 +28,9 @@ end
 
 # Check whether install a custom aws-parallelcluster-awsbatch-cli package or the standard one
 # Install awsbatch cli into awsbatch virtual env
+if aws_region.start_with?("us-iso") && !node['cluster']['custom_awsbatchcli_package'].empty?
+  node.default['cluster']['custom_awsbatchcli_package'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/awsbatch/aws-parallelcluster.tgz"
+end
 if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['custom_awsbatchcli_package'].empty?
   # Install custom aws-parallelcluster package
   bash "install aws-parallelcluster-awsbatch-cli" do
@@ -42,30 +45,14 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
       curl --retry 3 -L -o aws-parallelcluster.tgz ${custom_package_url}
       mkdir aws-parallelcluster-awsbatch-cli
       tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-awsbatch-cli
-
       cd aws-parallelcluster-awsbatch-cli/*aws-parallelcluster-*
+
       #{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install awsbatch-cli/
     CLI
   end
 else
   # Install aws-parallelcluster-awsbatch-cli package
-  remote_file "#{Chef::Config[:file_cache_path]}/aws-parallelcluster.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/awsbatch/aws-parallelcluster.tgz"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
-
-  bash "install aws-parallelcluster-awsbatch-cli" do
-    cwd Chef::Config[:file_cache_path]
-    code <<-CLI
-      set -e
-      mkdir aws-parallelcluster-awsbatch-cli
-      tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-awsbatch-cli
-
-      cd aws-parallelcluster-awsbatch-cli/*aws-parallelcluster-*
-      #{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install awsbatch-cli/
-    CLI
+  execute "pip_install_parallelcluster_awsbatch_cli" do
+    command "#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster-awsbatch-cli==#{node['cluster']['parallelcluster-awsbatch-cli-version']}"
   end
 end

@@ -8,7 +8,7 @@ function get_instance_region {
 
 REGION="$(get_instance_region)"
 
-echo -e "export AWS_CA_BUNDLE=/etc/pki/${REGION}/certs/ca-bundle.pem" >> /etc/profile.d/aws-cli-default-config.sh
+echo "export AWS_CA_BUNDLE=/etc/pki/${REGION}/certs/ca-bundle.pem" >> /etc/profile.d/aws-cli-default-config.sh
 
 echo "export AWS_DEFAULT_REGION=${REGION}" >> /etc/profile.d/aws-cli-default-config.sh
 

@@ -66,6 +66,9 @@ action :setup do
       owner 'root'
       group 'root'
       mode '0644'
+      variables(
+        compiler_path: compiler_path
+      )
     end
   end
 
