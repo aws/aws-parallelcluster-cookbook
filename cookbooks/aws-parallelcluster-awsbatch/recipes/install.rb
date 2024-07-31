@@ -45,7 +45,7 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
       curl --retry 3 -L -o aws-parallelcluster.tgz ${custom_package_url}
       mkdir aws-parallelcluster-awsbatch-cli
       tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-awsbatch-cli
-      cd aws-parallelcluster-awsbatch-cli/*aws-parallelcluster-*
+      cd aws-parallelcluster-awsbatch-cli/*aws-parallelcluster*
 
       #{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install awsbatch-cli/
     CLI
