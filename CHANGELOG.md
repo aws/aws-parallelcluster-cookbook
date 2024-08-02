@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Allow custom actions on Login Nodes.
+- Add new attribute `efs_access_point_ids` to specify optional EFS access points for the mounts
 
 **BUG FIXES**
 - Fix EFA kmod installation with RHEL 8.10 or newer.
