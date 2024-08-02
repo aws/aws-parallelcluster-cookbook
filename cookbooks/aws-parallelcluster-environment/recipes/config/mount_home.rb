@@ -73,7 +73,7 @@ else
         efs_fs_id_array [node['cluster']['efs_fs_ids'].split(',')[index]]
         efs_encryption_in_transit_array [node['cluster']['efs_encryption_in_transits'].split(',')[index]]
         efs_iam_authorization_array [node['cluster']['efs_iam_authorizations'].split(',')[index]]
-        efs_accesspoint_id [node['cluster']['efs_accesspoint_id'].split(',')[index]]
+        efs_access_point_id [node['cluster']['efs_access_point_id'].split(',')[index]]
         action :mount
       end
       break
