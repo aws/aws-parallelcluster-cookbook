@@ -255,7 +255,7 @@ describe 'cloudwatch:configure' do
           is_expected.to run_execute("cloudwatch-agent-start").with(
             user: 'root',
             timeout: 300,
-            command: "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
+            command: "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a append-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
           )
         end
       end
@@ -309,8 +309,12 @@ describe 'cloudwatch:configure' do
           ConvergeCloudWatch.configure(runner)
         end
 
-        it 'does not start cloudwatch' do
-          is_expected.not_to run_execute("cloudwatch-agent-start")
+        it 'starts cloudwatch agent' do
+          is_expected.to run_execute("cloudwatch-agent-start").with(
+            user: 'root',
+            timeout: 300,
+            command: "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a append-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
+          )
         end
       end
     end
