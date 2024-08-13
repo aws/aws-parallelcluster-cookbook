@@ -19,3 +19,5 @@ echo "export SSL_CERT_FILE=${AWS_CA_BUNDLE}" >> /etc/profile.d/aws-cli-default-c
 echo "Defaults env_keep += \"AWS_DEFAULT_REGION AWS_CA_BUNDLE REQUESTS_CA_BUNDLE SSL_CERT_FILE\"" > /etc/sudoers.d/pcluster-aws-cli-envkeep
 
 source /etc/profile.d/aws-cli-default-config.sh
+
+sudo aws configure set ca_bundle "$CA_BUNDLE"
