@@ -34,7 +34,9 @@ activate_virtual_env node_virtualenv_name do
 end
 
 if aws_region.start_with?("us-iso") && !is_custom_node?
-  node.default['cluster']['custom_node_package'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/node/aws-parallelcluster-node.tgz"
+  node_package = "aws-parallelcluster-node-#{node['cluster']['parallelcluster-node-version']}.tgz"
+
+  node.default['cluster']['custom_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/#{node_package}"
 end
 
 if is_custom_node?
