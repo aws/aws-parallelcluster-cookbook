@@ -18,6 +18,7 @@ property :shared_dir_array, Array, required: %i(mount unmount)
 property :efs_fs_id_array, Array, required: %i(mount unmount)
 property :efs_encryption_in_transit_array, Array, required: false
 property :efs_iam_authorization_array, Array, required: false
+property :efs_access_point_id_array, Array, required: false
 # This is the mount point on the EFS itself, as opposed to the local system directory, defaults to "/"
 property :efs_mount_point_array, Array, required: false
 property :efs_unmount_forced_array, Array, required: false
@@ -28,19 +29,23 @@ action :mount do
   efs_fs_id_array = new_resource.efs_fs_id_array.dup
   efs_encryption_in_transit_array = new_resource.efs_encryption_in_transit_array.dup
   efs_iam_authorization_array = new_resource.efs_iam_authorization_array.dup
+  efs_access_point_id_array = new_resource.efs_access_point_id_array.dup
   efs_mount_point_array = new_resource.efs_mount_point_array.dup
 
   efs_fs_id_array.each_with_index do |efs_fs_id, index|
     efs_shared_dir = efs_shared_dir_array[index]
     efs_encryption_in_transit = efs_encryption_in_transit_array[index] unless efs_encryption_in_transit_array.nil?
     efs_iam_authorization = efs_iam_authorization_array[index] unless efs_iam_authorization_array.nil?
+    efs_access_point_id = efs_access_point_id_array[index] unless efs_access_point_id_array.nil?
 
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
 
     # See reference of mount options: https://docs.aws.amazon.com/efs/latest/ug/automount-with-efs-mount-helper.html
     mount_options = "_netdev,noresvport"
-    if efs_encryption_in_transit == "true"
+    if efs_access_point_id
+      mount_options = "iam,tls,access_point=#{efs_access_point_id}"
+    elsif efs_encryption_in_transit == "true"
       mount_options += ",tls"
       if efs_iam_authorization == "true"
         mount_options += ",iam"
