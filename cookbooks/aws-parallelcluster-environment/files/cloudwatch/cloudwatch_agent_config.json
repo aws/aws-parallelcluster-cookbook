@@ -66,6 +66,23 @@
     },
     {
       "timestamp_format_key": "default",
+      "file_path": "/var/log/cfn-hup.log",
+      "log_stream_name": "cfn-hup",
+      "schedulers": [
+        "awsbatch",
+        "slurm"
+      ],
+      "platforms": {{ default_platforms | tojson}},
+      "node_roles": [
+        "HeadNode",
+        "ComputeFleet",
+        "LoginNode",
+        "ExternalSlurmDbd"
+      ],
+      "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
       "file_path": "/var/log/chef-client.log",
       "log_stream_name": "chef-client",
       "schedulers": [
