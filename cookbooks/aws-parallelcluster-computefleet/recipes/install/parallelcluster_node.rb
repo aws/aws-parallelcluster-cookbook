@@ -38,5 +38,7 @@ if is_custom_node?
 else
   execute "install official aws-parallelcluster-node" do
     command "#{virtualenv_path}/bin/pip install aws-parallelcluster-node==#{node['cluster']['parallelcluster-node-version']}"
+    retries 3
+    retry_delay 5
   end
 end
