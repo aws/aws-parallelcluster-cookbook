@@ -51,5 +51,7 @@ else
   # Install aws-parallelcluster-awsbatch-cli package
   execute "pip_install_parallelcluster_awsbatch_cli" do
     command "#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip install aws-parallelcluster-awsbatch-cli==#{node['cluster']['parallelcluster-awsbatch-cli-version']}"
+    retries 3
+    retry_delay 5
   end
 end
