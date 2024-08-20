@@ -50,7 +50,7 @@ action :mount do
         mount_options += ",iam"
       end
       # accesspoint requires tls
-      if efs_access_point_id && efs_access_point_id != ''
+      if efs_access_point_id != 'none'
         mount_options += ",accesspoint=#{efs_access_point_id}"
       end
     end

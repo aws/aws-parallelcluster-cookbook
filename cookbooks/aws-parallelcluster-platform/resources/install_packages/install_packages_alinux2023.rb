@@ -41,7 +41,7 @@ def default_packages
      blas-devel libffi-devel dkms libedit-devel jq
      libical-devel sendmail libxml2-devel libglvnd-devel
      libgcrypt-devel libevent-devel glibc-static bind-utils
-     iproute python3 python3-pip libcurl-devel
+     iproute python3 python3-pip libcurl-devel git
      coreutils environment-modules gcc gcc-c++ bzip2 iptables vim yum-plugin-versionlock)
 end
 

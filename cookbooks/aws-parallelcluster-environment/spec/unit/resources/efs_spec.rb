@@ -257,10 +257,11 @@ describe 'efs:mount' do
           end
           runner.converge_dsl do
             efs 'mount' do
-              efs_fs_id_array %w(id_1 id_2 id_3)
-              shared_dir_array %w(shared_dir_1 /shared_dir_2 /shared_dir_3)
-              efs_encryption_in_transit_array %w(true true not_true)
-              efs_iam_authorization_array %w(not_true true true)
+              efs_fs_id_array %w(id_1 id_2 id_3 id_4)
+              shared_dir_array %w(shared_dir_1 /shared_dir_2 /shared_dir_3 /shared_dir_4)
+              efs_encryption_in_transit_array %w(true true not_true true)
+              efs_iam_authorization_array %w(not_true true true true)
+              efs_access_point_id_array %w(none none none ap)
               action :mount
             end
           end
@@ -270,6 +271,7 @@ describe 'efs:mount' do
           stub_command("mount | grep ' /shared_dir_1 '").and_return(false)
           stub_command("mount | grep ' /shared_dir_2 '").and_return(true)
           stub_command("mount | grep ' /shared_dir_3 '").and_return(true)
+          stub_command("mount | grep ' /shared_dir_4 '").and_return(false)
         end
 
         it 'mounts efs' do
@@ -277,7 +279,7 @@ describe 'efs:mount' do
         end
 
         it 'creates shared directory' do
-          %w(/shared_dir_1 /shared_dir_2 /shared_dir_3).each do |shared_dir|
+          %w(/shared_dir_1 /shared_dir_2 /shared_dir_3 /shared_dir_4).each do |shared_dir|
             is_expected.to create_directory(shared_dir)
               .with(owner: 'root')
               .with(group: 'root')
@@ -293,6 +295,15 @@ describe 'efs:mount' do
             .with(dump: 0)
             .with(pass: 0)
             .with(options: %w(_netdev noresvport tls))
+            .with(retries: 10)
+            .with(retry_delay: 60)
+
+          is_expected.to mount_mount('/shared_dir_4')
+            .with(device: 'id_4:/')
+            .with(fstype: 'efs')
+            .with(dump: 0)
+            .with(pass: 0)
+            .with(options: %w(_netdev noresvport tls iam accesspoint=ap))
             .with(retries: 10)
             .with(retry_delay: 60)
         end
