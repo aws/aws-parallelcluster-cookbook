@@ -26,3 +26,6 @@ include_recipe 'aws-parallelcluster-platform::dcv'
 include_recipe 'aws-parallelcluster-platform::supervisord_config'
 fetch_config 'Fetch and load cluster configs'
 include_recipe 'aws-parallelcluster-platform::config_login' if node['cluster']['node_type'] == 'LoginNode'
+enroot 'Configure Enroot' do
+  action :configure
+end
