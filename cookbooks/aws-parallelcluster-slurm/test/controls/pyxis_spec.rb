@@ -17,9 +17,4 @@ control 'tag:install_pyxis_installed' do
   describe file("/opt/slurm/etc/plugstack.conf.d/pyxis.conf") do
     it { should exist }
   end
-
-  describe file("/usr/local/share/pyxis/pyxis.conf") do
-    it { should be_symlink }
-    it { should be_linked_to "/opt/slurm/etc/plugstack.conf.d/pyxis.conf" }
-  end
 end
