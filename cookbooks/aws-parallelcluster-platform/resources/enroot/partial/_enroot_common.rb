@@ -16,11 +16,12 @@ unified_mode true
 default_action :setup
 
 action :setup do
+  return if on_docker?
   action_install_package
 end
 
 action :configure do
-  enroot_installed = ::File.exist?('/usr/bin/enroot')
+  return if on_docker?
   return unless enroot_installed
 
   bash "Configure enroot" do
@@ -36,14 +37,14 @@ action :configure do
       ENROOT_CACHE_PATH=${SHARED_DIR}/enroot envsubst < /tmp/enroot.template.conf > /tmp/enroot.conf
       mv /tmp/enroot.conf /etc/enroot/enroot.conf
       chmod 0644 /etc/enroot/enroot.conf
-  
+
       mkdir -p /tmp/enroot
       chmod 1777 /tmp/enroot
       mkdir -p /tmp/enroot/data
       chmod 1777 /tmp/enroot/data
-  
+
       chmod 1777 ${SHARED_DIR}/enroot
-  
+
       mkdir -p ${SHARED_DIR}/pyxis/
       chown ${NONROOT_USER} ${SHARED_DIR}/pyxis/
       sed -i '${s/$/ runtime_path=${SHARED_DIR}\\/pyxis/}' /opt/slurm/etc/plugstack.conf.d/pyxis.conf
@@ -58,4 +59,8 @@ end
 
 def package_version
   node['cluster']['enroot']['version']
+end
+
+def enroot_installed
+  ::File.exist?('/usr/bin/enroot')
 end

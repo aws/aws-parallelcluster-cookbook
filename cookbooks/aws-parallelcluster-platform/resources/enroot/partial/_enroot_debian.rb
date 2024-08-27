@@ -24,7 +24,7 @@ action :install_package do
       curl -fSsL -O #{enroot_url}
       curl -fSsL -O #{enroot_caps_url}
       apt install -y ./*.deb
-  
+
       ln -s /usr/share/enroot/hooks.d/50-slurm-pmi.sh /etc/enroot/hooks.d/
       ln -s /usr/share/enroot/hooks.d/50-slurm-pytorch.sh /etc/enroot/hooks.d/
       mkdir -p /etc/sysconfig
