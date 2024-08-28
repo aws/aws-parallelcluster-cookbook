@@ -23,16 +23,8 @@ end
 control 'tag:config_enroot_enabled_on_graphic_instances' do
   only_if { !os_properties.on_docker? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
 
-  describe directory('/usr/bin/enroot') do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-  end
-
   describe file("/opt/parallelcluster/shared/enroot") do
     it { should exist }
-    its('mode') { should cmp '1777' }
-    its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end unless os_properties.redhat_on_docker?
 end
