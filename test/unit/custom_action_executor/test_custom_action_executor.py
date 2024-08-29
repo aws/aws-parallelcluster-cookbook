@@ -204,6 +204,7 @@ async def test_execute_script(script_runner, mocker, args):
     subprocess_mock.assert_has_calls(
         [
             call(["chmod", "+x", exe_script.path], check=True, stderr=subprocess.PIPE),
+            call(["dos2unix", exe_script.path], check=True, stderr=subprocess.PIPE),
             call(
                 [exe_script.path] + (exe_script.args or []),
                 check=True,
@@ -280,7 +281,7 @@ async def test_execute_script_supported_env_variables(conf, expected_in_env_vars
     script_runner = ScriptRunner("OnMockTestEvent", "OnMockTestRegionName", CfnConfigEnvEnricher(conf_mock))
 
     with tempfile.TemporaryFile(mode="w+t") as f:
-        await script_runner._execute_script(exe_script, stdout=f)
+        await script_runner._execute_script(exe_script, stdout=f, dos2unix=False)
         f.seek(0)
         output = f.read().strip()
 
@@ -312,7 +313,7 @@ async def test_execute_script_error_in_execution(script_runner, mocker):
         DownloadRunError,
         match="Failed to execute OnMockTestEvent script 0 s3://bucket/script.sh, " "return code: 1.",
     ):
-        await script_runner._execute_script(build_exe_script())
+        await script_runner._execute_script(build_exe_script(), dos2unix=False)
 
 
 @pytest.mark.asyncio

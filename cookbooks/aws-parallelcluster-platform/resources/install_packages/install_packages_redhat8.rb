@@ -30,5 +30,5 @@ def default_packages
      libical-devel sendmail libxml2-devel libglvnd-devel
      libgcrypt-devel libevent-devel glibc-static bind-utils
      iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     coreutils moreutils curl environment-modules gcc gcc-c++ bzip2)
+     coreutils moreutils curl environment-modules gcc gcc-c++ bzip2 dos2unix)
 end

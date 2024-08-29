@@ -265,7 +265,8 @@ class ScriptRunner:
         exe_script.path = file.name
         return exe_script
 
-    async def _execute_script(self, exe_script: ExecutableScript, stdout=None):
+    async def _execute_script(self, exe_script: ExecutableScript, stdout=None, dos2unix=True):
+        # dos2unix parameter is created for the easiness of unit testing
         # preserving error case for making the script executable
         try:
             subprocess.run(
@@ -284,6 +285,27 @@ class ScriptRunner:
                     "stderr": str(err.stderr),
                 },
             ) from err
+
+        # Covert the file format from Windows to Linux.
+        # This makes sure scripts can be executed even if they are created in Windows.
+        if dos2unix:
+            try:
+                subprocess.run(
+                    ["dos2unix", exe_script.path], check=True, stderr=subprocess.PIPE
+                )  # nosec - trusted input
+            except subprocess.CalledProcessError as err:
+                raise DownloadRunError(
+                    f"Failed to run {self.event_name} script {exe_script.step_num} {exe_script.url} "
+                    f"due to a failure in making the file compatible with Linux, return code: {err.returncode}.",
+                    f"Failed to run {self.event_name} script {exe_script.step_num} "
+                    f"due to a failure in making the file compatible with Linux, return code: {err.returncode}.",
+                    step_id=exe_script.step_num,
+                    stage="executing",
+                    error={
+                        "exit_code": err.returncode,
+                        "stderr": str(err.stderr),
+                    },
+                ) from err
 
         # execute script with it's args
         try:

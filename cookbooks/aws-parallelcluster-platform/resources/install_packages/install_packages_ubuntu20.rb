@@ -29,5 +29,5 @@ def default_packages
      r-base libblas-dev libffi-dev libxml2-dev
      libgcrypt20-dev libevent-dev iproute2 python3 python3-pip
      libatlas-base-dev libglvnd-dev iptables libcurl4-openssl-dev
-     coreutils moreutils curl python3-parted environment-modules)
+     coreutils moreutils curl python3-parted environment-modules dos2unix)
 end
