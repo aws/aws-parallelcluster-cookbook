@@ -13,7 +13,9 @@
 # limitations under the License.
 
 include_recipe "aws-parallelcluster-platform::enable_chef_error_handler"
-
+fetch_config 'Upload Common Dna to s3' do
+  action :share_common_dna
+end
 include_recipe "aws-parallelcluster-shared::setup_envars"
 
 os_type 'Validate OS type specified by the user is the same as the OS identified by Ohai'

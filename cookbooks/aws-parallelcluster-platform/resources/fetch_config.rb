@@ -9,6 +9,19 @@ property :update, [true, false],
 
 default_action :run
 
+
+action :share_common_dna do
+  return if on_docker?
+  Chef::Log.debug("Upload common_dna.json in s3")
+  case node['cluster']['node_type']
+  when 'HeadNode'
+
+    execute_command('Update HeadNode Ip', "sed -i 's/HEAD_NODE_PRIVATE_IP/#{get_primary_ip}/g' /tmp/common-dna.json")
+
+    upload_common_dna('upload_common_dna_to_s3', "#{node['cluster']['common_dna_s3_key']}", '/tmp/common-dna.json')
+  end
+end
+
 action :run do
   return if on_docker?
   Chef::Log.debug("Called fetch_config with update (#{new_resource.update})")
@@ -184,5 +197,15 @@ action_class do # rubocop:disable Metrics/BlockLength
       retry_delay 15
       timeout 5
     end
+  end
+  
+  def upload_common_dna(command_label, key, file_path, version_id = nil)
+    fetch_s3_object_command = "#{cookbook_virtualenv_path}/bin/aws s3api put-object" \
+                         " --bucket #{node['cluster']['cluster_s3_bucket']}" \
+                         " --key #{key}" \
+                         " --region #{node['cluster']['region']}" \
+                         " --body #{file_path}"
+    fetch_s3_object_command += " --version-id #{version_id}" unless version_id.nil?
+    execute_command(command_label, fetch_s3_object_command)
   end
 end
