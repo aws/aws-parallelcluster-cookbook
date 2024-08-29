@@ -38,6 +38,13 @@ when 'HeadNode'
     mode '0755'
   end
 
+  template "/usr/local/bin/is_fleet_ready.sh" do
+    source 'compute_fleet_status/is_fleet_ready.erb'
+    owner 'root'
+    group 'root'
+    mode '0755'
+  end
+
   template "#{node['cluster']['etc_dir']}/clusterstatusmgtd.conf" do
     source 'clusterstatusmgtd/clusterstatusmgtd.conf.erb'
     owner 'root'

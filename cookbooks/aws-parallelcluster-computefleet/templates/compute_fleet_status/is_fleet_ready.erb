@@ -1,0 +1,7 @@
+#!/bin/bash
+
+sinfo_output=$(<%= node['cluster']['slurm']['install_dir'] %>/bin/sinfo -h -o '%N %t' | grep -v -E '(idle|alloc|mix|maint)$')
+while IFS= read -r line; do
+    nodelist=$(echo "$line" | awk '{print $1}')
+    <%= node['cluster']['slurm']['install_dir'] %>/bin/scontrol show hostnames "$nodelist" | { grep -E '^[a-z0-9\-]+\-st\-[a-z0-9\-]+\-[0-9]+.*' || true; }
+done <<< "$sinfo_output"

@@ -204,18 +204,10 @@ def wait_static_fleet_running
         "/usr/local/bin/get-compute-fleet-status.sh"
       )
       # Example output for sinfo
-      # $ /opt/slurm/bin/sinfo -N -h -o '%N %t'
-      # ondemand-dy-c52xlarge-1 idle~
-      # ondemand-dy-c52xlarge-2 idle~
-      # spot-dy-c5xlarge-1 idle~
-      # spot-st-t2large-1 down
-      # spot-st-t2large-2 idle
-      # capacity-block-st-t2micro-1 maint
-      # capacity-block-dy-t2micro-1 maint
-      is_fleet_ready_command = Shellwords.escape(
-        "set -o pipefail && #{node['cluster']['slurm']['install_dir']}/bin/sinfo -N -h -o '%N %t' | { grep -E '^[a-z0-9\\-]+\\-st\\-[a-z0-9\\-]+\\-[0-9]+ .*' || true; } | { grep -v -E '(idle|alloc|mix|maint)$' || true; }"
-      )
-      until shell_out!("/bin/bash -c #{is_fleet_ready_command}").stdout.strip.empty?
+      # sinfo -h -o '%N %t'
+      # queue-0-dy-compute-resource-g4dn-0-[1-10],queue-1-dy-compute-resource-g4dn-1-[1-10] idle~
+      # queue-2-dy-compute-resource-g4dn-2-[1-10],queue-3-dy-compute-resource-g4dn-3-[1-10] idle
+      until shell_out!("/bin/bash -c /usr/local/bin/is_fleet_ready.sh").stdout.strip.empty?
         check_for_protected_mode(fleet_status_command)
 
         Chef::Log.info("Waiting for static fleet capacity provisioning")
