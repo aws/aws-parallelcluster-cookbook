@@ -9,6 +9,10 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ArmPL
 default['conditions']['arm_pl_supported'] = arm_instance?
 
+# Enroot + Pyxis
+default['cluster']['enroot']['version'] = '3.4.1'
+default['cluster']['pyxis']['version'] = '0.19.0'
+
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '535.183.01'

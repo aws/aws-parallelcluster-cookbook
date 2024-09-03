@@ -10,6 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Allow custom actions on login nodes.
 - Allow DCV connection on login nodes.
 - Add new attribute `efs_access_point_ids` to specify optional EFS access points for the mounts
+- Install enroot and pyxis in official pcluster AMIs
 
 **BUG FIXES**
 - Fix EFA kmod installation with RHEL 8.10 or newer.
