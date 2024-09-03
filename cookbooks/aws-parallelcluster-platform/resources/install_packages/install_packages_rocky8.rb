@@ -62,7 +62,7 @@ def default_packages
      libical-devel sendmail libxml2-devel libglvnd-devel
      libgcrypt-devel libevent-devel glibc-static bind-utils
      iproute NetworkManager-config-routing-rules python3 python3-pip iptables libcurl-devel yum-plugin-versionlock
-     moreutils curl environment-modules gcc gcc-c++ bzip2)
+     moreutils curl environment-modules gcc gcc-c++ bzip2 dos2unix)
   packages.append("coreutils") unless on_docker?  # on docker image coreutils conflict with coreutils-single, already installed on it
   packages
 end
