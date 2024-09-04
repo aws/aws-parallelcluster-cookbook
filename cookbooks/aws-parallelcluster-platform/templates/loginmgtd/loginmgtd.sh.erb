@@ -11,7 +11,7 @@ set -ex
 # This script must be executed as <%= node['cluster']['cluster_admin_user'] %> because
 # because only this user has sudoers privileges to execute the termination hook.
 
-CONFIG_PATH="<%= node['cluster']['shared_dir_login_nodes'] %>/loginmgtd_config.json"
+CONFIG_PATH="<%= node['cluster']['etc_dir'] %>/loginmgtd_config.json"
 CONFIG_JSON=$(cat $CONFIG_PATH)
 TERMINATION_SCRIPT_PATH=$(echo $CONFIG_JSON | jq -r .termination_script_path)
 TERMINATION_MESSAGE=$(echo $CONFIG_JSON | jq -r .termination_message)
