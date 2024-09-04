@@ -1,0 +1,5 @@
+[parallelcluster-update]
+triggers=post.update
+path=Resources.<%= @launch_template_resource_id %>.Metadata.AWS::CloudFormation::Init
+action=PATH=/usr/local/bin:/bin:/usr/bin:/opt/aws/bin; . /etc/parallelcluster/pcluster_cookbook_environment.sh; ./opt/parallelcluster/scripts/cfn-hup-update-compute-action.sh
+runas=root
