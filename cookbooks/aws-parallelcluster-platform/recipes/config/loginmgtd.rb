@@ -18,18 +18,18 @@
 load_cluster_config(node['cluster']['login_cluster_config_path'])
 
 # Create the configuration file for loginmgtd
-template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd_config.json" do
+template "#{node['cluster']['etc_dir']}/loginmgtd_config.json" do
   source 'loginmgtd/loginmgtd_config.json.erb'
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
   mode '0644'
   variables(
-    gracetime_period: lazy { node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :GracetimePeriod) }
+    gracetime_period: lazy { get_login_node_pool_config(node['cluster']['config'], node['cluster']['pool_name'])['GracetimePeriod'] }
   )
 end
 
 # Create the termination hook for loginmgtd
-template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd_on_termination.sh" do
+template "#{node['cluster']['etc_dir']}/loginmgtd_on_termination.sh" do
   source 'loginmgtd/loginmgtd_on_termination.sh.erb'
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
@@ -37,7 +37,7 @@ template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd_on_termination.
 end
 
 # Create the script to run loginmgtd
-template "#{node['cluster']['shared_dir_login_nodes']}/loginmgtd.sh" do
+template "#{node['cluster']['etc_dir']}/loginmgtd.sh" do
   source 'loginmgtd/loginmgtd.sh.erb'
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']

@@ -217,3 +217,7 @@ def wait_static_fleet_running
     end
   end
 end
+
+def get_login_node_pool_config(config, pool_name)
+  config['LoginNodes']['Pools'].select { |pool| pool['Name'] == pool_name }.first
+end
