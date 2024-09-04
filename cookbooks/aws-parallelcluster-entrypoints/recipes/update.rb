@@ -12,7 +12,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 include_recipe "aws-parallelcluster-shared::setup_envars"
-
+fetch_config 'Upload Common Dna to s3' do
+  action :share_common_dna
+end
 # Fetch and load cluster configs
 include_recipe 'aws-parallelcluster-platform::update'
 
