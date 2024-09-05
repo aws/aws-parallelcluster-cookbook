@@ -18,11 +18,14 @@ template "#{node['cluster']['scripts_dir']}/slurm/check_login_nodes_stopped.sh" 
   group 'root'
   mode '0700'
   variables(
-    target_group_name: lazy do
-      get_target_group_name(
-        node['cluster']['cluster_name'] || node['cluster']['stack_name'],
-        node['cluster']['config'].dig(:LoginNodes, :Pools, 0, :Name)
-      )
+    target_group_names: lazy do
+      # Generate a string that is the array representation in bash (e.g. "(item1, item2, item3)")
+      "(#{node['cluster']['config'].dig(:LoginNodes, :Pools).map do |pool_config|
+        get_target_group_name(
+          node['cluster']['cluster_name'] || node['cluster']['stack_name'],
+          pool_config['Name']
+        )
+      end.join(' ')})"
     end,
     region: node['cluster']['region']
   )
