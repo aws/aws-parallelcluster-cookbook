@@ -13,8 +13,8 @@ default["cluster"]["scheduler_compute_resource_name"] = nil
 default['cluster']['enable_nss_slurm'] = node['cluster']['directory_service']['enabled']
 
 # PMIX Version and Checksum
-default['cluster']['pmix']['version'] = '5.0.2'
-default['cluster']['pmix']['sha256'] = '133e79c44d426043fa54b80649ecc97607b915ad8c5cc119575a3dd0c4104941'
+default['cluster']['pmix']['version'] = '5.0.3'
+default['cluster']['pmix']['sha256'] = 'd9b0b81ba45f58f44573796eb05858061ed7f47ea6b29af8058090023e35dfa9'
 
 # Slurmdbd
 default['cluster']['slurmdbd_service_enabled'] = "true"
