@@ -16,7 +16,7 @@
 # limitations under the License.
 
 intelmpi_supported = !arm_instance?
-intelmpi_version = '2021.12'
+intelmpi_version = '2021.13'
 
 node.default['conditions']['intel_mpi_supported'] = intelmpi_supported
 node.default['cluster']['intelmpi']['version'] = intelmpi_version
@@ -25,7 +25,7 @@ node_attributes "dump node attributes"
 
 return unless intelmpi_supported
 
-intelmpi_full_version = "#{intelmpi_version}.1.8"
+intelmpi_full_version = "#{intelmpi_version}.1.769"
 intelmpi_installation_path = "/opt/intel/mpi/#{intelmpi_version}"
 intelmpi_installer = "l_mpi_oneapi_p_#{intelmpi_full_version}_offline.sh"
 intelmpi_installer_path = "#{node['cluster']['sources_dir']}/#{intelmpi_installer}"
