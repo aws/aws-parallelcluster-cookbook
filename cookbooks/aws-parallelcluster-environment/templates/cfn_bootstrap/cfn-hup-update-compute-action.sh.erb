@@ -8,7 +8,10 @@ PATH=/usr/local/bin:/bin:/usr/bin:/opt/aws/bin;
 S3_BUCKET=<%= @clusterS3Bucket %>
 S3_ARTIFACT_DIR=<%= @clusterS3ArtifactDir %>
 CLUSTER_CONFIG_VERSION=<%= @clusterConfigVersion %>
+echo "Cluster config version is $CLUSTER_CONFIG_VERSION"
 REGION=<%= @region %>
+CLUSTER_CONFIG_VERSION=$(aws s3api list-object-versions --bucket ${S3_BUCKET} --prefix  "${S3_ARTIFACT_DIR}/configs/cluster-config-with-implied-values.yaml" --region ${REGION} | jq -r '.Versions[] | select(.IsLatest == true) | .VersionId' 2>&1 || error_exit "${!S3API_RESULT}")
+echo "Cluster config version is $CLUSTER_CONFIG_VERSION"
 
 echo "Running S3 commands"
 AWS_RETRY_MODE=standard aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/common-dna-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/common-dna.json 2>&1 || error_exit "${!S3API_RESULT}"
