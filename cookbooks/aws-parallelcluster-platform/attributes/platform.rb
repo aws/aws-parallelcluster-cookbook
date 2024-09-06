@@ -15,8 +15,8 @@ default['cluster']['pyxis']['version'] = '0.19.0'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '535.183.01'
-default['cluster']['nvidia']['dcgm_version'] = '3.2.6'
+default['cluster']['nvidia']['driver_version'] = '550.90.07'
+default['cluster']['nvidia']['dcgm_version'] = '3.3.6'
 
 # DCV
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
