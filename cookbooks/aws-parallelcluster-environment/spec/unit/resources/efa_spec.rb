@@ -2,8 +2,8 @@ require 'spec_helper'
 
 # parallelcluster default source dir defined in attributes
 source_dir = '/opt/parallelcluster/sources'
-efa_version = '1.32.0'
-efa_checksum = '5f7233760be57f6fee6de8c09acbfbf59238de848e06048dc54d156ef578fc66'
+efa_version = '1.34.0'
+efa_checksum = 'bd68839e741b0afd3ec2e37d50603803cfa7a279c120f0a736cc57c2ff2d7fdc'
 
 class ConvergeEfa
   def self.setup(chef_run, efa_version: nil, efa_checksum: nil)
