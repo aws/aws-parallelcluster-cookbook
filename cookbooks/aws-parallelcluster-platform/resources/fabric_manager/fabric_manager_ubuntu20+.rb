@@ -20,7 +20,7 @@ use 'partial/_fabric_manager_common.rb'
 use 'partial/_fabric_manager_install_debian.rb'
 
 def fabric_manager_package
-  'nvidia-fabricmanager-535'
+  'nvidia-fabricmanager-550'
 end
 
 def fabric_manager_version
