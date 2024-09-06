@@ -60,7 +60,7 @@ stdout_logfile_maxbytes = 0
 <%# LoginNode -%>
 <% when 'LoginNode' -%>
 [program:loginmgtd]
-command = <%= node['cluster']['shared_dir_login_nodes'] %>/loginmgtd.sh
+command = <%= node['cluster']['etc_dir'] %>/loginmgtd.sh
 user = <%= node['cluster']['cluster_admin_user'] %>
 environment = HOME="/home/<%= node['cluster']['cluster_admin_user'] %>",USER="<%= node['cluster']['cluster_admin_user'] %>"
 autorestart = unexpected

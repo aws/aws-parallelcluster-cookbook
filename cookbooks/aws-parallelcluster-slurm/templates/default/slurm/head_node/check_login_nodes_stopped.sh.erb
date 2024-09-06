@@ -8,38 +8,40 @@
 
 set -e
 
-TARGET_GROUP_NAME="<%= @target_group_name %>"
+TARGET_GROUP_NAMES=<%= @target_group_names %>
 REGION="<%= @region %>"
 
-# Get Target Group ARN
-target_group_arn=$(aws elbv2 describe-target-groups \
-    --names ${TARGET_GROUP_NAME} \
-    --query "TargetGroups[0].TargetGroupArn" \
-    --output text \
-    --region ${REGION})
+for TARGET_GROUP_NAME in ${TARGET_GROUP_NAMES[@]}; do
+  # Get Target Group ARN
+  target_group_arn=$(aws elbv2 describe-target-groups \
+      --names ${TARGET_GROUP_NAME} \
+      --query "TargetGroups[0].TargetGroupArn" \
+      --output text \
+      --region ${REGION})
 
-# Exit if Target Group is not found
-if [[ -n "${target_group_arn}" ]]; then
-    echo "TargetGroup ARN found: ${target_group_arn}"
-else
-    echo "No Target Group found for the specified Load Balancer ${load_balancer_arn}."
-    exit 1
-fi
+  # Exit if Target Group is not found
+  if [[ -n "${target_group_arn}" ]]; then
+      echo "TargetGroup ARN found: ${target_group_arn}"
+  else
+      echo "No Target Group found for the specified Load Balancer ${load_balancer_arn}."
+      exit 1
+  fi
 
-# Get the number of healthy and unhealthy targets
-target_healths=$(aws elbv2 describe-target-health \
-    --target-group-arn $target_group_arn \
-    --region ${REGION})
+  # Get the number of healthy and unhealthy targets
+  target_healths=$(aws elbv2 describe-target-health \
+      --target-group-arn $target_group_arn \
+      --region ${REGION})
 
-healthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | select(.TargetHealth.State == "healthy") | .Target.Id' | wc -l)
-unhealthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | select(.TargetHealth.State != "healthy") | .Target.Id' | wc -l)
+  healthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | select(.TargetHealth.State == "healthy") | .Target.Id' | wc -l)
+  unhealthy_count=$(echo $target_healths | jq -r '.TargetHealthDescriptions[] | select(.TargetHealth.State != "healthy") | .Target.Id' | wc -l)
 
-# Check if there are running login nodes
-total_nodes=$((healthy_count + unhealthy_count))
-if [[ $total_nodes -gt 0 ]]; then
-    echo "Login nodes are running. Please stop them before updating the munge key."
-    exit 1
-fi
+  # Check if there are running login nodes
+  total_nodes=$((healthy_count + unhealthy_count))
+  if [[ $total_nodes -gt 0 ]]; then
+      echo "Login nodes are running. Please stop them before updating the munge key."
+      exit 1
+  fi
+done
 
 echo "Login nodes are stopped."
 exit 0

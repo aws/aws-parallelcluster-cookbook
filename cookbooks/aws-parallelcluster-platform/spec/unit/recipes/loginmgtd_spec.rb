@@ -8,7 +8,7 @@ describe 'aws-parallelcluster-platform::loginmgtd' do
       end
 
       it 'creates the loginmgtd configuration with the correct attributes' do
-        is_expected.to create_template('/opt/parallelcluster/shared_login_nodes/loginmgtd_config.json').with(
+        is_expected.to create_template('/etc/parallelcluster/loginmgtd_config.json').with(
           source: 'loginmgtd/loginmgtd_config.json.erb',
           owner: 'pcluster-admin',
           group: 'pcluster-admin',
@@ -17,7 +17,7 @@ describe 'aws-parallelcluster-platform::loginmgtd' do
       end
 
       it 'creates the loginmgtd script with the correct attributes' do
-        is_expected.to create_template('/opt/parallelcluster/shared_login_nodes/loginmgtd.sh').with(
+        is_expected.to create_template('/etc/parallelcluster/loginmgtd.sh').with(
           source: 'loginmgtd/loginmgtd.sh.erb',
           owner: 'pcluster-admin',
           group: 'pcluster-admin',
@@ -26,7 +26,7 @@ describe 'aws-parallelcluster-platform::loginmgtd' do
       end
 
       it 'creates the loginmgtd termination hook script with the correct attributes' do
-        is_expected.to create_template('/opt/parallelcluster/shared_login_nodes/loginmgtd_on_termination.sh').with(
+        is_expected.to create_template('/etc/parallelcluster/loginmgtd_on_termination.sh').with(
           source: 'loginmgtd/loginmgtd_on_termination.sh.erb',
           owner: 'pcluster-admin',
           group: 'pcluster-admin',
