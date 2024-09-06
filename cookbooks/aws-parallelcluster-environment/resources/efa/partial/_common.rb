@@ -55,7 +55,11 @@ end
 
 action :download_and_install do
   # Get EFA Installer
+  region = aws_region
   efa_installer_url = "https://efa-installer.amazonaws.com/aws-efa-installer-#{new_resource.efa_version}.tar.gz"
+  if region.start_with?("us-iso")
+    efa_installer_url = "https://aws-efa-installer.s3.#{aws_region}.#{aws_domain}/aws-efa-installer-#{new_resource.efa_version}.tar.gz"
+  end
   remote_file efa_tarball do
     source efa_installer_url
     mode '0644'
