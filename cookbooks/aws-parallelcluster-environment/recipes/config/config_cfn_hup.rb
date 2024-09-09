@@ -73,7 +73,8 @@ when 'ComputeFleet'
       region: node['cluster']['region'],
       clusterS3ArtifactDir: node['cluster']['cluster_config_s3_key'].chomp('/configs/cluster-config-with-implied-values.yaml'),
       clusterConfigVersion: node['cluster']['cluster_config_version'],
-      launch_template_resource_id: node['cluster']['launch_template_id']
+      launch_template_resource_id: node['cluster']['launch_template_id'],
+      # cluster_config_version_path: node['cluster']['shared_dir']/cluster-config-version
     )
   end
   

@@ -7,20 +7,33 @@ PATH=/usr/local/bin:/bin:/usr/bin:/opt/aws/bin;
 
 S3_BUCKET=<%= @clusterS3Bucket %>
 S3_ARTIFACT_DIR=<%= @clusterS3ArtifactDir %>
-CLUSTER_CONFIG_VERSION=<%= @clusterConfigVersion %>
-echo "Cluster config version is $CLUSTER_CONFIG_VERSION"
+OLD_CLUSTER_CONFIG_VERSION=<%= @clusterConfigVersion %>
 REGION=<%= @region %>
-CLUSTER_CONFIG_VERSION=$(aws s3api list-object-versions --bucket ${S3_BUCKET} --prefix  "${S3_ARTIFACT_DIR}/configs/cluster-config-with-implied-values.yaml" --region ${REGION} | jq -r '.Versions[] | select(.IsLatest == true) | .VersionId' 2>&1 || error_exit "${!S3API_RESULT}")
-echo "Cluster config version is $CLUSTER_CONFIG_VERSION"
+#CLUSTER_CONFIG_VERSION_FILE=<%#= cluster_config_version_path %>
+GET_LATEST_CLUSTER_CONFIG=true
 
-echo "Running S3 commands"
-AWS_RETRY_MODE=standard aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/common-dna-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/common-dna.json 2>&1 || error_exit "${!S3API_RESULT}"
-AWS_RETRY_MODE=standard aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/ComputeNode/compute-dna-<%= @launch_template_resource_id %>-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/compute-dna.json 2>&1 || error_exit "${!S3API_RESULT}"
-AWS_RETRY_MODE=standard aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/extra-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/extra.json 2>&1 || error_exit "${!S3API_RESULT}"
-echo "Completed S3 commands"
-
-mkdir -p /etc/chef/ohai/hints
-touch /etc/chef/ohai/hints/ec2.json
-jq -s ".[0] * .[1] * .[2] * .[3]" /tmp/common-dna.json /tmp/compute-dna.json /tmp/stack-arn.json /tmp/extra.json > /etc/chef/dna.json || ( echo "jq not installed"; cp /tmp/common-dna.json /tmp/compute-dna.json  /etc/chef/dna.json )
-cd /etc/chef
-cinc-client --local-mode --config /etc/chef/client.rb --log_level info --logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster-entrypoints::update && /opt/parallelcluster/scripts/fetch_and_run -postupdate
+while $GET_LATEST_CLUSTER_CONFIG; do
+  echo "Old Cluster config version is $OLD_CLUSTER_CONFIG_VERSION"
+  #NEW_CLUSTER_CONFIG_VERSION=$(aws s3api list-object-versions --bucket ${S3_BUCKET} --prefix  "${S3_ARTIFACT_DIR}/configs/cluster-config-with-implied-values.yaml" --region ${REGION} | jq -r '.Versions[] | select(.IsLatest == true) | .VersionId' 2>&1 || error_exit "${!S3API_RESULT}")
+  NEW_CLUSTER_CONFIG_VERSION=$(cat /opt/parallelcluster/shared/cluster-config-version )
+  echo "New Cluster config version is $NEW_CLUSTER_CONFIG_VERSION"
+  
+  if [[ -n $NEW_CLUSTER_CONFIG_VERSION ]] && [[ $NEW_CLUSTER_CONFIG_VERSION != $OLD_CLUSTER_CONFIG_VERSION]]; then
+    GET_LATEST_CLUSTER_CONFIG=false
+    CLUSTER_CONFIG_VERSION=$NEW_CLUSTER_CONFIG_VERSION
+    AWS_RETRY_MODE=standard
+    echo "Running S3 commands"
+    aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/common-dna-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/common-dna.json 2>&1 || error_exit "${!S3API_RESULT}"
+    aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/ComputeNode/compute-dna-<%= @launch_template_resource_id %>-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/compute-dna.json 2>&1 || error_exit "${!S3API_RESULT}"
+    aws s3api get-object --bucket ${S3_BUCKET} --key  "${S3_ARTIFACT_DIR}/assets/extra-${CLUSTER_CONFIG_VERSION}.json" --region ${REGION} /tmp/extra.json 2>&1 || error_exit "${!S3API_RESULT}"
+    echo "Completed S3 commands"
+    
+    mkdir -p /etc/chef/ohai/hints
+    touch /etc/chef/ohai/hints/ec2.json
+    jq -s ".[0] * .[1] * .[2] * .[3]" /tmp/common-dna.json /tmp/compute-dna.json /tmp/stack-arn.json /tmp/extra.json > /etc/chef/dna.json || ( echo "jq not installed"; cp /tmp/common-dna.json /tmp/compute-dna.json  /etc/chef/dna.json )
+    cd /etc/chef
+    cinc-client --local-mode --config /etc/chef/client.rb --log_level info --logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster-entrypoints::update && /opt/parallelcluster/scripts/fetch_and_run -postupdate
+  endif
+  
+  sleep 60
+done
