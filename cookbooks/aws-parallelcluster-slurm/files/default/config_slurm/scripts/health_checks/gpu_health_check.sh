@@ -115,7 +115,13 @@ function main() {
 
   ## Run GPUs Health Check test
   log_info "Running GPU Health Check with DCGMI level $DCGMI_LEVEL"
-  dcgmi diag -i $GPU_DEVICE_ORDINAL -r $DCGMI_LEVEL
+
+  parameters=""
+  if [[ $nvidia_smi_out =~ "NVIDIA L4" ]]; then
+    parameters="-p pcie.h2d_d2h_single_pinned.min_pci_width=8;pcie.h2d_d2h_single_unpinned.min_pci_width=8"
+  fi
+
+  dcgmi diag -i $GPU_DEVICE_ORDINAL -r $DCGMI_LEVEL $parameters
   dcgmi_exit_code=$?
 
   if [ $dcgmi_exit_code -ne 0 ]; then
