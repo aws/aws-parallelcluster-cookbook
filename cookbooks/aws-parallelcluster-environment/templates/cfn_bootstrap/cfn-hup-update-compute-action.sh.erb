@@ -14,11 +14,13 @@ GET_LATEST_CLUSTER_CONFIG=true
 
 while $GET_LATEST_CLUSTER_CONFIG; do
   echo "Old Cluster config version is $OLD_CLUSTER_CONFIG_VERSION"
+  sleep 60
   #NEW_CLUSTER_CONFIG_VERSION=$(aws s3api list-object-versions --bucket ${S3_BUCKET} --prefix  "${S3_ARTIFACT_DIR}/configs/cluster-config-with-implied-values.yaml" --region ${REGION} | jq -r '.Versions[] | select(.IsLatest == true) | .VersionId' 2>&1 || error_exit "${!S3API_RESULT}")
   NEW_CLUSTER_CONFIG_VERSION=$(cat /opt/parallelcluster/shared/cluster-config-version )
+#  NEW_CLUSTER_CONFIG_VERSION=$(cat /var/lib/cfn-hup/data/metadata_db.json | jq -r '.[].deployConfigFiles.files.config_version.content')
   echo "New Cluster config version is $NEW_CLUSTER_CONFIG_VERSION"
   
-  if [[ -n $NEW_CLUSTER_CONFIG_VERSION ]] && [[ $NEW_CLUSTER_CONFIG_VERSION != $OLD_CLUSTER_CONFIG_VERSION]]; then
+  if [[ -n "${NEW_CLUSTER_CONFIG_VERSION}" ]] && [[ "${NEW_CLUSTER_CONFIG_VERSION}" != "${OLD_CLUSTER_CONFIG_VERSION}" ]]; then
     GET_LATEST_CLUSTER_CONFIG=false
     CLUSTER_CONFIG_VERSION=$NEW_CLUSTER_CONFIG_VERSION
     AWS_RETRY_MODE=standard
@@ -33,7 +35,6 @@ while $GET_LATEST_CLUSTER_CONFIG; do
     jq -s ".[0] * .[1] * .[2] * .[3]" /tmp/common-dna.json /tmp/compute-dna.json /tmp/stack-arn.json /tmp/extra.json > /etc/chef/dna.json || ( echo "jq not installed"; cp /tmp/common-dna.json /tmp/compute-dna.json  /etc/chef/dna.json )
     cd /etc/chef
     cinc-client --local-mode --config /etc/chef/client.rb --log_level info --logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster-entrypoints::update && /opt/parallelcluster/scripts/fetch_and_run -postupdate
-  endif
+  fi
   
-  sleep 60
 done
