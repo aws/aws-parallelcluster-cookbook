@@ -41,7 +41,7 @@ def enroot_url
 end
 
 def enroot_caps_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot+caps_#{package_version}-1_#{arch_suffix}.deb"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot%2Bcaps_#{package_version}-1_#{arch_suffix}.deb"
 end
 
 def arch_suffix
