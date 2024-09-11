@@ -40,7 +40,6 @@ action :configure do
       ENROOT_CONFIG_RELEASE=pyxis
       SHARED_DIR=#{node['cluster']['shared_dir']}
       NONROOT_USER=#{node['cluster']['cluster_user']}
-      # wget -O /tmp/enroot.template.conf https://raw.githubusercontent.com/aws-samples/aws-parallelcluster-post-install-scripts/${ENROOT_CONFIG_RELEASE}/pyxis/enroot.template.conf
       mkdir -p ${SHARED_DIR}/enroot
       chown ${NONROOT_USER} ${SHARED_DIR}/enroot
       ENROOT_CACHE_PATH=${SHARED_DIR}/enroot envsubst < /tmp/enroot.template.conf > /tmp/enroot.conf
