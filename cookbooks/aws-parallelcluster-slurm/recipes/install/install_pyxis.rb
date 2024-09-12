@@ -18,7 +18,7 @@
 return unless nvidia_enabled?
 
 pyxis_version = node['cluster']['pyxis']['version']
-pyxis_url = "https://github.com/NVIDIA/pyxis/archive/refs/tags/v#{pyxis_version}.tar.gz"
+pyxis_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/pyxis/v#{pyxis_version}.tar.gz"
 pyxis_tarball = "#{node['cluster']['sources_dir']}/pyxis-#{pyxis_version}.tar.gz"
 
 remote_file pyxis_tarball do

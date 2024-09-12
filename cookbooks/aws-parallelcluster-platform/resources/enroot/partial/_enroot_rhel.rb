@@ -34,11 +34,11 @@ action :install_package do
 end
 
 def enroot_url
-  "https://github.com/NVIDIA/enroot/releases/download/v#{package_version}/enroot-#{package_version}-1.el8.#{arch_suffix}.rpm"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot-#{package_version}-1.el8.#{arch_suffix}.rpm"
 end
 
 def enroot_caps_url
-  "https://github.com/NVIDIA/enroot/releases/download/v#{package_version}/enroot+caps-#{package_version}-1.el8.#{arch_suffix}.rpm"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot+caps-#{package_version}-1.el8.#{arch_suffix}.rpm"
 end
 
 def arch_suffix
