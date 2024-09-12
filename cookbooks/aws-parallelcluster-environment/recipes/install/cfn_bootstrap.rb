@@ -98,5 +98,6 @@ template "#{node['cluster']['scripts_dir']}/cfn-hup-runner.sh" do
   owner 'root'
   group 'root'
   mode '0744'
-  variables(cfn_bootstrap_virtualenv_path: virtualenv_path)
+  variables(cfn_bootstrap_virtualenv_path: virtualenv_path,
+            node_bootstrap_timeout: node['cluster']['compute_node_bootstrap_timeout'] || node['cluster']['Timeout'])
 end
