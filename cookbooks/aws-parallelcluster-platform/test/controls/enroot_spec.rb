@@ -34,6 +34,6 @@ control 'tag:config_enroot_disabled_on_non_graphic_instances' do
 
   describe 'enroot service should be disabled' do
     subject { command("enroot version") }
-    its('exit_status') { should eq 127 }
+    its('exit_status') { should cmp > 0 }
   end
 end

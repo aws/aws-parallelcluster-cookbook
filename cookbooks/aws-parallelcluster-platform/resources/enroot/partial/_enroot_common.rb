@@ -24,6 +24,15 @@ action :configure do
   return if on_docker?
   return unless enroot_installed
 
+  cookbook_file "/tmp/enroot.template.conf" do
+    source 'enroot/enroot.template.conf'
+    cookbook 'aws-parallelcluster-platform'
+    owner 'root'
+    group 'root'
+    mode '0755'
+    action :create_if_missing
+  end
+
   bash "Configure enroot" do
     user 'root'
     code <<-ENROOT_CONFIGURE
@@ -31,7 +40,6 @@ action :configure do
       ENROOT_CONFIG_RELEASE=pyxis
       SHARED_DIR=#{node['cluster']['shared_dir']}
       NONROOT_USER=#{node['cluster']['cluster_user']}
-      wget -O /tmp/enroot.template.conf https://raw.githubusercontent.com/aws-samples/aws-parallelcluster-post-install-scripts/${ENROOT_CONFIG_RELEASE}/pyxis/enroot.template.conf
       mkdir -p ${SHARED_DIR}/enroot
       chown ${NONROOT_USER} ${SHARED_DIR}/enroot
       ENROOT_CACHE_PATH=${SHARED_DIR}/enroot envsubst < /tmp/enroot.template.conf > /tmp/enroot.conf

@@ -11,7 +11,7 @@ default['conditions']['arm_pl_supported'] = arm_instance?
 
 # Enroot + Pyxis
 default['cluster']['enroot']['version'] = '3.4.1'
-default['cluster']['pyxis']['version'] = '0.19.0'
+default['cluster']['pyxis']['version'] = '0.20.0'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'

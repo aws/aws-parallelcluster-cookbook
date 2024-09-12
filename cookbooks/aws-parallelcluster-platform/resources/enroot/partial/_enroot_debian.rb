@@ -37,11 +37,11 @@ action :install_package do
 end
 
 def enroot_url
-  "https://github.com/NVIDIA/enroot/releases/download/v#{package_version}/enroot_#{package_version}-1_#{arch_suffix}.deb"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot_#{package_version}-1_#{arch_suffix}.deb"
 end
 
 def enroot_caps_url
-  "https://github.com/NVIDIA/enroot/releases/download/v#{package_version}/enroot+caps_#{package_version}-1_#{arch_suffix}.deb"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot%2Bcaps_#{package_version}-1_#{arch_suffix}.deb"
 end
 
 def arch_suffix
