@@ -62,6 +62,7 @@ else
         efs_iam_authorization_array [node['cluster']['efs_iam_authorizations'].split(',')[index]]
         efs_mount_point_array ['/home']
         efs_access_point_id_array [node['cluster']['efs_access_point_ids'].split(',')[index]]
+        mode '755'
         action :mount
       end
       break
@@ -75,6 +76,7 @@ else
         efs_encryption_in_transit_array [node['cluster']['efs_encryption_in_transits'].split(',')[index]]
         efs_iam_authorization_array [node['cluster']['efs_iam_authorizations'].split(',')[index]]
         efs_access_point_id_array [node['cluster']['efs_access_point_ids'].split(',')[index]]
+        mode '755'
         action :mount
       end
       break
@@ -89,6 +91,7 @@ else
         fsx_dns_name_array [node['cluster']['fsx_dns_names'].split(',')[index]]
         fsx_mount_name_array [node['cluster']['fsx_mount_names'].split(',')[index]]
         fsx_volume_junction_path_array [node['cluster']['fsx_volume_junction_paths'].split(',')[index]]
+        mode '755'
         action :mount
       end
       break
@@ -101,6 +104,7 @@ else
         manage_ebs "add ebs /home" do
           shared_dir_array [dir]
           vol_array [node['cluster']['volume'].split(',')[index]]
+          mode '755'
           action %i(mount export)
         end
         break
@@ -111,6 +115,7 @@ else
         shared_dir '/home'
         device(lazy { "#{node['cluster']['head_node_private_ip']}:#{format_directory('/home')}" })
         fstype 'nfs'
+        mode '755'
         options node['cluster']['nfs']['hard_mount_options']
         retries 10
         retry_delay 6
@@ -123,6 +128,7 @@ else
         raid_shared_dir '/home'
         raid_type node['cluster']['raid_type']
         raid_vol_array node['cluster']['raid_vol_ids'].split(',')
+        mode '755'
         action %i(mount export)
       end
     when 'ComputeFleet', 'LoginNode'
@@ -131,6 +137,7 @@ else
         shared_dir '/home'
         device(lazy { "#{node['cluster']['head_node_private_ip']}:/home" })
         fstype 'nfs'
+        mode '755'
         options node['cluster']['nfs']['hard_mount_options']
         retries 10
         retry_delay 6

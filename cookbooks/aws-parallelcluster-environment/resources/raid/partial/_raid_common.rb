@@ -15,6 +15,7 @@ default_action :setup
 property :raid_shared_dir, String, required: %i(mount unmount export unexport)
 property :raid_type, [String, Integer], required: %i(mount)
 property :raid_vol_array, Array, required: %i(mount unmount)
+property :mode, String, default: "1777"
 
 action :setup do
   package 'mdadm' do
@@ -79,6 +80,7 @@ action :mount do
     device raid_dev
     fstype "ext4"
     options "defaults,nofail,_netdev"
+    mode new_resource.mode
     retries 10
     retry_delay 6
   end

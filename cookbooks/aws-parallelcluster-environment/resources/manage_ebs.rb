@@ -13,6 +13,7 @@ unified_mode true
 
 property :shared_dir_array, Array, required: %i(mount export unmount unexport)
 property :vol_array, Array, required: %i(mount unmount)
+property :mode, String, default: "1777"
 
 default_action :mount
 
@@ -43,6 +44,7 @@ action :mount do
 
     volume "mount volume #{index}" do
       action :mount
+      mode new_resource.mode
       shared_dir shared_dir_array[index]
       device(lazy_uuid(dev_path[index]))
       fstype(DelayedEvaluator.new { node['cluster']['volume_fs_type'] })

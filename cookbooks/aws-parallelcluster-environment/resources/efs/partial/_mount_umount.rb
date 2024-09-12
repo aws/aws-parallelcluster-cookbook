@@ -22,6 +22,7 @@ property :efs_access_point_id_array, Array, required: false
 # This is the mount point on the EFS itself, as opposed to the local system directory, defaults to "/"
 property :efs_mount_point_array, Array, required: false
 property :efs_unmount_forced_array, Array, required: false
+property :mode, String, default: "1777"
 
 action :mount do
   return if on_docker?
@@ -61,7 +62,7 @@ action :mount do
     directory efs_shared_dir do
       owner 'root'
       group 'root'
-      mode '1777'
+      mode new_resource.mode
       recursive true
       action :create
     end unless ::File.directory?(efs_shared_dir)
@@ -97,7 +98,7 @@ action :mount do
       path efs_shared_dir
       owner 'root'
       group 'root'
-      mode '1777'
+      mode new_resource.mode
       only_if { node['cluster']['node_type'] == "HeadNode" }
     end
   end
@@ -130,7 +131,7 @@ action :unmount do
     directory efs_shared_dir do
       owner 'root'
       group 'root'
-      mode '1777'
+      mode new_resource.mode
       recursive false
       action :delete
       only_if { Dir.exist?(efs_shared_dir.to_s) && Dir.empty?(efs_shared_dir.to_s) }

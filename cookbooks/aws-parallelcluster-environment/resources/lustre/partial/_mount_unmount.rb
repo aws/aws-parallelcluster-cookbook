@@ -15,6 +15,7 @@ property :fsx_shared_dir_array, Array, required: %i(mount unmount)
 property :fsx_dns_name_array, Array, required: %i(mount unmount)
 property :fsx_mount_name_array, Array, required: %i(mount unmount)
 property :fsx_volume_junction_path_array, Array, required: %i(mount unmount)
+property :mode, String, default: "1777"
 
 action :mount do
   return if on_docker?
@@ -25,7 +26,7 @@ action :mount do
     directory fsx.shared_dir do
       owner 'root'
       group 'root'
-      mode '1777'
+      mode new_resource.mode
       recursive true
       action :create
     end
@@ -61,7 +62,7 @@ action :mount do
       path fsx.shared_dir
       owner 'root'
       group 'root'
-      mode '1777'
+      mode new_resource.mode
       only_if { fsx.can_change_shared_dir_permissions && node['cluster']['node_type'] == "HeadNode" }
     end
   end
@@ -92,7 +93,7 @@ action :unmount do
     directory fsx.shared_dir do
       owner 'root'
       group 'root'
-      mode '1777'
+      mode new_resource.mode
       recursive false
       action :delete
       only_if { Dir.exist?(fsx.shared_dir) && Dir.empty?(fsx.shared_dir) }
