@@ -12,6 +12,21 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add new attribute `efs_access_point_ids` to specify optional EFS access points for the mounts
 - Install enroot and pyxis in official pcluster AMIs
 
+**CHANGES**
+- Upgrade Slurm to 23.11.10 (from 23.11.7).
+- Upgrade Pmix to 5.0.3 (from 5.0.2).
+- Upgrade EFA installer to `1.34.0`.
+  - Efa-driver: `efa-2.10.0-1`
+  - Efa-config: `efa-config-1.17-1`
+  - Efa-profile: `efa-profile-1.7-1`
+  - Libfabric-aws: `libfabric-aws-1.22.0-1`
+  - Rdma-core: `rdma-core-52.0-1`
+  - Open MPI: `openmpi40-aws-4.1.6-3` and `openmpi50-aws-5.0.3-11`
+- Upgrade NVIDIA driver to version 550.90.07 (from 535.183.01).
+- Upgrade CUDA Toolkit to version 12.4.1 (from 12.2.2).
+- Upgrade Python to 3.9.20 (from 3.9.19).
+- Upgrade Intel MPI Library to 2021.13.1.769 (from 2021.12.1.8).
+
 **BUG FIXES**
 - Fix EFA kmod installation with RHEL 8.10 or newer.
 
