@@ -8,12 +8,14 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
       cached(:python_version) { '3.9.20' }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
       cached(:virtualenv_path) { "system_pyenv_root/versions/#{python_version}/envs/cfn_bootstrap_virtualenv" }
+      cached(:timeout) { 1800 }
 
       context "when cfn_bootstrap virtualenv not installed yet" do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['region'] = 'non_china'
+            node.override['cluster']['compute_node_bootstrap_timeout'] = timeout
           end
           runner.converge(described_recipe)
         end
@@ -79,7 +81,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
             owner: 'root',
             group: 'root',
             mode: '0744',
-            variables: { cfn_bootstrap_virtualenv_path: virtualenv_path }
+            variables: { cfn_bootstrap_virtualenv_path: virtualenv_path, node_bootstrap_timeout: timeout }
           )
         end
       end

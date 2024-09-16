@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -x
 
 # This script is used to run cfn-hup is a way that is suitable to be managed by supervisord.
 # In particular, cfn-hup is executed in no-daemon mode.
@@ -9,6 +9,6 @@ set -ex
 [ -f /etc/profile.d/proxy.sh ] && . /etc/profile.d/proxy.sh
 
 while true; do
-  <%= @cfn_bootstrap_virtualenv_path %>/bin/cfn-hup --no-daemon --verbose
+  timeout <%= @node_bootstrap_timeout %> <%= @cfn_bootstrap_virtualenv_path %>/bin/cfn-hup --no-daemon --verbose
   sleep 60
 done
