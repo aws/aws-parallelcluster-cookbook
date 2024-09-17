@@ -38,7 +38,7 @@ def enroot_url
 end
 
 def enroot_caps_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot%2Bcaps-#{package_version}-1.el8.#{arch_suffix}.rpm"
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot-caps-#{package_version}-1.el8.#{arch_suffix}.rpm"
 end
 
 def arch_suffix
