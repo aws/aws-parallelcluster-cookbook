@@ -214,8 +214,9 @@ def handle_volume(volume_id, attach, detach):
 
     instance_id = get_metadata_value(token, "http://169.254.169.254/latest/meta-data/instance-id")
 
-    region = get_metadata_value(token, "http://169.254.169.254/latest/meta-data/placement/availability-zone")
-    region = region[:-1]
+    identity_document = get_metadata_value(token, "http://169.254.169.254/latest/dynamic/instance-identity/document")
+    identity = json.loads(identity_document)
+    region = identity['region']
 
     proxy_config = parse_proxy_config()
 
