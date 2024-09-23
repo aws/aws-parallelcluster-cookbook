@@ -43,6 +43,14 @@ describe 'aws-parallelcluster-platform::directories' do
           recursive: true
         )
       end
+
+      it 'sets permission 0755 for /etc' do
+        is_expected.to create_directory('/etc').with(
+          owner: 'root',
+          mode: '0755',
+          recursive: false
+        )
+      end
     end
   end
 end
