@@ -49,7 +49,7 @@ action :install_extras do
 
   if aws_region.start_with?("us-iso")
     remote_file "epel_deps.tar.gz" do
-      source "#{node['cluster']['artifacts_s3_url']}/dependencies/epel/rhel7/#{node['kernel']['machine']}/epel_deps.tar.gz"
+      source "#{node['cluster']['artifacts_s3_url']}/dependencies/epel/rhel7/#{node['kernel']['machine']}/deps-v2.tar.gz"
       mode '0644'
       retries 3
       retry_delay 5
