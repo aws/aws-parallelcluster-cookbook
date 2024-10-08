@@ -17,6 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - yum-7.4.20 (from yum-7.4.13)
   - yum-epel-5.0.8 (from yum-epel-5.0.2)
 - Upgrade Pmix to 5.0.6 (from 5.0.3).
+- Upgrade ARM PL to version 24.10 (from 23.10).
 
 3.12.0
 ------

@@ -27,12 +27,8 @@ property :aws_domain, String
 # We upload ArmPL to a ParallelCluster bucket (account for it in scope of the upgrade) and download it from there
 # to install ArmPL on the AMI.
 # We download gcc directly from gnu.org repository to install correct gcc version on the AMI.
-property :armpl_major_minor_version, String, default: '23.10'
+property :armpl_major_minor_version, String, default: '24.10'
 property :gcc_patch_version, String, default: '0'
-
-action :arm_pl_prerequisite do
-  # Do nothing
-end
 
 action :setup do
   return unless node['conditions']['arm_pl_supported']
@@ -49,10 +45,8 @@ action :setup do
   build_tools 'Prerequisite: build tools'
   package %w(wget bzip2)
 
-  action_arm_pl_prerequisite
-
   armpl_version = "#{new_resource.armpl_major_minor_version}"
-  armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}_gcc-#{gcc_major_minor_version}.tar"
+  armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{package_manager}_gcc.tar"
 
   armpl_url = %W(
     #{node['cluster']['artifacts_s3_url']}
@@ -62,7 +56,7 @@ action :setup do
 
   armpl_installer = "#{new_resource.sources_dir}/#{armpl_tarball_name}"
 
-  armpl_name = "arm-performance-libraries_#{armpl_version}_#{armpl_platform}"
+  armpl_name = "arm-performance-libraries_#{armpl_version}_#{package_manager}"
 
   # download ArmPL tarball
   remote_file armpl_installer do
@@ -89,11 +83,7 @@ action :setup do
   # create armpl module directory
   directory "#{modulefile_dir}/armpl"
 
-  armpl_license_dir = if new_resource.armpl_major_minor_version == "21.0"
-                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{new_resource.armpl_major_minor_version}_gcc-#{gcc_major_minor_version}/license_terms"
-                      else
-                        "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_version}_gcc-#{gcc_major_minor_version}/license_terms"
-                      end
+  armpl_license_dir = "/opt/arm/armpl/#{armpl_version}/arm-performance-libraries_#{armpl_version}_gcc/license_terms"
 
   # arm performance library modulefile configuration
   template "#{modulefile_dir}/armpl/#{armpl_version}" do
@@ -104,7 +94,6 @@ action :setup do
     mode '0755'
     variables(
       armpl_version: armpl_version,
-      armpl_major_minor_version: new_resource.armpl_major_minor_version,
       armpl_license_dir: armpl_license_dir,
       gcc_major_minor_version: gcc_major_minor_version
     )
@@ -167,7 +156,6 @@ action :setup do
   # save ArmPL and gcc versions on the node environment so that they will be available
   # to dependencies (for instance, test code)
   # Complete versions are intentionally redundant.
-  node.default['cluster']['armpl']['major_minor_version'] = new_resource.armpl_major_minor_version
   node.default['cluster']['armpl']['version'] = armpl_version
   node.default['cluster']['armpl']['gcc']['major_minor_version'] = gcc_major_minor_version
   node.default['cluster']['armpl']['gcc']['patch_version'] = new_resource.gcc_patch_version
@@ -179,5 +167,13 @@ end
 action_class do
   def modulefile_dir
     '/usr/share/Modules/modulefiles'
+  end
+
+  def package_manager
+    if platform_family?('debian')
+      'deb'
+    else
+      'rpm'
+    end
   end
 end
