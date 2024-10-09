@@ -1,2 +1,3 @@
 #!/bin/bash
+source /etc/profile.d/aws-cli-default-config.sh
 sudo -u <%= node['cluster']['cluster_admin_user'] %> <%= node_virtualenv_path %>/bin/slurm_fleet_status_manager "$@"
