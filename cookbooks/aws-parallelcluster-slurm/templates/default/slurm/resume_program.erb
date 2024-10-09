@@ -2,6 +2,8 @@
 # ResumeProgram should read SLURM_RESUME_FILE within ten seconds of starting to guarantee that it still exists.
 # ref https://slurm.schedmd.com/power_save.html#tolerance
 
+source /etc/profile.d/aws-cli-default-config.sh
+
 trap "rm -f ${SLURM_RESUME_FILE_TMP}" EXIT
 
 SLURM_RESUME_FILE_TMP=$(mktemp)
