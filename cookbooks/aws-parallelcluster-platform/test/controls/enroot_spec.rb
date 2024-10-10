@@ -14,16 +14,37 @@ control 'tag:install_expected_version_of_enroot_installed' do
 
   expected_enroot_version = node['cluster']['enroot']['version']
 
-  describe "gdrcopy version is expected to be #{expected_enroot_version}" do
+  describe "enroot version is expected to be #{expected_enroot_version}" do
     subject { command('enroot version').stdout.strip() }
     it { should eq expected_enroot_version }
+  end
+
+  base_dir1 = "/etc/enroot"
+  etc_dirs = [ base_dir1, "#{base_dir1}/enroot-cache"]
+
+  etc_dirs.each do |path|
+    describe directory(path) do
+      it { should exist }
+      its('mode') { should cmp '01777' }
+      its('owner') { should eq 'root' }
+      its('group') { should eq 'root' }
+    end
+  end
+
+  base_dir2 = "/run/enroot"
+  tmp_dirs = [ base_dir2, "#{base_dir2}/data" ]
+  tmp_dirs.each do |path|
+    describe directory(path) do
+      it { should exist }
+      its('mode') { should cmp '01777' }
+    end
   end
 end
 
 control 'tag:config_enroot_enabled_on_graphic_instances' do
   only_if { !os_properties.on_docker? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
 
-  describe file("/opt/parallelcluster/shared/enroot") do
+  describe file("/etc/enroot/enroot-cache") do
     it { should exist }
     its('group') { should eq 'root' }
   end unless os_properties.redhat_on_docker?

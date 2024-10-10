@@ -37,10 +37,51 @@ bash "Install pyxis" do
     cd /tmp/pyxis-#{pyxis_version}
     CPPFLAGS='-I /opt/slurm/include/' make
     CPPFLAGS='-I /opt/slurm/include/' make install
-    mkdir -p /opt/slurm/etc/plugstack.conf.d
-    echo -e 'include /opt/slurm/etc/plugstack.conf.d/*' | tee /opt/slurm/etc/plugstack.conf
-    ln -fs /usr/local/share/pyxis/pyxis.conf /opt/slurm/etc/plugstack.conf.d/pyxis.conf
   PYXIS_INSTALL
   retries 3
   retry_delay 5
+end
+
+directory "#{node['cluster']['slurm']['install_dir']}/etc" do
+  user 'root'
+  group 'root'
+  mode '0755'
+end
+
+directory "#{node['cluster']['slurm']['install_dir']}/etc/plugstack.conf.d"
+
+directory node['cluster']['config_examples_dir']
+
+directory "#{node['cluster']['config_examples_dir']}/spank"
+
+directory "#{node['cluster']['config_examples_dir']}/pyxis"
+
+directory "/run/pyxis" do
+  owner node['cluster']['cluster_user']
+  # group node['cluster']['cluster_user']
+  mode '1777'
+  action :create
+end
+
+template "#{node['cluster']['config_examples_dir']}/spank/plugstack.conf" do
+  source 'pyxis/plugstack.conf.erb'
+  cookbook 'aws-parallelcluster-slurm'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
+link '/usr/local/share/pyxis/pyxis.conf' do
+  to "#{node['cluster']['slurm']['install_dir']}/etc/plugstack.conf.d/pyxis.conf"
+end
+
+template "#{node['cluster']['config_examples_dir']}/pyxis/pyxis.conf" do
+  source 'pyxis/pyxis.conf.erb'
+  cookbook 'aws-parallelcluster-platform'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  variables(
+    pyxis_persistent_runtime_path: "/run/pyxis"
+  )
 end

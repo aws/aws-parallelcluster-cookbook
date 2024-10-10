@@ -9,14 +9,6 @@ class ConvergeEnroot
       end
     end
   end
-
-  def self.configure(chef_run)
-    chef_run.converge_dsl('aws-parallelcluster-platform') do
-      enroot 'configure' do
-        action :configure
-      end
-    end
-  end
 end
 
 describe 'enroot:package_version' do
@@ -123,47 +115,6 @@ describe 'enroot:setup' do
           it 'does not install Enroot' do
             is_expected.not_to run_bash('Install enroot')
           end
-        end
-      end
-    end
-  end
-end
-
-describe 'enroot:configure' do
-  for_all_oses do |platform, version|
-    context "on #{platform}#{version}" do
-      let(:chef_run) do
-        runner(platform: platform, version: version, step_into: ['enroot'])
-      end
-
-      context 'when enroot is installed' do
-        before do
-          stubs_for_provider('enroot') do |resource|
-            allow(resource).to receive(:enroot_installed).and_return(true)
-          end
-          ConvergeEnroot.configure(chef_run)
-        end
-        it 'run configure enroot script' do
-          is_expected.to run_bash('Configure enroot')
-            .with(retries: 3)
-            .with(retry_delay: 5)
-            .with(user: 'root')
-        end
-      end
-
-      context 'when enroot is not installed' do
-        before do
-          stubs_for_provider('enroot') do |resource|
-            allow(resource).to receive(:enroot_installed).and_return(false)
-          end
-          ConvergeEnroot.configure(chef_run)
-        end
-
-        it 'does not run configure enroot script' do
-          is_expected.not_to run_bash('Configure enroot')
-            .with(retries: 3)
-            .with(retry_delay: 5)
-            .with(user: 'root')
         end
       end
     end

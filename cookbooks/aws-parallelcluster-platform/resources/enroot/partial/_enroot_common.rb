@@ -18,50 +18,38 @@ default_action :setup
 action :setup do
   return if on_docker?
   action_install_package
-end
 
-action :configure do
-  return if on_docker?
-  return unless enroot_installed
+  directory node['cluster']['enroot_dir'] do
+    owner 'root'
+    group 'root'
+    mode '1777'
+    action :create
+  end
 
-  cookbook_file "/tmp/enroot.template.conf" do
-    source 'enroot/enroot.template.conf'
+  directory node['cluster']['enroot_cache_path'] do
+    owner 'root'
+    group 'root'
+    mode '1777'
+    action :create
+  end
+
+  directory "/run/enroot" do
+    mode '1777'
+    action :create
+  end
+
+  directory "/run/enroot/data" do
+    mode '1777'
+    action :create
+  end
+
+  template "/etc/enroot/enroot.conf" do
+    source 'enroot/enroot.conf.erb'
     cookbook 'aws-parallelcluster-platform'
     owner 'root'
     group 'root'
-    mode '0755'
-    action :create_if_missing
-  end
-
-  bash "Configure enroot" do
-    user 'root'
-    code <<-ENROOT_CONFIGURE
-      set -e
-      ENROOT_CONFIG_RELEASE=pyxis
-      SHARED_DIR=#{node['cluster']['shared_dir']}
-      NONROOT_USER=#{node['cluster']['cluster_user']}
-      mkdir -p ${SHARED_DIR}/enroot
-      chown ${NONROOT_USER} ${SHARED_DIR}/enroot
-      ENROOT_CACHE_PATH=${SHARED_DIR}/enroot envsubst < /tmp/enroot.template.conf > /tmp/enroot.conf
-      mv /tmp/enroot.conf /etc/enroot/enroot.conf
-      chmod 0644 /etc/enroot/enroot.conf
-
-      mkdir -p /tmp/enroot
-      chmod 1777 /tmp/enroot
-      mkdir -p /tmp/enroot/data
-      chmod 1777 /tmp/enroot/data
-
-      chmod 1777 ${SHARED_DIR}/enroot
-
-      mkdir -p ${SHARED_DIR}/pyxis/
-      chown ${NONROOT_USER} ${SHARED_DIR}/pyxis/
-      sed -i '${s/$/ runtime_path=${SHARED_DIR}\\/pyxis/}' /opt/slurm/etc/plugstack.conf.d/pyxis.conf
-      SHARED_DIR=${SHARED_DIR} envsubst < /opt/slurm/etc/plugstack.conf.d/pyxis.conf > /opt/slurm/etc/plugstack.conf.d/pyxis.tmp.conf
-      mv /opt/slurm/etc/plugstack.conf.d/pyxis.tmp.conf /opt/slurm/etc/plugstack.conf.d/pyxis.conf
-
-    ENROOT_CONFIGURE
-    retries 3
-    retry_delay 5
+    mode '0644'
+    action :create
   end
 end
 

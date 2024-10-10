@@ -1,9 +1,9 @@
 #ENROOT_LIBRARY_PATH        /usr/lib/enroot
 #ENROOT_SYSCONF_PATH        /etc/enroot
-ENROOT_RUNTIME_PATH        /tmp/enroot/user-$(id -u)
-ENROOT_CONFIG_PATH         ${ENROOT_CONFIG_PATH}
-ENROOT_CACHE_PATH          ${ENROOT_CACHE_PATH}
-ENROOT_DATA_PATH           /tmp/enroot/data/user-$(id -u)
+ENROOT_RUNTIME_PATH        /run/enroot/user-$(id -u)
+ENROOT_CONFIG_PATH         
+ENROOT_CACHE_PATH          <%= node['cluster']['enroot_cache_path'] %>
+ENROOT_DATA_PATH           /run/enroot/data/user-$(id -u)
 #ENROOT_TEMP_PATH           ${TMPDIR:-/tmp}
 
 # Gzip program used to uncompress digest layers.

@@ -33,3 +33,8 @@ default['cluster']["directory_service"]["enabled"] = 'false'
 
 # Default NFS mount options
 default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
+
+# Pyxis+Enroot Exmaple Config files
+default['cluster']['config_examples_dir'] = "#{node['cluster']['configs_dir']}/examples"
+default['cluster']['enroot_dir'] = "/etc/enroot"
+default['cluster']['enroot_cache_path'] = "#{node['cluster']['enroot_dir']}/enroot-cache"
