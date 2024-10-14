@@ -3,6 +3,15 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.11.1
+------
+
+**CHANGES**
+- Pyxis is now disabled by default and it must be manually enabled on the head node.
+
+**BUG FIXES**
+- Fix an issue in the way we configure the Pyxis Slurm plugin in ParallelCluster that can lead to job submission failures.
+
 3.11.0
 ------
 
