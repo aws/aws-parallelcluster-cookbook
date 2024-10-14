@@ -9,9 +9,10 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 # ArmPL
 default['conditions']['arm_pl_supported'] = arm_instance?
 
-# Enroot + Pyxis
+# Enroot
 default['cluster']['enroot']['version'] = '3.4.1'
-default['cluster']['pyxis']['version'] = '0.20.0'
+default['cluster']['enroot']['temporary_dir'] = '/run/enroot'
+default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
