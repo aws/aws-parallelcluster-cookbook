@@ -14,7 +14,26 @@ control 'tag:install_pyxis_installed' do
 
   title 'Checks Pyxis has been installed'
 
-  describe file("/opt/slurm/etc/plugstack.conf.d/pyxis.conf") do
+  describe directory('/opt/slurm/etc') do
+    it { should exist }
+    its('mode') { should cmp '0755' }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+  end
+
+  examples_dir = "/opt/parallelcluster/configs/examples"
+  dirs = [ examples_dir, "#{examples_dir}/spank", "#{examples_dir}/pyxis" ]
+  dirs.each do |path|
+    describe directory(path) do
+      it { should exist }
+    end
+  end
+
+  describe file("#{examples_dir}/pyxis/pyxis.conf") do
+    it { should exist }
+  end
+
+  describe file("#{examples_dir}/spank/plugstack.conf") do
     it { should exist }
   end
 end

@@ -36,6 +36,10 @@ describe 'aws-parallelcluster-platform::directories' do
         is_expected.to create_directory(node['cluster']['shared_dir'])
       end
 
+      it 'creates examples directory' do
+        is_expected.to create_directory(node['cluster']['examples_dir'])
+      end
+
       it 'creates log directory' do
         is_expected.to create_directory(node['cluster']['log_base_dir']).with(
           owner: 'root',
