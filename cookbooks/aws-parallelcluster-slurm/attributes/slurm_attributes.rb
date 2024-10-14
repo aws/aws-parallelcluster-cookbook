@@ -18,3 +18,10 @@ default['cluster']['pmix']['sha256'] = 'd9b0b81ba45f58f44573796eb05858061ed7f47e
 
 # Slurmdbd
 default['cluster']['slurmdbd_service_enabled'] = "true"
+
+# Spank
+default['cluster']['slurm']['spank_config_dir'] = "#{node['cluster']['slurm']['install_dir']}/etc/plugstack.conf.d"
+
+# Pyxis
+default['cluster']['pyxis']['version'] = '0.20.0'
+default['cluster']['pyxis']['runtime_path'] = '/run/pyxis'
