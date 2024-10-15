@@ -15,10 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-jwt_version = '1.15.3'
+jwt_version = '1.17.0'
 jwt_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/jwt/v#{jwt_version}.tar.gz"
 jwt_tarball = "#{node['cluster']['sources_dir']}/libjwt-#{jwt_version}.tar.gz"
-jwt_sha256 = 'cb2fd95123689e7d209a3a8c060e02f68341c9a5ded524c0cd881a8cd20d711f'
+jwt_sha256 = '617778f9687682220abf9b7daacbe72bab7c2985479f8bee4db9648bd2440687'
 
 remote_file jwt_tarball do
   source jwt_url
