@@ -2,7 +2,8 @@
 set -ex
 
 function get_instance_region {
-  local _token=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600")
+  local _token
+  _token=$(curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600")
   curl -H "X-aws-ec2-metadata-token: $_token" -v "http://169.254.169.254/latest/meta-data/placement/region" 2> /dev/null
 }
 
