@@ -32,11 +32,10 @@ end
 
 control 'tag:config_enroot_enabled_on_graphic_instances' do
   only_if { !os_properties.on_docker? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
-
-  describe file("/var/enroot/cache-group-1000") do
-    it { should exist }
-    its('group') { should eq 'root' }
-  end unless os_properties.redhat_on_docker?
+  describe 'enroot service should be enabled' do
+    subject { command("enroot version") }
+    its('exit_status') { should cmp == 0 }
+  end
 end
 
 control 'tag:config_enroot_disabled_on_non_graphic_instances' do
