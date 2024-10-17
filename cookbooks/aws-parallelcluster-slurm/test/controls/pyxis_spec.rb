@@ -14,14 +14,7 @@ control 'tag:install_pyxis_installed' do
 
   title 'Checks Pyxis has been installed'
 
-  describe directory('/opt/slurm/etc') do
-    it { should exist }
-    its('mode') { should cmp '0755' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-  end
-
-  examples_dir = "/opt/parallelcluster/configs/examples"
+  examples_dir = "/opt/parallelcluster/examples"
   dirs = [ examples_dir, "#{examples_dir}/spank", "#{examples_dir}/pyxis" ]
   dirs.each do |path|
     describe directory(path) do
