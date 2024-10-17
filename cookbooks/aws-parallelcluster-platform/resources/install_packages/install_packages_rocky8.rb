@@ -25,7 +25,7 @@ action :install_kernel_source do
   bash "Install kernel source" do
     user 'root'
     code <<-INSTALL_KERNEL_SOURCE
-    package="#{kernel_source_package}-#{kernel_source_package_version}"
+    package="#{kernel_source_package}-$(uname -r)"
 
     # try to install kernel source for a specific release version
     dnf install -y ${package} --releasever #{node['platform_version']}
