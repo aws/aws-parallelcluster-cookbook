@@ -30,3 +30,13 @@ directory node['cluster']['log_base_dir'] do
   mode '1777'
   recursive true
 end
+
+# The default permission for directory /etc is 0755.
+# However, in Rocky9.4 it was unintentionally changed to 0777,
+# causing issues with Munge, that fails to start if /etc has group-writable permission without sticky bit.
+# See https://forums.rockylinux.org/t/changed-permissions-on-etc-in-rl9-4-genericcloud-image/14449
+directory '/etc' do
+  owner 'root'
+  mode '0755'
+  recursive false
+end
