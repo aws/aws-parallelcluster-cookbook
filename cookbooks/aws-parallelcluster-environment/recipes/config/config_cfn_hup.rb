@@ -46,16 +46,46 @@ template '/etc/cfn/cfn-hup.conf' do
   )
 end
 
-template '/etc/cfn/hooks.d/pcluster-update.conf' do
-  source 'cfn_bootstrap/cfn-hook-update.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0400'
-  variables(
-    stack_id: node['cluster']['stack_arn'],
-    region: node['cluster']['region'],
-    cloudformation_url: cloudformation_url,
-    cfn_init_role: instance_role_name,
-    launch_template_resource_id: node['cluster']['launch_template_id']
-  )
+case node['cluster']['node_type']
+when 'HeadNode', 'LoginNode'
+  template '/etc/cfn/hooks.d/pcluster-update.conf' do
+    source 'cfn_bootstrap/cfn-hook-update.conf.erb'
+    owner 'root'
+    group 'root'
+    mode '0400'
+    variables(
+      stack_id: node['cluster']['stack_arn'],
+      region: node['cluster']['region'],
+      cloudformation_url: cloudformation_url,
+      cfn_init_role: instance_role_name,
+      launch_template_resource_id: node['cluster']['launch_template_id']
+    )
+  end
+
+when 'ComputeFleet'
+  template "#{node['cluster']['scripts_dir']}/cfn-hup-update-compute-action.sh" do
+    source "cfn_bootstrap/cfn-hup-update-compute-action.sh.erb"
+    owner 'root'
+    group 'root'
+    mode '0744'
+    variables(
+      clusterS3Bucket: node['cluster']['cluster_s3_bucket'],
+      region: node['cluster']['region'],
+      clusterS3ArtifactDir: node['cluster']['cluster_config_s3_key'].chomp('/configs/cluster-config-with-implied-values.yaml'),
+      clusterConfigVersion: node['cluster']['cluster_config_version'],
+      launch_template_resource_id: node['cluster']['launch_template_id'],
+      # cluster_config_version_path: node['cluster']['shared_dir']/cluster-config-version
+    )
+  end
+  
+  
+  template '/etc/cfn/hooks.d/pcluster-update.conf' do
+    source 'cfn_bootstrap/cfn-hook-update-compute.conf.erb'
+    owner 'root'
+    group 'root'
+    mode '0400'
+    variables(
+      launch_template_resource_id: node['cluster']['launch_template_id']
+    )
+  end
 end
