@@ -8,3 +8,7 @@ def aws_domain_for_fsx(region)
     CLASSIC_AWS_DOMAIN
   end
 end
+
+def lustre_enabled?
+  ['yes', true].include?(node['cluster']['lustre']['enabled'])
+end

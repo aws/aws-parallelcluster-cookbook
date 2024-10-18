@@ -77,3 +77,5 @@ default['cluster']['efa']['sha256'] = 'bd68839e741b0afd3ec2e37d50603803cfa7a279c
 default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"
 default['cluster']['spack']['version'] = '0.20.2'
 default['cluster']['spack']['sha256'] = '62f87ab6ca332118f2812a255edcf4be4977623d067b9396251ce8c44b158e49'
+
+default['cluster']['lustre']['enabled'] = 'yes'

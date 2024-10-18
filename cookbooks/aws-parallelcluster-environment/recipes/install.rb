@@ -19,7 +19,9 @@ ec2_udev_rules 'configure udev'
 cloudwatch 'Install amazon-cloudwatch-agent'
 efa 'Install EFA'
 raid 'Install RAID prerequisite packages'
-lustre 'Install FSx options'
+if lustre_enabled?
+  lustre 'Install FSx options'
+end
 efs 'Install efs-utils'
 stunnel 'Install stunnel'
 system_authentication "Install packages required for directory service integration"
