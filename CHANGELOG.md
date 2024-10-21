@@ -3,6 +3,14 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.12.0
+------
+
+**CHANGES**
+
+**BUG FIXES**
+- Fix an issue in the way we get region when manage volumes so that it can correctly handle local zone.
+
 3.11.1
 ------
 
