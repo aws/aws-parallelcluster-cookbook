@@ -16,29 +16,29 @@
 def dcv_sha256sum
   if arm_instance?
     case el_string
-    when "el7"
+    when "amzn2"
       # ALINUX2
-      'f921c50a1f98fc945ac0f740f4181a52fb66b4b70bf13c1b2321823a9ec7e95a'
+      '894f5a0b2c57bb9433a7124f152b0930d962ab0f2cfc6ea0f1e159893d667e86'
     when "el8"
       # RHEL and Rocky8
-      '4d4b794467220ec1b0f3272b6938701ce1282664e25f63497cc30632d71aed17'
+      '7647d00782fb7f14668571f1e48fffa2b8b587d878b7632b03f40bbb92a757ad'
     when "el9"
       # RHEL and Rocky9
-      'a74ee7376bf8595b95386352ff3f95eb5886e7bbc8b8512c53a48be1d3ec6282'
+      'f9b2fa95f84059c7168ef924b7ffe8b6f4d0d69e2e39280096d4bf76fdfb597c'
     else
       ''
     end
   else
     case el_string
-    when "el7"
+    when "amzn2"
       # ALINUX2
-      '31230edd66242038a95986c9207fc0f800986a94ee43bfc901e43521f4eb72a6'
+      '81e85db767e36c36877879e1d3afc0f20127b9bd81b845fc8599feb9abd04f24'
     when "el8"
       # RHEL and Rocky8
-      '9f696bfc21fdfd267a079cd222170b7c737f789ec6f3da66a6666bc1d8fe2648'
+      'f879513272ac351712814bd969e3862fc7717ada9cfdf1ec227876b0e8ebc77d'
     when "el9"
       # RHEL and Rocky9
-      '98a928194ff4c2ee21b52c3ab575ca93e60ca5475bd7bfda1561a5c6adffd7ca'
+      '5d631b5c0f2f6b21d0e56023432766994e2de5cc13f22c70a954cd643cde5b84'
     else
       ''
     end
@@ -47,7 +47,7 @@ end
 
 def el_string
   if platform?('amazon')
-    "el7"
+    "amzn2"
   else
     "el#{node['platform_version'].to_i}"
   end
