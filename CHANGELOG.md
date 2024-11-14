@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **CHANGES**
+- Upgrade mysql-community-client to version 8.0.39. 
 
 **BUG FIXES**
 - Fix an issue in the way we get region when manage volumes so that it can correctly handle local zone.
