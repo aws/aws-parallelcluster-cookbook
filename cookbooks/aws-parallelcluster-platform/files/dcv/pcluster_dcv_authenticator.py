@@ -103,7 +103,7 @@ class OneTimeTokenHandler:
 
 class DCVAuthenticator(BaseHTTPRequestHandler):
     """
-    Simple HTTP server to handle NICE DCV authentication process.
+    Simple HTTP server to handle Amazon DCV authentication process.
 
     The authentication process to access to a DCV session is performed by the following steps:
     1. Obtain a Request Token:
@@ -191,7 +191,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
 
     def do_POST(self):  # noqa N802 pylint: disable=C0103
         """
-        Handle POST requests, coming from NICE DCV server.
+        Handle POST requests, coming from Amazon DCV server.
 
         The format of the request is the following:
             curl -k http://localhost:<port> -d sessionId=<session-id> -d authenticationToken=<token>
@@ -360,7 +360,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         # because currently DCV doesn't allow list-session to list all session even for non-root user.
         # TODO change this method if DCV updates his behaviour.
         """
-        logger.info("Verifying NICE DCV session validity..")
+        logger.info("Verifying Amazon DCV session validity..")
         # Remove the first and the last because they are the heading and empty, respectively
         # All commands and arguments in this subprocess call are built as literals
         processes = subprocess.check_output(["/bin/ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec B603
@@ -370,7 +370,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
             filter(lambda process: DCVAuthenticator.check_dcv_process(process, user, session_id), processes), None
         ):
             raise DCVAuthenticator.IncorrectRequestError("The given session does not exists")
-        logger.info("The NICE DCV session is valid.")
+        logger.info("The Amazon DCV session is valid.")
 
     @staticmethod
     def _verify_session_existence(user, session_id):
@@ -402,9 +402,9 @@ class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
 
 def _run_server(port, certificate=None, key=None):
     """
-    Run NICE DCV authenticator server on localhost.
+    Run Amazon DCV authenticator server on localhost.
 
-    The NICE DCV authenticator server *must* run with an appropriate user.
+    The Amazon DCV authenticator server *must* run with an appropriate user.
 
     :param port: the port in which you want to start the server
     :param certificate: the certificate to use if HTTPSs
@@ -497,12 +497,12 @@ def main():
     global logger  # pylint: disable=C0103,W0603
     logger = _config_logger()
     try:
-        logger.info("Starting NICE DCV authenticator server")
+        logger.info("Starting Amazon DCV authenticator server")
         args = _parse_args()
         _prepare_auth_folder()
         _run_server(port=args.port if args.port else 8444, certificate=args.certificate, key=args.key)
     except KeyboardInterrupt:
-        logger.info("Closing NICE DCV authenticator server")
+        logger.info("Closing Amazon DCV authenticator server")
     except Exception as e:
         fail(f"Unexpected error of type {type(e).__name__}: {e}")
 

@@ -450,7 +450,7 @@ describe 'dcv:setup' do
 
         it 'sets up dcv authenticator group' do
           is_expected.to create_group(authenticator_group).with(
-            comment: 'NICE DCV External Authenticator group',
+            comment: 'Amazon DCV External Authenticator group',
             gid: authenticator_group_id,
             system: true
           )
@@ -458,7 +458,7 @@ describe 'dcv:setup' do
 
         it 'sets up dcv authenticator user' do
           is_expected.to create_user(authenticator_user).with(
-            comment: 'NICE DCV External Authenticator user',
+            comment: 'Amazon DCV External Authenticator user',
             gid: authenticator_group_id,
             uid: authenticator_user_id,
             manage_home: true,
@@ -884,7 +884,7 @@ describe 'dcv:configure' do
           )
         end
 
-        it 'starts NICE DCV server' do
+        it 'starts Amazon DCV server' do
           is_expected.to enable_service('dcvserver').with_action(%i(enable start))
         end
       end

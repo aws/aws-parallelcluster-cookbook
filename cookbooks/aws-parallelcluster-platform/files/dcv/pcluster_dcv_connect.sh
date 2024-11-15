@@ -90,18 +90,18 @@ _create_dcv_session() {
     dcv_session_file="$1"
     shared_folder_path="$2"
 
-    _log "Creating a new NICE DCV session..."
+    _log "Creating a new Amazon DCV session..."
     # Generate a random session id
     sessionid=$(shuf -zer -n20  {A..Z} {a..z} {0..9})
     echo "${sessionid}" > "${dcv_session_file}"
     dcv create-session --type virtual --storage-root "${shared_folder_path}" "${sessionid}"
-    _log "NICE DCV session created successfully."
+    _log "Amazon DCV session created successfully."
 
     echo "${sessionid}"
 }
 
 main() {
-    _log "--- Initializing NICE DCV authentication... ---"
+    _log "--- Initializing Amazon DCV authentication... ---"
 
     if [[ -z "$1" ]]; then
         _fail "The script requires the shared folder as input parameter."
@@ -117,7 +117,7 @@ main() {
     fi
 
     if ! systemctl is-active --quiet dcvserver; then
-        _fail "NICE DCV service is not active on the given instance."
+        _fail "Amazon DCV service is not active on the given instance."
     fi
 
     # Create a session with session storage enabled.
@@ -127,7 +127,7 @@ main() {
         sessionid=$(_create_dcv_session "${dcv_session_file}" "${shared_folder_path}")
     else
         sessionid=$(cat "${dcv_session_file}")
-        _log "Reusing existing NICE DCV session for the current user."
+        _log "Reusing existing Amazon DCV session for the current user."
 
         # number of session can either be 0 or 1
         number_of_sessions=$(dcv list-sessions |& grep "${user}" | grep -c "${sessionid}")
@@ -145,7 +145,7 @@ main() {
     # Retrieve Request Token and Access File name
     _log "Retrieving Request Token and Access File name.."
     user_token_request=$(/usr/bin/curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=requestToken -d authUser="${user}" -d sessionID="${sessionid}")
-    _validate_json "${user_token_request}" "Unable to obtain the Request Token from the NICE DCV external authenticator."
+    _validate_json "${user_token_request}" "Unable to obtain the Request Token from the Amazon DCV external authenticator."
     request_token=$(echo "${user_token_request}" | jq -r .requestToken)
     access_file=$(echo "${user_token_request}" | jq -r .accessFile)
     _log "Request Token and Access File name obtained successfully."
@@ -160,7 +160,7 @@ main() {
     # Retrieve Session Token
     _log "Retrieving Session Token.."
     session_token_request=$(/usr/bin/curl --retry 3 --max-time 5 -s -k -X GET -G "https://localhost:${ext_auth_port}" -d action=sessionToken -d requestToken="${request_token}")
-    _validate_json "${session_token_request}" "Unable to obtain the Session Token from the NICE DCV external authenticator."
+    _validate_json "${session_token_request}" "Unable to obtain the Session Token from the Amazon DCV external authenticator."
     session_token=$(echo "${session_token_request}" | jq -r .sessionToken)
     _log "Session Token obtained successfully."
 
@@ -168,7 +168,7 @@ main() {
       dcv_server_port=8443
     fi
 
-    _log "--- NICE DCV authentication performed successfully. ---"
+    _log "--- Amazon DCV authentication performed successfully. ---"
     echo "PclusterDcvServerPort=${dcv_server_port} PclusterDcvSessionId=${sessionid} PclusterDcvSessionToken=${session_token}"
 }
 

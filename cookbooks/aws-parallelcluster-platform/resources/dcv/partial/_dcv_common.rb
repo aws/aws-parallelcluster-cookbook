@@ -60,7 +60,7 @@ action_class do
     # empty by default
   end
 
-  # Configure the system to enable NICE DCV to have direct access to the Linux server's GPU and enable GPU sharing.
+  # Configure the system to enable Amazon DCV to have direct access to the Linux server's GPU and enable GPU sharing.
   def allow_gpu_acceleration
     # Update the xorg.conf to set up NVIDIA drivers.
     # NOTE: --enable-all-gpus parameter is needed to support servers with more than one NVIDIA GPU.
@@ -124,14 +124,14 @@ action :setup do
   if dcv_supported?
     # Setup dcv authenticator group
     group node['cluster']['dcv']['authenticator']['group'] do
-      comment 'NICE DCV External Authenticator group'
+      comment 'Amazon DCV External Authenticator group'
       gid node['cluster']['dcv']['authenticator']['group_id']
       system true
     end
 
     # Setup dcv authenticator user
     user node['cluster']['dcv']['authenticator']['user'] do
-      comment 'NICE DCV External Authenticator user'
+      comment 'Amazon DCV External Authenticator user'
       uid node['cluster']['dcv']['authenticator']['user_id']
       gid node['cluster']['dcv']['authenticator']['group_id']
       # home is mounted from the head node
@@ -247,7 +247,7 @@ action :configure do
       mode '0700'
     end
 
-    # Start NICE DCV server
+    # Start Amazon DCV server
     service "dcvserver" do
       action %i(enable start)
     end
