@@ -32,6 +32,8 @@ describe 'aws-parallelcluster-slurm::config_slurmctld_systemd_service' do
       it 'creates the service definition for slurmctld with the correct settings' do
         is_expected.to render_file('/etc/systemd/system/slurmctld.service')
           .with_content("After=network-online.target munge.service remote-fs.target")
+          .with_content("Restart=on-failure")
+          .with_content("RestartSec=1s")
       end
     end
   end

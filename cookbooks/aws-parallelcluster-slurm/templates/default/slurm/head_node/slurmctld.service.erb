@@ -12,6 +12,8 @@ ExecReload=/bin/kill -HUP $MAINPID
 LimitNOFILE=562930
 LimitMEMLOCK=infinity
 LimitSTACK=infinity
+Restart=on-failure
+RestartSec=1s
 
 [Install]
 WantedBy=multi-user.target
