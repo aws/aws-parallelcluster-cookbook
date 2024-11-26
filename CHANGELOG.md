@@ -8,7 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Upgrade mysql-community-client to version 8.0.39. 
-- Upgrade NICE DCV to version `2024.0-18131`.
+- Upgrade Amazon DCV to version `2024.0-18131`.
   - server: `2024.0-18131-1`
   - xdcv: `2024.0.631-1`
   - gl: `2024.0.1078-1`
