@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe 'aws-parallelcluster-platform::cuda' do
-  cached(:cuda_version) { '12.4' }
-  cached(:cuda_patch) { '1' }
+  cached(:cuda_version) { '12.6' }
+  cached(:cuda_patch) { '3' }
   cached(:cuda_complete_version) { "#{cuda_version}.#{cuda_patch}" }
   cached(:cuda_version_suffix) { '550.54.15' }
 
@@ -20,7 +20,7 @@ describe 'aws-parallelcluster-platform::cuda' do
   context 'when on arm' do
     cached(:cuda_arch) { 'linux_sbsa' }
     cached(:cuda_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
-    cached(:cuda_samples_version) { '12.4' }
+    cached(:cuda_samples_version) { '12.6' }
     cached(:cuda_samples_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples/v#{cuda_samples_version}.tar.gz" }
 
     cached(:chef_run) do

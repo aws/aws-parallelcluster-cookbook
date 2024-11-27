@@ -4628,7 +4628,7 @@ laws, restrictions or regulations.
 
 ------
 
-** Cuda Samples; version 12.4 -- https://github.com/NVIDIA/cuda-samples/
+** Cuda Samples; version 12.6 -- https://github.com/NVIDIA/cuda-samples/
 Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
  
     * Package Cuda Samples's source code may be found at:

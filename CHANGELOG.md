@@ -13,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2024.0.631-1`
   - gl: `2024.0.1078-1`
   - web_viewer: `2024.0-18131-1`
+- Upgrade CUDA Toolkit to version 12.6.3 (from 12.4.1).
 
 **BUG FIXES**
 - Fix an issue in the way we get region when manage volumes so that it can correctly handle local zone.
