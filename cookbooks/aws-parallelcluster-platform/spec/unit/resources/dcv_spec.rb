@@ -143,8 +143,9 @@ describe 'dcv:packages' do
           expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer_#{dcv_webviewer_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_gl).to eq("/nice-dcv-gl_#{dcv_gl_version}_#{dcv_pkg_arch}.#{base_os}.deb")
         else
-          dcv_platform_version = platform == "amazon" ? "7" :  version.to_i
-          expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-el#{dcv_platform_version}-#{dcv_url_arch}")
+          dcv_platform_version = platform == "amazon" ? "7" : version.to_i
+          dcv_platform_version_pkg = platform == "amazon" ? "amzn2" : "el" + version
+          expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-#{dcv_platform_version_pkg}-#{dcv_url_arch}")
           expect(resource.dcv_server).to eq("nice-dcv-server-#{dcv_server_version}.el#{dcv_platform_version}.#{dcv_url_arch}.rpm")
           expect(resource.xdcv).to eq("nice-xdcv-#{xdcv_version}.el#{dcv_platform_version}.#{dcv_url_arch}.rpm")
           expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer-#{dcv_webviewer_version}.el#{dcv_platform_version}.#{dcv_url_arch}.rpm")
@@ -450,7 +451,7 @@ describe 'dcv:setup' do
 
         it 'sets up dcv authenticator group' do
           is_expected.to create_group(authenticator_group).with(
-            comment: 'NICE DCV External Authenticator group',
+            comment: 'Amazon DCV External Authenticator group',
             gid: authenticator_group_id,
             system: true
           )
@@ -458,7 +459,7 @@ describe 'dcv:setup' do
 
         it 'sets up dcv authenticator user' do
           is_expected.to create_user(authenticator_user).with(
-            comment: 'NICE DCV External Authenticator user',
+            comment: 'Amazon DCV External Authenticator user',
             gid: authenticator_group_id,
             uid: authenticator_user_id,
             manage_home: true,
@@ -884,7 +885,7 @@ describe 'dcv:configure' do
           )
         end
 
-        it 'starts NICE DCV server' do
+        it 'starts Amazon DCV server' do
           is_expected.to enable_service('dcvserver').with_action(%i(enable start))
         end
       end

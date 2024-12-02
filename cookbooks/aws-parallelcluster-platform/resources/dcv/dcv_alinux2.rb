@@ -27,6 +27,22 @@ def prereq_packages
                          gnu-free-serif-fonts glx-utils) + (arm_instance? ? %w(mate-terminal) : %w(gnome-terminal))
 end
 
+def dcv_server
+  "nice-dcv-server-#{node['cluster']['dcv']['server']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
+def xdcv
+  "nice-xdcv-#{node['cluster']['dcv']['xdcv']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
+def dcv_web_viewer
+  "nice-dcv-web-viewer-#{node['cluster']['dcv']['web_viewer']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
+def dcv_gl
+  "nice-dcv-gl-#{node['cluster']['dcv']['gl']['version']}.el7.#{dcv_url_arch}.rpm"
+end
+
 action_class do
   def pre_install
     package prereq_packages do

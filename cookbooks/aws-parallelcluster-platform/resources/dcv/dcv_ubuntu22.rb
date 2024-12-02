@@ -21,5 +21,5 @@ use 'partial/_ubuntu_common'
 
 def dcv_sha256sum
   # Ubuntu22 supports DCV on x86
-  '2b996c4a422adaa7912a59cca06f38fcc59451b927be0dc0f49b362ecfcc23fb'
+  'b30a57f5029b9d8acb59db9fc72f1dbc7c6a33d76dbbfe02017cec553c5b86f9'
 end
