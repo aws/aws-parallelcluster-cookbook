@@ -56,7 +56,7 @@ bash "install custom aws-parallelcluster-node" do
     rm -fr aws-parallelcluster-custom-node
     mkdir aws-parallelcluster-custom-node
     tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
-    cd aws-parallelcluster-custom-node/*aws-parallelcluster-node-*
+    cd aws-parallelcluster-custom-node/*aws-parallelcluster-node*
     pip install .
     deactivate
   NODE
