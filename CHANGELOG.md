@@ -13,6 +13,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2024.0.631-1`
   - gl: `2024.0.1078-1`
   - web_viewer: `2024.0-18131-1`
+- Upgrade EFA installer to `1.36.0`.
+  - Efa-driver: `efa-2.13.0-1`
+  - Efa-config: `efa-config-1.17-1`
+  - Efa-profile: `efa-profile-1.7-1`
+  - Libfabric-aws: `libfabric-aws-1.22.0-1`
+  - Rdma-core: `rdma-core-54.0-1`
+  - Open MPI: `openmpi40-aws-4.1.7-1` and `openmpi50-aws-5.0.5`
 - Auto-restart slurmctld on failure.
 
 **BUG FIXES**
