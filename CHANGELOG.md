@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.12.0
 ------
 
+**ENHANCEMENTS**
+- Extend Amazon DCV support to Ubuntu2204 on ARM instances.
+
 **CHANGES**
 - Upgrade mysql-community-client to version 8.0.39. 
 - Upgrade Amazon DCV to version `2024.0-18131`.

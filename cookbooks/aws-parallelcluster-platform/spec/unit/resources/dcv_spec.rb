@@ -42,7 +42,7 @@ describe 'dcv:dcv_supported?' do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
         end
 
-        if platform == 'ubuntu' && version.to_i >= 20
+        if platform == 'ubuntu' && version.to_i == 20
           it "is false" do
             expect(resource.dcv_supported?).to eq(false)
           end
