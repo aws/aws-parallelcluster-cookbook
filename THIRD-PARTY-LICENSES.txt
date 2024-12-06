@@ -3459,9 +3459,9 @@ license document, but changing it is not allowed.
 
 ------
 
-** MySQL; version 8.0.36 -- https://www.mysql.com/products/community/
+** MySQL; version 8.0.39 -- https://www.mysql.com/products/community/
 Copyright (c) 1997, 2024, Oracle and/or its affiliates.
- 
+
 
 ------
 
@@ -3483,13 +3483,13 @@ Reserved.
 # Unless otherwise agreed by Intel in writing, you may not  remove or alter this
 # notice or any other notice embedded in Materials by Intel or Intel's suppliers
 # or licensors in any way.
- 
+
 
 ------
 
 ** setuptools; version 58.1.0 -- https://pypi.org/project/setuptools
 Copyright Jason R. Coombs
- 
+
     * Package setuptools's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
@@ -3518,7 +3518,7 @@ IN THE SOFTWARE.
 
 ** jsonschema; version 4.21.1 -- https://github.com/python-jsonschema/jsonschema
 Copyright (c) 2013 Julian Berman
- 
+
     * Package jsonschema's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
@@ -3548,7 +3548,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ** efs-utils; version 2.0.4 -- https://github.com/aws/efs-utils
 Copyright 2017 Amazon.com, Inc. or its affiliates.
- 
+
 MIT License
 
 Copyright 2017 Amazon.com, Inc. or its affiliates.
@@ -3575,7 +3575,7 @@ SOFTWARE.
 
 ** tabulate; version 0.8.10 -- https://pypi.org/project/tabulate
 Copyright (c) 2011-2020 Sergey Astanin and contributors
- 
+
     * Package tabulate's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
@@ -3605,7 +3605,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ** gdrcopy; version 2.4 -- https://github.com/NVIDIA/gdrcopy/tree/v2.4
 Copyright (c) 2014-2021, NVIDIA CORPORATION. All rights reserved.
- 
+
     * Package gdrcopy's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/gdr_copy/
@@ -3637,7 +3637,7 @@ Copyright (c) 2017-2021 Ingy döt Net
 Copyright (c) 2006-2016 Kirill Simonov
 ** chevron; version 0.14.0 -- https://pypi.org/project/chevron/
 Copyright (c) 2014 Noah Morrison
- 
+
     * Package chevron's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
@@ -3666,9 +3666,9 @@ SOFTWARE.
 
 ------
 
-** libjwt; version 1.15.3 -- https://github.com/openpmix/openpmix
+** libjwt; version 1.17.0 -- https://github.com/openpmix/openpmix
 Copyright (C) 2015-2022 Ben Collins <bcollins@maclara-llc.com>
- 
+
     * Package libjwt's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/pmix/
@@ -4049,23 +4049,26 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 ------
 
-** NICE DCV; version 2023.1-16388 -- https://www.nice-dcv.com/
+** Amazon DCV; version 2024.0-18131 -- https://www.nice-dcv.com/
 © 2020, NICE s.r.l. or its affiliates. All rights reserved.
- 
-    * Package NICE DCV's source code may be found at:
+
+    * Package Amazon DCV's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/dcv
 
 END-USER LICENSE AGREEMENT (EULA)
 for NICE Software and Solutions
-(Version 8.3)
+(Version 8.4)
 
 This End User License Agreement ("EULA" or "Agreement") contains the terms
 and conditions that govern your ("Licensee" or "you" or "your") access to and
-use of NICE EnginFrame and NICE DCV (together with any updates or
-enhancements, and accompanying documentation, "Software") and NICE DCV Web
-Client software development kit ("SDK"). As used in this EULA, "NICE" means
-NICE, S.r.l. with principal offices located at Via Milliavacca, 9 - 14100
+use of NICE EnginFrame and Amazon DCV (together with any updates, including
+updates to the software name, or enhancements, and accompanying documentation,
+"Software") and Amazon DCV Web Client software development kit (together with
+any updates, including any updates to the software development kit name, or
+enhancements, and accompanying documentation,"SDK"). As used in this EULA,
+"NICE"
+means NICE, S.r.l. with principal offices located at Via Milliavacca, 9 - 14100
 Asti - Italy ("NICE IT"), except that if Licensee is located in the United
 States, "NICE" means NICE USA LLC, with principal offices at 410 Terry Avenue
 North, Seattle, Washington, 98109-5210 ("NICE US"). This EULA supplements
@@ -4193,8 +4196,8 @@ costs of the audit.
 6. SUPPORT SERVICES. Licensee may be eligible to subscribe to software
 support for any or all of the Software (the "Support Services", as described
 and regulated under the Standard Support Services for NICE Products terms,
-available here
-https://www.nice-software.com/html/pdf/NICE_Standard_Support_Services.pdf, as
+available here:
+https://www.nice-software.com/html/pdf/NICE_Standard_Support_Services.pdf , as
 may be updated). Support Services are subject to and governed by the terms of
 this EULA and the Customer Agreement, as is any update or upgrade to the
 Software provided by NICE in connection with Support Services. If the Support
@@ -4279,13 +4282,13 @@ prepaid by Licensee based a ten year life-span for the Software.
 
 10. SDK. If you downloaded the SDK, you may use, reproduce, distribute,
 publish, and sublicense the SDK, and create derivative works of the SDK and
-NICE DCV Web Client solely to the extent those derivative works implement the
-NICE DCV Web Client, subject to the following conditions:
+Amazon DCV Web Client solely to the extent those derivative works implement the
+Amazon DCV Web Client, subject to the following conditions:
 (a) You will not remove any proprietary notices or labels on the SDK or any
 copy thereof.
 (b) You will include this permission notice in all copies or substantial
 portions of the SDK.
-(c) You require that each end user before accessing the SDK, NICE DCV Web
+(c) You require that each end user before accessing the SDK, Amazon DCV Web
 Client, or any copies, derivative works or substantial portions thereof,
 agrees to comply with this EULA.
 (d) Some components of the SDK may be governed by third party software
@@ -4470,7 +4473,7 @@ EULA.
 
 ------
 
-** Nvidia Driver; version 550.90.07 -- https://www.nvidia.com/download/index.aspx?lang=en-us
+** Nvidia Driver; version 550.127.08 -- https://www.nvidia.com/download/index.aspx?lang=en-us
 IMPORTANT NOTICE -- READ CAREFULLY: This License For Customer Use of NVIDIA
 Software ("LICENSE") is the agreement which governs use of the software of
 NVIDIA Corporation and its subsidiaries ("NVIDIA") downloadable herefrom,
@@ -4478,7 +4481,7 @@ including computer software and associated printed materials ("SOFTWARE"). By
 downloading, installing, copying, or otherwise using the SOFTWARE, you agree to
 be bound by the terms of this LICENSE. If you do not agree to the terms of this
 LICENSE, do not download the SOFTWARE.
- 
+
     * Package Nvidia Driver's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/nvidia_driver/
@@ -4630,7 +4633,7 @@ laws, restrictions or regulations.
 
 ** Cuda Samples; version 12.4 -- https://github.com/NVIDIA/cuda-samples/
 Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
- 
+
     * Package Cuda Samples's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/cuda/samples/
@@ -4933,7 +4936,7 @@ representatives of both parties.
 
 ** Nvidia CUDA; version 12-4-1 -- https://developer.nvidia.com/cuda-toolkit
 © 2007-2020 NVIDIA Corporation. All rights reserved.
- 
+
     * Package Nvidia CUDA's source code may be found at:
       https://us-east-1-aws-
 parallelcluster.s3.amazonaws.com/archives/dependencies/cuda/
