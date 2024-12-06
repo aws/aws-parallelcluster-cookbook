@@ -16,7 +16,7 @@ default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '550.90.07'
+default['cluster']['nvidia']['driver_version'] = '550.127.08'
 default['cluster']['nvidia']['dcgm_version'] = '3.3.6'
 
 # DCV

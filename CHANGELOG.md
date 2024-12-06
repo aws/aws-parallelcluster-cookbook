@@ -23,6 +23,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.22.0-1`
   - Rdma-core: `rdma-core-54.0-1`
   - Open MPI: `openmpi40-aws-4.1.7-1` and `openmpi50-aws-5.0.5`
+- Upgrade NVIDIA driver to version 550.127.08 (from 550.90.07). This addresses [a known issue from Nivdia](https://docs.nvidia.com/datacenter/tesla/tesla-release-notes-550-90-07/index.html#known-issues).
 - Auto-restart slurmctld on failure.
 
 **BUG FIXES**
