@@ -10,7 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Extend Amazon DCV support to Ubuntu2204 on ARM instances.
 
 **CHANGES**
-- Upgrade mysql-community-client to version 8.0.39. 
+- Upgrade NVIDIA driver to version 550.127.08 (from 550.90.07). This addresses [a known issue from Nivdia](https://docs.nvidia.com/datacenter/tesla/tesla-release-notes-550-90-07/index.html#known-issues).
 - Upgrade Amazon DCV to version `2024.0-18131`.
   - server: `2024.0-18131-1`
   - xdcv: `2024.0.631-1`
@@ -23,8 +23,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: `libfabric-aws-1.22.0-1`
   - Rdma-core: `rdma-core-54.0-1`
   - Open MPI: `openmpi40-aws-4.1.7-1` and `openmpi50-aws-5.0.5`
-- Upgrade NVIDIA driver to version 550.127.08 (from 550.90.07). This addresses [a known issue from Nivdia](https://docs.nvidia.com/datacenter/tesla/tesla-release-notes-550-90-07/index.html#known-issues).
 - Auto-restart slurmctld on failure.
+- Upgrade mysql-community-client to version 8.0.39.
 
 **BUG FIXES**
 - Fix an issue in the way we get region when manage volumes so that it can correctly handle local zone.
