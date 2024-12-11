@@ -169,11 +169,13 @@ describe 'nvidia_driver:setup' do
           cached(:nvidia_driver_version) { 'nvidia_driver_version' }
         end
         cached(:nvidia_driver_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
+        cached(:kernel_compiler_version) { "KERNEL_COMPILER_VERSION" }
         cached(:chef_run) do
           stubs_for_resource('nvidia_driver') do |res|
             allow(res).to receive(:nvidia_driver_enabled?).and_return(true)
             allow(res).to receive(:nvidia_arch).and_return(nvidia_arch)
             allow(res).to receive(:nvidia_kernel_module).and_return(kernel_module)
+            allow(res).to receive(:gcc_major_version_used_by_kernel).and_return(kernel_compiler_version)
           end
 
           stub_command("lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau").and_return(true)
@@ -244,6 +246,33 @@ describe 'nvidia_driver:setup' do
               )
               .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
               .with_code(%r{rm -f /tmp/nvidia.run})
+          end
+        elsif platform == 'ubuntu' && version == '22.04'
+          it 'installs gcc' do
+            is_expected.to install_package('gcc').with_retries(10).with_retry_delay(5)
+          end
+
+          it 'creates dkms/nvidia.conf' do
+            compiler_path = "CC=/usr/bin/gcc-#{kernel_compiler_version}"
+            is_expected.to create_template('/etc/dkms/nvidia.conf').with(
+              source: 'nvidia/amazon/dkms/nvidia.conf.erb',
+              cookbook: 'aws-parallelcluster-platform',
+              owner: 'root',
+              group: 'root',
+              mode: '0644',
+              variables: { compiler_path: compiler_path }
+            )
+          end
+          it 'installs nvidia driver' do
+            compiler_path = "CC=/usr/bin/gcc-#{kernel_compiler_version}"
+            is_expected.to run_bash('nvidia.run advanced')
+              .with(
+                               user: 'root',
+                               group: 'root',
+                               cwd: '/tmp',
+                               creates: '/usr/bin/nvidia-smi'
+                             )
+              .with_code(%r{#{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
           end
         else
           it "doesn't install gcc10" do

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :nvidia_driver, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+  node['platform_version'].to_i == 20
 end
 
 use 'partial/_nvidia_driver_common.rb'

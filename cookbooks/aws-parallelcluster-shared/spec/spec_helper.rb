@@ -1,6 +1,9 @@
 require 'chefspec'
 require 'chefspec/berkshelf'
 
+# Chef::Mixin::ShellOut is required to mock shellout
+include Chef::Mixin::ShellOut
+
 RSpec.configure do |c|
   c.before(:each) do
     allow(File).to receive(:exist?).and_call_original
