@@ -120,6 +120,7 @@ jobs:
         with:
           omnitruckUrl: omnitruck.cinc.sh
           project: cinc-workstation
+          version: 23
       - name: Run ChefSpec on ${{ matrix.cookbook }}
         run: |
           cd ${{ matrix.cookbook }}
