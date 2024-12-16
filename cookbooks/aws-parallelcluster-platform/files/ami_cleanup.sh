@@ -9,6 +9,11 @@ rm -f /etc/udev/rules.d/70-persistent-net.rules
 grep -l "Created by cloud-init on instance boot automatically" /etc/sysconfig/network-scripts/ifcfg-* | xargs rm -f
 rm -rf /var/crash/*
 
+if [ -f /opt/parallelcluster/pin_releasesever ]; then
+  rm -f /opt/parallelcluster/pin_releasesever
+  rm -f /etc/yum/vars/releasever
+fi
+
 # https://bugs.centos.org/view.php?id=13836#c33128
 source /etc/os-release
 if [ "${ID}${VERSION_ID}" == "centos7" ]; then
