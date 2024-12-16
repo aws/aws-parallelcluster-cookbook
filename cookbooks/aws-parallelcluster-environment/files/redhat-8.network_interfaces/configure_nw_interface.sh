@@ -13,7 +13,8 @@ set -e
 
 if
   [ -z "${DEVICE_NAME}" ] ||          # name of the device
-  [ -z "${DEVICE_NUMBER}" ] ||        # number of the device
+  [ -z "${DEVICE_NUMBER}" ] ||        # index of the device
+  [ -z "${NETWORK_CARD_INDEX}" ] ||   # index of the network card
   [ -z "${GW_IP_ADDRESS}" ] ||        # gateway ip address
   [ -z "${DEVICE_IP_ADDRESS}" ] ||    # ip address to assign to the interface
   [ -z "${CIDR_PREFIX_LENGTH}" ]      # the prefix length of the device IP cidr block
@@ -23,9 +24,10 @@ then
 fi
 
 con_name="System ${DEVICE_NAME}"
-route_table="100${DEVICE_NUMBER}"
-priority="100${DEVICE_NUMBER}"
-metric="100${DEVICE_NUMBER}"
+SUFFIX=$(printf "%03d" $NETWORK_CARD_INDEX)$(printf "%03d" $DEVICE_NUMBER)
+route_table="1${SUFFIX}"
+priority="1${SUFFIX}"
+metric="1${SUFFIX}"
 
 # Rename connection
 original_con_name=`nmcli -t -f GENERAL.CONNECTION device show ${DEVICE_NAME} | cut -f2 -d':'`

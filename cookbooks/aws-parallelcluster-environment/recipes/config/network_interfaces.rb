@@ -16,7 +16,13 @@
 return if on_docker?
 
 def network_card_index(mac, token)
+  # This IMDS call is not available on single NIC instance, therefore fallback to 0
   uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/network-card")
+  get_metadata_with_token(token, uri) || 0
+end
+
+def device_number(mac, token)
+  uri = URI("http://169.254.169.254/latest/meta-data/network/interfaces/macs/#{mac}/device-number")
   get_metadata_with_token(token, uri)
 end
 
@@ -69,6 +75,7 @@ if macs.length > 1
   # Configure nw interfaces
   macs.each do |mac|
     device_name = device_name(mac)
+    device_number = device_number(mac, token)
     network_card_index = network_card_index(mac, token)
     gw_ip_address = gateway_address
     device_ip_address = device_ip(mac, token)
@@ -84,7 +91,8 @@ if macs.length > 1
       environment(
         # TODO: The variables are a superset of what's required by individual scripts. Consider simplification.
         'DEVICE_NAME' => device_name,
-        'DEVICE_NUMBER' => "#{network_card_index}", # in configure_nw_interface DEVICE_NUMBER actually means network card index
+        'DEVICE_NUMBER' => "#{device_number}",
+        'NETWORK_CARD_INDEX' => "#{network_card_index}",
         'GW_IP_ADDRESS' => gw_ip_address,
         'DEVICE_IP_ADDRESS' => device_ip_address,
         'CIDR_PREFIX_LENGTH' => cidr_prefix_length,

@@ -10,7 +10,8 @@ set -e
 
 if
   [ -z "${DEVICE_NAME}" ] ||          # name of the device
-  [ -z "${DEVICE_NUMBER}" ] ||        # number of the device
+  [ -z "${DEVICE_NUMBER}" ] ||        # index of the device
+  [ -z "${NETWORK_CARD_INDEX}" ] ||   # index of the network card
   [ -z "${GW_IP_ADDRESS}" ] ||        # gateway ip address
   [ -z "${DEVICE_IP_ADDRESS}" ] ||    # ip address to assign to the interface
   [ -z "${CIDR_PREFIX_LENGTH}" ] ||   # the prefix length of the device IP cidr block
@@ -40,7 +41,8 @@ if [ "${STATIC_IP_CONFIG}" = "" ]
 fi
 
 FILE="/etc/netplan/${DEVICE_NAME}.yaml"
-ROUTE_TABLE="100${DEVICE_NUMBER}"
+SUFFIX=$(printf "%03d" $NETWORK_CARD_INDEX)$(printf "%03d" $DEVICE_NUMBER)
+ROUTE_TABLE="1${SUFFIX}"
 
 echo "Configuring ${DEVICE_NAME} with IP:${DEVICE_IP_ADDRESS} CIDR_PREFIX:${CIDR_PREFIX_LENGTH} NETMASK:${NETMASK} GW:${GW_IP_ADDRESS} ROUTING_TABLE:${ROUTE_TABLE}"
 
