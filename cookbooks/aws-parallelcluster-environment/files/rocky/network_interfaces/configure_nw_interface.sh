@@ -24,10 +24,10 @@ then
 fi
 
 con_name="System ${DEVICE_NAME}"
-SUFFIX=$(printf "%03d" $NETWORK_CARD_INDEX)$(printf "%03d" $DEVICE_NUMBER)
-route_table="1${SUFFIX}"
-priority="1${SUFFIX}"
-metric="1${SUFFIX}"
+SUFFIX=$(printf "%03d" $NETWORK_CARD_INDEX)$(printf "%02d" $DEVICE_NUMBER)
+route_table="$(( $SUFFIX + 10 ))"
+priority="${route_table}"
+metric="${route_table}"
 
 # Rename connection
 original_con_name=`nmcli -t -f GENERAL.CONNECTION device show ${DEVICE_NAME} | cut -f2 -d':'`
