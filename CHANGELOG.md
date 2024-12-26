@@ -2,6 +2,11 @@ aws-parallelcluster-cookbook CHANGELOG
 ======================================
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
+3.13.0
+------
+
+**CHANGES**
+- On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
 
 3.12.0
 ------
@@ -25,7 +30,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: `openmpi40-aws-4.1.7-1` and `openmpi50-aws-5.0.5`
 - Auto-restart slurmctld on failure.
 - Upgrade mysql-community-client to version 8.0.39.
-- On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
+
 
 **BUG FIXES**
 - Fix retrieval of regions when managing volumes to correctly handle local zones.
