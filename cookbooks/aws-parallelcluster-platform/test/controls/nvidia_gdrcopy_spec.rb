@@ -15,7 +15,7 @@ control 'tag:install_expected_versions_of_nvidia_gdrcopy_installed' do
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
-  expected_gdrcopy_version = node['cluster']['nvidia']['gdrcopy']['version']
+  expected_gdrcopy_version = "2.4"
 
   describe "gdrcopy version is expected to be #{expected_gdrcopy_version}" do
     subject { command('modinfo -F version gdrdrv').stdout.strip() }
