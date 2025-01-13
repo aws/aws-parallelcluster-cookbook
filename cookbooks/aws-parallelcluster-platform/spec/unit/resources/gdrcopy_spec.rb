@@ -160,7 +160,7 @@ describe 'gdrcopy:gdrcopy_checksum' do
         expected_gdrcopy_checksum = if platform == "centos"
                                       "59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8"
                                     else
-                                      "39e74d505ca16160567f109cc23478580d157da897f134989df1d563e55f7a5b"
+                                      "8802f7bc4a589a610118023bdcdd83c10a56dea399acf6eeaac32e8cc10739a8"
                                     end
         expect(resource.gdrcopy_checksum).to eq(expected_gdrcopy_checksum)
       end
@@ -191,7 +191,7 @@ describe 'gdrcopy:setup' do
         if platform == 'centos'
           '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
         else
-          '39e74d505ca16160567f109cc23478580d157da897f134989df1d563e55f7a5b'
+          '8802f7bc4a589a610118023bdcdd83c10a56dea399acf6eeaac32e8cc10739a8'
         end
       end
       cached(:gdrcopy_service) { platform == 'ubuntu' ? 'gdrdrv' : 'gdrcopy' }
