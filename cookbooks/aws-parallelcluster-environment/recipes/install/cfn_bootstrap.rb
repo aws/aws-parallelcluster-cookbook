@@ -53,7 +53,7 @@ bash 'pip install' do
     REQ
 end
 
-cfnbootstrap_version = '2.0-28'
+cfnbootstrap_version = '2.0-32'
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']
