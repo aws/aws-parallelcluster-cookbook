@@ -16,6 +16,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - openssh-2.11.14 (from openssh-2.11.12)
   - yum-7.4.20 (from yum-7.4.13)
   - yum-epel-5.0.8 (from yum-epel-5.0.2)
+- Upgrade Pmix to 5.0.6 (from 5.0.3).
 
 3.12.0
 ------
