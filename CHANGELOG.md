@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
+- Upgrade `aws-cfn-bootstrap` to version 2.0-32.
 
 3.12.0
 ------
