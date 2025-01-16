@@ -267,10 +267,10 @@ describe 'gdrcopy:setup' do
 
         if platform == 'ubuntu'
           expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-deb-packages.sh})
-          expect(installation_code).to match(/dpkg -i gdrdrv-dkms_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
-          expect(installation_code).to match(/dpkg -i libgdrapi_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
-          expect(installation_code).to match(/dpkg -i gdrcopy-tests_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}\+cuda\*.deb/)
-          expect(installation_code).to match(/dpkg -i gdrcopy_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+          expect(installation_code).to match(/dpkg -i gdrdrv-dkms_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+          expect(installation_code).to match(/dpkg -i libgdrapi_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+          expect(installation_code).to match(/dpkg -i gdrcopy-tests_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}\+cuda\*.deb/)
+          expect(installation_code).to match(/dpkg -i gdrcopy_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
         elsif platform == 'centos'
           expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-rpm-packages.sh})
           expect(installation_code).to match(/rpm -q gdrcopy-kmod-#{gdrcopy_version}-1dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version}-1dkms.noarch.#{gdrcopy_platform}.rpm/)
