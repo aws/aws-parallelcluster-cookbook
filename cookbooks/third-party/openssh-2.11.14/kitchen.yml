@@ -1,0 +1,62 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_zero
+  product_name: chef
+  deprecations_as_errors: true
+  chef_license: accept-no-persist
+
+verifier:
+  name: inspec
+
+platforms:
+  - name: amazonlinux-2
+  - name: centos-7
+  - name: centos-stream-8
+  - name: debian-10
+  - name: debian-10
+  - name: freebsd-12
+  - name: fedora-latest
+  - name: opensuse-leap-15
+  - name: ubuntu-18.04
+  - name: ubuntu-20.04
+  - name: macosx-10.15
+    driver_config:
+      box: tas50/macos_10.15
+      provider: vmware_desktop
+  - name: windows-2016
+    driver_config:
+      box: tas50/windows_2016
+  - name: windows-2019
+    driver_config:
+      box: tas50/windows_2019
+
+suites:
+  - name: default
+    run_list: openssh::default
+    excludes:
+      - windows-2016
+      - windows-2019
+      - windows-latest
+  - name: iptables
+    run_list:
+      - openssh::default
+      - openssh::iptables
+    excludes:
+      - almalinux-8
+      - centos-7
+      - centos-stream-8
+      - macosx-10.15
+      - opensuse-leap-15
+      - rockylinux-8
+      - windows-2016
+      - windows-2019
+      - windows-latest
+  - name: windows-default
+    run_list: openssh::default
+    includes:
+      - windows-2016
+      - windows-2019
+      - windows-latest

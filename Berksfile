@@ -8,11 +8,11 @@ source chef_repo: "."
 metadata
 
 cookbook "iptables", path: "./cookbooks/third-party/iptables-8.0.0"
-cookbook "line", path: "./cookbooks/third-party/line-4.5.13"
-cookbook "nfs", path: "./cookbooks/third-party/nfs-5.1.2"
-cookbook "openssh", path: "./cookbooks/third-party/openssh-2.11.12"
-cookbook "yum", path: "./cookbooks/third-party/yum-7.4.13"
-cookbook "yum-epel", path: "./cookbooks/third-party/yum-epel-5.0.2"
+cookbook "line", path: "./cookbooks/third-party/line-4.5.21"
+cookbook "nfs", path: "./cookbooks/third-party/nfs-5.1.5"
+cookbook "openssh", path: "./cookbooks/third-party/openssh-2.11.14"
+cookbook "yum", path: "./cookbooks/third-party/yum-7.4.20"
+cookbook "yum-epel", path: "./cookbooks/third-party/yum-epel-5.0.8"
 
 cookbook "aws-parallelcluster-awsbatch", path: "./cookbooks/aws-parallelcluster-awsbatch"
 cookbook "aws-parallelcluster-computefleet", path: "./cookbooks/aws-parallelcluster-computefleet"

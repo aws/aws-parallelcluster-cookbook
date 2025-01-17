@@ -1,10 +1,7 @@
-** apt Cookbook -- https://github.com/sous-chefs/apt
 ** iptables cookbook -- https://github.com/sous-chefs/iptables
 ** line cookbook -- https://github.com/sous-chefs/line
 ** NFS cookbook -- https://github.com/atomic-penguin/cookbook-nfs
 ** openssh cookbook -- https://github.com/sous-chefs/openssh
-** pyenv cookbook -- https://github.com/sous-chefs/pyenv
-** SELinux cookbook -- https://github.com/sous-chefs/selinux
 ** yum cookbook -- https://github.com/sous-chefs/yum
 ** yum-epel cookbook -- https://github.com/sous-chefs/yum-epel
 
@@ -206,8 +203,7 @@ See the License for the specific language governing permissions and
 
 limitations under the License.
 
-* For apt Cookbook see also this required NOTICE:
-    Copyright: 2009-2017, Chef Software, Inc.
+
 * For iptables cookbook see also this required NOTICE:
     Copyright: 2008-2020, Chef Software, Inc.
 * For line cookbook see also this required NOTICE:
@@ -217,11 +213,6 @@ limitations under the License.
     2012, Riot Games Copyright 2012, Sean OMeara
 * For openssh cookbook see also this required NOTICE:
     Copyright: 2008-2019, Chef Software, Inc.
-* For pyenv cookbook see also this required NOTICE:
-    Copyright: 2014-2017, Shane da Silva
-    Copyright: 2017-2018, Darwin D. Wu
-* For SELinux cookbook see also this required NOTICE:
-    Copyright: 2008-2018, Chef Software, Inc.
 * For yum cookbook see also this required NOTICE:
     Copyright:: 2011 Eric G. Wolfe
     Copyright:: 2013-2017 Chef Software, Inc.

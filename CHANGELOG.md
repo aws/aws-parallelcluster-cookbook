@@ -10,6 +10,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade `aws-cfn-bootstrap` to version 2.0-32.
 - Upgrade amazon-efs-utils to version 2.1.0.
 - Remove third-party cookbook: apt-7.5.22 and pyenv-4.2.3.
+- Upgrade third-party cookbook dependencies:
+  - line-4.5.21 (from line-4.5.13)
+  - nfs-5.1.5 (from nfs-5.1.2)
+  - openssh-2.11.14 (from openssh-2.11.12)
+  - yum-7.4.20 (from yum-7.4.13)
+  - yum-epel-5.0.8 (from yum-epel-5.0.2)
 
 3.12.0
 ------

@@ -4,8 +4,8 @@ metadata
 
 cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
 
-cookbook "line", path: "../third-party/line-4.5.13"
+cookbook "line", path: "../third-party/line-4.5.21"
 
 # for shared cookbook
-cookbook "yum", path: "../third-party/yum-7.4.13"
-cookbook "yum-epel", path: "../third-party/yum-epel-5.0.2"
+cookbook "yum", path: "../third-party/yum-7.4.20"
+cookbook "yum-epel", path: "../third-party/yum-epel-5.0.8"
