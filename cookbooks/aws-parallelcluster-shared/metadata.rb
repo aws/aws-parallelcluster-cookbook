@@ -9,6 +9,5 @@ source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '>= 18'
 version '3.13.0'
 
-depends 'pyenv', '~> 4.2.3'
 depends 'yum', '~> 7.4.13'
 depends 'yum-epel', '~> 5.0.2'
