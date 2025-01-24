@@ -1,6 +1,6 @@
 ** iptables cookbook -- https://github.com/sous-chefs/iptables
 ** line cookbook -- https://github.com/sous-chefs/line
-** NFS cookbook -- https://github.com/atomic-penguin/cookbook-nfs
+** NFS cookbook -- https://github.com/sous-chefs/nfs
 ** openssh cookbook -- https://github.com/sous-chefs/openssh
 ** yum cookbook -- https://github.com/sous-chefs/yum
 ** yum-epel cookbook -- https://github.com/sous-chefs/yum-epel
