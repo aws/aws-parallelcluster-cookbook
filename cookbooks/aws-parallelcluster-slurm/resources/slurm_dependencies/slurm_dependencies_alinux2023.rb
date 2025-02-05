@@ -14,6 +14,10 @@ end
 
 use 'partial/_slurm_dependencies_common'
 
+http_parser_version = "2.9.4"
+http_parser_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/http_parser/v#{http_parser_version}.tar.gz"
+http_parser_tarball = "#{node['cluster']['sources_dir']}/http-parser-#{http_parser_version}.tar.gz"
+
 def dependencies
   %w(json-c-devel perl perl-Switch lua-devel dbus-devel)
 end
@@ -22,13 +26,25 @@ action :install_extra_dependencies do
   # http parser is no longer maintained, therefore Amazon Linux 2023 does have have the package in OS repos
   # https://docs.aws.amazon.com/linux/al2023/release-notes/removed-AL2023.4-AL2.html
   # Following https://slurm.schedmd.com/related_software.html#jwt for Installing Http-parser
-  bash 'Install http-parser' do
-    code <<-HTTP_PARSER
-    set -e
-    git clone --depth 1 --single-branch -b v2.9.4 https://github.com/nodejs/http-parser.git http_parser
-    cd http_parser
-    make
-    make install
-    HTTP_PARSER
+
+  remote_file "#{http_parser_tarball}" do
+    source "#{http_parser_url}"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
+
+  bash 'make install' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['sources_dir']}"
+    code <<-HTTP
+      set -e
+      tar xf #{http_parser_tarball}
+      cd http-parser-#{http_parser_version}
+      make
+      make install
+    HTTP
   end
 end
