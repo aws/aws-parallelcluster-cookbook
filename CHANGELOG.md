@@ -2,6 +2,7 @@ aws-parallelcluster-cookbook CHANGELOG
 ======================================
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
+
 3.13.0
 ------
 
@@ -18,6 +19,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - yum-epel-5.0.8 (from yum-epel-5.0.2)
 - Upgrade Pmix to 5.0.6 (from 5.0.3).
 - Upgrade ARM PL to version 24.10 (from 23.10).
+- Remove generation of DSA keys for login nodes as DSA, which became unsupported in OpenSSH 9.7+.
 
 3.12.0
 ------
