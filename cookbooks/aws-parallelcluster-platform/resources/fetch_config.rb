@@ -9,23 +9,6 @@ property :update, [true, false],
 
 default_action :run
 
-
-action :share_dna_files do
-  return if on_docker?
-
-  Chef::Log.info("Share extra.json with all nodes")
-  ::FileUtils.cp_r('/tmp/extra.json', "#{node['cluster']['shared_dir']}/dna/extra.json",remove_destination: true)
-  ::FileUtils.cp_r('/tmp/extra.json', "#{node['cluster']['shared_dir_login_nodes']}/dna/extra.json",remove_destination: true)
-
-  execute "Share DNA files" do
-    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/get_compute_user_data.py" \
-              " --region #{node['cluster']['region']}"
-    timeout 30
-    retries 10
-    retry_delay 90
-  end
-end
-
 action :run do
   return if on_docker?
   Chef::Log.debug("Called fetch_config with update (#{new_resource.update})")
@@ -36,8 +19,6 @@ action :run do
   case node['cluster']['node_type']
   when 'HeadNode'
     if new_resource.update
-      action_share_dna_files
-
       Chef::Log.info("Backing up old configuration from (#{node['cluster']['cluster_config_path']}) to (#{node['cluster']['previous_cluster_config_path']})")
       ::FileUtils.cp_r(node['cluster']['cluster_config_path'], node['cluster']['previous_cluster_config_path'], remove_destination: true)
       fetch_cluster_config(node['cluster']['cluster_config_path'])
