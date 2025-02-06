@@ -282,10 +282,6 @@ template "#{node['cluster']['etc_dir']}/cfnconfig" do
   mode '0644'
 end
 
-execute "Cleanup DNA files" do
-  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/get_compute_user_data.py" \
-            " --region #{node['cluster']['region']} --cleanup"
-  timeout 30
-  retries 10
-  retry_delay 90
+fetch_dna_files 'Cleanup' do
+  action :cleanup
 end

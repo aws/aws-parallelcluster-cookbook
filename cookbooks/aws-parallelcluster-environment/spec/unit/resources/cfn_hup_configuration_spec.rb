@@ -56,7 +56,7 @@ describe 'cfn_hup_configuration:configure' do
 
           it "creates the file /etc/cfn/cfn-hup.conf" do
             is_expected.to create_template("/etc/cfn/cfn-hup.conf")
-                             .with(source: 'cfn_hup/cfn-hup.conf.erb')
+                             .with(source: 'cfn_hup_configuration/cfn-hup.conf.erb')
                              .with(user: "root")
                              .with(group: "root")
                              .with(mode: "0400")
@@ -70,7 +70,7 @@ describe 'cfn_hup_configuration:configure' do
 
           it "creates the file /etc/cfn/hooks.d/pcluster-update.conf" do
             is_expected.to create_template("/etc/cfn/hooks.d/pcluster-update.conf")
-                             .with(source: 'cfn_hup/cfn-hook-update.conf.erb')
+                             .with(source: 'cfn_hup_configuration/cfn-hook-update.conf.erb')
                              .with(user: "root")
                              .with(group: "root")
                              .with(mode: "0400")
@@ -87,7 +87,7 @@ describe 'cfn_hup_configuration:configure' do
           if %(ComputeFleet).include?(node_type)
             it "creates the file #{SCRIPT_DIR}/cfn-hup-update-action.sh" do
               is_expected.to create_template("#{SCRIPT_DIR}/cfn-hup-update-action.sh")
-                               .with(source: "cfn_hup/#{node_type}/cfn-hup-update-action.sh.erb")
+                               .with(source: "cfn_hup_configuration/#{node_type}/cfn-hup-update-action.sh.erb")
                                .with(user: "root")
                                .with(group: "root")
                                .with(mode: "0744")
@@ -99,7 +99,7 @@ describe 'cfn_hup_configuration:configure' do
           elsif node_type == 'HeadNode'
             it "creates #{SCRIPT_DIR}/get_compute_user_data.py" do
               is_expected.to create_if_missing_cookbook_file("#{SCRIPT_DIR}/get_compute_user_data.py")
-                               .with(source: 'cfn_hup/get_compute_user_data.py')
+                               .with(source: 'cfn_hup_configuration/get_compute_user_data.py')
                                .with(user: 'root')
                                .with(group: 'root')
                                .with(mode: '0755')

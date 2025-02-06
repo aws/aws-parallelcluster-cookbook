@@ -39,7 +39,7 @@ action :configure do
   end
 
   template '/etc/cfn/cfn-hup.conf' do
-    source 'cfn_hup/cfn-hup.conf.erb'
+    source 'cfn_hup_configuration/cfn-hup.conf.erb'
     owner 'root'
     group 'root'
     mode '0400'
@@ -54,7 +54,7 @@ action :configure do
   action_extra_configuration
 
   template '/etc/cfn/hooks.d/pcluster-update.conf' do
-    source "cfn_hup/cfn-hook-update.conf.erb"
+    source "cfn_hup_configuration/cfn-hook-update.conf.erb"
     owner 'root'
     group 'root'
     mode '0400'
@@ -73,7 +73,7 @@ action :extra_configuration do
   case node['cluster']['node_type']
   when 'HeadNode'
     cookbook_file "#{node['cluster']['scripts_dir']}/get_compute_user_data.py" do
-      source 'cfn_hup/get_compute_user_data.py'
+      source 'cfn_hup_configuration/get_compute_user_data.py'
       owner 'root'
       group 'root'
       mode '0755'
@@ -84,7 +84,7 @@ action :extra_configuration do
 
   when 'ComputeFleet'
     template "#{node['cluster']['scripts_dir']}/cfn-hup-update-action.sh" do
-      source "cfn_hup/#{node['cluster']['node_type']}/cfn-hup-update-action.sh.erb"
+      source "cfn_hup_configuration/#{node['cluster']['node_type']}/cfn-hup-update-action.sh.erb"
       owner 'root'
       group 'root'
       mode '0744' # TODO: Change permission
