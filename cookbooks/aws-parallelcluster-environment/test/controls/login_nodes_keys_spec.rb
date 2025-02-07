@@ -11,9 +11,6 @@
 
 key_types = %w(ecdsa ed25519 rsa)
 is_ubuntu = os_properties.ubuntu?
-if is_ubuntu
-  key_types << 'dsa'
-end
 
 control 'head_node_directory_initialized' do
   only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' }

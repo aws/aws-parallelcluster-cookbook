@@ -38,9 +38,6 @@ function create_keys() {
   ssh-keygen -t ecdsa -f "$FOLDER_PATH/ssh_host_ecdsa_key" -q -P ""
   ssh-keygen -t ed25519 -f "$FOLDER_PATH/ssh_host_ed25519_key" -q -P ""
   ssh-keygen -t rsa -f "$FOLDER_PATH/ssh_host_rsa_key" -q -P ""
-  if is_ubuntu; then
-    ssh-keygen -t dsa -f "$FOLDER_PATH/ssh_host_dsa_key" -q -P ""
-  fi
 }
 
 function import_keys() {
@@ -50,7 +47,6 @@ function import_keys() {
   cp "$FOLDER_PATH/ssh_host_ed25519"* /etc/ssh/
   cp "$FOLDER_PATH/ssh_host_rsa"* /etc/ssh/
   if is_ubuntu; then
-    cp "$FOLDER_PATH/ssh_host_dsa"* /etc/ssh/
     chown root:root /etc/ssh/ssh_host_*
     chmod 600 /etc/ssh/ssh_host_*_key
   else
