@@ -15,34 +15,37 @@
 import argparse
 from email import message_from_string
 import json
-import mimetypes
 import os
 import boto3
 import yaml
 import base64
+import logging
+from retrying import retry
 
 SHARED_LOCATION = "/opt/parallelcluster/"
 
 COMPUTE_FLEET_SHARED_LOCATION = SHARED_LOCATION + 'shared/'
-LOGIN_POOL_SHARED_LOCATION = SHARED_LOCATION + 'shared_login_nodes/'
 
 COMPUTE_FLEET_DNA_LOC = COMPUTE_FLEET_SHARED_LOCATION + 'dna/'
-LOGIN_POOL_DNA_LOC = LOGIN_POOL_SHARED_LOCATION + 'dna/'
 
 COMPUTE_FLEET_LAUNCH_TEMPLATE_ID = COMPUTE_FLEET_SHARED_LOCATION + 'launch-templates-config.json'
 
-LOGIN_POOL_LAUNCH_TEMPLATE_ID = LOGIN_POOL_SHARED_LOCATION + 'launch-templates-config.json'
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
+
+def get_compute_launch_template_ids(shared_storage):
+    """Load launch-templates-config.json which contains ID, Version number and Logical ID of all queues in Compute Fleet's Launch Template."""
+    try:
+        with open(shared_storage, 'r') as file:
+            lt_config = json.loads(file.read())
+        return  lt_config
+    except Exception as err:
+        logger.warn("Unable to read %s due to %s", shared_storage, err)
 
 
-
-def get_launch_template_details(shared_storage):
-    with open(shared_storage, 'r') as file:
-        lt_config = json.loads(file.read())
-    return  lt_config
-
-
-def get_compute_launch_template_ids(args):
-    lt_config = get_launch_template_details(COMPUTE_FLEET_LAUNCH_TEMPLATE_ID)
+def create_dna_files(args):
+    """Creates all dna.json for each queue in cluster."""
+    lt_config = get_compute_launch_template_ids(COMPUTE_FLEET_LAUNCH_TEMPLATE_ID)
     if lt_config:
         all_queues = lt_config.get('Queues')
         for _, queues in all_queues.items():
@@ -51,15 +54,15 @@ def get_compute_launch_template_ids(args):
                 get_latest_dns_data(compute_res, COMPUTE_FLEET_DNA_LOC, args)
 
 
-def get_login_pool_launch_template_ids(args):
-    lt_config = get_launch_template_details(LOGIN_POOL_LAUNCH_TEMPLATE_ID)
-    if lt_config:
-        login_pools = lt_config.get('LoginPools')
-        for _, pool in login_pools.items():
-            get_latest_dns_data(pool, LOGIN_POOL_DNA_LOC, args)
-
-
+@retry(stop_max_attempt_number=5, wait_fixed=3000)
 def get_user_data(lt_id, lt_version, region_name):
+    """
+    Calls EC2 DescribeLaunchTemplateVersions API to get UserData from Launch Template specified.
+    :param lt_id: Launch Template ID (eg: lt-12345678901234567)
+    :param lt_version: Launch Template latest Version Number (eg: 2)
+    :param region_name: AWS region name (eg: us-east-1)
+    :return: User_data in MIME format
+    """
     try:
         ec2_client = boto3.client("ec2", region_name=region_name)
         response = ec2_client.describe_launch_template_versions(
@@ -70,11 +73,19 @@ def get_user_data(lt_id, lt_version, region_name):
         ).get('LaunchTemplateVersions')
         decoded_data = base64.b64decode(response[0]['LaunchTemplateData']['UserData'], validate=True).decode('utf-8')
         return decoded_data
-    except Exception as e: # binascii.Error:
-        print("Exception raised", e)
+    except Exception as err:
+        if hasattr(err, "message"):
+            err = err.message
+        logger.error(
+            "Unable to get UserData for launch template%s with version %s.\nException: %s",
+            lt_id, lt_version, err
+        )
 
 
 def parse_mime_user_data(user_data):
+    """
+    Parses MIME formatted UserData that we get from EC2 to extract write_files section from cloud-config section.
+    """
     data = message_from_string(user_data)
     for cloud_config_section in data.walk():
         if cloud_config_section.get_content_type() == 'text/cloud-config':
@@ -84,29 +95,49 @@ def parse_mime_user_data(user_data):
 
 
 def write_dna_files(write_files_section, shared_storage_loc):
-    for data in write_files_section:
-        if data['path'] in ['/tmp/dna.json']:
-            with open(shared_storage_loc+"-dna.json" ,"w") as file:
-                file.write(json.dumps(json.loads(data['content']),indent=4))
-
+    """
+    Writes the dna.json in shared location after extracting it from write_files section of UserData.
+    :param write_files_section: Entire write_files section from UserData
+    :param shared_storage_loc: Shared Storage Location of where to write dna.json
+    :return: None
+    """
+    try:
+        file_path = shared_storage_loc+"-dna.json"
+        for data in write_files_section:
+            if data['path'] in ['/tmp/dna.json']:
+                with open(file_path,"w") as file:
+                    file.write(json.dumps(json.loads(data['content']),indent=4))
+    except Exception as err:
+        if hasattr(err, "message"):
+            err = err.message
+        logger.error("Unable to write %s due to %s", file_path, err)
 
 def get_latest_dns_data(resource, output_location, args):
+    """
+    Function to get latest User Data, extract relevant details and write dna.json.
+    :param resource: Resource containing LT ID, Version and Logical id
+    :param output_location: Shared Storage Location were we want to write dna.json
+    :param args: Command Line arguments
+    :rtype: None
+    """
     user_data = get_user_data(resource.get('LaunchTemplate').get('Id'), resource.get('LaunchTemplate').get('Version'), args.region)
     write_directives = parse_mime_user_data(user_data)
     write_dna_files(write_directives, output_location+resource.get('LaunchTemplate').get("LogicalId"))
 
 def cleanup(directory_loc):
+    """Cleanup dna.json and extra.json files."""
     for f in os.listdir(directory_loc):
         f_path = os.path.join(directory_loc, f)
         try:
             if os.path.isfile(f_path):
                 os.remove(f_path)
-        except Exception as e:
-            print(f"Error deleting {f_path}: {e}")
+        except Exception as err:
+            logger.warn(f"Unable to delete %s due to %s", f_path, err)
 
 def _parse_cli_args():
+    """Parse command line args."""
     parser = argparse.ArgumentParser(
-        description="Get latest User Data from Compute and Login Node Launch Templates.", exit_on_error=False
+        description="Get latest User Data from ComputeFleet Launch Templates.", exit_on_error=False
     )
 
     parser.add_argument(
@@ -133,13 +164,17 @@ def _parse_cli_args():
 
 
 def main():
-    args = _parse_cli_args()
-    if args.cleanup:
-        cleanup(COMPUTE_FLEET_DNA_LOC)
-        cleanup(LOGIN_POOL_DNA_LOC)
-    else:
-        get_compute_launch_template_ids(args)
-    #get_login_pool_launch_template_ids(args)
+    try:
+        args = _parse_cli_args()
+        if args.cleanup:
+            cleanup(COMPUTE_FLEET_DNA_LOC)
+        else:
+            create_dna_files(args)
+    except Exception as err:
+        if hasattr(err, "message"):
+            err = err.message
+        logger.exception("Encountered exception when fetching latest dna.json for ComputeFleet, exiting gracefully: %s", err)
+        raise SystemExit(0)
 
 
 if __name__ == "__main__":
