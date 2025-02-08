@@ -4,7 +4,7 @@
 set category arm
 set name     armpl
 set version  <%= @armpl_version %>
-set major_minor_version  <%= @armpl_major_minor_version %>
+set major_minor_version  <%= @armpl_version %>
 set gcc_version <%= @gcc_major_minor_version %>
 set root     /opt/$category/$name/$version
 
@@ -40,7 +40,7 @@ puts stderr "At compile time add '-I<armpl_include>' and at link time"
   }
 
   # Load the pre-installed armpl module
-  module load $root/modulefiles/armpl/${full_version}_gcc-${gcc_version}
+  module load $root/modulefiles/armpl/${full_version}_gcc
 
   # EULA
   if [ module-info mode load ] {
