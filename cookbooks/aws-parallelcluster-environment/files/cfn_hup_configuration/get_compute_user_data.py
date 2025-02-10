@@ -38,9 +38,11 @@ def get_compute_launch_template_ids(shared_storage):
     try:
         with open(shared_storage, 'r') as file:
             lt_config = json.loads(file.read())
-        return  lt_config
     except Exception as err:
         logger.warn("Unable to read %s due to %s", shared_storage, err)
+
+    return  lt_config
+
 
 
 def create_dna_files(args):
@@ -72,7 +74,6 @@ def get_user_data(lt_id, lt_version, region_name):
             ],
         ).get('LaunchTemplateVersions')
         decoded_data = base64.b64decode(response[0]['LaunchTemplateData']['UserData'], validate=True).decode('utf-8')
-        return decoded_data
     except Exception as err:
         if hasattr(err, "message"):
             err = err.message
@@ -80,6 +81,9 @@ def get_user_data(lt_id, lt_version, region_name):
             "Unable to get UserData for launch template%s with version %s.\nException: %s",
             lt_id, lt_version, err
         )
+
+    return decoded_data
+
 
 
 def parse_mime_user_data(user_data):
