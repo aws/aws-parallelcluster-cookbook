@@ -53,7 +53,7 @@ control 'tag:config_cfn_hup_compute_configuration' do
 
   describe file("#{node['cluster']['scripts_dir']}/cfn-hup-update-action.sh") do
     it { should exist }
-    its('mode') { should cmp '0744' }
+    its('mode') { should cmp '0700' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end

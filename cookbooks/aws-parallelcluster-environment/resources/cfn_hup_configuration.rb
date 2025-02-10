@@ -87,7 +87,7 @@ action :extra_configuration do
       source "cfn_hup_configuration/#{node['cluster']['node_type']}/cfn-hup-update-action.sh.erb"
       owner 'root'
       group 'root'
-      mode '0744' # TODO: Change permission
+      mode '0700'
       variables(
         monitor_shared_dir: monitor_shared_dir,
         launch_template_resource_id: node['cluster']['launch_template_id']

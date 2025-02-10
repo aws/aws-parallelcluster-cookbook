@@ -90,7 +90,7 @@ describe 'cfn_hup_configuration:configure' do
                                .with(source: "cfn_hup_configuration/#{node_type}/cfn-hup-update-action.sh.erb")
                                .with(user: "root")
                                .with(group: "root")
-                               .with(mode: "0744")
+                               .with(mode: "0700")
                                .with(variables: {
                                  monitor_shared_dir: "#{MONITOR_SHARED_DIR}/dna",
                                  launch_template_resource_id: LAUNCH_TEMPLATE_ID,
