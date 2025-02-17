@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright:: 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -27,14 +27,14 @@ action :configure do
   directory '/etc/cfn' do
     owner 'root'
     group 'root'
-    mode '0770'
+    mode '0700'
     recursive true
   end
 
   directory '/etc/cfn/hooks.d' do
     owner 'root'
     group 'root'
-    mode '0770'
+    mode '0700'
     recursive true
   end
 
@@ -64,7 +64,8 @@ action :configure do
       cloudformation_url: cloudformation_url,
       cfn_init_role: instance_role_name,
       launch_template_resource_id: node['cluster']['launch_template_id'],
-      update_hook_script_dir: node['cluster']['scripts_dir']
+      update_hook_script_dir: node['cluster']['scripts_dir'],
+      node_bootstrap_timeout: node['cluster']['compute_node_bootstrap_timeout'] || node['cluster']['Timeout']
     )
   end
 end
@@ -72,11 +73,11 @@ end
 action :extra_configuration do
   case node['cluster']['node_type']
   when 'HeadNode'
-    cookbook_file "#{node['cluster']['scripts_dir']}/get_compute_user_data.py" do
-      source 'cfn_hup_configuration/get_compute_user_data.py'
+    cookbook_file "#{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" do
+      source 'cfn_hup_configuration/share_compute_fleet_dna.py'
       owner 'root'
       group 'root'
-      mode '0755'
+      mode '0700'
       action :create_if_missing
     end
 

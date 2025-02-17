@@ -18,6 +18,7 @@ INSTANCE_ROLE_NAME = "INSTANCE_ROLE_NAME".freeze
 LAUNCH_TEMPLATE_ID = "LAUNCH_TEMPLATE_ID".freeze
 SCRIPT_DIR = "SCRIPT_DIR".freeze
 MONITOR_SHARED_DIR = "MONITOR_SHARED_DIR".freeze
+NODE_BOOTSTRAP_TIMEOUT = "1800"
 
 describe 'cfn_hup_configuration:configure' do
   for_all_oses do |platform, version|
@@ -39,6 +40,7 @@ describe 'cfn_hup_configuration:configure' do
               node.override["cluster"]["launch_template_id"] = LAUNCH_TEMPLATE_ID
               node.override['cluster']['scripts_dir'] = SCRIPT_DIR
               node.override['cluster']['shared_dir'] = MONITOR_SHARED_DIR
+              node.override['cluster']['compute_node_bootstrap_timeout'] = NODE_BOOTSTRAP_TIMEOUT
             end
             ConvergeCfnHupConfiguration.configure(runner)
           end
@@ -49,7 +51,7 @@ describe 'cfn_hup_configuration:configure' do
               is_expected.to create_directory(dir)
                                .with(owner: 'root')
                                .with(group: 'root')
-                               .with(mode:  "0770")
+                               .with(mode:  "0700")
                                .with(recursive: true)
             end
           end
@@ -81,6 +83,7 @@ describe 'cfn_hup_configuration:configure' do
                                cfn_init_role: INSTANCE_ROLE_NAME,
                                launch_template_resource_id: LAUNCH_TEMPLATE_ID,
                                update_hook_script_dir: SCRIPT_DIR,
+                               node_bootstrap_timeout: NODE_BOOTSTRAP_TIMEOUT,
                              })
           end
 
@@ -97,12 +100,12 @@ describe 'cfn_hup_configuration:configure' do
                                })
             end
           elsif node_type == 'HeadNode'
-            it "creates #{SCRIPT_DIR}/get_compute_user_data.py" do
-              is_expected.to create_if_missing_cookbook_file("#{SCRIPT_DIR}/get_compute_user_data.py")
-                               .with(source: 'cfn_hup_configuration/get_compute_user_data.py')
+            it "creates #{SCRIPT_DIR}/share_compute_fleet_dna.py" do
+              is_expected.to create_if_missing_cookbook_file("#{SCRIPT_DIR}/share_compute_fleet_dna.py")
+                               .with(source: 'cfn_hup_configuration/share_compute_fleet_dna.py')
                                .with(user: 'root')
                                .with(group: 'root')
-                               .with(mode: '0755')
+                               .with(mode: '0700')
             end
 
             it "creates the directory #{MONITOR_SHARED_DIR}/dna" do

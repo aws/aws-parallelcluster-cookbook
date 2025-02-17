@@ -1,4 +1,4 @@
-# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License. A copy of the License is located at
@@ -15,7 +15,7 @@ control 'tag:config_cfn_hup_conf_files_created' do
   %w(/etc/cfn /etc/cfn/hooks.d).each do |dir|
     describe directory(dir) do
       it { should exist }
-      its('mode') { should cmp '0770' }
+      its('mode') { should cmp '0700' }
       its('owner') { should eq 'root' }
       its('group') { should eq 'root' }
     end
@@ -35,9 +35,9 @@ control 'tag:config_cfn_hup_head_node_configuration' do
   title "cfn_hup configuration files and directories for HeadNode should be created"
   only_if { instance.head_node? }
 
-  describe file("#{node['cluster']['scripts_dir']}/get_compute_user_data.py") do
+  describe file("#{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py") do
     it { should exist }
-    its('mode') { should cmp '0400' }
+    its('mode') { should cmp '0700' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end

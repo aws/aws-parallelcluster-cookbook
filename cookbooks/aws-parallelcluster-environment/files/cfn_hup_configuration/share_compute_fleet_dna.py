@@ -1,4 +1,4 @@
-# Copyright 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the
@@ -11,49 +11,88 @@
 # limitations under the License.
 
 
-
+import configparser
 import argparse
 from email import message_from_string
 import json
 import os
 import boto3
+from botocore.config import Config
 import yaml
 import base64
 import logging
 from retrying import retry
 
-SHARED_LOCATION = "/opt/parallelcluster/"
+COMPUTE_FLEET_SHARED_LOCATION = "/opt/parallelcluster/shared/"
 
-COMPUTE_FLEET_SHARED_LOCATION = SHARED_LOCATION + 'shared/'
+COMPUTE_FLEET_SHARED_DNA_LOCATION = COMPUTE_FLEET_SHARED_LOCATION + 'dna/'
 
-COMPUTE_FLEET_DNA_LOC = COMPUTE_FLEET_SHARED_LOCATION + 'dna/'
-
-COMPUTE_FLEET_LAUNCH_TEMPLATE_ID = COMPUTE_FLEET_SHARED_LOCATION + 'launch-templates-config.json'
+COMPUTE_FLEET_LAUNCH_TEMPLATE_CONFIG = COMPUTE_FLEET_SHARED_LOCATION + 'launch-templates-config.json'
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 
-def get_compute_launch_template_ids(shared_storage):
-    """Load launch-templates-config.json which contains ID, Version number and Logical ID of all queues in Compute Fleet's Launch Template."""
+def get_compute_launch_template_ids(lt_config_file_name):
+    """Load launch-templates-config.json which contains ID, Version number and Logical ID of all queues in Compute Fleet's Launch Template.
+    The format of launch-templates-config.json is
+     {
+        "Queues": {
+            "queue1": {
+                "ComputeResources": {
+                    "queue1-i1": {
+                        "LaunchTemplate": {
+                            "Version": "1",
+                            "LogicalId": "LaunchTemplate123456789012345",
+                            "Id": "lt-12345678901234567"
+                        }
+                    }
+                }
+            },
+            "queue2": {
+                "ComputeResources": {
+                    "queue2-i1": {
+                        "LaunchTemplate": {
+                            "Version": "1",
+                            "LogicalId": "LaunchTemplate012345678901234",
+                            "Id": "lt-01234567890123456"
+                        }
+                    }
+                }
+            }
+        }
+     }
+    """
+    lt_config = None
     try:
-        with open(shared_storage, 'r') as file:
+        with open(lt_config_file_name, 'r') as file:
             lt_config = json.loads(file.read())
     except Exception as err:
-        logger.warn("Unable to read %s due to %s", shared_storage, err)
+        logger.warn("Unable to read %s due to %s", lt_config_file_name, err)
 
     return  lt_config
 
 
-
-def create_dna_files(args):
+def share_compute_fleet_dna(args):
     """Creates all dna.json for each queue in cluster."""
-    lt_config = get_compute_launch_template_ids(COMPUTE_FLEET_LAUNCH_TEMPLATE_ID)
+    lt_config = get_compute_launch_template_ids(COMPUTE_FLEET_LAUNCH_TEMPLATE_CONFIG)
     if lt_config:
         all_queues = lt_config.get('Queues')
         for _, queues in all_queues.items():
             compute_resources = queues.get('ComputeResources')
             for _, compute_res in compute_resources.items():
-                get_latest_dns_data(compute_res, COMPUTE_FLEET_DNA_LOC, args)
+                get_latest_dna_data(compute_res, COMPUTE_FLEET_SHARED_DNA_LOCATION, args)
+
+
+# FIXME: Fix Code Duplication
+def parse_proxy_config():
+    config = configparser.RawConfigParser()
+    config.read("/etc/boto.cfg")
+    proxy_config = Config()
+    if config.has_option("Boto", "proxy") and config.has_option("Boto", "proxy_port"):
+        proxy = config.get("Boto", "proxy")
+        proxy_port = config.get("Boto", "proxy_port")
+        proxy_config = Config(proxies={"https": f"{proxy}:{proxy_port}"})
+    return proxy_config
 
 
 @retry(stop_max_attempt_number=5, wait_fixed=3000)
@@ -65,8 +104,11 @@ def get_user_data(lt_id, lt_version, region_name):
     :param region_name: AWS region name (eg: us-east-1)
     :return: User_data in MIME format
     """
+    decoded_data = None
     try:
-        ec2_client = boto3.client("ec2", region_name=region_name)
+        proxy_config = parse_proxy_config()
+
+        ec2_client = boto3.client("ec2", region_name=region_name, config=proxy_config)
         response = ec2_client.describe_launch_template_versions(
             LaunchTemplateId= lt_id,
             Versions=[
@@ -78,23 +120,25 @@ def get_user_data(lt_id, lt_version, region_name):
         if hasattr(err, "message"):
             err = err.message
         logger.error(
-            "Unable to get UserData for launch template%s with version %s.\nException: %s",
+            "Unable to get UserData for launch template %s with version %s.\nException: %s",
             lt_id, lt_version, err
         )
 
     return decoded_data
 
 
-
-def parse_mime_user_data(user_data):
+def get_write_directives_section(user_data):
     """
     Parses MIME formatted UserData that we get from EC2 to extract write_files section from cloud-config section.
     """
-    data = message_from_string(user_data)
-    for cloud_config_section in data.walk():
-        if cloud_config_section.get_content_type() == 'text/cloud-config':
-            write_directives_section = yaml.safe_load(cloud_config_section._payload).get('write_files')
-
+    write_directives_section = None
+    try:
+        data = message_from_string(user_data)
+        for cloud_config_section in data.walk():
+            if cloud_config_section.get_content_type() == 'text/cloud-config':
+                write_directives_section = yaml.safe_load(cloud_config_section._payload).get('write_files')
+    except Exception as err:
+        logger.error("Error occurred while parsing write_files section.\nException: %s", err)
     return write_directives_section
 
 
@@ -116,7 +160,8 @@ def write_dna_files(write_files_section, shared_storage_loc):
             err = err.message
         logger.error("Unable to write %s due to %s", file_path, err)
 
-def get_latest_dns_data(resource, output_location, args):
+
+def get_latest_dna_data(resource, output_location, args):
     """
     Function to get latest User Data, extract relevant details and write dna.json.
     :param resource: Resource containing LT ID, Version and Logical id
@@ -125,8 +170,10 @@ def get_latest_dns_data(resource, output_location, args):
     :rtype: None
     """
     user_data = get_user_data(resource.get('LaunchTemplate').get('Id'), resource.get('LaunchTemplate').get('Version'), args.region)
-    write_directives = parse_mime_user_data(user_data)
-    write_dna_files(write_directives, output_location+resource.get('LaunchTemplate').get("LogicalId"))
+    if user_data:
+        write_directives = get_write_directives_section(user_data)
+        write_dna_files(write_directives, output_location+resource.get('LaunchTemplate').get("LogicalId"))
+
 
 def cleanup(directory_loc):
     """Cleanup dna.json and extra.json files."""
@@ -137,6 +184,7 @@ def cleanup(directory_loc):
                 os.remove(f_path)
         except Exception as err:
             logger.warn(f"Unable to delete %s due to %s", f_path, err)
+
 
 def _parse_cli_args():
     """Parse command line args."""
@@ -157,7 +205,6 @@ def _parse_cli_args():
         "-c",
         "--cleanup",
         action="store_true",
-        default=False,
         required=False,
         help="Cleanup DNA files created",
     )
@@ -171,9 +218,9 @@ def main():
     try:
         args = _parse_cli_args()
         if args.cleanup:
-            cleanup(COMPUTE_FLEET_DNA_LOC)
+            cleanup(COMPUTE_FLEET_SHARED_DNA_LOCATION)
         else:
-            create_dna_files(args)
+            share_compute_fleet_dna(args)
     except Exception as err:
         if hasattr(err, "message"):
             err = err.message

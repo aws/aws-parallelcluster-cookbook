@@ -45,9 +45,9 @@ describe 'fetch_dna_files resource' do
         #                    .with(source: "file://#{kitchen_instance_types_data_path}")
         # end
 
-        it 'runs get_compute_user_data.py to get dna files' do
+        it 'runs share_compute_fleet_dna.py to get dna files' do
           is_expected.to run_execute('Share dna.json with ComputeFleet').with(
-            command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/get_compute_user_data.py" \
+            command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" \
               " --region #{node['cluster']['region']}"
           )
         end
@@ -68,7 +68,7 @@ describe 'fetch_dna_files resource' do
 
         it 'cleanups dna files' do
           is_expected.to run_execute("Cleanup dna.json and extra.json from #{node['cluster']['shared_dir']}/dna").with(
-            command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/get_compute_user_data.py" \
+            command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" \
               " --region #{node['cluster']['region']} --cleanup"
           )
         end
