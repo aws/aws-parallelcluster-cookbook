@@ -244,7 +244,7 @@ describe 'nvidia_driver:setup' do
                 cwd: '/tmp',
                 creates: '/usr/bin/nvidia-smi'
               )
-              .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
+              .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau -m=#{kernel_module}})
               .with_code(%r{rm -f /tmp/nvidia.run})
           end
         elsif platform == 'ubuntu' && version == '22.04'
@@ -272,7 +272,7 @@ describe 'nvidia_driver:setup' do
                                cwd: '/tmp',
                                creates: '/usr/bin/nvidia-smi'
                              )
-              .with_code(%r{#{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
+              .with_code(%r{#{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau -m=#{kernel_module}})
           end
         else
           it "doesn't install gcc10" do
@@ -286,7 +286,7 @@ describe 'nvidia_driver:setup' do
                 cwd: '/tmp',
                 creates: '/usr/bin/nvidia-smi'
               )
-              .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau --no-cc-version-check -m=#{kernel_module}})
+              .with_code(%r{./nvidia.run --silent --dkms --disable-nouveau -m=#{kernel_module}})
               .with_code(%r{rm -f /tmp/nvidia.run})
           end
         end

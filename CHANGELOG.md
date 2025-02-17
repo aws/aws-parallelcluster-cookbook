@@ -21,6 +21,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade ARM PL to version 24.10 (from 23.10).
 - Remove generation of DSA keys for login nodes as DSA, which became unsupported in OpenSSH 9.7+.
 - Set instance ID and instance type information in Slurm upon compute nodes launch.
+- Install NVIDIA drivers without the option 'no-cc-version-check', which is now deprecated in the NVIDIA installer.
 
 3.12.0
 ------
