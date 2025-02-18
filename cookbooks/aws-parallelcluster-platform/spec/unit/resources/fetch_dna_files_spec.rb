@@ -35,7 +35,7 @@ describe 'fetch_dna_files resource' do
             node.override['cluster']['region'] = region
             node.override['kitchen'] = true
           end
-            ConvergeFetchDnaFiles.share(runner, extra_chef_attribute_location: "#{kitchen_instance_types_data_path}")
+          ConvergeFetchDnaFiles.share(runner, extra_chef_attribute_location: "#{kitchen_instance_types_data_path}")
         end
         cached(:node) { chef_run.node }
 
@@ -46,7 +46,7 @@ describe 'fetch_dna_files resource' do
         # end
 
         it 'runs share_compute_fleet_dna.py to get dna files' do
-          is_expected.to run_execute('Share dna.json with ComputeFleet').with(
+          is_expected.to run_execute('Run share_compute_fleet_dna.py to get user_data.sh and share dna.json with ComputeFleet').with(
             command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" \
               " --region #{node['cluster']['region']}"
           )

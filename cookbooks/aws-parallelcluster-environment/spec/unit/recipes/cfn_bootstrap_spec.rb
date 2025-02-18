@@ -77,7 +77,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
 
         it 'adds cfn-hup runner' do
           is_expected.to create_template("#{node['cluster']['scripts_dir']}/cfn-hup-runner.sh").with(
-            source: "cfn_bootstrap/cfn-hup-runner.sh.erb",
+            source: "cfn_hup_configuration/cfn-hup-runner.sh.erb",
             owner: 'root',
             group: 'root',
             mode: '0744',

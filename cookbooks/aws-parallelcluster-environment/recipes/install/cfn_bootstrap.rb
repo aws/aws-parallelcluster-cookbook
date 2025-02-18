@@ -94,7 +94,7 @@ end
 
 # Add cfn-hup runner
 template "#{node['cluster']['scripts_dir']}/cfn-hup-runner.sh" do
-  source "cfn_bootstrap/cfn-hup-runner.sh.erb"
+  source "cfn_hup_configuration/cfn-hup-runner.sh.erb"
   owner 'root'
   group 'root'
   mode '0744'

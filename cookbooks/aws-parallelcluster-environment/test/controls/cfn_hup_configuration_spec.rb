@@ -42,7 +42,7 @@ control 'tag:config_cfn_hup_head_node_configuration' do
     its('group') { should eq 'root' }
   end
 
-  describe directory("#{node['cluster']['base_dir']}/dna") do
+  describe directory("#{node['cluster']['shared_dir']}/dna") do
     it { should exist }
   end
 end

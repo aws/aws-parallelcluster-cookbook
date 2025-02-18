@@ -27,7 +27,6 @@ describe 'aws-parallelcluster-environment::config' do
       aws-parallelcluster-environment::raid
       aws-parallelcluster-environment::efs
       aws-parallelcluster-environment::fsx
-      aws-parallelcluster-environment::config_cfn_hup
     )
     @expected_recipes.each do |recipe_name|
       allow_any_instance_of(Chef::Recipe).to receive(:include_recipe).with(recipe_name) do
