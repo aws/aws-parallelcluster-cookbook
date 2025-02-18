@@ -32,6 +32,24 @@ function help() {
   --unset <user1,...,userN>   Remove iptables rules related to IMDS for the given list of users
   --flush                     Restore default IMDS access
   --help                      Print this help message
+
+  Examples:
+
+    Allow access for USER1 and USER2, without changing other users
+      ${cmd} --allow USER1,USER2
+
+    Deny access for USER1 and USER2, without changing other users
+      ${cmd} --deny USER1,USER2
+
+    Allow access only for USER1 and USER2, removing every other user from the allowlist
+      ${cmd} --flush
+      ${cmd} --allow USER1,USER2
+
+    Remove rules for USER1 and USER2, without changing other users
+      ${cmd} --unset USER1,USER2
+
+    Remove IMDS lockdown, so that all users will be able to access IMDS
+      ${cmd} --flush
 EOF
 }
 
