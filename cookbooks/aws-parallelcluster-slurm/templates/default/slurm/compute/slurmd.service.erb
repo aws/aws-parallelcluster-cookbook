@@ -7,7 +7,7 @@ ConditionPathExists=<%= node['cluster']['slurm']['install_dir'] %>/etc/slurm.con
 [Service]
 Type=simple
 EnvironmentFile=-/etc/sysconfig/slurmd
-ExecStart=<%= node['cluster']['slurm']['install_dir'] %>/sbin/slurmd -D -s $SLURMD_OPTIONS
+ExecStart=<%= node['cluster']['slurm']['install_dir'] %>/sbin/slurmd -D -s $SLURMD_OPTIONS --instance-id <%= node['ec2']['instance_id'] %> --instance-type <%= node['ec2']['instance_type'] %>
 ExecReload=/bin/kill -HUP $MAINPID
 KillMode=process
 LimitNOFILE=131072

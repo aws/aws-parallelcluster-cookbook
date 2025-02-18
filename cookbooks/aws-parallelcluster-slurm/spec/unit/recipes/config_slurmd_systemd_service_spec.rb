@@ -21,7 +21,11 @@ describe 'aws-parallelcluster-slurm::config_slurmd_systemd_service' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
-        runner(platform: platform, version: version).converge(described_recipe)
+        runner = runner(platform: platform, version: version) do |node|
+          node.override['ec2']['instance_id'] = "i-xxx"
+          node.override['ec2']['instance_type'] = "fake-instance-type"
+        end
+        runner.converge(described_recipe)
       end
 
       it 'creates the service definition for slurmd' do
