@@ -55,7 +55,7 @@ Copyright (c) 2022-2023 Triad National Security, LLC. All rights reserved
 
     * Package openpmix's source code may be found at:
       https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/pmix/
+parallelcluster.s3.amazonaws.com/archives/dependencies/pmix/pmix-5.0.6.tar.gz
 
 The following LICENSE pertains to both PMIx and any code ported
 from Open MPI.
@@ -97,30 +97,301 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ------
 
-** Python; version 3.9 -- https://www.python.org/
-Copyright © 2001-2022 Python Software Foundation; All Rights
-   Reserved
+** Python; version 3.12.8 -- https://www.python.org/
+Copyright © 2001 Python Software Foundation. All rights reserved.
 
     * Package Python's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/python/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/python/Python-3.12.8.tgz
 
-Copyright (C) 2006 by Rob Landley <rob@landley.net>
+A. HISTORY OF THE SOFTWARE
+==========================
 
-Permission to use, copy, modify, and/or distribute this software for any purpose
-with or without fee is hereby granted.
+Python was created in the early 1990s by Guido van Rossum at Stichting
+Mathematisch Centrum (CWI, see https://www.cwi.nl) in the Netherlands
+as a successor of a language called ABC.  Guido remains Python's
+principal author, although it includes many contributions from others.
+
+In 1995, Guido continued his work on Python at the Corporation for
+National Research Initiatives (CNRI, see https://www.cnri.reston.va.us)
+in Reston, Virginia where he released several versions of the
+software.
+
+In May 2000, Guido and the Python core development team moved to
+BeOpen.com to form the BeOpen PythonLabs team.  In October of the same
+year, the PythonLabs team moved to Digital Creations, which became
+Zope Corporation.  In 2001, the Python Software Foundation (PSF, see
+https://www.python.org/psf/) was formed, a non-profit organization
+created specifically to own Python-related Intellectual Property.
+Zope Corporation was a sponsoring member of the PSF.
+
+All Python releases are Open Source (see https://opensource.org for
+the Open Source Definition).  Historically, most, but not all, Python
+releases have also been GPL-compatible; the table below summarizes
+the various releases.
+
+    Release         Derived     Year        Owner       GPL-
+                    from                                compatible? (1)
+
+    0.9.0 thru 1.2              1991-1995   CWI         yes
+    1.3 thru 1.5.2  1.2         1995-1999   CNRI        yes
+    1.6             1.5.2       2000        CNRI        no
+    2.0             1.6         2000        BeOpen.com  no
+    1.6.1           1.6         2001        CNRI        yes (2)
+    2.1             2.0+1.6.1   2001        PSF         no
+    2.0.1           2.0+1.6.1   2001        PSF         yes
+    2.1.1           2.1+2.0.1   2001        PSF         yes
+    2.1.2           2.1.1       2002        PSF         yes
+    2.1.3           2.1.2       2002        PSF         yes
+    2.2 and above   2.1.1       2001-now    PSF         yes
+
+Footnotes:
+
+(1) GPL-compatible doesn't mean that we're distributing Python under
+    the GPL.  All Python licenses, unlike the GPL, let you distribute
+    a modified version without making your changes open source.  The
+    GPL-compatible licenses make it possible to combine Python with
+    other software that is released under the GPL; the others don't.
+
+(2) According to Richard Stallman, 1.6.1 is not GPL-compatible,
+    because its license has a choice of law clause.  According to
+    CNRI, however, Stallman's lawyer has told CNRI's lawyer that 1.6.1
+    is "not incompatible" with the GPL.
+
+Thanks to the many outside volunteers who have worked under Guido's
+direction to make these releases possible.
+
+
+B. TERMS AND CONDITIONS FOR ACCESSING OR OTHERWISE USING PYTHON
+===============================================================
+
+Python software and documentation are licensed under the
+Python Software Foundation License Version 2.
+
+Starting with Python 3.8.6, examples, recipes, and other code in
+the documentation are dual licensed under the PSF License Version 2
+and the Zero-Clause BSD license.
+
+Some software incorporated into Python is under different licenses.
+The licenses are listed with code falling under that license.
+
+
+PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+--------------------------------------------
+
+1. This LICENSE AGREEMENT is between the Python Software Foundation
+("PSF"), and the Individual or Organization ("Licensee") accessing and
+otherwise using this software ("Python") in source or binary form and
+its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, PSF hereby
+grants Licensee a nonexclusive, royalty-free, world-wide license to reproduce,
+analyze, test, perform and/or display publicly, prepare derivative works,
+distribute, and otherwise use Python alone or in any derivative version,
+provided, however, that PSF's License Agreement and PSF's notice of copyright,
+i.e., "Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010,
+2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023
+Python Software Foundation;
+All Rights Reserved" are retained in Python alone or in any derivative version
+prepared by Licensee.
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python.
+
+4. PSF is making Python available to Licensee on an "AS IS"
+basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. Nothing in this License Agreement shall be deemed to create any
+relationship of agency, partnership, or joint venture between PSF and
+Licensee.  This License Agreement does not grant permission to use PSF
+trademarks or trade name in a trademark sense to endorse or promote
+products or services of Licensee, or any third party.
+
+8. By copying, installing or otherwise using Python, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+BEOPEN.COM LICENSE AGREEMENT FOR PYTHON 2.0
+-------------------------------------------
+
+BEOPEN PYTHON OPEN SOURCE LICENSE AGREEMENT VERSION 1
+
+1. This LICENSE AGREEMENT is between BeOpen.com ("BeOpen"), having an
+office at 160 Saratoga Avenue, Santa Clara, CA 95051, and the
+Individual or Organization ("Licensee") accessing and otherwise using
+this software in source or binary form and its associated
+documentation ("the Software").
+
+2. Subject to the terms and conditions of this BeOpen Python License
+Agreement, BeOpen hereby grants Licensee a non-exclusive,
+royalty-free, world-wide license to reproduce, analyze, test, perform
+and/or display publicly, prepare derivative works, distribute, and
+otherwise use the Software alone or in any derivative version,
+provided, however, that the BeOpen Python License is retained in the
+Software, alone or in any derivative version prepared by Licensee.
+
+3. BeOpen is making the Software available to Licensee on an "AS IS"
+basis.  BEOPEN MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, BEOPEN MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+4. BEOPEN SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF THE
+SOFTWARE FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS
+AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY
+DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+5. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+6. This License Agreement shall be governed by and interpreted in all
+respects by the law of the State of California, excluding conflict of
+law provisions.  Nothing in this License Agreement shall be deemed to
+create any relationship of agency, partnership, or joint venture
+between BeOpen and Licensee.  This License Agreement does not grant
+permission to use BeOpen trademarks or trade names in a trademark
+sense to endorse or promote products or services of Licensee, or any
+third party.  As an exception, the "BeOpen Python" logos available at
+http://www.pythonlabs.com/logos.html may be used according to the
+permissions granted on that web page.
+
+7. By copying, installing or otherwise using the software, Licensee
+agrees to be bound by the terms and conditions of this License
+Agreement.
+
+
+CNRI LICENSE AGREEMENT FOR PYTHON 1.6.1
+---------------------------------------
+
+1. This LICENSE AGREEMENT is between the Corporation for National
+Research Initiatives, having an office at 1895 Preston White Drive,
+Reston, VA 20191 ("CNRI"), and the Individual or Organization
+("Licensee") accessing and otherwise using Python 1.6.1 software in
+source or binary form and its associated documentation.
+
+2. Subject to the terms and conditions of this License Agreement, CNRI
+hereby grants Licensee a nonexclusive, royalty-free, world-wide
+license to reproduce, analyze, test, perform and/or display publicly,
+prepare derivative works, distribute, and otherwise use Python 1.6.1
+alone or in any derivative version, provided, however, that CNRI's
+License Agreement and CNRI's notice of copyright, i.e., "Copyright (c)
+1995-2001 Corporation for National Research Initiatives; All Rights
+Reserved" are retained in Python 1.6.1 alone or in any derivative
+version prepared by Licensee.  Alternately, in lieu of CNRI's License
+Agreement, Licensee may substitute the following text (omitting the
+quotes): "Python 1.6.1 is made available subject to the terms and
+conditions in CNRI's License Agreement.  This Agreement together with
+Python 1.6.1 may be located on the internet using the following
+unique, persistent identifier (known as a handle): 1895.22/1013.  This
+Agreement may also be obtained from a proxy server on the internet
+using the following URL: http://hdl.handle.net/1895.22/1013".
+
+3. In the event Licensee prepares a derivative work that is based on
+or incorporates Python 1.6.1 or any part thereof, and wants to make
+the derivative work available to others as provided herein, then
+Licensee hereby agrees to include in any such work a brief summary of
+the changes made to Python 1.6.1.
+
+4. CNRI is making Python 1.6.1 available to Licensee on an "AS IS"
+basis.  CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND
+DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF PYTHON 1.6.1 WILL NOT
+INFRINGE ANY THIRD PARTY RIGHTS.
+
+5. CNRI SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF PYTHON
+1.6.1 FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING PYTHON 1.6.1,
+OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+
+6. This License Agreement will automatically terminate upon a material
+breach of its terms and conditions.
+
+7. This License Agreement shall be governed by the federal
+intellectual property law of the United States, including without
+limitation the federal copyright law, and, to the extent such
+U.S. federal law does not apply, by the law of the Commonwealth of
+Virginia, excluding Virginia's conflict of law provisions.
+Notwithstanding the foregoing, with regard to derivative works based
+on Python 1.6.1 that incorporate non-separable material that was
+previously distributed under the GNU General Public License (GPL), the
+law of the Commonwealth of Virginia shall govern this License
+Agreement only as to issues arising under or with respect to
+Paragraphs 4, 5, and 7 of this License Agreement.  Nothing in this
+License Agreement shall be deemed to create any relationship of
+agency, partnership, or joint venture between CNRI and Licensee.  This
+License Agreement does not grant permission to use CNRI trademarks or
+trade name in a trademark sense to endorse or promote products or
+services of Licensee, or any third party.
+
+8. By clicking on the "ACCEPT" button where indicated, or by copying,
+installing or otherwise using Python 1.6.1, Licensee agrees to be
+bound by the terms and conditions of this License Agreement.
+
+        ACCEPT
+
+
+CWI LICENSE AGREEMENT FOR PYTHON 0.9.0 THROUGH 1.2
+--------------------------------------------------
+
+Copyright (c) 1991 - 1995, Stichting Mathematisch Centrum Amsterdam,
+The Netherlands.  All rights reserved.
+
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all copies and that
+both that copyright notice and this permission notice appear in
+supporting documentation, and that the name of Stichting Mathematisch
+Centrum or CWI not be used in advertising or publicity pertaining to
+distribution of the software without specific, written prior
+permission.
+
+STICHTING MATHEMATISCH CENTRUM DISCLAIMS ALL WARRANTIES WITH REGARD TO
+THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS, IN NO EVENT SHALL STICHTING MATHEMATISCH CENTRUM BE LIABLE
+FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+ZERO-CLAUSE BSD LICENSE FOR CODE IN THE PYTHON DOCUMENTATION
+----------------------------------------------------------------------
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
 
 THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
-REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
-FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
-INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
-OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
-TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
-THIS SOFTWARE.
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
 
 ------
 
 ** enroot; version 3.4.1 -- https://github.com/NVIDIA/enroot
+
+    * Package enroot's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/enroot/enroot-3.4.1-1.el8.x86_64.rpm
 
 This product bundles libbsd, which is available under a dual
 "3-clause BSD" and "ISC" license.  For details, see deps/libbsd/.
@@ -142,8 +413,9 @@ This product bundles musl, which is available under a
 ** requests; version 2.31.0 -- https://pypi.org/project/requests/
 
     * Package requests's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
                                  Apache License
                            Version 2.0, January 2004
@@ -325,18 +597,46 @@ parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
 
 ------
 
-** awscli; version 1.32.85 -- https://pypi.org/project/awscli/1.32.85/
-** boto3; version 1.34.85 -- https://pypi.org/project/boto3/
-** retrying; version 1.3.4 -- https://pypi.org/project/retrying/
-** python-daemon; version 2.2.4 -- https://pypi.org/project/python-daemon/
-** RubyGem - berkshelf; version 8.0.7 -- https://rubygems.org/gems/berkshelf/versions/8.0.7
-** pyxis; version 0.20.0 -- https://github.com/NVIDIA/pyxis
 ** cookbook-line; version 4.5.21 -- https://supermarket.chef.io/cookbooks/line
 ** cookbook-yum-epel; version 5.0.8 -- https://supermarket.chef.io/cookbooks/yum-epel
 ** cookbook-yum; version 7.4.20 -- https://supermarket.chef.io/cookbooks/yum
 ** cookbook-openssh; version 2.11.14 -- https://supermarket.chef.io/cookbooks/openssh
 ** cookbook-nfs; version 5.1.5 -- https://supermarket.chef.io/cookbooks/nfs
 ** aws-cfn-bootstrap; version 2.0-32 -- https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html
+** RubyGem - berkshelf; version 8.0.7 -- https://rubygems.org/gems/berkshelf/versions/8.0.7
+** pyxis; version 0.20.0 -- https://github.com/NVIDIA/pyxis
+** awscli; version 1.32.85 -- https://pypi.org/project/awscli/1.32.85/
+** boto3; version 1.34.85 -- https://pypi.org/project/boto3/
+** retrying; version 1.3.4 -- https://pypi.org/project/retrying/
+** python-daemon; version 2.2.4 -- https://pypi.org/project/python-daemon/
+
+    * Package python-daemon's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
+
+    * Package retrying's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
+
+    * Package boto3's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
+
+    * Package awscli's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
+
+    * Package pyxis's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/pyxis/v0.20.0.tar.gz
+
+    * Package RubyGem - berkshelf's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/ruby/gems.tgz
 
     * Package aws-cfn-bootstrap's source code may be found at:
       https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-
@@ -356,30 +656,6 @@ py3-latest.tar.gz
 
     * Package cookbook-line's source code may be found at:
       https://github.com/sous-chefs/line/archive/refs/tags/4.5.21.tar.gz
-
-    * Package pyxis's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/pyxis
-
-    * Package RubyGem - berkshelf's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/ruby/
-
-    * Package python-daemon's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
-
-    * Package retrying's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
-
-    * Package boto3's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
-
-    * Package awscli's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
 
 Apache License
 Version 2.0, January 2004
@@ -564,54 +840,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-* For awscli see also this required NOTICE:
-    Copyright 2012-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-* For boto3 see also this required NOTICE:
-    boto3
-    Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-* For retrying see also this required NOTICE:
-    Copyright 2013 Ray Holder
-* For python-daemon see also this required NOTICE:
-    This work, ‘python-daemon’, is free software: you may copy, modify,
-    and/or distribute this work under certain conditions; see the relevant
-    files for specific grant of license. No warranty expressed or implied.
-
-    * Parts of this work are licensed to you under the terms of the GNU
-      General Public License as published by the Free Software Foundation;
-      version 3 of that license or any later version.
-      See the file ‘LICENSE.GPL-3’ for details.
-
-    * Parts of this work are licensed to you under the terms of the Apache
-      License, version 2.0 as published by the Apache Software Foundation.
-      See the file ‘LICENSE.ASF-2’ for details.
-
-    ?
-    ..
-        This document is written using `reStructuredText`_ markup, and can
-        be rendered with `Docutils`_ to other formats.
-
-        ..  _Docutils: http://docutils.sourceforge.net/
-        ..  _reStructuredText: http://docutils.sourceforge.net/rst.html
-
-    ..
-        This is free software: you may copy, modify, and/or distribute this work
-        under the terms of the Apache License version 2.0 as published by the
-        Apache Software Foundation.
-        No warranty expressed or implied. See the file ‘LICENSE.ASF-2’ for
-details.
-
-    ..
-        Local variables:
-        coding: utf-8
-        mode: rst
-        mode: text
-        End:
-        vim: fileencoding=utf-8 filetype=rst :
-* For RubyGem - berkshelf see also this required NOTICE:
-    -
-* For pyxis see also this required NOTICE:
-    Copyright 2019-2020 NVIDIA CORPORATION
-
 * For cookbook-line see also this required NOTICE:
     None
 * For cookbook-yum-epel see also this required NOTICE:
@@ -747,6 +975,54 @@ THE
     License along with this library; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
     02110-1301
+* For RubyGem - berkshelf see also this required NOTICE:
+    -
+* For pyxis see also this required NOTICE:
+    Copyright 2019-2020 NVIDIA CORPORATION
+
+* For awscli see also this required NOTICE:
+    Copyright 2012-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+* For boto3 see also this required NOTICE:
+    boto3
+    Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+* For retrying see also this required NOTICE:
+    Copyright 2013 Ray Holder
+* For python-daemon see also this required NOTICE:
+    This work, ‘python-daemon’, is free software: you may copy, modify,
+    and/or distribute this work under certain conditions; see the relevant
+    files for specific grant of license. No warranty expressed or implied.
+
+    * Parts of this work are licensed to you under the terms of the GNU
+      General Public License as published by the Free Software Foundation;
+      version 3 of that license or any later version.
+      See the file ‘LICENSE.GPL-3’ for details.
+
+    * Parts of this work are licensed to you under the terms of the Apache
+      License, version 2.0 as published by the Apache Software Foundation.
+      See the file ‘LICENSE.ASF-2’ for details.
+
+    ?
+    ..
+        This document is written using `reStructuredText`_ markup, and can
+        be rendered with `Docutils`_ to other formats.
+
+        ..  _Docutils: http://docutils.sourceforge.net/
+        ..  _reStructuredText: http://docutils.sourceforge.net/rst.html
+
+    ..
+        This is free software: you may copy, modify, and/or distribute this work
+        under the terms of the Apache License version 2.0 as published by the
+        Apache Software Foundation.
+        No warranty expressed or implied. See the file ‘LICENSE.ASF-2’ for
+details.
+
+    ..
+        Local variables:
+        coding: utf-8
+        mode: rst
+        mode: text
+        End:
+        vim: fileencoding=utf-8 filetype=rst :
 
 ------
 
@@ -788,8 +1064,9 @@ http_client.py code Copyright (c) by Daniel Krech, http://eikeon.com/.
   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
     * Package supervisor's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 Supervisor is licensed under the following license:
 
@@ -962,8 +1239,9 @@ License (as marked in its file header):
 Copyright: David Goodger
 
     * Package docutils's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 Copyright (c) <year> <owner> All rights reserved.
 
@@ -996,12 +1274,14 @@ Copyright 2007 Pallets
 Copyright 2014 Pallets
 
     * Package click's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
     * Package jinja2's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -2789,6 +3069,11 @@ Creative Commons may be contacted at creativecommons.org.
 ===============================================================================
 
 
+    * Package Arm Performance Libraries's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/armpl/AmazonLinux-2/arm-performance-
+libraries_24.10_rpm_gcc.tar
+
 SIMPLIFIED END USER LICENSE AGREEMENT FOR FREE OF CHARGE ARM REDISTRIBUTABLES
 
 This end user license agreement ("License") is a legal agreement between you (a
@@ -3032,8 +3317,8 @@ Arm document version 1.0, effective 24 June 2020
 ** Slurm; version 24.05.02 -- https://github.com/SchedMD/slurm
 
     * Package Slurm's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/slurm
+      https://us-east-1-aws-parallelcluster.s3.amazonaws.com/archives/dependenci
+es/slurm/slurm-24-05-2-1.tar.gz
 
                          SLURM LICENSE AGREEMENT
 
@@ -3631,7 +3916,8 @@ modified version without this exception; this exception also makes it possible
 to release a modified version which carries forward this exception.
 
     * Package stunnel's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.amazonaws.com/archives/stunnel
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/stunnel/stunnel-5.67.tar.gz
 
 GNU GENERAL PUBLIC LICENSE
 Version 2, June 1991
@@ -3949,8 +4235,8 @@ signature of Ty Coon, 1 April 1989 Ty Coon, President of Vice
 Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
 
     * Package MUNGE's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/munge
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/munge/munge-0.5.15.tar.gz
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
@@ -4695,8 +4981,8 @@ presumption that third-party software is unaffected by the copyleft
 requirements of the license of GCC.
 
     * Package gcc's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/gcc/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/gcc/gcc-11.3.0.tar.gz
 
 Version 3, 29 June 2007
 
@@ -5259,6 +5545,10 @@ license document, but changing it is not allowed.
 ** MySQL; version 8.0.39 -- https://www.mysql.com/products/community/
 Copyright (c) 1997, 2024, Oracle and/or its affiliates.
 
+    * Package MySQL's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/mysql/source/mysql-8.0.39.tar.gz
+
 
 ------
 
@@ -5281,6 +5571,10 @@ Reserved.
 # notice or any other notice embedded in Materials by Intel or Intel's suppliers
 # or licensors in any way.
 
+    * Package Intel MPI's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/impi/l_mpi_oneapi_p_2021.13.1.769_offline.sh
+
 
 ------
 
@@ -5288,8 +5582,9 @@ Reserved.
 Copyright Jason R. Coombs
 
     * Package setuptools's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 Copyright Jason R. Coombs
 
@@ -5317,8 +5612,9 @@ IN THE SOFTWARE.
 Copyright (c) 2013 Julian Berman
 
     * Package jsonschema's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 MIT License
 
@@ -5345,6 +5641,10 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ** efs-utils; version 2.1.0 -- https://github.com/aws/efs-utils
 Copyright 2017 Amazon.com, Inc. or its affiliates.
+
+    * Package efs-utils's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/efs/v2.1.0.tar.gz
 
 MIT License
 
@@ -5374,8 +5674,9 @@ SOFTWARE.
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
     * Package tabulate's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
@@ -5400,12 +5701,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 ------
 
-** gdrcopy; version 2.4 -- https://github.com/NVIDIA/gdrcopy/tree/v2.4
+** gdrcopy; version 2.4.4 -- https://github.com/NVIDIA/gdrcopy/releases/tag/v2.4.4
 Copyright (c) 2014-2021, NVIDIA CORPORATION. All rights reserved.
 
     * Package gdrcopy's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/gdr_copy/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/gdr_copy/v2.4.4.tar.gz
 
 Copyright (c) 2014-2021, NVIDIA CORPORATION. All rights reserved.
 
@@ -5436,12 +5737,14 @@ Copyright (c) 2006-2016 Kirill Simonov
 Copyright (c) 2014 Noah Morrison
 
     * Package chevron's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
     * Package pyyaml's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/PyPi/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/PyPi/pypi-
+dependencies-3.12-x86_64.tgz
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -5463,12 +5766,12 @@ SOFTWARE.
 
 ------
 
-** libjwt; version 1.17.0 -- https://github.com/openpmix/openpmix
+** libjwt; version 1.17.0 -- https://github.com/benmcollins/libjwt
 Copyright (C) 2015-2022 Ben Collins <bcollins@maclara-llc.com>
 
     * Package libjwt's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/pmix/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/jwt/v1.17.0.tar.gz
 
 Mozilla Public License Version 2.0
 ==================================
@@ -5850,8 +6153,9 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 © 2020, NICE s.r.l. or its affiliates. All rights reserved.
 
     * Package Amazon DCV's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/dcv
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/dcv/nice-
+dcv-2024.0-18131-el8-x86_64.tgz
 
 END-USER LICENSE AGREEMENT (EULA)
 for NICE Software and Solutions
@@ -6280,8 +6584,9 @@ be bound by the terms of this LICENSE. If you do not agree to the terms of this
 LICENSE, do not download the SOFTWARE.
 
     * Package Nvidia Driver's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/nvidia_driver/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-
+Linux-x86_64-550.127.08.run
 
 RECITALS
 
@@ -6432,8 +6737,8 @@ laws, restrictions or regulations.
 Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
 
     * Package Cuda Samples's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/cuda/samples/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/cuda/samples/v12.4.tar.gz
 
 1.1. License
 1.1.1. License Grant
@@ -6735,8 +7040,8 @@ representatives of both parties.
 © 2007-2020 NVIDIA Corporation. All rights reserved.
 
     * Package Nvidia CUDA's source code may be found at:
-      https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/cuda/
+      https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/cuda/cuda_12.4.1_550.54.15_linux.run
 
 1.1. License
 1.1.1. License Grant
