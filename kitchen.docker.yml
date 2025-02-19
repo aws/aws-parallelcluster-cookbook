@@ -60,6 +60,14 @@ platforms:
         base_os: ubuntu2204
         # Since the kernel version of the docker images is not compatible (6.2.0-1016-azure), set a fake kernel value to permit to install Lustre on docker.
         kernel_release: '5.15.0-1028-aws'
+  - name: ubuntu2404
+    driver:
+      image: <% if ENV['KITCHEN_UBUNTU2404_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU2404_IMAGE'] %> <% else %> dokken/ubuntu-24.04 <% end %>
+    attributes:
+      cluster:
+        base_os: ubuntu2404
+        # Since the kernel version of the docker images is not compatible (6.2.0-1016-azure), set a fake kernel value to permit to install Lustre on docker.
+        kernel_release: '5.15.0-1028-aws'
   - name: rhel8
     driver:
       image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi <% end %>
