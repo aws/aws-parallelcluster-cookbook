@@ -25,6 +25,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Set instance ID and instance type information in Slurm upon compute nodes launch.
 - Install NVIDIA drivers without the option 'no-cc-version-check', which is now deprecated in the NVIDIA installer.
 
+**BUG FIXES**
+- Remove usage of cfn-init for compute node bootstrapping to reduce node scale up time.
+
+
 3.12.0
 ------
 
