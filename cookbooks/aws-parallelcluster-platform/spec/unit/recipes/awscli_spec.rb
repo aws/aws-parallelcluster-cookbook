@@ -15,7 +15,7 @@ describe 'aws-parallelcluster-platform::awscli' do
         it 'downloads awscli-bundle from s3' do
           is_expected.to create_remote_file('download awscli bundle from s3').with(
             path: "#{file_cache_path}/awscli-bundle.zip",
-            source: 'https://s3.amazonaws.com/aws-cli/awscli-bundle.zip',
+            source: "https://awscli.test_aws_domain/awscli-exe-linux-#{node['kernel']['machine']}.zip",
             retries: 5,
             retry_delay: 5
           )
@@ -31,7 +31,7 @@ describe 'aws-parallelcluster-platform::awscli' do
 
         it 'installs awscli into cookbook virtualev path' do
           is_expected.to run_bash('install awscli')
-            .with_code "#{cookbook_virtualenv_path}/bin/python #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
+            .with_code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
         end
       end
 
