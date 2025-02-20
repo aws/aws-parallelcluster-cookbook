@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :setup do
+  return if node['platform_version'].to_i == 24
   apt_repository 'fsxlustreclientrepo' do
     uri          "https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu"
     components   ['main']
