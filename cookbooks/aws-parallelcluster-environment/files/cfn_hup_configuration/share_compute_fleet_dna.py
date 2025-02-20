@@ -71,6 +71,7 @@ def get_compute_launch_template_ids(lt_config_file_name):
     """
     lt_config = None
     try:
+        logger.info("Getting LaunchTemplate ID and versions from %s", lt_config_file_name)
         with open(lt_config_file_name, "r", encoding="utf-8") as file:
             lt_config = json.loads(file.read())
     except Exception as err:
@@ -117,6 +118,7 @@ def get_user_data(lt_id, lt_version, region_name):
         proxy_config = parse_proxy_config()
 
         ec2_client = boto3.client("ec2", region_name=region_name, config=proxy_config)
+        logger.info("Running EC2 DescribeLaunchTemplateVersions API for %s version %s", lt_id, lt_version)
         response = ec2_client.describe_launch_template_versions(
             LaunchTemplateId=lt_id,
             Versions=[
@@ -139,6 +141,7 @@ def get_write_directives_section(user_data):
     write_directives_section = None
     try:
         data = message_from_string(user_data)
+        logger.info("Parsing UserData to get write_files section")
         for cloud_config_section in data.walk():
             if cloud_config_section.get_content_type() == "text/cloud-config":
                 write_directives_section = yaml.safe_load(cloud_config_section._payload).get("write_files")
@@ -160,6 +163,7 @@ def write_dna_files(write_files_section, shared_storage_loc):
         for data in write_files_section:
             if data["path"] in ["/tmp/dna.json"]:  # nosec B108
                 with open(file_path, "w", encoding="utf-8") as file:
+                    logger.info("Writing %s", file_path)
                     file.write(json.dumps(json.loads(data["content"]), indent=4))
     except Exception as err:
         if hasattr(err, "message"):
@@ -190,6 +194,7 @@ def cleanup(directory_loc):
         f_path = os.path.join(directory_loc, f)
         try:
             if os.path.isfile(f_path):
+                logger.info("Cleaning up %s", f_path)
                 os.remove(f_path)
         except Exception as err:
             logger.warning("Unable to delete %s due to %s", f_path, err)
@@ -237,6 +242,8 @@ def main():
             "Encountered exception when fetching latest dna.json for ComputeFleet, exiting gracefully: %s", err
         )
         raise SystemExit(0)
+
+    logger.info("All dna.json files have been shared!")
 
 
 if __name__ == "__main__":

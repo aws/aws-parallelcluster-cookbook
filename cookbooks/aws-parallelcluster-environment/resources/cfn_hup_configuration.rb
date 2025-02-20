@@ -59,11 +59,14 @@ action :configure do
     group 'root'
     mode '0400'
     variables(
+      # Common variable
+      launch_template_resource_id: node['cluster']['launch_template_id'],
+      # HeadNode and LoginNode specific variables
       stack_id: node['cluster']['stack_arn'],
       region: node['cluster']['region'],
       cloudformation_url: cloudformation_url,
       cfn_init_role: instance_role_name,
-      launch_template_resource_id: node['cluster']['launch_template_id'],
+      # ComputeFleet specific variables
       update_hook_script_dir: node['cluster']['scripts_dir'],
       node_bootstrap_timeout: node['cluster']['compute_node_bootstrap_timeout'] || node['cluster']['Timeout']
     )
