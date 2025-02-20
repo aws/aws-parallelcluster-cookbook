@@ -314,6 +314,20 @@ suites:
         directory_service:
           enabled: "true"
         node_type: HeadNode
+  - name: cfn_hup_configuration
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-tests::test_resource]
+    verifier:
+      controls:
+        - /tag:config_cfn_hup/
+    attributes:
+      resource: cfn_hup_configuration:configure
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+      cluster:
+        node_type: HeadNode
+        stack_arn: 'test'
 
 # Recipes
   - name: cfnconfig_mixed

@@ -5,6 +5,7 @@ metadata
 cookbook "aws-parallelcluster-computefleet", path: "../aws-parallelcluster-computefleet"
 cookbook "aws-parallelcluster-environment", path: "../aws-parallelcluster-environment"
 cookbook "aws-parallelcluster-shared", path: "../aws-parallelcluster-shared"
+cookbook "aws-parallelcluster-platform", path: "../aws-parallelcluster-platform"
 
 cookbook "iptables", path: "../third-party/iptables-8.0.0"
 cookbook "line", path: "../third-party/line-4.5.21"

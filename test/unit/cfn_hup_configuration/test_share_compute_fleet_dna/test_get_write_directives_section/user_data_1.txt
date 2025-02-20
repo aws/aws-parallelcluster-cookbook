@@ -1,0 +1,53 @@
+Content-Type: multipart/mixed; boundary="==BOUNDARY=="
+MIME-Version: 1.0
+
+--==BOUNDARY==
+Content-Type: text/cloud-boothook; charset="us-ascii"
+MIME-Version: 1.0
+
+#!/bin/bash -x
+
+  which dnf 2>/dev/null; dnf=$?
+  which yum 2>/dev/null; yum=$?
+
+--==BOUNDARY==
+Content-Type: text/cloud-config; charset=us-ascii
+MIME-Version: 1.0
+
+bootcmd:
+
+output:
+  all: "| tee -a /var/log/cloud-init-output.log | logger -t user-data -s 2>/dev/ttyS0"
+write_files:
+  - path: /tmp/dna.json
+    permissions: '0644'
+    owner: root:root
+    content: |
+      {"cluster":{"base_os":"alinux2","cluster_name":"clustername","directory_service":{"domain_read_only_user":"","enabled":"false","generate_ssh_keys_for_users":"false"},"launch_template_id":"LoginNodeLaunchTemplate2736fab291f04e69"}}
+  - path: /tmp/extra.json
+    permissions: '0644'
+    owner: root:root
+    content: |
+      {}
+  - path: /tmp/bootstrap.sh
+    permissions: '0744'
+    owner: root:root
+    content: |
+      #!/bin/bash -x
+
+      function error_exit
+      {
+        echo "Bootstrap failed"
+      }
+
+--==BOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+
+#!/bin/bash -x
+
+function error_exit
+{
+  exit 1
+}
+--==BOUNDARY==

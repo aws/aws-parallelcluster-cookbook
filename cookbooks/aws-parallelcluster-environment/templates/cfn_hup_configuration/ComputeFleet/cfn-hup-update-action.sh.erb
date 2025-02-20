@@ -1,0 +1,45 @@
+#!/bin/bash
+set -ex
+
+# This script is invoked by cfn-hup as part of its update hook action.
+# This script runs on each node of ComputeFleet to monitor the shared location for latest dna.json and extra.json files and run ParallelCluster Cookbook recipes.
+#
+# Usage:   ./cfn-hup-update-action.sh
+
+function run_cookbook_recipes() {
+    LATEST_DNA_LOC=<%= @monitor_shared_dir %>
+    LATEST_DNA_FILE=$LATEST_DNA_LOC/<%= @launch_template_resource_id %>-dna.json
+    LATEST_EXTRA_FILE=$LATEST_DNA_LOC/extra.json
+
+    GET_DNA_FILE=true
+    while $GET_DNA_FILE; do
+        if [[ -f $LATEST_DNA_FILE ]]; then
+          GET_DNA_FILE=false
+          cp $LATEST_DNA_FILE /tmp/dna.json
+          chown root:root /tmp/dna.json
+          chmod 000644 /tmp/dna.json
+          cp $LATEST_EXTRA_FILE /tmp/extra.json
+          chown root:root /tmp/extra.json
+          chmod 000644 /tmp/extra.json
+          mkdir -p /etc/chef/ohai/hints
+          touch /etc/chef/ohai/hints/ec2.json
+          jq -s ".[0] * .[1]" /tmp/dna.json /tmp/extra.json > /etc/chef/dna.json || ( echo "jq not installed"; cp /tmp/dna.json /etc/chef/dna.json )
+          cd /etc/chef
+          cinc-client --local-mode --config /etc/chef/client.rb --log_level info --logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster-entrypoints::update && /opt/parallelcluster/scripts/fetch_and_run -postupdate
+
+        fi
+
+        sleep 60
+    done
+}
+
+
+main() {
+  PATH=/usr/local/bin:/bin:/usr/bin:/opt/aws/bin;
+  . /etc/parallelcluster/pcluster_cookbook_environment.sh;
+  echo "We monitor <%= @monitor_shared_dir %> to check for <%= @launch_template_resource_id %>-dna.json has been added and run ParallelCluster cookbook recipes."
+  run_cookbook_recipes
+}
+
+
+main "$@"

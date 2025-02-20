@@ -1,0 +1,46 @@
+Content-Type: multipart/mixed; boundary="==BOUNDARY=="
+MIME-Version: 1.0
+
+--==BOUNDARY==
+Content-Type: text/cloud-boothook; charset="us-ascii"
+MIME-Version: 1.0
+
+#!/bin/bash -x
+
+  which dnf 2>/dev/null; dnf=$?
+  which yum 2>/dev/null; yum=$?
+
+--==BOUNDARY==
+Content-Type: text/cloud-config; charset=us-ascii
+MIME-Version: 1.0
+
+write_files:
+  - path: /tmp/dna.json
+    permissions: '0644'
+    owner: root:root
+    content: |
+      {"cluster":{"base_os":"alinux2"}}
+  - path: /tmp/extra.json
+    permissions: '0644'
+    owner: root:root
+    content: |
+      {"cluster": {"nvidia": {"enabled": "yes" }, "is_official_ami_build": "true"}}
+  - path: /tmp/bootstrap.sh
+    permissions: '0744'
+    owner: root:root
+    content: |
+      #!/bin/bash -x
+
+      echo "Bootstrap failed with error: $1"
+
+--==BOUNDARY==
+Content-Type: text/x-shellscript; charset="us-ascii"
+MIME-Version: 1.0
+
+#!/bin/bash -x
+function error_exit
+{
+  exit 1
+}
+
+--==BOUNDARY==
