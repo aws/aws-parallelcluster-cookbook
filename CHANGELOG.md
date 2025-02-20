@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 **ENHANCEMENTS**
 - Add support for Ubuntu24.
+- Disable unused services like cups and wpa_supplicant from Official ParallelCluster AMIs to improve security.
 
 **CHANGES**
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.

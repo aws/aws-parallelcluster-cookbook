@@ -27,3 +27,12 @@ end unless on_docker?
 service 'log4j-cve-2021-44228-hotpatch' do
   action %i(disable stop mask)
 end unless on_docker?
+
+# Disable services if node['cluster']['disable_services'] is provided
+if node['cluster']['disable_services']
+  node['cluster']['disable_services'].split().each do |service_name|
+    service service_name do
+      action %i(disable stop mask)
+    end unless on_docker?
+  end
+end
