@@ -28,5 +28,25 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
+remote_file "#{node['cluster']['base_dir']}/awsbatch-dependencies.tgz" do
+  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/awsbatch-dependencies.tgz"
+  mode '0644'
+  retries 3
+  retry_delay 5
+  action :create_if_missing
+end
+
+bash 'pip install' do
+  user 'root'
+  group 'root'
+  cwd "#{node['cluster']['base_dir']}"
+  code <<-REQ
+    set -e
+    tar xzf awsbatch-dependencies.tgz
+    cd awsbatch
+    #{virtualenv_path}/bin/pip install * -f ./ --no-index
+    REQ
+end
+
 node.default['cluster']['awsbatch_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
