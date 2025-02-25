@@ -10,6 +10,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Disable unused services like cups and wpa_supplicant from Official ParallelCluster AMIs to improve security.
 
 **CHANGES**
+- Upgrade NVIDIA driver to version 570.86.15 (from 550.127.08) for all OSs except AL2.
+- Upgrade CUDA Toolkit to version 12.8.0 (from 12.4.1) for all OSs except AL2.
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
 - Upgrade `aws-cfn-bootstrap` to version 2.0-32.
 - Upgrade amazon-efs-utils to version 2.1.0.
