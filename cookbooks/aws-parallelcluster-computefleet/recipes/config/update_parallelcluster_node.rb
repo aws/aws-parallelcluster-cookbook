@@ -17,6 +17,8 @@
 
 # REMINDER: the update recipe runs only on the head node and the only supervisord daemon provided by the
 # aws-parallelcluster-node package on the head node is clustermgtd. Therefore, only this daemon is restarted.
+return unless node['cluster']['node_type'] == 'HeadNode'
+
 execute 'stop clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd"
 end
