@@ -16,6 +16,13 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Python to 3.12.8 for all OSs except AL2 (from 3.9.20).
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
 - Upgrade `aws-cfn-bootstrap` to version 2.0-33.
+- Upgrade EFA installer to `1.38.0`.
+  - Efa-driver: `efa-2.13.0-1`
+  - Efa-config: `efa-config-1.17-1`
+  - Efa-profile: `efa-profile-1.7-1`
+  - Libfabric-aws: `libfabric-aws-1.22.0-1`
+  - Rdma-core: `rdma-core-54.0-1`
+  - Open MPI: `openmpi40-aws-4.1.7-1` and `openmpi50-aws-5.0.5`
 - Upgrade amazon-efs-utils to version 2.1.0.
 - Remove third-party cookbook: apt-7.5.22 and pyenv-4.2.3.
 - Upgrade third-party cookbook dependencies:
