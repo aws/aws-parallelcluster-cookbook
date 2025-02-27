@@ -12,6 +12,10 @@
 # limitations under the License.
 
 virtualenv_path = cookbook_virtualenv_path
+pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/pypi-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}.tgz"
+if platform?('amazon') && node['platform_version'] == "2"
+  pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cookbook-dependencies.tgz"
+end
 
 node.default['cluster']['cookbook_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
@@ -28,7 +32,7 @@ activate_virtual_env cookbook_virtualenv_name do
 end
 
 remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do
-  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cookbook-dependencies.tgz"
+  source pypi_s3_uri
   mode '0644'
   retries 3
   retry_delay 5

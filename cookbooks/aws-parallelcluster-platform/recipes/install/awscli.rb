@@ -20,7 +20,7 @@ return if ::File.exist?("/usr/local/bin/aws") || redhat_on_docker?
 
 file_cache_path = Chef::Config[:file_cache_path]
 region = aws_region
-awscli_url = "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip"
+awscli_url = "https://awscli.#{aws_domain}/awscli-exe-linux-#{node['kernel']['machine']}.zip"
 
 if region.start_with?("us-iso-")
   awscli_url = "https://aws-sdk-common-infra-dca-prod-deployment-bucket.s3.#{aws_region}.#{aws_domain}/aws-cli-v2/linux/x86_64/awscli-exe-linux-x86_64.zip"
@@ -42,10 +42,11 @@ archive_file 'extract awscli bundle' do
   overwrite true
 end
 
+bash 'install awscli' do
+  code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
+end
+
 if region.start_with?("us-iso")
-  bash 'install awscli' do
-    code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
-  end
 
   cookbook_file "#{node['cluster']['scripts_dir']}/iso-ca-bundle-config.sh" do
     source 'isolated/iso-ca-bundle-config.sh'
@@ -58,9 +59,5 @@ if region.start_with?("us-iso")
 
   execute "patch ca bundle" do
     command "sh #{node['cluster']['scripts_dir']}/iso-ca-bundle-config.sh"
-  end
-else
-  bash 'install awscli' do
-    code "#{cookbook_virtualenv_path}/bin/python #{file_cache_path}/awscli/awscli-bundle/install -i /usr/local/aws -b /usr/local/bin/aws"
   end
 end
