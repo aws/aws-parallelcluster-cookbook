@@ -60,6 +60,8 @@ describe 'system_authentication:configure' do
           'authconfig --enablemkhomedir --enablesssdauth --enablesssd --updateall'
         when 'ubuntu'
           'pam-auth-update --enable mkhomedir'
+        when 'rocky'
+          'authselect select sssd with-mkhomedir --force'
         else
           'authselect select sssd with-mkhomedir'
         end

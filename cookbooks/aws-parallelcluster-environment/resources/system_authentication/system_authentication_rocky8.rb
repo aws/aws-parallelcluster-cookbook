@@ -28,7 +28,7 @@ action :configure do
     user 'root'
     # Tell NSS, PAM to use SSSD for system authentication and identity information
     # authconfig is a compatibility tool, replaced by authselect
-    command "authselect select sssd with-mkhomedir"
+    command "authselect select sssd with-mkhomedir --force"
     sensitive true
     default_env true
   end
