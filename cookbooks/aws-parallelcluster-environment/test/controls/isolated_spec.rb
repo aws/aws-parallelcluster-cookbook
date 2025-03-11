@@ -17,6 +17,5 @@ control 'tag:install_patch_isolated_instance_script_created' do
     its('owner') { should cmp 'root' }
     its('group') { should cmp 'root' }
     its('mode') { should cmp '0744' }
-    its('content') { should match /USERS=\(root #{node['cluster']['cluster_admin_user']} #{node['cluster']['cluster_user']}\)/ }
   end
 end

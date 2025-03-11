@@ -26,7 +26,7 @@ describe 'aws-parallelcluster-environment::isolated_install' do
 
       it 'has the correct content' do
         is_expected.to render_file("#{node['cluster']['scripts_dir']}/patch-iso-instance.sh")
-          .with_content("USERS=(root #{node['cluster']['cluster_admin_user']} #{node['cluster']['cluster_user']})")
+          .with_content("source /etc/profile.d/aws-cli-default-config.sh")
       end
     end
   end
