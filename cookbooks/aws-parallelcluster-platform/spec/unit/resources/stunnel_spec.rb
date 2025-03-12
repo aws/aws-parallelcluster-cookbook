@@ -45,7 +45,7 @@ describe 'stunnel:setup' do
         is_expected.to setup_stunnel('setup')
       end
 
-      if platform == 'amazon'
+      if platform == 'amazon' && version == '2'
         it "doesn't install stunnel" do
           is_expected.not_to run_bash('install stunnel')
         end

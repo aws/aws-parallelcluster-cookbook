@@ -53,9 +53,9 @@ describe 'efa:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:prerequisites) do
-        if %(redhat rocky).include?(platform)
+        if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
           %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
-        elsif platform == 'amazon'
+        elsif platform == 'amazon' && version == '2'
           %w(environment-modules libibverbs-utils librdmacm-utils)
         else
           "environment-modules"

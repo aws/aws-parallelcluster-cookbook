@@ -201,6 +201,12 @@ describe 'gdrcopy:setup' do
         case platform
         when 'ubuntu'
           %w(build-essential devscripts debhelper check libsubunit-dev fakeroot pkg-config dkms)
+        when 'amazon'
+          if version == '2023'
+            %w(dkms rpm-build make check check-devel)
+          else
+            %w(dkms rpm-build make check check-devel subunit subunit-devel)
+          end
         else
           %w(dkms rpm-build make check check-devel subunit subunit-devel)
         end
@@ -209,6 +215,7 @@ describe 'gdrcopy:setup' do
       cached(:gdrcopy_platform) do
         platforms = {
           'amazon2' => 'amzn-2',
+          'amazon2023' => 'amzn-2023',
           'centos7' => 'el7',
           'rhel8' => 'el8',
           'rocky8' => 'el8',
@@ -216,6 +223,7 @@ describe 'gdrcopy:setup' do
           'rocky9' => 'el9',
           'ubuntu20.04' => 'Ubuntu20_04',
           'ubuntu22.04' => 'Ubuntu22_04',
+          'ubuntu24.04' => 'Ubuntu24_04',
         }
         platforms["#{platform}#{version}"]
       end
