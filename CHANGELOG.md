@@ -6,7 +6,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.13.0
 ------
 **ENHANCEMENTS**
-- Add support for Ubuntu24.
+- Add support for Ubuntu 24.04.
+  Notice that ParallelCluster official AMI for Ubuntu 24.04 does not support Lustre.
 - Disable unused services like cups and wpa_supplicant from Official ParallelCluster AMIs to improve security.
 
 **CHANGES**
@@ -15,14 +16,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA Toolkit to version 12.8.0 (from 12.4.1) for all OSs except AL2.
 - Upgrade Python to 3.12.8 for all OSs except AL2 (from 3.9.20).
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
-- Upgrade `aws-cfn-bootstrap` to version 2.0-33.
-- Upgrade EFA installer to `1.38.0`.
-  - Efa-driver: `efa-2.13.0-1`
-  - Efa-config: `efa-config-1.17-1`
-  - Efa-profile: `efa-profile-1.7-1`
-  - Libfabric-aws: `libfabric-aws-1.22.0-1`
-  - Rdma-core: `rdma-core-54.0-1`
-  - Open MPI: `openmpi40-aws-4.1.7-1` and `openmpi50-aws-5.0.5`
+- Upgrade aws-cfn-bootstrap to version 2.0-33.
+- Upgrade EFA installer to 1.38.0 (from 1.36.0).
+  - Efa-driver: efa-2.13.0-1
+  - Efa-config: efa-config-1.17-1
+  - Efa-profile: efa-profile-1.7-1
+  - Libfabric-aws: libfabric-aws-1.22.0-1
+  - Rdma-core: rdma-core-54.0-1
+  - Open MPI: openmpi40-aws-4.1.7-1 and openmpi50-aws-5.0.5
 - Upgrade amazon-efs-utils to version 2.1.0.
 - Remove third-party cookbook: apt-7.5.22 and pyenv-4.2.3.
 - Upgrade third-party cookbook dependencies:
@@ -38,8 +39,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install NVIDIA drivers without the option 'no-cc-version-check', which is now deprecated in the NVIDIA installer.
 
 **BUG FIXES**
-- Remove usage of cfn-init for compute node bootstrapping to reduce node scale up time.
+- Remove usage of cfn-init for compute node bootstrapping to reduce node scale-up time.
 - Fix the execution of overriding aws-parallelcluster-node package only on the head node during update.
+- On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel 
+  to prevent installation failures.
+- Fix the execution of overriding aws-parallelcluster-node package only on the head node during update. 
 - Fix an issue where containerized jobs executed through Pyxis/Enroot in a multi-user environment (integrated with Active Directory) would fail.
 - Fix usage of authselect causing node bootstrap failures on Rocky 9.5+ when directory service is used.
 
