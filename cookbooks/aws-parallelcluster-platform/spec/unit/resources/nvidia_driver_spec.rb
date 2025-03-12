@@ -221,21 +221,34 @@ describe 'nvidia_driver:setup' do
         end
 
         if platform == 'amazon'
-          compiler_path = version == 2023 ? 'CC=/usr/bin/gcc' : 'CC=/usr/bin/gcc10-gcc'
-          it 'installs gcc10' do
-            is_expected.to install_package('gcc10').with_retries(10).with_retry_delay(5)
+          compiler_version = version == '2023' ? 'gcc' : 'gcc10'
+          compiler_path = version == '2023' ? 'CC=/usr/bin/gcc' : 'CC=/usr/bin/gcc10-gcc'
+          if version == '2'
+            it "installs #{compiler_version}" do
+              is_expected.to install_package(compiler_version).with_retries(10).with_retry_delay(5)
+            end
+            it 'creates dkms/nvidia.conf' do
+              is_expected.to create_template('/etc/dkms/nvidia.conf').with(
+                source: 'nvidia/amazon/dkms/nvidia.conf.erb',
+                cookbook: 'aws-parallelcluster-platform',
+                owner: 'root',
+                group: 'root',
+                mode: '0644',
+                variables: { compiler_path: compiler_path }
+              )
+            end
+          else
+            # Amazon Linux 2023 is expected to install the compiler and create nvidia conf when kernel version is 6.
+            # Here we are testing with kernel version 5
+            it "does not install #{compiler_version}" do
+              is_expected.not_to install_package(compiler_version).with_retries(10).with_retry_delay(5)
+            end
+
+            it 'does not create dkms/nvidia.conf' do
+              is_expected.not_to create_template('/etc/dkms/nvidia.conf')
+            end
           end
 
-          it 'creates dkms/nvidia.conf' do
-            is_expected.to create_template('/etc/dkms/nvidia.conf').with(
-              source: 'nvidia/amazon/dkms/nvidia.conf.erb',
-              cookbook: 'aws-parallelcluster-platform',
-              owner: 'root',
-              group: 'root',
-              mode: '0644',
-              variables: { compiler_path: compiler_path }
-            )
-          end
           it 'installs nvidia driver' do
             is_expected.to run_bash('nvidia.run advanced')
               .with(

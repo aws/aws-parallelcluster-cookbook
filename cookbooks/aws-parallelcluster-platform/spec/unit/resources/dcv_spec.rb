@@ -42,7 +42,8 @@ describe 'dcv:dcv_supported?' do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
         end
 
-        if platform == 'ubuntu' && version.to_i == 20
+        case "#{platform}#{version}"
+        when "amazon2023", "ubuntu20.04"
           it "is false" do
             expect(resource.dcv_supported?).to eq(false)
           end
@@ -58,9 +59,10 @@ describe 'dcv:dcv_supported?' do
       end
 
       context 'when not on arm' do
-        it "is true" do
+        is_supported = !("#{platform}#{version}" == 'amazon2023')
+        it "is #{is_supported}" do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-          expect(resource.dcv_supported?).to eq(true)
+          expect(resource.dcv_supported?).to eq(is_supported)
         end
       end
     end
@@ -142,8 +144,8 @@ describe 'dcv:packages' do
           expect(resource.xdcv).to eq("nice-xdcv_#{xdcv_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer_#{dcv_webviewer_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_gl).to eq("/nice-dcv-gl_#{dcv_gl_version}_#{dcv_pkg_arch}.#{base_os}.deb")
-        else
-          dcv_platform_version = platform == "amazon" ? "7" : version.to_i
+        elsif "#{platform}#{version}" != 'amazon2023'
+          dcv_platform_version = "#{platform}#{version}" == "amazon2" ? "7" : version.to_i
           dcv_platform_version_pkg = platform == "amazon" ? "amzn2" : "el" + version
           expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-#{dcv_platform_version_pkg}-#{dcv_url_arch}")
           expect(resource.dcv_server).to eq("nice-dcv-server-#{dcv_server_version}.el#{dcv_platform_version}.#{dcv_url_arch}.rpm")
@@ -479,14 +481,16 @@ describe 'dcv:setup' do
                                                       .with_code(/apt -y purge ifupdown/)
                                                       .with_code(%r{wget https://d1uj6qtbmh3dt5.cloudfront.net/NICE-GPG-KEY})
           when 'amazon'
-            is_expected.to install_package(alinux_prereq_packages).with_retries(10).with_retry_delay(5)
-            is_expected.to create_file('Setup Gnome standard').with(
-              content: "PREFERRED=/usr/bin/gnome-session",
-              owner: "root",
-              group: "root",
-              mode: "0755",
-              path: "/etc/sysconfig/desktop"
-            )
+            if version == '2'
+              is_expected.to install_package(alinux_prereq_packages).with_retries(10).with_retry_delay(5)
+              is_expected.to create_file('Setup Gnome standard').with(
+                content: "PREFERRED=/usr/bin/gnome-session",
+                owner: "root",
+                group: "root",
+                mode: "0755",
+                path: "/etc/sysconfig/desktop"
+              )
+            end
           else
             is_expected.to run_execute('Install gnome desktop').with_command('yum -y install @gnome').with_retries(3).with_retry_delay(5)
             is_expected.to install_package('xorg-x11-server-Xorg').with_retries(3).with_retry_delay(5)

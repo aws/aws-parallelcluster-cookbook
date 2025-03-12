@@ -38,6 +38,8 @@ for_all_oses do |platform, version|
           "/usr/share/modules/init/.modulespath"
         when 'redhat', 'rocky'
           '/etc/environment-modules/modulespath'
+        when 'amazon'
+          version == '2' ? '/usr/share/Modules/init/.modulespath' : '/etc/environment-modules/modulespath'
         else
           "/usr/share/Modules/init/.modulespath"
         end
