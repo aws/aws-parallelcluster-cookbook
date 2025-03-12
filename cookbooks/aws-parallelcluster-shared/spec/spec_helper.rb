@@ -43,6 +43,7 @@ def for_all_oses
     %w(amazon 2023),
     %w(ubuntu 20.04),
     %w(ubuntu 22.04),
+    %w(ubuntu 24.04),
     %w(redhat 8),
     %w(rocky 8),
     %w(redhat 9),
