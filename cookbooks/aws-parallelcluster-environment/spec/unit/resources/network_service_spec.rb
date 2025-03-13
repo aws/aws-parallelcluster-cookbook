@@ -27,19 +27,28 @@ describe 'network_service:restart' do
       end
       cached(:node) { chef_run.node }
       cached(:network_service_name) do
-        {
-          'amazon' => 'network',
-          'centos' => 'network',
-          'redhat' => 'NetworkManager',
-          'rocky' => 'NetworkManager',
-          'ubuntu' => 'systemd-resolved',
-        }[platform]
+        if platform == 'amazon' && version == '2' || platform == 'centos'
+          'network'
+        elsif platform == 'amazon' && version == '2023'
+          'systemd-networkd'
+        elsif platform == 'ubuntu'
+          'systemd-resolved'
+        elsif %(redhat rocky).include?(platform)
+          'NetworkManager'
+        else
+          raise "Cannot determine network_service_name: unrecognized platform #{platform}"
+        end
       end
 
       it "restarts network service" do
         is_expected.to restart_network_service('restart')
+        network_services_to_restart = if platform == 'amazon' && version == '2023'
+                                        [network_service_name, 'systemd-resolved']
+                                      else
+                                        [network_service_name]
+                                      end
 
-        is_expected.to write_log("Restarting '#{network_service_name}' service, platform #{platform} '#{node['platform_version']}'")
+        is_expected.to write_log("Restarting '#{network_services_to_restart.join(' ')}' service, platform #{platform} '#{node['platform_version']}'")
 
         is_expected.to restart_service(network_service_name)
           .with(ignore_failure: true)
@@ -56,13 +65,17 @@ describe 'network_service:reload' do
         ConvergeNetworkService.reload(runner)
       end
       cached(:network_service_name) do
-        {
-          'amazon' => 'network',
-          'centos' => 'network',
-          'redhat' => 'NetworkManager',
-          'rocky' => 'NetworkManager',
-          'ubuntu' => 'systemd-resolved',
-        }[platform]
+        if platform == 'amazon' && version == '2' || platform == 'centos'
+          'network'
+        elsif platform == 'amazon' && version == '2023'
+          'systemd-networkd'
+        elsif platform == 'ubuntu'
+          'systemd-resolved'
+        elsif %(redhat rocky).include?(platform)
+          'NetworkManager'
+        else
+          raise "Cannot determine network_service_name: unrecognized platform #{platform}"
+        end
       end
 
       it 'reloads network_service' do

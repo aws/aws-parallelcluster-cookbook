@@ -26,14 +26,19 @@ describe 'arm_pl:setup' do
         when 'ubuntu'
           "Ubuntu-#{version}"
         when 'amazon'
-          "AmazonLinux-2"
+          if version == '2'
+            "AmazonLinux-2"
+          elsif version == '2023'
+            'RHEL-9'
+          end
         else
           "RHEL-#{version}"
         end
       end
 
       cached(:gcc_major_minor_version) do
-        if platform == 'ubuntu' && version == '22.04' || version == '9'
+        case "#{platform}#{version}"
+        when 'amazon2023', 'ubuntu24.04', 'ubuntu22.04', 'redhat9', 'rocky9'
           '11.3'
         else
           '9.3'

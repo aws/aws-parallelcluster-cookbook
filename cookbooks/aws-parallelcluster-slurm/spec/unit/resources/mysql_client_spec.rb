@@ -30,6 +30,8 @@ describe 'mysql_client:setup' do
         cached(:package_platform) do
           platform_version = if version.to_i == 2
                                7
+                             elsif platform == 'amazon' && version == '2023'
+                               9
                              else
                                version.to_i
                              end

@@ -41,9 +41,9 @@ describe 'dns_domain:configure' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:dns_domain) { 'dns_domain' }
-      cached(:search_domain_config_path) { platform == 'ubuntu' ? '/etc/systemd/resolved.conf' : '/etc/dhcp/dhclient.conf' }
-      cached(:append_pattern) { platform == 'ubuntu' ? 'Domains=*' : 'append domain-name*' }
-      cached(:append_line) { platform == 'ubuntu' ? "Domains=#{dns_domain}" : "append domain-name \" #{dns_domain}\";" }
+      cached(:search_domain_config_path) { platform == 'ubuntu' || platform == 'amazon' && version == '2023' ? '/etc/systemd/resolved.conf' : '/etc/dhcp/dhclient.conf' }
+      cached(:append_pattern) { platform == 'ubuntu' || platform == 'amazon' && version == '2023' ? 'Domains=*' : 'append domain-name*' }
+      cached(:append_line) { platform == 'ubuntu' || platform == 'amazon' && version == '2023' ? "Domains=#{dns_domain}" : "append domain-name \" #{dns_domain}\";" }
 
       cached(:chef_run) do
         runner = runner(platform: platform, version: version, step_into: ['dns_domain']) do |node|
@@ -56,7 +56,7 @@ describe 'dns_domain:configure' do
         is_expected.to configure_dns_domain('configure')
       end
 
-      it 'updates search domaint' do
+      it 'updates search domain' do
         is_expected.to edit_replace_or_add("append Route53 search domain in #{search_domain_config_path}").with(
           path: search_domain_config_path,
           pattern: append_pattern,

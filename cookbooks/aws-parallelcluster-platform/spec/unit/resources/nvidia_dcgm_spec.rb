@@ -89,7 +89,7 @@ describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
           chef_run.find_resource('nvidia_dcgm', 'setup')
         end
 
-        if %w(centos amazon).include?(platform)
+        if %w(centos7 amazon2).include?("#{platform}#{version}")
           it "is not enabled" do
             expect(resource._nvidia_dcgm_enabled).to eq(false)
           end
@@ -164,7 +164,7 @@ describe 'nvidia_dcgm:setup' do
             ConvergeNvidiaDcgm.setup(chef_run)
           end
 
-          if %w(centos amazon).include?(platform)
+          if %w(centos7 amazon2).include?("#{platform}#{version}")
             it 'does not install datacenter gpu manager' do
               is_expected.not_to run_bash('Install datacenter-gpu-manager')
             end

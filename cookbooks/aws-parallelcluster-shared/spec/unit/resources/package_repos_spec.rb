@@ -28,10 +28,15 @@ describe 'package_repos:setup' do
           expect(chef_run).to include_recipe('yum')
         end
 
-        it 'installs epel' do
-          is_expected.to install_alinux_extras_topic('epel')
+        if version == '2'
+          it 'installs epel' do
+            is_expected.to install_alinux_extras_topic('epel')
+          end
+        else
+          it 'does not install epel' do
+            is_expected.not_to install_alinux_extras_topic('epel')
+          end
         end
-
       when 'centos'
         it 'installs yum and epel' do
           expect(chef_run).to include_recipe('yum')

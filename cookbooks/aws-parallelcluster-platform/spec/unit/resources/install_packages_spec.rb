@@ -59,7 +59,7 @@ describe 'install_packages:setup' do
           end
         end
 
-        if platform == 'amazon'
+        if platform == 'amazon' && version == '2'
           it 'installs extra packages' do
             is_expected.to install_alinux_extras_topic('R3.4')
           end

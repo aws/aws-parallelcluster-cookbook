@@ -84,7 +84,9 @@ describe 'nvidia_repo:add' do
       cached(:arch_suffix) { 'arch_suffix' }
       cached(:nvidia_platform) do
         case platform
-        when 'amazon', 'centos'
+        when 'amazon'
+          version == '2023' ? 'rhel9' : 'rhel7'
+        when 'centos'
           'rhel7'
         when 'redhat', 'rocky'
           "rhel#{version.to_i}"
