@@ -17,7 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Python to 3.12.8 for all OSs except AL2 (from 3.9.20).
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
 - Upgrade aws-cfn-bootstrap to version 2.0-33.
-- Upgrade EFA installer to 1.38.0 (from 1.36.0).
+- Upgrade EFA installer to 1.38.1 (from 1.36.0).
   - Efa-driver: efa-2.13.0-1
   - Efa-config: efa-config-1.17-1
   - Efa-profile: efa-profile-1.7-1
