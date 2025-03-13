@@ -40,7 +40,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Remove usage of cfn-init for compute node bootstrapping to reduce node scale-up time.
-- Fix the execution of overriding aws-parallelcluster-node package only on the head node during update.
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel 
   to prevent installation failures.
 - Fix the execution of overriding aws-parallelcluster-node package only on the head node during update. 
