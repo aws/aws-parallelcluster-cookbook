@@ -37,6 +37,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Remove generation of DSA keys for login nodes as DSA, which became unsupported in OpenSSH 9.7+.
 - Set instance ID and instance type information in Slurm upon compute nodes launch.
 - Install NVIDIA drivers without the option 'no-cc-version-check', which is now deprecated in the NVIDIA installer.
+- Reduce RHEL/Rocky Linux boot time by the following network customization:
+  - Configuring higher priority to IPv4 than IPv6
+  - Disabling Internet connectivity check
+  - Configuring only IPv4 IMDS endpoint to cloud-init
 
 **BUG FIXES**
 - Remove usage of cfn-init for compute node bootstrapping to reduce node scale-up time.
