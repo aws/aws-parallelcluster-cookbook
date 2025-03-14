@@ -73,7 +73,9 @@ when 'ComputeFleet'
   bash "copy_auth_file" do
     code <<-PERMS
       set -e
-      cp -p #{node['cluster']['shared_dir']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
+      cp #{node['cluster']['shared_dir']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
+      chmod --reference=#{node['cluster']['shared_dir']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
+      chown --reference=#{node['cluster']['shared_dir']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
     PERMS
     only_if { node['cluster']['default_user_home'] == 'local' }
   end
@@ -90,7 +92,9 @@ when 'LoginNode'
   bash "copy_auth_file" do
     code <<-PERMS
       set -e
-      cp -p #{node['cluster']['shared_dir_login_nodes']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
+      cp #{node['cluster']['shared_dir_login_nodes']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
+      chmod --reference=#{node['cluster']['shared_dir_login_nodes']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
+      chown --reference=#{node['cluster']['shared_dir_login_nodes']}/authorized_keys #{node['cluster']['cluster_user_home']}/.ssh/authorized_keys
     PERMS
     only_if { node['cluster']['default_user_home'] == 'local' }
   end
