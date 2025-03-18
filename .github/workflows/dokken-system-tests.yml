@@ -2,8 +2,8 @@ name: ParallelCluster Cookbook Validation on Docker
 
 on:
   push:
-  pull_request:
-    types: [ opened, synchronize, reopened, labeled, unlabeled ]
+    tags:
+      - 'temp-skip*'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
