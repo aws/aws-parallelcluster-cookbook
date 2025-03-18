@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.14.0
+------
+
+**ENHANCEMENTS**
+- Remove UnkillableStepTimeout from slurm.conf and let slurm set this value.
+
 3.13.0
 ------
 **ENHANCEMENTS**
