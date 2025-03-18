@@ -7,7 +7,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 **ENHANCEMENTS**
 - Add support for Ubuntu 24.04.
-  Notice that ParallelCluster official AMI for Ubuntu 24.04 does not support Lustre.
 - Disable unused services like cups and wpa_supplicant from Official ParallelCluster AMIs to improve security.
 
 **CHANGES**
