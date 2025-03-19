@@ -5,6 +5,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 3.13.0
 ------
+
+**DEPRECATIONS**
+- This is the last ParallelCluster release supporting Ubuntu 20.04  
+  as Ubuntu 20.04 will be in End-Of-Standard-Support on May 2025.
+
 **ENHANCEMENTS**
 - Add support for Ubuntu 24.04.
 - Disable unused services like cups and wpa_supplicant from Official ParallelCluster AMIs to improve security.
