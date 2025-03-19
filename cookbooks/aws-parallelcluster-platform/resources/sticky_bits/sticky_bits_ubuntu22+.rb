@@ -1,3 +1,7 @@
+# frozen_string_literal: true
+
+# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
 # A copy of the License is located at
@@ -8,16 +12,15 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :munge, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+provides :sticky_bits, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-use 'partial/_munge_actions'
+unified_mode true
 
-def prerequisites
-  %w(automake autoconf libtool libssl-dev)
-end
-
-def munge_libdir
-  '/usr/lib'
+action :setup do
+  # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
+  sysctl 'fs.protected_regular' do
+    value 0
+  end
 end

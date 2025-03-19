@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -10,18 +10,17 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License.
+# See the License for the specific language governing permissions and limitations under the License
 
-provides :build_tools, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+provides :stunnel, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-unified_mode true
-default_action :setup
+use 'partial/_common'
+use 'partial/_setup'
 
-action :setup do
-  package %w(build-essential) do
-    retries 10
-    retry_delay 5
+action_class do
+  def dependencies
+    %w(libssl-dev libwrap0-dev)
   end
 end

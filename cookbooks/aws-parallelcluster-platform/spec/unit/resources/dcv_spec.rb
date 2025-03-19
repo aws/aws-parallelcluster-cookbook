@@ -43,7 +43,7 @@ describe 'dcv:dcv_supported?' do
         end
 
         case "#{platform}#{version}"
-        when "amazon2023", "ubuntu20.04"
+        when "amazon2023"
           it "is false" do
             expect(resource.dcv_supported?).to eq(false)
           end

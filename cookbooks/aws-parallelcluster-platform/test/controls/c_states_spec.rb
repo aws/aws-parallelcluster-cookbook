@@ -2,20 +2,10 @@
 control 'tag:install_c_states_kernel_configured' do
   title 'Check the configuration to disable c states'
   only_if { !os_properties.on_docker? && os_properties.x86? }
-
-  if os_properties.ubuntu?
-    %w(/etc/default/grub /boot/grub/grub.cfg).each do |file_path|
-      describe file(file_path) do
-        it { should exist }
-        its('content') { should match(/processor.max_cstate=1/) }
-        its('content') { should match(/intel_idle.max_cstate=1/) }
-      end
-    end
-  else
-    describe bash('cpupower idle-info') do
-      its('stdout') { should match(/Number of idle states: 2/) }
-      its('stdout') { should match(/Available idle states: POLL C1/) }
-    end
+  ## cpupower is installed for Ubuntu >=22
+  describe bash('cpupower idle-info') do
+    its('stdout') { should match(/Number of idle states: 2/) }
+    its('stdout') { should match(/Available idle states: POLL C1/) }
   end
 end
 

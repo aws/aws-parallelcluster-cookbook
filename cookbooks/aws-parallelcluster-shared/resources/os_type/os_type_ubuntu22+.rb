@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-#
 # Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -11,23 +10,14 @@
 #
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
-# See the License for the specific language governing permissions and limitations under the License
-provides :network_service, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+# See the License for the specific language governing permissions and limitations under the License.
+
+provides :os_type, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-unified_mode true
-default_action :restart
+use 'partial/_os_type_common.rb'
 
-use 'partial/_network_service'
-
-action :reload do
-  execute "apply network configuration" do
-    command "netplan apply"
-    timeout 60
-  end unless on_docker?
-end
-
-def network_service_name
-  'systemd-resolved'
+def current_os
+  "ubuntu#{node['platform_version'].tr('.', '')}"
 end

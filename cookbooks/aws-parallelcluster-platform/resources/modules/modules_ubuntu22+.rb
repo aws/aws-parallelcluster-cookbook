@@ -12,15 +12,19 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :sticky_bits, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+provides :modules, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-unified_mode true
+use 'partial/_modules_common.rb'
+use 'partial/_modules_apt.rb'
 
-action :setup do
-  # Restore old behavior with sticky bits in Ubuntu 20 to allow root writing to files created by other users
-  sysctl 'fs.protected_regular' do
-    value 0
+action_class do
+  def packages
+    %w(environment-modules)
+  end
+
+  def modules_home
+    '/usr/share/modules'
   end
 end

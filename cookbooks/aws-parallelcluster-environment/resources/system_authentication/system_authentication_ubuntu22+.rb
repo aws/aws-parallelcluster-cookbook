@@ -12,16 +12,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_repo, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+provides :system_authentication, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-use 'partial/_nvidia_repo_common.rb'
-
-def platform
-  "ubuntu#{node['platform_version'].delete('.')}"
-end
-
-def repository_key
-  '3bf863cc.pub'
-end
+use 'partial/_system_authentication_common'
+use 'partial/_system_authentication_debian'

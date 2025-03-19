@@ -221,7 +221,6 @@ describe 'gdrcopy:setup' do
           'rocky8' => 'el8',
           'rhel9' => 'el9',
           'rocky9' => 'el9',
-          'ubuntu20.04' => 'Ubuntu20_04',
           'ubuntu22.04' => 'Ubuntu22_04',
           'ubuntu24.04' => 'Ubuntu24_04',
         }

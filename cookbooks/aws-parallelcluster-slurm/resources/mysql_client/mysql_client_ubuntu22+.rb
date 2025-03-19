@@ -12,22 +12,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :arm_pl, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i == 20
+provides :mysql_client, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-use 'partial/_arm_pl_common.rb'
-
-action_class do
-  def armpl_platform
-    "Ubuntu-#{node['platform_version']}"
-  end
-
-  def modulefile_dir
-    "/usr/share/modules/modulefiles"
-  end
-
-  def gcc_major_minor_version
-    '9.3'
-  end
-end
+use 'partial/_common'
+use 'partial/_setup_ubuntu'

@@ -12,12 +12,8 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_driver, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i == 20
+provides :enroot, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
-
-use 'partial/_nvidia_driver_common.rb'
-
-def rebuild_initramfs?
-  true
-end
+use 'partial/_enroot_common.rb'
+use 'partial/_enroot_debian.rb'

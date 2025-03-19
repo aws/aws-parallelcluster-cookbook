@@ -31,7 +31,6 @@ jobs:
         os:
           - alinux2
           - alinux-2023
-          - ubuntu2004
           - ubuntu2204
           - ubuntu2404
           - rhel8

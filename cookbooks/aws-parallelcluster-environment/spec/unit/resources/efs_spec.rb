@@ -79,7 +79,7 @@ describe 'efs:install_utils' do
   end
 
   for_oses([
-             %w(ubuntu 20.04),
+             %w(ubuntu 24.04),
              %w(ubuntu 22.04),
            ]) do |platform, version|
     context "on #{platform}#{version}" do

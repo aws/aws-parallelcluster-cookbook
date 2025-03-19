@@ -1,8 +1,3 @@
-# frozen_string_literal: true
-
-#
-# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
 # A copy of the License is located at
@@ -13,13 +8,22 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :lustre, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+provides :dns_domain, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-unified_mode true
+use 'partial/_dns_domain_common'
 
-use 'partial/_install_lustre_debian'
-use 'partial/_mount_unmount'
+def search_domain_config_path
+  # Configure resolved to automatically append Route53 search domain in resolv.conf.
+  # On Ubuntu18 resolv.conf is managed by systemd-resolved.
+  '/etc/systemd/resolved.conf'
+end
 
-default_action :setup
+def append_pattern
+  'Domains=*'
+end
+
+def append_line
+  "Domains=#{node['cluster']['dns_domain']}"
+end

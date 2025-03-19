@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 provides :gdrcopy, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+  node['platform_version'].to_i >= 22
 end
 
 use 'partial/_gdrcopy_common.rb'

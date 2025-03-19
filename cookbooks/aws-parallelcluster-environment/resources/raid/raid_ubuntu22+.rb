@@ -1,5 +1,5 @@
 provides :raid, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+  node['platform_version'].to_i >= 22
 end
 
 use 'partial/_raid_common'

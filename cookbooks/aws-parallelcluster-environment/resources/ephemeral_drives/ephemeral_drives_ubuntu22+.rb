@@ -12,18 +12,14 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :chrony, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 20
+provides :ephemeral_drives, platform: 'ubuntu' do |node|
+  node['platform_version'].to_i >= 22
 end
 
-use 'partial/_chrony_common.rb'
+use 'partial/_ephemeral_drives_common.rb'
 
 action_class do
-  def chrony_conf_path
-    '/etc/chrony/chrony.conf'
-  end
-
-  def chrony_service
-    'chrony'
+  def network_target
+    'network.target'
   end
 end

@@ -13,7 +13,7 @@ RSpec.configure do |c|
   end
   # This will be used by default when platform doesn't matter
   # When it matters, platform value must be overridden for a specific test
-  c.platform = 'ubuntu'
+  c.platform = 'redhat'
 end
 
 module ChefSpec
@@ -41,7 +41,6 @@ def for_all_oses
   [
     %w(amazon 2),
     %w(amazon 2023),
-    %w(ubuntu 20.04),
     %w(ubuntu 22.04),
     %w(ubuntu 24.04),
     %w(redhat 8),

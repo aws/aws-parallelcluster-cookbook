@@ -13,7 +13,7 @@ end
 describe 'sudo_access:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:default_user) { 'ubuntu' }
+      cached(:default_user) { 'ec2-user' }
       let(:chef_run) do
         runner(platform: platform, version: version, step_into: ['sudo_access']) do |node|
           node.override['cluster']['cluster_user'] = default_user

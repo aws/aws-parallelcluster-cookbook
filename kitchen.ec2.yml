@@ -237,32 +237,6 @@ platforms:
     attributes:
       cluster:
         base_os: rocky9
-  - name: ubuntu2004
-    driver_plugin: ec2
-    driver:
-      <% if ENV['KITCHEN_UBUNTU2004_AMI'] %>
-      # Use the Ubuntu 20 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_UBUNTU2004_AMI'] %>
-      <% else %>
-      image_search:
-        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd/ubuntu-focal-20.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-<% else %><%= pcluster_prefix %>-ubuntu-2004-lts-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
-      <% end %>
-      block_device_mappings:
-        - device_name: /dev/sda1
-          ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
-            volume_type: gp2
-            delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
-        - device_name: /dev/xvdb<%= c %>
-          virtual_name: ephemeral<%= i %>
-      <% end %>
-    transport:
-      username: ubuntu
-    attributes:
-      cluster:
-        base_os: ubuntu2004
   - name: ubuntu2204
     driver_plugin: ec2
     driver:

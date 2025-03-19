@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Remove UnkillableStepTimeout from slurm.conf and let slurm set this value.
 
+**CHANGES**
+- Ubuntu 20.04 is no longer supported.
+
 3.13.0
 ------
 **ENHANCEMENTS**
