@@ -20,5 +20,10 @@ if [ "${ID}${VERSION_ID}" == "centos7" ]; then
     rm -f /etc/sysconfig/network-scripts/ifcfg-eth0
 fi
 
+# Clean resolv.conf if it's not managed by system
+if [ ! -L "/etc/resolv.conf" ]; then
+    echo -n > /etc/resolv.conf
+fi
+
 find /var/log -type f -exec /bin/rm -v {} \;
 touch /var/log/lastlog
