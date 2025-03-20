@@ -22,7 +22,7 @@ fi
 
 # Clean resolv.conf if it's not managed by system
 if [ ! -L "/etc/resolv.conf" ]; then
-    echo -n > /etc/resolv.conf
+    sed -i '/^nameserver/d' /etc/resolv.conf
 fi
 
 find /var/log -type f -exec /bin/rm -v {} \;
