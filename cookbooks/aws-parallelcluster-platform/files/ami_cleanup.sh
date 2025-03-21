@@ -1,5 +1,7 @@
 #!/bin/bash
 
+IS_OFFICIAL_AMI_BUILD=${1:-"false"}
+
 # clean up cloud init artifacts https://cloudinit.readthedocs.io/en/latest/topics/cli.html#clean
 cloud-init clean -s
 
@@ -21,8 +23,10 @@ if [ "${ID}${VERSION_ID}" == "centos7" ]; then
 fi
 
 # Clean resolv.conf if it's not managed by system
-if [ ! -L "/etc/resolv.conf" ]; then
-    sed -i '/^nameserver/d' /etc/resolv.conf
+if [ "${IS_OFFICIAL_AMI_BUILD}" == "true" ]; then
+    echo "Clean resolv.conf for official AMIs"
+    echo -n > /etc/resolv.conf
+    rm -f /run/systemd/resolve/resolv.conf
 fi
 
 find /var/log -type f -exec /bin/rm -v {} \;
