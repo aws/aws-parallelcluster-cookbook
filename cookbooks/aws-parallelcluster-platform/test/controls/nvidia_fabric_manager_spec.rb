@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:install_expected_versions_of_nvidia_fabric_manager_installed' do
-  only_if { !os_properties.arm? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
+  only_if { !os_properties.arm? && ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
 
   describe package(node['cluster']['nvidia']['fabricmanager']['package']) do
     it { should be_installed }
