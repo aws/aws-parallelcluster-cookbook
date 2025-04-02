@@ -13,21 +13,20 @@ control 'tag:install_mysql_client_installed' do
   title "MySql client is installed"
 
   mysql_packages = []
+  ubuntu = os_properties.ubuntu?
   if os.redhat?
     mysql_packages.concat %w(mysql-community-client-plugins mysql-community-common
        mysql-community-devel mysql-community-libs)
     if os_properties.alinux2? || os_properties.centos7?
       mysql_packages.concat %w(mysql-community-libs-compat)
     end
-  elsif os_properties.ubuntu2004? || os_properties.ubuntu2204?
+  elsif ubuntu
     mysql_packages.concat %w(libmysqlclient-dev libmysqlclient21)
   else
     describe "unsupported OS" do
       pending "support for #{os.name}-#{os.release} needs to be implemented"
     end
   end
-
-  ubuntu = os_properties.ubuntu?
 
   mysql_packages.each do |pkg|
     describe package(pkg) do

@@ -33,6 +33,16 @@ action :configure do
     mode '0644'
   end
 
+  # Disable ipv6 IMDS in cloud init to speed up
+  cookbook_file '99-disable-ipv6-metadata.cfg' do
+    path '/etc/cloud/cloud.cfg.d/99-disable-ipv6-metadata.cfg'
+    source 'dns_domain/99-disable-ipv6-metadata.cfg'
+    cookbook 'aws-parallelcluster-slurm'
+    user 'root'
+    group 'root'
+    mode '0644'
+  end
+
   action_update_search_domain
   network_service 'Restart network service'
 end

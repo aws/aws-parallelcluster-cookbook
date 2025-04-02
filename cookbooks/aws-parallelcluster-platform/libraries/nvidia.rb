@@ -1,5 +1,5 @@
 def nvidia_enabled?
-  ['yes', true].include?(node['cluster']['nvidia']['enabled'])
+  ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled'])
 end
 
 #

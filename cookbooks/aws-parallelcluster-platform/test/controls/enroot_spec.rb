@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:install_expected_version_of_enroot_installed' do
-  only_if { !os_properties.on_docker? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
+  only_if { !os_properties.on_docker? && ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
 
   expected_enroot_version = node['cluster']['enroot']['version']
 
@@ -31,7 +31,7 @@ control 'tag:install_expected_version_of_enroot_installed' do
 end
 
 control 'tag:config_enroot_enabled_on_graphic_instances' do
-  only_if { !os_properties.on_docker? && ['yes', true].include?(node['cluster']['nvidia']['enabled']) }
+  only_if { !os_properties.on_docker? && ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
   describe 'enroot service should be enabled' do
     subject { command("enroot version") }
     its('exit_status') { should cmp == 0 }
@@ -39,7 +39,7 @@ control 'tag:config_enroot_enabled_on_graphic_instances' do
 end
 
 control 'tag:config_enroot_disabled_on_non_graphic_instances' do
-  only_if { !os_properties.on_docker? && !['yes', true].include?(node['cluster']['nvidia']['enabled']) }
+  only_if { !os_properties.on_docker? && !['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
 
   describe 'enroot service should be disabled' do
     subject { command("enroot version") }
