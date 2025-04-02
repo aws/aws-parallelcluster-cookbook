@@ -95,7 +95,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -121,7 +121,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/xvda
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp3
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -147,7 +147,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -173,7 +173,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -199,7 +199,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -225,7 +225,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -251,7 +251,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -277,7 +277,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp2
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
@@ -303,7 +303,7 @@ platforms:
       block_device_mappings:
         - device_name: /dev/sda1
           ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 40 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
+            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
             volume_type: gp3
             delete_on_termination: true
       <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
