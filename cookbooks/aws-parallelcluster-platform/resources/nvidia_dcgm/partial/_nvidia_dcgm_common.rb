@@ -24,7 +24,7 @@ action :setup do
 end
 
 def _nvidia_enabled
-  nvidia_enabled.nil? ? ['yes', true].include?(node['cluster']['nvidia']['enabled']) : nvidia_enabled
+  nvidia_enabled.nil? ? ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) : nvidia_enabled
 end
 
 def package_version

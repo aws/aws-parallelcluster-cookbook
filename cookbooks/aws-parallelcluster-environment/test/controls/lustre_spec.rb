@@ -27,7 +27,7 @@ control 'tag:install_lustre_client_installed' do
     end
   end
 
-  if os_properties.redhat? && inspec.os.release.to_f >= 8.2 && !os_properties.on_docker? && !os_properties.ubuntu2404?
+  if os_properties.redhat? && inspec.os.release.to_f >= 8.2 && !os_properties.on_docker?
     # TODO: restore installation and check on docker when Lustre is available for RH8.9
     # See: https://docs.aws.amazon.com/fsx/latest/LustreGuide/install-lustre-client.html
     unless inspec.os.release.to_f == 8.7 && (node['cluster']['kernel_release'].include?("4.18.0-425.3.1.el8") || node['cluster']['kernel_release'].include?("4.18.0-425.13.1.el8_7"))
@@ -55,7 +55,7 @@ control 'tag:install_lustre_client_installed' do
     end
   end
 
-  if os_properties.debian_family? && !os_properties.ubuntu2404?
+  if os_properties.debian_family?
     describe apt('https://fsx-lustre-client-repo.s3.amazonaws.com/ubuntu') do
       it { should exist }
       it { should be_enabled }
@@ -89,7 +89,7 @@ end
 
 control 'tag:install_lustre_lnet_kernel_module_enabled' do
   title "Verify that lnet kernel module is enabled"
-  only_if { !os_properties.on_docker? && !os_properties.alinux? && !os_properties.ubuntu2404? }
+  only_if { !os_properties.on_docker? && !os_properties.alinux? }
   describe kernel_module("lnet") do
     it { should be_loaded }
     it { should_not be_disabled }
@@ -98,7 +98,7 @@ control 'tag:install_lustre_lnet_kernel_module_enabled' do
 end
 
 control 'lustre_mounted' do
-  only_if { !os_properties.on_docker? && !os_properties.ubuntu2404? }
+  only_if { !os_properties.on_docker? }
   describe mount('/shared_dir') do
     it { should be_mounted }
     its('type') { should eq 'lustre' }
@@ -106,7 +106,7 @@ control 'lustre_mounted' do
 end
 
 control 'lustre_unmounted' do
-  only_if { !os_properties.on_docker? && !os_properties.ubuntu2404? }
+  only_if { !os_properties.on_docker? }
 
   describe mount('/shared_dir') do
     it { should_not be_mounted }

@@ -11,7 +11,7 @@
 
 control 'tag:install_nvidia_dcgm_installed' do
   only_if do
-    ['yes', true].include?(node['cluster']['nvidia']['enabled']) && !instance.custom_ami? &&
+    ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) && !instance.custom_ami? &&
       (!os_properties.arm? || !(os_properties.alinux2? || os_properties.centos?))
   end
 
