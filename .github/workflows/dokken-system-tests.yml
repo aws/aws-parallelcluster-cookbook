@@ -64,7 +64,7 @@ jobs:
           df -h /
       - name: Get changed files
         id: changed-files-excluding-tests
-        uses: tj-actions/changed-files@v41.0.0
+        uses: tj-actions/changed-files@v45.0.8
         with:
           files_ignore: |
             !.*
