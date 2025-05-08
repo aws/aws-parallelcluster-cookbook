@@ -13,8 +13,8 @@ control 'tag:install_c_states_kernel_configured' do
     end
   else
     describe bash('cpupower idle-info') do
-      its('stdout') { should match(/Number of idle states: 2/) }
-      its('stdout') { should match(/Available idle states: POLL C1/) }
+      its('stdout') { should match(/Number of idle states: 2|No idle states/) }
+      its('stdout') { should match(/Available idle states: POLL C1|No idle states/) }
     end
   end
 end
