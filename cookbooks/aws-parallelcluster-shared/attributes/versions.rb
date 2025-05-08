@@ -7,7 +7,7 @@ if platform?('amazon') && node['platform_version'] == "2"
 end
 
 # ParallelCluster versions
-default['cluster']['parallelcluster-version'] = '3.13.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.13.0'
-default['cluster']['parallelcluster-node-version'] = '3.13.0'
+default['cluster']['parallelcluster-version'] = '3.13.1'
+default['cluster']['parallelcluster-cookbook-version'] = '3.13.1'
+default['cluster']['parallelcluster-node-version'] = '3.13.1'
 default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.4.0'
