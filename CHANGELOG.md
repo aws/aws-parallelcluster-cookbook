@@ -9,6 +9,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade Slurm to version 24.05.8.
 
+**BUG FIXES**
+- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments 
+due to cookbook retrieving GCC dependencies from GCC website rather than ParallelCluster bucket.
+
 3.13.0
 ------
 **ENHANCEMENTS**

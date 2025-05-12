@@ -125,8 +125,9 @@ action :setup do
         rm -rf gcc-#{gcc_version}
         tar -xf #{gcc_tarball}
         cd gcc-#{gcc_version}
-        # Patch the download_prerequisites script to download over https and not ftp. This works better in China regions.
-        sed -i "s#ftp://gcc\.gnu\.org/pub/gcc/infrastructure##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
+        # Patch the download_prerequisites script to download GCC dependencies from our public bucket.
+        # This is required to support build image in isolated environments.
+        sed -i "s#http://gcc\.gnu\.org/pub/gcc/infrastructure##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
         ./contrib/download_prerequisites
         mkdir build && cd build
         ../configure --prefix=/opt/arm/armpl/gcc/#{gcc_version} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
