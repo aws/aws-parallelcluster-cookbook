@@ -88,10 +88,15 @@ describe 'efs:install_utils' do
       cached(:tarball_path) { "#{source_dir}/efs-utils-#{utils_version}.tar.gz" }
       cached(:tarball_url) { "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.test_aws_domain/archives/dependencies/efs/v#{utils_version}.tar.gz" }
       cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
+      cached(:bash_untar_code) do
+        <<-EFSUTILSUNTAR
+      set -e
+      tar xf #{tarball_path}
+        EFSUTILSUNTAR
+      end
       cached(:bash_code) do
         <<-EFSUTILSINSTALL
       set -e
-      tar xf #{tarball_path}
       cd efs-utils-#{utils_version}
       ./build-deb.sh
       apt-get -y install ./build/amazon-efs-utils*deb
@@ -125,6 +130,12 @@ describe 'efs:install_utils' do
             .with(retries: 3)
             .with(retry_delay: 5)
             .with(checksum: tarball_checksum)
+        end
+
+        it 'it untars the downloaded tarball' do
+          is_expected.to run_bash('Untar the efs-utils')
+            .with(cwd: source_dir)
+            .with(code: bash_untar_code)
         end
 
         it 'installs package from downloaded tarball' do
@@ -168,10 +179,15 @@ describe 'efs:install_utils' do
       cached(:tarball_path) { "#{source_dir}/efs-utils-#{utils_version}.tar.gz" }
       cached(:tarball_url) { "https://#{aws_region}-aws-parallelcluster.s3.#{aws_region}.test_aws_domain/archives/dependencies/efs/v#{utils_version}.tar.gz" }
       cached(:tarball_checksum) { 'TARBALL CHECKSUM' }
+      cached(:bash_untar_code) do
+        <<-EFSUTILSUNTAR
+      set -e
+      tar xf #{tarball_path}
+        EFSUTILSUNTAR
+      end
       cached(:bash_code) do
         <<-EFSUTILSINSTALL
       set -e
-      tar xf #{tarball_path}
       cd efs-utils-#{utils_version}
       make rpm
       yum -y install ./build/amazon-efs-utils*rpm
@@ -216,6 +232,12 @@ describe 'efs:install_utils' do
             .with(retries: 3)
             .with(retry_delay: 5)
             .with(checksum: tarball_checksum)
+        end
+
+        it 'it untars the downloaded tarball' do
+          is_expected.to run_bash('Untar the efs-utils')
+            .with(cwd: source_dir)
+            .with(code: bash_untar_code)
         end
 
         it 'installs package from downloaded tarball' do
