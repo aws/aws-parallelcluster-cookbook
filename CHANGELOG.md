@@ -18,6 +18,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade Slurm to version 24.05.8.
 
+**BUG FIXES**
+- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments 
+due to cookbook retrieving GCC dependencies from GCC website rather than ParallelCluster bucket.
+- Use patched version of efs-utils v2.1.0 which pins backtrace version to v3.0.74 to resolve build image failure.
+
 3.13.0
 ------
 **ENHANCEMENTS**
