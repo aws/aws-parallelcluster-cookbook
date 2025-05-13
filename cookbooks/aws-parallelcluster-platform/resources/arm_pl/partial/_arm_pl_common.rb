@@ -127,7 +127,8 @@ action :setup do
         cd gcc-#{gcc_version}
         # Patch the download_prerequisites script to download GCC dependencies from our public bucket.
         # This is required to support build image in isolated environments.
-        sed -i "s#http://gcc\.gnu\.org/pub/gcc/infrastructure##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
+        # Note: gcc 9.3 uses ftp, whereas gcc 11.3 uses http.
+        sed -i "s#\\(ftp\\|http\\)://gcc\.gnu\.org/pub/gcc/infrastructure##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
         ./contrib/download_prerequisites
         mkdir build && cd build
         ../configure --prefix=/opt/arm/armpl/gcc/#{gcc_version} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
