@@ -20,6 +20,8 @@ use 'partial/_get_package_version_rpm'
 use 'partial/_common'
 use 'partial/_mount_umount'
 
+property :efs_utils_version, String, default: '2.1.0'
+
 action :install_utils do
   package_name = "amazon-efs-utils-#{new_resource.efs_utils_version}"
 
