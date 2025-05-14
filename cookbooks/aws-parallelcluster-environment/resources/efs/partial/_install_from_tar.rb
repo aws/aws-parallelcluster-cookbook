@@ -32,7 +32,7 @@ action :install_utils do
   package_name = "amazon-efs-utils"
   package_version = new_resource.efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
+  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}-patched.tar.gz"
 
   # Do not install efs-utils if a same or newer version is already installed.
   return if already_installed?(package_name, package_version)
@@ -48,22 +48,6 @@ action :install_utils do
     retry_delay 5
     checksum new_resource.efs_utils_checksum
     action :create_if_missing
-  end
-
-  bash "Untar the efs-utils" do
-    cwd node['cluster']['sources_dir']
-    code <<-EFSUTILSUNTAR
-      set -e
-      tar xf #{efs_utils_tarball}
-    EFSUTILSUNTAR
-  end
-
-  cookbook_file "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}/src/proxy/Cargo.toml" do
-    source 'efs/Cargo.toml'
-    owner 'root'
-    group 'root'
-    mode '0755'
-    action :create
   end
 
   # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html

@@ -6,7 +6,7 @@ control 'tag:install_efs_utils_installed' do
 
   describe file("#{node['cluster']['sources_dir']}/efs-utils-2.1.0.tar.gz") do
     it { should exist }
-    its('sha256sum') { should eq '2996bdd5387131d302310812fa1e07e1be00f80814a580f5dfeb27d68519fd24' }
+    its('sha256sum') { should eq 'f257a9859059710bcd8a4a870de2a8f11574b2615feeb7989b764820a9f0c887' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
