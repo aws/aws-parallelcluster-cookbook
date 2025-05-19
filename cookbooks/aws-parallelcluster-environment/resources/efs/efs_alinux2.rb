@@ -18,13 +18,11 @@ use 'partial/_get_package_version_rpm'
 use 'partial/_common'
 use 'partial/_mount_umount'
 
-property :efs_utils_version, String, default: '2.1.0'
-
 action :install_utils do
   package_name = "amazon-efs-utils"
-  full_package = "#{package_name}-#{new_resource.efs_utils_version}"
+  full_package = "#{package_name}-#{_efs_utils_version}"
   # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?(package_name, new_resource.efs_utils_version)
+  return if already_installed?(package_name, _efs_utils_version)
 
   # On Amazon Linux 2, amazon-efs-utils and stunnel are installed from OS repo.
   package full_package do

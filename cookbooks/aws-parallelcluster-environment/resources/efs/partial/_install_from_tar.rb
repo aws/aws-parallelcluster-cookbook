@@ -30,7 +30,7 @@ action :install_utils do
   return if redhat_on_docker?
 
   package_name = "amazon-efs-utils"
-  package_version = new_resource.efs_utils_version
+  package_version = _efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
   efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
 
@@ -46,7 +46,7 @@ action :install_utils do
     mode '0644'
     retries 3
     retry_delay 5
-    checksum new_resource.efs_utils_checksum
+    checksum _efs_utils_checksum
     action :create_if_missing
   end
 

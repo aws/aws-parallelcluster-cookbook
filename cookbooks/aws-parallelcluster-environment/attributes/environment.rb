@@ -73,6 +73,11 @@ default['cluster']['head_node_private_ip'] = nil
 default['cluster']['efa']['version'] = '1.41.0'
 default['cluster']['efa']['sha256'] = '3506354cdfbe31ff552fe75f5d0d9bb7efd29cf79bd99457347d29c751c38f9f'
 
+default['cluster']['efs']['version'] = '2.3.1'
+default['cluster']['efs']['sha256'] = 'ced12f82e76f9740476b63f30c49bd76cc00b6375e12a9f5f7ba852635c49e15'
+if platform?('amazon')
+  default['cluster']['efs']['version'] = '2.1.0'
+end
 # TODO: Move to platform cookbook
 default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"
 default['cluster']['spack']['version'] = '0.20.2'
