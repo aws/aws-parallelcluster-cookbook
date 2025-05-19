@@ -70,8 +70,8 @@ default['cluster']['internal_initial_shared_dir'] = "#{node['cluster']['base_dir
 
 default['cluster']['head_node_private_ip'] = nil
 
-default['cluster']['efa']['version'] = '1.38.1'
-default['cluster']['efa']['sha256'] = '83923374afd388b1cfcf4b3a21a2b1ba7cf46a01a587f7b519b8386cb95e4f81'
+default['cluster']['efa']['version'] = '1.41.0'
+default['cluster']['efa']['sha256'] = '3506354cdfbe31ff552fe75f5d0d9bb7efd29cf79bd99457347d29c751c38f9f'
 
 # TODO: Move to platform cookbook
 default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"
