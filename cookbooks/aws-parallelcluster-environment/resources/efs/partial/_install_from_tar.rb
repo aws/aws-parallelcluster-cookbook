@@ -50,22 +50,6 @@ action :install_utils do
     action :create_if_missing
   end
 
-  bash "Untar the efs-utils" do
-    cwd node['cluster']['sources_dir']
-    code <<-EFSUTILSUNTAR
-      set -e
-      tar xf #{efs_utils_tarball}
-    EFSUTILSUNTAR
-  end
-
-  cookbook_file "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}/src/proxy/Cargo.toml" do
-    source 'efs/Cargo.toml'
-    owner 'root'
-    group 'root'
-    mode '0755'
-    action :create
-  end
-
   # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
   bash "install efs utils" do
     cwd node['cluster']['sources_dir']
