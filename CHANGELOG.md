@@ -18,12 +18,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Upgrade Slurm to version 24.05.8.
 - Upgrade EFA installer to 1.41.0 (from 1.38.1).
-  - Efa-driver: efa-2.13.0-1
-  - Efa-config: efa-config-1.17-1
+  - Efa-driver: efa-2.15.0-1
+  - Efa-config: efa-config-1.18-1
   - Efa-profile: efa-profile-1.7-1
-  - Libfabric-aws: libfabric-aws-1.22.0-1
-  - Rdma-core: rdma-core-54.0-1
-  - Open MPI: openmpi40-aws-4.1.7-1 and openmpi50-aws-5.0.5
+  - Libfabric-aws: libfabric-aws-2.1.0-1
+  - Rdma-core: rdma-core-57.0-1
+  - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.6
 
 **BUG FIXES**
 - Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments 
@@ -44,12 +44,12 @@ due to cookbook retrieving GCC dependencies from GCC website rather than Paralle
 - On Ubuntu 22.04, install the Nvidia driver with the same compiler version used to compile the kernel.
 - Upgrade aws-cfn-bootstrap to version 2.0-33.
 - Upgrade EFA installer to 1.38.1 (from 1.36.0).
-  - Efa-driver: efa-2.15.0-1
-  - Efa-config: efa-config-1.18-1
+  - Efa-driver: efa-2.13.0-1
+  - Efa-config: efa-config-1.17-1
   - Efa-profile: efa-profile-1.7-1
-  - Libfabric-aws: libfabric-aws-2.1.0-1
-  - Rdma-core: rdma-core-57.0-1
-  - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.6
+  - Libfabric-aws: libfabric-aws-1.22.0-1
+  - Rdma-core: rdma-core-54.0-1
+  - Open MPI: openmpi40-aws-4.1.7-1 and openmpi50-aws-5.0.5
 - Upgrade amazon-efs-utils to version 2.1.0.
 - Remove third-party cookbook: apt-7.5.22 and pyenv-4.2.3.
 - Upgrade third-party cookbook dependencies:
