@@ -9,25 +9,24 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-# FIXME: Re-enabled the following check and fix failures
-# control 'tag:install_pyxis_installed' do
-#   only_if { instance.nvidia_installed? }
-#
-#   title 'Checks Pyxis has been installed'
-#
-#   examples_dir = "/opt/parallelcluster/examples"
-#   dirs = [ examples_dir, "#{examples_dir}/spank", "#{examples_dir}/pyxis" ]
-#   dirs.each do |path|
-#     describe directory(path) do
-#       it { should exist }
-#     end
-#   end
-#
-#   describe file("#{examples_dir}/pyxis/pyxis.conf") do
-#     it { should exist }
-#   end
-#
-#   describe file("#{examples_dir}/spank/plugstack.conf") do
-#     it { should exist }
-#   end
-# end
+control 'tag:install_pyxis_installed' do
+  only_if { ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) || instance.nvidia_installed? }
+
+  title 'Checks Pyxis has been installed'
+
+  examples_dir = "/opt/parallelcluster/examples"
+  dirs = [ examples_dir, "#{examples_dir}/spank", "#{examples_dir}/pyxis" ]
+  dirs.each do |path|
+    describe directory(path) do
+      it { should exist }
+    end
+  end
+
+  describe file("#{examples_dir}/pyxis/pyxis.conf") do
+    it { should exist }
+  end
+
+  describe file("#{examples_dir}/spank/plugstack.conf") do
+    it { should exist }
+  end
+end

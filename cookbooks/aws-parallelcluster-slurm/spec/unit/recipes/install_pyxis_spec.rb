@@ -33,6 +33,7 @@ describe 'aws-parallelcluster-slurm::install_pyxis' do
           node.override['cluster']['pyxis']['version'] = pyxis_version
           node.override['cluster']['pyxis']['runtime_path'] = pyxis_runtime_dir
         end
+        allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
         allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
         allow_any_instance_of(Object).to receive(:pyxis_installed?).and_return(false)
         runner.converge(described_recipe)
@@ -93,6 +94,7 @@ describe 'aws-parallelcluster-slurm::install_pyxis' do
           runner = runner(platform: platform, version: version) do |_node|
             RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
           end
+          allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
           allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
           allow_any_instance_of(Object).to receive(:pyxis_installed?).and_return(true)
           runner.converge(described_recipe)
