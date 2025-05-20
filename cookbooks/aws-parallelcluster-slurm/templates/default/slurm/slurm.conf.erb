@@ -69,6 +69,10 @@ TaskPlugin=task/affinity,task/cgroup
 GresTypes=gpu
 SelectType=select/cons_tres
 #
+# TOPOLOGY Plugin
+<% unless node['cluster']['topology_block_size'].nil? -%>
+TopologyPlugin=topology/block
+<% end -%>
 # LOGGING
 SlurmctldDebug=verbose
 SlurmctldLogFile=/var/log/slurmctld.log
