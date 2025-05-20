@@ -17,8 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.6
 
 **BUG FIXES**
-- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments 
-due to cookbook retrieving GCC dependencies from GCC website rather than ParallelCluster bucket.
+- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments.
 - Upgrade amazon-efs-utils to version 2.3.1 (from v2.1.0) for non-Amazon Linux AMI's.
 
 3.13.0
