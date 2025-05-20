@@ -55,6 +55,15 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
 end
 
 unless on_docker?
+  # Generate Slurm topology.conf file
+  execute "generate_topology_config" do
+    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
+              " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
+              " --block-sizes #{node['cluster']['topology_block_size']}"\
+              " --input-file #{node['cluster']['cluster_config_path']}"
+    not_if { node['cluster']['topology_block_size'].nil? }
+  end
+
   # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do

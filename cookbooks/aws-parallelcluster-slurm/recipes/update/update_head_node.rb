@@ -150,6 +150,15 @@ ruby_block "replace slurm queue nodes" do
     end
   end
 end
+# Generate Slurm topology.conf file
+execute "generate_topology_config" do
+  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
+            " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
+            " --block-sizes #{node['cluster']['topology_block_size']}"\
+            " --input-file #{node['cluster']['cluster_config_path']}"
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['topology_block_size'].nil? }
+  #TODO: Need to remove topology.conf if CB is removed
+end
 
 execute "generate_pcluster_slurm_configs" do
   command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
