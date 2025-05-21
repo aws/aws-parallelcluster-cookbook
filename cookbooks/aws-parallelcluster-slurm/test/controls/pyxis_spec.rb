@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:install_pyxis_installed' do
-  only_if { ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
+  only_if { instance.nvidia_installed? }
 
   title 'Checks Pyxis has been installed'
 

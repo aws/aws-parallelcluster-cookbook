@@ -21,10 +21,10 @@ use 'partial/_common'
 use 'partial/_mount_umount'
 
 action :install_utils do
-  package_name = "amazon-efs-utils-#{new_resource.efs_utils_version}"
+  package_name = "amazon-efs-utils-#{_efs_utils_version}"
 
   # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?(package_name, new_resource.efs_utils_version)
+  return if already_installed?(package_name, _efs_utils_version)
 
   # On Amazon Linux 2, amazon-efs-utils and stunnel are installed from OS repo.
   package package_name do

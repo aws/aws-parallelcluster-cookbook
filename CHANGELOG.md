@@ -17,6 +17,17 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Upgrade Slurm to version 24.05.8.
+- Upgrade EFA installer to 1.41.0 (from 1.38.1).
+  - Efa-driver: efa-2.15.0-1
+  - Efa-config: efa-config-1.18-1
+  - Efa-profile: efa-profile-1.7-1
+  - Libfabric-aws: libfabric-aws-2.1.0-1
+  - Rdma-core: rdma-core-57.0-1
+  - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.6
+
+**BUG FIXES**
+- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments.
+- Upgrade amazon-efs-utils to version 2.3.1 (from v2.1.0) for non-Amazon Linux AMI's.
 
 3.13.0
 ------
