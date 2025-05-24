@@ -1,7 +1,16 @@
 #!/bin/bash
 
-sinfo_output=$(<%= node['cluster']['slurm']['install_dir'] %>/bin/sinfo -h -o '%N %t' | grep -v -E '(idle|alloc|mix|maint)$')
-while IFS= read -r line; do
-    nodelist=$(echo "$line" | awk '{print $1}')
-    <%= node['cluster']['slurm']['install_dir'] %>/bin/scontrol show hostnames "$nodelist" | { grep -E '^[a-z0-9\-]+\-st\-[a-z0-9\-]+\-[0-9]+.*' || true; }
-done <<< "$sinfo_output"
+
+
+cluster_static_node_count=$1
+if [[ -z "$cluster_static_node_count" ]]; then
+ cluster_static_node_count=1
+fi
+
+if [[ "$cluster_static_node_count" -ge "1" ]]; then
+  sinfo_output=$(<%= node['cluster']['slurm']['install_dir'] %>/bin/sinfo -h -o '%N %t' | grep -v -E '(idle|alloc|mix|maint)$')
+  while IFS= read -r line; do
+      nodelist=$(echo "$line" | awk '{print $1}')
+      <%= node['cluster']['slurm']['install_dir'] %>/bin/scontrol show hostnames "$nodelist" | { grep -E '^[a-z0-9\-]+\-st\-[a-z0-9\-]+\-[0-9]+.*' || true; }
+  done <<< "$sinfo_output"
+fi
