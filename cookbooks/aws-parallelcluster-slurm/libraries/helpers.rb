@@ -178,6 +178,21 @@ def wait_cluster_ready
   end
 end
 
+def get_static_node_count
+  require 'yaml'
+  cluster_config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  total_min_count = 0
+  slurm_queues_section = cluster_config.dig("Scheduling", "SlurmQueues")
+  if slurm_queues_section
+    slurm_queues_section.each do |queue_config|
+      queue_config['ComputeResources'].each do |compute_resource_config|
+        total_min_count += compute_resource_config['MinCount'].to_i
+      end
+    end
+  end
+  total_min_count
+end
+
 def wait_static_fleet_running
   ruby_block "wait for static fleet capacity" do
     block do
@@ -203,15 +218,21 @@ def wait_static_fleet_running
       fleet_status_command = Shellwords.escape(
         "/usr/local/bin/get-compute-fleet-status.sh"
       )
+
+      total_static_node_count = get_static_node_count
+      Chef::Log.info("Count of cluster static nodes is #{total_static_node_count}")
+
       # Example output for sinfo
       # sinfo -h -o '%N %t'
       # queue-0-dy-compute-resource-g4dn-0-[1-10],queue-1-dy-compute-resource-g4dn-1-[1-10] idle~
       # queue-2-dy-compute-resource-g4dn-2-[1-10],queue-3-dy-compute-resource-g4dn-3-[1-10] idle
-      until shell_out!("/bin/bash -c /usr/local/bin/is_fleet_ready.sh").stdout.strip.empty?
-        check_for_protected_mode(fleet_status_command)
+      if total_static_node_count.to_i > 0
+        until shell_out!("/bin/bash -c /usr/local/bin/is_fleet_ready.sh").stdout.strip.empty?
+          check_for_protected_mode(fleet_status_command)
 
-        Chef::Log.info("Waiting for static fleet capacity provisioning")
-        sleep(15)
+          Chef::Log.info("Waiting for static fleet capacity provisioning")
+          sleep(15)
+        end
       end
       Chef::Log.info("Static fleet capacity is ready")
     end
