@@ -71,5 +71,9 @@ control 'tag:config_slurm_sudoers_correctly_defined' do
     its('content') { should match %r{Cmnd_Alias SHUTDOWN = /usr/sbin/shutdown} }
     its('content') { should match /#{node['cluster']['slurm']['user']} ALL = \(#{node['cluster']['cluster_admin_user']}\) NOPASSWD:SETENV: SLURM_HOOKS_COMMANDS/ }
     its('content') { should match %r{Cmnd_Alias SLURM_HOOKS_COMMANDS = #{venv_bin}/slurm_suspend, #{venv_bin}/slurm_resume, #{venv_bin}/slurm_fleet_status_manager} } unless redhat_on_docker
+    if os_properties.ubuntu2404?
+      its('content') { should match %r{Cmnd_Alias SYSTEMCTL_POWEROFF = /usr/bin/systemctl poweroff --force} }
+      its('content') { should match /#{node['cluster']['cluster_admin_user']} ALL = \(root\) NOPASSWD: SYSTEMCTL_POWEROFF/ }
+    end
   end
 end
