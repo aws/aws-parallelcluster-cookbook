@@ -79,6 +79,7 @@ jobs:
         with:
           omnitruckUrl: omnitruck.cinc.sh
           project: cinc-workstation
+          chef_version: 25.2.1075
       - name: Kitchen Test Install
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/test-kitchen@main
