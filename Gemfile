@@ -2,7 +2,7 @@
 
 source 'https://rubygems.org'
 
-gem 'berkshelf'
+gem 'berkshelf', '= 8.0.21'
 
 group :style do
   gem 'cookstyle', '~> 7.25.9'
