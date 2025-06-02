@@ -17,9 +17,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.6
 - Upgrade amazon-efs-utils to version 2.3.1 (from v2.1.0) for non-Amazon Linux AMI's.
 
-
 **BUG FIXES**
 - Fix an issue where we were not installing Pyxis if NVIDIA is already installed.
+- Fix a bug that was preventing the script 'update_directory_service_password.sh' from updating the AD password.
 
 3.13.0
 ------
