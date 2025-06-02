@@ -6,7 +6,7 @@ license 'Apache-2.0'
 description 'Installs/Configures AWS ParallelCluster'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
-chef_version '>= 18'
+chef_version 'chef_version >= 25.2.1075'
 version '3.14.0'
 
 depends 'iptables', '~> 8.0.0'
