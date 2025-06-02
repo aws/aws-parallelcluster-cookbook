@@ -36,7 +36,7 @@ end
 if aws_region.start_with?("us-iso") && !is_custom_node?
   node_package = "aws-parallelcluster-node-#{node['cluster']['parallelcluster-node-version']}.tgz"
 
-  node.default['cluster']['custom_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/#{node_package}"
+  node.override['cluster']['custom_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/#{node_package}"
 end
 
 if is_custom_node?
