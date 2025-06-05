@@ -34,5 +34,5 @@ end
 
 def extra_packages
   kernel_version = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
-  ["kernel-modules-extra-#{kernel_version}", "kernel-modules-extra-common-#{kernel_version}"]
+  ["kernel-modules-extra-#{kernel_version}", "kernel-modules-extra-common"]
 end
