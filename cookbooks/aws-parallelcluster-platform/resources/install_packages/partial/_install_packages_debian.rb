@@ -19,20 +19,3 @@ action :install do
     retry_delay 5
   end
 end
-
-action :install_kernel_source do
-  package "install kernel packages" do
-    package_name kernel_source_package
-    version kernel_source_package_version
-    retries 3
-    retry_delay 5
-  end unless on_docker?
-end
-
-def kernel_source_package
-  "linux-headers-#{node['kernel']['release']}"
-end
-
-def kernel_source_package_version
-  nil
-end

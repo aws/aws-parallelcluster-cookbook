@@ -20,11 +20,3 @@ action :install do
     flush_cache({ before: true })
   end
 end
-
-def kernel_source_package
-  'kernel-devel'
-end
-
-def kernel_source_package_version
-  node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
-end

@@ -30,7 +30,6 @@ suites:
       resource: dcv:configure
       dependencies:
         - resource:package_repos
-        - resource:install_packages:install_kernel_source
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
@@ -52,7 +51,6 @@ suites:
     attributes:
       dependencies:
         - resource:package_repos
-        - resource:install_packages:install_kernel_source
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
@@ -74,7 +72,6 @@ suites:
     attributes:
       dependencies:
         - resource:package_repos
-        - resource:install_packages:install_kernel_source
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install
@@ -206,7 +203,6 @@ suites:
           enabled: true
       dependencies:
         - resource:package_repos
-        - resource:install_packages:install_kernel_source
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
         - recipe:aws-parallelcluster-platform::nvidia_install

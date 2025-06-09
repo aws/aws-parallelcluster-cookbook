@@ -44,10 +44,6 @@ control 'tag:install_install_packages' do
       it { should be_installed }
     end
 
-    describe package('kernel-devel') do
-      it { should be_installed }
-    end unless os_properties.on_docker?
-
     # Check amazon linux2 extra
     if os_properties.alinux2?
       describe package('R-core') do

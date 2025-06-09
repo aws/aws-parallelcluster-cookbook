@@ -517,7 +517,7 @@ suites:
         - /iptables_correctly_configured/
     attributes:
       dependencies:
-        - 'resource:install_packages:install_kernel_source {"packages": ["iptables"]}'
+        - 'resource:package { "package_name": "iptables" }'
       cluster:
         node_type: HeadNode
         scheduler: slurm
@@ -533,7 +533,7 @@ suites:
         - /iptables_correctly_configured/
     attributes:
       dependencies:
-        - 'resource:install_packages:install_kernel_source {"packages": ["iptables"]}'
+        - 'resource:package { "package_name": "iptables" }'
       cluster:
         node_type: LoginNode
         scheduler: slurm
