@@ -99,6 +99,7 @@ def generate_fleet_config_file(output_file: str, input_file: str):
                     queue_capacity_reservation=queue_capacity_reservation,
                     queue_capacity_type=queue_capacity_type,
                     queue_subnets=queue_config["Networking"]["SubnetIds"],
+                    queue_single_availability_zone=queue_config["Networking"]["EnableSingleAvailabilityZone"],
                 )
                 fleet_config[queue_name][compute_resource_name] = config_for_fleet
 
@@ -125,6 +126,7 @@ def _generate_compute_resource_fleet_config(
     queue_capacity_reservation: str,
     queue_capacity_type: str,
     queue_subnets: List,
+    queue_single_availability_zone: bool,
 ):
     """
     Generate compute resource config to add in the fleet-config.json, overriding values from the queue.
@@ -156,7 +158,10 @@ def _generate_compute_resource_fleet_config(
                 {
                     "Api": "create-fleet",
                     "Instances": copy.deepcopy(compute_resource_config["Instances"]),
-                    "Networking": {"SubnetIds": queue_subnets},
+                    "Networking": {
+                        "SubnetIds": queue_subnets,
+                        "SingleAvailabilityZone": queue_single_availability_zone
+                    },
                 }
             )
             allocation_strategy = compute_resource_config.get("AllocationStrategy", queue_allocation_strategy)
