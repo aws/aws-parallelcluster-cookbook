@@ -160,7 +160,7 @@ def _generate_compute_resource_fleet_config(
                     "Instances": copy.deepcopy(compute_resource_config["Instances"]),
                     "Networking": {
                         "SubnetIds": queue_subnets,
-                        "SingleAvailabilityZone": queue_single_availability_zone
+                        "SingleAvailabilityZone": queue_single_availability_zone,
                     },
                 }
             )

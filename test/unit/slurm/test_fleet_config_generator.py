@@ -47,20 +47,20 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
             "Unable to find key 'Networking' in the configuration file. Queue: q1",
         ),
         (
-                {
-                    "Scheduling": {
-                        "SlurmQueues": [
-                            {
-                                "Name": "q1",
-                                "CapacityType": "SPOT",
-                                "ComputeResources": [{"Instances": []}],
-                                "Networking": {"SubnetIds": ["123"]},
-                            }
-                        ]
-                    }
-                },
-                CriticalError,
-                "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "SPOT",
+                            "ComputeResources": [{"Instances": []}],
+                            "Networking": {"SubnetIds": ["123"]},
+                        }
+                    ]
+                }
+            },
+            CriticalError,
+            "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
         ),
         (
             {
@@ -225,22 +225,22 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
             "Unable to find key 'SubnetIds' in the configuration file. Queue: q1",
         ),
         (
-                {
-                    "Scheduling": {
-                        "SlurmQueues": [
-                            {
-                                "Name": "q1",
-                                "CapacityType": "SPOT",
-                                "ComputeResources": [
-                                    {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
-                                ],
-                                "Networking": {"SubnetIds": ["123"]},
-                            }
-                        ]
-                    }
-                },
-                CriticalError,
-                "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "SPOT",
+                            "ComputeResources": [
+                                {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
+                            ],
+                            "Networking": {"SubnetIds": ["123"]},
+                        }
+                    ]
+                }
+            },
+            CriticalError,
+            "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
         ),
         (
             {
