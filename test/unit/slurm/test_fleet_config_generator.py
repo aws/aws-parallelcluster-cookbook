@@ -47,6 +47,22 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
             "Unable to find key 'Networking' in the configuration file. Queue: q1",
         ),
         (
+                {
+                    "Scheduling": {
+                        "SlurmQueues": [
+                            {
+                                "Name": "q1",
+                                "CapacityType": "SPOT",
+                                "ComputeResources": [{"Instances": []}],
+                                "Networking": {"SubnetIds": ["123"]},
+                            }
+                        ]
+                    }
+                },
+                CriticalError,
+                "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
+        ),
+        (
             {
                 "Scheduling": {
                     "SlurmQueues": [
@@ -54,7 +70,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                             "Name": "q1",
                             "CapacityType": "SPOT",
                             "ComputeResources": [{"Instances": []}],
-                            "Networking": {"SubnetIds": ["123"]},
+                            "Networking": {"SubnetIds": ["123"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -70,7 +86,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                             "Name": "q1",
                             "CapacityType": "ONDEMAND",
                             "ComputeResources": [{"Name": "cr1", "Instances": []}],
-                            "Networking": {"SubnetIds": ["123"]},
+                            "Networking": {"SubnetIds": ["123"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -89,7 +105,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                                 {"Name": "cr1", "Instances": [{"InstanceType": "test"}]},
                                 {"Name": "cr2", "InstanceType": "test"},
                             ],
-                            "Networking": {"SubnetIds": ["123"]},
+                            "Networking": {"SubnetIds": ["123"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -108,7 +124,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                                 {"Name": "cr1", "Instances": [{"InstanceType": "test"}, {"InstanceType": "test-2"}]},
                                 {"Name": "cr2", "InstanceType": "test"},
                             ],
-                            "Networking": {"SubnetIds": ["123", "456", "789"]},
+                            "Networking": {"SubnetIds": ["123", "456", "789"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -131,7 +147,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                                 },
                                 {"Name": "cr2", "InstanceType": "test", "SpotPrice": "10"},
                             ],
-                            "Networking": {"SubnetIds": ["123", "456", "789"]},
+                            "Networking": {"SubnetIds": ["123", "456", "789"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -147,7 +163,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                             "Name": "q1",
                             "CapacityType": "SPOT",
                             "ComputeResources": [{"Name": "cr1", "Instances": [{"InstanceType": "test"}]}],
-                            "Networking": {"SubnetIds": ["123"]},
+                            "Networking": {"SubnetIds": ["123"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -165,7 +181,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                             "ComputeResources": [
                                 {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
                             ],
-                            "Networking": {"SubnetIds": ["123"]},
+                            "Networking": {"SubnetIds": ["123"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }
@@ -209,6 +225,24 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
             "Unable to find key 'SubnetIds' in the configuration file. Queue: q1",
         ),
         (
+                {
+                    "Scheduling": {
+                        "SlurmQueues": [
+                            {
+                                "Name": "q1",
+                                "CapacityType": "SPOT",
+                                "ComputeResources": [
+                                    {"Name": "cr1", "Instances": [{"InstanceType": "test"}], "SpotPrice": 10}
+                                ],
+                                "Networking": {"SubnetIds": ["123"]},
+                            }
+                        ]
+                    }
+                },
+                CriticalError,
+                "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
+        ),
+        (
             {
                 "Scheduling": {
                     "SlurmQueues": [
@@ -231,7 +265,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                                     },
                                 },
                             ],
-                            "Networking": {"SubnetIds": ["123"]},
+                            "Networking": {"SubnetIds": ["123"], "EnableSingleAvailabilityZone": None},
                         }
                     ]
                 }

@@ -27,7 +27,8 @@
             "Networking": {
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4"
-                ]
+                ],
+                "SingleAvailabilityZone": true
             },
             "AllocationStrategy": "lowest-price"
         }
@@ -57,7 +58,8 @@
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4",
                     "subnet-0b903123096649662"
-                ]
+                ],
+                "SingleAvailabilityZone": false
             },
             "AllocationStrategy": "lowest-price"
         }
@@ -84,7 +86,8 @@
             "Networking": {
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4"
-                ]
+                ],
+                "SingleAvailabilityZone": null
             },
             "AllocationStrategy": "capacity-optimized",
             "MaxPrice": 10
@@ -100,7 +103,8 @@
             "Networking": {
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4"
-                ]
+                ],
+                "SingleAvailabilityZone": null
             },
             "AllocationStrategy": "capacity-optimized"
         }
@@ -131,7 +135,8 @@
             "Networking": {
                 "SubnetIds": [
                     "subnet-0230367ab0e5123a4"
-                ]
+                ],
+                "SingleAvailabilityZone": null
             }
         }
     }

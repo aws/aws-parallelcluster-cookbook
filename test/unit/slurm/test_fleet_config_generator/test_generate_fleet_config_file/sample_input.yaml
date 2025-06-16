@@ -62,6 +62,7 @@ Scheduling:
       SecurityGroups: null
       SubnetIds:
       - subnet-0230367ab0e5123a4
+      EnableSingleAvailabilityZone: true
     # queue ondemand without capacity reservations and with multiple subnets
   - AllocationStrategy: lowest-price
     CapacityReservationTarget: null
@@ -121,6 +122,7 @@ Scheduling:
       SubnetIds:
       - subnet-0230367ab0e5123a4
       - subnet-0b903123096649662
+      EnableSingleAvailabilityZone: false
     # queue spot
   - AllocationStrategy: capacity-optimized
     CapacityReservationTarget: null
@@ -191,6 +193,7 @@ Scheduling:
       SecurityGroups: null
       SubnetIds:
       - subnet-0230367ab0e5123a4
+      EnableSingleAvailabilityZone: null
     # queue for capacity-block
   - CapacityReservationTarget:
       CapacityReservationId: cr-987654
@@ -250,6 +253,7 @@ Scheduling:
       SecurityGroups: null
       SubnetIds:
         - subnet-0230367ab0e5123a4
+      EnableSingleAvailabilityZone: null
   SlurmSettings:
     Dns:
       DisableManagedDns: false
