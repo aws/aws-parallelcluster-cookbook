@@ -179,8 +179,18 @@ def wait_cluster_ready
 end
 
 def get_static_node_count
-  cmd = Mixlib::ShellOut.new("#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py  --input-file #{node['cluster']['cluster_config_path']} --total-min-count | grep -o 'The total MinCount of cluster is =\([0-9]*\)' | cut -d'=' -f2")
-  cmd.run_command.stdout.strip
+  require 'yaml'
+  cluster_config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
+  total_min_count = 0
+  slurm_queues_section = cluster_config.dig("Scheduling", "SlurmQueues")
+  if slurm_queues_section
+    slurm_queues_section.each do |queue_config|
+      queue_config.dig('ComputeResources').each do |compute_resource_config|
+        total_min_count += compute_resource_config.dig('MinCount').to_i
+      end
+    end
+  end
+  total_min_count
 end
 
 def wait_static_fleet_running
