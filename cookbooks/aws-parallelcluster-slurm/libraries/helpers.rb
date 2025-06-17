@@ -179,7 +179,7 @@ def wait_cluster_ready
 end
 
 def get_static_node_count
-  cmd = Mixlib::ShellOut.new("cat #{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster.conf | grep -o '#TOTAL_MIN_COUNT=\([0-9]*\)' | cut -d'=' -f2")
+  cmd = Mixlib::ShellOut.new("#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_fleet_config_generator.py  --input-file #{node['cluster']['cluster_config_path']} --total-min-count | grep -o 'The total MinCount of cluster is =\([0-9]*\)' | cut -d'=' -f2")
   cmd.run_command.stdout.strip
 end
 
