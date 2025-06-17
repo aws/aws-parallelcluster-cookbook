@@ -1,8 +1,8 @@
 # Slurm
-default['cluster']['slurm']['version'] = '24-05-8-1'
+default['cluster']['slurm']['version'] = '24-11-5-1'
 default['cluster']['slurm']['commit'] = ''
 default['cluster']['slurm']['branch'] = ''
-default['cluster']['slurm']['sha256'] = '06f4b837c3f7ec523a8924a5fee23d8305f20ca8ef3ad6128e128e87986821e4'
+default['cluster']['slurm']['sha256'] = 'e1a5547edd212c38b5e3230a284133f777b32746551f094aaa81cc4af375e332'
 default['cluster']['slurm']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/slurm"
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.16'

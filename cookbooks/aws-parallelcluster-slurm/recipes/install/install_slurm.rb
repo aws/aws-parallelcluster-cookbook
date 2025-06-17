@@ -30,7 +30,7 @@ slurm_tar_name = if !slurm_commit.empty?
                    "slurm-#{slurm_version}"
                  end
 slurm_tarball = "#{node['cluster']['sources_dir']}/#{slurm_tar_name}.tar.gz"
-slurm_url = "#{node['cluster']['slurm']['base_url']}/#{slurm_tar_name}.tar.gz"
+slurm_url = "https://github.com/SchedMD/slurm/archive/#{slurm_tar_name}.tar.gz"
 slurm_sha256 = if slurm_branch.empty?
                  node['cluster']['slurm']['sha256']
                end
