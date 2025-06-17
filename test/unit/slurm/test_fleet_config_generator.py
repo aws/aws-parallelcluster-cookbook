@@ -12,7 +12,7 @@ import os
 
 import pytest
 from assertpy import assert_that
-from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, CriticalError, generate_fleet_config_file
+from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, CriticalError, generate_fleet_config_file, get_total_min_count
 
 
 @pytest.mark.parametrize(
@@ -266,3 +266,117 @@ def _assert_files_are_equal(file, expected_file):
         expected_file_content = exp_f.read()
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
         assert_that(f.read()).is_equal_to(expected_file_content)
+
+@pytest.mark.parametrize(
+    "cluster_config, expected_exception, expected_message, expected_total_min_count",
+    [
+        ({}, CriticalError, "Unable to find key 'Scheduling' in the configuration file", 0),
+        ({"Scheduling": {}}, CriticalError, "Unable to find key 'SlurmQueues' in the configuration file", 0),
+        ({"Scheduling": {"SlurmQueues": []}}, None, None, 0),
+        (
+                {
+                    "Scheduling": {
+                        "SlurmQueues": [
+                            {
+                                "Name": "q1",
+                                "CapacityType": "ONDEMAND",
+                                "ComputeResources": [
+                                    {"MinCount": 0, "Instances": [{"InstanceType": "test"}]},
+                                ],
+                            }
+                        ]
+                    }
+                },
+                None,
+                None,0,
+        ),
+        (
+                {
+                    "Scheduling": {
+                        "SlurmQueues": [
+                            {
+                                "Name": "q1",
+                                "CapacityType": "ONDEMAND",
+                                "ComputeResources": [
+                                    {"MinCount": 2, "Instances": [{"InstanceType": "test"}]},
+                                    {"MinCount": 3, "InstanceType": "test"},
+                                ],
+                            }
+                        ]
+                    }
+                },
+                None,
+                None,5,
+        ),
+        (
+                {
+                    "Scheduling": {
+                        "SlurmQueues": [
+                            {
+                                "Name": "q1",
+                                "CapacityType": "SPOT",
+                                "ComputeResources": [
+                                    {
+                                        "Name": "cr1",
+                                        "Instances": [{"InstanceType": "test"}, {"InstanceType": "test-2"}],
+                                        "MinCount": 3,
+                                        "SpotPrice": "10",
+                                    },
+                                    {"Name": "cr2", "InstanceType": "test", "SpotPrice": "10", "MinCount": 9},
+                                ],
+                                "Networking": {"SubnetIds": ["123", "456", "789"]},
+                            }
+                        ]
+                    }
+                },
+                None,
+                None,12,
+        ),
+        (
+                {
+                    "Scheduling": {
+                        "SlurmQueues": [
+                            {
+                                "Name": "q1",
+                                "CapacityType": "CAPACITY_BLOCK",
+                                "ComputeResources": [
+                                    {
+                                        "Name": "cr1",
+                                        "Instances": [{"InstanceType": "test"}],
+                                        "MinCount":2,
+                                        "CapacityReservationTarget": {
+                                            "CapacityReservationResourceGroupArn": "arn",
+                                        },
+                                    },
+                                    {
+                                        "Name": "cr2",
+                                        "MinCount":2,
+                                        "Instances": [{"InstanceType": "test"}],
+                                        "CapacityReservationTarget": {
+                                            "CapacityReservationId": "id",
+                                        },
+                                    },
+                                ],
+                                "Networking": {"SubnetIds": ["123"]},
+                            }
+                        ]
+                    }
+                },
+                None,
+                None,4,
+        ),
+    ],
+)
+def test_get_total_min_count(
+        mocker, tmpdir, cluster_config, expected_exception, expected_message, expected_total_min_count
+):
+    mocker.patch("pcluster_fleet_config_generator._load_cluster_config", return_value=cluster_config)
+
+    if expected_message:
+        with pytest.raises(expected_exception, match=expected_message):
+            actual_min_count = get_total_min_count(input_file="fake")
+            assert_that(actual_min_count).is_equal_to(expected_total_min_count)
+
+    else:
+        actual_min_count = get_total_min_count(input_file="fake")
+        assert_that(actual_min_count).is_equal_to(expected_total_min_count)
