@@ -185,8 +185,8 @@ def get_static_node_count
   slurm_queues_section = cluster_config.dig("Scheduling", "SlurmQueues")
   if slurm_queues_section
     slurm_queues_section.each do |queue_config|
-      queue_config.dig('ComputeResources').each do |compute_resource_config|
-        total_min_count += compute_resource_config.dig('MinCount').to_i
+      queue_config['ComputeResources'].each do |compute_resource_config|
+        total_min_count += compute_resource_config['MinCount'].to_i
       end
     end
   end
@@ -219,11 +219,14 @@ def wait_static_fleet_running
         "/usr/local/bin/get-compute-fleet-status.sh"
       )
 
+      total_static_node_count = get_static_node_count
+      Chef::Log.info("Count of cluster static nodes is #{total_static_node_count}")
+
       # Example output for sinfo
       # sinfo -h -o '%N %t'
       # queue-0-dy-compute-resource-g4dn-0-[1-10],queue-1-dy-compute-resource-g4dn-1-[1-10] idle~
       # queue-2-dy-compute-resource-g4dn-2-[1-10],queue-3-dy-compute-resource-g4dn-3-[1-10] idle
-      until shell_out!("/bin/bash -c /usr/local/bin/is_fleet_ready.sh #{get_static_node_count}").stdout.strip.empty?
+      until shell_out!("/bin/bash /usr/local/bin/is_fleet_ready.sh #{total_static_node_count}").stdout.strip.empty?
         check_for_protected_mode(fleet_status_command)
 
         Chef::Log.info("Waiting for static fleet capacity provisioning")
