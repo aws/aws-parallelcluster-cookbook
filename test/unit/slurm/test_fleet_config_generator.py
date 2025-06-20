@@ -60,7 +60,7 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                 }
             },
             CriticalError,
-            "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
+            "Unable to find key 'Name' in the configuration file. Queue: q1",
         ),
         (
             {
@@ -239,8 +239,8 @@ from pcluster_fleet_config_generator import ConfigurationFieldNotFoundError, Cri
                     ]
                 }
             },
-            CriticalError,
-            "Unable to find key 'EnableSingleAvailabilityZone' in the configuration file. Queue: q1",
+            None,
+            None,
         ),
         (
             {

@@ -99,7 +99,9 @@ def generate_fleet_config_file(output_file: str, input_file: str):
                     queue_capacity_reservation=queue_capacity_reservation,
                     queue_capacity_type=queue_capacity_type,
                     queue_subnets=queue_config["Networking"]["SubnetIds"],
-                    queue_single_availability_zone=queue_config["Networking"]["EnableSingleAvailabilityZone"],
+                    queue_single_availability_zone=queue_config.get("Networking", {}).get(
+                        "EnableSingleAvailabilityZone", None
+                    ),
                 )
                 fleet_config[queue_name][compute_resource_name] = config_for_fleet
 
