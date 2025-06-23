@@ -20,6 +20,8 @@ execute 'stop clustermgtd' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
+include_recipe 'aws-parallelcluster-slurm::config_slurm_resume'
+
 ruby_block "update_shared_storages" do
   block do
     run_context.include_recipe 'aws-parallelcluster-environment::update_shared_storages'
