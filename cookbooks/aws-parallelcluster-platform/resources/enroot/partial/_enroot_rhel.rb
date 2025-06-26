@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
-  return unless nvidia_enabled?
+  return unless nvidia_enabled? || nvidia_installed?
 
   package prerequisites do
     retries 3
