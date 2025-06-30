@@ -39,7 +39,7 @@ control 'tag:config_enroot_enabled_on_graphic_instances' do
 end
 
 control 'tag:config_enroot_disabled_on_non_graphic_instances' do
-  only_if { !os_properties.on_docker? && !['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
+  only_if { !os_properties.on_docker? && !['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) && !instance.nvidia_installed? }
 
   describe 'enroot service should be disabled' do
     subject { command("enroot version") }
