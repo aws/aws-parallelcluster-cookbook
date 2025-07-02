@@ -18,13 +18,16 @@ def dcv_sha256sum
     case el_string
     when "amzn2"
       # ALINUX2
-      '894f5a0b2c57bb9433a7124f152b0930d962ab0f2cfc6ea0f1e159893d667e86'
+      '4b77afb807c4aa87e0ac958223f12887d4fc2f1e95adf313cf42025b94adfed8'
+    when "amzn2023"
+      # ALINUX2023
+      "60001ea60e91513b5c5018c38c2178cb0fac5cd0f15875ccf694ab95d7cfe661"
     when "el8"
       # RHEL and Rocky8
-      '7647d00782fb7f14668571f1e48fffa2b8b587d878b7632b03f40bbb92a757ad'
+      '1f59654f27e5f6c148bdc8520994fe2a150a84650af3bc9fefce7f07ff7d310d'
     when "el9"
       # RHEL and Rocky9
-      'f9b2fa95f84059c7168ef924b7ffe8b6f4d0d69e2e39280096d4bf76fdfb597c'
+      '59ed3e6b2698aad03112d759f8bf9a6ffa6850fdf1072fa4afb4756e7314e19d'
     else
       ''
     end
@@ -32,13 +35,16 @@ def dcv_sha256sum
     case el_string
     when "amzn2"
       # ALINUX2
-      '81e85db767e36c36877879e1d3afc0f20127b9bd81b845fc8599feb9abd04f24'
+      '3b9a0ad9c9d521b8a9f6d5c2db0640bd97413d34fe32d418a8a7fd9cae7cc828'
+    when "amzn2023"
+      # ALINUX2023
+      "35128b988dee4f1f4582bd912dc4764b8712c1f0e3a35082a5da7e039eb7ff92"
     when "el8"
       # RHEL and Rocky8
-      'f879513272ac351712814bd969e3862fc7717ada9cfdf1ec227876b0e8ebc77d'
+      'b9d24624b857d4315bcd5d90047d18d4924940153d98828b67ae78521916dd83'
     when "el9"
       # RHEL and Rocky9
-      '5d631b5c0f2f6b21d0e56023432766994e2de5cc13f22c70a954cd643cde5b84'
+      '473b439f95a3354c99718d97338256a280431c7103b5d4bed0d8d63dfc8f6312'
     else
       ''
     end
@@ -47,7 +53,7 @@ end
 
 def el_string
   if platform?('amazon')
-    "amzn2"
+    "amzn#{node['platform_version'].to_i}"
   else
     "el#{node['platform_version'].to_i}"
   end
