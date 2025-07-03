@@ -38,19 +38,9 @@ describe 'dcv:dcv_supported?' do
       end
 
       context 'when on arm' do
-        before do
+        it "is true" do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
-        end
-
-        case "#{platform}#{version}"
-        when "amazon2023"
-          it "is false" do
-            expect(resource.dcv_supported?).to eq(false)
-          end
-        else
-          it "is true" do
-            expect(resource.dcv_supported?).to eq(true)
-          end
+          expect(resource.dcv_supported?).to eq(true)
         end
 
         it 'executes nothing action of dcv resource' do
@@ -59,10 +49,9 @@ describe 'dcv:dcv_supported?' do
       end
 
       context 'when not on arm' do
-        is_supported = !("#{platform}#{version}" == 'amazon2023')
-        it "is #{is_supported}" do
+        it "is true" do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-          expect(resource.dcv_supported?).to eq(is_supported)
+          expect(resource.dcv_supported?).to eq(true)
         end
       end
     end
@@ -144,7 +133,14 @@ describe 'dcv:packages' do
           expect(resource.xdcv).to eq("nice-xdcv_#{xdcv_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer_#{dcv_webviewer_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_gl).to eq("/nice-dcv-gl_#{dcv_gl_version}_#{dcv_pkg_arch}.#{base_os}.deb")
-        elsif "#{platform}#{version}" != 'amazon2023'
+        elsif "#{platform}#{version}" == "amazon2023"
+          dcv_platform_version_pkg = "amzn2023"
+          expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-#{dcv_platform_version_pkg}-#{dcv_url_arch}")
+          expect(resource.dcv_server).to eq("nice-dcv-server-#{dcv_server_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+          expect(resource.xdcv).to eq("nice-xdcv-#{xdcv_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+          expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer-#{dcv_webviewer_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+          expect(resource.dcv_gl).to eq("nice-dcv-gl-#{dcv_gl_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+        else
           dcv_platform_version = "#{platform}#{version}" == "amazon2" ? "7" : version.to_i
           dcv_platform_version_pkg = platform == "amazon" ? "amzn2" : "el" + version
           expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-#{dcv_platform_version_pkg}-#{dcv_url_arch}")
