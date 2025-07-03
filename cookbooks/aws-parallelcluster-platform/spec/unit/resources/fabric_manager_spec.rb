@@ -260,3 +260,40 @@ describe 'fabric_manager:configure' do
     end
   end
 end
+
+describe 'fabric_manager:get_nvswitches' do
+  cached(:chef_run) do
+    ChefSpec::SoloRunner.new(step_into: ['fabric_manager'])
+  end
+
+  let(:output_of_shell) { double('shell_out') }
+  cached(:resource) do
+    ConvergeFabricManager.setup(chef_run)
+    chef_run.find_resource('fabric_manager', 'setup')
+  end
+
+  before do
+    allow(resource).to receive(:shell_out).and_return(output_of_shell)
+  end
+
+  context 'when count of NVSwitches > 1' do
+    it 'correctly counts multiple NVSwitches' do
+      allow(output_of_shell).to receive(:stdout).and_return("2\n", "0\n", "0\n")
+      expect(resource.get_nvswitches).to eq(2)
+    end
+  end
+
+  context 'when count of NVSwitches == 0' do
+    it 'returns zero when no NVSwitches are found' do
+      allow(output_of_shell).to receive(:stdout).and_return("0\n")
+      expect(resource.get_nvswitches).to eq(0)
+    end
+  end
+
+  context 'when count of NVSwitches gives unexpected output' do
+    it 'handles non-numeric output' do
+      allow(output_of_shell).to receive(:stdout).and_return("error\n")
+      expect(resource.get_nvswitches).to eq(0)
+    end
+  end
+end

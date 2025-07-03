@@ -54,10 +54,12 @@ end
 
 # Get number of nv switches
 def get_nvswitches
-  #  A100 (P4) and H100(P5) systems have NVSwitches
+  #  A100 (P4), H100(P5) and B200(P6) systems have NVSwitches
   # NVSwitch device id is 10de:1af1 for P4 instance
   # NVSwitch device id is 10de:22a3 for P5 instance
-  nvswitch_check_p4 = shell_out("lspci -d 10de:1af1 | wc -l")
-  nvswitch_check_p5 = shell_out("lspci -d 10de:22a3 | wc -l")
-  nvswitch_check_p4.stdout.strip.to_i + nvswitch_check_p5.stdout.strip.to_i
+  # NVSwitch device id is 10de:2901 for P6 instance
+  # We sum the count for all these deviceIds as output of lscpi command will be >0
+  # for only one device ID based on the instance type
+  nvswitch_device_ids = ['10de:1af1', '10de:22a3', '10de:2901']
+  nvswitch_device_ids.sum { |id| shell_out("lspci -d #{id} | wc -l").stdout.strip.to_i }
 end
