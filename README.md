@@ -8,9 +8,7 @@ This repo contains the AWS ParallelCluster Chef cookbook used in AWS ParallelClu
 
 # Code structure
 
-The root folder of the cookbook repository can be considered the main cookbook, since it contains two files: `Berksfile` and `metadata.rb`.
-These files are used by the CLI (build image time) and `user-data.sh` code to [vendor](https://docs.chef.io/workstation/berkshelf/#berks-vendor)
-the other sub-cookbooks and third party cookbooks.
+The root folder of the cookbook repository can be considered the main cookbook.
 
 The main cookbook does not contain any recipe, attribute or library. They are distributed in the functional cookbooks under the `cookbooks` folder
 defined as follows:
@@ -390,15 +388,6 @@ If you interrupt it and try to run `kitchen verify`, you see authentication fail
 
 This happens because Ubuntu22 does not accept authentication via RSA key. You need to re-create a key pair 
 using `ED25519` key type.
-
-### Known issues with Berks
-
-#### Kitchen doesn't see your changes
-
-If Kitchen doesn't detect your changes, try
-```
-berks shelf uninstall ${COOKBOOK_NAME}
-```
 
 ## About python tests
 

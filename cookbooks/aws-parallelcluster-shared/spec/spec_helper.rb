@@ -1,5 +1,4 @@
 require 'chefspec'
-require 'chefspec/berkshelf'
 
 # Chef::Mixin::ShellOut is required to mock shellout
 include Chef::Mixin::ShellOut
