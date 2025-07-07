@@ -11,7 +11,7 @@
 # - improvement in the dpkg installation to avoid conflicts with other running installations.
 #
 # When updating this modified file, please remember to bump the version and reference it in the CI/CD.
-# - cinc-install.sh v1.3.0
+# - cinc-install.sh v1.4.0
 #
 # WARNING: REQUIRES /bin/bash
 #
@@ -75,6 +75,7 @@ checksum_mismatch() {
 unable_to_retrieve_package() {
   echo "Unable to retrieve a valid package!"
   report_bug
+  echo "Metadata URL: $metadata_url"
   if test "x$download_url" != "x"; then
     echo "Download URL: $download_url"
   fi
@@ -106,6 +107,7 @@ http_404_error() {
   echo "that $platform is not supported."
   echo ""
   # deliberately do not call report_bug to suppress bug report noise.
+  echo "Metadata URL: $metadata_url"
   if test "x$download_url" != "x"; then
     echo "Download URL: $download_url"
   fi
@@ -130,7 +132,7 @@ do_wget() {
   wget --user-agent="User-Agent: mixlib-install/3.12.30" -O "$2" "$1" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
-  grep "ERROR 404" $tmp_dir/stderr >/dev/null 2>&1
+  grep "ERROR 404" $tmp_dir/stderr 2>&1 >/dev/null
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -151,7 +153,7 @@ do_curl() {
   curl -A "User-Agent: mixlib-install/3.12.30" --retry 5 -sL -D $tmp_dir/stderr "$1" > "$2"
   rc=$?
   # check for 404
-  grep "404 Not Found" $tmp_dir/stderr >/dev/null 2>&1
+  grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -181,7 +183,7 @@ do_perl() {
   perl -e 'use LWP::Simple; getprint($ARGV[0]);' "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
-  grep "404 Not Found" $tmp_dir/stderr >/dev/null 2>&1
+  grep "404 Not Found" $tmp_dir/stderr 2>&1 >/dev/null
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -202,7 +204,7 @@ do_python() {
   python -c "import sys,urllib2; sys.stdout.write(urllib2.urlopen(urllib2.Request(sys.argv[1], headers={ 'User-Agent': 'mixlib-install/3.12.30' })).read())" "$1" > "$2" 2>$tmp_dir/stderr
   rc=$?
   # check for 404
-  grep "HTTP Error 404" $tmp_dir/stderr >/dev/null 2>&1
+  grep "HTTP Error 404" $tmp_dir/stderr 2>&1 >/dev/null
   if test $? -eq 0; then
     echo "ERROR 404"
     http_404_error
@@ -379,6 +381,7 @@ tmp_dir="$tmp/install.sh.$$"
 #
 # Outputs:
 # $version: Requested version to be installed.
+# $channel: Channel to install the product from
 # $project: Project to be installed
 # $cmdline_filename: Name of the package downloaded on local disk.
 # $cmdline_dl_dir: Name of the directory downloaded package will be saved to on local disk.
@@ -388,14 +391,17 @@ tmp_dir="$tmp/install.sh.$$"
 ############
 
 # Defaults
+channel="stable"
 project="cinc"
 
-while getopts v:b:f:P:d:s:l:a opt
+while getopts pnv:c:f:P:d:s:l:a opt
 do
   case "$opt" in
 
     v)  version="$OPTARG";;
-    b)  bucket="$OPTARG";; # WARNING: custom option, to override default bucket for downloading CINC client
+    c)  channel="$OPTARG";;
+    p)  channel="current";; # compat for prerelease option
+    n)  channel="current";; # compat for nightlies option
     f)  cmdline_filename="$OPTARG";;
     P)  project="$OPTARG";;
     d)  cmdline_dl_dir="$OPTARG";;
@@ -404,12 +410,12 @@ do
     a)  checksum="$OPTARG";;
     \?)   # unknown flag
       echo >&2 \
-      "usage: $0 [-P project] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum] [-b bucket]"
+      "usage: $0 [-P project] [-c release_channel] [-v version] [-f filename | -d download_dir] [-s install_strategy] [-l download_url_override] [-a checksum]"
       exit 1;;
   esac
 done
 
-shift "$(expr $OPTIND - 1)"
+shift `expr $OPTIND - 1`
 
 
 if test -d "/opt/$project" && test "x$install_strategy" = "xonce"; then
@@ -469,7 +475,13 @@ elif test -f "/etc/redhat-release"; then
   platform=`sed 's/^\(.\+\) release.*/\1/' /etc/redhat-release | tr '[A-Z]' '[a-z]'`
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
 
-  if test "$platform" = "xenserver"; then
+  if test "$platform" = "rocky linux"; then
+  	source /etc/os-release
+ 	os="${REDHAT_SUPPORT_PRODUCT}"
+  	platform_version="${ROCKY_SUPPORT_PRODUCT_VERSION}"
+        platform=$ID
+
+  elif test "$platform" = "xenserver"; then
     # Current XenServer 6.2 is based on CentOS 5, platform is not reset to "el" server should handle response
     platform="xenserver"
   else
@@ -501,6 +513,7 @@ elif test -f "/etc/system-release"; then
         ;;
     esac
   esac
+
 
 # Apple macOS
 elif test -f "/usr/bin/sw_vers"; then
@@ -610,22 +623,6 @@ case $machine in
     ;;
 esac
 
-# WARNING: Custom case to manage download of ubuntu packages from S3.
-# This is not required when downloading from omnitruck because the url to use is in the metadata file.
-if test "$platform" = "ubuntu"; then
-  case $machine in
-    "arm64"|"aarch64")
-      machine="arm64"
-      ;;
-    "x86_64"|"amd64"|"x64")
-      machine="amd64"
-      ;;
-    "i386"|"i86pc"|"x86"|"i686")
-      machine="i386"
-      ;;
-  esac
-fi
-
 if test "x$platform_version" = "x"; then
   echo "Unable to determine platform version!"
   report_bug
@@ -638,24 +635,7 @@ if test "x$platform" = "xsolaris2"; then
   export PATH
 fi
 
-# WARNING: Custom code to detect AWS Region
-# shellcheck disable=SC2034 # instance_metadata_file is used below
-instance_metadata_file=$tmp_dir/instance_metadata
-get_region instance_metadata_file
-
-# WARNING: Custom code to detect AWS S3 Domain
-if [[ ${region} == cn-* ]]; then
-  download_domain="amazonaws.com.cn"
-elif [[ ${region} == us-iso-* ]]; then
-  download_domain="c2s.ic.gov"
-elif [[ ${region} == us-isob-* ]]; then
-  download_domain="sc2s.sgov.gov"
-else
-  download_domain="amazonaws.com"
-fi
-
-# WARNING: echo modified to return the region in the output
-echo "${platform} ${platform_version} ${machine} ${region}"
+echo "$platform $platform_version $machine"
 
 ############
 # end of platform_detection.sh
@@ -700,14 +680,13 @@ if test "x$no_proxy" != "x"; then
 fi
 
 
-# create_download_url.sh
+# fetch_metadata.sh
 ############
-# WARNING: This is a modified version of the original fetch_metadata.sh section,
-# the changes will permit to download cinc installer from S3 rather than from omintruck website.
-#
-# This section creates the url of the package to download.
+# This section calls omnitruck to get the information about the build to be
+#   installed.
 #
 # Inputs:
+# $channel:
 # $project:
 # $version:
 # $platform:
@@ -720,35 +699,30 @@ fi
 # $sha256:
 ############
 
-if test "x$bucket" = "x"; then
-  # Use official bucket if not specified
-  bucket="${region}-aws-parallelcluster"
-fi
-
-bucket_url="https://${bucket}.s3.${region}.${download_domain}/archives/${project}/${platform}/${platform_version}/"
-
-if test "x$build" = "x"; then
-  # Build version set to 1 by default if not specified
-  build=1
-fi
-
 if test "x$download_url_override" = "x"; then
-  case "$platform" in
-  "debian"|"ubuntu")
-    package_file="${project}_${version}-${build}_${machine}.deb"
-    ;;
-  *)
-    package_file="${project}-${version}-${build}.${platform}${platform_version}.${machine}.rpm"
-    ;;
-  esac
+  echo "Getting information for $project $channel $version for $platform..."
 
-  download_url=${bucket_url}${package_file}
-  checksum_url="${download_url}.sha256"
+  metadata_filename="$tmp_dir/metadata.txt"
+  metadata_url="https://omnitruck.cinc.sh/$channel/$project/metadata?v=$version&p=$platform&pv=$platform_version&m=$machine"
 
-  # Extracting sha256 checksum
-  checksum_file=${tmp_dir}/${package_file}.sha256
-  do_download "${checksum_url}" ${checksum_file}
-  sha256=$(awk '{print $1}' ${checksum_file})
+  do_download "$metadata_url"  "$metadata_filename"
+
+  cat "$metadata_filename"
+
+  echo ""
+  # check that all the mandatory fields in the downloaded metadata are there
+  if grep '^url' $metadata_filename > /dev/null && grep '^sha256' $metadata_filename > /dev/null; then
+    echo "downloaded metadata file looks valid..."
+  else
+    echo "downloaded metadata file is corrupted or an uncaught error was encountered in downloading the file..."
+    # this generally means one of the download methods downloaded a 404 or something like that and then reported a successful exit code,
+    # and this should be fixed in the function that was doing the download.
+    report_bug
+    exit 1
+  fi
+
+  download_url=`awk '$1 == "url" { print $2 }' "$metadata_filename"`
+  sha256=`awk '$1 == "sha256" { print $2 }' "$metadata_filename"`
 else
   download_url=$download_url_override
   # Set sha256 to empty string if checksum not set
@@ -756,7 +730,7 @@ else
 fi
 
 ############
-# end of create_download_url.sh
+# end of fetch_metadata.sh
 ############
 
 
@@ -776,8 +750,7 @@ fi
 # $filetype: Type of the file downloaded.
 ############
 
-# WARNING: modified sed to be able to retrieve file name from S3 download url
-filename=`echo $download_url | sed -e 's/^.*\///'`
+filename=`echo $download_url | sed -e 's/?.*//' | sed -e 's/^.*\///'`
 filetype=`echo $filename | sed -e 's/^.*\.//'`
 
 # use either $tmp_dir, the provided directory (-d) or the provided filename (-f)

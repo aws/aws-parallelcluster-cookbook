@@ -2,8 +2,6 @@
 
 source 'https://rubygems.org'
 
-gem 'berkshelf'
-
 group :style do
   gem 'cookstyle', '~> 7.25.9'
   gem 'rake', '~> 13.0.1'

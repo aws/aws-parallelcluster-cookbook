@@ -7,6 +7,8 @@ verifier:
 provisioner:
   data_path: test/data
   environments_path: test/environments
+  policy_name: aws-parallelcluster
+  policy_group: kitchen
   client_rb:
     environment: kitchen
   attributes:
