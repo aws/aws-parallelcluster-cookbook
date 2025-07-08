@@ -4,6 +4,19 @@ require 'chefspec'
 include Chef::Mixin::ShellOut
 
 RSpec.configure do |c|
+  c.before(:suite) do
+    # Copy third-party cookbooks to cookbooks directory for ChefSpec tests
+    require 'fileutils'
+    third_party_path = File.expand_path('../../third-party', __dir__)
+    cookbooks_path = File.expand_path('../..', __dir__)
+    if Dir.exist?(third_party_path)
+      Dir.glob(File.join(third_party_path, '*')).each do |cookbook|
+        next unless File.directory?(cookbook)
+        FileUtils.cp_r(cookbook, cookbooks_path)
+      end
+    end
+  end
+
   c.before(:each) do
     allow(File).to receive(:exist?).and_call_original
     allow(Dir).to receive(:exist?).and_call_original
