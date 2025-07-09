@@ -32,9 +32,9 @@ The `test` folder contains Python unit tests files and Kitchen [environment](htt
 
 The `kitchen` folder contains utility files used when running Inspec tests locally.
 
-The `cookbooks/third-party` folder contains cookbooks from marketplace. They must be regularly updated and should not be modified by hand.
+The `iptables`, `line`, `nfs`, `openssh`, `yum`, `yum-eple` are cookbooks from marketplace. They must be regularly updated and should not be modified by hand.
 They have been pre-downloaded and stored in our repository to avoid contacting Chef Marketplace at AMI build time and cluster creation.
-You can find more information about them in the `cookbooks/third-party/THIRD-PARTY-LICENSES.txt` file.
+You can find more information about them in the `cookbooks/THIRD-PARTY-LICENSES.txt` file.
 
 # Development
 

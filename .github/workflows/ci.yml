@@ -95,7 +95,7 @@ jobs:
         uses: ludeeus/action-shellcheck@master
         with:
           severity: warning
-          ignore_paths: cookbooks/third-party
+          ignore_paths: cookbooks/iptables cookbooks/line cookbooks/nfs cookbooks/openssh cookbooks/yum cookbooks/yum-epel
   rspec:
     name: ChefSpec
     runs-on: ubuntu-latest
