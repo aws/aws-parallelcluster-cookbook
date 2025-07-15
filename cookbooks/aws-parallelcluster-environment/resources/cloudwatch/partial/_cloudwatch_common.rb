@@ -163,6 +163,8 @@ action :configure do
     command "#{cookbook_virtualenv_path}/bin/python #{validator_script_path}"
   end unless redhat_on_docker?
 
+  CW_AGENT_CONFIG_JSON = '/etc/parallelcluster/amazon-cloudwatch-agent/amazon-cloudwatch-agent.json'
+
   execute "cloudwatch-config-creation" do
     user 'root'
     timeout 300
@@ -182,6 +184,6 @@ action :configure do
   execute "cloudwatch-agent-start" do
     user 'root'
     timeout 300
-    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a append-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s || /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s"
+    command "/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a append-config -m ec2 -c file:#{CW_AGENT_CONFIG_JSON} -s || /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:#{CW_AGENT_CONFIG_JSON} -s"
   end unless node['cluster']['cw_logging_enabled'] != 'true' || on_docker?
 end

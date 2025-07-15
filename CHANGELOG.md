@@ -15,6 +15,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade DCV to version 2024.0-19030.
 - Remove `berkshelf`. All cookbooks are local and do not need `berkshelf` dependency management.
 
+**BUG FIXES**
+- Fix a race condition in CloudWatch Agent startup that could cause nodes bootstrap failures.
+
 3.13.2
 ------
 
