@@ -88,6 +88,15 @@ if node['cluster']['slurmdbd_service_enabled'] == "true"
     retry_delay 10
   end unless kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
 
+  bash "Remove existing cluster name state file" do
+    user 'root'
+    group 'root'
+    code <<-CLUSTERSTATE
+      rm /var/spool/slurm.state/clustername
+    CLUSTERSTATE
+    only_if { ::File.exist?('/var/spool/slurm.state/clustername') }
+  end
+
   bash "bootstrap slurm database" do
     user 'root'
     group 'root'

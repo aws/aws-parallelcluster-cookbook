@@ -23,3 +23,12 @@ service "slurmdbd" do
   supports restart: false
   action %i(disable stop)
 end
+
+bash "Remove existing cluster name state file" do
+  user 'root'
+  group 'root'
+  code <<-CLUSTERSTATE
+      rm /var/spool/slurm.state/clustername
+    CLUSTERSTATE
+  only_if { ::File.exist?('/var/spool/slurm.state/clustername') }
+end
