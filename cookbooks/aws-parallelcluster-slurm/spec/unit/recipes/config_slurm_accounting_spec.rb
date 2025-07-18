@@ -10,6 +10,7 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
               allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
               allow_any_instance_of(Object).to receive(:dig).and_return(true)
               RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+              mock_file_exists("/var/spool/slurm.state/clustername", true)
               node.override['cluster']['slurmdbd_service_enabled'] = enable_service
             end
             runner.converge(described_recipe)
@@ -70,6 +71,9 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
             )
           end
           if enable_service == "true"
+            it 'Removes existing cluster name state file' do
+              is_expected.to delete_file('/var/spool/slurm.state/clustername')
+            end
             it 'starts the slurm database daemon' do
               is_expected.to enable_service("slurmdbd")
               is_expected.to start_service("slurmdbd")
