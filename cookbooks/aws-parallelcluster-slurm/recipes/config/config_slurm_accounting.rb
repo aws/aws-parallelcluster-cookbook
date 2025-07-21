@@ -76,6 +76,10 @@ service "slurmdbd" do
   action action
 end unless on_docker?
 
+file "/var/spool/slurm.state/clustername" do
+  action "delete"
+end
+
 if node['cluster']['slurmdbd_service_enabled'] == "true"
   # After starting slurmdbd the database may not be fully responsive yet and
   # its bootstrapping may fail. We need to wait for sacctmgr to successfully
@@ -87,11 +91,6 @@ if node['cluster']['slurmdbd_service_enabled'] == "true"
     retries node['cluster']['slurmdbd_response_retries']
     retry_delay 10
   end unless kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
-
-
-  file '/var/spool/slurm.state/clustername' do
-    action :delete
-  end
 
   bash "bootstrap slurm database" do
     user 'root'

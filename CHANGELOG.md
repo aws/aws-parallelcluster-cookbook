@@ -12,6 +12,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Ubuntu 20.04 is no longer supported.
 - Upgrade Slurm to version 24.11.5.
+- Addressed cluster id mismatch known issue by deleting the file `/var/spool/slurm.state/clustername` before configuring Slurm accounting.
 - Upgrade DCV to version 2024.0-19030.
 - Remove `berkshelf`. All cookbooks are local and do not need `berkshelf` dependency management.
 
