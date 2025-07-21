@@ -33,7 +33,7 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-if aws_region.start_with?("us-iso") && platform?('amazon') && node['platform_version'] == "2"
+if aws_region.start_with?("us-iso")
   remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
     source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cfn-dependencies.tgz"
     mode '0644'
