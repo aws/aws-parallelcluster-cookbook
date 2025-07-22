@@ -48,7 +48,7 @@ if aws_region.start_with?("us-iso")
     cwd "#{node['cluster']['base_dir']}"
     code <<-REQ
       set -e
-      tar xzf pypi-cfn-dependencies-3.12-x86_64.tgz
+      tar xzf cfn-dependencies.tgz
       cd dependencies
       #{virtualenv_path}/bin/pip install * -f ./ --no-index
       REQ
