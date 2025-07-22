@@ -17,7 +17,7 @@ default_action :install
 
 action :install do
   return unless nvidia_enabled_or_installed?
-  return if on_docker? || imex_installed
+  return if on_docker? || imex_installed || aws_region.start_with?("us-iso")
 
   # Add NVIDIA repo for nvidia-imex
   nvidia_repo 'add nvidia repository' do

@@ -165,6 +165,7 @@ describe 'nvidia_imex:install' do
 
         before do
           chef_run.node.override['cluster']['shared_dir'] = shared_dir
+          chef_run.node.override['cluster']['region'] = 'aws_region'
           chef_run.node.override['cluster']['nvidia']['driver_version'] = nvidia_version
           ConvergeNvidiaImex.install(chef_run)
         end
