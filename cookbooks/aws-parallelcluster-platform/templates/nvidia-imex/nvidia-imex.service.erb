@@ -1,0 +1,26 @@
+[Unit]
+Description=NVIDIA IMEX service
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+Environment="KRB5_CLIENT_KTNAME=/etc/krb5.keytab"
+User=root
+PrivateTmp=false
+Type=forking
+TimeoutStartSec=infinity
+
+ExecStart=/usr/bin/nvidia-imex -c <%= node['cluster']['shared_dir'] %>/nvidia-imex/config.cfg
+
+LimitCORE=infinity
+
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
