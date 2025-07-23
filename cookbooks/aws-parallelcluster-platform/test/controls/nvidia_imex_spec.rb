@@ -28,7 +28,7 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
 
   nvidia_imex_dir = "#{node['cluster']['shared_dir']}/nvidia-imex"
 
-  %w("#{nvidia_imex_dir}/config.cfg" "#{nvidia_imex_dir}/nodes_config.cfg").each do |conf_files|
+  ["#{nvidia_imex_dir}/config.cfg", "#{nvidia_imex_dir}/nodes_config.cfg"].each do |conf_files|
     describe file(conf_files) do
       it { should exist }
       its('owner') { should eq 'root' }
@@ -39,7 +39,7 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
 end
 
 control 'tag:config_nvidia_fabric_manager_enabled' do
-  only_if { instance.nvs_switch_enabled? }
+  only_if { instance.nvs_switch_enabled? && node['cluster']['node_type'] == "ComputeFleet" }
 
   describe service('nvidia-imex') do
     it { should be_enabled }

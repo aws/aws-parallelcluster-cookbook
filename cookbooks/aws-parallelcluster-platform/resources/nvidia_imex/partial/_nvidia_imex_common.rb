@@ -55,6 +55,17 @@ action :install do
   end
 end
 
+action :configure do
+  return unless imex_installed
+  # Start nvidia-imex on p6e-gb200
+  if get_nvswitch_count(get_device_ids['gb200']) > 1
+    service 'nvidia-imex' do
+      action %i(start enable)
+      supports status: true
+    end unless on_docker?
+  end
+end
+
 def imex_installed
   ::File.exist?('/usr/bin/nvidia-imex') || ::File.exist?('/usr/bin/nvidia-imex-ctl')
 end
