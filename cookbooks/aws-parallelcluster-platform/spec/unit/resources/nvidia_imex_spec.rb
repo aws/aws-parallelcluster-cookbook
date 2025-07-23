@@ -3,6 +3,8 @@ require 'spec_helper'
 shared_dir = "SHARED_DIR"
 nvidia_version = "NVIDIA_VERSION"
 nvidia_imex_shared_dir = "#{shared_dir}/nvidia-imex"
+imex_binary = '/usr/bin/nvidia-imex'
+imex_ctl_binary = '/usr/bin/nvidia-imex-ctl'
 
 class ConvergeNvidiaImex
   def self.install(chef_run)
@@ -64,8 +66,6 @@ end
 describe 'nvidia_imex:imex_installed' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      imex_binary = '/usr/bin/nvidia-imex'
-      imex_ctl_binary = '/usr/bin/nvidia-imex-ctl'
       cached(:chef_run) do
         runner(platform: platform, version: version, step_into: ['nvidia_imex'])
       end
@@ -80,8 +80,14 @@ describe 'nvidia_imex:imex_installed' do
           allow(File).to receive(:exist?).with(imex_binary).and_return(false)
         end
 
-        it 'is false' do
-          expect(resource.imex_installed).to eq(false)
+        if platform == 'amazon' && version =='2'
+          it 'is true' do
+            expect(resource.imex_installed).to eq(true)
+          end
+        else
+          it 'is false' do
+            expect(resource.imex_installed).to eq(false)
+          end
         end
       end
 
@@ -158,7 +164,8 @@ describe 'nvidia_imex:install' do
         cached(:chef_run) do
           stubs_for_resource('nvidia_imex') do |res|
             allow(res).to receive(:nvidia_enabled_or_installed?).and_return(true)
-            allow(res).to receive(:imex_installed).and_return(false)
+            allow(File).to receive(:exist?).with(imex_ctl_binary).and_return(false)
+            allow(File).to receive(:exist?).with(imex_binary).and_return(false)
           end
           runner(platform: platform, version: version, step_into: ['nvidia_imex'])
         end
@@ -170,29 +177,55 @@ describe 'nvidia_imex:install' do
           ConvergeNvidiaImex.install(chef_run)
         end
 
-        it 'installs nvidia-imex' do
-          is_expected.to add_nvidia_repo('add nvidia repository')
-          is_expected.to create_directory(nvidia_imex_shared_dir)
+        if platform == 'amazon' && version == '2'
+          it 'does not install nvidia-imex' do
+            is_expected.not_to add_nvidia_repo('add nvidia repository')
+            is_expected.not_to create_directory(nvidia_imex_shared_dir)
+            is_expected.not_to create_template("#{nvidia_imex_shared_dir}/config.cfg")
+              .with(source: 'nvidia-imex/nvidia-imex-config.erb')
+              .with(user: 'root')
+              .with(group: 'root')
+              .with(mode: '0755')
+            is_expected.not_to create_template("#{nvidia_imex_shared_dir}/nodes_config.cfg")
+              .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
+              .with(user: 'root')
+              .with(group: 'root')
+              .with(mode: '0755')
+            is_expected.not_to create_template("/etc/systemd/system/nvidia-imex.service")
+               .with(source: 'nvidia-imex/nvidia-imex.service.erb')
+               .with(user: 'root')
+               .with(group: 'root')
+              .with(mode: '0644')
+            is_expected.not_to install_package('nvidia-imex')
+              .with(retries: 3)
+              .with(retry_delay: 5)
+              .with(version: nvidia_version)
+          end
+        else
+          it 'installs nvidia-imex' do
+            is_expected.to add_nvidia_repo('add nvidia repository')
+            is_expected.to create_directory(nvidia_imex_shared_dir)
 
-          is_expected.to create_template("#{nvidia_imex_shared_dir}/config.cfg")
-            .with(source: 'nvidia-imex/nvidia-imex-config.erb')
-            .with(user: 'root')
-            .with(group: 'root')
-            .with(mode: '0755')
-          is_expected.to create_template("#{nvidia_imex_shared_dir}/nodes_config.cfg")
-            .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
-            .with(user: 'root')
-            .with(group: 'root')
-            .with(mode: '0755')
-          is_expected.to create_template("/etc/systemd/system/nvidia-imex.service")
-            .with(source: 'nvidia-imex/nvidia-imex.service.erb')
-            .with(user: 'root')
-            .with(group: 'root')
-            .with(mode: '0644')
-          is_expected.to install_package('nvidia-imex')
-            .with(retries: 3)
-            .with(retry_delay: 5)
-            .with(version: nvidia_version)
+            is_expected.to create_template("#{nvidia_imex_shared_dir}/config.cfg")
+              .with(source: 'nvidia-imex/nvidia-imex-config.erb')
+              .with(user: 'root')
+              .with(group: 'root')
+              .with(mode: '0755')
+            is_expected.to create_template("#{nvidia_imex_shared_dir}/nodes_config.cfg")
+              .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
+              .with(user: 'root')
+              .with(group: 'root')
+              .with(mode: '0755')
+            is_expected.to create_template("/etc/systemd/system/nvidia-imex.service")
+              .with(source: 'nvidia-imex/nvidia-imex.service.erb')
+              .with(user: 'root')
+              .with(group: 'root')
+              .with(mode: '0644')
+            is_expected.to install_package('nvidia-imex')
+              .with(retries: 3)
+              .with(retry_delay: 5)
+              .with(version: nvidia_version)
+          end
         end
       end
     end
