@@ -80,7 +80,7 @@ describe 'nvidia_imex:imex_installed' do
           allow(File).to receive(:exist?).with(imex_binary).and_return(false)
         end
 
-        if platform == 'amazon' && version =='2'
+        if platform == 'amazon' && version == '2'
           it 'is true' do
             expect(resource.imex_installed).to eq(true)
           end
@@ -192,9 +192,9 @@ describe 'nvidia_imex:install' do
               .with(group: 'root')
               .with(mode: '0755')
             is_expected.not_to create_template("/etc/systemd/system/nvidia-imex.service")
-               .with(source: 'nvidia-imex/nvidia-imex.service.erb')
-               .with(user: 'root')
-               .with(group: 'root')
+              .with(source: 'nvidia-imex/nvidia-imex.service.erb')
+              .with(user: 'root')
+              .with(group: 'root')
               .with(mode: '0644')
             is_expected.not_to install_package('nvidia-imex')
               .with(retries: 3)
