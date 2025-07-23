@@ -15,3 +15,8 @@
 provides :nvidia_imex, platform: 'amazon', platform_version: '2'
 
 use 'partial/_nvidia_imex_common.rb'
+
+def imex_installed
+  # We do not install NVIDIA-Imex for Alinux2 due to restriction on NVIDIA driver
+  return true
+end
