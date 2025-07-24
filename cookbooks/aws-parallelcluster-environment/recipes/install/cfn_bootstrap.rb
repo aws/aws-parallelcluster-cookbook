@@ -34,8 +34,14 @@ activate_virtual_env virtualenv_name do
 end
 
 if aws_region.start_with?("us-iso")
+  dependency_package_name = "pypi-cfn-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+  dependency_folder_name = dependency_package_name
+  if platform?('amazon') && node['platform_version'] == "2"
+    dependency_package_name = "cfn-dependencies"
+    dependency_folder_name = "cfn"
+  end
   remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/pypi-cfn-dependencies-3.12-x86_64.tgz"
+    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
     mode '0644'
     retries 3
     retry_delay 5
@@ -49,7 +55,7 @@ if aws_region.start_with?("us-iso")
     code <<-REQ
       set -e
       tar xzf cfn-dependencies.tgz
-      cd dependencies
+      cd #{dependency_folder_name}
       #{virtualenv_path}/bin/pip install * -f ./ --no-index
       REQ
   end
