@@ -51,7 +51,7 @@ action :install do
   package 'nvidia-imex' do
     retries 3
     retry_delay 5
-    version node['cluster']['nvidia']['driver_version']
+    version _nvidia_imex_version
   end
 end
 

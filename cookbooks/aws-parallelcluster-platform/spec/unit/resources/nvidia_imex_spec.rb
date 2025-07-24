@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 shared_dir = "SHARED_DIR"
-nvidia_version = "NVIDIA_VERSION"
+nvidia_version = "1.2.3"
 nvidia_imex_shared_dir = "#{shared_dir}/nvidia-imex"
 imex_binary = '/usr/bin/nvidia-imex'
 imex_ctl_binary = '/usr/bin/nvidia-imex-ctl'
@@ -169,6 +169,13 @@ describe 'nvidia_imex:install' do
           end
           runner(platform: platform, version: version, step_into: ['nvidia_imex'])
         end
+        cached(:nvidia_imex_version) do
+          if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
+            "1-1.2.3-1"
+          else
+            "1_1.2.3-1"
+          end
+        end
 
         before do
           chef_run.node.override['cluster']['shared_dir'] = shared_dir
@@ -199,7 +206,7 @@ describe 'nvidia_imex:install' do
             is_expected.not_to install_package('nvidia-imex')
               .with(retries: 3)
               .with(retry_delay: 5)
-              .with(version: nvidia_version)
+              .with(version: nvidia_imex_version)
           end
         else
           it 'installs nvidia-imex' do
@@ -224,7 +231,7 @@ describe 'nvidia_imex:install' do
             is_expected.to install_package('nvidia-imex')
               .with(retries: 3)
               .with(retry_delay: 5)
-              .with(version: nvidia_version)
+              .with(version: nvidia_imex_version)
           end
         end
       end

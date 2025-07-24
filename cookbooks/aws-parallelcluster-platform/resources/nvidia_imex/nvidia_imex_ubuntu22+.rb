@@ -17,3 +17,8 @@ provides :nvidia_imex, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_nvidia_imex_common.rb'
+
+def _nvidia_imex_version
+  nvidia_major_version = node['cluster']['nvidia']['driver_version'].split('.')[0]
+  "#{nvidia_major_version}_#{node['cluster']['nvidia']['driver_version']}-1"
+end
