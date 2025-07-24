@@ -12,8 +12,10 @@
 # limitations under the License.
 
 virtualenv_path = cookbook_virtualenv_path
-pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/pypi-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}.tgz"
+dependency_package_name = "pypi-cookbook-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{dependency_package_name}.tgz"
 if platform?('amazon') && node['platform_version'] == "2"
+  dependency_package_name = "dependencies"
   pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cookbook-dependencies.tgz"
 end
 
@@ -46,7 +48,7 @@ bash 'pip install' do
   code <<-REQ
     set -e
     tar xzf cookbook-dependencies.tgz
-    cd dependencies
+    cd #{dependency_package_name}
     #{virtualenv_path}/bin/pip install * -f ./ --no-index
     REQ
 end
