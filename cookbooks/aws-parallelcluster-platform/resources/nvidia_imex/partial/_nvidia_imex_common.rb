@@ -51,6 +51,7 @@ action :install do
   package 'nvidia-imex' do
     retries 3
     retry_delay 5
+    flush_cache({ before: true })
     version _nvidia_imex_version
   end
 end
