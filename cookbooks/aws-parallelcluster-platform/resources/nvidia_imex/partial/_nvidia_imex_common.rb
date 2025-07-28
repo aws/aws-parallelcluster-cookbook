@@ -58,8 +58,8 @@ action :install do
 end
 
 action :configure do
-  return unless imex_installed
-  # Start nvidia-imex on p6e-gb200
+  return unless imex_installed && node['cluster']['node_type'] == "ComputeFleet"
+  # Start nvidia-imex on p6e-gb200 and only on ComputeFleet
   if get_nvswitch_count(get_device_ids['gb200']) > 1
     service nvidia_imex_service do
       action %i(start enable)
