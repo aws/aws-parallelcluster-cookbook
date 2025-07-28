@@ -48,11 +48,13 @@ action :install do
     action :create
   end
 
-  package "nvidia-imex-#{_nvidia_imex_version}" do
-    retries 3
-    retry_delay 5
-    # version _nvidia_imex_version
+  install_packages 'Install nvidia-imex' do
+    packages "nvidia-imex-#{_nvidia_imex_version}"
+    action :install
   end
+  # Save Imex version in Node Attributes for InSpec Tests
+  node.default['cluster']['nvidia']['imex']['version'] = _nvidia_imex_version
+  node_attributes 'dump node attributes'
 end
 
 action :configure do

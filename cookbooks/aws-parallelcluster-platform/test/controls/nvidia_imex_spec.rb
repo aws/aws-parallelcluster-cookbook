@@ -14,7 +14,7 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
 
   describe package('nvidia-imex') do
     it { should be_installed }
-    its('version') { should match /#{node['cluster']['nvidia']['driver_version']}/ }
+    its('version') { should match /#{node['cluster']['nvidia']['imex']['version']}/ }
   end
 
   %w(/usr/bin/nvidia-imex /usr/bin/nvidia-imex-ctl).each do |path|

@@ -176,6 +176,7 @@ describe 'nvidia_imex:install' do
             "1_1.2.3-1"
           end
         end
+        cached(:node) { chef_run.node }
 
         before do
           chef_run.node.override['cluster']['shared_dir'] = shared_dir
@@ -203,10 +204,13 @@ describe 'nvidia_imex:install' do
               .with(user: 'root')
               .with(group: 'root')
               .with(mode: '0644')
-            is_expected.not_to install_package('nvidia-imex')
-              .with(retries: 3)
-              .with(retry_delay: 5)
-              .with(version: nvidia_imex_version)
+            is_expected.not_to install_install_packages('Install nvidia-imex')
+              .with(packages: "nvidia-imex-#{nvidia_imex_version}")
+              .with(action: %i(install))
+          end
+          it 'does not set nvidia-imex version' do
+            expect(node.default['cluster']['nvidia']['imex']['version']).not_to eq(nvidia_imex_version)
+            is_expected.not_to write_node_attributes('dump node attributes')
           end
         else
           it 'installs nvidia-imex' do
@@ -228,10 +232,13 @@ describe 'nvidia_imex:install' do
               .with(user: 'root')
               .with(group: 'root')
               .with(mode: '0644')
-            is_expected.to install_package('nvidia-imex')
-              .with(retries: 3)
-              .with(retry_delay: 5)
-              .with(version: nvidia_imex_version)
+            is_expected.to install_install_packages('Install nvidia-imex')
+              .with(packages: "nvidia-imex-#{nvidia_imex_version}")
+              .with(action: %i(install))
+          end
+          it 'sets nvidia-imex version' do
+            expect(node.default['cluster']['nvidia']['imex']['version']).to eq(nvidia_imex_version)
+            is_expected.to write_node_attributes('dump node attributes')
           end
         end
       end
