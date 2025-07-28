@@ -177,11 +177,12 @@ describe 'nvidia_imex:install' do
           end
           runner(platform: platform, version: version, step_into: ['nvidia_imex'])
         end
-        cached(:nvidia_imex_version) do
+        cached(:nvidia_imex_version) { "1.2.3-1" }
+        cached(:nvidia_imex_name) do
           if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
-            "1-1.2.3-1"
+            "nvidia-imex-1-#{nvidia_imex_version}"
           else
-            "1_1.2.3-1"
+            "nvidia-imex-1_#{nvidia_imex_version}"
           end
         end
         cached(:node) { chef_run.node }
@@ -213,7 +214,7 @@ describe 'nvidia_imex:install' do
               .with(group: 'root')
               .with(mode: '0644')
             is_expected.not_to install_install_packages('Install nvidia-imex')
-              .with(packages: "nvidia-imex-#{nvidia_imex_version}")
+              .with(packages: "#{nvidia_imex_name}")
               .with(action: %i(install))
           end
           it 'does not set nvidia-imex version' do
@@ -241,7 +242,7 @@ describe 'nvidia_imex:install' do
               .with(group: 'root')
               .with(mode: '0644')
             is_expected.to install_install_packages('Install nvidia-imex')
-              .with(packages: "nvidia-imex-#{nvidia_imex_version}")
+              .with(packages: "#{nvidia_imex_name}")
               .with(action: %i(install))
           end
           it 'sets nvidia-imex version' do
