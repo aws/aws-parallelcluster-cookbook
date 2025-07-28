@@ -18,7 +18,7 @@ LOG_LEVEL=4
 #       to console(stderr). If the specified log file can't be opened or the
 #       path is empty.
 #   Default Value: /var/log/nvidia-imex.log
-LOG_FILE_NAME=/var/log/nvidia-imex.log
+# LOG_FILE_NAME=/var/log/nvidia-imex.log
 
 #   Description: Filename for IMEX stats logging
 #   Possible Values:
@@ -28,7 +28,7 @@ LOG_FILE_NAME=/var/log/nvidia-imex.log
 #   Default Value: /var/log/nvidia-imex-stats.log
 #   Note: If STATS_FILE_NAME is configured same as LOG_FILE_NAME, then stats will
 #       be redirected to the path/filename specified by LOG_FILE_NAME.
-STATS_FILE_NAME=/var/log/nvidia-imex-stats.log
+# STATS_FILE_NAME=/var/log/nvidia-imex-stats.log
 
 #   Description: Append to an existing log file or overwrite the logs
 #   Possible Values:
@@ -41,7 +41,7 @@ LOG_APPEND_TO_LOG=1
 #   Possible Values:
 #           Any Integer values
 #   Default Value: 1024
-LOG_FILE_MAX_SIZE=1024
+# LOG_FILE_MAX_SIZE=1024
 
 #   Description: Number of times the IMEX log is rotated once it reaches LOG_FILE_MAX_SIZE
 #   Possible Values:
@@ -58,7 +58,7 @@ LOG_MAX_ROTATE_COUNT=3
 #           0  - No
 #           1  - Yes
 #   Default Value: 0
-LOG_USE_SYSLOG=0
+LOG_USE_SYSLOG=1
 
 #   Description: daemonize IMEX on start-up
 #   Possible Values:
