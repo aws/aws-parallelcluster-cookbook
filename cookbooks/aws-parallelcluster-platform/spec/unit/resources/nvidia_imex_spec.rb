@@ -14,6 +14,14 @@ class ConvergeNvidiaImex
       end
     end
   end
+
+  def self.configure(chef_run)
+    chef_run.converge_dsl('aws-parallelcluster-platform') do
+      nvidia_imex 'configure' do
+        action :configure
+      end
+    end
+  end
 end
 
 describe 'nvidia_imex:nvidia_enabled_or_installed?' do
@@ -240,6 +248,75 @@ describe 'nvidia_imex:install' do
             expect(node.default['cluster']['nvidia']['imex']['version']).to eq(nvidia_imex_version)
             is_expected.to write_node_attributes('dump node attributes')
           end
+        end
+      end
+    end
+  end
+end
+
+describe 'nvidia_imex:configure' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      context 'when nvidia-imex binary is not installed' do
+        cached(:chef_run) do
+          stubs_for_resource('nvidia_imex') do |res|
+            allow(res).to receive(:imex_installed).and_return(false)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])
+          ConvergeNvidiaImex.configure(runner)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'does not configure nvidia-imex' do
+          is_expected.not_to configure_nvidia_imex('nvidia-imex')
+        end
+      end
+
+      context 'when get_nvswitch_count > 1' do
+        cached(:chef_run) do
+          stubs_for_provider('nvidia_imex[configure]') do |pro|
+            allow(pro).to receive(:imex_installed).and_return(true)
+            allow(pro).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
+            allow(pro).to receive(:get_nvswitch_count).with('test').and_return(4)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])
+          ConvergeNvidiaImex.configure(runner)
+        end
+        cached(:node) { chef_run.node }
+
+        before do
+          chef_run.node.override['cluster']['region'] = 'aws_region'
+        end
+
+        if platform == 'amazon' && version == '2'
+          it 'does not configure nvidia-imex' do
+            is_expected.not_to start_service('nvidia-imex').with_action(%i(start enable)).with_supports({ status: true })
+          end
+        else
+          it 'starts nvidia-imex service' do
+            is_expected.to start_service('nvidia-imex').with_action(%i(start enable)).with_supports({ status: true })
+          end
+        end
+      end
+
+      context 'when get_nvswitch_count <= 1' do
+        cached(:chef_run) do
+          stubs_for_provider('nvidia_imex[configure]') do |pro|
+            allow(pro).to receive(:imex_installed).and_return(true)
+            allow(pro).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
+            allow(pro).to receive(:get_nvswitch_count).with('test').and_return(1)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])
+          ConvergeNvidiaImex.configure(runner)
+        end
+        cached(:node) { chef_run.node }
+
+        before do
+          chef_run.node.override['cluster']['region'] = 'aws_region'
+        end
+
+        it 'does not configure nvidia-imex' do
+          is_expected.not_to start_service('nvidia-imex').with_action(%i(start enable)).with_supports({ status: true })
         end
       end
     end

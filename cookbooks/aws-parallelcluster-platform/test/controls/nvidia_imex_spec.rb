@@ -12,12 +12,14 @@
 control 'tag:install_expected_versions_of_nvidia_imex_installed' do
   only_if { ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
 
-  describe package('nvidia-imex') do
+  nvidia_imex_service = 'nvidia-imex'
+
+  describe package(nvidia_imex_service) do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['nvidia']['imex']['version']}/ }
   end
 
-  %w(/usr/bin/nvidia-imex /usr/bin/nvidia-imex-ctl).each do |path|
+  ["/usr/bin/#{nvidia_imex_service}", "/usr/bin/#{nvidia_imex_service}-ctl"].each do |path|
     describe file(path) do
       it { should exist }
       its('owner') { should eq 'root' }
@@ -26,7 +28,7 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
     end
   end
 
-  nvidia_imex_dir = "#{node['cluster']['shared_dir']}/nvidia-imex"
+  nvidia_imex_dir = "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}"
 
   ["#{nvidia_imex_dir}/config.cfg", "#{nvidia_imex_dir}/nodes_config.cfg"].each do |conf_files|
     describe file(conf_files) do

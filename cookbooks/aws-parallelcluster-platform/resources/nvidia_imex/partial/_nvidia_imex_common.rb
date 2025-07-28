@@ -24,23 +24,23 @@ action :install do
     action :add
   end
 
-  directory "#{node['cluster']['shared_dir']}/nvidia-imex"
+  directory "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}"
 
-  template "#{node['cluster']['shared_dir']}/nvidia-imex/config.cfg" do
+  template "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}/config.cfg" do
     source 'nvidia-imex/nvidia-imex-config.erb'
     owner 'root'
     group 'root'
     mode '0755'
   end
 
-  template "#{node['cluster']['shared_dir']}/nvidia-imex/nodes_config.cfg" do
+  template "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}/nodes_config.cfg" do
     source 'nvidia-imex/nvidia-imex-nodes.erb'
     owner 'root'
     group 'root'
     mode '0755'
   end
 
-  template "/etc/systemd/system/nvidia-imex.service" do
+  template "/etc/systemd/system/#{nvidia_imex_service}.service" do
     source 'nvidia-imex/nvidia-imex.service.erb'
     owner 'root'
     group 'root'
@@ -49,7 +49,7 @@ action :install do
   end
 
   install_packages 'Install nvidia-imex' do
-    packages "nvidia-imex-#{_nvidia_imex_version}"
+    packages "#{nvidia_imex_service}-#{_nvidia_imex_version}"
     action :install
   end
   # Save Imex version in Node Attributes for InSpec Tests
@@ -61,15 +61,19 @@ action :configure do
   return unless imex_installed
   # Start nvidia-imex on p6e-gb200
   if get_nvswitch_count(get_device_ids['gb200']) > 1
-    service 'nvidia-imex' do
+    service nvidia_imex_service do
       action %i(start enable)
       supports status: true
-    end unless on_docker?
+    end
   end
 end
 
+def nvidia_imex_service
+  'nvidia-imex'
+end
+
 def imex_installed
-  ::File.exist?('/usr/bin/nvidia-imex') || ::File.exist?('/usr/bin/nvidia-imex-ctl')
+  ::File.exist?("/usr/bin/#{nvidia_imex_service}") || ::File.exist?("/usr/bin/#{nvidia_imex_service}-ctl")
 end
 
 def nvidia_enabled_or_installed?

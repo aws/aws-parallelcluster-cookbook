@@ -20,3 +20,7 @@ def imex_installed
   # We do not install NVIDIA-Imex for Alinux2 due to restriction on NVIDIA driver
   true
 end
+
+action :configure do
+  # Do nothing
+end
