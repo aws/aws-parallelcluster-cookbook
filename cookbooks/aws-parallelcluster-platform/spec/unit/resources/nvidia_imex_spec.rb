@@ -178,11 +178,12 @@ describe 'nvidia_imex:install' do
           runner(platform: platform, version: version, step_into: ['nvidia_imex'])
         end
         cached(:nvidia_imex_version) { "1.2.3-1" }
+        cached(:nvidia_imex_package) { "nvidia-imex-1" }
         cached(:nvidia_imex_name) do
           if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
-            "nvidia-imex-1-#{nvidia_imex_version}"
+            "#{nvidia_imex_package}-#{nvidia_imex_version}"
           else
-            "nvidia-imex-1_#{nvidia_imex_version}"
+            "#{nvidia_imex_package}_#{nvidia_imex_version}"
           end
         end
         cached(:node) { chef_run.node }
@@ -219,7 +220,9 @@ describe 'nvidia_imex:install' do
           end
           it 'does not set nvidia-imex version' do
             expect(node.default['cluster']['nvidia']['imex']['version']).not_to eq(nvidia_imex_version)
+            expect(node.default['cluster']['nvidia']['imex']['package']).not_to eq(nvidia_imex_package)
             is_expected.not_to write_node_attributes('dump node attributes')
+            is_expected.not_to remove_nvidia_repo('remove nvidia repository')
           end
         else
           it 'installs nvidia-imex' do
@@ -241,13 +244,23 @@ describe 'nvidia_imex:install' do
               .with(user: 'root')
               .with(group: 'root')
               .with(mode: '0644')
-            is_expected.to install_install_packages('Install nvidia-imex')
-              .with(packages: "#{nvidia_imex_name}")
-              .with(action: %i(install))
+            if platform == 'ubuntu'
+              is_expected.to install_apt_package('Install nvidia-imex')
+                .with(package_name: nvidia_imex_package)
+                .with(version: nvidia_imex_version)
+                .with(retries: 10)
+                .with(retry_delay: 5)
+            else
+              is_expected.to install_install_packages('Install nvidia-imex')
+                .with(packages: nvidia_imex_name)
+                .with(action: %i(install))
+            end
           end
           it 'sets nvidia-imex version' do
             expect(node.default['cluster']['nvidia']['imex']['version']).to eq(nvidia_imex_version)
+            expect(node.default['cluster']['nvidia']['imex']['package']).to eq(nvidia_imex_package)
             is_expected.to write_node_attributes('dump node attributes')
+            is_expected.to remove_nvidia_repo('remove nvidia repository')
           end
         end
       end

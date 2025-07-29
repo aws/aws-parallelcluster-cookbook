@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 #
-# Copyright:: 2013-2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -48,14 +48,15 @@ action :install do
     action :create
   end
 
-  install_packages 'Install nvidia-imex' do
-    packages "#{nvidia_imex_service}-#{_nvidia_imex_version}"
-    action :install
-  end
+  action_install_imex
   # Save Imex version in Node Attributes for InSpec Tests
   node.default['cluster']['nvidia']['imex']['version'] = nvidia_imex_full_version
   node.default['cluster']['nvidia']['imex']['package'] = "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
   node_attributes 'dump node attributes'
+
+  nvidia_repo 'remove nvidia repository' do
+    action :remove
+  end
 end
 
 action :configure do

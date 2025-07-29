@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-
-# Copyright:: 2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
 # You may not use this file except in compliance with the License.
@@ -12,13 +12,11 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_imex, platform: 'redhat' do |node|
-  node['platform_version'].to_i >= 8
-end
-
-use 'partial/_nvidia_imex_common.rb'
-use 'partial/_nvidia_imex_rhel.rb'
-
-def _nvidia_imex_version
-  "#{nvidia_driver_major_version}-#{nvidia_imex_full_version}"
+action :install_imex do
+  apt_package "Install nvidia-imex" do
+    package_name "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
+    version nvidia_imex_full_version
+    retries 10
+    retry_delay 5
+  end
 end

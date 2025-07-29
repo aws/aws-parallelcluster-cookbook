@@ -17,10 +17,8 @@ provides :nvidia_imex, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_nvidia_imex_common.rb'
+use 'partial/_nvidia_imex_debian.rb'
 
 def _nvidia_imex_version
-  "1:#{nvidia_driver_major_version}_#{nvidia_imex_full_version}"
-  # The single digit "1" is epoch version. Without the "1", package install fails because version does not exist.
-  # See details here:
-  # https://askubuntu.com/questions/441879/why-do-some-packages-have-extra-numbers-before-a-colon-on-the-front-of-their-ver
+  "#{nvidia_driver_major_version}_#{nvidia_imex_full_version}"
 end
