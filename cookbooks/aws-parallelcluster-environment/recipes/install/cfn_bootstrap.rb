@@ -79,11 +79,16 @@ remote_file "/tmp/#{cfnbootstrap_package}" do
   retry_delay 5
 end
 
+if aws_region.start_with?("us-iso")
+  command = "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package} --no-build-isolation"
+else
+  command = "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package}"
+end
 bash "Install CloudFormation helpers from #{cfnbootstrap_package}" do
   user 'root'
   group 'root'
   cwd '/tmp'
-  code "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package}"
+  code command
   creates "#{virtualenv_path}/bin/cfn-hup"
 end
 
