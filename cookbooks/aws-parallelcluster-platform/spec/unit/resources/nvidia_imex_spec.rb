@@ -1,8 +1,7 @@
 require 'spec_helper'
 
-shared_dir = "SHARED_DIR"
 nvidia_version = "1.2.3"
-nvidia_imex_shared_dir = "#{shared_dir}/nvidia-imex"
+nvidia_imex_shared_dir = "SHARED_DIR/nvidia-imex"
 imex_binary = '/usr/bin/nvidia-imex'
 imex_ctl_binary = '/usr/bin/nvidia-imex-ctl'
 
@@ -189,7 +188,7 @@ describe 'nvidia_imex:install' do
         cached(:node) { chef_run.node }
 
         before do
-          chef_run.node.override['cluster']['shared_dir'] = shared_dir
+          chef_run.node.override['cluster']['nvidia']['imex']['shared_dir'] = nvidia_imex_shared_dir
           chef_run.node.override['cluster']['region'] = 'aws_region'
           chef_run.node.override['cluster']['nvidia']['driver_version'] = nvidia_version
           ConvergeNvidiaImex.install(chef_run)

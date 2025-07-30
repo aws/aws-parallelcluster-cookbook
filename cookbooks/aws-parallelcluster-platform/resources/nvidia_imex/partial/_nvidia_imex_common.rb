@@ -24,16 +24,16 @@ action :install do
     action :add
   end
 
-  directory "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}"
+  directory node['cluster']['nvidia']['imex']['shared_dir']
 
-  template "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}/config.cfg" do
+  template "#{node['cluster']['nvidia']['imex']['shared_dir']}/config.cfg" do
     source 'nvidia-imex/nvidia-imex-config.erb'
     owner 'root'
     group 'root'
     mode '0755'
   end
 
-  template "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}/nodes_config.cfg" do
+  template "#{node['cluster']['nvidia']['imex']['shared_dir']}/nodes_config.cfg" do
     source 'nvidia-imex/nvidia-imex-nodes.erb'
     owner 'root'
     group 'root'

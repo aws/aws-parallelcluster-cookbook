@@ -22,6 +22,9 @@ if platform?('amazon') && node['platform_version'] == "2"
   default['cluster']['nvidia']['driver_version'] = '550.127.08'
 end
 
+# Nvidia-imex
+default['cluster']['nvidia']['imex']['shared_dir'] = "#{node['cluster']['shared_dir']}/nvidia-imex"
+
 # DCV
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3

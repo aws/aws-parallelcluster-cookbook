@@ -13,12 +13,6 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
   only_if { ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) && !os_properties.alinux2? }
 
   nvidia_imex_service = 'nvidia-imex'
-
-  describe package("#{node['cluster']['nvidia']['imex']['package']}") do
-    it { should be_installed }
-    its('version') { should match /#{node['cluster']['nvidia']['imex']['version']}/ }
-  end
-
   ["/usr/bin/#{nvidia_imex_service}", "/usr/bin/#{nvidia_imex_service}-ctl"].each do |path|
     describe file(path) do
       it { should exist }
@@ -28,15 +22,34 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
     end
   end
 
-  nvidia_imex_dir = "#{node['cluster']['shared_dir']}/#{nvidia_imex_service}"
+  nvidia_imex_dir = "#{node['cluster']['nvidia']['imex']['shared_dir']}"
 
-  ["#{nvidia_imex_dir}/config.cfg", "#{nvidia_imex_dir}/nodes_config.cfg"].each do |conf_files|
-    describe file(conf_files) do
-      it { should exist }
-      its('owner') { should eq 'root' }
-      its('group') { should eq 'root' }
-      its('mode') { should cmp '0755' }
-    end
+  describe file("#{nvidia_imex_dir}/config.cfg") do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0755' }
+    its('content') { should match %r{/IMEX_NODE_CONFIG_FILE=#{nvidia_imex_dir}/nodes_config.cfg/} }
+  end
+
+  describe file("#{nvidia_imex_dir}/nodes_config.cfg") do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0755' }
+  end
+
+  describe file("/etc/systemd/system/#{nvidia_imex_service}.service") do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0644' }
+    its('content') { should match %r{ExecStart=/usr/bin/nvidia-imex -c #{nvidia_imex_dir}/config.cfg} }
+  end
+
+  describe package("#{node['cluster']['nvidia']['imex']['package']}") do
+    it { should be_installed }
+    its('version') { should match /#{node['cluster']['nvidia']['imex']['version']}/ }
   end
 end
 
