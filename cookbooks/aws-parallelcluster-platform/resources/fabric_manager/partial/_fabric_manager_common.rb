@@ -54,6 +54,8 @@ end
 
 # Get number of nv switches
 def get_nvswitches
+  # We sum the count for all these deviceIds as output of lscpi command will be >0
+  # for only one device ID based on the instance type
   nvswitch_device_ids = get_device_ids.values
   nvswitch_device_ids.sum { |id| get_nvswitch_count(id) }
 end

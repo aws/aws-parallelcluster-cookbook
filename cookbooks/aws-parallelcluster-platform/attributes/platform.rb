@@ -22,7 +22,7 @@ if platform?('amazon') && node['platform_version'] == "2"
   default['cluster']['nvidia']['driver_version'] = '550.127.08'
 end
 
-# Nvidia-imex
+# nvidia-imex
 default['cluster']['nvidia']['imex']['shared_dir'] = "#{node['cluster']['shared_dir']}/nvidia-imex"
 
 # DCV

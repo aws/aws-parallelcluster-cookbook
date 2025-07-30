@@ -25,4 +25,4 @@ fabric_manager 'Install Nvidia Fabric Manager'
 
 nvidia_dcgm 'install Nvidia datacenter-gpu-manager'
 
-nvidia_imex 'Install Nvidia-imex'
+nvidia_imex 'Install nvidia-imex'

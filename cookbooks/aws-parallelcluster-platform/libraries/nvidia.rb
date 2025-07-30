@@ -32,7 +32,5 @@ def get_device_ids
   # NVSwitch device id is 10de:22a3 for P5 instance
   # NVSwitch device id is 10de:2901 for P6 instance
   # NVSwitch device id is 10de:2941 for P6e instance
-  # We sum the count for all these deviceIds as output of lscpi command will be >0
-  # for only one device ID based on the instance type
   { 'a100' => '10de:1af1', 'h100' => '10de:22a3', 'b200' => '10de:2901', 'gb200' => '10de:2941' }
 end
