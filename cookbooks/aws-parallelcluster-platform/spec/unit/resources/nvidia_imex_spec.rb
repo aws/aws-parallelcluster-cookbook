@@ -305,11 +305,11 @@ describe 'nvidia_imex:configure' do
 
           if (platform == 'amazon' && version == '2') || %w(HeadNode LoginNode).include?(node_type)
             it 'does not configure nvidia-imex' do
-              is_expected.not_to start_service('nvidia-imex').with_action(%i(start enable)).with_supports({ status: true })
+              is_expected.not_to start_service('nvidia-imex').with_action(%i(enable start)).with_supports({ status: true })
             end
           else
             it 'it starts nvidia-imex service' do
-              is_expected.to start_service('nvidia-imex').with_action(%i(start enable)).with_supports({ status: true })
+              is_expected.to start_service('nvidia-imex').with_action(%i(enable start)).with_supports({ status: true })
             end
           end
         end
@@ -332,7 +332,7 @@ describe 'nvidia_imex:configure' do
         end
 
         it 'does not configure nvidia-imex' do
-          is_expected.not_to start_service('nvidia-imex').with_action(%i(start enable)).with_supports({ status: true })
+          is_expected.not_to start_service('nvidia-imex').with_action(%i(enable start)).with_supports({ status: true })
         end
       end
     end

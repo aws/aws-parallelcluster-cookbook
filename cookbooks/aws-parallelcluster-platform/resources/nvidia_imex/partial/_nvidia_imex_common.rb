@@ -64,7 +64,7 @@ action :configure do
   # Start nvidia-imex on p6e-gb200 and only on ComputeFleet
   if get_nvswitch_count(get_device_ids['gb200']) > 1
     service nvidia_imex_service do
-      action %i(start enable)
+      action %i(enable start)
       supports status: true
     end
   end
