@@ -18,7 +18,3 @@ end
 
 use 'partial/_nvidia_imex_common.rb'
 use 'partial/_nvidia_imex_rhel.rb'
-
-def _nvidia_imex_version
-  "#{nvidia_driver_major_version}-#{nvidia_imex_full_version}"
-end
