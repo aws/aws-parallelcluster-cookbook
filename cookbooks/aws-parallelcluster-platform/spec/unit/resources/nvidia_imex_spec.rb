@@ -70,7 +70,7 @@ describe 'nvidia_imex:nvidia_enabled_or_installed?' do
   end
 end
 
-describe 'nvidia_imex:imex_installed' do
+describe 'nvidia_imex:imex_installed?' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
@@ -89,11 +89,11 @@ describe 'nvidia_imex:imex_installed' do
 
         if platform == 'amazon' && version == '2'
           it 'is true' do
-            expect(resource.imex_installed).to eq(true)
+            expect(resource.imex_installed?).to eq(true)
           end
         else
           it 'is false' do
-            expect(resource.imex_installed).to eq(false)
+            expect(resource.imex_installed?).to eq(false)
           end
         end
       end
@@ -105,7 +105,7 @@ describe 'nvidia_imex:imex_installed' do
         end
 
         it 'is true' do
-          expect(resource.imex_installed).to eq(true)
+          expect(resource.imex_installed?).to eq(true)
         end
       end
 
@@ -116,7 +116,7 @@ describe 'nvidia_imex:imex_installed' do
         end
 
         it 'is true' do
-          expect(resource.imex_installed).to eq(true)
+          expect(resource.imex_installed?).to eq(true)
         end
       end
 
@@ -127,7 +127,7 @@ describe 'nvidia_imex:imex_installed' do
         end
 
         it 'is true' do
-          expect(resource.imex_installed).to eq(true)
+          expect(resource.imex_installed?).to eq(true)
         end
       end
     end
@@ -155,7 +155,7 @@ describe 'nvidia_imex:install' do
       context 'when nvidia-imex binary already exists' do
         cached(:chef_run) do
           stubs_for_resource('nvidia_imex') do |res|
-            allow(res).to receive(:imex_installed).and_return(true)
+            allow(res).to receive(:imex_installed?).and_return(true)
           end
           runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])
           ConvergeNvidiaImex.install(runner)
@@ -273,7 +273,7 @@ describe 'nvidia_imex:configure' do
       context "when nvidia-imex binary is not installed" do
         cached(:chef_run) do
           stubs_for_resource('nvidia_imex') do |res|
-            allow(res).to receive(:imex_installed).and_return(false)
+            allow(res).to receive(:imex_installed?).and_return(false)
           end
           runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])
           ConvergeNvidiaImex.configure(runner)
@@ -289,7 +289,7 @@ describe 'nvidia_imex:configure' do
         context "when get_nvswitch_count > 1 on #{node_type} node" do
           cached(:chef_run) do
             stubs_for_provider('nvidia_imex[configure]') do |pro|
-              allow(pro).to receive(:imex_installed).and_return(true)
+              allow(pro).to receive(:imex_installed?).and_return(true)
               allow(pro).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
               allow(pro).to receive(:get_nvswitch_count).with('test').and_return(4)
             end
@@ -318,7 +318,7 @@ describe 'nvidia_imex:configure' do
       context "when get_nvswitch_count <= 1" do
         cached(:chef_run) do
           stubs_for_provider('nvidia_imex[configure]') do |pro|
-            allow(pro).to receive(:imex_installed).and_return(true)
+            allow(pro).to receive(:imex_installed?).and_return(true)
             allow(pro).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
             allow(pro).to receive(:get_nvswitch_count).with('test').and_return(1)
           end
