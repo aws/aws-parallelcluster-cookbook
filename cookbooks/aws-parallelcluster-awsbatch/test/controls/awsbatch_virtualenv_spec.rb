@@ -13,7 +13,7 @@ base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
 control 'tag:install_awsbatch_virtualenv_created' do
-  python_version = os_properties.alinux2? ? '3.9.20' : '3.12.8'
+  python_version = os_properties.alinux2? ? '3.9.20' : '3.12.11'
   title "awsbatch virtualenv should be created on #{python_version}"
   only_if { !os_properties.redhat? }
 

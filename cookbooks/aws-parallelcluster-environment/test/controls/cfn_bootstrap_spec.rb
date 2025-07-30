@@ -13,7 +13,7 @@ base_dir = "/opt/parallelcluster"
 pyenv_dir = "#{base_dir}/pyenv"
 
 control 'tag:install_cfnbootstrap_virtualenv_created' do
-  cfn_python_version = os_properties.alinux2? ? '3.9.20' : '3.12.8'
+  cfn_python_version = os_properties.alinux2? ? '3.9.20' : '3.12.11'
   title "cfnbootstrap virtualenv should be created on #{cfn_python_version}"
   only_if { !os_properties.redhat_on_docker? }
 

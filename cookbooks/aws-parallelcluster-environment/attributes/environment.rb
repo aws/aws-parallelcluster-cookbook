@@ -70,8 +70,8 @@ default['cluster']['internal_initial_shared_dir'] = "#{node['cluster']['base_dir
 
 default['cluster']['head_node_private_ip'] = nil
 
-default['cluster']['efa']['version'] = '1.41.0'
-default['cluster']['efa']['sha256'] = '3506354cdfbe31ff552fe75f5d0d9bb7efd29cf79bd99457347d29c751c38f9f'
+default['cluster']['efa']['version'] = '1.42.0'
+default['cluster']['efa']['sha256'] = '4114fe612905ee05083ae5cb391a00a012510f3abfecc642d86c9a5ae4be9008'
 
 default['cluster']['efs']['version'] = '2.3.1'
 default['cluster']['efs']['sha256'] = 'ced12f82e76f9740476b63f30c49bd76cc00b6375e12a9f5f7ba852635c49e15'

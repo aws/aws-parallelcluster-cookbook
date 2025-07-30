@@ -13,32 +13,43 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
-  remote_file "#{node['cluster']['sources_dir']}/#{dcgm_package}-#{package_version}.deb" do
-    source "#{dcgm_url}"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
+  packages_urls_list = if package_version.start_with?("3.")
+                         [dcgm_package]
+                       else
+                         [dcgm4_core_package, dcgm4_package]
+                       end
+  packages_urls_list.each do |package|
+    remote_file "#{node['cluster']['sources_dir']}/#{package}-#{package_version}.deb" do
+      source "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm/#{platform}/#{package}_#{package_version}_#{arch_suffix}.deb"
+      mode '0644'
+      retries 3
+      retry_delay 5
+      action :create_if_missing
+    end
 
-  bash "Install #{dcgm_package}" do
-    user 'root'
-    cwd node['cluster']['sources_dir']
-    code <<-DCGM_INSTALL
-    set -e
-    dpkg -i #{dcgm_package}-#{package_version}.deb
-    DCGM_INSTALL
-    retries 3
-    retry_delay 5
+    bash "Install #{package}" do
+      user 'root'
+      cwd node['cluster']['sources_dir']
+      code <<-DCGM_INSTALL
+      set -e
+      dpkg -i #{package}-#{package_version}.deb
+      DCGM_INSTALL
+      retries 3
+      retry_delay 5
+    end
   end
-end
-
-def dcgm_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm/#{platform}/#{dcgm_package}_#{package_version}_#{arch_suffix}.deb"
 end
 
 def dcgm_package
   'datacenter-gpu-manager'
+end
+
+def dcgm4_package
+  "#{dcgm_package}-4-cuda12"
+end
+
+def dcgm4_core_package
+  "#{dcgm_package}-4-core"
 end
 
 def arch_suffix
