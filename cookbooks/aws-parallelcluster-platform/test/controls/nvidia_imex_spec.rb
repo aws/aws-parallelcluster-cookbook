@@ -29,7 +29,7 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0755' }
-    its('content') { should match %r{/IMEX_NODE_CONFIG_FILE=#{nvidia_imex_dir}/nodes_config.cfg/} }
+    its('content') { should match %r{IMEX_NODE_CONFIG_FILE=#{nvidia_imex_dir}/nodes_config.cfg} }
   end
 
   describe file("#{nvidia_imex_dir}/nodes_config.cfg") do
