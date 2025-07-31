@@ -14,7 +14,7 @@
 
 action :install_imex do
   install_packages 'Install nvidia-imex' do
-    packages "#{nvidia_imex_service}-#{nvidia_driver_major_version}-#{nvidia_imex_full_version}"
+    packages "#{nvidia_imex_package}-#{nvidia_imex_full_version}"
     action :install
   end
 end

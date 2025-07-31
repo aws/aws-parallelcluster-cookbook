@@ -14,7 +14,7 @@
 
 action :install_imex do
   apt_package "Install nvidia-imex" do
-    package_name "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
+    package_name nvidia_imex_package
     version nvidia_imex_full_version
     retries 10
     retry_delay 5

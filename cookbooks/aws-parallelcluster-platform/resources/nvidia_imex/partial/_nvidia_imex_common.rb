@@ -51,7 +51,7 @@ action :install do
   action_install_imex
   # Save Imex version in Node Attributes for InSpec Tests
   node.default['cluster']['nvidia']['imex']['version'] = nvidia_imex_full_version
-  node.default['cluster']['nvidia']['imex']['package'] = "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
+  node.default['cluster']['nvidia']['imex']['package'] = nvidia_imex_package
   node_attributes 'dump node attributes'
 
   nvidia_repo 'remove nvidia repository' do
@@ -68,6 +68,10 @@ action :configure do
       supports status: true
     end
   end
+end
+
+def nvidia_imex_package
+  "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
 end
 
 def nvidia_driver_major_version
