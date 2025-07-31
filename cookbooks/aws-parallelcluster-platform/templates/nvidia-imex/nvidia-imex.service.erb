@@ -1,10 +1,12 @@
+# This file is created by ParallelCluster by following default settings
+# as given by official NVIDIA docs https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/gettingstarted.html#on-linux-based-systems
+
 [Unit]
 Description=NVIDIA IMEX service
 After=network-online.target
 Requires=network-online.target
 
 [Service]
-Environment="KRB5_CLIENT_KTNAME=/etc/krb5.keytab"
 User=root
 PrivateTmp=false
 Type=forking
