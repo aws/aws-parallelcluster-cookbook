@@ -18,3 +18,7 @@ end
 
 use 'partial/_nvidia_imex_common.rb'
 use 'partial/_nvidia_imex_debian.rb'
+
+def platform
+  "ubuntu#{node['platform_version'].delete('.')}"
+end

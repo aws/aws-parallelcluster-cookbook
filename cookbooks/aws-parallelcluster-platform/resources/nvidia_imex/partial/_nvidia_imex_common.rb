@@ -19,50 +19,49 @@ action :install do
   return unless nvidia_enabled_or_installed?
   return if on_docker? || imex_installed? || aws_region.start_with?("us-iso")
 
-  # Add NVIDIA repo for nvidia-imex
-  nvidia_repo 'add nvidia repository' do
-    action :add
-  end
-
   directory node['cluster']['nvidia']['imex']['shared_dir']
-
-  template "#{node['cluster']['nvidia']['imex']['shared_dir']}/config.cfg" do
-    source 'nvidia-imex/nvidia-imex-config.erb'
-    owner 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  template "#{node['cluster']['nvidia']['imex']['shared_dir']}/nodes_config.cfg" do
-    source 'nvidia-imex/nvidia-imex-nodes.erb'
-    owner 'root'
-    group 'root'
-    mode '0755'
-  end
-
-  template "/etc/systemd/system/#{nvidia_imex_service}.service" do
-    source 'nvidia-imex/nvidia-imex.service.erb'
-    owner 'root'
-    group 'root'
-    mode '0644'
-    action :create
-  end
 
   action_install_imex
   # Save Imex version in Node Attributes for InSpec Tests
   node.default['cluster']['nvidia']['imex']['version'] = nvidia_imex_full_version
   node.default['cluster']['nvidia']['imex']['package'] = nvidia_imex_package
   node_attributes 'dump node attributes'
-
-  nvidia_repo 'remove nvidia repository' do
-    action :remove
-  end
 end
 
 action :configure do
   return unless imex_installed? && node['cluster']['node_type'] == "ComputeFleet"
   # Start nvidia-imex on p6e-gb200 and only on ComputeFleet
   if get_nvswitch_count(get_device_ids['gb200']) > 1
+    # For each Compute Resource, we generate a unique NVIDIA IMEX configuration file,
+    # if one doesn't already exist in a common, shared location.
+    template nvidia_imex_nodes_conf_file do
+      source 'nvidia-imex/nvidia-imex-nodes.erb'
+      owner 'root'
+      group 'root'
+      mode '0755'
+      action :create
+      not_if { file_exists_and_cluster_update?(nvidia_imex_nodes_conf_file) }
+    end
+
+    template nvidia_imex_main_conf_file do
+      source 'nvidia-imex/nvidia-imex-config.erb'
+      owner 'root'
+      group 'root'
+      mode '0755'
+      action :create
+      not_if { file_exists_and_cluster_update?(nvidia_imex_main_conf_file) }
+      variables(imex_nodes_config_file_path: nvidia_imex_nodes_conf_file)
+    end
+
+    template "/etc/systemd/system/#{nvidia_imex_service}.service" do
+      source 'nvidia-imex/nvidia-imex.service.erb'
+      owner 'root'
+      group 'root'
+      mode '0644'
+      action :create
+      variables(imex_main_config_file_path: nvidia_imex_main_conf_file)
+    end
+
     service nvidia_imex_service do
       action %i(enable start)
       supports status: true
@@ -92,4 +91,16 @@ end
 
 def nvidia_enabled_or_installed?
   nvidia_enabled? || nvidia_installed?
+end
+
+def file_exists_and_cluster_update?(file_path)
+  ::File.exist?(file_path) && !are_queues_updated?
+end
+
+def nvidia_imex_main_conf_file
+  "#{node['cluster']['nvidia']['imex']['shared_dir']}/config_#{node['cluster']['launch_template_id']}.cfg"
+end
+
+def nvidia_imex_nodes_conf_file
+  "#{node['cluster']['nvidia']['imex']['shared_dir']}/nodes_config_#{node['cluster']['launch_template_id']}.cfg"
 end

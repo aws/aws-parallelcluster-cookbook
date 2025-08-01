@@ -18,3 +18,7 @@ end
 
 use 'partial/_nvidia_imex_common.rb'
 use 'partial/_nvidia_imex_rhel.rb'
+
+def platform
+  "rhel#{node['platform_version'].to_i}"
+end

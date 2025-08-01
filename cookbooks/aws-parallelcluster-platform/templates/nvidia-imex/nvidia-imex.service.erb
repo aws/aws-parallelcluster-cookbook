@@ -12,7 +12,7 @@ PrivateTmp=false
 Type=forking
 TimeoutStartSec=infinity
 
-ExecStart=/usr/bin/nvidia-imex -c <%= node['cluster']['nvidia']['imex']['shared_dir'] %>/config.cfg
+ExecStart=/usr/bin/nvidia-imex -c <%= @imex_main_config_file_path %>
 
 LimitCORE=infinity
 
