@@ -18,6 +18,24 @@ end
 
 use 'partial/_get_package_version_rpm'
 use 'partial/_common'
-use 'partial/_redhat_based'
+# use 'partial/_redhat_based'
 use 'partial/_install_from_tar'
 use 'partial/_mount_umount'
+
+def install_script_code(efs_utils_tarball, efs_utils_package, efs_utils_version)
+  <<-EFSUTILSINSTALL
+      set -e
+      tar xf #{efs_utils_tarball}
+      mv efs-proxy-dependencies-#{efs_utils_version}.tar.gz efs-utils-#{efs_utils_version}/src/proxy/
+      cd efs-utils-#{efs_utils_version}/src/proxy/
+      tar -xf efs-proxy-dependencies-#{efs_utils_version}.tar.gz
+      cargo build --offline
+      cd ../..
+      make rpm
+      yum -y install ./build/#{efs_utils_package}*rpm
+  EFSUTILSINSTALL
+end
+
+def prerequisites
+  %w(rpm-build make rust cargo openssl-devel)
+end
