@@ -13,10 +13,30 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_imex do
-  apt_package "Install nvidia-imex" do
-    package_name nvidia_imex_package
-    version nvidia_imex_full_version
-    retries 10
+  remote_file "#{node['cluster']['sources_dir']}/#{nvidia_imex_package}-#{nvidia_imex_full_version}.deb" do
+    source "#{nvidia_imex_url}"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
+
+  bash "Install nvidia-imex" do
+    user 'root'
+    cwd node['cluster']['sources_dir']
+    code <<-NVIDIA_IMEX
+    set -e
+    dpkg -i #{nvidia_imex_package}-#{nvidia_imex_full_version}.deb && apt-mark hold #{nvidia_imex_package}
+    NVIDIA_IMEX
+    retries 3
     retry_delay 5
   end
+end
+
+def nvidia_imex_url
+  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_imex/#{platform}/#{nvidia_imex_package}_#{nvidia_imex_full_version}_#{arch_suffix}.deb"
+end
+
+def arch_suffix
+  arm_instance? ? 'arm64' : 'amd64'
 end
