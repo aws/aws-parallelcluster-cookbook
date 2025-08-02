@@ -39,6 +39,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: libfabric-aws-2.1.0-1
   - Rdma-core: rdma-core-57.0-1
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.6
+- Upgrade NVIDIA driver to version 570.172.08 (from 570.86.15) for all OSs except AL2.
 
 **BUG FIXES**
 - Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments.
