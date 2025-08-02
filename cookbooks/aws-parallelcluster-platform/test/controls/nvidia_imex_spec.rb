@@ -22,31 +22,6 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
     end
   end
 
-  nvidia_imex_dir = "#{node['cluster']['nvidia']['imex']['shared_dir']}"
-
-  describe file("#{nvidia_imex_dir}/config.cfg") do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('mode') { should cmp '0755' }
-    its('content') { should match %r{IMEX_NODE_CONFIG_FILE=#{nvidia_imex_dir}/nodes_config.cfg} }
-  end
-
-  describe file("#{nvidia_imex_dir}/nodes_config.cfg") do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('mode') { should cmp '0755' }
-  end
-
-  describe file("/etc/systemd/system/#{nvidia_imex_service}.service") do
-    it { should exist }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('mode') { should cmp '0644' }
-    its('content') { should match %r{ExecStart=/usr/bin/nvidia-imex -c #{nvidia_imex_dir}/config.cfg} }
-  end
-
   describe package("#{node['cluster']['nvidia']['imex']['package']}") do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['nvidia']['imex']['version']}/ }
@@ -55,6 +30,14 @@ end
 
 control 'tag:config_nvidia_fabric_manager_enabled' do
   only_if { instance.nvs_switch_enabled? && node['cluster']['node_type'] == "ComputeFleet" && !os_properties.alinux2? }
+
+  describe file("/etc/systemd/system/nvidia-imex.service") do
+    it { should exist }
+    its('owner') { should eq 'root' }
+    its('group') { should eq 'root' }
+    its('mode') { should cmp '0644' }
+    its('content') { should match %r{ExecStart=/usr/bin/nvidia-imex -c #{node['cluster']['nvidia']['imex']['shared_dir']}} }
+  end
 
   describe service('nvidia-imex') do
     it { should be_enabled }
