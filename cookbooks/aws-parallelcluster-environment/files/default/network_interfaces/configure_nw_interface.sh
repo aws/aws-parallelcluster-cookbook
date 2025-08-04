@@ -22,6 +22,12 @@ then
   exit 1
 fi
 
+# Check if this is an EFA-only interface (no device name or IP)
+if [ -z "${DEVICE_NAME}" ] || [ -z "${DEVICE_IP_ADDRESS}" ]; then
+  echo "EFA-only interface detected - skipping IP configuration"
+  exit 0
+fi
+
 SUFFIX=$NETWORK_CARD_INDEX$(printf "%02d" $DEVICE_NUMBER)
 
 ROUTE_TABLE="$(( $SUFFIX + 1000 ))"
