@@ -1,0 +1,199 @@
+Scheduling:
+    SlurmQueues:
+        - CapacityType: SPOT
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: c4.xlarge
+                MaxCount: 10
+                MinCount: 5
+                Name: multiplespot-1
+                SpotPrice: null
+                StaticNodePriority: 1
+                DynamicNodePriority: 1000
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: c5.2xlarge
+                MaxCount: 5
+                MinCount: 5
+                Name: multiplespot-2
+                SpotPrice: 1.5
+                StaticNodePriority: 1
+                DynamicNodePriority: 1000
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: multiple_spot
+        - CapacityType: ONDEMAND
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: true
+                    GdrSupport: false
+                InstanceType: c5n.18xlarge
+                MaxCount: 5
+                MinCount: 1
+                Name: efa-c5n
+                SpotPrice: null
+                StaticNodePriority: 1
+                DynamicNodePriority: 1000
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: efa
+        - CapacityType: ONDEMAND
+          ComputeResources:
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: g3.8xlarge
+                MaxCount: 5
+                MinCount: 1
+                Name: gpu-g38xlarge
+                SpotPrice: null
+                StaticNodePriority: 1
+                DynamicNodePriority: 1000
+              - DisableSimultaneousMultithreading: true
+                Efa:
+                    Enabled: false
+                    GdrSupport: false
+                InstanceType: p3dn.24xlarge
+                MaxCount: 10
+                MinCount: 10
+                Name: gpu-p3dn24xlarge
+                SpotPrice: null
+                StaticNodePriority: 1
+                DynamicNodePriority: 1000
+          ComputeSettings: null
+          CustomActions: null
+          Iam:
+              AdditionalIamPolicies: []
+              InstanceRole: null
+              S3Access: null
+          Name: gpu
+        - CapacityType: CAPACITY_BLOCK
+          CapacityReservationTarget:
+            CapacityReservationId: cr-987654
+          ComputeResources:
+            # compute resource with different reservation id, single instance type
+            - CapacityReservationTarget:
+                CapacityReservationId: cr-876543
+              DisableSimultaneousMultithreading: false
+              Efa:
+                Enabled: true
+                GdrSupport: false
+              InstanceType: p6e-gb200.36xlarge
+              MaxCount: 9
+              MinCount: 9
+              Name: cb-gb200-1
+              # compute resource with multiple instance types
+            - CapacityReservationTarget: null
+              DisableSimultaneousMultithreading: false
+              Efa:
+                Enabled: true
+                GdrSupport: false
+              Instances:
+                - InstanceType: c5n.4xlarge
+                - InstanceType: r5.4xlarge
+              MaxCount: 10
+              MinCount: 10
+              Name: fleet-no-res
+              SchedulableMemory: null
+              SpotPrice: null
+          ComputeSettings:
+            LocalStorage:
+              EphemeralVolume: null
+              RootVolume:
+                Encrypted: true
+                Iops: 3000
+                Size: null
+                Throughput: 125
+                VolumeType: gp3
+          CustomActions: null
+          Iam:
+            AdditionalIamPolicies: [ ]
+            InstanceProfile: null
+            InstanceRole: null
+            S3Access: null
+          Image: null
+          Name: capacity-block-queue1
+          Networking:
+            AdditionalSecurityGroups: null
+            AssignPublicIp: null
+            PlacementGroup:
+              Enabled: true
+              Id: null
+            Proxy: null
+            SecurityGroups: null
+            SubnetIds:
+              - subnet-0230367ab0e5123a4
+        - CapacityType: CAPACITY_BLOCK
+          ComputeResources:
+            - CapacityReservationTarget:
+                CapacityReservationId: cr-876543
+              DisableSimultaneousMultithreading: false
+              Efa:
+                Enabled: true
+                GdrSupport: false
+              InstanceType: p6e-gb200.36xlarge
+              MaxCount: 18
+              MinCount: 18
+              Name: cb-gb200-2
+              SchedulableMemory: null
+              SpotPrice: null
+              # compute resource with multiple instance types
+            - CapacityReservationTarget:
+                CapacityReservationId: cr-876543
+              DisableSimultaneousMultithreading: false
+              Efa:
+                Enabled: true
+                GdrSupport: false
+              InstanceType: p6e-gb200.36xlarge
+              MaxCount: 9
+              MinCount: 9
+              Name: cb-gb200-3
+              SchedulableMemory: null
+              SpotPrice: null
+          ComputeSettings:
+            LocalStorage:
+              EphemeralVolume: null
+              RootVolume:
+                Encrypted: true
+                Iops: 3000
+                Size: null
+                Throughput: 125
+                VolumeType: gp3
+          CustomActions: null
+          Iam:
+            AdditionalIamPolicies: [ ]
+            InstanceProfile: null
+            InstanceRole: null
+            S3Access: null
+          Image: null
+          Name: capacity-block-queue2
+          Networking:
+            AdditionalSecurityGroups: null
+            AssignPublicIp: null
+            PlacementGroup:
+              Enabled: true
+              Id: null
+            Proxy: null
+            SecurityGroups: null
+            SubnetIds:
+              - subnet-0230367ab0e5123a4
+    Scheduler: slurm
+    SlurmSettings:
+        ScaledownIdletime: 10
+        Database: null
+        ExternalSlurmdbd: null
