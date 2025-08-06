@@ -156,7 +156,7 @@ execute "generate_topology_config" do
             " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
             " --block-sizes #{node['cluster']['topology_block_size']}"\
             " --input-file #{node['cluster']['cluster_config_path']}"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['topology_block_size'].nil? }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['topology_block_size'].nil? || (platform?('amazon') && node['platform_version'] == "2") }
   #TODO: Need to remove topology.conf if CB is removed
 end
 

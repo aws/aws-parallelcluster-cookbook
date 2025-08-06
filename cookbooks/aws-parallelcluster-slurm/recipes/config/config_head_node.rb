@@ -61,7 +61,7 @@ unless on_docker?
               " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
               " --block-sizes #{node['cluster']['topology_block_size']}"\
               " --input-file #{node['cluster']['cluster_config_path']}"
-    not_if { node['cluster']['topology_block_size'].nil? }
+    not_if { node['cluster']['topology_block_size'].nil? || (platform?('amazon') && node['platform_version'] == "2") }
   end
 
   # Generate pcluster specific configs
