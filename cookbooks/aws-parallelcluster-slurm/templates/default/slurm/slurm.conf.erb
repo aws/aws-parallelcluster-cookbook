@@ -70,7 +70,7 @@ GresTypes=gpu
 SelectType=select/cons_tres
 #
 # TOPOLOGY Plugin
-<% unless node['cluster']['topology_block_size'].nil? -%>
+<% unless node['cluster']['p6egb200_block_sizes'].nil? -%>
 TopologyPlugin=topology/block
 <% end -%>
 # LOGGING

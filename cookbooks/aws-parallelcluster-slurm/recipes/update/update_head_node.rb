@@ -154,9 +154,9 @@ end
 execute "generate_topology_config" do
   command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
             " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
-            " --block-sizes #{node['cluster']['topology_block_size']}"\
+            " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
             " --input-file #{node['cluster']['cluster_config_path']}"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['topology_block_size'].nil? || (platform?('amazon') && node['platform_version'] == "2") }
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['p6egb200_block_sizes'].nil? || (platform?('amazon') && node['platform_version'] == "2") }
   #TODO: Need to remove topology.conf if CB is removed
 end
 
