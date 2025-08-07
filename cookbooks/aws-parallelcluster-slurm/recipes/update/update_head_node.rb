@@ -160,7 +160,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_t
 end
 
 # Generate Slurm topology.conf file
-execute "generate_topology_config" do
+execute "update_topology_config" do
   command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
             " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
             " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
