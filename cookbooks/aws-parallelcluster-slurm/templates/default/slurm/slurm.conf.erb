@@ -69,10 +69,6 @@ TaskPlugin=task/affinity,task/cgroup
 GresTypes=gpu
 SelectType=select/cons_tres
 #
-# TOPOLOGY Plugin
-<% unless node['cluster']['p6egb200_block_sizes'].nil? -%>
-TopologyPlugin=topology/block
-<% end -%>
 # LOGGING
 SlurmctldDebug=verbose
 SlurmctldLogFile=/var/log/slurmctld.log
@@ -88,3 +84,7 @@ include slurm_parallelcluster.conf
 # WARNING!!! The custom_slurm_settings_include_file_slurm.conf file included below can be updated by the pcluster process.
 # Please do not edit it.
 include pcluster/custom_slurm_settings_include_file_slurm.conf
+#
+# WARNING!!! The slurm_parallelcluster_topology.conf file included below can be updated by the pcluster process.
+# Please do not edit it.
+include slurm_parallelcluster_topology.conf

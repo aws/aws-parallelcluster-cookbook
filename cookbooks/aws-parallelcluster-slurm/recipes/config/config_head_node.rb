@@ -54,6 +54,14 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
   mode '0644'
 end
 
+# Use slurm_parallelcluster_topology to add Block Topology plugin
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
+  source 'slurm/slurm_parallelcluster_topology.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 unless on_docker?
   # Generate Slurm topology.conf file
   execute "generate_topology_config" do
