@@ -66,10 +66,10 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
             queue_name = queue_config["Name"]
 
             # Retrieve capacity info from the queue_name, if there
-            queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
-            if queue_capacity_type != CAPACITY_TYPE_MAP.get("CAPACITY_BLOCK"):
-                log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
-                continue
+            # queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
+            # if queue_capacity_type != CAPACITY_TYPE_MAP.get("CAPACITY_BLOCK"):
+            #     log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
+            #     continue
 
             queue_capacity_reservation_target = queue_config.get("CapacityReservationTarget", {})
             queue_capacity_reservation = (
@@ -94,11 +94,11 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
                     else queue_capacity_reservation
                 )
                 ### Check for if reservation is for NVLink and size matches min_block_size_list
-                if compute_resource_config.get('InstanceType') == 'p6e-gb200.36xlarge':
-                    if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
-                        block_count += 1
-                        ### Each Capacity Reservation ID is a Capacity Block and we associate each slurm block with a single capacity Block
-                        topology_config += "BlockName=Block" + str(block_count)+ "  Nodes=" + str(queue_name) + "-" + str(node_type) + "-" + str(compute_resource_name) + "-[1-" + str(compute_max_count) + "]\n"
+                # if compute_resource_config.get('InstanceType') == 'p6e-gb200.36xlarge':
+                if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
+                    block_count += 1
+                    ### Each Capacity Reservation ID is a Capacity Block and we associate each slurm block with a single capacity Block
+                    topology_config += "BlockName=Block" + str(block_count)+ "  Nodes=" + str(queue_name) + "-" + str(node_type) + "-" + str(compute_resource_name) + "-[1-" + str(compute_max_count) + "]\n"
 
         topology_config += "BlockSizes="+ str(block_sizes)
     except(KeyError, AttributeError) as e:
