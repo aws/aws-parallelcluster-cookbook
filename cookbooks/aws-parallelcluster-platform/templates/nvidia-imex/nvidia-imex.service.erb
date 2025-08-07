@@ -1,0 +1,28 @@
+# This file is created by ParallelCluster by following default settings
+# as given by official NVIDIA docs https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/gettingstarted.html#on-linux-based-systems
+
+[Unit]
+Description=NVIDIA IMEX service
+After=network-online.target
+Requires=network-online.target
+
+[Service]
+User=root
+PrivateTmp=false
+Type=forking
+TimeoutStartSec=infinity
+
+ExecStart=/usr/bin/nvidia-imex -c <%= @imex_main_config_file_path %>
+
+LimitCORE=infinity
+
+Restart=on-failure
+RestartSec=1s
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+

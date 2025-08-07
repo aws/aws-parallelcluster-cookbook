@@ -24,3 +24,5 @@ gdrcopy 'Install Nvidia gdrcopy'
 fabric_manager 'Install Nvidia Fabric Manager'
 
 nvidia_dcgm 'install Nvidia datacenter-gpu-manager'
+
+nvidia_imex 'Install nvidia-imex'
