@@ -151,22 +151,8 @@ ruby_block "replace slurm queue nodes" do
   end
 end
 
-# Update slurm_parallelcluster_topology to add/remove Block Topology plugin
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
-  source 'slurm/slurm_parallelcluster_topology.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  not_if { is_amazon_linux_2? }
-end
-
-# Update Slurm topology.conf file
-execute "update or cleanup topology.conf" do
-  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
-            " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
-            " --input-file #{node['cluster']['cluster_config_path']}"\
-            "#{topology_generator_command_args}"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && topology_generator_command_args.nil? || is_amazon_linux_2? }
+block_topology 'Update or Cleanup Slurm Topology' do
+  action :update
 end
 
 execute "generate_pcluster_slurm_configs" do

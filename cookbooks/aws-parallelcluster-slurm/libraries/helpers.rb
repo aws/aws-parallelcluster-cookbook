@@ -242,7 +242,3 @@ end
 def get_login_node_pool_config(config, pool_name)
   config['LoginNodes']['Pools'].select { |pool| pool['Name'] == pool_name }.first
 end
-
-def is_amazon_linux_2?
-  platform?('amazon') && node['platform_version'] == "2"
-end

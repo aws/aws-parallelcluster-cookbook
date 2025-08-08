@@ -101,7 +101,7 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
                     ### Each Capacity Reservation ID is a Capacity Block and we associate each slurm block with a single capacity Block
                     topology_config += "BlockName=Block" + str(block_count)+ "  Nodes=" + str(queue_name) + "-" + str(node_type) + "-" + str(compute_resource_name) + "-[1-" + str(compute_max_count) + "]\n"
 
-        topology_config += "BlockSizes="+ str(block_sizes)
+        topology_config += "BlockSizes="+ str(block_sizes)+"\n"
     except(KeyError, AttributeError) as e:
         if isinstance(e, KeyError):
             message = f"Unable to find key {e} in the configuration file."

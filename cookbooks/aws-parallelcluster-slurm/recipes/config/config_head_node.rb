@@ -45,7 +45,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf" do
   owner 'root'
   group 'root'
   mode '0644'
-  variables( is_amazon_linux_2: is_amazon_linux_2? )
+  variables(is_amazon_linux_2: platform?('amazon') && node['platform_version'] == "2")
 end
 
 template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
@@ -55,25 +55,11 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
   mode '0644'
 end
 
-# Use slurm_parallelcluster_topology to add Block Topology plugin
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
-  source 'slurm/slurm_parallelcluster_topology.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-  not_if { is_amazon_linux_2? }
+block_topology 'Add Block Topology configuration' do
+  action :configure
 end
 
 unless on_docker?
-  # Generate Slurm topology.conf file
-  execute "generate_topology_config" do
-    command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
-              " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
-              " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
-              " --input-file #{node['cluster']['cluster_config_path']}"
-    not_if { node['cluster']['p6egb200_block_sizes'].nil? || (platform?('amazon') && node['platform_version'] == "2") }
-  end
-
   # Generate pcluster specific configs
   no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do

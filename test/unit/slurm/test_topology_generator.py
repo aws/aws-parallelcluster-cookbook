@@ -10,7 +10,6 @@
 # limitations under the License.
 
 import pytest
-import os
 from assertpy import assert_that
 from pcluster_topology_generator import (
     cleanup_topology_config_file,
