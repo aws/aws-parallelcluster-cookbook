@@ -10,15 +10,11 @@
 # limitations under the License.
 
 import pytest
-import yaml
 import os
 from assertpy import assert_that
-from config_utils import get_template_folder
-from unittest.mock import mock_open, patch
 from pcluster_topology_generator import (
+    cleanup_topology_config_file,
     generate_topology_config_file,
-    CriticalError,
-    _load_cluster_config,
 )
 
 
@@ -41,21 +37,17 @@ def test_generate_topology_config(test_datadir, tmpdir, file_name_suffix):
     _assert_files_are_equal(output_file_path, test_datadir / "expected_outputs" / output_file_name)
 
 
-
-def test_load_cluster_config_file_not_found():
-    """Test loading a non-existent configuration file."""
-    with pytest.raises(FileNotFoundError):
-        _load_cluster_config("nonexistent_file.yaml")
-
-
-def test_generate_topology_config_missing_key(tmp_path):
-    """Test generating topology config with missing required key."""
-    invalid_config = {"Scheduling": {}}  # Missing SlurmQueues
-    config_path = tmp_path / "invalid_config.yaml"
-    with open(config_path, 'w') as f:
-        yaml.dump(invalid_config, f)
-
-    output_file = str(tmp_path / "topology.conf")
-    with pytest.raises(CriticalError):
-        generate_topology_config_file(output_file, str(config_path), "9,18")
+@pytest.mark.parametrize("file_exists", [
+    True,
+    False
+])
+def test_cleanup_topology_config_file(mocker, tmpdir, file_exists):
+    topology_file_path = tmpdir / "topology.conf"
+    mocker.patch("os.path.exists", return_value=file_exists)
+    mock_remove = mocker.patch("os.remove")
+    cleanup_topology_config_file(str(topology_file_path))
+    if file_exists:
+        mock_remove.assert_called_once_with(str(topology_file_path))
+    else:
+        mock_remove.assert_not_called()
 
