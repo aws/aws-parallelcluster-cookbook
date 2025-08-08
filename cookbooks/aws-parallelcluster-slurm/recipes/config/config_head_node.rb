@@ -45,6 +45,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf" do
   owner 'root'
   group 'root'
   mode '0644'
+  variables( is_amazon_linux_2: is_amazon_linux_2? )
 end
 
 template "#{node['cluster']['slurm']['install_dir']}/etc/gres.conf" do
@@ -60,7 +61,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_t
   owner 'root'
   group 'root'
   mode '0644'
-  not_if { platform?('amazon') && node['platform_version'] == "2" }
+  not_if { is_amazon_linux_2? }
 end
 
 unless on_docker?

@@ -151,35 +151,22 @@ ruby_block "replace slurm queue nodes" do
   end
 end
 
-ruby_block "Update slurm topology" do
-  block do
-    # Update slurm_parallelcluster_topology to add/remove Block Topology plugin
-    template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
-      source 'slurm/slurm_parallelcluster_topology.conf.erb'
-      owner 'root'
-      group 'root'
-      mode '0644'
-    end
+# Update slurm_parallelcluster_topology to add/remove Block Topology plugin
+template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
+  source 'slurm/slurm_parallelcluster_topology.conf.erb'
+  owner 'root'
+  group 'root'
+  mode '0644'
+  not_if { is_amazon_linux_2? }
+end
 
-    if node['cluster']['p6egb200_block_sizes'].nil? && are_queues_updated? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
-      # If topology.conf exist and Capacity Block is removed, we cleanup
-      topology_generator_command_args = " --cleanup"
-    elsif node['cluster']['p6egb200_block_sizes'].nil? && !are_queues_updated?
-      # We do nothing if p6e-gb200 is not used and queues are not updated
-      topology_generator_command_args = nil
-    else
-      topology_generator_command_args = " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"
-    end
-    # Update Slurm topology.conf file
-    execute "update or cleanup topology.conf" do
-      command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
-                " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
-                " --input-file #{node['cluster']['cluster_config_path']}"\
-                "#{topology_generator_command_args}"
-      not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && topology_generator_command_args.nil? }
-    end
-  end
-  not_if { platform?('amazon') && node['platform_version'] == "2" }
+# Update Slurm topology.conf file
+execute "update or cleanup topology.conf" do
+  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
+            " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
+            " --input-file #{node['cluster']['cluster_config_path']}"\
+            "#{topology_generator_command_args}"
+  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && topology_generator_command_args.nil? || is_amazon_linux_2? }
 end
 
 execute "generate_pcluster_slurm_configs" do

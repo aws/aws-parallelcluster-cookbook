@@ -100,3 +100,15 @@ def is_login_nodes_removed?
   previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
   previous_config.dig("LoginNodes") and !config.dig("LoginNodes")
 end
+
+def topology_generator_command_args
+  if node['cluster']['p6egb200_block_sizes'].nil? && are_queues_updated? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
+    # If topology.conf exist and Capacity Block is removed, we cleanup
+    " --cleanup"
+  elsif node['cluster']['p6egb200_block_sizes'].nil? && !are_queues_updated?
+    # We do nothing if p6e-gb200 is not used and queues are not updated
+    nil
+  else
+    " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"
+  end
+end
