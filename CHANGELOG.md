@@ -15,7 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Addressed cluster id mismatch known issue by deleting the file `/var/spool/slurm.state/clustername` before configuring Slurm accounting.
 - Upgrade DCV to version 2024.0-19030.
 - Remove `berkshelf`. All cookbooks are local and do not need `berkshelf` dependency management.
-- Add support for GB200 instance types
+- Add support for GB200 instance types.
 - Install nvidia-imex for all OSs except AL2.
 
 **BUG FIXES**

@@ -6,7 +6,7 @@
 #   interface
 # - A routing rule to make the OS use the specific routing table for this network interface
 
-set -e
+set -ex
 
 if
   [ -z "${DEVICE_NUMBER}" ] ||        # index of the device
@@ -27,7 +27,7 @@ fi
 
 # If one of these is missing but not both, it is an invalid configuration
 if [ -z "${DEVICE_NAME}" ] || [ -z "${DEVICE_IP_ADDRESS}" ]; then
-    echo "One or more environment variables missing"
+    echo "Device name or IP address is missing"
     exit 1
 fi
 
