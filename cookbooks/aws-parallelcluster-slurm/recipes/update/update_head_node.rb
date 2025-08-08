@@ -151,22 +151,27 @@ ruby_block "replace slurm queue nodes" do
   end
 end
 
-# Update slurm_parallelcluster_topology to add/remove Block Topology plugin
-template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
-  source 'slurm/slurm_parallelcluster_topology.conf.erb'
-  owner 'root'
-  group 'root'
-  mode '0644'
-end
+ruby_block "Update slurm topology" do
+  block do
+    # Update slurm_parallelcluster_topology to add/remove Block Topology plugin
+    template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_topology.conf" do
+      source 'slurm/slurm_parallelcluster_topology.conf.erb'
+      owner 'root'
+      group 'root'
+      mode '0644'
+    end
 
-# Generate Slurm topology.conf file
-execute "update_topology_config" do
-  command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
-            " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
-            " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
-            " --input-file #{node['cluster']['cluster_config_path']}"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['p6egb200_block_sizes'].nil? || (platform?('amazon') && node['platform_version'] == "2") }
-  #TODO: Need to remove topology.conf if CB is removed
+    # Update Slurm topology.conf file
+    execute "update or cleanup topology.conf" do
+      command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
+                " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
+                " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
+                " --input-file #{node['cluster']['cluster_config_path']}"
+      not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['p6egb200_block_sizes'].nil? }
+      #TODO: Need to remove topology.conf if CB is removed
+    end
+  end
+  not_if { platform?('amazon') && node['platform_version'] == "2" }
 end
 
 execute "generate_pcluster_slurm_configs" do

@@ -60,6 +60,7 @@ template "#{node['cluster']['slurm']['install_dir']}/etc/slurm_parallelcluster_t
   owner 'root'
   group 'root'
   mode '0644'
+  not_if { platform?('amazon') && node['platform_version'] == "2" }
 end
 
 unless on_docker?

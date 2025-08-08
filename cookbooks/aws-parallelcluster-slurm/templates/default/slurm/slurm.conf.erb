@@ -84,8 +84,9 @@ include slurm_parallelcluster.conf
 # WARNING!!! The custom_slurm_settings_include_file_slurm.conf file included below can be updated by the pcluster process.
 # Please do not edit it.
 include pcluster/custom_slurm_settings_include_file_slurm.conf
-
+<% unless platform?('amazon') && node['platform_version'] == "2" -%>
 #
 # WARNING!!! The slurm_parallelcluster_topology.conf file included below can be updated by the pcluster process.
 # Please do not edit it.
 include slurm_parallelcluster_topology.conf
+<%  end -%>
