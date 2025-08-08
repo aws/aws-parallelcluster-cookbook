@@ -20,9 +20,9 @@ return unless nvidia_enabled?
 # Cuda installer from https://developer.nvidia.com/cuda-toolkit-archive
 # Cuda installer naming: cuda_11.8.0_520.61.05_linux
 cuda_version = '12.8'
-cuda_patch = '0'
+cuda_patch = '1'
 cuda_complete_version = "#{cuda_version}.#{cuda_patch}"
-cuda_version_suffix = '570.86.10'
+cuda_version_suffix = '570.124.06'
 cuda_samples_version = '12.8'
 if platform?('amazon') && node['platform_version'] == "2"
   cuda_version = '12.4'

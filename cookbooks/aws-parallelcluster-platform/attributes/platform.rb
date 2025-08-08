@@ -17,9 +17,10 @@ default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '570.172.08'
-default['cluster']['nvidia']['dcgm_version'] = '3.3.6'
+default['cluster']['nvidia']['dcgm_version'] = '4.2.3-2'
 if platform?('amazon') && node['platform_version'] == "2"
   default['cluster']['nvidia']['driver_version'] = '550.127.08'
+  default['cluster']['nvidia']['dcgm_version'] = '3.3.6-1'
 end
 
 # nvidia-imex

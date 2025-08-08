@@ -13,32 +13,45 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
-  remote_file "#{node['cluster']['sources_dir']}/#{dcgm_package}-#{package_version}.rpm" do
-    source "#{dcgm_url}"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
+  if package_version.start_with?("3.")
+    packages_urls_list = [dcgm_package]
+    package_url_separator = "-"
+  else
+    packages_urls_list = [dcgm4_core_package, dcgm4_package]
+    package_url_separator = "."
   end
+  packages_urls_list.each do |package|
+    remote_file "#{node['cluster']['sources_dir']}/#{package}-#{package_version}.rpm" do
+      source "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm/#{platform}/#{package}-#{package_version}#{package_url_separator}#{arch_suffix}.rpm"
+      mode '0644'
+      retries 3
+      retry_delay 5
+      action :create_if_missing
+    end
 
-  bash "Install #{dcgm_package}" do
-    user 'root'
-    cwd node['cluster']['sources_dir']
-    code <<-DCGM_INSTALL
-    set -e
-    yum install -y #{dcgm_package}-#{package_version}.rpm
-    DCGM_INSTALL
-    retries 3
-    retry_delay 5
+    bash "Install #{package}" do
+      user 'root'
+      cwd node['cluster']['sources_dir']
+      code <<-DCGM_INSTALL
+      set -e
+      yum install -y #{package}-#{package_version}.rpm
+      DCGM_INSTALL
+      retries 3
+      retry_delay 5
+    end
   end
-end
-
-def dcgm_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm/#{platform}/#{dcgm_package}-#{package_version}-1-#{arch_suffix}.rpm"
 end
 
 def dcgm_package
   'datacenter-gpu-manager'
+end
+
+def dcgm4_package
+  "#{dcgm_package}-4-cuda12"
+end
+
+def dcgm4_core_package
+  "#{dcgm_package}-4-core"
 end
 
 def arch_suffix

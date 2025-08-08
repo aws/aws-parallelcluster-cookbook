@@ -170,7 +170,8 @@ describe 'nvidia_dcgm:setup' do
             end
           else
             it 'installs datacenter gpu manager' do
-              is_expected.to run_bash('Install datacenter-gpu-manager')
+              is_expected.to run_bash('Install datacenter-gpu-manager-4-core')
+              is_expected.to run_bash('Install datacenter-gpu-manager-4-cuda12')
             end
           end
         end
