@@ -8,7 +8,6 @@
 
 set -e
 
-# commented out inputs that are not required and don't exist for efa-only interfaces
 if
   [ -z "${DEVICE_NUMBER}" ] ||        # index of the device
   [ -z "${NETWORK_CARD_INDEX}" ] ||   # index of the network card
@@ -21,9 +20,15 @@ then
 fi
 
 # Check if this is an EFA-only interface (no device name or IP)
-if [ -z "${DEVICE_NAME}" ] || [ -z "${DEVICE_IP_ADDRESS}" ]; then
+if [ -z "${DEVICE_NAME}" ] && [ -z "${DEVICE_IP_ADDRESS}" ]; then
   echo "EFA-only interface detected - skipping IP configuration"
   exit 0
+fi
+
+# If one of these is missing but not both, it is an invalid configuration
+if [ -z "${DEVICE_NAME}" ] || [ -z "${DEVICE_IP_ADDRESS}" ]; then
+    echo "One or more environment variables missing"
+    exit 1
 fi
 
 SUFFIX=$NETWORK_CARD_INDEX$(printf "%02d" $DEVICE_NUMBER)
