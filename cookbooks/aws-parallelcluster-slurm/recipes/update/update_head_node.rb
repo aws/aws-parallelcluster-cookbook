@@ -161,14 +161,22 @@ ruby_block "Update slurm topology" do
       mode '0644'
     end
 
+    if node['cluster']['p6egb200_block_sizes'].nil? && are_queues_updated? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
+      # If topology.conf exist and Capacity Block is removed, we cleanup
+      topology_generator_command_args = " --cleanup"
+    elsif node['cluster']['p6egb200_block_sizes'].nil? && !are_queues_updated?
+      # We do nothing if p6e-gb200 is not used and queues are not updated
+      topology_generator_command_args = nil
+    else
+      topology_generator_command_args = " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"
+    end
     # Update Slurm topology.conf file
     execute "update or cleanup topology.conf" do
       command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
                 " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
-                " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
-                " --input-file #{node['cluster']['cluster_config_path']}"
-      not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && node['cluster']['p6egb200_block_sizes'].nil? }
-      #TODO: Need to remove topology.conf if CB is removed
+                " --input-file #{node['cluster']['cluster_config_path']}"\
+                "#{topology_generator_command_args}"
+      not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && topology_generator_command_args.nil? }
     end
   end
   not_if { platform?('amazon') && node['platform_version'] == "2" }

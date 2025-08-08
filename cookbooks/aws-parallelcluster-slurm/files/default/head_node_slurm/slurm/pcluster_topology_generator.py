@@ -13,6 +13,7 @@ import argparse
 import yaml
 import logging
 import traceback
+import os
 log = logging.getLogger()
 
 
@@ -118,6 +119,16 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
     log.info("Finished.")
 
 
+def cleanup_topology_config_file(file_path):
+    """Cleanup topology.conf file."""
+    try:
+        if os.path.exists(file_path):
+            log.info("Cleaning up %s", file_path)
+            os.remove(file_path)
+    except Exception as err:
+        log.warning("Unable to delete %s due to %s", file_path, err)
+
+
 def main():
     try:
         logging.basicConfig(
@@ -125,15 +136,25 @@ def main():
         )
         log.info("Running ParallelCluster Topology Config Generator")
         parser = argparse.ArgumentParser(description="Take in Topology configuration generator related parameters")
+        cleanup_or_generate_exclusive_group = parser.add_mutually_exclusive_group(required=True)
         parser.add_argument("--output-file", help="The output file for generated topology.conf", required=True)
         parser.add_argument(
             "--input-file",
             help="Yaml file containing pcluster CLI configuration file with default values",
             required=True,
         )
-        parser.add_argument("--block-sizes", help="Block Size of topology.conf", required=True)
+        cleanup_or_generate_exclusive_group.add_argument("--block-sizes", help="Block Sizes of topology.conf")
+        cleanup_or_generate_exclusive_group.add_argument(
+            "--cleanup",
+            action="store_true",
+            help="Cleanup topology.conf",
+        )
         args = parser.parse_args()
-        generate_topology_config_file(args.output_file, args.input_file, args.block_sizes)
+        if args.cleanup:
+            cleanup_topology_config_file(args.output_file)
+        else:
+            generate_topology_config_file(args.output_file, args.input_file, args.block_sizes)
+        log.info("Completed Execution of ParallelCluster Topology Config Generator")
     except Exception as e:
         log.exception("Failed to generate Topology.conf, exception: %s", e)
         raise
