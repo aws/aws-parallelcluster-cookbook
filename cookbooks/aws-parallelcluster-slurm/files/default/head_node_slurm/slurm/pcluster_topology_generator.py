@@ -54,69 +54,69 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
     BlockName=block2 Nodes=queue-1-st-compute-resource-0-[1-18] #### 18 nodes
     BlockSizes=9,18
     """
+    if block_sizes:
+        min_block_size_list = min(list(map(int, block_sizes.split(","))))
+        max_block_size_list = max(list(map(int, block_sizes.split(","))))
 
-    min_block_size_list = min(list(map(int, block_sizes.split(","))))
-    max_block_size_list = max(list(map(int, block_sizes.split(","))))
+        cluster_config = _load_cluster_config(input_file)
+        queue_name, compute_resource_name = None, None
+        try:
+            topology_config = CONFIG_HEADER + "\n"
+            block_count = 0
+            for queue_config in cluster_config["Scheduling"]["SlurmQueues"]:
+                queue_name = queue_config["Name"]
 
-    cluster_config = _load_cluster_config(input_file)
-    queue_name, compute_resource_name = None, None
-    try:
-        topology_config = CONFIG_HEADER + "\n"
-        block_count = 0
-        for queue_config in cluster_config["Scheduling"]["SlurmQueues"]:
-            queue_name = queue_config["Name"]
+                # Retrieve capacity info from the queue_name, if there
+                # queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
+                # if queue_capacity_type != CAPACITY_TYPE_MAP.get("CAPACITY_BLOCK"):
+                #     log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
+                #     continue
 
-            # Retrieve capacity info from the queue_name, if there
-            # queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
-            # if queue_capacity_type != CAPACITY_TYPE_MAP.get("CAPACITY_BLOCK"):
-            #     log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
-            #     continue
-
-            queue_capacity_reservation_target = queue_config.get("CapacityReservationTarget", {})
-            queue_capacity_reservation = (
-                queue_capacity_reservation_target.get("CapacityReservationId")
-                if queue_capacity_reservation_target
-                else None
-            )
-
-            for compute_resource_config in queue_config["ComputeResources"]:
-                compute_resource_name = compute_resource_config["Name"]
-                compute_min_count = compute_resource_config["MinCount"]
-                compute_max_count = compute_resource_config["MaxCount"]
-                if compute_min_count == compute_max_count:
-                    node_type = "st"
-                else:
-                    continue
-
-                capacity_reservation_target = compute_resource_config.get("CapacityReservationTarget", {})
-                capacity_reservation = (
-                    capacity_reservation_target.get("CapacityReservationId", queue_capacity_reservation)
-                    if capacity_reservation_target
-                    else queue_capacity_reservation
+                queue_capacity_reservation_target = queue_config.get("CapacityReservationTarget", {})
+                queue_capacity_reservation = (
+                    queue_capacity_reservation_target.get("CapacityReservationId")
+                    if queue_capacity_reservation_target
+                    else None
                 )
-                ### Check for if reservation is for NVLink and size matches min_block_size_list
-                # if compute_resource_config.get('InstanceType') == 'p6e-gb200.36xlarge':
-                if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
-                    block_count += 1
-                    ### Each Capacity Reservation ID is a Capacity Block and we associate each slurm block with a single capacity Block
-                    topology_config += "BlockName=Block" + str(block_count)+ "  Nodes=" + str(queue_name) + "-" + str(node_type) + "-" + str(compute_resource_name) + "-[1-" + str(compute_max_count) + "]\n"
 
-        topology_config += "BlockSizes="+ str(block_sizes)+"\n"
-    except(KeyError, AttributeError) as e:
-        if isinstance(e, KeyError):
-            message = f"Unable to find key {e} in the configuration file."
-        else:
-            message = f"Error parsing configuration file. {e}. {traceback.format_exc()}."
-        message += f" Queue: {queue_name}" if queue_name else ""
-        log.error(message)
-        raise CriticalError(message)
+                for compute_resource_config in queue_config["ComputeResources"]:
+                    compute_resource_name = compute_resource_config["Name"]
+                    compute_min_count = compute_resource_config["MinCount"]
+                    compute_max_count = compute_resource_config["MaxCount"]
+                    if compute_min_count == compute_max_count:
+                        node_type = "st"
+                    else:
+                        continue
 
-    log.info("Writing Info %s", topology_config)
-    log.info("Generating %s", output_file)
-    with open(output_file, "w", encoding="utf-8") as output:
-        output.write(topology_config)
+                    capacity_reservation_target = compute_resource_config.get("CapacityReservationTarget", {})
+                    capacity_reservation = (
+                        capacity_reservation_target.get("CapacityReservationId", queue_capacity_reservation)
+                        if capacity_reservation_target
+                        else queue_capacity_reservation
+                    )
+                    ### Check for if reservation is for NVLink and size matches min_block_size_list
+                    # if compute_resource_config.get('InstanceType') == 'p6e-gb200.36xlarge':
+                    if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
+                        block_count += 1
+                        ### Each Capacity Reservation ID is a Capacity Block and we associate each slurm block with a single capacity Block
+                        topology_config += "BlockName=Block" + str(block_count)+ "  Nodes=" + str(queue_name) + "-" + str(node_type) + "-" + str(compute_resource_name) + "-[1-" + str(compute_max_count) + "]\n"
 
-    log.info("Finished.")
+            topology_config += "BlockSizes="+ str(block_sizes)+"\n"
+        except(KeyError, AttributeError) as e:
+            if isinstance(e, KeyError):
+                message = f"Unable to find key {e} in the configuration file."
+            else:
+                message = f"Error parsing configuration file. {e}. {traceback.format_exc()}."
+            message += f" Queue: {queue_name}" if queue_name else ""
+            log.error(message)
+            raise CriticalError(message)
+
+        log.info("Writing Info %s", topology_config)
+        log.info("Generating %s", output_file)
+        with open(output_file, "w", encoding="utf-8") as output:
+            output.write(topology_config)
+
+        log.info("Finished.")
 
 
 def cleanup_topology_config_file(file_path):

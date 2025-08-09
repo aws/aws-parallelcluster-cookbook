@@ -10,6 +10,7 @@
 # limitations under the License.
 
 import pytest
+import os
 from assertpy import assert_that
 from pcluster_topology_generator import (
     cleanup_topology_config_file,
@@ -27,13 +28,16 @@ def _assert_files_are_equal(file, expected_file):
     "no_capacity_block"
 ])
 def test_generate_topology_config(test_datadir, tmpdir, file_name_suffix):
-    block_sizes = "9,18" #if 'no' not in file_name_suffix else None
+    block_sizes = "9,18" if 'no' not in file_name_suffix else None
     file_name = "sample_" + file_name_suffix + ".yaml"
     input_file_path = str(test_datadir / file_name)
     output_file_name = "topology_" + file_name_suffix + ".conf"
     output_file_path = f"{tmpdir}/{output_file_name}"
     generate_topology_config_file(output_file_path, input_file_path, block_sizes)
-    _assert_files_are_equal(output_file_path, test_datadir / "expected_outputs" / output_file_name)
+    if 'no' in file_name_suffix:
+        assert_that(os.path.isfile(output_file_path)).is_equal_to(False)
+    else:
+        _assert_files_are_equal(output_file_path, test_datadir / "expected_outputs" / output_file_name)
 
 
 @pytest.mark.parametrize("file_exists", [
