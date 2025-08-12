@@ -33,22 +33,24 @@ activate_virtual_env cookbook_virtualenv_name do
   not_if { ::File.exist?("#{cookbook_virtualenv_path}/bin/activate") }
 end
 
-remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do
-  source pypi_s3_uri
-  mode '0644'
-  retries 3
-  retry_delay 5
-  action :create_if_missing
-end
+if aws_region.start_with?("us-iso")
+  remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do
+    source pypi_s3_uri
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
 
-bash 'pip install' do
-  user 'root'
-  group 'root'
-  cwd "#{node['cluster']['base_dir']}"
-  code <<-REQ
+  bash 'pip install' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['base_dir']}"
+    code <<-REQ
     set -e
     tar xzf cookbook-dependencies.tgz
     cd #{dependency_package_name}
     #{virtualenv_path}/bin/pip install * -f ./ --no-index
     REQ
+  end
 end

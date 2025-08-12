@@ -50,20 +50,6 @@ action :install_utils do
     action :create_if_missing
   end
 
-  if aws_region.start_with?("us-iso") && platform?('redhat') && node['platform_version'] == "8"
-    efs_proxy_deps = "efs-proxy-dependencies-#{package_version}.tar.gz"
-    efs_proxy_deps_tarball = "#{node['cluster']['sources_dir']}/#{efs_proxy_deps}"
-    efs_proxy_deps_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/#{efs_proxy_deps}"
-    remote_file efs_proxy_deps_tarball do
-      source efs_proxy_deps_url
-      mode '0644'
-      retries 3
-      retry_delay 5
-      checksum new_resource.efs_utils_checksum
-      action :create_if_missing
-    end
-  end
-
   # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
   bash "install efs utils" do
     cwd node['cluster']['sources_dir']
