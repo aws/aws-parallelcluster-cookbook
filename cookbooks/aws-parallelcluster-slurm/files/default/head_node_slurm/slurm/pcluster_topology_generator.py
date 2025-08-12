@@ -72,13 +72,6 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
                     log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
                     continue
 
-                queue_capacity_reservation_target = queue_config.get("CapacityReservationTarget", {})
-                queue_capacity_reservation = (
-                    queue_capacity_reservation_target.get("CapacityReservationId")
-                    if queue_capacity_reservation_target
-                    else None
-                )
-
                 for compute_resource_config in queue_config["ComputeResources"]:
                     compute_resource_name = compute_resource_config["Name"]
                     compute_min_count = compute_resource_config["MinCount"]
@@ -88,12 +81,6 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
                     else:
                         continue
 
-                    capacity_reservation_target = compute_resource_config.get("CapacityReservationTarget", {})
-                    capacity_reservation = (
-                        capacity_reservation_target.get("CapacityReservationId", queue_capacity_reservation)
-                        if capacity_reservation_target
-                        else queue_capacity_reservation
-                    )
                     ### Check for if reservation is for NVLink and size matches min_block_size_list
                     if compute_resource_config.get('InstanceType') == 'p6e-gb200.36xlarge':
                         if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
