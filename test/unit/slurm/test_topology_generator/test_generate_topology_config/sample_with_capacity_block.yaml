@@ -18,8 +18,8 @@ Scheduling:
                     Enabled: false
                     GdrSupport: false
                 InstanceType: c5.2xlarge
-                MaxCount: 5
-                MinCount: 5
+                MaxCount: 9
+                MinCount: 9
                 Name: multiplespot-2
                 SpotPrice: 1.5
                 StaticNodePriority: 1
@@ -69,8 +69,8 @@ Scheduling:
                     Enabled: false
                     GdrSupport: false
                 InstanceType: p3dn.24xlarge
-                MaxCount: 10
-                MinCount: 10
+                MaxCount: 9
+                MinCount: 9
                 Name: gpu-p3dn24xlarge
                 SpotPrice: null
                 StaticNodePriority: 1
@@ -106,8 +106,8 @@ Scheduling:
               Instances:
                 - InstanceType: c5n.4xlarge
                 - InstanceType: r5.4xlarge
-              MaxCount: 10
-              MinCount: 10
+              MaxCount: 18
+              MinCount: 18
               Name: fleet-no-res
               SchedulableMemory: null
               SpotPrice: null

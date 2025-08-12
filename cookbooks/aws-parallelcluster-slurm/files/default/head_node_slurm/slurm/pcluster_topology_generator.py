@@ -22,7 +22,7 @@ import yaml
 
 log = logging.getLogger()
 
-
+P6E_GB200 = "p6e-gb200"
 CAPACITY_TYPE_MAP = {
     "ONDEMAND": "on-demand",
     "SPOT": "spot",
@@ -49,7 +49,17 @@ def _load_cluster_config(input_file_path):
         return yaml.load(input_file, Loader=yaml.SafeLoader)
 
 
-def generate_topology_config_file(output_file: str, input_file: str, block_sizes: str):  # noqa: C901
+def _is_capacity_block(capacity_type):
+    return capacity_type == CAPACITY_TYPE_MAP.get("CAPACITY_BLOCK")
+
+
+def _is_gb200(instance_type):
+    return instance_type is not None and instance_type.split(".")[0] == P6E_GB200
+
+
+def generate_topology_config_file(
+    output_file: str, input_file: str, block_sizes: str, force_configuration: bool
+):  # noqa: C901
     """
     Generate Topology configuration file.
 
@@ -74,9 +84,13 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
 
                 # Retrieve capacity info from the queue_name, if there
                 queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
-                if queue_capacity_type != CAPACITY_TYPE_MAP.get("CAPACITY_BLOCK"):
-                    log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
-                    continue
+                if not _is_capacity_block(queue_capacity_type):
+                    if force_configuration:
+                        # We ignore this check if force_configuration option is used
+                        pass
+                    else:
+                        log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
+                        continue
 
                 for compute_resource_config in queue_config["ComputeResources"]:
                     compute_resource_name = compute_resource_config["Name"]
@@ -88,7 +102,7 @@ def generate_topology_config_file(output_file: str, input_file: str, block_sizes
                         continue
 
                     # Check for if reservation is for NVLink and size matches min_block_size_list
-                    if compute_resource_config.get("InstanceType") == "p6e-gb200.36xlarge":
+                    if _is_gb200(compute_resource_config.get("InstanceType")) or force_configuration:
                         if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
                             block_count += 1
                             # Each Capacity Reservation ID is a Capacity Block,
@@ -149,6 +163,11 @@ def main():
             help="Yaml file containing pcluster CLI configuration file with default values",
             required=True,
         )
+        parser.add_argument(
+            "--force-configuration",
+            help="Force creation of topology.conf by ignoring the checks of Capacity Block and Instance Type. ",
+            action="store_true",
+        )
         cleanup_or_generate_exclusive_group.add_argument("--block-sizes", help="Block Sizes of topology.conf")
         cleanup_or_generate_exclusive_group.add_argument(
             "--cleanup",
@@ -159,7 +178,7 @@ def main():
         if args.cleanup:
             cleanup_topology_config_file(args.output_file)
         else:
-            generate_topology_config_file(args.output_file, args.input_file, args.block_sizes)
+            generate_topology_config_file(args.output_file, args.input_file, args.block_sizes, args.force_configuration)
         log.info("Completed Execution of ParallelCluster Topology Config Generator")
     except Exception as e:
         log.exception("Failed to generate Topology.conf, exception: %s", e)
