@@ -53,5 +53,6 @@ action :run do
     make
     make install
     VENV
+    not_if { Dir.glob("#{prefix}/versions/#{python_version}/bin/python*").any? }
   end
 end
