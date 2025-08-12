@@ -12,6 +12,10 @@
 # or in the "LICENSE.txt" file accompanying this file.
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
+package_name = "amazon-efs-utils"
+package_version = new_resource.efs_utils_version
+efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
+efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
 
 action :install_utils do
   package_repos 'update package repositories' do
@@ -29,11 +33,6 @@ action :install_utils do
 
   return if redhat_on_docker?
 
-  package_name = "amazon-efs-utils"
-  package_version = new_resource.efs_utils_version
-  efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
-
   # Do not install efs-utils if a same or newer version is already installed.
   return if already_installed?(package_name, package_version)
 
@@ -50,10 +49,19 @@ action :install_utils do
     action :create_if_missing
   end
 
+  action_install_efs_utils
+
   # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
+  # bash "install efs utils" do
+  #   cwd node['cluster']['sources_dir']
+  #   code install_script_code(efs_utils_tarball, package_name, package_version)
+  # end
+  action_increase_poll_interval
+end
+
+action :install_efs_utils do
   bash "install efs utils" do
     cwd node['cluster']['sources_dir']
     code install_script_code(efs_utils_tarball, package_name, package_version)
   end
-  action_increase_poll_interval
 end

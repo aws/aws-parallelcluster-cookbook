@@ -22,7 +22,7 @@ use 'partial/_common'
 # use 'partial/_install_from_tar'
 use 'partial/_mount_umount'
 
-def install_script_code(efs_utils_tarball, efs_utils_package, efs_utils_version)
+def adc_install_script_code(efs_utils_tarball, efs_utils_package, efs_utils_version)
   <<-EFSUTILSINSTALL
       set -e
       tar xf #{efs_utils_tarball}
@@ -40,58 +40,37 @@ def prerequisites
   %w(rpm-build make rust cargo openssl-devel)
 end
 
-action :install_utils do
-  package_repos 'update package repositories' do
-    action :update
-  end
-
-  package prerequisites do
-    retries 3
-    retry_delay 5
-  end
-
-  directory node['cluster']['sources_dir'] do
-    recursive true
-  end
-
-  return if redhat_on_docker?
+action :install_efs_utils do
 
   package_name = "amazon-efs-utils"
   package_version = new_resource.efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
 
-  # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?(package_name, package_version)
+  if aws_region.start_with?("us-iso")
 
-  # On all OSes but Amazon Linux 2, amazon-efs-utils and stunnel are installed from source,
-  # because their OS repos do not have amazon-efs-utils and new stunnel
+    efs_proxy_deps = "efs-proxy-dependencies-#{package_version}.tar.gz"
+    efs_proxy_deps_tarball = "#{node['cluster']['sources_dir']}/#{efs_proxy_deps}"
+    efs_proxy_deps_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/#{efs_proxy_deps}"
+    remote_file efs_proxy_deps_tarball do
+      source efs_proxy_deps_url
+      mode '0644'
+      retries 3
+      retry_delay 5
+      action :create_if_missing
+    end
 
-  # Get EFS Utils tarball
-  remote_file efs_utils_tarball do
-    source efs_utils_url
-    mode '0644'
-    retries 3
-    retry_delay 5
-    checksum new_resource.efs_utils_checksum
-    action :create_if_missing
+    bash "install efs utils" do
+      cwd node['cluster']['sources_dir']
+      code adc_install_script_code(efs_utils_tarball, package_name, package_version)
+    end
+
+  else
+    # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
+    bash "install efs utils" do
+      cwd node['cluster']['sources_dir']
+      code install_script_code(efs_utils_tarball, package_name, package_version)
+    end
   end
 
-  efs_proxy_deps = "efs-proxy-dependencies-#{package_version}.tar.gz"
-  efs_proxy_deps_tarball = "#{node['cluster']['sources_dir']}/#{efs_proxy_deps}"
-  efs_proxy_deps_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/#{efs_proxy_deps}"
-  remote_file efs_proxy_deps_tarball do
-    source efs_proxy_deps_url
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
-
-  # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
-  bash "install efs utils" do
-    cwd node['cluster']['sources_dir']
-    code install_script_code(efs_utils_tarball, package_name, package_version)
-  end
   action_increase_poll_interval
 end
