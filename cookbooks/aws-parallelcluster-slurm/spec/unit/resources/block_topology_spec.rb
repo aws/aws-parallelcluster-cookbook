@@ -129,10 +129,18 @@ describe 'block_topology:update' do
                 .with(mode: '0644')
             end
 
-            it 'update or cleanup topology.conf when block sizes are present' do
-              expect(chef_run).to run_execute('update or cleanup topology.conf')
-                .with(command: command_to_exe)
+            if topo_command_args.nil?
+              it 'update or cleanup topology.conf when block sizes are present' do
+                expect(chef_run).not_to run_execute('update or cleanup topology.conf')
+                                      .with(command: command_to_exe)
+              end
+            else
+              it 'update or cleanup topology.conf when block sizes are present' do
+                expect(chef_run).to run_execute('update or cleanup topology.conf')
+                                      .with(command: command_to_exe)
+              end
             end
+
           end
         end
       end

@@ -51,7 +51,7 @@ action :update do
               " --input-file #{node['cluster']['cluster_config_path']}"\
               "#{topology_generator_command_args}"\
               "#{topology_generator_extra_args}"
-    not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && topology_generator_command_args.nil? }
+    not_if { topology_generator_command_args.nil? }
   end
 end
 
