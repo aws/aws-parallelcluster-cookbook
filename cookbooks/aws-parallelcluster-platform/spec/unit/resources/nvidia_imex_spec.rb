@@ -336,12 +336,12 @@ describe 'nvidia_imex:configure' do
 
             if (platform == 'amazon' && version == '2') || %w(HeadNode LoginNode).include?(node_type)
               it 'does not configure nvidia-imex' do
-                is_expected.not_to create_template("#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg")
+                is_expected.not_to create_if_missing_template("#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0755')
-                is_expected.not_to create_template("#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg")
+                is_expected.not_to create_if_missing_template("#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-config.erb')
                   .with(user: 'root')
                   .with(group: 'root')
@@ -357,12 +357,12 @@ describe 'nvidia_imex:configure' do
               end
             else
               it 'it starts nvidia-imex service' do
-                is_expected.to create_template("#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg")
+                is_expected.to create_if_missing_template("#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0755')
-                is_expected.to create_template("#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg")
+                is_expected.to create_if_missing_template("#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-config.erb')
                   .with(user: 'root')
                   .with(group: 'root')

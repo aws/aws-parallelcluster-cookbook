@@ -39,8 +39,7 @@ action :configure do
       owner 'root'
       group 'root'
       mode '0755'
-      action :create
-      not_if { file_exists_and_cluster_update?(nvidia_imex_nodes_conf_file) }
+      action :create_if_missing
     end
 
     template nvidia_imex_main_conf_file do
@@ -48,8 +47,7 @@ action :configure do
       owner 'root'
       group 'root'
       mode '0755'
-      action :create
-      not_if { file_exists_and_cluster_update?(nvidia_imex_main_conf_file) }
+      action :create_if_missing
       variables(imex_nodes_config_file_path: nvidia_imex_nodes_conf_file)
     end
 
@@ -91,10 +89,6 @@ end
 
 def nvidia_enabled_or_installed?
   nvidia_enabled? || nvidia_installed?
-end
-
-def file_exists_and_cluster_update?(file_path)
-  ::File.exist?(file_path) && !are_queues_updated?
 end
 
 def nvidia_imex_main_conf_file
