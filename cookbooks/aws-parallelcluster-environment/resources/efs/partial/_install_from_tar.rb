@@ -13,11 +13,12 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 package_name = "amazon-efs-utils"
-package_version = new_resource.efs_utils_version
-efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
 
 action :install_utils do
+  package_version = new_resource.efs_utils_version
+  efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
+  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
+
   package_repos 'update package repositories' do
     action :update
   end
@@ -60,6 +61,9 @@ action :install_utils do
 end
 
 action :install_efs_utils do
+  package_version = new_resource.efs_utils_version
+  efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
+
   bash "install efs utils" do
     cwd node['cluster']['sources_dir']
     code install_script_code(efs_utils_tarball, package_name, package_version)

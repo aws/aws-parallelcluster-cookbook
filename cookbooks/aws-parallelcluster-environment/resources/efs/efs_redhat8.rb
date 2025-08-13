@@ -18,8 +18,8 @@ end
 
 use 'partial/_get_package_version_rpm'
 use 'partial/_common'
-# use 'partial/_redhat_based'
-# use 'partial/_install_from_tar'
+use 'partial/_redhat_based'
+use 'partial/_install_from_tar'
 use 'partial/_mount_umount'
 
 def adc_install_script_code(efs_utils_tarball, efs_utils_package, efs_utils_version)
