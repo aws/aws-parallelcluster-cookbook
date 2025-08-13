@@ -74,7 +74,5 @@ end
 def topology_generator_extra_args
   if ['true', 'yes', true].include?(node['cluster']['slurm']['block_topology']['force_configuration'])
     " --force-configuration"
-  else
-    nil
   end
 end

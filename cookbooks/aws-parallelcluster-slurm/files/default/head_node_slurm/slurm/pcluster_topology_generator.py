@@ -57,9 +57,9 @@ def _is_gb200(instance_type):
     return instance_type is not None and instance_type.split(".")[0] == P6E_GB200
 
 
-def generate_topology_config_file(
+def generate_topology_config_file(  # noqa: C901
     output_file: str, input_file: str, block_sizes: str, force_configuration: bool
-):  # noqa: C901
+):
     """
     Generate Topology configuration file.
 
@@ -84,13 +84,10 @@ def generate_topology_config_file(
 
                 # Retrieve capacity info from the queue_name, if there
                 queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
-                if not _is_capacity_block(queue_capacity_type):
-                    if force_configuration:
-                        # We ignore this check if force_configuration option is used
-                        pass
-                    else:
-                        log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
-                        continue
+                if not _is_capacity_block(queue_capacity_type) and not force_configuration:
+                    # We ignore this check when force_configuration option is used.
+                    log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
+                    continue
 
                 for compute_resource_config in queue_config["ComputeResources"]:
                     compute_resource_name = compute_resource_config["Name"]

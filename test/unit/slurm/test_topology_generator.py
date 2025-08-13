@@ -67,7 +67,7 @@ def test_cleanup_topology_config_file(mocker, tmpdir, file_exists):
         ("capacity-block", True),
         ("on-demand", False),
         ("spot", False),
-        ("anay-value", False),
+        ("any-value", False),
         ("bla-capacity-block-bla", False),
     ],
 )
