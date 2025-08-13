@@ -12,6 +12,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
           runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
+            node.override['cluster']['region'] = 'us-iso-east-1'
           end
           runner.converge(described_recipe)
         end
@@ -34,13 +35,9 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
         end
 
         context "when region starts with us-iso" do
-          before do
-            allow(node).to receive(:[]).with('cluster').and_return({'region' => 'us-iso-east-1'})
-          end
-
           it 'installs python packages' do
             is_expected.to run_bash("pip install").with(
-              user: '****',
+              user: 'root',
               group: 'root',
               cwd: "#{node['cluster']['base_dir']}"
             ).with_code(/tar xzf cookbook-dependencies.tgz/)
