@@ -33,12 +33,18 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
           is_expected.to write_node_attributes('dump node attributes')
         end
 
-        it 'installs python packages' do
-          is_expected.to run_bash("pip install").with(
-            user: 'root',
-            group: 'root',
-            cwd: "#{node['cluster']['base_dir']}"
-          ).with_code(/tar xzf cookbook-dependencies.tgz/)
+        context "when region starts with us-iso" do
+          before do
+            allow(node).to receive(:[]).with('cluster').and_return({'region' => 'us-iso-east-1'})
+          end
+
+          it 'installs python packages' do
+            is_expected.to run_bash("pip install").with(
+              user: '****',
+              group: 'root',
+              cwd: "#{node['cluster']['base_dir']}"
+            ).with_code(/tar xzf cookbook-dependencies.tgz/)
+          end
         end
       end
     end
