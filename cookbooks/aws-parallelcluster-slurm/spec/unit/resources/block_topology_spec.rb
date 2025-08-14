@@ -154,11 +154,24 @@ describe 'block_topology:topology_generator_command_args' do
       cached(:chef_run) do
         runner(platform: platform, version: version, step_into: ['block_topology']) do |node|
           node.override['cluster']['p6egb200_block_sizes'] = nil
+          node.override['cluster']['slurm']['install_dir'] = slurm_install_dir
         end
       end
       cached(:resource) do
         ConvergeBlockTopology.update(chef_run)
         chef_run.find_resource('block_topology', 'update')
+      end
+
+      context "when queues are updated and topolog.conf does exists" do
+        before do
+          allow_any_instance_of(Object).to receive(:are_queues_updated?).and_return(true)
+          allow(File).to receive(:exist?).with("#{slurm_install_dir}/etc/topology.conf").and_return(true)
+          chef_run.node.override['cluster']['p6egb200_block_sizes'] = nil
+        end
+
+        it 'returns cleanup' do
+          expect(resource.topology_generator_command_args).to eq(" --cleanup")
+        end
       end
 
       context "when queues are not updated and topolog.conf does not exists" do
@@ -169,6 +182,18 @@ describe 'block_topology:topology_generator_command_args' do
 
         it 'it gives nil' do
           expect(resource.topology_generator_command_args).to eq(nil)
+        end
+      end
+
+      context "when queues are updated and topolog.conf does not exists" do
+        before do
+          allow_any_instance_of(Object).to receive(:are_queues_updated?).and_return(true)
+          allow(File).to receive(:exist?).with("#{slurm_install_dir}/etc/topology.conf").and_return(false)
+          chef_run.node.override['cluster']['p6egb200_block_sizes'] = block_sizes
+        end
+
+        it 'returns block-sizes argument' do
+          expect(resource.topology_generator_command_args).to eq(" --block-sizes #{block_sizes}")
         end
       end
 
