@@ -60,7 +60,7 @@ def is_block_topology_supported?
 end
 
 def topology_generator_command_args
-  if node['cluster']['p6egb200_block_sizes'].nil? && are_queues_updated? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
+  if node['cluster']['p6egb200_block_sizes'].nil? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
     # If topology.conf exist and Capacity Block is removed, we cleanup
     " --cleanup"
   elsif !node['cluster']['p6egb200_block_sizes'].nil?

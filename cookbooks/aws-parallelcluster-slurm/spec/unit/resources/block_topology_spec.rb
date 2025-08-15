@@ -21,6 +21,7 @@ end
 script_dir = 'SCRIPT_DIR'
 slurm_install_dir = 'SLURM_INSTALL_DIR'
 block_sizes = '9,18'
+new_block_size = '1,2'
 cluster_config = 'CONFIG_YAML'
 cookbook_env = 'FAKE_COOKBOOK_PATH'
 force_configuration_extra_args = ' --force-configuration'
@@ -162,9 +163,8 @@ describe 'block_topology:topology_generator_command_args' do
         chef_run.find_resource('block_topology', 'update')
       end
 
-      context "when queues are updated and topolog.conf does exists" do
+      context "when capacity block is removed and topolog.conf does exists" do
         before do
-          allow_any_instance_of(Object).to receive(:are_queues_updated?).and_return(true)
           allow(File).to receive(:exist?).with("#{slurm_install_dir}/etc/topology.conf").and_return(true)
           chef_run.node.override['cluster']['p6egb200_block_sizes'] = nil
         end
@@ -174,10 +174,10 @@ describe 'block_topology:topology_generator_command_args' do
         end
       end
 
-      context "when queues are not updated and topolog.conf does not exists" do
+      context "when capacity block is not used and topolog.conf does not exists" do
         before do
-          allow_any_instance_of(Object).to receive(:are_queues_updated?).and_return(false)
           allow(File).to receive(:exist?).with("#{slurm_install_dir}/etc/topology.conf").and_return(false)
+          chef_run.node.override['cluster']['p6egb200_block_sizes'] = nil
         end
 
         it 'it gives nil' do
@@ -185,15 +185,25 @@ describe 'block_topology:topology_generator_command_args' do
         end
       end
 
-      context "when queues are updated and topolog.conf does not exists" do
+      context "when capacity block is updated and topolog.conf does not exists" do
         before do
-          allow_any_instance_of(Object).to receive(:are_queues_updated?).and_return(true)
           allow(File).to receive(:exist?).with("#{slurm_install_dir}/etc/topology.conf").and_return(false)
           chef_run.node.override['cluster']['p6egb200_block_sizes'] = block_sizes
         end
 
         it 'returns block-sizes argument' do
           expect(resource.topology_generator_command_args).to eq(" --block-sizes #{block_sizes}")
+        end
+      end
+
+      context "when capacity block is updated and topolog.conf does exists" do
+        before do
+          allow(File).to receive(:exist?).with("#{slurm_install_dir}/etc/topology.conf").and_return(true)
+          chef_run.node.override['cluster']['p6egb200_block_sizes'] = new_block_size
+        end
+
+        it 'returns block-sizes argument' do
+          expect(resource.topology_generator_command_args).to eq(" --block-sizes #{new_block_size}")
         end
       end
 
