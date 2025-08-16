@@ -5,6 +5,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
     context "on #{platform}#{version}" do
       cached(:python_version) { 'python_version' }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
+      cached(:aws_region) { 'us-iso-east-1' }
       cached(:virtualenv_path) { 'system_pyenv_root/versions/python_version/envs/cookbook_virtualenv' }
 
       context "when cookbook virtualenv not installed yet" do
@@ -36,7 +37,6 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
 
         context "when region starts with us-iso" do
           it 'installs python packages' do
-            is_expected.to write_node_attributes('HERE')
             is_expected.to run_bash("pip install").with(
               user: 'root',
               group: 'root',
