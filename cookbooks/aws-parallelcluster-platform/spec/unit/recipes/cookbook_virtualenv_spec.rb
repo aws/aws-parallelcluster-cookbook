@@ -40,8 +40,8 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
               user: 'root',
               group: 'root',
             ).with_code(/tar xzf cookbook-dependencies.tgz/)
+            is_expected.to write_node_attributes('HERE')
           end
-          is_expected.to write_node_attributes('HERE')
         end
       end
     end
