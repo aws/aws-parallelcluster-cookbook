@@ -36,6 +36,11 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
         end
 
         context "when region starts with us-iso" do
+          before do
+            allow_any_instance_of(Chef::Recipe)
+              .to receive(:aws_region)
+                    .and_return('us-iso-east-1')
+          end
           it 'installs python packages' do
             is_expected.to run_bash("pip install").with(
               user: 'root',
