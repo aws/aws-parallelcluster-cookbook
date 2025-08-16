@@ -39,9 +39,9 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
             is_expected.to run_bash("pip install").with(
               user: 'root',
               group: 'root',
-              cwd: "#{node['cluster']['base_dir']}"
             ).with_code(/tar xzf cookbook-dependencies.tgz/)
           end
+          is_expected.to write_node_attributes('HERE')
         end
       end
     end
