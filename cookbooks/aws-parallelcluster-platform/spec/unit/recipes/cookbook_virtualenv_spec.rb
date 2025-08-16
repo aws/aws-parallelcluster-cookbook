@@ -36,11 +36,11 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
 
         context "when region starts with us-iso" do
           it 'installs python packages' do
+            is_expected.to write_node_attributes('HERE')
             is_expected.to run_bash("pip install").with(
               user: 'root',
               group: 'root',
             ).with_code(/tar xzf cookbook-dependencies.tgz/)
-            is_expected.to write_node_attributes('HERE')
           end
         end
       end
