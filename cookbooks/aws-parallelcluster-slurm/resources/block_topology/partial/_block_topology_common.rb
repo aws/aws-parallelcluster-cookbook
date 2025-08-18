@@ -29,7 +29,8 @@ action :configure do
     command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
               " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
               " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"\
-              " --input-file #{node['cluster']['cluster_config_path']}"
+              " --input-file #{node['cluster']['cluster_config_path']}"\
+              "#{topology_generator_extra_args}"
     not_if { node['cluster']['p6egb200_block_sizes'].nil? }
   end
 end
@@ -48,8 +49,9 @@ action :update do
     command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_topology_generator.py"\
               " --output-file #{node['cluster']['slurm']['install_dir']}/etc/topology.conf"\
               " --input-file #{node['cluster']['cluster_config_path']}"\
-              "#{topology_generator_command_args}"
-    not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && topology_generator_command_args.nil? }
+              "#{topology_generator_command_args}"\
+              "#{topology_generator_extra_args}"
+    not_if { topology_generator_command_args.nil? }
   end
 end
 
@@ -58,13 +60,17 @@ def is_block_topology_supported?
 end
 
 def topology_generator_command_args
-  if node['cluster']['p6egb200_block_sizes'].nil? && are_queues_updated? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
+  if node['cluster']['p6egb200_block_sizes'].nil? && ::File.exist?("#{node['cluster']['slurm']['install_dir']}/etc/topology.conf")
     # If topology.conf exist and Capacity Block is removed, we cleanup
     " --cleanup"
-  elsif node['cluster']['p6egb200_block_sizes'].nil? && !are_queues_updated?
-    # We do nothing if p6e-gb200 is not used and queues are not updated
-    nil
-  else
+  elsif !node['cluster']['p6egb200_block_sizes'].nil?
+    # We add/update topology.conf if p6egb200_block_sizes is not null
     " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"
+  end
+end
+
+def topology_generator_extra_args
+  if ['true', 'yes', true].include?(node['cluster']['slurm']['block_topology']['force_configuration'])
+    " --force-configuration"
   end
 end
