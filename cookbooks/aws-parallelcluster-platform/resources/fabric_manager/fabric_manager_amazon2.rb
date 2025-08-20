@@ -28,3 +28,7 @@ end
 def platform
   'rhel7'
 end
+
+def _fabric_manager_enabled
+  !arm_instance? && _nvidia_enabled
+end

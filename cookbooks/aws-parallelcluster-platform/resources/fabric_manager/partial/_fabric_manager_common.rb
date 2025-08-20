@@ -40,8 +40,7 @@ action :configure do
 end
 
 def _fabric_manager_enabled
-  # NVIDIA Fabric Manager not present on ARM
-  !arm_instance? && _nvidia_enabled
+  _nvidia_enabled
 end
 
 def _nvidia_enabled

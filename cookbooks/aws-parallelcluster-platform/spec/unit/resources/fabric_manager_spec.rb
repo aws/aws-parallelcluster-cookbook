@@ -118,45 +118,55 @@ describe 'fabric_manager:_nvidia_enabled' do
 end
 
 describe 'fabric_manager:_fabric_manager_enabled' do
-  context 'when on arm' do
-    cached(:chef_run) do
-      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
-      ChefSpec::SoloRunner.new(step_into: ['fabric_manager'])
-    end
-    cached(:resource) do
-      ConvergeFabricManager.setup(chef_run, nvidia_enabled: true)
-      chef_run.find_resource('fabric_manager', 'setup')
-    end
-    it "is not enabled" do
-      expect(resource._fabric_manager_enabled).to eq(false)
-    end
-  end
-
-  context 'when not on arm' do
-    cached(:chef_run) do
-      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-      ChefSpec::SoloRunner.new(step_into: ['fabric_manager'])
-    end
-
-    context 'when nvidia enabled' do
-      cached(:resource) do
-        ConvergeFabricManager.setup(chef_run, nvidia_enabled: true)
-        chef_run.find_resource('fabric_manager', 'setup')
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      context 'when on arm' do
+        cached(:chef_run) do
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
+          ChefSpec::SoloRunner.new(step_into: ['fabric_manager'], platform: platform, version: version)
+        end
+        cached(:resource) do
+          ConvergeFabricManager.setup(chef_run, nvidia_enabled: true)
+          chef_run.find_resource('fabric_manager', 'setup')
+        end
+        if platform == 'amazon' && version == '2'
+          it "is not enabled" do
+            expect(resource._fabric_manager_enabled).to eq(false)
+          end
+        else
+          it "is enabled" do
+            expect(resource._fabric_manager_enabled).to eq(true)
+          end
+        end
       end
 
-      it "is enabled" do
-        expect(resource._fabric_manager_enabled).to eq(true)
-      end
-    end
+      context 'when not on arm' do
+        cached(:chef_run) do
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          ChefSpec::SoloRunner.new(step_into: ['fabric_manager'])
+        end
 
-    context 'when nvidia not enabled' do
-      cached(:resource) do
-        ConvergeFabricManager.setup(chef_run, nvidia_enabled: false)
-        chef_run.find_resource('fabric_manager', 'setup')
-      end
+        context 'when nvidia enabled' do
+          cached(:resource) do
+            ConvergeFabricManager.setup(chef_run, nvidia_enabled: true)
+            chef_run.find_resource('fabric_manager', 'setup')
+          end
 
-      it "is not enabled" do
-        expect(resource._fabric_manager_enabled).to eq(false)
+          it "is enabled" do
+            expect(resource._fabric_manager_enabled).to eq(true)
+          end
+        end
+
+        context 'when nvidia not enabled' do
+          cached(:resource) do
+            ConvergeFabricManager.setup(chef_run, nvidia_enabled: false)
+            chef_run.find_resource('fabric_manager', 'setup')
+          end
+
+          it "is not enabled" do
+            expect(resource._fabric_manager_enabled).to eq(false)
+          end
+        end
       end
     end
   end
