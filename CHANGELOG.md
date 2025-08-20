@@ -24,6 +24,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA Toolkit to version 12.8.1 (from 12.8.0) for all OSs except AL2.
 - Upgrade DCGM to version 4.2.3 (from 3.3.6) for all OSs except AL2.
 - Upgrade Python to 3.12.11 (from 3.12.8) for all OSs except AL2.
+- Upgrade Python to 3.9.23 (from 3.9.20) for AL2.
 - Upgrade Intel MPI Library to 2021.16.0 (from 2021.13.1).
 - Addressed cluster id mismatch known issue by deleting the file `/var/spool/slurm.state/clustername` before configuring Slurm accounting.
 - Upgrade DCV to version 2024.0-19030.
