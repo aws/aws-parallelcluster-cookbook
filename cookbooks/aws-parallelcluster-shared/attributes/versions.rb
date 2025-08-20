@@ -2,7 +2,7 @@
 default['cluster']['python-version'] = '3.12.11'
 default['cluster']['python-major-minor-version'] = '3.12'
 if platform?('amazon') && node['platform_version'] == "2"
-  default['cluster']['python-version'] = '3.9.20'
+  default['cluster']['python-version'] = '3.9.23'
   default['cluster']['python-major-minor-version'] = '3.9'
 end
 
