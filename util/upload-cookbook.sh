@@ -93,21 +93,22 @@ main() {
     # Create archive and md5
     _cwd=$(pwd)
     pushd "${_srcdir}" > /dev/null || exit
+    GIT_REF=$(git rev-parse HEAD)
     _stashName=$(git stash create)
-    git archive --format tar --prefix="aws-parallelcluster-cookbook-${_version}/" "${_stashName:-HEAD}" | gzip > "${_cwd}/aws-parallelcluster-cookbook-${_version}.tgz"
+    git archive --format tar --prefix="aws-parallelcluster-cookbook-${_version}/" "${_stashName:-HEAD}" | gzip > "${_cwd}/aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz"
     #tar zcvf "${_cwd}/aws-parallelcluster-cookbook-${_version}.tgz" --transform "s,^aws-parallelcluster-cookbook/,aws-parallelcluster-cookbook-${_version}/," ../aws-parallelcluster-cookbook
     popd > /dev/null || exit
-    md5sum aws-parallelcluster-cookbook-${_version}.tgz > aws-parallelcluster-cookbook-${_version}.md5
+    md5sum aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz > aws-parallelcluster-cookbook-${_version}-${GIT_REF}.md5
 
     # upload packages
     _key_path="parallelcluster/${_version}/cookbooks"
     if [ -n "${_scope}" ]; then
         _key_path="${_key_path}/${_scope}"
     fi
-    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.tgz s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz || _error_exit 'Failed to push cookbook to S3'
-    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.md5 s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
-    aws ${_profile} --region "${_region}" s3api head-object --bucket ${_bucket} --key ${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz --output text --query LastModified > aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to fetch LastModified date'
-    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}.tgz.date s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz.date || _error_exit 'Failed to push cookbook date'
+    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz || _error_exit 'Failed to push cookbook to S3'
+    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}-${GIT_REF}.md5 s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}-${GIT_REF}.md5 || _error_exit 'Failed to push cookbook md5 to S3'
+    aws ${_profile} --region "${_region}" s3api head-object --bucket ${_bucket} --key ${_key_path}/aws-parallelcluster-cookbook-${_version}.tgz --output text --query LastModified > aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz.date || _error_exit 'Failed to fetch LastModified date'
+    aws ${_profile} --region "${_region}" s3 cp aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz.date s3://${_bucket}/${_key_path}/aws-parallelcluster-cookbook-${_version}-${GIT_REF}.tgz.date || _error_exit 'Failed to push cookbook date'
 
     _bucket_region=$(aws ${_profile} s3api get-bucket-location --bucket ${_bucket} --output text)
     if [ ${_bucket_region} = "None" ]; then
