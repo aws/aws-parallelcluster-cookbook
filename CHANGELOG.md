@@ -31,7 +31,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Remove `berkshelf`. All cookbooks are local and do not need `berkshelf` dependency management.
 - Add support for GB200 instance types.
 - Install nvidia-imex for all OSs except AL2.
-- Install nvidia-fabricmanager for ARM instances for all OSs except AL2.
 
 **BUG FIXES**
 - Fix a race condition in CloudWatch Agent startup that could cause nodes bootstrap failures.
