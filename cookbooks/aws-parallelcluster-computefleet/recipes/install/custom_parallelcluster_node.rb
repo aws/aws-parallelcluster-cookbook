@@ -19,9 +19,22 @@
 
 # TODO: once the pyenv Chef resource supports installing packages from a path (e.g. `pip install .`), convert the
 # bash block to a recipe that uses the pyenv resource.
-if aws_region.start_with?("us-iso") && platform?('amazon') && node['platform_version'] == "2"
+command = if aws_region.start_with?("us-iso")
+            "pip install . --no-build-isolation"
+          else
+            "pip install ."
+          end
+
+if aws_region.start_with?("us-iso")
+  dependency_package_name = "pypi-node-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+  dependency_folder_name = dependency_package_name
+  if platform?('amazon') && node['platform_version'] == "2"
+    dependency_package_name = "node-dependencies"
+    dependency_folder_name = "node"
+  end
+
   remote_file "#{node['cluster']['base_dir']}/node-dependencies.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/node-dependencies.tgz"
+    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
     mode '0644'
     retries 3
     retry_delay 5
@@ -35,7 +48,7 @@ if aws_region.start_with?("us-iso") && platform?('amazon') && node['platform_ver
     code <<-REQ
       set -e
       tar xzf node-dependencies.tgz
-      cd node
+      cd #{dependency_folder_name}
       #{node_virtualenv_path}/bin/pip install * -f ./ --no-index
       REQ
   end
@@ -59,7 +72,7 @@ bash "install custom aws-parallelcluster-node" do
     mkdir aws-parallelcluster-custom-node
     tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
     cd aws-parallelcluster-custom-node/*aws-parallelcluster-node*
-    pip install .
+    #{command}
     deactivate
   NODE
 end
