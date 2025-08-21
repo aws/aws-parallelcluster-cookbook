@@ -31,7 +31,7 @@ end
 action :configure do
   return unless imex_installed? && node['cluster']['node_type'] == "ComputeFleet"
   # Start nvidia-imex on p6e-gb200 and only on ComputeFleet
-  if get_nvswitch_count(get_device_ids['gb200']) > 1 || enable_force_configuration?
+  if is_gb200_node? || enable_force_configuration?
     # For each Compute Resource, we generate a unique NVIDIA IMEX configuration file,
     # if one doesn't already exist in a common, shared location.
     template nvidia_imex_nodes_conf_file do

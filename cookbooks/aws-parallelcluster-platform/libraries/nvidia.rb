@@ -34,3 +34,7 @@ def get_device_ids
   # NVSwitch device id is 10de:2941 for P6e instance
   { 'a100' => '10de:1af1', 'h100' => '10de:22a3', 'b200' => '10de:2901', 'gb200' => '10de:2941' }
 end
+
+def is_gb200_node?
+  get_nvswitch_count(get_device_ids['gb200']) > 1
+end
