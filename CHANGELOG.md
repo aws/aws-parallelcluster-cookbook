@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Remove UnkillableStepTimeout from slurm.conf and let slurm set this value.
+- Add `build-image` support for kernel 6.12 of Amazon Linux 2023. The official ParallelCluster Amazon Linux 2023 AMIs use kernel 6.12.
 
 **CHANGES**
 - Ubuntu 20.04 is no longer supported.

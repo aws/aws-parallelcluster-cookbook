@@ -34,5 +34,9 @@ end
 
 def extra_packages
   kernel_version = node['kernel']['release'].chomp('.x86_64').chomp('.aarch64')
-  ["kernel-modules-extra-#{kernel_version}", "kernel-modules-extra-common"]
+  if kernel_version.start_with?("6.12.")
+    ["kernel6.12-modules-extra-#{kernel_version}", "kernel6.12-modules-extra-common"]
+  else
+    ["kernel-modules-extra-#{kernel_version}", "kernel-modules-extra-common"]
+  end
 end
