@@ -224,6 +224,32 @@ def test_generate_slurm_config_with_custom_settings(mocker, test_datadir, tmpdir
         _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
+def test_generate_slurm_config_with_custom_features(mocker, test_datadir, tmpdir):
+    _mock_head_node_config(mocker)
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+    )
+
+    for queue in ["efa", "gpu", "multiple_spot"]:
+        file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        output_file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
+
+
 def test_generate_slurm_config_with_job_exc_alloc(mocker, test_datadir, tmpdir):
     _mock_head_node_config(mocker)
 
