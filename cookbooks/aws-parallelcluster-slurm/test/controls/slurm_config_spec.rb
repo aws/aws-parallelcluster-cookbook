@@ -46,7 +46,7 @@ control 'tag:config_slurm_correctly_installed_on_compute_node' do
   end
 
   describe 'check cgroup memory resource controller is enabled' do
-    subject { bash("grep memory /proc/cgroups | awk '{print $4}'") }
+    subject { bash("sleep 5 && grep memory /proc/cgroups | awk '{print $4}'") }
     its('exit_status') { should eq 0 }
     its('stdout.strip') { should cmp 1 }
   end
