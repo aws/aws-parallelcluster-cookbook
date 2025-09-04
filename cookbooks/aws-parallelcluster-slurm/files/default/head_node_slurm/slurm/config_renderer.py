@@ -24,6 +24,8 @@ class ComputeResourceRenderer:
         self.name = compute_resource_config["Name"]
         self.disable_multithreading = compute_resource_config["DisableSimultaneousMultithreading"]
         self.custom_settings = compute_resource_config.get("CustomSlurmSettings", {})
+        # If Features are in CustomSlurmSettings, fetch them and remove from CustomSlurmSettings
+        self.custom_features = self.custom_settings.pop("Feature", "")
         self.spot_price = compute_resource_config.get("SpotPrice", None)
         self.instance_types = get_instance_types(compute_resource_config)
         self.real_memory = get_real_memory(
@@ -85,7 +87,7 @@ class ComputeResourceRenderer:
         return definitions
 
     def _features(self, dynamic=False):
-        features = set(self.custom_settings.get("Features", "").split(','))
+        features = set(self.custom_features.split(','))
         # this is a simple workaround for empty Features: split will give [''] and we'll discard it 
         # as well as all empty strings.
         features.discard('')
