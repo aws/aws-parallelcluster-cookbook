@@ -85,24 +85,38 @@ class ComputeResourceRenderer:
         return definitions
 
     def _features(self, dynamic=False):
+        features = set(self.custom_settings.get("Features", "").split(','))
+        # this is a simple workaround for empty Features: split will give [''] and we'll discard it 
+        # as well as all empty strings.
+        features.discard('')
+
+        # remove "system" features from configured features, so that they will never interfere
+        for feat in ('static', 'dynamic', 'gpu', 'efa') :
+            features.discard(feat)
+
         resource_type = "static"
         if dynamic:
             resource_type = "dynamic"
+        features.add(resource_type)
+        
+        # If there's only 1 instance type defined, add it as a feature.
+        # Note: When multiple instance types are defined we do not know in advance which one will be used
+        # to launch the node. So we do not list any of them as feature
+        if len(self.instance_types) == 1:
+            features.add(self.instance_types[0])
 
-        instance_type = f",{self.instance_types[0]}"
-        if len(self.instance_types) > 1:
-            # When multiple instance types are defined we do not know in advance which one will be used
-            # to launch the node. So we do not list any of them as feature
-            instance_type = ""
+        # add ComputeResource name as a feature
+        features.add(self.name)
 
-        features = f"Feature={resource_type}{instance_type},{self.name}"
         if self.efa_enabled:
-            features += ",efa"
+            features.add('efa')
 
         if self.gpu_count > 0:
-            features += ",gpu"
-
-        return features
+            features.add('gpu')
+        
+        # Note: sorted() is called to ease tests development only: we can then predict features ordering
+        features_string = ','.join(sorted(features))
+        return f"Feature={features_string}"
 
     def _custom_settings(self):
         custom = ""
