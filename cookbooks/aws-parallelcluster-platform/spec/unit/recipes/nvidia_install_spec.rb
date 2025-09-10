@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe 'aws-parallelcluster-platform::nvidia_install' do
-
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
@@ -20,6 +19,10 @@ describe 'aws-parallelcluster-platform::nvidia_install' do
 
       it 'installs gdrcopy' do
         is_expected.to setup_gdrcopy('Install Nvidia gdrcopy')
+      end
+
+      it 'installs nvidia_nvlsm' do
+        is_expected.to install_nvidia_nvlsm('Install Nvidia NVLink Subnet Manager')
       end
 
       it 'installs fabric_manager' do

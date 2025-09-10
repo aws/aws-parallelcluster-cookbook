@@ -8,6 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for P6e-GB200 instances. ParallelCluster sets up Slurm topology plugin to handle P6e-GB200 UltraServers. See limitations section for important additional setup requirements.
+- Add support for P6-B200 instances for all OSs except AL2.
 - Add `build-image` support for Amazon Linux 2023 AMIs based on kernel 6.12 (in addition to 6.1).
 
 **LIMITATIONS**

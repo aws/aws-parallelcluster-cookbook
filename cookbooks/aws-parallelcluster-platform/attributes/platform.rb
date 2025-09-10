@@ -27,6 +27,9 @@ end
 default['cluster']['nvidia']['imex']['shared_dir'] = "#{node['cluster']['shared_dir']}/nvidia-imex"
 default['cluster']['nvidia']['imex']['force_configuration'] = false
 
+# NVIDIA NVLSM
+default['cluster']['nvidia']['nvlsm']['enabled'] = true
+
 # DCV
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
