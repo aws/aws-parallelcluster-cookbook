@@ -46,8 +46,21 @@ control 'tag:config_slurm_correctly_installed_on_compute_node' do
   end
 
   describe 'check cgroup memory resource controller is enabled' do
-    subject { bash("sleep 5 && grep memory /proc/cgroups | awk '{print $4}'") }
-    its('exit_status') { should eq 0 }
-    its('stdout.strip') { should cmp 1 }
+    # Check if we're using cgroups v2
+    cgroup_v2 = bash('test -f /sys/fs/cgroup/cgroup.controllers').exit_status == 0
+
+    if cgroup_v2
+      # For cgroups v2, check if memory controller is in available controllers
+      describe bash('cat /sys/fs/cgroup/cgroup.controllers') do
+        its('stdout') { should include 'memory' }
+        its('exit_status') { should eq 0 }
+      end
+    else
+      # Original check for cgroups v1
+      describe bash("grep memory /proc/cgroups | awk '{print $4}'") do
+        its('stdout.strip') { should cmp '1' }
+        its('exit_status') { should eq 0 }
+      end
+    end
   end
 end
