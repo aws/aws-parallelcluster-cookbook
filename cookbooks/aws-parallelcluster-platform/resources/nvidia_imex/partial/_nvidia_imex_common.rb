@@ -19,6 +19,7 @@ action :install do
   return unless nvidia_enabled_or_installed?
   return if on_docker? || imex_installed? || aws_region.start_with?("us-iso")
 
+  # We are using the existence of this directory to verify if Imex was installed by ParallelCluster
   directory node['cluster']['nvidia']['imex']['shared_dir']
 
   action_install_imex
@@ -31,7 +32,7 @@ end
 action :configure do
   return unless imex_installed? && node['cluster']['node_type'] == "ComputeFleet"
   # Start nvidia-imex on p6e-gb200 and only on ComputeFleet
-  if is_gb200_node? || enable_force_configuration?
+  if (is_gb200_node? && pcluster_installed_imex?) || enable_force_configuration?
     # For each Compute Resource, we generate a unique NVIDIA IMEX configuration file,
     # if one doesn't already exist in a common, shared location.
     template nvidia_imex_nodes_conf_file do
@@ -51,6 +52,7 @@ action :configure do
       variables(imex_nodes_config_file_path: nvidia_imex_nodes_conf_file)
     end
 
+    # We keep nvidia-imex.service file in this location to give precedence to pcluster configured service file.
     template "/etc/systemd/system/#{nvidia_imex_service}.service" do
       source 'nvidia-imex/nvidia-imex.service.erb'
       owner 'root'
@@ -63,6 +65,7 @@ action :configure do
     service nvidia_imex_service do
       action %i(enable start)
       supports status: true
+      only_if { ::File.exist?("/etc/systemd/system/#{nvidia_imex_service}.service") }
     end
   end
 end
@@ -101,4 +104,9 @@ end
 
 def enable_force_configuration?
   ['true', 'yes', true].include?(node['cluster']['nvidia']['imex']['force_configuration'])
+end
+
+def pcluster_installed_imex?
+  # We configure Imex only if the shared directory exists
+  Dir.exist?(node['cluster']['nvidia']['imex']['shared_dir'])
 end
