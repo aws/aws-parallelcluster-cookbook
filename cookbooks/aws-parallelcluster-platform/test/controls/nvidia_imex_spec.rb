@@ -36,7 +36,7 @@ control 'tag:config_nvidia_fabric_manager_enabled' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('mode') { should cmp '0644' }
-    its('content') { should match %r{ExecStart=/usr/bin/nvidia-imex -c #{node['cluster']['nvidia']['imex']['shared_dir']}} }
+    its('content') { should match %r{ExecStart=/usr/bin/nvidia-imex -c /etc/nvidia-imex/config.cfg} }
   end
 
   describe service('nvidia-imex') do
