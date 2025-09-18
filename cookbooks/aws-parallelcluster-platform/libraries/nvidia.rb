@@ -27,11 +27,12 @@ def get_nvswitch_count(device_id)
 end
 
 def get_device_ids
-  #  A100 (P4), H100(P5), B200(P6) and GB200()p6e) systems have NVSwitches
+  #  A100 (P4), H100(P5), B200(P6) and GB200(p6e) systems have NVSwitches
   # NVSwitch device id is 10de:1af1 for P4 instance
   # NVSwitch device id is 10de:22a3 for P5 instance
+  # NVSwitch device id is 10de:2901 for P6 instance
   # NVSwitch device id is 10de:2941 for P6e instance
-  { 'a100' => '10de:1af1', 'h100' => '10de:22a3', 'gb200' => '10de:2941' }
+  { 'a100' => '10de:1af1', 'h100' => '10de:22a3', 'b200' => '10de:2901', 'gb200' => '10de:2941' }
 end
 
 def is_gb200_node?

@@ -92,11 +92,11 @@ def nvidia_enabled_or_installed?
 end
 
 def nvidia_imex_main_conf_file
-  "#{node['cluster']['nvidia']['imex']['shared_dir']}/config_#{node['cluster']['launch_template_id']}.cfg"
+  "#{node['cluster']['nvidia']['imex']['shared_dir']}/config_#{node['cluster']['scheduler_queue_name']}_#{node['cluster']['scheduler_compute_resource_name']}.cfg"
 end
 
 def nvidia_imex_nodes_conf_file
-  "#{node['cluster']['nvidia']['imex']['shared_dir']}/nodes_config_#{node['cluster']['launch_template_id']}.cfg"
+  "#{node['cluster']['nvidia']['imex']['shared_dir']}/nodes_config_#{node['cluster']['scheduler_queue_name']}_#{node['cluster']['scheduler_compute_resource_name']}.cfg"
 end
 
 def enable_force_configuration?

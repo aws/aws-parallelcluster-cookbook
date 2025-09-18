@@ -5,7 +5,8 @@ SOURCE_DIR = 'SOURCE_DIR'.freeze
 nvidia_imex_shared_dir = "SHARED_DIR/nvidia-imex"
 imex_binary = '/usr/bin/nvidia-imex'
 imex_ctl_binary = '/usr/bin/nvidia-imex-ctl'
-launch_template_id = 'lt-123456789012'
+queue_name = 'queue-name'
+compute_resource_name = 'compute-resource-name'
 cluster_artifacts_s3_url = 'https://aws_region-aws-parallelcluster.s3.aws_region.AWS_DOMAIN'
 
 class ConvergeNvidiaImex
@@ -330,50 +331,52 @@ describe 'nvidia_imex:configure' do
               chef_run.node.override['cluster']['nvidia']['imex']['force_configuration'] = force_indicator
               chef_run.node.override['cluster']['nvidia']['imex']['shared_dir'] = nvidia_imex_shared_dir
               chef_run.node.override['cluster']['node_type'] = node_type
-              chef_run.node.override['cluster']['launch_template_id'] = launch_template_id
+              chef_run.node.override['cluster']['scheduler_queue_name'] = queue_name
+              chef_run.node.override['cluster']['scheduler_compute_resource_name'] = compute_resource_name
+
               ConvergeNvidiaImex.configure(chef_run)
             end
 
             if (platform == 'amazon' && version == '2') || %w(HeadNode LoginNode).include?(node_type)
               it 'does not configure nvidia-imex' do
-                is_expected.not_to create_if_missing_template("#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg")
+                is_expected.not_to create_if_missing_template("#{nvidia_imex_shared_dir}/nodes_config_#{queue_name}_#{compute_resource_name}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0755')
-                is_expected.not_to create_if_missing_template("#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg")
+                is_expected.not_to create_if_missing_template("#{nvidia_imex_shared_dir}/config_#{queue_name}_#{compute_resource_name}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-config.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0755')
-                  .with(variables: { imex_nodes_config_file_path: "#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg" })
+                  .with(variables: { imex_nodes_config_file_path: "#{nvidia_imex_shared_dir}/nodes_config_#{queue_name}_#{compute_resource_name}.cfg" })
                 is_expected.not_to create_template("/etc/systemd/system/nvidia-imex.service")
                   .with(source: 'nvidia-imex/nvidia-imex.service.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0644')
-                  .with(variables: { imex_main_config_file_path: "#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg" })
+                  .with(variables: { imex_main_config_file_path: "#{nvidia_imex_shared_dir}/config_#{queue_name}_#{compute_resource_name}.cfg" })
                 is_expected.not_to start_service('nvidia-imex').with_action(%i(enable start)).with_supports({ status: true })
               end
             else
               it 'it starts nvidia-imex service' do
-                is_expected.to create_if_missing_template("#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg")
+                is_expected.to create_if_missing_template("#{nvidia_imex_shared_dir}/nodes_config_#{queue_name}_#{compute_resource_name}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-nodes.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0755')
-                is_expected.to create_if_missing_template("#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg")
+                is_expected.to create_if_missing_template("#{nvidia_imex_shared_dir}/config_#{queue_name}_#{compute_resource_name}.cfg")
                   .with(source: 'nvidia-imex/nvidia-imex-config.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0755')
-                  .with(variables: { imex_nodes_config_file_path: "#{nvidia_imex_shared_dir}/nodes_config_#{launch_template_id}.cfg" })
+                  .with(variables: { imex_nodes_config_file_path: "#{nvidia_imex_shared_dir}/nodes_config_#{queue_name}_#{compute_resource_name}.cfg" })
                 is_expected.to create_template("/etc/systemd/system/nvidia-imex.service")
                   .with(source: 'nvidia-imex/nvidia-imex.service.erb')
                   .with(user: 'root')
                   .with(group: 'root')
                   .with(mode: '0644')
-                  .with(variables: { imex_main_config_file_path: "#{nvidia_imex_shared_dir}/config_#{launch_template_id}.cfg" })
+                  .with(variables: { imex_main_config_file_path: "#{nvidia_imex_shared_dir}/config_#{queue_name}_#{compute_resource_name}.cfg" })
                 is_expected.to start_service('nvidia-imex').with_action(%i(enable start)).with_supports({ status: true })
               end
             end
