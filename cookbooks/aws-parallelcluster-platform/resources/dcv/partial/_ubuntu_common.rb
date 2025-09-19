@@ -81,4 +81,20 @@ action_class do
       command "sed --in-place '/RANDFILE/d' /etc/ssl/openssl.cnf"
     end
   end
+
+  def post_install
+    # ubuntu-desktop comes with NetworkManager. On a cloud instance NetworkManager is unnecessary and causes delay.
+    # Instruct Netplan to use networkd for better performance
+    bash 'Instruct Netplan to use networkd' do
+      code <<-NETPLAN
+        set -e
+        cat > /etc/netplan/95-parallelcluster-force-networkd.yaml << 'EOF'
+network:
+  version: 2
+  renderer: networkd
+EOF
+        netplan apply
+      NETPLAN
+    end unless on_docker?
+  end
 end
