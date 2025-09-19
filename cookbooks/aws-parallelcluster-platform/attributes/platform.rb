@@ -24,7 +24,9 @@ if platform?('amazon') && node['platform_version'] == "2"
 end
 
 # nvidia-imex
-default['cluster']['nvidia']['imex']['shared_dir'] = "#{node['cluster']['shared_dir']}/nvidia-imex"
+default['cluster']['nvidia']['imex']['conf_dir'] = "/etc/nvidia-imex"
+default['cluster']['nvidia']['imex']['main_config'] = "#{node['cluster']['nvidia']['imex']['conf_dir']}/config.cfg"
+default['cluster']['nvidia']['imex']['nodes_config'] = "#{node['cluster']['nvidia']['imex']['conf_dir']}/nodes_config.cfg"
 default['cluster']['nvidia']['imex']['force_configuration'] = false
 
 # NVIDIA NVLSM
