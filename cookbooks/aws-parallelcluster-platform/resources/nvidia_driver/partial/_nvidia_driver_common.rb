@@ -79,7 +79,7 @@ action :setup do
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      #{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau -m=#{nvidia_kernel_module}
+      #{compiler_path} ./nvidia.run --silent --dkms #{drm}--disable-nouveau -m=#{nvidia_kernel_module}
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
@@ -89,6 +89,10 @@ action :setup do
     command 'update-initramfs -u'
     only_if 'lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau'
   end if rebuild_initramfs?
+end
+
+def drm
+  ''
 end
 
 def _nvidia_driver_version

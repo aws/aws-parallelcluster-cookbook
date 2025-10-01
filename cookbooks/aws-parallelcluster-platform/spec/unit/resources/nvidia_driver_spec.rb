@@ -249,6 +249,8 @@ describe 'nvidia_driver:setup' do
             end
           end
 
+          drm = platform == 'ubuntu' && version == '24' ? '--no-drm' : ''
+
           it 'installs nvidia driver' do
             is_expected.to run_bash('nvidia.run advanced')
               .with(
@@ -257,7 +259,7 @@ describe 'nvidia_driver:setup' do
                 cwd: '/tmp',
                 creates: '/usr/bin/nvidia-smi'
               )
-              .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms --disable-nouveau -m=#{kernel_module}})
+              .with_code(%r{CC=/usr/bin/gcc10-gcc ./nvidia.run --silent --dkms #{drm} --disable-nouveau -m=#{kernel_module}})
               .with_code(%r{rm -f /tmp/nvidia.run})
           end
         elsif platform == 'ubuntu' && version == '22.04'

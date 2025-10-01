@@ -22,6 +22,12 @@ def rebuild_initramfs?
   true
 end
 
+def drm
+  if node['platform_version'].to_i == 24
+    '--no-drm '
+  end
+end
+
 def set_compiler?
   true
 end
