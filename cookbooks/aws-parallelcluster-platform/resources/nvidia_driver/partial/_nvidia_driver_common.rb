@@ -79,7 +79,7 @@ action :setup do
     cwd '/tmp'
     code <<-NVIDIA
       set -e
-      #{compiler_path} ./nvidia.run --silent --dkms #{drm}--disable-nouveau -m=#{nvidia_kernel_module}
+      #{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau -m=#{nvidia_kernel_module} --ui=none --no-questions
       rm -f /tmp/nvidia.run
     NVIDIA
     creates '/usr/bin/nvidia-smi'
