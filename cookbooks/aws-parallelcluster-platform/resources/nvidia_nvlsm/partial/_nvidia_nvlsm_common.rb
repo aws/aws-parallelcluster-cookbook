@@ -17,6 +17,7 @@ default_action :install
 
 action :install do
   return unless nvlsm_installation_enabled?
+  return if aws_region.start_with?("us-iso")
 
   action_install_nvlsm_dependencies
   action_install_nvlsm

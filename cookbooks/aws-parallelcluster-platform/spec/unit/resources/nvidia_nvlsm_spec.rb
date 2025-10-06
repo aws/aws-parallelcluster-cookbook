@@ -101,6 +101,46 @@ describe 'nvidia_nvlsm:install' do
         end
       end
 
+      context 'when region starts with us-iso' do
+        let(:nvlsm_version) { "2025.03.9-1" }
+        let(:region_name) { 'us-iso-region' }
+        cached(:chef_run) do
+          stubs_for_resource('nvidia_nvlsm') do |res|
+            allow(res).to receive(:nvlsm_installation_enabled?).and_return(true)
+            allow(res).to receive(:nvidia_enabled?).and_return(true)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_nvlsm']) do |node|
+            node.override['cluster']['region'] = region_name
+            node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+            node.override['cluster']['sources_dir'] = source_dir
+            node.automatic['kernel']['machine'] = 'x86_64'
+          end
+          ConvergeNvidiaNvlsm.install(runner)
+        end
+        cached(:node) { chef_run.node }
+
+        before do
+          allow_any_instance_of(Chef::RunContext).to receive(:aws_region).and_return(region_name)
+        end
+
+        it 'does not install nvlsm' do
+          is_expected.not_to run_bash("Install nvlsm")
+        end
+
+        it 'does not install nvlsm dependencies' do
+          is_expected.not_to run_bash("Install nvlsm dependencies")
+        end
+
+        it 'does not download nvlsm package' do
+          package_name = if %(redhat rocky amazon).include?(platform)
+                           "nvlsm-#{nvlsm_version}.#{arch_suffix_rhel['x86_64']}.rpm"
+                         else
+                           "nvlsm_#{nvlsm_version}_#{arch_suffix_debian['x86_64']}.deb"
+                         end
+          is_expected.not_to create_if_missing_remote_file("#{source_dir}/#{package_name}")
+        end
+      end
+
       %w(x86_64 aarch64).each do |arch|
         context "when nvlsm installation is enabled on #{arch}" do
           cached(:chef_run) do
