@@ -15,7 +15,7 @@
 package_name = "amazon-efs-utils"
 
 action :install_utils do
-  package_version = new_resource.efs_utils_version
+  package_version = _efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
   efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
 
@@ -46,7 +46,7 @@ action :install_utils do
     mode '0644'
     retries 3
     retry_delay 5
-    checksum new_resource.efs_utils_checksum
+    checksum _efs_utils_checksum
     action :create_if_missing
   end
 
@@ -61,9 +61,9 @@ action :install_utils do
 end
 
 action :install_efs_utils do
-  package_version = new_resource.efs_utils_version
+  package_version = _efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-
+  # Install EFS Utils following https://docs.aws.amazon.com/efs/latest/ug/installing-amazon-efs-utils.html
   bash "install efs utils" do
     cwd node['cluster']['sources_dir']
     code install_script_code(efs_utils_tarball, package_name, package_version)
