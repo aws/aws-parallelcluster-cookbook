@@ -1,11 +1,9 @@
 require 'spec_helper'
 
 class ConvergeEfs
-  def self.install_utils(chef_run, efs_utils_version:, tarball_checksum:)
+  def self.install_utils(chef_run)
     chef_run.converge_dsl('aws-parallelcluster-environment') do
       efs 'install_utils' do
-        efs_utils_checksum tarball_checksum
-        efs_utils_version efs_utils_version
         action :install_utils
       end
     end
@@ -28,14 +26,17 @@ describe 'efs:install_utils' do
   context "on amazon2" do
     cached(:efs_utils_version) { '1.2.3' }
     cached(:tarball_checksum) { 'tarball_checksum' }
-    let(:chef_run) do
-      runner(platform: 'amazon', version: '2', step_into: ['efs'])
-    end
 
     context "when same version of amazon-efs-utils already installed" do
+      cached(:chef_run) do
+        runner(platform: 'amazon', version: '2', step_into: ['efs'])
+      end
+      cached(:node) { chef_run.node }
       before do
+        node.override['cluster']['efs']['version'] = efs_utils_version
+        node.override['cluster']['efs']['sha256'] = tarball_checksum
         mock_get_package_version('amazon-efs-utils', efs_utils_version)
-        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'does not install amazon-efs-utils' do
@@ -44,9 +45,13 @@ describe 'efs:install_utils' do
     end
 
     context "when newer version of amazon-efs-utils already installed" do
+      cached(:chef_run) do
+        runner(platform: 'amazon', version: '2', step_into: ['efs'])
+      end
+      cached(:node) { chef_run.node }
       before do
         mock_get_package_version('amazon-efs-utils', '1.3.2')
-        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'does not install amazon-efs-utils' do
@@ -55,9 +60,15 @@ describe 'efs:install_utils' do
     end
 
     context "when amazon-efs-utils not installed" do
+      cached(:chef_run) do
+        runner(platform: 'amazon', version: '2', step_into: ['efs'])
+      end
+      cached(:node) { chef_run.node }
       before do
+        node.override['cluster']['efs']['version'] = efs_utils_version
+        node.override['cluster']['efs']['sha256'] = tarball_checksum
         mock_get_package_version('amazon-efs-utils', '')
-        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'installs amazon-efs-utils' do
@@ -67,9 +78,15 @@ describe 'efs:install_utils' do
     end
 
     context "when older version of amazon-efs-utils installed" do
+      cached(:chef_run) do
+        runner(platform: 'amazon', version: '2', step_into: ['efs'])
+      end
+      cached(:node) { chef_run.node }
       before do
+        node.override['cluster']['efs']['version'] = efs_utils_version
+        node.override['cluster']['efs']['sha256'] = tarball_checksum
         mock_get_package_version('amazon-efs-utils', '1.1.4')
-        ConvergeEfs.install_utils(chef_run, efs_utils_version: efs_utils_version, tarball_checksum: tarball_checksum)
+        ConvergeEfs.install_utils(chef_run)
       end
 
       it 'installs amazon-efs-utils' do
@@ -105,8 +122,10 @@ describe 'efs:install_utils' do
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
             node.override['cluster']['sources_dir'] = source_dir
             node.override['cluster']['region'] = aws_region
+            node.override['cluster']['efs']['version'] = utils_version
+            node.override['cluster']['efs']['sha256'] = tarball_checksum
           end
-          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
+          ConvergeEfs.install_utils(runner)
         end
         cached(:node) { chef_run.node }
 
@@ -140,8 +159,10 @@ describe 'efs:install_utils' do
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
             node.override['cluster']['sources_dir'] = source_dir
+            node.override['cluster']['efs']['version'] = utils_version
+            node.override['cluster']['efs']['sha256'] = tarball_checksum
           end
-          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
+          ConvergeEfs.install_utils(runner)
         end
         cached(:node) { chef_run.node }
 
@@ -190,9 +211,11 @@ describe 'efs:install_utils' do
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
             node.override['cluster']['sources_dir'] = source_dir
+            node.override['cluster']['efs']['version'] = utils_version
+            node.override['cluster']['efs']['sha256'] = tarball_checksum
             node.override['cluster']['region'] = aws_region
           end
-          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
+          ConvergeEfs.install_utils(runner)
         end
 
         it 'creates sources dir' do
@@ -230,9 +253,11 @@ describe 'efs:install_utils' do
           mock_already_installed('amazon-efs-utils', utils_version, true)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
+            node.override['cluster']['efs']['version'] = utils_version
+            node.override['cluster']['efs']['sha256'] = tarball_checksum
             node.override['cluster']['sources_dir'] = source_dir
           end
-          ConvergeEfs.install_utils(runner, efs_utils_version: utils_version, tarball_checksum: tarball_checksum)
+          ConvergeEfs.install_utils(runner)
         end
 
         it 'does not download tarball' do
