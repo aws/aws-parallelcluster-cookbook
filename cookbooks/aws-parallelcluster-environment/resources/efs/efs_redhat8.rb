@@ -42,7 +42,7 @@ end
 
 action :install_efs_utils do
   package_name = "amazon-efs-utils"
-  package_version = new_resource.efs_utils_version
+  package_version = _efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
 
   if aws_region.start_with?("us-iso")
