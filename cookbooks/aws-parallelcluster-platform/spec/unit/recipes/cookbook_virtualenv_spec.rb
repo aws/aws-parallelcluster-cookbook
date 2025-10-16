@@ -6,7 +6,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
       cached(:python_version) { 'python_version' }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
       cached(:virtualenv_path) { 'system_pyenv_root/versions/python_version/envs/cookbook_virtualenv' }
-      cached(:aws_region) { 'us-iso-test' }
+      cached(:aws_region) { 'any-region' }
 
       context "when cookbook virtualenv not installed yet" do
         cached(:chef_run) do
@@ -35,14 +35,12 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
           expect(node.default['cluster']['cookbook_virtualenv_path']).to eq(virtualenv_path)
           is_expected.to write_node_attributes('dump node attributes')
         end
-        context "when in isolated region" do
-          it 'installs python packages' do
-            is_expected.to run_bash("pip install").with(
-              user: 'root',
-              group: 'root',
-              cwd: "#{node['cluster']['base_dir']}"
-            ).with_code(/tar xzf cookbook-dependencies.tgz/)
-          end
+        it 'installs python packages' do
+          is_expected.to run_bash("pip install").with(
+            user: 'root',
+            group: 'root',
+            cwd: "#{node['cluster']['base_dir']}"
+          ).with_code(/tar xzf cookbook-dependencies.tgz/)
         end
       end
     end
