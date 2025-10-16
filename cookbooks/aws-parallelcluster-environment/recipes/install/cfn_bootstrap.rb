@@ -33,32 +33,31 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-if aws_region.start_with?("us-iso")
-  dependency_package_name = "pypi-cfn-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
-  dependency_folder_name = dependency_package_name
-  if platform?('amazon') && node['platform_version'] == "2"
-    dependency_package_name = "cfn-dependencies"
-    dependency_folder_name = "cfn"
-  end
-  remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
+dependency_package_name = "pypi-cfn-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+dependency_folder_name = dependency_package_name
+if platform?('amazon') && node['platform_version'] == "2"
+  dependency_package_name = "cfn-dependencies"
+  dependency_folder_name = "cfn"
+end
 
-  bash 'pip install' do
-    user 'root'
-    group 'root'
-    cwd "#{node['cluster']['base_dir']}"
-    code <<-REQ
-      set -e
-      tar xzf cfn-dependencies.tgz
-      cd #{dependency_folder_name}
-      #{virtualenv_path}/bin/pip install * -f ./ --no-index
-      REQ
-  end
+remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
+  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
+  mode '0644'
+  retries 3
+  retry_delay 5
+  action :create_if_missing
+end
+
+bash 'pip install' do
+  user 'root'
+  group 'root'
+  cwd "#{node['cluster']['base_dir']}"
+  code <<-REQ
+    set -e
+    tar xzf cfn-dependencies.tgz
+    cd #{dependency_folder_name}
+    #{virtualenv_path}/bin/pip install * -f ./ --no-index
+    REQ
 end
 
 cfnbootstrap_version = '2.0-33'
@@ -79,11 +78,8 @@ remote_file "/tmp/#{cfnbootstrap_package}" do
   retry_delay 5
 end
 
-command = if aws_region.start_with?("us-iso")
-            "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package} --no-build-isolation"
-          else
-            "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package}"
-          end
+command = "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package} --no-build-isolation"
+
 bash "Install CloudFormation helpers from #{cfnbootstrap_package}" do
   user 'root'
   group 'root'

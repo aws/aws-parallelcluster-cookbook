@@ -4,18 +4,46 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:cfnbootstrap_version) { '2.0-33' }
-      cached(:cfnbootstrap_package) { "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz" }
+      cached(:arch) { 'x86_64' }
+      cached(:s3_url) { 's3://url' }
+      cached(:base_dir) { 'base_dir' }
       cached(:python_version) { "#{node['cluster']['python-version']}" }
+      cached(:dependecy_package_name_suffix) do
+        if platform == 'amazon' && version == '2'
+          "cfn-dependencies"
+        else
+          "pypi-cfn-dependencies-#{node['cluster']['python-major-minor-version']}-#{arch}"
+        end
+      end
+      cached(:dependecy_folder_name) do
+        if platform == 'amazon' && version == '2'
+          "cfn"
+        else
+          dependecy_package_name_suffix
+        end
+      end
+      cached(:cfnbootstrap_package) { "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz" }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
       cached(:virtualenv_path) { "system_pyenv_root/versions/#{python_version}/envs/cfn_bootstrap_virtualenv" }
       cached(:timeout) { 1800 }
+      cached(:dependency_bash_code) do
+        <<-REQ
+    set -e
+    tar xzf cfn-dependencies.tgz
+    cd #{dependecy_folder_name}
+    #{virtualenv_path}/bin/pip install * -f ./ --no-index
+        REQ
+      end
 
       context "when cfn_bootstrap virtualenv not installed yet" do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['region'] = 'non_china'
+            node.override['cluster']['base_dir'] = base_dir
             node.override['cluster']['compute_node_bootstrap_timeout'] = timeout
+            node.override['cluster']['artifacts_s3_url'] = s3_url
+            node.override['kernel']['machine'] = arch
           end
           runner.converge(described_recipe)
         end
@@ -37,6 +65,22 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
           is_expected.to write_node_attributes('dump node attributes')
         end
 
+        it 'downloads cfn_dependecies package from s3' do
+          is_expected.to create_if_missing_remote_file("#{base_dir}/cfn-dependencies.tgz")
+            .with(source: "#{s3_url}/dependencies/PyPi/#{arch}/#{dependecy_package_name_suffix}.tgz")
+            .with(mode: '0644')
+            .with(retries: 3)
+            .with(retry_delay: 5)
+        end
+
+        it 'pip installs dependencies' do
+          is_expected.to run_bash('pip install')
+            .with(user: 'root')
+            .with(group: 'root')
+            .with(cwd: base_dir)
+            .with(code: dependency_bash_code)
+        end
+
         it 'downloads cfn_bootstrap package from s3' do
           is_expected.to create_remote_file("/tmp/#{cfnbootstrap_package}").with(
             source: "https://s3.amazonaws.com/cloudformation-examples/#{cfnbootstrap_package}"
@@ -48,7 +92,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
             user: 'root',
             group: 'root',
             cwd: '/tmp',
-            code: "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package}",
+            code: "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package} --no-build-isolation",
             creates: "#{virtualenv_path}/bin/cfn-hup"
           )
         end
