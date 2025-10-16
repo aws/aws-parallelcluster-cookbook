@@ -13,7 +13,7 @@
 
 virtualenv_path = cookbook_virtualenv_path
 dependency_package_name = "pypi-cookbook-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
-pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{dependency_package_name}.tgz"
+pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
 if platform?('amazon') && node['platform_version'] == "2"
   dependency_package_name = "dependencies"
   pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/cookbook-dependencies.tgz"
@@ -33,24 +33,22 @@ activate_virtual_env cookbook_virtualenv_name do
   not_if { ::File.exist?("#{cookbook_virtualenv_path}/bin/activate") }
 end
 
-if aws_region.start_with?("us-iso")
-  remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do
-    source pypi_s3_uri
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
+remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do
+  source pypi_s3_uri
+  mode '0644'
+  retries 3
+  retry_delay 5
+  action :create_if_missing
+end
 
-  bash 'pip install' do
-    user 'root'
-    group 'root'
-    cwd "#{node['cluster']['base_dir']}"
-    code <<-REQ
-    set -e
-    tar xzf cookbook-dependencies.tgz
-    cd #{dependency_package_name}
-    #{virtualenv_path}/bin/pip install * -f ./ --no-index
-    REQ
-  end
+bash 'pip install' do
+  user 'root'
+  group 'root'
+  cwd "#{node['cluster']['base_dir']}"
+  code <<-REQ
+  set -e
+  tar xzf cookbook-dependencies.tgz
+  cd #{dependency_package_name}
+  #{virtualenv_path}/bin/pip install * -f ./ --no-index
+  REQ
 end
