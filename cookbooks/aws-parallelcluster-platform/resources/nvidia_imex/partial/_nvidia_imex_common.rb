@@ -17,7 +17,7 @@ default_action :install
 
 action :install do
   return unless nvidia_enabled_or_installed?
-  return if on_docker? || imex_installed? || aws_region.start_with?("us-iso")
+  return if on_docker? || imex_installed?
 
   action_install_imex
 
