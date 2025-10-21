@@ -2,7 +2,7 @@
 # Local modifications could be overwritten.
 <%# HeadNode, ComputeFleet, LoginNode -%>
 <% case node['cluster']['node_type'] -%>
-<% when 'HeadNode', 'ComputeFleet', 'LoginNode' -%>
+<% when 'HeadNode', 'LoginNode' -%>
 [program:cfn-hup]
 command = <%= node['cluster']['scripts_dir']%>/cfn-hup-runner.sh
 autorestart = true
