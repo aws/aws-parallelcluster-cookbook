@@ -34,3 +34,6 @@ default['cluster']["directory_service"]["enabled"] = 'false'
 
 # Default NFS mount options
 default['cluster']['nfs']['hard_mount_options'] = 'hard,_netdev,noatime'
+
+# Cluster Updates
+default['cluster']['in_place_update_on_fleet_enabled'] = 'true'
