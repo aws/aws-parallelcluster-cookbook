@@ -3,6 +3,14 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.15.0
+------
+
+**CHANGES**
+1. Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
+   and achieve better performance at scale.
+
+
 3.14.0
 ------
 

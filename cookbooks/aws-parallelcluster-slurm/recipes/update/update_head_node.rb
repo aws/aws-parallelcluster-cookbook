@@ -272,7 +272,7 @@ end
 
 chef_sleep '15'
 
-wait_cluster_ready
+wait_cluster_ready if cluster_readiness_check_on_update_enabled?
 
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"

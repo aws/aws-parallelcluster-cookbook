@@ -106,3 +106,14 @@ def wait_sync_file(path)
     timeout 5
   end
 end
+
+def cfnhup_enabled?
+  # cfn-hup is always enabled on the head node, as it is required to perform cluster updates.
+  # cfn-hup can be disabled on compute nodes and login nodes, limiting the cluster update in the sense that
+  # live updates on compute and login nodes are not possible.
+  node['cluster']['node_type'] == 'HeadNode' || node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
+end
+
+def cluster_readiness_check_on_update_enabled?
+  node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
+end

@@ -15,6 +15,7 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(are_mount_or_unmount_required)
               allow_any_instance_of(Object).to receive(:dig).and_return(true)
               allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
+              allow_any_instance_of(Object).to receive(:cluster_readiness_check_on_update_enabled?).and_return(true)
               RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
               node.override['cluster']['stack_name'] = cluster_name
@@ -56,6 +57,27 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               retry_delay: 90
             )
           end
+        end
+      end
+
+      context 'when cluster readiness check is disabled' do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
+            allow_any_instance_of(Object).to receive(:dig).and_return(true)
+            allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
+            allow_any_instance_of(Object).to receive(:cluster_readiness_check_on_update_enabled?).and_return(false)
+            RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+
+            node.override['cluster']['stack_name'] = cluster_name
+            node.override['cluster']['region'] = region
+            node.override['cluster']['cluster_config_version'] = cluster_config_version
+            node.override['cluster']['scripts_dir'] = scripts_dir
+          end
+          runner.converge(described_recipe)
+        end
+        it 'does not check cluster readiness' do
+          is_expected.not_to run_execute("Check cluster readiness")
         end
       end
     end
