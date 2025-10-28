@@ -80,7 +80,7 @@ class ComputeResourceRenderer:
         definitions += f" Weight={self.dynamic_node_priority if dynamic else self.static_node_priority}"
 
         if self.has_gpu and self.gpu_count > 0:
-            definitions += f" Gres=gpu:{ self.gpu_type }:{self.gpu_count}"
+            definitions += f" Gres=gpu:{self.gpu_type}:{self.gpu_count}"
 
         return definitions
 
