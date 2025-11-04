@@ -3,6 +3,9 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.15.0
+------
+
 3.14.1
 ------
 
@@ -10,6 +13,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
    and achieve better performance at scale. 
 - Load kernel module `drm_client_lib` before installation of NVIDIA driver, if available on the kernel.
+- Reduce dependency footprint by installing the package `sssd-common` rather than `sssd`.
 - Upgrade Slurm to version 24.11.7 (from 24.11.6).
 - Upgrade Pmix to 5.0.9 (from 5.0.6).
 - Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSs except Amazon Linux 2.

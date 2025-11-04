@@ -25,6 +25,6 @@ end
 
 action_class do
   def required_packages
-    %w(sssd sssd-tools sssd-ldap)
+    %w(sssd-common sssd-tools sssd-ldap)
   end
 end
