@@ -24,11 +24,11 @@ describe 'system_authentication:setup' do
       cached(:required_packages) do
         case platform
         when 'amazon', 'centos'
-          %w(sssd sssd-tools sssd-ldap authconfig)
+          %w(sssd-common sssd-tools sssd-ldap authconfig)
         when 'redhat', 'rocky'
-          %w(sssd sssd-tools sssd-ldap authselect oddjob-mkhomedir)
+          %w(sssd-common sssd-tools sssd-ldap authselect oddjob-mkhomedir)
         else
-          %w(sssd sssd-tools sssd-ldap)
+          %w(sssd-common sssd-tools sssd-ldap)
         end
       end
       cached(:chef_run) do
