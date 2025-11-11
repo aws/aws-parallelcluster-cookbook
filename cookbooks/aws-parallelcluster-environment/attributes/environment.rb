@@ -73,8 +73,8 @@ default['cluster']['head_node_private_ip'] = nil
 default['cluster']['efa']['version'] = '1.43.2'
 default['cluster']['efa']['sha256'] = 'de15c5bdbc83b952afbde876110830c604ad0796680e5157c05f7c1979a41069'
 
-default['cluster']['efs']['version'] = '2.3.1'
-default['cluster']['efs']['sha256'] = 'ced12f82e76f9740476b63f30c49bd76cc00b6375e12a9f5f7ba852635c49e15'
+default['cluster']['efs']['version'] = '2.4.0'
+default['cluster']['efs']['sha256'] = '9b60c039c162388091d6fab6e9c6cfc5832f34b26b6d05b0a68b333147d78a25'
 if platform?('amazon')
   default['cluster']['efs']['version'] = '2.1.0'
 end
