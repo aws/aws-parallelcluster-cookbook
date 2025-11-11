@@ -18,8 +18,8 @@ describe 'aws-parallelcluster-slurm::install_jwt' do
     context "on #{platform}#{version}" do
       cached(:cluster_artifacts_s3_url) { 'https://REGION-aws-parallelcluster.s3.REGION.AWS_DOMAIN' }
       cached(:cluster_sources_dir) { '/path/to/cluster/sources/dir' }
-      cached(:jwt_version) { '1.17.0' }
-      cached(:jwt_checksum) { '617778f9687682220abf9b7daacbe72bab7c2985479f8bee4db9648bd2440687' }
+      cached(:jwt_version) { '1.18.4' }
+      cached(:jwt_checksum) { '8496257cb39ee7dddfdfc919e7b80a997399b0319f9fdcbefd374b0e4f147159' }
 
       cached(:chef_run) do
         runner = runner(platform: platform, version: version) do |node|
