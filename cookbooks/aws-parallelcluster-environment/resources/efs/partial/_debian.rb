@@ -24,5 +24,5 @@ def install_script_code(efs_utils_tarball, efs_utils_package, efs_utils_version)
 end
 
 def prerequisites
-  %w(dkms pkg-config libssl-dev rustc cargo )
+  %w(dkms pkg-config libssl-dev rustc cargo golang)
 end

@@ -200,8 +200,8 @@ describe 'efs:install_utils' do
       end
       cached(:required_packages) do
         {
-          "redhat" => %w(rpm-build make rust cargo openssl-devel),
-          "rocky" => %w(rpm-build make rust cargo openssl-devel),
+          "redhat" => %w(rpm-build make rust go cargo openssl-devel),
+          "rocky" => %w(rpm-build make rust go cargo openssl-devel),
         }
       end
 

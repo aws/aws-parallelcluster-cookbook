@@ -37,7 +37,7 @@ def adc_install_script_code(efs_utils_tarball, efs_utils_package, efs_utils_vers
 end
 
 def prerequisites
-  %w(rpm-build make rust cargo openssl-devel)
+  %w(rpm-build make rust go cargo openssl-devel)
 end
 
 action :install_efs_utils do
