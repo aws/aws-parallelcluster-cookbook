@@ -7,8 +7,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **CHANGES**
-1. Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
-   and achieve better performance at scale.
+- Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
+   and achieve better performance at scale. 
+- Load kernel module `drm_client_lib` before installation of NVIDIA driver, if available on the kernel.
 
 
 3.14.0

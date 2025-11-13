@@ -72,6 +72,13 @@ action :setup do
     end
   end
 
+  # Load kernel modules in best effort
+  kernel_modules_to_load.each do |km|
+    execute "Load kernel module if exposed by the kernel: #{km}" do
+      command "if modinfo #{km}; then modprobe #{km}; fi"
+    end
+  end
+
   # Install driver
   bash 'nvidia.run advanced' do
     user 'root'
@@ -125,4 +132,8 @@ def nvidia_kernel_module
   else
     "kernel-open"
   end
+end
+
+def kernel_modules_to_load
+  %w(drm_client_lib)
 end
