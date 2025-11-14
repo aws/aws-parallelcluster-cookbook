@@ -18,8 +18,8 @@ describe 'aws-parallelcluster-slurm::install_jwt' do
     context "on #{platform}#{version}" do
       cached(:cluster_artifacts_s3_url) { 'https://REGION-aws-parallelcluster.s3.REGION.AWS_DOMAIN' }
       cached(:cluster_sources_dir) { '/path/to/cluster/sources/dir' }
-      cached(:jwt_version) { '1.18.4' }
-      cached(:jwt_checksum) { '8496257cb39ee7dddfdfc919e7b80a997399b0319f9fdcbefd374b0e4f147159' }
+      cached(:jwt_version) { '1.2.3' }
+      cached(:jwt_checksum) { 'somechecksum' }
 
       cached(:chef_run) do
         runner = runner(platform: platform, version: version) do |node|
@@ -27,6 +27,8 @@ describe 'aws-parallelcluster-slurm::install_jwt' do
 
           node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
           node.override['cluster']['sources_dir'] = cluster_sources_dir
+          node.override['cluster']['jwt']['version'] = jwt_version
+          node.override['cluster']['jwt']['sha256'] = jwt_checksum
         end
         allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
         runner.converge(described_recipe)
