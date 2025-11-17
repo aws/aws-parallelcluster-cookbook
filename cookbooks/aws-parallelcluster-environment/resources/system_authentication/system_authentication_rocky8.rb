@@ -36,6 +36,6 @@ end
 
 action_class do
   def required_packages
-    %w(sssd sssd-tools sssd-ldap authselect oddjob-mkhomedir)
+    %w(sssd-common sssd-tools sssd-ldap authselect oddjob-mkhomedir)
   end
 end

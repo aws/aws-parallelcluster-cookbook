@@ -19,6 +19,6 @@ use 'partial/_system_authentication_alinux_centos'
 
 action_class do
   def required_packages
-    %w(sssd sssd-tools sssd-ldap authconfig)
+    %w(sssd-common sssd-tools sssd-ldap authconfig)
   end
 end

@@ -97,8 +97,8 @@ def _validate_timestamp_keys(input_json):
         if log_config.get("timestamp_format_key") not in valid_keys:
             _fail(
                 f"Log config with log_stream_name {log_config.get('log_stream_name')} and "
-                f"file_path {log_config.get('file_path'),} contains an invalid timestamp_format_key: "
-                f"{log_config.get('timestamp_format_key')}. Valid values are {', '.join(valid_keys),}"
+                f"file_path {log_config.get('file_path'), } contains an invalid timestamp_format_key: "
+                f"{log_config.get('timestamp_format_key')}. Valid values are {', '.join(valid_keys), }"
             )
 
 

@@ -2,15 +2,12 @@ unified_mode true
 
 default_action :install_utils
 
-property :efs_utils_version, String
-property :efs_utils_checksum, String
-
 def _efs_utils_version
-  efs_utils_version || node['cluster']['efs']['version']
+  node['cluster']['efs']['version']
 end
 
 def _efs_utils_checksum
-  efs_utils_checksum || node['cluster']['efs']['sha256']
+  node['cluster']['efs']['sha256']
 end
 
 def already_installed?(package_name, expected_version)

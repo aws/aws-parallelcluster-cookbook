@@ -140,11 +140,27 @@ describe 'nvidia_driver:nvidia_arch' do
   end
 end
 
+describe 'nvidia_driver:kernel_modules_to_load' do
+  cached(:chef_run) do
+    ChefSpec::SoloRunner.new(step_into: ['nvidia_driver'])
+  end
+
+  cached(:resource) do
+    ConvergeNvidiaDriver.setup(chef_run)
+    chef_run.find_resource('nvidia_driver', 'setup')
+  end
+
+  it 'returns expected kernel modules' do
+    expect(resource.kernel_modules_to_load).to eq(%w(drm_client_lib))
+  end
+end
+
 describe 'nvidia_driver:setup' do
   for_all_oses do |platform, version|
     cached(:nvidia_arch) { 'nvidia_arch' }
     cached(:nvidia_kernel_module) { 'nvidia_kernel_module' }
     cached(:nvidia_driver_version) { 'nvidia_driver_version' }
+    cached(:kernel_modules_to_load) { %w(module1 module2) }
     cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
 
     context "on #{platform}#{version} when nvidia_driver not enabled" do
@@ -176,6 +192,7 @@ describe 'nvidia_driver:setup' do
             allow(res).to receive(:nvidia_arch).and_return(nvidia_arch)
             allow(res).to receive(:nvidia_kernel_module).and_return(kernel_module)
             allow(res).to receive(:gcc_major_version_used_by_kernel).and_return(kernel_compiler_version)
+            allow(res).to receive(:kernel_modules_to_load).and_return(kernel_modules_to_load)
           end
 
           stub_command("lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau").and_return(true)
@@ -218,6 +235,14 @@ describe 'nvidia_driver:setup' do
             group: 'root',
             mode: '0644'
           )
+        end
+
+        it 'loads kernel modules in they are exposed by the kernel' do
+          kernel_modules_to_load.each do |km|
+            is_expected.to run_execute("Load kernel module if exposed by the kernel: #{km}").with(
+              command: "if modinfo #{km}; then modprobe #{km}; fi"
+            )
+          end
         end
 
         if platform == 'amazon'

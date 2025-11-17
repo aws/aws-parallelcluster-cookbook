@@ -12,7 +12,7 @@
 control 'tag:install_system_authentication_packages_installed' do
   title 'Check that system authentication packages are installed correctly'
 
-  packages = %w(sssd sssd-tools sssd-ldap)
+  packages = %w(sssd-common sssd-tools sssd-ldap)
 
   if os_properties.redhat8?
     packages.append("authselect")
