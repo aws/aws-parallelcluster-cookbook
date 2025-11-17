@@ -12,3 +12,7 @@ provides :munge, platform: 'amazon', platform_version: '2'
 
 use 'partial/_munge_actions'
 use 'partial/_munge_rhel'
+
+def prerequisites
+  %w(automake autoconf libtool openssl11-devel)
+end

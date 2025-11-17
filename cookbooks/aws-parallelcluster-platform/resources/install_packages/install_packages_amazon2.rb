@@ -22,7 +22,7 @@ use 'partial/_install_packages_rhel_amazon.rb'
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
   # iptables needed for IMDS setup
-  packages = %w(vim ksh tcsh zsh openssl-devel ncurses-devel pam-devel net-tools openmotif-devel
+  packages = %w(vim ksh tcsh zsh openssl11-devel ncurses-devel pam-devel net-tools openmotif-devel
      libXmu-devel hwloc-devel libdb-devel tcl-devel automake autoconf pyparted libtool
      httpd boost-devel system-lsb mlocate atlas-devel glibc-static iproute
      libffi-devel dkms libedit-devel sendmail cmake byacc libglvnd-devel libgcrypt-devel libevent-devel
