@@ -10,6 +10,17 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
    and achieve better performance at scale. 
 - Load kernel module `drm_client_lib` before installation of NVIDIA driver, if available on the kernel.
+- Upgrade Slurm to version 24.11.7 (from 24.11.6).
+- Upgrade Pmix to 5.0.9 (from 5.0.6).
+- Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSs except Amazon Linux 2.
+- Upgrade amazon-efs-utils to version 2.4.0 (from v2.3.1).
+- Upgrade EFA installer to 1.44.0 (from 1.43.2).
+  - Efa-driver: efa-2.17.3-1
+  - Efa-config: efa-config-1.18-1
+  - Efa-profile: efa-profile-1.7-1
+  - Libfabric-aws: libfabric-aws-2.3.1-1
+  - Rdma-core: rdma-core-59.0-1
+  - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
 
 3.14.0
 ------
