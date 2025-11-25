@@ -3,9 +3,6 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.15.0
-------
-
 3.14.1
 ------
 
@@ -15,7 +12,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Load kernel module `drm_client_lib` before installation of NVIDIA driver, if available on the kernel.
 - Reduce dependency footprint by installing the package `sssd-common` rather than `sssd`.
 - Upgrade Slurm to version 24.11.7 (from 24.11.6).
-- Upgrade Pmix to 5.0.9 (from 5.0.6).
 - Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSs except Amazon Linux 2.
 - Upgrade amazon-efs-utils to version 2.4.0 (from v2.3.1).
 - Upgrade EFA installer to 1.44.0 (from 1.43.2).
