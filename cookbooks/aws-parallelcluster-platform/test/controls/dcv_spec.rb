@@ -318,3 +318,27 @@ control 'tag:config_dcv_services_correctly_configured' do
     end
   end
 end
+
+control 'tag:config_dcv_xorg_running_with_x11_session_type' do
+  title 'Check that Xorg is running and GDM is using X11 session type (not Wayland)'
+  only_if do
+    !os_properties.on_docker? &&
+      instance.head_node? &&
+      instance.dcv_installed? &&
+      node['cluster']['dcv_enabled'] == "head_node" &&
+      instance.graphic? &&
+      instance.nvidia_installed? &&
+      instance.dcv_gpu_accel_supported?
+  end
+
+  describe 'Xorg process should be running' do
+    subject { command('pidof Xorg || pidof X') }
+    its('exit_status') { should eq 0 }
+    its('stdout') { should_not be_empty }
+  end
+
+  describe 'GDM should be using X11 session type, not Wayland' do
+    subject { command("loginctl show-session $(loginctl | grep gdm | awk '{print $1}') -p Type 2>/dev/null | grep -i x11") }
+    its('exit_status') { should eq 0 }
+  end
+end
