@@ -8,12 +8,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
-   and achieve better performance at scale. 
+  and mitigate performance impact at scale.
+- Upgrade Slurm to version 24.11.7 (from 24.11.6).
+- Upgrade Werkzeug to ~=3.1 (from ~=2.0) to address [CVE-2024-34069](https://nvd.nist.gov/vuln/detail/cve-2024-34069).
+- Upgrade Connexion to ~=2.15.1 (from ~=2.13.0).
+- Upgrade Flask to ~=3.1.0 (from >=2.2.5,<2.3).
 - Load kernel module `drm_client_lib` before installation of NVIDIA driver, if available on the kernel.
 - Reduce dependency footprint by installing the package `sssd-common` rather than `sssd`.
-- Disable Wayland protocol in GDM3 for Ubuntu 22.04+ to force the use of Xorg on GPU instances running without a display.
-- Upgrade Slurm to version 24.11.7 (from 24.11.6).
-- Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSs except Amazon Linux 2.
+- Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSes except Amazon Linux 2.
 - Upgrade amazon-efs-utils to version 2.4.0 (from v2.3.1).
 - Upgrade EFA installer to 1.44.0 (from 1.43.2).
   - Efa-driver: efa-2.17.3-1
