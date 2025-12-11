@@ -112,13 +112,16 @@ def check_deployed_config_version(cluster_name: str, table_name: str, expected_c
 
         missing, incomplete, wrong = _check_cluster_config_items(instance_ids, items, expected_config_version)
 
-        if missing or incomplete or wrong:
+        if incomplete or wrong:
             raise CheckFailedError(
                 f"Check failed due to the following erroneous records:\n"
                 f"  * missing records ({len(missing)}): {missing}\n"
                 f"  * incomplete records ({len(incomplete)}): {incomplete}\n"
                 f"  * wrong records ({len(wrong)}): {wrong}"
             )
+        if missing:
+            logger.warning(f"Ignoring the following missing records due them being recently bootstrapped:\n"
+                           f"  *  missing records ({len(missing)}): {missing}")
         logger.info("Verified cluster configuration for cluster node(s) %s", instance_ids)
 
 
