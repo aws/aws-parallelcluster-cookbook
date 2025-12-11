@@ -25,6 +25,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Rdma-core: rdma-core-59.0-1
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
 
+**BUG FIXES**
+- Prevent cluster readiness check failures due to instances launched while the check is in progress.
+
 3.14.0
 ------
 

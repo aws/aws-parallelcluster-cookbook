@@ -120,8 +120,12 @@ def check_deployed_config_version(cluster_name: str, table_name: str, expected_c
                 f"  * wrong records ({len(wrong)}): {wrong}"
             )
         if missing:
-            logger.warning(f"Ignoring the following missing records due them being recently bootstrapped:\n"
-                           f"  *  missing records ({len(missing)}): {missing}")
+            logger.warning(
+                "Ignoring the following missing records due them being recently bootstrapped:\n"
+                "  *  missing records (%s): %s",
+                len(missing),
+                missing,
+            )
         logger.info("Verified cluster configuration for cluster node(s) %s", instance_ids)
 
 
