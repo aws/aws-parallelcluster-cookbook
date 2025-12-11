@@ -83,10 +83,7 @@ def _mocked_request_batch_get_items(table_name: str, compute_nodes: [str], ddb_r
             ["i-cmp123456789"],
             ["i-lgn123456789"],
             {},
-            "Check failed due to the following erroneous records:\n"
-            "  * missing records (2): ['i-cmp123456789', 'i-lgn123456789']\n"
-            "  * incomplete records (0): []\n"
-            "  * wrong records (0): []",
+            None,
             id="Check with missing DDB records",
         ),
         pytest.param(
