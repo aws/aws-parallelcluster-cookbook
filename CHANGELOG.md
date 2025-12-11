@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.14.1
 ------
 
+**ENHANCEMENTS**
+- Ensure clustermgtd runs after cluster update. On success, start it unconditionally. On failure, start it if the queue reconfiguration succeeded.
+
 **CHANGES**
 - Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
   and mitigate performance impact at scale.
@@ -27,6 +30,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Prevent cluster readiness check failures due to instances launched while the check is in progress.
+- Fix race condition where compute nodes could deploy the wrong cluster config version after an update failure.
 
 3.14.0
 ------
