@@ -57,6 +57,12 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               retry_delay: 90
             )
           end
+
+          it 'starts clustermgtd unconditionally' do
+            is_expected.to run_execute('start clustermgtd').with(
+              command: "#{cookbook_venv_path}/bin/supervisorctl start clustermgtd"
+            )
+          end
         end
       end
 

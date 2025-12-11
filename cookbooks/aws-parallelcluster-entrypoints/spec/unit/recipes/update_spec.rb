@@ -63,6 +63,10 @@ describe 'aws-parallelcluster-entrypoints::update' do
                 chef_run
                 expect(@included_recipes).to eq(expected_recipes)
               end
+
+              it "enables the update failure handler" do
+                expect(chef_run).to enable_chef_handler('ErrorHandlers::UpdateFailureHandler').with(type: { exception: true })
+              end
             end
           end
         end

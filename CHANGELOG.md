@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.14.1
 ------
 
+**ENHANCEMENTS**
+- Ensure clustermgtd runs after cluster update. On success, start it unconditionally. On failure, start it if the queue reconfiguration succeeded.
+
 **CHANGES**
 - Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
    and achieve better performance at scale. 
@@ -26,6 +29,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: libfabric-aws-2.3.1-1
   - Rdma-core: rdma-core-59.0-1
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
+
+**BUG FIXES**
+- Fix race condition where compute nodes could deploy the wrong cluster config version after an update failure.
 
 3.14.0
 ------
