@@ -93,7 +93,7 @@ def _mocked_request_batch_get_items(table_name: str, compute_nodes: [str], ddb_r
                 "i-cmp123456789": {"UNEXPECTED_KEY_A": {"S": "UNEXPECTED_KEY_VALUE_A"}},
                 "i-lgn123456789": {"UNEXPECTED_KEY_B": {"S": "UNEXPECTED_KEY_VALUE_B"}},
             },
-            "Check failed due to the following erroneous records:\n"
+            "Check failed due to the following erroneous records (missing records are not counted for the failure):\n"
             "  * missing records (0): []\n"
             "  * incomplete records (2): ['i-cmp123456789', 'i-lgn123456789']\n"
             "  * wrong records (0): []",
@@ -106,7 +106,7 @@ def _mocked_request_batch_get_items(table_name: str, compute_nodes: [str], ddb_r
                 "i-cmp123456789": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_A"}},
                 "i-lgn123456789": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_B"}},
             },
-            "Check failed due to the following erroneous records:\n"
+            "Check failed due to the following erroneous records (missing records are not counted for the failure):\n"
             "  * missing records (0): []\n"
             "  * incomplete records (0): []\n"
             "  * wrong records (2): [('i-cmp123456789', 'WRONG_CLUSTER_CONFIG_VERSION_A'), "
@@ -124,7 +124,7 @@ def _mocked_request_batch_get_items(table_name: str, compute_nodes: [str], ddb_r
                 "i-cmp1234567893": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_A"}},
                 "i-lgn1234567893": {"cluster_config_version": {"S": "WRONG_CLUSTER_CONFIG_VERSION_B"}},
             },
-            "Check failed due to the following erroneous records:\n"
+            "Check failed due to the following erroneous records (missing records are not counted for the failure):\n"
             "  * missing records (2): ['i-cmp1234567894', 'i-lgn1234567894']\n"
             "  * incomplete records (2): ['i-cmp1234567892', 'i-lgn1234567892']\n"
             "  * wrong records (2): [('i-cmp1234567893', 'WRONG_CLUSTER_CONFIG_VERSION_A'), "
