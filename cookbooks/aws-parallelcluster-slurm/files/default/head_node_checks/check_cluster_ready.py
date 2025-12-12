@@ -114,7 +114,8 @@ def check_deployed_config_version(cluster_name: str, table_name: str, expected_c
 
         if incomplete or wrong:
             raise CheckFailedError(
-                f"Check failed due to the following erroneous records:\n"
+                f"Check failed due to the following erroneous records "
+                f"(missing records are not counted for the failure):\n"
                 f"  * missing records ({len(missing)}): {missing}\n"
                 f"  * incomplete records ({len(incomplete)}): {incomplete}\n"
                 f"  * wrong records ({len(wrong)}): {wrong}"
