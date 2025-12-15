@@ -262,7 +262,7 @@ execute "check slurmctld status" do
   retry_delay 2
 end
 
-execute 'reload config for running nodes' do
+execute SCONTROL_RECONFIGURE_RESOURCE_NAME do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
   retry_delay 5
@@ -276,7 +276,6 @@ wait_cluster_ready if cluster_readiness_check_on_update_enabled?
 
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 # The updated cfnconfig will be used by post update custom scripts
