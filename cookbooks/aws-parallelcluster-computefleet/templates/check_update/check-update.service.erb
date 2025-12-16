@@ -1,0 +1,21 @@
+[Unit]
+Description=Check for recent file modifications
+
+[Service]
+Type=oneshot
+TimeoutStartSec=30
+ExecStart=/bin/bash -c '\
+SHARED_FILE="<%= node['cluster']['shared_update_path'] %>"; \
+LOCAL_CHECKPOINT="<%= node['cluster']['update_checkpoint'] %>"; \
+\
+[ ! -f "$SHARED_FILE" ] && exit 0; \
+\
+CURRENT_UPDATE=$(cat "$SHARED_FILE") || exit 0; \
+LAST_APPLIED=$([ -f "$LOCAL_CHECKPOINT" ] && cat "$LOCAL_CHECKPOINT" || echo ""); \
+\
+if [ "$CURRENT_UPDATE" != "$LAST_APPLIED" ]; then \
+echo "$CURRENT_UPDATE" > "$LOCAL_CHECKPOINT" && <%= node['cluster']['scripts_dir'] %>/cfn-hup-update-action.sh; \
+fi'
+
+[Install]
+WantedBy=multi-user.target

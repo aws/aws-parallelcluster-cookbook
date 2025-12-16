@@ -20,6 +20,14 @@ execute 'stop clustermgtd' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
+# Write the new config version to shared storage to signal compute nodes to update
+file node['cluster']['shared_update_path'] do
+  content node['cluster']['cluster_config_version']
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 ruby_block "update_shared_storages" do
   block do
     run_context.include_recipe 'aws-parallelcluster-environment::update_shared_storages'
