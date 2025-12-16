@@ -4,6 +4,7 @@
     "default": "%Y-%m-%d %H:%M:%S,%f",
     "bracket_default": "[%Y-%m-%d %H:%M:%S]",
     "slurm": "%Y-%m-%dT%H:%M:%S.%f",
+    "chef": "[%Y-%m-%dT%H:%M:%S",
     "json": ""
   },
   "log_configs": [
@@ -82,7 +83,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "default",
+      "timestamp_format_key": "chef",
       "file_path": "/var/log/chef-client.log",
       "log_stream_name": "chef-client",
       "schedulers": [
