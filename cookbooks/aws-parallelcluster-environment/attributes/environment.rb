@@ -75,9 +75,7 @@ default['cluster']['efa']['sha256'] = 'f129a5b44a49d593d247e55a59eb9bcb57121566e
 
 default['cluster']['efs']['version'] = '2.4.0'
 default['cluster']['efs']['sha256'] = '9b60c039c162388091d6fab6e9c6cfc5832f34b26b6d05b0a68b333147d78a25'
-if platform?('amazon')
-  default['cluster']['efs']['version'] = '2.1.0'
-end
+
 # TODO: Move to platform cookbook
 default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"
 default['cluster']['spack']['version'] = '0.20.2'
