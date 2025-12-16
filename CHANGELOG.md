@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.15.0
 ------
 
+**BUG FIXES**
+- Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
+
 3.14.1
 ------
 

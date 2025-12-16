@@ -2,10 +2,9 @@
   "timestamp_formats": {
     "month_first": "%b %-d %H:%M:%S",
     "default": "%Y-%m-%d %H:%M:%S,%f",
-    "bracket_default": "[%Y-%m-%d %H:%M:%S]",
-    "slurm": "%Y-%m-%dT%H:%M:%S.%f",
-    "chef": "[%Y-%m-%dT%H:%M:%S",
-    "json": ""
+    "default_seconds": "%Y-%m-%d %H:%M:%S",
+    "iso8610": "%Y-%m-%dT%H:%M:%S.%f",
+    "iso8610_seconds": "%Y-%m-%dT%H:%M:%S"
   },
   "log_configs": [
     {
@@ -31,7 +30,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "month_first",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/syslog",
       "log_stream_name": "syslog",
       "schedulers": [
@@ -83,7 +82,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "chef",
+      "timestamp_format_key": "iso8610_seconds",
       "file_path": "/var/log/chef-client.log",
       "log_stream_name": "chef-client",
       "schedulers": [
@@ -100,7 +99,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "json",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/parallelcluster/bootstrap_error_msg",
       "log_stream_name": "bootstrap_error_msg",
       "schedulers": [
@@ -174,7 +173,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "json",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/parallelcluster/clustermgtd.events",
       "log_stream_name": "clustermgtd_events",
       "schedulers": [
@@ -187,7 +186,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "json",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/parallelcluster/slurm_resume.events",
       "log_stream_name": "slurm_resume_events",
       "schedulers": [
@@ -265,7 +264,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "slurm",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/slurmd.log",
       "log_stream_name": "slurmd",
       "schedulers": [
@@ -278,7 +277,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "slurm",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/slurmctld.log",
       "log_stream_name": "slurmctld",
       "schedulers": [
@@ -291,7 +290,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "slurm",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/slurmdbd.log",
       "log_stream_name": "slurmdbd",
       "schedulers": [
@@ -325,7 +324,7 @@
       ]
     },
     {
-      "timestamp_format_key": "default",
+      "timestamp_format_key": "default_seconds",
       "file_path": "/var/log/sssd/sssd.log",
       "log_stream_name": "sssd",
       "schedulers": [
@@ -346,7 +345,7 @@
       ]
     },
     {
-      "timestamp_format_key": "default",
+      "timestamp_format_key": "default_seconds",
       "file_path": "/var/log/sssd/sssd_default.log",
       "log_stream_name": "sssd_domain_default",
       "schedulers": [
@@ -389,7 +388,7 @@
       ]
     },
     {
-      "timestamp_format_key": "bracket_default",
+      "timestamp_format_key": "default",
       "file_path": "/var/log/parallelcluster/pcluster_dcv_connect.log",
       "log_stream_name": "dcv-ext-authenticator",
       "schedulers": [
@@ -522,7 +521,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "json",
+      "timestamp_format_key": "iso8610",
       "file_path": "/var/log/parallelcluster/slurm_health_check.events",
       "log_stream_name": "slurm_health_check_events",
       "schedulers": [

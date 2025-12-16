@@ -40,12 +40,6 @@ LOG_FILE_PATH="/var/log/parallelcluster/pcluster_dcv_connect.log"
 LOG_FILE_MAX_SIZE=5242880 # 5MB
 
 
-_fail() {
-  message=$1
-  >&2 echo "ERROR: ${message}"
-  exit 1
-}
-
 _validate_json() {
   json_param=$1
   message=$2
@@ -82,8 +76,14 @@ _log() {
     fi
 
     # append log
-    log_time=$(date "+%Y-%m-%d %H:%M:%S")
+    log_time=$(date "+%Y-%m-%d %H:%M:%S,%3N")
     echo "[${log_time}]: ${text}" >> "${LOG_FILE_PATH}"
+}
+
+_fail() {
+  message=$1
+  _log "ERROR: ${message}"
+  exit 1
 }
 
 _create_dcv_session() {
