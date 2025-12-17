@@ -34,6 +34,15 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
             )
           end
 
+          it 'writes the config version to shared update file' do
+            is_expected.to create_file(chef_run.node['cluster']['shared_update_path']).with(
+              content: cluster_config_version,
+              owner: 'root',
+              group: 'root',
+              mode: '0644'
+            )
+          end
+
           if are_mount_or_unmount_required
             it 'updates the shared storage' do
               is_expected.to run_ruby_block("update_shared_storages")
