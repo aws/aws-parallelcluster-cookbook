@@ -173,7 +173,7 @@ def wait_cluster_ready
               " --config-version #{node['cluster']['cluster_config_version']}" \
               " --region #{node['cluster']['region']}"
     timeout 30
-    retries 20
+    retries 10
     retry_delay 90
   end
 end

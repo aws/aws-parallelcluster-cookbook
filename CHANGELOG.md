@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.15.0
 ------
 
+**CHANGES**
+- Replace cfn-hup in compute nodes with systemd timers to support in place updates.
+
 3.14.1
 ------
 

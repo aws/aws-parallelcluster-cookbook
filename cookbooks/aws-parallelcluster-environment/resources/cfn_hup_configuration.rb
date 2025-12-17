@@ -68,8 +68,7 @@ action :configure do
       cfn_init_role: instance_role_name,
       # ComputeFleet specific variables
       update_hook_script_dir: node['cluster']['scripts_dir'],
-      node_bootstrap_timeout: node['cluster']['compute_node_bootstrap_timeout'] || node['cluster']['Timeout'],
-      update_dir: node['cluster']['shared_update_path']
+      node_bootstrap_timeout: node['cluster']['compute_node_bootstrap_timeout'] || node['cluster']['Timeout']
     )
   end
 end

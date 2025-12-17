@@ -84,6 +84,7 @@ describe 'cfn_hup_configuration:configure' do
                 launch_template_resource_id: LAUNCH_TEMPLATE_ID,
                 update_hook_script_dir: SCRIPT_DIR,
                 node_bootstrap_timeout: NODE_BOOTSTRAP_TIMEOUT,
+                update_dir: "#{MONITOR_SHARED_DIR}/check_update",
              })
           end
 
