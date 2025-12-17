@@ -94,8 +94,7 @@ action :extra_configuration do
       mode '0700'
       variables(
         monitor_shared_dir: monitor_shared_dir,
-        launch_template_resource_id: node['cluster']['launch_template_id'],
-        update_dir: node['cluster']['shared_update_path']
+        launch_template_resource_id: node['cluster']['launch_template_id']
       )
     end
   end
