@@ -15,7 +15,6 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(are_mount_or_unmount_required)
               allow_any_instance_of(Object).to receive(:dig).and_return(true)
               allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
-              allow_any_instance_of(Object).to receive(:cluster_readiness_check_on_update_enabled?).and_return(true)
               RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
               node.override['cluster']['stack_name'] = cluster_name
@@ -81,7 +80,6 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
             allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
             allow_any_instance_of(Object).to receive(:dig).and_return(true)
             allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
-            allow_any_instance_of(Object).to receive(:cluster_readiness_check_on_update_enabled?).and_return(false)
             RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
             node.override['cluster']['stack_name'] = cluster_name
