@@ -6,10 +6,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.14.1
 ------
 
-**ENHANCEMENTS**
-- Ensure clustermgtd runs after cluster update. On success, start it unconditionally. On failure, start it if the queue reconfiguration succeeded.
-
 **CHANGES**
+- Improve cluster update resiliency by ensuring clustermgtd is started after updates complete successfully, or after failed updates where queue reconfiguration succeeded.
 - Add chef attribute `cluster/in_place_update_on_fleet_enabled` to disable in-place updates on compute and login nodes
   and mitigate performance impact at scale.
 - Upgrade Slurm to version 24.11.7 (from 24.11.6).
@@ -29,9 +27,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
 
 **BUG FIXES**
-- Fix incorrect timestamp parsing for chef-client.log in CloudWatch Agent configuration.
-- Prevent cluster readiness check failures due to instances launched while the check is in progress.
 - Fix race condition where compute nodes could deploy the wrong cluster config version after an update failure.
+- Prevent cluster readiness check failures due to instances launched while the check is in progress.
+- Fix incorrect timestamp parsing for chef-client.log in CloudWatch Agent configuration.
 
 3.14.0
 ------
