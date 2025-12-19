@@ -19,10 +19,12 @@ control 'tag:install_lustre_client_installed' do
         its('version') { should cmp >= minimal_lustre_client_version }
       end
 
-      describe yum.repo('aws-fsx') do
-        it { should exist }
-        it { should be_enabled }
-        its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
+      with_retry(retries: 3, delay: 5) do
+        describe yum.repo('aws-fsx') do
+          it { should exist }
+          it { should be_enabled }
+          its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
+        end
       end
     end
   end
@@ -47,10 +49,12 @@ control 'tag:install_lustre_client_installed' do
         its('version') { should cmp >= minimal_lustre_client_version }
       end
 
-      describe yum.repo('aws-fsx') do
-        it { should exist }
-        it { should be_enabled }
-        its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
+      with_retry(retries: 3, delay: 5) do
+        describe yum.repo('aws-fsx') do
+          it { should exist }
+          it { should be_enabled }
+          its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
+        end
       end
     end
   end
