@@ -16,7 +16,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Flask to ~=3.1.0 (from >=2.2.5,<2.3).
 - Load kernel module `drm_client_lib` before installation of NVIDIA driver, if available on the kernel.
 - Reduce dependency footprint by installing the package `sssd-common` rather than `sssd`.
-- Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSes except Amazon Linux 2.
+- Disable Wayland protocol in GDM3 for Ubuntu 22.04+ to force the use of Xorg on GPU instances running without a display.
+- Upgrade libjwt to version 1.18.4 (from 1.17.0) for all OSs except Amazon Linux 2.
 - Upgrade amazon-efs-utils to version 2.4.0 (from v2.3.1).
 - Upgrade EFA installer to 1.44.0 (from 1.43.2).
   - Efa-driver: efa-2.17.3-1
