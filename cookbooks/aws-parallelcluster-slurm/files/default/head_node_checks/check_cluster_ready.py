@@ -14,7 +14,7 @@ import logging
 import click
 from common.constants import CLUSTER_CONFIG_DDB_ID
 from common.ddb_utils import get_cluster_config_records
-from common.ec2_utils import list_cluster_instance_ids_iterator
+from common.ec2_utils import get_asg_terminating_instance_ids, list_cluster_instance_ids_iterator
 from common.exceptions import CheckFailedError
 
 logger = logging.getLogger(__name__)
@@ -93,12 +93,21 @@ def check_deployed_config_version(cluster_name: str, table_name: str, expected_c
         expected_config_version,
     )
 
+    # Get instances that are in ASG terminating states (Terminating:Wait, Terminating:Proceed).
+    # These instances may still appear as 'running' in EC2 but should be excluded from validation
+    # since they are being removed and will never update to the new config version.
+    terminating_instance_ids = get_asg_terminating_instance_ids(cluster_name, region)
+    if terminating_instance_ids:
+        logger.info("Excluding %s instance(s) in ASG terminating states: %s", len(terminating_instance_ids), terminating_instance_ids)
+
     for instance_ids in list_cluster_instance_ids_iterator(
         cluster_name=cluster_name,
         node_type=["Compute", "LoginNode"],
         instance_state=["running"],
         region=region,
     ):
+        # Filter out instances that are in ASG terminating states
+        instance_ids = [i for i in instance_ids if i not in terminating_instance_ids]
         n_instance_ids = len(instance_ids)
 
         if not n_instance_ids:
