@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.15.0
 ------
 
+**CHANGES**
+- Mitigate the risk of transient build-image failures in RHEL and Rocky caused by out-of-sync repo mirrors.
+
 **BUG FIXES**
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
 - Fix an issue that was blocking the logging of slurm health check events.

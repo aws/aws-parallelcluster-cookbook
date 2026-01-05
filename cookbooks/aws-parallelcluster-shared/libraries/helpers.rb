@@ -117,3 +117,72 @@ end
 def cluster_readiness_check_on_update_enabled?
   node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
 end
+
+# Executes a block with retry logic for handling transient failures.
+#
+# @param max_retries [Integer] Maximum number of retry attempts (default: 10)
+# @param retry_delay [Integer] Seconds to wait between retries (default: 5)
+# @param on_retry [Proc] Optional callback executed after each failed attempt (receives attempt number and exception)
+# @yield The block to execute with retry protection
+# @raise [StandardError] Re-raises the last exception if all retries are exhausted
+#
+# @example Basic usage
+#   with_retries do
+#     some_flaky_operation
+#   end
+#
+# @example Advanced usage
+#   with_retries(max_retries: 5, retry_delay: 10, on_retry: ->(attempt, e) { cleanup }) do
+#     some_flaky_operation
+#   end
+#
+def with_retries(max_retries: 10, retry_delay: 5, on_retry: nil)
+  last_exception = nil
+
+  max_retries.times do |attempt|
+    begin
+      return yield
+    rescue StandardError => e
+      last_exception = e
+      Chef::Log.error("Attempt #{attempt + 1}/#{max_retries} failed: #{e.message}")
+
+      if attempt < max_retries - 1
+        if on_retry
+          Chef::Log.info("Executing on_retry callback...")
+          begin
+            on_retry.call(attempt, e)
+          rescue StandardError => retry_error
+            Chef::Log.error("on_retry callback failed (ignored): #{retry_error.message}")
+          end
+        end
+        Chef::Log.info("Sleeping #{retry_delay}s before next attempt...")
+        sleep retry_delay
+      end
+    end
+  end
+
+  Chef::Log.error("All #{max_retries} retry attempts exhausted")
+  raise last_exception
+end
+
+# Executes a shell command with logging of command, exit status, stdout, and stderr.
+#
+# @param cmd [String] The shell command to execute
+# @param timeout [Integer] Command timeout in seconds (default: nil)
+# @param raise_on_error [Boolean] If true, raises exception on non-zero exit (default: false)
+# @return [Mixlib::ShellOut] The shell_out result object
+#
+# @example Basic usage (non-raising)
+#   run_cmd('dnf clean metadata')
+#
+# @example With timeout and raise on error
+#   run_cmd('dnf install -y package', timeout: 600, raise_on_error: true)
+#
+def run_cmd(cmd, timeout: nil, raise_on_error: false)
+  Chef::Log.info("Executing: #{cmd}")
+  result = raise_on_error ? shell_out!(cmd, timeout: timeout) : shell_out(cmd, timeout: timeout)
+  Chef::Log.info("Exit status: #{result.exitstatus}")
+  Chef::Log.info("Stdout: #{result.stdout}") unless result.stdout.strip.empty?
+  Chef::Log.info("Stderr: #{result.stderr}") unless result.stderr.strip.empty?
+  result
+end

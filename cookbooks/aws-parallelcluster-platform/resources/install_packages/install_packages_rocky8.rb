@@ -17,7 +17,7 @@ provides :install_packages, platform: 'rocky' do |node|
 end
 
 use 'partial/_install_packages_common.rb'
-use 'partial/_install_packages_rhel_amazon.rb'
+use 'partial/_install_packages_rhel_rocky.rb'
 
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL
