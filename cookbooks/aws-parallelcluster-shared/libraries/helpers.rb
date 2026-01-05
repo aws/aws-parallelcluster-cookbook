@@ -106,3 +106,7 @@ def wait_sync_file(path)
     timeout 5
   end
 end
+
+def cluster_readiness_check_on_update_enabled?
+  node['cluster']['update']['cluster_readiness_check_enabled'] == 'true'
+end
