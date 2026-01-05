@@ -2,9 +2,9 @@
 
 #
 # Cookbook:: aws-parallelcluster-slurm
-# Recipe:: config_compute
+# Recipe:: config_check_update_systemd_service
 #
-# Copyright:: 2013-2021 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,22 +15,29 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-template '/etc/systemd/system/check-update.service' do
-  source 'check_update/check-update.service.erb'
+template "#{node['cluster']['scripts_dir']}/pcluster-check-update.sh" do
+  source 'check_update/pcluster-check-update.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0755'
+end
+
+template '/etc/systemd/system/pcluster-check-update.service' do
+  source 'check_update/pcluster-check-update.service.erb'
   owner 'root'
   group 'root'
   mode '0644'
 end
 
-cookbook_file '/etc/systemd/system/check-update.timer' do
-  source 'check_update/check-update.timer'
+cookbook_file '/etc/systemd/system/pcluster-check-update.timer' do
+  source 'check_update/pcluster-check-update.timer'
   owner 'root'
   group 'root'
   mode '0644'
   action :create
 end
 
-file node['cluster']['shared_update_path'] do
+file node['cluster']['update']['trigger_file'] do
   content ''
   owner 'root'
   group 'root'
@@ -38,7 +45,7 @@ file node['cluster']['shared_update_path'] do
   action :create_if_missing
 end
 
-file node['cluster']['update_checkpoint'] do
+file node['cluster']['update']['checkpoint_file'] do
   content ''
   owner 'root'
   group 'root'
@@ -46,6 +53,6 @@ file node['cluster']['update_checkpoint'] do
   action :create_if_missing
 end
 
-service 'check-update.timer' do
+service 'pcluster-check-update.timer' do
   action [:enable, :start]
 end

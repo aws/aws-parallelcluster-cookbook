@@ -1,0 +1,11 @@
+[Unit]
+Description=Trigger pcluster-check-update.service every minute to check for file modifications to the update_trigger file.
+
+[Timer]
+AccuracySec=20s
+OnActiveSec=60sec
+OnUnitActiveSec=60sec
+Unit=pcluster-check-update.service
+
+[Install]
+WantedBy=timers.target

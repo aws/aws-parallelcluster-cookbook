@@ -546,6 +546,19 @@
         "HeadNode"
       ],
       "feature_conditions": []
+    },
+    {
+      "timestamp_format_key": "default",
+      "file_path": "/var/log/parallelcluster/pcluster-check-update.log",
+      "log_stream_name": "pcluster-check-update",
+      "schedulers": [
+        "slurm"
+      ],
+      "platforms": {{ default_platforms | tojson}},
+      "node_roles": [
+        "ComputeFleet"
+      ],
+      "feature_conditions": []
     }
   ],
   "metric_configs": {

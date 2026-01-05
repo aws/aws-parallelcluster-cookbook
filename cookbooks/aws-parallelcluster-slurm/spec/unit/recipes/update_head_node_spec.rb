@@ -34,7 +34,7 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
           end
 
           it 'writes the config version to shared update file' do
-            is_expected.to create_file(chef_run.node['cluster']['shared_update_path']).with(
+            is_expected.to create_file(chef_run.node['cluster']['update']['trigger_file']).with(
               content: cluster_config_version,
               owner: 'root',
               group: 'root',

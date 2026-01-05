@@ -26,3 +26,6 @@ include_recipe 'aws-parallelcluster-platform::dcv'
 include_recipe 'aws-parallelcluster-platform::supervisord_config'
 fetch_config 'Fetch and load cluster configs'
 include_recipe 'aws-parallelcluster-platform::config_login' if node['cluster']['node_type'] == 'LoginNode'
+if ['ComputeFleet'].include?(node['cluster']['node_type'])
+  include_recipe 'aws-parallelcluster-platform::config_check_update_systemd_service'
+end

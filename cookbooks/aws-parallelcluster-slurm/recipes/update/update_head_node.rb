@@ -21,7 +21,7 @@ execute 'stop clustermgtd' do
 end
 
 # Write the new config version to shared storage to signal compute nodes to update
-file node['cluster']['shared_update_path'] do
+file node['cluster']['update']['trigger_file'] do
   content node['cluster']['cluster_config_version']
   owner 'root'
   group 'root'
