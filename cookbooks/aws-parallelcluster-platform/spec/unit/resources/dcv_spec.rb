@@ -568,7 +568,14 @@ describe 'dcv:setup' do
 
         it 'executes postinstall operations' do
           case platform
-          when 'redhat', 'centos'
+          when 'redhat', 'centos', 'rocky'
+            # Download dcv-gl dependencies for offline installation
+            is_expected.to create_directory("#{sources_dir}/dcv-gl-deps")
+            is_expected.to run_execute('download dcv-gl dependencies')
+              .with_command(%r{dnf download --destdir=#{sources_dir}/dcv-gl-deps --resolve})
+              .with_retries(3)
+              .with_retry_delay(5)
+
             # stop firewall
             is_expected.to disable_service('firewalld').with_action(%i(disable stop))
 
@@ -853,8 +860,8 @@ describe 'dcv:configure' do
             is_expected.to run_execute('apt install dcv-gl')
               .with_command("apt -y install #{sources_dir}/#{dcv_package}/#{dcv_gl}")
           else
-            is_expected.to install_package("#{sources_dir}/#{dcv_package}/#{dcv_gl}")
-              .with_source("#{sources_dir}/#{dcv_package}/#{dcv_gl}")
+            is_expected.to run_execute('install dcv-gl offline')
+              .with_command("rpm -ivh #{sources_dir}/#{dcv_package}/#{dcv_gl}")
           end
         end
 

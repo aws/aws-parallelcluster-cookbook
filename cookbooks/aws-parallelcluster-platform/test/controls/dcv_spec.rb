@@ -196,6 +196,15 @@ control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
   end
 end
 
+control 'tag:install_dcv_gl_deps_downloaded' do
+  title 'Check dcv-gl dependencies are downloaded for offline installation'
+  only_if { instance.dcv_install_enabled? && !os_properties.debian_family? && !os_properties.redhat_on_docker? }
+
+  describe directory("#{node['cluster']['sources_dir']}/dcv-gl-deps") do
+    it { should exist }
+  end
+end
+
 control 'tag:config_dcv_correctly_installed' do
   only_if do
     instance.head_node? && instance.dcv_installed? && !os_properties.redhat_on_docker?

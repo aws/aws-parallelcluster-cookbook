@@ -9,6 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
 - Fix an issue that was blocking the logging of slurm health check events.
+- Fix cluster creation failure without Internet access when GPU instances and DCV are used.
 
 3.14.1
 ------
