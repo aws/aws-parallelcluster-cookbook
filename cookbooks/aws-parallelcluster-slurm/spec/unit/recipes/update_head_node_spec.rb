@@ -7,6 +7,9 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
     region = "MOCK_REGION"
     cluster_config_version = "MOCK_CLUSTER_CONFIG_VERSION"
     scripts_dir = "/MOCK_SCRIPTS_DIR"
+    slurm_install_dir = "/MOCK_SLURM_INSTALL_DIR"
+    reconfigure_timeout = 600
+
     context "on #{platform}#{version}" do
       [true, false].each do |are_mount_or_unmount_required|
         context "when mount/unmount is #{'not ' unless are_mount_or_unmount_required}required" do
@@ -22,6 +25,8 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               node.override['cluster']['region'] = region
               node.override['cluster']['cluster_config_version'] = cluster_config_version
               node.override['cluster']['scripts_dir'] = scripts_dir
+              node.override['cluster']['slurm']['install_dir'] = slurm_install_dir
+              node.override['cluster']['slurm']['reconfigure_timeout'] = reconfigure_timeout
             end
             runner.converge(described_recipe)
           end
@@ -61,6 +66,13 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
           it 'starts clustermgtd unconditionally' do
             is_expected.to run_execute('start clustermgtd').with(
               command: "#{cookbook_venv_path}/bin/supervisorctl start clustermgtd"
+            )
+          end
+
+          it 'runs scontrol reconfigure with timeout from attribute' do
+            is_expected.to run_execute('reload config for running nodes').with(
+              command: "#{slurm_install_dir}/bin/scontrol reconfigure",
+              timeout: reconfigure_timeout
             )
           end
         end

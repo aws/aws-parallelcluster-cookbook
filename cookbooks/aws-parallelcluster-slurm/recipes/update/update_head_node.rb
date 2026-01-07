@@ -266,7 +266,7 @@ execute SCONTROL_RECONFIGURE_RESOURCE_NAME do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
   retry_delay 5
-  timeout 300
+  timeout node['cluster']['slurm']['reconfigure_timeout']
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 

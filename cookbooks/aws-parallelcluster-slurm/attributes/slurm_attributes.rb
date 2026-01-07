@@ -29,3 +29,6 @@ default['cluster']['pyxis']['runtime_path'] = '/run/pyxis'
 # Block Topology Plugin
 default['cluster']['slurm']['block_topology']['force_configuration'] = false
 default['cluster']['p6egb200_block_sizes'] = nil
+
+# Slurm Reconfigure
+default['cluster']['slurm']['reconfigure_timeout'] = 300 # seconds
