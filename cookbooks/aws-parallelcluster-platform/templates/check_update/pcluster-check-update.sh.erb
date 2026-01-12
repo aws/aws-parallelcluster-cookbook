@@ -6,7 +6,7 @@
 
 set -ex
 
-SHARED_FILE="<%= node['cluster']['update']['trigger_file'] %>"
+SHARED_TRIGGER_FILE="<%= node['cluster']['update']['trigger_file'] %>"
 LOCAL_CHECKPOINT="<%= node['cluster']['update']['checkpoint_file'] %>"
 UPDATE_SCRIPT="<%= node['cluster']['scripts_dir'] %>/cfn-hup-update-action.sh"
 FS_TIMEOUT=20
@@ -18,22 +18,22 @@ log() {
 log "Starting pcluster-check-update"
 
 # Check if shared file exists
-if ! timeout $FS_TIMEOUT test -f "$SHARED_FILE"; then
-    log "Shared update file does not exist: $SHARED_FILE"
+if ! timeout $FS_TIMEOUT test -f "$SHARED_TRIGGER_FILE"; then
+    log "Shared update file does not exist: $SHARED_TRIGGER_FILE"
     log "Completed pcluster-check-update - no action needed"
     exit 0
 fi
-log "Shared update file exists: $SHARED_FILE"
+log "Shared update file exists: $SHARED_TRIGGER_FILE"
 
-# Read current update version from shared file
-CURRENT_UPDATE=$(timeout $FS_TIMEOUT cat "$SHARED_FILE" 2>/dev/null) || {
-    log "Failed to read shared update file: $SHARED_FILE"
+# Read current cluster config version from shared file
+CURRENT_UPDATE=$(timeout $FS_TIMEOUT cat "$SHARED_TRIGGER_FILE" 2>/dev/null) || {
+    log "Failed to read shared update file: $SHARED_TRIGGER_FILE"
     log "Completed pcluster-check-update - no action needed"
     exit 0
 }
 log "Trigger file content: '$CURRENT_UPDATE'"
 
-# Read last applied version from local checkpoint
+# Read last applied cluster config version from local checkpoint
 LAST_APPLIED=$(timeout $FS_TIMEOUT cat "$LOCAL_CHECKPOINT" 2>/dev/null || echo "")
 log "Checkpoint file content: '$LAST_APPLIED'"
 
@@ -41,14 +41,14 @@ log "Checkpoint file content: '$LAST_APPLIED'"
 if [ "$CURRENT_UPDATE" != "$LAST_APPLIED" ]; then
     log "Update needed: trigger='$CURRENT_UPDATE' differs from checkpoint='$LAST_APPLIED'"
     
-    # Write checkpoint before running update (for rollback detection)
+    # Write checkpoint before running update
     log "Writing checkpoint file: $LOCAL_CHECKPOINT"
     timeout $FS_TIMEOUT sh -c "echo \"$CURRENT_UPDATE\" > \"$LOCAL_CHECKPOINT\"" || {
         log "Failed to write checkpoint file"
         exit 1
     }
     
-    # Run the update action (timeout handled by systemd TimeoutStartSec)
+    # Run the update action
     log "Executing update script: $UPDATE_SCRIPT"
     "$UPDATE_SCRIPT"
     log "Update script completed"

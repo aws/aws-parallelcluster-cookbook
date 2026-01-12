@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'aws-parallelcluster-computefleet::config_check_update_systemd_service' do
+describe 'aws-parallelcluster-platform::config_check_update_systemd_service' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:chef_run) do
@@ -59,44 +59,14 @@ describe 'aws-parallelcluster-computefleet::config_check_update_systemd_service'
             .with_content("TimeoutStartSec=#{node['cluster']['compute_node_bootstrap_timeout']}")
         end
 
-        it 'sets filesystem timeout to 20 seconds for file operations' do
+        it 'calls pcluster-check-update.sh script' do
           is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content('FS_TIMEOUT=20')
+            .with_content("ExecStart=#{node['cluster']['scripts_dir']}/pcluster-check-update.sh")
         end
 
-        it 'applies filesystem timeout to reading shared file' do
+        it 'logs output to pcluster-check-update.log' do
           is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content('CURRENT_UPDATE=$(timeout $FS_TIMEOUT cat "$SHARED_FILE"')
-        end
-
-        it 'applies filesystem timeout to reading checkpoint file' do
-          is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content('LAST_APPLIED=$(timeout $FS_TIMEOUT cat "$LOCAL_CHECKPOINT"')
-        end
-
-        it 'applies filesystem timeout to writing checkpoint file' do
-          is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content('timeout $FS_TIMEOUT sh -c "echo \\"$CURRENT_UPDATE\\" > \\"$LOCAL_CHECKPOINT\\""')
-        end
-
-        it 'exits with error if checkpoint write fails' do
-          is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content('$LOCAL_CHECKPOINT"" || exit 1')
-        end
-
-        it 'references the correct shared update path' do
-          is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content("SHARED_FILE=\"#{node['cluster']['update']['trigger_file']}\"")
-        end
-
-        it 'references the correct local checkpoint path' do
-          is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content("LOCAL_CHECKPOINT=\"#{node['cluster']['update']['checkpoint_file']}\"")
-        end
-
-        it 'calls cfn-hup-update-action.sh for the update' do
-          is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')
-            .with_content("#{node['cluster']['scripts_dir']}/cfn-hup-update-action.sh")
+            .with_content("StandardOutput=append:#{node['cluster']['log_base_dir']}/pcluster-check-update.log")
         end
       end
     end

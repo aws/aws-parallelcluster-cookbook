@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Cookbook:: aws-parallelcluster-slurm
+# Cookbook:: aws-parallelcluster-platform
 # Recipe:: config_check_update_systemd_service
 #
 # Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -50,7 +50,7 @@ file node['cluster']['update']['checkpoint_file'] do
   owner 'root'
   group 'root'
   mode '0644'
-  action :create_if_missing
+  action :create
 end
 
 service 'pcluster-check-update.timer' do
