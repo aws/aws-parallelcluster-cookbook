@@ -32,11 +32,17 @@ describe 'install_packages:setup' do
       end
 
       if %w(amazon centos redhat rocky).include?(platform)
-        it 'installs default packages' do
-          is_expected.to install_package(default_packages)
-            .with(retries: 10)
-            .with(retry_delay: 5)
-            .with(flush_cache: { before: true })
+        if platform == 'amazon'
+          it 'installs default packages' do
+            is_expected.to install_package(default_packages)
+              .with(retries: 10)
+              .with(retry_delay: 5)
+              .with(flush_cache: { before: true })
+          end
+        else
+          it 'installs default packages with mirror refresh retry logic' do
+            is_expected.to run_ruby_block('install_packages_with_metadata_refresh')
+          end
         end
 
         if platform == 'amazon' && version == '2'

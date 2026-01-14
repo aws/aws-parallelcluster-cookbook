@@ -20,6 +20,7 @@ control 'tag:install_lustre_client_installed' do
       end
 
       describe yum.repo('aws-fsx') do
+        before { retry_helpers.wait_for_command("yum -v repolist all 2>/dev/null | grep -q 'aws-fsx'") }
         it { should exist }
         it { should be_enabled }
         its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
@@ -48,6 +49,7 @@ control 'tag:install_lustre_client_installed' do
       end
 
       describe yum.repo('aws-fsx') do
+        before { retry_helpers.wait_for_command("yum -v repolist all 2>/dev/null | grep -q 'aws-fsx'") }
         it { should exist }
         it { should be_enabled }
         its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
@@ -81,6 +83,7 @@ control 'tag:install_lustre_client_installed' do
 
   if os_properties.alinux2?
     describe yum.repo('amzn2extra-lustre') do
+      before { retry_helpers.wait_for_command("yum -v repolist all 2>/dev/null | grep -q 'amzn2extra-lustre'") }
       it { should exist }
       it { should be_enabled }
     end

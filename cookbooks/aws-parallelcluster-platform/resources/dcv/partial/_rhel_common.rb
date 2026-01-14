@@ -105,6 +105,31 @@ action_class do
   end
 
   def post_install
+    if x86_instance?
+      # Download dependencies for nice-dcv-gl (for offline installation during cluster creation)
+      dcv_gl_deps_dir = "#{node['cluster']['sources_dir']}/dcv-gl-deps"
+      dcv_gl_package = "#{node['cluster']['sources_dir']}/#{dcv_package}/#{dcv_gl}"
+      directory dcv_gl_deps_dir
+
+      # Use --resolve to download all transitive dependencies
+      download_cmd = if el_string == 'amzn2'
+                       "yum install --downloadonly --downloaddir=#{dcv_gl_deps_dir} #{dcv_gl_package}"
+                     else
+                       "dnf download --destdir=#{dcv_gl_deps_dir} --resolve #{dcv_gl_package}"
+                     end
+      execute 'download dcv-gl dependencies' do
+        command download_cmd
+        retries 3
+        retry_delay 5
+      end
+
+      # Remove dcv-gl package itself (we only want dependencies in dcv_gl_deps_dir)
+      execute 'remove dcv-gl from deps dir' do
+        command "rm -f #{dcv_gl_deps_dir}/nice-dcv-gl-*.rpm"
+        only_if { ::Dir.exist?(dcv_gl_deps_dir) }
+      end
+    end
+
     # stop firewall
     service "firewalld" do
       action %i(disable stop)
@@ -114,10 +139,19 @@ action_class do
   end
 
   def install_dcv_gl
+    # The following installation happens during cluster creation time.
+    # So `rpm` installation is needed to remove requirement of Internet access.
+    # Install dependencies from downloaded RPMs (offline)
+    dcv_gl_deps_dir = "#{node['cluster']['sources_dir']}/dcv-gl-deps"
+    execute 'install dcv-gl dependencies offline' do
+      command "rpm -ivh #{dcv_gl_deps_dir}/*.rpm"
+      only_if { ::Dir.exist?(dcv_gl_deps_dir) && !::Dir.empty?(dcv_gl_deps_dir) }
+    end
+
     package = "#{node['cluster']['sources_dir']}/#{dcv_package}/#{dcv_gl}"
-    package package do
-      action :install
-      source package
+    # Install dcv-gl without repo access
+    execute 'install dcv-gl offline' do
+      command "rpm -ivh #{package}"
     end
   end
 end

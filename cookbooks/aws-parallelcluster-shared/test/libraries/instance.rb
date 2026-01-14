@@ -39,6 +39,10 @@ class Instance < Inspec.resource(1)
     inspec.file("/etc/dcv/dcv.conf").exist?
   end
 
+  def dcv_install_enabled?
+    inspec.node['cluster']['dcv']['install_enabled'] != false
+  end
+
   def imds_token
     @imds_token = inspec.http('http://169.254.169.254/latest/api/token', method: 'PUT', headers: {
       "X-aws-ec2-metadata-token-ttl-seconds": 900,

@@ -11,7 +11,7 @@
 
 control 'tag:install_dcv_connect_script_installed' do
   title 'Check pcluster dcv connect script is installed'
-  only_if { !os_properties.redhat_on_docker? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? }
 
   describe file("#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh") do
     it { should be_file }
@@ -23,7 +23,7 @@ end
 
 control 'tag:install_dcv_authenticator_user_and_group_set_up' do
   title 'Check that dcv authenticator user and group have been set up'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   describe group(node['cluster']['dcv']['authenticator']['group']) do
     it { should exist }
@@ -39,7 +39,7 @@ end
 
 control 'tag:install_dcv_disabled_lock_screen' do
   title 'Check that the lock screen has been disabled'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   describe bash('gsettings get org.gnome.desktop.lockdown disable-lock-screen') do
     its('exit_status') { should eq 0 }
@@ -54,7 +54,7 @@ end
 
 control 'tag:install_dcv_installed' do
   title 'Check dcv is installed'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   pkgs = %W(nice-dcv-server nice-xdcv nice-dcv-web-viewer)
   pkgs.each do |pkg|
@@ -66,7 +66,7 @@ end
 
 control 'tag:install_dcv_external_authenticator_virtualenv_created' do
   title 'Check dcv external authenticator virtual environment is created'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   describe file("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate") do
     it { should be_file }
@@ -76,7 +76,7 @@ end
 
 control 'tag:install_dcv_debian_specific_setup' do
   title 'Check debian specific setup'
-  only_if { os_properties.debian_family? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && os_properties.debian_family? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   pkgs = %W(whoopsie ubuntu-desktop mesa-utils)
   pkgs.each do |pkg|
@@ -97,7 +97,7 @@ end
 
 control 'tag:install_dcv_rhel_and_centos_specific_setup' do
   title 'Check rhel and centos specific setup'
-  only_if { !os_properties.on_docker? }
+  only_if { instance.dcv_install_enabled? && !os_properties.on_docker? }
   only_if { !os_properties.alinux2023? }
   only_if { os_properties.centos? || os_properties.redhat? }
 
@@ -136,7 +136,7 @@ end
 control 'tag:install_dcv_alinux2_specific_setup' do
   title 'Check alinux2 specific setup'
 
-  only_if { os_properties.alinux2? }
+  only_if { instance.dcv_install_enabled? && os_properties.alinux2? }
 
   prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
                        xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
@@ -160,7 +160,7 @@ end
 
 control 'tag:install_dcv_switch_runlevel_to_multiuser_target' do
   title 'Check that runlevel is switched to multi-user.target'
-  only_if { !os_properties.on_docker? }
+  only_if { instance.dcv_install_enabled? && !os_properties.on_docker? }
   only_if { !os_properties.alinux2023? }
 
   describe bash('systemctl get-default') do
@@ -193,6 +193,15 @@ control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
   describe package('nice-dcv-gl') do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['dcv']['gl']['version']}/ }
+  end
+end
+
+control 'tag:install_dcv_gl_deps_downloaded' do
+  title 'Check dcv-gl dependencies are downloaded for offline installation'
+  only_if { instance.dcv_install_enabled? && !os_properties.debian_family? && !os_properties.redhat_on_docker? && os_properties.x86? }
+
+  describe directory("#{node['cluster']['sources_dir']}/dcv-gl-deps") do
+    it { should exist }
   end
 end
 

@@ -568,7 +568,14 @@ describe 'dcv:setup' do
 
         it 'executes postinstall operations' do
           case platform
-          when 'redhat', 'centos'
+          when 'redhat', 'centos', 'rocky'
+            # Download dcv-gl dependencies for offline installation
+            is_expected.to create_directory("#{sources_dir}/dcv-gl-deps")
+            is_expected.to run_execute('download dcv-gl dependencies')
+              .with_command(%r{dnf download --destdir=#{sources_dir}/dcv-gl-deps --resolve})
+              .with_retries(3)
+              .with_retry_delay(5)
+
             # stop firewall
             is_expected.to disable_service('firewalld').with_action(%i(disable stop))
 
@@ -650,6 +657,39 @@ describe 'dcv:setup' do
         end
 
         it 'does not install dcv' do
+          is_expected.not_to create_if_missing_cookbook_file("#{scripts_dir}/pcluster_dcv_connect.sh")
+          is_expected.not_to create_group(authenticator_group)
+          is_expected.not_to create_user(authenticator_user)
+          is_expected.not_to run_execute('set default systemd runlevel to multi-user.target')
+        end
+      end
+
+      context "when install_enabled is false" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+            node_setup.call(node)
+            node.override['cluster']['dcv']['install_enabled'] = false
+          end
+          stubs_for_resource('dcv') do |res|
+            allow(res).to receive(:dcv_sha256sum).and_return(checksum)
+            allow(res).to receive(:dcv_supported?).and_return(true)
+            allow(res).to receive(:prereq_packages).and_return(alinux_prereq_packages) if platform == 'amazon'
+            allow(res).to receive(:dcv_package).and_return(dcv_package)
+            allow(res).to receive(:dcv_server).and_return(dcv_server)
+            allow(res).to receive(:xdcv).and_return(xdcv)
+            allow(res).to receive(:dcv_web_viewer).and_return(dcv_web_viewer)
+            allow(res).to receive(:dcv_url_arch).and_return(dcv_url_arch)
+            allow(res).to receive(:dcv_pkg_arch).and_return(dcv_pkg_arch)
+            allow(res).to receive(:dcv_url).and_return(dcv_url)
+            allow(res).to receive(:dcv_tarball).and_return(dcv_tarball)
+            allow(res).to receive(:dcvauth_virtualenv).and_return(dcvauth_virtualenv)
+            allow(res).to receive(:dcvauth_virtualenv_path).and_return(dcvauth_virtualenv_path)
+          end
+          method_setup.call
+          ConvergeDcv.setup(runner)
+        end
+
+        it 'does not install dcv when install_enabled is false' do
           is_expected.not_to create_if_missing_cookbook_file("#{scripts_dir}/pcluster_dcv_connect.sh")
           is_expected.not_to create_group(authenticator_group)
           is_expected.not_to create_user(authenticator_user)
@@ -820,8 +860,8 @@ describe 'dcv:configure' do
             is_expected.to run_execute('apt install dcv-gl')
               .with_command("apt -y install #{sources_dir}/#{dcv_package}/#{dcv_gl}")
           else
-            is_expected.to install_package("#{sources_dir}/#{dcv_package}/#{dcv_gl}")
-              .with_source("#{sources_dir}/#{dcv_package}/#{dcv_gl}")
+            is_expected.to run_execute('install dcv-gl offline')
+              .with_command("rpm -ivh #{sources_dir}/#{dcv_package}/#{dcv_gl}")
           end
         end
 
