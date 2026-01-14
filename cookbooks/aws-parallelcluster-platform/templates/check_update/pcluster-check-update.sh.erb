@@ -28,8 +28,9 @@ log "Shared update file exists: $SHARED_TRIGGER_FILE"
 # Read current cluster config version from shared file
 CURRENT_UPDATE=$(timeout $FS_TIMEOUT cat "$SHARED_TRIGGER_FILE" 2>/dev/null) || {
     log "Failed to read shared update file: $SHARED_TRIGGER_FILE"
+    log "File info: $(ls -l "$SHARED_TRIGGER_FILE" 2>&1)"
     log "Completed pcluster-check-update - no action needed"
-    exit 0
+    exit 1
 }
 log "Trigger file content: '$CURRENT_UPDATE'"
 

@@ -50,7 +50,7 @@ file node['cluster']['update']['checkpoint_file'] do
   owner 'root'
   group 'root'
   mode '0644'
-  action :create
+  action :create_if_missing
 end
 
 service 'pcluster-check-update.timer' do

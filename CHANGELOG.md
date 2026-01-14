@@ -8,7 +8,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Replace cfn-hup in compute nodes with systemd timer to support in place updates in order to improve performance.
-  - This new mechanism relies on shared storage to sync updates between the head node and compute nodes.
+  This new mechanism relies on shared storage to sync updates between the head node and compute nodes.
 
 3.14.1
 ------
