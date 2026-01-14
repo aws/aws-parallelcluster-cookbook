@@ -19,7 +19,9 @@
 
 # TODO: once the pyenv Chef resource supports installing packages from a path (e.g. `pip install .`), convert the
 # bash block to a recipe that uses the pyenv resource.
-command = "pip install . --no-build-isolation"
+# Use --no-build-isolation when installing from S3 pre-built deps, omit when installing from internet
+pip_install_flags = node['cluster']['install_python_from_internet'] ? "" : "--no-build-isolation"
+command = "pip install . #{pip_install_flags}".strip
 
 dependency_package_name = "pypi-node-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
 dependency_folder_name = dependency_package_name
@@ -28,24 +30,28 @@ if platform?('amazon') && node['platform_version'] == "2"
   dependency_folder_name = "node"
 end
 
-remote_file "#{node['cluster']['base_dir']}/node-dependencies.tgz" do
-  source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
-  mode '0644'
-  retries 3
-  retry_delay 5
-  action :create_if_missing
-end
+# Install dependencies from S3 pre-built packages (production mode)
+# When install_python_from_internet is true, dependencies are installed from PyPI instead
+unless node['cluster']['install_python_from_internet']
+  remote_file "#{node['cluster']['base_dir']}/node-dependencies.tgz" do
+    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
 
-bash 'pip install' do
-  user 'root'
-  group 'root'
-  cwd "#{node['cluster']['base_dir']}"
-  code <<-REQ
-    set -e
-    tar xzf node-dependencies.tgz
-    cd #{dependency_folder_name}
-    #{node_virtualenv_path}/bin/pip install * -f ./ --no-index
+  bash 'pip install node dependencies from S3' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['base_dir']}"
+    code <<-REQ
+      set -e
+      tar xzf node-dependencies.tgz
+      cd #{dependency_folder_name}
+      #{node_virtualenv_path}/bin/pip install * -f ./ --no-index
     REQ
+  end
 end
 
 bash "install custom aws-parallelcluster-node" do

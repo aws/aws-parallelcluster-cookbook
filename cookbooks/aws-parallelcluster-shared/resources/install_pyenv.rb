@@ -16,7 +16,10 @@ action :run do
   python_version = new_resource.python_version || node['cluster']['python-version']
   python_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/python/Python-#{python_version}.tgz"
 
-  if !aws_region.start_with?("us-iso") && new_resource.python_version
+  # Use python.org for non-isolated regions when:
+  # - python_version is explicitly set, OR
+  # - install_python_from_internet is enabled (for testing new Python versions)
+  if !aws_region.start_with?("us-iso") && (new_resource.python_version || node['cluster']['install_python_from_internet'])
     python_url = "https://www.python.org/ftp/python/#{python_version}/Python-#{python_version}.tgz"
   end
 
