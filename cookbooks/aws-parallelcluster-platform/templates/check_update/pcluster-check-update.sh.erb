@@ -27,7 +27,7 @@ log "Shared update file exists: $SHARED_TRIGGER_FILE"
 
 # Read current cluster config version from shared file
 CURRENT_UPDATE=$(timeout $FS_TIMEOUT cat "$SHARED_TRIGGER_FILE" 2>/dev/null) || {
-    log "Failed to read shared update file: $SHARED_TRIGGER_FILE"
+    log "[ERROR] Failed to read shared update file: $SHARED_TRIGGER_FILE"
     log "File info: $(ls -l "$SHARED_TRIGGER_FILE" 2>&1)"
     log "Completed pcluster-check-update - no action needed"
     exit 1
@@ -45,7 +45,7 @@ if [ "$CURRENT_UPDATE" != "$LAST_APPLIED" ]; then
     # Write checkpoint before running update
     log "Writing checkpoint file: $LOCAL_CHECKPOINT"
     timeout $FS_TIMEOUT sh -c "echo \"$CURRENT_UPDATE\" > \"$LOCAL_CHECKPOINT\"" || {
-        log "Failed to write checkpoint file"
+        log "[ERROR] Failed to write checkpoint file"
         exit 1
     }
     
