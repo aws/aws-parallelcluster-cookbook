@@ -4,7 +4,7 @@
 # This script checks if a cluster update is needed by comparing the shared update file
 # with the local checkpoint. If they differ, it triggers the update action.
 
-set -ex
+set -e
 
 SHARED_TRIGGER_FILE="<%= node['cluster']['update']['trigger_file'] %>"
 LOCAL_CHECKPOINT="<%= node['cluster']['update']['checkpoint_file'] %>"
