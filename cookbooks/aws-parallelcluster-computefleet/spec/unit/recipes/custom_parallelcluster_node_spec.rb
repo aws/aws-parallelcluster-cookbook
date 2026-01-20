@@ -27,14 +27,18 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
       cached(:custom_node_s3_url) { "#{s3_url}/pyenv/versions/#{python_version}/envs/node_virtualenv" }
       cached(:pip_install_bash_code) do
         <<-REQ
-  set -e
-  tar xzf node-dependencies.tgz
-  cd #{dependency_folder_name_suffix}
-  #{virtualenv_path}/bin/pip install * -f ./ --no-index
+    set -e
+    tar xzf node-dependencies.tgz
+    cd #{dependency_folder_name_suffix}
+    #{virtualenv_path}/bin/pip install * -f ./ --no-index
         REQ
       end
-      cached(:node_bash_code) do
-        <<-NODE
+
+      [true, false].each do |install_from_internet|
+        context "when install_python_from_internet is #{install_from_internet}" do
+          cached(:pip_install_flags) { install_from_internet ? "" : "--no-build-isolation" }
+          cached(:node_bash_code) do
+            <<-NODE
   set -e
   [[ ":$PATH:" != *":/usr/local/bin:"* ]] && PATH="/usr/local/bin:${PATH}"
   echo "PATH is $PATH"
@@ -50,41 +54,55 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
   mkdir aws-parallelcluster-custom-node
   tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node
   cd aws-parallelcluster-custom-node/*aws-parallelcluster-node*
-  pip install . --no-build-isolation
+  pip install .#{pip_install_flags.empty? ? '' : ' ' + pip_install_flags}
   deactivate
-        NODE
-      end
-      cached(:chef_run) do
-        runner = runner(platform: platform, version: version) do |node|
-          node.override['kernel']['machine'] = arch
-          node.override['cluster']['python-major-minor-version'] = python_version
-          node.override['cluster']['python-version'] = python_version
-          node.override['cluster']['base_dir'] = base_dir
-          node.override['cluster']['region'] = region
-          node.override['cluster']['artifacts_s3_url'] = s3_url
-          node.override['cluster']['custom_node_package'] = custom_node_s3_url
+            NODE
+          end
+
+          cached(:chef_run) do
+            runner = runner(platform: platform, version: version) do |node|
+              node.override['kernel']['machine'] = arch
+              node.override['cluster']['python-major-minor-version'] = python_version
+              node.override['cluster']['python-version'] = python_version
+              node.override['cluster']['base_dir'] = base_dir
+              node.override['cluster']['region'] = region
+              node.override['cluster']['artifacts_s3_url'] = s3_url
+              node.override['cluster']['custom_node_package'] = custom_node_s3_url
+              node.override['cluster']['install_python_from_internet'] = install_from_internet
+            end
+            allow(File).to receive(:exist?).with("#{virtualenv_path}/bin/activate").and_return(true)
+            runner.converge(described_recipe)
+          end
+
+          if install_from_internet
+            it 'does not download tarball from S3' do
+              is_expected.not_to create_remote_file("base_dir/node-dependencies.tgz")
+            end
+
+            it 'does not pip install node dependencies from S3' do
+              is_expected.not_to run_bash('pip install node dependencies from S3')
+            end
+          else
+            it 'downloads tarball from S3' do
+              is_expected.to create_if_missing_remote_file("base_dir/node-dependencies.tgz")
+                .with(source: "#{s3_url}/dependencies/PyPi/#{arch}/#{dependency_pkg_name_suffix}.tgz")
+                .with(mode: '0644')
+                .with(retries: 3)
+                .with(retry_delay: 5)
+            end
+
+            it 'pip installs node dependencies from S3' do
+              is_expected.to run_bash('pip install node dependencies from S3')
+                .with(cwd: base_dir)
+                .with(code: pip_install_bash_code.gsub(/^  /, '    '))
+            end
+          end
+
+          it 'installs custom aws-parallelcluster-node' do
+            is_expected.to run_bash('install custom aws-parallelcluster-node')
+              .with(code: node_bash_code.gsub(/^  /, '    '))
+          end
         end
-        allow(File).to receive(:exist?).with("#{virtualenv_path}/bin/activate").and_return(true)
-        runner.converge(described_recipe)
-      end
-
-      it 'downloads tarball' do
-        is_expected.to create_if_missing_remote_file("base_dir/node-dependencies.tgz")
-          .with(source: "#{s3_url}/dependencies/PyPi/#{arch}/#{dependency_pkg_name_suffix}.tgz")
-          .with(mode: '0644')
-          .with(retries: 3)
-          .with(retry_delay: 5)
-      end
-
-      it 'pip installs' do
-        is_expected.to run_bash('pip install')
-          .with(cwd: base_dir)
-          .with(code: pip_install_bash_code.gsub(/^  /, '    '))
-      end
-
-      it 'install custom aws-parallelcluster-node' do
-        is_expected.to run_bash('install custom aws-parallelcluster-node')
-          .with(code: node_bash_code.gsub(/^  /, '    '))
       end
     end
   end
