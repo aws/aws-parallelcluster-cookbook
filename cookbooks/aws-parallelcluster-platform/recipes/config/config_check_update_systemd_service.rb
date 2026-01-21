@@ -53,6 +53,15 @@ file node['cluster']['update']['checkpoint_file'] do
   action :create_if_missing
 end
 
+# Create log file so CloudWatch agent can monitor it before the service runs
+file "#{node['cluster']['log_base_dir']}/pcluster-check-update.log" do
+  content ''
+  owner 'root'
+  group 'root'
+  mode '0644'
+  action :create_if_missing
+end
+
 service 'pcluster-check-update.timer' do
   action [:enable, :start]
 end
