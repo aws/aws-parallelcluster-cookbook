@@ -10,7 +10,7 @@
 # limitations under the License.
 
 from common.aws import boto_client
-from common.constants import BOTO_PAGINATION_CONFIG, CLUSTER_NAME_TAG, NODE_TYPE_TAG
+from common.constants import BOTO_PAGINATION_CONFIG, CLUSTER_NAME_TAG, NODE_TYPE_TAG, QUEUE_NAME_TAG
 from retrying import retry
 
 
@@ -20,6 +20,7 @@ def list_cluster_instance_ids_iterator(
     region: str,
     instance_state: [str] = ("pending", "running", "stopping", "stopped"),
     node_type: [str] = None,
+    queue_names: [str] = None,
 ):
     """
     Generate an iterator over batch of cluster instances.
@@ -28,11 +29,12 @@ def list_cluster_instance_ids_iterator(
     :param region: AWS region name (eg: us-east-1)
     :param instance_state: list of instance states to include in the filter; default is None.
     :param node_type: list of node types to include in the filter; default is None.
+    :param queue_names: list of queue names to include in the filter; default is None.
     :return: the iterator to iterate over batch of cluster instances.
     """
     ec2 = boto_client("ec2", region_name=region)
 
-    filters = _get_filters_to_list_instances(cluster_name, instance_state, node_type)
+    filters = _get_filters_to_list_instances(cluster_name, instance_state, node_type, queue_names)
 
     paginator = ec2.get_paginator("describe_instances")
 
@@ -44,19 +46,25 @@ def list_cluster_instance_ids_iterator(
         yield instances
 
 
-def _get_filters_to_list_instances(cluster_name: str, instance_state: [str] = None, node_type: [str] = None):
+def _get_filters_to_list_instances(
+    cluster_name: str, instance_state: [str] = None, node_type: [str] = None, queue_names: [str] = None
+):
     """
     Generate a list of filters to be used in EC2 requests to filter cluster instances.
 
     :param cluster_name: name of the cluster.
     :param instance_state: list of instance states to include in the filter; default is None.
     :param node_type: list of node types to include in the filter; default is None.
+    :param queue_names: list of queue names to include in the filter; default is None.
     :return: the list of filters.
     """
     filters = [{"Name": f"tag:{CLUSTER_NAME_TAG}", "Values": [cluster_name]}]
 
     if node_type:
         filters.append({"Name": f"tag:{NODE_TYPE_TAG}", "Values": list(node_type)})
+
+    if queue_names:
+        filters.append({"Name": f"tag:{QUEUE_NAME_TAG}", "Values": list(queue_names)})
 
     if instance_state:
         filters.append({"Name": "instance-state-name", "Values": list(instance_state)})
