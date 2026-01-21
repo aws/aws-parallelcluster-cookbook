@@ -3,7 +3,6 @@ require 'spec_helper'
 describe 'aws-parallelcluster-environment::cfn_bootstrap' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:cfnbootstrap_version) { '2.0-33' }
       cached(:arch) { 'x86_64' }
       cached(:s3_url) { 's3://url' }
       cached(:base_dir) { 'base_dir' }
@@ -22,7 +21,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
           dependecy_package_name_suffix
         end
       end
-      cached(:cfnbootstrap_package) { "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz" }
+      cached(:cfnbootstrap_package) { "aws-cfn-bootstrap-py3-#{node['cluster']['cfn_bootstrap']['version']}.tar.gz" }
       cached(:system_pyenv_root) { 'system_pyenv_root' }
       cached(:virtualenv_path) { "system_pyenv_root/versions/#{python_version}/envs/cfn_bootstrap_virtualenv" }
       cached(:timeout) { 1800 }

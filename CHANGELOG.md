@@ -18,6 +18,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Rdma-core: rdma-core-60.0-1
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
 - Upgrade Python to 3.14.2 (from 3.12.11) for all OSs except Amazon Linux 2.
+- Upgrade aws-cfn-bootstrap to version 2.0-38 (from 2.0-33).
 
 **BUG FIXES**
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.

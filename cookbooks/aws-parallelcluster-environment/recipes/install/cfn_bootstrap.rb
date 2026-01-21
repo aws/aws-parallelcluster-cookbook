@@ -64,7 +64,7 @@ unless node['cluster']['install_python_from_internet']
   end
 end
 
-cfnbootstrap_version = '2.0-33'
+cfnbootstrap_version = node['cluster']['cfn_bootstrap']['version']
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']
