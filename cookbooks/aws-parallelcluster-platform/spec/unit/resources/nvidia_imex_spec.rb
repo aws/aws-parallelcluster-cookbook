@@ -352,12 +352,11 @@ describe 'nvidia_imex:configure' do
         end
 
         %w(HeadNode LoginNode ComputeFleet).each do |node_type|
-          context "when get_nvswitch_count > 1 on #{node_type} node" do
+          context "when is_gb200_node? is true on #{node_type} node" do
             cached(:chef_run) do
               stubs_for_provider('nvidia_imex[configure]') do |pro|
                 allow(pro).to receive(:imex_installed?).and_return(true)
-                allow(pro).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
-                allow(pro).to receive(:get_nvswitch_count).with('test').and_return(4)
+                allow(pro).to receive(:is_gb200_node?).and_return(true)
                 allow(pro).to receive(:enable_force_configuration?).and_return(force_indicator)
               end
               runner(platform: platform, version: version, step_into: ['nvidia_imex'])
@@ -394,12 +393,11 @@ describe 'nvidia_imex:configure' do
           end
         end
 
-        context "when get_nvswitch_count <= 1" do
+        context "when is_gb200_node? is false" do
           cached(:chef_run) do
             stubs_for_provider('nvidia_imex[configure]') do |pro|
               allow(pro).to receive(:imex_installed?).and_return(true)
-              allow(pro).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
-              allow(pro).to receive(:get_nvswitch_count).with('test').and_return(1)
+              allow(pro).to receive(:is_gb200_node?).and_return(false)
               allow(pro).to receive(:enable_force_configuration?).and_return(force_indicator)
             end
             runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])

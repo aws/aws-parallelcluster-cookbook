@@ -217,20 +217,20 @@ describe 'fabric_manager:setup' do
 end
 
 describe 'fabric_manager:configure' do
-  let(:output_of_shell) { double('shell_out') }
   cached(:nvidia_driver_version) { 'nvidia_driver_version' }
   [true, false].each do |is_gb200|
     for_all_oses do |platform, version|
       context "on #{platform}#{version} on #{is_gb200} gb200 node" do
-        cached(:fabric_manager_version) { nvidia_driver_version }
         cached(:fabric_manager_package) { platform == 'amazon' && version == '2' ? 'nvidia-fabric-manager' : 'nvidia-fabricmanager' }
-        context('when nvswithes are > 1') do
+        cached(:fabric_manager_version) { nvidia_driver_version }
+
+        context('when fabric manager is required (multiple GPUs with bridges)') do
           cached(:chef_run) do
             stubs_for_provider('fabric_manager') do |res|
-              allow(res).to receive(:get_nvswitches).and_return(2)
-              allow(res).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
-              allow(res).to receive(:is_gb200_node?).and_return(is_gb200)
-              allow(res).to receive(:shell_out).and_return(output_of_shell)
+              allow(res).to receive(:get_pci_device_count).with('10de', '', '0302').and_return(8)
+              allow(res).to receive(:get_pci_device_count).with('10de', '', '0680').and_return(6)
+              allow(res).to receive(:get_pci_device_count).with('15b3', '', '0207').and_return(0)
+              allow(res).to receive(:get_pci_device_count).with('10de', '2941').and_return(is_gb200 ? 2 : 0)
             end
             runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
             ConvergeFabricManager.configure(runner)
@@ -243,8 +243,6 @@ describe 'fabric_manager:configure' do
           if is_gb200
             it 'does not start nvidia-fabricmanager service' do
               is_expected.not_to start_service("#{fabric_manager_package}")
-                .with_action(%i(start enable))
-                .with_supports({ status: true })
             end
           else
             it 'starts nvidia-fabricmanager service' do
@@ -255,13 +253,13 @@ describe 'fabric_manager:configure' do
           end
         end
 
-        context('when nvswithes are not > 1') do
+        context('when fabric manager is not required (single GPU or no bridges)') do
           cached(:chef_run) do
             stubs_for_provider('fabric_manager[configure]') do |res|
-              allow(res).to receive(:get_nvswitches).and_return(1)
-              allow(res).to receive(:get_device_ids).and_return({ 'gb200' => 'test' })
-              allow(res).to receive(:is_gb200_node?).and_return(is_gb200)
-              allow(res).to receive(:shell_out).and_return(output_of_shell)
+              allow(res).to receive(:get_pci_device_count).with('10de', '', '0302').and_return(1)
+              allow(res).to receive(:get_pci_device_count).with('10de', '', '0680').and_return(0)
+              allow(res).to receive(:get_pci_device_count).with('15b3', '', '0207').and_return(0)
+              allow(res).to receive(:get_pci_device_count).with('10de', '2941').and_return(0)
             end
             runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
             ConvergeFabricManager.configure(runner)
@@ -276,39 +274,44 @@ describe 'fabric_manager:configure' do
   end
 end
 
-describe 'fabric_manager:get_nvswitches' do
-  cached(:chef_run) do
-    ChefSpec::SoloRunner.new(step_into: ['fabric_manager'])
-  end
+describe 'fabric_manager:enable_fabric_manager?' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:fabric_manager_package) { platform == 'amazon' && version == '2' ? 'nvidia-fabric-manager' : 'nvidia-fabricmanager' }
 
-  let(:output_of_shell) { double('shell_out') }
-  cached(:resource) do
-    ConvergeFabricManager.setup(chef_run)
-    chef_run.find_resource('fabric_manager', 'setup')
-  end
+      context 'when multiple GPUs with NVSwitches' do
+        cached(:chef_run) do
+          stubs_for_provider('fabric_manager') do |res|
+            allow(res).to receive(:get_pci_device_count).with('10de', '', '0302').and_return(8)
+            allow(res).to receive(:get_pci_device_count).with('10de', '', '0680').and_return(6)
+            allow(res).to receive(:get_pci_device_count).with('15b3', '', '0207').and_return(0)
+            allow(res).to receive(:get_pci_device_count).with('10de', '2941').and_return(0)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
+          ConvergeFabricManager.configure(runner)
+        end
 
-  before do
-    allow(resource).to receive(:shell_out).and_return(output_of_shell)
-  end
+        it 'enables fabric manager service' do
+          is_expected.to start_service(fabric_manager_package)
+        end
+      end
 
-  context 'when count of NVSwitches > 1' do
-    it 'correctly counts multiple NVSwitches' do
-      allow(output_of_shell).to receive(:stdout).and_return("2\n", "0\n", "0\n")
-      expect(resource.get_nvswitches).to eq(2)
-    end
-  end
+      context 'when single GPU' do
+        cached(:chef_run) do
+          stubs_for_provider('fabric_manager') do |res|
+            allow(res).to receive(:get_pci_device_count).with('10de', '', '0302').and_return(1)
+            allow(res).to receive(:get_pci_device_count).with('10de', '', '0680').and_return(0)
+            allow(res).to receive(:get_pci_device_count).with('15b3', '', '0207').and_return(0)
+            allow(res).to receive(:get_pci_device_count).with('10de', '2941').and_return(0)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
+          ConvergeFabricManager.configure(runner)
+        end
 
-  context 'when count of NVSwitches == 0' do
-    it 'returns zero when no NVSwitches are found' do
-      allow(output_of_shell).to receive(:stdout).and_return("0\n")
-      expect(resource.get_nvswitches).to eq(0)
-    end
-  end
-
-  context 'when count of NVSwitches gives unexpected output' do
-    it 'handles non-numeric output' do
-      allow(output_of_shell).to receive(:stdout).and_return("error\n")
-      expect(resource.get_nvswitches).to eq(0)
+        it 'does not enable fabric manager service' do
+          is_expected.not_to start_service(fabric_manager_package)
+        end
+      end
     end
   end
 end

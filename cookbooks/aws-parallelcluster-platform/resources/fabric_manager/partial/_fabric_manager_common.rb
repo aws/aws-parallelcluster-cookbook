@@ -30,8 +30,8 @@ action :setup do
 end
 
 action :configure do
-  # Start nvidia fabric manager on NVSwitch enabled systems, except for GB200 which does not need it
-  if get_nvswitches > 1 && !is_gb200_node?
+  # Start nvidia fabric manager on NVSwitch enabled systems, except for GB200 which does not need it.
+  if enable_fabric_manager? && !is_gb200_node?
     service "#{fabric_manager_package}" do
       action %i(start enable)
       supports status: true
@@ -58,12 +58,4 @@ end
 
 def fabric_manager_version
   _nvidia_driver_version
-end
-
-# Get number of nv switches
-def get_nvswitches
-  # We sum the count for all these deviceIds as output of lscpi command will be >0
-  # for only one device ID based on the instance type
-  nvswitch_device_ids = get_device_ids.values
-  nvswitch_device_ids.sum { |id| get_nvswitch_count(id) }
 end

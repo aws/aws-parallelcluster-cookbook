@@ -1,3 +1,15 @@
+# PCI Vendor IDs
+NVIDIA_VENDOR_ID = '10de'.freeze
+MELLANOX_VENDOR_ID = '15b3'.freeze
+
+# PCI Class IDs
+GPU_3D_CONTROLLER_CLASS_ID = '0302'.freeze      # 3D Controllers (GPU without display)
+NVSWITCH_BRIDGE_CLASS_ID = '0680'.freeze        # NVSwitch/Bridges
+INFINIBAND_CONTROLLER_CLASS_ID = '0207'.freeze  # Infiniband controller (Mellanox CX-7 on P6/B300)
+
+# PCI Device IDs
+GB200_DEVICE_ID = '2941'.freeze # P6e (GB200) instance
+
 def nvidia_enabled?
   ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled'])
 end
@@ -20,22 +32,46 @@ def is_process_running(process_name)
 end
 
 #
-# Get Count of GPUs in instance
+# Get device counts using lspci -d vendor_id:device_id:class_id
 #
-def get_nvswitch_count(device_id)
-  shell_out("lspci -d #{device_id} | wc -l").stdout.strip.to_i
+
+# Generic function to count PCI devices matching vendor_id:device_id:class_id
+# Format: lspci -d [vendor]:[device]:[class]
+# Use empty string to match any value for that field
+def get_pci_device_count(vendor_id, device_id = '', class_id = '')
+  pci_device_filter = "#{vendor_id}:#{device_id}:#{class_id}"
+  count = shell_out("lspci -d #{pci_device_filter} | wc -l").stdout.strip.to_i
+  Chef::Log.info("PCI device count for filter '#{pci_device_filter}': #{count}")
+  count
 end
 
-def get_device_ids
-  #  A100 (P4), H100(P5), B200(P6), B300(p6-b300) and GB200(p6e) systems have NVSwitches
-  # NVSwitch device id is 10de:1af1 for P4 instance
-  # NVSwitch device id is 10de:22a3 for P5 instance
-  # NVSwitch device id is 10de:2901 for P6 instance
-  # NVSwitch device id is 10de:2941 for P6e instance
-  # NVSwitch device id is 10de:3182 for P6-b300 instance
-  { 'a100' => '10de:1af1', 'h100' => '10de:22a3', 'b200' => '10de:2901', 'gb200' => '10de:2941', 'b300' => '10de:3182' }
+# Count NVIDIA GPUs (3D controllers)
+def get_gpu_count
+  get_pci_device_count(NVIDIA_VENDOR_ID, '', GPU_3D_CONTROLLER_CLASS_ID)
+end
+
+# Count NVIDIA NVSwitches (Bridges)
+def get_nvswitch_count
+  get_pci_device_count(NVIDIA_VENDOR_ID, '', NVSWITCH_BRIDGE_CLASS_ID)
+end
+
+# Count Mellanox Infiniband controllers (CX-7 bridges on P6/B300)
+def get_mellanox_bridge_count
+  get_pci_device_count(MELLANOX_VENDOR_ID, '', INFINIBAND_CONTROLLER_CLASS_ID)
+end
+
+# Count GB200 devices by specific device ID
+def get_gb200_count
+  get_pci_device_count(NVIDIA_VENDOR_ID, GB200_DEVICE_ID)
+end
+
+def enable_fabric_manager?
+  return false if get_gpu_count <= 1
+
+  # Enable if NVSwitch bridges or Mellanox Infiniband controllers are detected
+  (get_nvswitch_count > 1) || (get_mellanox_bridge_count > 1)
 end
 
 def is_gb200_node?
-  get_nvswitch_count(get_device_ids['gb200']) > 1
+  get_gb200_count > 1
 end
