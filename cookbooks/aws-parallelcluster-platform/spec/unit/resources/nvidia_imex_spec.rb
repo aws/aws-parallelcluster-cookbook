@@ -202,7 +202,7 @@ describe 'nvidia_imex:install' do
       %w(aarch64 x86_64).each do |arm_or_x86|
         context "when nvidia is enabled on #{arm_or_x86}" do
           cached(:nvidia_imex_version) { "1.2.3-1" }
-          cached(:nvidia_imex_package) { "nvidia-imex-1" }
+          cached(:nvidia_imex_package) { "nvidia-imex" }
           cached(:nvidia_imex_name) do
             if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
               "#{nvidia_imex_package}-#{nvidia_imex_version}"

@@ -32,7 +32,7 @@ end
 action :configure do
   # Start nvidia fabric manager on NVSwitch enabled systems, except for GB200 which does not need it
   if get_nvswitches > 1 && !is_gb200_node?
-    service 'nvidia-fabricmanager' do
+    service "#{fabric_manager_package}" do
       action %i(start enable)
       supports status: true
     end

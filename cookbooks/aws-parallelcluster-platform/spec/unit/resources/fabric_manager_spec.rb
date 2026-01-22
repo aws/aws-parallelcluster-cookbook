@@ -168,8 +168,8 @@ describe 'fabric_manager:setup' do
 
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-570' : 'nvidia-fabric-manager' }
-      cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}" : nvidia_driver_version }
+      cached(:fabric_manager_version) { nvidia_driver_version }
+      cached(:fabric_manager_package) { platform == 'amazon' && version == '2' ? 'nvidia-fabric-manager' : 'nvidia-fabricmanager' }
 
       context 'when fabric manager is to install' do
         cached(:chef_run) do
@@ -204,7 +204,7 @@ describe 'fabric_manager:setup' do
           end
 
           it 'installs fabric manager' do
-            is_expected.to run_bash("Install nvidia-fabric-manager")
+            is_expected.to run_bash("Install #{fabric_manager_package}")
               .with(user: 'root')
               .with_retries(3)
               .with_retry_delay(5)
@@ -222,9 +222,8 @@ describe 'fabric_manager:configure' do
   [true, false].each do |is_gb200|
     for_all_oses do |platform, version|
       context "on #{platform}#{version} on #{is_gb200} gb200 node" do
-        cached(:fabric_manager_package) { platform == 'ubuntu' ? 'nvidia-fabricmanager-535' : 'nvidia-fabric-manager' }
-        cached(:fabric_manager_version) { platform == 'ubuntu' ? "#{nvidia_driver_version}" : nvidia_driver_version }
-
+        cached(:fabric_manager_version) { nvidia_driver_version }
+        cached(:fabric_manager_package) { platform == 'amazon' && version == '2' ? 'nvidia-fabric-manager' : 'nvidia-fabricmanager' }
         context('when nvswithes are > 1') do
           cached(:chef_run) do
             stubs_for_provider('fabric_manager') do |res|
@@ -243,13 +242,13 @@ describe 'fabric_manager:configure' do
 
           if is_gb200
             it 'does not start nvidia-fabricmanager service' do
-              is_expected.not_to start_service('nvidia-fabricmanager')
+              is_expected.not_to start_service("#{fabric_manager_package}")
                 .with_action(%i(start enable))
                 .with_supports({ status: true })
             end
           else
             it 'starts nvidia-fabricmanager service' do
-              is_expected.to start_service('nvidia-fabricmanager')
+              is_expected.to start_service("#{fabric_manager_package}")
                 .with_action(%i(start enable))
                 .with_supports({ status: true })
             end
@@ -269,7 +268,7 @@ describe 'fabric_manager:configure' do
           end
 
           it "doesn't start nvidia-fabricmanager service" do
-            is_expected.not_to start_service('nvidia-fabricmanager')
+            is_expected.not_to start_service("#{fabric_manager_package}")
           end
         end
       end

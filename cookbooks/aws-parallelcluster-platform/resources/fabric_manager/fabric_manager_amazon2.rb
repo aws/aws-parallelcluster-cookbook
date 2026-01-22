@@ -24,4 +24,3 @@ end
 def fabric_manager_package
   'nvidia-fabric-manager'
 end
-
