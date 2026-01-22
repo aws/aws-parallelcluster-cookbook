@@ -22,6 +22,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade DCV to version 2025.0-20103 (from 2024.0-19030).
 - Upgrade CUDA Toolkit to version 13.0.2 (from 12.8.1) for all OSs except Amazon Linux 2.
 - Upgrade NVIDIA Fabric manager to 580.105.08 for all OSs except Amazon Linux 2.
+- Upgrade Python to 3.14.2 (from 3.12.11) for all OSs except Amazon Linux 2.
+- Upgrade aws-cfn-bootstrap to version 2.0-38 (from 2.0-33).
 
 **BUG FIXES**
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
