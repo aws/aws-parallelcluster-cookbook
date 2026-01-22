@@ -17,6 +17,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: libfabric-aws-2.3.1-1
   - Rdma-core: rdma-core-60.0-1
   - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
+- Upgrade NVIDIA driver to version 580.105.08 (from 570.172.08) for all OSs except Amazon Linux 2.
+- Upgrade GDRCopy to version 2.5.1 (from 2.4.4).
+- Upgrade DCV to version 2025.0-20103 (from 2024.0-19030).
+- Upgrade CUDA Toolkit to version 13.0.2 (from 12.8.1) for all OSs except Amazon Linux 2.
+- Upgrade NVIDIA Fabric manager to 580.105.08 for all OSs except Amazon Linux 2.
 
 **BUG FIXES**
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
