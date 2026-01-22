@@ -136,7 +136,7 @@ describe 'gdrcopy:gdrcopy_version' do
         expected_gdrcopy_version = if platform == "centos"
                                      "2.3.1"
                                    else
-                                     "2.4.4"
+                                     "2.5.1"
                                    end
         expect(resource.gdrcopy_version).to eq(expected_gdrcopy_version)
       end
@@ -186,7 +186,7 @@ describe 'gdrcopy:setup' do
 
     context "on #{platform}#{version} when gdrcopy enabled" do
       cached(:sources_dir) { 'sources_dir' }
-      cached(:gdrcopy_version) { platform == 'centos' ? '2.3.1' : '2.4.4' }
+      cached(:gdrcopy_version) { platform == 'centos' ? '2.3.1' : '2.5.1' }
       cached(:gdrcopy_checksum) do
         if platform == 'centos'
           '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'

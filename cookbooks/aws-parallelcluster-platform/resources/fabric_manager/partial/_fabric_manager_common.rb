@@ -52,6 +52,14 @@ def _nvidia_driver_version
   nvidia_driver_version || node['cluster']['nvidia']['driver_version']
 end
 
+def fabric_manager_package
+  'nvidia-fabricmanager'
+end
+
+def fabric_manager_version
+  _nvidia_driver_version
+end
+
 # Get number of nv switches
 def get_nvswitches
   # We sum the count for all these deviceIds as output of lscpi command will be >0

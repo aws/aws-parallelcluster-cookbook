@@ -80,7 +80,7 @@ action :configure do
 end
 
 def nvidia_imex_package
-  "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
+  "#{nvidia_imex_service}"
 end
 
 def nvidia_driver_major_version

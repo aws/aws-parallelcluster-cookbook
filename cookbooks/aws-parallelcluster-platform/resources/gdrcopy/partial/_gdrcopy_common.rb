@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 def gdrcopy_version
-  '2.4.4'
+  '2.5.1'
 end
 
 def gdrcopy_checksum
-  '8802f7bc4a589a610118023bdcdd83c10a56dea399acf6eeaac32e8cc10739a8'
+  'c6d5ebb7dabb89d798f27609511735595004da73af28d93ac041bb5290c4cbec'
 end
 
 unified_mode true

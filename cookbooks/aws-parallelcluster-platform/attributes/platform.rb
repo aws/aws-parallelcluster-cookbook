@@ -16,7 +16,7 @@ default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '570.172.08'
+default['cluster']['nvidia']['driver_version'] = '580.105.08'
 default['cluster']['nvidia']['dcgm_version'] = '4.4.1-1'
 if platform?('amazon') && node['platform_version'] == "2"
   default['cluster']['nvidia']['driver_version'] = '550.127.08'
@@ -40,13 +40,13 @@ default['cluster']['dcv']['authenticator']['certificate'] = "#{node['cluster']['
 default['cluster']['dcv']['authenticator']['private_key'] = "#{node['cluster']['etc_dir']}/ext-auth-private-key.pem"
 default['cluster']['dcv']['authenticator']['virtualenv_name'] = "dcv_authenticator_virtualenv"
 default['cluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['dcv']['authenticator']['virtualenv_name']}"
-default['cluster']['dcv']['version'] = '2024.0-19030'
+default['cluster']['dcv']['version'] = '2025.0-20103'
 default['cluster']['dcv_port'] = 8443
 
-default['cluster']['dcv']['server']['version'] = '2024.0.19030-1'
-default['cluster']['dcv']['xdcv']['version'] = '2024.0.654-1'
-default['cluster']['dcv']['gl']['version'] = '2024.0.1096-1'
-default['cluster']['dcv']['web_viewer']['version'] = '2024.0.19030-1'
+default['cluster']['dcv']['server']['version'] = '2025.0.20103-1'
+default['cluster']['dcv']['xdcv']['version'] = '2025.0.688-1'
+default['cluster']['dcv']['gl']['version'] = '2025.0.1112-1'
+default['cluster']['dcv']['web_viewer']['version'] = '2025.0.20103-1'
 
 # OpenSSH settings for AWS ParallelCluster instances
 default['openssh']['server']['protocol'] = '2'

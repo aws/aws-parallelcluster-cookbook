@@ -25,3 +25,7 @@ end
 action :configure do
   # Do nothing
 end
+
+def nvidia_imex_package
+  "#{nvidia_imex_service}-#{nvidia_driver_major_version}"
+end

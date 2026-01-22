@@ -19,14 +19,6 @@ end
 use 'partial/_fabric_manager_common.rb'
 use 'partial/_fabric_manager_install_debian.rb'
 
-def fabric_manager_package
-  'nvidia-fabricmanager-570'
-end
-
-def fabric_manager_version
-  "#{_nvidia_driver_version}"
-end
-
 def platform
   "ubuntu#{node['platform_version'].delete('.')}"
 end

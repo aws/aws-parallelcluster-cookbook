@@ -17,14 +17,11 @@ provides :fabric_manager, platform: 'amazon', platform_version: '2'
 use 'partial/_fabric_manager_common.rb'
 use 'partial/_fabric_manager_install_rhel.rb'
 
+def platform
+  'rhel7'
+end
+
 def fabric_manager_package
   'nvidia-fabric-manager'
 end
 
-def fabric_manager_version
-  _nvidia_driver_version
-end
-
-def platform
-  'rhel7'
-end

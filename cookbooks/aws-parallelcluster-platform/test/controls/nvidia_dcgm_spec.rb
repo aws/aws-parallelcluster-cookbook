@@ -19,7 +19,7 @@ control 'tag:install_nvidia_dcgm_installed' do
       it { should be_installed }
     end
   else
-    describe package('datacenter-gpu-manager-4-cuda12') do
+    describe package('datacenter-gpu-manager-4-cuda13') do
       it { should be_installed }
     end
   end

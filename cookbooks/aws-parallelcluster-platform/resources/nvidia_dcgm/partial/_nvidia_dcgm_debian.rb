@@ -45,7 +45,7 @@ def dcgm_package
 end
 
 def dcgm4_package
-  "#{dcgm_package}-4-cuda12"
+  "#{dcgm_package}-4-cuda13"
 end
 
 def dcgm4_core_package

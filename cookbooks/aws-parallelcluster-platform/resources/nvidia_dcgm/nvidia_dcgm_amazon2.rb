@@ -24,3 +24,7 @@ end
 def platform
   'rhel7'
 end
+
+def dcgm4_package
+  "#{dcgm_package}-4-cuda12"
+end
