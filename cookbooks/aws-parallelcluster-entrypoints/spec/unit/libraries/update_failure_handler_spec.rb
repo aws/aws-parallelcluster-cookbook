@@ -38,7 +38,6 @@ describe ErrorHandlers::UpdateFailureHandler do
   end
   let(:node_type) { 'HeadNode' }
   let(:run_status) { double('run_status', exception: exception, updated_resources: updated_resources, node: node) }
-  let(:scontrol_resource_name) { 'reload config for running nodes' }
   let(:command_runner) { instance_double(ErrorHandlers::CommandRunner) }
 
   before do
@@ -100,27 +99,10 @@ describe ErrorHandlers::UpdateFailureHandler do
   end
 
   describe '#run_recovery' do
-    context 'when scontrol reconfigure succeeded' do
-      let(:reload_resource) { double('reload_resource', resource_name: :execute, name: scontrol_resource_name) }
-      let(:action_record) { double('action_record', new_resource: reload_resource, status: :updated) }
-
-      before do
-        allow(action_collection).to receive(:filtered_collection).and_return([action_record])
-      end
-
-      it 'cleans up DNA files and starts clustermgtd' do
-        expect(handler).to receive(:cleanup_dna_files)
-        expect(handler).to receive(:start_clustermgtd)
-        handler.run_recovery
-      end
-    end
-
-    context 'when scontrol reconfigure did not succeed' do
-      it 'cleans up DNA files but does not start clustermgtd' do
-        expect(handler).to receive(:cleanup_dna_files)
-        expect(handler).not_to receive(:start_clustermgtd)
-        handler.run_recovery
-      end
+    it 'cleans up DNA files and starts clustermgtd unconditionally' do
+      expect(handler).to receive(:cleanup_dna_files).ordered
+      expect(handler).to receive(:start_clustermgtd).ordered
+      handler.run_recovery
     end
   end
 
