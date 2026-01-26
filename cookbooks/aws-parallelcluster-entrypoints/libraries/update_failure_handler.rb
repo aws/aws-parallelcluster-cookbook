@@ -22,7 +22,7 @@ module ErrorHandlers
   # to restore the cluster to a consistent state:
   # 1. Logs information about the update failure including which resources succeeded before failure
   # 2. Cleans up DNA files shared with compute nodes
-  # 3. Starts clustermgtd if scontrol reconfigure succeeded
+  # 3. Starts clustermgtd
   #
   # Only runs on HeadNode - compute and login nodes skip this handler.
   class UpdateFailureHandler < Chef::Handler
@@ -54,20 +54,8 @@ module ErrorHandlers
 
     def run_recovery
       Chef::Log.info("#{log_prefix} Running recovery commands")
-
-      # Cleanup DNA files
       cleanup_dna_files
-
-      # Start clustermgtd if scontrol reconfigure succeeded
-      # Must match SCONTROL_RECONFIGURE_RESOURCE_NAME in aws-parallelcluster-slurm/libraries/update.rb
-      scontrol_reconfigure_resource_name = 'reload config for running nodes'
-      Chef::Log.info("#{log_prefix} Resource '#{scontrol_reconfigure_resource_name}' has execution status: #{resource_status(scontrol_reconfigure_resource_name)}")
-      if resource_succeeded?(scontrol_reconfigure_resource_name)
-        Chef::Log.info("#{log_prefix} scontrol reconfigure succeeded, starting clustermgtd")
-        start_clustermgtd
-      else
-        Chef::Log.info("#{log_prefix} scontrol reconfigure did not succeed, skipping clustermgtd start")
-      end
+      start_clustermgtd
     end
 
     def cleanup_dna_files
