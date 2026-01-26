@@ -207,17 +207,6 @@ replace_or_add "update node replacement timeout" do
   replace_only true
 end
 
-ruby_block "Update Slurm Accounting" do
-  block do
-    if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
-      run_context.include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
-    else
-      run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
-    end
-  end
-  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
-end unless on_docker?
-
 # Cover the following two scenarios:
 # - a cluster without login nodes is updated to have login nodes;
 # - a cluster with login nodes is updated to use another pool name.
@@ -242,8 +231,6 @@ template "#{node['cluster']['scripts_dir']}/slurm/update_munge_key.sh" do
   only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_custom_munge_key_updated? }
 end
 
-update_munge_head_node
-
 # The previous execute "generate_pcluster_slurm_configs" block resource may have overridden the slurmdbd password in
 # slurm_parallelcluster_slurmdbd.conf with a default value, so if it has run and Slurm accounting
 # is enabled we must pull the database password from Secrets Manager once again.
@@ -254,6 +241,19 @@ execute "update Slurm database password" do
   # This horrible only_if guard is needed to cover all cases that trigger "generate_pcluster_slurm_settings", in the case Slurm accounting is being used
   only_if { !(::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated?) && !node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
 end
+
+update_munge_head_node
+
+ruby_block "Update Slurm Accounting" do
+  block do
+    if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
+      run_context.include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
+    else
+      run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
+    end
+  end
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
+end unless on_docker?
 
 service 'slurmctld' do
   action :restart
@@ -280,11 +280,11 @@ end
 
 chef_sleep '15'
 
-wait_cluster_ready if cluster_readiness_check_on_update_enabled?
-
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
 end
+
+wait_cluster_ready if cluster_readiness_check_on_update_enabled?
 
 # The updated cfnconfig will be used by post update custom scripts
 template "#{node['cluster']['etc_dir']}/cfnconfig" do
