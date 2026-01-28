@@ -23,10 +23,11 @@ describe 'mysql_client:setup' do
     %w(x86_64 aarch64).each do |architecture|
       context "on #{platform}#{version} #{architecture}" do
         cached(:source_dir) { 'SOURCE_DIR' }
-        cached(:package_source_version) { '8.0.39' }
-        cached(:package_version) { '8.0.39-1' }
+        cached(:package_source_version) { 'VERSION' }
+        cached(:package_version) { 'VERSION-1' }
         cached(:package_filename) { "mysql-community-client-#{package_version}.tar.gz" }
         cached(:s3_url) { 's3://url' }
+        cached(:mysql_base_url) { "#{s3_url}/mysql" }
         cached(:package_platform) do
           platform_version = if version.to_i == 2
                                7
@@ -47,7 +48,7 @@ describe 'mysql_client:setup' do
             pending "unsupported architecture #{architecture}"
           end
         end
-        cached(:package_archive) { "#{s3_url}/mysql/#{package_platform}/#{package_filename}" }
+        cached(:package_archive) { "#{mysql_base_url}/#{package_platform}/#{package_filename}" }
         cached(:tarfile) { "/tmp/mysql-community-client-#{package_version}.tar.gz" }
         cached(:repository_packages) do
           if platform == 'ubuntu'
@@ -65,6 +66,9 @@ describe 'mysql_client:setup' do
             node.automatic['kernel']['machine'] = architecture
             node.override['cluster']['sources_dir'] = source_dir
             node.override['cluster']['artifacts_s3_url'] = s3_url
+            node.override['cluster']['mysql']['version'] = package_version
+            node.override['cluster']['mysql']['source_version'] = package_source_version
+            node.override['cluster']['mysql']['base_url'] = mysql_base_url
           end
           ConvergeMysqlClient.setup(runner)
         end
@@ -117,7 +121,7 @@ describe 'mysql_client:setup' do
           is_expected.to create_file("#{source_dir}/mysql_source_code.txt")
             .with(content: %(You can get MySQL source code here:
 
-#{"#{s3_url}/source/mysql-#{package_source_version}.tar.gz"}
+#{"#{mysql_base_url}/source/mysql-#{package_source_version}.tar.gz"}
 ))
             .with(owner: 'root')
             .with(group: 'root')

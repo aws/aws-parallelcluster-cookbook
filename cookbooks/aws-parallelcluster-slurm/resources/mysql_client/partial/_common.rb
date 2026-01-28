@@ -25,7 +25,7 @@ action :create_source_link do
   file "#{node['cluster']['sources_dir']}/mysql_source_code.txt" do
     content %(You can get MySQL source code here:
 
-#{package_source(node['cluster']['artifacts_s3_url'])}
+#{package_source}
 )
     owner 'root'
     group 'root'
@@ -35,26 +35,22 @@ end
 
 action_class do
   def package_version
-    "8.0.39-1"
+    node['cluster']['mysql']['version']
   end
 
   def package_source_version
-    "8.0.39"
+    node['cluster']['mysql']['source_version']
   end
 
   def package_filename
     "mysql-community-client-#{package_version}.tar.gz"
   end
 
-  def package_root(s3_url)
-    "#{s3_url}/mysql"
+  def package_archive
+    "#{node['cluster']['mysql']['base_url']}/#{package_platform}/#{package_filename}"
   end
 
-  def package_archive(s3_url)
-    "#{package_root(s3_url)}/#{package_platform}/#{package_filename}"
-  end
-
-  def package_source(s3_url)
-    "#{s3_url}/source/mysql-#{package_source_version}.tar.gz"
+  def package_source
+    "#{node['cluster']['mysql']['base_url']}/source/mysql-#{package_source_version}.tar.gz"
   end
 end
