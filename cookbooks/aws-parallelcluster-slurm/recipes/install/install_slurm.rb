@@ -127,10 +127,10 @@ bash 'copy license stuff' do
     cp -v COPYING #{node['cluster']['license_dir']}/slurm/COPYING
     cp -v DISCLAIMER #{node['cluster']['license_dir']}/slurm/DISCLAIMER
     cp -v LICENSE.OpenSSL #{node['cluster']['license_dir']}/slurm/LICENSE.OpenSSL
-    cp -v README.rst #{node['cluster']['license_dir']}/slurm/README.rst
+    cp -v README.md #{node['cluster']['license_dir']}/slurm/README.md
   SLURMLICENSE
   # TODO: Fix, so it works for upgrade
-  creates "#{node['cluster']['license_dir']}/slurm/README.rst"
+  creates "#{node['cluster']['license_dir']}/slurm/README.md"
 end
 
 file '/etc/ld.so.conf.d/slurm.conf' do
