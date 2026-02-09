@@ -18,16 +18,22 @@ require_relative 'command_runner'
 module ErrorHandlers
   # Chef exception handler for cluster update failures.
   #
-  # This handler is triggered when the update recipe fails. It performs recovery actions
-  # to restore the cluster to a consistent state:
-  # 1. Logs information about the update failure including which resources succeeded before failure
-  # 2. Cleans up DNA files shared with compute nodes
-  # 3. Starts clustermgtd
+  # This handler is triggered when either the update or update-compute-fleet recipe fails.
+  # It performs recovery actions to restore the cluster to a consistent state:
+  # 1. Logs information about the update failure including which resources succeeded before failure.
+  # 2. Cleans up DNA files shared with compute nodes, if cleanup_dna_files=true.
+  # 3. Starts clustermgtd, if start_clustermgtd=true.
   #
   # Only runs on HeadNode - compute and login nodes skip this handler.
   class UpdateFailureHandler < Chef::Handler
+    def initialize(config = {})
+      @cleanup_dna_files = config.fetch(:cleanup_dna_files, false)
+      @start_clustermgtd = config.fetch(:start_clustermgtd, false)
+      super()
+    end
+
     def report
-      Chef::Log.info("#{log_prefix} Started")
+      Chef::Log.info("#{log_prefix} Started with parameters @cleanup_dna_files=#{@cleanup_dna_files}, @start_clustermgtd=#{@start_clustermgtd}")
 
       unless node_type == 'HeadNode'
         Chef::Log.info("#{log_prefix} Node type is #{node_type}, recovery from update failure only executes on the HeadNode")
@@ -54,8 +60,8 @@ module ErrorHandlers
 
     def run_recovery
       Chef::Log.info("#{log_prefix} Running recovery commands")
-      cleanup_dna_files
-      start_clustermgtd
+      cleanup_dna_files if @cleanup_dna_files
+      start_clustermgtd if @start_clustermgtd
     end
 
     def cleanup_dna_files
