@@ -19,6 +19,8 @@ bash 'update compute fleet' do
   user 'root'
   code <<-UPDATE_COMPUTE_FLEET
       set -xe
+      #{cookbook_virtualenv_path}/bin/supervisorctl stop clustermgtd
       #{node['cluster']['scripts_dir']}/slurm/slurm_fleet_status_manager -cf #{node['cluster']['computefleet_status_path']}
+      #{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd
   UPDATE_COMPUTE_FLEET
 end

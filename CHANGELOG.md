@@ -32,7 +32,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Intel MPI Library to 2021.17.2 (from 2021.16.0).
 - Upgrade Cinc Client to version 18.8.54 (from 18.7.10).
 - Always start clustermgtd on cluster update failure, regardless the failure condition.
-- Keep clustermgtd running during compute-fleet status updates.
 
 **BUG FIXES**
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
