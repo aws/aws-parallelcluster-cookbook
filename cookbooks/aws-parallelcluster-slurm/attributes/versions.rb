@@ -5,12 +5,8 @@ default['cluster']['slurm']['branch'] = ''
 default['cluster']['slurm']['sha256'] = '719783317e46b6241ab5c8f1e3f91e1e34fda63b5a1cd21403fa7696ec8d517c'
 default['cluster']['slurm']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/slurm"
 # Munge
-default['cluster']['munge']['munge_version'] = '0.5.17'
-default['cluster']['munge']['sha256'] = '4d6a1b9665d8a1119fb90678e6bcf446012340dc59dbcc90a10e2ab2e4724f08'
-if platform?('amazon') && node['platform_version'] == "2"
-  default['cluster']['munge']['munge_version'] = '0.5.16'
-  default['cluster']['munge']['sha256'] = 'fa27205d6d29ce015b0d967df8f3421067d7058878e75d0d5ec3d91f4d32bb57'
-end
+default['cluster']['munge']['munge_version'] = '0.5.18'
+default['cluster']['munge']['sha256'] = '67722a4fbf46d206fa01061cd8832a04693d8a5d2699540b86528016de7efb55'
 default['cluster']['munge']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/munge"
 # LibJwt
 default['cluster']['jwt']['version'] = '1.18.4'
