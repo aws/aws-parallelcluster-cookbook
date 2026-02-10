@@ -3,6 +3,11 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.14.2
+------
+**CHANGES**
+- Upgrade munge to version 0.5.18 (from 0.5.16).
+
 3.14.1
 ------
 
