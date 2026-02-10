@@ -67,7 +67,12 @@ bash "install custom aws-parallelcluster-node" do
     else
       custom_package_url=#{node['cluster']['custom_node_package']}
     fi
-    curl --retry 3 -L -o aws-parallelcluster-node.tgz ${custom_package_url}
+    delays=(1 2 4 8 16 32 64 128 256)
+    for i in {0..8}; do
+      curl -v -L -o aws-parallelcluster-node.tgz ${custom_package_url} && break
+      echo "Curl attempt $((i+1)) failed, retrying in ${delays[$i]}s..."
+      sleep ${delays[$i]}
+    done
     rm -fr aws-parallelcluster-custom-node
     mkdir aws-parallelcluster-custom-node
     tar -xzf aws-parallelcluster-node.tgz --directory aws-parallelcluster-custom-node

@@ -40,7 +40,12 @@ if !node['cluster']['custom_awsbatchcli_package'].nil? && !node['cluster']['cust
       else
         custom_package_url=#{node['cluster']['custom_awsbatchcli_package']}
       fi
-      curl --retry 3 -L -o aws-parallelcluster.tgz ${custom_package_url}
+      delays=(1 2 4 8 16 32 64 128 256)
+      for i in {0..8}; do
+        curl -v -L -o aws-parallelcluster.tgz ${custom_package_url} && break
+        echo "Curl attempt $((i+1)) failed, retrying in ${delays[$i]}s..."
+        sleep ${delays[$i]}
+      done
       mkdir aws-parallelcluster-awsbatch-cli
       tar -xzf aws-parallelcluster.tgz --directory aws-parallelcluster-awsbatch-cli
       cd aws-parallelcluster-awsbatch-cli/*aws-parallelcluster*
