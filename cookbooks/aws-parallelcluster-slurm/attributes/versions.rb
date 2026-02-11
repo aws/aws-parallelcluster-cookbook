@@ -6,7 +6,7 @@ default['cluster']['slurm']['sha256'] = '719783317e46b6241ab5c8f1e3f91e1e34fda63
 default['cluster']['slurm']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/slurm"
 # Munge
 default['cluster']['munge']['munge_version'] = '0.5.18'
-default['cluster']['munge']['sha256'] = '67722a4fbf46d206fa01061cd8832a04693d8a5d2699540b86528016de7efb55'
+default['cluster']['munge']['sha256'] = '39c3ec6ef5604bfa206e8aa10fc05d5119040f6de4a554bc0fb98ca1aed838dc'
 default['cluster']['munge']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/munge"
 # LibJwt
 default['cluster']['jwt']['version'] = '1.18.4'
