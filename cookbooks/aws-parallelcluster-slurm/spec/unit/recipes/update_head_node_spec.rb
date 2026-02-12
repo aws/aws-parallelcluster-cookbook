@@ -84,6 +84,42 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               timeout: reconfigure_timeout
             )
           end
+          it 'executes resources in the correct order' do
+            # NOTE: The most important aspect in the sequence is that clustermgtd is stopped while executing:
+            #   1. update_munge_key
+            #   2. restart of slurmctld
+            #   3. scontrol reconfigure
+            resource_names = chef_run.resource_collection.map(&:name)
+
+            expected_sequence = [
+              'stop clustermgtd',
+              chef_run.node['cluster']['update']['trigger_file'],
+              'update_shared_storages',
+              'replace slurm queue nodes',
+              'Update or Cleanup Slurm Topology',
+              'generate_pcluster_slurm_configs',
+              'generate_pcluster_custom_slurm_settings_include_files',
+              'Override Custom Slurm Settings with remote file',
+              'generate_pcluster_fleet_config',
+              'update node replacement timeout',
+              'Update Slurm Accounting',
+              "#{scripts_dir}/slurm/check_login_nodes_stopped.sh",
+              "#{scripts_dir}/slurm/update_munge_key.sh",
+              'update_munge_key',
+              'update Slurm database password',
+              'slurmctld',
+              '5',
+              'check slurmctld status',
+              'reload config for running nodes',
+              '15',
+              'start clustermgtd',
+              'Check cluster readiness',
+              '/etc/parallelcluster/cfnconfig',
+              'Cleanup',
+            ]
+
+            expect(resource_names).to eq(expected_sequence)
+          end
         end
       end
 

@@ -280,11 +280,11 @@ end
 
 chef_sleep '15'
 
-wait_cluster_ready if cluster_readiness_check_on_update_enabled?
-
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
 end
+
+wait_cluster_ready if cluster_readiness_check_on_update_enabled?
 
 # The updated cfnconfig will be used by post update custom scripts
 template "#{node['cluster']['etc_dir']}/cfnconfig" do
