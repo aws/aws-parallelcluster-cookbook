@@ -40,6 +40,60 @@ class CriticalError(Exception):
     pass
 
 
+def _build_topology_block_mapping(slurm_conf_dir):
+    """
+    Build a mapping of (queue_name, compute_resource_name) -> block_name from topology.conf.
+
+    Returns an empty dict if topology.conf does not exist.
+    """
+    topology_conf_path = path.join(slurm_conf_dir, "topology.conf")
+    mapping = {}
+
+    if not path.exists(topology_conf_path):
+        return mapping
+
+    try:
+        with open(topology_conf_path, encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if not line.startswith("BlockName="):
+                    continue
+
+                block_name = None
+                nodes_spec = None
+                for token in line.split():
+                    if token.startswith("BlockName="):
+                        block_name = token.split("=", 1)[1]
+                    elif token.startswith("Nodes="):
+                        nodes_spec = token.split("=", 1)[1]
+
+                if not block_name or not nodes_spec:
+                    continue
+
+                # Extract queue_name and compute_resource_name from node spec
+                # Node spec format: {queue_name}-st-{compute_resource_name}-[1-N]
+                #                or {queue_name}-dy-{compute_resource_name}-[1-N]
+                # Remove the trailing -[1-N] part
+                node_prefix = re.sub(r"-\[.*\]$", "", nodes_spec)
+                # Split by "-st-" or "-dy-" to get queue_name and compute_resource_name
+                parts = re.split(r"-(st|dy)-", node_prefix, maxsplit=1)
+                if len(parts) == 3:
+                    queue_name, _node_type, compute_resource_name = parts
+                    mapping[(queue_name, compute_resource_name)] = block_name
+                    log.info(
+                        "Topology mapping: (%s, %s) -> %s",
+                        queue_name,
+                        compute_resource_name,
+                        block_name,
+                    )
+    except Exception as e:
+        log.warning("Failed to parse topology.conf for block mapping: %s", e)
+
+    return mapping
+
+
 def generate_slurm_config_files(
     output_directory,
     template_directory,
@@ -81,6 +135,13 @@ def generate_slurm_config_files(
     # Initialize partition-nodelist mapping
     partition_nodelist_mapping = {}
 
+    # TODO: Revert this changes after SchedMd fix the bug
+    # Build topology block mapping from topology.conf (if it exists)
+    # This is a workaround for a Slurm 25.11.2 bug where nodes are incorrectly removed from
+    # topology blocks when they enter power-down state. Setting Topology=default:<BlockName>
+    # on the NodeName line prevents this issue.
+    topology_block_mapping = _build_topology_block_mapping(output_directory)
+
     # Generate slurm_parallelcluster_{QueueName}_partitions.conf and slurm_parallelcluster_{QueueName}_gres.conf
     is_default_queue = True  # The first queue in the queues list is the default queue
     for queue in queues:
@@ -92,6 +153,7 @@ def generate_slurm_config_files(
                 instance_types_data,
                 conf_type=file_type,
                 default=is_default_queue,
+                topology_block_mapping=topology_block_mapping if file_type == "partition" else None,
             )
             _generate_queue_config(
                 queue["Name"],

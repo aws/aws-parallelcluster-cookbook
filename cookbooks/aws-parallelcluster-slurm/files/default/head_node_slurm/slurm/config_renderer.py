@@ -16,12 +16,21 @@ log = logging.getLogger()
 class ComputeResourceRenderer:
     """Renders a PCluster ComputeResource Config as a Slurm NodeName config, gres config or node_set element."""
 
-    def __init__(self, queue_name: str, compute_resource_config: Dict, no_gpu, memory_ratio, instance_types_info: Dict):
+    def __init__(
+        self,
+        queue_name: str,
+        compute_resource_config: Dict,
+        no_gpu,
+        memory_ratio,
+        instance_types_info: Dict,
+        topology_block_name: str = None,
+    ):
         self.queue_name = queue_name
         self.has_gpu = not no_gpu
         self.static_nodes = compute_resource_config["MinCount"]
         self.dynamic_nodes = compute_resource_config["MaxCount"] - self.static_nodes
         self.name = compute_resource_config["Name"]
+        self.topology_block_name = topology_block_name
         self.disable_multithreading = compute_resource_config["DisableSimultaneousMultithreading"]
         self.custom_settings = compute_resource_config.get("CustomSlurmSettings", {})
         self.spot_price = compute_resource_config.get("SpotPrice", None)
@@ -82,6 +91,9 @@ class ComputeResourceRenderer:
         if self.has_gpu and self.gpu_count > 0:
             definitions += f" Gres=gpu:{self.gpu_type}:{self.gpu_count}"
 
+        if self.topology_block_name:
+            definitions += f" Topology=default:{self.topology_block_name}"
+
         return definitions
 
     def _features(self, dynamic=False):
@@ -134,13 +146,29 @@ class ComputeResourceRenderer:
 class QueueRenderer:
     """Renders a PCluster Queue Config as a Slurm partition config or as gres config."""
 
-    def __init__(self, queue_config, no_gpu, memory_ratio, instance_types_info, conf_type="partition", default=False):
+    def __init__(
+        self,
+        queue_config,
+        no_gpu,
+        memory_ratio,
+        instance_types_info,
+        conf_type="partition",
+        default=False,
+        topology_block_mapping=None,
+    ):
         self.name = queue_config["Name"]
         self.is_default = default
         self.conf_type = conf_type
         self.custom_settings = queue_config.get("CustomSlurmSettings", {})
         self.compute_renderers = [
-            ComputeResourceRenderer(self.name, compute_resource_config, no_gpu, memory_ratio, instance_types_info)
+            ComputeResourceRenderer(
+                self.name,
+                compute_resource_config,
+                no_gpu,
+                memory_ratio,
+                instance_types_info,
+                topology_block_name=(topology_block_mapping or {}).get((self.name, compute_resource_config["Name"])),
+            )
             for compute_resource_config in queue_config["ComputeResources"]
         ]
         self.job_exclusive_allocation = queue_config.get("JobExclusiveAllocation")
