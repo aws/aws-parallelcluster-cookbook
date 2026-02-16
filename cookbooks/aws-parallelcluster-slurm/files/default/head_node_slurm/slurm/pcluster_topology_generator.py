@@ -57,6 +57,53 @@ def _is_gb200(instance_type):
     return instance_type is not None and instance_type.split(".")[0] == P6E_GB200
 
 
+def build_topology_block_mapping(cluster_config, block_sizes, force_configuration):
+    """
+    Build a mapping of (queue_name, compute_resource_name) -> block_name.
+
+    This is the single source of truth for determining which queue/CR pairs
+    get topology blocks and what their block names are.
+
+    Returns a dict mapping (queue_name, compute_resource_name) tuples to block name strings.
+    Returns an empty dict if block_sizes is falsy.
+
+    Example output:
+        {
+            ("queue1", "cr1"): "Block1",
+            ("queue2", "cr2"): "Block2",
+        }
+    """
+    mapping = {}
+    if not block_sizes:
+        return mapping
+
+    min_block_size_list = min(list(map(int, block_sizes.split(","))))
+    max_block_size_list = max(list(map(int, block_sizes.split(","))))
+
+    block_count = 0
+    for queue_config in cluster_config["Scheduling"]["SlurmQueues"]:
+        queue_name = queue_config["Name"]
+
+        queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
+        if not _is_capacity_block(queue_capacity_type) and not force_configuration:
+            log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
+            continue
+
+        for compute_resource_config in queue_config["ComputeResources"]:
+            compute_resource_name = compute_resource_config["Name"]
+            compute_min_count = compute_resource_config["MinCount"]
+            compute_max_count = compute_resource_config["MaxCount"]
+            if compute_min_count != compute_max_count:
+                continue
+
+            if _is_gb200(compute_resource_config.get("InstanceType")) or force_configuration:
+                if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
+                    block_count += 1
+                    mapping[(queue_name, compute_resource_name)] = f"Block{block_count}"
+
+    return mapping
+
+
 def generate_topology_config_file(  # noqa: C901
     output_file: str, input_file: str, block_sizes: str, force_configuration: bool
 ):
@@ -71,52 +118,33 @@ def generate_topology_config_file(  # noqa: C901
     BlockSizes=9,18
     """
     if block_sizes:
-        min_block_size_list = min(list(map(int, block_sizes.split(","))))
-        max_block_size_list = max(list(map(int, block_sizes.split(","))))
-
         cluster_config = _load_cluster_config(input_file)
         queue_name, compute_resource_name = None, None
         try:
             topology_config = CONFIG_HEADER + "\n"
-            block_count = 0
+            block_mapping = build_topology_block_mapping(cluster_config, block_sizes, force_configuration)
+
+            # Build a lookup from (queue_name, cr_name) to compute_resource_config for node counts
+            cr_configs = {}
             for queue_config in cluster_config["Scheduling"]["SlurmQueues"]:
-                queue_name = queue_config["Name"]
+                for cr_config in queue_config["ComputeResources"]:
+                    cr_configs[(queue_config["Name"], cr_config["Name"])] = cr_config
 
-                # Retrieve capacity info from the queue_name, if there
-                queue_capacity_type = CAPACITY_TYPE_MAP.get(queue_config.get("CapacityType", "ONDEMAND"))
-                if not _is_capacity_block(queue_capacity_type) and not force_configuration:
-                    # We ignore this check when force_configuration option is used.
-                    log.info("ParallelCluster does not create topology for %s", queue_capacity_type)
-                    continue
-
-                for compute_resource_config in queue_config["ComputeResources"]:
-                    compute_resource_name = compute_resource_config["Name"]
-                    compute_min_count = compute_resource_config["MinCount"]
-                    compute_max_count = compute_resource_config["MaxCount"]
-                    if compute_min_count == compute_max_count:
-                        node_type = "st"
-                    else:
-                        continue
-
-                    # Check for if reservation is for NVLink and size matches min_block_size_list
-                    if _is_gb200(compute_resource_config.get("InstanceType")) or force_configuration:
-                        if min_block_size_list == compute_min_count or max_block_size_list == compute_max_count:
-                            block_count += 1
-                            # Each Capacity Reservation ID is a Capacity Block,
-                            # we associate each slurm block with a single capacity Block
-                            topology_config += (
-                                "BlockName=Block"
-                                + str(block_count)
-                                + "  Nodes="
-                                + str(queue_name)
-                                + "-"
-                                + str(node_type)
-                                + "-"
-                                + str(compute_resource_name)
-                                + "-[1-"
-                                + str(compute_max_count)
-                                + "]\n"
-                            )
+            for (queue_name, compute_resource_name), block_name in block_mapping.items():
+                compute_max_count = cr_configs[(queue_name, compute_resource_name)]["MaxCount"]
+                # Each Capacity Reservation ID is a Capacity Block,
+                # we associate each slurm block with a single capacity Block
+                topology_config += (
+                    "BlockName="
+                    + str(block_name)
+                    + "  Nodes="
+                    + str(queue_name)
+                    + "-st-"
+                    + str(compute_resource_name)
+                    + "-[1-"
+                    + str(compute_max_count)
+                    + "]\n"
+                )
 
             topology_config += "BlockSizes=" + str(block_sizes) + "\n"
         except (KeyError, AttributeError) as e:

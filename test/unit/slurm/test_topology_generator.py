@@ -16,6 +16,7 @@ from assertpy import assert_that
 from pcluster_topology_generator import (
     _is_capacity_block,
     _is_gb200,
+    build_topology_block_mapping,
     cleanup_topology_config_file,
     generate_topology_config_file,
 )
@@ -59,6 +60,151 @@ def test_cleanup_topology_config_file(mocker, tmpdir, file_exists):
         mock_remove.assert_called_once_with(str(topology_file_path))
     else:
         mock_remove.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "cluster_config, block_sizes, force_configuration, expected_mapping",
+    [
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {"Name": "cr1", "MinCount": 1, "MaxCount": 1, "InstanceType": "p6e-gb200.ANY_SIZE"},
+                            ],
+                        }
+                    ]
+                }
+            },
+            None,
+            False,
+            {},
+            id="no block_sizes returns empty mapping",
+        ),
+        pytest.param(
+            {"Scheduling": {"SlurmQueues": []}},
+            "",
+            False,
+            {},
+            id="empty block_sizes returns empty mapping",
+        ),
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "ONDEMAND",
+                            "ComputeResources": [
+                                {"Name": "cr1", "MinCount": 10, "MaxCount": 10, "InstanceType": "ANY_INSTANCE"},
+                            ],
+                        }
+                    ]
+                }
+            },
+            "10",
+            False,
+            {},
+            id="on-demand without force_configuration returns empty",
+        ),
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "ONDEMAND",
+                            "ComputeResources": [
+                                {"Name": "cr1", "MinCount": 10, "MaxCount": 10, "InstanceType": "ANY_INSTANCE"},
+                            ],
+                        }
+                    ]
+                }
+            },
+            "10",
+            True,
+            {("q1", "cr1"): "Block1"},
+            id="force_configuration bypasses capacity block and instance type checks",
+        ),
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {"Name": "cr1", "MinCount": 5, "MaxCount": 10, "InstanceType": "p6e-gb200.ANY_SIZE"},
+                            ],
+                        }
+                    ]
+                }
+            },
+            "10",
+            False,
+            {},
+            id="dynamic nodes (MinCount != MaxCount) are skipped",
+        ),
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "my-st-queue",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {
+                                    "Name": "my-dy-cr",
+                                    "MinCount": 9,
+                                    "MaxCount": 9,
+                                    "InstanceType": "p6e-gb200.ANY_SIZE",
+                                },
+                                {"Name": "cr2", "MinCount": 18, "MaxCount": 18, "InstanceType": "p6e-gb200.ANY_SIZE"},
+                            ],
+                        },
+                        {
+                            "Name": "q2",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {"Name": "cr3", "MinCount": 9, "MaxCount": 9, "InstanceType": "p6e-gb200.ANY_SIZE"},
+                            ],
+                        },
+                    ]
+                }
+            },
+            "9,18",
+            False,
+            {("my-st-queue", "my-dy-cr"): "Block1", ("my-st-queue", "cr2"): "Block2", ("q2", "cr3"): "Block3"},
+            id="multiple queues and CRs with st/dy in names get sequential block names",
+        ),
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {"Name": "cr1", "MinCount": 5, "MaxCount": 5, "InstanceType": "p6e-gb200.ANY_SIZE"},
+                            ],
+                        }
+                    ]
+                }
+            },
+            "9,18",
+            False,
+            {},
+            id="block size mismatch returns empty",
+        ),
+    ],
+)
+def test_build_topology_block_mapping(cluster_config, block_sizes, force_configuration, expected_mapping):
+    """Test build_topology_block_mapping returns correct mapping."""
+    result = build_topology_block_mapping(cluster_config, block_sizes, force_configuration)
+    assert_that(result).is_equal_to(expected_mapping)
 
 
 @pytest.mark.parametrize(

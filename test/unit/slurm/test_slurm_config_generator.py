@@ -15,7 +15,7 @@ import os
 import pytest
 from assertpy import assert_that
 from config_utils import get_template_folder
-from pcluster_slurm_config_generator import generate_slurm_config_files
+from pcluster_slurm_config_generator import _build_topology_block_mapping, generate_slurm_config_files
 
 
 def _mock_head_node_config(mocker):
@@ -277,6 +277,121 @@ def test_generate_partition_nodelist_mapping(mocker, test_datadir, tmpdir):
     with open(os.path.join(test_datadir, "expected_outputs", filename), "r", encoding="utf-8") as file:
         expected_mapping = json.load(file)
     assert_that(output_mapping).is_equal_to(expected_mapping)
+
+
+@pytest.mark.parametrize(
+    "cluster_config, block_sizes, force_topology_configuration, mock_exception, expected_block_mapping, expect_warning",
+    [
+        pytest.param(
+            {
+                "Scheduling": {
+                    "SlurmQueues": [
+                        {
+                            "Name": "q1",
+                            "CapacityType": "CAPACITY_BLOCK",
+                            "ComputeResources": [
+                                {"Name": "cr1", "MinCount": 10, "MaxCount": 10, "InstanceType": "p6e-gb200.ANY_SIZE"},
+                            ],
+                        }
+                    ]
+                }
+            },
+            "10",
+            False,
+            None,
+            {("q1", "cr1"): "Block1"},
+            False,
+            id="happy path with p6e-gb200",
+        ),
+        pytest.param(
+            {},
+            None,
+            False,
+            None,
+            {},
+            False,
+            id="no block_sizes returns empty mapping",
+        ),
+        pytest.param(
+            {},
+            "",
+            False,
+            None,
+            {},
+            False,
+            id="empty block_sizes returns empty mapping",
+        ),
+        pytest.param(
+            {"Scheduling": {"SlurmQueues": []}},
+            "10",
+            True,
+            ValueError("test error"),
+            {},
+            True,
+            id="exception returns empty mapping and logs warning",
+        ),
+    ],
+)
+def test_build_topology_block_mapping(
+    mocker,
+    cluster_config,
+    block_sizes,
+    force_topology_configuration,
+    mock_exception,
+    expected_block_mapping,
+    expect_warning,
+):
+    """Test _build_topology_block_mapping handles happy path, missing args, and exceptions."""
+    mock_log = mocker.patch("pcluster_slurm_config_generator.log")
+    if mock_exception:
+        mocker.patch(
+            "pcluster_topology_generator.build_topology_block_mapping",
+            side_effect=mock_exception,
+        )
+    result = _build_topology_block_mapping(cluster_config, block_sizes, force_topology_configuration)
+    assert_that(result).is_equal_to(expected_block_mapping)
+    if expect_warning:
+        mock_log.warning.assert_called_once_with("Failed to build topology block mapping: %s", mocker.ANY)
+    else:
+        mock_log.warning.assert_not_called()
+
+
+@pytest.mark.parametrize("with_topology", [True, False])
+def test_generate_slurm_config_with_topology_block(mocker, test_datadir, tmpdir, with_topology):
+    _mock_head_node_config(mocker)
+
+    input_file = os.path.join(test_datadir, "sample_input.yaml")
+    instance_types_data = os.path.join(test_datadir, "sample_instance_types_data.json")
+
+    template_directory = get_template_folder()
+
+    # When testing with topology, pass block_sizes and force_topology_configuration
+    topology_kwargs = {}
+    if with_topology:
+        topology_kwargs = {
+            "block_sizes": "10,5",
+            "force_topology_configuration": True,
+        }
+
+    generate_slurm_config_files(
+        tmpdir,
+        template_directory,
+        input_file,
+        instance_types_data,
+        dryrun=False,
+        no_gpu=False,
+        compute_node_bootstrap_timeout=1600,
+        realmemory_to_ec2memory_ratio=0.95,
+        slurmdbd_user="slurm",
+        cluster_name="test-cluster",
+        **topology_kwargs,
+    )
+
+    suffix = "" if with_topology else "_no_topology"
+    for queue in ["queue1", "queue2"]:
+        file_name = f"pcluster/slurm_parallelcluster_{queue}_partition.conf"
+        output_file_name = f"pcluster/slurm_parallelcluster_{queue}_partition{suffix}.conf"
+        _assert_files_are_equal(tmpdir / file_name, test_datadir / "expected_outputs" / output_file_name)
 
 
 def _assert_files_are_equal(file, expected_file):

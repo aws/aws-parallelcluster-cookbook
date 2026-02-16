@@ -173,7 +173,9 @@ execute "generate_pcluster_slurm_configs" do
           " #{nvidia_installed? ? '' : '--no-gpu'}"\
           " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
           " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
-          " --cluster-name #{node['cluster']['stack_name']}"
+          " --cluster-name #{node['cluster']['stack_name']}"\
+            "#{node['cluster']['p6egb200_block_sizes'].nil? ? '' : " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"}"\
+            "#{['true', 'yes', true].include?(node['cluster']['slurm']['block_topology']['force_configuration']) ? ' --force-topology-configuration' : ''}"
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? }
 end
 

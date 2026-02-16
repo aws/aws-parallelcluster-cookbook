@@ -71,7 +71,9 @@ unless on_docker?
             " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
             " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
             " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
-            " --cluster-name #{node['cluster']['stack_name']}"
+            " --cluster-name #{node['cluster']['stack_name']}"\
+            "#{node['cluster']['p6egb200_block_sizes'].nil? ? '' : " --block-sizes #{node['cluster']['p6egb200_block_sizes']}"}"\
+            "#{['true', 'yes', true].include?(node['cluster']['slurm']['block_topology']['force_configuration']) ? ' --force-topology-configuration' : ''}"
   end
 
   # Generate custom Slurm settings include files

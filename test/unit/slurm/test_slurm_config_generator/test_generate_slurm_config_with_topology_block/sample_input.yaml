@@ -1,0 +1,33 @@
+Scheduling:
+  SlurmQueues:
+    - Name: queue1
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: cr1
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: false
+            GdrSupport: false
+          InstanceType: c5.2xlarge
+          MaxCount: 10
+          MinCount: 10
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+    - Name: queue2
+      CapacityType: ONDEMAND
+      ComputeResources:
+        - Name: cr2
+          DisableSimultaneousMultithreading: false
+          Efa:
+            Enabled: false
+            GdrSupport: false
+          InstanceType: c4.xlarge
+          MaxCount: 5
+          MinCount: 5
+          StaticNodePriority: 1
+          DynamicNodePriority: 1000
+  Scheduler: slurm
+  SlurmSettings:
+    ScaledownIdletime: 10
+    Database: null
+    ExternalSlurmdbd: null
