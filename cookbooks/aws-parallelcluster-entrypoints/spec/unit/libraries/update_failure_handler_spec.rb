@@ -15,7 +15,7 @@ require_relative '../../spec_helper'
 require_relative '../../../libraries/update_failure_handler'
 
 describe ErrorHandlers::UpdateFailureHandler do
-  let(:handler) { described_class.new }
+  let(:handler) { described_class.new(cleanup_dna_files: true, start_clustermgtd: true) }
   let(:exception) { StandardError.new('Test error') }
   let(:resource1) { double('resource1', to_s: 'file[/tmp/test]') }
   let(:updated_resources) { [resource1] }
@@ -99,10 +99,28 @@ describe ErrorHandlers::UpdateFailureHandler do
   end
 
   describe '#run_recovery' do
-    it 'cleans up DNA files and starts clustermgtd unconditionally' do
-      expect(handler).to receive(:cleanup_dna_files).ordered
-      expect(handler).to receive(:start_clustermgtd).ordered
-      handler.run_recovery
+    { cleanup_dna_files: :cleanup_dna_files, start_clustermgtd: :start_clustermgtd }.each do |flag, method|
+      [true, false].each do |enabled|
+        context "when #{flag} is #{enabled}" do
+          let(:handler) { described_class.new(flag => enabled) }
+
+          before do
+            allow(handler).to receive(:run_status).and_return(run_status)
+            allow(handler).to receive(:action_collection).and_return(action_collection)
+            allow(handler).to receive(:command_runner).and_return(command_runner)
+            allow(Chef::Log).to receive(:info)
+          end
+
+          it "#{enabled ? 'calls' : 'does not call'} #{method}" do
+            if enabled
+              expect(handler).to receive(method)
+            else
+              expect(handler).not_to receive(method)
+            end
+            handler.run_recovery
+          end
+        end
+      end
     end
   end
 

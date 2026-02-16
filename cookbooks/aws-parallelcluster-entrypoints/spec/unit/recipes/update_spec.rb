@@ -65,7 +65,10 @@ describe 'aws-parallelcluster-entrypoints::update' do
               end
 
               it "enables the update failure handler" do
-                expect(chef_run).to enable_chef_handler('ErrorHandlers::UpdateFailureHandler').with(type: { exception: true })
+                expect(chef_run).to enable_chef_handler('ErrorHandlers::UpdateFailureHandler').with(
+                  arguments: { cleanup_dna_files: true, start_clustermgtd: true },
+                  type: { exception: true }
+                )
               end
             end
           end

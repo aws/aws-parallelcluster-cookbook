@@ -13,6 +13,7 @@
 # limitations under the License.
 
 chef_handler 'ErrorHandlers::UpdateFailureHandler' do
+  arguments cleanup_dna_files: true, start_clustermgtd: true
   type exception: true
 end
 

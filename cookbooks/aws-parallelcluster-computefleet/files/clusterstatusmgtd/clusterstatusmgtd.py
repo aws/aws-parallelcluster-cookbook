@@ -389,7 +389,7 @@ class ClusterStatusManager:
             "sudo cinc-client "
             "--local-mode "
             "--config /etc/chef/client.rb "
-            "--log_level auto "
+            "--log_level info "
             f"--logfile {cinc_log_file} "
             "--force-formatter "
             "--no-color "
