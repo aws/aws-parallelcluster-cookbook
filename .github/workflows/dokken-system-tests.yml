@@ -79,6 +79,25 @@ jobs:
         with:
           omnitruckUrl: omnitruck.cinc.sh
           project: cinc-workstation
+      - name: Downgrade Docker for kitchen-dokken 2.20.8 compatibility
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
+        run: |
+          # kitchen-dokken 2.20.8 sends Cmd as string and platform as "os/arch" string
+          # Docker 29.x (rolled out Feb 9 2026) rejects these — downgrade to 28.x
+          # https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20260201.15
+          echo "Current Docker: $(docker --version)"
+          # Ensure Docker official repo is configured
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get update
+          # List available versions for debugging
+          apt-cache madison docker-ce | head -20
+          # Find latest 28.x version (format is 5:28.x.y-1~ubuntu...)
+          VERSION_STRING=$(apt-cache madison docker-ce | awk -F'|' '{print $2}' | tr -d ' ' | grep '^5:28\.' | head -1)
+          echo "Installing Docker version: $VERSION_STRING"
+          sudo apt-get install -y --allow-downgrades docker-ce=$VERSION_STRING docker-ce-cli=$VERSION_STRING
+          echo "New Docker: $(docker --version)"
       - name: Kitchen Test Install
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/test-kitchen@main
