@@ -37,6 +37,21 @@ action_class do
   def pre_install
     apt_update
 
+    # ubuntu-desktop comes with NetworkManager. On a cloud instance NetworkManager is unnecessary and causes delay.
+    # Instruct Netplan to use networkd for better performance,
+    # and avoid network disruption when installing ubuntu-desktop.
+    bash 'Instruct Netplan to use networkd' do
+      code <<-NETPLAN
+        set -e
+        cat > /etc/netplan/95-parallelcluster-force-networkd.yaml << 'EOF'
+network:
+  version: 2
+  renderer: networkd
+EOF
+        netplan apply
+      NETPLAN
+    end unless on_docker?
+
     bash 'install pre-req' do
       cwd Chef::Config[:file_cache_path]
       # Must install whoopsie separately before installing ubuntu-desktop to avoid whoopsie crash pop-up
@@ -136,21 +151,5 @@ action_class do
       retries 10
       retry_delay 5
     end
-  end
-
-  def post_install
-    # ubuntu-desktop comes with NetworkManager. On a cloud instance NetworkManager is unnecessary and causes delay.
-    # Instruct Netplan to use networkd for better performance
-    bash 'Instruct Netplan to use networkd' do
-      code <<-NETPLAN
-        set -e
-        cat > /etc/netplan/95-parallelcluster-force-networkd.yaml << 'EOF'
-network:
-  version: 2
-  renderer: networkd
-EOF
-        netplan apply
-      NETPLAN
-    end unless on_docker?
   end
 end
