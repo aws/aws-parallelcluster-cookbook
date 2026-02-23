@@ -10,7 +10,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Replace cfn-hup in compute nodes with systemd timer to support in place updates in order to improve performance.
   This new mechanism relies on shared storage to sync updates between the head node and compute nodes.
 - Mitigate the risk of transient build-image failures in RHEL and Rocky caused by out-of-sync repo mirrors.
-- Upgrade Slurm to version 25.11.2 (from 24.11.7).
+- Upgrade Slurm to version 25.11.3 (from 24.11.7).
 - Upgrade Pmix to 5.0.10 (from 5.0.6).
 - Upgrade EFA installer to 1.46.0 (from 1.44.0).
   - Efa-driver: efa-2.17.3-1
