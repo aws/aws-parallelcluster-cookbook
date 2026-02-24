@@ -37,7 +37,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix timestamp formats in CloudWatch log configuration to let CloudWatch parse the correct timestamps.
 - Fix an issue that was blocking the logging of slurm health check events.
 - Fix cluster creation failure without Internet access when GPU instances and DCV are used.
-- Fix build-image failure on Ubuntu with outdated os packages. Using the latest Ubuntu base AMI and/or enabling os packages update is recommended for most stable build-image process.
+- Fix build-image failure during ubuntu-desktop installation on a Ubuntu parent image with outdated OS packages.
 
 3.14.2
 ------
