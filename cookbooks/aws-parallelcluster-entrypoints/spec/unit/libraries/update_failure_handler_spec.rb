@@ -29,6 +29,7 @@ describe ErrorHandlers::UpdateFailureHandler do
     {
       'cluster' => {
         'node_type' => node_type,
+        'scheduler' => scheduler,
         'system_pyenv_root' => pyenv_root,
         'python-version' => python_version,
         'scripts_dir' => scripts_dir,
@@ -37,6 +38,7 @@ describe ErrorHandlers::UpdateFailureHandler do
     }
   end
   let(:node_type) { 'HeadNode' }
+  let(:scheduler) { 'slurm' }
   let(:run_status) { double('run_status', exception: exception, updated_resources: updated_resources, node: node) }
   let(:command_runner) { instance_double(ErrorHandlers::CommandRunner) }
 
@@ -54,6 +56,12 @@ describe ErrorHandlers::UpdateFailureHandler do
     end
   end
 
+  describe '#scheduler' do
+    it 'returns the scheduler from cluster attributes' do
+      expect(handler.scheduler).to eq('slurm')
+    end
+  end
+
   describe '#cookbook_virtualenv_path' do
     it 'constructs the correct virtualenv path' do
       expect(handler.cookbook_virtualenv_path).to eq(virtualenv_path)
@@ -61,7 +69,7 @@ describe ErrorHandlers::UpdateFailureHandler do
   end
 
   describe '#report' do
-    context 'when node type is HeadNode' do
+    context 'when node type is HeadNode and scheduler is slurm' do
       it 'writes error report and runs recovery commands' do
         expect(handler).to receive(:write_error_report)
         expect(handler).to receive(:run_recovery)
@@ -83,7 +91,32 @@ describe ErrorHandlers::UpdateFailureHandler do
         expect(handler).not_to receive(:write_error_report)
         expect(handler).not_to receive(:run_recovery)
         allow(Chef::Log).to receive(:info)
-        expect(Chef::Log).to receive(:info).with(/Node type is ComputeFleet/)
+        expect(Chef::Log).to receive(:info).with(/Node type is ComputeFleet and scheduler is slurm, recovery from update failure only executes on the HeadNode with slurm scheduler/)
+        handler.report
+      end
+    end
+
+    context 'when scheduler is not slurm' do
+      let(:scheduler) { 'awsbatch' }
+
+      it 'skips recovery and returns early' do
+        expect(handler).not_to receive(:write_error_report)
+        expect(handler).not_to receive(:run_recovery)
+        allow(Chef::Log).to receive(:info)
+        expect(Chef::Log).to receive(:info).with(/Node type is HeadNode and scheduler is awsbatch, recovery from update failure only executes on the HeadNode with slurm scheduler/)
+        handler.report
+      end
+    end
+
+    context 'when node type is not HeadNode and scheduler is not slurm' do
+      let(:node_type) { 'ComputeFleet' }
+      let(:scheduler) { 'awsbatch' }
+
+      it 'skips recovery and returns early' do
+        expect(handler).not_to receive(:write_error_report)
+        expect(handler).not_to receive(:run_recovery)
+        allow(Chef::Log).to receive(:info)
+        expect(Chef::Log).to receive(:info).with(/Node type is ComputeFleet and scheduler is awsbatch, recovery from update failure only executes on the HeadNode with slurm scheduler/)
         handler.report
       end
     end

@@ -35,8 +35,8 @@ module ErrorHandlers
     def report
       Chef::Log.info("#{log_prefix} Started with parameters @cleanup_dna_files=#{@cleanup_dna_files}, @start_clustermgtd=#{@start_clustermgtd}")
 
-      unless node_type == 'HeadNode'
-        Chef::Log.info("#{log_prefix} Node type is #{node_type}, recovery from update failure only executes on the HeadNode")
+      unless node_type == 'HeadNode' && scheduler == 'slurm'
+        Chef::Log.info("#{log_prefix} Node type is #{node_type} and scheduler is #{scheduler}, recovery from update failure only executes on the HeadNode with slurm scheduler")
         return
       end
 
@@ -80,6 +80,10 @@ module ErrorHandlers
 
     def node_type
       cluster_attributes['node_type']
+    end
+
+    def scheduler
+      cluster_attributes['scheduler']
     end
 
     def cookbook_virtualenv_path
