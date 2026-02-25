@@ -79,6 +79,20 @@ end
 describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
+      cached(:expected_platform) do
+        platforms = {
+          'amazon2' => 'rhel7',
+          'amazon2023' => 'amzn2023',
+          'ubuntu22.04' => 'ubuntu2204',
+          'ubuntu24.04' => 'ubuntu2404',
+          'redhat8' => 'rhel8',
+          'redhat9' => 'rhel9',
+          'rocky8' => 'rhel8',
+          'rocky9' => 'rhel9',
+        }
+        platforms["#{platform}#{version}"]
+      end
+
       context 'when on arm and nvidia enabled' do
         cached(:chef_run) do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
@@ -97,6 +111,10 @@ describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
           it "is enabled" do
             expect(resource._nvidia_dcgm_enabled).to eq(true)
           end
+
+          it "returns correct platform for download URL" do
+            expect(resource.platform).to eq(expected_platform)
+          end
         end
       end
 
@@ -114,6 +132,10 @@ describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
 
           it "is enabled" do
             expect(resource._nvidia_dcgm_enabled).to eq(true)
+          end
+
+          it "returns correct platform for download URL" do
+            expect(resource.platform).to eq(expected_platform)
           end
         end
 
