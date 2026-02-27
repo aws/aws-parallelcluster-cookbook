@@ -45,6 +45,7 @@ action_class do
       code <<-PREREQ
         set -e
         DEBIAN_FRONTEND=noninteractive
+        NEEDRESTART_MODE=l
         apt -y install whoopsie
         apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)
         apt -y purge ifupdown

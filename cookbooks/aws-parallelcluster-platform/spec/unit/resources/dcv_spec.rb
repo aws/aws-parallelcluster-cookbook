@@ -472,6 +472,7 @@ describe 'dcv:setup' do
           when 'ubuntu'
             is_expected.to periodic_apt_update('')
             is_expected.to run_bash('install pre-req').with_cwd(Chef::Config[:file_cache_path]).with_retries(10).with_retry_delay(5)
+                                                      .with_code(/NEEDRESTART_MODE=l/)
                                                       .with_code(/apt -y install whoopsie/)
                                                       .with_code(/apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)/)
                                                       .with_code(/apt -y purge ifupdown/)
