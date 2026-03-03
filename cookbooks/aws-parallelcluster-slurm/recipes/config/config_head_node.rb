@@ -220,4 +220,12 @@ execute "check slurmctld status" do
   command "systemctl is-active --quiet slurmctld.service"
   retries 5
   retry_delay 2
-end unless redhat_on_docker?
+end
+
+ruby_block "Bootstrap Slurm Accounting Users" do
+  block do
+    run_context.include_recipe "aws-parallelcluster-slurm::bootstrap_slurm_accounting"
+  end
+  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+  not_if { kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd") }
+end unless on_docker?
