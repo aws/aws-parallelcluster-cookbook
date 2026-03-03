@@ -220,7 +220,7 @@ execute "check slurmctld status" do
   command "systemctl is-active --quiet slurmctld.service"
   retries 5
   retry_delay 2
-end
+end unless redhat_on_docker?
 
 ruby_block "Bootstrap Slurm Accounting Users" do
   block do

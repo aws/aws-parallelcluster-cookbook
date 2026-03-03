@@ -19,7 +19,7 @@ execute "wait for cluster registration" do
   command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -x '#{node['cluster']['stack_name']}'"
   retries 30
   retry_delay 10
-end unless kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
+end
 
 bash "bootstrap slurm database" do
   user 'root'
@@ -44,4 +44,4 @@ bash "bootstrap slurm database" do
 
     exit 0
   BOOTSTRAP
-end unless kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
+end

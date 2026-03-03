@@ -71,9 +71,6 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
             )
           end
           if enable_service == "true"
-            it 'Removes existing cluster name state file' do
-              is_expected.to delete_file('/var/spool/slurm.state/clustername')
-            end
             it 'starts the slurm database daemon' do
               is_expected.to enable_service("slurmdbd")
               is_expected.to start_service("slurmdbd")
@@ -82,10 +79,6 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
               is_expected.to run_execute("wait for slurm database").with(
                 command: "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
               )
-            end
-
-            it "bootstraps the Slurm database idempotently" do
-              is_expected.to run_bash("bootstrap slurm database")
             end
           else
             it 'disables the slurm database daemon' do

@@ -19,10 +19,6 @@ describe 'aws-parallelcluster-slurm::clear_slurm_accounting' do
       it 'deletes the Slurm database password update script' do
         is_expected.to delete_file("#{node['cluster']['scripts_dir']}/slurm/update_slurm_database_password.sh")
       end
-
-      it 'Removes existing cluster name state file' do
-        is_expected.to delete_file('/var/spool/slurm.state/clustername')
-      end
     end
   end
 end

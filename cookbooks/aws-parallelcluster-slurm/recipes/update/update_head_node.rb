@@ -207,7 +207,7 @@ replace_or_add "update node replacement timeout" do
   replace_only true
 end
 
-ruby_block "Configure Slurm Accounting" do
+ruby_block "Update Slurm Accounting" do
   block do
     if node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil?
       run_context.include_recipe "aws-parallelcluster-slurm::clear_slurm_accounting"
@@ -274,7 +274,7 @@ ruby_block "Bootstrap Slurm Accounting Users" do
   block do
     run_context.include_recipe "aws-parallelcluster-slurm::bootstrap_slurm_accounting"
   end
-  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? && !node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
   not_if { kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd") }
 end
 
