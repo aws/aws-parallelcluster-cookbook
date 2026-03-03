@@ -24,6 +24,11 @@ if platform?('amazon') && node['platform_version'] == "2"
 end
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
 
+# GDRCopy
+default['cluster']['nvidia']['gdrcopy']['version'] = '2.5.1'
+default['cluster']['nvidia']['gdrcopy']['sha256'] = 'c6d5ebb7dabb89d798f27609511735595004da73af28d93ac041bb5290c4cbec'
+default['cluster']['nvidia']['gdrcopy']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{node['cluster']['nvidia']['gdrcopy_version']}.tar.gz"
+
 # nvidia-imex
 default['cluster']['nvidia']['imex']['force_configuration'] = false
 
