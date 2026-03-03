@@ -115,8 +115,15 @@ def cfnhup_enabled?
 end
 
 def cluster_readiness_check_on_update_enabled?
-  node['cluster']['update']['cluster_readiness_check_enabled'] == 'true' ||
-    node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
+  cluster_readiness_check_enabled? && node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
+end
+
+def cluster_readiness_check_enabled?
+  node['cluster']['cluster_readiness_check_enabled'].to_s.downcase == 'true'
+end
+
+def cluster_readiness_check_ignore_failure?
+  node['cluster']['cluster_readiness_check_ignore_failure'].to_s.downcase == 'true'
 end
 
 # Executes a block with retry logic for handling transient failures.

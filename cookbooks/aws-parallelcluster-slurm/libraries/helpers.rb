@@ -175,6 +175,8 @@ def wait_cluster_ready
     timeout 30
     retries 10
     retry_delay 90
+    ignore_failure cluster_readiness_check_ignore_failure?
+    only_if { cluster_readiness_check_enabled? }
   end
 end
 
