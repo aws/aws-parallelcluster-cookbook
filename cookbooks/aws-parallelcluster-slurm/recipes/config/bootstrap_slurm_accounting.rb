@@ -4,7 +4,7 @@
 # Cookbook:: aws-parallelcluster-slurm
 # Recipe:: bootstrap_slurm_accounting
 #
-# Copyright:: 2013-2023 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# Copyright:: 2026 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -15,8 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+return if kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
+
 execute "wait for cluster registration" do
-  command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -x '#{node['cluster']['stack_name']}'"
+  command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -Fx '#{node['cluster']['stack_name']}'"
   retries 30
   retry_delay 10
 end

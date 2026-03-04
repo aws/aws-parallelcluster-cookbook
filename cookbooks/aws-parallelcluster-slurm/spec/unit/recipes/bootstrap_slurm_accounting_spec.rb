@@ -11,7 +11,7 @@ describe 'aws-parallelcluster-slurm::bootstrap_slurm_accounting' do
 
       it "waits for cluster registration" do
         is_expected.to run_execute("wait for cluster registration").with(
-          command: "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -x '#{node['cluster']['stack_name']}'"
+          command: "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -Fx '#{node['cluster']['stack_name']}'"
         )
       end
 

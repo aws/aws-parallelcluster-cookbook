@@ -204,8 +204,8 @@ ruby_block "Configure Slurm Accounting" do
   block do
     run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
   end
-  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
-end unless on_docker?
+  not_if { on_docker? || node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+end
 
 service "slurmctld" do
   supports restart: false
@@ -226,6 +226,5 @@ ruby_block "Bootstrap Slurm Accounting Users" do
   block do
     run_context.include_recipe "aws-parallelcluster-slurm::bootstrap_slurm_accounting"
   end
-  not_if { node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
-  not_if { kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd") }
-end unless on_docker?
+  not_if { on_docker? || node['cluster']['config'].dig(:Scheduling, :SlurmSettings, :Database).nil? }
+end
