@@ -25,11 +25,10 @@ LaunchParameters=enable_nss_slurm
 <% end -%>
 #
 # CLOUD CONFIGS OPTIONS
+SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>,enable_expedited_requeue
 <% if node['cluster']['use_private_hostname'] == 'true' or node['cluster']['dns_domain'].nil? or node['cluster']['dns_domain'].empty? -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>
 TreeWidth=65533
 <% else -%>
-SlurmctldParameters=idle_on_node_suspend,power_save_min_interval=30,node_reg_mem_percent=<%= node['cluster']['slurm_node_reg_mem_percent'] %>
 TreeWidth=30
 <% end -%>
 SuspendProgram=<%= node['cluster']['scripts_dir'] %>/slurm/slurm_suspend

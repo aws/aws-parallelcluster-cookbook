@@ -75,9 +75,6 @@ default['cluster']['efa']['sha256'] = '8302bd7849afb95c903a875d7dcb6f85b3d7629e9
 
 default['cluster']['efs']['version'] = '2.4.0'
 default['cluster']['efs']['sha256'] = '9b60c039c162388091d6fab6e9c6cfc5832f34b26b6d05b0a68b333147d78a25'
-if platform?('amazon')
-  default['cluster']['efs']['version'] = '2.1.0'
-end
 
 default['cluster']['cfn_bootstrap']['version'] = '2.0-38'
 

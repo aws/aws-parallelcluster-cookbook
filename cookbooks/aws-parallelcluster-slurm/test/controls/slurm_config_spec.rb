@@ -64,3 +64,13 @@ control 'tag:config_slurm_correctly_installed_on_compute_node' do
     end
   end
 end
+
+control 'tag:config_slurm_expedited_requeue_enabled' do
+  title 'Check that expedited requeue is enabled by default in slurm.conf'
+
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.on_docker? }
+
+  describe file("#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf") do
+    its('content') { should match /SlurmctldParameters=.*enable_expedited_requeue/ }
+  end
+end
