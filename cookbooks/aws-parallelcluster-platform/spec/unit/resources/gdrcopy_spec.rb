@@ -132,12 +132,8 @@ describe 'gdrcopy:gdrcopy_version' do
         chef_run.find_resource('gdrcopy', 'setup')
       end
 
-      it 'returns the expected gdrcopy version' do
-        expected_gdrcopy_version = if platform == "centos"
-                                     "2.3.1"
-                                   else
-                                     "2.5.1"
-                                   end
+      it 'returns the expected gdrcopy version from node attributes' do
+        expected_gdrcopy_version = chef_run.node['cluster']['nvidia']['gdrcopy']['version']
         expect(resource.gdrcopy_version).to eq(expected_gdrcopy_version)
       end
     end
@@ -156,12 +152,8 @@ describe 'gdrcopy:gdrcopy_checksum' do
         chef_run.find_resource('gdrcopy', 'setup')
       end
 
-      it 'returns the expected gdrcopy checksum' do
-        expected_gdrcopy_checksum = if platform == "centos"
-                                      "59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8"
-                                    else
-                                      "c6d5ebb7dabb89d798f27609511735595004da73af28d93ac041bb5290c4cbec"
-                                    end
+      it 'returns the expected gdrcopy checksum from node attributes' do
+        expected_gdrcopy_checksum = chef_run.node['cluster']['nvidia']['gdrcopy']['sha256']
         expect(resource.gdrcopy_checksum).to eq(expected_gdrcopy_checksum)
       end
     end
@@ -186,31 +178,7 @@ describe 'gdrcopy:setup' do
 
     context "on #{platform}#{version} when gdrcopy enabled" do
       cached(:sources_dir) { 'sources_dir' }
-      cached(:gdrcopy_version) { platform == 'centos' ? '2.3.1' : '2.5.1' }
-      cached(:gdrcopy_checksum) do
-        if platform == 'centos'
-          '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
-        else
-          'c6d5ebb7dabb89d798f27609511735595004da73af28d93ac041bb5290c4cbec'
-        end
-      end
       cached(:gdrcopy_service) { platform == 'ubuntu' ? 'gdrdrv' : 'gdrcopy' }
-      cached(:gdrcopy_tarball) { "#{sources_dir}/gdrcopy-#{gdrcopy_version}.tar.gz" }
-      cached(:gdrcopy_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{gdrcopy_version}.tar.gz" }
-      cached(:gdrcopy_dependencies) do
-        case platform
-        when 'ubuntu'
-          %w(build-essential devscripts debhelper check libsubunit-dev fakeroot pkg-config dkms)
-        when 'amazon'
-          if version == '2023'
-            %w(dkms rpm-build make check check-devel)
-          else
-            %w(dkms rpm-build make check check-devel subunit subunit-devel)
-          end
-        else
-          %w(dkms rpm-build make check check-devel subunit subunit-devel)
-        end
-      end
       cached(:gdrcopy_arch) { 'gdrcopy_arch' }
       cached(:gdrcopy_platform) do
         platforms = {
@@ -237,6 +205,24 @@ describe 'gdrcopy:setup' do
         ConvergeGdrcopy.setup(runner)
       end
       cached(:node) { chef_run.node }
+      cached(:gdrcopy_version) { node['cluster']['nvidia']['gdrcopy']['version'] }
+      cached(:gdrcopy_checksum) { node['cluster']['nvidia']['gdrcopy']['sha256'] }
+      cached(:gdrcopy_tarball) { "#{sources_dir}/gdrcopy-#{gdrcopy_version}.tar.gz" }
+      cached(:gdrcopy_url) { node['cluster']['nvidia']['gdrcopy']['base_url'] }
+      cached(:gdrcopy_dependencies) do
+        case platform
+        when 'ubuntu'
+          %w(build-essential devscripts debhelper check libsubunit-dev fakeroot pkg-config dkms)
+        when 'amazon'
+          if version == '2023'
+            %w(dkms rpm-build make check check-devel)
+          else
+            %w(dkms rpm-build make check check-devel subunit subunit-devel)
+          end
+        else
+          %w(dkms rpm-build make check check-devel subunit subunit-devel)
+        end
+      end
 
       it 'sets up gdrcopy' do
         is_expected.to setup_gdrcopy('setup')
