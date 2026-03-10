@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-# Copyright:: 2024 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Cookbook:: aws-parallelcluster
+# Recipe:: finalize_check_update_systemd_service.rb
+#
+# Copyright:: 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -11,7 +15,8 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'aws-parallelcluster-environment::finalize_directory_service'
+return unless node['cluster']['node_type'] == 'ComputeFleet'
 
-# This recipe must always be the last one because once execute, the node starts checking for cluster updates.
-include_recipe 'aws-parallelcluster-environment::finalize_check_update_systemd_service'
+service 'pcluster-check-update.timer' do
+  action [:enable, :start]
+end

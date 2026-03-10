@@ -43,11 +43,6 @@ describe 'aws-parallelcluster-platform::config_check_update_systemd_service' do
           .with(mode: '0644')
       end
 
-      it 'enables and starts the pcluster-check-update.timer service' do
-        is_expected.to enable_service('pcluster-check-update.timer')
-        is_expected.to start_service('pcluster-check-update.timer')
-      end
-
       describe 'pcluster-check-update.service template content' do
         it 'has Type=oneshot to prevent concurrent executions' do
           is_expected.to render_file('/etc/systemd/system/pcluster-check-update.service')

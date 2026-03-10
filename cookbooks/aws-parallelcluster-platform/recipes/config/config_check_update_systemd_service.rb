@@ -61,7 +61,3 @@ file "#{node['cluster']['log_base_dir']}/pcluster-check-update.log" do
   mode '0644'
   action :create_if_missing
 end
-
-service 'pcluster-check-update.timer' do
-  action [:enable, :start]
-end

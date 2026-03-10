@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2024 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+# Copyright:: 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -13,7 +13,7 @@
 
 require 'spec_helper'
 
-describe 'aws-parallelcluster-environment::finalize' do
+describe 'aws-parallelcluster-environment::finalize_check_update_systemd_service' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       for_all_node_types do |node_type|
@@ -24,12 +24,16 @@ describe 'aws-parallelcluster-environment::finalize' do
             end
             runner.converge(described_recipe)
           end
-          cached(:node) { chef_run.node }
 
-          ["aws-parallelcluster-environment::finalize_directory_service",
-           "aws-parallelcluster-environment::finalize_check_update_systemd_service"].each do |recipe_name|
-            it "includes the recipe #{recipe_name}" do
-              is_expected.to include_recipe(recipe_name)
+          if node_type == 'ComputeFleet'
+            it 'enables and starts the pcluster-check-update.timer service' do
+              is_expected.to enable_service('pcluster-check-update.timer')
+              is_expected.to start_service('pcluster-check-update.timer')
+            end
+          else
+            it 'does not enable or start the pcluster-check-update.timer service' do
+              is_expected.not_to enable_service('pcluster-check-update.timer')
+              is_expected.not_to start_service('pcluster-check-update.timer')
             end
           end
         end
