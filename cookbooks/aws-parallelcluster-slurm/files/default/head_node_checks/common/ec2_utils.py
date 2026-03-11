@@ -62,3 +62,34 @@ def _get_filters_to_list_instances(cluster_name: str, instance_state: [str] = No
         filters.append({"Name": "instance-state-name", "Values": list(instance_state)})
 
     return filters
+
+
+@retry(stop_max_attempt_number=5, wait_fixed=3000)
+def get_asg_terminating_instance_ids(cluster_name: str, region: str) -> set:
+    """
+    Return instance IDs that are in ASG terminating lifecycle states.
+
+    Instances in Terminating:Wait or Terminating:Proceed states are being terminated
+    but may still appear as 'running' in EC2. These should be excluded from readiness checks.
+
+    :param cluster_name: name of the cluster.
+    :param region: AWS region name (eg: us-east-1).
+    :return: set of instance IDs in terminating states.
+    """
+    asg = boto_client("autoscaling", region_name=region)
+
+    terminating_ids = set()
+    paginator = asg.get_paginator("describe_auto_scaling_instances")
+
+    for page in paginator.paginate(PaginationConfig=BOTO_PAGINATION_CONFIG):
+        for instance in page.get("AutoScalingInstances", []):
+            # Check if instance belongs to this cluster by matching ASG name pattern
+            asg_name = instance.get("AutoScalingGroupName", "")
+            if cluster_name not in asg_name:
+                continue
+
+            lifecycle_state = instance.get("LifecycleState", "")
+            if lifecycle_state in ("Terminating:Wait", "Terminating:Proceed"):
+                terminating_ids.add(instance["InstanceId"])
+
+    return terminating_ids
