@@ -9,6 +9,7 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
     scripts_dir = "/MOCK_SCRIPTS_DIR"
     slurm_install_dir = "/MOCK_SLURM_INSTALL_DIR"
     reconfigure_timeout = 600
+    time_now = "2024-01-16T15:30:45.000+00:00"
 
     context "on #{platform}#{version}" do
       [true, false].each do |are_mount_or_unmount_required|
@@ -19,6 +20,7 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               allow_any_instance_of(Object).to receive(:dig).and_return(true)
               allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
               allow_any_instance_of(Object).to receive(:cluster_readiness_check_on_update_enabled?).and_return(true)
+              allow(Time).to receive(:now).and_return(Time.parse(time_now))
               RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
               node.override['cluster']['stack_name'] = cluster_name
@@ -63,7 +65,8 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               " --cluster-name #{cluster_name}" \
               " --table-name parallelcluster-#{cluster_name}" \
               " --config-version #{cluster_config_version}" \
-              " --region #{region}"
+              " --region #{region}" \
+              " --cutoff-time '#{time_now}'"
             is_expected.to run_execute("Check cluster readiness").with(
               command: expected_command,
               timeout: 30,

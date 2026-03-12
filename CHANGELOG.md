@@ -41,6 +41,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix an issue that was blocking the logging of slurm health check events.
 - Fix cluster creation failure without Internet access when GPU instances and DCV are used.
 - Fix build-image failure during ubuntu-desktop installation on a Ubuntu parent image with outdated OS packages.
+- Prevent cluster update failures caused by nodes that completed their bootstrap during the update workflow.
 - Prevent unexpected execution of cluster update failure recovery on AWS Batch.
 
 3.14.2

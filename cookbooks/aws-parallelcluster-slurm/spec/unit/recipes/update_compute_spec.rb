@@ -21,7 +21,7 @@ describe 'aws-parallelcluster-slurm::update_compute' do
     region = "MOCK_REGION"
     instance_id = "MOCK_INSTANCE_ID"
     cluster_config_version = "MOCK_CLUSTER_CONFIG_VERSION"
-    time_now = "2024-01-16 15:30:45 UTC"
+    time_now = "2024-01-16T15:30:45.000+00:00"
 
     context "on #{platform}#{version}" do
       [true, false].each do |are_mount_or_unmount_required|
@@ -56,7 +56,7 @@ describe 'aws-parallelcluster-slurm::update_compute' do
                 end
               end
 
-              status = "DEPLOYED"
+              status = "DEPLOYED_UPDATE"
               it "saves the cluster config version to dynamodb with status #{status}" do
                 expected_command = "#{cookbook_venv_path}/bin/aws dynamodb put-item" \
                   " --table-name parallelcluster-#{cluster_name}"\

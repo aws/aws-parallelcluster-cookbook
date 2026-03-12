@@ -166,12 +166,15 @@ end
 
 def wait_cluster_ready
   return if on_docker? || kitchen_test? && !node['interact_with_ddb']
+  # Must match TIMESTAMP_FORMAT in check_cluster_ready.py
+  check_start_time = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%S.%3N+00:00")
   execute "Check cluster readiness" do
     command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/head_node_checks/check_cluster_ready.py" \
               " --cluster-name #{node['cluster']['stack_name']}" \
               " --table-name parallelcluster-#{node['cluster']['stack_name']}" \
               " --config-version #{node['cluster']['cluster_config_version']}" \
-              " --region #{node['cluster']['region']}"
+              " --region #{node['cluster']['region']}" \
+              " --cutoff-time '#{check_start_time}'"
     timeout 30
     retries 10
     retry_delay 90
