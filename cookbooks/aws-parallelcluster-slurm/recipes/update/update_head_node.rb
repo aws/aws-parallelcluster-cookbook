@@ -299,7 +299,3 @@ template "#{node['cluster']['etc_dir']}/cfnconfig" do
   cookbook 'aws-parallelcluster-environment'
   mode '0644'
 end
-
-fetch_dna_files 'Cleanup' do
-  action :cleanup
-end
