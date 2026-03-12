@@ -9,7 +9,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-from unittest.mock import patch
+from unittest.mock import patch, mock_open
 
 import pytest
 from assertpy import assert_that
@@ -158,3 +158,235 @@ def test_check_cluster_ready(boto3_stubber, compute_nodes, login_nodes, ddb_reco
         assert_that(str(exc.value)).is_equal_to(expected_error)
     else:
         check_cluster_ready("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION")
+
+
+def _mocked_request_describe_instances_with_queue(
+    cluster_name: str, node_type: str, queue_names: [str], instance_ids: [str]
+):
+    """Mock EC2 describe_instances with optional queue filter."""
+    filters = [
+        {"Name": "tag:parallelcluster:cluster-name", "Values": [cluster_name]},
+        {"Name": "tag:parallelcluster:node-type", "Values": [node_type]},
+    ]
+    if queue_names:
+        filters.append({"Name": "tag:parallelcluster:queue-name", "Values": queue_names})
+    filters.append({"Name": "instance-state-name", "Values": ["running"]})
+
+    return MockedBoto3Request(
+        method="describe_instances",
+        response={"Reservations": [{"Instances": [{"InstanceId": iid} for iid in instance_ids]}]},
+        expected_params={"Filters": filters, "MaxResults": 100},
+        generate_error=False,
+        error_code=None,
+    )
+
+
+@patch("check_cluster_ready.json.load")
+@patch("check_cluster_ready.os.path.exists")
+@patch("builtins.open", new_callable=mock_open)
+def test_queue_filtering_single_modified(mock_file, mock_exists, mock_json_load, boto3_stubber):
+    """Test that only nodes in modified queue are checked."""
+    # Setup: change-set indicates queue1 was modified
+    change_set = {
+        "changeSet": [
+            {"parameter": "Scheduling.SlurmQueues[queue1].ComputeResources[0].InstanceType", "requestedValue": "c5.xlarge"}
+        ]
+    }
+    mock_exists.return_value = True
+    mock_json_load.return_value = change_set
+
+    compute_nodes_queue1 = ["i-queue1-node1", "i-queue1-node2"]
+    login_nodes = ["i-login1"]
+    ddb_records = {
+        "i-queue1-node1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-queue1-node2": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-login1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+    }
+
+    # Mock EC2: only queue1 compute nodes and login nodes should be queried
+    boto3_stubber(
+        "ec2",
+        [
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "Compute", ["queue1"], compute_nodes_queue1),
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "LoginNode", None, login_nodes),
+        ],
+    )
+
+    boto3_stubber("dynamodb", [
+        _mocked_request_batch_get_items("TABLE_NAME", compute_nodes_queue1, ddb_records),
+        _mocked_request_batch_get_items("TABLE_NAME", login_nodes, ddb_records),
+    ])
+
+    from check_cluster_ready import check_deployed_config_version
+    check_deployed_config_version("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION", "/fake/shared")
+
+
+@patch("check_cluster_ready.json.load")
+@patch("check_cluster_ready.os.path.exists")
+@patch("builtins.open", new_callable=mock_open)
+def test_queue_addition_new_queue(mock_file, mock_exists, mock_json_load, boto3_stubber):
+    """Test adding a new queue with no nodes yet."""
+    change_set = {
+        "changeSet": [
+            {"parameter": "Scheduling.SlurmQueues[new-queue].ComputeResources[0].InstanceType", "requestedValue": "c5.xlarge"}
+        ]
+    }
+    mock_exists.return_value = True
+    mock_json_load.return_value = change_set
+
+    # No compute nodes in new queue yet, but login nodes exist
+    login_nodes = ["i-login1"]
+    ddb_records = {"i-login1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}}}
+
+    boto3_stubber(
+        "ec2",
+        [
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "Compute", ["new-queue"], []),
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "LoginNode", None, login_nodes),
+        ],
+    )
+
+    boto3_stubber("dynamodb", [_mocked_request_batch_get_items("TABLE_NAME", login_nodes, ddb_records)])
+
+    from check_cluster_ready import check_deployed_config_version
+    check_deployed_config_version("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION", "/fake/shared")
+
+
+@patch("check_cluster_ready.os.path.exists")
+def test_no_change_set_fallback(mock_exists, boto3_stubber):
+    """Test fallback to checking all nodes when change-set.json is missing."""
+    mock_exists.return_value = False  # change-set.json doesn't exist
+
+    all_nodes = ["i-compute1", "i-compute2", "i-login1"]
+    ddb_records = {
+        "i-compute1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-compute2": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-login1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+    }
+
+    # Should check all Compute + LoginNode without queue filter
+    boto3_stubber("ec2", [_mocked_request_describe_instances("CLUSTER_NAME", ["Compute", "LoginNode"], all_nodes)])
+    boto3_stubber("dynamodb", [_mocked_request_batch_get_items("TABLE_NAME", all_nodes, ddb_records)])
+
+    from check_cluster_ready import check_deployed_config_version
+    check_deployed_config_version("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION", "/fake/shared")
+
+
+@patch("check_cluster_ready.json.load")
+@patch("check_cluster_ready.os.path.exists")
+@patch("builtins.open", new_callable=mock_open)
+def test_malformed_change_set_fallback(mock_file, mock_exists, mock_json_load, boto3_stubber):
+    """Test fallback when change-set.json is malformed."""
+    mock_exists.return_value = True
+    mock_json_load.side_effect = ValueError("Invalid JSON")  # Simulate JSON parse error
+
+    all_nodes = ["i-compute1", "i-login1"]
+    ddb_records = {
+        "i-compute1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-login1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+    }
+
+    # Should fallback to checking all nodes
+    boto3_stubber("ec2", [_mocked_request_describe_instances("CLUSTER_NAME", ["Compute", "LoginNode"], all_nodes)])
+    boto3_stubber("dynamodb", [_mocked_request_batch_get_items("TABLE_NAME", all_nodes, ddb_records)])
+
+    from check_cluster_ready import check_deployed_config_version
+    check_deployed_config_version("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION", "/fake/shared")
+
+
+@patch("check_cluster_ready.json.load")
+@patch("check_cluster_ready.os.path.exists")
+@patch("builtins.open", new_callable=mock_open)
+def test_login_nodes_always_checked(mock_file, mock_exists, mock_json_load, boto3_stubber):
+    """Test that LoginNode is always checked separately from queues."""
+    change_set = {
+        "changeSet": [
+            {"parameter": "Scheduling.SlurmQueues[queue1].ComputeResources[0].MaxCount", "requestedValue": "10"}
+        ]
+    }
+    mock_exists.return_value = True
+    mock_json_load.return_value = change_set
+
+    compute_nodes = ["i-queue1-compute1"]
+    login_nodes = ["i-login1", "i-login2"]
+    ddb_records = {
+        "i-queue1-compute1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-login1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-login2": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+    }
+
+    boto3_stubber(
+        "ec2",
+        [
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "Compute", ["queue1"], compute_nodes),
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "LoginNode", None, login_nodes),
+        ],
+    )
+
+    boto3_stubber("dynamodb", [
+        _mocked_request_batch_get_items("TABLE_NAME", compute_nodes, ddb_records),
+        _mocked_request_batch_get_items("TABLE_NAME", login_nodes, ddb_records),
+    ])
+
+    from check_cluster_ready import check_deployed_config_version
+    check_deployed_config_version("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION", "/fake/shared")
+
+
+@patch("check_cluster_ready.json.load")
+@patch("check_cluster_ready.os.path.exists")
+@patch("builtins.open", new_callable=mock_open)
+def test_mixed_queue_changes(mock_file, mock_exists, mock_json_load, boto3_stubber):
+    """Test multiple queues modified simultaneously."""
+    change_set = {
+        "changeSet": [
+            {"parameter": "Scheduling.SlurmQueues[queue1].ComputeResources[0].InstanceType", "requestedValue": "c5.xlarge"},
+            {"parameter": "Scheduling.SlurmQueues[queue2].ComputeResources[0].MaxCount", "requestedValue": "5"},
+        ]
+    }
+    mock_exists.return_value = True
+    mock_json_load.return_value = change_set
+
+    # Nodes in both queues should be checked
+    compute_nodes_queue1 = ["i-q1-node1"]
+    compute_nodes_queue2 = ["i-q2-node1", "i-q2-node2"]
+    login_nodes = ["i-login1"]
+
+    ddb_records = {
+        "i-q1-node1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-q2-node1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-q2-node2": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+        "i-login1": {"cluster_config_version": {"S": "EXPECTED_CONFIG_VERSION"}},
+    }
+
+    # Note: EC2 filter will include both queues in Values list
+    boto3_stubber(
+        "ec2",
+        [
+            MockedBoto3Request(
+                method="describe_instances",
+                response={"Reservations": [
+                    {"Instances": [{"InstanceId": iid} for iid in compute_nodes_queue1 + compute_nodes_queue2]}
+                ]},
+                expected_params={
+                    "Filters": [
+                        {"Name": "tag:parallelcluster:cluster-name", "Values": ["CLUSTER_NAME"]},
+                        {"Name": "tag:parallelcluster:node-type", "Values": ["Compute"]},
+                        {"Name": "tag:parallelcluster:queue-name", "Values": ["queue1", "queue2"]},
+                        {"Name": "instance-state-name", "Values": ["running"]},
+                    ],
+                    "MaxResults": 100,
+                },
+                generate_error=False,
+                error_code=None,
+            ),
+            _mocked_request_describe_instances_with_queue("CLUSTER_NAME", "LoginNode", None, login_nodes),
+        ],
+    )
+
+    boto3_stubber("dynamodb", [
+        _mocked_request_batch_get_items("TABLE_NAME", compute_nodes_queue1 + compute_nodes_queue2, ddb_records),
+        _mocked_request_batch_get_items("TABLE_NAME", login_nodes, ddb_records),
+    ])
+
+    from check_cluster_ready import check_deployed_config_version
+    check_deployed_config_version("CLUSTER_NAME", "TABLE_NAME", "EXPECTED_CONFIG_VERSION", "REGION", "/fake/shared")
