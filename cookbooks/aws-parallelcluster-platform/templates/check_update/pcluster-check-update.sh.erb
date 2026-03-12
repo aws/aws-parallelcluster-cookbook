@@ -49,10 +49,15 @@ if [ "$CURRENT_UPDATE" != "$LAST_APPLIED" ]; then
         exit 1
     }
     
-    # Run the update action
+    # Run the update action; on failure clear checkpoint so the next timer tick retries
     log "Executing update script: $UPDATE_SCRIPT"
-    "$UPDATE_SCRIPT"
-    log "Update script completed"
+    if "$UPDATE_SCRIPT"; then
+        log "Update script completed successfully"
+    else
+        log "[ERROR] Update script failed. Clearing checkpoint to allow retry."
+        timeout $FS_TIMEOUT sh -c "echo '' > \"$LOCAL_CHECKPOINT\"" || true
+        exit 1
+    fi
 else
     log "No update needed: trigger and checkpoint match ('$CURRENT_UPDATE')"
 fi
