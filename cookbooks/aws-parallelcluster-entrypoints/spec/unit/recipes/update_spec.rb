@@ -70,6 +70,10 @@ describe 'aws-parallelcluster-entrypoints::update' do
                   type: { exception: true }
                 )
               end
+
+              it "deletes the update failed marker on success" do
+                expect(chef_run).to delete_file("#{node['cluster']['shared_dir']}/update_failed_marker")
+              end
             end
           end
         end

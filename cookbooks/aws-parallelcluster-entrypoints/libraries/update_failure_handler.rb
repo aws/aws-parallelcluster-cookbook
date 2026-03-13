@@ -65,8 +65,17 @@ module ErrorHandlers
     end
 
     def cleanup_dna_files
-      command = "#{cookbook_virtualenv_path}/bin/python #{cluster_attributes['scripts_dir']}/share_compute_fleet_dna.py --region #{cluster_attributes['region']} --cleanup"
-      command_runner.run_with_retries(command, description: "cleanup DNA files")
+      marker = "#{cluster_attributes['shared_dir']}/update_failed_marker"
+      if ::File.exist?(marker)
+        # Marker exists from previous update failure — this is a rollback failure, keep DNA files
+        Chef::Log.info("#{log_prefix} Rollback failure detected, keeping DNA files for bootstrapping nodes")
+        ::File.delete(marker)
+      else
+        # No marker — this is an update failure, clean up DNA files and write marker
+        command = "#{cookbook_virtualenv_path}/bin/python #{cluster_attributes['scripts_dir']}/share_compute_fleet_dna.py --region #{cluster_attributes['region']} --cleanup"
+        command_runner.run_with_retries(command, description: "cleanup DNA files")
+        ::File.write(marker, '')
+      end
     end
 
     def start_clustermgtd

@@ -25,6 +25,7 @@ describe ErrorHandlers::UpdateFailureHandler do
   let(:scripts_dir) { '/opt/parallelcluster/scripts' }
   let(:region) { 'us-east-1' }
   let(:virtualenv_path) { "#{pyenv_root}/versions/#{python_version}/envs/cookbook_virtualenv" }
+  let(:shared_dir) { '/opt/parallelcluster/shared' }
   let(:node) do
     {
       'cluster' => {
@@ -34,6 +35,7 @@ describe ErrorHandlers::UpdateFailureHandler do
         'python-version' => python_version,
         'scripts_dir' => scripts_dir,
         'region' => region,
+        'shared_dir' => shared_dir,
       },
     }
   end
@@ -158,10 +160,46 @@ describe ErrorHandlers::UpdateFailureHandler do
   end
 
   describe '#cleanup_dna_files' do
-    it 'runs the cleanup command with correct arguments' do
-      expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/share_compute_fleet_dna.py --region #{region} --cleanup"
-      expect(command_runner).to receive(:run_with_retries).with(expected_command, description: "cleanup DNA files")
-      handler.cleanup_dna_files
+    let(:marker) { "#{shared_dir}/update_failed_marker" }
+
+    context 'when marker does not exist (update failure)' do
+      before do
+        allow(::File).to receive(:exist?).with(marker).and_return(false)
+        allow(::File).to receive(:write)
+      end
+
+      it 'runs the cleanup command' do
+        expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/share_compute_fleet_dna.py --region #{region} --cleanup"
+        expect(command_runner).to receive(:run_with_retries).with(expected_command, description: "cleanup DNA files")
+        handler.cleanup_dna_files
+      end
+
+      it 'writes the marker file' do
+        expect(::File).to receive(:write).with(marker, '')
+        handler.cleanup_dna_files
+      end
+    end
+
+    context 'when marker exists (rollback failure)' do
+      before do
+        allow(::File).to receive(:exist?).with(marker).and_return(true)
+        allow(::File).to receive(:delete)
+      end
+
+      it 'does not run the cleanup command' do
+        expect(command_runner).not_to receive(:run_with_retries)
+        handler.cleanup_dna_files
+      end
+
+      it 'deletes the marker file' do
+        expect(::File).to receive(:delete).with(marker)
+        handler.cleanup_dna_files
+      end
+
+      it 'logs rollback failure detected' do
+        expect(Chef::Log).to receive(:info).with(/Rollback failure detected, keeping DNA files/)
+        handler.cleanup_dna_files
+      end
     end
   end
 
