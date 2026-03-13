@@ -9,7 +9,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Replace cfn-hup in compute nodes with systemd timer to support in place updates in order to improve MPI collective performance at scale.
   This new mechanism relies on shared storage to sync updates between the head node and compute nodes.
-- Stop cleaning up shared DNA files after a successful head node update or rollback.
+- Stop cleaning up shared DNA files after a successful head node update, a successful rollback, or a failed rollback.
 - Disable dnf-makecache.timer to improve MPI collective performance on RHEL/Rocky at scale.
 - Mitigate the risk of transient build-image failures in RHEL and Rocky caused by out-of-sync repo mirrors.
 - Upgrade Slurm to version 25.11.3 (from 24.11.7).
