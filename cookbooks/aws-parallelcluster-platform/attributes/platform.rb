@@ -25,8 +25,8 @@ end
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
 
 # GDRCopy
-default['cluster']['nvidia']['gdrcopy']['version'] = '2.5.1'
-default['cluster']['nvidia']['gdrcopy']['sha256'] = 'c6d5ebb7dabb89d798f27609511735595004da73af28d93ac041bb5290c4cbec'
+default['cluster']['nvidia']['gdrcopy']['version'] = '2.5.2'
+default['cluster']['nvidia']['gdrcopy']['sha256'] = '32bc7b2c198dd97ec251de0ff4823252c95e31a4c79a5f843c82514c9af2052b'
 default['cluster']['nvidia']['gdrcopy']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
 
 # nvidia-imex

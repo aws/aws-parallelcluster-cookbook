@@ -20,11 +20,13 @@ describe 'aws-parallelcluster-slurm::finalize_head_node' do
     region = "MOCK_REGION"
     cluster_config_version = "MOCK_CLUSTER_CONFIG_VERSION"
     scripts_dir = "/MOCK_SCRIPTS_DIR"
+    time_now = "2024-01-16T15:30:45.000+00:00"
 
     context "on #{platform}#{version}" do
       cached(:chef_run) do
         runner = runner(platform: platform, version: version) do |node|
           allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
+          allow(Time).to receive(:now).and_return(Time.parse(time_now))
           RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
           node.override['cluster']['stack_name'] = cluster_name
@@ -44,7 +46,8 @@ describe 'aws-parallelcluster-slurm::finalize_head_node' do
           " --cluster-name #{cluster_name}" \
           " --table-name parallelcluster-#{cluster_name}" \
           " --config-version #{cluster_config_version}" \
-          " --region #{region}"
+          " --region #{region}" \
+          " --cutoff-time '#{time_now}'"
         is_expected.to run_execute("Check cluster readiness").with(
           command: expected_command,
           timeout: 30,

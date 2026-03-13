@@ -17,7 +17,8 @@
 
 DDB_CONFIG_STATUS = {
   # The node successfully deployed the cluster configuration.
-  DEPLOYED: "DEPLOYED",
+  DEPLOYED_BOOTSTRAP: "DEPLOYED_BOOTSTRAP",
+  DEPLOYED_UPDATE: "DEPLOYED_UPDATE",
 }.freeze
 
 def save_instance_config_version_to_dynamodb(status)
@@ -28,7 +29,8 @@ def save_instance_config_version_to_dynamodb(status)
     item_id = "CLUSTER_CONFIG.#{node['ec2']['instance_id']}"
     node_type = node['cluster']['node_type']
     config_version = node['cluster']['cluster_config_version']
-    last_update_time = Time.now.utc
+    # Must match TIMESTAMP_FORMAT in check_cluster_ready.py
+    last_update_time = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%S.%3N+00:00")
 
     item_data = "{\"cluster_config_version\": {\"S\": \"#{config_version}\"}, \"status\": {\"S\": \"#{status}\"}, \"node_type\": {\"S\": \"#{node_type}\"}, \"lastUpdateTime\": {\"S\": \"#{last_update_time}\"}}"
     item = "{\"Id\": {\"S\": \"#{item_id}\"}, \"Data\": {\"M\": #{item_data}}}"

@@ -12,17 +12,17 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Stop cleaning up shared DNA files after a successful head node update, a successful rollback, or a failed rollback.
 - Disable dnf-makecache.timer to improve MPI collective performance on RHEL/Rocky at scale.
 - Mitigate the risk of transient build-image failures in RHEL and Rocky caused by out-of-sync repo mirrors.
-- Upgrade Slurm to version 25.11.3 (from 24.11.7).
+- Upgrade Slurm to version 25.11.4 (from 24.11.7).
 - Upgrade Pmix to 5.0.10 (from 5.0.6).
-- Upgrade EFA installer to 1.46.0 (from 1.44.0).
-  - Efa-driver: efa-2.17.3-1
+- Upgrade EFA installer to 1.47.0 (from 1.44.0).
+  - Efa-driver: efa-3.0.0
   - Efa-config: efa-config-1.18-1
   - Efa-profile: efa-profile-1.7-1
-  - Libfabric-aws: libfabric-aws-2.3.1-1
-  - Rdma-core: rdma-core-60.0-1
-  - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.8-11
+  - Libfabric-aws: libfabric-aws-2.4.0-1
+  - Rdma-core: rdma-core-61.0-1
+  - Open MPI: openmpi40-aws-4.1.7-2 and openmpi50-aws-5.0.9
 - Upgrade NVIDIA driver to version 580.105.08 (from 570.172.08) for all OSs except Amazon Linux 2.
-- Upgrade GDRCopy to version 2.5.1 (from 2.4.4).
+- Upgrade GDRCopy to version 2.5.2 (from 2.4.4).
 - Upgrade DCV to version 2025.0-20103 (from 2024.0-19030).
 - Upgrade CUDA Toolkit to version 13.0.2 (from 12.8.1) for all OSs except Amazon Linux 2.
 - Upgrade NVIDIA Fabric manager to 580.105.08 for all OSs except Amazon Linux 2.
@@ -41,6 +41,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix an issue that was blocking the logging of slurm health check events.
 - Fix cluster creation failure without Internet access when GPU instances and DCV are used.
 - Fix build-image failure during ubuntu-desktop installation on a Ubuntu parent image with outdated OS packages.
+- Prevent cluster update failures caused by nodes that completed their bootstrap during the update workflow.
 - Prevent unexpected execution of cluster update failure recovery on AWS Batch.
 
 3.14.2
