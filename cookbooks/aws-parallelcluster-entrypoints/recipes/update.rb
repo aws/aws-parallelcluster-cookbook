@@ -26,13 +26,12 @@ include_recipe 'aws-parallelcluster-environment::update'
 
 include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
 
-# Clean up update failure marker on success
-file "#{node['cluster']['shared_dir']}/update_failed_marker" do
-  action :delete
-  only_if { ::File.exist?("#{node['cluster']['shared_dir']}/update_failed_marker") }
-end
-
 # Update node package - useful for development purposes only
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
+end
+
+# Clean up update failure marker on success
+file "#{node['cluster']['shared_dir']}/update_failed_marker" do
+  action :delete
 end

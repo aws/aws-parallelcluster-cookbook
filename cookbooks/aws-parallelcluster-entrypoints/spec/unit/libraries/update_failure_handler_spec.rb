@@ -178,6 +178,11 @@ describe ErrorHandlers::UpdateFailureHandler do
         expect(::File).to receive(:write).with(marker, '')
         handler.cleanup_dna_files
       end
+
+      it 'logs update failure detected with marker path' do
+        expect(Chef::Log).to receive(:info).with(/Update failure detected.*#{Regexp.escape(marker)}/)
+        handler.cleanup_dna_files
+      end
     end
 
     context 'when marker exists (rollback failure)' do
@@ -196,8 +201,25 @@ describe ErrorHandlers::UpdateFailureHandler do
         handler.cleanup_dna_files
       end
 
-      it 'logs rollback failure detected' do
-        expect(Chef::Log).to receive(:info).with(/Rollback failure detected, keeping DNA files/)
+      it 'logs rollback failure detected with marker path' do
+        expect(Chef::Log).to receive(:info).with(/Rollback failure detected.*#{Regexp.escape(marker)}/)
+        handler.cleanup_dna_files
+      end
+    end
+
+    context 'when marker check raises an error' do
+      before do
+        allow(::File).to receive(:exist?).with(marker).and_raise(Errno::EIO.new("I/O error"))
+      end
+
+      it 'falls back to cleaning up DNA files' do
+        expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/share_compute_fleet_dna.py --region #{region} --cleanup"
+        expect(command_runner).to receive(:run_with_retries).with(expected_command, description: "cleanup DNA files")
+        handler.cleanup_dna_files
+      end
+
+      it 'logs a warning' do
+        expect(Chef::Log).to receive(:warn).with(/Error during marker check/)
         handler.cleanup_dna_files
       end
     end
