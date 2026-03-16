@@ -15,7 +15,7 @@ pyenv_dir = "#{base_dir}/pyenv"
 control 'tag:install_awsbatch_virtualenv_created' do
   python_version = os_properties.alinux2? ? '3.9.23' : '3.14.2'
   title "awsbatch virtualenv should be created on #{python_version}"
-  only_if { !os_properties.redhat? }
+  only_if { !os_properties.redhat? && !node['cluster']['skip_awsbatch_cli_install'] }
 
   describe directory("#{pyenv_dir}/versions/#{python_version}/envs/awsbatch_virtualenv") do
     it { should exist }

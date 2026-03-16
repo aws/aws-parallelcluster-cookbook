@@ -18,3 +18,6 @@ default['conditions']['ami_bootstrapped'] = ami_bootstrapped?
 
 # Official ami build
 default['cluster']['is_official_ami_build'] = false
+
+# Skip awsbatch CLI install (for air-gapped environments without PyPI access)
+default['cluster']['skip_awsbatch_cli_install'] = false

@@ -11,7 +11,7 @@
 
 control 'custom_awsbatchcli_package_installed' do
   title "custom aws-parallelcluster-awsbatch-cli should have been installed in the virtualenv"
-  only_if { !os_properties.redhat_on_docker? }
+  only_if { !os_properties.redhat_on_docker? && !node['cluster']['skip_awsbatch_cli_install'] }
 
   describe command("#{node['cluster']['awsbatch_virtualenv_path']}/bin/pip freeze | grep aws-parallelcluster-awsbatch-cli") do
     its('exit_status') { should eq(0) }

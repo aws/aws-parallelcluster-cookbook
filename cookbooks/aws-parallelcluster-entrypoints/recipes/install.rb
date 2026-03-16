@@ -22,7 +22,7 @@ include_recipe 'aws-parallelcluster-platform::install'
 include_recipe 'aws-parallelcluster-environment::install'
 include_recipe 'aws-parallelcluster-computefleet::install'
 include_recipe 'aws-parallelcluster-slurm::install'
-include_recipe 'aws-parallelcluster-awsbatch::install'
+include_recipe 'aws-parallelcluster-awsbatch::install' unless node['cluster']['skip_awsbatch_cli_install']
 
 # == WORKSTATIONS
 # DCV recipe installs Gnome, X and their dependencies so it must be installed as latest to not break the environment
