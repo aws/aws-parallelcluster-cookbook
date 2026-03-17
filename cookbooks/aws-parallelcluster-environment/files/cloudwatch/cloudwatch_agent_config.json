@@ -4,7 +4,8 @@
     "default": "%Y-%m-%d %H:%M:%S,%f",
     "default_seconds": "%Y-%m-%d %H:%M:%S",
     "iso8610": "%Y-%m-%dT%H:%M:%S.%f",
-    "iso8610_seconds": "%Y-%m-%dT%H:%M:%S"
+    "iso8610_seconds": "%Y-%m-%dT%H:%M:%S",
+    "chef": "[%Y-%m-%dT%H:%M:%S"
   },
   "log_configs": [
     {
@@ -81,7 +82,7 @@
       "feature_conditions": []
     },
     {
-      "timestamp_format_key": "iso8610_seconds",
+      "timestamp_format_key": "chef",
       "file_path": "/var/log/chef-client.log",
       "log_stream_name": "chef-client",
       "schedulers": [
