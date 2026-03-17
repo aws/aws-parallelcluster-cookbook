@@ -72,7 +72,11 @@ describe 'aws-parallelcluster-entrypoints::update' do
               end
 
               it "deletes the update failed marker on success" do
-                is_expected.to delete_file("#{node['cluster']['shared_dir']}/update_failed_marker")
+                if node_type == 'HeadNode'
+                  is_expected.to delete_file("#{node['cluster']['shared_dir']}/update_failed_marker")
+                else
+                  is_expected.not_to delete_file("#{node['cluster']['shared_dir']}/update_failed_marker")
+                end
               end
             end
           end

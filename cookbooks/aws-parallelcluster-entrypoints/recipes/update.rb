@@ -31,7 +31,8 @@ if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
 end
 
-# Clean up update failure marker on success
+# Clean up update failure marker on success (only on HeadNode, which owns the marker lifecycle)
 file "#{node['cluster']['shared_dir']}/update_failed_marker" do
   action :delete
+  only_if { node['cluster']['node_type'] == 'HeadNode' }
 end
