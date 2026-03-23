@@ -17,7 +17,7 @@ package_name = "amazon-efs-utils"
 action :install_utils do
   package_version = _efs_utils_version
   efs_utils_tarball = "#{node['cluster']['sources_dir']}/efs-utils-#{package_version}.tar.gz"
-  efs_utils_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs/v#{package_version}.tar.gz"
+  efs_utils_url = "#{node['cluster']['efs']['base_url']}/v#{package_version}.tar.gz"
 
   package_repos 'update package repositories' do
     action :update

@@ -81,6 +81,28 @@ describe 'efs:install_utils' do
         end
       end
 
+      context "when base_url is overridden via ExtraChefAttributes" do
+        cached(:public_base_url) { 'https://fake-public.example.DOMAIN/aws/efs-utils/archive' }
+
+        cached(:chef_run) do
+          mock_already_installed('amazon-efs-utils', utils_version, false)
+          runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
+            node.override['cluster']['efs_utils']['tarball_path'] = tarball_path
+            node.override['cluster']['sources_dir'] = source_dir
+            node.override['cluster']['region'] = aws_region
+            node.override['cluster']['efs']['version'] = utils_version
+            node.override['cluster']['efs']['sha256'] = tarball_checksum
+            node.override['cluster']['efs']['base_url'] = public_base_url
+          end
+          ConvergeEfs.install_utils(runner)
+        end
+
+        it 'downloads tarball from overridden base_url' do
+          is_expected.to create_if_missing_remote_file(tarball_path)
+            .with(source: "#{public_base_url}/v#{utils_version}.tar.gz")
+        end
+      end
+
       context "utils package already installed" do
         cached(:chef_run) do
           mock_already_installed('amazon-efs-utils', utils_version, true)
