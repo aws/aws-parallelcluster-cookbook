@@ -14,10 +14,6 @@ end
 
 use 'partial/_slurm_dependencies_common'
 
-http_parser_version = "2.9.4"
-http_parser_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/http_parser/v#{http_parser_version}.tar.gz"
-http_parser_tarball = "#{node['cluster']['sources_dir']}/http-parser-#{http_parser_version}.tar.gz"
-
 def dependencies
   %w(json-c-devel perl perl-Switch lua-devel dbus-devel)
 end
@@ -29,8 +25,14 @@ action :install_extra_dependencies do
   # We install into /usr (LIBDIR=/usr/lib64) so the shared library lands in the dynamic linker's
   # default search path.
 
-  remote_file "#{http_parser_tarball}" do
-    source "#{http_parser_url}"
+  # Construct URLs inside the action so that node attribute overrides (e.g. via
+  # ExtraChefAttributes) take effect at runtime.
+  http_parser_version = node['cluster']['http_parser']['version']
+  http_parser_url = "#{node['cluster']['http_parser']['base_url']}/v#{http_parser_version}.tar.gz"
+  http_parser_tarball = "#{node['cluster']['sources_dir']}/http-parser-#{http_parser_version}.tar.gz"
+
+  remote_file http_parser_tarball do
+    source http_parser_url
     mode '0644'
     retries 3
     retry_delay 5
@@ -40,7 +42,7 @@ action :install_extra_dependencies do
   bash 'make install' do
     user 'root'
     group 'root'
-    cwd "#{node['cluster']['sources_dir']}"
+    cwd node['cluster']['sources_dir']
     code <<-HTTP
       set -e
       tar xf #{http_parser_tarball}

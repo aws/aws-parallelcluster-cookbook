@@ -28,6 +28,10 @@ default['cluster']['pyxis']['version'] = '0.20.0'
 default['cluster']['pyxis']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/pyxis"
 default['cluster']['pyxis']['runtime_path'] = '/run/pyxis'
 
+# HTTP Parser (only needed on AL2023)
+default['cluster']['http_parser']['version'] = '2.9.4'
+default['cluster']['http_parser']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/http_parser"
+
 # Block Topology Plugin
 default['cluster']['slurm']['block_topology']['force_configuration'] = false
 default['cluster']['p6egb200_block_sizes'] = nil
