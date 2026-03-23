@@ -22,71 +22,82 @@ describe 'aws-parallelcluster-slurm::install_pyxis' do
       cached(:slurm_install_dir) { '/path/to/slurm/install/dir' }
       cached(:pyxis_version) { '1.2.3' }
       cached(:pyxis_runtime_dir) { '/path/to/pyxis/runtime/dir' }
-      cached(:chef_run) do
-        runner = runner(platform: platform, version: version) do |node|
-          RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+      cached(:default_base_url) { "#{cluster_artifacts_s3_url}/dependencies/pyxis" }
 
-          node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
-          node.override['cluster']['sources_dir'] = cluster_sources_dir
-          node.override['cluster']['examples_dir'] = cluster_examples_dir
-          node.override['cluster']['slurm']['install_dir'] = slurm_install_dir
-          node.override['cluster']['pyxis']['version'] = pyxis_version
-          node.override['cluster']['pyxis']['runtime_path'] = pyxis_runtime_dir
-        end
-        allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
-        allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
-        allow_any_instance_of(Object).to receive(:pyxis_installed?).and_return(false)
-        runner.converge(described_recipe)
-      end
+      {
+        'default S3 base_url' => nil,
+        'base_url overridden via ExtraChefAttributes' => 'https://fake-public.example.DOMAIN/pyxis',
+      }.each do |scenario, override_url|
+        context "when #{scenario}" do
+          cached(:expected_base_url) { override_url || default_base_url }
+          cached(:chef_run) do
+            runner = runner(platform: platform, version: version) do |node|
+              RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
-      it 'downloads Pyxis tarball' do
-        is_expected.to create_if_missing_remote_file("#{cluster_sources_dir}/pyxis-#{pyxis_version}.tar.gz").with(
-          source: "#{cluster_artifacts_s3_url}/dependencies/pyxis/v#{pyxis_version}.tar.gz",
-          mode: '0644',
-          retries: 3,
-          retry_delay: 5
-        )
-      end
+              node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+              node.override['cluster']['sources_dir'] = cluster_sources_dir
+              node.override['cluster']['examples_dir'] = cluster_examples_dir
+              node.override['cluster']['slurm']['install_dir'] = slurm_install_dir
+              node.override['cluster']['pyxis']['version'] = pyxis_version
+              node.override['cluster']['pyxis']['runtime_path'] = pyxis_runtime_dir
+              node.override['cluster']['pyxis']['base_url'] = override_url if override_url
+            end
+            allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
+            allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+            allow_any_instance_of(Object).to receive(:pyxis_installed?).and_return(false)
+            runner.converge(described_recipe)
+          end
 
-      it 'install Pyxis' do
-        is_expected.to run_bash('Install pyxis').with(
-          user: 'root',
-          retries: 3,
-          retry_delay: 5,
-          code: <<-CODE
+          it 'downloads Pyxis tarball from the expected URL' do
+            is_expected.to create_if_missing_remote_file("#{cluster_sources_dir}/pyxis-#{pyxis_version}.tar.gz").with(
+              source: "#{expected_base_url}/v#{pyxis_version}.tar.gz",
+              mode: '0644',
+              retries: 3,
+              retry_delay: 5
+            )
+          end
+
+          it 'install Pyxis' do
+            is_expected.to run_bash('Install pyxis').with(
+              user: 'root',
+              retries: 3,
+              retry_delay: 5,
+              code: <<-CODE
     set -e
     tar xf #{cluster_sources_dir}/pyxis-#{pyxis_version}.tar.gz -C /tmp
     cd /tmp/pyxis-#{pyxis_version}
     CPPFLAGS='-I #{slurm_install_dir}/include/' make
     CPPFLAGS='-I #{slurm_install_dir}/include/' make install
-          CODE
-        )
-      end
+              CODE
+            )
+          end
 
-      it 'creates the Spank examples directory' do
-        is_expected.to create_directory("#{cluster_examples_dir}/spank")
-      end
+          it 'creates the Spank examples directory' do
+            is_expected.to create_directory("#{cluster_examples_dir}/spank")
+          end
 
-      it 'creates the Spank example configuration' do
-        is_expected.to create_template("#{cluster_examples_dir}/spank/plugstack.conf").with(
-          source: 'pyxis/plugstack.conf.erb',
-          owner: 'root',
-          group: 'root',
-          mode: '0644'
-        )
-      end
+          it 'creates the Spank example configuration' do
+            is_expected.to create_template("#{cluster_examples_dir}/spank/plugstack.conf").with(
+              source: 'pyxis/plugstack.conf.erb',
+              owner: 'root',
+              group: 'root',
+              mode: '0644'
+            )
+          end
 
-      it 'creates the Pyxis examples directory' do
-        is_expected.to create_directory("#{cluster_examples_dir}/pyxis")
-      end
+          it 'creates the Pyxis examples directory' do
+            is_expected.to create_directory("#{cluster_examples_dir}/pyxis")
+          end
 
-      it 'creates the Pyxis example configuration' do
-        is_expected.to create_template("#{cluster_examples_dir}/pyxis/pyxis.conf").with(
-          source: 'pyxis/pyxis.conf.erb',
-          owner: 'root',
-          group: 'root',
-          mode: '0644'
-        )
+          it 'creates the Pyxis example configuration' do
+            is_expected.to create_template("#{cluster_examples_dir}/pyxis/pyxis.conf").with(
+              source: 'pyxis/pyxis.conf.erb',
+              owner: 'root',
+              group: 'root',
+              mode: '0644'
+            )
+          end
+        end
       end
 
       context "when Pyxis is already installed" do

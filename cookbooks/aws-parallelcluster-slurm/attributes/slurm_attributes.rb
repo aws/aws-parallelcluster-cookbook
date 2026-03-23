@@ -25,6 +25,7 @@ default['cluster']['slurm']['spank_config_dir'] = "#{node['cluster']['slurm']['i
 
 # Pyxis
 default['cluster']['pyxis']['version'] = '0.20.0'
+default['cluster']['pyxis']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/pyxis"
 default['cluster']['pyxis']['runtime_path'] = '/run/pyxis'
 
 # Block Topology Plugin

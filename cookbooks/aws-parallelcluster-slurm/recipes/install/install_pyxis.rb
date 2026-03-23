@@ -19,7 +19,7 @@ return unless nvidia_enabled? || nvidia_installed?
 return if pyxis_installed?
 
 pyxis_version = node['cluster']['pyxis']['version']
-pyxis_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/pyxis/v#{pyxis_version}.tar.gz"
+pyxis_url = "#{node['cluster']['pyxis']['base_url']}/v#{pyxis_version}.tar.gz"
 pyxis_tarball = "#{node['cluster']['sources_dir']}/pyxis-#{pyxis_version}.tar.gz"
 
 spank_examples_dir = "#{node['cluster']['examples_dir']}/spank"
