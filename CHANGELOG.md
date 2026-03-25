@@ -31,7 +31,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade CUDA Toolkit to version 13.0.2 (from 12.8.1) for all OSs except Amazon Linux 2.
 - Upgrade NVIDIA Fabric manager to 580.105.08 for all OSs except Amazon Linux 2.
 - Upgrade Python to 3.14.2 (from 3.12.11) for all OSs except Amazon Linux 2.
-- Upgrade aws-cfn-bootstrap to version 2.0-38 (from 2.0-33).
 - Upgrade DCGM to version 4.5.1 (from 4.4.1) for all OSs except Amazon Linux 2.
 - Upgrade Munge to version 0.5.17 (from 0.5.16) for all OSs except Amazon Linux 2.
 - Upgrade mysql-community-client to version 8.4.8 (from 8.0.39) for all OSs except Amazon Linux 2.

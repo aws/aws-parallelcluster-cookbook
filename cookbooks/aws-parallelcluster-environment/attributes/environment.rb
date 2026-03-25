@@ -76,7 +76,7 @@ default['cluster']['efa']['sha256'] = '2df4201e046833c7dc8160907bee7f52b76ff80ed
 default['cluster']['efs']['version'] = '2.4.0'
 default['cluster']['efs']['sha256'] = '9b60c039c162388091d6fab6e9c6cfc5832f34b26b6d05b0a68b333147d78a25'
 
-default['cluster']['cfn_bootstrap']['version'] = '2.0-38'
+default['cluster']['cfn_bootstrap']['version'] = '2.0-33'
 
 # TODO: Move to platform cookbook
 default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"
