@@ -23,9 +23,11 @@ describe 'aws-parallelcluster-entrypoints::install' do
     aws-parallelcluster-awsbatch::install
   )
 
+  setup_proxy_recipe = 'aws-parallelcluster-shared::setup_proxy'
+
   before do
     @included_recipes = []
-    all_recipes.each do |recipe_name|
+    (all_recipes + [setup_proxy_recipe]).each do |recipe_name|
       allow_any_instance_of(Chef::Recipe).to receive(:include_recipe).with(recipe_name) do
         @included_recipes << recipe_name
       end
@@ -61,6 +63,7 @@ describe 'aws-parallelcluster-entrypoints::install' do
           it "includes all recipes in the right order" do
             chef_run
             expect(@included_recipes).to eq(all_recipes)
+            expect(@included_recipes).not_to include(setup_proxy_recipe)
           end
         end
 
@@ -76,6 +79,22 @@ describe 'aws-parallelcluster-entrypoints::install' do
           it "includes all recipes except awsbatch in the right order" do
             chef_run
             expect(@included_recipes).to eq(all_recipes - %w(aws-parallelcluster-awsbatch::install))
+          end
+        end
+
+        context "when install_http_proxy_address is set" do
+          cached(:chef_run) do
+            runner = runner(platform: platform, version: version) do |node|
+              node.override['conditions']['ami_bootstrapped'] = false
+              node.override['cluster']['skip_awsbatch_cli_install'] = false
+              node.override['cluster']['install_http_proxy_address'] = 'http://10.0.0.109:8888'
+            end
+            runner.converge(described_recipe)
+          end
+
+          it "includes setup_proxy recipe" do
+            chef_run
+            expect(@included_recipes).to include(setup_proxy_recipe)
           end
         end
       end
