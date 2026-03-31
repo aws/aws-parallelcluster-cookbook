@@ -18,6 +18,33 @@ class ConvergeNfs
   end
 end
 
+describe 'nfs:port_overrides' do
+  # Verify that NFS service ports inside the Linux ephemeral port range (32768-60999)
+  # are overridden to safe values. Only lockd and rquotad need overriding.
+  cached(:chef_run) { ChefSpec::SoloRunner.new.converge('aws-parallelcluster-environment') }
+  cached(:node) { chef_run.node }
+
+  it "overrides nfs port for lockd to 32763" do
+    expect(node['nfs']['port']['lockd']).to eq(32_763)
+  end
+
+  it "overrides nfs port for rquotad to 32764" do
+    expect(node['nfs']['port']['rquotad']).to eq(32_764)
+  end
+
+  it "keeps nfs port for statd at upstream default 32765" do
+    expect(node['nfs']['port']['statd']).to eq(32_765)
+  end
+
+  it "keeps nfs port for statd_out at upstream default 32766" do
+    expect(node['nfs']['port']['statd_out']).to eq(32_766)
+  end
+
+  it "keeps nfs port for mountd at upstream default 32767" do
+    expect(node['nfs']['port']['mountd']).to eq(32_767)
+  end
+end
+
 describe 'nfs:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

@@ -3,6 +3,13 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.16.0
+------
+
+**CHANGES**
+- Move the NFS service `lockd` to port 32763 (from 32768) and `rquotad` to port 32764 (from 32769),
+  to reduce the risk of port collision within the ephemeral ports range.
+
 3.15.0
 ------
 
