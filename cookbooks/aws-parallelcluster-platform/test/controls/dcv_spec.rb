@@ -238,6 +238,11 @@ control 'tag:config_dcv_correctly_configured' do
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
     it { should be_mode 0755 }
+
+    unless instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+      its('content') { should match /enable-gl-in-virtual-sessions\s*=\s*"always-off"/ }
+      its('content') { should match /display-encoders=\['turbojpeg', 'lz4', 'ffmpeg'\]/ }
+    end
   end
 
   describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do

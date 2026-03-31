@@ -931,6 +931,12 @@ describe 'dcv:configure' do
         it 'starts Amazon DCV server' do
           is_expected.to enable_service('dcvserver').with_action(%i(enable start))
         end
+
+        it 'passes gpu_accel_supported=true to dcv.conf template' do
+          is_expected.to create_template('/etc/dcv/dcv.conf').with(
+            variables: { gpu_accel_supported: true }
+          )
+        end
       end
 
       context "when g2 instance" do
@@ -1000,6 +1006,50 @@ describe 'dcv:configure' do
             .with_user('root')
             .with_code(/systemctl set-default graphical.target/)
             .with_code(/systemctl isolate graphical.target &/)
+        end
+
+        it 'passes gpu_accel_supported=false to dcv.conf template' do
+          is_expected.to create_template('/etc/dcv/dcv.conf').with(
+            variables: { gpu_accel_supported: false }
+          )
+        end
+
+        it 'disables NVIDIA EGL platform config files to prevent Xdcv GLX crash' do
+          is_expected.to run_execute('disable nvidia egl platform on non-gpu instances')
+            .with_user('root')
+            .with_command(/find.*egl_external_platform.*nvidia.*disabled/)
+        end
+      end
+
+      context "when dcv_gpu_accel not supported and nvidia not installed" do
+        cached(:chef_run) do
+          stubs_for_resource('dcv') do |res|
+            allow(res).to receive(:dcv_supported?).and_return(true)
+            allow(res).to receive(:dcv_gpu_accel_supported?).and_return(false)
+            allow(res).to receive(:dcv_package).and_return(dcv_package)
+            allow(res).to receive(:dcv_gl).and_return(dcv_gl)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+            node.override['ec2']['instance_type'] = 'any'
+            node.override['cluster']['sources_dir'] = sources_dir
+            node.override['cluster']['node_type'] = 'HeadNode'
+            node.override['cluster']['dcv']['gl']['version'] = dcv_gl_version
+            node.override['cluster']['base_os'] = base_os
+            node.override['cluster']['dcv']['version'] = dcv_version
+            node.override['cluster']['dcv']['authenticator']['certificate'] = certificate
+            node.override['cluster']['dcv']['authenticator']['private_key'] = private_key
+            node.override['cluster']['dcv']['authenticator']['user'] = user
+            node.override['cluster']['dcv']['authenticator']['user_home'] = user_home
+          end
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          allow_any_instance_of(Object).to receive(:graphic_instance?).and_return(false)
+          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
+          ConvergeDcv.configure(runner)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'does not disable NVIDIA EGL platform config files when nvidia is not installed' do
+          is_expected.not_to run_execute('disable nvidia egl platform on non-gpu instances')
         end
       end
     end

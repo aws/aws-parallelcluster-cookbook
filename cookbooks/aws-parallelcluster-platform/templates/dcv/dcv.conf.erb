@@ -41,7 +41,13 @@
 # 'dcv-gl' feature (a specific license will be required).
 # Allowed values: 'always-on', 'always-off', 'default-on', 'default-off'.
 # If not specified, the default value is 'default-on'.
+<% if @gpu_accel_supported %>
 #enable-gl-in-virtual-sessions = "default-on"
+<% else %>
+# Explicitly disable dcv-gl on instances where GPU acceleration is not supported
+# (e.g. g5g) to prevent Xdcv segfaults during GLX initialization.
+enable-gl-in-virtual-sessions = "always-off"
+<% end %>
 
 # Property "virtual-session-source-profile" specifies whether the shell that
 # runs the session starter script should source the user profile.
@@ -99,7 +105,10 @@ virtual-session-source-profile = true
 # second that are sent to the client. A higher value consumes more bandwidth
 # and resources. By default it is set to 25. Set to 0 for no limit
 #target-fps = 30
-<% unless node['cluster']['dcv']['is_graphic_instance'] %>
+<% unless @gpu_accel_supported %>
+# On instances that do not support GPU acceleration, DCV must use
+# software-only encoders because there is no GPU that can be used
+# for hardware encoding.
 display-encoders=['turbojpeg', 'lz4', 'ffmpeg']
 <% end %>
 

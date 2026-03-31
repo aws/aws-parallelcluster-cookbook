@@ -188,10 +188,21 @@ end
 
 action :configure do
   if dcv_supported? && (node['cluster']['node_type'] == "HeadNode" || node['cluster']['node_type'] == "LoginNode")
-    if dcv_gpu_accel_supported?
+    gpu_accel = dcv_gpu_accel_supported?
+    if gpu_accel
       # Enable graphic acceleration in dcv conf file for graphic instances.
       allow_gpu_acceleration
     else
+      # On non-GPU instances, disable the NVIDIA EGL config files to prevent
+      # Xdcv from crashing during GLX initialization (SIGABRT in libnvidia-egl-gbm.so).
+      # The AMI ships NVIDIA libraries for GPU instance types, but on non-GPU instances
+      # there is no hardware to back them and Xdcv crashes when it discovers them via EGL.
+      execute 'disable nvidia egl platform on non-gpu instances' do
+        command "find /usr/share/egl/egl_external_platform.d /etc/egl/egl_external_platform.d -name '*nvidia*' -exec mv {} {}.disabled \\; 2>/dev/null; true"
+        user 'root'
+        only_if { nvidia_installed? }
+      end
+
       bash 'set default systemd runlevel to graphical.target' do
         user 'root'
         code <<-SETUPX
@@ -234,6 +245,7 @@ action :configure do
       owner 'root'
       group 'root'
       mode '0755'
+      variables(gpu_accel_supported: gpu_accel)
     end
 
     # Create directory for the external authenticator to store access file created by the users

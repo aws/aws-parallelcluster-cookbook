@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.16.0
+------
+
+**BUG FIXES**
+- Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
+
 3.15.0
 ------
 
