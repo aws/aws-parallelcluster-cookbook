@@ -18,7 +18,7 @@
 return if kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
 
 execute "wait for cluster registration" do
-  command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -Fx '#{node['cluster']['stack_name']}'"
+  command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -Fxi '#{node['cluster']['stack_name']}'"
   retries 30
   retry_delay 10
 end
