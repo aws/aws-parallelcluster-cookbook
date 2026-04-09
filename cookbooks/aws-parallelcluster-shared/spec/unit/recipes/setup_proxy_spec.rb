@@ -5,6 +5,7 @@ require 'spec_helper'
 describe 'aws-parallelcluster-shared::setup_proxy' do
   PROXY_URL = 'http://10.0.0.109:8888'
   TEST_REGION = 'test-region-1'
+  TEST_AWS_DOMAIN = 'test_aws_domain'
   RUBY_BLOCK_NAME = 'configure proxy from install_http_proxy_address'
 
   for_all_oses do |platform, version|
@@ -32,18 +33,21 @@ describe 'aws-parallelcluster-shared::setup_proxy' do
 
         it 'sets proxy env vars in the ruby block' do
           chef_run
+          allow_any_instance_of(Object).to receive(:aws_domain).and_return("test_aws_domain")
           chef_run.ruby_block(RUBY_BLOCK_NAME).block.call
 
           %w(http_proxy https_proxy HTTP_PROXY HTTPS_PROXY).each do |var|
             expect(ENV[var]).to eq(PROXY_URL)
           end
-          expect(ENV['no_proxy']).to include(".s3.#{TEST_REGION}.amazonaws.com")
-          expect(ENV['no_proxy']).to include("s3.#{TEST_REGION}.amazonaws.com")
-          expect(ENV['no_proxy']).to include(".s3-#{TEST_REGION}.amazonaws.com")
-          expect(ENV['no_proxy']).to include('.s3.amazonaws.com')
-          expect(ENV['no_proxy']).to include(".s3.dualstack.#{TEST_REGION}.amazonaws.com")
           expect(ENV['no_proxy']).to include('169.254.169.254')
           expect(ENV['no_proxy']).to include('localhost')
+          expect(ENV['no_proxy']).to include(".s3.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy']).to include("s3.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy']).to include(".s3-#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy']).to include("s3-#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy']).to include(".s3.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy']).to include(".s3.dualstack.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy']).to include("s3.dualstack.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
         end
 
         # snapd proxy configuration tests

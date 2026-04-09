@@ -54,19 +54,21 @@ ruby_block 'configure proxy from install_http_proxy_address' do
       region = node['cluster']['region']
 
       # S3 endpoints bypass the proxy and use the VPC Gateway Endpoint.
-      # Includes regional (s3.{region}), dash-style (s3-{region}), global (s3.amazonaws.com),
+      # Includes regional (s3.{region}), dash-style (s3-{region}), global (s3.{domain}),
       # and dualstack (s3.dualstack.{region}) variants used by different AWS services and repos.
+      # China regions use amazonaws.com.cn domain suffix (via aws_domain helper).
+      domain = aws_domain
       no_proxy = [
         "localhost",
         "127.0.0.1",
         "169.254.169.254",
-        ".s3.#{region}.amazonaws.com",
-        "s3.#{region}.amazonaws.com",
-        ".s3-#{region}.amazonaws.com",
-        "s3-#{region}.amazonaws.com",
-        ".s3.amazonaws.com",
-        ".s3.dualstack.#{region}.amazonaws.com",
-        "s3.dualstack.#{region}.amazonaws.com",
+        ".s3.#{region}.#{domain}",
+        "s3.#{region}.#{domain}",
+        ".s3-#{region}.#{domain}",
+        "s3-#{region}.#{domain}",
+        ".s3.#{domain}",
+        ".s3.dualstack.#{region}.#{domain}",
+        "s3.dualstack.#{region}.#{domain}",
       ].join(",")
 
       Chef::Log.info("Configuring proxy: #{proxy_url}")
