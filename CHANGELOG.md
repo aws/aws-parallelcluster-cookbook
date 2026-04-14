@@ -159,7 +159,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA driver to version 570.172.08 (from 570.86.15) for all OSs except AL2.
 
 **BUG FIXES**
-- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in isolated environments.
+- Fix a bug in the installation of ARM Performance Library that was causing the build image fail in AWS Top Secret and AWS Secret Regions.
 - Upgrade amazon-efs-utils to version 2.3.1 (from v2.1.0) for non-Amazon Linux AMI's.
 
 3.13.0
@@ -285,7 +285,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **ENHANCEMENTS**
 - Add support for external Slurmdbd.
-- Add support for build-image to be run in an isolated network and ADC regions
+- Add support for build-image in AWS Top Secret and AWS Secret Regions.
 - Add support for Amazon Linux 2023.
 
 **CHANGES**
@@ -484,7 +484,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **CHANGES**
-- Remove security updates step executed on cluster nodes bootstrap in US isolated regions
+- Remove security updates step executed on cluster nodes bootstrap in AWS Top Secret and AWS Secret Regions
   in order to reduce bootstrap time and avoid a potential point of failure.
 - Replace `nvidia-persistenced` service with `parallelcluster_nvidia` service to avoid conflicts with DLAMI.
 
@@ -546,7 +546,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Add support for US isolated region us-isob-east-1.
+- Add support for AWS Secret region us-isob-east-1.
 
 **CHANGES**
 - Upgrade EFA installer to `1.22.0`
