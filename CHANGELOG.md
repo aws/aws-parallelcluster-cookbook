@@ -6,6 +6,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.16.0
 ------
 
+**CHANGES**
+- Switch NFS server to NFSv4-only mode. Disable NFSv2 and NFSv3 in the NFS server configuration and mask
+  `rpcbind.service` and `rpcbind.socket` to prevent from starting the auxiliary services that
+  are not needed by NFSv4 (`rpc-statd`, `nfs-mountd`).
+
 **BUG FIXES**
 - Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
 
@@ -45,6 +50,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade amazon-efs-utils to version 2.4.0 (from v2.1.0) for Amazon Linux AMI's.
 
 **BUG FIXES**
+- Fix Xdcv segfault on RHEL9 and Rocky9 caused by DCV attempting GL initialization when GPU acceleration is not supported.
 - Fix a failure when creating a cluster with GPU instances and with DCV enabled but without internet access.
 - Fix build-image failure during ubuntu-desktop installation on a Ubuntu parent image with outdated OS packages.
 - Fix the CloudWatch agent configuration to ensure proper parsing of timestamps across all log files.

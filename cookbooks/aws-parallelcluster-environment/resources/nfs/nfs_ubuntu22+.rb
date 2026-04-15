@@ -29,6 +29,7 @@ action :setup do
   action_install_nfs
   action_install_nfs4
   action_disable_start_at_boot
+  action_mask_nfsv2_nfsv3_services
 end
 
 action_class do

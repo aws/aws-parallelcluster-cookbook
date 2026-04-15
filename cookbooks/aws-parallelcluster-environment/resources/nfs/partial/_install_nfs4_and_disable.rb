@@ -23,3 +23,15 @@ action :disable_start_at_boot do
     action :disable
   end unless on_docker?
 end
+
+action :mask_nfsv2_nfsv3_services do
+  # Mask rpcbind so systemd does not start it (or rpc-statd/nfs-mountd that depend on it)
+  # as transitive dependencies of nfs-server.service. Both units are masked because
+  # rpcbind is socket-activated. See nfs.systemd(7), "Masking unwanted services".
+  %w(rpcbind.service rpcbind.socket).each do |svc|
+    service svc do
+      action :mask
+      only_if { !on_docker? && node['cluster']['nfs']['mask-nfsv2-nfsv3-services'] }
+    end
+  end
+end
