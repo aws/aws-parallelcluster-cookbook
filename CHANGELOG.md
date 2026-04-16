@@ -8,7 +8,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **BUG FIXES**
 - Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
-- Fix Slurm accounting bootstrap failure when ClusterName is overridden via custom Slurm settings.
+- Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
+via custom Slurm settings or the cluster name contains upper-case letters.
 
 3.15.0
 ------

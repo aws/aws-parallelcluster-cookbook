@@ -22,7 +22,7 @@ execute "wait for cluster registration" do
   # ClusterName via custom Slurm settings. Read the effective value from the running slurmctld config.
   command lazy {
     cluster_name = get_slurm_accounting_cluster_name
-    "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{cluster_name} format=cluster | grep -Fx '#{cluster_name}'"
+    "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{cluster_name} format=cluster | grep -Fxi '#{cluster_name}'"
   }
   retries 30
   retry_delay 10

@@ -18,7 +18,7 @@ describe 'aws-parallelcluster-slurm::bootstrap_slurm_accounting' do
         is_expected.to run_execute("wait for cluster registration")
         command = chef_run.execute("wait for cluster registration").command
         expect(command).to include("cluster=#{accounting_cluster_name}")
-        expect(command).to include("grep -Fx '#{accounting_cluster_name}'")
+        expect(command).to include("grep -Fxi '#{accounting_cluster_name}'")
       end
 
       it "bootstraps the Slurm database using the name returned by get_slurm_accounting_cluster_name" do
