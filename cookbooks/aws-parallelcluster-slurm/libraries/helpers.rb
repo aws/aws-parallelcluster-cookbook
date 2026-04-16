@@ -247,3 +247,14 @@ end
 def get_login_node_pool_config(config, pool_name)
   config['LoginNodes']['Pools'].select { |pool| pool['Name'] == pool_name }.first
 end
+
+#
+# Return the cluster name used for Slurm accounting registration.
+# Normally this matches the stack name, but users can override ClusterName via custom Slurm settings.
+#
+def get_slurm_accounting_cluster_name
+  cluster_name = shell_out!(
+    "#{node['cluster']['slurm']['install_dir']}/bin/scontrol show config | awk '/^ClusterName/{print $3}'"
+  ).stdout.strip
+  cluster_name.empty? ? node['cluster']['stack_name'] : cluster_name
+end

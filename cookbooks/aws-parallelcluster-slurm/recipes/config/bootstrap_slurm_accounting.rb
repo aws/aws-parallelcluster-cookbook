@@ -18,7 +18,12 @@
 return if kitchen_test? || (node['cluster']['node_type'] == "ExternalSlurmDbd")
 
 execute "wait for cluster registration" do
-  command "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{node['cluster']['stack_name']} format=cluster | grep -Fx '#{node['cluster']['stack_name']}'"
+  # The cluster name used for accounting may differ from the stack name if the user has overridden
+  # ClusterName via custom Slurm settings. Read the effective value from the running slurmctld config.
+  command lazy {
+    cluster_name = get_slurm_accounting_cluster_name
+    "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn cluster=#{cluster_name} format=cluster | grep -Fx '#{cluster_name}'"
+  }
   retries 30
   retry_delay 10
 end
@@ -26,9 +31,11 @@ end
 bash "bootstrap slurm database" do
   user 'root'
   group 'root'
-  code <<-BOOTSTRAP
+  code lazy {
+    cluster_name = get_slurm_accounting_cluster_name
+    <<-BOOTSTRAP
     SACCTMGR_CMD=#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr
-    CLUSTER_NAME=#{node['cluster']['stack_name']}
+    CLUSTER_NAME=#{cluster_name}
     DEF_ACCOUNT=pcdefault
     SLURM_USER=#{node['cluster']['slurm']['user']}
     DEF_USER=#{node['cluster']['cluster_user']}
@@ -45,5 +52,6 @@ bash "bootstrap slurm database" do
         $SACCTMGR_CMD -iQ add user $DEF_USER Account=$DEF_ACCOUNT AdminLevel=Admin
 
     exit 0
-  BOOTSTRAP
+    BOOTSTRAP
+  }
 end
