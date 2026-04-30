@@ -1,4 +1,48 @@
-** openpmix; version 5.0.6 -- https://github.com/openpmix/openpmix/
+# ParallelCluster Cookbook — Third-Party License Attributions
+
+> Markdown rendering of `THIRD-PARTY-LICENSES.txt`. License texts are preserved verbatim inside fenced code blocks.
+
+## Contents
+
+- [openpmix; version 5.0.10](#openpmix-version-5010)
+- [Python; version 3.14.2 (3.9.23 on AL2)](#python-version-3142-3923-on-al2)
+- [enroot; version 3.4.1](#enroot-version-341)
+- [requests; version 2.32.5](#requests-version-2325)
+- [cookbook-line (grouped with 12 other entries sharing this license)](#cookbook-line-grouped-with-12-other-entries-sharing-this-license)
+- [supervisor; version 4.3.0](#supervisor-version-430)
+- [docutils; version 0.22.4](#docutils-version-0224)
+- [jinja2; version 3.1.6](#jinja2-version-316)
+- [click; version 8.1.7](#click-version-817)
+- [Arm Performance Libraries; version 24.10](#arm-performance-libraries-version-2410)
+- [Slurm; version 25.11.4-1](#slurm-version-25114-1)
+- [stunnel; version 5.67](#stunnel-version-567)
+- [MUNGE; version 0.5.18](#munge-version-0518)
+- [gcc; version 11.3.0, 9.3.0](#gcc-version-1130-930)
+- [MySQL; version 8.4.8 (8.0.39 on AL2, 8.0.45 on Ubuntu 24.04)](#mysql-version-848-8039-on-al2-8045-on-ubuntu-2404)
+- [Intel MPI; version 2021.17 (2021.17.2.94)](#intel-mpi-version-202117-202117294)
+- [setuptools; version 80.10.1](#setuptools-version-80101)
+- [jsonschema; version 4.26.0](#jsonschema-version-4260)
+- [efs-utils; version 2.4.0](#efs-utils-version-240)
+- [tabulate; version 0.8.10](#tabulate-version-0810)
+- [gdrcopy; version 2.5.2](#gdrcopy-version-252)
+- [pyyaml; version 6.0.3](#pyyaml-version-603)
+- [chevron; version 0.14.0](#chevron-version-0140)
+- [libjwt; version 1.18.4 (1.17.0 on AL2)](#libjwt-version-1184-1170-on-al2)
+- [Amazon DCV; version 2025.0-20103](#amazon-dcv-version-20250-20103)
+- [Nvidia Driver; version 580.105.08 (550.127.08 on AL2)](#nvidia-driver-version-58010508-55012708-on-al2)
+- [Cuda Samples; version 13.0 (12.4 on AL2)](#cuda-samples-version-130-124-on-al2)
+- [Nvidia CUDA; version 13.0.2 (12.4.1 on AL2)](#nvidia-cuda-version-1302-1241-on-al2)
+- [NVIDIA Fabric Manager (grouped with 2 other entries sharing this license)](#nvidia-fabric-manager-grouped-with-2-other-entries-sharing-this-license)
+- [NVIDIA DCGM; version 4.5.1-1 (datacenter-gpu-manager-4-core + datacenter-gpu-manager-4-cuda13; 3.3.6-1 on AL2)](#nvidia-dcgm-version-451-1-datacenter-gpu-manager-4-core-datacenter-gpu-manager-4-cuda13-336-1-on-al2)
+- [EFA Installer; version 1.47.0](#efa-installer-version-1470)
+- [http-parser; version 2.9.4](#http-parser-version-294)
+
+
+## openpmix; version 5.0.10
+
+<https://github.com/openpmix/openpmix/>
+
+```text
 Most files in this release are marked with the copyrights of the
 organizations who have edited them.  The copyrights below are in no
 particular order and generally reflect members of the Open MPI core
@@ -55,7 +99,7 @@ Copyright (c) 2022-2023 Triad National Security, LLC. All rights reserved
 
     * Package openpmix's source code may be found at:
       https://us-east-1-aws-
-parallelcluster.s3.amazonaws.com/archives/dependencies/pmix/pmix-5.0.6.tar.gz
+parallelcluster.s3.amazonaws.com/archives/dependencies/pmix/pmix-5.0.10.tar.gz
 
 The following LICENSE pertains to both PMIx and any code ported
 from Open MPI.
@@ -94,15 +138,20 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
 
-------
+---
 
-** Python; version 3.12.8 -- https://www.python.org/
+## Python; version 3.14.2 (3.9.23 on AL2)
+
+<https://www.python.org/>
+
+```text
 Copyright © 2001 Python Software Foundation. All rights reserved.
 
     * Package Python's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/python/Python-3.12.8.tgz
+east-1.amazonaws.com/archives/dependencies/python/Python-3.14.2.tgz
 
 A. HISTORY OF THE SOFTWARE
 ==========================
@@ -384,10 +433,15 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
 LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
 OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
+```
 
-------
+---
 
-** enroot; version 3.4.1 -- https://github.com/NVIDIA/enroot
+## enroot; version 3.4.1
+
+<https://github.com/NVIDIA/enroot>
+
+```text
 
     * Package enroot's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
@@ -407,10 +461,15 @@ This product bundles musl, which is available under a
 "MIT" license.  For details, see deps/musl/.
 * For enroot see also this required NOTICE:
     Copyright (c) 2018-2023, NVIDIA CORPORATION. All rights reserved.
+```
 
-------
+---
 
-** requests; version 2.31.0 -- https://pypi.org/project/requests/
+## requests; version 2.32.5
+
+<https://pypi.org/project/requests/>
+
+```text
 
     * Package requests's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
@@ -594,21 +653,29 @@ dependencies-3.12-x86_64.tgz
 * For requests see also this required NOTICE:
     Requests
     Copyright 2019 Kenneth Reitz
+```
 
-------
+---
 
-** cookbook-line; version 4.5.21 -- https://supermarket.chef.io/cookbooks/line
-** cookbook-yum-epel; version 5.0.8 -- https://supermarket.chef.io/cookbooks/yum-epel
-** cookbook-yum; version 7.4.20 -- https://supermarket.chef.io/cookbooks/yum
-** cookbook-openssh; version 2.11.14 -- https://supermarket.chef.io/cookbooks/openssh
-** cookbook-nfs; version 5.1.5 -- https://supermarket.chef.io/cookbooks/nfs
-** aws-cfn-bootstrap; version 2.0-32 -- https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html
-** RubyGem - berkshelf; version 8.0.7 -- https://rubygems.org/gems/berkshelf/versions/8.0.7
-** pyxis; version 0.20.0 -- https://github.com/NVIDIA/pyxis
-** awscli; version 1.32.85 -- https://pypi.org/project/awscli/1.32.85/
-** boto3; version 1.34.85 -- https://pypi.org/project/boto3/
-** retrying; version 1.3.4 -- https://pypi.org/project/retrying/
-** python-daemon; version 2.2.4 -- https://pypi.org/project/python-daemon/
+## cookbook-line (grouped with 12 other entries sharing this license)
+
+**Entries covered by the license text below:**
+
+- **cookbook-line; version 4.5.21** — <https://supermarket.chef.io/cookbooks/line>
+- **cookbook-yum-epel; version 5.0.8** — <https://supermarket.chef.io/cookbooks/yum-epel>
+- **cookbook-yum; version 7.4.20** — <https://supermarket.chef.io/cookbooks/yum>
+- **cookbook-openssh; version 2.11.14** — <https://supermarket.chef.io/cookbooks/openssh>
+- **cookbook-nfs; version 5.1.5** — <https://supermarket.chef.io/cookbooks/nfs>
+- **cookbook-iptables; version 8.0.0** — <https://supermarket.chef.io/cookbooks/iptables>
+- **aws-cfn-bootstrap; version 2.0-38** — <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html>
+- **RubyGem - berkshelf; version 8.0.7** — <https://rubygems.org/gems/berkshelf/versions/8.0.7>
+- **pyxis; version 0.20.0** — <https://github.com/NVIDIA/pyxis>
+- **awscli; version 1.44.18** — <https://pypi.org/project/awscli/1.44.18/>
+- **boto3; version 1.42.31** — <https://pypi.org/project/boto3/>
+- **retrying; version 1.3.4** — <https://pypi.org/project/retrying/>
+- **python-daemon; version 2.2.4** — <https://pypi.org/project/python-daemon/>
+
+```text
 
     * Package python-daemon's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
@@ -1023,11 +1090,16 @@ details.
         mode: text
         End:
         vim: fileencoding=utf-8 filetype=rst :
+```
 
-------
+---
 
-** supervisor; version 4.2.5 -- https://pypi.org/project/supervisor/
-Supervisor is Copyright (c) 2006-2013 Agendaless Consulting and Contributors.
+## supervisor; version 4.3.0
+
+<https://pypi.org/project/supervisor/>
+
+```text
+Supervisor is Copyright (c) 2006-2015 Agendaless Consulting and Contributors.
 (http://www.agendaless.com), All Rights Reserved
 
   This software is subject to the provisions of the license at
@@ -1232,10 +1304,15 @@ License (as marked in its file header):
     OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
     SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
     DAMAGE.
+```
 
-------
+---
 
-** docutils; version 0.21.1 -- https://pypi.org/project/docutils/
+## docutils; version 0.22.4
+
+<https://pypi.org/project/docutils/>
+
+```text
 Copyright: David Goodger
 
     * Package docutils's source code may be found at:
@@ -1265,12 +1342,23 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
 
-------
+---
 
-** jinja2; version 3.1.3 -- https://pypi.org/project/Jinja2/
+## jinja2; version 3.1.6
+
+<https://pypi.org/project/Jinja2/>
+
+```text
 Copyright 2007 Pallets
-** click; version 8.1.7 -- https://pypi.org/project/click/
+```
+
+## click; version 8.1.7
+
+<https://pypi.org/project/click/>
+
+```text
 Copyright 2014 Pallets
 
     * Package click's source code may be found at:
@@ -1309,10 +1397,15 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+```
 
-------
+---
 
-** Arm Performance Libraries; version 24.10 -- https://developer.arm.com/tools-and-software/server-and-hpc/downloads/arm-performance-libraries
+## Arm Performance Libraries; version 24.10
+
+<https://developer.arm.com/tools-and-software/server-and-hpc/downloads/arm-performance-libraries>
+
+```text
 ================================================================================
 This file lists the package level copyright and license information for third
 party software included in this release of 'Arm Performance Libraries'. Refer
@@ -3309,16 +3402,19 @@ License, unless waived in writing, shall not constitute a waiver of Arm's rights
 to enforce such provision or any other provision of this License in the future.
 
 Arm document version 1.0, effective 24 June 2020
+```
 
+---
 
+## Slurm; version 25.11.4-1
 
-------
+<https://github.com/SchedMD/slurm>
 
-** Slurm; version 24.05.02 -- https://github.com/SchedMD/slurm
+```text
 
     * Package Slurm's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.amazonaws.com/archives/dependenci
-es/slurm/slurm-24-05-2-1.tar.gz
+es/slurm/slurm-25-11-4-1.tar.gz
 
                          SLURM LICENSE AGREEMENT
 
@@ -3880,10 +3976,15 @@ of source files in this program which reference this file.
  * copied and put under another distribution licence
  * [including the GNU Public Licence.]
  */
+```
 
-------
+---
 
-** stunnel; version 5.67 -- https://www.stunnel.org/
+## stunnel; version 5.67
+
+<https://www.stunnel.org/>
+
+```text
 Copyright (C) 1998-2019 Michal Trojnara
 
 This program is free software; you can redistribute it and/or modify it under
@@ -4228,15 +4329,20 @@ a sample; alter the names:
 `Gnomovision' (which makes passes at compilers) written by James Hacker.
 
 signature of Ty Coon, 1 April 1989 Ty Coon, President of Vice
+```
 
-------
+---
 
-** MUNGE; version 0.5.15 -- https://github.com/dun/munge/archive/refs/tags/munge-0.5.15.tar.gz
+## MUNGE; version 0.5.18
+
+<https://github.com/dun/munge/archive/refs/tags/munge-0.5.18.tar.gz>
+
+```text
 Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
 
     * Package MUNGE's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/munge/munge-0.5.15.tar.gz
+east-1.amazonaws.com/archives/dependencies/munge/munge-0.5.18.tar.gz
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
@@ -4912,10 +5018,15 @@ may consider it more useful to permit linking proprietary applications with
 the library.  If this is what you want to do, use the GNU Lesser General
 Public License instead of this License.  But first, please read
 <http://www.gnu.org/philosophy/why-not-lgpl.html>.
+```
 
-------
+---
 
-** gcc; version 11.3.0, 9.3.0 -- https://ftp.gnu.org/gnu/gcc/gcc-11.3.0/
+## gcc; version 11.3.0, 9.3.0
+
+<https://ftp.gnu.org/gnu/gcc/gcc-11.3.0/>
+
+```text
 This GCC Runtime Library Exception ("Exception") is an additional
 permission under section 7 of the GNU General Public License, version
 3 ("GPLv3"). It applies to a given file (the "Runtime Library") that
@@ -5539,46 +5650,577 @@ Copyright (C) 2009 Free Software Foundation, Inc.
 
 Everyone is permitted to copy and distribute verbatim copies of this
 license document, but changing it is not allowed.
+```
 
-------
+---
 
-** MySQL; version 8.0.39 -- https://www.mysql.com/products/community/
-Copyright (c) 1997, 2024, Oracle and/or its affiliates.
+## MySQL; version 8.4.8 (8.0.39 on AL2, 8.0.45 on Ubuntu 24.04)
+
+<https://www.mysql.com/products/community/>
+
+```text
+Copyright (c) 1997, 2025, Oracle and/or its affiliates.
 
     * Package MySQL's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/mysql/source/mysql-8.0.39.tar.gz
+east-1.amazonaws.com/archives/mysql/source/mysql-8.4.8.tar.gz
+      (AL2 continues to use mysql-8.0.39.tar.gz; Ubuntu 22.04/24.04 install
+       libmysqlclient from the distribution's own archive)
+
+Licensing Information User Manual
+
+MySQL 8.4.8 Community
+
+Introduction
+
+   This License Information User Manual contains Oracle's product license
+   and other licensing information, including licensing information for
+   third-party software which may be included in this distribution of
+   MySQL 8.4.8 Community.
+
+   Last updated: November 2025
+
+Licensing Information
+
+   This release of MySQL 8.4.8 Community is brought to you by the MySQL
+   team at Oracle. This software is released under version 2 of the GNU
+   General Public License (GPLv2), as set forth below, with the following
+   additional permissions:
+
+   This distribution of MySQL 8.4.8 Community is designed to work with
+   certain software (including but not limited to OpenSSL) that is
+   licensed under separate terms, as designated in a particular file or
+   component or in the license documentation. Without limiting your rights
+   under the GPLv2, the authors of MySQL hereby grant you an additional
+   permission to link the program and your derivative works with the
+   separately licensed software that they have either included with the
+   program or referenced in the documentation.
+
+   This distribution includes the MySQL C API client library
+   (libmysqlclient) otherwise known as MySQL Connector/C. Without limiting
+   the foregoing grant of rights under the GPLv2 and additional permission
+   as to separately licensed software, this Connector is also subject to
+   the Universal FOSS Exception, version 1.0, a copy of which is
+   reproduced below and can also be found along with its FAQ at
+   http://oss.oracle.com/licenses/universal-foss-exception.
+
+Election of GPLv2
+
+   For the avoidance of doubt, except that if any license choice other
+   than GPL or LGPL is available it will apply instead, Oracle elects to
+   use only the General Public License version 2 (GPLv2) at this time for
+   any software where a choice of GPL license versions is made available
+   with the language indicating that GPLv2 or any later version may be
+   used, or where a choice of which version of the GPL is applied is
+   otherwise unspecified.
+
+GNU General Public License Version 2.0, June 1991
+
+The following applies to all products licensed under the GNU General
+Public License, Version 2.0: You may not use the identified files
+except in compliance with the GNU General Public License, Version
+2.0 (the "License.") You may obtain a copy of the License at
+http://www.gnu.org/licenses/gpl-2.0.txt. A copy of the license is
+also reproduced below. Unless required by applicable law or agreed
+to in writing, software distributed under the License is distributed
+on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the License for the specific language
+governing permissions and limitations under the License.
 
 
-------
+  ======================================================================
+  ======================================================================
 
-** Intel MPI; version 2021.13.1 -- https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#mpi
-# Copyright (C) 2006-2020 Intel Corporation. All rights reserved., All Rights
-Reserved.
-# The  source code,  information and material  ("Material")  contained herein is
-# owned  by  Intel  Corporation or its suppliers or licensors, and title to such
-# Material  remains  with  Intel  Corporation  or  its  suppliers  or licensors.
-# The  Material  contains proprietary information of  Intel or its suppliers and
-# licensors.   The Material is protected by  worldwide copyright laws and treaty
-# provisions. No part of the Material may be used, copied, reproduced, modified,
-# published,  uploaded, posted, transmitted, distributed or disclosed in any way
-# without Intel's prior express written permission. No license under any patent,
-# copyright  or other intellectual property rights in the Material is granted to
-# or conferred upon you, either expressly,  by implication, inducement, estoppel
-# or  otherwise.  Any license  under such intellectual  property rights  must be
-# express and approved by Intel in writing.
-# Unless otherwise agreed by Intel in writing, you may not  remove or alter this
-# notice or any other notice embedded in Materials by Intel or Intel's suppliers
-# or licensors in any way.
+
+GNU GENERAL PUBLIC LICENSE
+Version 2, June 1991
+
+Copyright (C) 1989, 1991 Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+Everyone is permitted to copy and distribute verbatim
+copies of this license document, but changing it is not
+allowed.
+
+                     Preamble
+
+  The licenses for most software are designed to take away your
+freedom to share and change it.  By contrast, the GNU General Public
+License is intended to guarantee your freedom to share and change free
+software--to make sure the software is free for all its users.  This
+General Public License applies to most of the Free Software
+Foundation's software and to any other program whose authors commit to
+using it.  (Some other Free Software Foundation software is covered by
+the GNU Lesser General Public License instead.)  You can apply it to
+your programs, too.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+this service if you wish), that you receive source code or can get it
+if you want it, that you can change the software or use pieces of it
+in new free programs; and that you know you can do these things.
+
+  To protect your rights, we need to make restrictions that forbid
+anyone to deny you these rights or to ask you to surrender the rights.
+These restrictions translate to certain responsibilities for you if you
+distribute copies of the software, or if you modify it.
+
+  For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must give the recipients all the rights that
+you have.  You must make sure that they, too, receive or can get the
+source code.  And you must show them these terms so they know their
+rights.
+
+  We protect your rights with two steps: (1) copyright the software,
+and (2) offer you this license which gives you legal permission to
+copy, distribute and/or modify the software.
+
+  Also, for each author's protection and ours, we want to make certain
+that everyone understands that there is no warranty for this free
+software.  If the software is modified by someone else and passed on,
+we want its recipients to know that what they have is not the original,
+so that any problems introduced by others will not reflect on the
+original authors' reputations.
+
+  Finally, any free program is threatened constantly by software
+patents.  We wish to avoid the danger that redistributors of a free
+program will individually obtain patent licenses, in effect making the
+program proprietary.  To prevent this, we have made it clear that any
+patent must be licensed for everyone's free use or not licensed at all.
+
+  The precise terms and conditions for copying, distribution and
+modification follow.
+
+                    GNU GENERAL PUBLIC LICENSE
+   TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+  0. This License applies to any program or other work which contains
+a notice placed by the copyright holder saying it may be distributed
+under the terms of this General Public License.  The "Program", below,
+refers to any such program or work, and a "work based on the Program"
+means either the Program or any derivative work under copyright law:
+that is to say, a work containing the Program or a portion of it,
+either verbatim or with modifications and/or translated into another
+language.  (Hereinafter, translation is included without limitation in
+the term "modification".)  Each licensee is addressed as "you".
+
+Activities other than copying, distribution and modification are not
+covered by this License; they are outside its scope.  The act of
+running the Program is not restricted, and the output from the Program
+is covered only if its contents constitute a work based on the
+Program (independent of having been made by running the Program).
+Whether that is true depends on what the Program does.
+
+  1. You may copy and distribute verbatim copies of the Program's
+source code as you receive it, in any medium, provided that you
+conspicuously and appropriately publish on each copy an appropriate
+copyright notice and disclaimer of warranty; keep intact all the
+notices that refer to this License and to the absence of any warranty;
+and give any other recipients of the Program a copy of this License
+along with the Program.
+
+You may charge a fee for the physical act of transferring a copy, and
+you may at your option offer warranty protection in exchange for a fee.
+
+  2. You may modify your copy or copies of the Program or any portion
+of it, thus forming a work based on the Program, and copy and
+distribute such modifications or work under the terms of Section 1
+above, provided that you also meet all of these conditions:
+
+    a) You must cause the modified files to carry prominent notices
+    stating that you changed the files and the date of any change.
+
+    b) You must cause any work that you distribute or publish, that in
+    whole or in part contains or is derived from the Program or any
+    part thereof, to be licensed as a whole at no charge to all third
+    parties under the terms of this License.
+
+    c) If the modified program normally reads commands interactively
+    when run, you must cause it, when started running for such
+    interactive use in the most ordinary way, to print or display an
+    announcement including an appropriate copyright notice and a
+    notice that there is no warranty (or else, saying that you provide
+    a warranty) and that users may redistribute the program under
+    these conditions, and telling the user how to view a copy of this
+    License.  (Exception: if the Program itself is interactive but
+    does not normally print such an announcement, your work based on
+    the Program is not required to print an announcement.)
+
+These requirements apply to the modified work as a whole.  If
+identifiable sections of that work are not derived from the Program,
+and can be reasonably considered independent and separate works in
+themselves, then this License, and its terms, do not apply to those
+sections when you distribute them as separate works.  But when you
+distribute the same sections as part of a whole which is a work based
+on the Program, the distribution of the whole must be on the terms of
+this License, whose permissions for other licensees extend to the
+entire whole, and thus to each and every part regardless of who wrote it.
+
+Thus, it is not the intent of this section to claim rights or contest
+your rights to work written entirely by you; rather, the intent is to
+exercise the right to control the distribution of derivative or
+collective works based on the Program.
+
+In addition, mere aggregation of another work not based on the Program
+with the Program (or with a work based on the Program) on a volume of
+a storage or distribution medium does not bring the other work under
+the scope of this License.
+
+  3. You may copy and distribute the Program (or a work based on it,
+under Section 2) in object code or executable form under the terms of
+Sections 1 and 2 above provided that you also do one of the following:
+
+    a) Accompany it with the complete corresponding machine-readable
+    source code, which must be distributed under the terms of Sections
+    1 and 2 above on a medium customarily used for software
+    interchange; or,
+
+    b) Accompany it with a written offer, valid for at least three
+    years, to give any third party, for a charge no more than your
+    cost of physically performing source distribution, a complete
+    machine-readable copy of the corresponding source code, to be
+    distributed under the terms of Sections 1 and 2 above on a medium
+    customarily used for software interchange; or,
+
+    c) Accompany it with the information you received as to the offer
+    to distribute corresponding source code.  (This alternative is
+    allowed only for noncommercial distribution and only if you
+    received the program in object code or executable form with such
+    an offer, in accord with Subsection b above.)
+
+The source code for a work means the preferred form of the work for
+making modifications to it.  For an executable work, complete source
+code means all the source code for all modules it contains, plus any
+associated interface definition files, plus the scripts used to
+control compilation and installation of the executable.  However, as
+a special exception, the source code distributed need not include
+anything that is normally distributed (in either source or binary
+form) with the major components (compiler, kernel, and so on) of the
+operating system on which the executable runs, unless that component
+itself accompanies the executable.
+
+If distribution of executable or object code is made by offering
+access to copy from a designated place, then offering equivalent
+access to copy the source code from the same place counts as
+distribution of the source code, even though third parties are not
+compelled to copy the source along with the object code.
+
+  4. You may not copy, modify, sublicense, or distribute the Program
+except as expressly provided under this License.  Any attempt
+otherwise to copy, modify, sublicense or distribute the Program is
+void, and will automatically terminate your rights under this License.
+However, parties who have received copies, or rights, from you under
+this License will not have their licenses terminated so long as such
+parties remain in full compliance.
+
+  5. You are not required to accept this License, since you have not
+signed it.  However, nothing else grants you permission to modify or
+distribute the Program or its derivative works.  These actions are
+prohibited by law if you do not accept this License.  Therefore, by
+modifying or distributing the Program (or any work based on the
+Program), you indicate your acceptance of this License to do so, and
+all its terms and conditions for copying, distributing or modifying
+the Program or works based on it.
+
+  6. Each time you redistribute the Program (or any work based on the
+Program), the recipient automatically receives a license from the
+original licensor to copy, distribute or modify the Program subject to
+these terms and conditions.  You may not impose any further
+restrictions on the recipients' exercise of the rights granted herein.
+You are not responsible for enforcing compliance by third parties to
+this License.
+
+  7. If, as a consequence of a court judgment or allegation of patent
+infringement or for any other reason (not limited to patent issues),
+conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot
+distribute so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you
+may not distribute the Program at all.  For example, if a patent
+license would not permit royalty-free redistribution of the Program by
+all those who receive copies directly or indirectly through you, then
+the only way you could satisfy both it and this License would be to
+refrain entirely from distribution of the Program.
+
+If any portion of this section is held invalid or unenforceable under
+any particular circumstance, the balance of the section is intended to
+apply and the section as a whole is intended to apply in other
+circumstances.
+
+It is not the purpose of this section to induce you to infringe any
+patents or other property right claims or to contest validity of any
+such claims; this section has the sole purpose of protecting the
+integrity of the free software distribution system, which is
+implemented by public license practices.  Many people have made
+generous contributions to the wide range of software distributed
+through that system in reliance on consistent application of that
+system; it is up to the author/donor to decide if he or she is willing
+to distribute software through any other system and a licensee cannot
+impose that choice.
+
+This section is intended to make thoroughly clear what is believed to
+be a consequence of the rest of this License.
+
+  8. If the distribution and/or use of the Program is restricted in
+certain countries either by patents or by copyrighted interfaces, the
+original copyright holder who places the Program under this License
+may add an explicit geographical distribution limitation excluding
+those countries, so that distribution is permitted only in or among
+countries not thus excluded.  In such case, this License incorporates
+the limitation as if written in the body of this License.
+
+  9. The Free Software Foundation may publish revised and/or new
+versions of the General Public License from time to time.  Such new
+versions will be similar in spirit to the present version, but may
+differ in detail to address new problems or concerns.
+
+Each version is given a distinguishing version number.  If the Program
+specifies a version number of this License which applies to it and
+"any later version", you have the option of following the terms and
+conditions either of that version or of any later version published by
+the Free Software Foundation.  If the Program does not specify a
+version number of this License, you may choose any version ever
+published by the Free Software Foundation.
+
+  10. If you wish to incorporate parts of the Program into other free
+programs whose distribution conditions are different, write to the
+author to ask for permission.  For software which is copyrighted by the
+Free Software Foundation, write to the Free Software Foundation; we
+sometimes make exceptions for this.  Our decision will be guided by the
+two goals of preserving the free status of all derivatives of our free
+software and of promoting the sharing and reuse of software generally.
+
+                            NO WARRANTY
+
+  11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO
+WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS
+WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+  12. IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
+WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU
+FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+                     END OF TERMS AND CONDITIONS
+
+   ======================================================================
+   ======================================================================
+
+The Universal FOSS Exception, Version 1.0
+
+   In addition to the rights set forth in the other license(s) included in
+   the distribution for this software, data, and/or documentation
+   (collectively the "Software", and such licenses collectively with this
+   additional permission the "Software License"), the copyright holders
+   wish to facilitate interoperability with other software, data, and/or
+   documentation distributed with complete corresponding source under a
+   license that is OSI-approved and/or categorized by the FSF as free
+   (collectively "Other FOSS"). We therefore hereby grant the following
+   additional permission with respect to the use and distribution of the
+   Software with Other FOSS, and the constants, function signatures, data
+   structures and other invocation methods used to run or interact with
+   each of them (as to each, such software's "Interfaces"):
+
+    i. The Software's Interfaces may, to the extent permitted by the
+       license of the Other FOSS, be copied into, used and distributed in
+       the Other FOSS in order to enable interoperability, without
+       requiring a change to the license of the Other FOSS other than as
+       to any Interfaces of the Software embedded therein. The Software's
+       Interfaces remain at all times under the Software License,
+       including without limitation as used in the Other FOSS (which upon
+       any such use also then contains a portion of the Software under the
+       Software License).
+
+   ii. The Other FOSS's Interfaces may, to the extent permitted by the
+       license of the Other FOSS, be copied into, used and distributed in
+       the Software in order to enable interoperability, without requiring
+       that such Interfaces be licensed under the terms of the Software
+       License or otherwise altering their original terms, if this does
+       not require any portion of the Software other than such Interfaces
+       to be licensed under the terms other than the Software License.
+
+   iii. If only Interfaces and no other code is copied between the
+       Software and the Other FOSS in either direction, the use and/or
+       distribution of the Software with the Other FOSS shall not be
+       deemed to require that the Other FOSS be licensed under the license
+       of the Software, other than as to any Interfaces of the Software
+       copied into the Other FOSS. This includes, by way of example and
+       without limitation, statically or dynamically linking the Software
+       together with Other FOSS after enabling interoperability using the
+       Interfaces of one or both, and distributing the resulting
+       combination under different licenses for the respective portions
+       thereof.
+
+       For avoidance of doubt, a license which is OSI-approved or
+       categorized by the FSF as free, includes, for the purpose of this
+       permission, such licenses with additional permissions, and any
+       license that has previously been so approved or categorized as
+       free, even if now deprecated or otherwise no longer recognized as
+       approved or free. Nothing in this additional permission grants any
+       right to distribute any portion of the Software on terms other than
+       those of the Software License or grants any additional permission
+       of any kind for use or distribution of the Software in conjunction
+       with software other than Other FOSS.
+
+   ======================================================================
+   ======================================================================
+
+Licenses for Third-Party Components
+
+   MySQL 8.4.8 Community bundles the following third-party components under
+   their own licenses. The full per-component license texts are installed on
+   the head node at /usr/share/doc/mysql-community-libs/LICENSE. In summary:
+
+   Permissively-licensed (BSD-style / MIT): Boost C++ Libraries, cURL
+   (libcurl), Cyrus SASL, dtoa.c (Lucent), Editline Library (libedit),
+   Facebook Fast Checksum Patch / Facebook Patches, FMT, Fred Fish's Dbug
+   Library (public domain), Google Controlling Master Thread I/O Rate Patch,
+   Google Perftools (TCMalloc), Google Protocol Buffers, Google SMP Patch,
+   Google Test (GMock), gperftools, double-conversion, jemalloc, LZ4, MeCab,
+   MeCab Dictionary, memcached, nt_servc (public domain), Percona Multiple
+   I/O Threads Patch, RapidJSON, Richard A. O'Keefe String Library,
+   Time Zone Database (public domain), unordered_dense, xxHash, zlib.
+
+   Apache-2.0: abseil-cpp (embedded in Google Protocol Buffers), OpenSSL 3.0.
+
+   Dual BSD / GPLv2 (Oracle elects BSD): ZSTD (Zstandard).
+
+   LGPL-2.1: Libaio.
+
+   GPL-2.0 / Perl Artistic 1.0 (Oracle elects Artistic 1.0): Memcached.pm.
+
+   CC-BY-SA 3.0 (documentation portion only): Kerberos5 documentation.
+
+   Other mixed-permissive: Kerberos5 (MIT + contributor licenses), ICU4C
+   Unicode Libraries (Unicode + ICU + cjdict/laodict/burmesedict BSD terms,
+   Time Zone Database public domain, NAIST licenses for dictionary data),
+   EPSG Geodetic Parameter Dataset (IOGP terms of use), libevent (3-clause
+   BSD + OpenBSD + MIT arc4/libutp sub-components), LibFIDO + libcbor (BSD +
+   MIT), libtirpc (BSD-3-Clause style). Unicode Data Files & Software: see
+   Unicode Inc. License Agreement.
+
+   The full verbatim text of each third-party license is included on the
+   distribution at /usr/share/doc/mysql-community-libs/LICENSE and is
+   available from Oracle's Written Offer for Source Code (see
+   http://www.oracle.com/goto/opensourcecode) or by written request to
+   Oracle America, Inc., Attn: Senior Vice President, Development and
+   Engineering Legal, 500 Oracle Parkway, 10th Floor, Redwood Shores, CA
+   94065. A full copy may also be obtained from within the MySQL 8.4.8
+   source tarball referenced in this block's source-code pointer above.
+
+Standard Licenses incorporated by reference:
+
+   * GNU Lesser General Public License v2.1, February 1999 — see
+     http://www.gnu.org/licenses/lgpl-2.1.html
+   * Perl "Artistic License" 1.0 — see https://dev.perl.org/licenses/artistic.html
+   * Apache License Version 2.0, January 2004 — see http://www.apache.org/licenses/LICENSE-2.0
+```
+
+---
+
+## Intel MPI; version 2021.17 (2021.17.2.94)
+
+<https://www.intel.com/content/www/us/en/developer/articles/tool/oneapi-standalone-components.html#mpi>
+
+```text
+Intel(R) MPI Library: Copyright (C) 2009 Intel Corporation
 
     * Package Intel MPI's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/impi/l_mpi_oneapi_p_2021.13.1.769_offline.sh
+east-1.amazonaws.com/archives/impi/l_mpi_oneapi_p_2021.17.2.94_offline.sh
 
+Intel Simplified Software License (Version October 2022)
 
-------
+Use and Redistribution. You may use and redistribute the software, which is
+provided in binary form only, (the "Software"), without modification, provided the
+following conditions are met:
 
-** setuptools; version 58.1.0 -- https://pypi.org/project/setuptools
+* Redistributions must reproduce the above copyright notice and these terms of use
+in the Software and in the documentation and/or other materials provided with
+the distribution.
+* Neither the name of Intel nor the names of its suppliers may be used to endorse
+or promote products derived from this Software without specific prior written
+permission.
+* No reverse engineering, decompilation, or disassembly of the Software is
+permitted, nor any modification or alteration of the Software or its operation
+at any time, including during execution.
+
+No other licenses. Except as provided in the preceding section, Intel grants no
+licenses or other rights by implication, estoppel or otherwise to, patent,
+copyright, trademark, trade name, service mark or other intellectual property
+licenses or rights of Intel.
+
+Third party software. "Third Party Software" means the files (if any) listed in
+the "third-party-software.txt" or other similarly-named text file that may be
+included with the Software. Third Party Software, even if included with the
+distribution of the Software, may be governed by separate license terms, including
+without limitation, third party license terms, open source software notices and
+terms, and/or other Intel software license terms. These separate license terms
+solely govern Your use of the Third Party Software.
+
+DISCLAIMER. THIS SOFTWARE IS PROVIDED "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT ARE
+DISCLAIMED. THIS SOFTWARE IS NOT INTENDED FOR USE IN SYSTEMS OR APPLICATIONS
+WHERE FAILURE OF THE SOFTWARE MAY CAUSE PERSONAL INJURY OR DEATH AND YOU AGREE
+THAT YOU ARE FULLY RESPONSIBLE FOR ANY CLAIMS, COSTS, DAMAGES, EXPENSES, AND
+ATTORNEYS' FEES ARISING OUT OF ANY SUCH USE, EVEN IF ANY CLAIM ALLEGES THAT
+INTEL WAS NEGLIGENT REGARDING THE DESIGN OR MANUFACTURE OF THE SOFTWARE.
+
+LIMITATION OF LIABILITY. IN NO EVENT WILL INTEL BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+No support. Intel may make changes to the Software, at any time without notice,
+and is not obligated to support, update or provide training for the Software.
+
+Termination. Your right to use the Software is terminated in the event of your
+breach of this license.
+
+Feedback. Should you provide Intel with comments, modifications, corrections,
+enhancements or other input ("Feedback") related to the Software, Intel will be
+free to use, disclose, reproduce, license or otherwise distribute or exploit the
+Feedback in its sole discretion without any obligations or restrictions of any
+kind, including without limitation, intellectual property rights or licensing
+obligations.
+
+Compliance with laws. You agree to comply with all relevant laws and regulations
+governing your use, transfer, import or export (or prohibition thereof) of the
+Software.
+
+Governing law.  All disputes will be governed by the laws of the United States of
+America and the State of Delaware without reference to conflict of law principles
+and subject to the exclusive jurisdiction of the state or federal courts sitting
+in the State of Delaware, and each party agrees that it submits to the personal
+jurisdiction and venue of those courts and waives any objections. THE UNITED
+NATIONS CONVENTION ON CONTRACTS FOR THE INTERNATIONAL SALE OF GOODS (1980) IS
+SPECIFICALLY EXCLUDED AND WILL NOT APPLY TO THE SOFTWARE.
+```
+
+---
+
+## setuptools; version 80.10.1
+
+<https://pypi.org/project/setuptools>
+
+```text
 Copyright Jason R. Coombs
 
     * Package setuptools's source code may be found at:
@@ -5605,10 +6247,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 IN THE SOFTWARE.
+```
 
-------
+---
 
-** jsonschema; version 4.21.1 -- https://github.com/python-jsonschema/jsonschema
+## jsonschema; version 4.26.0
+
+<https://github.com/python-jsonschema/jsonschema>
+
+```text
 Copyright (c) 2013 Julian Berman
 
     * Package jsonschema's source code may be found at:
@@ -5636,15 +6283,20 @@ FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
 IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
-------
+---
 
-** efs-utils; version 2.1.0 -- https://github.com/aws/efs-utils
+## efs-utils; version 2.4.0
+
+<https://github.com/aws/efs-utils>
+
+```text
 Copyright 2017 Amazon.com, Inc. or its affiliates.
 
     * Package efs-utils's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/efs/v2.1.0.tar.gz
+east-1.amazonaws.com/archives/dependencies/efs/v2.4.0.tar.gz
 
 MIT License
 
@@ -5667,10 +6319,15 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 
-------
+---
 
-** tabulate; version 0.8.10 -- https://pypi.org/project/tabulate
+## tabulate; version 0.8.10
+
+<https://pypi.org/project/tabulate>
+
+```text
 Copyright (c) 2011-2020 Sergey Astanin and contributors
 
     * Package tabulate's source code may be found at:
@@ -5698,15 +6355,20 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
 OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
-------
+---
 
-** gdrcopy; version 2.4.4 -- https://github.com/NVIDIA/gdrcopy/releases/tag/v2.4.4
+## gdrcopy; version 2.5.2
+
+<https://github.com/NVIDIA/gdrcopy/releases/tag/v2.5.2>
+
+```text
 Copyright (c) 2014-2021, NVIDIA CORPORATION. All rights reserved.
 
     * Package gdrcopy's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/gdr_copy/v2.4.4.tar.gz
+east-1.amazonaws.com/archives/dependencies/gdr_copy/v2.5.2.tar.gz
 
 Copyright (c) 2014-2021, NVIDIA CORPORATION. All rights reserved.
 
@@ -5727,13 +6389,24 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
+```
 
-------
+---
 
-** pyyaml; version 6.0.1 -- https://pypi.org/project/PyYAML/
+## pyyaml; version 6.0.3
+
+<https://pypi.org/project/PyYAML/>
+
+```text
 Copyright (c) 2017-2021 Ingy döt Net
 Copyright (c) 2006-2016 Kirill Simonov
-** chevron; version 0.14.0 -- https://pypi.org/project/chevron/
+```
+
+## chevron; version 0.14.0
+
+<https://pypi.org/project/chevron/>
+
+```text
 Copyright (c) 2014 Noah Morrison
 
     * Package chevron's source code may be found at:
@@ -5763,15 +6436,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+```
 
-------
+---
 
-** libjwt; version 1.17.0 -- https://github.com/benmcollins/libjwt
+## libjwt; version 1.18.4 (1.17.0 on AL2)
+
+<https://github.com/benmcollins/libjwt>
+
+```text
 Copyright (C) 2015-2022 Ben Collins <bcollins@maclara-llc.com>
 
     * Package libjwt's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/jwt/v1.17.0.tar.gz
+east-1.amazonaws.com/archives/dependencies/jwt/v1.18.4.tar.gz
+      (AL2 continues to use https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/jwt/v1.17.0.tar.gz)
 
 Mozilla Public License Version 2.0
 ==================================
@@ -6144,601 +6824,814 @@ You may add additional accurate notices of copyright ownership.
 Exhibit B - "Incompatible With Secondary Licenses" Notice
 ---------------------------------------------------------
 
-  This Source Code Form is "Incompatible With Secondary Licenses", as
+  This Source Code Form is "Incompatible With Secondary Licenses", asP
   defined by the Mozilla Public License, v. 2.0.
+```
 
-------
+---
 
-** Amazon DCV; version 2024.0-18131 -- https://www.nice-dcv.com/
-© 2020, NICE s.r.l. or its affiliates. All rights reserved.
+## Amazon DCV; version 2025.0-20103
+
+<https://www.nice-dcv.com/>
+
+```text
+© 2020-2025, NICE s.r.l. or its affiliates. All rights reserved.
 
     * Package Amazon DCV's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
 east-1.amazonaws.com/archives/dependencies/dcv/nice-
-dcv-2024.0-18131-el8-x86_64.tgz
+dcv-2025.0-20103-el8-x86_64.tgz
 
 END-USER LICENSE AGREEMENT (EULA)
 for NICE Software and Solutions
-(Version 8.4)
+(Version 8.5)
 
-This End User License Agreement ("EULA" or "Agreement") contains the terms
-and conditions that govern your ("Licensee" or "you" or "your") access to and
-use of NICE EnginFrame and Amazon DCV (together with any updates, including
-updates to the software name, or enhancements, and accompanying documentation,
-"Software") and Amazon DCV Web Client software development kit (together with
-any updates, including any updates to the software development kit name, or
-enhancements, and accompanying documentation,"SDK"). As used in this EULA,
-"NICE"
-means NICE, S.r.l. with principal offices located at Via Milliavacca, 9 - 14100
-Asti - Italy ("NICE IT"), except that if Licensee is located in the United
-States, "NICE" means NICE USA LLC, with principal offices at 410 Terry Avenue
-North, Seattle, Washington, 98109-5210 ("NICE US"). This EULA supplements
-the AWS Customer Agreement posted at aws.amazon.com/agreement or other
-agreement with NICE or an affiliate governing your use of NICE services (the
-"Customer Agreement"), and unless otherwise defined in this EULA, capitalized
-terms will have the same meaning as set forth in the Customer Agreement.
+This End User License Agreement ("EULA" or "Agreement") contains the terms and conditions that
+govern your ("Licensee" or "you" or "your") access to and use of NICE EnginFrame and Amazon DCV
+(together with any updates, including updates to the software name, or enhancements, and
+accompanying documentation, "Software") and Amazon DCV Web Client software development kit
+(together with any updates, including any updates to the software development kit name, or
+enhancements, and accompanying documentation,"SDK"). As used in this EULA, "NICE" means
+NICE, S.r.l. with principal offices located at Via Milliavacca, 9 – 14100 Asti - Italy ("NICE IT"), except
+that if Licensee is located in the United States, "NICE" means NICE USA LLC, with principal offices
+at 410 Terry Avenue North, Seattle, Washington, 98109-5210 ("NICE US"). This EULA supplements
+the AWS Customer Agreement posted at aws.amazon.com/agreement or other agreement with
+NICE or an affiliate governing your use of NICE services (the "Customer Agreement"), and unless
+otherwise defined in this EULA, capitalized terms will have the same meaning as set forth in the
+Customer Agreement.
 
-1. LICENSE TO AND USE OF THE SOFTWARE. The Software may be accessed and used
-only in accordance with this EULA and the Customer Agreement, and subject to
-these terms:
-(a) You are granted a limited, non-transferable, revocable, non-sublicensable
-license to install and use the Software for your internal business purposes
-only and only in the quantity that you have purchased from NICE or an
-authorized reseller of the Software, or to the extent your use has otherwise
-been authorized by NICE or Amazon Web Services.
-(b) if you requested access to the Software to evaluate its features and
-functionality, you are granted a limited, non-transferable, revocable,
-non-sublicensable license to install and use the Software for your internal
-evaluation and testing purposes only, and only in the quantity that you have
-requested from NICE.
+1. LICENSE TO AND USE OF THE SOFTWARE. The Software may be accessed and used only in
+accordance with this EULA and the Customer Agreement, and subject to these terms:
+(a) You are granted a limited, non-transferable, revocable, non-sublicensable license to install and
+use the Software for your internal business purposes only and only in the quantity that you have
+purchased from NICE or an authorized reseller of the Software, or to the extent your use has
+otherwise been authorized by NICE or Amazon Web Services.
+(b) if you requested access to the Software to evaluate its features and functionality, you are
+granted a limited, non-transferable, revocable, non-sublicensable license to install and use the
+Software for your internal evaluation and testing purposes only, and only in the quantity that you
+have requested from NICE.
+(c) The source code for the Amazon DCV Access Console Web Client, Amazon DCV Access
+Console Handler, Amazon DCV Access Console Authentication Server, Amazon DCV Access
+Console Configuration Wizard, Amazon DCV Access Console Model, and Amazon DCV Access
+Console Integration Tests (“Open-Sourced Amazon DCV Access Console Components”) is
+governed by the Apache 2.0 License (https://github.com/aws/dcv-access-console/blob/main/LICENSE),
+not this EULA or the Customer Agreement. Your access to and use of the code is subject to the terms
+of the Apache 2.0 License. Notwithstanding the foregoing, your use of Amazon DCV
+(including any Amazon DCV product or component available for download at https://www.amazondcv.com/
+and any successor or related site designated by NICE) is always subject to the terms of this EULA
+and the Customer Agreement even when they are used in combination with the Open-Sourced
+Amazon DCV Access Console Components, or any derivative works created using the Open-Sourced
+Amazon DCV Access Console Components.
 
-2. BETA PARTICIPATION. NICE may provide Licensee certain features,
-technologies, software, and services that are not yet generally available,
-including those labeled "beta", "preview", "pre-release", or "experimental"
-(each, a "Beta"). Access and use of Betas are subject to any Beta terms
-provided by NICE and if there is a conflict between the terms of this Section
-and any Beta terms, Beta terms will take precedence. Betas are Software
-subject to all the terms and conditions of this EULA.
-(a) Licensee agrees not to allow access to or use of any Beta or any related
-materials by any third party other than Licensee's employees and contractors
-who have a need to use or access in connection with Licensee's internal
-evaluation activities and have executed written non-disclosure agreements
-obligating them to protect the confidentiality of the Beta and related
-materials.
-(b) Licensee must comply with all policies and guidelines related to any Beta
-as posted on the NICE's website or otherwise made available to Licensee. NICE
-may add or modify restrictions, including usage limits related to access to
-or use of any Beta or related materials at any time. If requested by NICE,
-Licensee will promptly increase or decrease usage to the levels that NICE may
-specify. Any service level agreements that Licensee may have for the Software
-do not apply to Betas.
-(c) Licensee will, when requested by NICE, provide NICE with information
-relating to Licensee's access, use, testing, and evaluation of the Beta and
-any related Beta Materials, including observations or information regarding
-the performance, features, and functionality of the Beta in the form
-reasonably requested by NICE ("Test Observations"). NICE will own and may use
-and evaluate all Test Observations for its own purposes. All Betas, related
-materials, and Test Observations are NICE Confidential Information. Each
-individual Beta license will automatically terminate upon the release of a
-generally available version of the Beta or upon notice of termination by NICE
-which may occur at any time and for any reason. Upon the termination of
-Licensee's license to any Beta, Licensee will cease use of the Beta and
-immediately return or, if instructed by NICE, destroy all copies of the Beta
-and all related materials. NICE does not guarantee that any Beta will ever be
-made generally available or that any generally available version will contain
-the same or similar functionality as any Beta version made available to
-Licensee.
+2. BETA PARTICIPATION. NICE may provide Licensee certain features, technologies, software, and
+services that are not yet generally available, including those labeled "beta", "preview", "pre-release",
+or "experimental" (each, a "Beta"). Access and use of Betas are subject to any Beta terms provided
+by NICE and if there is a conflict between the terms of this Section and any Beta terms, Beta terms
+will take precedence. Betas are Software subject to all the terms and conditions of this EULA.
+(a) Licensee agrees not to allow access to or use of any Beta or any related materials by any third
+party other than Licensee's employees and contractors who have a need to use or access in
+connection with Licensee's internal evaluation activities and have executed written non-disclosure
+agreements obligating them to protect the confidentiality of the Beta and related materials.
+(b) Licensee must comply with all policies and guidelines related to any Beta as posted on the
+NICE's website or otherwise made available to Licensee. NICE may add or modify restrictions,
+including usage limits related to access to or use of any Beta or related materials at any time. If
+requested by NICE, Licensee will promptly increase or decrease usage to the levels that NICE may
+specify. Any service level agreements that Licensee may have for the Software do not apply to
+Betas.
+(c) Licensee will, when requested by NICE, provide NICE with information relating to Licensee's
+access, use, testing, and evaluation of the Beta and any related Beta Materials, including
+observations or information regarding the performance, features, and functionality of the Beta in
+the form reasonably requested by NICE ("Test Observations"). NICE will own and may use and
+evaluate all Test Observations for its own purposes. All Betas, related materials, and Test
+Observations are NICE Confidential Information. Each individual Beta license will automatically
+terminate upon the release of a generally available version of the Beta or upon notice of termination
+by NICE which may occur at any time and for any reason. Upon the termination of Licensee's
+license to any Beta, Licensee will cease use of the Beta and immediately return or, if instructed by
+NICE, destroy all copies of the Beta and all related materials. NICE does not guarantee that any
+Beta will ever be made generally available or that any generally available version will contain the
+same or similar functionality as any Beta version made available to Licensee.
 (d) WITHOUT LIMITING ANY DISCLAIMERS HEREIN, BETAS ARE NOT READY FOR GENERAL
 COMMERCIAL RELEASE AND MAY CONTAIN BUGS, ERRORS, DEFECTS OR HARMFUL
 COMPONENTS. ACCORDINGLY, AND NOTWITHSTANDING ANYTHING TO THE CONTRARY IN THIS
 EULA OR OTHERWISE, NICE PROVIDES BETAS TO LICENSEE "AS IS."
 
-3. USE RESTRICTIONS. Your use of the Software is conditioned upon your
-compliance with the following limitations:
-(a) Licensee will not distribute, rent, lease, lend, loan, transfer, assign,
-resell, sublicense, disclose, or otherwise provide the Software to or use the
-Software for the benefit of any third party (including acting as a service
-bureau or provide of a time sharing service). Notwithstanding the foregoing,
-Licensee may permit its third party contractors to use the software for
-Licensee's internal business purposes provided that Licensee enters to a
-binding agreement with contractor requiring contractor to comply with this
-EULA and is solely responsible and liable for any breach of this EULA
-including any unauthorized use of the Software by Licensee's contractors.
-(b) Licensee will not modify, adapt, translate, alter, tamper with, repair,
-or otherwise create derivative works of the Software, subject to Section 10.
-(c) Licensee will not decompile, decipher, disassemble, reverse engineer or
-otherwise attempt to access or derive source code of the Software, except to
-the extent applicable law does not allow this restriction.
-(d) Licensee will not attempt to use the Software in excess of any usage
-limits and will not attempt to circumvent any technology in or with the
-Software that is designed to monitor, restrict, or limit use. Licensee
-acknowledges and agrees that the Software (including all evaluation versions)
-may require the use of license key or token in order to operate and that
-operation of the Software will automatically terminate upon expiration.
-(e) Licensee will not remove any proprietary notices or labels on the
-Software or any copy thereof.
-(f) Licensee requires that each end user before accessing the Software,
-agrees to comply with this EULA.
-(g) Licensee will not make any use of the Software in any manner not
-expressly permitted by this EULA.
+3. USE RESTRICTIONS. Your use of the Software is conditioned upon your compliance with the
+following limitations:
+(a) Licensee will not distribute, rent, lease, lend, loan, transfer, assign, resell, sublicense, disclose,
+or otherwise provide the Software to or use the Software for the benefit of any third party (including
+acting as a service bureau or provider of a time sharing service). Notwithstanding the foregoing,
+Licensee may permit its third party contractors to use the software for Licensee's internal business
+purposes provided that Licensee enters to a binding agreement with contractor requiring contractor
+to comply with this EULA and is solely responsible and liable for any breach of this EULA including
+any unauthorized use of the Software by Licensee's contractors.
+(b) Licensee will not modify, adapt, translate, alter, tamper with, repair, or otherwise create
+derivative works of the Software, subject to Section 10.
+(c) Licensee will not decompile, decipher, disassemble, reverse engineer or otherwise attempt to
+access or derive source code of the Software, except to the extent applicable law does not allow
+this restriction. (d) Licensee will not attempt to use the Software in excess of any usage limits and
+will not attempt to circumvent any technology in or with the Software that is designed to monitor,
+restrict, or limit use. Licensee acknowledges and agrees that the Software (including all evaluation
+versions) may require the use of license key or token in order to operate and that operation of the
+Software will automatically terminate upon expiration.
+(e) Licensee will not remove any proprietary notices or labels on the Software or any copy thereof.
+(f) Licensee requires that each end user before accessing the Software, agrees to comply with this
+EULA. (g) Licensee will not make any use of the Software in any manner not expressly permitted by
+this EULA.
 
 4. INTELLECTUAL PROPERTY.
-(a) The Software and SDK (including the related documentation) are owned by
-NICE. Licensee acknowledges and agrees that title to the Software and SDK,
-including the documentation, and all the copies thereof, including all
-industrial and intellectual property rights (including the exclusive rights
-of economic exploitation), copyright, trade secrets, and patent rights,
-remains with NICE.
-(b) Licensee has no obligation to give NICE any suggestions, comments, or
-other feedback relating to the Software ("Feedback"). To the extent Licensee
-provides Feedback to NICE, NICE may use and exercise any and all rights in
-the Feedback without obligation or restriction of any kind during and after
-the Term, and Feedback will not be deemed to be confidential information of
-Licensee or otherwise create any confidentiality obligation. Licensee agrees
-not to provide any Feedback that: (i) Licensee knows is subject to any
-patent, copyright or other intellectual property claim or right of any third
-party; or (ii) is subject to license terms which seek to require any products
-incorporating or derived from the Feedback, or other NICE intellectual
-property, to be licensed to or otherwise shared with any third party.
+(a) The Software and SDK (including the related documentation) are owned by NICE. Licensee
+acknowledges and agrees that title to the Software and SDK, including the documentation, and all
+the copies thereof, including all industrial and intellectual property rights (including the exclusive
+rights of economic exploitation), copyright, trade secrets, and patent rights, remains with NICE.
+(b) Licensee has no obligation to give NICE any suggestions, comments, or other feedback relating
+to the Software ("Feedback"). To the extent Licensee provides Feedback to NICE, NICE may use and
+exercise any and all rights in the Feedback without obligation or restriction of any kind during and
+after the Term, and Feedback will not be deemed to be confidential information of Licensee or
+otherwise create any confidentiality obligation. Licensee agrees not to provide any Feedback that:
+(i) Licensee knows is subject to any patent, copyright or other intellectual property claim or right of
+any third party; or (ii) is subject to license terms which seek to require any products incorporating or
+derived from the Feedback, or other NICE intellectual property, to be licensed to or otherwise
+shared with any third party.
 
-5. AUDIT. Licensee shall maintain accurate records regarding Licensee's use
-of the Software and compliance with this EULA and, upon request, make such
-records available to NICE and certify Licensee's compliance with this EULA.
-NICE or a third party may examine and audit Licensee's access, use, and
-deployment of the Software and verify Licensee's compliance with this EULA.
-Any audit will take place during normal business hours on at least 10 days
-prior written notice. If Licensee misreported any figure or underpaid any
-amount, Licensee will remit to NICE the amount of any underpayment within 10
-days after notification of the discrepancy. If the discrepancy exceeds $1,000
-U.S. dollars or 5% of the total amount purchased or reported by Licensee for
-the period audited, then Licensee will reimburse NICE for the reasonable
-costs of the audit.
+5. AUDIT. Licensee shall maintain accurate records regarding Licensee's use of the Software and
+compliance with this EULA and, upon request, make such records available to NICE and certify
+Licensee's compliance with this EULA. NICE or a third party may examine and audit Licensee's
+access, use, and deployment of the Software and verify Licensee's compliance with this EULA. Any
+audit will take place during normal business hours on at least 10 days prior written notice. If
+Licensee misreported any figure or underpaid any amount, Licensee will remit to NICE the amount
+of any underpayment within 10 days after notification of the discrepancy. If the discrepancy
+exceeds $1,000 U.S. dollars or 5% of the total amount purchased or reported by Licensee for the
+period audited, then Licensee will reimburse NICE for the reasonable costs of the audit.
 
-6. SUPPORT SERVICES. Licensee may be eligible to subscribe to software
-support for any or all of the Software (the "Support Services", as described
-and regulated under the Standard Support Services for NICE Products terms,
-available here:
-https://www.nice-software.com/html/pdf/NICE_Standard_Support_Services.pdf , as
-may be updated). Support Services are subject to and governed by the terms of
-this EULA and the Customer Agreement, as is any update or upgrade to the
-Software provided by NICE in connection with Support Services. If the Support
-Services are terminated, Licensee's license to the Software under this EULA
-will continue in accordance with the terms of this EULA. If Support Services
-expire or terminate and Licensee later reinstates Support Services, Licensee
-shall pay a reinstatement fee equal to 70% of the current annual charge for
-Support Services for the period of time when Licensee did not receive Support
-Services. The reinstatement fee for any partial year will be a pro rata
-portion of the applicable annual fee.
+6. SUPPORT SERVICES. Licensee may be eligible to subscribe to software support for any or all of
+the Software (the "Support Services", as described and regulated under the Standard Support
+Services for NICE Products terms, available here:
+https://www.nice-software.com/html/pdf/NICE_Standard_Support_Services.pdf , as may be
+updated). Support Services are subject to and governed by the terms of this EULA and the
+Customer Agreement, as is any update or upgrade to the Software provided by NICE in connection
+with Support Services. If the Support Services are terminated, Licensee's license to the Software
+under this EULA will continue in accordance with the terms of this EULA. If Support Services expire
+or terminate and Licensee later reinstates Support Services, Licensee shall pay a reinstatement fee
+equal to 70% of the current annual charge for Support Services for the period of time when
+Licensee did not receive Support Services. The reinstatement fee for any partial year will be a pro
+rata portion of the applicable annual fee.
 
 7. LIMITED WARRANTY.
-(a) NICE warrants that the Software will for a period of 60 days from
-delivery to the Licensee (the "Warranty Period"), when used in accordance
-with NICE's written instructions, operate substantially in compliance with
-NICE's official published documentation. NICE's sole responsibility, and
-Licensee's exclusive remedy, in the event of breach of the limited warranty
-during the Warranty Period, is for NICE, at its option, to use reasonable
-efforts to repair the Software, replace the Software, or provide a refund.
-NICE shall not be responsible or liable for any noncompliance with the
-foregoing warranty or limitations or defects of the Software, if they have
-been caused, in whole or in part, by unauthorized behavior of Licensee, any
-use of the Software which is inconsistent with the Documentation, any
-accident, abuse, or misapplication, and/or if they arise from or are related
-to software or any other products which are not supplied by NICE.
-(b) DISCLAIMER. EXCEPT FOR THE LIMITED WARRANTY IN SECTION 7(A), THE SOFTWARE
-IS PROVIDED "AS IS." EXCEPT TO THE EXTENT PROHIBITED BY LAW, OR TO THE EXTENT
-ANY STATUTORY RIGHTS APPLY THAT CANNOT BE EXCLUDED, LIMITED OR WAIVED, NICE
-AND ITS AFFILIATES AND LICENSORS (I) MAKE NO OTHER REPRESENTATIONS OR
-WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE
-REGARDING THE SOFTWARE, AND (II) DISCLAIM ALL OTHER WARRANTIES, INCLUDING ANY
-IMPLIED OR EXPRESS WARRANTIES (A) OF MERCHANTABILITY, SATISFACTORY QUALITY,
-FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR QUIET ENJOYMENT, (B)
-ARISING OUT OF ANY COURSE OF DEALING OR USAGE OF TRADE, (C) THAT THE SOFTWARE
-WILL BE UNINTERRUPTED, ERROR FREE, OR FREE OF HARMFUL COMPONENTS, AND (D)
-THAT ANY CONTENT WILL BE SECURE OR NOT OTHERWISE LOST OR ALTERED.
+(a) NICE warrants that the Software will for a period of 60 days from delivery to the Licensee (the
+"Warranty Period"), when used in accordance with NICE's written instructions, operate
+substantially in compliance with NICE's official published documentation. NICE's sole
+responsibility, and Licensee's exclusive remedy, in the event of breach of the limited warranty
+during the Warranty Period, is for NICE, at its option, to use reasonable efforts to repair the
+Software, replace the Software, or provide a refund. NICE shall not be responsible or liable for any
+noncompliance with the foregoing warranty or limitations or defects of the Software, if they have
+been caused, in whole or in part, by unauthorized behavior of Licensee, any use of the Software
+which is inconsistent with the Documentation, any accident, abuse, or misapplication, and/or if
+they arise from or are related to software or any other products which are not supplied by NICE.
+(b) DISCLAIMER. EXCEPT FOR THE LIMITED WARRANTY IN SECTION 7(A), THE SOFTWARE IS
+PROVIDED "AS IS." EXCEPT TO THE EXTENT PROHIBITED BY LAW, OR TO THE EXTENT ANY
+STATUTORY RIGHTS APPLY THAT CANNOT BE EXCLUDED, LIMITED OR WAIVED, NICE AND ITS
+AFFILIATES AND LICENSORS (I) MAKE NO OTHER REPRESENTATIONS OR WARRANTIES OF ANY
+KIND, WHETHER EXPRESS, IMPLIED, STATUTORY OR OTHERWISE REGARDING THE SOFTWARE,
+AND (II) DISCLAIM ALL OTHER WARRANTIES, INCLUDING ANY IMPLIED OR EXPRESS WARRANTIES
+(A) OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A PARTICULAR PURPOSE, NON-
+INFRINGEMENT, OR QUIET ENJOYMENT, (B) ARISING OUT OF ANY COURSE OF DEALING OR
+USAGE OF TRADE, (C) THAT THE SOFTWARE WILL BE UNINTERRUPTED, ERROR FREE, OR FREE OF
+HARMFUL COMPONENTS, AND (D) THAT ANY CONTENT WILL BE SECURE OR NOT OTHERWISE
+LOST OR ALTERED.
 
-8. LIMITATIONS OF LIABILITY. NICE AND ITS AFFILIATES AND LICENSORS WILL NOT
-BE LIABLE TO LICENSEE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-CONSEQUENTIAL OR EXEMPLARY DAMAGES (INCLUDING DAMAGES FOR LOSS OF PROFITS,
-REVENUES, CUSTOMERS, OPPORTUNITIES, GOODWILL, USE, OR DATA), EVEN IF A PARTY
-HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. FURTHER, NEITHER NICE
-NOR ANY OF ITS AFFILIATES OR LICENSORS WILL BE RESPONSIBLE FOR ANY
-COMPENSATION, REIMBURSEMENT, OR DAMAGES ARISING IN CONNECTION WITH: (A) YOUR
-INABILITY TO USE THE SOFTWARE, INCLUDING AS A RESULT OF ANY (I) TERMINATION
-OR EXPIRATION OF THIS EULA OR YOUR USE OF OR ACCESS TO THE SOFTWARE OR, (II)
-ANY ERROR OR UNANTICIPATED INTERUPTION IN THE OPERATION OF THE SOFTWARE FOR
-ANY REASON; (B) THE COST OF PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; (C)
-ANY INVESTMENTS, EXPENDITURES, OR COMMITMENTS BY LICENSEE IN CONNECTION WITH
-THIS EULA OR YOUR USE OF OR ACCESS TO THE SOFTWARE; OR (D) ANY UNAUTHORIZED
-ACCESS TO, ALTERATION OF, OR THE DELETION, DESTRUCTION, DAMAGE, LOSS OR
-FAILURE TO STORE ANY OF YOUR CONTENT OR OTHER DATA. IN ANY CASE, NICE AND ITS
-AFFILIATES' AND LICENSORS' AGGREGATE LIABILITY UNDER THIS EULA WILL NOT
-EXCEED THE AMOUNT LICENSEE ACTUALLY PAID NICE FOR THE SOFTWARE THAT GAVE RISE
-TO THE CLAIM DURING THE 12 MONTHS BEFORE THE LIABILITY AROSE. THE LIMITATIONS
-IN THIS SECTION APPLY ONLY TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.
+8. LIMITATIONS OF LIABILITY. NICE AND ITS AFFILIATES AND LICENSORS WILL NOT BE LIABLE TO
+LICENSEE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY
+DAMAGES (INCLUDING DAMAGES FOR LOSS OF PROFITS, REVENUES, CUSTOMERS,
+OPPORTUNITIES, GOODWILL, USE, OR DATA), EVEN IF A PARTY HAS BEEN ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGES. FURTHER, NEITHER NICE NOR ANY OF ITS AFFILIATES OR
+LICENSORS WILL BE RESPONSIBLE FOR ANY COMPENSATION, REIMBURSEMENT, OR DAMAGES
+ARISING IN CONNECTION WITH: (A) YOUR INABILITY TO USE THE SOFTWARE, INCLUDING AS A
+RESULT OF ANY (I) TERMINATION OR EXPIRATION OF THIS EULA OR YOUR USE OF OR ACCESS TO
+THE SOFTWARE OR, (II) ANY ERROR OR UNANTICIPATED INTERUPTION IN THE OPERATION OF THE
+SOFTWARE FOR ANY REASON; (B) THE COST OF PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; (C) ANY INVESTMENTS, EXPENDITURES, OR COMMITMENTS BY LICENSEE IN
+CONNECTION WITH THIS EULA OR YOUR USE OF OR ACCESS TO THE SOFTWARE; OR (D) ANY
+UNAUTHORIZED ACCESS TO, ALTERATION OF, OR THE DELETION, DESTRUCTION, DAMAGE, LOSS
+OR FAILURE TO STORE ANY OF YOUR CONTENT OR OTHER DATA. IN ANY CASE, NICE AND ITS
+AFFILIATES' AND LICENSORS' AGGREGATE LIABILITY UNDER THIS EULA WILL NOT EXCEED THE
+AMOUNT LICENSEE ACTUALLY PAID NICE FOR THE SOFTWARE THAT GAVE RISE TO THE CLAIM
+DURING THE 12 MONTHS BEFORE THE LIABILITY AROSE. THE LIMITATIONS IN THIS SECTION
+APPLY ONLY TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW.
 
 9. TERM AND TERMINATION.
-(a) This EULA is effective upon the earlier of NICE's (i) acceptance of an
-order for Software, (ii) delivery of the Software and it will continue until
-it expires or terminates ("Term").
-(b) NICE may terminate this EULA at any time and for any reason on 30 days'
-prior written notice to Licensee. Your rights under this EULA will
-automatically terminate without notice from us if you fail to comply with any
-term of this EULA or the Customer Agreement.
-(c) Licensee may terminate this EULA at any time by uninstalling or
-destroying all copies of the Software that are in your possession or control.
-(d) Upon termination or expiration of this EULA, Licensee shall (i) be no
-longer entitled to use the Software and documentation, (ii) immediately
-remove the Software from all computers on which the Software is installed,
-(iii) return to NICE, within 5 days from expiration or termination, all
-copies of the Software and documentation (or destroy such materials, as
-instructed by NICE) and will certify in writing that all copies or partial
-copies of the Software and documentation have been returned to NICE or
-destroyed; and (iv) remain responsible and liable for all fees and charges
-for the Software that Licensee incurred through the date of termination or
-expiration.
-(e) If NICE terminates this EULA for convenience under subsection (b) of this
-Section, NICE will issue Licensee a prorata credit of any license fees
-prepaid by Licensee based a ten year life-span for the Software.
+(a) This EULA is effective upon the earlier of NICE's (i) acceptance of an order for Software, (ii)
+delivery of the Software and it will continue until it expires or terminates ("Term").
+(b) NICE may terminate this EULA at any time and for any reason on 30 days' prior written notice to
+Licensee. Your rights under this EULA will automatically terminate without notice from us if you fail
+to comply with any term of this EULA or the Customer Agreement.
+(c) Licensee may terminate this EULA at any time by uninstalling or destroying all copies of the
+Software that are in your possession or control.
+(d) Upon termination or expiration of this EULA, Licensee shall (i) be no longer entitled to use the
+Software and documentation, (ii) immediately remove the Software from all computers on which
+the Software is installed, (iii) return to NICE, within 5 days from expiration or termination, all copies
+of the Software and documentation (or destroy such materials, as instructed by NICE) and will
+certify in writing that all copies or partial copies of the Software and documentation have been
+returned to NICE or destroyed; and (iv) remain responsible and liable for all fees and charges for the
+Software that Licensee incurred through the date of termination or expiration.
+(e) If NICE terminates this EULA for convenience under subsection (b) of this Section, NICE will
+issue Licensee a prorata credit of any license fees prepaid by Licensee based a ten year life-span
+for the Software.
 (f) Sections 3-11 inclusive will survive termination of this EULA.
 
-10. SDK. If you downloaded the SDK, you may use, reproduce, distribute,
-publish, and sublicense the SDK, and create derivative works of the SDK and
-Amazon DCV Web Client solely to the extent those derivative works implement the
-Amazon DCV Web Client, subject to the following conditions:
-(a) You will not remove any proprietary notices or labels on the SDK or any
-copy thereof.
-(b) You will include this permission notice in all copies or substantial
-portions of the SDK.
-(c) You require that each end user before accessing the SDK, Amazon DCV Web
-Client, or any copies, derivative works or substantial portions thereof,
-agrees to comply with this EULA.
-(d) Some components of the SDK may be governed by third party software
-licenses. Your license rights with respect to these individual components are
-defined by the applicable third party software licenses, and nothing in this
-Agreement will restrict, limit, or otherwise affect any rights or obligations
-you may have, or conditions to which you may be subject, under such third
-party software licenses.
-(e) THE SDK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SDK OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+10. SDK. If you downloaded the SDK, you may use, reproduce, distribute, publish, and sublicense
+the SDK, and create derivative works of the SDK and Amazon DCV Web Client solely to the extent
+those derivative works implement the Amazon DCV Web Client, subject to the following conditions:
+(a) You will not remove any proprietary notices or labels on the SDK or any copy thereof.
+(b) You will include this permission notice in all copies or substantial portions of the SDK.
+(c) You require that each end user before accessing the SDK, Amazon DCV Web Client, or any
+copies, derivative works or substantial portions thereof, agrees to comply with this EULA.
+(d) Some components of the SDK may be governed by third party software licenses. Your license
+rights with respect to these individual components are defined by the applicable third party
+software licenses, and nothing in this Agreement will restrict, limit, or otherwise affect any rights or
+obligations you may have, or conditions to which you may be subject, under such third party
+software licenses.
+(e) THE SDK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SDK OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 11. GENERAL.
-(a) Entire Agreement. This EULA and its incorporation of the Customer
-Agreement, along with related documents provided by NICE, represents the
-complete and exclusive agreement between the parties with respect to the
-subject matter hereof and supersedes all prior agreements, negotiations, and
-understandings. NICE will not be bound by, and specifically objects to, any
-term, condition or other provision that is different from or in addition to
-the provisions of this EULA (whether or not it would materially alter this
-EULA) including for example, any term, condition or other provision (i)
-submitted by Licensee in any purchase order, receipt, acceptance,
-confirmation, correspondence or other document, or (ii) related to any
-invoicing process that Licensee submits or require NICE to complete. To the
-extent there is any conflict between this EULA and the Customer Agreement,
-this EULA prevails.
-(b) Assignment. Licensee shall not assign or otherwise transfer this EULA or
-any of Licensee's rights or obligations, without our prior written consent.
-Any assignment or transfer in violation of this Section will be void. NICE
-may assign this EULA without your consent (i) in connection with a merger,
-acquisition or sale of all or substantially all of our assets, or (ii) to any
-affiliate or as part of a corporate reorganization; and effective upon such
-assignment, the assignee is deemed substituted for NICE as a party to this
-EULA and NICE is fully released from all of its obligations and duties to
-perform under this EULA. Subject to the foregoing, this EULA will be binding
-upon, and inure to the benefit of the parties and their respective permitted
-successors and assigns.
-(c) Governing Law and Dispute Resolution for US Licensees. If NICE US is the
-contracting party to this EULA, the laws of the State of Washington, without
-reference to conflict of law rules, govern this EULA and any dispute of any
-sort that might arise between NICE and Licensee. The United Nations
-Convention for the International Sale of Goods does not apply to this EULA.
-Any dispute or claim relating in any way to the Software or this EULA will be
-adjudicated exclusively in the federal and state courts located in King
-County, Washington, and Licensee consents and waives any objections to such
-exclusive jurisdiction and venue. Notwithstanding the foregoing, NICE may
-seek injunctive (or similar) remedies in any jurisdiction.
-(d) Governing Law and Dispute Resolution when Licensees Outside the US.
-(i) If NICE IT is the contracting party to this EULA, the laws of the
-Republic of Italy, without reference to conflict of law rules, govern this
-EULA and any dispute of any sort that might arise between NICE and Licensee.
-The United Nations Convention for the International Sale of Goods does not
-apply to this EULA. Any dispute or claim relating in any way to the Software
-or this EULA will be adjudicated exclusively in the Court of Milan, Italy,
-and Licensee consents and waives any objections to such exclusive
-jurisdiction and venue. Notwithstanding the foregoing, NICE may seek
-injunctive (or similar) remedies in any jurisdiction.
-(ii) IF NICE IT IS THE CONTRACTING PARTY, PURSUANT TO AND BY THE EFFECT OF
-SECTIONS 1341 AND 1342 OF THE ITALIAN CIVIL CODE, LICENSEE EXPLICITLY
-APPROVES THE FOLLOWING CONDITIONS: 3 (USE RESTRICTIONS), 7 (LIMITED
-WARRANTY), 8 (LIMITATIONS OF LIABILITY), 9 (TERMINATION), 10 (GENERAL -
-INCLUDING GOVERNING LAW, DISPUTE RESOLUTION, CONFIDENTIALITY AND PUBLICITY,
-AND MODIFICATIONS TO THE AGREEMENT).
-(e) Waiver. The failure by NICE to enforce any provision of this EULA will
-not constitute a present or future waiver of such provision nor will it limit
-NICE's right to enforce such provision at a later time. All waivers by NICE
-must be in writing to be effective.
-(f) Severability. If any portion of this Agreement is held to be invalid or
-unenforceable, the remaining portions of this Agreement will remain in full
-force and effect. Any invalid or unenforceable portions will be interpreted
-to effectuate the intent of the original portion. If such construction is not
-possible, the invalid or unenforceable portion will be severed from this
-Agreement but the rest of the Agreement will remain in full force and effect.
-(g) Taxes. Each party will be responsible, as required under applicable law,
-for identifying and paying all taxes and other governmental fees and charges
-(and any penalties, interest, and other additions thereto) that are imposed
-on that party upon or with respect to the transactions and payments under
-this EULA. All fees payable by Licensee are exclusive of applicable taxes and
-duties, including VAT, Service Tax, GST, excise taxes, sales and transactions
-taxes, and gross receipts tax ("Indirect Taxes"). NICE may charge and
-Licensee will pay applicable Indirect Taxes that NICE is legally obligated or
-authorized to collect from Licensee. Licensee will provide such information
-to NICE as reasonably required to determine whether NICE is obligated to
-collect Indirect Taxes from Licensee. NICE will not collect, and Licensee
-will not pay, any Indirect Tax for which Licensee furnishes NICE a properly
-completed exemption certificate or a direct payment permit certificate for
-which NICE may claim an available exemption from such Indirect Tax. All
-payments made by Licensee to NICE under this EULA will be made free and clear
-of any deduction or withholding, as may be required by law. If any such
-deduction or withholding (including cross-border withholding taxes) is
-required on any payment, Licensee will pay such additional amounts as are
-necessary so that the net amount received by NICE is equal to the amount then
-due and payable under this EULA. NICE will provide Licensee with such tax
-forms as are reasonably requested in order to reduce or eliminate the amount
-of any withholding or deduction for taxes in respect of payments made under
-this EULA.
-(h) Confidentiality And Publicity. Licensee may use NICE Confidential
-Information only in connection with Licensee's use of the Software as
-permitted under this EULA. Licensee will not disclose NICE Confidential
-Information during the Term or at any time after without NICE's advance
-written consent. Licensee will take all reasonable measures to avoid
-disclosure, dissemination, or unauthorized use of NICE Confidential
-Information, including, at a minimum, those measures Licensee takes to
-protect its own confidential information of a similar nature. Licensee will
-not issue any press release or make any other public communication with
-respect to this EULA or your use of the Software. "NICE Confidential
-Information" means all nonpublic information disclosed by NICE its
-affiliates, business partners or its or their respective employees,
-contractors or agents that is designated as confidential or that, given the
-nature of the information or circumstances surrounding its disclosure,
-reasonably should be understood to be confidential. NICE Confidential
-Information does not include any information that: (i) is or becomes publicly
-available without breach of this EULA; (ii) can be shown by documentation to
-have been known to Licensee at the time of receipt from NICE; (iii) is
-received from a third party who did not acquire or disclose the same by a
-wrongful or tortious act; or (iv) can be shown by documentation to have been
-independently developed by Licensee without reference to NICE Confidential
-Information.
-(i) Notices. Any notice required or permitted by this EULA to be given to
-either party shall be effective upon receipt and shall be given in writing
-and sent by overnight courier, facsimile, or first class certified mail with
-postage prepaid. Notices to Licensee will be sent to the addresses indicated
-in the applicable order for the Software and to the NICE contracting party at
-the address in the opening paragraph of this EULA. Receipt shall be presumed
-received 5 business days after mailing by first class mail unless the sender
-obtains a delivery receipt indicating it was delivered earlier, the next day
-if sent by over-night courier, and when confirmation is received if by fax.
-In addition, a copy of the notice shall also be given via e-mail to each
-party's primary contact. Either party may designate a different address than
-that given below by notice to the other party in accordance with this
-paragraph. A copy of any notice required or permitted to be sent to NICE
-shall also be sent to Amazon.com, Inc. Attn: General Counsel P.O. Box 81226
-Seattle, WA 98108-1226 Fax: (206) 266-7010 E-mail: contracts-legal@amazon.com.
-(j) Modifications To The Agreement. NICE may modify this EULA at any time by
-posting a revised version on the NICE website (nice-software.com, and any
-successor or related site designated by NICE, hereinafter, the "NICE
-Website") or by sending a message to the email address then associated with
-Licensee's account. Notices of modifications NICE provides by posting on the
-NICE Website will be effective upon posting, and notices NICE provides by
-email will be effective when NICE sends the email. It is Licensee's
-responsibility to keep its email address current. Licensee will be deemed to
-have received any email sent to the email address then associated with its
-account when NICE sends the email, whether or not Licensee actually receives
-the email. By continuing to use the Software after the effective date of any
-modifications to this EULA, Licensee agrees to be bound by the modified
-terms. It is Licensee's responsibility to check the NICE Website regularly
-for modifications to this EULA.
-(k) Trade Compliance. In connection with this EULA, Licensee will comply with
-all applicable import, re-import, sanctions, anti-boycott, export, and
-re-export control laws and regulations, including all such laws and
-regulations that apply to a U.S. company, such as the Export Administration
-Regulations, the International Traffic in Arms Regulations, and economic
-sanctions programs implemented by the Office of Foreign Assets Control. For
-clarity, Licensee is solely responsible for compliance related to the manner
-in which Licensee chooses to use the Software. Licensee represents and
-warrants that Licensee and its financial institutions, or any party that owns
-or controls Licensee or its financial institutions, are not subject to
-sanctions or otherwise designated on any list of prohibited or restricted
-parties, including the lists maintained by the United Nations Security
-Council, the US Government (e.g., the US Department of Treasury's Specially
-Designated Nationals list and Foreign Sanctions Evaders list and the US
-Department of Commerce's Entity List), the European Union or its member
-states, or other applicable government authority.
-(l) U.S. Government Rights. The Software is provided to the U.S. Government
-as "commercial items," "commercial computer software," "commercial computer
-software documentation," and "technical data" with the same rights and
-restrictions generally applicable to the Software. If you are using the
-Software on behalf of the U.S. Government and these terms fail to meet the
-U.S. Government's needs or are inconsistent in any respect with federal law,
-Licensee will immediately discontinue use of the Software. The terms
-"commercial item" "commercial computer software," "commercial computer
-software documentation," and "technical data" are defined in the Federal
-Acquisition Regulation and the Defense Federal Acquisition Regulation
-Supplement.
-(m) No Third-Party Beneficiaries. This EULA does not create any third-party
-beneficiary rights in any individual or entity that is not a party to this
-EULA.
+(a) Entire Agreement. This EULA and its incorporation of the Customer Agreement, along with
+related documents provided by NICE, represents the complete and exclusive agreement between
+the parties with respect to the subject matter hereof and supersedes all prior agreements,
+negotiations, and understandings. NICE will not be bound by, and specifically objects to, any term,
+condition or other provision that is different from or in addition to the provisions of this EULA
+(whether or not it would materially alter this EULA) including for example, any term, condition or
+other provision (i) submitted by Licensee in any purchase order, receipt, acceptance, confirmation,
+correspondence or other document, or (ii) related to any invoicing process that Licensee submits or
+require NICE to complete. To the extent there is any conflict between this EULA and the Customer
+Agreement, this EULA prevails.
+(b) Assignment. Licensee shall not assign or otherwise transfer this EULA or any of Licensee's rights
+or obligations, without our prior written consent. Any assignment or transfer in violation of this
+Section will be void. NICE may assign this EULA without your consent (i) in connection with a
+merger, acquisition or sale of all or substantially all of our assets, or (ii) to any affiliate or as part of a
+corporate reorganization; and effective upon such assignment, the assignee is deemed substituted
+for NICE as a party to this EULA and NICE is fully released from all of its obligations and duties to
+perform under this EULA. Subject to the foregoing, this EULA will be binding upon, and inure to the
+benefit of the parties and their respective permitted successors and assigns.
+(c) Governing Law and Dispute Resolution for US Licensees. If NICE US is the contracting party to
+this EULA, the laws of the State of Washington, without reference to conflict of law rules, govern
+this EULA and any dispute of any sort that might arise between NICE and Licensee. The United
+Nations Convention for the International Sale of Goods does not apply to this EULA. Any dispute or
+claim relating in any way to the Software or this EULA will be adjudicated exclusively in the federal
+and state courts located in King County, Washington, and Licensee consents and waives any
+objections to such exclusive jurisdiction and venue. Notwithstanding the foregoing, NICE may seek
+injunctive (or similar) remedies in any jurisdiction. (d) Governing Law and Dispute Resolution when
+Licensees Outside the US. (i) If NICE IT is the contracting party to this EULA, the laws of the
+Republic of Italy, without reference to conflict of law rules, govern this EULA and any dispute of any
+sort that might arise between NICE and Licensee. The United Nations Convention for the
+International Sale of Goods does not apply to this EULA. Any dispute or claim relating in any way to
+the Software or this EULA will be adjudicated exclusively in the Court of Milan, Italy, and Licensee
+consents and waives any objections to such exclusive jurisdiction and venue. Notwithstanding the
+foregoing, NICE may seek injunctive (or similar) remedies in any jurisdiction. (ii) IF NICE IT IS THE
+CONTRACTING PARTY, PURSUANT TO AND BY THE EFFECT OF SECTIONS 1341 AND 1342 OF THE
+ITALIAN CIVIL CODE, LICENSEE EXPLICITLY APPROVES THE FOLLOWING CONDITIONS: 3 (USE
+RESTRICTIONS), 7 (LIMITED WARRANTY), 8 (LIMITATIONS OF LIABILITY), 9 (TERMINATION), 10
+(GENERAL - INCLUDING GOVERNING LAW, DISPUTE RESOLUTION, CONFIDENTIALITY AND
+PUBLICITY, AND MODIFICATIONS TO THE AGREEMENT).
+(e) Waiver. The failure by NICE to enforce any provision of this EULA will not constitute a present or
+future waiver of such provision nor will it limit NICE's right to enforce such provision at a later time.
+All waivers by NICE must be in writing to be effective.
+(f) Severability. If any portion of this Agreement is held to be invalid or unenforceable, the remaining
+portions of this Agreement will remain in full force and effect. Any invalid or unenforceable portions
+will be interpreted to effectuate the intent of the original portion. If such construction is not
+possible, the invalid or unenforceable portion will be severed from this Agreement but the rest of
+the Agreement will remain in full force and effect.
+(g) Taxes. Each party will be responsible, as required under applicable law, for identifying and
+paying all taxes and other governmental fees and charges (and any penalties, interest, and other
+additions thereto) that are imposed on that party upon or with respect to the transactions and
+payments under this EULA. All fees payable by Licensee are exclusive of applicable taxes and
+duties, including VAT, Service Tax, GST, excise taxes, sales and transactions taxes, and gross
+receipts tax ("Indirect Taxes"). NICE may charge and Licensee will pay applicable Indirect Taxes that
+NICE is legally obligated or authorized to collect from Licensee. Licensee will provide such
+information to NICE as reasonably required to determine whether NICE is obligated to collect
+Indirect Taxes from Licensee. NICE will not collect, and Licensee will not pay, any Indirect Tax for
+which Licensee furnishes NICE a properly completed exemption certificate or a direct payment
+permit certificate for which NICE may claim an available exemption from such Indirect Tax. All
+payments made by Licensee to NICE under this EULA will be made free and clear of any deduction
+or withholding, as may be required by law. If any such deduction or withholding (including cross-
+border withholding taxes) is required on any payment, Licensee will pay such additional amounts
+as are necessary so that the net amount received by NICE is equal to the amount then due and
+payable under this EULA. NICE will provide Licensee with such tax forms as are reasonably
+requested in order to reduce or eliminate the amount of any withholding or deduction for taxes in
+respect of payments made under this EULA.
+(h) Confidentiality And Publicity. Licensee may use NICE Confidential Information only in
+connection with Licensee's use of the Software as permitted under this EULA. Licensee will not
+disclose NICE Confidential Information during the Term or at any time after without NICE's advance
+written consent. Licensee will take all reasonable measures to avoid disclosure, dissemination, or
+unauthorized use of NICE Confidential Information, including, at a minimum, those measures
+Licensee takes to protect its own confidential information of a similar nature. Licensee will not
+issue any press release or make any other public communication with respect to this EULA or your
+use of the Software. "NICE Confidential Information" means all nonpublic information disclosed by
+NICE its affiliates, business partners or its or their respective employees, contractors or agents that
+is designated as confidential or that, given the nature of the information or circumstances
+surrounding its disclosure, reasonably should be understood to be confidential. NICE Confidential
+Information does not include any information that: (i) is or becomes publicly available without
+breach of this EULA; (ii) can be shown by documentation to have been known to Licensee at the
+time of receipt from NICE; (iii) is received from a third party who did not acquire or disclose the
+same by a wrongful or tortious act; or (iv) can be shown by documentation to have been
+independently developed by Licensee without reference to NICE Confidential Information.
+(i) Notices. Any notice required or permitted by this EULA to be given to either party shall be
+effective upon receipt and shall be given in writing and sent by overnight courier, facsimile, or first
+class certified mail with postage prepaid. Notices to Licensee will be sent to the addresses
+indicated in the applicable order for the Software and to the NICE contracting party at the address
+in the opening paragraph of this EULA. Receipt shall be presumed received 5 business days after
+mailing by first class mail unless the sender obtains a delivery receipt indicating it was delivered
+earlier, the next day if sent by over-night courier, and when confirmation is received if by fax. In
+addition, a copy of the notice shall also be given via e-mail to each party's primary contact. Either
+party may designate a different address than that given below by notice to the other party in
+accordance with this paragraph. A copy of any notice required or permitted to be sent to NICE shall
+also be sent to Amazon.com, Inc. Attn: General Counsel P.O. Box 81226 Seattle, WA 98108-1226
+Fax: (206) 266-7010 E-mail: contracts-legal@amazon.com.
+(j) Modifications To The Agreement. NICE may modify this EULA at any time by posting a revised
+version on the NICE website (nice-software.com, and any successor or related site designated by
+NICE, hereinafter, the "NICE Website") or by sending a message to the email address then
+associated with Licensee's account. Notices of modifications NICE provides by posting on the NICE
+Website will be effective upon posting, and notices NICE provides by email will be effective when
+NICE sends the email. It is Licensee's responsibility to keep its email address current. Licensee will
+be deemed to have received any email sent to the email address then associated with its account
+when NICE sends the email, whether or not Licensee actually receives the email. By continuing to
+use the Software after the effective date of any modifications to this EULA, Licensee agrees to be
+bound by the modified terms. It is Licensee's responsibility to check the NICE Website regularly for
+modifications to this EULA.
+(k) Trade Compliance. In connection with this EULA, Licensee will comply with all applicable
+import, re-import, sanctions, anti-boycott, export, and re-export control laws and regulations,
+including all such laws and regulations that apply to a U.S. company, such as the Export
+Administration Regulations, the International Traffic in Arms Regulations, and economic sanctions
+programs implemented by the Office of Foreign Assets Control. For clarity, Licensee is solely
+responsible for compliance related to the manner in which Licensee chooses to use the Software.
+Licensee represents and warrants that Licensee and its financial institutions, or any party that
+owns or controls Licensee or its financial institutions, are not subject to sanctions or otherwise
+designated on any list of prohibited or restricted parties, including the lists maintained by the
+United Nations Security Council, the US Government (e.g., the US Department of Treasury's
+Specially Designated Nationals list and Foreign Sanctions Evaders list and the US Department of
+Commerce's Entity List), the European Union or its member states, or other applicable government
+authority.
+(l) U.S. Government Rights. The Software is provided to the U.S. Government as "commercial
+items," "commercial computer software," "commercial computer software documentation," and
+"technical data" with the same rights and restrictions generally applicable to the Software. If you
+are using the Software on behalf of the U.S. Government and these terms fail to meet the U.S.
+Government's needs or are inconsistent in any respect with federal law, Licensee will immediately
+discontinue use of the Software. The terms "commercial item" "commercial computer software,"
+"commercial computer software documentation," and "technical data" are defined in the Federal
+Acquisition Regulation and the Defense Federal Acquisition Regulation Supplement.
+(m) No Third-Party Beneficiaries. This EULA does not create any third-party beneficiary rights in any
+individual or entity that is not a party to this EULA.
+```
 
-------
+---
 
-** Nvidia Driver; version 550.127.08 -- https://www.nvidia.com/download/index.aspx?lang=en-us
-IMPORTANT NOTICE -- READ CAREFULLY: This License For Customer Use of NVIDIA
-Software ("LICENSE") is the agreement which governs use of the software of
-NVIDIA Corporation and its subsidiaries ("NVIDIA") downloadable herefrom,
-including computer software and associated printed materials ("SOFTWARE"). By
-downloading, installing, copying, or otherwise using the SOFTWARE, you agree to
-be bound by the terms of this LICENSE. If you do not agree to the terms of this
-LICENSE, do not download the SOFTWARE.
+## Nvidia Driver; version 580.105.08 (550.127.08 on AL2)
+
+<https://www.nvidia.com/download/index.aspx?lang=en-us>
+
+```text
 
     * Package Nvidia Driver's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
 east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-
-Linux-x86_64-550.127.08.run
+Linux-x86_64-580.105.08.run
+      (AL2 continues to use NVIDIA-Linux-x86_64-550.127.08.run)
 
-RECITALS
+NVIDIA Driver License Agreement
 
-Use of NVIDIA's products requires three elements: the SOFTWARE, the hardware on
-a graphics controller board, and a personal computer. The SOFTWARE is protected
-by copyright laws and international copyright treaties, as well as other
-intellectual property laws and treaties. The SOFTWARE is not sold, and instead
-is only licensed for use, strictly in accordance with this document. The
-hardware is protected by various patents, and is sold, but this LICENSE does not
-cover that sale, since it may not necessarily be sold as a package with the
-SOFTWARE. This LICENSE sets forth the terms and conditions of the SOFTWARE
-LICENSE only.
+IMPORTANT NOTICE - PLEASE READ AND AGREE BEFORE USING THE SOFTWARE.
 
-1. DEFINITIONS
+This license agreement ("Agreement") is a legal agreement between you, whether
+an individual or entity ("you") and NVIDIA Corporation ("NVIDIA") and governs
+your use of the NVIDIA driver, and any additional software and materials
+provided (the "SOFTWARE").
 
-1.1 Customer. Customer means the entity or individual that downloads the
-SOFTWARE.
+If you don't have the required age or authority to enter into this Agreement or
+if you don't accept all the terms below, do not use the SOFTWARE.
 
-2. GRANT OF LICENSE
+You agree to use the SOFTWARE only for purposes that are permitted by this
+Agreement and any applicable law or regulation in the relevant jurisdictions.
 
-2.1 Rights and Limitations of Grant. NVIDIA hereby grants Customer the following
-non-exclusive, non-transferable right to use the SOFTWARE, with the following
-limitations:
+1. License.
 
-2.1.1 Rights. Customer may install and use multiple copies of the SOFTWARE on a
-shared computer or concurrently on different computers, and make multiple back-
-up copies of the SOFTWARE, solely for Customer's use within Customer's
-Enterprise. "Enterprise" shall mean individual use by Customer or any legal
-entity (such as a corporation or university) and the subsidiaries it owns by
-more than fifty percent (50%).
+1.1 Subject to the terms of this Agreement, NVIDIA grants you a non-exclusive,
+revocable, non-transferable and non-sublicensable (except as expressly provided
+in this Agreement) license to:
 
-2.1.2 Linux/FreeBSD Exception. Notwithstanding the foregoing terms of Section
-2.1.1, SOFTWARE designed exclusively for use on the Linux or FreeBSD operating
-systems, or other operating systems derived from the source code to these
-operating systems, may be copied and redistributed, provided that the binary
-files thereof are not modified in any way (except for unzipping of compressed
-files).
+a. Install and use copies of the SOFTWARE,
 
-2.1.3 Limitations.
+b. Modify and create derivative works of any portion of the SOFTWARE delivered
+by NVIDIA in source code format,
 
-No Reverse Engineering. Customer may not reverse engineer, decompile, or
-disassemble the SOFTWARE, nor attempt in any other manner to obtain the source
-code.
+c. Deploy, for your own use, the SOFTWARE on infrastructure you own or lease,
+and
 
-No Separation of Components. The SOFTWARE is licensed as a single product. Its
-component parts may not be separated for use on more than one computer, nor
-otherwise used separately from the other parts.
+d. Distribute the SOFTWARE provided for use with operating system kernels
+distributed under the terms of an OSI-approved open source license as listed by
+the Open Source Initiative at http://opensource.org, provided that (i) the
+binary files thereof are not modified in any way (except for uncompressing of
+compressed files) and (ii) this Agreement is provided to each SOFTWARE
+recipient.
 
-No Rental. Customer may not rent or lease the SOFTWARE to someone else.
+2. Limitations.
 
-3. TERMINATION
+The following license limitations apply to your use of the SOFTWARE:
 
-This LICENSE will automatically terminate if Customer fails to comply with any
-of the terms and conditions hereof. In such event, Customer must destroy all
-copies of the SOFTWARE and all of its component parts.
+2.1 The SOFTWARE is only licensed for use in conjunction with microprocessor(s),
+SoCs, and GPUs which have been (i) designed by NVIDIA and/or its affiliates and
+(ii) sold (directly or indirectly) by NVIDIA and/or its affiliates ("NVIDIA
+Platform"). You may only use firmware in NVIDIA Platforms. You may not translate
+firmware, nor cause or permit firmware to be translated, from the architecture
+or language in which it is originally provided by NVIDIA, into any other
+architecture or language.
 
-Defensive Suspension. If Customer commences or participates in any legal
-proceeding against NVIDIA, then NVIDIA may, in its sole discretion, suspend or
-terminate all license grants and any other rights provided under this LICENSE
-during the pendency of such legal proceedings.
+2.2 You may not reverse engineer, decompile, or disassemble the SOFTWARE
+provided in binary form, nor attempt in any other manner to obtain source code
+of such SOFTWARE.
 
-4. COPYRIGHT
+2.3 You may not modify or create derivative works of the SOFTWARE provided in
+binary form.
 
-All title and copyrights in and to the SOFTWARE (including but not limited to
-all images, photographs, animations, video, audio, music, text, and other
-information incorporated into the SOFTWARE), the accompanying printed materials,
-and any copies of the SOFTWARE, are owned by NVIDIA, or its suppliers. The
-SOFTWARE is protected by copyright laws and international treaty provisions.
-Accordingly, Customer is required to treat the SOFTWARE like any other
-copyrighted material, except as otherwise allowed pursuant to this LICENSE and
-that it may make one copy of the SOFTWARE solely for backup or archive purposes.
+2.4 You may not distribute any modified header files.
 
-5. APPLICABLE LAW
+2.5 You may not change or remove copyright or other proprietary notices in the
+SOFTWARE, or misrepresent the authorship of the SOFTWARE, and you must cause any
+modified files to carry prominent notices stating that you changed the files
+such that modifications are not misrepresented as an original SOFTWARE.
 
-This LICENSE shall be deemed to have been made in, and shall be construed
-pursuant to, the laws of the State of Delaware. The United Nations Convention on
-Contracts for the International Sale of Goods is specifically disclaimed.
+2.6 You may not bypass, disable, or circumvent any technical limitation,
+encryption, security, digital rights management or authentication mechanism in
+the SOFTWARE.
 
-6. DISCLAIMER OF WARRANTIES AND LIMITATION ON LIABILITY
+2.7 Except as expressly granted in this Agreement, you may not sell, rent,
+sublicense, distribute or transfer the SOFTWARE or provide commercial hosting
+services with the SOFTWARE.
 
-6.1 No Warranties. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE
-SOFTWARE IS PROVIDED "AS IS" AND NVIDIA AND ITS SUPPLIERS DISCLAIM ALL
-WARRANTIES OF ANY KIND OR NATURE, WHETHER EXPRESS, IMPLIED, OR STATUTORY,
-RELATING TO OR ARISING FROM THE SOFTWARE, INCLUDING, BUT NOT LIMITED TO, IMPLIED
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-
-INFRINGEMENT. Without limiting the foregoing, you are solely responsible for
-determining and verifying that the SOFTWARE that you obtain and install is the
-appropriate version for your model of graphics controller board, operating
-system, and computer hardware.
+2.8 You agree that GeForce or Titan SOFTWARE: (i) is licensed for use only on
+GeForce or Titan hardware products you own, and (ii) is not licensed for
+datacenter deployment.
 
-6.2 No Liability for Consequential Damages. TO THE MAXIMUM EXTENT PERMITTED BY
-APPLICABLE LAW, IN NO EVENT SHALL NVIDIA OR ITS SUPPLIERS BE LIABLE FOR ANY
-SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING,
-WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS, LOSS OF DATA, BUSINESS
-INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS) ARISING
-OUT OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF NVIDIA HAS BEEN
-ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+2.9 You may not use the SOFTWARE in any manner that would cause it to become
+subject to an open source software license, subject to the terms in the
+"Components Under Other Licenses" section below.
 
-7. SYSTEM UPDATES
+2.10 You acknowledge that the SOFTWARE as delivered is not tested or certified
+by NVIDIA for use in any system or application where the use of or failure of
+such system or application developed with the SOFTWARE could result in injury,
+death or catastrophic damage (each, a "Critical Application"). Examples of
+Critical Applications include use in avionics, navigation, autonomous vehicle
+applications, automotive products, military, medical, life support or other life
+critical applications. NVIDIA will not be liable to you or any third party, in
+whole or in part, for any claims or damages arising from these uses. You are
+solely responsible for ensuring that systems and applications developed with the
+SOFTWARE include sufficient safety and redundancy features, and comply with all
+applicable legal and regulatory standards and requirements.
 
-Customer hereby agrees and acknowledges that the SOFTWARE may access, collect
-non-personally identifiable information about, update, and configure Customer's
-system in order to properly optimize such system for use with the SOFTWARE. To
-the extent that Customer uses the SOFTWARE, Customer hereby consents to all of
-the foregoing, and represent and warrant that Customer has the right to grant
-such consent. In addition, Customer agrees that Customer is solely responsible
-for maintaining appropriate data backups and system restore points for
-Customer's system, and that NVIDIA will have no responsibility for any damage or
-loss to such system (including loss of data or access) arising from or relating
-to (a) any changes to the configuration, application settings, environment
-variables, registry, drivers, BIOS, or other attributes of the system (or any
-part of such system) initiated through the SOFTWARE; or (b) installation of any
-SOFTWARE or third party software patches through the NVIDIA Update Service. The
-SOFTWARE may contain links to websites and services. We encourage you to review
-the privacy statements on those sites and services that you choose to visit so
-that you can understand how they may collect, use and share your personal
-information. NVIDIA is not responsible for the privacy statements or practices
-of sites and services controlled by other companies or organizations.
+2.11 You agree to defend, indemnify and hold harmless NVIDIA and its affiliates,
+and their respective employees, contractors, agents, officers and directors,
+from and against any and all claims, damages, obligations, losses, liabilities,
+costs or debt, fines, restitutions and expenses (including but not limited to
+attorney's fees and costs incident to establishing the right of indemnification)
+arising out of or related to products or services that have been developed with
+or use the SOFTWARE (including for use in or for Critical Applications), and for
+use of the SOFTWARE outside of the scope of this Agreement or not in compliance
+with its terms.
 
-Registration and Customer Information. Customer represents and warrants that the
-non-personally identifiable information that Customer has furnished in
-connection with its registration for the SOFTWARE is complete and accurate.
-Customer also acknowledges that from time to time, NVIDIA may collect, use, and
-disclose such information about Customer and/or Customer's system in connection
-with the SOFTWARE in accordance with NVIDIA's privacy policy, available at URL
-http://www.nvidia.com/object/privacy_policy.html If Customer does not wish the
-SOFTWARE to provide system updates as described in this Section 7, uncheck
-"Automatically check for updates" in the "Preferences" tab of the applicable
-NVIDIA Update control panel for the SOFTWARE.
+3. Authorized Users.
 
-8. MISCELLANEOUS
+You may allow employees and contractors of your entity or of your
+subsidiary(ies) to access and use the SOFTWARE from your secure network to
+perform the work authorized by this Agreement on your behalf.
 
-If any provision of this LICENSE is inconsistent with, or cannot be fully
-enforced under, the law, such provision will be construed as limited to the
-extent necessary to be consistent with and fully enforceable under the law. This
-LICENSE is the final, complete and exclusive agreement between the parties
-relating to the subject matter hereof, and supersedes all prior or
-contemporaneous understandings and agreements relating to such subject matter,
-whether oral or written. This LICENSE may only be modified in writing signed by
-an authorized officer of NVIDIA. Customer agrees that it will not ship, transfer
-or export the SOFTWARE into any country, or use the SOFTWARE in any manner,
-prohibited by the United States Bureau of Industry and Security or any export
-laws, restrictions or regulations.
+If you are an academic institution, you may allow users enrolled or employed by
+the academic institution to access and use the SOFTWARE as authorized by this
+Agreement from your secure network.
 
-------
+You are responsible for the compliance with the terms of this Agreement by your
+authorized users. Any act or omission that if committed by you would constitute
+a breach of this Agreement will be deemed to constitute a breach of this
+Agreement if committed by your authorized users.
 
-** Cuda Samples; version 12.4 -- https://github.com/NVIDIA/cuda-samples/
+4. Pre-Release SOFTWARE.
+
+The SOFTWARE versions identified as alpha, beta, preview or otherwise as
+pre-release may not be fully functional, may contain errors or design flaws, and
+may have reduced or different security, privacy, accessibility and reliability
+standards relative to commercial versions of NVIDIA software and materials.
+
+You may use pre-release SOFTWARE at your own risk, understanding that
+pre-release SOFTWARE is not intended for use in production or business-critical
+systems and NVIDIA may choose not to make available a commercial version of any
+pre-release SOFTWARE.
+
+5. Support and Updates.
+
+NVIDIA is not obligated to support any SOFTWARE, unless there is a separate
+agreement for this purpose. NVIDIA may, at its option, make available patches,
+workarounds or other updates to the SOFTWARE. Unless the updates are provided
+with their separate governing terms, they are deemed part of the SOFTWARE
+licensed to you as provided in this Agreement.
+
+6. Components Under Other Licenses.
+
+The SOFTWARE may include or be distributed with components provided with
+separate legal notices or terms that accompany the components, such as open
+source software licenses and other license terms ("Other Licenses"). The
+components are subject to the applicable Other Licenses, including any
+proprietary notices, disclaimers, requirements and extended use rights; except
+that this Agreement will prevail regarding the use of third-party open source
+software, unless a third-party open source software license requires its license
+terms to prevail. Open source software license means any software, data or
+documentation subject to any license identified as an open source license by the
+Open Source Initiative (http://opensource.org), Free Software Foundation
+(http://www.fsf.org) or other similar open source organization or listed by the
+Software Package Data Exchange (SPDX) Workgroup under the Linux Foundation
+(http://www.spdx.org).
+
+You acknowledge and agree that it is your sole responsibility to obtain any
+additional third-party licenses required to make, have made, use, have used,
+sell, import, and offer for sale your products or services that include or
+incorporate any third-party software and content, including, without limitation,
+audio and/or video encoders and decoders and implementations of technical
+standards. NVIDIA does not grant to you under this Agreement any necessary
+patent or other rights, including standard essential patent rights, with respect
+to any third-party software and content.
+
+7. Termination.
+
+This Agreement will automatically terminate without notice from NVIDIA if you
+fail to comply with any of the terms in this Agreement or if you commence or
+participate in any legal proceeding against NVIDIA with respect to the
+SOFTWARE. Upon any termination, you must stop using and destroy all copies of
+the SOFTWARE. You can terminate this Agreement whenever you want by stopping use
+of the SOFTWARE and destroying all copies of the SOFTWARE. Your prior
+distributions according to this Agreement are not affected by termination. All
+provisions will survive termination, except for the licenses granted to you.
+
+8. Ownership.
+
+The SOFTWARE, including all intellectual property rights, is and will remain the
+sole and exclusive property of NVIDIA or its licensors. Except as expressly
+granted in this Agreement, (i) NVIDIA reserves all rights, interests, and
+remedies in connection with the SOFTWARE, and (ii) no other license or right is
+granted to you by implication, estoppel or otherwise. You agree to cooperate
+with NVIDIA and provide reasonably requested information to verify your
+compliance with this Agreement.
+
+9. Feedback.
+
+You may, but you are not obligated to, provide suggestions, requests, fixes,
+modifications, enhancements, or other feedback regarding the SOFTWARE
+(collectively, "Feedback"). Feedback, even if designated as confidential by you,
+will not create any confidentiality obligation for NVIDIA or its affiliates. If
+you provide Feedback, you grant NVIDIA, its affiliates and its designees a
+non-exclusive, perpetual, irrevocable, sublicensable, worldwide, royalty-free,
+fully paid-up and transferable license, under your intellectual property rights,
+to publicly perform, publicly display, reproduce, use, make, have made, sell,
+offer for sale, distribute (through multiple tiers of distribution), import,
+create derivative works of and otherwise commercialize and exploit the Feedback
+at NVIDIA's discretion. You will not give Feedback (i) that you have reason to
+believe is subject to any restriction that impairs the exercise of the grant
+stated in this section; or (ii) subject to license terms which seek to require
+any product incorporating or developed using such Feedback, or other
+intellectual property of NVIDIA or its affiliates, to be licensed to or
+otherwise shared with any third party.
+
+10. Governing Law and Dispute Resolution.
+
+10.1 Informal Resolution.
+
+If you or NVIDIA have any dispute, claim or controversy arising out of or
+relating to the SOFTWARE or this Agreement ("Dispute"), the parties agree to
+work in good faith to resolve the Dispute informally. If you have a Dispute, you
+must first contact NVIDIA and give NVIDIA an opportunity to resolve it by
+contacting NVIDIA by mail at NVIDIA Corporation, ATTN: Legal, 2788 San Tomas
+Expressway, Santa Clara, California, 95051. Either you or NVIDIA may seek to
+have a Dispute resolved in small claims court if all the requirements of the
+small claims court are satisfied. Either you or NVIDIA may seek to have a
+Dispute resolved in small claims court in your county of residence or the small
+claims court in closest proximity to your residence at any time before an
+arbitrator is appointed, and you may also bring a Dispute in small claims court
+in the Superior Court of California, County of Santa Clara.
+
+10.2 Binding Arbitration.
+
+For any Disputes that are not resolved informally or by the small claims court,
+you and NVIDIA each agree to resolve any such Dispute by binding arbitration
+before an arbitrator from Judicial Mediation and Arbitration Services ("JAMS")
+(rules available at https://www.jamsadr.com/). Except as otherwise provided in
+this section, all issues are for the arbitrator to decide, including
+jurisdictional and arbitrability issues and the formation, existence, validity,
+interpretation, and scope of this arbitration provision. The arbitration will be
+conducted in Santa Clara County, California (or the nearest JAMS office to Santa
+Clara County), unless you request an in-person hearing in your hometown or you
+and NVIDIA agree otherwise. You and NVIDIA agree that the parties will arbitrate
+all Disputes, remedies, and requests for relief subject to individual
+arbitration first, the arbitrator will only determine issues of liability on the
+merits of any claim asserted, and the arbitrator may only award declaratory or
+injunctive relief in favor of the individual party seeking relief and only to
+the extent necessary to provide relief warranted by that party's individual
+claim. You and NVIDIA agree that any remaining unresolved Disputes, remedies, or
+requests for relief may be pursued in court only after the arbitrator's award
+has been issued. In any later court proceeding, the arbitrator's factual
+findings will not be entitled to deference by the court. Nothing in these terms
+will prevent a party from seeking injunctive or other equitable relief from the
+courts in any jurisdiction to prevent the actual or threatened violation of that
+party's data security, intellectual property rights, or other proprietary
+rights. If for any reason this Section 10.2 is unenforceable concerning any
+Dispute, and a Dispute proceeds in a court of general jurisdiction, the Dispute
+will be exclusively brought in state or federal court located in Santa Clara
+County, California.
+
+10.3 Class Action, Representative Action, & Jury Trial Waiver.
+
+All Disputes must be brought by a party in its individual capacity, and not as a
+plaintiff or class member in any purported class or representative
+proceeding. You and NVIDIA agree to waive the right to a jury trial, participate
+in class action lawsuits, class-wide arbitrations, any collective, consolidated,
+or other proceeding or request for relief where someone acts in a representative
+capacity.
+
+10.4 Right to Opt-Out.
+
+You may opt-out of the foregoing jury trial, class action, arbitration, and
+collective or consolidated proceeding waiver provision by notifying NVIDIA in
+writing within 30 days of commencement of use of the SOFTWARE, within 30 days of
+the effective date of this Agreement, or within 30 days of any future change
+NVIDIA may make to this Section 10.4. Such written notification must be sent by
+mail to NVIDIA Corporation, Attn: Legal, 2788 San Tomas Expressway, Santa Clara,
+California, 95051 and must include (1) your name, (2) your address, (3) the
+reference to NVIDIA drivers as the software to which the notice relates, and (4)
+a clear statement indicating that you do not wish to resolve disputes through
+arbitration and demonstrating compliance with the 30-day time limit to
+opt-out. Any opt-out notification received after the opt-out deadline or not
+including the required items noted in (1)-(4) in the preceding sentence will not
+be valid and you will be required to pursue your Dispute in arbitration or small
+claims court. Opting out of this dispute resolution procedure will not affect
+the terms and conditions of this Agreement, which still apply to you. If you
+opt-out of any future change NVIDIA may make to this Section 10.4, the most
+recent version of Section 10.4 before the change you rejected will apply.
+
+10.5 Governing Law.
+
+You and NVIDIA each agree that all Disputes will be governed by the Federal
+Arbitration Act, in addition to the internal substantive laws of the State of
+Delaware and the United States, without regard to or application of its conflict
+of laws rules or principles. The United Nations Convention on Contracts for the
+International Sale of Goods is expressly disclaimed. Any translation of this
+Agreement is done for local requirements and, if there is a dispute between the
+English and any non-English versions, you and NVIDIA agree that the English
+version of this Agreement will govern to the extent not prohibited by local law
+in your jurisdiction.
+
+11. Disclaimer of Warranties.
+
+THE SOFTWARE IS PROVIDED BY NVIDIA AS-IS AND WITH ALL FAULTS. TO THE FULLEST
+EXTENT PERMITTED BY APPLICABLE LAW, NVIDIA DISCLAIMS ALL WARRANTIES AND
+REPRESENTATIONS OF ANY KIND, WHETHER EXPRESS, IMPLIED OR STATUTORY, RELATING TO
+OR ARISING UNDER THIS AGREEMENT, INCLUDING, WITHOUT LIMITATION, THE WARRANTIES
+OF TITLE, NONINFRINGEMENT, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+USAGE OF TRADE AND COURSE OF DEALING. WITHOUT LIMITING THE FOREGOING, NVIDIA
+DOES NOT WARRANT THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS; THAT ANY DEFECTS
+OR ERRORS WILL BE CORRECTED; THAT ANY CERTAIN CONTENT WILL BE AVAILABLE; OR THAT
+THE SOFTWARE IS FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS.
+
+In addition, you agree that you are solely responsible for maintaining
+appropriate data backups and system restore points for systems that include the
+SOFTWARE, and that NVIDIA will have no responsibility for any damage or loss to
+such systems (including loss of data or access) arising from or relating to (a)
+any changes to the configuration, application settings, environment variables,
+registry, drivers, BIOS, or other attributes of the system (or any part of such
+system) initiated through the SOFTWARE; or (b) installation of any SOFTWARE or
+third party software patches through the NVIDIA update service.
+
+NO INFORMATION OR ADVICE GIVEN BY NVIDIA WILL IN ANY WAY INCREASE THE SCOPE OF
+ANY WARRANTY EXPRESSLY PROVIDED IN THIS AGREEMENT. You are responsible for
+checking that a SOFTWARE version is the appropriate one for your NVIDIA product
+model, operating system, and computer hardware.
+
+12. Limitations of Liability.
+
+TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT WILL NVIDIA BE
+LIABLE FOR ANY (I) INDIRECT, PUNITIVE, SPECIAL, INCIDENTAL OR CONSEQUENTIAL
+DAMAGES, OR (II) DAMAGES FOR (A) THE COST OF PROCURING SUBSTITUTE GOODS, OR (B)
+LOSS OF PROFITS, REVENUES, USE, DATA OR GOODWILL ARISING OUT OF OR RELATED TO
+THIS AGREEMENT, WHETHER BASED ON BREACH OF CONTRACT, TORT (INCLUDING
+NEGLIGENCE), STRICT LIABILITY, OR OTHERWISE, AND EVEN IF NVIDIA HAS BEEN ADVISED
+OF THE POSSIBILITY OF SUCH DAMAGES AND EVEN IF A PARTY'S REMEDIES FAIL THEIR
+ESSENTIAL PURPOSE.
+
+ADDITIONALLY, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, NVIDIA'S TOTAL
+CUMULATIVE AGGREGATE LIABILITY FOR ANY AND ALL LIABILITIES, OBLIGATIONS OR
+CLAIMS ARISING OUT OF OR RELATED TO THIS AGREEMENT WILL NOT EXCEED FIVE
+U.S. DOLLARS (US$5).
+
+13. Data Collection.
+
+If you are using the SOFTWARE on a Windows operating system, you hereby
+acknowledge that at the time of SOFTWARE installation, NVIDIA will access and
+collect data to: (a) properly configure and optimize the system for use with the
+SOFTWARE; (b) deliver content or service through SOFTWARE; and (c) improve
+NVIDIA products and services. Information collected may include configuration
+data such as GPU and CPU, and operating system.
+
+The SOFTWARE may contain links to third party websites and services. NVIDIA
+encourages you to review the privacy statements on those sites and services that
+you choose to visit to understand how they may collect, use and share your
+data. NVIDIA is not responsible for the privacy statements or practices of third
+party sites or services.
+
+Please review the NVIDIA Privacy Policy, located at
+https://www.nvidia.com/en-us/about-nvidia/privacy-policy, which explains
+NVIDIA's policy for collecting and using data.
+
+14. Assignment.
+
+NVIDIA may assign, delegate or transfer its rights or obligations under this
+Agreement by any means or operation of law. You may not, without NVIDIA's prior
+written consent, assign, delegate or transfer any of its rights or obligations
+under this Agreement by any means or operation of law, and any attempt to do so
+is null and void.
+
+15. Trade Compliance.
+
+You agree to comply with all applicable export, import, trade and economic
+sanctions laws and regulations, including U.S. Export Administration
+Regulations and Office of Foreign Assets Control regulations. These laws include
+restrictions on destinations, end-users and end-use.
+
+16. Government Use.
+
+The SOFTWARE, including related documentation ("Protected Items") is a
+"Commercial product" as this term is defined at 48 C.F.R. 2.101, consisting of
+"commercial computer software" and "commercial computer software documentation"
+as such terms are used in, respectively, 48 C.F.R. 12.212 and 48 C.F.R. 227.7202
+& 252.227-7014(a)(1). Before any Protected Items are supplied to the
+U.S. Government, you will (i) inform the U.S. Government in writing that the
+Protected Items are and must be treated as commercial computer software and
+commercial computer software documentation developed at private expense; (ii)
+inform the U.S. Government that the Protected Items are provided subject to the
+terms of this Agreement; and (iii) mark the Protected Items as commercial
+computer software and commercial computer software documentation developed at
+private expense. In no event will you permit the U.S. Government to acquire
+rights in Protected Items beyond those specified in 48
+C.F.R. 52.227-19(b)(1)-(2) or 252.227-7013(c) except as expressly approved by
+NVIDIA in writing.
+
+17. Notices.
+
+Please direct your legal notices or other correspondence to NVIDIA Corporation,
+2788 San Tomas Expressway, Santa Clara, California 95051, United States of
+America, Attention: Legal Department. If NVIDIA needs to contact you about the
+SOFTWARE, you consent to receive the notices by email and that such notices will
+satisfy any legal communication requirements.
+
+18. Entire Agreement.
+
+Regarding the subject matter of this Agreement, the parties agree that (i) this
+Agreement constitutes the entire and exclusive agreement between the parties and
+supersedes all prior and contemporaneous communications and (ii) any additional
+or different terms or conditions, whether contained in purchase orders, order
+acknowledgments, invoices or otherwise, will not be binding on the receiving
+party and are null and void. This Agreement may only be modified in a writing
+signed by an authorized representative of each party.
+
+If a court of competent jurisdiction rules that a provision of this Agreement is
+unenforceable, that provision will be deemed modified to the extent necessary to
+make it enforceable and the remainder of this Agreement will continue in full
+force and effect.
+
+19. No Waiver.
+
+No failure or delay by a party to enforce any Agreement term or obligation will
+operate as a waiver by that party, or prevent the enforcement of such term or
+obligation later.
+
+20. Licensing.
+
+For any questions regarding this Agreement, please contact NVIDIA at
+driver-licensing@nvidia.com
+
+(v. February 25, 2025)
+```
+
+---
+
+## Cuda Samples; version 13.0 (12.4 on AL2)
+
+<https://github.com/NVIDIA/cuda-samples/>
+
+```text
 Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
 
     * Package Cuda Samples's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/cuda/samples/v12.4.tar.gz
+east-1.amazonaws.com/archives/dependencies/cuda/samples/v13.0.tar.gz
+      (AL2 continues to use https://us-east-1-aws-parallelcluster.s3.us-
+east-1.amazonaws.com/archives/dependencies/cuda/samples/v12.4.tar.gz)
 
 1.1. License
 1.1.1. License Grant
@@ -7033,281 +7926,2422 @@ between the parties relating to this SDK license. Any additional and/or
 conflicting terms on documents issued by you are null, void, and invalid. Any
 amendment or waiver under this Agreement shall be in writing and signed by
 representatives of both parties.
+```
 
-------
+---
 
-** Nvidia CUDA; version 12-4-1 -- https://developer.nvidia.com/cuda-toolkit
-© 2007-2020 NVIDIA Corporation. All rights reserved.
+## Nvidia CUDA; version 13.0.2 (12.4.1 on AL2)
+
+<https://developer.nvidia.com/cuda-toolkit>
+
+```text
+Copyright (c) 2007-2025 NVIDIA Corporation. All rights reserved.
 
     * Package Nvidia CUDA's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
-east-1.amazonaws.com/archives/dependencies/cuda/cuda_12.4.1_550.54.15_linux.run
+east-1.amazonaws.com/archives/dependencies/cuda/cuda_13.0.2_580.95.05_linux.run
+      (AL2 continues to use cuda_12.4.1_550.54.15_linux.run)
+
+End User License Agreement
+--------------------------
+
+NVIDIA Software License Agreement and CUDA Supplement to
+Software License Agreement.
+
+The CUDA Toolkit End User License Agreement applies to the
+NVIDIA CUDA Toolkit, the NVIDIA CUDA Samples, the NVIDIA
+Display Driver, NVIDIA Nsight tools (Visual Studio Edition),
+and the associated documentation on CUDA APIs, programming
+model and development tools. If you do not agree with the
+terms and conditions of the license agreement, then do not
+download or use the software.
+
+Last updated: January 12, 2025
+
+
+Preface
+-------
+
+The Software License Agreement in Chapter 1 and the Supplement
+in Chapter 2 contain license terms and conditions that govern
+the use of NVIDIA toolkit. By accepting this agreement, you
+agree to comply with all the terms and conditions applicable
+to the product(s) included herein.
+
+
+NVIDIA Driver
+
+
+Description
+
+This package contains the operating system driver and
+fundamental system software components for NVIDIA GPUs.
+
+
+NVIDIA CUDA Toolkit
+
+
+Description
+
+The NVIDIA CUDA Toolkit provides command-line and graphical
+tools for building, debugging and optimizing the performance
+of applications accelerated by NVIDIA GPUs, runtime and math
+libraries, and documentation including programming guides,
+user manuals, and API references.
+
+
+Default Install Location of CUDA Toolkit
+
+Windows platform:
+
+%ProgramFiles%\NVIDIA GPU Computing Toolkit\CUDA\v#.#
+
+Linux platform:
+
+/usr/local/cuda-#.#
+
+Mac platform:
+
+/Developer/NVIDIA/CUDA-#.#
+
+
+NVIDIA CUDA Samples
+
+
+Description
+
+CUDA Samples are now located in
+https://github.com/nvidia/cuda-samples, which includes
+instructions for obtaining, building, and running the samples.
+They are no longer included in the CUDA toolkit.
+
+
+NVIDIA Nsight Visual Studio Edition (Windows only)
+
+
+Description
+
+NVIDIA Nsight Development Platform, Visual Studio Edition is a
+development environment integrated into Microsoft Visual
+Studio that provides tools for debugging, profiling, analyzing
+and optimizing your GPU computing and graphics applications.
+
+
+Default Install Location of Nsight Visual Studio Edition
+
+Windows platform:
+
+%ProgramFiles(x86)%\NVIDIA Corporation\Nsight Visual Studio Edition #.#
+
+
+1. License Agreement for NVIDIA Software Development Kits
+---------------------------------------------------------
+
+
+Important Notice—Read before downloading, installing,
+copying or using the licensed software:
+-------------------------------------------------------
+
+This license agreement, including exhibits attached
+("Agreement”) is a legal agreement between you and NVIDIA
+Corporation ("NVIDIA") and governs your use of a NVIDIA
+software development kit (“SDK”).
+
+Each SDK has its own set of software and materials, but here
+is a description of the types of items that may be included in
+a SDK: source code, header files, APIs, data sets and assets
+(examples include images, textures, models, scenes, videos,
+native API input/output files), binary software, sample code,
+libraries, utility programs, programming code and
+documentation.
+
+This Agreement can be accepted only by an adult of legal age
+of majority in the country in which the SDK is used.
+
+If you are entering into this Agreement on behalf of a company
+or other legal entity, you represent that you have the legal
+authority to bind the entity to this Agreement, in which case
+“you” will mean the entity you represent.
+
+If you don’t have the required age or authority to accept
+this Agreement, or if you don’t accept all the terms and
+conditions of this Agreement, do not download, install or use
+the SDK.
+
+You agree to use the SDK only for purposes that are permitted
+by (a) this Agreement, and (b) any applicable law, regulation
+or generally accepted practices or guidelines in the relevant
+jurisdictions.
+
 
 1.1. License
+
+
 1.1.1. License Grant
 
-Subject to the terms of this Agreement, NVIDIA hereby grants you a non-
-exclusive, non-transferable license, without the right to sublicense (except as
-expressly provided in this Agreement) to:
+Subject to the terms of this Agreement, NVIDIA hereby grants
+you a non-exclusive, non-transferable license, without the
+right to sublicense (except as expressly provided in this
+Agreement) to:
 
-    Install and use the SDK,
-    Modify and create derivative works of sample source code delivered in the
-SDK, and
-    Distribute those portions of the SDK that are identified in this Agreement
-as distributable, as incorporated in object code format into a software
-application that meets the distribution requirements indicated in this
-Agreement.
+  1. Install and use the SDK,
+
+  2. Modify and create derivative works of sample source code
+    delivered in the SDK, and
+
+  3. Distribute those portions of the SDK that are identified
+    in this Agreement as distributable, as incorporated in
+    object code format into a software application that meets
+    the distribution requirements indicated in this Agreement.
+
 
 1.1.2. Distribution Requirements
-These are the distribution requirements for you to exercise the distribution
-grant:
 
-    Your application must have material additional functionality, beyond the
-included portions of the SDK.
-    The distributable portions of the SDK shall only be accessed by your
-application.
-    The following notice shall be included in modifications and derivative works
-of sample source code distributed: “This software contains source code provided
-by NVIDIA Corporation.”
-    Unless a developer tool is identified in this Agreement as distributable, it
-is delivered for your internal use only.
-    The terms under which you distribute your application must be consistent
-with the terms of this Agreement, including (without limitation) terms relating
-to the license grant and license restrictions and protection of NVIDIA’s
-intellectual property rights. Additionally, you agree that you will protect the
-privacy, security and legal rights of your application users.
-    You agree to notify NVIDIA in writing of any known or suspected distribution
-or use of the SDK not in compliance with the requirements of this Agreement, and
-to enforce the terms of your agreements with respect to distributed SDK.
+These are the distribution requirements for you to exercise
+the distribution grant:
+
+  1. Your application must have material additional
+    functionality, beyond the included portions of the SDK.
+
+  2. The distributable portions of the SDK shall only be
+    accessed by your application.
+
+  3. The following notice shall be included in modifications
+    and derivative works of sample source code distributed:
+    “This software contains source code provided by NVIDIA
+    Corporation.”
+
+  4. Unless a developer tool is identified in this Agreement
+    as distributable, it is delivered for your internal use
+    only.
+
+  5. The terms under which you distribute your application
+    must be consistent with the terms of this Agreement,
+    including (without limitation) terms relating to the
+    license grant and license restrictions and protection of
+    NVIDIA’s intellectual property rights. Additionally, you
+    agree that you will protect the privacy, security and
+    legal rights of your application users.
+
+  6. You agree to notify NVIDIA in writing of any known or
+    suspected distribution or use of the SDK not in compliance
+    with the requirements of this Agreement, and to enforce
+    the terms of your agreements with respect to distributed
+    SDK.
+
 
 1.1.3. Authorized Users
 
-You may allow employees and contractors of your entity or of your
-subsidiary(ies) to access and use the SDK from your secure network to perform
-work on your behalf.
+You may allow employees and contractors of your entity or of
+your subsidiary(ies) to access and use the SDK from your
+secure network to perform work on your behalf.
 
-If you are an academic institution you may allow users enrolled or employed by
-the academic institution to access and use the SDK from your secure network.
+If you are an academic institution you may allow users
+enrolled or employed by the academic institution to access and
+use the SDK from your secure network.
 
-You are responsible for the compliance with the terms of this Agreement by your
-authorized users. If you become aware that your authorized users didn’t follow
-the terms of this Agreement, you agree to take reasonable steps to resolve the
+You are responsible for the compliance with the terms of this
+Agreement by your authorized users. If you become aware that
+your authorized users didn’t follow the terms of this
+Agreement, you agree to take reasonable steps to resolve the
 non-compliance and prevent new occurrences.
+
+
 1.1.4. Pre-Release SDK
 
-The SDK versions identified as alpha, beta, preview or otherwise as pre-release,
-may not be fully functional, may contain errors or design flaws, and may have
-reduced or different security, privacy, accessibility, availability, and
-reliability standards relative to commercial versions of NVIDIA software and
-materials. Use of a pre-release SDK may result in unexpected results, loss of
-data, project delays or other unpredictable damage or loss.
+The SDK versions identified as alpha, beta, preview or
+otherwise as pre-release, may not be fully functional, may
+contain errors or design flaws, and may have reduced or
+different security, privacy, accessibility, availability, and
+reliability standards relative to commercial versions of
+NVIDIA software and materials. Use of a pre-release SDK may
+result in unexpected results, loss of data, project delays or
+other unpredictable damage or loss.
 
-You may use a pre-release SDK at your own risk, understanding that pre-release
-SDKs are not intended for use in production or business-critical systems.
+You may use a pre-release SDK at your own risk, understanding
+that pre-release SDKs are not intended for use in production
+or business-critical systems.
 
-NVIDIA may choose not to make available a commercial version of any pre-release
-SDK. NVIDIA may also choose to abandon development and terminate the
-availability of a pre-release SDK at any time without liability.
+NVIDIA may choose not to make available a commercial version
+of any pre-release SDK. NVIDIA may also choose to abandon
+development and terminate the availability of a pre-release
+SDK at any time without liability.
+
+
 1.1.5. Updates
 
-NVIDIA may, at its option, make available patches, workarounds or other updates
-to this SDK. Unless the updates are provided with their separate governing
-terms, they are deemed part of the SDK licensed to you as provided in this
-Agreement. You agree that the form and content of the SDK that NVIDIA provides
-may change without prior notice to you. While NVIDIA generally maintains
-compatibility between versions, NVIDIA may in some cases make changes that
-introduce incompatibilities in future versions of the SDK.
-1.1.6. Third Party Licenses
+NVIDIA may, at its option, make available patches, workarounds
+or other updates to this SDK. Unless the updates are provided
+with their separate governing terms, they are deemed part of
+the SDK licensed to you as provided in this Agreement. You
+agree that the form and content of the SDK that NVIDIA
+provides may change without prior notice to you. While NVIDIA
+generally maintains compatibility between versions, NVIDIA may
+in some cases make changes that introduce incompatibilities in
+future versions of the SDK.
 
-The SDK may come bundled with, or otherwise include or be distributed with,
-third party software licensed by a NVIDIA supplier and/or open source software
-provided under an open source license. Use of third party software is subject to
-the third-party license terms, or in the absence of third party terms, the terms
-of this Agreement. Copyright to third party software is held by the copyright
-holders indicated in the third-party software or license.
 
-Subject to the other terms of this Agreement, you may use the SDK to develop and
-test applications released under Open Source Initiative (OSI) approved open
-source software licenses.
+1.1.6. Components Under Other Licenses
+
+The SDK may come bundled with, or otherwise include or be
+distributed with, NVIDIA or third-party components with
+separate legal notices or terms as may be described in
+proprietary notices accompanying the SDK. If and to the extent
+there is a conflict between the terms in this Agreement and
+the license terms associated with the component, the license
+terms associated with the components control only to the
+extent necessary to resolve the conflict.
+
+Subject to the other terms of this Agreement, you may use the
+SDK to develop and test applications released under Open
+Source Initiative (OSI) approved open source software
+licenses.
+
+
 1.1.7. Reservation of Rights
 
-NVIDIA reserves all rights, title, and interest in and to the SDK, not expressly
-granted to you under this Agreement.
-1.2. Limitations
-The following license limitations apply to your use of the SDK:
+NVIDIA reserves all rights, title, and interest in and to the
+SDK, not expressly granted to you under this Agreement.
 
-    You may not reverse engineer, decompile or disassemble, or remove copyright
-or other proprietary notices from any portion of the SDK or copies of the SDK.
-    Except as expressly provided in this Agreement, you may not copy, sell,
-rent, sublicense, transfer, distribute, modify, or create derivative works of
-any portion of the SDK. For clarity, you may not distribute or sublicense the
-SDK as a stand-alone product.
-    Unless you have an agreement with NVIDIA for this purpose, you may not
-indicate that an application created with the SDK is sponsored or endorsed by
-NVIDIA.
-    You may not bypass, disable, or circumvent any encryption, security, digital
-rights management or authentication mechanism in the SDK.
-    You may not use the SDK in any manner that would cause it to become subject
-to an open source software license. As examples, licenses that require as a
-condition of use, modification, and/or distribution that the SDK be:
-        Disclosed or distributed in source code form;
-        Licensed for the purpose of making derivative works; or
-        Redistributable at no charge.
-    Unless you have an agreement with NVIDIA for this purpose, you may not use
-the SDK with any system or application where the use or failure of the system or
-application can reasonably be expected to threaten or result in personal injury,
-death, or catastrophic loss. Examples include use in nuclear, avionics,
-navigation, military, medical, life support or other life critical applications.
-NVIDIA does not design, test or manufacture the SDK for these critical uses and
-NVIDIA shall not be liable to you or any third party, in whole or in part, for
-any claims or damages arising from such uses.
-    You agree to defend, indemnify and hold harmless NVIDIA and its affiliates,
-and their respective employees, contractors, agents, officers and directors,
-from and against any and all claims, damages, obligations, losses, liabilities,
-costs or debt, fines, restitutions and expenses (including but not limited to
-attorney’s fees and costs incident to establishing the right of indemnification)
-arising out of or related to your use of the SDK outside of the scope of this
-Agreement, or not in compliance with its terms.
+
+1.2. Limitations
+
+The following license limitations apply to your use of the
+SDK:
+
+  1. You may not reverse engineer, decompile or disassemble,
+    or remove copyright or other proprietary notices from any
+    portion of the SDK or copies of the SDK.
+
+  2. Except as expressly provided in this Agreement, you may
+    not copy, sell, rent, sublicense, transfer, distribute,
+    modify, or create derivative works of any portion of the
+    SDK. For clarity, you may not distribute or sublicense the
+    SDK as a stand-alone product.
+
+  3. Unless you have an agreement with NVIDIA for this
+    purpose, you may not indicate that an application created
+    with the SDK is sponsored or endorsed by NVIDIA.
+
+  4. You may not bypass, disable, or circumvent any
+    encryption, security, digital rights management or
+    authentication mechanism in the SDK.
+
+  5. You may not use the SDK in any manner that would cause it
+    to become subject to an open source software license. As
+    examples, licenses that require as a condition of use,
+    modification, and/or distribution that the SDK be:
+
+      a. Disclosed or distributed in source code form;
+
+      b. Licensed for the purpose of making derivative works;
+        or
+
+      c. Redistributable at no charge.
+
+  6.  You acknowledge that the SDK as delivered is not tested
+    or certified by NVIDIA for use in connection with the
+    design, construction, maintenance, and/or operation of any
+    system where the use or failure of such system could
+    result in a situation that threatens the safety of human
+    life or results in catastrophic damages (each, a "Critical
+    Application"). Examples of Critical Applications include
+    use in avionics, navigation, autonomous vehicle
+    applications, ai solutions for automotive products,
+    military, medical, life support or other life critical
+    applications. NVIDIA shall not be liable to you or any
+    third party, in whole or in part, for any claims or
+    damages arising from such uses. You are solely responsible
+    for ensuring that any product or service developed with
+    the SDK as a whole includes sufficient features to comply
+    with all applicable legal and regulatory standards and
+    requirements.
+
+  7.  You agree to defend, indemnify and hold harmless NVIDIA
+    and its affiliates, and their respective employees,
+    contractors, agents, officers and directors, from and
+    against any and all claims, damages, obligations, losses,
+    liabilities, costs or debt, fines, restitutions and
+    expenses (including but not limited to attorney’s fees
+    and costs incident to establishing the right of
+    indemnification) arising out of or related to products or
+    services that use the SDK in or for Critical Applications,
+    and for use of the SDK outside of the scope of this
+    Agreement or not in compliance with its terms.
+
+  8. You may not reverse engineer, decompile or disassemble
+    any portion of the output generated using SDK elements for
+    the purpose of translating such output artifacts to target
+    a non-NVIDIA platform.
+
 
 1.3. Ownership
 
-    NVIDIA or its licensors hold all rights, title and interest in and to the
-SDK and its modifications and derivative works, including their respective
-intellectual property rights, subject to your rights under Section 1.3.2. This
-SDK may include software and materials from NVIDIA’s licensors, and these
-licensors are intended third party beneficiaries that may enforce this Agreement
-with respect to their intellectual property rights.
-    You hold all rights, title and interest in and to your applications and your
-derivative works of the sample source code delivered in the SDK, including their
-respective intellectual property rights, subject to NVIDIA’s rights under
-Section 1.3.1.
-    You may, but don’t have to, provide to NVIDIA suggestions, feature requests
-or other feedback regarding the SDK, including possible enhancements or
-modifications to the SDK. For any feedback that you voluntarily provide, you
-hereby grant NVIDIA and its affiliates a perpetual, non-exclusive, worldwide,
-irrevocable license to use, reproduce, modify, license, sublicense (through
-multiple tiers of sublicensees), and distribute (through multiple tiers of
-distributors) it without the payment of any royalties or fees to you. NVIDIA
-will use feedback at its choice. NVIDIA is constantly looking for ways to
-improve its products, so you may send feedback to NVIDIA through the developer
-portal at https://developer.nvidia.com.
+  1.  NVIDIA or its licensors hold all rights, title and
+    interest in and to the SDK and its modifications and
+    derivative works, including their respective intellectual
+    property rights, subject to your rights under Section
+    1.3.2. This SDK may include software and materials from
+    NVIDIA’s licensors, and these licensors are intended
+    third party beneficiaries that may enforce this Agreement
+    with respect to their intellectual property rights.
+
+  2.  You hold all rights, title and interest in and to your
+    applications and your derivative works of the sample
+    source code delivered in the SDK, including their
+    respective intellectual property rights, subject to
+    NVIDIA’s rights under Section 1.3.1.
+
+  3. You may, but don’t have to, provide to NVIDIA
+    suggestions, feature requests or other feedback regarding
+    the SDK, including possible enhancements or modifications
+    to the SDK. For any feedback that you voluntarily provide,
+    you hereby grant NVIDIA and its affiliates a perpetual,
+    non-exclusive, worldwide, irrevocable license to use,
+    reproduce, modify, license, sublicense (through multiple
+    tiers of sublicensees), and distribute (through multiple
+    tiers of distributors) it without the payment of any
+    royalties or fees to you. NVIDIA will use feedback at its
+    choice. NVIDIA is constantly looking for ways to improve
+    its products, so you may send feedback to NVIDIA through
+    the developer portal at https://developer.nvidia.com.
+
 
 1.4. No Warranties
 
-THE SDK IS PROVIDED BY NVIDIA “AS IS” AND “WITH ALL FAULTS.” TO THE MAXIMUM
-EXTENT PERMITTED BY LAW, NVIDIA AND ITS AFFILIATES EXPRESSLY DISCLAIM ALL
-WARRANTIES OF ANY KIND OR NATURE, WHETHER EXPRESS, IMPLIED OR STATUTORY,
-INCLUDING, BUT NOT LIMITED TO, ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
-PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, OR THE ABSENCE OF ANY DEFECTS
-THEREIN, WHETHER LATENT OR PATENT. NO WARRANTY IS MADE ON THE BASIS OF TRADE
-USAGE, COURSE OF DEALING OR COURSE OF TRADE.
+THE SDK IS PROVIDED BY NVIDIA “AS IS” AND “WITH ALL
+FAULTS.” TO THE MAXIMUM EXTENT PERMITTED BY LAW, NVIDIA AND
+ITS AFFILIATES EXPRESSLY DISCLAIM ALL WARRANTIES OF ANY KIND
+OR NATURE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING,
+BUT NOT LIMITED TO, ANY WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, OR THE
+ABSENCE OF ANY DEFECTS THEREIN, WHETHER LATENT OR PATENT. NO
+WARRANTY IS MADE ON THE BASIS OF TRADE USAGE, COURSE OF
+DEALING OR COURSE OF TRADE.
+
+
 1.5. Limitation of Liability
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, NVIDIA AND ITS AFFILIATES SHALL NOT BE
-LIABLE FOR ANY SPECIAL, INCIDENTAL, PUNITIVE OR CONSEQUENTIAL DAMAGES, OR ANY
-LOST PROFITS, LOSS OF USE, LOSS OF DATA OR LOSS OF GOODWILL, OR THE COSTS OF
-PROCURING SUBSTITUTE PRODUCTS, ARISING OUT OF OR IN CONNECTION WITH THIS
-AGREEMENT OR THE USE OR PERFORMANCE OF THE SDK, WHETHER SUCH LIABILITY ARISES
-FROM ANY CLAIM BASED UPON BREACH OF CONTRACT, BREACH OF WARRANTY, TORT
-(INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR ANY OTHER CAUSE OF ACTION OR THEORY
-OF LIABILITY. IN NO EVENT WILL NVIDIA’S AND ITS AFFILIATES TOTAL CUMULATIVE
-LIABILITY UNDER OR ARISING OUT OF THIS AGREEMENT EXCEED US$10.00. THE NATURE OF
-THE LIABILITY OR THE NUMBER OF CLAIMS OR SUITS SHALL NOT ENLARGE OR EXTEND THIS
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, NVIDIA AND ITS
+AFFILIATES SHALL NOT BE LIABLE FOR ANY (I) SPECIAL, INCIDENTAL,
+PUNITIVE OR CONSEQUENTIAL DAMAGES, OR (II) DAMAGES FOR (A) ANY 
+LOST PROFITS, LOSS OF USE, LOSS OF DATA OR LOSS OF GOODWILL, 
+OR THE COSTS OF PROCURING SUBSTITUTE PRODUCTS, ARISING OUT OF 
+OR IN CONNECTION WITH THIS AGREEMENT OR THE USE OR PERFORMANCE 
+OF THE SDK, WHETHER SUCH LIABILITY ARISES FROM ANY CLAIM BASED 
+UPON BREACH OF CONTRACT, BREACH OF WARRANTY, TORT (INCLUDING 
+NEGLIGENCE), PRODUCT LIABILITY OR ANY OTHER CAUSE OF ACTION OR 
+THEORY OF LIABILITY. IN NO EVENT WILL NVIDIA’S AND ITS AFFILIATES
+TOTAL CUMULATIVE LIABILITY UNDER OR ARISING OUT OF THIS
+AGREEMENT EXCEED US$10.00. THE NATURE OF THE LIABILITY OR THE
+NUMBER OF CLAIMS OR SUITS SHALL NOT ENLARGE OR EXTEND THIS
 LIMIT.
 
-These exclusions and limitations of liability shall apply regardless if NVIDIA
-or its affiliates have been advised of the possibility of such damages, and
-regardless of whether a remedy fails its essential purpose. These exclusions and
-limitations of liability form an essential basis of the bargain between the
-parties, and, absent any of these exclusions or limitations of liability, the
-provisions of this Agreement, including, without limitation, the economic terms,
+These exclusions and limitations of liability shall apply
+regardless if NVIDIA or its affiliates have been advised of
+the possibility of such damages, and regardless of whether a
+remedy fails its essential purpose. These exclusions and
+limitations of liability form an essential basis of the
+bargain between the parties, and, absent any of these
+exclusions or limitations of liability, the provisions of this
+Agreement, including, without limitation, the economic terms,
 would be substantially different.
+
+
 1.6. Termination
 
-    This Agreement will continue to apply until terminated by either you or
-NVIDIA as described below.
-    If you want to terminate this Agreement, you may do so by stopping to use
-the SDK.
-    NVIDIA may, at any time, terminate this Agreement if:
-        (i) you fail to comply with any term of this Agreement and the non-
-compliance is not fixed within thirty (30) days following notice from NVIDIA (or
-immediately if you violate NVIDIA’s intellectual property rights);
-        (ii) you commence or participate in any legal proceeding against NVIDIA
-with respect to the SDK; or
-        (iii) NVIDIA decides to no longer provide the SDK in a country or, in
-NVIDIA’s sole discretion, the continued use of it is no longer commercially
-viable.
-    Upon any termination of this Agreement, you agree to promptly discontinue
-use of the SDK and destroy all copies in your possession or control. Your prior
-distributions in accordance with this Agreement are not affected by the
-termination of this Agreement. Upon written request, you will certify in writing
-that you have complied with your commitments under this section. Upon any
-termination of this Agreement all provisions survive except for the license
-grant provisions.
+  1. This Agreement will continue to apply until terminated by
+    either you or NVIDIA as described below.
+
+  2. If you want to terminate this Agreement, you may do so by
+    stopping to use the SDK.
+
+  3. NVIDIA may, at any time, terminate this Agreement if:
+
+      a. (i) you fail to comply with any term of this
+        Agreement and the non-compliance is not fixed within
+        thirty (30) days following notice from NVIDIA (or
+        immediately if you violate NVIDIA’s intellectual
+        property rights);
+
+      b. (ii) you commence or participate in any legal
+        proceeding against NVIDIA with respect to the SDK; or
+
+      c. (iii) NVIDIA decides to no longer provide the SDK in
+        a country or, in NVIDIA’s sole discretion, the
+        continued use of it is no longer commercially viable.
+
+  4. Upon any termination of this Agreement, you agree to
+    promptly discontinue use of the SDK and destroy all copies
+    in your possession or control. Your prior distributions in
+    accordance with this Agreement are not affected by the
+    termination of this Agreement. Upon written request, you
+    will certify in writing that you have complied with your
+    commitments under this section. Upon any termination of
+    this Agreement all provisions survive except for the
+    license grant provisions.
+
 
 1.7. General
 
-If you wish to assign this Agreement or your rights and obligations, including
-by merger, consolidation, dissolution or operation of law, contact NVIDIA to ask
-for permission. Any attempted assignment not approved by NVIDIA in writing shall
-be void and of no effect. NVIDIA may assign, delegate or transfer this Agreement
-and its rights and obligations, and if to a non-affiliate you will be notified.
+If you wish to assign this Agreement or your rights and
+obligations, including by merger, consolidation, dissolution
+or operation of law, contact NVIDIA to ask for permission. Any
+attempted assignment not approved by NVIDIA in writing shall
+be void and of no effect. NVIDIA may assign, delegate or
+transfer this Agreement and its rights and obligations, and if
+to a non-affiliate you will be notified.
 
-You agree to cooperate with NVIDIA and provide reasonably requested information
-to verify your compliance with this Agreement.
+You agree to cooperate with NVIDIA and provide reasonably
+requested information to verify your compliance with this
+Agreement.
 
-This Agreement will be governed in all respects by the laws of the United States
-and of the State of Delaware as those laws are applied to contracts entered into
-and performed entirely within Delaware by Delaware residents, without regard to
-the conflicts of laws principles. The United Nations Convention on Contracts for
-the International Sale of Goods is specifically disclaimed. You agree to all
-terms of this Agreement in the English language.
+This Agreement will be governed in all respects by the laws of
+the United States and of the State of Delaware, without regard to the
+conflicts of laws principles. The United Nations Convention on
+Contracts for the International Sale of Goods is specifically
+disclaimed. You agree to all terms of this Agreement in the
+English language.
 
-The state or federal courts residing in Santa Clara County, California shall
-have exclusive jurisdiction over any dispute or claim arising out of this
-Agreement. Notwithstanding this, you agree that NVIDIA shall still be allowed to
+The state or federal courts residing in Santa Clara County,
+California shall have exclusive jurisdiction over any dispute
+or claim arising out of this Agreement. Notwithstanding this,
+you agree that NVIDIA shall still be allowed to apply for
+injunctive remedies or an equivalent type of urgent legal
+relief in any jurisdiction.
+
+If any court of competent jurisdiction determines that any
+provision of this Agreement is illegal, invalid or
+unenforceable, such provision will be construed as limited to
+the extent necessary to be consistent with and fully
+enforceable under the law and the remaining provisions will
+remain in full force and effect. Unless otherwise specified,
+remedies are cumulative.
+
+Each party acknowledges and agrees that the other is an
+independent contractor in the performance of this Agreement.
+
+The SDK has been developed entirely at private expense and is
+“commercial items” consisting of “commercial computer
+software” and “commercial computer software
+documentation” provided with RESTRICTED RIGHTS. Use,
+duplication or disclosure by the U.S. Government or a U.S.
+Government subcontractor is subject to the restrictions in
+this Agreement pursuant to DFARS 227.7202-3(a) or as set forth
+in subparagraphs (c)(1) and (2) of the Commercial Computer
+Software - Restricted Rights clause at FAR 52.227-19, as
+applicable. Contractor/manufacturer is NVIDIA, 2788 San Tomas
+Expressway, Santa Clara, CA 95051.
+
+The SDK is subject to United States export laws and
+regulations. You agree that you will not ship, transfer or
+export the SDK into any country, or use the SDK in any manner,
+prohibited by the United States Bureau of Industry and
+Security or economic sanctions regulations administered by the
+U.S. Department of Treasury’s Office of Foreign Assets
+Control (OFAC), or any applicable export laws, restrictions or
+regulations. These laws include restrictions on destinations,
+end users and end use. By accepting this Agreement, you
+confirm that you are not located in a country currently 
+embargoed by the U.S. or otherwise prohibited from receiving 
+the SDK under U.S. law.
+
+Any notice delivered by NVIDIA to you under this Agreement
+will be delivered via mail, email or fax. You agree that any
+notices that NVIDIA sends you electronically will satisfy any
+legal communication requirements. Please direct your legal
+notices or other correspondence to NVIDIA Corporation, 2788
+San Tomas Expressway, Santa Clara, California 95051, United
+States of America, Attention: Legal Department.
+
+This Agreement and any exhibits incorporated into this
+Agreement constitute the entire agreement of the parties with
+respect to the subject matter of this Agreement and supersede
+all prior negotiations or documentation exchanged between the
+parties relating to this SDK license. Any additional and/or
+conflicting terms on documents issued by you are null, void,
+and invalid. Any amendment or waiver under this Agreement
+shall be in writing and signed by representatives of both
+parties.
+
+
+2. CUDA Toolkit Supplement to Software License Agreement for
+NVIDIA Software Development Kits
+------------------------------------------------------------
+
+The terms in this supplement govern your use of the NVIDIA
+CUDA Toolkit SDK under the terms of your license agreement
+(“Agreement”) as modified by this supplement. Capitalized
+terms used but not defined below have the meaning assigned to
+them in the Agreement.
+
+This supplement is an exhibit to the Agreement and is
+incorporated as an integral part of the Agreement. In the
+event of conflict between the terms in this supplement and the
+terms in the Agreement, the terms in this supplement govern.
+
+
+2.1. License Scope
+
+The SDK is licensed for you to develop applications only for
+use in systems with NVIDIA GPUs.
+
+
+2.2. Distribution
+
+The portions of the SDK that are distributable under the
+Agreement are listed in Attachment A.
+
+
+2.3. Operating Systems
+
+Those portions of the SDK designed exclusively for use on the
+Linux or FreeBSD operating systems, or other operating systems
+derived from the source code to these operating systems, may
+be copied and redistributed for use in accordance with this
+Agreement, provided that the object code files are not
+modified in any way (except for unzipping of compressed
+files).
+
+
+2.4. Audio and Video Encoders and Decoders
+
+You acknowledge and agree that it is your sole responsibility
+to obtain any additional third-party licenses required to
+make, have made, use, have used, sell, import, and offer for
+sale your products or services that include or incorporate any
+third-party software and content relating to audio and/or
+video encoders and decoders from, including but not limited
+to, Microsoft, Thomson, Fraunhofer IIS, Sisvel S.p.A.,
+MPEG-LA, and Coding Technologies. NVIDIA does not grant to you
+under this Agreement any necessary patent or other rights with
+respect to any audio and/or video encoders and decoders.
+
+
+2.5. Licensing
+
+If the distribution terms in this Agreement are not suitable
+for your organization, or for any questions regarding this
+Agreement, please contact NVIDIA at
+nvidia-compute-license-questions@nvidia.com.
+```
+
+### 2.6. Attachment A — Redistributable CUDA Toolkit Components
+
+The following CUDA Toolkit files may be distributed with
+applications developed by you, including certain
+variations of these files that have version number or
+architecture specific information embedded in the file name -
+as an example only, for release version 9.0 of the 64-bit
+Windows software, the file cudart64_90.dll is redistributable.
+
+| Component | Windows | Mac OSX | Linux | Android | All |
+| --- | --- | --- | --- | --- | --- |
+| CUDA Runtime | cudart.dll, cudart_static.lib, cudadevrt.lib | libcudart.dylib, libcudart_static.a, libcudadevrt.a | libcudart.so, libcudart_static.a, libcudadevrt.a | libcudart.so, libcudart_static.a, libcudadevrt.a | — |
+| CUDA FFT Library | cufft.dll, cufftw.dll, cufft.lib, cufftw.lib | libcufft.dylib, libcufft_static.a, libcufftw.dylib, libcufftw_static.a | libcufft.so, libcufft_static.a, libcufftw.so, libcufftw_static.a | libcufft.so, libcufft_static.a, libcufftw.so, libcufftw_static.a | — |
+| CUDA BLAS Library | cublas.dll, cublasLt.dll | libcublas.dylib, libcublasLt.dylib, libcublas_static.a, libcublasLt_static.a | libcublas.so, libcublasLt.so, libcublas_static.a, libcublasLt_static.a | libcublas.so, libcublasLt.so, libcublas_static.a, libcublasLt_static.a | — |
+| NVIDIA "Drop-in" BLAS Library | nvblas.dll | libnvblas.dylib | libnvblas.so | — | — |
+| CUDA Sparse Matrix Library | cusparse.dll, cusparse.lib | libcusparse.dylib, libcusparse_static.a | libcusparse.so, libcusparse_static.a | libcusparse.so, libcusparse_static.a | — |
+| CUDA Linear Solver Library | cusolver.dll, cusolver.lib | libcusolver.dylib, libcusolver_static.a | libcusolver.so, libcusolver_static.a | libcusolver.so, libcusolver_static.a | — |
+| CUDA Random Number Generation Library | curand.dll, curand.lib | libcurand.dylib, libcurand_static.a | libcurand.so, libcurand_static.a | libcurand.so, libcurand_static.a | — |
+| NVIDIA Performance Primitives Library | nppc.dll, nppc.lib, nppial.dll, nppial.lib, nppicc.dll, nppicc.lib, nppicom.dll, nppicom.lib, nppidei.dll, nppidei.lib, nppif.dll, nppif.lib, nppig.dll, nppig.lib, nppim.dll, nppim.lib, nppist.dll, nppist.lib, nppisu.dll, nppisu.lib, nppitc.dll, nppitc.lib, npps.dll, npps.lib | libnppc.dylib, libnppc_static.a, libnppial.dylib, libnppial_static.a, libnppicc.dylib, libnppicc_static.a, libnppicom.dylib, libnppicom_static.a, libnppidei.dylib, libnppidei_static.a, libnppif.dylib, libnppif_static.a, libnppig.dylib, libnppig_static.a, libnppim.dylib, libnppisu_static.a, libnppitc.dylib, libnppitc_static.a, libnpps.dylib, libnpps_static.a | libnppc.so, libnppc_static.a, libnppial.so, libnppial_static.a, libnppicc.so, libnppicc_static.a, libnppicom.so, libnppicom_static.a, libnppidei.so, libnppidei_static.a, libnppif.so, libnppif_static.a libnppig.so, libnppig_static.a, libnppim.so, libnppim_static.a, libnppist.so, libnppist_static.a, libnppisu.so, libnppisu_static.a, libnppitc.so libnppitc_static.a, libnpps.so, libnpps_static.a | libnppc.so, libnppc_static.a, libnppial.so, libnppial_static.a, libnppicc.so, libnppicc_static.a, libnppicom.so, libnppicom_static.a, libnppidei.so, libnppidei_static.a, libnppif.so, libnppif_static.a libnppig.so, libnppig_static.a, libnppim.so, libnppim_static.a, libnppist.so, libnppist_static.a, libnppisu.so, libnppisu_static.a, libnppitc.so libnppitc_static.a, libnpps.so, libnpps_static.a | — |
+| NVIDIA JPEG Library | nvjpeg.lib, nvjpeg.dll | — | libnvjpeg.so, libnvjpeg_static.a | — | — |
+| Internal common library required for statically linking to cuBLAS, cuSPARSE, cuFFT, cuRAND, nvJPEG and NPP | — | libculibos.a | libculibos.a | — | — |
+| NVIDIA Runtime Compilation Library and Header | nvrtc.dll, nvrtc-builtins.dll | libnvrtc.dylib, libnvrtc-builtins.dylib | libnvrtc.so, libnvrtc-builtins.so, libnvrtc_static.a, libnvrtx-builtins_static.a | — | nvrtc.h |
+| NVIDIA Optimizing Compiler Library | nvvm.dll | libnvvm.dylib | libnvvm.so | — | — |
+| NVIDIA JIT Linking Library | libnvJitLink.dll, libnvJitLink.lib | — | libnvJitLink.so, libnvJitLink_static.a | — | — |
+| NVIDIA Common Device Math Functions Library | libdevice.10.bc | libdevice.10.bc | libdevice.10.bc | — | — |
+| CUDA Occupancy Calculation Header Library | — | — | — | — | cuda_occupancy.h |
+| CUDA Floating Point Type Headers | — | — | — | — | cuda_fp16.h, cuda_fp16.hpp, cuda_bf16.h, cuda_bf16.hpp, cuda_fp8.h, cuda_fp8.hpp, cuda_fp6.h, cuda_fp6.hpp, cuda_fp4.h, cuda_fp4.hpp |
+| CUDA Headers for Runtime Compilation | — | — | — | — | crt/host_defines.h, cuComplex.h, cuda_awbarrier_helpers.h, cuda_awbarrier_primitives.h, cuda_awbarrier.h, cuda_pipeline_helpers.h, ccuda_pipeline_primitives.h, ccuda_pipeline.h, cuda_runtime_api.h, cuda.h, cuda/std/tuple, cuda/std/type_traits, cuda/std/type_traits, cuda/std/utility, device_types.h, vector_functions.h, vector_types.h |
+| CUDA Profiling Tools Interface (CUPTI) Library | cupti.dll | libcupti.dylib | libcupti.so | — | — |
+| NVIDIA Tools Extension Library | nvToolsExt.dll, nvToolsExt.lib | libnvToolsExt.dylib | libnvToolsExt.so | — | — |
+| NVIDIA CUDA Driver Libraries | — | — | libcuda.so, libnvidia-ptxjitcompiler.so, libnvptxcompiler_static.a | — | — |
+| NVIDIA CUDA File IO Libraries and Header | — | — | libcufile.so, libcufile_rdma.so, libcufile_static.a, libcufile_rdma_static.a | — | cufile.h |
+
+```text
+In addition to the rights above, for parties that are
+developing software intended solely for use on Jetson
+development kits or Jetson modules, and running Linux for
+Tegra software, the following shall apply:
+
+  * The SDK may be distributed in its entirety, as provided by
+    NVIDIA, and without separation of its components, for you
+    and/or your licensees to create software development kits
+    for use only on the Jetson platform and running Linux for
+    Tegra software.
+```
+
+### 2.7. Attachment B
+
+```text
+
+
+
+Additional Licensing Obligations
+
+The following third party components included in the SOFTWARE
+are licensed to Licensee pursuant to the following terms and
+conditions:
+
+  1. Licensee's use of the GDB third party component is
+    subject to the terms and conditions of GNU GPL v3:
+
+    This product includes copyrighted third-party software licensed
+    under the terms of the GNU General Public License v3 ("GPL v3").
+    All third-party software packages are copyright by their respective
+    authors. GPL v3 terms and conditions are hereby incorporated into
+    the Agreement by this reference:     http://www.gnu.org/licenses/gpl.txt
+
+    Consistent with these licensing requirements, the software
+    listed below is provided under the terms of the specified
+    open source software licenses. To obtain source code for
+    software provided under licenses that require
+    redistribution of source code, including the GNU General
+    Public License (GPL) and GNU Lesser General Public License
+    (LGPL), contact oss-requests@nvidia.com. This offer is
+    valid for a period of three (3) years from the date of the
+    distribution of this product by NVIDIA CORPORATION.
+
+    Component          License
+    CUDA-GDB           GPL v3  
+
+  2. Licensee represents and warrants that any and all third
+    party licensing and/or royalty payment obligations in
+    connection with Licensee's use of the H.264 video codecs
+    are solely the responsibility of Licensee.
+
+  3. Licensee's use of the Thrust library is subject to the
+    terms and conditions of the Apache License Version 2.0.
+    All third-party software packages are copyright by their
+    respective authors. Apache License Version 2.0 terms and
+    conditions are hereby incorporated into the Agreement by
+    this reference.
+    http://www.apache.org/licenses/LICENSE-2.0.html
+
+    In addition, Licensee acknowledges the following notice:
+    Thrust includes source code from the Boost Iterator,
+    Tuple, System, and Random Number libraries.
+
+    Boost Software License - Version 1.0 - August 17th, 2003
+    . . . .
+    
+    Permission is hereby granted, free of charge, to any person or 
+    organization obtaining a copy of the software and accompanying 
+    documentation covered by this license (the "Software") to use, 
+    reproduce, display, distribute, execute, and transmit the Software, 
+    and to prepare derivative works of the Software, and to permit 
+    third-parties to whom the Software is furnished to do so, all 
+    subject to the following:
+    
+    The copyright notices in the Software and this entire statement, 
+    including the above license grant, this restriction and the following 
+    disclaimer, must be included in all copies of the Software, in whole 
+    or in part, and all derivative works of the Software, unless such 
+    copies or derivative works are solely in the form of machine-executable 
+    object code generated by a source language processor.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND 
+    NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR 
+    ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR 
+    OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+    OTHER DEALINGS IN THE SOFTWARE.  
+
+  4. Licensee's use of the LLVM third party component is
+    subject to the following terms and conditions:
+
+    ======================================================
+    LLVM Release License
+    ======================================================
+    University of Illinois/NCSA
+    Open Source License
+    
+    Copyright (c) 2003-2010 University of Illinois at Urbana-Champaign.
+    All rights reserved.
+    
+    Developed by:
+    
+        LLVM Team
+    
+        University of Illinois at Urbana-Champaign
+    
+        http://llvm.org
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to 
+    deal with the Software without restriction, including without limitation the
+    rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
+    sell copies of the Software, and to permit persons to whom the Software is 
+    furnished to do so, subject to the following conditions:
+    
+    *  Redistributions of source code must retain the above copyright notice, 
+       this list of conditions and the following disclaimers.
+    
+    *  Redistributions in binary form must reproduce the above copyright 
+       notice, this list of conditions and the following disclaimers in the 
+       documentation and/or other materials provided with the distribution.
+    
+    *  Neither the names of the LLVM Team, University of Illinois at Urbana-
+       Champaign, nor the names of its contributors may be used to endorse or
+       promote products derived from this Software without specific prior 
+       written permission.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL 
+    THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR 
+    OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS WITH THE SOFTWARE.  
+
+  5. Licensee's use of the PCRE third party component is
+    subject to the following terms and conditions:
+
+    ------------
+    PCRE LICENCE
+    ------------
+    PCRE is a library of functions to support regular expressions whose syntax
+    and semantics are as close as possible to those of the Perl 5 language.
+    Release 8 of PCRE is distributed under the terms of the "BSD" licence, as
+    specified below. The documentation for PCRE, supplied in the "doc" 
+    directory, is distributed under the same terms as the software itself. The
+    basic library functions are written in C and are freestanding. Also 
+    included in the distribution is a set of C++ wrapper functions, and a just-
+    in-time compiler that can be used to optimize pattern matching. These are 
+    both optional features that can be omitted when the library is built.
+    
+    THE BASIC LIBRARY FUNCTIONS
+    ---------------------------
+    Written by:       Philip Hazel
+    Email local part: ph10
+    Email domain:     cam.ac.uk
+    University of Cambridge Computing Service,
+    Cambridge, England.
+    Copyright (c) 1997-2012 University of Cambridge
+    All rights reserved.
+    
+    PCRE JUST-IN-TIME COMPILATION SUPPORT
+    -------------------------------------
+    Written by:       Zoltan Herczeg
+    Email local part: hzmester
+    Emain domain:     freemail.hu
+    Copyright(c) 2010-2012 Zoltan Herczeg
+    All rights reserved.
+    
+    STACK-LESS JUST-IN-TIME COMPILER
+    --------------------------------
+    Written by:       Zoltan Herczeg
+    Email local part: hzmester
+    Emain domain:     freemail.hu
+    Copyright(c) 2009-2012 Zoltan Herczeg
+    All rights reserved.
+    
+    THE C++ WRAPPER FUNCTIONS
+    -------------------------
+    Contributed by:   Google Inc.
+    Copyright (c) 2007-2012, Google Inc.
+    All rights reserved.
+
+    THE "BSD" LICENCE
+    -----------------
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+    
+      * Redistributions of source code must retain the above copyright notice, 
+        this list of conditions and the following disclaimer.
+    
+      * Redistributions in binary form must reproduce the above copyright 
+        notice, this list of conditions and the following disclaimer in the 
+        documentation and/or other materials provided with the distribution.
+    
+      * Neither the name of the University of Cambridge nor the name of Google 
+        Inc. nor the names of their contributors may be used to endorse or 
+        promote products derived from this software without specific prior 
+        written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+    AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+    ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE 
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+    POSSIBILITY OF SUCH DAMAGE.  
+
+  6. Some of the cuBLAS library routines were written by or
+    derived from code written by Vasily Volkov and are subject
+    to the Modified Berkeley Software Distribution License as
+    follows:
+
+    Copyright (c) 2007-2009, Regents of the University of California
+    
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided
+          with the distribution.
+        * Neither the name of the University of California, Berkeley nor
+          the names of its contributors may be used to endorse or promote
+          products derived from this software without specific prior
+          written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.  
+
+  7. Some of the cuBLAS library routines were written by or
+    derived from code written by Davide Barbieri and are
+    subject to the Modified Berkeley Software Distribution
+    License as follows:
+
+    Copyright (c) 2008-2009 Davide Barbieri @ University of Rome Tor Vergata.
+    
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided
+          with the distribution.
+        * The name of the author may not be used to endorse or promote
+          products derived from this software without specific prior
+          written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.  
+
+  8. Some of the cuBLAS library routines were derived from
+    code developed by the University of Tennessee and are
+    subject to the Modified Berkeley Software Distribution
+    License as follows:
+
+    Copyright (c) 2010 The University of Tennessee.
+    
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer listed in this license in the documentation and/or
+          other materials provided with the distribution.
+        * Neither the name of the copyright holders nor the names of its
+          contributors may be used to endorse or promote products derived
+          from this software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  9. Some of the cuBLAS library routines were written by or
+    derived from code written by Jonathan Hogg and are subject
+    to the Modified Berkeley Software Distribution License as
+    follows:
+
+    Copyright (c) 2012, The Science and Technology Facilities Council (STFC).
+    
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided
+          with the distribution.
+        * Neither the name of the STFC nor the names of its contributors
+          may be used to endorse or promote products derived from this
+          software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE STFC BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+    BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+    WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+    OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  10. Some of the cuBLAS library routines were written by or
+    derived from code written by Ahmad M. Abdelfattah, David
+    Keyes, and Hatem Ltaief, and are subject to the Apache
+    License, Version 2.0, as follows:
+
+     -- (C) Copyright 2013 King Abdullah University of Science and Technology
+      Authors:
+      Ahmad Abdelfattah (ahmad.ahmad@kaust.edu.sa)
+      David Keyes (david.keyes@kaust.edu.sa)
+      Hatem Ltaief (hatem.ltaief@kaust.edu.sa)
+    
+      Redistribution  and  use  in  source and binary forms, with or without
+      modification,  are  permitted  provided  that the following conditions
+      are met:
+    
+      * Redistributions  of  source  code  must  retain  the above copyright
+        notice,  this  list  of  conditions  and  the  following  disclaimer.
+      * Redistributions  in  binary  form must reproduce the above copyright
+        notice,  this list of conditions and the following disclaimer in the
+        documentation  and/or other materials provided with the distribution.
+      * Neither  the  name of the King Abdullah University of Science and
+        Technology nor the names of its contributors may be used to endorse 
+        or promote products derived from this software without specific prior 
+        written permission.
+    
+      THIS  SOFTWARE  IS  PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+      ``AS IS''  AND  ANY  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+      LIMITED  TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+      A  PARTICULAR  PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+      HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+      SPECIAL,  EXEMPLARY,  OR  CONSEQUENTIAL  DAMAGES  (INCLUDING,  BUT NOT
+      LIMITED  TO,  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+      DATA,  OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+      THEORY  OF  LIABILITY,  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+      (INCLUDING  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+      OF  THIS  SOFTWARE,  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE  
+
+  11. Some of the cuSPARSE library routines were written by or
+    derived from code written by Li-Wen Chang and are subject
+    to the NCSA Open Source License as follows:
+
+    Copyright (c) 2012, University of Illinois.
+    
+    All rights reserved.
+    
+    Developed by: IMPACT Group, University of Illinois, http://impact.crhc.illinois.edu
+    
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal with the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimers in the documentation and/or other materials provided
+          with the distribution.
+        * Neither the names of IMPACT Group, University of Illinois, nor
+          the names of its contributors may be used to endorse or promote
+          products derived from this Software without specific prior
+          written permission.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT
+    HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+    IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS WITH THE
+    SOFTWARE.  
+
+  12. Some of the cuRAND library routines were written by or
+    derived from code written by Mutsuo Saito and Makoto
+    Matsumoto and are subject to the following license:
+
+    Copyright (c) 2009, 2010 Mutsuo Saito, Makoto Matsumoto and Hiroshima
+    University. All rights reserved.
+    
+    Copyright (c) 2011 Mutsuo Saito, Makoto Matsumoto, Hiroshima
+    University and University of Tokyo.  All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions and the following
+          disclaimer in the documentation and/or other materials provided
+          with the distribution.
+        * Neither the name of the Hiroshima University nor the names of
+          its contributors may be used to endorse or promote products
+          derived from this software without specific prior written
+          permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  13. Some of the cuRAND library routines were derived from
+    code developed by D. E. Shaw Research and are subject to
+    the following license:
+
+    Copyright 2010-2011, D. E. Shaw Research.
+    
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions, and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+          copyright notice, this list of conditions, and the following
+          disclaimer in the documentation and/or other materials provided
+          with the distribution.
+        * Neither the name of D. E. Shaw Research nor the names of its
+          contributors may be used to endorse or promote products derived
+          from this software without specific prior written permission.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  14. Some of the Math library routines were written by or
+    derived from code developed by Norbert Juffa and are
+    subject to the following license:
+
+    Copyright (c) 2015-2017, Norbert Juffa
+    All rights reserved.
+    
+    Redistribution and use in source and binary forms, with or without 
+    modification, are permitted provided that the following conditions
+    are met:
+    
+    1. Redistributions of source code must retain the above copyright 
+       notice, this list of conditions and the following disclaimer.
+    
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT 
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT 
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  15. Licensee's use of the lz4 third party component is
+    subject to the following terms and conditions:
+
+    Copyright (C) 2011-2013, Yann Collet.
+    BSD 2-Clause License (http://www.opensource.org/licenses/bsd-license.php)
+    
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+    
+        * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following disclaimer
+    in the documentation and/or other materials provided with the
+    distribution.
+    
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+    A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+    OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+    LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+    DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+    THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+    (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.  
+
+  16. The NPP library uses code from the Boost Math Toolkit,
+    and is subject to the following license:
+
+    Boost Software License - Version 1.0 - August 17th, 2003
+    . . . .
+    
+    Permission is hereby granted, free of charge, to any person or 
+    organization obtaining a copy of the software and accompanying 
+    documentation covered by this license (the "Software") to use, 
+    reproduce, display, distribute, execute, and transmit the Software, 
+    and to prepare derivative works of the Software, and to permit 
+    third-parties to whom the Software is furnished to do so, all 
+    subject to the following:
+    
+    The copyright notices in the Software and this entire statement, 
+    including the above license grant, this restriction and the following 
+    disclaimer, must be included in all copies of the Software, in whole 
+    or in part, and all derivative works of the Software, unless such 
+    copies or derivative works are solely in the form of machine-executable 
+    object code generated by a source language processor.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF 
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND 
+    NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR 
+    ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE FOR ANY DAMAGES OR 
+    OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING 
+    FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+    OTHER DEALINGS IN THE SOFTWARE.  
+
+  17. Portions of the Nsight Eclipse Edition is subject to the
+    following license:
+
+    The Eclipse Foundation makes available all content in this plug-in
+    ("Content"). Unless otherwise indicated below, the Content is provided
+    to you under the terms and conditions of the Eclipse Public License
+    Version 1.0 ("EPL"). A copy of the EPL is available at http://
+    www.eclipse.org/legal/epl-v10.html. For purposes of the EPL, "Program"
+    will mean the Content.
+    
+    If you did not receive this Content directly from the Eclipse
+    Foundation, the Content is being redistributed by another party
+    ("Redistributor") and different terms and conditions may apply to your
+    use of any object code in the Content. Check the Redistributor's
+    license that was provided with the Content. If no such license exists,
+    contact the Redistributor. Unless otherwise indicated below, the terms
+    and conditions of the EPL still apply to any source code in the
+    Content and such source code may be obtained at http://www.eclipse.org.  
+
+  18. Some of the cuBLAS library routines uses code from
+    OpenAI, which is subject to the following license:
+
+    License URL 
+    https://github.com/openai/openai-gemm/blob/master/LICENSE
+    
+    License Text 
+    The MIT License
+    
+    Copyright (c) 2016 OpenAI (http://openai.com), 2016 Google Inc.
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.   
+
+  19. Licensee's use of the Visual Studio Setup Configuration
+    Samples is subject to the following license:
+
+    The MIT License (MIT) 
+    Copyright (C) Microsoft Corporation. All rights reserved.
+    
+    Permission is hereby granted, free of charge, to any person 
+    obtaining a copy of this software and associated documentation 
+    files (the "Software"), to deal in the Software without restriction, 
+    including without limitation the rights to use, copy, modify, merge, 
+    publish, distribute, sublicense, and/or sell copies of the Software, 
+    and to permit persons to whom the Software is furnished to do so, 
+    subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included 
+    in all copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS 
+    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  
+
+ 20. Licensee's use of linmath.h header for CPU functions for
+     GL vector/matrix operations from lunarG is subject to the
+     Apache License Version 2.0.
+
+ 21. The DX12-CUDA sample uses the d3dx12.h header, which is
+     subject to the MIT license.
+
+ 22. Components of the driver and compiler used for binary management, including 
+      nvFatBin, nvcc, and cuobjdump, use the Zstandard library which is subject to
+      the following license:
+
+      BSD License
+
+      For Zstandard software
+
+      Copyright (c) Meta Platforms, Inc. and affiliates. All rights reserved.
+
+      Redistribution and use in source and binary forms, with or without modification,
+      are permitted provided that the following conditions are met:
+
+        * Redistributions of source code must retain the above copyright notice, this
+          list of conditions and the following disclaimer.
+
+        * Redistributions in binary form must reproduce the above copyright notice,
+          this list of conditions and the following disclaimer in the documentation
+          and/or other materials provided with the distribution.
+
+        * Neither the name Facebook, nor Meta, nor the names of its contributors may
+          be used to endorse or promote products derived from this software without
+          specific prior written permission.
+
+     THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+     ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+     WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+     DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY
+     DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+     BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+     OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+     WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
+     OF SUCH DAMAGE.
+
+
+  23. Portions of support for math operations on 128-bit floating-point data type in compiler
+      were derived from SLEEF library which is subject to the following license:
+
+     Boost Software License - Version 1.0 - August 17th, 2003
+
+    Permission is hereby granted, free of charge, to any person or organization
+    obtaining a copy of the software and accompanying documentation covered by
+    this license (the "Software") to use, reproduce, display, distribute,
+    execute, and transmit the Software, and to prepare derivative works of the
+    Software, and to permit third-parties to whom the Software is furnished to
+    do so, all subject to the following:
+
+    The copyright notices in the Software and this entire statement, including
+    the above license grant, this restriction and the following disclaimer,
+    must be included in all copies of the Software, in whole or in part, and
+    all derivative works of the Software, unless such copies or derivative
+    works are solely in the form of machine-executable object code generated by
+    a source language processor.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+    SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+    FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+    ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS IN THE SOFTWARE.
+   
+ 24. Portions of support for math operations on 128-bit floating-point data type
+     in compiler were derived from SoftFloat library which is subject to the following license:
+
+    The SoftFloat package was written by me, John R. Hauser. Release 3 of SoftFloat
+    was a completely new implementation supplanting earlier releases. The project to
+    create Release 3 (now through 3e) was done in the employ of the University of
+    California, Berkeley, within the Department of Electrical Engineering and
+    Computer Sciences, first for the Parallel Computing Laboratory (Par Lab) and
+    then for the ASPIRE Lab. The work was officially overseen by Prof. Krste
+    Asanovic, with funding provided by these sources:
+
+    Par Lab: Microsoft (Award #024263), Intel (Award #024894), and U.C. Discovery
+    (Award #DIG07-10227), with additional support from Par Lab affiliates Nokia,
+    NVIDIA, Oracle, and Samsung.
+    ASPIRE Lab: DARPA PERFECT program (Award #HR0011-12-2-0016), with additional
+    support from ASPIRE industrial sponsor Intel and ASPIRE affiliates Google, Nokia,
+    NVIDIA, Oracle, and Samsung.
+    The following applies to the whole of SoftFloat Release 3e as well as to each
+    source file individually.
+
+    Copyright 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018 The Regents of the
+    University of California. All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without modification,
+    are permitted provided that the following conditions are met:
+
+    Redistributions in binary form must reproduce the above copyright notice, this
+    list of conditions, and the following disclaimer in the documentation and/or
+    other materials provided with the distribution.
+
+    Neither the name of the University nor the names of its contributors may be used
+    to endorse or promote products derived from this software without specific prior
+    written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS", AND ANY EXPRESS
+    OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+    MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ARE DISCLAIMED. IN NO EVENT
+    SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+    BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+-----------------
+```
+
+---
+
+## NVIDIA Fabric Manager (grouped with 2 other entries sharing this license)
+
+**Entries covered by the license text below:**
+
+- **NVIDIA Fabric Manager; version 580.105.08 (matches Nvidia Driver; 550.127.08 on AL2)** — <https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/>
+- **NVIDIA IMEX; version 580.105.08 (matches Nvidia Driver; 550.127.08 on AL2)** — <https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/>
+- **NVIDIA NVLSM; version 2025.03.9-1** — <https://docs.nvidia.com/networking/display/mlnxofedv461000/nvidia+subnet+manager>
+
+```text
+
+    * Package NVIDIA Fabric Manager's source/binary may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_fabric/
+
+    * Package NVIDIA IMEX's source/binary may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_imex/
+
+    * Package NVIDIA NVLSM's source/binary may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_nvlsm/
+
+The nvidia-fabricmanager, nvidia-imex, and nvlsm packages are installed
+from NVIDIA-signed RPMs. Each carries its own LICENSE file at
+/usr/share/licenses/<package>/LICENSE on the built ParallelCluster AMI.
+The three LICENSE files share the same legal text (the "License For
+Customer Use of NVIDIA Software" template), reproduced once below.
+Each package also ships its own third-party-notices file listing the
+third-party components it bundles; those notices are reproduced
+separately after the shared LICENSE.
+
+           License For Customer Use of NVIDIA Software
+
+
+IMPORTANT NOTICE -- READ CAREFULLY: This License For Customer Use of
+NVIDIA Software ("LICENSE") is the agreement which governs use of
+the software of NVIDIA Corporation and its subsidiaries ("NVIDIA")
+downloadable herefrom, including computer software and associated
+printed materials ("SOFTWARE").  By downloading, installing, copying,
+or otherwise using the SOFTWARE, you agree to be bound by the terms
+of this LICENSE.  If you do not agree to the terms of this LICENSE,
+do not download the SOFTWARE.
+
+RECITALS
+
+Use of NVIDIA's products requires three elements: the SOFTWARE, the
+hardware on a graphics controller board, and a personal computer. The
+SOFTWARE is protected by copyright laws and international copyright
+treaties, as well as other intellectual property laws and treaties.
+The SOFTWARE is not sold, and instead is only licensed for use,
+strictly in accordance with this document.  The hardware is protected
+by various patents, and is sold, but this agreement does not cover
+that sale, since it may not necessarily be sold as a package with
+the SOFTWARE.  This agreement sets forth the terms and conditions
+of the SOFTWARE LICENSE only.
+
+1.  DEFINITIONS
+
+1.1  Customer.  Customer means the entity or individual that
+downloads the SOFTWARE.
+
+2.  GRANT OF LICENSE
+
+2.1  Rights and Limitations of Grant.  NVIDIA hereby grants Customer
+the following non-exclusive, non-transferable right to use the
+SOFTWARE, with the following limitations:
+
+2.1.1  Rights.  Customer may install and use multiple copies of the
+SOFTWARE on a shared computer or concurrently on different computers,
+and make multiple back-up copies of the SOFTWARE, solely for Customer's
+use within Customer's Enterprise. "Enterprise" shall mean individual use
+by Customer or any legal entity (such as a corporation or university)
+and the subsidiaries it owns by more than fifty percent (50%).
+
+2.1.2  Linux/FreeBSD Exception.  Notwithstanding the foregoing terms
+of Section 2.1.1, SOFTWARE designed exclusively for use on the Linux or
+FreeBSD operating systems, or other operating systems derived from the
+source code to these operating systems, may be copied and redistributed,
+provided that the binary files thereof are not modified in any way
+(except for unzipping of compressed files).
+
+2.1.3  Limitations.
+
+No Reverse Engineering.  Customer may not reverse engineer,
+decompile, or disassemble the SOFTWARE, nor attempt in any other
+manner to obtain the source code.
+
+No Separation of Components.  The SOFTWARE is licensed as a
+single product.  Its component parts may not be separated for use
+on more than one computer, nor otherwise used separately from the
+other parts.
+
+No Rental.  Customer may not rent or lease the SOFTWARE to someone
+else.
+
+3.  TERMINATION
+
+This LICENSE will automatically terminate if Customer fails to
+comply with any of the terms and conditions hereof.  In such event,
+Customer must destroy all copies of the SOFTWARE and all of its
+component parts.
+
+Defensive Suspension.  If Customer commences or participates in any legal
+proceeding against NVIDIA, then NVIDIA may, in its sole discretion,
+suspend or terminate all license grants and any other rights provided
+under this LICENSE during the pendency of such legal proceedings.
+
+4.  COPYRIGHT
+
+All title and copyrights in and to the SOFTWARE (including but
+not limited to all images, photographs, animations, video, audio,
+music, text, and other information incorporated into the SOFTWARE),
+the accompanying printed materials, and any copies of the SOFTWARE,
+are owned by NVIDIA, or its suppliers.  The SOFTWARE is protected
+by copyright laws and international treaty provisions.  Accordingly,
+Customer is required to treat the SOFTWARE like any other copyrighted
+material, except as otherwise allowed pursuant to this LICENSE
+and that it may make one copy of the SOFTWARE solely for backup or
+archive purposes.
+
+5.  APPLICABLE LAW
+
+This agreement shall be deemed to have been made in, and shall be
+construed pursuant to, the laws of the State of California.
+
+6.  DISCLAIMER OF WARRANTIES AND LIMITATION ON LIABILITY
+
+6.1  No Warranties.  TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE
+LAW, THE SOFTWARE IS PROVIDED "AS IS" AND NVIDIA AND ITS SUPPLIERS
+DISCLAIM ALL WARRANTIES, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT
+NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE.
+
+6.2  No Liability for Consequential Damages.  TO THE MAXIMUM
+EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL NVIDIA OR
+ITS SUPPLIERS BE LIABLE FOR ANY SPECIAL, INCIDENTAL, INDIRECT, OR
+CONSEQUENTIAL DAMAGES WHATSOEVER (INCLUDING, WITHOUT LIMITATION,
+DAMAGES FOR LOSS OF BUSINESS PROFITS, BUSINESS INTERRUPTION, LOSS
+OF BUSINESS INFORMATION, OR ANY OTHER PECUNIARY LOSS) ARISING OUT
+OF THE USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF NVIDIA HAS
+BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+6.3  Specific Use.  SOFTWARE is licensed only for use with NVIDIA products.
+Customer's use of NVIDIA products with any other firmware is at its own
+risk and may cause an NVIDIA product to become non-compliant with certain
+of its certification markings.
+
+7.  MISCELLANEOUS
+
+The United Nations Convention on Contracts for the International
+Sale of Goods is specifically disclaimed.  If any provision of this
+LICENSE is inconsistent with, or cannot be fully enforced under,
+the law, such provision will be construed as limited to the extent
+necessary to be consistent with and fully enforceable under the law.
+This agreement is the final, complete and exclusive agreement between
+the parties relating to the subject matter hereof, and supersedes
+all prior or contemporaneous understandings and agreements relating
+to such subject matter, whether oral or written.  Customer agrees
+that it will not ship, transfer or export the SOFTWARE into any
+country, or use the SOFTWARE in any manner, prohibited by the
+United States Bureau of Export Administration or any export laws,
+restrictions or regulations.  This LICENSE may only be modified in
+writing signed by an authorized officer of NVIDIA.
+
+Third-Party Components Bundled in NVIDIA Fabric Manager
+-------------------------------------------------------
+Source: /usr/share/licenses/nvidia-fabricmanager/third-party-notices.txt
+
+This Third Party Notices file provides notices and information about third
+party components included in the SOFTWARE. The following third party
+components are licensed to Licensee pursuant to the following terms and conditions:
+
+1. Licensee's use of Google Protobuffers 3.20.1 is subject to the terms and conditions of the
+3-clause BSD License. All third-party software packages are copyright by their
+respective authors. The 3-clause BSD License terms and conditions are hereby
+incorporated into the Agreement by this reference. https://github.com/protocolbuffers/protobuf/blob/main/LICENSE
+
+2. Licensee's use of libevent 2.0.22 is subject to the terms and conditions of the
+3-clause BSD License. All third-party software packages are copyright by their
+respective authors. The 3-clause BSD License terms and conditions are hereby
+incorporated into the Agreement by this referece. http://libevent.org/LICENSE.txt
+
+==============================
+Copyright (c) 2000-2007 Niels Provos <provos@citi.umich.edu>
+Copyright (c) 2007-2010 Niels Provos and Nick Mathewson
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+   notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+   notice, this list of conditions and the following disclaimer in the
+   documentation and/or other materials provided with the distribution.
+3. The name of the author may not be used to endorse or promote products
+   derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+3. Licensee's use of the Multi-Threaded Libevent Server Example is subject to
+the terms and conditions of the BSD License. All third-party software packages
+are copyright by their respective authors. The BSD License terms and conditions are hereby
+incorporated into the Agreement by this referece.
+http://sourceforge.net/projects/libevent-thread/files/?source=navbar
+
+Copyright (c) 2012, Ronald B. Cemer
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer. Redistributions in binary
+form must reproduce the above copyright notice, this list of conditions and
+the following disclaimer in the documentation and/or other materials provided
+with the distribution. Neither the name of Ronald B. Cemer nor the names of
+its contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+4. Licensee's use of OpenSSL 3.x is subject to the terms and conditions of the Apache License 2.0.
+All third party software packages are copyright by their respective authors. The Apache License 2.0
+terms and conditions are hereby incorporated into the Agreement by this reference.
+https://www.openssl.org/source/apache-license-2.0.txt
+
+5. Licensee's use of gRPC 1.45 is subject to the terms and conditions of the
+Apache License 2.0, 3-clause BSD License and Mozilla Public License Version 2.0.
+All third-party software packages are copyright by their
+respective authors. The Apache License 2.0, 3-clause BSD License
+and Mozilla Public License Version 2.0 terms and conditions are hereby
+incorporated into the Agreement by this referece. https://github.com/grpc/grpc/blob/master/LICENSE
+(The Apache-2.0, BSD-3-Clause, and MPL-2.0 full license texts are reproduced
+in full earlier in this document and in the MySQL block's Standard Licenses
+section; they are not duplicated here. The gRPC-specific copyright header is:)
+
+==============================
+Copyright 2008 Google Inc.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+    * Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above
+copyright notice, this list of conditions and the following disclaimer
+in the documentation and/or other materials provided with the
+distribution.
+    * Neither the name of Google Inc. nor the names of its
+contributors may be used to endorse or promote products derived from
+this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Code generated by the Protocol Buffer compiler is owned by the owner
+of the input file used when generating it.  This code is not
+standalone and requires a support library to be linked with it.  This
+support library is itself covered by the above license.
+==============================
+
+6. Licensee's use of lmdb is subject to the terms and conditions of the
+OpenLDAP Public License. All third-party software packages are copyright by their
+respective authors. The OpenLDAP Public License terms and conditions are hereby
+incorporated into the Agreement by this reference.
+https://github.com/LMDB/lmdb/blob/mdb.master/libraries/liblmdb/LICENSE
+
+The OpenLDAP Public License
+  Version 2.8, 17 August 2003
+
+Redistribution and use of this software and associated documentation
+("Software"), with or without modification, are permitted provided
+that the following conditions are met:
+
+1. Redistributions in source form must retain copyright statements
+   and notices,
+
+2. Redistributions in binary form must reproduce applicable copyright
+   statements and notices, this list of conditions, and the following
+   disclaimer in the documentation and/or other materials provided
+   with the distribution, and
+
+3. Redistributions must contain a verbatim copy of this document.
+
+The OpenLDAP Foundation may revise this license from time to time.
+Each revision is distinguished by a version number.  You may use
+this Software under terms of this license revision or under the
+terms of any subsequent revision of the license.
+
+THIS SOFTWARE IS PROVIDED BY THE OPENLDAP FOUNDATION AND ITS
+CONTRIBUTORS ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT
+SHALL THE OPENLDAP FOUNDATION, ITS CONTRIBUTORS, OR THE AUTHOR(S)
+OR OWNER(S) OF THE SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+The names of the authors and copyright holders must not be used in
+advertising or otherwise to promote the sale, use or other dealing
+in this Software without specific, written prior permission.  Title
+to copyright in this Software shall at all times remain with copyright
+holders.
+
+OpenLDAP is a registered trademark of the OpenLDAP Foundation.
+
+Copyright 1999-2003 The OpenLDAP Foundation, Redwood City,
+California, USA.  All Rights Reserved.  Permission to copy and
+distribute verbatim copies of this document is granted.
+
+7. Licensee's use of libibumad is subject to the terms and conditions of the
+OpenIB.org BSD (FreeBSD variant) License. All third-party software packages are
+copyright by their respective authors. The OpenIB.org BSD (FreeBSD variant) License
+terms and conditions are hereby incorporated into the Agreement by this reference.
+https://github.com/linux-rdma/rdma-core/blob/master/COPYING.BSD_FB
+
+
+                   OpenIB.org BSD license (FreeBSD Variant)
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+  - Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
+
+  - Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Third-Party Components Bundled in NVIDIA NVLSM
+----------------------------------------------
+Source: /usr/share/nvidia/nvlsm/third-party-notices.txt
+
+NVLSM's third-party notices overlap with Fabric Manager's (libibumad, Google
+Protobuffers, gRPC) — those are covered above. NVLSM additionally bundles:
+
+1. Licensee's use of opensm is subject to the terms and conditions of the
+OpenIB.org BSD (FreeBSD variant) License. All third-party software packages are
+copyright by their respective authors. The OpenIB.org BSD (FreeBSD variant) License
+terms and conditions are hereby incorporated into the Agreement by this reference.
+https://github.com/linux-rdma/opensm/blob/master/COPYING
+(License text is the same OpenIB.org BSD (FreeBSD Variant) reproduced above
+under Fabric Manager's libibumad entry.)
+```
+
+---
+
+## NVIDIA DCGM; version 4.5.1-1 (datacenter-gpu-manager-4-core + datacenter-gpu-manager-4-cuda13; 3.3.6-1 on AL2)
+
+<https://developer.nvidia.com/dcgm>
+
+```text
+
+    * Package NVIDIA DCGM's source/binary may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_dcgm/
+      Upstream source: https://github.com/NVIDIA/DCGM (Apache-2.0)
+
+The installed DCGM packages (datacenter-gpu-manager-4-core,
+datacenter-gpu-manager-4-cuda13) declare License: NVIDIA Proprietary in RPM
+metadata and ship the "NVIDIA Data Center GPU Manager License" reproduced
+below (v. January 22, 2021) at /usr/share/licenses/datacenter-gpu-manager-4-core-4.5.1/LICENSE
+and the identical text at /usr/share/licenses/datacenter-gpu-manager-4-cuda13-4.5.1/LICENSE.
+This proprietary license governs the binary packages as redistributed by
+NVIDIA. A separate third-party-notices.txt (reproduced after this LICENSE)
+covers open-source components bundled inside DCGM.
+
+                 NVIDIA DATA CENTER GPU MANAGER LICENSE
+
+This license is a legal agreement between you and NVIDIA Corporation ("NVIDIA")
+and governs your use of the NVIDIA Data Center GPU Manager (DCGM) software and
+materials provided hereunder ("SOFTWARE").
+
+This license can be accepted only by an adult of legal age of majority in the
+country in which the SOFTWARE is used. If you are under the legal age of
+majority, you must ask your parent or legal guardian to consent to this license.
+If you are entering into this license on behalf of a company or other legal
+entity, you represent that you have legal authority and "you" will mean the
+entity you represent.
+
+By using the SOFTWARE, you affirm that you have reached the legal age of
+majority, you accept the terms of this license, and you take legal and financial
+responsibility for the actions of your permitted users.
+
+You agree to use the SOFTWARE only for purposes that are permitted by (a) this
+license, and (b) any applicable law, regulation or generally accepted practices
+or guidelines in the relevant jurisdictions.
+
+1. LICENSE
+Subject to the terms of this license, NVIDIA hereby grants you a
+non-exclusive, non-transferable license to install and use the SOFTWARE for your
+purposes in systems with NVIDIA GPUs.
+
+2. LIMITATIONS
+Your license to use the SOFTWARE is restricted as follows:
+a. You may not reverse engineer, decompile or disassemble, or remove copyright
+or other proprietary notices from any portion of the SOFTWARE or copies of the
+SOFTWARE.
+b. You may not modify or create derivative works of any portion of the SOFTWARE.
+c. Except as provided in this license, you may not sell, rent, sublicense,
+transfer or distribute the SOFTWARE, or make its functionality available to
+others.
+d. You may not bypass, disable, or circumvent any technical limitations,
+encryption, security, digital rights management or authentication mechanism in
+the SOFTWARE.
+e. You may not use the SOFTWARE in any manner that would cause it to become
+subject to an open source software license. As examples, licenses that require
+as a condition of use, modification, and/or distribution that the SOFTWARE be
+(i) disclosed or distributed in source code form; (ii) licensed for the purpose
+of making derivative works; or (iii) redistributable at no charge.
+
+3. AUTHORIZED USERS
+You may allow employees and contractors of your entity or
+of your subsidiary(ies) to access and use the SOFTWARE from your secure network
+to perform work on your behalf. If you are an academic institution you may allow
+users enrolled or employed by the academic institution to access and use the
+SOFTWARE from your secure network. You are responsible for the compliance with
+the terms of this license by your authorized users.
+
+4. UPDATES
+NVIDIA is not obligated to support or update the SOFTWARE. This
+license also applies to SOFTWARE patches, workarounds or other updates, unless
+other terms accompany those items.
+
+5. PRE-RELEASE VERSIONS
+SOFTWARE versions identified as alpha, beta, preview,
+early access or otherwise as pre-release may not be fully functional, may
+contain errors or design flaws, and may have reduced or different security,
+privacy, availability, and reliability standards relative to commercial versions
+of NVIDIA software and materials. You may use a pre-release SOFTWARE version at
+your own risk, understanding that these versions are not intended for use in
+production or business-critical systems.
+
+6. THIRD-PARTY COMPONENTS
+The SOFTWARE may include third-party components with
+separate legal notices or terms as may be described in proprietary notices
+accompanying the SOFTWARE. If and to the extent there is a conflict between the
+terms in this license and the third-party license terms, the third-party terms
+control only to the extent necessary to resolve the conflict.
+
+7. OWNERSHIP
+NVIDIA reserves all rights, title and interest in and to the
+SOFTWARE not expressly granted to you under this license. The SOFTWARE and the
+related intellectual property rights therein are and will remain the sole and
+exclusive property of NVIDIA or its licensors. The SOFTWARE is copyrighted and
+protected by the laws of the United States and other countries, and
+international treaty provisions.
+
+8. FEEDBACK
+You may, but are not obligated to, provide to NVIDIA suggestions,
+fixes, modifications, feature requests or other feedback regarding the SOFTWARE
+("Feedback"). For any Feedback that you voluntarily provide, you hereby grant
+NVIDIA and its affiliates a perpetual, non-exclusive, worldwide, irrevocable
+license to use, reproduce, modify, license, sublicense (through multiple tiers
+of sublicensees), and distribute (through multiple tiers of distributors) the
+Feedback without the payment of any royalties or fees to you. NVIDIA will use
+Feedback at its choice.
+
+9. NO WARRANTIES
+THE SOFTWARE IS PROVIDED "AS IS" WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTY OF ANY KIND INCLUDING, BUT NOT LIMITED TO, WARRANTIES OF
+MERCHANTABILITY, NONINFRINGEMENT, OR FITNESS FOR A PARTICULAR PURPOSE. NVIDIA
+DOES NOT WARRANT THAT THE SOFTWARE WILL MEET YOUR REQUIREMENTS OR THAT THE
+OPERATION THEREOF WILL BE UNINTERRUPTED OR ERROR-FREE, OR THAT ALL ERRORS WILL
+BE CORRECTED. NVIDIA does not warrant or assume responsibility for the accuracy
+or completeness of any information, text, graphics, links or other items
+contained within the SOFTWARE.
+
+10. LIMITATIONS OF LIABILITY
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, NVIDIA
+AND ITS AFFILIATES SHALL NOT BE LIABLE FOR ANY SPECIAL, INCIDENTAL, PUNITIVE OR
+CONSEQUENTIAL DAMAGES, OR ANY LOST PROFITS, PROJECT DELAYS, LOSS OF USE, LOSS OF
+DATA OR LOSS OF GOODWILL, OR THE COSTS OF PROCURING SUBSTITUTE PRODUCTS, ARISING
+OUT OF OR IN CONNECTION WITH THIS LICENSE OR THE USE OR PERFORMANCE OF THE
+SOFTWARE, WHETHER SUCH LIABILITY ARISES FROM ANY CLAIM BASED UPON BREACH OF
+CONTRACT, BREACH OF WARRANTY, TORT (INCLUDING NEGLIGENCE), PRODUCT LIABILITY OR
+ANY OTHER CAUSE OF ACTION OR THEORY OF LIABILITY, EVEN IF NVIDIA HAS PREVIOUSLY
+BEEN ADVISED OF, OR COULD REASONABLY HAVE FORESEEN, THE POSSIBILITY OF SUCH
+DAMAGES. IN NO EVENT WILL NVIDIA"S AND ITS AFFILIATES TOTAL CUMULATIVE LIABILITY
+UNDER OR ARISING OUT OF THIS LICENSE EXCEED US$10.00. THE NATURE OF THE
+LIABILITY OR THE NUMBER OF CLAIMS OR SUITS SHALL NOT ENLARGE OR EXTEND THIS
+LIMIT.
+
+11. TERMINATION
+Your rights under this license will terminate automatically
+without notice from NVIDIA if you fail to comply with any term of this license
+or if you commence or participate in any legal proceeding against NVIDIA with
+respect to the SOFTWARE. NVIDIA may terminate this license with advance written
+notice to you, if NVIDIA decides to no longer provide the SOFTWARE in a country
+or, in NVIDIA"s sole discretion, the continued use of it is no longer
+commercially viable. Upon any termination of this license, you agree to promptly
+discontinue use of the SOFTWARE and destroy all copies in your possession or
+control. All provisions of this license will survive termination, except for the
+license granted to you.
+
+12. APPLICABLE LAW
+This license will be governed in all respects by the laws of
+the United States and of the State of Delaware as those laws are applied to
+contracts entered into and performed entirely within Delaware by Delaware
+residents, without regard to the conflicts of laws principles. The United
+Nations Convention on Contracts for the International Sale of Goods is
+specifically disclaimed. You agree to all terms of this Agreement in the English
+language. The state or federal courts residing in Santa Clara County, California
+shall have exclusive jurisdiction over any dispute or claim arising out of this
+license. Notwithstanding this, you agree that NVIDIA shall still be allowed to
 apply for injunctive remedies or an equivalent type of urgent legal relief in
 any jurisdiction.
 
-If any court of competent jurisdiction determines that any provision of this
-Agreement is illegal, invalid or unenforceable, such provision will be construed
-as limited to the extent necessary to be consistent with and fully enforceable
-under the law and the remaining provisions will remain in full force and effect.
-Unless otherwise specified, remedies are cumulative.
+13. NO ASSIGNMENT
+This license and your rights and obligations thereunder may
+not be assigned by you by any means or operation of law without NVIDIA"s
+permission. Any attempted assignment not approved by NVIDIA in writing shall be
+void and of no effect.
 
-Each party acknowledges and agrees that the other is an independent contractor
-in the performance of this Agreement.
+14. EXPORT
+The SOFTWARE is subject to United States export laws and
+regulations. You agree to comply with all applicable U.S. and international
+export laws, including the Export Administration Regulations (EAR) administered
+by the U.S. Department of Commerce and economic sanctions administered by the
+U.S. Department of Treasury"s Office of Foreign Assets Control (OFAC). These
+laws include restrictions on destinations, end-users and end-use. By accepting
+this license, you confirm that you are not currently residing in a country or
+region currently embargoed by the U.S. and that you are not otherwise prohibited
+from receiving the SOFTWARE.
 
-The SDK has been developed entirely at private expense and is “commercial items”
-consisting of “commercial computer software” and “commercial computer software
-documentation” provided with RESTRICTED RIGHTS. Use, duplication or disclosure
-by the U.S. Government or a U.S. Government subcontractor is subject to the
-restrictions in this Agreement pursuant to DFARS 227.7202-3(a) or as set forth
-in subparagraphs (c)(1) and (2) of the Commercial Computer Software - Restricted
-Rights clause at FAR 52.227-19, as applicable. Contractor/manufacturer is
-NVIDIA, 2788 San Tomas Expressway, Santa Clara, CA 95051.
+15. GOVERNMENT USE
+The SOFTWARE is, and shall be treated as being, "Commercial
+Items" as that term is defined at 48 CFR " 2.101, consisting of "commercial
+computer software" and "commercial computer software documentation",
+respectively, as such terms are used in, respectively, 48 CFR " 12.212 and 48
+CFR "" 227.7202 & 252.227-7014(a)(1). Use, duplication or disclosure by the U.S.
+Government or a U.S. Government subcontractor is subject to the restrictions in
+this license pursuant to 48 CFR " 12.212 or 48 CFR " 227.7202. In no event shall
+the US Government user acquire rights in the SOFTWARE beyond those specified in
+48 C.F.R. 52.227-19(b)(1)-(2).
 
-The SDK is subject to United States export laws and regulations. You agree that
-you will not ship, transfer or export the SDK into any country, or use the SDK
-in any manner, prohibited by the United States Bureau of Industry and Security
-or economic sanctions regulations administered by the U.S. Department of
-Treasury’s Office of Foreign Assets Control (OFAC), or any applicable export
-laws, restrictions or regulations. These laws include restrictions on
-destinations, end users and end use. By accepting this Agreement, you confirm
-that you are not a resident or citizen of any country currently embargoed by the
-U.S. and that you are not otherwise prohibited from receiving the SDK.
+16. NOTICES
+Please direct your legal notices or other correspondence to NVIDIA
+Corporation, 2788 San Tomas Expressway, Santa Clara, California 95051, United
+States of America, Attention: Legal Department.
 
-Any notice delivered by NVIDIA to you under this Agreement will be delivered via
-mail, email or fax. You agree that any notices that NVIDIA sends you
-electronically will satisfy any legal communication requirements. Please direct
-your legal notices or other correspondence to NVIDIA Corporation, 2788 San Tomas
-Expressway, Santa Clara, California 95051, United States of America, Attention:
-Legal Department.
+17. ENTIRE AGREEMENT
+This license is the final, complete and exclusive
+agreement between the parties relating to the subject matter of this license and
+supersedes all prior or contemporaneous understandings and agreements relating
+to this subject matter, whether oral or written. If any court of competent
+jurisdiction determines that any provision of this license is illegal, invalid
+or unenforceable, the remaining provisions will remain in full force and effect.
+This license may only be modified in a writing signed by an authorized
+representative of each party.
 
-This Agreement and any exhibits incorporated into this Agreement constitute the
-entire agreement of the parties with respect to the subject matter of this
-Agreement and supersede all prior negotiations or documentation exchanged
-between the parties relating to this SDK license. Any additional and/or
-conflicting terms on documents issued by you are null, void, and invalid. Any
-amendment or waiver under this Agreement shall be in writing and signed by
-representatives of both parties.
+(v. January 22, 2021)
+
+Third-Party Components Bundled in NVIDIA DCGM
+---------------------------------------------
+Source: /usr/share/doc/datacenter-gpu-manager-4/third-party-notices.txt
+
+This Third-Party Notices file provides notices and information about third
+party components included in the SOFTWARE. The following third-party
+components are licensed to Licensee pursuant to the following terms and conditions:
+
+
+1. Licensee's use of Zlib 1.2.11 is subject to the terms and conditions of the ZLib license.
+   All third-party software packages are copyright by their respective authors.
+   The ZLib license terms and conditions are hereby incorporated into the Agreement by this reference.
+   https://zlib.net/zlib_license.html
+
+   Copyright (C) 1995-2017 Jean-loup Gailly and Mark Adler
+
+   This software is provided 'as-is', without any express or implied
+   warranty.  In no event will the authors be held liable for any damages
+   arising from the use of this software.
+
+   Permission is granted to anyone to use this software for any purpose,
+   including commercial applications, and to alter it and redistribute it
+   freely, subject to the following restrictions:
+
+   1. The origin of this software must not be misrepresented; you must not
+      claim that you wrote the original software. If you use this software
+      in a product, an acknowledgment in the product documentation would be
+      appreciated but is not required.
+   2. Altered source versions must be plainly marked as such, and must not be
+      misrepresented as being the original software.
+   3. This notice may not be removed or altered from any source distribution.
+
+   Jean-loup Gailly        Mark Adler
+   jloup@gzip.org          madler@alumni.caltech.edu
+
+
+2. Licensee's use of OpenSSL 1.1.1d is subject to the terms and conditions of double OpenSSL and SSLeay licenses.
+   All third-party software packages are copyright by their respective authors.
+   The OpenSSL license and SSLeay license terms and conditions are hereby incorporated into the Agreement by this reference.
+   https://www.openssl.org/source/license-openssl-ssleay.txt
+
+   OpenSSL License
+
+   Copyright (c) 1998-2019 The OpenSSL Project.  All rights reserved.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+
+   1. Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in
+      the documentation and/or other materials provided with the
+      distribution.
+
+   3. All advertising materials mentioning features or use of this
+      software must display the following acknowledgment:
+      "This product includes software developed by the OpenSSL Project
+      for use in the OpenSSL Toolkit. (http://www.openssl.org/)"
+
+   4. The names "OpenSSL Toolkit" and "OpenSSL Project" must not be used to
+      endorse or promote products derived from this software without
+      prior written permission. For written permission, please contact
+      openssl-core@openssl.org.
+
+   5. Products derived from this software may not be called "OpenSSL"
+      nor may "OpenSSL" appear in their names without prior written
+      permission of the OpenSSL Project.
+
+   6. Redistributions of any form whatsoever must retain the following
+      acknowledgment:
+      "This product includes software developed by the OpenSSL Project
+      for use in the OpenSSL Toolkit (http://www.openssl.org/)"
+
+   THIS SOFTWARE IS PROVIDED BY THE OpenSSL PROJECT ``AS IS'' AND ANY
+   EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+   PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE OpenSSL PROJECT OR
+   ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+   STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+   OF THE POSSIBILITY OF SUCH DAMAGE.
+
+   This product includes cryptographic software written by Eric Young
+   (eay@cryptsoft.com).  This product includes software written by Tim
+   Hudson (tjh@cryptsoft.com).
+
+
+   Original SSLeay License
+
+   Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
+   All rights reserved.
+
+   This package is an SSL implementation written
+   by Eric Young (eay@cryptsoft.com).
+   The implementation was written so as to conform with Netscapes SSL.
+
+   This library is free for commercial and non-commercial use as long as
+   the following conditions are aheared to.  The following conditions
+   apply to all code found in this distribution, be it the RC4, RSA,
+   lhash, DES, etc., code; not just the SSL code.  The SSL documentation
+   included with this distribution is covered by the same copyright terms
+   except that the holder is Tim Hudson (tjh@cryptsoft.com).
+
+   Copyright remains Eric Young's, and as such any Copyright notices in
+   the code are not to be removed.
+   If this package is used in a product, Eric Young should be given attribution
+   as the author of the parts of the library used.
+   This can be in the form of a textual message at program startup or
+   in documentation (online or textual) provided with the package.
+
+   Redistribution and use in source and binary forms, with or without
+   modification, are permitted provided that the following conditions
+   are met:
+   1. Redistributions of source code must retain the copyright
+      notice, this list of conditions and the following disclaimer.
+   2. Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+   3. All advertising materials mentioning features or use of this software
+      must display the following acknowledgement:
+      "This product includes cryptographic software written by
+       Eric Young (eay@cryptsoft.com)"
+      The word 'cryptographic' can be left out if the rouines from the library
+      being used are not cryptographic related :-).
+   4. If you include any Windows specific code (or a derivative thereof) from
+      the apps directory (application code) you must include an acknowledgement:
+      "This product includes software written by Tim Hudson (tjh@cryptsoft.com)"
+
+   THIS SOFTWARE IS PROVIDED BY ERIC YOUNG ``AS IS'' AND
+   ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+   FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+   DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+   OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+   SUCH DAMAGE.
+
+   The licence and distribution terms for any publically available version or
+   derivative of this code cannot be changed.  i.e. this code cannot simply be
+   copied and put under another distribution licence
+   [including the GNU Public Licence.]
+
+
+3. Licensee's use of JsonCPP 1.8.4 is subject to the terms and conditions of the MIT License.
+   All third-party software packages are copyright by their respective authors.
+   The MIT License terms and conditions are hereby incorporated into the Agreement by this reference.
+   https://github.com/open-source-parsers/jsoncpp/blob/1.8.4/LICENSE
+
+   Copyright (c) 2007-2010 Baptiste Lepilleur and The JsonCpp Authors
+
+   Permission is hereby granted, free of charge, to any person
+   obtaining a copy of this software and associated documentation
+   files (the "Software"), to deal in the Software without
+   restriction, including without limitation the rights to use, copy,
+   modify, merge, publish, distribute, sublicense, and/or sell copies
+   of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be
+   included in all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+
+4. Licensee's use of Libevent 2.1.8 is subject to the terms and conditions of the 3-clause BSD license.
+   All third-party software packages are copyright by their respective authors.
+   The 3-clause BSD license terms and conditions are hereby incorporated into the Agreement by this reference.
+   https://github.com/libevent/libevent/blob/release-2.1.8-stable/LICENSE
+(License text is identical to the libevent entry under the Fabric Manager
+block above; copyright 2000-2007 Niels Provos / 2007-2012 Niels Provos and
+Nick Mathewson.)
+
+
+5. Licensee's use of Google Protocol Buffers 3.7.1 is subject to the terms and conditions of the 3-clause BSD license.
+   https://github.com/protocolbuffers/protobuf/blob/v3.7.1/LICENSE
+(License text is identical to the Google Protobuffers entry under the
+Fabric Manager block above; Copyright 2008 Google Inc. 3-clause BSD.)
+
+
+6. Licensee's use of TCLAP 1.2.2 is subject to the terms and conditions of the MIT license.
+   All third-party software packages are copyright by their respective authors.
+   The MIT license terms and conditions are hereby incorporated into the Agreement by this reference.
+   https://sourceforge.net/p/tclap/code/ci/v1.2.2/tree/COPYING
+
+   Copyright (c) 2003 Michael E. Smoot
+   Copyright (c) 2004 Daniel Aarno
+   Copyright (c) 2017 Google Inc.
+
+   Permission is hereby granted, free of charge, to any person
+   obtaining a copy of this software and associated documentation
+   files (the "Software"), to deal in the Software without restriction,
+   including without limitation the rights to use, copy, modify, merge,
+   publish, distribute, sublicense, and/or sell copies of the Software,
+   and to permit persons to whom the Software is furnished to do so,
+   subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be
+   included in all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+   AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+   IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+
+
+7. Licensee's use of YAML-CPP 0.6.2 is subject of the terms and conditions of the MIT license.
+   https://github.com/jbeder/yaml-cpp/blob/yaml-cpp-0.6.2/LICENSE
+
+   Copyright (c) 2008-2015 Jesse Beder.
+
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+   of this software and associated documentation files (the "Software"), to deal
+   in the Software without restriction, including without limitation the rights
+   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+   copies of the Software, and to permit persons to whom the Software is
+   furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+   THE SOFTWARE.
+
+
+8. Licensee's use of Catch2 2.9.2 is subject to the terms and conditions of the Boost Software License 1.0.
+   https://github.com/catchorg/Catch2/blob/v2.9.2/LICENSE.txt
+
+   Boost Software License - Version 1.0 - August 17th, 2003
+
+   Permission is hereby granted, free of charge, to any person or organization
+   obtaining a copy of the software and accompanying documentation covered by
+   this license (the "Software") to use, reproduce, display, distribute,
+   execute, and transmit the Software, and to prepare derivative works of the
+   Software, and to permit third-parties to whom the Software is furnished to
+   do so, all subject to the following:
+
+   The copyright notices in the Software and this entire statement, including
+   the above license grant, this restriction and the following disclaimer,
+   must be included in all copies of the Software, in whole or in part, and
+   all derivative works of the Software, unless such copies or derivative
+   works are solely in the form of machine-executable object code generated by
+   a source language processor.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT. IN NO EVENT
+   SHALL THE COPYRIGHT HOLDERS OR ANYONE DISTRIBUTING THE SOFTWARE BE LIABLE
+   FOR ANY DAMAGES OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE,
+   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+   DEALINGS IN THE SOFTWARE.
+
+
+9. Licensee's use of PLog 1.1.4 is subject to the terms and conditions of the Mozilla Public License 2.0.
+   https://github.com/SergiusTheBest/plog/blob/1.1.4/LICENSE
+   The full text of the MPL 2.0 license is available at https://www.mozilla.org/en-US/MPL/2.0
+(Full MPL-2.0 text is reproduced in the Fabric Manager gRPC sub-section above; not duplicated here.)
+
+
+10. Licensee's use of Fmtlib 8.0.0 is subject to the terms and conditions of the modified MIT license.
+    https://github.com/fmtlib/fmt/blob/8.0.0/LICENSE.rst
+
+    Copyright (c) 2012 - present, Victor Zverovich
+
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be
+    included in all copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+    EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+    MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+    NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+    OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+    WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+    --- Optional exception to the license ---
+
+    As an exception, if, as a result of your compiling your source code, portions
+    of this Software are embedded into a machine-executable object form of such
+    source code, you may redistribute such embedded portions in such object form
+    without including the above copyright and permission notices.
+
+
+11. Licensee's use of cuda_memtest is subject to the terms and conditions of the Illinois Open Source License
+    University of Illinois/NCSA
+    Open Source License
+
+    Copyright (c) 2009, University of Illinois.  All rights reserved.
+
+    Developed by:
+
+    Innovative Systems Lab
+    National Center for Supercomputing Applications
+    http://www.ncsa.uiuc.edu/AboutUs/Directorates/ISL.html
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy of
+    this software and associated documentation files (the "Software"), to deal with
+    the Software without restriction, including without limitation the rights to use,
+    copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the
+    Software, and to permit persons to whom the Software is furnished to do so, subject
+    to the following conditions:
+
+    * Redistributions of source code must retain the above copyright notice, this list
+    of conditions and the following disclaimers.
+
+    * Redistributions in binary form must reproduce the above copyright notice, this list
+    of conditions and the following disclaimers in the documentation and/or other materials
+    provided with the distribution.
+
+    * Neither the names of the Innovative Systems Lab, the National Center for Supercomputing
+    Applications, nor the names of its contributors may be used to endorse or promote products
+    derived from this Software without specific prior written permission.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE CONTRIBUTORS OR COPYRIGHT HOLDERS BE
+    LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
+    OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+    DEALINGS WITH THE SOFTWARE.
+
+
+12. Licensee's use of boost is subject to the terms and conditions of the Boost License
+(Full Boost Software License 1.0 text is reproduced in items 8 and 12 of the
+Fabric Manager block above and in DCGM item 8; not duplicated here.)
+```
+
+---
+
+## EFA Installer; version 1.47.0
+
+<https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html>
+
+```text
+
+    * Package EFA Installer's source/binary may be found at:
+      https://efa-installer.amazonaws.com/aws-efa-installer-1.47.0.tar.gz
+
+The EFA Installer is an Amazon-packaged bundle containing:
+  * AWS EFA kernel module and userspace (GPL-2.0 / BSD-2-Clause dual)
+  * libfabric (BSD-2-Clause / GPL-2.0 dual)
+  * Open MPI (BSD-3-Clause)
+  * Amazon-contributed installer scripts (Apache-2.0)
+Each sub-component's license text is distributed inside the EFA installer
+tarball (see RELEASE_NOTES and LICENSE files within the archive).
+```
+
+---
+
+## http-parser; version 2.9.4
+
+<https://github.com/nodejs/http-parser>
+
+```text
+
+    * Package http-parser's source code may be found at:
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/http_parser/
+
+Note: http-parser is only compiled from source on Amazon Linux 2023, where it
+is not available in the OS repositories. It is a build-time dependency of
+Slurm's REST API (slurmrestd).
+
+MIT License
+
+Copyright Joyent, Inc. and other Node contributors.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to
+deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+sell copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+```
+
