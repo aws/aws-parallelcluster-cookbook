@@ -11,6 +11,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
 via custom Slurm settings or the cluster name contains upper-case letters.
 - Remove deprecated parameter `AccountingStorageUser` from Slurm configuration that was causing harmless error messages.
+- Fix DCV prerequisite installation potentially blocking on interactive prompts by exporting `DEBIAN_FRONTEND=noninteractive` to child processes.
 
 3.15.0
 ------

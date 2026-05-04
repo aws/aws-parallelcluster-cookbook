@@ -59,7 +59,7 @@ EOF
       # Run dpkg --configure -a if there is a `dpkg interrupted` issue when installing ubuntu-desktop
       code <<-PREREQ
         set -e
-        DEBIAN_FRONTEND=noninteractive
+        export DEBIAN_FRONTEND=noninteractive
         apt -y install whoopsie
         apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)
         apt -y purge ifupdown

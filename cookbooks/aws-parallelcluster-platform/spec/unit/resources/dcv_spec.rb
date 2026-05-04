@@ -475,6 +475,7 @@ describe 'dcv:setup' do
               .with_code(%r{cat > /etc/netplan/95-parallelcluster-force-networkd.yaml})
               .with_code(/netplan apply/)
             is_expected.to run_bash('install pre-req').with_cwd(Chef::Config[:file_cache_path]).with_retries(10).with_retry_delay(5)
+                                                      .with_code(/export DEBIAN_FRONTEND=noninteractive/)
                                                       .with_code(/apt -y install whoopsie/)
                                                       .with_code(/apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)/)
                                                       .with_code(/apt -y purge ifupdown/)
