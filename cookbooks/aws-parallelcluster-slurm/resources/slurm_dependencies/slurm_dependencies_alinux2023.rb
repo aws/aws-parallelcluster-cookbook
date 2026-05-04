@@ -23,9 +23,11 @@ def dependencies
 end
 
 action :install_extra_dependencies do
-  # http parser is no longer maintained, therefore Amazon Linux 2023 does have have the package in OS repos
+  # http parser is no longer maintained, therefore Amazon Linux 2023 does not have the package in OS repos
   # https://docs.aws.amazon.com/linux/al2023/release-notes/removed-AL2023.4-AL2.html
-  # Following https://slurm.schedmd.com/related_software.html#jwt for Installing Http-parser
+  # Following https://slurm.schedmd.com/related_software.html#jwt for Installing Http-parser.
+  # We install into /usr (LIBDIR=/usr/lib64) so the shared library lands in the dynamic linker's
+  # default search path.
 
   remote_file "#{http_parser_tarball}" do
     source "#{http_parser_url}"
@@ -44,7 +46,8 @@ action :install_extra_dependencies do
       tar xf #{http_parser_tarball}
       cd http-parser-#{http_parser_version}
       make
-      make install
+      make install PREFIX=/usr LIBDIR=/usr/lib64
+      ldconfig
     HTTP
   end
 end

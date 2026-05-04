@@ -29,6 +29,11 @@ control 'tag:install_slurm_dependencies_installed' do
       packages.concat %w(json-c-devel http-parser-devel perl-Switch) unless os_properties.redhat_on_docker?
     elsif os_properties.alinux2023?
       packages.concat %w(json-c-devel perl-Switch perl dbus-devel) unless os_properties.redhat_on_docker?
+      # http-parser is built from source on AL2023 (not available in OS repos).
+      # Verify the shared library is installed in the default linker path.
+      describe file('/usr/lib64/libhttp_parser.so') do
+        it { should exist }
+      end
     else
       packages.concat %w(json-c-devel http-parser-devel perl dbus-devel) unless os_properties.redhat_on_docker?
     end
