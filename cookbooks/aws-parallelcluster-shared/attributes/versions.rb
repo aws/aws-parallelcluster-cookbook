@@ -11,7 +11,7 @@ end
 default['cluster']['install_python_from_internet'] = false
 
 # ParallelCluster versions
-default['cluster']['parallelcluster-version'] = '3.15.0'
-default['cluster']['parallelcluster-cookbook-version'] = '3.15.0'
-default['cluster']['parallelcluster-node-version'] = '3.15.0'
-default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.5.0'
+default['cluster']['parallelcluster-version'] = '3.15.1'
+default['cluster']['parallelcluster-cookbook-version'] = '3.15.1'
+default['cluster']['parallelcluster-node-version'] = '3.15.1'
+default['cluster']['parallelcluster-awsbatch-cli-version'] = '1.6.0'
