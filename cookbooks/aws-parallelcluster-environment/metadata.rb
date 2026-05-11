@@ -7,9 +7,9 @@ description 'AWS ParallelCluster node environment'
 issues_url 'https://github.com/aws/aws-parallelcluster-cookbook/issues'
 source_url 'https://github.com/aws/aws-parallelcluster-cookbook'
 chef_version '>= 18'
-version '3.15.0'
+version '3.15.1'
 
 depends 'line', '~> 4.5.21'
 depends 'nfs', '~> 5.1.5'
 
-depends 'aws-parallelcluster-shared', '~> 3.15.0'
+depends 'aws-parallelcluster-shared', '~> 3.15.1'
