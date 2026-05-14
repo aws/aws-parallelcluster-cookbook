@@ -11,18 +11,18 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   See the `pcluster-diag` README for usage instructions.
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
-- Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 
+- Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes,
   removing the dependency on cfn-hup and cfn-init.
 - Upgrade third-party cookbook dependencies:
-  - line-5.0.0 (from line-4.5.21)
-  - nfs-5.1.6 (from nfs-5.1.5)
-  - openssh-2.11.17 (from openssh-2.11.14)
-  - yum-8.0.0 (from yum-7.4.20)
-  - yum-epel-5.0.9 (from yum-epel-5.0.8)
+    - line-5.0.0 (from line-4.5.21)
+    - nfs-5.1.6 (from nfs-5.1.5)
+    - openssh-2.11.17 (from openssh-2.11.14)
+    - yum-8.0.0 (from yum-7.4.20)
+    - yum-epel-5.0.9 (from yum-epel-5.0.8)
 - Upgrade aws-cfn-bootstrap to version 2.0-39 (from 2.0-38).
 - Move all ParallelCluster-managed bootstrap files off `/tmp` into a dedicated `/opt/parallelcluster/tmp`
   directory. Therefore, Image builds, cluster creations and updates work on custom AMIs that mount `/tmp` with `noexec`.
-  
+
 
 **CHANGES**
 - Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). The NFSv3 client stack (rpcbind, rpc-statd, lockd) are unchanged, so cluster nodes can still mount external NFSv3 servers.
@@ -30,17 +30,17 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - In GPU Health Check, skip DCGM diagnostics when NVIDIA MIG is enabled because dcgmi diag does not support MIG.
 - Upgrade Slurm to version 25.11.6 (from 25.11.4).
 - Upgrade EFA installer to 1.49.0 (from 1.47.0).
-  - Efa-driver: efa-3.1.0
-  - Efa-config: efa-config-1.18-1
-  - Efa-profile: efa-profile-1.7-1
-  - Libfabric-aws: libfabric-aws-2.4.0-1
-  - Rdma-core: rdma-core-63.0-1
-  - Open MPI: openmpi40-aws-4.1.7-3 and openmpi50-aws-5.0.9-11
+    - Efa-driver: efa-3.1.0
+    - Efa-config: efa-config-1.18-1
+    - Efa-profile: efa-profile-1.7-1
+    - Libfabric-aws: libfabric-aws-2.4.0-1
+    - Rdma-core: rdma-core-63.0-1
+    - Open MPI: openmpi40-aws-4.1.7-3 and openmpi50-aws-5.0.9-11
 - Install the aws-parallelcluster-node package from S3 in all regions instead of PyPI, to support air-gapped and proxied environments.
 
 **BUG FIXES**
-- Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
-via custom Slurm settings or the cluster name contains upper-case letters.
+- Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden
+  via custom Slurm settings or the cluster name contains upper-case letters.
 - Remove deprecated parameter `AccountingStorageUser` from Slurm configuration that was causing harmless error messages.
 - Fix DCV configuration by letting DCV server decide the display-encoders for the instance type.
 - Fix DCV prerequisite installation potentially blocking on interactive prompts by exporting `DEBIAN_FRONTEND=noninteractive` to child processes.
@@ -54,6 +54,15 @@ via custom Slurm settings or the cluster name contains upper-case letters.
 **DEPRECATIONS**
 - Amazon Linux 2 is no longer supported.
 - AWS Batch as a scheduler is no longer supported.
+
+3.15.1
+------
+
+**CHANGES**
+- Disable `algif_aead` kernel module on Ubuntu to address [CVE-2026-31431](https://nvd.nist.gov/vuln/detail/CVE-2026-31431).
+- Upgrade NVIDIA driver to version 580.126.20 (from 580.105.08) for all OSs except Amazon Linux 2 to address CVE-2025-33219.
+- Upgrade NVIDIA Fabric manager to 580.126.20 (from 580.105.08) for all OSs except Amazon Linux 2.
+- Upgrade NVIDIA IMEX to 580.126.20 (from 580.105.08) for all OSs except Amazon Linux 2.
 
 3.15.0
 ------
