@@ -29,7 +29,7 @@
 - [chevron; version 0.14.0](#chevron-version-0140)
 - [libjwt; version 1.18.4 (1.17.0 on AL2)](#libjwt-version-1184-1170-on-al2)
 - [Amazon DCV; version 2025.0-20103](#amazon-dcv-version-20250-20103)
-- [Nvidia Driver; version 580.105.08 (550.127.08 on AL2)](#nvidia-driver-version-58010508-55012708-on-al2)
+- [Nvidia Driver; version 580.126.20 (550.127.08 on AL2)](#nvidia-driver-version-58012618-55012708-on-al2)
 - [Cuda Samples; version 13.0 (12.4 on AL2)](#cuda-samples-version-130-124-on-al2)
 - [Nvidia CUDA; version 13.0.2 (12.4.1 on AL2)](#nvidia-cuda-version-1302-1241-on-al2)
 - [NVIDIA Fabric Manager (grouped with 2 other entries sharing this license)](#nvidia-fabric-manager-grouped-with-2-other-entries-sharing-this-license)
@@ -7188,7 +7188,7 @@ individual or entity that is not a party to this EULA.
 
 ---
 
-## Nvidia Driver; version 580.105.08 (550.127.08 on AL2)
+## Nvidia Driver; version 580.126.20 (550.127.08 on AL2)
 
 <https://www.nvidia.com/download/index.aspx?lang=en-us>
 
@@ -7197,7 +7197,7 @@ individual or entity that is not a party to this EULA.
     * Package Nvidia Driver's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-
 east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-
-Linux-x86_64-580.105.08.run
+Linux-x86_64-580.126.20.run
       (AL2 continues to use NVIDIA-Linux-x86_64-550.127.08.run)
 
 NVIDIA Driver License Agreement
@@ -9338,8 +9338,8 @@ conditions:
 
 **Entries covered by the license text below:**
 
-- **NVIDIA Fabric Manager; version 580.105.08 (matches Nvidia Driver; 550.127.08 on AL2)** — <https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/>
-- **NVIDIA IMEX; version 580.105.08 (matches Nvidia Driver; 550.127.08 on AL2)** — <https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/>
+- **NVIDIA Fabric Manager; version 580.126.20 (matches Nvidia Driver; 550.127.08 on AL2)** — <https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/>
+- **NVIDIA IMEX; version 580.126.20 (matches Nvidia Driver; 550.127.08 on AL2)** — <https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/>
 - **NVIDIA NVLSM; version 2025.03.9-1** — <https://docs.nvidia.com/networking/display/mlnxofedv461000/nvidia+subnet+manager>
 
 ```text
