@@ -85,6 +85,12 @@ default['cluster']['instance_types_data_version'] = nil
 default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 
+# Kernel modules to disable
+default['cluster']['disable_kernel_modules'] = []
+if platform?('ubuntu')
+  default['cluster']['disable_kernel_modules'] = %w(algif_aead)
+end
+
 # Intel MPI
 default['cluster']['intelmpi']['version'] = '2021.17'
 default['cluster']['intelmpi']['full_version'] = '2021.17.2.94'

@@ -24,6 +24,7 @@ unless alinux2023_on_docker? # Running this recipe on Alinux 2023 docker generat
   include_recipe "openssh"
 end
 include_recipe "aws-parallelcluster-platform::disable_selinux"
+include_recipe "aws-parallelcluster-platform::disable_kernel_modules"
 include_recipe "aws-parallelcluster-platform::license_readme"
 include_recipe "aws-parallelcluster-platform::gc_thresh_values"
 include_recipe "aws-parallelcluster-platform::supervisord_install"
