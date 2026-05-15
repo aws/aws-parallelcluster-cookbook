@@ -18,6 +18,5 @@ end
 
 use 'partial/_get_package_version_rpm'
 use 'partial/_common'
-use 'partial/_redhat_based'
-use 'partial/_install_from_tar'
+use 'partial/_install_from_repo_redhat'
 use 'partial/_mount_umount'

@@ -37,6 +37,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Rdma-core: rdma-core-63.0-1
   - Open MPI: openmpi40-aws-4.1.7-3 and openmpi50-aws-5.0.9-11
 - Install the aws-parallelcluster-node package from S3 in all regions instead of PyPI, to support air-gapped and proxied environments.
+- Install amazon-efs-utils from the official EFS endpoint instead of building from source.
 
 **BUG FIXES**
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 

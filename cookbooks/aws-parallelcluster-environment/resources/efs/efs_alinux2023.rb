@@ -21,15 +21,12 @@ use 'partial/_common'
 use 'partial/_mount_umount'
 
 action :install_utils do
-  package_name = "amazon-efs-utils-#{_efs_utils_version}"
+  return if _skip_efs_utils_install?
 
   # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?(package_name, _efs_utils_version)
+  return if already_installed?("amazon-efs-utils", _efs_utils_version)
 
-  # On Amazon Linux 2, amazon-efs-utils and stunnel are installed from OS repo.
-  package package_name do
-    retries 3
-    retry_delay 5
-  end
+  # amazon-efs-utils ships in the OS repo (no EFS repo needed).
+  action_install_efs_utils_within_major
   action_increase_poll_interval
 end

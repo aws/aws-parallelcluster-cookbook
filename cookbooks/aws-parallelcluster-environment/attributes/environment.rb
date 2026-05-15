@@ -80,9 +80,11 @@ default['cluster']['head_node_private_ip'] = nil
 default['cluster']['efa']['version'] = '1.49.0'
 default['cluster']['efa']['sha256'] = 'cf2e9281a2328a243c76f911a490faed43ca0fecfe4733c25e34b2e92a32c309'
 
-default['cluster']['efs']['version'] = '2.4.0'
-default['cluster']['efs']['sha256'] = '9b60c039c162388091d6fab6e9c6cfc5832f34b26b6d05b0a68b333147d78a25'
-default['cluster']['efs']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/efs"
+# efs-utils version: repos track the newest release within this major; ADC (raw
+# S3 object) installs this exact version.
+default['cluster']['efs']['version'] = '3.1.3'
+# DevSetting: skip installing amazon-efs-utils entirely.
+default['cluster']['efs']['skip_install'] = false
 
 default['cluster']['cfn_bootstrap']['version'] = '2.0-39'
 
