@@ -933,9 +933,9 @@ describe 'dcv:configure' do
           is_expected.to enable_service('dcvserver').with_action(%i(enable start))
         end
 
-        it 'passes gpu_accel_supported=true to dcv.conf template' do
+        it 'passes is_dcv_gl_supported=true to dcv.conf template' do
           is_expected.to create_template('/etc/dcv/dcv.conf').with(
-            variables: { gpu_accel_supported: true }
+            variables: { is_dcv_gl_supported: true }
           )
         end
       end
@@ -1009,9 +1009,9 @@ describe 'dcv:configure' do
             .with_code(/systemctl isolate graphical.target &/)
         end
 
-        it 'passes gpu_accel_supported=false to dcv.conf template' do
+        it 'passes is_dcv_gl_supported=false to dcv.conf template' do
           is_expected.to create_template('/etc/dcv/dcv.conf').with(
-            variables: { gpu_accel_supported: false }
+            variables: { is_dcv_gl_supported: false }
           )
         end
 

@@ -10,11 +10,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.
 
 **BUG FIXES**
-- Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
 via custom Slurm settings or the cluster name contains upper-case letters.
 - Remove deprecated parameter `AccountingStorageUser` from Slurm configuration that was causing harmless error messages.
+- Fix DCV configuration by letting DCV server decide the display-encoders for the instance type.
 - Fix DCV prerequisite installation potentially blocking on interactive prompts by exporting `DEBIAN_FRONTEND=noninteractive` to child processes.
+- Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
 - Fix slurmrestd failing to start on AL2023 because the http-parser library was not discoverable by the dynamic linker.
 - Fix compute node bootstrap hanging without a clear error when the compute subnet cannot reach DynamoDB.
 

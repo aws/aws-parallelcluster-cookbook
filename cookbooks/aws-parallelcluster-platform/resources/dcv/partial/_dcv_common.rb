@@ -188,8 +188,8 @@ end
 
 action :configure do
   if dcv_supported? && (node['cluster']['node_type'] == "HeadNode" || node['cluster']['node_type'] == "LoginNode")
-    gpu_accel = dcv_gpu_accel_supported?
-    if gpu_accel
+    is_dcv_gl_supported = dcv_gpu_accel_supported?
+    if is_dcv_gl_supported
       # Enable graphic acceleration in dcv conf file for graphic instances.
       allow_gpu_acceleration
     else
@@ -245,7 +245,7 @@ action :configure do
       owner 'root'
       group 'root'
       mode '0755'
-      variables(gpu_accel_supported: gpu_accel)
+      variables(is_dcv_gl_supported: is_dcv_gl_supported)
     end
 
     # Create directory for the external authenticator to store access file created by the users

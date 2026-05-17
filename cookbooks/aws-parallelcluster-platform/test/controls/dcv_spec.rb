@@ -241,7 +241,6 @@ control 'tag:config_dcv_correctly_configured' do
 
     unless instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
       its('content') { should match /enable-gl-in-virtual-sessions\s*=\s*"always-off"/ }
-      its('content') { should match /display-encoders=\['turbojpeg', 'lz4', 'ffmpeg'\]/ }
     end
   end
 
