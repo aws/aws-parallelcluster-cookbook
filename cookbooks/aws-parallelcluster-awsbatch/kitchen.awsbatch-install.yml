@@ -21,4 +21,4 @@ suites:
         - /custom_awsbatchcli_package_installed/
     attributes:
       cluster:
-        custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/develop.tar.gz
+        custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/release-3.15.tar.gz

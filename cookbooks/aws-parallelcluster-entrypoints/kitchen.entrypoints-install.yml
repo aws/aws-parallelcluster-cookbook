@@ -14,8 +14,8 @@ provisioner:
     cluster:
       # The following parameters are required when running install recipes on system tests
       region: us-east-1
-      custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
-      custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/develop.tar.gz
+      custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/release-3.15.tar.gz
+      custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/release-3.15.tar.gz
 
 suites:
   - name: entrypoints_install
