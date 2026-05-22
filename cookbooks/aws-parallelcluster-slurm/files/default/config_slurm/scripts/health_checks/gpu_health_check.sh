@@ -45,6 +45,11 @@ function main() {
   fast_success_exit "$?" "The GPU Health Check has been executed but the NVIDIA DCGM Diagnostic tool is not available in this system or is located in a different file path. Please consider using an official ParallelCluster AMI."
 
   ## Check if the NVIDIA GPU is supported by DCGM tool
+  ## The "nvidia-smi -L" return the list of GPUs available on the node:
+  ## $nvidia-smi -L
+  ## GPU 0: NVIDIA A100-SXM4-40GB (UUID: GPU-...)
+  ## GPU 1: NVIDIA A100-SXM4-40GB (UUID: GPU-...)
+  ##     MIG 1g.10gb     Device  1: (UUID: MIG-...)
   nvidia_smi_output=$(nvidia-smi -L)
   fast_success_exit "$?" "The nvidia-smi tool failed its execution."
   log_info "GPU list is '${nvidia_smi_output//$'\n'/, }'"
@@ -53,22 +58,9 @@ function main() {
 
   ## Check if there are GPU associated to the job
   if [ -z "$GPU_DEVICE_ORDINAL" ]; then
-    # The "nvidia-smi -L" return the list of GPUs available on the node:
-    # $nvidia-smi -L
-    # GPU 0: NVIDIA A100-SXM4-80GB (UUID: GPU-e57350fc-1789-b69a-0637-18a3025b1da2)
-    # GPU 1: NVIDIA A100-SXM4-80GB (UUID: GPU-c4798aff-efab-68a7-1a52-107a0d6775fd)
-    # ...
-    # for each line in the output the ID is removing all characters after the colon symbol and the "GPU " string
-    # $nvidia-smi -L | while IFS= read -r gpu ; do echo $gpu | cut -d ':' -f1 | sed s/"GPU "//; done
-    # 0
-    # 1
-    # Then the newline is replaced by a comma
-    # $nvidia-smi -L | while IFS= read -r gpu ; do echo $gpu | cut -d ':' -f1 | sed s/"GPU "//; done | tr '\n' ','
-    # 0,1,
-    # and then we remove the last char
-    # $nvidia-smi -L | while IFS= read -r gpu ; do echo $gpu | cut -d ':' -f1 | sed s/"GPU "//; done | tr '\n' ',' | sed 's/.$//'
-    # 0,1
-    GPU_DEVICE_ORDINAL=$(echo "$nvidia_smi_output" | while IFS= read -r gpu ; do echo $gpu | cut -d ':' -f1 | sed s/"GPU "//; done | tr '\n' ',' | sed 's/.$//')
+    ## nvidia-smi --query-gpu=index --format=csv,noheader returns the list of GPU indices,
+    ## that we transform to a comma separated list.
+    GPU_DEVICE_ORDINAL=$(nvidia-smi --query-gpu=index --format=csv,noheader | tr '\n' ',' | sed 's/,$//')
     log_info "The variable GPU_DEVICE_ORDINAL has been initialized using information provided by nvidia-smi"
   fi
   log_info "The value of GPU_DEVICE_ORDINAL is '${GPU_DEVICE_ORDINAL}'"
@@ -159,8 +151,24 @@ function is_nvidia() {
 }
 
 function is_dcgm_supported() {
-  echo $nvidia_smi_output | grep -v -i -o ' K520 ' &>/dev/null
-  return $?
+  ## DCGM Diagnostic is not supported on K520 GPUs
+  if ! echo $nvidia_smi_output | grep -v -i -o ' K520 ' &>/dev/null; then
+    log_info "K520 GPU detected on the node: DCGM Diagnostic is not supported."
+    return 1
+  fi
+
+  ## DCGM Diagnostic is not supported when MIG is enabled on any GPU on the node (verified up to DCGM 4.5.3).
+  if is_mig_enabled; then
+    log_info "MIG detected on at least one GPU on the node: DCGM Diagnostic is not supported."
+    return 1
+  fi
+
+  return 0
+}
+
+function is_mig_enabled() {
+  ## Returns 0 (true) if MIG mode is enabled on at least one GPU on the node, non-zero otherwise.
+  nvidia-smi --query-gpu=mig.mode.current --format=csv,noheader | grep -qi "Enabled"
 }
 
 function start_service() {
