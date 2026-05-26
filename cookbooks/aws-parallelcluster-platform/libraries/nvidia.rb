@@ -14,6 +14,32 @@ def nvidia_enabled?
   ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled'])
 end
 
+# Whether a base_url attribute still points to the default ParallelCluster artifacts location.
+# Used by: fabric manager, dcgm, nvlsm, enroot (caps).
+# Limitation: this check assumes attribute precedence resolves at attribute-load time
+# (the ExtraChefAttributes path). If artifacts_s3_url is overridden after cookbook
+# attributes load — for example via node.override from inside a recipe — base_url
+# will still embed the original value and this check may return false incorrectly.
+def default_artifacts_url?(base_url)
+  base_url.include?(node['cluster']['artifacts_s3_url'])
+end
+
+# NVIDIA public repo uses 'x86_64' or 'sbsa' as the arch directory
+def nvidia_repo_arch
+  arm_instance? ? 'sbsa' : 'x86_64'
+end
+
+# Build download URL for NVIDIA-hosted packages (dcgm, fabric manager, nvlsm).
+# Default: downloads from ParallelCluster S3 mirror — URL pattern is {base_url}/{platform}/{filename}
+# Overridden: downloads from NVIDIA public repo — URL pattern is {base_url}/{platform}/{arch}/{filename}
+def nvidia_package_url(base_url, platform, filename)
+  if default_artifacts_url?(base_url)
+    "#{base_url}/#{platform}/#{filename}"
+  else
+    "#{base_url}/#{platform}/#{nvidia_repo_arch}/#{filename}"
+  end
+end
+
 #
 # Check if the instance has a GPU
 #
