@@ -22,7 +22,7 @@ action :install_package do
   end
   packages_urls_list.each do |package|
     remote_file "#{node['cluster']['sources_dir']}/#{package}-#{package_version}.rpm" do
-      source "#{node['cluster']['nvidia']['dcgm_base_url']}/#{platform}/#{package}-#{package_version}#{package_url_separator}#{arch_suffix}.rpm"
+      source dcgm_url(package, package_url_separator)
       mode '0644'
       retries 3
       retry_delay 5
@@ -56,6 +56,11 @@ end
 
 def arch_suffix
   arm_instance? ? 'aarch64' : 'x86_64'
+end
+
+def dcgm_url(package, separator)
+  nvidia_package_url(node['cluster']['nvidia']['dcgm_base_url'], platform,
+    "#{package}-#{package_version}#{separator}#{arch_suffix}.rpm")
 end
 
 def package_version
