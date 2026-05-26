@@ -11,6 +11,7 @@ default['conditions']['arm_pl_supported'] = arm_instance?
 
 # Enroot
 default['cluster']['enroot']['version'] = '3.4.1'
+default['cluster']['enroot']['caps_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
 default['cluster']['enroot']['temporary_dir'] = '/run/enroot'
 default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 
