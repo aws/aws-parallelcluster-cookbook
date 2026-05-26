@@ -83,19 +83,42 @@ describe 'aws-parallelcluster-platform::cuda' do
 
   context 'when not on arm' do
     cached(:cuda_arch) { 'linux' }
-    cached(:cuda_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
+    cached(:default_base_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda" }
+    cached(:default_samples_base_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples" }
 
-    cached(:chef_run) do
-      allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
-      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-      allow(::File).to receive(:exist?).with("/usr/local/cuda-#{cuda_version}").and_return(false)
-      allow(::File).to receive(:exist?).with("/usr/local/cuda-#{cuda_version}/samples").and_return(false)
-      ChefSpec::Runner.new.converge(described_recipe)
-    end
-    cached(:node) { chef_run.node }
+    {
+      'default S3 base_url' => { base_url: nil, samples_base_url: nil },
+      'base_url overridden via ExtraChefAttributes' => {
+        base_url: 'https://fake-public.example.DOMAIN/cuda',
+        samples_base_url: 'https://fake-public.example.DOMAIN/cuda-samples',
+      },
+    }.each do |scenario, urls|
+      context "when #{scenario}" do
+        cached(:expected_base_url) { urls[:base_url] || default_base_url }
+        cached(:expected_samples_base_url) { urls[:samples_base_url] || default_samples_base_url }
+        cached(:cuda_url) { "#{expected_base_url}/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run" }
+        cached(:cuda_samples_url) { "#{expected_samples_base_url}/v#{cuda_version}.tar.gz" }
 
-    it 'downloads CUDA run file' do
-      is_expected.to create_remote_file('/tmp/cuda.run').with_source(cuda_url)
+        cached(:chef_run) do
+          allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          allow(::File).to receive(:exist?).with("/usr/local/cuda-#{cuda_version}").and_return(false)
+          allow(::File).to receive(:exist?).with("/usr/local/cuda-#{cuda_version}/samples").and_return(false)
+          ChefSpec::Runner.new do |node|
+            node.override['cluster']['nvidia']['cuda']['base_url'] = urls[:base_url] if urls[:base_url]
+            node.override['cluster']['nvidia']['cuda']['samples_base_url'] = urls[:samples_base_url] if urls[:samples_base_url]
+          end.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'downloads CUDA run file from the expected URL' do
+          is_expected.to create_remote_file('/tmp/cuda.run').with_source(cuda_url)
+        end
+
+        it 'downloads CUDA samples from the expected URL' do
+          is_expected.to create_remote_file('/tmp/cuda-sample.tar.gz').with_source(cuda_samples_url)
+        end
+      end
     end
   end
 end

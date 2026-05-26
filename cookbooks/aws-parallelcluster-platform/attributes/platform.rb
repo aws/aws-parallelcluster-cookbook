@@ -20,6 +20,12 @@ default['cluster']['nvidia']['driver_version'] = '580.105.08'
 default['cluster']['nvidia']['dcgm_version'] = '4.5.1-1'
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
 
+# CUDA
+default['cluster']['nvidia']['cuda']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda"
+default['cluster']['nvidia']['cuda']['samples_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples"
+default['cluster']['nvidia']['cuda']['version'] = '13.0.2'
+default['cluster']['nvidia']['cuda']['driver_version_suffix'] = '580.95.05'
+
 # GDRCopy
 default['cluster']['nvidia']['gdrcopy']['version'] = '2.5.2'
 default['cluster']['nvidia']['gdrcopy']['sha256'] = '32bc7b2c198dd97ec251de0ff4823252c95e31a4c79a5f843c82514c9af2052b'
