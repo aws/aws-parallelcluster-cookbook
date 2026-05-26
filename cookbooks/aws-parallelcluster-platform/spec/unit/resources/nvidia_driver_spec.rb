@@ -43,6 +43,41 @@ describe 'nvidia_driver:_nvidia_driver_version' do
   end
 end
 
+describe 'nvidia_driver:nvidia_driver_url' do
+  cached(:driver_version) { 'fake_driver_version' }
+  cached(:s3_base_url) { 'fake_s3_base_url/dependencies/nvidia_driver' }
+  cached(:public_base_url) { 'fake_public_nvidia_url/tesla' }
+
+  {
+    'default S3 base_url' => 'fake_s3_base_url/dependencies/nvidia_driver',
+    'base_url overridden to public NVIDIA Tesla URL' => 'fake_public_nvidia_url/tesla',
+  }.each do |scenario, base_url|
+    context "when driver_base_url is #{scenario}" do
+      cached(:chef_run) do
+        ChefSpec::SoloRunner.new(step_into: ['nvidia_driver']) do |node|
+          node.override['cluster']['nvidia']['driver_version'] = driver_version
+          node.override['cluster']['nvidia']['driver_base_url'] = base_url
+        end
+      end
+
+      cached(:resource) do
+        ConvergeNvidiaDriver.setup(chef_run)
+        chef_run.find_resource('nvidia_driver', 'setup')
+      end
+
+      it 'constructs URL using x86_64 for non-ARM' do
+        allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+        expect(resource.nvidia_driver_url).to eq("#{base_url}/NVIDIA-Linux-x86_64-#{driver_version}.run")
+      end
+
+      it 'constructs URL using aarch64 for ARM' do
+        allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
+        expect(resource.nvidia_driver_url).to eq("#{base_url}/NVIDIA-Linux-aarch64-#{driver_version}.run")
+      end
+    end
+  end
+end
+
 describe 'nvidia_driver:nvidia_driver_enabled?' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

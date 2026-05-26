@@ -18,6 +18,8 @@ default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '580.105.08'
 default['cluster']['nvidia']['dcgm_version'] = '4.5.1-1'
+
+default['cluster']['nvidia']['driver_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver"
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
 
 # CUDA
