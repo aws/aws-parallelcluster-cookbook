@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright:: 2024 Amazon.com, Inc. and its affiliates. All Rights Reserved.
+# Copyright:: 2026 Amazon.com, Inc. and its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the
 # License. A copy of the License is located at
@@ -20,35 +20,43 @@ describe 'aws-parallelcluster-slurm::install_jwt' do
       cached(:cluster_sources_dir) { '/path/to/cluster/sources/dir' }
       cached(:jwt_version) { '1.2.3' }
       cached(:jwt_checksum) { 'somechecksum' }
+      cached(:default_base_url) { "#{cluster_artifacts_s3_url}/dependencies/jwt" }
 
-      cached(:chef_run) do
-        runner = runner(platform: platform, version: version) do |node|
-          RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+      {
+        'default S3 base_url' => nil,
+        'base_url overridden via ExtraChefAttributes' => 'https://fake-public.example.DOMAIN/libjwt',
+      }.each do |scenario, override_url|
+        context "when #{scenario}" do
+          cached(:expected_base_url) { override_url || default_base_url }
+          cached(:chef_run) do
+            runner = runner(platform: platform, version: version) do |node|
+              RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
-          node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
-          node.override['cluster']['sources_dir'] = cluster_sources_dir
-          node.override['cluster']['jwt']['version'] = jwt_version
-          node.override['cluster']['jwt']['sha256'] = jwt_checksum
-        end
-        allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
-        runner.converge(described_recipe)
-      end
+              node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+              node.override['cluster']['sources_dir'] = cluster_sources_dir
+              node.override['cluster']['jwt']['version'] = jwt_version
+              node.override['cluster']['jwt']['sha256'] = jwt_checksum
+              node.override['cluster']['jwt']['base_url'] = override_url if override_url
+            end
+            allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
+            runner.converge(described_recipe)
+          end
 
-      it 'downloads libjwt' do
-        is_expected.to create_if_missing_remote_file("#{cluster_sources_dir}/libjwt-#{jwt_version}.tar.gz").with(
-          source: "#{cluster_artifacts_s3_url}/dependencies/jwt/v#{jwt_version}.tar.gz",
-          mode: '0644',
-          retries: 3,
-          retry_delay: 5,
-          checksum: jwt_checksum
-        )
-      end
+          it 'downloads libjwt from the expected URL' do
+            is_expected.to create_if_missing_remote_file("#{cluster_sources_dir}/libjwt-#{jwt_version}.tar.gz").with(
+              source: "#{expected_base_url}/v#{jwt_version}.tar.gz",
+              mode: '0644',
+              retries: 3,
+              retry_delay: 5,
+              checksum: jwt_checksum
+            )
+          end
 
-      it 'installs libjwt' do
-        is_expected.to run_bash('libjwt').with(
-          user: 'root',
-          group: 'root',
-          code: <<-CODE
+          it 'installs libjwt' do
+            is_expected.to run_bash('libjwt').with(
+              user: 'root',
+              group: 'root',
+              code: <<-CODE
     set -e
     tar xf #{"#{cluster_sources_dir}/libjwt-#{jwt_version}.tar.gz"} --no-same-owner
     cd libjwt-#{jwt_version}
@@ -57,8 +65,10 @@ describe 'aws-parallelcluster-slurm::install_jwt' do
     CORES=$(grep processor /proc/cpuinfo | wc -l)
     make -j $CORES
     sudo make install
-          CODE
-        )
+              CODE
+            )
+          end
+        end
       end
     end
   end
