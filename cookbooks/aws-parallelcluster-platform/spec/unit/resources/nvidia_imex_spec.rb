@@ -406,3 +406,74 @@ describe 'nvidia_imex:configure' do
     end
   end
 end
+
+# Tests for the NVIDIA library helper nvidia_package_url as exercised
+# through nvidia_imex URL construction.
+#
+# Default S3 path:  {base_url}/{platform}/{filename}
+# Public repo path: {base_url}/{platform}/{arch}/{filename}
+describe 'nvidia_imex_url construction' do
+  s3_imex_base_url = "#{cluster_artifacts_s3_url}/dependencies/nvidia_imex"
+  public_imex_base_url = 'https://fake-public.example.DOMAIN/compute/cuda/repos'
+
+  platform_dirs = {
+    'amazon2023' => 'amzn2023',
+    'ubuntu22.04' => 'ubuntu2204',
+    'ubuntu24.04' => 'ubuntu2404',
+    'redhat8' => 'rhel8',
+    'redhat9' => 'rhel9',
+    'rocky8' => 'rhel8',
+    'rocky9' => 'rhel9',
+  }.freeze
+
+  for_all_oses do |platform, version|
+    debian = (platform == 'ubuntu')
+    ext = debian ? 'deb' : 'rpm'
+    package_join = debian ? '_' : '-' # joiner between package name and version
+    arch_join = debian ? '_' : '.' # joiner between version-release and arch
+    expected_platform = platform_dirs["#{platform}#{version}"]
+
+    [false, true].each do |arm|
+      arch_suffix = if debian
+                      arm ? 'arm64' : 'amd64'
+                    else
+                      arm ? 'aarch64' : 'x86_64'
+                    end
+      package_filename = "nvidia-imex#{package_join}#{nvidia_version}-1#{arch_join}#{arch_suffix}.#{ext}"
+
+      [
+        ['default S3 base_url',
+         s3_imex_base_url,
+         "#{s3_imex_base_url}/#{expected_platform}/#{package_filename}"],
+        ['overridden public base_url',
+         public_imex_base_url,
+         "#{public_imex_base_url}/#{expected_platform}/#{arm ? 'sbsa' : 'x86_64'}/#{package_filename}"],
+      ].each do |scenario, base_url, expected_source|
+        context "on #{platform}#{version} #{arm ? 'ARM' : 'x86_64'} with #{scenario}" do
+          cached(:chef_run) do
+            stubs_for_resource('nvidia_imex') do |res|
+              allow(res).to receive(:nvidia_enabled_or_installed?).and_return(true)
+              allow(res).to receive(:imex_installed?).and_return(false)
+            end
+            allow_any_instance_of(Object).to receive(:arm_instance?).and_return(arm)
+            runner = runner(platform: platform, version: version, step_into: ['nvidia_imex']) do |node|
+              node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+              node.override['cluster']['nvidia']['imex']['base_url'] = base_url
+              node.override['cluster']['nvidia']['driver_version'] = nvidia_version
+            end
+            runner.converge_dsl('aws-parallelcluster-platform') do
+              nvidia_imex 'install' do
+                action :install
+              end
+            end
+          end
+
+          it 'builds the expected URL' do
+            remote_file = chef_run.find_resource('remote_file', /nvidia-imex.*\.#{ext}/)
+            expect(remote_file.source.first).to eq(expected_source)
+          end
+        end
+      end
+    end
+  end
+end

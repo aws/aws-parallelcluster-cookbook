@@ -34,7 +34,9 @@ action :install_imex do
 end
 
 def nvidia_imex_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_imex/#{platform}/#{nvidia_imex_package}_#{nvidia_imex_full_version}_#{arch_suffix}.deb"
+  base_url = node['cluster']['nvidia']['imex']['base_url']
+  nvidia_package_url(base_url, platform,
+    "#{nvidia_imex_package}_#{nvidia_imex_full_version}_#{arch_suffix}.deb")
 end
 
 def arch_suffix

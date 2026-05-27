@@ -40,5 +40,7 @@ def arch_suffix
 end
 
 def nvidia_imex_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_imex/#{platform}/#{nvidia_imex_package}-#{nvidia_imex_full_version}.#{arch_suffix}.rpm"
+  base_url = node['cluster']['nvidia']['imex']['base_url']
+  nvidia_package_url(base_url, platform,
+    "#{nvidia_imex_package}-#{nvidia_imex_full_version}.#{arch_suffix}.rpm")
 end
