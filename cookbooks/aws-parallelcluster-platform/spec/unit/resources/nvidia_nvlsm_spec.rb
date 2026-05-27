@@ -199,3 +199,76 @@ describe 'nvidia_nvlsm:install' do
     end
   end
 end
+
+# Tests for the NVIDIA library helpers nvidia_package_url and default_artifacts_url?
+# as exercised through nvidia_nvlsm URL construction and checksum verification.
+#
+# Default S3 path:   {base_url}/{platform}/{filename} (with checksum verification)
+# Public repo path:  {base_url}/{platform}/{arch}/{filename} (checksum skipped because
+# the test harness pre-computes checksums only for the S3-hosted artifacts)
+describe 'nvidia_nvlsm install URL and checksum override behavior' do
+  s3_nvlsm_base_url = "#{cluster_artifacts_s3_url}/dependencies/nvidia_nvlsm"
+  public_nvlsm_base_url = 'https://fake-public.example.DOMAIN/compute/cuda/repos'
+
+  for_all_oses do |platform, version|
+    debian = (platform == 'ubuntu')
+    ext = debian ? 'deb' : 'rpm'
+    package_join = debian ? '_' : '-'
+    arch_join = debian ? '_' : '.'
+    expected_platform = if platform == 'amazon'
+                          "amzn#{version}"
+                        elsif %w(redhat rocky).include?(platform)
+                          "rhel#{version}"
+                        else
+                          "#{platform}#{version.delete('.')}"
+                        end
+
+    %w(x86_64 aarch64).each do |arch|
+      arch_suffix = debian ? arch_suffix_debian[arch] : arch_suffix_rhel[arch]
+      package_filename = "nvlsm#{package_join}2025.03.9-1#{arch_join}#{arch_suffix}.#{ext}"
+
+      [
+        ['default S3 base_url',
+         s3_nvlsm_base_url,
+         "#{s3_nvlsm_base_url}/#{expected_platform}/#{package_filename}",
+         true],
+        ['overridden public base_url',
+         public_nvlsm_base_url,
+         "#{public_nvlsm_base_url}/#{expected_platform}/#{arch == 'aarch64' ? 'sbsa' : 'x86_64'}/#{package_filename}",
+         false],
+      ].each do |scenario, base_url, expected_source, checksum_expected|
+        context "on #{platform}#{version} #{arch} with #{scenario}" do
+          cached(:chef_run) do
+            stubs_for_resource('nvidia_nvlsm') do |res|
+              allow(res).to receive(:nvlsm_installation_enabled?).and_return(true)
+            end
+            runner = runner(platform: platform, version: version, step_into: ['nvidia_nvlsm']) do |node|
+              node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+              node.override['cluster']['nvidia']['nvlsm']['base_url'] = base_url
+              node.override['cluster']['sources_dir'] = source_dir
+              node.automatic['kernel']['machine'] = arch
+            end
+            ConvergeNvidiaNvlsm.install(runner)
+          end
+
+          it 'builds the expected URL' do
+            remote_file = chef_run.find_resource('remote_file', "#{source_dir}/#{package_filename}")
+            expect(remote_file.source.first).to eq(expected_source)
+          end
+
+          if checksum_expected
+            it 'verifies checksum on default S3 download' do
+              remote_file = chef_run.find_resource('remote_file', "#{source_dir}/#{package_filename}")
+              expect(remote_file.checksum).not_to be_nil
+            end
+          else
+            it 'skips checksum when base_url is overridden' do
+              remote_file = chef_run.find_resource('remote_file', "#{source_dir}/#{package_filename}")
+              expect(remote_file.checksum).to be_nil
+            end
+          end
+        end
+      end
+    end
+  end
+end
