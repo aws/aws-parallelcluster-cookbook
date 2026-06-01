@@ -33,20 +33,24 @@ describe 'fetch_dna_files resource' do
             node.override['cluster']['shared_dir'] = shared_dir
             node.override['cluster']['node_type'] = 'HeadNode'
             node.override['cluster']['region'] = region
+            node.override['cluster']['cluster_config_version'] = 'CLUSTER_CONFIG_VERSION'
             node.override['kitchen'] = true
           end
+          allow_any_instance_of(Object).to receive(:login_nodes_enabled?).and_return(true)
           ConvergeFetchDnaFiles.share(runner, extra_chef_attribute_location: "#{kitchen_instance_types_data_path}")
         end
         cached(:node) { chef_run.node }
 
-        # it "it copies data from /tmp/extra.json" do
-        #   is_expected.to create_remote_file("copy extra.json")
-        #                    .with(path: "#{shared_dir}/dna/extra.json")
-        #                    .with(source: "file://#{kitchen_instance_types_data_path}")
-        # end
+        it 'waits for login nodes LT to have the expected cluster_config_version' do
+          is_expected.to run_execute('Wait for login nodes LT to have the expected cluster_config_version').with(
+            command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" \
+              " --region #{node['cluster']['region']}" \
+              " --wait-login-nodes-launch-template-config-version #{node['cluster']['cluster_config_version']}"
+          )
+        end
 
-        it 'runs share_compute_fleet_dna.py to get dna files' do
-          is_expected.to run_execute('Run share_compute_fleet_dna.py to get user_data.sh and share dna.json with ComputeFleet').with(
+        it 'runs share_compute_fleet_dna.py to share dna files with both fleets' do
+          is_expected.to run_execute('Run share_compute_fleet_dna.py to get user_data.sh and share dna.json with ComputeFleet and LoginNodes').with(
             command: "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" \
               " --region #{node['cluster']['region']}"
           )

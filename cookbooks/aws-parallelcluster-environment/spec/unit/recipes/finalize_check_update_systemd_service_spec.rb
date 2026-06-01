@@ -25,7 +25,7 @@ describe 'aws-parallelcluster-environment::finalize_check_update_systemd_service
             runner.converge(described_recipe)
           end
 
-          if node_type == 'ComputeFleet'
+          if %w(ComputeFleet LoginNode).include?(node_type)
             it 'enables and starts the pcluster-check-update.timer service' do
               is_expected.to enable_service('pcluster-check-update.timer')
               is_expected.to start_service('pcluster-check-update.timer')

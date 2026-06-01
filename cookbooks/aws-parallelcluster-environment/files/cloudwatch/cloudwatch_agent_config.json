@@ -57,7 +57,6 @@
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
         "HeadNode",
-        "LoginNode",
         "ExternalSlurmDbd"
       ],
       "feature_conditions": []
@@ -72,7 +71,6 @@
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
         "HeadNode",
-        "LoginNode",
         "ExternalSlurmDbd"
       ],
       "feature_conditions": []
@@ -541,7 +539,8 @@
       ],
       "platforms": {{ default_platforms | tojson}},
       "node_roles": [
-        "ComputeFleet"
+        "ComputeFleet",
+        "LoginNode"
       ],
       "feature_conditions": []
     }

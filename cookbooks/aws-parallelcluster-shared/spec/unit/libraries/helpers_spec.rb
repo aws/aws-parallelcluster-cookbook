@@ -1,47 +1,46 @@
 require_relative '../../../libraries/helpers'
 require 'spec_helper'
 
-describe 'cfnhup_enabled?' do
+describe 'login_nodes_enabled?' do
   let(:node) { Chef::Node.new }
+  let(:shared_dir) { '/opt/parallelcluster/shared' }
+  let(:lt_config_path) { "#{shared_dir}/launch-templates-config.json" }
 
-  context 'when node type is HeadNode' do
-    before { node.override['cluster']['node_type'] = 'HeadNode' }
+  before { node.override['cluster']['shared_dir'] = shared_dir }
 
-    it 'returns true regardless of in_place_update_on_fleet_enabled setting' do
-      node.override['cluster']['in_place_update_on_fleet_enabled'] = 'false'
-      expect(cfnhup_enabled?).to be true
-    end
+  it 'raises an error when the launch templates config file does not exist' do
+    allow(::File).to receive(:exist?).with(lt_config_path).and_return(false)
+    expect { login_nodes_enabled? }.to raise_error(/does not exist/)
   end
 
-  %w(ComputeFleet LoginNode).each do |node_type|
-    context "when node type is #{node_type}" do
-      before { node.override['cluster']['node_type'] = node_type }
-
-      it 'returns true when in_place_update_on_fleet_enabled is true' do
-        node.override['cluster']['in_place_update_on_fleet_enabled'] = 'true'
-        expect(cfnhup_enabled?).to be true
-      end
-
-      it 'returns false when in_place_update_on_fleet_enabled is false' do
-        node.override['cluster']['in_place_update_on_fleet_enabled'] = 'false'
-        expect(cfnhup_enabled?).to be false
-      end
-    end
+  it 'returns true when the config contains a non-empty LoginPools map' do
+    allow(::File).to receive(:exist?).with(lt_config_path).and_return(true)
+    allow(::File).to receive(:read).with(lt_config_path).and_return('{"LoginPools": {"pool-0": {}}}')
+    expect(login_nodes_enabled?).to be true
   end
-end
 
-describe 'cluster_readiness_check_on_update_enabled?' do
-  let(:node) { Chef::Node.new }
+  it 'returns false when LoginPools is present but empty' do
+    allow(::File).to receive(:exist?).with(lt_config_path).and_return(true)
+    allow(::File).to receive(:read).with(lt_config_path).and_return('{"LoginPools": {}}')
+    expect(login_nodes_enabled?).to be false
+  end
 
-  [true, false].each do |cluster_readiness_check_enabled|
-    [true, false].each do |in_place_update_on_fleet_enabled|
-      expected = cluster_readiness_check_enabled && in_place_update_on_fleet_enabled
-      it "returns #{expected} when cluster_readiness_check_enabled is #{cluster_readiness_check_enabled} and in_place_update_on_fleet_enabled is #{in_place_update_on_fleet_enabled}" do
-        node.override['cluster']['cluster_readiness_check_enabled'] = cluster_readiness_check_enabled.to_s
-        node.override['cluster']['in_place_update_on_fleet_enabled'] = in_place_update_on_fleet_enabled.to_s
-        expect(cluster_readiness_check_on_update_enabled?).to be expected
-      end
-    end
+  it 'returns false when LoginPools key is absent' do
+    allow(::File).to receive(:exist?).with(lt_config_path).and_return(true)
+    allow(::File).to receive(:read).with(lt_config_path).and_return('{"Queues": {"queue-0": {}}}')
+    expect(login_nodes_enabled?).to be false
+  end
+
+  it 'returns false when the substring LoginPools appears outside of a real key' do
+    allow(::File).to receive(:exist?).with(lt_config_path).and_return(true)
+    allow(::File).to receive(:read).with(lt_config_path).and_return('{"Queues": {"LoginPools-decoy": {}}}')
+    expect(login_nodes_enabled?).to be false
+  end
+
+  it 'raises an error when the config is not valid JSON' do
+    allow(::File).to receive(:exist?).with(lt_config_path).and_return(true)
+    allow(::File).to receive(:read).with(lt_config_path).and_return('{not valid json')
+    expect { login_nodes_enabled? }.to raise_error(JSON::ParserError)
   end
 end
 

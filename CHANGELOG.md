@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
+- Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 
+  removing the dependency on cfn-hup and cfn-init.
+  
 
 **CHANGES**
 - In GPU Health Check, skip DCGM diagnostics when NVIDIA MIG is enabled because dcgmi diag does not support MIG.
@@ -25,6 +28,7 @@ via custom Slurm settings or the cluster name contains upper-case letters.
 - Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
 - Fix slurmrestd failing to start on AL2023 because the http-parser library was not discoverable by the dynamic linker.
 - Fix compute node bootstrap hanging without a clear error when the compute subnet cannot reach DynamoDB.
+- Fix login nodes not mounting `/opt/parallelcluster/shared` when EFS is used as the internal shared storage type.
 
 **DEPRECATIONS**
 - Amazon Linux 2 is no longer supported.

@@ -46,60 +46,46 @@ describe 'cfn_hup_configuration:configure' do
           end
           cached(:node) { chef_run.node }
 
-          %w(/etc/cfn /etc/cfn/hooks.d).each do |dir|
-            it "creates the directory #{dir}" do
-              is_expected.to create_directory(dir)
-                .with(owner: 'root')
-                .with(group: 'root')
-                .with(mode:  "0700")
-                .with(recursive: true)
+          if node_type == 'HeadNode'
+            %w(/etc/cfn /etc/cfn/hooks.d).each do |dir|
+              it "creates the directory #{dir}" do
+                is_expected.to create_directory(dir)
+                  .with(owner: 'root')
+                  .with(group: 'root')
+                  .with(mode:  "0700")
+                  .with(recursive: true)
+              end
             end
-          end
 
-          it "creates the file /etc/cfn/cfn-hup.conf" do
-            is_expected.to create_template("/etc/cfn/cfn-hup.conf")
-              .with(source: 'cfn_hup_configuration/cfn-hup.conf.erb')
-              .with(user: "root")
-              .with(group: "root")
-              .with(mode: "0400")
-              .with(variables: {
-                stack_id: STACK_ID,
-                region: AWS_REGION,
-                cloudformation_url: CLOUDFORMATION_URL,
-                cfn_init_role: INSTANCE_ROLE_NAME,
-             })
-          end
-
-          it "creates the file /etc/cfn/hooks.d/pcluster-update.conf" do
-            is_expected.to create_template("/etc/cfn/hooks.d/pcluster-update.conf")
-              .with(source: 'cfn_hup_configuration/cfn-hook-update.conf.erb')
-              .with(user: "root")
-              .with(group: "root")
-              .with(mode: "0400")
-              .with(variables: {
-                stack_id: STACK_ID,
-                region: AWS_REGION,
-                cloudformation_url: CLOUDFORMATION_URL,
-                cfn_init_role: INSTANCE_ROLE_NAME,
-                launch_template_resource_id: LAUNCH_TEMPLATE_ID,
-                update_hook_script_dir: SCRIPT_DIR,
-                node_bootstrap_timeout: NODE_BOOTSTRAP_TIMEOUT,
-             })
-          end
-
-          if %(ComputeFleet).include?(node_type)
-            it "creates the file #{SCRIPT_DIR}/cfn-hup-update-action.sh" do
-              is_expected.to create_template("#{SCRIPT_DIR}/cfn-hup-update-action.sh")
-                .with(source: "cfn_hup_configuration/#{node_type}/cfn-hup-update-action.sh.erb")
+            it "creates the file /etc/cfn/cfn-hup.conf" do
+              is_expected.to create_template("/etc/cfn/cfn-hup.conf")
+                .with(source: 'cfn_hup_configuration/cfn-hup.conf.erb')
                 .with(user: "root")
                 .with(group: "root")
-                .with(mode: "0700")
+                .with(mode: "0400")
                 .with(variables: {
-                   monitor_shared_dir: "#{MONITOR_SHARED_DIR}/dna",
-                   launch_template_resource_id: LAUNCH_TEMPLATE_ID,
-                               })
+                  stack_id: STACK_ID,
+                  region: AWS_REGION,
+                  cloudformation_url: CLOUDFORMATION_URL,
+                  cfn_init_role: INSTANCE_ROLE_NAME,
+               })
             end
-          elsif node_type == 'HeadNode'
+
+            it "creates the file /etc/cfn/hooks.d/pcluster-update.conf" do
+              is_expected.to create_template("/etc/cfn/hooks.d/pcluster-update.conf")
+                .with(source: 'cfn_hup_configuration/cfn-hook-update.conf.erb')
+                .with(user: "root")
+                .with(group: "root")
+                .with(mode: "0400")
+                .with(variables: {
+                  launch_template_resource_id: LAUNCH_TEMPLATE_ID,
+                  stack_id: STACK_ID,
+                  region: AWS_REGION,
+                  cloudformation_url: CLOUDFORMATION_URL,
+                  cfn_init_role: INSTANCE_ROLE_NAME,
+               })
+            end
+
             it "creates #{SCRIPT_DIR}/share_compute_fleet_dna.py" do
               is_expected.to create_if_missing_cookbook_file("#{SCRIPT_DIR}/share_compute_fleet_dna.py")
                 .with(source: 'cfn_hup_configuration/share_compute_fleet_dna.py')
@@ -110,6 +96,30 @@ describe 'cfn_hup_configuration:configure' do
 
             it "creates the directory #{MONITOR_SHARED_DIR}/dna" do
               is_expected.to create_directory("#{MONITOR_SHARED_DIR}/dna")
+            end
+          elsif %w(ComputeFleet LoginNode).include?(node_type)
+            it "does not create the directory /etc/cfn" do
+              is_expected.not_to create_directory('/etc/cfn')
+            end
+
+            it "does not create the file /etc/cfn/cfn-hup.conf" do
+              is_expected.not_to create_template('/etc/cfn/cfn-hup.conf')
+            end
+
+            it "does not create the file /etc/cfn/hooks.d/pcluster-update.conf" do
+              is_expected.not_to create_template('/etc/cfn/hooks.d/pcluster-update.conf')
+            end
+
+            it "creates the file #{SCRIPT_DIR}/cfn-hup-update-action.sh" do
+              is_expected.to create_template("#{SCRIPT_DIR}/cfn-hup-update-action.sh")
+                .with(source: 'cfn_hup_configuration/ComputeFleet/cfn-hup-update-action.sh.erb')
+                .with(user: "root")
+                .with(group: "root")
+                .with(mode: "0700")
+                .with(variables: {
+                   monitor_shared_dir: "#{MONITOR_SHARED_DIR}/dna",
+                   launch_template_resource_id: LAUNCH_TEMPLATE_ID,
+                               })
             end
           end
         end

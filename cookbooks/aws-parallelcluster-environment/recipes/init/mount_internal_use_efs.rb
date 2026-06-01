@@ -87,7 +87,10 @@ internal_efs_mount_point_array = []
 node['cluster']['internal_shared_dirs'].each do |dir|
   # Don't mount the login nodes shared dir to compute nodes
   next if node['cluster']['node_type'] == 'ComputeFleet' && dir == node['cluster']['shared_dir_login_nodes']
-  next if node['cluster']['node_type'] == 'LoginNode' && dir == node['cluster']['shared_dir_compute']
+  # Don't mount the compute-specific shared dir to login nodes, but only when it is a distinct
+  # directory. Today this is a no-op because shared_dir_compute aliases shared_dir, which
+  # login nodes must mount.
+  next if node['cluster']['node_type'] == 'LoginNode' && dir == node['cluster']['shared_dir_compute'] && node['cluster']['shared_dir_compute'] != node['cluster']['shared_dir']
   internal_shared_dir_array.push(dir)
   internal_efs_fs_id_array.push(initial_efs_fs_id_array[0])
   internal_efs_encryption_array.push(initial_efs_encryption_array[0])

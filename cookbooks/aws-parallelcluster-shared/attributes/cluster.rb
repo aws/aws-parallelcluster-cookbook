@@ -10,9 +10,12 @@ default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['etc_dir'] = '/etc/parallelcluster'
 
 # Cluster Updates
+# The trigger file lives in shared storage. The head node writes the current cluster config
+# version on every cluster update; compute and login nodes poll the file via the
+# pcluster-check-update systemd timer and run the update recipes when the version differs
+# from their local checkpoint.
 default['cluster']['update']['trigger_file'] = "#{node['cluster']['shared_dir']}/update_trigger"
 default['cluster']['update']['checkpoint_file'] = "#{node['cluster']['scripts_dir']}/update_checkpoint"
-default['cluster']['in_place_update_on_fleet_enabled'] = 'true'
 
 # Cluster readiness checks
 default['cluster']['cluster_readiness_check_enabled'] = 'true'

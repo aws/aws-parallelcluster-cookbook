@@ -107,15 +107,17 @@ def wait_sync_file(path)
   end
 end
 
-def cfnhup_enabled?
-  # cfn-hup is always enabled on the head node, as it is required to perform cluster updates.
-  # cfn-hup can be disabled on compute nodes and login nodes, limiting the cluster update in the sense that
-  # live updates on compute and login nodes are not possible.
-  node['cluster']['node_type'] == 'HeadNode' || node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
-end
+def login_nodes_enabled?
+  require 'json'
+  lt_config_path = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
+  unless ::File.exist?(lt_config_path)
+    raise "Unable to determine whether login nodes are enabled: launch templates config file #{lt_config_path} does not exist"
+  end
 
-def cluster_readiness_check_on_update_enabled?
-  cluster_readiness_check_enabled? && node['cluster']['in_place_update_on_fleet_enabled'] == 'true'
+  lt_config = JSON.parse(::File.read(lt_config_path))
+
+  login_pools = lt_config.is_a?(Hash) ? lt_config['LoginPools'] : nil
+  login_pools.is_a?(Hash) && !login_pools.empty?
 end
 
 def cluster_readiness_check_enabled?

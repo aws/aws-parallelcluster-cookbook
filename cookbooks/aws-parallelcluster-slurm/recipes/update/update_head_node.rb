@@ -20,7 +20,9 @@ execute 'stop clustermgtd' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
-# Write the new config version to shared storage to signal compute nodes to update
+# Write the new config version to shared storage to signal compute and login nodes to update.
+# Both fleets share the same shared_dir; the systemd timer on each node compares the trigger
+# against a local checkpoint and runs the update recipes when they differ.
 file node['cluster']['update']['trigger_file'] do
   content node['cluster']['cluster_config_version']
   owner 'root'
@@ -287,7 +289,7 @@ end
 
 chef_sleep '15'
 
-wait_cluster_ready if cluster_readiness_check_on_update_enabled?
+wait_cluster_ready
 
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"

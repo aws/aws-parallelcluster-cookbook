@@ -32,7 +32,6 @@ template "#{node['cluster']['etc_dir']}/parallelcluster_supervisord.conf" do
     dcv_port: node['cluster']['dcv_port'],
     dcv_auth_certificate: node['cluster']['dcv']['authenticator']['certificate'],
     dcv_auth_private_key: node['cluster']['dcv']['authenticator']['private_key'],
-    dcv_auth_user: node['cluster']['dcv']['authenticator']['user'],
-    cfnhup_enabled: cfnhup_enabled?
+    dcv_auth_user: node['cluster']['dcv']['authenticator']['user']
   )
 end

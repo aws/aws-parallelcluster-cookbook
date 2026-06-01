@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless node['cluster']['node_type'] == 'ComputeFleet'
+return unless %w(ComputeFleet LoginNode).include?(node['cluster']['node_type'])
 
 service 'pcluster-check-update.timer' do
   action [:enable, :start]

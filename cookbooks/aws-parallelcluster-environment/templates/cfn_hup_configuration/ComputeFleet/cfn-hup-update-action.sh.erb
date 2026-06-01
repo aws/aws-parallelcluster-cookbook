@@ -1,8 +1,10 @@
 #!/bin/bash
 set -ex
 
-# This script is invoked by cfn-hup as part of its update hook action.
-# This script runs on each node of ComputeFleet to monitor the shared location for latest dna.json and extra.json files and run ParallelCluster Cookbook recipes.
+# This script is invoked by the pcluster-check-update systemd service when the cluster
+# config version on the head node differs from the last applied version on this node.
+# It runs on each ComputeFleet and LoginNode instance to monitor the shared location for
+# the latest dna.json and extra.json files and run ParallelCluster cookbook recipes.
 #
 # Usage:   ./cfn-hup-update-action.sh
 
