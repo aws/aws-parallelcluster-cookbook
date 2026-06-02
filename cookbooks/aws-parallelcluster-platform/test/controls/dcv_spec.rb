@@ -214,8 +214,10 @@ control 'tag:config_dcv_correctly_configured' do
     it { should be_grouped_into 'root' }
     it { should be_mode 0755 }
 
-    unless instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
-      its('content') { should match /enable-gl-in-virtual-sessions\s*=\s*"always-off"/ }
+    it 'should disable GL in virtual sessions when GPU acceleration is not supported' do
+      unless instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+        expect(subject.content).to match(/enable-gl-in-virtual-sessions\s*=\s*"always-off"/)
+      end
     end
   end
 
