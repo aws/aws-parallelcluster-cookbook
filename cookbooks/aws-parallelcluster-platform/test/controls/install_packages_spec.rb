@@ -20,9 +20,11 @@ control 'tag:install_install_packages' do
   end unless instance.custom_ami? || os_properties.alinux2023? || os_properties.ubuntu2404?
   # Need to change the jq --argfile commands as its deprecated in 1.7( latest)
 
-  # NOTE: Skipped on AL2023 because the Desktop group (installed for DCV) now pulls in
-  # ImageMagick-libs which depends on fftw-libs-double
-  unless os_properties.alinux2023?
+  # NOTE: Skipped where the desktop group (@gnome, installed for DCV) transitively
+  # pulls in FFTW:
+  #   - AL2023: via ImageMagick-libs (fftw-libs-double)
+  #   - Rocky9: via pipewire-libs (fftw-libs-single)
+  unless os_properties.alinux2023? || os_properties.rocky?
     # Verify fftw package is not installed
     describe bash('ls 2>/dev/null /usr/lib64/libfftw*') do
       its('stdout') { should be_empty }
