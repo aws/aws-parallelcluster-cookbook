@@ -61,3 +61,14 @@ file "#{node['cluster']['log_base_dir']}/pcluster-check-update.log" do
   mode '0644'
   action :create_if_missing
 end
+
+template "#{node['cluster']['scripts_dir']}/cluster-update-action.sh" do
+  source 'check_update/cluster-update-action.sh.erb'
+  owner 'root'
+  group 'root'
+  mode '0700'
+  variables(
+    monitor_shared_dir: node['cluster']['update']['dna_dir'],
+    launch_template_resource_id: node['cluster']['launch_template_id']
+  )
+end

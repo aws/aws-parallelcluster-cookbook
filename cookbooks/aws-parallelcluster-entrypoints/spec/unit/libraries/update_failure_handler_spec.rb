@@ -144,7 +144,7 @@ describe ErrorHandlers::UpdateFailureHandler do
       end
 
       it 'runs the cleanup command' do
-        expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/share_compute_fleet_dna.py --region #{region} --cleanup"
+        expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/manage_fleet_dna.py --region #{region} --cleanup"
         expect(command_runner).to receive(:run_with_retries).with(expected_command, description: "cleanup DNA files")
         handler.cleanup_dna_files
       end
@@ -188,7 +188,7 @@ describe ErrorHandlers::UpdateFailureHandler do
       end
 
       it 'falls back to cleaning up DNA files' do
-        expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/share_compute_fleet_dna.py --region #{region} --cleanup"
+        expected_command = "#{virtualenv_path}/bin/python #{scripts_dir}/manage_fleet_dna.py --region #{region} --cleanup"
         expect(command_runner).to receive(:run_with_retries).with(expected_command, description: "cleanup DNA files")
         handler.cleanup_dna_files
       end

@@ -74,14 +74,14 @@ module ErrorHandlers
         else
           # No marker — this is an update failure, clean up DNA files and write marker
           Chef::Log.info("#{log_prefix} Update failure detected (no marker at #{marker}), cleaning up DNA files")
-          command = "#{cookbook_virtualenv_path}/bin/python #{cluster_attributes['scripts_dir']}/share_compute_fleet_dna.py --region #{cluster_attributes['region']} --cleanup"
+          command = "#{cookbook_virtualenv_path}/bin/python #{cluster_attributes['scripts_dir']}/manage_fleet_dna.py --region #{cluster_attributes['region']} --cleanup"
           command_runner.run_with_retries(command, description: "cleanup DNA files")
           ::File.write(marker, '')
         end
       rescue => e
         # If marker I/O fails, fall back to deleting DNA files
         Chef::Log.warn("#{log_prefix} Error during marker check (#{e.message}), falling back to cleaning up DNA files")
-        command = "#{cookbook_virtualenv_path}/bin/python #{cluster_attributes['scripts_dir']}/share_compute_fleet_dna.py --region #{cluster_attributes['region']} --cleanup"
+        command = "#{cookbook_virtualenv_path}/bin/python #{cluster_attributes['scripts_dir']}/manage_fleet_dna.py --region #{cluster_attributes['region']} --cleanup"
         command_runner.run_with_retries(command, description: "cleanup DNA files")
       end
     end

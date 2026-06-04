@@ -17,7 +17,7 @@ import boto3
 import pytest
 from assertpy import assert_that
 from botocore.stub import Stubber
-from share_compute_fleet_dna import (
+from manage_fleet_dna import (
     get_compute_launch_template_ids,
     get_latest_dna_data_for_login_nodes,
     get_user_data,
@@ -282,8 +282,8 @@ def test_share_compute_fleet_dna(lt_config, expected_compute_ids):
     def fake_get_user_data(lt_id, *_args, **_kwargs):
         fetched_ids.append(lt_id)
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
-        with patch("share_compute_fleet_dna.get_user_data", side_effect=fake_get_user_data):
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+        with patch("manage_fleet_dna.get_user_data", side_effect=fake_get_user_data):
             share_compute_fleet_dna(args)
 
     assert_that(sorted(fetched_ids)).is_equal_to(sorted(expected_compute_ids))
@@ -305,8 +305,8 @@ def test_share_login_nodes_dna(lt_config, expected_pools):
     def fake_share_login(pool_name, _pool, *_args, **_kwargs):
         fetched_pools.append(pool_name)
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
-        with patch("share_compute_fleet_dna.get_latest_dna_data_for_login_nodes", side_effect=fake_share_login):
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+        with patch("manage_fleet_dna.get_latest_dna_data_for_login_nodes", side_effect=fake_share_login):
             share_login_nodes_dna(args)
 
     assert_that(sorted(fetched_pools)).is_equal_to(sorted(expected_pools))
@@ -316,8 +316,8 @@ def test_share_login_nodes_dna_propagates_login_pool_failure():
     """A login pool failure propagates so the head-node Chef step retries."""
     args = _share_args()
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=LT_CONFIG_COMPUTE_AND_LOGIN):
-        with patch("share_compute_fleet_dna.get_latest_dna_data_for_login_nodes", side_effect=RuntimeError("boom")):
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=LT_CONFIG_COMPUTE_AND_LOGIN):
+        with patch("manage_fleet_dna.get_latest_dna_data_for_login_nodes", side_effect=RuntimeError("boom")):
             with pytest.raises(RuntimeError, match="boom"):
                 share_login_nodes_dna(args)
 
@@ -355,7 +355,7 @@ def test_get_latest_dna_data_for_login_nodes_writes_dna_file(tmp_path):
     pool = {"LaunchTemplate": {"Name": "stack-pool-0", "Version": "$Latest", "LogicalId": "LoginNodeLT0"}}
     user_data = _login_user_data('{"cluster": {"launch_template_id": "LoginNodeLT0"}}')
 
-    with patch("share_compute_fleet_dna.get_user_data", return_value=user_data):
+    with patch("manage_fleet_dna.get_user_data", return_value=user_data):
         get_latest_dna_data_for_login_nodes("pool-0", pool, output_location, args)
 
     target = tmp_path / "LoginNodeLT0-dna.json"
@@ -397,7 +397,7 @@ def test_get_latest_dna_data_for_login_nodes_raises_on_invalid_input(tmp_path, p
     args = MagicMock(region="us-east-1")
     output_location = str(tmp_path) + "/"
 
-    with patch("share_compute_fleet_dna.get_user_data", return_value=user_data):
+    with patch("manage_fleet_dna.get_user_data", return_value=user_data):
         with pytest.raises(RuntimeError):
             get_latest_dna_data_for_login_nodes("pool-0", pool, output_location, args)
 
@@ -409,7 +409,7 @@ def test_get_latest_dna_data_for_login_nodes_uses_version_from_config():
     args = MagicMock(region="us-east-1")
     pool = {"LaunchTemplate": {"Name": "stack-pool-0", "Version": "$Latest", "LogicalId": "LoginNodeLT0"}}
 
-    with patch("share_compute_fleet_dna.get_user_data") as mock_get_user_data:
+    with patch("manage_fleet_dna.get_user_data") as mock_get_user_data:
         mock_get_user_data.return_value = _login_user_data('{"cluster": {}}')
         get_latest_dna_data_for_login_nodes("pool-0", pool, "/unused/", args)
 
@@ -479,8 +479,8 @@ def test_wait_for_login_nodes_lt_update_uses_version_from_config():
     }
     user_data = _login_user_data('{"cluster": {"cluster_config_version": "v-new"}}')
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
-        with patch("share_compute_fleet_dna.get_user_data", return_value=user_data) as mock_get_user_data:
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+        with patch("manage_fleet_dna.get_user_data", return_value=user_data) as mock_get_user_data:
             wait_for_login_nodes_lt_update("v-new", "us-east-1")
 
     mock_get_user_data.assert_called_once_with(
@@ -496,8 +496,8 @@ def test_wait_for_login_nodes_lt_update_passes_when_versions_match():
     }
     user_data = _login_user_data('{"cluster": {"cluster_config_version": "v-new"}}')
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
-        with patch("share_compute_fleet_dna.get_user_data", return_value=user_data) as mock_get_user_data:
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+        with patch("manage_fleet_dna.get_user_data", return_value=user_data) as mock_get_user_data:
             wait_for_login_nodes_lt_update("v-new", "us-east-1")
 
     mock_get_user_data.assert_called_once_with(
@@ -513,8 +513,8 @@ def test_wait_for_login_nodes_lt_update_raises_when_versions_mismatch():
     }
     user_data = _login_user_data('{"cluster": {"cluster_config_version": "v-old"}}')
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
-        with patch("share_compute_fleet_dna.get_user_data", return_value=user_data):
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+        with patch("manage_fleet_dna.get_user_data", return_value=user_data):
             with pytest.raises(RuntimeError, match="cluster_config_version=v-old, expected v-new"):
                 wait_for_login_nodes_lt_update("v-new", "us-east-1")
 
@@ -526,7 +526,7 @@ def test_wait_for_login_nodes_lt_update_raises_when_version_missing_in_config():
         }
     }
 
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
         with pytest.raises(RuntimeError, match="missing required data Name/Version/LogicalId"):
             wait_for_login_nodes_lt_update("v-new", "us-east-1")
 
@@ -537,8 +537,8 @@ def test_wait_for_login_nodes_lt_update_raises_when_config_missing():
     The launch template config is expected to always be written, so a missing or
     unreadable config (None) is a retryable error rather than a silent pass.
     """
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=None):
-        with patch("share_compute_fleet_dna.get_user_data") as mock_get_user_data:
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=None):
+        with patch("manage_fleet_dna.get_user_data") as mock_get_user_data:
             with pytest.raises(RuntimeError):
                 wait_for_login_nodes_lt_update("v-new", "us-east-1")
             mock_get_user_data.assert_not_called()
@@ -551,8 +551,8 @@ def test_wait_for_login_nodes_lt_update_returns_without_login_pools(lt_config):
     When the config is present but has no login node pool, there is nothing to wait
     for: a warning is logged and the function returns without raising.
     """
-    with patch("share_compute_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
-        with patch("share_compute_fleet_dna.get_user_data") as mock_get_user_data:
+    with patch("manage_fleet_dna.get_compute_launch_template_ids", return_value=lt_config):
+        with patch("manage_fleet_dna.get_user_data") as mock_get_user_data:
             wait_for_login_nodes_lt_update("v-new", "us-east-1")
             mock_get_user_data.assert_not_called()
 
@@ -564,10 +564,10 @@ def test_wait_for_login_nodes_lt_update_returns_without_login_pools(lt_config):
 
 def test_main_cleanup_branch():
     """--cleanup invokes cleanup and nothing else."""
-    with patch("sys.argv", ["share_compute_fleet_dna.py", "--region", "us-east-1", "--cleanup"]):
-        with patch("share_compute_fleet_dna.cleanup") as mock_cleanup:
-            with patch("share_compute_fleet_dna.share_compute_fleet_dna") as mock_compute:
-                with patch("share_compute_fleet_dna.wait_for_login_nodes_lt_update") as mock_wait:
+    with patch("sys.argv", ["manage_fleet_dna.py", "--region", "us-east-1", "--cleanup"]):
+        with patch("manage_fleet_dna.cleanup") as mock_cleanup:
+            with patch("manage_fleet_dna.share_compute_fleet_dna") as mock_compute:
+                with patch("manage_fleet_dna.wait_for_login_nodes_lt_update") as mock_wait:
                     main()
 
     mock_cleanup.assert_called_once()
@@ -578,16 +578,16 @@ def test_main_cleanup_branch():
 def test_main_wait_login_nodes_branch():
     """The --wait-login-nodes-launch-template-config-version flag invokes the wait and nothing else."""
     argv = [
-        "share_compute_fleet_dna.py",
+        "manage_fleet_dna.py",
         "--region",
         "us-east-1",
         "--wait-login-nodes-launch-template-config-version",
         "v-new",
     ]
     with patch("sys.argv", argv):
-        with patch("share_compute_fleet_dna.wait_for_login_nodes_lt_update") as mock_wait:
-            with patch("share_compute_fleet_dna.share_compute_fleet_dna") as mock_compute:
-                with patch("share_compute_fleet_dna.cleanup") as mock_cleanup:
+        with patch("manage_fleet_dna.wait_for_login_nodes_lt_update") as mock_wait:
+            with patch("manage_fleet_dna.share_compute_fleet_dna") as mock_compute:
+                with patch("manage_fleet_dna.cleanup") as mock_cleanup:
                     main()
 
     mock_wait.assert_called_once_with("v-new", "us-east-1")
@@ -597,9 +597,9 @@ def test_main_wait_login_nodes_branch():
 
 def test_main_share_branch():
     """With no special flag, main shares both compute fleet and login nodes dna."""
-    with patch("sys.argv", ["share_compute_fleet_dna.py", "--region", "us-east-1"]):
-        with patch("share_compute_fleet_dna.share_compute_fleet_dna") as mock_compute:
-            with patch("share_compute_fleet_dna.share_login_nodes_dna") as mock_login:
+    with patch("sys.argv", ["manage_fleet_dna.py", "--region", "us-east-1"]):
+        with patch("manage_fleet_dna.share_compute_fleet_dna") as mock_compute:
+            with patch("manage_fleet_dna.share_login_nodes_dna") as mock_login:
                 main()
 
     mock_compute.assert_called_once()
@@ -612,8 +612,8 @@ def test_main_share_branch():
 )
 def test_main_propagates_any_exception(exception):
     """The main function does not swallow exceptions; they propagate (Python exits non-zero)."""
-    with patch("sys.argv", ["share_compute_fleet_dna.py", "--region", "us-east-1"]):
-        with patch("share_compute_fleet_dna.share_compute_fleet_dna", side_effect=exception):
+    with patch("sys.argv", ["manage_fleet_dna.py", "--region", "us-east-1"]):
+        with patch("manage_fleet_dna.share_compute_fleet_dna", side_effect=exception):
             with pytest.raises(type(exception)):
                 main()
 
@@ -621,13 +621,13 @@ def test_main_propagates_any_exception(exception):
 def test_main_wait_branch_propagates_failure():
     """A failure while waiting for login nodes LT propagates out of main."""
     argv = [
-        "share_compute_fleet_dna.py",
+        "manage_fleet_dna.py",
         "--region",
         "us-east-1",
         "--wait-login-nodes-launch-template-config-version",
         "v-new",
     ]
     with patch("sys.argv", argv):
-        with patch("share_compute_fleet_dna.wait_for_login_nodes_lt_update", side_effect=RuntimeError("stale")):
+        with patch("manage_fleet_dna.wait_for_login_nodes_lt_update", side_effect=RuntimeError("stale")):
             with pytest.raises(RuntimeError, match="stale"):
                 main()

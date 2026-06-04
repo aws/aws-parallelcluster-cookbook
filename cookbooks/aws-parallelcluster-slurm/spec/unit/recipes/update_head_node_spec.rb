@@ -76,7 +76,7 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
           end
 
           it 'does not cleanup DNA files after update' do
-            is_expected.not_to run_execute("Cleanup dna.json and extra.json from #{chef_run.node['cluster']['shared_dir']}/dna")
+            is_expected.not_to run_execute("Cleanup dna.json and extra.json from #{chef_run.node['cluster']['update']['dna_dir']}")
           end
 
           it 'starts clustermgtd unconditionally' do

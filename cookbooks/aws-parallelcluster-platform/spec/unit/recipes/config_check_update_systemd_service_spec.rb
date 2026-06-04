@@ -8,6 +8,8 @@ describe 'aws-parallelcluster-platform::config_check_update_systemd_service' do
           cached(:chef_run) do
             runner = runner(platform: platform, version: version) do |node|
               node.override['cluster']['node_type'] = node_type
+              node.override['cluster']['launch_template_id'] = 'LAUNCH_TEMPLATE_ID'
+              node.override['cluster']['update']['dna_dir'] = 'DNA_DIR'
             end
             runner.converge(described_recipe)
           end
@@ -43,6 +45,30 @@ describe 'aws-parallelcluster-platform::config_check_update_systemd_service' do
               .with(owner: 'root')
               .with(group: 'root')
               .with(mode: '0644')
+          end
+
+          it 'creates the cluster-update-action.sh template' do
+            is_expected.to create_template("#{node['cluster']['scripts_dir']}/cluster-update-action.sh")
+              .with(source: 'check_update/cluster-update-action.sh.erb')
+              .with(owner: 'root')
+              .with(group: 'root')
+              .with(mode: '0700')
+              .with(variables: {
+                               monitor_shared_dir: node['cluster']['update']['dna_dir'],
+                               launch_template_resource_id: node['cluster']['launch_template_id'],
+                             })
+          end
+
+          describe 'cluster-update-action.sh template content' do
+            it 'monitors the dna_dir for the launch template dna.json' do
+              is_expected.to render_file("#{node['cluster']['scripts_dir']}/cluster-update-action.sh")
+                .with_content("LATEST_DNA_LOC=#{node['cluster']['update']['dna_dir']}")
+            end
+
+            it 'looks for the launch template specific dna.json file' do
+              is_expected.to render_file("#{node['cluster']['scripts_dir']}/cluster-update-action.sh")
+                .with_content("LATEST_DNA_FILE=$LATEST_DNA_LOC/#{node['cluster']['launch_template_id']}-dna.json")
+            end
           end
 
           describe 'pcluster-check-update.service template content' do

@@ -16,6 +16,7 @@ default['cluster']['etc_dir'] = '/etc/parallelcluster'
 # from their local checkpoint.
 default['cluster']['update']['trigger_file'] = "#{node['cluster']['shared_dir']}/update_trigger"
 default['cluster']['update']['checkpoint_file'] = "#{node['cluster']['scripts_dir']}/update_checkpoint"
+default['cluster']['update']['dna_dir'] = "#{node['cluster']['shared_dir']}/dna"
 
 # Cluster readiness checks
 default['cluster']['cluster_readiness_check_enabled'] = 'true'

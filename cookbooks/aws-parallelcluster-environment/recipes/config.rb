@@ -38,4 +38,4 @@ include_recipe 'aws-parallelcluster-environment::fsx'
 # spack 'Configure Spack Packages' do
 #   action :configure
 # end
-cfn_hup_configuration "Configure cfn-hup"
+cfn_hup_configuration "Configure cfn-hup" if node['cluster']['node_type'] == 'HeadNode'

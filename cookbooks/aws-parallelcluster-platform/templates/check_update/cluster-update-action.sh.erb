@@ -6,7 +6,7 @@ set -ex
 # It runs on each ComputeFleet and LoginNode instance to monitor the shared location for
 # the latest dna.json and extra.json files and run ParallelCluster cookbook recipes.
 #
-# Usage:   ./cfn-hup-update-action.sh
+# Usage:   ./cluster-update-action.sh
 
 function run_cookbook_recipes() {
     LATEST_DNA_LOC=<%= @monitor_shared_dir %>

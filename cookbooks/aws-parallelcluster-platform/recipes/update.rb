@@ -15,7 +15,9 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-fetch_dna_files "Fetch ComputeFleet's and LoginFleets's Dna files"
+manage_dna_files "Fetch ComputeFleet's and LoginFleets's Dna files" do
+  action :share
+end
 fetch_config 'Fetch and load cluster configs' do
   update true
 end

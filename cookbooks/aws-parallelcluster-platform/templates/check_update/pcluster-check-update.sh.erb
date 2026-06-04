@@ -8,7 +8,7 @@ set -e
 
 SHARED_TRIGGER_FILE="<%= node['cluster']['update']['trigger_file'] %>"
 LOCAL_CHECKPOINT="<%= node['cluster']['update']['checkpoint_file'] %>"
-UPDATE_SCRIPT="<%= node['cluster']['scripts_dir'] %>/cfn-hup-update-action.sh"
+UPDATE_SCRIPT="<%= node['cluster']['scripts_dir'] %>/cluster-update-action.sh"
 FS_TIMEOUT=20
 
 log() {

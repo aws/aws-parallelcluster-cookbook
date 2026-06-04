@@ -35,26 +35,14 @@ control 'tag:config_cfn_hup_head_node_configuration' do
   title "cfn_hup configuration files and directories for HeadNode should be created"
   only_if { instance.head_node? }
 
-  describe file("#{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py") do
+  describe file("#{node['cluster']['scripts_dir']}/manage_fleet_dna.py") do
     it { should exist }
     its('mode') { should cmp '0700' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
   end
 
-  describe directory("#{node['cluster']['shared_dir']}/dna") do
+  describe directory(node['cluster']['update']['dna_dir']) do
     it { should exist }
-  end
-end
-
-control 'tag:config_cfn_hup_compute_configuration' do
-  title "cfn_hup configuration files and directories for ComputeFleet should be created"
-  only_if { instance.compute_node? }
-
-  describe file("#{node['cluster']['scripts_dir']}/cfn-hup-update-action.sh") do
-    it { should exist }
-    its('mode') { should cmp '0700' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
   end
 end
