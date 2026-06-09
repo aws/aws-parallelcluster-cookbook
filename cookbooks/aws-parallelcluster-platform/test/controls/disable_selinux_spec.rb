@@ -26,6 +26,13 @@ control 'tag:install_selinux_disabled' do
     its('stdout') { should match(/selinux=0/) }
     its('stdout') { should_not match(/selinux=1/) }
   end if selinux_applies
+
+  # Verify the GRUB template has selinux=0 so kernel updates and any later
+  # grub2-mkconfig regeneration produce BLS entries with SELinux disabled.
+  describe file('/etc/default/grub') do
+    its('content') { should match(/^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=0/) }
+    its('content') { should_not match(/^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=1/) }
+  end if selinux_applies
 end
 
 control 'tag:testami_selinux_disabled' do

@@ -402,6 +402,7 @@ describe 'dcv:setup' do
           stub_command('which getenforce').and_return(true)
           stub_command('grubby --info=ALL | grep -q "selinux=0"').and_return(false)
           stub_command('grep -qE "^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=1" /etc/default/grub').and_return(false)
+          stub_command('grep -qE "^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=" /etc/default/grub').and_return(true)
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
           allow(::File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(false)
           allow(::File).to receive(:exist?).with(dcv_tarball).and_return(false)

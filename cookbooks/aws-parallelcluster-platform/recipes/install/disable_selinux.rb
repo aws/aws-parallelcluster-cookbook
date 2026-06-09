@@ -33,10 +33,18 @@ execute 'disable selinux via grubby' do
 end
 
 # Persist selinux=0 in /etc/default/grub so the setting survives any later
-# grub2-mkconfig regeneration. Required on AL2023 / RHEL8 x86_64 where the
-# c_states resource regenerates BLS entries after this recipe runs and would
-# otherwise restore selinux=1 from /etc/default/grub.
-execute 'persist selinux=0 in /etc/default/grub' do
+# grub2-mkconfig regeneration and kernel updates that create new BLS entries.
+# Required on AL2023 / RHEL8 x86_64 (c_states regenerates BLS) and on all
+# OSes long-term (kernel updates create new BLS entries from this template).
+
+# Replace selinux=1 with selinux=0 if present (AL2023, RHEL/Rocky 8).
+execute 'replace selinux=1 in /etc/default/grub' do
   command 'sed -i -E \'/^GRUB_CMDLINE_LINUX(_DEFAULT)?=/ s/selinux=1/selinux=0/g\' /etc/default/grub'
   only_if 'grep -qE "^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=1" /etc/default/grub'
+end
+
+# Append selinux=0 if no selinux= is present on the line (Rocky9).
+execute 'append selinux=0 to /etc/default/grub' do
+  command 'sed -i -E \'/^GRUB_CMDLINE_LINUX(_DEFAULT)?=/ {/selinux=/!s/"$/ selinux=0"/}\' /etc/default/grub'
+  not_if 'grep -qE "^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=" /etc/default/grub'
 end
