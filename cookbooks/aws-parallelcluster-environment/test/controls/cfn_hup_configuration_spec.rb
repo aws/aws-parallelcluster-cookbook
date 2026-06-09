@@ -9,8 +9,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'tag:config_cfn_hup_conf_files_created' do
-  title "cfn_hup configuration files and directories should be created"
+control 'tag:config_cfn_hup_head_node_configuration' do
+  title "cfn_hup configuration files and directories for HeadNode should be created"
+  only_if { instance.head_node? }
 
   %w(/etc/cfn /etc/cfn/hooks.d).each do |dir|
     describe directory(dir) do
@@ -29,11 +30,6 @@ control 'tag:config_cfn_hup_conf_files_created' do
       its('group') { should eq 'root' }
     end
   end
-end
-
-control 'tag:config_cfn_hup_head_node_configuration' do
-  title "cfn_hup configuration files and directories for HeadNode should be created"
-  only_if { instance.head_node? }
 
   describe file("#{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py") do
     it { should exist }
