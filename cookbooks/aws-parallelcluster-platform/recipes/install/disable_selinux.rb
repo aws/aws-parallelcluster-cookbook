@@ -38,13 +38,13 @@ end
 # OSes long-term (kernel updates create new BLS entries from this template).
 
 # Replace selinux=1 with selinux=0 if present (AL2023, RHEL/Rocky 8).
-execute 'replace selinux=1 in /etc/default/grub' do
-  command 'sed -i -E \'/^GRUB_CMDLINE_LINUX(_DEFAULT)?=/ s/selinux=1/selinux=0/g\' /etc/default/grub'
-  only_if 'grep -qE "^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=1" /etc/default/grub'
+filter_lines 'replace selinux=1 in /etc/default/grub' do
+  path '/etc/default/grub'
+  filters substitute: [/^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=1/, /selinux=1/, 'selinux=0']
 end
 
 # Append selinux=0 if no selinux= is present on the line (Rocky9).
-execute 'append selinux=0 to /etc/default/grub' do
-  command 'sed -i -E \'/^GRUB_CMDLINE_LINUX(_DEFAULT)?=/ {/selinux=/!s/"$/ selinux=0"/}\' /etc/default/grub'
-  not_if 'grep -qE "^GRUB_CMDLINE_LINUX(_DEFAULT)?=.*selinux=" /etc/default/grub'
+filter_lines 'append selinux=0 to /etc/default/grub' do
+  path '/etc/default/grub'
+  filters substitute: [/^GRUB_CMDLINE_LINUX(_DEFAULT)?=(?!.*selinux=)/, /"$/, ' selinux=0"']
 end
