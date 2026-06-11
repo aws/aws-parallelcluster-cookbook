@@ -14,20 +14,24 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :setup do
-  mysql_archive_url = package_archive
-  mysql_tar_file = "/tmp/#{package_filename}"
-
-  log "Downloading MySQL packages archive from #{mysql_archive_url}"
-
   # Add MySQL source file
   action_create_source_link
 
-  remote_file mysql_tar_file do
-    source mysql_archive_url
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
+  # Download the individual MySQL community client RPMs from base_url and
+  # install them in a single yum transaction so interdependencies resolve.
+  # (Previously a single .tar.gz bundle was downloaded and extracted; the RPMs
+  # are now stored unbundled, so base_url can point at either the PCluster S3
+  # mirror or MySQL's public yum repo using ExtraChefAttributes.
+  rpm_files = mysql_rpm_filenames
+
+  rpm_files.each do |rpm|
+    remote_file "/tmp/#{rpm}" do
+      source "#{package_base_url}/#{rpm}"
+      mode '0644'
+      retries 3
+      retry_delay 5
+      action :create_if_missing
+    end
   end
 
   bash 'Install MySQL packages' do
@@ -36,26 +40,42 @@ action :setup do
     cwd '/tmp'
     code <<-MYSQL
         set -e
-
-        EXTRACT_DIR=$(mktemp -d --tmpdir mysql.XXXXXXX)
-        tar xf "#{mysql_tar_file}" --directory "${EXTRACT_DIR}"
-        yum install -y ${EXTRACT_DIR}/*
+        yum install -y #{rpm_files.join(' ')}
     MYSQL
   end
 end
 
 action_class do
-  def package_platform
+  def el_version
     platform_version = node['platform_version'].to_i
-    if platform_version == 2
-      platform_version = 7
-    elsif platform_version == 2023
-      platform_version = 9
+    if platform_version == 2023
+      9
+    else
+      platform_version
     end
-    arm_instance? ? "el/#{platform_version}/aarch64" : "el/#{platform_version}/x86_64"
   end
 
-  def repository_packages
-    %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat)
+  def rpm_arch
+    arm_instance? ? 'aarch64' : 'x86_64'
+  end
+
+  def package_platform
+    "el/#{el_version}/#{rpm_arch}"
+  end
+
+  # base_url + platform path holding the individual RPMs.
+  def package_base_url
+    "#{node['cluster']['mysql']['base_url']}/#{package_platform}"
+  end
+
+  # MySQL community client RPM filenames for this platform/arch.
+  def mysql_rpm_components
+    %w(common client-plugins libs devel)
+  end
+
+  def mysql_rpm_filenames
+    mysql_rpm_components.map do |component|
+      "mysql-community-#{component}-#{node['cluster']['mysql']['version']}.el#{el_version}.#{rpm_arch}.rpm"
+    end
   end
 end

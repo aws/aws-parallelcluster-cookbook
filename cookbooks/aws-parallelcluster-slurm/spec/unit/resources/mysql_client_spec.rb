@@ -25,40 +25,28 @@ describe 'mysql_client:setup' do
         cached(:source_dir) { 'SOURCE_DIR' }
         cached(:package_source_version) { 'VERSION' }
         cached(:package_version) { 'VERSION-1' }
-        cached(:package_filename) { "mysql-community-client-#{package_version}.tar.gz" }
         cached(:s3_url) { 's3://url' }
         cached(:mysql_base_url) { "#{s3_url}/mysql" }
-        cached(:package_platform) do
-          platform_version = if version.to_i == 2
-                               7
-                             elsif platform == 'amazon' && version == '2023'
-                               9
-                             else
-                               version.to_i
-                             end
-          if architecture == 'aarch64'
-            "el/#{platform_version}/aarch64"
-          elsif architecture == 'x86_64'
-            if platform == 'ubuntu'
-              "ubuntu/${version}/x86_64"
-            else
-              "el/#{platform_version}/x86_64"
-            end
+        cached(:el_version) do
+          if platform == 'amazon' && version == '2023'
+            9
           else
-            pending "unsupported architecture #{architecture}"
+            version.to_i
           end
         end
-        cached(:package_archive) { "#{mysql_base_url}/#{package_platform}/#{package_filename}" }
-        cached(:tarfile) { "/tmp/mysql-community-client-#{package_version}.tar.gz" }
+        cached(:package_platform) { "el/#{el_version}/#{architecture}" }
+        cached(:package_base_url) { "#{mysql_base_url}/#{package_platform}" }
+        cached(:mysql_rpm_filenames) do
+          components = %w(common client-plugins libs devel)
+          components.map { |c| "mysql-community-#{c}-#{package_version}.el#{el_version}.#{architecture}.rpm" }
+        end
+        # Ubuntu installs from the apt repository by package name; RHEL-based
+        # platforms install the downloaded RPMs directly (see mysql_rpm_filenames).
         cached(:repository_packages) do
-          if platform == 'ubuntu'
-            if version.to_i == 18
-              %w(libmysqlclient-dev libmysqlclient20)
-            elsif version.to_i >= 20
-              %w(libmysqlclient-dev libmysqlclient21)
-            end
-          else
-            %w(mysql-community-devel mysql-community-libs mysql-community-common mysql-community-client-plugins mysql-community-libs-compat)
+          if version.to_i == 18
+            %w(libmysqlclient-dev libmysqlclient20)
+          elsif version.to_i >= 20
+            %w(libmysqlclient-dev libmysqlclient21)
           end
         end
         cached(:chef_run) do
@@ -78,28 +66,23 @@ describe 'mysql_client:setup' do
           is_expected.to setup_mysql_client('setup')
         end
 
-        if %w(amazon centos redhat).include?(platform)
-          it 'logs MySQL archive URL' do
-            is_expected.to write_log("Downloading MySQL packages archive from #{package_archive}")
-          end
-
-          it 'downloads and installs packages' do
-            is_expected.to create_if_missing_remote_file(tarfile)
-              .with(source: package_archive)
-              .with(mode: '0644')
-              .with(retries: 3)
-              .with(retry_delay: 5)
+        if %w(amazon centos redhat rocky).include?(platform)
+          it 'downloads each MySQL RPM and installs them in one transaction' do
+            mysql_rpm_filenames.each do |rpm|
+              is_expected.to create_if_missing_remote_file("/tmp/#{rpm}")
+                .with(source: "#{package_base_url}/#{rpm}")
+                .with(mode: '0644')
+                .with(retries: 3)
+                .with(retry_delay: 5)
+            end
 
             is_expected.to run_bash('Install MySQL packages')
               .with(user: 'root')
               .with(group: 'root')
               .with(cwd: '/tmp')
-              .with(code: %{        set -e
-
-        EXTRACT_DIR=$(mktemp -d --tmpdir mysql.XXXXXXX)
-        tar xf "#{tarfile}" --directory "${EXTRACT_DIR}"
-        yum install -y ${EXTRACT_DIR}/*
-})
+              .with(code: %(        set -e
+        yum install -y #{mysql_rpm_filenames.join(' ')}
+))
           end
 
         elsif platform == 'ubuntu'

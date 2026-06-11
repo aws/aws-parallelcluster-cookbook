@@ -42,14 +42,6 @@ action_class do
     node['cluster']['mysql']['source_version']
   end
 
-  def package_filename
-    "mysql-community-client-#{package_version}.tar.gz"
-  end
-
-  def package_archive
-    "#{node['cluster']['mysql']['base_url']}/#{package_platform}/#{package_filename}"
-  end
-
   def package_source
     "#{node['cluster']['mysql']['base_url']}/source/mysql-#{package_source_version}.tar.gz"
   end

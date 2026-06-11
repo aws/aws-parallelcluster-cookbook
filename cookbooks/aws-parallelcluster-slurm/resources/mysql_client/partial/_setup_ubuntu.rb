@@ -15,12 +15,4 @@ action_class do
   def repository_packages
     %w(libmysqlclient-dev libmysqlclient21)
   end
-
-  def package_platform
-    if arm_instance?
-      'el/7/aarch64'
-    else
-      "ubuntu/#{node['platform_version']}/x86_64"
-    end
-  end
 end
