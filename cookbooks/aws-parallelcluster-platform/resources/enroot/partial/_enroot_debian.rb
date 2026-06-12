@@ -37,7 +37,7 @@ action :install_package do
 end
 
 def enroot_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot_#{package_version}-1_#{arch_suffix}.deb"
+  "#{node['cluster']['enroot']['base_url']}/enroot_#{package_version}-1_#{arch_suffix}.deb"
 end
 
 def enroot_caps_url

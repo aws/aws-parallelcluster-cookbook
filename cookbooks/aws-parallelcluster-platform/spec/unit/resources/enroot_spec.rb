@@ -199,17 +199,15 @@ describe 'aws-parallelcluster-platform::enroot:setup' do
   end
 end
 
-# Tests for the NVIDIA library helper default_artifacts_url? as exercised
-# through the enroot caps filename construction.
-#
-# Default S3 mirror uses "enroot-caps" (hyphen). Public NVIDIA repo uses
-# "enroot+caps" (plus). The helper distinguishes between the two by checking
-# whether the configured caps_base_url still references the cluster's
-# artifacts_s3_url.
-describe 'enroot_caps_url filename selection' do
+# Tests for the enroot package URLs (main + caps). Both build from base_url /
+# caps_base_url, which default to the S3 mirror but can be overridden to the
+# NVIDIA public release (so a version not yet mirrored to S3 can be pulled
+# upstream). enroot_caps_url also toggles the filename via default_artifacts_url?:
+# "enroot-caps" (hyphen) on the S3 mirror, "enroot+caps" (plus) on the public repo.
+describe 'enroot package URL construction' do
   ENROOT_S3_ARTIFACTS_URL = 'https://REGION-aws-parallelcluster.s3.REGION.AWS_DOMAIN'.freeze
-  ENROOT_S3_CAPS_BASE_URL = "#{ENROOT_S3_ARTIFACTS_URL}/dependencies/enroot".freeze
-  ENROOT_PUBLIC_CAPS_BASE_URL = 'https://fake-public.example.DOMAIN/releases/download/v3.4.1'.freeze
+  ENROOT_S3_BASE_URL = "#{ENROOT_S3_ARTIFACTS_URL}/dependencies/enroot".freeze
+  ENROOT_PUBLIC_BASE_URL = 'https://fake-public.example.DOMAIN/releases/download/v9.9.9'.freeze
   ENROOT_VERSION = '9.9.9'.freeze
 
   for_all_oses do |platform, version|
@@ -219,8 +217,8 @@ describe 'enroot_caps_url filename selection' do
     rhel_suffix = debian ? '' : '.el8' # rhel partial pins to el8
 
     [
-      ['default S3 caps_base_url', ENROOT_S3_CAPS_BASE_URL, 'enroot-caps'],
-      ['overridden public caps_base_url', ENROOT_PUBLIC_CAPS_BASE_URL, 'enroot+caps'],
+      ['default S3 mirror', ENROOT_S3_BASE_URL, 'enroot-caps'],
+      ['overridden public repo', ENROOT_PUBLIC_BASE_URL, 'enroot+caps'],
     ].each do |scenario, base_url, expected_caps_name|
       context "on #{platform}#{version} with #{scenario}" do
         cached(:chef_run) do
@@ -233,12 +231,22 @@ describe 'enroot_caps_url filename selection' do
           runner(platform: platform, version: version, step_into: ['enroot']) do |node|
             node.override['cluster']['artifacts_s3_url'] = ENROOT_S3_ARTIFACTS_URL
             node.override['cluster']['enroot']['version'] = ENROOT_VERSION
+            node.override['cluster']['enroot']['base_url'] = base_url
             node.override['cluster']['enroot']['caps_base_url'] = base_url
           end
         end
         cached(:resource) do
           ConvergeEnroot.setup(chef_run)
           chef_run.find_resource('enroot', 'setup')
+        end
+
+        it "builds the main package URL from base_url" do
+          expected_filename = if debian
+                                "enroot_#{ENROOT_VERSION}-1_#{arch_suffix}.#{ext}"
+                              else
+                                "enroot-#{ENROOT_VERSION}-1#{rhel_suffix}.#{arch_suffix}.#{ext}"
+                              end
+          expect(resource.enroot_url).to eq("#{base_url}/#{expected_filename}")
         end
 
         it "uses '#{expected_caps_name}' in the caps filename" do

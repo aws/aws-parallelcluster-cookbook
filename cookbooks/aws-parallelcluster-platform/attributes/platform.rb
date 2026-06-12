@@ -18,6 +18,7 @@ default['cluster']['stunnel']['base_url'] = "#{node['cluster']['artifacts_s3_url
 
 # Enroot
 default['cluster']['enroot']['version'] = '3.4.1'
+default['cluster']['enroot']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
 default['cluster']['enroot']['caps_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
 default['cluster']['enroot']['temporary_dir'] = '/run/enroot'
 default['cluster']['enroot']['persistent_dir'] = '/var/enroot'

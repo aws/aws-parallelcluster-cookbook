@@ -33,7 +33,7 @@ action :install_package do
 end
 
 def enroot_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot-#{package_version}-1.el8.#{arch_suffix}.rpm"
+  "#{node['cluster']['enroot']['base_url']}/enroot-#{package_version}-1.el8.#{arch_suffix}.rpm"
 end
 
 def enroot_caps_url
