@@ -41,7 +41,9 @@ control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
-  expected_cuda_version = node['cluster']['nvidia']['cuda']['version']
+  # nvcc and the install dir use major.minor (e.g. 13.3); cuda.version may be a 3-part
+  # value (e.g. 13.3.0) when set via ExtraChefAttributes, so normalize to major.minor.
+  expected_cuda_version = node['cluster']['nvidia']['cuda']['version'].split('.')[0, 2].join('.')
   cmd = %(
     export PATH=/usr/local/cuda-#{expected_cuda_version}/bin:${PATH};
     export LD_LIBRARY_PATH=/usr/local/cuda-#{expected_cuda_version}/lib64:${LD_LIBRARY_PATH}

@@ -31,7 +31,8 @@ cuda_samples_url = "#{node['cluster']['nvidia']['cuda']['samples_base_url']}/v#{
 tmp_cuda_run = '/tmp/cuda.run'
 tmp_cuda_sample_archive = '/tmp/cuda-sample.tar.gz'
 
-node.default['cluster']['nvidia']['cuda']['version'] = cuda_version
+# Save resolved CUDA versions to .default so InSpec/build-image tests which run during ParallelClusterTestComponent see them (mirrors Nvidia driver).
+node.default['cluster']['nvidia']['cuda']['version'] = cuda_full_version
 node.default['cluster']['nvidia']['cuda_samples_version'] = cuda_samples_version
 node_attributes 'Save cuda and cuda samples versions for InSpec tests'
 

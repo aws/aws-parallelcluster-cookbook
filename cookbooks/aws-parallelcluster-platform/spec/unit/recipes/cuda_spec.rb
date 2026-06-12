@@ -33,7 +33,7 @@ describe 'aws-parallelcluster-platform::cuda' do
     cached(:node) { chef_run.node }
 
     it 'saves cuda and cuda samples version' do
-      expect(node['cluster']['nvidia']['cuda']['version']).to eq(cuda_version)
+      expect(node['cluster']['nvidia']['cuda']['version']).to eq(cuda_complete_version)
       expect(node['cluster']['nvidia']['cuda_samples_version']).to eq(cuda_samples_version)
       is_expected.to write_node_attributes('Save cuda and cuda samples versions for InSpec tests')
     end
