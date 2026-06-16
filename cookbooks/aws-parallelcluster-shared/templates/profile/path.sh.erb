@@ -1,9 +1,14 @@
-#!/bin/bash
+#!/bin/sh
 
-PATH_REQUIRED_DIRECTORIES=(<%= @path_required_directories.join(' ') %>)
-
-for directory in "${PATH_REQUIRED_DIRECTORIES[@]}"; do
-    [[ ":$PATH:" == *":$directory:"* ]] || PATH="${PATH:+"$PATH:"}$directory"
+# This file is installed under /etc/profile.d and is *sourced*, not executed,
+# so it must be POSIX sh compatible: on Debian/Ubuntu /etc/profile is processed
+# by dash, which has no arrays. Using bash-only syntax here makes login `sh`
+# abort with a syntax error.
+for directory in <%= @path_required_directories.join(' ') %>; do
+    case ":$PATH:" in
+        *":$directory:"*) ;;
+        *) PATH="${PATH:+$PATH:}$directory" ;;
+    esac
 done
 
 export PATH

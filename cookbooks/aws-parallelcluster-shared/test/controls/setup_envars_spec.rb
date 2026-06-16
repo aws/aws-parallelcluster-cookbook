@@ -22,6 +22,13 @@ control 'tag:config_setup_envars_system_path_contains_required_directories' do
     its('group') { should eq 'root' }
   end
 
+  # Regression test: files under /etc/profile.d are sourced (not executed) by
+  # the login shell, which on Debian/Ubuntu is dash. The script must therefore
+  # be POSIX sh compatible, otherwise login `sh` aborts with a syntax error.
+  describe command('sh -n /etc/profile.d/path.sh') do
+    its('exit_status') { should eq 0 }
+  end
+
   path = bash('. /etc/profile.d/path.sh; echo ${PATH}').stdout.strip().split(':')
   describe "System path #{path}" do
     subject { path }
