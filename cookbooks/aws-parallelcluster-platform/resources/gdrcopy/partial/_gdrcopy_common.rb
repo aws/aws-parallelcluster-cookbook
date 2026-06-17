@@ -16,6 +16,14 @@ def gdrcopy_version
   node['cluster']['nvidia']['gdrcopy']['version']
 end
 
+# True if gdrcopy is installed (regardless of version). Like nvidia-smi for the
+# driver, the gdrcopy_sanity binary is the one of the test commands that are
+# installed by GDRCopy and we use it as signal of a healthy install
+# and is installed to /usr/bin on all platforms.
+def gdrcopy_installed?
+  ::File.exist?('/usr/bin/gdrcopy_sanity')
+end
+
 def gdrcopy_checksum
   node['cluster']['nvidia']['gdrcopy']['sha256']
 end
@@ -26,6 +34,9 @@ default_action :setup
 action :setup do
   return unless gdrcopy_enabled?
   return if on_docker?
+
+  # Skip rebuild + install if already installed (e.g. DLAMI).
+  return if gdrcopy_installed?
 
   # Save gdrcopy version for InSpec tests
   node.default['cluster']['nvidia']['gdrcopy']['version'] = gdrcopy_version
@@ -90,7 +101,6 @@ action :configure do
   return if on_docker?
   # Save gdrcopy version for InSpec tests
   node.default['cluster']['nvidia']['gdrcopy']['version'] = gdrcopy_version
-  node.default['cluster']['nvidia']['gdrcopy']['service'] = gdrcopy_service
   node_attributes 'dump node attributes'
 
   if graphic_instance? && is_service_installed?(gdrcopy_service)

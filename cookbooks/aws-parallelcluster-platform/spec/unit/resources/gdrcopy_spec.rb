@@ -184,8 +184,10 @@ describe 'gdrcopy:setup' do
         platforms = {
           'amazon2023' => 'amzn-2023',
           'centos7' => 'el7',
+          'redhat8' => 'el8',
           'rhel8' => 'el8',
           'rocky8' => 'el8',
+          'redhat9' => 'el9',
           'rhel9' => 'el9',
           'rocky9' => 'el9',
           'ubuntu22.04' => 'Ubuntu22_04',
@@ -197,6 +199,7 @@ describe 'gdrcopy:setup' do
         stubs_for_resource('gdrcopy') do |res|
           allow(res).to receive(:gdrcopy_enabled?).and_return(true)
           allow(res).to receive(:gdrcopy_arch).and_return(gdrcopy_arch)
+          allow(res).to receive(:gdrcopy_installed?).and_return(false)
         end
         runner = runner(platform: platform, version: version, step_into: ['gdrcopy']) do |node|
           node.override['cluster']['sources_dir'] = sources_dir
@@ -279,6 +282,22 @@ describe 'gdrcopy:setup' do
 
       it 'disables gdrcopy service' do
         is_expected.to disable_service(gdrcopy_service).with_action(%i(disable stop))
+      end
+    end
+
+    context "on #{platform}#{version} when the target gdrcopy version is already installed" do
+      cached(:chef_run) do
+        stubs_for_resource('gdrcopy') do |res|
+          allow(res).to receive(:gdrcopy_enabled?).and_return(true)
+          allow(res).to receive(:gdrcopy_arch).and_return('gdrcopy_arch')
+          allow(res).to receive(:gdrcopy_installed?).and_return(true)
+        end
+        ConvergeGdrcopy.setup(runner(platform: platform, version: version, step_into: ['gdrcopy']))
+      end
+
+      it 'skips the rebuild and install' do
+        is_expected.not_to run_bash('Install NVIDIA GDRCopy')
+        is_expected.not_to write_node_attributes('dump node attributes')
       end
     end
   end
