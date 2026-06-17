@@ -14,6 +14,9 @@ end
 describe 'nvidia_dcgm:_nvidia_enabled' do
   context 'when nvidia enabled property is set' do
     cached(:chef_run) do
+      stubs_for_resource('nvidia_dcgm') do |res|
+        allow(res).to receive(:dcgmi_installed?).and_return(false)
+      end
       ChefSpec::SoloRunner.new(step_into: ['nvidia_dcgm']) do |node|
         node.override['cluster']['nvidia']['enabled'] = false
       end
@@ -31,6 +34,9 @@ describe 'nvidia_dcgm:_nvidia_enabled' do
   context 'when nvidia enabled property is not set' do
     context "and node['cluster']['nvidia']['enabled'] is true" do
       cached(:chef_run) do
+        stubs_for_resource('nvidia_dcgm') do |res|
+          allow(res).to receive(:dcgmi_installed?).and_return(false)
+        end
         ChefSpec::SoloRunner.new(step_into: ['nvidia_dcgm']) do |node|
           node.override['cluster']['nvidia']['enabled'] = true
         end
@@ -46,6 +52,9 @@ describe 'nvidia_dcgm:_nvidia_enabled' do
 
     context "and node['cluster']['nvidia']['enabled'] is yes" do
       cached(:chef_run) do
+        stubs_for_resource('nvidia_dcgm') do |res|
+          allow(res).to receive(:dcgmi_installed?).and_return(false)
+        end
         ChefSpec::SoloRunner.new(step_into: ['nvidia_dcgm']) do |node|
           node.override['cluster']['nvidia']['enabled'] = 'yes'
         end
@@ -61,6 +70,9 @@ describe 'nvidia_dcgm:_nvidia_enabled' do
 
     context "and node['cluster']['nvidia']['enabled'] is not yes or true" do
       cached(:chef_run) do
+        stubs_for_resource('nvidia_dcgm') do |res|
+          allow(res).to receive(:dcgmi_installed?).and_return(false)
+        end
         ChefSpec::SoloRunner.new(step_into: ['nvidia_dcgm']) do |node|
           node.override['cluster']['nvidia']['enabled'] = 'any'
         end
@@ -93,11 +105,12 @@ describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
       end
 
       context 'when on arm and nvidia enabled' do
-        cached(:chef_run) do
-          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
-          runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
-        end
         cached(:resource) do
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
+          stubs_for_resource('nvidia_dcgm') do |res|
+            allow(res).to receive(:dcgmi_installed?).and_return(false)
+          end
+          chef_run = runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
           ConvergeNvidiaDcgm.setup(chef_run, nvidia_enabled: true)
           chef_run.find_resource('nvidia_dcgm', 'setup')
         end
@@ -110,36 +123,39 @@ describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
         end
       end
 
-      context 'when not on arm' do
-        cached(:chef_run) do
+      context 'when not on arm and nvidia enabled' do
+        cached(:resource) do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-          runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
+          stubs_for_resource('nvidia_dcgm') do |res|
+            allow(res).to receive(:dcgmi_installed?).and_return(false)
+          end
+          chef_run = runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
+          ConvergeNvidiaDcgm.setup(chef_run, nvidia_enabled: true)
+          chef_run.find_resource('nvidia_dcgm', 'setup')
         end
 
-        context 'when nvidia enabled' do
-          cached(:resource) do
-            ConvergeNvidiaDcgm.setup(chef_run, nvidia_enabled: true)
-            chef_run.find_resource('nvidia_dcgm', 'setup')
-          end
-
-          it "is enabled" do
-            expect(resource._nvidia_dcgm_enabled).to eq(true)
-          end
-
-          it "returns correct platform for download URL" do
-            expect(resource.platform).to eq(expected_platform)
-          end
+        it "is enabled" do
+          expect(resource._nvidia_dcgm_enabled).to eq(true)
         end
 
-        context 'when nvidia not enabled' do
-          cached(:resource) do
-            ConvergeNvidiaDcgm.setup(chef_run, nvidia_enabled: false)
-            chef_run.find_resource('nvidia_dcgm', 'setup')
-          end
+        it "returns correct platform for download URL" do
+          expect(resource.platform).to eq(expected_platform)
+        end
+      end
 
-          it "is not enabled" do
-            expect(resource._nvidia_dcgm_enabled).to eq(false)
+      context 'when not on arm and nvidia not enabled' do
+        cached(:resource) do
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          stubs_for_resource('nvidia_dcgm') do |res|
+            allow(res).to receive(:dcgmi_installed?).and_return(false)
           end
+          chef_run = runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
+          ConvergeNvidiaDcgm.setup(chef_run, nvidia_enabled: false)
+          chef_run.find_resource('nvidia_dcgm', 'setup')
+        end
+
+        it "is not enabled" do
+          expect(resource._nvidia_dcgm_enabled).to eq(false)
         end
       end
     end
@@ -168,6 +184,7 @@ describe 'nvidia_dcgm:setup' do
         cached(:chef_run) do
           stubs_for_resource('nvidia_dcgm') do |res|
             allow(res).to receive(:_nvidia_enabled).and_return(true)
+            allow(res).to receive(:dcgmi_installed?).and_return(false)
           end
           runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
         end
@@ -197,6 +214,23 @@ describe 'nvidia_dcgm:setup' do
           # it 'installs datacenter gpu manager' do
           #   is_expected.to install_package('datacenter-gpu-manager')
           # end
+        end
+      end
+
+      context 'when nvidia enabled and DCGM is already installed' do
+        cached(:chef_run) do
+          stubs_for_resource('nvidia_dcgm') do |res|
+            allow(res).to receive(:_nvidia_enabled).and_return(true)
+            allow(res).to receive(:dcgmi_installed?).and_return(true)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_dcgm'])
+          ConvergeNvidiaDcgm.setup(runner)
+        end
+
+        it 'does not install datacenter gpu manager' do
+          is_expected.not_to run_bash('Install datacenter-gpu-manager-4-core')
+          is_expected.not_to run_bash('Install datacenter-gpu-manager-4-cuda13')
+          is_expected.not_to run_bash('Install datacenter-gpu-manager')
         end
       end
     end
@@ -255,6 +289,7 @@ describe 'nvidia_dcgm download URL construction' do
           cached(:chef_run) do
             stubs_for_resource('nvidia_dcgm') do |res|
               allow(res).to receive(:_nvidia_dcgm_enabled).and_return(true)
+              allow(res).to receive(:dcgmi_installed?).and_return(false)
             end
             allow_any_instance_of(Object).to receive(:arm_instance?).and_return(arm)
             runner = runner(platform: platform, version: version, step_into: ['nvidia_dcgm']) do |node|
