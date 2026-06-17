@@ -17,7 +17,10 @@ control 'tag:install_arm_pl_installed' do
   gcc_major_minor_version = node['cluster']['armpl']['gcc']['major_minor_version']
 
   armpl_module_general_name = "armpl/#{armpl_version}"
-  armpl_module_name = "armpl/#{armpl_version}.0_gcc"
+  # ArmPL's gcc module name uses a 3-segment version: a 2-part version (24.10) is
+  # padded to 24.10.0, while a 3-part version (26.01.1) is used as-is.
+  armpl_module_version = armpl_version.split('.').length < 3 ? "#{armpl_version}.0" : armpl_version
+  armpl_module_name = "armpl/#{armpl_module_version}_gcc"
   gcc_module_name = "armpl/gcc-#{gcc_major_minor_version}"
 
   armpl_script_dir = "/opt/arm/#{armpl_module_general_name}/arm-performance-libraries_#{armpl_version}_gcc"
