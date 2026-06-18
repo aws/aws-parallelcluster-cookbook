@@ -30,6 +30,7 @@ via custom Slurm settings or the cluster name contains upper-case letters.
 - Fix compute node bootstrap hanging without a clear error when the compute subnet cannot reach DynamoDB.
 - Fix login nodes not mounting `/opt/parallelcluster/shared` when EFS is used as the internal shared storage type.
 - Fix SELinux not actually being disabled on RHEL-family OSes (kernels >= 6.4) due to a [deprecated mechanism](https://github.com/SELinuxProject/selinux-kernel/wiki/DEPRECATE-runtime-disable) being silently ignored by newer kernels.
+- Fix `build-image` failure by skipping installation of `gdrcopy` and `dcgm` if parent image has an existing installed version.
 
 **DEPRECATIONS**
 - Amazon Linux 2 is no longer supported.
