@@ -17,3 +17,4 @@ provides :nvidia_driver, platform: 'rocky' do |node|
 end
 
 use 'partial/_nvidia_driver_common.rb'
+use 'partial/_nvidia_driver_install_rhel.rb'

@@ -15,9 +15,12 @@ control 'tag:install_expected_versions_of_nvidia_driver_installed' do
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
+  # driver_version holds either the version pcluster installed or, on images that
+  # ship their own driver (e.g. DLAMI), the detected pre-installed version. Either
+  # way the driver must report exactly this version, which verifies pcluster
+  # installed the configured version and did not change a shipped one.
   expected_nvidia_driver_version = node['cluster']['nvidia']['driver_version']
   expected_nvidia_kernel_license = 'Dual MIT/GPL'
-  expected_nvidia_kernel_module = "NVRM version: NVIDIA UNIX Open Kernel Module"
 
   describe "nvidia driver version is expected to be #{expected_nvidia_driver_version}" do
     subject { command('modinfo -F version nvidia').stdout.strip }
@@ -27,11 +30,6 @@ control 'tag:install_expected_versions_of_nvidia_driver_installed' do
   describe "nvidia kernel module is expected to be licensed as #{expected_nvidia_kernel_license}" do
     subject { command('modinfo -F license nvidia').stdout.strip }
     it { should eq expected_nvidia_kernel_license }
-  end
-
-  describe "nvidia kernel module is expected to be #{expected_nvidia_kernel_module}" do
-    subject { command('cat /proc/driver/nvidia/version').stdout.strip }
-    it { should include expected_nvidia_kernel_module }
   end
 end
 

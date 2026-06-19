@@ -14,6 +14,15 @@ def nvidia_enabled?
   ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled'])
 end
 
+# Convert a full CUDA version to its 'major-minor' dashed form used in CUDA repo
+# and package names, e.g. '13-0' for '13.0.2'. The patch level (the '.2') is
+# intentionally dropped because CUDA repos and packages are keyed on major-minor
+# only (e.g. 'cuda-repo-rhel9-13-0-local', 'cuda-toolkit-13-0').
+def cuda_version_dash(cuda_version)
+  major, minor = cuda_version.split('.')
+  "#{major}-#{minor}"
+end
+
 # Whether a base_url attribute still points to the default ParallelCluster artifacts location.
 # Used by: fabric manager, dcgm, nvlsm, enroot (caps).
 # Limitation: this check assumes attribute precedence resolves at attribute-load time

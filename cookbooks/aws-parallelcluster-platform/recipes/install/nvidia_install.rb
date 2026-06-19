@@ -15,9 +15,14 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Register the NVIDIA local repos (driver and CUDA) up front so that the
+# nvidia_driver and nvidia_cuda resources can install their packages from them.
+# Versions and URLs default to node attributes and can be overridden there.
+nvidia_repo 'Install NVIDIA local repos'
+
 nvidia_driver 'Install Nvidia driver'
 
-include_recipe "aws-parallelcluster-platform::cuda"
+nvidia_cuda 'Install Nvidia CUDA'
 
 gdrcopy 'Install Nvidia gdrcopy'
 
@@ -28,3 +33,8 @@ fabric_manager 'Install Nvidia Fabric Manager'
 nvidia_dcgm 'install Nvidia datacenter-gpu-manager'
 
 nvidia_imex 'Install nvidia-imex'
+
+# Remove the NVIDIA local repos now that all NVIDIA packages have been installed
+nvidia_repo 'Remove NVIDIA local repos' do
+  action :remove
+end

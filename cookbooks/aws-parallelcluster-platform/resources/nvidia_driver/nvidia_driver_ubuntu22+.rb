@@ -17,6 +17,7 @@ provides :nvidia_driver, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_nvidia_driver_common.rb'
+use 'partial/_nvidia_driver_install_debian.rb'
 
 def rebuild_initramfs?
   true

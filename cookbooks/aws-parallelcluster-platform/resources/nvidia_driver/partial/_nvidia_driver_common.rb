@@ -15,25 +15,18 @@
 unified_mode true
 default_action :setup
 
-property :nvidia_driver_version, String
-
-tmp_nvidia_run = '/tmp/nvidia.run'
+property :nvidia_driver_version, String, default: node['cluster']['nvidia']['driver_version']
+property :extra_driver_packages, String, default: node['cluster']['nvidia']['driver_extra_packages']
 
 action :setup do
   return unless nvidia_driver_enabled?
+  return if nvidia_driver_installed?
   return if on_docker?
 
-  # Share nvidia driver version with InSpec tests
-  node.default['cluster']['nvidia']['driver_version'] = _nvidia_driver_version
+  # Record the configured version that pcluster is about to install so InSpec
+  # verifies the right version.
+  node.default['cluster']['nvidia']['driver_version'] = new_resource.nvidia_driver_version
   node_attributes "Save Nvidia driver version for Inspec tests"
-
-  remote_file tmp_nvidia_run do
-    source nvidia_driver_url
-    mode '0755'
-    retries 3
-    retry_delay 5
-    not_if { ::File.exist?('/usr/bin/nvidia-smi') }
-  end
 
   # Make sure nouveau kernel module is unloaded, otherwise installation of NVIDIA driver fails
   kernel_module 'nouveau' do
@@ -79,18 +72,10 @@ action :setup do
     end
   end
 
-  # Install driver
-  bash 'nvidia.run advanced' do
-    user 'root'
-    group 'root'
-    cwd '/tmp'
-    code <<-NVIDIA
-      set -e
-      #{compiler_path} ./nvidia.run --silent --dkms --disable-nouveau -m=#{nvidia_kernel_module}
-      rm -f /tmp/nvidia.run
-    NVIDIA
-    creates '/usr/bin/nvidia-smi'
-  end
+  # Install the NVIDIA software from the distribution package manager using the
+  # NVIDIA local-repo package.
+  action_install_driver
+  action_install_extra_packages
 
   execute 'initramfs to remove nouveau' do
     command 'update-initramfs -u'
@@ -98,20 +83,20 @@ action :setup do
   end if rebuild_initramfs?
 end
 
-def _nvidia_driver_version
-  nvidia_driver_version || node['cluster']['nvidia']['driver_version']
-end
-
-def nvidia_driver_url
-  "#{node['cluster']['nvidia']['driver_base_url']}/NVIDIA-Linux-#{nvidia_arch}-#{_nvidia_driver_version}.run"
+# Whether the open-source kernel modules flavor must be installed.
+def nvidia_open_kernel_modules?
+  !['false', 'no', false].include?(node['cluster']['nvidia']['kernel_open'])
 end
 
 def nvidia_driver_enabled?
   nvidia_enabled?
 end
 
-def nvidia_arch
-  arm_instance? ? 'aarch64' : 'x86_64'
+# True if the NVIDIA driver is already installed (e.g. shipped by the base image
+# such as the DLAMI). nvidia-smi is the canonical signal of a healthy driver and
+# is installed to /usr/bin on all platforms.
+def nvidia_driver_installed?
+  ::File.exist?('/usr/bin/nvidia-smi')
 end
 
 def rebuild_initramfs?
@@ -124,14 +109,6 @@ end
 
 def compiler_path
   ""
-end
-
-def nvidia_kernel_module
-  if ['false', 'no', false].include?(node['cluster']['nvidia']['kernel_open'])
-    "kernel"
-  else
-    "kernel-open"
-  end
 end
 
 def kernel_modules_to_load

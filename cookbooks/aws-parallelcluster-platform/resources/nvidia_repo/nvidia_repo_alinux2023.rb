@@ -17,11 +17,8 @@ provides :nvidia_repo, platform: 'amazon' do |node|
 end
 
 use 'partial/_nvidia_repo_common.rb'
+use 'partial/_nvidia_repo_rhel.rb'
 
-def platform
-  'rhel9'
-end
-
-def repository_key
-  'D42D0685.pub'
+def local_repo_platform
+  'amzn2023'
 end

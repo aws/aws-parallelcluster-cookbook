@@ -9,12 +9,16 @@ describe 'aws-parallelcluster-platform::nvidia_install' do
       end
       cached(:node) { chef_run.node }
 
+      it 'registers the NVIDIA local repos up front' do
+        is_expected.to add_nvidia_repo('Install NVIDIA local repos')
+      end
+
       it 'installs nvidia driver' do
         is_expected.to setup_nvidia_driver('Install Nvidia driver')
       end
 
       it 'installs cuda' do
-        is_expected.to include_recipe('aws-parallelcluster-platform::cuda')
+        is_expected.to setup_nvidia_cuda('Install Nvidia CUDA')
       end
 
       it 'installs gdrcopy' do
@@ -35,6 +39,10 @@ describe 'aws-parallelcluster-platform::nvidia_install' do
 
       it 'installs nvidia_imex' do
         is_expected.to install_nvidia_imex('Install nvidia-imex')
+      end
+
+      it 'removes the NVIDIA local repos as the last step' do
+        is_expected.to remove_nvidia_repo('Remove NVIDIA local repos')
       end
     end
   end

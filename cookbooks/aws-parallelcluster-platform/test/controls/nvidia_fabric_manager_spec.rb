@@ -12,14 +12,13 @@
 control 'tag:install_expected_versions_of_nvidia_fabric_manager_installed' do
   only_if { !os_properties.arm? && ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) }
 
+  # On images that ship their own NVIDIA stack (e.g. DLAMI) pcluster skips the
+  # install and leaves Fabric Manager as-is, so the version attribute is unset and
+  # we only verify it is present. When pcluster installs it, the version attribute
+  # is set and we verify the package matches the configured version.
   describe package(node['cluster']['nvidia']['fabricmanager']['package']) do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['nvidia']['fabricmanager']['version']}/ }
-  end
-
-  version_lock_check = os_properties.debian_family? ? 'apt-mark showhold | grep "nvidia-fabric.*manager"' : 'yum versionlock list | grep "nvidia-fabric.*manager"'
-  describe bash(version_lock_check) do
-    its('exit_status') { should eq 0 }
   end
 end
 

@@ -17,11 +17,8 @@ provides :nvidia_repo, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_nvidia_repo_common.rb'
+use 'partial/_nvidia_repo_debian.rb'
 
-def platform
+def local_repo_platform
   "ubuntu#{node['platform_version'].delete('.')}"
-end
-
-def repository_key
-  '3bf863cc.pub'
 end

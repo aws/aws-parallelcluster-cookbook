@@ -17,6 +17,7 @@ provides :nvidia_driver, platform: 'amazon' do |node|
 end
 
 use 'partial/_nvidia_driver_common.rb'
+use 'partial/_nvidia_driver_install_rhel.rb'
 
 def set_compiler?
   # Amazon linux 2 with Kernel 5 need to set CC to /usr/bin/gcc10-gcc using dkms override

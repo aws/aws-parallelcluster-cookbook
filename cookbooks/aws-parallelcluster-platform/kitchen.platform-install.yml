@@ -110,6 +110,7 @@ suites:
         - resource:package_repos
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
+        - resource:nvidia_repo:add
       cluster:
         nvidia:
           enabled: true
@@ -142,8 +143,9 @@ suites:
         - resource:package_repos
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
+        - resource:nvidia_repo:add
         - resource:nvidia_driver
-        - recipe:aws-parallelcluster-platform::cuda
+        - resource:nvidia_cuda
       cluster:
         nvidia:
           enabled: true
@@ -263,7 +265,7 @@ suites:
   - name: nvidia_cuda
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
-      - recipe[aws-parallelcluster-platform::cuda]
+      - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
         - /tag:install_.*cuda/
@@ -271,10 +273,12 @@ suites:
       # nvidia_driver can be executed only on a graphic EC2 instance example: g5.xlarge(x86_86) or g5g.xlarge(aarm64)
       instance_type: g4dn.2xlarge
     attributes:
+      resource: nvidia_cuda
       dependencies:
         - resource:package_repos
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
+        - resource:nvidia_repo:add
       cluster:
         nvidia:
           enabled: true

@@ -28,6 +28,11 @@ default['cluster']['nvidia']['enabled'] = 'no'
 default['cluster']['nvidia']['driver_version'] = '580.126.20'
 default['cluster']['nvidia']['dcgm_version'] = '4.6.0-1'
 
+# Extra packages installed from the NVIDIA local repo alongside the driver
+# meta-package, as a comma-separated list.
+# * nvidia-xconfig: required by DCV to generate the X configuration
+default['cluster']['nvidia']['driver_extra_packages'] = 'nvidia-xconfig'
+
 default['cluster']['nvidia']['driver_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver"
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
 default['cluster']['nvidia']['fabricmanager']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_fabric"

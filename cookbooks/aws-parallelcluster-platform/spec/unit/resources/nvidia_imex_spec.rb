@@ -79,6 +79,17 @@ describe 'nvidia_imex:nvidia_enabled_or_installed?' do
           expect(resource.nvidia_enabled_or_installed?).to eq(true)
         end
       end
+
+      context "when nvidia is enabled and installed" do
+        before do
+          allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
+          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+        end
+
+        it 'is true' do
+          expect(resource.nvidia_enabled_or_installed?).to eq(true)
+        end
+      end
     end
   end
 end
@@ -181,6 +192,7 @@ describe 'nvidia_imex:install' do
       context 'when nvidia-imex binary already exists' do
         cached(:chef_run) do
           stubs_for_resource('nvidia_imex') do |res|
+            allow(res).to receive(:nvidia_enabled_or_installed?).and_return(true)
             allow(res).to receive(:imex_installed?).and_return(true)
           end
           runner = runner(platform: platform, version: version, step_into: ['nvidia_imex'])

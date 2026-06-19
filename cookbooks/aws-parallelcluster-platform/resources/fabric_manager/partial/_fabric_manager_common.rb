@@ -20,6 +20,7 @@ property :nvidia_driver_version, String
 
 action :setup do
   return unless _fabric_manager_enabled
+  return if fabric_manager_installed?
 
   # Share fabric manager package and version with InSpec tests
   node.default['cluster']['nvidia']['fabricmanager']['package'] = fabric_manager_package
@@ -42,6 +43,12 @@ end
 def _fabric_manager_enabled
   # NVIDIA Fabric Manager not present on ARM
   !arm_instance? && _nvidia_enabled
+end
+
+# True if Fabric Manager is already installed (e.g. shipped by the base image
+# such as the DLAMI). nv-fabricmanager is installed to /usr/bin on all platforms.
+def fabric_manager_installed?
+  ::File.exist?('/usr/bin/nv-fabricmanager')
 end
 
 def _nvidia_enabled

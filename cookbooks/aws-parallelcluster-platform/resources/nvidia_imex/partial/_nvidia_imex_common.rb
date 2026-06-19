@@ -99,6 +99,7 @@ def imex_installed?
   ::File.exist?("/usr/bin/#{nvidia_imex_service}") || ::File.exist?("/usr/bin/#{nvidia_imex_service}-ctl")
 end
 
+# Install IMEX when NVIDIA is enabled or already installed.
 def nvidia_enabled_or_installed?
   nvidia_enabled? || nvidia_installed?
 end

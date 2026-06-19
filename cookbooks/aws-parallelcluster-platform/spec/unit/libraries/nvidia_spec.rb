@@ -27,12 +27,12 @@ describe 'nvidia_enabled? via nvidia_driver resource' do
       end
 
       if should_install
-        it 'runs nvidia driver install bash' do
-          is_expected.to run_bash('nvidia.run advanced')
+        it 'installs the nvidia driver' do
+          is_expected.to create_cookbook_file('blacklist-nouveau.conf')
         end
       else
-        it 'does not run nvidia driver install bash' do
-          is_expected.not_to run_bash('nvidia.run advanced')
+        it 'does not install the nvidia driver' do
+          is_expected.not_to create_cookbook_file('blacklist-nouveau.conf')
         end
       end
     end

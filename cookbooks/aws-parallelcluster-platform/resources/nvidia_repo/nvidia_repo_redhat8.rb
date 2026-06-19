@@ -17,11 +17,4 @@ provides :nvidia_repo, platform: 'redhat' do |node|
 end
 
 use 'partial/_nvidia_repo_common.rb'
-
-def platform
-  "rhel#{node['platform_version'].to_i}"
-end
-
-def repository_key
-  'D42D0685.pub'
-end
+use 'partial/_nvidia_repo_rhel.rb'

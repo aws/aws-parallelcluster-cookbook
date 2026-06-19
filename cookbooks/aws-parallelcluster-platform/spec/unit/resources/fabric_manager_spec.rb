@@ -175,6 +175,7 @@ describe 'fabric_manager:setup' do
         cached(:chef_run) do
           stubs_for_resource('fabric_manager') do |res|
             allow(res).to receive(:_fabric_manager_enabled).and_return(true)
+            allow(res).to receive(:fabric_manager_installed?).and_return(false)
           end
           runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
           ConvergeFabricManager.setup(runner, nvidia_driver_version: nvidia_driver_version)
@@ -210,6 +211,23 @@ describe 'fabric_manager:setup' do
               .with_retry_delay(5)
               .with_code(/yum install -y #{fabric_manager_package}-#{fabric_manager_version}.rpm/)
           end
+        end
+      end
+
+      context 'when fabric manager is already installed (e.g. DLAMI)' do
+        cached(:chef_run) do
+          stubs_for_resource('fabric_manager') do |res|
+            allow(res).to receive(:_fabric_manager_enabled).and_return(true)
+            allow(res).to receive(:fabric_manager_installed?).and_return(true)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
+          ConvergeFabricManager.setup(runner, nvidia_driver_version: nvidia_driver_version)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'skips the install when fabric manager is already present' do
+          is_expected.not_to run_bash('install_fabricmanager_for_ubuntu')
+          is_expected.not_to run_bash("Install #{fabric_manager_package}")
         end
       end
     end
