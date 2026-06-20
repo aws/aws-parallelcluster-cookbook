@@ -154,6 +154,31 @@ export KITCHEN_INSTANCE_TYPE=t2.large
 export KITCHEN_IAM_PROFILE=test-kitchen  # required for tests with lifecycle hooks
 ```
 
+
+#### Testing against a locally-built AMI with dependency overrides
+
+When validating a dependency upgrade, point the `config` phase at the AMI you built and inject the
+same `ExtraChefAttributes` the build used, so the converge resolves the AMI-baked versions instead
+of the cookbook defaults:
+
+- Override the AMI per OS with `KITCHEN_<OS>_AMI` (e.g. `KITCHEN_ALINUX2023_AMI`, `KITCHEN_RHEL8_AMI`,
+  `KITCHEN_UBUNTU2404_AMI`). If unset, `kitchen.ec2.yml` `image_search` picks the latest matching
+  `aws-parallelcluster-<version>-<os>-*` AMI (version from `KITCHEN_PCLUSTER_VERSION`, default `3.16.0`).
+- Set `EXTRA_CHEF_ATTRIBUTES` (the same JSON used to build the AMI). `kitchen.ec2.yml` parses it and
+  deep-merges its `cluster` hash into the provisioner attributes for the converge (EC2 only — Docker
+  runs are unaffected). Per-platform `attributes.cluster` (e.g. `base_os`) merges on top.
+
+```
+export KITCHEN_ALINUX2023_AMI=ami-0123456789abcdef0
+export EXTRA_CHEF_ATTRIBUTES='{"cluster": {"python-version": "3.14.6", "efs": {"version": "3.1.3"}}}'
+./kitchen.ec2.sh environment-config test efs-alinux2023
+```
+
+If the converge can't find an upgraded component on the AMI (e.g. a `python` venv path under
+`/opt/parallelcluster/pyenv/versions/<python-version>/...` or a version-pinned binary), the AMI and
+the injected attributes disagree — rebuild the AMI with the same overrides, or align
+`EXTRA_CHEF_ATTRIBUTES` to what the AMI actually carries.
+
 ### Kitchen tests definition
 
 The different `kitchen.${context}.yml` files in the functional cookbooks contain a list of Inspec tests

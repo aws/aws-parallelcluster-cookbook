@@ -1,6 +1,13 @@
 <%
+  require 'json'
   pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.16.0'
   pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
+
+  # The ExtraChefAttributes used to build the AMI is also used for testing
+  # ('{"cluster": {...}}'); merge its cluster hash so the converge resolves the
+  # AMI-baked versions (e.g. cluster.python-version) instead of the cookbook defaults.
+  extra = ENV['EXTRA_CHEF_ATTRIBUTES'].to_s
+  extra_cluster = extra.empty? ? {} : (JSON.parse(extra)['cluster'] || {}) rescue {}
 %>
 ---
 driver:
@@ -79,6 +86,9 @@ provisioner:
     exit_status: :enabled # Opt-in to the standardized exit codes
     client_fork: false  # Forked instances don't return the real exit code
   log_level: info
+  # Per-platform attributes.cluster (e.g. base_os) deep-merge on top of this.
+  attributes:
+    cluster: <%= extra_cluster.to_json %>
 
 platforms:
   - name: alinux2023
