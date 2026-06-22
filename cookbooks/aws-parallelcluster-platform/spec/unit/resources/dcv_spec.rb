@@ -849,6 +849,11 @@ describe 'dcv:configure' do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
           allow_any_instance_of(Object).to receive(:graphic_instance?).and_return(true)
           allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+          dcv_gl_deps_dir = "#{sources_dir}/dcv-gl-deps"
+          allow(::Dir).to receive(:exist?).and_call_original
+          allow(::Dir).to receive(:empty?).and_call_original
+          allow(::Dir).to receive(:exist?).with(dcv_gl_deps_dir).and_return(true)
+          allow(::Dir).to receive(:empty?).with(dcv_gl_deps_dir).and_return(false)
           ConvergeDcv.configure(runner)
         end
         cached(:node) { chef_run.node }
@@ -868,8 +873,14 @@ describe 'dcv:configure' do
             is_expected.to run_execute('apt install dcv-gl')
               .with_command("apt -y install #{sources_dir}/#{dcv_package}/#{dcv_gl}")
           else
+            is_expected.to run_execute('install dcv-gl dependencies offline')
+              .with_command("rpm -ivh #{sources_dir}/dcv-gl-deps/*.rpm")
+              .with_retries(3)
+              .with_retry_delay(5)
             is_expected.to run_execute('install dcv-gl offline')
               .with_command("rpm -ivh #{sources_dir}/#{dcv_package}/#{dcv_gl}")
+              .with_retries(3)
+              .with_retry_delay(5)
           end
         end
 
