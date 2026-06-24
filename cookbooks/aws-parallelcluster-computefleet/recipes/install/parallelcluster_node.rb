@@ -33,18 +33,16 @@ activate_virtual_env node_virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-if aws_region.start_with?("us-iso") && !is_custom_node?
-  node_package = "aws-parallelcluster-node-#{node['cluster']['parallelcluster-node-version']}.tgz"
-
-  node.override['cluster']['custom_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/#{node_package}"
-end
-
-if is_custom_node?
-  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
-else
-  execute "install official aws-parallelcluster-node" do
+# Install the official node package from S3 in all regions (air-gapped/proxied
+# support), unless the user opts into installing from PyPI via
+# install_node_from_internet. A user-provided custom_node_package always wins.
+if node['cluster']['install_node_from_internet']
+  # install_node_from_internet was requested: install from PyPI.
+  execute "install aws-parallelcluster-node from Pypi" do
     command "#{virtualenv_path}/bin/pip install aws-parallelcluster-node==#{node['cluster']['parallelcluster-node-version']}"
     retries 3
     retry_delay 5
   end
+else
+  include_recipe 'aws-parallelcluster-computefleet::custom_parallelcluster_node'
 end

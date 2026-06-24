@@ -18,6 +18,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 
 **CHANGES**
 - Upgrade Slurm to version 25.11.6 (from 25.11.4).
+- Install the aws-parallelcluster-node package from S3 in all regions instead of PyPI, to support air-gapped and proxied environments.
 
 **BUG FIXES**
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
