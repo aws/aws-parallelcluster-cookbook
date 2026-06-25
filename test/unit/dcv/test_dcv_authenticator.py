@@ -92,29 +92,48 @@ def test_sha_generator():
 
 
 @pytest.mark.parametrize(
-    "user, command, session_id, result",
+    "uid, command, session_id, result",
     [
-        ("user1", "/usr/libexec/dcv/dcvagent", "mysession", True),
-        ("user1", "/usr/libexec/dcv/dcvagent2", "mysession", False),
-        ("wrong", "/usr/libexec/dcv/dcvagent", "mysession", False),
-        ("user1", "/usr/libexec/dcv/dcvagent", "wrong", False),
-        ("user1", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "mysession", True),
-        ("wrong", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "mysession", False),
-        ("user1", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "wrong", False),
+        (1000, "/usr/libexec/dcv/dcvagent", "mysession", True),
+        (1000, "/usr/libexec/dcv/dcvagent2", "mysession", False),
+        (4242, "/usr/libexec/dcv/dcvagent", "mysession", False),
+        (1000, "/usr/libexec/dcv/dcvagent", "wrong", False),
+        (1000, "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "mysession", True),
+        (4242, "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "mysession", False),
+        (1000, "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "wrong", False),
     ],
 )
-def test_is_process_valid(user, command, session_id, result):
+def test_is_process_valid(uid, command, session_id, result):
     expected_session_id = "mysession"
-    expected_user = "user1"
+    expected_uid = 1000
 
-    ps_aux_output = (
-        f"{user}                63   0.0  0.0  4348844   3108   ??  Ss   23Jul19   2:32.46 {command} --mode full "
-        f"--session-id {session_id}"
-    )
+    # Row format produced by `ps -eo uid,args`: "<uid> <command> <args...>".
+    # The numeric UID avoids the username truncation that `ps aux` introduces for names > 8 chars.
+    ps_output = f"{uid} {command} --mode full --session-id {session_id}"
 
-    assert_that(DCVAuthenticator.check_dcv_process(ps_aux_output, expected_user, expected_session_id)).is_equal_to(
-        result
-    )
+    assert_that(DCVAuthenticator.check_dcv_process(ps_output, expected_uid, expected_session_id)).is_equal_to(result)
+
+
+@pytest.mark.parametrize(
+    "row",
+    [
+        "",  # empty line
+        "   ",  # blank line
+        "1000",  # uid only, no command
+        "1000 /usr/libexec/dcv/dcvagent --mode full",  # no --session-id argument
+        "1000 /usr/libexec/dcv/dcvagent --mode full --session-id",  # --session-id with no value
+    ],
+)
+def test_is_process_valid_malformed_rows(row):
+    # Malformed or non-dcvagent rows must never be considered a valid session.
+    assert_that(DCVAuthenticator.check_dcv_process(row, 1000, "mysession")).is_false()
+
+
+def test_is_process_valid_minimal_row():
+    # A dcvagent process invoked without --mode must still be matched (regression for an
+    # overly strict field-count guard).
+    row = "1000 /usr/libexec/dcv/dcvagent --session-id mysession"
+    assert_that(DCVAuthenticator.check_dcv_process(row, 1000, "mysession")).is_true()
 
 
 def mock_generate_random_token(mocker, value):
@@ -202,6 +221,36 @@ def test_get_request_token(mocker):
 def test_get_request_token_regex(user, session_id):
     with pytest.raises(DCVAuthenticator.IncorrectRequestError):
         DCVAuthenticator._get_request_token(user, session_id)
+
+
+@pytest.mark.parametrize(
+    "user",
+    [
+        "first.last",  # dot is now allowed (e.g. AD/LDAP style names)
+        "first.last.middle",
+        "averylongusernamebeyond8chars",  # names longer than 8 chars must be accepted
+        "a" * 32,  # 1 leading char + 31 = max length
+        "_service.account",
+        "first.last$",  # trailing $ (machine account style)
+    ],
+)
+def test_user_regex_allows_valid_names(user):
+    # Should not raise for valid usernames, including those with dots and long names.
+    DCVAuthenticator._validate_param(user, DCVAuthenticator.USER_REGEX, "authUser")
+
+
+@pytest.mark.parametrize(
+    "user",
+    [
+        ".first.last",  # cannot start with a dot
+        "First.Last",  # uppercase not allowed
+        "a" * 33,  # exceeds max length
+        "first.last space",  # whitespace not allowed
+    ],
+)
+def test_user_regex_rejects_invalid_names(user):
+    with pytest.raises(DCVAuthenticator.IncorrectRequestError):
+        DCVAuthenticator._validate_param(user, DCVAuthenticator.USER_REGEX, "authUser")
 
 
 @pytest.mark.parametrize("token", ["assvbsd", "?" + "".join(("c" for _ in range(255)))])

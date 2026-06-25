@@ -11,9 +11,14 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
 - Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 
   removing the dependency on cfn-hup and cfn-init.
+- Support usernames longer than 8 characters and usernames with `.` in DCV authenticator.
   
 
 **CHANGES**
+- Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). NFSv3 can be
+  re-enabled on the server by overriding the `nfs/v3` attribute to `'yes'`. The NFSv3 client
+  stack (rpcbind, rpc-statd, lockd) and its statically pinned ports are unchanged, so cluster
+  nodes can still mount external NFSv3 servers through a restricted firewall.
 - In GPU Health Check, skip DCGM diagnostics when NVIDIA MIG is enabled because dcgmi diag does not support MIG.
 
 **CHANGES**

@@ -29,7 +29,7 @@ from collections import OrderedDict, namedtuple
 from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from logging.handlers import RotatingFileHandler
-from pwd import getpwuid
+from pwd import getpwnam, getpwuid
 from socketserver import ThreadingMixIn
 from urllib.parse import parse_qsl, urlparse
 
@@ -133,7 +133,7 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
 
         pass
 
-    USER_REGEX = r"^[a-z_]([a-z0-9_-]{0,31}|[a-z0-9_-]{0,30}\$)$"
+    USER_REGEX = r"^[a-z_]([a-z0-9_.-]{0,31}|[a-z0-9_.-]{0,30}\$)$"
     SESSION_ID_REGEX = r"^([a-zA-Z0-9_-]{0,128})$"
     # A nosec comment is appended to the following line in order to disable the B105 check.
     # Since the TOKEN_REGEX is not a hardcoded password
@@ -356,18 +356,24 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         """
         Verify if the DCV session exists and the ownership.
 
-        # We are using ps aux to retrieve the list of sessions
-        # because currently DCV doesn't allow list-session to list all session even for non-root user.
-        # TODO change this method if DCV updates his behaviour.
+        We use `ps -eo uid,args` rather than `ps aux` because the latter truncates the user
+        column to 8 characters, which breaks ownership checks for usernames longer than 8
+        characters. The username is resolved to its numeric UID and matched against the UID
+        column instead.
         """
         logger.info("Verifying Amazon DCV session validity..")
-        # Remove the first and the last because they are the heading and empty, respectively
-        # All commands and arguments in this subprocess call are built as literals
-        processes = subprocess.check_output(["/bin/ps", "aux"]).decode("utf-8").split("\n")[1:-1]  # nosec B603
 
-        # Check the filter is empty
+        try:
+            uid = getpwnam(user).pw_uid
+        except KeyError:
+            raise DCVAuthenticator.IncorrectRequestError("The given user does not exist on this system")
+
+        # The first and last entries are the heading and the trailing empty line, respectively.
+        # All commands and arguments in this subprocess call are built as literals.
+        processes = subprocess.check_output(["/bin/ps", "-eo", "uid,args"]).decode("utf-8").split("\n")[1:-1]  # nosec B603
+
         if not next(
-            filter(lambda process: DCVAuthenticator.check_dcv_process(process, user, session_id), processes), None
+            filter(lambda process: DCVAuthenticator.check_dcv_process(process, uid, session_id), processes), None
         ):
             raise DCVAuthenticator.IncorrectRequestError("The given session does not exists")
         logger.info("The Amazon DCV session is valid.")
@@ -377,23 +383,19 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         retry(DCVAuthenticator._is_session_valid, func_args=[user, session_id], attempts=20, wait=1)
 
     @staticmethod
-    def check_dcv_process(row, user, session_id):
-        """Check if there is a dcvagent process running for the given user and for the given session_id."""
-        # row example:
-        # centos 63 0.0 0.0 4348844 3108   ??  Ss   23Jul19   2:32.46  /usr/libexec/dcv/dcvagent --mode full \
-        #     --session-id mysession
-        # ubuntu 2949 0.3 0.4 860568 34328 ? Sl 20:10 0:18 /usr/lib/x86_64-linux-gnu/dcv/dcvagent --mode full \
-        #     --session-id mysession
+    def check_dcv_process(row, uid, session_id):
+        """Check if there is a dcvagent process running for the given UID and for the given session_id."""
+        # row example (from `ps -eo uid,args`):
+        # 1000 /usr/libexec/dcv/dcvagent --mode full --session-id mysession
         fields = row.split()
-        command_index = 10
-        session_name_index = 14
-        user_index = 0
-
-        return (
-            fields[command_index].endswith("/dcv/dcvagent")
-            and fields[user_index] == user
-            and fields[session_name_index] == session_id
-        )
+        try:
+            return (
+                    fields[1].endswith("/dcv/dcvagent")
+                    and fields[0] == str(uid)
+                    and fields[fields.index("--session-id") + 1] == session_id
+            )
+        except (ValueError, IndexError):
+            return False
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

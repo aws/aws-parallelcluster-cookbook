@@ -5,6 +5,11 @@ default['cluster']['proxy'] = 'NONE'
 # For performance, set NFS threads to min(256, max(8, num_cores * 4))
 default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 256].min
 
+# Enforce NFSv4-only on the ParallelCluster-managed NFS server.
+default['nfs']['v4'] = 'yes'
+default['nfs']['v3'] = 'no'
+default['nfs']['v2'] = 'no'
+
 # Kernel release version used to select Lustre version
 # This is a mechanism used to mock kernel release on docker system-tests, see kitchen.docker.yml:
 # when kernel_release is defined, it will be used, otherwise the release version will be taken from ohai.
