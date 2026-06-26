@@ -7,6 +7,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Ship the diagnostics tool `pcluster-diag` into ParallelCluster AMIs to run on-demand diagnostics check on the cluster.
+  See the `pcluster-diag` README for usage instructions.
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
 - Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 

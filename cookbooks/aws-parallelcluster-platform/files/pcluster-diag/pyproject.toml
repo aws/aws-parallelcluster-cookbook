@@ -1,0 +1,65 @@
+# The tool supports two independent workflows:
+#   * pip-installable
+#     In this case, the build-system is used.
+#   * run directly from source with `python -m pcluster_diag.cli`.
+#     In this case, the build-system is not used.
+[build-system]
+requires = ["setuptools>=80.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pcluster-diag"
+description = "Diagnostics tool for AWS ParallelCluster nodes."
+readme = "README.md"
+requires-python = ">=3.14"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Amazon Web Services" },
+]
+dynamic = ["version"]
+dependencies = [
+    "boto3~=1.42",
+    "click~=8.0",
+    "pyyaml~=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest~=9.0",
+    "pytest-cov~=7.0",
+    "tox~=4.0",
+]
+
+[project.scripts]
+pcluster-diag = "pcluster_diag.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "pcluster_diag.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pcluster_diag*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+cache_dir = "tests/.pytest_cache"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+profile = "black"
+line_length = 120
+known_first_party = ["pcluster_diag"]
+
+[tool.coverage.run]
+source = ["pcluster_diag"]
+branch = true
+data_file = "tests/.coverage"
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 90
+
+[tool.coverage.xml]
+output = "tests/coverage.xml"

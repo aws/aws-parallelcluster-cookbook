@@ -1,0 +1,59 @@
+# Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the
+# License. A copy of the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Unit tests for the shell command-runner utility."""
+
+import logging
+import subprocess
+
+from pcluster_diag.util import shell
+from pcluster_diag.util.shell import run_command
+
+
+def test_run_command_runs_without_shell_logs_and_returns_result(monkeypatch, caplog):
+    captured = {}
+
+    def fake_run(command, **kwargs):
+        captured["command"] = command
+        captured["kwargs"] = kwargs
+        return subprocess.CompletedProcess(command, 0, stdout="out", stderr="err")
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+
+    with caplog.at_level(logging.INFO, logger="pcluster_diag.util.shell"):
+        result = run_command(["echo", "hi"])
+
+    # The command is captured and never run through a shell nor raised on a non-zero exit.
+    assert captured["command"] == ["echo", "hi"]
+    assert "shell" not in captured["kwargs"]
+    # A default 60s timeout is applied.
+    assert captured["kwargs"] == {"capture_output": True, "text": True, "check": False, "timeout": 60}
+    # The CompletedProcess is returned unchanged.
+    assert result.returncode == 0
+    assert result.stdout == "out"
+    # The outcome is logged to stderr.
+    assert any("Executed command" in record.getMessage() for record in caplog.records)
+
+
+def test_run_command_uses_caller_supplied_timeout(monkeypatch):
+    captured = {}
+
+    def fake_run(command, **kwargs):
+        captured["kwargs"] = kwargs
+        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+
+    run_command(["echo", "hi"], timeout=5)
+
+    # The caller's timeout overrides the default.
+    assert captured["kwargs"]["timeout"] == 5

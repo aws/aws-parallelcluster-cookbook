@@ -36,3 +36,5 @@ report.html
 /.kitchen.env.sh
 
 .DS_Store
+
+.kiro/specs/
