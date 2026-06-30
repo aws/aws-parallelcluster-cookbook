@@ -50,7 +50,7 @@ unless node['cluster']['install_python_from_internet']
   end
 end
 
-bash "install aws-parallelcluster-node" do
+bash "install aws-parallelcluster-node from #{node['cluster']['custom_node_package']}" do
   cwd Chef::Config[:file_cache_path]
   code <<-NODE
     set -e

@@ -92,7 +92,7 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
           end
 
           it 'installs aws-parallelcluster-node' do
-            is_expected.to run_bash('install aws-parallelcluster-node')
+            is_expected.to run_bash("install aws-parallelcluster-node from #{custom_node_s3_url}")
               .with(code: node_bash_code.gsub(/^  /, '    '))
           end
         end

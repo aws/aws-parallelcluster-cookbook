@@ -75,11 +75,17 @@ def load_cluster_config(config_path)
 end
 
 #
-# Check if custom node is specified in the config
+# Check if a custom node package is specified in the config using DevSettings.
+# We ship a default custom_node_package (the official S3 package), so we
+# compare the effective value against the full default-precedence value:
+# only a value the customer changed counts as custom.
 #
 def is_custom_node?
   custom_node_package = node['cluster']['custom_node_package']
-  !custom_node_package.nil? && !custom_node_package.empty?
+  return false if custom_node_package.nil? || custom_node_package.empty?
+  custom = custom_node_package != node.default['cluster']['custom_node_package']
+  Chef::Log.info("is_custom_node?: #{custom} (package: #{custom_node_package})")
+  custom
 end
 
 def write_sync_file(path)
