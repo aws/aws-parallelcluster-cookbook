@@ -24,13 +24,13 @@ describe 'package_repos:setup' do
 
       case platform
       when 'amazon'
-        it 'installs yum' do
-          expect(chef_run).to include_recipe('yum')
+        it 'writes yum global config' do
+          expect(chef_run).to create_yum_globalconfig('/etc/yum.conf')
         end
 
       when 'redhat'
-        it 'installs yum and epel' do
-          expect(chef_run).to include_recipe('yum')
+        it 'writes yum global config and installs epel' do
+          expect(chef_run).to create_yum_globalconfig('/etc/yum.conf')
           expect(chef_run).to include_recipe('yum-epel')
         end
 
@@ -54,8 +54,8 @@ describe 'package_repos:setup' do
         end
 
       when 'rocky'
-        it 'installs yum' do
-          expect(chef_run).to include_recipe('yum')
+        it 'writes yum global config' do
+          expect(chef_run).to create_yum_globalconfig('/etc/yum.conf')
         end
 
         it 'installs yum-epel' do

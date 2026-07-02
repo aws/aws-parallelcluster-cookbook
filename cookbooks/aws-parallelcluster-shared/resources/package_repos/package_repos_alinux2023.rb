@@ -22,7 +22,10 @@ use 'partial/_package_repos_rpm.rb'
 default_action :setup
 
 action :setup do
-  include_recipe 'yum'
+  # yum 8.0.0 dropped the yum::default recipe; write /etc/yum.conf via the resource.
+  yum_globalconfig '/etc/yum.conf' do
+    action :create
+  end
   # include_recipe "yum-epel"
 
   # package 'yum-utils' do
