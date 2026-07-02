@@ -114,7 +114,7 @@ describe 'nvidia_driver:setup' do
 
       it 'does not install the driver' do
         is_expected.not_to run_execute('Enable NVIDIA driver module')
-        is_expected.not_to install_apt_package('nvidia-open')
+        is_expected.not_to install_package('nvidia-open')
       end
     end
 
@@ -136,7 +136,7 @@ describe 'nvidia_driver:setup' do
 
       it 'does not install the driver (nvidia-smi already present)' do
         is_expected.not_to run_execute('Enable NVIDIA driver module')
-        is_expected.not_to install_apt_package('nvidia-open')
+        is_expected.not_to install_package('nvidia-open')
       end
 
       it 'leaves the shipped driver untouched and records no version' do
@@ -184,7 +184,7 @@ describe 'nvidia_driver:setup' do
 
       if platform == 'ubuntu'
         it 'installs the open driver meta-package' do
-          is_expected.to install_apt_package('nvidia-open')
+          is_expected.to install_package('nvidia-open')
         end
 
         it 'does not hold the driver package (version-locking package handles pinning)' do
@@ -199,11 +199,11 @@ describe 'nvidia_driver:setup' do
           is_expected.to run_execute('initramfs to remove nouveau').with_command('update-initramfs -u')
         end
       else
-        it 'enables the open-dkms module stream and installs nvidia-open via dnf' do
+        it 'enables the open-dkms module stream and installs nvidia-open' do
           is_expected.to run_execute('Enable NVIDIA driver module').with(
-            command: 'dnf -y module enable nvidia-driver:open-dkms'
+            command: 'dnf -y module enable nvidia-driver:open-dkms && dnf clean all'
           )
-          is_expected.to install_dnf_package('nvidia-open')
+          is_expected.to install_package('nvidia-open')
         end
 
         it 'does not rebuild the initramfs' do
@@ -236,16 +236,16 @@ describe 'nvidia_driver:setup with proprietary kernel modules' do
 
       if platform == 'ubuntu'
         it 'installs the proprietary cuda-drivers meta-package' do
-          is_expected.to install_apt_package('cuda-drivers')
-          is_expected.not_to install_apt_package('nvidia-open')
+          is_expected.to install_package('cuda-drivers')
+          is_expected.not_to install_package('nvidia-open')
         end
       else
-        it 'enables the latest-dkms module stream and installs cuda-drivers via dnf' do
+        it 'enables the latest-dkms module stream and installs cuda-drivers' do
           is_expected.to run_execute('Enable NVIDIA driver module').with(
-            command: 'dnf -y module enable nvidia-driver:latest-dkms'
+            command: 'dnf -y module enable nvidia-driver:latest-dkms && dnf clean all'
           )
-          is_expected.to install_dnf_package('cuda-drivers')
-          is_expected.not_to install_dnf_package('nvidia-open')
+          is_expected.to install_package('cuda-drivers')
+          is_expected.not_to install_package('nvidia-open')
         end
       end
     end

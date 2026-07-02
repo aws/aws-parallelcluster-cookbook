@@ -69,7 +69,6 @@ end
 describe 'nvidia_cuda:setup' do
   for_all_oses do |platform, version|
     cached(:cuda_version) { '13.0.2' }
-    cached(:debian?) { platform == 'ubuntu' }
 
     context "on #{platform}#{version} when nvidia not enabled" do
       cached(:chef_run) do
@@ -79,8 +78,7 @@ describe 'nvidia_cuda:setup' do
       end
 
       it 'does not install the cuda toolkit' do
-        is_expected.not_to install_dnf_package('cuda-toolkit-13-0')
-        is_expected.not_to install_apt_package('cuda-toolkit-13-0')
+        is_expected.not_to install_package('cuda-toolkit-13-0')
       end
     end
 
@@ -93,14 +91,11 @@ describe 'nvidia_cuda:setup' do
         ConvergeNvidiaCuda.setup(runner, cuda_version: cuda_version)
       end
 
-      it 'does not install the toolkit or samples' do
-        is_expected.not_to install_dnf_package('cuda-toolkit-13-0')
-        is_expected.not_to install_apt_package('cuda-toolkit-13-0')
+      it 'skips the entire cuda setup' do
+        is_expected.not_to install_package('cuda-toolkit-13-0')
         is_expected.not_to create_remote_file('/tmp/cuda-sample.tar.gz')
-      end
-
-      it 'still renders the cuda.sh profile' do
-        is_expected.to create_template('/etc/profile.d/cuda.sh')
+        is_expected.not_to create_template('/etc/profile.d/cuda.sh')
+        is_expected.not_to write_node_attributes('Save cuda and cuda samples versions for InSpec tests')
       end
     end
 
@@ -144,14 +139,11 @@ describe 'nvidia_cuda:setup' do
         )
       end
 
-      if platform == 'ubuntu'
-        it 'installs the cuda toolkit via apt' do
-          is_expected.to install_apt_package('cuda-toolkit-13-0')
-        end
-      else
-        it 'installs the cuda toolkit via dnf' do
-          is_expected.to install_dnf_package('cuda-toolkit-13-0')
-        end
+      it 'installs the cuda toolkit via the platform package manager' do
+        is_expected.to install_package('cuda-toolkit-13-0').with(
+          retries: 3,
+          retry_delay: 5
+        )
       end
     end
   end

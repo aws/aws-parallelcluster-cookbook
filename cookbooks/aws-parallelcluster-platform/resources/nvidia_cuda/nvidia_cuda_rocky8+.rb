@@ -17,4 +17,3 @@ provides :nvidia_cuda, platform: 'rocky' do |node|
 end
 
 use 'partial/_nvidia_cuda_common.rb'
-use 'partial/_nvidia_cuda_install_rhel.rb'

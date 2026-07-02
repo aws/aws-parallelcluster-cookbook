@@ -9,27 +9,49 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-control 'nvidia_repo_added' do
-  if os_properties.ubuntu?
-    describe file('/etc/apt/sources.list.d/nvidia-repo.list') do
-      it { should exist }
-      its('content') { should match %r{https://developer.download.nvidia.com/compute/cuda/repos/ubuntu} }
-    end
+driver_version = node['cluster']['nvidia']['driver_version']
+cuda_version_dashed = node['cluster']['nvidia']['cuda']['version'].split('.')[0, 2].join('-')
+local_repo_platform =
+  if os_properties.alinux?
+    'amzn2023'
+  elsif os_properties.ubuntu?
+    "ubuntu#{os.release.delete('.')}"
   else
-    describe yum.repo('nvidia-repo') do
+    "rhel#{os.release.to_i}"
+  end
+nvidia_local_repo_packages = [
+  "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}",
+  "cuda-repo-#{local_repo_platform}-#{cuda_version_dashed}-local",
+]
+
+# No tag:install_ prefix on purpose: the added state only holds between nvidia_repo:add and :remove,
+# so full install builds must not select this control.
+control 'tag:nvidia_local_repos_added' do
+  only_if do
+    !os_properties.on_docker? &&
+      (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
+  end
+
+  nvidia_local_repo_packages.each do |repo_package|
+    describe package(repo_package) do
+      it { should be_installed }
+    end
+
+    describe directory("/var/#{repo_package}") do
       it { should exist }
-      it { should be_enabled }
     end
   end
 end
 
-control 'nvidia_repo_removed' do
-  if os_properties.ubuntu?
-    describe file('/etc/apt/sources.list.d/nvidia-repo.list') do
-      it { should_not exist }
+control 'tag:install_nvidia_local_repos_removed' do
+  only_if { !instance.custom_ami? }
+
+  nvidia_local_repo_packages.each do |repo_package|
+    describe package(repo_package) do
+      it { should_not be_installed }
     end
-  else
-    describe yum.repo('nvidia-repo') do
+
+    describe directory("/var/#{repo_package}") do
       it { should_not exist }
     end
   end

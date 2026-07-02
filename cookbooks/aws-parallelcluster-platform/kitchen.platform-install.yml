@@ -155,20 +155,26 @@ suites:
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - nvidia_repo_added
+        - tag:nvidia_local_repos_added
     attributes:
       resource: nvidia_repo:add
+      cluster:
+        nvidia:
+          enabled: true
   - name: nvidia_repo_remove
     run_list:
       - recipe[aws-parallelcluster-tests::setup]
       - recipe[aws-parallelcluster-tests::test_resource]
     verifier:
       controls:
-        - nvidia_repo_removed
+        - tag:install_nvidia_local_repos_removed
     attributes:
       resource: nvidia_repo:remove
       dependencies:
         - resource:nvidia_repo:add
+      cluster:
+        nvidia:
+          enabled: true
   - name: modules
     run_list:
       - recipe[aws-parallelcluster-tests::setup]

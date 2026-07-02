@@ -72,10 +72,22 @@ action :setup do
     end
   end
 
-  # Install the NVIDIA software from the distribution package manager using the
-  # NVIDIA local-repo package.
-  action_install_driver
-  action_install_extra_packages
+  # Prepare the system for the driver meta-package install (platform-specific)
+  action_prepare_driver_install
+
+  # Install the driver meta-package from the NVIDIA local repo.
+  package nvidia_driver_package do
+    retries 3
+    retry_delay 5
+  end
+
+  # Install the extra driver packages from the NVIDIA local repo.
+  new_resource.extra_driver_packages.split(',').each do |pkg|
+    package pkg do
+      retries 3
+      retry_delay 5
+    end
+  end
 
   execute 'initramfs to remove nouveau' do
     command 'update-initramfs -u'
@@ -86,6 +98,12 @@ end
 # Whether the open-source kernel modules flavor must be installed.
 def nvidia_open_kernel_modules?
   !['false', 'no', false].include?(node['cluster']['nvidia']['kernel_open'])
+end
+
+# Driver meta-package installed from the local repo.
+# Open kernel modules -> 'nvidia-open', proprietary -> 'cuda-drivers'.
+def nvidia_driver_package
+  nvidia_open_kernel_modules? ? 'nvidia-open' : 'cuda-drivers'
 end
 
 def nvidia_driver_enabled?

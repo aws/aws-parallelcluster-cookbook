@@ -17,4 +17,3 @@ provides :nvidia_cuda, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_nvidia_cuda_common.rb'
-use 'partial/_nvidia_cuda_install_debian.rb'

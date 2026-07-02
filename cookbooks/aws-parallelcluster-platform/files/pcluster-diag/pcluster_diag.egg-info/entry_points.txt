@@ -1,2 +1,0 @@
-[console_scripts]
-pcluster-diag = pcluster_diag.cli:main

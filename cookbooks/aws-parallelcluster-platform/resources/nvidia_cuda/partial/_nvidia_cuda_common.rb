@@ -22,6 +22,10 @@ action :setup do
   return unless nvidia_enabled?
   return if on_docker?
 
+  # Skip the entire CUDA setup when any CUDA version is already installed
+  # (cuda_path is the version-agnostic symlink created by the toolkit).
+  return if ::File.exist?(cuda_path)
+
   # Share CUDA versions with InSpec tests. We expose the major.minor under a
   # dedicated attribute and leave the canonical 'version' attribute as the full
   # version, so other resources (e.g. nvidia_repo) can rely on it regardless of order.
@@ -29,13 +33,14 @@ action :setup do
   node.default['cluster']['nvidia']['cuda_samples_version'] = cuda_major_minor
   node_attributes 'Save cuda and cuda samples versions for InSpec tests'
 
-  # Skip the CUDA toolkit and samples installation when any CUDA version is already
-  # installed (cuda_path is the version-agnostic symlink created by the toolkit).
-  cuda_already_installed = ::File.exist?(cuda_path)
-
-  # Install the CUDA toolkit from the local repo (platform-specific: dnf vs apt).
-  # The CUDA local repo is registered earlier in the nvidia install recipe.
-  action_install_cuda unless cuda_already_installed
+  # Install the CUDA toolkit from the local repo. The built-in `package` resource
+  # dispatches to the platform's package manager (dnf on RHEL/Amazon Linux, apt on
+  # Ubuntu), so no platform-specific partial is needed. The CUDA local repo, and its
+  # refreshed package-manager metadata, is registered earlier in the nvidia install recipe.
+  package cuda_toolkit_package do
+    retries 3
+    retry_delay 5
+  end
 
   # Expose CUDA binaries and libraries to all users
   template '/etc/profile.d/cuda.sh' do
@@ -47,28 +52,25 @@ action :setup do
     variables(cuda_path: cuda_path)
   end
 
-  # Download and unpack the CUDA samples. Skipped whenever the toolkit install is
-  # skipped (i.e. when CUDA was already installed before this run).
-  unless cuda_already_installed
-    remote_file cuda_samples_archive do
-      source cuda_samples_url
-      mode '0644'
-      retries 3
-      retry_delay 5
-      not_if { ::File.exist?(cuda_samples_dir) }
-    end
+  # Download and unpack the CUDA samples.
+  remote_file cuda_samples_archive do
+    source cuda_samples_url
+    mode '0644'
+    retries 3
+    retry_delay 5
+    not_if { ::File.exist?(cuda_samples_dir) }
+  end
 
-    bash 'cuda.sample install' do
-      user 'root'
-      group 'root'
-      cwd '/tmp'
-      code <<-CUDA
-        set -e
-        tar xf "#{cuda_samples_archive}" --directory "#{cuda_installation_base_dir}/"
-        rm -f "#{cuda_samples_archive}"
-      CUDA
-      creates cuda_samples_dir
-    end
+  bash 'cuda.sample install' do
+    user 'root'
+    group 'root'
+    cwd '/tmp'
+    code <<-CUDA
+      set -e
+      tar xf "#{cuda_samples_archive}" --directory "#{cuda_installation_base_dir}/"
+      rm -f "#{cuda_samples_archive}"
+    CUDA
+    creates cuda_samples_dir
   end
 end
 
