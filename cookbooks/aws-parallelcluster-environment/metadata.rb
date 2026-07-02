@@ -10,6 +10,6 @@ chef_version '>= 18'
 version '3.16.0'
 
 depends 'line', '~> 5.0.0'
-depends 'nfs', '~> 5.1.5'
+depends 'nfs', '~> 5.1.6'
 
 depends 'aws-parallelcluster-shared', '~> 3.16.0'
