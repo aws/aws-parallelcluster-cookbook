@@ -2,6 +2,16 @@
 
 This file is used to list changes made in each version of the openssh cookbook.
 
+## 2.11.17 - *2025-09-04*
+
+## 2.11.16 - *2025-06-08*
+
+Standardise files with files in sous-chefs/repo-management
+
+## 2.11.15 - *2024-11-27*
+
+- In more recent enterprise linux (rhel, oel, etc) systems system policies are added at end of sshd config and therefor any match block needs to be closed
+
 ## 2.11.14 - *2024-11-18*
 
 Standardise files with files in sous-chefs/repo-management
