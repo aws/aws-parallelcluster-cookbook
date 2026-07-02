@@ -3,7 +3,7 @@ driver:
   name: vagrant
 
 provisioner:
-  name: chef_zero
+  name: chef_infra
   product_name: chef
   chef_license: accept-no-persist
   multiple_converge: 2
@@ -15,24 +15,51 @@ verifier:
 
 platforms:
   - name: almalinux-8
-  - name: amazonlinux-2
-  - name: centos-7
-  - name: centos-stream-8
+  - name: almalinux-9
+  - name: almalinux-10
+  - name: amazonlinux-2023
+  - name: centos-stream-9
+  - name: centos-stream-10
   - name: fedora-latest
-  - name: oraclelinux-7
   - name: oraclelinux-8
+  - name: oraclelinux-9
+  - name: oraclelinux-10
   - name: rockylinux-8
+  - name: rockylinux-9
+  - name: rockylinux-10
+
+x-run_lists:
+  default: &default_run_list
+    - recipe[test::default]
+  dnf_module: &dnf_module_run_list
+    - recipe[test::dnf_module]
+
+x-verifiers:
+  default: &default_verifier
+    name: inspec
+    inspec_tests:
+      - test/integration/default
+  dnf_module: &dnf_module_verifier
+    name: inspec
+    inspec_tests:
+      - test/integration/dnf_module
 
 suites:
   - name: default
-    run_list:
-      - recipe[yum::default]
-      - recipe[test::test_globalconfig_two]
+    run_list: *default_run_list
+    verifier: *default_verifier
 
   - name: dnf_module
-    run_list:
-      - recipe[test::dnf_module]
+    run_list: *dnf_module_run_list
+    verifier: *dnf_module_verifier
     excludes:
-      - amazonlinux-2
-      - centos-7
-      - oraclelinux-7
+      - almalinux-9
+      - almalinux-10
+      - amazonlinux-2023
+      - centos-stream-9
+      - centos-stream-10
+      - fedora-latest
+      - oraclelinux-9
+      - oraclelinux-10
+      - rockylinux-9
+      - rockylinux-10

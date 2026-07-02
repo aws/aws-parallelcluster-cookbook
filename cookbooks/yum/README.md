@@ -16,8 +16,13 @@ This cookbook is maintained by the Sous Chefs. The Sous Chefs are a community of
 
 ### Platforms
 
-- RHEL/CentOS and derivatives
+- AlmaLinux
+- Amazon Linux 2023
+- CentOS Stream
 - Fedora
+- Oracle Linux
+- Red Hat Enterprise Linux
+- Rocky Linux
 
 ### Chef
 
@@ -32,38 +37,11 @@ This cookbook is maintained by the Sous Chefs. The Sous Chefs are a community of
 - [`yum_globalconfig`](documentation/yum_globalconfig.md)
 - [`dnf_module`](documentation/dnf_module.md)
 
-## Recipes (deprecated)
+## Migration
 
-- `default` - Configures `yum_globalconfig[/etc/yum.conf]` with values found in node attributes at `node['yum']['main']`
-
-## Attributes
-
-The following attributes are set by default
-
-```ruby
-default['yum']['main']['cachedir'] = '/var/cache/yum/$basearch/$releasever'
-default['yum']['main']['keepcache'] = false
-default['yum']['main']['debuglevel'] = nil
-default['yum']['main']['exclude'] = nil
-default['yum']['main']['logfile'] = '/var/log/yum.log'
-default['yum']['main']['exactarch'] = nil
-default['yum']['main']['obsoletes'] = nil
-default['yum']['main']['installonly_limit'] = nil
-default['yum']['main']['installonlypkgs'] = nil
-default['yum']['main']['installroot'] = nil
-```
-
-For Amazon platform nodes, the default is to receive a continuous flow of updates,
-
-```ruby
-default['yum']['main']['releasever'] = 'latest'
-```
-
-To lock existing instances to the current version of the Amazon AMI,
-
-```ruby
-default['yum']['main']['releasever'] = ''
-```
+This cookbook has completed a full custom resource migration. Recipes and node
+attributes were removed in favor of resource properties. See
+[migration.md](migration.md) for the breaking-change migration path.
 
 ## Related Cookbooks
 
@@ -81,7 +59,13 @@ Recipes from older versions of this cookbook have been moved individual cookbook
 
 ## Usage
 
-Put `depends 'yum'` in your metadata.rb to gain access to the yum_repository resource.
+Put `depends 'yum'` in your metadata.rb to gain access to the resources.
+
+```ruby
+yum_globalconfig '/etc/yum.conf' do
+  action :create
+end
+```
 
 ## Contributors
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Full blown parameterization. Exercercises the
 # recipe->resource->provider->template chain
 yum_globalconfig '/tmp/yum-full.conf' do

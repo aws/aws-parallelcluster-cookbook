@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+dnf_module 'nodejs:12' do
+  action :install
+end
+
 package 'nodejs'
 
 dnf_module 'ruby:2.7' do

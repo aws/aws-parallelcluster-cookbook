@@ -1,0 +1,7 @@
+---
+name: dnf_module
+title: DNF Module Resource Tests
+maintainer: Sous Chefs
+license: Apache-2.0
+summary: Verifies DNF module resource behavior
+version: 1.0.0

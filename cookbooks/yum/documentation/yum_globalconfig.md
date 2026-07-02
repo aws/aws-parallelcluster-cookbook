@@ -2,11 +2,22 @@
 
 [Back to resource list](../README.md#Resources)
 
-This renders a template with global yum configuration parameters. The default recipe uses it to render `/etc/yum.conf`. It is flexible enough to be used in other scenarios, such as building RPMs in isolation by modifying `installroot`.
+This renders a template with global yum configuration parameters. Declare it
+directly to render `/etc/yum.conf`, or use a custom path for isolated RPM build
+roots.
+
+## Actions
+
+| Action    | Description                                      |
+| --------- | ------------------------------------------------ |
+| `:create` | Creates or updates the yum configuration file.   |
+| `:delete` | Deletes the yum configuration file at `path`.    |
 
 ## Properties
 
-`yum_globalconfig` can take most of the same parameters as a `yum_repository`, plus more, too numerous to describe here. Below are a few of the more commonly used ones. For a complete list, please consult the [`yum.conf` man page](http://linux.die.net/man/5/yum.conf)
+`yum_globalconfig` can take most of the same parameters as `yum_repository`,
+plus more. For the complete option semantics, consult the
+[`yum.conf` man page](http://linux.die.net/man/5/yum.conf).
 
 - `cachedir` - Directory where yum should store its cache and db files. The default is '/var/cache/yum'.
 - `keepcache` - Either `true` or `false`. Determines whether or not yum keeps the cache of headers and packages after successful installation. Default is `false`
@@ -17,6 +28,12 @@ This renders a template with global yum configuration parameters. The default re
 - `logfile` - Full directory and file name for where yum should write its log file.
 - `exactarch` - Either `true` or `false`. Set to `true` to make 'yum update' only update the architectures of packages that you have installed. ie: with this enabled yum will not install an i686 package to update an x86_64 package. Default is `true`
 - `gpgcheck` - Either `true` or `false`. This tells yum whether or not it should perform a GPG signature check on the packages gotten from this repository.
+- `distroverpkg` - Package used to derive `$releasever`. Defaults to the same
+  platform-aware values used by older `node['yum']['main']['distroverpkg']`
+  attributes.
+- `releasever` - Release value written to the config. Defaults to `'latest'` on
+  Amazon Linux and is unset elsewhere.
+- `options` - Hash of extra key/value pairs rendered into the `[main]` section.
 
 ## Example
 

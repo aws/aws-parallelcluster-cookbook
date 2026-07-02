@@ -6,7 +6,9 @@ Provides interactions with the `dnf module` commands.
 
 ## Actions
 
-These map to `dnf module` subcommands, documented [here](https://dnf.readthedocs.io/en/latest/command_ref.html#module-command) A basic summary for each is included below:
+These map to `dnf module` subcommands, documented in the
+[DNF module command reference](https://dnf.readthedocs.io/en/latest/command_ref.html#module-command).
+A basic summary for each is included below:
 
 - `:switch_to` - *(Default)* Enable a module stream and upgrade any packages to versions provided by the module
 - `:enable` - Enable a module stream without installing any packages
@@ -24,6 +26,9 @@ These map to `dnf module` subcommands, documented [here](https://dnf.readthedocs
 | `flush_cache` | `true`, `false`     | `true`        | Whether to flush the Chef package cache after the module action |
 
 Flushing Chef's package cache is needed when switching to a module stream added *during* the Chef run, e.g. from a new repo.
+
+The resource is a no-op on platforms that do not support DNF modules, including
+RHEL-family platforms before major version 8.
 
 ## Examples
 

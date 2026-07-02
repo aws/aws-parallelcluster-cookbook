@@ -1,4 +1,5 @@
-resource_name :dnf_module
+# frozen_string_literal: true
+
 provides :dnf_module
 
 unified_mode true
@@ -24,7 +25,7 @@ action_class do
   def list_modules(type)
     raw_output = shell_out!('dnf -q module list').stdout.split("\n")
     raw_output.keep_if { |l| l.match? /\[#{type}\]/ }
-    raw_output.map { |l| "#{l.split[0]}:#{l.split[1]}" }[0..-2] # remove Hint: line from end
+    raw_output.map { |l| "#{l.split.first}:#{l.split[1]}" }[0..-2] # remove Hint: line from end
   end
 
   def enabled_modules

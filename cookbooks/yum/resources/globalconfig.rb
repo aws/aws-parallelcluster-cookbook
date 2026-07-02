@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook:: yum
 # Resource:: repository
@@ -20,7 +22,30 @@
 
 # http://man7.org/linux/man-pages/man5/yum.conf.5.html
 
+provides :yum_globalconfig
 unified_mode true
+
+action_class do
+  def default_distroverpkg
+    case node['platform']
+    when 'amazon'
+      'system-release'
+    when 'scientific'
+      'sl-release'
+    when 'redhat'
+      nil
+    when 'oracle'
+      'oraclelinux-release'
+    else
+      "#{node['platform']}-release"
+    end
+  end
+
+  def apply_platform_defaults
+    new_resource.distroverpkg(default_distroverpkg) if new_resource.distroverpkg.nil? && !default_distroverpkg.nil?
+    new_resource.releasever('latest') if new_resource.releasever.nil? && platform?('amazon')
+  end
+end
 
 property :alwaysprompt, [true, false], description: 'When true yum will not prompt for confirmation when the list of packages to be installed exactly matches those given on the command line. Unless assumeyes is enabled, it will prompt when additional packages need to be installed to fulfill dependencies regardless of this setting. Note that older versions of yum would also always prompt for package removal, and that is no longer true.'
 property :assumeno, [true, false], description: "If yum would prompt for confirmation of critical actions, assume the user chose no. This is basically the same as doing 'echo | yum ...'  but is a bit more usable. This option overrides assumeyes, but is still subject to alwaysprompt."
@@ -95,7 +120,7 @@ property :max_connections, String, regex: /^\d+/, description: 'The maximum numb
 property :mddownloadpolicy, String, equal_to: %w(sqlite xml), description: "You can select which kinds of repodata you would prefer yum to download:\n'sqlite' - Download the .sqlite files, if available. This is currently slightly faster, once they are downloaded. However these files tend to be bigger, and thus. take longer to download. \n'xml' - Download the .XML files, which yum will do anyway as a fallback on the other options. These files tend to be smaller, but they require parsing/converting locally after download and some aditional checks are performed on them each time they are used."
 property :mdpolicy, String, equal_to: %w(instant group:primary group:small group:main group:all), description: "You can select from different metadata download policies depending on how much data you want to download with the main repository metadata index. The advantages of downloading more metadata with the index is that you can't get into situations where you need to use that metadata later and the versions available aren't compatible (or the user lacks privileges) and that if the metadata is corrupt in any way yum will revert to the previous metadata.\n'instant' - Just download the new metadata index, this is roughly what yum always did, however it now does some checking on the index and reverts if it classifies it as bad.\n'group:primary' - Download the primary metadata with the index. This contains most of the package information and so is almost always required anyway.\n'group:small' - With the primary also download the updateinfo metadata, groups, and pkgtags. This is required for yum-security operations and it also used in the graphical clients. This file also tends to be significantly smaller than most others. This is the default. \n'group:main' - With the primary and updateinfo download the filelists metadata and the group metadata. The filelists data is required for operations like 'yum install /bin/bash', and also some dependency resolutions require it. The group data is used in some graphical clients and for group operations like 'yum grouplist Base'.\n'group:all' - Download all metadata listed in the index, currently the only one not listed above is the other metadata, which contains the changelog information which is used by yum-changelog. This is what 'yum makecache' uses."
 property :metadata_expire, String, regex: [/^\d+$/, /^\d+[mhd]$/, /never/], description: "Time (in seconds) after which the metadata will expire. So that if the current metadata downloaded is less than this many seconds old then yum will not update the metadata against the repository. If you find that yum is not downloading information on updates as often as you would like lower the value of this option. You can also change from the default of using seconds to using days, hours or minutes by appending a d, h or m respectively. The default is 6 hours, to compliment yum-updatesd running once an hour. It's also possible to use the word 'never', meaning that the metadata will never expire. Note that when using a metalink file the metalink must always be newer than the metadata for the repository, due to the validation, so this timeout also applies to the metalink file."
-property :metadata_expire_filter, String, equal_to: %w(never read-only:past read-only:present read-only:future), description: "Filter the metadata_expire time, allowing a trade of speed for accuracy if a command doesn't require it. Each yum command can specify that it requires a certain level of timeliness quality from the remote repos. from 'I\'m about to install/upgrade, so this better be current' to 'Anything that\'s available is good enough'. \n'never' - Nothing is filtered, always obey metadata_expire. \n'read-only:past' - Commands that only care about past\ information are filtered from metadata expiring.  Eg. yum history info (if history needs to lookup anything about a previous transaction, then by definition the remote package was available in the past). \n'read-only:present' - Commands that are balanced between past and future.  This is the default.  Eg. yum list yum\n'read-only:future' - Commands that are likely to result in running other commands which will require the latest metadata. Eg. yum check-update\nNote that this option requires that all the enabled repositories be roughly the same freshness (meaning the cache age difference from one another is at most 5 days).  Failing that, metadata_expire will always be obeyed, just like with 'never'.\nAlso note that this option does not override 'yum clean expire-cache'."
+property :metadata_expire_filter, String, equal_to: %w(never read-only:past read-only:present read-only:future), description: "Filter the metadata_expire time, allowing a trade of speed for accuracy if a command doesn't require it. Each yum command can specify that it requires a certain level of timeliness quality from the remote repos. from 'I'm about to install/upgrade, so this better be current' to 'Anything that's available is good enough'. \n'never' - Nothing is filtered, always obey metadata_expire. \n'read-only:past' - Commands that only care about past information are filtered from metadata expiring.  Eg. yum history info (if history needs to lookup anything about a previous transaction, then by definition the remote package was available in the past). \n'read-only:present' - Commands that are balanced between past and future.  This is the default.  Eg. yum list yum\n'read-only:future' - Commands that are likely to result in running other commands which will require the latest metadata. Eg. yum check-update\nNote that this option requires that all the enabled repositories be roughly the same freshness (meaning the cache age difference from one another is at most 5 days).  Failing that, metadata_expire will always be obeyed, just like with 'never'.\nAlso note that this option does not override 'yum clean expire-cache'."
 property :minrate, String, description: "This sets the low speed threshold in bytes per second. If the server is sending data slower than this for at least 'timeout' seconds, Yum aborts the connection."
 property :mirrorlist_expire, String, regex: /^\d+$/, description: 'Time (in seconds) after which the mirrorlist locally cached will expire. If the current mirrorlist is less than this many seconds old then yum will not download another copy of the mirrorlist, it has the same extra format as metadata_expire. If you find that yum is not downloading the mirrorlists as often as you would like lower the value of this option.'
 property :multilib_policy, String, equal_to: %w(all best), description: "The policy installation policy. Can be set to 'all' or 'best'. All means install all possible arches for any package you want to install. Therefore yum install foo will install foo.i386 and foo.x86_64 on x86_64, if it is available. Best means install the best arch for this platform, only. "
@@ -154,6 +179,8 @@ property :usr_w_check, [true, false], description: "Set this to false to disable
 alias_method :max_retries, :retries
 
 action :create do
+  apply_platform_defaults
+
   template new_resource.path do
     source 'main.erb'
     cookbook 'yum'
