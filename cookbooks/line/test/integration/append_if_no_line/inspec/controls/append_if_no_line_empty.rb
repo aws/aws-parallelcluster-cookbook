@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Append a line to an empty file
 #

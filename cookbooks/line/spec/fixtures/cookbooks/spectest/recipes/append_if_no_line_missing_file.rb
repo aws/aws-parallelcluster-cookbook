@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 append_if_no_line 'missing_file fail' do
   path '/tmp/nofilehere'
   line 'add this line'

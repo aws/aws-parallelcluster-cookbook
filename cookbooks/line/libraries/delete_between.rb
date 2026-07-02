@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -27,7 +29,7 @@ module Line
       # args[3] is a symbol. Include the start and end lines in the delete match. Default is :exclude. Other options are :first, :include, :last
       #
       # returns array with deleted lines
-      first_pattern = verify_kind(args[0], Regexp)
+      first_pattern = verify_kind(args.first, Regexp)
       second_pattern = verify_kind(args[1], Regexp)
       delete_pattern = verify_kind(args[2], Regexp)
       ends = verify_one_of(args[3], [nil, :exclude, :first, :include, :last]) || :exclude

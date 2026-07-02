@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Test for missing and empty file behavior
 #

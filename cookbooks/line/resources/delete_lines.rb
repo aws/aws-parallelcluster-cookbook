@@ -1,6 +1,9 @@
+# frozen_string_literal: true
+
 property :backup, [true, false, Integer], default: false
 property :eol, String
 property :ignore_missing, [true, false], default: true
+property :manage_symlink_source, [true, false]
 property :path, String
 property :pattern, [String, Regexp]
 
@@ -16,15 +19,17 @@ action :edit do
   backup_if_true
   regex = new_resource.pattern.is_a?(String) ? /#{new_resource.pattern}/ : new_resource.pattern
   current = target_current_lines
+  manage_symlink_source_explicit = property_is_set?(:manage_symlink_source)
 
   # remove lines
   new = current.reject { |l| l =~ regex }
 
   # Last line terminator
-  new[-1] += eol unless new[-1].to_s.empty?
+  terminate_last_line(new, eol)
 
   file new_resource.path do
     content new.join(eol)
+    manage_symlink_source new_resource.manage_symlink_source if manage_symlink_source_explicit
     backup new_resource.backup
     sensitive new_resource.sensitive
     not_if { new == current }

@@ -12,17 +12,26 @@ provisioner:
 verifier: inspec
 
 platforms:
-  - name: debian-9
-  - name: debian-10
-  - name: centos-7
-  - name: centos-8
-  - name: centos-stream-8
+  - name: almalinux-9
+  - name: almalinux-10
+  - name: amazonlinux-2023
+  - name: centos-stream-9
+  - name: centos-stream-10
+  - name: debian-12
+  - name: debian-13
   - name: fedora-latest
-  - name: ubuntu-20.04
-  - name: ubuntu-21.04
-  - name: amazonlinux-2
+  - name: rockylinux-9
+  - name: rockylinux-10
+  - name: ubuntu-22.04
+  - name: ubuntu-24.04
 
 suites:
+  - name: default
+    run_list:
+      - recipe[test::default]
+    verifier:
+      inspec_tests:
+        - path: test/integration/default
   - name: add_to_list
     run_list:
       - recipe[test::add_to_list_1d]
@@ -69,3 +78,4 @@ suites:
       - recipe[test::replace_or_add_duplicate]
       - recipe[test::replace_or_add_missing_file]
       - recipe[test::replace_or_add_replace_only]
+      - recipe[test::replace_or_add_manage_symlink_source]

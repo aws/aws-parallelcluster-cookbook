@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FileExtResource < Inspec.resource(1)
   name 'file_ext'
 

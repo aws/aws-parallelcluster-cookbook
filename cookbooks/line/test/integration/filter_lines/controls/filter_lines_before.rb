@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Spec tests for the before filter
 #

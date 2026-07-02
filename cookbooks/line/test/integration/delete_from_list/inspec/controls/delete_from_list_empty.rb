@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Delete from empty file
 #

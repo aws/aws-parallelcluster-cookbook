@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 replace_or_add 'missing_file fail' do
   path '/tmp/nofilehere'
   pattern 'multi = '

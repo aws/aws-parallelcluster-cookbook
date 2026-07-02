@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # http://www.apache.org/licenses/LICENSE-2.0
 #

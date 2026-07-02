@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+Standardise files with files in sous-chefs/repo-management
+Standardise files with files in sous-chefs/repo-management
+
+## [5.0.0](https://github.com/sous-chefs/line/compare/v4.6.0...v5.0.0) (2026-05-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate line to custom resources ([#291](https://github.com/sous-chefs/line/issues/291))
+
+### Features
+
+* migrate line to custom resources ([#291](https://github.com/sous-chefs/line/issues/291)) ([964728d](https://github.com/sous-chefs/line/commit/964728d15544463b7634d6d69bc640fc000721c6))
+
+## [4.6.0](https://github.com/sous-chefs/line/compare/v4.5.23...v4.6.0) (2026-04-20)
+
+
+### Features
+
+* expose manage_symlink_source and release slack secrets ([53caec2](https://github.com/sous-chefs/line/commit/53caec2f1b7e40dfeac99ed7b9f8b533b60bd527))
+
+
+### Bug Fixes
+
+* align kitchen matrix and resource EOL handling ([2b6a0a0](https://github.com/sous-chefs/line/commit/2b6a0a0b6f8294610584a94408809e0926bd1007))
+* **ci:** Update workflows to use release pipeline ([#280](https://github.com/sous-chefs/line/issues/280)) ([1ac66c4](https://github.com/sous-chefs/line/commit/1ac66c43992f258b238bccf4c09be878483bc0af))
+* drop almalinux 8 from matrix ([64f335c](https://github.com/sous-chefs/line/commit/64f335c516bee57a7315225ab6419f4c81408a69))
+* drop oraclelinux and rocky 8 from matrix ([5ed3e45](https://github.com/sous-chefs/line/commit/5ed3e459f2871b8e124cead3380bb57967327b6b))
+* remove debug lines ([f285dc2](https://github.com/sous-chefs/line/commit/f285dc250b3a27ecb13d0da8da1174725d8c1178))
+* Remove debug lines from Chef run ([#284](https://github.com/sous-chefs/line/issues/284)) ([f285dc2](https://github.com/sous-chefs/line/commit/f285dc250b3a27ecb13d0da8da1174725d8c1178))
+* restore helper for resource line endings ([0afec01](https://github.com/sous-chefs/line/commit/0afec016bd135399fd5fa9dc83ac98ff560cfddc))
+* use Cinc workstation installer ([8bb5510](https://github.com/sous-chefs/line/commit/8bb55106ab05bc405136002f4e84824abc33581b))
+
+## [4.5.23](https://github.com/sous-chefs/line/compare/4.5.22...v4.5.23) (2025-10-15)
+
+
+### Bug Fixes
+
+* **ci:** Update workflows to use release pipeline ([#280](https://github.com/sous-chefs/line/issues/280)) ([1ac66c4](https://github.com/sous-chefs/line/commit/1ac66c43992f258b238bccf4c09be878483bc0af))
+
 ## 4.5.21 - *2024-11-18*
 
 Standardise files with files in sous-chefs/repo-management
@@ -16,33 +56,13 @@ Standardise files with files in sous-chefs/repo-management
 
 Standardise files with files in sous-chefs/repo-management
 
-## 4.5.19 - *2024-05-02*
-
-## 4.5.18 - *2024-05-02*
-
-## 4.5.17 - *2023-12-27*
-
-## 4.5.16 - *2023-10-31*
-
-## 4.5.15 - *2023-09-28*
-
-## 4.5.14 - *2023-09-11*
-
-## 4.5.13 - *2023-07-10*
-
-## 4.5.12 - *2023-05-16*
-
 ## 4.5.11 - *2023-04-26*
 
 Update CI test matrix
 
-## 4.5.10 - *2023-04-17*
-
 ## 4.5.9 - *2023-04-11*
 
 Standardise files with files in sous-chefs/repo-management
-
-## 4.5.8 - *2023-04-01*
 
 ## 4.5.7 - *2023-02-23*
 
@@ -51,8 +71,6 @@ Standardise files with files in sous-chefs/repo-management
 ## 4.5.6 - *2023-02-16*
 
 Standardise files with files in sous-chefs/repo-management
-
-## 4.5.5 - *2023-02-15*
 
 ## 4.5.4 - *2023-02-15*
 
@@ -64,7 +82,7 @@ Standardise files with files in sous-chefs/repo-management
 
 ## 4.5.2 - *2022-06-08*
 
-- StanzaSlash add some stanza filter unit tests to fill in the checks
+* StanzaSlash add some stanza filter unit tests to fill in the checks
 
 ## 4.5.1 - *2022-06-05*
 
@@ -72,100 +90,94 @@ Standardise files with files in sous-chefs/repo-management
 
 ## 4.5.0 - *2022-06-05*
 
-- StanzaSlash support using a slash as a character in a stanza name for the stanza filter
+* StanzaSlash support using a slash as a character in a stanza name for the stanza filter
   Improve detection of unsupported characters in a stanza name
 
 ## 4.4.4 - *2022-02-10*
 
-- Standardise files with files in sous-chefs/repo-management
+* Standardise files with files in sous-chefs/repo-management
 
 ## 4.4.3 - *2022-02-08*
 
-- Remove delivery folder
+* Remove delivery folder
 
 ## 4.4.2 - *2021-09-26*
 
-- Documentation fixes for filter_lines comment filter
-
-## 4.4.1 - *2021-09-21*
+* Documentation fixes for filter_lines comment filter
 
 ## 4.4.0 - *2021-09-09*
 
-- resolved cookstyle error: resources/delete_from_list.rb:32:1 refactor: `Chef/Modernize/ClassEvalActionClass`
+* resolved cookstyle error: resources/delete_from_list.rb:32:1 refactor: `Chef/Modernize/ClassEvalActionClass`
 
 ## 4.3.0 - *2021-08-24*
 
-- Add `mode` property to the `append_if_no_line` and `replace_or_add` resources
-- Add corresponding tests
+* Add `mode` property to the `append_if_no_line` and `replace_or_add` resources
+* Add corresponding tests
 
 ## 4.2.0 - *2021-08-23*
 
-- Add `owner` and `group` properties to the `append_if_no_line` and `replace_or_add` resources
-- Add corresponding tests
-
-## 4.1.1 - *2021-08-23*
+* Add `owner` and `group` properties to the `append_if_no_line` and `replace_or_add` resources
+* Add corresponding tests
 
 ## 4.1.0 - *2021-08-20*
 
-- Update Inspec Tests
-- Patch Bug in `add_to_list` that caused elements to be added multiple times
-- Idempotency fixes
-
-## 4.0.1 - *2021-06-01*
+* Update Inspec Tests
+* Patch Bug in `add_to_list` that caused elements to be added multiple times
+* Idempotency fixes
 
 ## 4.0.0 - *2021-05-11*
 
-- Greately increase the platforms we test in CI
-- Increase the minimum supported Chef version to 15.3 for unified mode
-- Remove code that was only there to support chef 12
+* Greately increase the platforms we test in CI
+* Increase the minimum supported Chef version to 15.3 for unified mode
+* Remove code that was only there to support chef 12
 
 ## 2.9.3 - *2020-12-07*
 
-- Add a type to the EOL property of the filter_lines resource
+* Add a type to the EOL property of the filter_lines resource
 
 ## 2.9.2 - *2020-12-06*
 
-- resolved cookstyle error: libraries/filter_helper.rb:59:11 convention: `Style/CommentAnnotation`
+* resolved cookstyle error: libraries/filter_helper.rb:59:11 convention: `Style/CommentAnnotation`
 
 ## 2.9.1 (2020-09-16)
 
-- resolved cookstyle error: libraries/filter_helper.rb:54:17 convention: `Style/BisectedAttrAccessor`
-- resolved cookstyle error: libraries/filter_helper.rb:56:1 convention: `Layout/EmptyLines`
-- resolved cookstyle error: libraries/filter_helper.rb:56:1 convention: `Layout/TrailingWhitespace`
-- resolved cookstyle error: libraries/filter_helper.rb:56:17 convention: `Style/BisectedAttrAccessor`
-- resolved cookstyle error: libraries/filter_helper.rb:57:1 convention: `Layout/EmptyLines`
-- resolved cookstyle error: libraries/substitute_filter.rb:39:7 convention: `Style/RedundantAssignment`
-- resolved cookstyle error: libraries/substitute_filter.rb:44:1 convention: `Layout/EmptyLinesAroundMethodBody`
-- resolved cookstyle error: libraries/substitute_filter.rb:44:1 convention: `Layout/TrailingWhitespace`
+* resolved cookstyle error: libraries/filter_helper.rb:54:17 convention: `Style/BisectedAttrAccessor`
+* resolved cookstyle error: libraries/filter_helper.rb:56:1 convention: `Layout/EmptyLines`
+* resolved cookstyle error: libraries/filter_helper.rb:56:1 convention: `Layout/TrailingWhitespace`
+* resolved cookstyle error: libraries/filter_helper.rb:56:17 convention: `Style/BisectedAttrAccessor`
+* resolved cookstyle error: libraries/filter_helper.rb:57:1 convention: `Layout/EmptyLines`
+* resolved cookstyle error: libraries/substitute_filter.rb:39:7 convention: `Style/RedundantAssignment`
+* resolved cookstyle error: libraries/substitute_filter.rb:44:1 convention: `Layout/EmptyLinesAroundMethodBody`
+* resolved cookstyle error: libraries/substitute_filter.rb:44:1 convention: `Layout/TrailingWhitespace`
 
 ## 2.9.0 (2020-06-18)
 
-- Restore compatibility with Chef Infra Client < 16
+* Restore compatibility with Chef Infra Client < 16
 
 ## 2.8.1 - 2020-06-02
 
-- resolved cookstyle error: resources/add_to_list.rb:10:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
-- resolved cookstyle error: resources/append_if_no_line.rb:7:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
-- resolved cookstyle error: resources/delete_from_list.rb:10:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
-- resolved cookstyle error: resources/delete_lines.rb:7:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
-- resolved cookstyle error: resources/filter_lines.rb:25:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
-- resolved cookstyle error: resources/replace_or_add.rb:10:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
+* resolved cookstyle error: resources/add_to_list.rb:10:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
+* resolved cookstyle error: resources/append_if_no_line.rb:7:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
+* resolved cookstyle error: resources/delete_from_list.rb:10:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
+* resolved cookstyle error: resources/delete_lines.rb:7:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
+* resolved cookstyle error: resources/filter_lines.rb:25:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
+* resolved cookstyle error: resources/replace_or_add.rb:10:1 warning: `ChefDeprecations/ResourceUsesOnlyResourceName`
 
 ## [2.8.0] - 2020-03-06
 
-- Feature - no duplicates
-- Feature - next replace between
-- Migrate to github actions
-- Documentation fixes
+* Feature - no duplicates
+* Feature - next replace between
+* Migrate to github actions
+* Documentation fixes
 
 ## [2.7.0]
 
-- Add new property remove_duplicates to add_or_replace resource
-- Update documentation for the default value of the replace_only property in the add_or_replace resource
+* Add new property remove_duplicates to add_or_replace resource
+* Update documentation for the default value of the replace_only property in the add_or_replace resource
 
 ## [2.6.0] - 2019-12-19
 
-- Add the :next boundary option to replace_between
+* Add the :next boundary option to replace_between
 
 ```ruby
     This new options lets you replace delimited setting that extend over
@@ -194,158 +206,159 @@ Standardise files with files in sous-chefs/repo-management
 
 ## [2.5.1]
 
-- Replace_between examples had typos
+* Replace_between examples had typos
 
 ## [2.5.0] - 2019-10-15
 
-- Clean up processing of add and delete from lists
-- Add processing of ends_with to delete from list
-- Add unit tests for add and delete from list
+* Clean up processing of add and delete from lists
+* Add processing of ends_with to delete from list
+* Add unit tests for add and delete from list
 
 ## [2.4.1] - 2019-08-07
 
-- Rename match_insert_lines to match_insert_lines?
-- Add tests for match_insert_lines?
+* Rename match_insert_lines to match_insert_lines?
+* Add tests for match_insert_lines?
 
 ## [2.4.0]
 
-- Add the replace_between filter to allow replacing all of the lines between two lines that match patterns.
-- Change the test dangerfile name to samplefile.  There was a name conflict between the lint Dangerfile and the test data dangerfile that was causing some confusion.
+* Add the replace_between filter to allow replacing all of the lines between two lines that match patterns.
+* Change the test dangerfile name to samplefile.  There was a name conflict between the lint Dangerfile and the test data dangerfile that was causing some confusion.
 
 ## [2.3.3]
 
-- Fix `filter_lines` to work with Chef12. The filters helper method matched the name of a resource property.
+* Fix `filter_lines` to work with Chef12. The filters helper method matched the name of a resource property.
   Changed the name to avoid the collision.
-- Add tests for the sensitive_default method
-- Cookstyle comments
+* Add tests for the sensitive_default method
+* Cookstyle comments
 
 ## [2.3.2]
 
-- Fix internal documentation references
-- Bump to get a rebuild
+* Fix internal documentation references
+* Bump to get a rebuild
 
 ## [2.3.1]
 
-- Try to make the links pretty on supermarket.chef.io.  Relative links did not translate well.
+* Try to make the links pretty on supermarket.chef.io.  Relative links did not translate well.
 
 ## [2.3.0]
 
-- Add the between filter.
+* Add the between filter.
   Add lines between lines matching two patterns.
-- Add the comment filter.
+* Add the comment filter.
   Allow selected lines to be changed to comments in a file.
-- Add the delete_before filter.
-- Add the replace filter.
+* Add the delete_before filter.
+* Add the replace filter.
   Allow selected lines in a file to be replaced by other lines.
-- Add the safe option to the after and before filter.
+* Add the safe option to the after and before filter.
   Safe was the intended behavior.
-- Add missing tests for methods verify_kind and verify_one_of.
-- Allow inserted lines to be specified as strings. Split input strings on EOL characters.
-- Add the substitute filter
-- Add the stanza filter
+* Add missing tests for methods verify_kind and verify_one_of.
+* Allow inserted lines to be specified as strings. Split input strings on EOL characters.
+* Add the substitute filter
+* Add the stanza filter
 
 ## [2.2.0] - 2018-10-09
 
-- Add the before filter method to allow lines to be inserted before a matching line.
-- Add test examples that show combining filters.
-- Add a couple tests of empty file edge cases.
+* Add the before filter method to allow lines to be inserted before a matching line.
+* Add test examples that show combining filters.
+* Add a couple tests of empty file edge cases.
 
 ## [2.1.1] - 2018-10-08
 
-- Allow the backup option to be specified as true
+* Allow the backup option to be specified as true
 
 ## [2.1.0] - 2018-09-28
 
-- Add the filter_lines resource
-- Add the after filter method to allow lines to be inserted after matching a line
+* Add the filter_lines resource
+* Add the after filter method to allow lines to be inserted after matching a line
 
 ## [2.0.2] - 2018-06-29
 
-- Explicitly disallow embedded EOL characters in replacement and append lines
+* Explicitly disallow embedded EOL characters in replacement and append lines
 
 ## [2.0.1] - 2018-06-01
 
-- Tested on chef 12.13.37.  Fix error caused by using the sensitive attribute.  Sensitive true will always be used for chef 12.
+* Tested on chef 12.13.37.  Fix error caused by using the sensitive attribute.  Sensitive true will always be used for chef 12.
 
 ## [2.0.0] - 2018-05-19
 
-- **Breaking change** - Files are processed in memory instead of line by line. It's possible that large files that were previously updated by the line cookbook will not be able to be processed.
-- **Breaking change** - Drop Chef 12 support
-- Use template files instead of `cookbook_file` so that we get platform sensitive line endings written for testing.
-- Add windows support to `add_to_list`, `append_if_no_line`, `delete_from_list`, `delete_lines`, `replace_or_add`.
-- Make the processing of missing target files consistent. Add the `ignore_missing` property to the resources to allow a missing file to raise an error.
-- Clean up the order of some boiler plate code.
-- Create helper methods for some common resource functions.
-- Drop the OS helpers in favour os using `platform_family?`.
+**Breaking change** - Files are processed in memory instead of line by line. It's possible that large files that were previously updated by the line cookbook will not be able to be processed.
+**Breaking change** - Drop Chef 12 support
+
+* Use template files instead of `cookbook_file` so that we get platform sensitive line endings written for testing.
+* Add windows support to `add_to_list`, `append_if_no_line`, `delete_from_list`, `delete_lines`, `replace_or_add`.
+* Make the processing of missing target files consistent. Add the `ignore_missing` property to the resources to allow a missing file to raise an error.
+* Clean up the order of some boiler plate code.
+* Create helper methods for some common resource functions.
+* Drop the OS helpers in favour os using `platform_family?`.
 
 ## [1.2.0] - 2018-04-18
 
-- Add the ignore_missing option to the `delete_lines` and `delete_from_list`. Don't raise an error if the target file is missing.
+* Add the ignore_missing option to the `delete_lines` and `delete_from_list`. Don't raise an error if the target file is missing.
 
 ## [1.1.1] - 2018-04-16
 
-- Allow appending to an empty file.
+* Allow appending to an empty file.
 
 ## [1.1.0] - 2018-03-26
 
-- Rework `delete_lines` to use file provider sub-resource.
-- Support matching with regexps in addition to strings with `delete_lines`.
-- Rework `append_if_no_line` to use file provider sub-resource.
-- Fix edge conditions around `files-with-no-trailing-CR` being fed to `append_if_no_line`.
-- Remove library helpers.
-- Remove the `escape_regexp` and escape_string methods in favour of native `Regexp.escape`
+* Rework `delete_lines` to use file provider sub-resource.
+* Support matching with regexps in addition to strings with `delete_lines`.
+* Rework `append_if_no_line` to use file provider sub-resource.
+* Fix edge conditions around `files-with-no-trailing-CR` being fed to `append_if_no_line`.
+* Remove library helpers.
+* Remove the `escape_regexp` and escape_string methods in favour of native `Regexp.escape`
 
 ## [1.0.6] - 2018-03-23
 
-- Add question mark to regular expression escape characters
+* Add question mark to regular expression escape characters
 
 ## [1.0.5] - 2018-02-20
 
-- Minor Testing updates
-- Remove custom matchers for ChefSpec. ChefDK 1 versions of ChefSpec will no longer work when unit testing against this cookbook.
+* Minor Testing updates
+* Remove custom matchers for ChefSpec. ChefDK 1 versions of ChefSpec will no longer work when unit testing against this cookbook.
 
 ## [1.0.4] - 2018-01-10
 
-- Handle deleting items from a list using spaces as the delimeter
+* Handle deleting items from a list using spaces as the delimeter
 
 ## [1.0.3] - 2017-08-22
 
-- Add edge case tests for `add_to_list`
-- Handle the `delete_lines`, `add_to_list`, and `delete_from_list` resources when a missing file is specified.
+* Add edge case tests for `add_to_list`
+* Handle the `delete_lines`, `add_to_list`, and `delete_from_list` resources when a missing file is specified.
 
 ## [1.0.2] - 2017-07-07
 
-- Fix #58 Add resource locator matchers
-- Fix #59 Add resource matcher tests
-- Make cookstyle 2.0.0 fixes
-- Delete the unused minitest files
-- Clean up the `file_ext` inspec resource
+* Fix #58 Add resource locator matchers
+* Fix #59 Add resource matcher tests
+* Make cookstyle 2.0.0 fixes
+* Delete the unused minitest files
+* Clean up the `file_ext` inspec resource
 
 ## [1.0.1] - 2017-07-05
 
-- Fix #53 `append_if_no_line` appends line always appends
+* Fix #53 `append_if_no_line` appends line always appends
 
 ## [1.0.0] - 2017-06-13
 
-- Move cookbook to Sous-Chefs org
-- Move to using custom resources
+* Move cookbook to Sous-Chefs org
+* Move to using custom resources
 
 ## [0.6.3] - 2015-10-27
 
-- Fixing Ruby and Chef deprecation warnings
-- Cleaning up tests a bit
-- Adding support for `source_url` and `issues_url`
-- `delete_from_list` resource
+* Fixing Ruby and Chef deprecation warnings
+* Cleaning up tests a bit
+* Adding support for `source_url` and `issues_url`
+* `delete_from_list` resource
 
 ## [0.6.2] - 2015-07-15
 
-- Catch lines missed by strict patterns
-- Add rspec tests for the `replace_or_add` provider. The existing chefspec tests don't step into the provider code and so don't check the provider functionality.
-- Change the Gemfile to reflect the need for berkshelf 3, chefspec v4.2, rspec 3 for the tests.
-- Update `provider_replace_or_add` to handle cases where the pattern does not match the replacement line.
-- Fix notification problem where `updated_by_last_action` was set when nothing changed.
+* Catch lines missed by strict patterns
+* Add rspec tests for the `replace_or_add` provider. The existing chefspec tests don't step into the provider code and so don't check the provider functionality.
+* Change the Gemfile to reflect the need for berkshelf 3, chefspec v4.2, rspec 3 for the tests.
+* Update `provider_replace_or_add` to handle cases where the pattern does not match the replacement line.
+* Fix notification problem where `updated_by_last_action` was set when nothing changed.
 
 ## [0.6.1] - 2015-02-24
 
-- Adding CHANGELOG
-- Adding ChefSpec matchers
+* Adding CHANGELOG
+* Adding ChefSpec matchers

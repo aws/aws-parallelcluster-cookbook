@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 add_to_list 'missing_file fail' do
   path '/tmp/nofilehere'
   pattern Regexp.escape('empty_delimited_list=(')

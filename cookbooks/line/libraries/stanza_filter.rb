@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright:: 2018 Sous Chefs
 #
 #
@@ -37,7 +39,7 @@ module Line
       # args[2] keyword style option
       # Comment lines will be ignored
       #
-      @stanza_name = verify_kind(args[0], String)
+      @stanza_name = verify_kind(args.first, String)
       @settings = verify_kind(args[1], Hash) # A hash of keywords and values
       @key_style = (verify_one_of(args[2], [nil, :equal, 'equal', :value, 'value']) || :equal).to_sym
 

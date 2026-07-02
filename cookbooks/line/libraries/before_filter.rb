@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -33,7 +35,7 @@ module Line
       # args[3] options allowed - safe
       #
       # returns array with inserted lines
-      match_pattern = verify_kind(args[0], Regexp)
+      match_pattern = verify_kind(args.first, Regexp)
       insert_array = prepare_insert_lines(args[1])
       select_match = verify_one_of(args[2], [nil, :each, 'each', :first, 'first', :last, 'last']) || :each
       options(args[3], safe: [true, false])

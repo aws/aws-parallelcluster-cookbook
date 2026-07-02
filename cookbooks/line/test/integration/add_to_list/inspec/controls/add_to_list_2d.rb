@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Test for lists with 2 delimitors ||, ||
 #

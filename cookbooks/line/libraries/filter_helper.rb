@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2019 Sous Chefs
 #
@@ -54,10 +56,9 @@ module Line
     attr_accessor :eol
 
     def expand(lines)
-      new_lines = []
-      lines.each do |line|
+      new_lines = lines.map do |line|
         # NOTE: - want to do *lines to add them instead adding an array
-        new_lines.push line.class == Replacement ? line.insert : line
+        line.class == Replacement ? line.insert : line
       end
       new_lines.compact.flatten # add the lines better so we don't need this
     end

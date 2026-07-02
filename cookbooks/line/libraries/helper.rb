@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -74,6 +76,10 @@ module Line
 
     def sensitive_default
       new_resource.sensitive = true unless property_is_set?(:sensitive)
+    end
+
+    def terminate_last_line(lines, eol)
+      lines[-1] = "#{lines.last}#{eol}" unless lines.last.to_s.empty?
     end
 
     def target_current_lines

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 delete_lines 'missing_file fail' do
   path '/tmp/nofilehere'
   pattern '^#.*'

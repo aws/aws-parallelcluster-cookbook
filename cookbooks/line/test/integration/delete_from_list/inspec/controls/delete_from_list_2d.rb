@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Delete from list with 2 deliminators ||, ||
 #

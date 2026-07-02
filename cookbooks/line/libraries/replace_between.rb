@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2019 Sous Chefs
 #
@@ -28,7 +30,7 @@ module Line
       # args[4] options.
       #
       # returns array with replaced lines
-      start_pattern = verify_kind(args[0], Regexp)
+      start_pattern = verify_kind(args.first, Regexp)
       end_pattern = verify_kind(args[1], Regexp)
       insert_array = prepare_insert_lines(args[2])
       ends = verify_all_of(args[3], [nil, :exclude, :first, :include, :last, :next]) || :exclude
@@ -52,14 +54,6 @@ module Line
 
       start_line = first_matches.first
       end_line = match_limits(ends, [:next]) ? next_match_after(start_line, second_matches) : second_matches.last
-      puts
-      puts "START #{start_line}"
-      puts "END #{end_line}"
-      puts "ENDS #{ends}"
-      puts "Current #{current}"
-      puts "Start Pattern #{start_pattern}"
-      puts "END Pattern #{end_pattern}"
-      puts "SMATCH #{second_matches}"
 
       if start_line && end_line && start_line <= end_line
         replace_start = match_limits(ends, [:first, :include]) ? start_line : start_line + 1
@@ -69,7 +63,6 @@ module Line
         end
         current[replace_start] = Replacement.new(current[replace_start], insert_array, :replace)
       end
-      puts "NEW #{expand(current)}"
       expand(current)
     end
   end

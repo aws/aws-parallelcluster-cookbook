@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -30,7 +32,7 @@ module Line
       # error condition - If the substitute string will match a line after replacement
       #  it is possible for the file size to increase after every converge. Use force
       # to ignore the possible error.
-      match_pattern = verify_kind(args[0], Regexp)
+      match_pattern = verify_kind(args.first, Regexp)
       sub_pattern = verify_kind(args[1], [Regexp]) || match_pattern
       substitute_str = verify_kind(args[2], [NilClass, String, Hash]) # String or Hash
       options(args[3], safe: [true, false])

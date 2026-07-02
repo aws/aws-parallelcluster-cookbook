@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -25,7 +27,7 @@ module Line
       # args[1] :after or :before
       #
       # returns array with inserted lines
-      insert_array = prepare_insert_lines(args[0])
+      insert_array = prepare_insert_lines(args.first)
       add_point = verify_one_of(args[1], [nil, :after, 'after', :before, 'before']) || :after
 
       case add_point
@@ -35,8 +37,8 @@ module Line
         current[current.size] = Replacement.new(current[current.size], insert_lines, rep)
       when :before
         insert_lines = missing_lines_between(current, -1, current.size + 1, insert_array)
-        rep = current[0] ? :before : :replace
-        current[0] = Replacement.new(current[0], insert_lines, rep)
+        rep = current.first ? :before : :replace
+        current[0] = Replacement.new(current.first, insert_lines, rep)
       end
       expand(current)
     end

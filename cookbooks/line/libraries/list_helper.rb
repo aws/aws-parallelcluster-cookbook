@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2019 Sous Chefs
 #
@@ -27,10 +29,10 @@ module Line
         line = line.dup
         next unless line =~ line_select
         list_end = line.rindex(/#{ends_with}/) || 0
-        seperator = line =~ /#{new_resource.pattern}.*\S.*#{ends_with}/ ? new_resource.delim[0] : ''
+        seperator = line =~ /#{new_resource.pattern}.*\S.*#{ends_with}/ ? new_resource.delim.first : ''
         case new_resource.delim.count
         when 1
-          next if line =~ /(#{regexdelim[0]}|#{new_resource.pattern})\s*#{new_resource.entry}\s*(#{regexdelim[0]}|#{ends_with})/
+          next if line =~ /(#{regexdelim.first}|#{new_resource.pattern})\s*#{new_resource.entry}\s*(#{regexdelim.first}|#{ends_with})/
           line = line.insert(list_end, "#{seperator}#{new_resource.entry}")
         when 2
           next if line =~ /#{regexdelim[1]}#{new_resource.entry}\s*#{regexdelim[1]}/
@@ -57,24 +59,24 @@ module Line
         case new_resource.delim.count
         when 1
           case line
-          when /#{regexdelim[0]}\s*#{new_resource.entry}\s*(#{regexdelim[0]}|#{ends_with})/
+          when /#{regexdelim.first}\s*#{new_resource.entry}\s*(#{regexdelim.first}|#{ends_with})/
             prefix, list, suffix = line_parts(line, pattern, ends_with)
-            list = list.sub(/(#{regexdelim[0]})*\s*#{new_resource.entry}(\s*#{regexdelim[0]}\s*|\s*\z)/, new_resource.delim[0])
+            list = list.sub(/(#{regexdelim.first})*\s*#{new_resource.entry}(\s*#{regexdelim.first}\s*|\s*\z)/, new_resource.delim.first)
             line = prefix + list + suffix
             # delete any trailing delimeters
-            line = line.sub(/\s*#{regexdelim[0]}*\s*(#{ends_with})\s*$/, '\1') # want to delete between last entry and ends_with
-          when /#{new_resource.entry}\s*(#{regexdelim[0]}|#{ends_with})/
-            line = line.sub(/#{new_resource.entry}(#{regexdelim[0]})*/, '')
+            line = line.sub(/\s*#{regexdelim.first}*\s*(#{ends_with})\s*$/, '\1') # want to delete between last entry and ends_with
+          when /#{new_resource.entry}\s*(#{regexdelim.first}|#{ends_with})/
+            line = line.sub(/#{new_resource.entry}(#{regexdelim.first})*/, '')
           end
         when 2
           case line
           when /#{regexdelim[1]}#{new_resource.entry}#{regexdelim[1]}/
-            line = line.sub(/(#{regexdelim[0]})*\s*#{regexdelim[1]}#{new_resource.entry}#{regexdelim[1]}(#{regexdelim[0]})*/, '')
+            line = line.sub(/(#{regexdelim.first})*\s*#{regexdelim[1]}#{new_resource.entry}#{regexdelim[1]}(#{regexdelim.first})*/, '')
           end
         when 3
           case line
           when /#{regexdelim[1]}#{new_resource.entry}#{regexdelim[2]}/
-            line = line.sub(/(#{regexdelim[0]})*\s*#{regexdelim[1]}#{new_resource.entry}#{regexdelim[2]}(#{regexdelim[0]})*/, '')
+            line = line.sub(/(#{regexdelim.first})*\s*#{regexdelim[1]}#{new_resource.entry}#{regexdelim[2]}(#{regexdelim.first})*/, '')
           end
         end
         new[-1] = line

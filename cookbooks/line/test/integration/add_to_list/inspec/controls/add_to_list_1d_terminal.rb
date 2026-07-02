@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Test for lists with 1 delimitor and a terminal " , "
 #

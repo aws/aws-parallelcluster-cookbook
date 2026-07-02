@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -132,16 +134,16 @@ describe 'stanza method' do
   end
 
   it 'should allow certain characters in a stanza name' do
-    expect('stanzakey' =~ @filt.key_value_regex).to be_truthy()
-    expect('/stanzakey@' =~ @filt.key_value_regex).to be_truthy()
-    expect('/abcde1234-_.%@' =~ @filt.key_value_regex).to be_truthy()
+    expect('stanzakey' =~ @filt.key_value_regex).to be_truthy
+    expect('/stanzakey@' =~ @filt.key_value_regex).to be_truthy
+    expect('/abcde1234-_.%@' =~ @filt.key_value_regex).to be_truthy
   end
 
   it 'should not allow leading and trailing blanks in a stanza name' do
-    expect(' stanzakey ' =~ @filt.key_value_regex).to be_falsy()
+    expect(' stanzakey ' =~ @filt.key_value_regex).to be_falsy
   end
 
   it 'should only allow character in the name pattern in a stanza name' do
-    expect('stanza key' =~ @filt.key_value_regex).to be_falsy()
+    expect('stanza key' =~ @filt.key_value_regex).to be_falsy
   end
 end

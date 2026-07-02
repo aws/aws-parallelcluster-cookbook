@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Replace or add with missing file
 #

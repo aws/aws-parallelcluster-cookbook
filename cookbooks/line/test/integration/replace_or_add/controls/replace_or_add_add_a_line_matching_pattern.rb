@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Add a line matching pattern
 #

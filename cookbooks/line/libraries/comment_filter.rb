@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright:: 2018 Sous Chefs
 #
@@ -25,7 +27,7 @@ module Line
       # args[2] Space between comment string and the real line
       #
       # returns array with inserted lines
-      match_pattern = verify_kind(args[0], Regexp)
+      match_pattern = verify_kind(args.first, Regexp)
       @comment_str = verify_kind(args[1], [String, NilClass]) || '#'
       @comment_space = verify_kind(args[2], [String, NilClass]) || ' '
 

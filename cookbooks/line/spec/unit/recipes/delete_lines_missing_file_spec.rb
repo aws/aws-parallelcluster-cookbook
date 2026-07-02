@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook:: line
 # Spec:: delete_lines_missing_file

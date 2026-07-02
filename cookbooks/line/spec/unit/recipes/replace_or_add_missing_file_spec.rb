@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Cookbook:: line
 # Spec:: replace_or_add_missing_file

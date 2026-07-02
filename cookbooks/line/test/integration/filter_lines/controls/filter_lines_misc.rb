@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 #
 # Spec tests for the nonstatdard properties
