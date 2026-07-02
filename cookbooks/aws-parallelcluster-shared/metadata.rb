@@ -10,4 +10,4 @@ chef_version '>= 18'
 version '3.16.0'
 
 depends 'yum', '~> 7.4.20'
-depends 'yum-epel', '~> 5.0.8'
+depends 'yum-epel', '~> 5.0.9'

@@ -2,6 +2,8 @@
 
 This file is used to list changes made in each version of the yum-epel cookbook.
 
+## 5.0.9 - *2025-09-04*
+
 ## 5.0.8 - *2024-05-02*
 
 ## 5.0.7 - *2024-05-02*
