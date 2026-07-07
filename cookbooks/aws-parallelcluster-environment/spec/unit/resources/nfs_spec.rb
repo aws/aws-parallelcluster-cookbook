@@ -105,7 +105,7 @@ describe 'nfs:configure' do
         it 'pins the ancillary v3 client ports in the drop-in (unpinned by nfs::server4 on AL2023)' do
           expect(chef_run).to render_file(nfs_conf_dropin).with_content(/\[statd\]\nport=32765\noutgoing-port=32766/)
           expect(chef_run).to render_file(nfs_conf_dropin).with_content(/\[mountd\]\nport=32767/)
-          expect(chef_run).to render_file(nfs_conf_dropin).with_content(/\[lockd\]\nport=32768\nudp-port=32768/)
+          expect(chef_run).to render_file(nfs_conf_dropin).with_content(/\[lockd\]\nport=4045\nudp-port=4045/)
         end
 
         it 'restart of the server is notified when the drop-in changes' do

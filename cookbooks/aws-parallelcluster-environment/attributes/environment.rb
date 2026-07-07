@@ -9,6 +9,8 @@ default['cluster']['nfs']['threads'] = [[node['cpu']['cores'].to_i * 4, 8].max, 
 default['nfs']['v4'] = 'yes'
 default['nfs']['v3'] = 'no'
 default['nfs']['v2'] = 'no'
+# Use 4045 as the lockd port to change the default 32768 from nfs third party cookbook
+default['nfs']['port']['lockd'] = 4045
 
 # Kernel release version used to select Lustre version
 # This is a mechanism used to mock kernel release on docker system-tests, see kitchen.docker.yml:
