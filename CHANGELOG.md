@@ -11,7 +11,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
 - Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 
   removing the dependency on cfn-hup and cfn-init.
-  
+- Upgrade third-party cookbook dependencies:
+  - line-5.0.0 (from line-4.5.21)
+  - nfs-5.1.6 (from nfs-5.1.5)
+  - openssh-2.11.17 (from openssh-2.11.14)
+  - yum-8.0.0 (from yum-7.4.20)
+  - yum-epel-5.0.9 (from yum-epel-5.0.8)
 
 **CHANGES**
 - Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). The NFSv3 client stack (rpcbind, rpc-statd, lockd) are unchanged, so cluster nodes can still mount external NFSv3 servers.
