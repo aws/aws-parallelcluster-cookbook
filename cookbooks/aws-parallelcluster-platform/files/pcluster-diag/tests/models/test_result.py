@@ -14,6 +14,7 @@
 
 import pytest
 
+from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.result import Result, Status
 from tests.sample_data import FakeCheck, sample_result
 
@@ -33,12 +34,11 @@ def test_result_status_is_a_valid_status_member(status):
     [
         (Result.passed, Status.PASSED),
         (Result.error, Status.ERROR),
-        (Result.failure, Status.FAILURE),
         (Result.skipped, Status.SKIPPED),
     ],
-    ids=["passed", "error", "failure", "skipped"],
+    ids=["passed", "error", "skipped"],
 )
-def test_factory_builds_result_from_check(factory, expected_status):
+def test_message_factory_builds_result_from_check(factory, expected_status):
     message = "a message"
     metadata = {"key": "value"}
 
@@ -49,9 +49,31 @@ def test_factory_builds_result_from_check(factory, expected_status):
     assert result.check_description == _SAMPLE_CHECK.description
     assert result.message == message
     assert result.metadata == metadata
+    assert result.errors is None
 
-    # message and metadata default to None when omitted.
+    # message, metadata, and errors default to None when omitted.
     defaults = factory(_SAMPLE_CHECK)
     assert defaults.status is expected_status
     assert defaults.message is None
     assert defaults.metadata is None
+    assert defaults.errors is None
+
+
+def test_failure_factory_builds_result_with_errors():
+    errors = [CheckError("E1", "boom"), CheckError("E2", "kaboom")]
+    metadata = {"key": "value"}
+
+    result = Result.failure(_SAMPLE_CHECK, errors=errors, metadata=metadata)
+
+    assert result.status is Status.FAILURE
+    assert result.check_id == _SAMPLE_CHECK.identifier
+    assert result.check_description == _SAMPLE_CHECK.description
+    assert result.errors == errors
+    assert result.metadata == metadata
+    # A failure is described by its errors, never a message.
+    assert result.message is None
+
+    # errors default to None when omitted, and a failure still carries no message.
+    defaults = Result.failure(_SAMPLE_CHECK)
+    assert defaults.errors is None
+    assert defaults.message is None

@@ -14,7 +14,9 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Optional
+from typing import List, Optional
+
+from pcluster_diag.models.check_error import CheckError
 
 
 class Status(Enum):
@@ -38,8 +40,9 @@ class Result:
         check_id: The check identifier (the Check class simple name).
         check_description: The Check's human-readable description.
         status: The Status of the execution (PASSED, ERROR, FAILURE, or SKIPPED).
-        message: An optional human-readable message carrying the failure reason,
-            a recovery suggestion, or an exception stack trace.
+        message: An optional human-readable message (e.g. a SKIPPED reason or an exception stack trace).
+        errors: The set of failure modes for a FAILURE Result, each a CheckError (code + message);
+            None for any other status.
         metadata: An optional dictionary carrying any underlying data referenced by the Result.
     """
 
@@ -47,6 +50,7 @@ class Result:
     check_description: str
     status: Status
     message: Optional[str] = None
+    errors: Optional[List[CheckError]] = None
     metadata: Optional[dict] = None
 
     @staticmethod
@@ -72,13 +76,13 @@ class Result:
         )
 
     @staticmethod
-    def failure(check, message: Optional[str] = None, metadata: Optional[dict] = None) -> "Result":
-        """Build a FAILURE Result for ``check`` (it completed with its condition not satisfied)."""
+    def failure(check, errors: Optional[List[CheckError]] = None, metadata: Optional[dict] = None) -> "Result":
+        """Build a FAILURE Result for ``check``; the failure modes are described by ``errors``."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
             status=Status.FAILURE,
-            message=message,
+            errors=errors,
             metadata=metadata,
         )
 

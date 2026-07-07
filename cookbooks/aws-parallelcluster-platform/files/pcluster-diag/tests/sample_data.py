@@ -13,6 +13,7 @@
 """Shared sample data for the test suite: Contexts, Check doubles, and Results."""
 
 from pcluster_diag.models.check import Check
+from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context, NodeType
 from pcluster_diag.models.report import Report
 from pcluster_diag.models.result import Result, Status
@@ -116,14 +117,17 @@ class FakeCheck(Check):
 # --- Results --------------------------------------------------------------------------
 
 
-def sample_result(status: Status = Status.PASSED, *, check_id: str = "SampleCheck", message=None, metadata=None):
-    """Return a sample Result with the given status (and optional message/metadata)."""
+def sample_result(
+    status: Status = Status.PASSED, *, check_id: str = "SampleCheck", message=None, metadata=None, errors=None
+):
+    """Return a sample Result with the given status (and optional message/metadata/errors)."""
     return Result(
         check_id=check_id,
         check_description="description for {}".format(check_id),
         status=status,
         message=message,
         metadata=metadata,
+        errors=errors,
     )
 
 
@@ -131,7 +135,9 @@ def sample_results():
     """Return one sample Result per Status, spanning absent, plain, and nested message/metadata shapes."""
     return [
         sample_result(Status.PASSED, check_id="PassedCheck"),
-        sample_result(Status.FAILURE, check_id="FailedCheck", message="nope", metadata={"path": "/x"}),
+        sample_result(
+            Status.FAILURE, check_id="FailedCheck", errors=[CheckError("E1", "nope")], metadata={"path": "/x"}
+        ),
         sample_result(Status.ERROR, check_id="ErroredCheck", message="trace"),
         sample_result(
             Status.SKIPPED,
