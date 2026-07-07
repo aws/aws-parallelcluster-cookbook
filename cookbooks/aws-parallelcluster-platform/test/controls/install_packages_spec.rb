@@ -23,8 +23,8 @@ control 'tag:install_install_packages' do
   # NOTE: Skipped where the desktop group (@gnome, installed for DCV) transitively
   # pulls in FFTW:
   #   - AL2023: via ImageMagick-libs (fftw-libs-double)
-  #   - Rocky9: via pipewire-libs (fftw-libs-single)
-  unless os_properties.alinux2023? || os_properties.rocky?
+  #   - Rocky9/RHEL9: via pipewire-libs (fftw-libs-single)
+  unless os_properties.alinux2023? || os_properties.rocky? || os_properties.redhat?
     # Verify fftw package is not installed
     describe bash('ls 2>/dev/null /usr/lib64/libfftw*') do
       its('stdout') { should be_empty }
