@@ -40,6 +40,10 @@ class OsProperties < Inspec.resource(1)
     redhat? && inspec.os.release.to_i == 8
   end
 
+  def redhat9?
+    redhat? && inspec.os.release.to_i == 9
+  end
+
   def rocky8?
     rocky? && inspec.os.release.to_i == 8
   end
