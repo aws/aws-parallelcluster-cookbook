@@ -1,0 +1,3 @@
+#!/bin/sh
+export PYTHONPATH="<%= @source_dir %>"
+exec <%= @virtualenv_path %>/bin/python -m pcluster_diag.cli "$@"

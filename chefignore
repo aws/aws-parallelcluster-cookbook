@@ -95,3 +95,7 @@ Vagrantfile
 
 # Kitchen #
 .kitchen/*
+
+# pcluster-diag developer-only tools (never shipped to nodes)
+*/pcluster-diag/tools/*
+*/pcluster-diag/DEVELOPMENT.md

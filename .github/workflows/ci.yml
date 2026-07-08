@@ -52,6 +52,9 @@ jobs:
           - Python 3.10 Tests
           - Python 3.10 Tests Coverage
           - Code Checks
+          - pcluster-diag Tests
+          - pcluster-diag Tests Coverage
+          - pcluster-diag Code Checks
         include:
           - name: Python 3.8 Tests
             python: 3.8
@@ -68,6 +71,15 @@ jobs:
           - name: Code Checks
             python: '3.10'
             toxenv: code-linters
+          - name: pcluster-diag Tests
+            python: '3.14'
+            toxenv: pcluster-diag -- -e test
+          - name: pcluster-diag Tests Coverage
+            python: '3.14'
+            toxenv: pcluster-diag -- -e test-with-coverage
+          - name: pcluster-diag Code Checks
+            python: '3.14'
+            toxenv: pcluster-diag -- -e code-linters
 
     steps:
       - uses: actions/checkout@main
@@ -85,6 +97,13 @@ jobs:
         with:
           files: coverage.xml
           flags: unittests
+          verbose: true
+      - name: Upload pcluster-diag code coverage report to Codecov
+        if: ${{ matrix.toxenv == 'pcluster-diag -- -e test-with-coverage' }}
+        uses: codecov/codecov-action@v3
+        with:
+          files: cookbooks/aws-parallelcluster-platform/files/pcluster-diag/tests/coverage.xml
+          flags: pcluster-diag
           verbose: true
   shellcheck:
     name: Shellcheck

@@ -288,6 +288,17 @@ suites:
     attributes:
       dependencies:
         - resource:package_repos:update
+  - name: pcluster_diag
+    run_list:
+      - recipe[aws-parallelcluster-tests::setup]
+      - recipe[aws-parallelcluster-platform::pcluster_diag]
+    verifier:
+      controls:
+        - /tag:install_pcluster_diag/
+    attributes:
+      dependencies:
+        - recipe:aws-parallelcluster-platform::directories
+        - recipe:aws-parallelcluster-platform::cookbook_virtualenv
   - name: sudo
     run_list:
       - recipe[aws-parallelcluster-platform::sudo_install]
