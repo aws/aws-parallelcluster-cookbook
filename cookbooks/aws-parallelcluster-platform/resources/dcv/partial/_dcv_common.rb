@@ -153,7 +153,9 @@ action :setup do
     unless ::File.exist?(dcv_tarball)
       remote_file dcv_tarball do
         source dcv_url
-        checksum dcv_sha256sum
+        # The hardcoded per-arch/os sha only matches the default S3 mirror; skip
+        # verification when base_url is overridden using ExtraChefAttributes.
+        checksum dcv_sha256sum if default_artifacts_url?(node['cluster']['dcv']['base_url'])
         mode '0644'
         retries 3
         retry_delay 5

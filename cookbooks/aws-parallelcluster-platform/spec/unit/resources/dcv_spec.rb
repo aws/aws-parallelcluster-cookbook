@@ -1071,3 +1071,74 @@ describe 'dcv:configure' do
     end
   end
 end
+
+# Tests the DCV tarball checksum override: the hardcoded per-arch/os sha is verified
+# only on the default S3 mirror. When base_url is overridden the checksum is skipped,
+# because default_artifacts_url? returns false.
+describe 'dcv:setup checksum override behavior' do
+  cluster_artifacts_s3_url = 'https://aws_region-aws-parallelcluster.s3.AWS_REGION.AWS_DOMAIN'
+  s3_dcv_base_url = "#{cluster_artifacts_s3_url}/dependencies/dcv"
+  public_dcv_base_url = 'https://fake-public.example.DOMAIN/dcv'
+
+  for_all_oses do |platform, version|
+    cached(:sources_dir) { 'sources_dir' }
+    cached(:dcv_tarball) { 'dcv_tarball' }
+    cached(:checksum) { 'checksum' }
+    cached(:dcv_package) { 'dcv_package' }
+    cached(:dcv_server) { 'dcv_server' }
+    cached(:xdcv) { 'xdcv' }
+    cached(:dcv_web_viewer) { 'dcv_web_viewer' }
+    cached(:dcvauth_virtualenv) { 'dcvauth_virtualenv' }
+    cached(:dcvauth_virtualenv_path) { 'dcvauth_virtualenv_path' }
+    cached(:alinux_prereq_packages) { 'alinux_prereq_packages' }
+
+    [
+      ['default S3 base_url', s3_dcv_base_url, true],
+      ['overridden public base_url', public_dcv_base_url, false],
+    ].each do |scenario, base_url, checksum_expected|
+      context "on #{platform}#{version} with #{scenario}" do
+        cached(:chef_run) do
+          stub_command('which getenforce').and_return(true)
+          stub_command('grubby --info=ALL | grep -q "selinux=0"').and_return(false)
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          allow(::File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(false)
+          allow(::File).to receive(:exist?).with(dcv_tarball).and_return(false)
+          stubs_for_resource('dcv') do |res|
+            allow(res).to receive(:dcv_sha256sum).and_return(checksum)
+            allow(res).to receive(:dcv_supported?).and_return(true)
+            allow(res).to receive(:prereq_packages).and_return(alinux_prereq_packages) if platform == 'amazon'
+            allow(res).to receive(:dcv_package).and_return(dcv_package)
+            allow(res).to receive(:dcv_server).and_return(dcv_server)
+            allow(res).to receive(:xdcv).and_return(xdcv)
+            allow(res).to receive(:dcv_web_viewer).and_return(dcv_web_viewer)
+            allow(res).to receive(:dcv_tarball).and_return(dcv_tarball)
+            allow(res).to receive(:dcvauth_virtualenv).and_return(dcvauth_virtualenv)
+            allow(res).to receive(:dcvauth_virtualenv_path).and_return(dcvauth_virtualenv_path)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+            node.override['cluster']['sources_dir'] = sources_dir
+            node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+            node.override['cluster']['dcv']['base_url'] = base_url
+          end
+          ConvergeDcv.setup(runner)
+        end
+
+        it 'downloads the DCV tarball' do
+          is_expected.to create_remote_file(dcv_tarball).with(source: "#{base_url}/#{dcv_package}.tgz")
+        end
+
+        if checksum_expected
+          it 'verifies checksum on default S3 download' do
+            remote_file = chef_run.find_resource('remote_file', dcv_tarball)
+            expect(remote_file.checksum).to eq(checksum)
+          end
+        else
+          it 'skips checksum when base_url is overridden' do
+            remote_file = chef_run.find_resource('remote_file', dcv_tarball)
+            expect(remote_file.checksum).to be_nil
+          end
+        end
+      end
+    end
+  end
+end
