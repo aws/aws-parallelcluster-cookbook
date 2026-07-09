@@ -23,13 +23,17 @@ class Status(Enum):
     """The status of a Check execution."""
 
     PASSED = "PASSED"  # condition satisfied
-    ERROR = "ERROR"  # check raised / could not complete
+    CHECK_ERROR = "CHECK_ERROR"  # check raised / could not complete
     FAILURE = "FAILURE"  # check completed; condition not satisfied
-    SKIPPED = "SKIPPED"  # not applicable or user-skipped
+    SKIPPED_BY_USER = "SKIPPED_BY_USER"  # user did not approve its execution
+    SKIPPED_NOT_APPLICABLE = "SKIPPED_NOT_APPLICABLE"  # does not apply to the context
 
 
 # Statuses that make the run unsuccessful: any of these in the results yields a non-zero exit code.
-FAILED_STATUSES = (Status.FAILURE, Status.ERROR)
+FAILED_STATUSES = (Status.FAILURE, Status.CHECK_ERROR)
+
+# The error code carried by a CHECK_ERROR Result (an exception prevented the Check's completion).
+INTERNAL_ERROR_CODE = "E0"
 
 
 @dataclass
@@ -39,60 +43,65 @@ class Result:
     Attributes:
         check_id: The check identifier (the Check class simple name).
         check_description: The Check's human-readable description.
-        status: The Status of the execution (PASSED, ERROR, FAILURE, or SKIPPED).
-        message: An optional human-readable message (e.g. a SKIPPED reason or an exception stack trace).
-        errors: The set of failure modes for a FAILURE Result, each a CheckError (code + message);
-            None for any other status.
-        metadata: An optional dictionary carrying any underlying data referenced by the Result.
+        status: The Status of the execution (PASSED, CHECK_ERROR, FAILURE, SKIPPED_BY_USER, or
+            SKIPPED_NOT_APPLICABLE).
+        errors: The set of failure modes for a FAILURE or CHECK_ERROR Result, each a CheckError
+            (code + message); None for any other status.
     """
 
     check_id: str
     check_description: str
     status: Status
-    message: Optional[str] = None
     errors: Optional[List[CheckError]] = None
-    metadata: Optional[dict] = None
 
     @staticmethod
-    def passed(check, message: Optional[str] = None, metadata: Optional[dict] = None) -> "Result":
+    def passed(check) -> "Result":
         """Build a PASSED Result for ``check`` (its condition was satisfied)."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
             status=Status.PASSED,
-            message=message,
-            metadata=metadata,
         )
 
     @staticmethod
-    def error(check, message: Optional[str] = None, metadata: Optional[dict] = None) -> "Result":
-        """Build an ERROR Result for ``check`` (it raised or could not complete)."""
+    def error(check, exception: Exception) -> "Result":
+        """Build a CHECK_ERROR Result for ``check`` (an exception prevented its completion).
+
+        The Result carries a single CheckError coded ``E0`` whose message is
+        ``"{exceptionName}: {exceptionMessage}"``.
+        """
+        error = CheckError(INTERNAL_ERROR_CODE, "{}: {}".format(type(exception).__name__, exception))
         return Result(
             check_id=check.identifier,
             check_description=check.description,
-            status=Status.ERROR,
-            message=message,
-            metadata=metadata,
+            status=Status.CHECK_ERROR,
+            errors=[error],
         )
 
     @staticmethod
-    def failure(check, errors: Optional[List[CheckError]] = None, metadata: Optional[dict] = None) -> "Result":
+    def failure(check, errors: Optional[List[CheckError]] = None) -> "Result":
         """Build a FAILURE Result for ``check``; the failure modes are described by ``errors``."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
             status=Status.FAILURE,
             errors=errors,
-            metadata=metadata,
         )
 
     @staticmethod
-    def skipped(check, message: Optional[str] = None, metadata: Optional[dict] = None) -> "Result":
-        """Build a SKIPPED Result for ``check`` (not applicable or user-skipped)."""
+    def skipped_by_user(check) -> "Result":
+        """Build a SKIPPED_BY_USER Result for ``check`` (the user did not approve its execution)."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
-            status=Status.SKIPPED,
-            message=message,
-            metadata=metadata,
+            status=Status.SKIPPED_BY_USER,
+        )
+
+    @staticmethod
+    def skipped_not_applicable(check) -> "Result":
+        """Build a SKIPPED_NOT_APPLICABLE Result for ``check`` (it does not apply to the context)."""
+        return Result(
+            check_id=check.identifier,
+            check_description=check.description,
+            status=Status.SKIPPED_NOT_APPLICABLE,
         )

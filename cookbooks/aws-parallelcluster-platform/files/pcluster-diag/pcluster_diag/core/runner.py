@@ -17,7 +17,6 @@ their Results in that same order.
 """
 
 import logging
-import traceback
 from typing import List
 
 from pcluster_diag.models.check import Check
@@ -30,9 +29,9 @@ logger = logging.getLogger(__name__)
 class Runner:
     """Executes the Checks and aggregates their Results, one Result per Check, in registration order.
 
-    Checks that run execute in isolation (an unhandled exception becomes an ERROR Result), and a
-    FAILURE or ERROR never stops the run. Non-applicable Checks are recorded as SKIPPED and declined
-    confirmation-required Checks as SKIPPED ("Skipped by the user"). Each outcome is logged to stderr
+    Checks that run execute in isolation (an unhandled exception becomes a CHECK_ERROR Result), and a
+    FAILURE or CHECK_ERROR never stops the run. Non-applicable Checks are recorded as SKIPPED_NOT_APPLICABLE
+    and declined confirmation-required Checks as SKIPPED_BY_USER. Each outcome is logged to stderr
     and never alters the JSON Report.
     """
 
@@ -47,16 +46,16 @@ class Runner:
 
         Each Check in ``checks`` is handled in order and, based on its disposition:
 
-        - recorded SKIPPED ("not applicable") when it is in ``check_not_applicable``;
-        - recorded SKIPPED ("Skipped by the user") when it is in ``check_not_approved``;
-        - otherwise executed in isolation (an unhandled exception becomes an ERROR Result).
+        - recorded SKIPPED_NOT_APPLICABLE when it is in ``check_not_applicable``;
+        - recorded SKIPPED_BY_USER when it is in ``check_not_approved``;
+        - otherwise executed in isolation (an unhandled exception becomes a CHECK_ERROR Result).
 
         Args:
             context: The runtime Context for this diagnosis.
             checks: Every Check to account for, in registration order.
-            check_not_applicable: Non-applicable Checks to record as SKIPPED.
+            check_not_applicable: Non-applicable Checks to record as SKIPPED_NOT_APPLICABLE.
             check_not_approved: Confirmation-required Checks the user declined,
-                recorded as SKIPPED ("Skipped by the user").
+                recorded as SKIPPED_BY_USER.
 
         Returns:
             One Result per Check in ``checks``, in the same (registration) order.
@@ -66,9 +65,9 @@ class Runner:
         results: List[Result] = []
         for check in checks:
             if check.identifier in not_applicable_ids:
-                result = Result.skipped(check, message="Check is not applicable to the current context.")
+                result = Result.skipped_not_applicable(check)
             elif check.identifier in not_approved_ids:
-                result = Result.skipped(check, message="Skipped by the user")
+                result = Result.skipped_by_user(check)
             else:
                 result = self._execute_check(context, check)
             self._collect_result(results, result)
@@ -83,7 +82,7 @@ class Runner:
     def _print_outcome(result: Result) -> None:
         """Log a per-Check outcome line to stderr; never alters the JSON Report.
 
-        FAILURE and ERROR outcomes are logged at error level; PASSED and SKIPPED at info level.
+        FAILURE and CHECK_ERROR outcomes are logged at error level; PASSED and SKIPPED_* at info level.
         """
         line = "%s: %s" % (result.check_id, result.status.value)
         if result.status in FAILED_STATUSES:
@@ -92,11 +91,11 @@ class Runner:
             logger.info(line)
 
     def _execute_check(self, context: Context, check: Check) -> Result:
-        """Run the Check in isolation, converting any unexpected error into an ERROR Result."""
+        """Run the Check in isolation, converting any unexpected error into a CHECK_ERROR Result."""
         logger.info("Check %s: started", check.identifier)
         try:
             return check.run(context)
-        except Exception:  # noqa: B902 - isolation: any failure becomes an ERROR Result
-            return Result.error(check, message=traceback.format_exc())
+        except Exception as exception:  # noqa: B902 - isolation: any failure becomes a CHECK_ERROR Result
+            return Result.error(check, exception)
         finally:
             logger.info("Check %s: finished", check.identifier)

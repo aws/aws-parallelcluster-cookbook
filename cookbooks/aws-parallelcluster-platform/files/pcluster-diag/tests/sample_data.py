@@ -58,7 +58,6 @@ class FakeCheck(Check):
         applicable: What ``should_run`` returns.
         approval: What ``approval_required`` returns.
         status: The Status of the Result ``run`` returns.
-        message: The message of the Result ``run`` returns.
         raises: When True, ``run`` raises instead of returning a Result.
         events: When provided, ``should_run`` and ``run`` append ``"should_run:<id>"`` /
             ``"run:<id>"`` so call ordering can be asserted.
@@ -72,7 +71,6 @@ class FakeCheck(Check):
         applicable=True,
         approval=False,
         status=Status.PASSED,
-        message=None,
         raises=False,
         events=None,
     ):
@@ -82,7 +80,6 @@ class FakeCheck(Check):
         self._applicable = applicable
         self._approval = approval
         self._status = status
-        self._message = message
         self._raises = raises
         self._events = events
         self.ran = False
@@ -109,42 +106,30 @@ class FakeCheck(Check):
             self._events.append("run:{}".format(self._identifier))
         if self._raises:
             raise RuntimeError(FAKE_CHECK_RAISE_MESSAGE)
-        return Result(
-            check_id=self._identifier, check_description=self._description, status=self._status, message=self._message
-        )
+        return Result(check_id=self._identifier, check_description=self._description, status=self._status)
 
 
 # --- Results --------------------------------------------------------------------------
 
 
-def sample_result(
-    status: Status = Status.PASSED, *, check_id: str = "SampleCheck", message=None, metadata=None, errors=None
-):
-    """Return a sample Result with the given status (and optional message/metadata/errors)."""
+def sample_result(status: Status = Status.PASSED, *, check_id: str = "SampleCheck", errors=None):
+    """Return a sample Result with the given status (and optional errors)."""
     return Result(
         check_id=check_id,
         check_description="description for {}".format(check_id),
         status=status,
-        message=message,
-        metadata=metadata,
         errors=errors,
     )
 
 
 def sample_results():
-    """Return one sample Result per Status, spanning absent, plain, and nested message/metadata shapes."""
+    """Return one sample Result per Status, spanning absent, plain, and error-bearing shapes."""
     return [
         sample_result(Status.PASSED, check_id="PassedCheck"),
-        sample_result(
-            Status.FAILURE, check_id="FailedCheck", errors=[CheckError("E1", "nope")], metadata={"path": "/x"}
-        ),
-        sample_result(Status.ERROR, check_id="ErroredCheck", message="trace"),
-        sample_result(
-            Status.SKIPPED,
-            check_id="SkippedCheck",
-            message="Skipped by the user",
-            metadata={"nested": {"values": [1, 2, 3], "flag": True, "empty": None}},
-        ),
+        sample_result(Status.FAILURE, check_id="FailedCheck", errors=[CheckError("E1", "nope")]),
+        sample_result(Status.CHECK_ERROR, check_id="ErroredCheck", errors=[CheckError("E0", "RuntimeError: boom")]),
+        sample_result(Status.SKIPPED_BY_USER, check_id="SkippedByUserCheck"),
+        sample_result(Status.SKIPPED_NOT_APPLICABLE, check_id="SkippedNotApplicableCheck"),
     ]
 
 

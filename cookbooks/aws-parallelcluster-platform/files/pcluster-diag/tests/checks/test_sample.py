@@ -39,4 +39,3 @@ def test_run():
 
     assert result.status is Status.PASSED
     assert result.check_id == check.identifier
-    assert result.message is None

@@ -49,7 +49,7 @@ class ContextBuildError(PclusterDiagError):
 
 
 class DiagnosticCheckNotPassedError(PclusterDiagError):
-    """Raised when at least one check did not pass (a FAILURE or ERROR result)."""
+    """Raised when at least one check did not pass (a FAILURE or CHECK_ERROR result)."""
 
     exit_code = ExitCode.DIAGNOSTIC_CHECK_FAILURE
     default_message = "The diagnosis detected at least one failed check."

@@ -29,9 +29,7 @@ class _MinimalCheck(Check):
         return context.node_type is NodeType.HEAD
 
     def run(self, context: Context) -> Result:
-        return Result(
-            check_id=self.identifier, check_description=self.description, status=Status.PASSED, metadata={"ran": True}
-        )
+        return Result(check_id=self.identifier, check_description=self.description, status=Status.PASSED)
 
 
 class _ApprovalCheck(_MinimalCheck):
@@ -94,7 +92,6 @@ def test_run_returns_result():
     assert isinstance(result, Result)
     assert result.check_id == check.identifier
     assert result.status is Status.PASSED
-    assert result.metadata == {"ran": True}
 
 
 def test_abstract_method_bodies_raise_not_implemented():
