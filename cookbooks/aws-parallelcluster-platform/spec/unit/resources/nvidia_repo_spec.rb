@@ -88,7 +88,7 @@ describe 'nvidia_repo:add' do
           version == '2023' ? 'rhel9' : 'rhel7'
         when 'centos'
           'rhel7'
-        when 'redhat', 'rocky'
+        when 'almalinux', 'redhat', 'rocky'
           "rhel#{version.to_i}"
         when 'ubuntu'
           "ubuntu#{version.delete('.')}"

@@ -112,14 +112,14 @@ describe 'nvidia_nvlsm:install' do
 
           cached(:nvlsm_version) { "2025.03.9-1" }
           cached(:nvlsm_package_full_name) do
-            if %(redhat rocky amazon).include?(platform)
+            if %(almalinux redhat rocky amazon).include?(platform)
               "nvlsm-#{nvlsm_version}.#{arch_suffix_rhel[arch]}.rpm"
             else
               "nvlsm_#{nvlsm_version}_#{arch_suffix_debian[arch]}.deb"
             end
           end
           cached(:nvlsm_checksum) do
-            if %(redhat rocky amazon).include?(platform)
+            if %(almalinux redhat rocky amazon).include?(platform)
               if arch == 'aarch64'
                 'f21f14843c11ce64136fd1c3fa763b7511e18f160695f54b2a8d763776313539'
               else
@@ -134,7 +134,7 @@ describe 'nvidia_nvlsm:install' do
           cached(:nvlsm_url) do
             os_directory = if platform == 'amazon'
                              "amzn#{version}"
-                           elsif %(redhat rocky).include?(platform)
+                           elsif %(almalinux redhat rocky).include?(platform)
                              "rhel#{version}"
                            else
                              "#{platform}#{version.delete('.')}"
@@ -143,14 +143,14 @@ describe 'nvidia_nvlsm:install' do
           end
 
           cached(:nvlsm_installation_commands) do
-            if %(redhat rocky amazon).include?(platform)
+            if %(almalinux redhat rocky amazon).include?(platform)
               "    set -ex\n    yum install -y #{nvlsm_package_full_name} && yum versionlock nvlsm\n"
             else
               "    set -ex\n    dpkg -i #{nvlsm_package_full_name} && apt-mark hold nvlsm\n"
             end
           end
           cached(:nvlsm_dependencies_installation_commands) do
-            if %(redhat rocky amazon).include?(platform)
+            if %(almalinux redhat rocky amazon).include?(platform)
               "    set -ex\n    yum install -y infiniband-diags libibumad\n"
             else
               "    set -ex\n    apt install -y infiniband-diags ibutils\n"
@@ -217,7 +217,7 @@ describe 'nvidia_nvlsm install URL and checksum override behavior' do
     arch_join = debian ? '_' : '.'
     expected_platform = if platform == 'amazon'
                           "amzn#{version}"
-                        elsif %w(redhat rocky).include?(platform)
+                        elsif %w(almalinux redhat rocky).include?(platform)
                           "rhel#{version}"
                         else
                           "#{platform}#{version.delete('.')}"

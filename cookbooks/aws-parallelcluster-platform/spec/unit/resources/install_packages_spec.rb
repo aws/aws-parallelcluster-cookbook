@@ -31,7 +31,7 @@ describe 'install_packages:setup' do
         is_expected.to install_install_packages('default')
       end
 
-      if %w(amazon centos redhat rocky).include?(platform)
+      if %w(almalinux amazon centos redhat rocky).include?(platform)
         if platform == 'amazon'
           it 'installs default packages' do
             is_expected.to install_package(default_packages)

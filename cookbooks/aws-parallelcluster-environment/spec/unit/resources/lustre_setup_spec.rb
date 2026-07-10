@@ -20,7 +20,7 @@ class Lustre
 end
 
 describe 'lustre:setup' do
-  [%w(redhat RHEL), ["rocky", "Rocky Linux"]].each do |platform, platform_string|
+  [%w(almalinux AlmaLinux), %w(redhat RHEL), ["rocky", "Rocky Linux"]].each do |platform, platform_string|
     context "on #{platform} lower than 8.2" do
       cached(:chef_run) do
         runner = runner(

@@ -53,7 +53,7 @@ describe 'efa:setup' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:prerequisites) do
-        if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
+        if %(almalinux redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
           %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
         else
           %w(environment-modules)
@@ -176,7 +176,7 @@ describe 'efa:configure' do
         runner(platform: platform, version: version, step_into: ['efa'])
       end
 
-      if %w(amazon centos redhat rocky).include?(platform)
+      if %w(almalinux amazon centos redhat rocky).include?(platform)
         it 'does nothing' do
           ConvergeEfa.configure(chef_run)
           is_expected.to configure_efa('configure')

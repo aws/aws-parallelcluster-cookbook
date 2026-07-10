@@ -33,6 +33,14 @@ platforms:
     attributes:
       cluster:
         base_os: alinux2023
+  - name: almalinux8
+    driver:
+      image: <% if ENV['KITCHEN_ALMALINUX8_IMAGE'] %> <%= ENV['KITCHEN_ALMALINUX8_IMAGE'] %> <% else %> almalinux:8 <% end %>
+    attributes:
+      cluster:
+        base_os: almalinux8
+        # Docker uses the host kernel; provide a representative EL8 kernel for Lustre checks.
+        kernel_release: '4.18.0-553.8.1.el8_10.fake-value'
   - name: ubuntu2204
     driver:
       image: <% if ENV['KITCHEN_UBUNTU2204_IMAGE'] %> <%= ENV['KITCHEN_UBUNTU2204_IMAGE'] %> <% else %> dokken/ubuntu-22.04 <% end %>

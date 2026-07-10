@@ -33,7 +33,7 @@ action :install_lustre do
   package %w(kmod-lustre-client lustre-client dracut) do
     retries 3
     retry_delay 5
-  end unless redhat_on_docker? || rocky_on_docker?
+  end unless redhat_on_docker? || rocky_on_docker? || almalinux_on_docker?
 
-  kernel_module 'lnet' unless redhat_on_docker? || rocky_on_docker?
+  kernel_module 'lnet' unless redhat_on_docker? || rocky_on_docker? || almalinux_on_docker?
 end

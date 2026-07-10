@@ -93,6 +93,7 @@ describe 'nvidia_dcgm:_nvidia_dcgm_enabled' do
     context "on #{platform}#{version}" do
       cached(:expected_platform) do
         platforms = {
+          'almalinux8' => 'rhel8',
           'amazon2023' => 'amzn2023',
           'ubuntu22.04' => 'ubuntu2204',
           'ubuntu24.04' => 'ubuntu2404',
@@ -252,6 +253,7 @@ describe 'nvidia_dcgm download URL construction' do
   DCGM_VERSION = '9.9.9-1'.freeze # any non-3.x version exercises the 4-core / 4-cudaXX package path
 
   PLATFORM_DIRS = {
+    'almalinux8' => 'rhel8',
     'amazon2023' => 'amzn2023',
     'ubuntu22.04' => 'ubuntu2204',
     'ubuntu24.04' => 'ubuntu2404',

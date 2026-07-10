@@ -24,8 +24,16 @@ class OsProperties < Inspec.resource(1)
     inspec.os.name == 'rocky'
   end
 
+  def almalinux?
+    inspec.os.name == 'almalinux'
+  end
+
   def rocky_on_docker?
     on_docker? && rocky?
+  end
+
+  def almalinux_on_docker?
+    on_docker? && almalinux?
   end
 
   def ubuntu?
@@ -46,6 +54,10 @@ class OsProperties < Inspec.resource(1)
 
   def rocky8?
     rocky? && inspec.os.release.to_i == 8
+  end
+
+  def almalinux8?
+    almalinux? && inspec.os.release.to_i == 8
   end
 
   def alinux?

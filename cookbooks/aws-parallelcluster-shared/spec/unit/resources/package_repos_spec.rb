@@ -53,7 +53,7 @@ describe 'package_repos:setup' do
           is_expected.to periodic_apt_update('')
         end
 
-      when 'rocky'
+      when 'almalinux', 'rocky'
         it 'writes yum global config' do
           expect(chef_run).to create_yum_globalconfig('/etc/yum.conf')
         end

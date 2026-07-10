@@ -73,7 +73,7 @@ describe 'nfs:configure' do
         is_expected.to configure_nfs('configure')
       end
 
-      if %w(amazon redhat rocky centos).include?(platform) && version.to_i == 8
+      if %w(almalinux amazon redhat rocky centos).include?(platform) && version.to_i == 8
         it 'renders /etc/nfs.conf with the NFSv4-only template (no conf.d on el8)' do
           is_expected.to create_template(nfs_conf)
             .with(source: 'nfs/nfs.conf.erb')
@@ -130,7 +130,7 @@ describe 'nfs:configure' do
         end
 
         it 'advertises vers3 in the rendered config' do
-          target = (%w(redhat rocky centos).include?(platform) && version.to_i == 8) ? nfs_conf : nfs_conf_dropin
+          target = (%w(almalinux redhat rocky centos).include?(platform) && version.to_i == 8) ? nfs_conf : nfs_conf_dropin
           expect(chef_run).to render_file(target).with_content(/vers3=yes/)
         end
       end

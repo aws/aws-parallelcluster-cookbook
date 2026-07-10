@@ -88,6 +88,11 @@ describe 'slurm_dependencies' do
     include_examples 'installs packages from OS repos via robust_package', %w(json-c-devel http-parser-devel lua-devel perl dbus-devel)
   end
 
+  context "on almalinux8" do
+    include_context 'converge slurm_dependencies', 'almalinux', '8'
+    include_examples 'installs packages from OS repos via robust_package', %w(json-c-devel http-parser-devel lua-devel perl dbus-devel)
+  end
+
   context "on rocky8" do
     include_context 'converge slurm_dependencies', 'rocky', '8'
     include_examples 'installs packages from OS repos via robust_package', %w(json-c-devel http-parser-devel lua-devel perl dbus-devel)

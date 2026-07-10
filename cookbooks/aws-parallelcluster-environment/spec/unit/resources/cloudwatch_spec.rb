@@ -37,7 +37,7 @@ describe 'cloudwatch:setup' do
           case platform
           when 'amazon'
             'amazon_linux'
-          when 'rocky'
+          when 'almalinux', 'rocky'
             'redhat'
           else
             platform
@@ -114,7 +114,7 @@ describe 'cloudwatch:setup' do
           case platform
           when 'amazon'
             'amazon_linux'
-          when 'centos', 'rocky'
+          when 'almalinux', 'centos', 'rocky'
             'redhat'
           else
             platform

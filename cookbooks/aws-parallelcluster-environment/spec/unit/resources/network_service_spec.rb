@@ -31,7 +31,7 @@ describe 'network_service:restart' do
           'systemd-networkd'
         elsif platform == 'ubuntu'
           'systemd-resolved'
-        elsif %(redhat rocky).include?(platform)
+        elsif %(almalinux redhat rocky).include?(platform)
           'NetworkManager'
         else
           raise "Cannot determine network_service_name: unrecognized platform #{platform}"
@@ -67,7 +67,7 @@ describe 'network_service:reload' do
           'systemd-networkd'
         elsif platform == 'ubuntu'
           'systemd-resolved'
-        elsif %(redhat rocky).include?(platform)
+        elsif %(almalinux redhat rocky).include?(platform)
           'NetworkManager'
         else
           raise "Cannot determine network_service_name: unrecognized platform #{platform}"
