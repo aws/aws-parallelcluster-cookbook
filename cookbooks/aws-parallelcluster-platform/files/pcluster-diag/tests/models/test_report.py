@@ -33,18 +33,18 @@ from tests.sample_data import sample_report
     ids=["empty-results", "mixed-results"],
 )
 def test_report_serialization_content_per_check(report):
-    """The serialized Report carries the context and, per executed Check, its id, Status, message, and metadata."""
+    """The serialized Report carries the context and, per executed Check, its id and Status."""
     serialized = to_dict(report)
 
     assert serialized["context"]["node_type"] == report.context.node_type.value
     assert len(serialized["results"]) == len(report.results)
 
     for entry, result in zip(serialized["results"], report.results):
-        assert set(entry.keys()) >= {"check_id", "status", "message", "metadata"}
+        assert set(entry.keys()) >= {"check_id", "status"}
+        # The message field has been removed from Result and must not appear in the serialized output.
+        assert "message" not in entry
         assert entry["check_id"] == result.check_id
         assert entry["status"] == result.status.value
-        assert entry["message"] == result.message
-        assert entry["metadata"] == result.metadata
 
 
 def test_report_save_writes_json_to_the_given_path(tmp_path):

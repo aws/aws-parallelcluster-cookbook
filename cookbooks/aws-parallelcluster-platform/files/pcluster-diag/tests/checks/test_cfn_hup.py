@@ -38,39 +38,29 @@ def test_approval_required(node_type):
     assert CfnHupRunsOnlyOnHeadNode().approval_required(sample_context(node_type)) is False
 
 
+_NOT_RUNNING = CfnHupRunsOnlyOnHeadNode.NOT_RUNNING_ON_HEAD_NODE
+_RUNNING_ON_NON_HEAD = CfnHupRunsOnlyOnHeadNode.RUNNING_ON_NON_HEAD_NODE
+
+
 @pytest.mark.parametrize(
-    "node_type, is_running, expected_status, expected_message",
+    "node_type, is_running, expected_status, expected_errors",
     [
         (NodeType.HEAD, True, Status.PASSED, None),  # head: running as expected
-        (
-            NodeType.HEAD,
-            False,
-            Status.FAILURE,
-            "cfn-hup is not running on the HeadNode.",
-        ),  # head: should run but isn't
+        (NodeType.HEAD, False, Status.FAILURE, [_NOT_RUNNING]),  # head: should run but isn't
         (NodeType.COMPUTE, False, Status.PASSED, None),  # compute: not running as expected
-        (
-            NodeType.COMPUTE,
-            True,
-            Status.FAILURE,
-            "cfn-hup is running on the ComputeFleet.",
-        ),  # compute: running but shouldn't be
+        (NodeType.COMPUTE, True, Status.FAILURE, [_RUNNING_ON_NON_HEAD]),  # compute: running but shouldn't be
         (NodeType.LOGIN, False, Status.PASSED, None),  # login: not running as expected
-        (
-            NodeType.LOGIN,
-            True,
-            Status.FAILURE,
-            "cfn-hup is running on the LoginNode.",
-        ),  # login: running but shouldn't be
+        (NodeType.LOGIN, True, Status.FAILURE, [_RUNNING_ON_NON_HEAD]),  # login: running but shouldn't be
     ],
 )
-def test_run(monkeypatch, node_type, is_running, expected_status, expected_message):
+def test_run(monkeypatch, node_type, is_running, expected_status, expected_errors):
     monkeypatch.setattr(cfn_hup, "is_supervisord_program_running", lambda _program: is_running)
 
     result = CfnHupRunsOnlyOnHeadNode().run(sample_context(node_type))
 
     assert result.status is expected_status
-    assert result.message == expected_message
+    # A failure returns the Check's own constant error(s); a pass carries none.
+    assert result.errors == expected_errors
 
 
 def test_run_propagates_when_status_cannot_be_determined(monkeypatch):

@@ -15,6 +15,7 @@
 import logging
 
 from pcluster_diag.core.runner import Runner
+from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.result import Status
 from tests.sample_data import FAKE_CHECK_RAISE_MESSAGE, FakeCheck, sample_context
 
@@ -38,15 +39,15 @@ def test_failure_does_not_stop_remaining_checks():
     assert b.ran is True
 
 
-def test_unhandled_exception_becomes_error_with_stack_trace():
+def test_unhandled_exception_becomes_check_error_with_e0_error():
     a = FakeCheck("A", raises=True)
     b = FakeCheck("B")
 
     results = Runner().execute(sample_context(), [a, b])
 
-    assert results[0].status == Status.ERROR
-    assert "Traceback" in results[0].message
-    assert FAKE_CHECK_RAISE_MESSAGE in results[0].message
+    assert results[0].status == Status.CHECK_ERROR
+    # A CHECK_ERROR carries a single E0 error coded "{exceptionName}: {exceptionMessage}".
+    assert results[0].errors == [CheckError("E0", "RuntimeError: {}".format(FAKE_CHECK_RAISE_MESSAGE))]
     # Isolation: the next Check still ran.
     assert results[1].status == Status.PASSED
 
@@ -56,8 +57,7 @@ def test_not_approved_check_yields_skipped_by_user():
 
     results = Runner().execute(sample_context(), [a], check_not_approved=[a])
 
-    assert results[0].status == Status.SKIPPED
-    assert results[0].message == "Skipped by the user"
+    assert results[0].status == Status.SKIPPED_BY_USER
     # A not-approved Check is never executed.
     assert a.ran is False
 
@@ -106,14 +106,10 @@ def test_results_follow_registration_order_across_dispositions():
 
     assert [(r.check_id, r.status) for r in results] == [
         ("Run1", Status.PASSED),
-        ("Skip", Status.SKIPPED),
+        ("Skip", Status.SKIPPED_NOT_APPLICABLE),
         ("Run2", Status.PASSED),
-        ("Declined", Status.SKIPPED),
+        ("Declined", Status.SKIPPED_BY_USER),
     ]
-    # Skipped / declined Checks carry their user-facing messages and never execute.
-    skip_result = next(r for r in results if r.check_id == "Skip")
-    declined_result = next(r for r in results if r.check_id == "Declined")
-    assert skip_result.message == "Check is not applicable to the current context."
-    assert declined_result.message == "Skipped by the user"
+    # Skipped / declined Checks never execute.
     assert skip.ran is False
     assert declined.ran is False

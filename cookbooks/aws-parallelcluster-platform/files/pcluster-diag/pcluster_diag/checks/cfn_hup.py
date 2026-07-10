@@ -14,6 +14,7 @@
 
 from pcluster_diag.core.constants import CFN_HUP_PROGRAM
 from pcluster_diag.models.check import Check
+from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context, NodeType
 from pcluster_diag.models.result import Result
 from pcluster_diag.util.services import is_supervisord_program_running
@@ -21,6 +22,9 @@ from pcluster_diag.util.services import is_supervisord_program_running
 
 class CfnHupRunsOnlyOnHeadNode(Check):
     """Verify that the cfn-hup daemon runs only on the head node."""
+
+    NOT_RUNNING_ON_HEAD_NODE = CheckError("E1", "{} is not running on the head node.".format(CFN_HUP_PROGRAM))
+    RUNNING_ON_NON_HEAD_NODE = CheckError("E2", "{} is running on a non-head node.".format(CFN_HUP_PROGRAM))
 
     @property
     def description(self) -> str:
@@ -31,11 +35,7 @@ class CfnHupRunsOnlyOnHeadNode(Check):
         """Pass when cfn-hup is running on the head node and stopped elsewhere; fail otherwise."""
         should_be_running = context.node_type is NodeType.HEAD
         is_running = is_supervisord_program_running(CFN_HUP_PROGRAM)
-        node_type = context.node_type.value
         if is_running == should_be_running:
             return Result.passed(self)
-        if should_be_running:
-            message = "{} is not running on the {}.".format(CFN_HUP_PROGRAM, node_type)
-        else:
-            message = "{} is running on the {}.".format(CFN_HUP_PROGRAM, node_type)
-        return Result.failure(self, message=message)
+        error = self.NOT_RUNNING_ON_HEAD_NODE if should_be_running else self.RUNNING_ON_NON_HEAD_NODE
+        return Result.failure(self, errors=[error])

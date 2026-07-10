@@ -164,12 +164,12 @@ def test_confirmation_required_check_flow(runner, monkeypatch, invoke_args, cli_
     # The confirmation listing/prompt is emitted to stderr unless --yes bypasses it.
     assert ("require your confirmation" in result.stderr) is expect_prompt
     if not expected_ran:
-        # A declined check is recorded SKIPPED and carries the user-facing message in the report.
+        # A declined check is recorded SKIPPED_BY_USER in the report.
         # (Interactive input is echoed onto stdout before the JSON, so parse from the first brace.)
-        assert "ApprovalCheck: SKIPPED" in result.stderr
+        assert "ApprovalCheck: SKIPPED_BY_USER" in result.stderr
         brace_at = result.stdout.index("{")
         payload = json.loads(result.stdout[brace_at:])
-        assert payload["results"][0]["message"] == "Skipped by the user"
+        assert payload["results"][0]["status"] == "SKIPPED_BY_USER"
 
 
 @pytest.mark.parametrize(
@@ -177,17 +177,14 @@ def test_confirmation_required_check_flow(runner, monkeypatch, invoke_args, cli_
     [
         ([("PassedCheck", Status.PASSED, True), ("SkippedCheck", Status.PASSED, False)], 0),
         ([("HealthyCheck", Status.PASSED, True), ("FailingCheck", Status.FAILURE, True)], 3),
-        ([("ErroringCheck", Status.ERROR, True)], 3),
+        ([("ErroringCheck", Status.CHECK_ERROR, True)], 3),
     ],
     ids=["all-successful-exit-zero", "any-failure-exits-non-zero", "any-error-exits-non-zero"],
 )
 def test_run_exit_code_reflects_worst_result_status(runner, monkeypatch, checks_spec, expected_exit_code):
     # A single FAILURE or ERROR makes the whole run unsuccessful; the report is still printed and the
     # handler exits with the diagnostic-failure code without emitting a separate JSON error.
-    checks = [
-        FakeCheck(name, status=status, applicable=applicable, message="detail")
-        for name, status, applicable in checks_spec
-    ]
+    checks = [FakeCheck(name, status=status, applicable=applicable) for name, status, applicable in checks_spec]
     _stub_registry_with(monkeypatch, checks)
 
     result = runner.invoke(main, ["run"])

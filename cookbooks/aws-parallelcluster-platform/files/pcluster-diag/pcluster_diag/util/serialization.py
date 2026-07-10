@@ -18,10 +18,12 @@ from enum import Enum
 
 
 def to_dict(obj):
-    """Convert a dataclass instance to a JSON-serializable dict (enum fields become their value)."""
+    """Convert a dataclass to a JSON-serializable dict, dropping None fields (enums become their value)."""
     return dataclasses.asdict(
         obj,
-        dict_factory=lambda items: {key: (value.value if isinstance(value, Enum) else value) for key, value in items},
+        dict_factory=lambda items: {
+            key: (value.value if isinstance(value, Enum) else value) for key, value in items if value is not None
+        },
     )
 
 

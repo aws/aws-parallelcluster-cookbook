@@ -71,9 +71,9 @@ class Registry:
         - ``registered``: every registered Check (the Runner runs those that are neither skipped nor
           declined).
         - ``not_applicable``: non-applicable Checks (``should_run(context)`` False); the Runner records
-          these as SKIPPED.
+          these as SKIPPED_NOT_APPLICABLE.
         - ``not_approved``: applicable, confirmation-required Checks whose prompt the user declined; the
-          Runner records these as SKIPPED ("Skipped by the user").
+          Runner records these as SKIPPED_BY_USER.
 
         Confirmation-required Checks (``approval_required(context)`` True) are listed and prompted yes/no
         here, before the Runner is invoked, so execution begins only once every decision is collected.
