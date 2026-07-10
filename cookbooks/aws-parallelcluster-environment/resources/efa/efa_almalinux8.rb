@@ -21,6 +21,10 @@ default_action :setup
 use 'partial/_common'
 
 action_class do
+  def skip_efa_install?
+    true
+  end
+
   def efa_supported?
     if Gem::Version.new(node['platform_version']) < Gem::Version.new("8.4")
       log "EFA is not supported in this AlmaLinux version #{node['platform_version']}, supported versions are >= 8.4" do
