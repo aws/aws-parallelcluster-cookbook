@@ -16,13 +16,14 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
-from pcluster_diag.models.check_error import CheckError
+from pcluster_diag.models.finding import CheckError, CheckWarning
 
 
 class Status(Enum):
     """The status of a Check execution."""
 
     PASSED = "PASSED"  # condition satisfied
+    WARNING = "WARNING"  # condition satisfied, but with non-fatal warnings (still successful)
     CHECK_ERROR = "CHECK_ERROR"  # check raised / could not complete
     FAILURE = "FAILURE"  # check completed; condition not satisfied
     SKIPPED_BY_USER = "SKIPPED_BY_USER"  # user did not approve its execution
@@ -30,10 +31,11 @@ class Status(Enum):
 
 
 # Statuses that make the run unsuccessful: any of these in the results yields a non-zero exit code.
+# WARNING is deliberately excluded: a check carrying only warnings is considered successful.
 FAILED_STATUSES = (Status.FAILURE, Status.CHECK_ERROR)
 
 # The error code carried by a CHECK_ERROR Result (an exception prevented the Check's completion).
-INTERNAL_ERROR_CODE = "E0"
+INTERNAL_ERROR_CODE = 0
 
 
 @dataclass
@@ -43,16 +45,19 @@ class Result:
     Attributes:
         check_id: The check identifier (the Check class simple name).
         check_description: The Check's human-readable description.
-        status: The Status of the execution (PASSED, CHECK_ERROR, FAILURE, SKIPPED_BY_USER, or
-            SKIPPED_NOT_APPLICABLE).
+        status: The Status of the execution (PASSED, WARNING, CHECK_ERROR, FAILURE, SKIPPED_BY_USER,
+            or SKIPPED_NOT_APPLICABLE).
         errors: The set of failure modes for a FAILURE or CHECK_ERROR Result, each a CheckError
             (code + message); None for any other status.
+        warnings: The set of non-fatal warnings raised by the Check, each a CheckWarning (code +
+            message); present on a WARNING Result and optionally on a FAILURE Result; None otherwise.
     """
 
     check_id: str
     check_description: str
     status: Status
     errors: Optional[List[CheckError]] = None
+    warnings: Optional[List[CheckWarning]] = None
 
     @staticmethod
     def passed(check) -> "Result":
@@ -79,13 +84,29 @@ class Result:
         )
 
     @staticmethod
-    def failure(check, errors: Optional[List[CheckError]] = None) -> "Result":
-        """Build a FAILURE Result for ``check``; the failure modes are described by ``errors``."""
+    def failure(
+        check, errors: Optional[List[CheckError]] = None, warnings: Optional[List[CheckWarning]] = None
+    ) -> "Result":
+        """Build a FAILURE Result for ``check``; ``errors`` are the failure modes, ``warnings`` any warnings."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
             status=Status.FAILURE,
             errors=errors,
+            warnings=warnings,
+        )
+
+    @staticmethod
+    def warning(check, warnings: Optional[List[CheckWarning]] = None) -> "Result":
+        """Build a WARNING Result for ``check`` (its condition holds, but ``warnings`` were raised).
+
+        A WARNING Result is considered successful: it does not make the run fail.
+        """
+        return Result(
+            check_id=check.identifier,
+            check_description=check.description,
+            status=Status.WARNING,
+            warnings=warnings,
         )
 
     @staticmethod

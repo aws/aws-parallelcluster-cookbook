@@ -14,8 +14,8 @@
 
 from pcluster_diag.core.constants import CFN_HUP_PROGRAM
 from pcluster_diag.models.check import Check
-from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context, NodeType
+from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Result
 from pcluster_diag.util.services import is_supervisord_program_running
 
@@ -23,8 +23,8 @@ from pcluster_diag.util.services import is_supervisord_program_running
 class CfnHupRunsOnlyOnHeadNode(Check):
     """Verify that the cfn-hup daemon runs only on the head node."""
 
-    NOT_RUNNING_ON_HEAD_NODE = CheckError("E1", "{} is not running on the head node.".format(CFN_HUP_PROGRAM))
-    RUNNING_ON_NON_HEAD_NODE = CheckError("E2", "{} is running on a non-head node.".format(CFN_HUP_PROGRAM))
+    NOT_RUNNING_ON_HEAD_NODE = CheckError(1, "{} is not running on the head node.".format(CFN_HUP_PROGRAM))
+    RUNNING_ON_NON_HEAD_NODE = CheckError(2, "{} is running on a non-head node.".format(CFN_HUP_PROGRAM))
 
     @property
     def description(self) -> str:

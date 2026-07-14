@@ -176,10 +176,16 @@ def test_confirmation_required_check_flow(runner, monkeypatch, invoke_args, cli_
     "checks_spec, expected_exit_code",
     [
         ([("PassedCheck", Status.PASSED, True), ("SkippedCheck", Status.PASSED, False)], 0),
+        ([("HealthyCheck", Status.PASSED, True), ("WarnedCheck", Status.WARNING, True)], 0),
         ([("HealthyCheck", Status.PASSED, True), ("FailingCheck", Status.FAILURE, True)], 3),
         ([("ErroringCheck", Status.CHECK_ERROR, True)], 3),
     ],
-    ids=["all-successful-exit-zero", "any-failure-exits-non-zero", "any-error-exits-non-zero"],
+    ids=[
+        "all-successful-exit-zero",
+        "warnings-only-exit-zero",
+        "any-failure-exits-non-zero",
+        "any-error-exits-non-zero",
+    ],
 )
 def test_run_exit_code_reflects_worst_result_status(runner, monkeypatch, checks_spec, expected_exit_code):
     # A single FAILURE or ERROR makes the whole run unsuccessful; the report is still printed and the

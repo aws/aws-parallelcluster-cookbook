@@ -15,7 +15,7 @@
 import logging
 
 from pcluster_diag.core.runner import Runner
-from pcluster_diag.models.check_error import CheckError
+from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Status
 from tests.sample_data import FAKE_CHECK_RAISE_MESSAGE, FakeCheck, sample_context
 
@@ -47,7 +47,7 @@ def test_unhandled_exception_becomes_check_error_with_e0_error():
 
     assert results[0].status == Status.CHECK_ERROR
     # A CHECK_ERROR carries a single E0 error coded "{exceptionName}: {exceptionMessage}".
-    assert results[0].errors == [CheckError("E0", "RuntimeError: {}".format(FAKE_CHECK_RAISE_MESSAGE))]
+    assert results[0].errors == [CheckError(0, "RuntimeError: {}".format(FAKE_CHECK_RAISE_MESSAGE))]
     # Isolation: the next Check still ran.
     assert results[1].status == Status.PASSED
 
@@ -87,6 +87,17 @@ def test_emits_outcome_log_line_per_check(caplog):
     levels = {record.getMessage(): record.levelno for record in caplog.records}
     assert levels["A: PASSED"] == logging.INFO
     assert levels["B: FAILURE"] == logging.ERROR
+
+
+def test_warning_outcome_logged_at_warning_level(caplog):
+    a = FakeCheck("A", status=Status.WARNING)
+
+    with caplog.at_level(logging.INFO, logger="pcluster_diag.core.runner"):
+        Runner().execute(sample_context(), [a])
+
+    levels = {record.getMessage(): record.levelno for record in caplog.records}
+    # A WARNING outcome is logged at warning level (and never makes the run fail).
+    assert levels["A: WARNING"] == logging.WARNING
 
 
 def test_results_follow_registration_order_across_dispositions():

@@ -30,9 +30,9 @@ from pcluster_diag.core.constants import (
     SLURM_USER,
 )
 from pcluster_diag.models.check import Check
-from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context, NodeType
 from pcluster_diag.models.expected_path_permissions import ExpectedPathPermissions
+from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Result
 from pcluster_diag.util import filesystem
 
@@ -71,9 +71,9 @@ CRITICAL_PATHS: List[ExpectedPathPermissions] = [
 class CriticalPathsHaveExpectedPermissions(Check):
     """Verify ParallelCluster's critical files exist with their expected owner, group, and mode."""
 
-    MISSING_PATH = "E1"
-    WRONG_OWNERSHIP = "E2"
-    WRONG_MODE = "E3"
+    MISSING_PATH = CheckError(1, "'{}' is missing.")
+    WRONG_OWNERSHIP = CheckError(2, "'{}' is owned by {}:{} but should be {}:{}.")
+    WRONG_MODE = CheckError(3, "'{}' has mode {} but should be {}.")
 
     def __init__(self, critical_paths: Optional[List[ExpectedPathPermissions]] = None) -> None:
         """Create the Check, optionally overriding the inspected critical paths (used by tests)."""
@@ -103,23 +103,15 @@ class CriticalPathsHaveExpectedPermissions(Check):
         try:
             observed = filesystem.stat_path(critical.path)
         except FileNotFoundError:
-            return [CheckError(self.MISSING_PATH, "'{}' is missing.".format(critical.path))]
+            return [self.MISSING_PATH.format(critical.path)]
 
         errors = []
         if observed.owner != critical.owner or observed.group != critical.group:
             errors.append(
-                CheckError(
-                    self.WRONG_OWNERSHIP,
-                    "'{}' is owned by {}:{} but should be {}:{}.".format(
-                        critical.path, observed.owner, observed.group, critical.owner, critical.group
-                    ),
+                self.WRONG_OWNERSHIP.format(
+                    critical.path, observed.owner, observed.group, critical.owner, critical.group
                 )
             )
         if observed.mode != critical.mode:
-            errors.append(
-                CheckError(
-                    self.WRONG_MODE,
-                    "'{}' has mode {} but should be {}.".format(critical.path, observed.mode, critical.mode),
-                )
-            )
+            errors.append(self.WRONG_MODE.format(critical.path, observed.mode, critical.mode))
         return errors

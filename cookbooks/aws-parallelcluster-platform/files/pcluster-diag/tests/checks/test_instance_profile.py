@@ -77,7 +77,7 @@ def test_fails_when_imds_role_differs_from_configured_role(monkeypatch, tmp_path
     result = _check(tmp_path, role_line="role=old-role").run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ImdsRoleMatchesCfnHupConfig.ROLE_MISMATCH]
+    assert _codes(result) == [ImdsRoleMatchesCfnHupConfig.ROLE_MISMATCH.code]
     assert "does not match" in _messages(result)
     assert "new-role" in _messages(result) and "old-role" in _messages(result)
 
@@ -88,7 +88,7 @@ def test_fails_when_imds_reports_no_role(monkeypatch, tmp_path):
     result = _check(tmp_path).run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ImdsRoleMatchesCfnHupConfig.NO_ROLE_FROM_IMDS]
+    assert _codes(result) == [ImdsRoleMatchesCfnHupConfig.NO_ROLE_FROM_IMDS.code]
     assert "IMDS reports no IAM role" in _messages(result)
 
 
@@ -101,7 +101,7 @@ def test_fails_when_config_has_no_role(monkeypatch, tmp_path):
     result = ImdsRoleMatchesCfnHupConfig(cfn_hup_conf_path=str(conf)).run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ImdsRoleMatchesCfnHupConfig.NO_ROLE_CONFIGURED]
+    assert _codes(result) == [ImdsRoleMatchesCfnHupConfig.NO_ROLE_CONFIGURED.code]
     assert "No 'role' is set" in _messages(result)
 
 

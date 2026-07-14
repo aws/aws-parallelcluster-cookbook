@@ -13,8 +13,8 @@
 """Shared sample data for the test suite: Contexts, Check doubles, and Results."""
 
 from pcluster_diag.models.check import Check
-from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context, NodeType
+from pcluster_diag.models.finding import CheckError, CheckWarning
 from pcluster_diag.models.report import Report
 from pcluster_diag.models.result import Result, Status
 
@@ -112,22 +112,24 @@ class FakeCheck(Check):
 # --- Results --------------------------------------------------------------------------
 
 
-def sample_result(status: Status = Status.PASSED, *, check_id: str = "SampleCheck", errors=None):
-    """Return a sample Result with the given status (and optional errors)."""
+def sample_result(status: Status = Status.PASSED, *, check_id: str = "SampleCheck", errors=None, warnings=None):
+    """Return a sample Result with the given status (and optional errors/warnings)."""
     return Result(
         check_id=check_id,
         check_description="description for {}".format(check_id),
         status=status,
         errors=errors,
+        warnings=warnings,
     )
 
 
 def sample_results():
-    """Return one sample Result per Status, spanning absent, plain, and error-bearing shapes."""
+    """Return one sample Result per Status, spanning absent, plain, warning-, and error-bearing shapes."""
     return [
         sample_result(Status.PASSED, check_id="PassedCheck"),
-        sample_result(Status.FAILURE, check_id="FailedCheck", errors=[CheckError("E1", "nope")]),
-        sample_result(Status.CHECK_ERROR, check_id="ErroredCheck", errors=[CheckError("E0", "RuntimeError: boom")]),
+        sample_result(Status.WARNING, check_id="WarnedCheck", warnings=[CheckWarning(1, "heads up")]),
+        sample_result(Status.FAILURE, check_id="FailedCheck", errors=[CheckError(1, "nope")]),
+        sample_result(Status.CHECK_ERROR, check_id="ErroredCheck", errors=[CheckError(0, "RuntimeError: boom")]),
         sample_result(Status.SKIPPED_BY_USER, check_id="SkippedByUserCheck"),
         sample_result(Status.SKIPPED_NOT_APPLICABLE, check_id="SkippedNotApplicableCheck"),
     ]

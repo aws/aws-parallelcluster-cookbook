@@ -114,7 +114,7 @@ def test_run_fails_when_owner_wrong(monkeypatch):
     result = _check().run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP]
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP.code]
     assert "is owned by root:pcluster-admin but should be pcluster-admin:pcluster-admin" in _messages(result)
 
 
@@ -124,7 +124,7 @@ def test_run_fails_when_group_wrong(monkeypatch):
     result = _check().run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP]
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP.code]
     assert "pcluster-admin:root but should be pcluster-admin:pcluster-admin" in _messages(result)
 
 
@@ -134,7 +134,7 @@ def test_run_fails_when_mode_wrong(monkeypatch):
     result = _check().run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_MODE]
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_MODE.code]
     assert "has mode 0700 but should be 0755" in _messages(result)
 
 
@@ -145,8 +145,8 @@ def test_run_reports_both_ownership_and_mode_when_both_wrong(monkeypatch):
 
     assert result.status is Status.FAILURE
     assert _codes(result) == [
-        CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP,
-        CriticalPathsHaveExpectedPermissions.WRONG_MODE,
+        CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP.code,
+        CriticalPathsHaveExpectedPermissions.WRONG_MODE.code,
     ]
 
 
@@ -156,7 +156,7 @@ def test_run_fails_when_path_missing(monkeypatch):
     result = _check().run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.MISSING_PATH]
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.MISSING_PATH.code]
     assert "is missing" in _messages(result)
 
 

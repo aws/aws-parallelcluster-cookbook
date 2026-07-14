@@ -82,7 +82,7 @@ def test_fails_when_a_user_is_missing(monkeypatch):
     result = ReservedUsersAndGroups().run(sample_context())
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ReservedUsersAndGroups.MISSING]
+    assert _codes(result) == [ReservedUsersAndGroups.MISSING.code]
     assert "user 'slurm' does not exist" in _messages(result)
 
 
@@ -95,7 +95,7 @@ def test_fails_when_a_group_is_missing(monkeypatch):
     result = ReservedUsersAndGroups().run(sample_context())
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ReservedUsersAndGroups.MISSING]
+    assert _codes(result) == [ReservedUsersAndGroups.MISSING.code]
     assert "group 'pcluster-slurm-share' does not exist" in _messages(result)
 
 
@@ -109,7 +109,7 @@ def test_fails_when_user_uid_is_shared(monkeypatch):
     result = ReservedUsersAndGroups().run(sample_context())
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ReservedUsersAndGroups.SHARED_ID]
+    assert _codes(result) == [ReservedUsersAndGroups.SHARED_ID.code]
     assert "user 'pcluster-admin' shares id 400 with: svc-erd" in _messages(result)
 
 
@@ -127,7 +127,7 @@ def test_fails_when_group_gid_is_shared(monkeypatch):
     result = ReservedUsersAndGroups().run(sample_context())
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [ReservedUsersAndGroups.SHARED_ID]
+    assert _codes(result) == [ReservedUsersAndGroups.SHARED_ID.code]
     assert "group 'pcluster-admin' shares id 400 with: legacy-grp" in _messages(result)
 
 
@@ -147,4 +147,4 @@ def test_reports_both_missing_and_shared_across_users_and_groups(monkeypatch):
     result = ReservedUsersAndGroups().run(sample_context())
 
     assert result.status is Status.FAILURE
-    assert sorted(_codes(result)) == [ReservedUsersAndGroups.MISSING, ReservedUsersAndGroups.SHARED_ID]
+    assert sorted(_codes(result)) == [ReservedUsersAndGroups.MISSING.code, ReservedUsersAndGroups.SHARED_ID.code]

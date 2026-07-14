@@ -21,7 +21,7 @@ from typing import List
 
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
-from pcluster_diag.models.result import FAILED_STATUSES, Result
+from pcluster_diag.models.result import FAILED_STATUSES, Result, Status
 
 logger = logging.getLogger(__name__)
 
@@ -82,11 +82,14 @@ class Runner:
     def _print_outcome(result: Result) -> None:
         """Log a per-Check outcome line to stderr; never alters the JSON Report.
 
-        FAILURE and CHECK_ERROR outcomes are logged at error level; PASSED and SKIPPED_* at info level.
+        FAILURE and CHECK_ERROR outcomes are logged at error level; WARNING at warning level; PASSED
+        and SKIPPED_* at info level.
         """
         line = "%s: %s" % (result.check_id, result.status.value)
         if result.status in FAILED_STATUSES:
             logger.error(line)
+        elif result.status is Status.WARNING:
+            logger.warning(line)
         else:
             logger.info(line)
 

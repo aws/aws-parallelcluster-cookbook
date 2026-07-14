@@ -20,8 +20,8 @@ sudoers rules silently run as the wrong user and lose their privileges.
 
 from pcluster_diag.core.constants import RESERVED_GROUP_IDS, RESERVED_USER_IDS
 from pcluster_diag.models.check import Check
-from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context
+from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Result
 from pcluster_diag.util import users
 
@@ -29,8 +29,8 @@ from pcluster_diag.util import users
 class ReservedUsersAndGroups(Check):
     """Verify each reserved ParallelCluster user and group exists and does not share its id."""
 
-    MISSING = "E1"
-    SHARED_ID = "E2"
+    MISSING = CheckError(1, "{} '{}' does not exist.")
+    SHARED_ID = CheckError(2, "{} '{}' shares id {} with: {}.")
 
     @property
     def description(self) -> str:
@@ -52,14 +52,9 @@ class ReservedUsersAndGroups(Check):
         for name in reserved_ids:
             actual_id = get_id(name)
             if actual_id is None:
-                errors.append(CheckError(self.MISSING, "{} '{}' does not exist.".format(kind, name)))
+                errors.append(self.MISSING.format(kind, name))
                 continue
             others = [other for other in get_names_for_id(actual_id) if other != name]
             if others:
-                errors.append(
-                    CheckError(
-                        self.SHARED_ID,
-                        "{} '{}' shares id {} with: {}.".format(kind, name, actual_id, ", ".join(others)),
-                    )
-                )
+                errors.append(self.SHARED_ID.format(kind, name, actual_id, ", ".join(others)))
         return errors

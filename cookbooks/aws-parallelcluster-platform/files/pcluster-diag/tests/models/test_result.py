@@ -14,7 +14,7 @@
 
 import pytest
 
-from pcluster_diag.models.check_error import CheckError
+from pcluster_diag.models.finding import CheckError, CheckWarning
 from pcluster_diag.models.result import INTERNAL_ERROR_CODE, Result, Status
 from tests.sample_data import FakeCheck, sample_result
 
@@ -23,11 +23,12 @@ _SAMPLE_CHECK = FakeCheck(identifier="SampleCheck", description="a sample check"
 
 @pytest.mark.parametrize("status", list(Status), ids=lambda status: status.name)
 def test_result_status_is_a_valid_status_member(status):
-    """A Result's Status is one of PASSED, CHECK_ERROR, FAILURE, SKIPPED_BY_USER, or SKIPPED_NOT_APPLICABLE."""
+    """A Result's Status is one of PASSED, WARNING, CHECK_ERROR, FAILURE, SKIPPED_BY_USER, or SKIPPED_NOT_APPLICABLE."""
     result = sample_result(status=status)
 
     assert result.status in {
         Status.PASSED,
+        Status.WARNING,
         Status.CHECK_ERROR,
         Status.FAILURE,
         Status.SKIPPED_BY_USER,
@@ -76,7 +77,7 @@ def test_skipped_factory_builds_result_with_no_errors(factory, expected_status):
 
 
 def test_failure_factory_builds_result_with_errors():
-    errors = [CheckError("E1", "boom"), CheckError("E2", "kaboom")]
+    errors = [CheckError(1, "boom"), CheckError(2, "kaboom")]
 
     result = Result.failure(_SAMPLE_CHECK, errors=errors)
 
@@ -85,6 +86,34 @@ def test_failure_factory_builds_result_with_errors():
     assert result.check_description == _SAMPLE_CHECK.description
     assert result.errors == errors
 
-    # errors default to None when omitted.
+    # errors and warnings default to None when omitted.
     defaults = Result.failure(_SAMPLE_CHECK)
     assert defaults.errors is None
+    assert defaults.warnings is None
+
+
+def test_failure_factory_can_carry_warnings():
+    errors = [CheckError(1, "boom")]
+    warnings = [CheckWarning(1, "heads up")]
+
+    result = Result.failure(_SAMPLE_CHECK, errors=errors, warnings=warnings)
+
+    assert result.status is Status.FAILURE
+    assert result.errors == errors
+    assert result.warnings == warnings
+
+
+def test_warning_factory_builds_result_with_warnings():
+    warnings = [CheckWarning(1, "heads up"), CheckWarning(2, "also this")]
+
+    result = Result.warning(_SAMPLE_CHECK, warnings=warnings)
+
+    assert result.status is Status.WARNING
+    assert result.check_id == _SAMPLE_CHECK.identifier
+    assert result.check_description == _SAMPLE_CHECK.description
+    # A WARNING Result carries warnings but no errors.
+    assert result.warnings == warnings
+    assert result.errors is None
+
+    # warnings default to None when omitted.
+    assert Result.warning(_SAMPLE_CHECK).warnings is None

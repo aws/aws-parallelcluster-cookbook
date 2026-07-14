@@ -22,8 +22,8 @@ import configparser
 
 from pcluster_diag.core.constants import CFN_HUP_CONF_PATH
 from pcluster_diag.models.check import Check
-from pcluster_diag.models.check_error import CheckError
 from pcluster_diag.models.context import Context, NodeType
+from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Result
 from pcluster_diag.util import imds
 
@@ -36,9 +36,13 @@ class ImdsRoleMatchesCfnHupConfig(Check):
     retrieval from IMDS.
     """
 
-    NO_ROLE_CONFIGURED = "E1"
-    NO_ROLE_FROM_IMDS = "E2"
-    ROLE_MISMATCH = "E3"
+    NO_ROLE_CONFIGURED = CheckError(1, "No 'role' is set in {}.")
+    NO_ROLE_FROM_IMDS = CheckError(2, "IMDS reports no IAM role attached to this instance.")
+    ROLE_MISMATCH = CheckError(
+        3,
+        "The IAM role reported by IMDS ('{}') does not match the role configured in {} ('{}'); "
+        "make sure they match.",
+    )
 
     def __init__(self, cfn_hup_conf_path: str = CFN_HUP_CONF_PATH) -> None:
         """Create the Check, optionally overriding the cfn-hup config path (used by tests)."""
@@ -57,28 +61,16 @@ class ImdsRoleMatchesCfnHupConfig(Check):
         """Pass when the cfn-hup ``role=`` matches the role IMDS reports; fail on a mismatch or if absent."""
         configured_role = self._read_configured_role()
         if configured_role is None:
-            return Result.failure(
-                self,
-                errors=[CheckError(self.NO_ROLE_CONFIGURED, "No 'role' is set in {}.".format(self._cfn_hup_conf_path))],
-            )
+            return Result.failure(self, errors=[self.NO_ROLE_CONFIGURED.format(self._cfn_hup_conf_path)])
 
         imds_role = imds.get_iam_role_name()
         if imds_role is None:
-            return Result.failure(
-                self,
-                errors=[CheckError(self.NO_ROLE_FROM_IMDS, "IMDS reports no IAM role attached to this instance.")],
-            )
+            return Result.failure(self, errors=[self.NO_ROLE_FROM_IMDS])
 
         if imds_role != configured_role:
             return Result.failure(
                 self,
-                errors=[
-                    CheckError(
-                        self.ROLE_MISMATCH,
-                        "The IAM role reported by IMDS ('{}') does not match the role configured in {} ('{}'); "
-                        "make sure they match.".format(imds_role, self._cfn_hup_conf_path, configured_role),
-                    )
-                ],
+                errors=[self.ROLE_MISMATCH.format(imds_role, self._cfn_hup_conf_path, configured_role)],
             )
 
         return Result.passed(self)
