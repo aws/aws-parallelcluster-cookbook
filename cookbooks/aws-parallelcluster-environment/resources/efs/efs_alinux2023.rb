@@ -16,15 +16,13 @@ provides :efs, platform: 'amazon' do |node|
   node['platform_version'].to_i == 2023
 end
 
-use 'partial/_get_package_version_rpm'
 use 'partial/_common'
 use 'partial/_mount_umount'
 
 action :install_utils do
   return if _skip_efs_utils_install?
 
-  # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?("amazon-efs-utils", _efs_utils_version)
+  return if already_installed?
 
   # amazon-efs-utils ships in the OS repo (no EFS repo needed).
   action_install_efs_utils_within_major

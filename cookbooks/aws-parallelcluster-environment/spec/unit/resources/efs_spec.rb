@@ -10,15 +10,9 @@ class ConvergeEfs
   end
 end
 
-def mock_get_package_version(package, expected_version)
+def mock_already_installed(installed)
   stubs_for_resource('efs') do |res|
-    allow(res).to receive(:get_package_version).with(package).and_return(expected_version)
-  end
-end
-
-def mock_already_installed(package, expected_version, installed)
-  stubs_for_resource('efs') do |res|
-    allow(res).to receive(:already_installed?).with(package, expected_version).and_return(installed)
+    allow(res).to receive(:already_installed?).and_return(installed)
   end
 end
 
@@ -39,7 +33,7 @@ describe 'efs:install_utils' do
 
       context "utils package not yet installed" do
         cached(:chef_run) do
-          mock_already_installed('amazon-efs-utils', utils_version, false)
+          mock_already_installed(false)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs']['version'] = utils_version
           end
@@ -62,7 +56,7 @@ describe 'efs:install_utils' do
 
       context "utils package already installed" do
         cached(:chef_run) do
-          mock_already_installed('amazon-efs-utils', utils_version, true)
+          mock_already_installed(true)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs']['version'] = utils_version
           end
@@ -89,7 +83,7 @@ describe 'efs:install_utils' do
           "https://s3-efs-utils-mvp-prod-#{iso_region}.s3.#{iso_region}.#{iso_domain}/#{rpm_file}"
         end
         cached(:chef_run) do
-          mock_already_installed('amazon-efs-utils', utils_version, false)
+          mock_already_installed(false)
           allow_any_instance_of(Object).to receive(:aws_region).and_return(iso_region)
           allow_any_instance_of(Object).to receive(:aws_domain).and_return(iso_domain)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
@@ -119,7 +113,7 @@ describe 'efs:install_utils' do
   # Amazon Linux 2023: amazon-efs-utils ships in the OS repo (no EFS repo added).
   context "on amazon2023" do
     cached(:chef_run) do
-      mock_already_installed('amazon-efs-utils', utils_version, false)
+      mock_already_installed(false)
       runner = runner(platform: 'amazon', version: '2023', step_into: ['efs']) do |node|
         node.override['cluster']['efs']['version'] = utils_version
       end
@@ -144,7 +138,7 @@ describe 'efs:install_utils' do
     context "on #{platform}#{version}" do
       context "utils package not yet installed" do
         cached(:chef_run) do
-          mock_already_installed('amazon-efs-utils', utils_version, false)
+          mock_already_installed(false)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs']['version'] = utils_version
           end
@@ -166,7 +160,7 @@ describe 'efs:install_utils' do
 
       context "utils package already installed" do
         cached(:chef_run) do
-          mock_already_installed('amazon-efs-utils', utils_version, true)
+          mock_already_installed(true)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs']['version'] = utils_version
           end
@@ -186,15 +180,7 @@ describe 'efs:install_utils' do
 
   # DevSetting efs.skip_install so the recipe must install nothing regardless of
   # OS/repo flavor. It arrives as the string "true"/"false" via ExtraChefAttributes.
-  for_oses([
-    %w(redhat 8),
-    %w(redhat 9),
-    %w(rocky 8),
-    %w(rocky 9),
-    %w(ubuntu 22.04),
-    %w(ubuntu 24.04),
-    %w(amazon 2023),
-  ]) do |platform, version|
+  for_all_oses do |platform, version|
     [true, 'true'].each do |skip_value|
       context "with efs.skip_install #{skip_value.inspect} on #{platform}#{version}" do
         cached(:chef_run) do
@@ -219,7 +205,7 @@ describe 'efs:install_utils' do
     # The string "false" is truthy in Ruby, so it must NOT skip the install.
     context "with efs.skip_install \"false\" on #{platform}#{version}" do
       cached(:chef_run) do
-        mock_already_installed('amazon-efs-utils', utils_version, false)
+        mock_already_installed(false)
         runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
           node.override['cluster']['efs']['version'] = utils_version
           node.override['cluster']['efs']['skip_install'] = 'false'
@@ -394,6 +380,33 @@ describe 'efs:unmount' do
           .with(recursive: false)
 
         is_expected.not_to delete_directory('/shared_dir_2')
+      end
+    end
+  end
+end
+
+describe 'efs:already_installed?' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner(platform: platform, version: version, step_into: ['efs']).converge_dsl('aws-parallelcluster-environment') do
+          efs 'query' do
+            action :nothing
+          end
+        end
+      end
+      cached(:resource) { chef_run.find_resource('efs', 'query') }
+
+      it 'reports installed when mount.efs is found, regardless of version' do
+        allow(::File).to receive(:exist?).and_call_original
+        allow(::File).to receive(:exist?).with('/usr/sbin/mount.efs').and_return(true)
+        expect(resource.already_installed?).to be true
+      end
+
+      it 'reports not installed when mount.efs is absent' do
+        allow(::File).to receive(:exist?).and_call_original
+        allow(::File).to receive(:exist?).with('/usr/sbin/mount.efs').and_return(false)
+        expect(resource.already_installed?).to be false
       end
     end
   end

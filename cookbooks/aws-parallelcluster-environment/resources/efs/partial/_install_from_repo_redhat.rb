@@ -41,8 +41,7 @@ action :install_utils do
 
   return if redhat_on_docker?
 
-  # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?("amazon-efs-utils", _efs_utils_version)
+  return if already_installed?
 
   if aws_region.start_with?("us-iso")
     action_install_efs_utils_from_s3

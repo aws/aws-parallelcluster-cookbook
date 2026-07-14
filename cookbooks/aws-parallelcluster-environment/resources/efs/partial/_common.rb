@@ -22,17 +22,11 @@ def _skip_efs_utils_install?
   node['cluster']['efs']['skip_install'].to_s == 'true'
 end
 
-def already_installed?(package_name, expected_version)
-  Gem::Version.new(get_package_version(package_name)) >= Gem::Version.new(expected_version)
-end
-
-def get_package_version(package_name)
-  cmd = get_package_version_command(package_name)
-  version = shell_out(cmd).stdout.strip
-  if version.empty?
-    Chef::Log.info("#{package_name} not found when trying to get the version.")
-  end
-  version
+# If efs-utils is already on the AMI, treat it as CX-owned and don't override,
+# regardless of version. Probe the mount.efs binary it provides (Package Manager
+# agnostic and stable); it resolves to /usr/sbin on all supported OSes.
+def already_installed?
+  ::File.exist?('/usr/sbin/mount.efs')
 end
 
 action :increase_poll_interval do

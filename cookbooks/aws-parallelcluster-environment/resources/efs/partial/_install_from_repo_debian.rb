@@ -18,8 +18,7 @@
 action :install_utils do
   return if _skip_efs_utils_install?
 
-  # Do not install efs-utils if a same or newer version is already installed.
-  return if already_installed?("amazon-efs-utils", _efs_utils_version)
+  return if already_installed?
 
   # The repo path includes the version (repo/deb/ubuntu/<version>/dists/<version>/...);
   # both the uri and the suite carry it, matching efs-utils-installer.sh.
