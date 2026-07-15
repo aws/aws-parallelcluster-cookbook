@@ -51,9 +51,32 @@ end
 
 describe 'efa:setup' do
   for_all_oses do |platform, version|
+    if platform == 'almalinux'
+      context "on #{platform}#{version}" do
+        let(:chef_run) do
+          runner(platform: platform, version: version, step_into: ['efa']) do |node|
+            node.override['cluster']['efa']['version'] = efa_version
+            node.override['cluster']['efa']['sha256'] = efa_checksum
+            node.override['cluster']['sources_dir'] = source_dir
+          end
+        end
+
+        before do
+          ConvergeEfa.setup(chef_run)
+        end
+
+        it 'skips EFA installation explicitly' do
+          is_expected.to write_log('EFA is not supported on AlmaLinux 8; skipping installation').with_level(:warn)
+          is_expected.not_to run_bash('install efa')
+          is_expected.not_to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
+        end
+      end
+      next
+    end
+
     context "on #{platform}#{version}" do
       cached(:prerequisites) do
-        if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
+        if %(almalinux redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
           %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
         else
           %w(environment-modules)
@@ -176,7 +199,7 @@ describe 'efa:configure' do
         runner(platform: platform, version: version, step_into: ['efa'])
       end
 
-      if %w(amazon centos redhat rocky).include?(platform)
+      if %w(almalinux amazon centos redhat rocky).include?(platform)
         it 'does nothing' do
           ConvergeEfa.configure(chef_run)
           is_expected.to configure_efa('configure')

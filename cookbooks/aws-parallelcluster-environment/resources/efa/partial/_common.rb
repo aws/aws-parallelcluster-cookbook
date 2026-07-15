@@ -21,6 +21,13 @@ property :efa_version, String, default: node['cluster']['efa']['version']
 property :efa_checksum, String, default: node['cluster']['efa']['sha256']
 
 action :setup do
+  if skip_efa_install?
+    log 'EFA is not supported on AlmaLinux 8; skipping installation' do
+      level :warn
+    end
+    return
+  end
+
   if efa_installed? && !::File.exist?(efa_tarball)
     log 'efa installed' do
       message 'Existing EFA version differs from the one shipped with ParallelCluster. Skipping ParallelCluster EFA installation and configuration.'
@@ -103,6 +110,10 @@ action_class do
 
   def efa_supported?
     true
+  end
+
+  def skip_efa_install?
+    false
   end
 
   def efa_tarball

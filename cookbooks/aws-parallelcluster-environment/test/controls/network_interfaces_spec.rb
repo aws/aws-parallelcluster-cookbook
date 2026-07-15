@@ -18,6 +18,7 @@ control 'network_interfaces_configuration_script_created' do
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('content') { should match /^# Configure a specific Network Interface according to the OS/ }
+    its('content') { should match /^sudo nmcli connection modify/ } if os_properties.almalinux?
   end
 end
 

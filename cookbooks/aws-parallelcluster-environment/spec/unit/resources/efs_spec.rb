@@ -128,6 +128,7 @@ describe 'efs:install_utils' do
   end
 
   for_oses([
+    %w(almalinux 8),
     %w(redhat 8),
     %w(rocky 8),
     %w(redhat 9),
@@ -150,6 +151,7 @@ describe 'efs:install_utils' do
       end
       cached(:required_packages) do
         {
+          "almalinux" => %w(rpm-build make rust go cargo openssl-devel cmake perl),
           "redhat" => %w(rpm-build make rust go cargo openssl-devel cmake perl),
           "rocky" => %w(rpm-build make rust go cargo openssl-devel cmake perl),
         }

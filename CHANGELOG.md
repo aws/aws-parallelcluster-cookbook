@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
+- Add cookbook support for AlmaLinux 8 custom images.
 - Ship the diagnostics tool `pcluster-diag` into ParallelCluster AMIs to run on-demand diagnostics check on the cluster.
   See the `pcluster-diag` README for usage instructions.
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.

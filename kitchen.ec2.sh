@@ -35,7 +35,10 @@
 # KITCHEN_ALINUX2_AMI:        specific AMI to use for alinux2
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
-# KITCHEN_RHEL8_AMI:        specific AMI to use for redhat8
+# KITCHEN_ALMALINUX8_AMI:    specific AMI to use for AlmaLinux 8
+#                             if not specified, will look for the latest suitable image
+#
+# KITCHEN_RHEL8_AMI:         specific AMI to use for redhat8
 #                             if not specified, will look for the latest suitable ParallelCluster AMI
 #
 # KITCHEN_CENTOS7_AMI:        specific AMI to use for centos7

@@ -17,7 +17,7 @@
 # Resource:: robust_package
 #
 # Cross-platform wrapper around the Chef `package` resource that uses a
-# metadata-refresh + mirror-rotation retry strategy on RHEL/Rocky to mitigate
+# metadata-refresh + mirror-rotation retry strategy on AlmaLinux/RHEL/Rocky to mitigate
 # transient build-image failures caused by out-of-sync RHUI mirrors.
 #
 # On Amazon Linux and Debian-based platforms the resource falls back to the
@@ -43,7 +43,7 @@ action :install do
   max_retries = new_resource.max_retries
   retry_delay = new_resource.retry_delay
 
-  if platform?('redhat', 'rocky')
+  if platform?('almalinux', 'redhat', 'rocky')
     ruby_block "robust_package install #{new_resource.name}" do
       block do
         dnf_install_with_refresh(packages, max_retries: max_retries, retry_delay: retry_delay)

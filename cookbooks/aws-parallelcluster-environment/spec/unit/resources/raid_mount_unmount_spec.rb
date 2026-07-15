@@ -11,7 +11,7 @@ describe 'raid:mount' do
     context "on #{platform}#{version}" do
       cached(:venv_path) { 'venv' }
       cached(:raid_superblock_version) do
-        %(redhat rocky ubuntu).include?(platform) || "#{platform}#{version}" == 'amazon2023' ? '1.2' : '0.90'
+        %(almalinux redhat rocky ubuntu).include?(platform) || "#{platform}#{version}" == 'amazon2023' ? '1.2' : '0.90'
       end
       cached(:chef_run) do
         runner = runner(

@@ -287,6 +287,7 @@ describe 'fabric_manager_url construction' do
   FM_DRIVER_VERSION = '999.99.99'.freeze
 
   PLATFORM_DIRS_FM = {
+    'almalinux8' => 'rhel8',
     'amazon2023' => 'rhel9', # FM AL2023 partial sets platform to 'rhel9'
     'ubuntu22.04' => 'ubuntu2204',
     'ubuntu24.04' => 'ubuntu2404',

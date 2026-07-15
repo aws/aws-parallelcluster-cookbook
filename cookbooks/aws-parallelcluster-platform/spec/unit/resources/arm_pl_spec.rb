@@ -202,6 +202,7 @@ describe 'arm_pl download URL construction' do
   SOURCES_DIR = 'SOURCES_DIR'.freeze
 
   ARMPL_PLATFORM_DIRS = {
+    'almalinux8' => 'RHEL-8',
     'amazon2023' => 'RHEL-9',
     'ubuntu22.04' => 'Ubuntu-22.04',
     'ubuntu24.04' => 'Ubuntu-24.04',
@@ -211,6 +212,7 @@ describe 'arm_pl download URL construction' do
     'rocky9' => 'RHEL-9',
   }.freeze
   GCC_MAJOR_MINOR = {
+    'almalinux8' => '9.3',
     'amazon2023' => '11.3',
     'ubuntu22.04' => '11.3',
     'ubuntu24.04' => '11.3',

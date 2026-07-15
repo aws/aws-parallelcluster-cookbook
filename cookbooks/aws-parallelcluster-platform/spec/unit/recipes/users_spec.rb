@@ -8,6 +8,13 @@ describe 'aws-parallelcluster-platform::users' do
       end
       cached(:node) { chef_run.node }
 
+      if platform == 'almalinux'
+        it 'uses the AlmaLinux cloud image user' do
+          expect(node['cluster']['cluster_user']).to eq('ec2-user')
+          expect(node['cluster']['cluster_user_home']).to eq('/home/ec2-user')
+        end
+      end
+
       it 'creates admin group' do
         is_expected.to create_group(node['cluster']['cluster_admin_group']).with(
           comment: 'AWS ParallelCluster Admin group',

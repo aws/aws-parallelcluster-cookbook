@@ -93,7 +93,7 @@ describe 'gdrcopy:gdrcopy_arch' do
       context 'on arm instance' do
         cached(:expected_arch) do
           case platform
-          when 'amazon', 'redhat', 'rocky'
+          when 'almalinux', 'amazon', 'redhat', 'rocky'
             'aarch64'
           else
             'arm64'
@@ -182,6 +182,7 @@ describe 'gdrcopy:setup' do
       cached(:gdrcopy_arch) { 'gdrcopy_arch' }
       cached(:gdrcopy_platform) do
         platforms = {
+          'almalinux8' => 'el8',
           'amazon2023' => 'amzn-2023',
           'centos7' => 'el7',
           'redhat8' => 'el8',

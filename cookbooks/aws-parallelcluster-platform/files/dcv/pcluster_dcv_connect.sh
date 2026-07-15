@@ -112,7 +112,7 @@ main() {
     os=$(< /etc/chef/dna.json jq -r .cluster.base_os)
     _log "Input parameters: user: ${user}, OS: ${os}, shared_folder_path: ${shared_folder_path}."
 
-    if ! [[ "${os}" =~ ^(alinux2023|ubuntu2204|ubuntu2404|rhel8|rocky8|rhel9|rocky9)$ ]]; then
+    if ! [[ "${os}" =~ ^(alinux2023|almalinux8|ubuntu2204|ubuntu2404|rhel8|rocky8|rhel9|rocky9)$ ]]; then
         _fail "OS not supported."
     fi
 

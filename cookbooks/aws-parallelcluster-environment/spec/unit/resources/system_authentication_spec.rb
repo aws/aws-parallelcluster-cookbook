@@ -25,7 +25,7 @@ describe 'system_authentication:setup' do
         case platform
         when 'amazon', 'centos'
           %w(sssd-common sssd-tools sssd-ldap authconfig)
-        when 'redhat', 'rocky'
+        when 'almalinux', 'redhat', 'rocky'
           %w(sssd-common sssd-tools sssd-ldap authselect oddjob-mkhomedir)
         else
           %w(sssd-common sssd-tools sssd-ldap)
@@ -60,7 +60,7 @@ describe 'system_authentication:configure' do
           'authconfig --enablemkhomedir --enablesssdauth --enablesssd --updateall'
         when 'ubuntu'
           'pam-auth-update --enable mkhomedir'
-        when 'rocky'
+        when 'almalinux', 'rocky'
           'authselect select sssd with-mkhomedir --force'
         else
           'authselect select sssd with-mkhomedir'

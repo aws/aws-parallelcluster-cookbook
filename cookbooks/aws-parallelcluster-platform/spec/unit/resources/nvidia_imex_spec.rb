@@ -198,14 +198,14 @@ describe 'nvidia_imex:install' do
           cached(:nvidia_imex_version) { "1.2.3-1" }
           cached(:nvidia_imex_package) { "nvidia-imex" }
           cached(:nvidia_imex_name) do
-            if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
+            if %(almalinux redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
               "#{nvidia_imex_package}-#{nvidia_imex_version}"
             else
               "#{nvidia_imex_package}_#{nvidia_imex_version}"
             end
           end
           cached(:url_arch) do
-            if %(redhat rocky amazon).include?(platform)
+            if %(almalinux redhat rocky amazon).include?(platform)
               arm_or_x86
             elsif platform == 'ubuntu'
               arm_or_x86 == 'x86_64' ? 'amd64' : 'arm64'
@@ -214,7 +214,7 @@ describe 'nvidia_imex:install' do
             end
           end
           cached(:url_suffix) do
-            if %(redhat rocky).include?(platform)
+            if %(almalinux redhat rocky).include?(platform)
               "rhel#{version}/#{nvidia_imex_name}.#{url_arch}"
             elsif platform == 'amazon' && version == '2023'
               "amzn2023/#{nvidia_imex_name}.#{url_arch}"
@@ -417,6 +417,7 @@ describe 'nvidia_imex_url construction' do
   public_imex_base_url = 'https://fake-public.example.DOMAIN/compute/cuda/repos'
 
   platform_dirs = {
+    'almalinux8' => 'rhel8',
     'amazon2023' => 'amzn2023',
     'ubuntu22.04' => 'ubuntu2204',
     'ubuntu24.04' => 'ubuntu2404',

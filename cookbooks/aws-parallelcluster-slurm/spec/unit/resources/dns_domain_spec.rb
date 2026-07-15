@@ -68,7 +68,7 @@ describe 'dns_domain:configure' do
         is_expected.to restart_network_service('Restart network service')
       end
 
-      if platform == 'redhat'
+      if %w(almalinux redhat rocky).include?(platform)
         it 'creates NetworkManager.conf' do
           is_expected.to create_cookbook_file('NetworkManager.conf').with(
             path: '/etc/NetworkManager/NetworkManager.conf',
@@ -79,6 +79,18 @@ describe 'dns_domain:configure' do
           )
         end
       end
+    end
+  end
+end
+
+describe 'dns_domain:almalinux cookbook files' do
+  %w(NetworkManager.conf 99-disable-ipv6-metadata.cfg).each do |filename|
+    it "packages #{filename}" do
+      expect(
+        File.exist?(
+          File.expand_path("../../../files/almalinux/dns_domain/#{filename}", __dir__)
+        )
+      ).to be true
     end
   end
 end

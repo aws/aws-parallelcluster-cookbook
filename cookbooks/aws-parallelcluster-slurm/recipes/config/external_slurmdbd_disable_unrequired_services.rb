@@ -19,13 +19,13 @@
 # This recipe will disable some that are certainly unused, like { apache2, cups, ...,  wpa_supplicant }
 
 # The list depends on the base OS
-# This was tested on Ubuntu 20.04, Alinux2 and Rocky8
+# This was tested on Ubuntu 20.04 and EL8 derivatives
 # Others OS should be checked and added
 
 serviceList = %w()
 if platform_family?('debian')
   serviceList = %w(apache2 avahi-daemon cups.service ModemManager wpa_supplicant stunnel whoopsie)
-elsif platform?('rocky') && node['platform_version'].to_i == 8
+elsif platform?('almalinux', 'rocky') && node['platform_version'].to_i == 8
   serviceList = %w(avahi-daemon cups.service ModemManager mlocate-updatedb)
 end
 

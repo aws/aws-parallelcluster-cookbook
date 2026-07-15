@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument(
         "--platform",
         help="OS family of this instance",
-        choices=["amazon", "centos", "ubuntu", "redhat", "rocky"],
+        choices=["almalinux", "amazon", "centos", "ubuntu", "redhat", "rocky"],
         required=True,
     )
     parser.add_argument("--log-group", help="Name of the log group", required=True)

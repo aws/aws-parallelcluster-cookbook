@@ -8,8 +8,11 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+import sys
+
 import pytest
 from assertpy import assert_that
+from cloudwatch_agent_common_utils import CONFIG_ARGS
 from write_cloudwatch_agent_json import (
     add_aggregation_dimensions,
     add_append_dimensions,
@@ -19,6 +22,7 @@ from write_cloudwatch_agent_json import (
     create_config,
     filter_output_fields,
     gethostname,
+    parse_args,
     select_configs_for_feature,
     select_configs_for_node_role,
     select_configs_for_platform,
@@ -33,7 +37,7 @@ CONFIGS = [
         "log_stream_name": "system-messages",
         "schedulers": ["slurm"],
         "node_roles": ["ComputeFleet", "HeadNode"],
-        "platforms": ["amazon", "centos"],
+        "platforms": ["almalinux", "amazon", "centos"],
         "feature_conditions": [{"dna_key": "dcv_enabled", "satisfying_values": ["head_node"]}],
     },
     {
@@ -93,11 +97,37 @@ def test_add_instance_log_stream_prefixes():
 
 @pytest.mark.parametrize(
     "platform, length",
-    [("amazon", 2), ("ubuntu", 2)],
+    [("almalinux", 1), ("amazon", 2), ("ubuntu", 2)],
 )
 def test_select_configs_for_platform(platform, length):
     configs = select_configs_for_platform(CONFIGS, platform)
     assert_that(len(configs)).is_equal_to(length)
+
+
+def test_default_platforms_include_almalinux():
+    assert_that(CONFIG_ARGS["default_platforms"]).contains("almalinux")
+
+
+def test_parse_args_accepts_almalinux(monkeypatch):
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "write_cloudwatch_agent_json.py",
+            "--config",
+            "config.json",
+            "--platform",
+            "almalinux",
+            "--log-group",
+            "log-group",
+            "--node-role",
+            "HeadNode",
+            "--scheduler",
+            "slurm",
+        ],
+    )
+
+    assert_that(parse_args().platform).is_equal_to("almalinux")
 
 
 @pytest.mark.parametrize(

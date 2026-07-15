@@ -4,7 +4,7 @@ from jinja2 import FileSystemLoader
 from jinja2.sandbox import SandboxedEnvironment
 
 CONFIG_ARGS = {
-    "default_platforms": ["amazon", "centos", "redhat", "rocky", "ubuntu"],
+    "default_platforms": ["almalinux", "amazon", "centos", "redhat", "rocky", "ubuntu"],
 }
 
 
