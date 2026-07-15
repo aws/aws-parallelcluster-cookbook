@@ -1,5 +1,5 @@
 # Python Version
-default['cluster']['python-version'] = '3.14.2'
+default['cluster']['python-version'] = '3.14.6'
 default['cluster']['python-major-minor-version'] = '3.14'
 
 # Test mode: install Python and dependencies from internet instead of pre-built S3 packages
