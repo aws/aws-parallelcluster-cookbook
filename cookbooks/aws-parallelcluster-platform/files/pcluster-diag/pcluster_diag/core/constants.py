@@ -47,7 +47,6 @@ CFN_HUP_CONF_PATH = "/etc/cfn/cfn-hup.conf"
 # Reserved users and groups, with the ids ParallelCluster assigns them (derived from a base of 400).
 # See cookbooks/aws-parallelcluster-shared/attributes/users.rb.
 ROOT_USER = "root"
-SLURM_USER = "slurm"
 CLUSTER_ADMIN_USER = "pcluster-admin"
 CLUSTER_ADMIN_GROUP = "pcluster-admin"
 SLURM_USER = "slurm"
