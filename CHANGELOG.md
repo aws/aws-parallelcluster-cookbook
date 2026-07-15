@@ -49,6 +49,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Python to version 3.14.6 (from 3.14.2).
 - Upgrade Intel MPI to version 2021.18.0.749 (from 2021.17.2.94).
 - Upgrade Arm Performance Libraries (ArmPL) to version 26.01.1 (from 24.10).
+- Upgrade Cinc Client to version 19.3.14 (from 18.8.54).
 
 **BUG FIXES**
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
