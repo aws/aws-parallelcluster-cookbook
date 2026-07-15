@@ -19,7 +19,13 @@ action :install do
   return unless nvidia_enabled_or_installed?
   return if on_docker? || imex_installed?
 
-  action_install_imex
+  package nvidia_imex_package do
+    version nvidia_imex_full_version
+    retries 3
+    retry_delay 5
+  end
+
+  action_lock_package_version
 
   # Create Imex configuration files
   action_create_configuration_files
