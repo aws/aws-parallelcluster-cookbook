@@ -16,7 +16,7 @@ describe 'arm_pl:setup' do
       cached(:aws_region) { 'test_region' }
       cached(:aws_domain) { 'test_domain' }
       cached(:armpl_major_minor_version) do
-        '24.10'
+        'armpl_test_version'
       end
 
       cached(:armpl_platform) do
@@ -62,6 +62,7 @@ describe 'arm_pl:setup' do
           runner = runner(platform: platform, version: version, step_into: ['arm_pl']) do |node|
             node.override['conditions']['arm_pl_supported'] = false
             node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.amazonaws.com/archives"
+            node.override['cluster']['armpl']['version'] = armpl_version
           end
           ConvergeArmPl.setup(runner)
         end
@@ -79,6 +80,7 @@ describe 'arm_pl:setup' do
             node.override['cluster']['sources_dir'] = sources_dir
             node.override['cluster']['region'] = aws_region
             node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.amazonaws.com/archives"
+            node.override['cluster']['armpl']['version'] = armpl_version
           end
           allow_any_instance_of(Object).to receive(:aws_domain).and_return(aws_domain)
           ConvergeArmPl.setup(runner)
