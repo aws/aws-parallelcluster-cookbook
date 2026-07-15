@@ -21,7 +21,7 @@
 set -euo pipefail
 
 info() { printf 'INFO: %s\n' "$*"; }
-fail() { printf 'ERROR: %s\n' "$*" >&2; }
+fail() { printf 'ERROR: %s\n' "$*" >&2; exit 1; }
 
 # Report a clear failure if any step below errors out (set -e triggers this on the failing command).
 trap 'fail "sync-to-cluster failed."' ERR
@@ -57,13 +57,10 @@ info "Syncing local pcluster-diag source to cluster '${CLUSTER_NAME}' (${REGION}
 info "Resolving cluster user from CloudFormation stack '${CLUSTER_NAME}'..."
 if ! CLUSTER_USER="$(aws cloudformation describe-stacks --stack-name "${CLUSTER_NAME}" --region "${REGION}" \
     --query "Stacks[0].Parameters[?ParameterKey=='ClusterUser'].ParameterValue | [0]" --output text 2>&1)"; then
-  fail "Failed to describe CloudFormation stack '${CLUSTER_NAME}':"
-  printf '%s\n' "${CLUSTER_USER}" >&2
-  exit 1
+  fail "Failed to describe CloudFormation stack '${CLUSTER_NAME}': ${CLUSTER_USER}"
 fi
 if [ -z "${CLUSTER_USER}" ] || [ "${CLUSTER_USER}" = "None" ]; then
   fail "Could not determine ClusterUser from CloudFormation stack '${CLUSTER_NAME}'."
-  exit 1
 fi
 info "Cluster user: ${CLUSTER_USER}"
 
@@ -71,16 +68,13 @@ info "Cluster user: ${CLUSTER_USER}"
 # capture the full document and extract the field with python3; capture stderr to surface failures.
 info "Resolving head node IP..."
 if ! DESCRIBE_JSON="$(pcluster describe-cluster --cluster-name "${CLUSTER_NAME}" --region "${REGION}" 2>&1)"; then
-  fail "Failed to describe cluster '${CLUSTER_NAME}':"
-  printf '%s\n' "${DESCRIBE_JSON}" >&2
-  exit 1
+  fail "Failed to describe cluster '${CLUSTER_NAME}': ${DESCRIBE_JSON}"
 fi
 HEAD_NODE_IP="$(printf '%s' "${DESCRIBE_JSON}" \
   | python3 -c 'import json, sys; print((json.load(sys.stdin).get("headNode") or {}).get("publicIpAddress") or "")')"
 
 if [ -z "${HEAD_NODE_IP}" ] || [ "${HEAD_NODE_IP}" = "None" ]; then
   fail "Could not determine the head node public IP for cluster '${CLUSTER_NAME}'."
-  exit 1
 fi
 info "Head node: ${CLUSTER_USER}@${HEAD_NODE_IP}"
 
@@ -98,7 +92,6 @@ rsync -av --filter=':- .gitignore' --exclude='.git' --delete \
 info "Installing the pcluster-diag wrapper at ${NODE_BIN_PATH} on the head node..."
 if [ ! -f "${WRAPPER_TEMPLATE}" ]; then
   fail "Could not find the wrapper template at ${WRAPPER_TEMPLATE}."
-  exit 1
 fi
 
 # Resolve the cookbook_virtualenv path the wrapper must run. The glob expands remotely (kept literal
@@ -107,7 +100,6 @@ VIRTUALENV_PATH="$(ssh -i "${SSH_KEY}" "${CLUSTER_USER}@${HEAD_NODE_IP}" \
   "ls -d ${COOKBOOK_VIRTUALENV_GLOB} 2>/dev/null | head -n1")"
 if [ -z "${VIRTUALENV_PATH}" ]; then
   fail "Could not locate the cookbook_virtualenv (${COOKBOOK_VIRTUALENV_GLOB}) on the node."
-  exit 1
 fi
 
 info "Installing wrapper from ${WRAPPER_TEMPLATE} (interpreter: ${VIRTUALENV_PATH})..."
