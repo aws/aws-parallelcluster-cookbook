@@ -104,6 +104,6 @@ default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
 
 # Intel MPI
-default['cluster']['intelmpi']['version'] = '2021.17'
-default['cluster']['intelmpi']['full_version'] = '2021.17.2.94'
+default['cluster']['intelmpi']['version'] = '2021.18'
+default['cluster']['intelmpi']['full_version'] = '2021.18.0.749'
 default['cluster']['intelmpi']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/impi"
