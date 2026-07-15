@@ -22,6 +22,7 @@ import click
 
 from pcluster_diag.checks.cfn_hup import CfnHupRunsOnlyOnHeadNode
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
+from pcluster_diag.checks.imds import Imds
 from pcluster_diag.checks.instance_profile import ImdsRoleMatchesCfnHupConfig
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
 from pcluster_diag.models.check import Check
@@ -127,6 +128,7 @@ class Registry:
 # ``register`` (which returns the registry).
 DEFAULT_REGISTRY = (
     Registry()
+    .register(Imds())
     .register(CfnHupRunsOnlyOnHeadNode())
     .register(ReservedUsersAndGroups())
     .register(CriticalPathsHaveExpectedPermissions())

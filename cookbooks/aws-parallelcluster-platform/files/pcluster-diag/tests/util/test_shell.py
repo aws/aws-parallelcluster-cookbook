@@ -57,3 +57,49 @@ def test_run_command_uses_caller_supplied_timeout(monkeypatch):
 
     # The caller's timeout overrides the default.
     assert captured["kwargs"]["timeout"] == 5
+
+
+class _FakeAccount:
+    def __init__(self, uid, gid):
+        self.pw_uid = uid
+        self.pw_gid = gid
+
+
+def test_run_command_as_user_prepends_setpriv_prefix(monkeypatch):
+    captured = {}
+
+    def fake_run(command, **kwargs):
+        captured["command"] = command
+        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+    monkeypatch.setattr(shell.pwd, "getpwnam", lambda name: _FakeAccount(1001, 2002))
+
+    run_command(["curl", "http://example"], as_user="pcluster-admin")
+
+    # The command runs as the user's uid/gid via setpriv (no PAM session), with the original argv appended.
+    assert captured["command"] == [
+        "setpriv",
+        "--reuid",
+        "1001",
+        "--regid",
+        "2002",
+        "--clear-groups",
+        "curl",
+        "http://example",
+    ]
+
+
+def test_run_command_without_as_user_leaves_command_unchanged(monkeypatch):
+    captured = {}
+
+    def fake_run(command, **kwargs):
+        captured["command"] = command
+        return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+
+    run_command(["curl", "http://example"])
+
+    # No privilege dropping when as_user is omitted.
+    assert captured["command"] == ["curl", "http://example"]
