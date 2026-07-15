@@ -40,6 +40,15 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install amazon-efs-utils from the official EFS endpoint instead of building from source.
   Need to allowlist the CloudFront domain `amazon-efs-utils.aws.com` in their proxy/egress configuration 
   for `build-image` with isolated subnets.
+- Upgrade Cinc Client to version 19.3.14 (from 18.8.54).
+- Upgrade GDRCopy to version 2.6 (from 2.5.2).
+- Upgrade PMIx to version 5.0.11 (from 5.0.10).
+- Upgrade Enroot to version 4.2.1 (from 3.4.1).
+- Upgrade Pyxis to version 0.24.0 (from 0.20.0).
+- Upgrade stunnel to version 5.78 (from 5.67).
+- Upgrade Python to version 3.14.6 (from 3.14.2).
+- Upgrade Intel MPI to version 2021.18.0.749 (from 2021.17.2.94).
+- Upgrade Arm Performance Libraries (ArmPL) to version 26.01.1 (from 24.10).
 
 **BUG FIXES**
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
