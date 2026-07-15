@@ -27,7 +27,13 @@ action :setup do
   node.default['cluster']['nvidia']['fabricmanager']['version'] = fabric_manager_version
   node_attributes "dump node attributes"
 
-  action_install_package
+  package fabric_manager_package do
+    version fabric_manager_version
+    retries 3
+    retry_delay 5
+  end
+
+  action_lock_package_version
 end
 
 action :configure do
