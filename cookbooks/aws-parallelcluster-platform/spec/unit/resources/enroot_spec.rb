@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-package_version = '3.4.1'
+package_version = 'enroot_version'
 class ConvergeEnroot
   def self.setup(chef_run)
     chef_run.converge_dsl('aws-parallelcluster-platform') do
@@ -16,16 +16,17 @@ describe 'aws-parallelcluster-platform::enroot:package_version' do
     context "on #{platform}#{version}" do
       cached(:chef_run) do
         allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(false)
-        runner = runner(platform: platform, version: version, step_into: ['enroot'])
-        ConvergeEnroot.setup(runner)
+        runner(platform: platform, version: version, step_into: ['enroot']) do |node|
+          node.override['cluster']['enroot']['version'] = package_version
+        end
       end
       cached(:resource) do
+        ConvergeEnroot.setup(chef_run)
         chef_run.find_resource('enroot', 'setup')
       end
 
-      it 'returns the expected enroot version' do
-        expected_enroot_version = "3.4.1"
-        expect(resource.package_version).to eq(expected_enroot_version)
+      it 'returns the version from the node attribute' do
+        expect(resource.package_version).to eq(package_version)
       end
     end
   end

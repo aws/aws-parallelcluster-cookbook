@@ -17,7 +17,7 @@ default['cluster']['stunnel']['sha256'] = '3086939ee6407516c59b0ba3fbf555338f9d5
 default['cluster']['stunnel']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/stunnel"
 
 # Enroot
-default['cluster']['enroot']['version'] = '3.4.1'
+default['cluster']['enroot']['version'] = '4.2.1'
 default['cluster']['enroot']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
 default['cluster']['enroot']['caps_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
 default['cluster']['enroot']['temporary_dir'] = '/run/enroot'
