@@ -39,8 +39,8 @@ default['cluster']['nvidia']['cuda']['version'] = '13.0.2'
 default['cluster']['nvidia']['cuda']['driver_version_suffix'] = '580.95.05'
 
 # GDRCopy
-default['cluster']['nvidia']['gdrcopy']['version'] = '2.5.2'
-default['cluster']['nvidia']['gdrcopy']['sha256'] = '32bc7b2c198dd97ec251de0ff4823252c95e31a4c79a5f843c82514c9af2052b'
+default['cluster']['nvidia']['gdrcopy']['version'] = '2.6'
+default['cluster']['nvidia']['gdrcopy']['sha256'] = 'c9eaf0593567ac5765d04c48cf7923dacb2644240b35bb5f025edb3bde1d5b4f'
 default['cluster']['nvidia']['gdrcopy']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
 
 # nvidia-imex
