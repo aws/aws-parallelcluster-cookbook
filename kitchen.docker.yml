@@ -84,6 +84,9 @@ platforms:
   - name: rocky9
     driver:
       image: <% if ENV['KITCHEN_ROCKY9_IMAGE'] %> <%= ENV['KITCHEN_ROCKY9_IMAGE'] %> <% else %> dokken/rockylinux-9 <% end %>
+      intermediate_instructions:
+        # xz is absent from the rocky9 dokken image; munge unpacks a .tar.xz tarball.
+        - RUN yum install xz -y
     attributes:
       cluster:
         base_os: rocky9
