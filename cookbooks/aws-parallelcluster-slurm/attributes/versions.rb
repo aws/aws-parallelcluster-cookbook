@@ -13,6 +13,6 @@ default['cluster']['jwt']['version'] = '1.18.4'
 default['cluster']['jwt']['sha256'] = '8496257cb39ee7dddfdfc919e7b80a997399b0319f9fdcbefd374b0e4f147159'
 default['cluster']['jwt']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/jwt"
 ## MySql
-default['cluster']['mysql']['source_version'] = '8.4.8'
+default['cluster']['mysql']['source_version'] = '8.4.10'
 default['cluster']['mysql']['version'] = "#{node['cluster']['mysql']['source_version']}-1"
 default['cluster']['mysql']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/mysql"

@@ -22,7 +22,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade aws-cfn-bootstrap to version 2.0-39 (from 2.0-38).
 - Move all ParallelCluster-managed bootstrap files off `/tmp` into a dedicated `/opt/parallelcluster/tmp`
   directory. Therefore, Image builds, cluster creations and updates work on custom AMIs that mount `/tmp` with `noexec`.
-  
+- Upgrade mysql-community-client to version 8.4.10 (from 8.4.8).
 
 **CHANGES**
 - Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). The NFSv3 client stack (rpcbind, rpc-statd, lockd) are unchanged, so cluster nodes can still mount external NFSv3 servers.
