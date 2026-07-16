@@ -19,7 +19,14 @@ action :install do
   return unless nvlsm_installation_enabled?
 
   action_install_nvlsm_dependencies
-  action_install_nvlsm
+
+  package nvidia_nvlsm_package do
+    version nvidia_nvlsm_version
+    retries 3
+    retry_delay 5
+  end
+
+  action_lock_package_version
 end
 
 action :install_nvlsm_dependencies do
@@ -40,34 +47,6 @@ action :install_nvlsm_dependencies do
     owner 'root'
     group 'root'
     mode '0644'
-  end
-end
-
-action :install_nvlsm do
-  base_url = node['cluster']['nvidia']['nvlsm']['base_url']
-  remote_file "#{node['cluster']['sources_dir']}/#{nvidia_nvlsm_package_full_name}" do
-    source nvidia_nvlsm_url
-    # The NVLSM checksum is specific to each distribution and architecture combination,
-    # and a single overridden value cannot satisfy all OS/architecture variants when
-    # build-image runs in parallel across them. Skip the checksum when base_url is
-    # overridden; the cookbook still validates the checksum on the default S3 path
-    # where the per-OS/per-arch values are pinned.
-    checksum nvidia_nvlsm_checksum if default_artifacts_url?(base_url)
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
-  end
-
-  bash "Install nvlsm" do
-    user 'root'
-    cwd node['cluster']['sources_dir']
-    code <<-CODE
-    set -ex
-    #{nvidia_nvlsm_install_commands}
-    CODE
-    retries 3
-    retry_delay 5
   end
 end
 
