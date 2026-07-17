@@ -86,7 +86,7 @@ default['cluster']['efs']['version'] = '3.1.3'
 # DevSetting: skip installing amazon-efs-utils entirely.
 default['cluster']['efs']['skip_install'] = false
 
-default['cluster']['cfn_bootstrap']['version'] = '2.0-39'
+default['cluster']['cfn_bootstrap']['version'] = '2.0-40'
 
 # TODO: Move to platform cookbook
 default['cluster']['spack_shared_dir'] = "#{node['cluster']['shared_dir']}/spack"
