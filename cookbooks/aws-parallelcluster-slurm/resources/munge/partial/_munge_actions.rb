@@ -20,8 +20,8 @@ unified_mode true
 default_action :setup
 
 munge_version = node['cluster']['munge']['munge_version']
-munge_url = "#{node['cluster']['munge']['base_url']}/munge-#{munge_version}.tar.gz"
-munge_tarball = "#{node['cluster']['sources_dir']}/munge-#{munge_version}.tar.gz"
+munge_url = "#{node['cluster']['munge']['base_url']}/munge-#{munge_version}.tar.xz"
+munge_tarball = "#{node['cluster']['sources_dir']}/munge-#{munge_version}.tar.xz"
 munge_user = node['cluster']['munge']['user']
 munge_user_id = node['cluster']['munge']['user_id']
 munge_group = node['cluster']['munge']['group']
@@ -81,8 +81,7 @@ action :compile_and_install do
     code <<-MUNGE
       set -e
       tar xf #{munge_tarball}
-      cd munge-munge-#{munge_version}
-      ./bootstrap
+      cd munge-#{munge_version}
       ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libdir=#{munge_libdir}
       CORES=$(grep processor /proc/cpuinfo | wc -l)
       make -j $CORES

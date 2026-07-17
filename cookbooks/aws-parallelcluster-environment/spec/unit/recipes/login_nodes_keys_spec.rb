@@ -7,21 +7,6 @@ describe 'aws-parallelcluster-environment::login_nodes_keys' do
 
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      context "when awsbatch scheduler" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            node.override['cluster']['scheduler'] = 'awsbatch'
-            node.override['cluster']['shared_dir_login_nodes'] = SHARED_DIR_LOGIN_NODES
-          end
-          runner.converge(described_recipe)
-        end
-        cached(:node) { chef_run.node }
-
-        it 'does not create the script directory' do
-          is_expected.to_not create_directory("#{SHARED_DIR_LOGIN_NODES}/scripts")
-        end
-      end
-
       context "when compute node" do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|

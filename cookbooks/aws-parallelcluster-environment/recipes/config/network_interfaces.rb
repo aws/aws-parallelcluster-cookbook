@@ -64,9 +64,11 @@ log "macs: #{macs}"
 
 if macs.length > 1
 
+  configure_nw_interface_script = "#{node['cluster']['exec_tmp_dir']}/configure_nw_interface.sh"
+
   cookbook_file 'configure_nw_interface.sh' do
     source 'network_interfaces/configure_nw_interface.sh'
-    path '/tmp/configure_nw_interface.sh'
+    path configure_nw_interface_script
     user 'root'
     group 'root'
     mode '0644'
@@ -87,7 +89,7 @@ if macs.length > 1
     execute 'configure_nw_interface' do
       user 'root'
       group 'root'
-      cwd "/tmp"
+      cwd node['cluster']['exec_tmp_dir']
       environment(
         # TODO: The variables are a superset of what's required by individual scripts. Consider simplification.
         'DEVICE_NAME' => device_name,
@@ -101,7 +103,7 @@ if macs.length > 1
         'MAC' => mac
       )
 
-      command 'sh /tmp/configure_nw_interface.sh'
+      command "sh #{configure_nw_interface_script}"
     end
   end
 

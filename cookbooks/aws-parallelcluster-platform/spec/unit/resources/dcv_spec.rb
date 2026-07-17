@@ -38,19 +38,9 @@ describe 'dcv:dcv_supported?' do
       end
 
       context 'when on arm' do
-        before do
+        it "is true" do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
-        end
-
-        case "#{platform}#{version}"
-        when "amazon2023"
-          it "is false" do
-            expect(resource.dcv_supported?).to eq(false)
-          end
-        else
-          it "is true" do
-            expect(resource.dcv_supported?).to eq(true)
-          end
+          expect(resource.dcv_supported?).to eq(true)
         end
 
         it 'executes nothing action of dcv resource' do
@@ -59,10 +49,9 @@ describe 'dcv:dcv_supported?' do
       end
 
       context 'when not on arm' do
-        is_supported = !("#{platform}#{version}" == 'amazon2023')
-        it "is #{is_supported}" do
+        it "is true" do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-          expect(resource.dcv_supported?).to eq(is_supported)
+          expect(resource.dcv_supported?).to eq(true)
         end
       end
     end
@@ -144,9 +133,16 @@ describe 'dcv:packages' do
           expect(resource.xdcv).to eq("nice-xdcv_#{xdcv_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer_#{dcv_webviewer_version}_#{dcv_pkg_arch}.#{base_os}.deb")
           expect(resource.dcv_gl).to eq("/nice-dcv-gl_#{dcv_gl_version}_#{dcv_pkg_arch}.#{base_os}.deb")
-        elsif "#{platform}#{version}" != 'amazon2023'
-          dcv_platform_version = "#{platform}#{version}" == "amazon2" ? "7" : version.to_i
-          dcv_platform_version_pkg = platform == "amazon" ? "amzn2" : "el" + version
+        elsif "#{platform}#{version}" == "amazon2023"
+          dcv_platform_version_pkg = "amzn2023"
+          expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-#{dcv_platform_version_pkg}-#{dcv_url_arch}")
+          expect(resource.dcv_server).to eq("nice-dcv-server-#{dcv_server_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+          expect(resource.xdcv).to eq("nice-xdcv-#{xdcv_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+          expect(resource.dcv_web_viewer).to eq("nice-dcv-web-viewer-#{dcv_webviewer_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+          expect(resource.dcv_gl).to eq("nice-dcv-gl-#{dcv_gl_version}.#{dcv_platform_version_pkg}.#{dcv_url_arch}.rpm")
+        else
+          dcv_platform_version = version.to_i
+          dcv_platform_version_pkg = "el" + version
           expect(resource.dcv_package).to eq("nice-dcv-#{dcv_version}-#{dcv_platform_version_pkg}-#{dcv_url_arch}")
           expect(resource.dcv_server).to eq("nice-dcv-server-#{dcv_server_version}.el#{dcv_platform_version}.#{dcv_url_arch}.rpm")
           expect(resource.xdcv).to eq("nice-xdcv-#{xdcv_version}.el#{dcv_platform_version}.#{dcv_url_arch}.rpm")
@@ -248,6 +244,45 @@ describe 'dcv:dcv_url' do
   end
 end
 
+# Tests for dcv_url construction for the default S3 base_url and an overridden base_url.
+describe 'dcv:dcv_url download URL construction' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:dcv_major_minor) { 'major.minor' }
+      cached(:dcv_version) { "#{dcv_major_minor}-patch" }
+      cached(:dcv_package) { "dcv_package" }
+
+      [
+        ['default S3 base_url', nil],
+        ['overridden public base_url', 'https://fake-public.example.DOMAIN/dcv'],
+      ].each do |scenario, base_url|
+        context "with #{scenario}" do
+          cached(:chef_run) do
+            allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+            runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+              node.override['cluster']['dcv']['version'] = dcv_version
+              node.override['cluster']['dcv']['base_url'] = base_url if base_url
+            end
+          end
+          cached(:node) { chef_run.node }
+          cached(:expected_base_url) { base_url || "#{node['cluster']['artifacts_s3_url']}/dependencies/dcv" }
+          cached(:resource) do
+            stubs_for_resource('dcv') do |res|
+              allow(res).to receive(:dcv_package).and_return(dcv_package)
+            end
+            ConvergeDcv.nothing(chef_run)
+            chef_run.find_resource('dcv', 'nothing')
+          end
+
+          it 'returns dcv_url built from the expected base_url' do
+            expect(resource.dcv_url).to eq("#{expected_base_url}/#{dcv_package}.tgz")
+          end
+        end
+      end
+    end
+  end
+end
+
 describe 'dcv:dcv_tarball' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
@@ -296,42 +331,6 @@ describe 'dcv:dcvauth_virtualenv' do
         expect(resource.dcvauth_virtualenv).to eq(virtualenv)
         expect(resource.dcvauth_virtualenv_path).to eq("#{node['cluster']['system_pyenv_root']}/versions/#{python_version}/envs/#{virtualenv}")
       end
-    end
-  end
-end
-
-describe 'dcv:prereq_packages on amazon linux' do
-  cached(:chef_run) do
-    runner(platform: 'amazon', version: '2', step_into: ['dcv'])
-  end
-  cached(:resource) do
-    ConvergeDcv.nothing(chef_run)
-    chef_run.find_resource('dcv', 'nothing')
-  end
-  cached(:common_prereq_packages) do
-    %w(gdm gnome-session gnome-classic-session gnome-session-xsession
-                         xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
-                         gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
-                         gnu-free-serif-fonts glx-utils)
-  end
-
-  context 'when on arm' do
-    before do
-      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
-    end
-
-    it 'returns prereq package list with mate-terminal' do
-      expect(resource.prereq_packages).to eq(common_prereq_packages + %w(mate-terminal))
-    end
-  end
-
-  context 'when not on arm' do
-    before do
-      allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-    end
-
-    it 'returns prereq package list with gnome-terminal' do
-      expect(resource.prereq_packages).to eq(common_prereq_packages + %w(gnome-terminal))
     end
   end
 end
@@ -401,6 +400,7 @@ describe 'dcv:setup' do
       cached(:method_setup) do
         lambda {
           stub_command('which getenforce').and_return(true)
+          stub_command('grubby --info=ALL | grep -q "selinux=0"').and_return(false)
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
           allow(::File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(false)
           allow(::File).to receive(:exist?).with(dcv_tarball).and_return(false)
@@ -475,7 +475,11 @@ describe 'dcv:setup' do
           case platform
           when 'ubuntu'
             is_expected.to periodic_apt_update('')
+            is_expected.to run_bash('Instruct Netplan to use networkd')
+              .with_code(%r{cat > /etc/netplan/95-parallelcluster-force-networkd.yaml})
+              .with_code(/netplan apply/)
             is_expected.to run_bash('install pre-req').with_cwd(Chef::Config[:file_cache_path]).with_retries(10).with_retry_delay(5)
+                                                      .with_code(/export DEBIAN_FRONTEND=noninteractive/)
                                                       .with_code(/apt -y install whoopsie/)
                                                       .with_code(/apt -y install ubuntu-desktop && apt -y install mesa-utils || (dpkg --configure -a && exit 1)/)
                                                       .with_code(/apt -y purge ifupdown/)
@@ -572,7 +576,14 @@ describe 'dcv:setup' do
 
         it 'executes postinstall operations' do
           case platform
-          when 'redhat', 'centos'
+          when 'redhat', 'centos', 'rocky'
+            # Download dcv-gl dependencies for offline installation
+            is_expected.to create_directory("#{sources_dir}/dcv-gl-deps")
+            is_expected.to run_execute('download dcv-gl dependencies')
+              .with_command(%r{dnf download --destdir=#{sources_dir}/dcv-gl-deps --resolve})
+              .with_retries(3)
+              .with_retry_delay(5)
+
             # stop firewall
             is_expected.to disable_service('firewalld').with_action(%i(disable stop))
 
@@ -654,6 +665,39 @@ describe 'dcv:setup' do
         end
 
         it 'does not install dcv' do
+          is_expected.not_to create_if_missing_cookbook_file("#{scripts_dir}/pcluster_dcv_connect.sh")
+          is_expected.not_to create_group(authenticator_group)
+          is_expected.not_to create_user(authenticator_user)
+          is_expected.not_to run_execute('set default systemd runlevel to multi-user.target')
+        end
+      end
+
+      context "when install_enabled is false" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+            node_setup.call(node)
+            node.override['cluster']['dcv']['install_enabled'] = false
+          end
+          stubs_for_resource('dcv') do |res|
+            allow(res).to receive(:dcv_sha256sum).and_return(checksum)
+            allow(res).to receive(:dcv_supported?).and_return(true)
+            allow(res).to receive(:prereq_packages).and_return(alinux_prereq_packages) if platform == 'amazon'
+            allow(res).to receive(:dcv_package).and_return(dcv_package)
+            allow(res).to receive(:dcv_server).and_return(dcv_server)
+            allow(res).to receive(:xdcv).and_return(xdcv)
+            allow(res).to receive(:dcv_web_viewer).and_return(dcv_web_viewer)
+            allow(res).to receive(:dcv_url_arch).and_return(dcv_url_arch)
+            allow(res).to receive(:dcv_pkg_arch).and_return(dcv_pkg_arch)
+            allow(res).to receive(:dcv_url).and_return(dcv_url)
+            allow(res).to receive(:dcv_tarball).and_return(dcv_tarball)
+            allow(res).to receive(:dcvauth_virtualenv).and_return(dcvauth_virtualenv)
+            allow(res).to receive(:dcvauth_virtualenv_path).and_return(dcvauth_virtualenv_path)
+          end
+          method_setup.call
+          ConvergeDcv.setup(runner)
+        end
+
+        it 'does not install dcv when install_enabled is false' do
           is_expected.not_to create_if_missing_cookbook_file("#{scripts_dir}/pcluster_dcv_connect.sh")
           is_expected.not_to create_group(authenticator_group)
           is_expected.not_to create_user(authenticator_user)
@@ -805,6 +849,11 @@ describe 'dcv:configure' do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
           allow_any_instance_of(Object).to receive(:graphic_instance?).and_return(true)
           allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+          dcv_gl_deps_dir = "#{sources_dir}/dcv-gl-deps"
+          allow(::Dir).to receive(:exist?).and_call_original
+          allow(::Dir).to receive(:empty?).and_call_original
+          allow(::Dir).to receive(:exist?).with(dcv_gl_deps_dir).and_return(true)
+          allow(::Dir).to receive(:empty?).with(dcv_gl_deps_dir).and_return(false)
           ConvergeDcv.configure(runner)
         end
         cached(:node) { chef_run.node }
@@ -824,8 +873,14 @@ describe 'dcv:configure' do
             is_expected.to run_execute('apt install dcv-gl')
               .with_command("apt -y install #{sources_dir}/#{dcv_package}/#{dcv_gl}")
           else
-            is_expected.to install_package("#{sources_dir}/#{dcv_package}/#{dcv_gl}")
-              .with_source("#{sources_dir}/#{dcv_package}/#{dcv_gl}")
+            is_expected.to run_execute('install dcv-gl dependencies offline')
+              .with_command("rpm -ivh #{sources_dir}/dcv-gl-deps/*.rpm")
+              .with_retries(3)
+              .with_retry_delay(5)
+            is_expected.to run_execute('install dcv-gl offline')
+              .with_command("rpm -ivh #{sources_dir}/#{dcv_package}/#{dcv_gl}")
+              .with_retries(3)
+              .with_retry_delay(5)
           end
         end
 
@@ -891,6 +946,12 @@ describe 'dcv:configure' do
 
         it 'starts Amazon DCV server' do
           is_expected.to enable_service('dcvserver').with_action(%i(enable start))
+        end
+
+        it 'passes is_dcv_gl_supported=true to dcv.conf template' do
+          is_expected.to create_template('/etc/dcv/dcv.conf').with(
+            variables: { is_dcv_gl_supported: true }
+          )
         end
       end
 
@@ -961,6 +1022,121 @@ describe 'dcv:configure' do
             .with_user('root')
             .with_code(/systemctl set-default graphical.target/)
             .with_code(/systemctl isolate graphical.target &/)
+        end
+
+        it 'passes is_dcv_gl_supported=false to dcv.conf template' do
+          is_expected.to create_template('/etc/dcv/dcv.conf').with(
+            variables: { is_dcv_gl_supported: false }
+          )
+        end
+
+        it 'disables NVIDIA EGL platform config files to prevent Xdcv GLX crash' do
+          is_expected.to run_execute('disable nvidia egl platform on non-gpu instances')
+            .with_user('root')
+            .with_command(/find.*egl_external_platform.*nvidia.*disabled/)
+        end
+      end
+
+      context "when dcv_gpu_accel not supported and nvidia not installed" do
+        cached(:chef_run) do
+          stubs_for_resource('dcv') do |res|
+            allow(res).to receive(:dcv_supported?).and_return(true)
+            allow(res).to receive(:dcv_gpu_accel_supported?).and_return(false)
+            allow(res).to receive(:dcv_package).and_return(dcv_package)
+            allow(res).to receive(:dcv_gl).and_return(dcv_gl)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+            node.override['ec2']['instance_type'] = 'any'
+            node.override['cluster']['sources_dir'] = sources_dir
+            node.override['cluster']['node_type'] = 'HeadNode'
+            node.override['cluster']['dcv']['gl']['version'] = dcv_gl_version
+            node.override['cluster']['base_os'] = base_os
+            node.override['cluster']['dcv']['version'] = dcv_version
+            node.override['cluster']['dcv']['authenticator']['certificate'] = certificate
+            node.override['cluster']['dcv']['authenticator']['private_key'] = private_key
+            node.override['cluster']['dcv']['authenticator']['user'] = user
+            node.override['cluster']['dcv']['authenticator']['user_home'] = user_home
+          end
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          allow_any_instance_of(Object).to receive(:graphic_instance?).and_return(false)
+          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
+          ConvergeDcv.configure(runner)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'does not disable NVIDIA EGL platform config files when nvidia is not installed' do
+          is_expected.not_to run_execute('disable nvidia egl platform on non-gpu instances')
+        end
+      end
+    end
+  end
+end
+
+# Tests the DCV tarball checksum override: the hardcoded per-arch/os sha is verified
+# only on the default S3 mirror. When base_url is overridden the checksum is skipped,
+# because default_artifacts_url? returns false.
+describe 'dcv:setup checksum override behavior' do
+  cluster_artifacts_s3_url = 'https://aws_region-aws-parallelcluster.s3.AWS_REGION.AWS_DOMAIN'
+  s3_dcv_base_url = "#{cluster_artifacts_s3_url}/dependencies/dcv"
+  public_dcv_base_url = 'https://fake-public.example.DOMAIN/dcv'
+
+  for_all_oses do |platform, version|
+    cached(:sources_dir) { 'sources_dir' }
+    cached(:dcv_tarball) { 'dcv_tarball' }
+    cached(:checksum) { 'checksum' }
+    cached(:dcv_package) { 'dcv_package' }
+    cached(:dcv_server) { 'dcv_server' }
+    cached(:xdcv) { 'xdcv' }
+    cached(:dcv_web_viewer) { 'dcv_web_viewer' }
+    cached(:dcvauth_virtualenv) { 'dcvauth_virtualenv' }
+    cached(:dcvauth_virtualenv_path) { 'dcvauth_virtualenv_path' }
+    cached(:alinux_prereq_packages) { 'alinux_prereq_packages' }
+
+    [
+      ['default S3 base_url', s3_dcv_base_url, true],
+      ['overridden public base_url', public_dcv_base_url, false],
+    ].each do |scenario, base_url, checksum_expected|
+      context "on #{platform}#{version} with #{scenario}" do
+        cached(:chef_run) do
+          stub_command('which getenforce').and_return(true)
+          stub_command('grubby --info=ALL | grep -q "selinux=0"').and_return(false)
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          allow(::File).to receive(:exist?).with('/etc/dcv/dcv.conf').and_return(false)
+          allow(::File).to receive(:exist?).with(dcv_tarball).and_return(false)
+          stubs_for_resource('dcv') do |res|
+            allow(res).to receive(:dcv_sha256sum).and_return(checksum)
+            allow(res).to receive(:dcv_supported?).and_return(true)
+            allow(res).to receive(:prereq_packages).and_return(alinux_prereq_packages) if platform == 'amazon'
+            allow(res).to receive(:dcv_package).and_return(dcv_package)
+            allow(res).to receive(:dcv_server).and_return(dcv_server)
+            allow(res).to receive(:xdcv).and_return(xdcv)
+            allow(res).to receive(:dcv_web_viewer).and_return(dcv_web_viewer)
+            allow(res).to receive(:dcv_tarball).and_return(dcv_tarball)
+            allow(res).to receive(:dcvauth_virtualenv).and_return(dcvauth_virtualenv)
+            allow(res).to receive(:dcvauth_virtualenv_path).and_return(dcvauth_virtualenv_path)
+          end
+          runner = runner(platform: platform, version: version, step_into: ['dcv']) do |node|
+            node.override['cluster']['sources_dir'] = sources_dir
+            node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
+            node.override['cluster']['dcv']['base_url'] = base_url
+          end
+          ConvergeDcv.setup(runner)
+        end
+
+        it 'downloads the DCV tarball' do
+          is_expected.to create_remote_file(dcv_tarball).with(source: "#{base_url}/#{dcv_package}.tgz")
+        end
+
+        if checksum_expected
+          it 'verifies checksum on default S3 download' do
+            remote_file = chef_run.find_resource('remote_file', dcv_tarball)
+            expect(remote_file.checksum).to eq(checksum)
+          end
+        else
+          it 'skips checksum when base_url is overridden' do
+            remote_file = chef_run.find_resource('remote_file', dcv_tarball)
+            expect(remote_file.checksum).to be_nil
+          end
         end
       end
     end

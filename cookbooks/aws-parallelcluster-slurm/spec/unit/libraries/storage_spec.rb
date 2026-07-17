@@ -11,7 +11,7 @@ describe "aws-parallelcluster-slurm:libraries:storage_change_supports_live_updat
 
   shared_examples "the correct method" do |changeset, info_outcome, expected_result|
     it "returns #{expected_result}" do
-      allow(File).to receive(:read).with("/SHARED_DIR/change-set.json").and_return(JSON.dump(changeset))
+      allow(File).to receive(:read).with("/SHARED_DIR/change-set.json", any_args).and_return(JSON.dump(changeset))
       allow(SharedStorageChangeInfo).to receive(:new).and_return(mock_shared_storage_change_info)
       allow(mock_shared_storage_change_info).to receive(:support_live_updates?).and_return(info_outcome)
       result = storage_change_supports_live_update?

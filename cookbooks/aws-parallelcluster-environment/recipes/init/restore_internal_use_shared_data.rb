@@ -28,14 +28,14 @@ if node['cluster']['node_type'] == 'HeadNode'
       user 'root'
       group 'root'
       code <<-EOH
-        rsync -a --ignore-existing /tmp#{dir}/ #{dir}
-        diff_output=$(diff -r /tmp#{dir}/ #{dir})
-        if [[ $diff_output != *"Only in /tmp#{dir}"* ]]; then
-          echo "Data integrity check succeeded, removing temporary directory /tmp#{dir}"
-          rm -rf /tmp#{dir}
+        rsync -a --ignore-existing #{node['cluster']['exec_tmp_dir']}#{dir}/ #{dir}
+        diff_output=$(diff -r #{node['cluster']['exec_tmp_dir']}#{dir}/ #{dir})
+        if [[ $diff_output != *"Only in #{node['cluster']['exec_tmp_dir']}#{dir}"* ]]; then
+          echo "Data integrity check succeeded, removing temporary directory #{node['cluster']['exec_tmp_dir']}#{dir}"
+          rm -rf #{node['cluster']['exec_tmp_dir']}#{dir}
         else
-          only_in_tmp=$(echo "$diff_output" | grep "Only in /tmp#{dir}")
-          echo "Data integrity check failed comparing #{dir} and /tmp#{dir}. Differences:"
+          only_in_tmp=$(echo "$diff_output" | grep "Only in #{node['cluster']['exec_tmp_dir']}#{dir}")
+          echo "Data integrity check failed comparing #{dir} and #{node['cluster']['exec_tmp_dir']}#{dir}. Differences:"
           echo "$only_in_tmp"
           exit 1
         fi

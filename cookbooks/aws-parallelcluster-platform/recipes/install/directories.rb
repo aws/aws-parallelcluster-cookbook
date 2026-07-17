@@ -17,6 +17,12 @@
 directory node['cluster']['etc_dir']
 directory node['cluster']['base_dir']
 directory node['cluster']['sources_dir']
+directory node['cluster']['exec_tmp_dir'] do
+  owner 'root'
+  group 'root'
+  mode '0755'
+  recursive true
+end
 directory node['cluster']['scripts_dir']
 directory node['cluster']['license_dir']
 directory node['cluster']['configs_dir']

@@ -16,13 +16,10 @@
 action :configure do
   if node['cluster']['node_type'] == "HeadNode"
     node.force_override['nfs']['threads'] = node['cluster']['nfs']['threads']
+    render_server_config
 
-    override_server_template
-
-    # Explicitly restart NFS server for thread setting to take effect
-    # and enable it to start at boot
     service node['nfs']['service']['server'] do
-      action %i(restart enable)
+      action %i(enable start)
       supports restart: true
       retries 5
       retry_delay 10
@@ -31,5 +28,37 @@ action :configure do
     service node['nfs']['service']['server'] do
       action %i(stop disable)
     end unless on_docker?
+  end
+end
+
+action_class do
+  def render_server_config
+    server_service = node['nfs']['service']['server']
+
+    if conf_d_supported?
+      directory '/etc/nfs.conf.d' do
+        mode '0755'
+      end
+
+      template '/etc/nfs.conf.d/parallelcluster-nfs.conf' do
+        source 'nfs/parallelcluster-nfs.conf.erb'
+        cookbook 'aws-parallelcluster-environment'
+        mode '0644'
+        notifies :restart, "service[#{server_service}]", :delayed unless on_docker?
+      end
+    else
+      template '/etc/nfs.conf' do
+        source 'nfs/nfs.conf.erb'
+        cookbook 'aws-parallelcluster-environment'
+        mode '0644'
+        notifies :restart, "service[#{server_service}]", :delayed unless on_docker?
+      end
+    end
+  end
+
+  # /etc/nfs.conf.d/*.conf auto-include requires nfs-utils >= ~2.4.1. The only supported platform
+  # older than that is RHEL/Rocky 8 (nfs-utils 2.3.3), where we render /etc/nfs.conf directly.
+  def conf_d_supported?
+    !(platform_family?('rhel') && node['platform_version'].to_i == 8)
   end
 end

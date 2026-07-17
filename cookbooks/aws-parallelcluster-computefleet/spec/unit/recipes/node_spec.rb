@@ -9,11 +9,13 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
       cached(:virtualenv_path) { 'system_pyenv_root/versions/python_version/envs/node_virtualenv' }
 
       context "when node virtualenv not installed yet and custom node package is not set" do
+        cached(:s3_url) { 'https://REGION-aws-parallelcluster.s3.REGION.test_aws_domain' }
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
             node.override['cluster']['parallelcluster-node-version'] = node_version
+            node.override['cluster']['s3_url'] = s3_url
           end
           runner.converge(described_recipe)
         end
@@ -35,8 +37,40 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
           is_expected.to write_node_attributes('dump node attributes')
         end
 
-        it 'installs official node package' do
-          is_expected.to run_execute('install official aws-parallelcluster-node')
+        # By default (install_python_from_internet false) the node package is
+        # installed from S3 in all regions, not from PyPI.
+        it 'points custom_node_package at the S3 node package' do
+          expect(node['cluster']['custom_node_package'])
+            .to eq("#{s3_url}/parallelcluster/#{node_version}/node/aws-parallelcluster-node-#{node_version}.tgz")
+        end
+
+        it 'installs node from S3 via the custom node recipe' do
+          is_expected.to include_recipe('aws-parallelcluster-computefleet::custom_parallelcluster_node')
+        end
+
+        it 'does not install the node package from PyPI' do
+          is_expected.not_to run_execute('install aws-parallelcluster-node from Pypi')
+        end
+      end
+
+      context "when install_node_from_internet is set" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            node.override['cluster']['system_pyenv_root'] = system_pyenv_root
+            node.override['cluster']['python-version'] = python_version
+            node.override['cluster']['parallelcluster-node-version'] = node_version
+            node.override['cluster']['install_node_from_internet'] = true
+          end
+          runner.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'installs the node package from PyPI' do
+          is_expected.to run_execute('install aws-parallelcluster-node from Pypi')
+        end
+
+        it 'does not install node via the custom node recipe' do
+          is_expected.not_to include_recipe('aws-parallelcluster-computefleet::custom_parallelcluster_node')
         end
       end
 

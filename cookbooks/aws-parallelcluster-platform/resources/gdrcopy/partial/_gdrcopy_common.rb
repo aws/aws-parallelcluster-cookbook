@@ -13,11 +13,19 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 def gdrcopy_version
-  '2.4.4'
+  node['cluster']['nvidia']['gdrcopy']['version']
+end
+
+# True if gdrcopy is installed (regardless of version). Like nvidia-smi for the
+# driver, the gdrcopy_sanity binary is the one of the test commands that are
+# installed by GDRCopy and we use it as signal of a healthy install
+# and is installed to /usr/bin on all platforms.
+def gdrcopy_installed?
+  ::File.exist?('/usr/bin/gdrcopy_sanity')
 end
 
 def gdrcopy_checksum
-  '8802f7bc4a589a610118023bdcdd83c10a56dea399acf6eeaac32e8cc10739a8'
+  node['cluster']['nvidia']['gdrcopy']['sha256']
 end
 
 unified_mode true
@@ -26,6 +34,9 @@ default_action :setup
 action :setup do
   return unless gdrcopy_enabled?
   return if on_docker?
+
+  # Skip rebuild + install if already installed (e.g. DLAMI).
+  return if gdrcopy_installed?
 
   # Save gdrcopy version for InSpec tests
   node.default['cluster']['nvidia']['gdrcopy']['version'] = gdrcopy_version
@@ -51,9 +62,8 @@ action :setup do
     action :update
   end
 
-  package gdrcopy_build_dependencies do
-    retries 3
-    retry_delay 5
+  robust_package 'install gdrcopy build dependencies' do
+    packages gdrcopy_build_dependencies
   end
 
   bash 'Install NVIDIA GDRCopy' do
@@ -91,7 +101,6 @@ action :configure do
   return if on_docker?
   # Save gdrcopy version for InSpec tests
   node.default['cluster']['nvidia']['gdrcopy']['version'] = gdrcopy_version
-  node.default['cluster']['nvidia']['gdrcopy']['service'] = gdrcopy_service
   node_attributes 'dump node attributes'
 
   if graphic_instance? && is_service_installed?(gdrcopy_service)
@@ -112,5 +121,5 @@ def gdrcopy_version_extended
 end
 
 def gdrcopy_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{gdrcopy_version}.tar.gz"
+  node['cluster']['nvidia']['gdrcopy']['base_url']
 end

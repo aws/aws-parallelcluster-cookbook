@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :setup do
-  stunnel_url = "#{node['cluster']['artifacts_s3_url']}/stunnel/stunnel-#{new_resource.stunnel_version}.tar.gz"
+  stunnel_url = "#{node['cluster']['stunnel']['base_url']}/stunnel-#{new_resource.stunnel_version}.tar.gz"
   stunnel_tarball = "#{node['cluster']['sources_dir']}/stunnel-#{new_resource.stunnel_version}.tar.gz"
 
   # Save stunnel version for InSpec tests

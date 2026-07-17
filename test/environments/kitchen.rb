@@ -1,10 +1,9 @@
 # In order to share values with kitchen recipes running remotely, attribute values must be set in this file.
 # For every value to pass and for every OS, add a line to this file:
 #   '<suite_name>-<variable_name>/<platform>' => 'placeholder'
-# For instance: 'ebs_mount-vol_array/alinux2' => 'placeholder'.
+# For instance: 'ebs_mount-vol_array/alinux2023' => 'placeholder'.
 name 'kitchen'
 default_attributes 'kitchen_hooks' => {
-  'ebs_mount-vol_array/alinux2' => '',
   'ebs_mount-vol_array/alinux2023' => '',
   'ebs_mount-vol_array/rhel8' => '',
   'ebs_mount-vol_array/rhel9' => '',
@@ -12,7 +11,6 @@ default_attributes 'kitchen_hooks' => {
   'ebs_mount-vol_array/ubuntu2404' => '',
   'ebs_mount-vol_array/rocky8' => '',
   'ebs_mount-vol_array/rocky9' => '',
-  'ebs_unmount-vol_array/alinux2' => '',
   'ebs_unmount-vol_array/alinux2023' => '',
   'ebs_unmount-vol_array/rhel8' => '',
   'ebs_unmount-vol_array/rhel9' => '',
@@ -20,7 +18,6 @@ default_attributes 'kitchen_hooks' => {
   'ebs_unmount-vol_array/ubuntu2404' => '',
   'ebs_unmount-vol_array/rocky8' => '',
   'ebs_unmount-vol_array/rocky9' => '',
-  'raid_mount-raid_vol_array/alinux2' => '',
   'raid_mount-raid_vol_array/alinux2023' => '',
   'raid_mount-raid_vol_array/rhel8' => '',
   'raid_mount-raid_vol_array/rhel9' => '',
@@ -28,7 +25,6 @@ default_attributes 'kitchen_hooks' => {
   'raid_mount-raid_vol_array/ubuntu2404' => '',
   'raid_mount-raid_vol_array/rocky8' => '',
   'raid_mount-raid_vol_array/rocky9' => '',
-  'raid_unmount-raid_vol_array/alinux2' => '',
   'raid_unmount-raid_vol_array/alinux2023' => '',
   'raid_unmount-raid_vol_array/rhel8' => '',
   'raid_unmount-raid_vol_array/rhel9' => '',

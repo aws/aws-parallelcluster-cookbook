@@ -15,8 +15,6 @@ control 'tag:install_slurm_dependencies_installed' do
   def lua_devel_package
     if os.debian?
       'liblua5.3-dev'
-    elsif os_properties.alinux2?
-      'lua53-devel'
     else
       'lua-devel'
     end
@@ -24,11 +22,13 @@ control 'tag:install_slurm_dependencies_installed' do
 
   packages = []
   if os.redhat?
-    if os_properties.alinux2? || os_properties.centos7?
-      # Skipping redhat on docker since ubi-appstream repo is not aligned with the main repo
-      packages.concat %w(json-c-devel http-parser-devel perl-Switch) unless os_properties.redhat_on_docker?
-    elsif os_properties.alinux2023?
+    if os_properties.alinux2023?
       packages.concat %w(json-c-devel perl-Switch perl dbus-devel) unless os_properties.redhat_on_docker?
+      # http-parser is built from source on AL2023 (not available in OS repos).
+      # Verify the shared library is installed in the default linker path.
+      describe file('/usr/lib64/libhttp_parser.so') do
+        it { should exist }
+      end
     else
       packages.concat %w(json-c-devel http-parser-devel perl dbus-devel) unless os_properties.redhat_on_docker?
     end

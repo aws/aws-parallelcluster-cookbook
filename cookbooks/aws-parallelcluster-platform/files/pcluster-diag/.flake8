@@ -1,0 +1,24 @@
+[flake8]
+# D100 Missing docstring in public module
+# D101 Missing docstring in public class
+# D102 Missing docstring in public method
+# D103 Missing docstring in public function
+# D104 Missing docstring in public package
+per-file-ignores =
+    */__init__.py: D104
+    tests/*: D100, D101, D102, D103
+exclude =
+    .tox,
+    .git,
+    .pytest_cache,
+    build,
+    dist,
+    *.pyc,
+    *.egg-info,
+    .cache,
+    .eggs
+max-complexity = 10
+max-line-length = 120
+import-order-style = google
+application-import-names = flake8
+format = %(cyan)s%(path)s%(reset)s:%(bold)s%(yellow)s%(row)d%(reset)s:%(bold)s%(green)s%(col)d%(reset)s: %(bold)s%(red)s%(code)s%(reset)s %(text)s

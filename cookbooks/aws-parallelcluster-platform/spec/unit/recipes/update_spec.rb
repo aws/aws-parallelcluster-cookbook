@@ -32,23 +32,6 @@ describe 'aws-parallelcluster-platform::update' do
           is_expected.to setup_sudo_access('Update Sudo Access')
         end
       end
-
-      context "when scheduler is awsbatch" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            node.override['cluster']['scheduler'] = 'awsbatch'
-          end
-          runner.converge(described_recipe)
-        end
-        cached(:node) { chef_run.node }
-
-        it 'it fetches and updates cluster configs' do
-          is_expected.to run_fetch_config('Fetch and load cluster configs')
-        end
-        it 'it doesnt update sudo access' do
-          is_expected.not_to setup_sudo_access('Update Sudo Access')
-        end
-      end
     end
   end
 end

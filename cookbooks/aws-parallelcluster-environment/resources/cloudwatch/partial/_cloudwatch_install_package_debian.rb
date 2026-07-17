@@ -1,7 +1,7 @@
 action :cloudwatch_install_package do
   dpkg_package package_path do
     source package_path
-  end
+  end unless on_docker?
 end
 
 action_class do

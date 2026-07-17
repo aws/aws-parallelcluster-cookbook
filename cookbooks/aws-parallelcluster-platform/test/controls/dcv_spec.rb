@@ -11,7 +11,7 @@
 
 control 'tag:install_dcv_connect_script_installed' do
   title 'Check pcluster dcv connect script is installed'
-  only_if { !os_properties.redhat_on_docker? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? }
 
   describe file("#{node['cluster']['scripts_dir']}/pcluster_dcv_connect.sh") do
     it { should be_file }
@@ -23,7 +23,7 @@ end
 
 control 'tag:install_dcv_authenticator_user_and_group_set_up' do
   title 'Check that dcv authenticator user and group have been set up'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   describe group(node['cluster']['dcv']['authenticator']['group']) do
     it { should exist }
@@ -39,7 +39,7 @@ end
 
 control 'tag:install_dcv_disabled_lock_screen' do
   title 'Check that the lock screen has been disabled'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   describe bash('gsettings get org.gnome.desktop.lockdown disable-lock-screen') do
     its('exit_status') { should eq 0 }
@@ -54,7 +54,7 @@ end
 
 control 'tag:install_dcv_installed' do
   title 'Check dcv is installed'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   pkgs = %W(nice-dcv-server nice-xdcv nice-dcv-web-viewer)
   pkgs.each do |pkg|
@@ -66,7 +66,7 @@ end
 
 control 'tag:install_dcv_external_authenticator_virtualenv_created' do
   title 'Check dcv external authenticator virtual environment is created'
-  only_if { !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   describe file("#{node['cluster']['dcv']['authenticator']['virtualenv_path']}/bin/activate") do
     it { should be_file }
@@ -76,7 +76,7 @@ end
 
 control 'tag:install_dcv_debian_specific_setup' do
   title 'Check debian specific setup'
-  only_if { os_properties.debian_family? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
+  only_if { instance.dcv_install_enabled? && os_properties.debian_family? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
   pkgs = %W(whoopsie ubuntu-desktop mesa-utils)
   pkgs.each do |pkg|
@@ -97,9 +97,9 @@ end
 
 control 'tag:install_dcv_rhel_and_centos_specific_setup' do
   title 'Check rhel and centos specific setup'
-  only_if { !os_properties.on_docker? }
+  only_if { instance.dcv_install_enabled? && !os_properties.on_docker? }
   only_if { !os_properties.alinux2023? }
-  only_if { os_properties.centos? || os_properties.redhat? }
+  only_if { os_properties.redhat? }
 
   describe command('gnome-shell --version') do
     its('exit_status') { should eq 0 }
@@ -133,34 +133,9 @@ control 'tag:install_dcv_rhel_and_centos_specific_setup' do
   # we test in this control, we simply omit that check.
 end
 
-control 'tag:install_dcv_alinux2_specific_setup' do
-  title 'Check alinux2 specific setup'
-
-  only_if { os_properties.alinux2? }
-
-  prereq_packages = %w(gdm gnome-session gnome-classic-session gnome-session-xsession
-                       xorg-x11-server-Xorg xorg-x11-fonts-Type1 xorg-x11-drivers
-                       gnu-free-fonts-common gnu-free-mono-fonts gnu-free-sans-fonts
-                       gnu-free-serif-fonts glx-utils) + (os_properties.arm? ? %w(mate-terminal) : %w(gnome-terminal))
-
-  prereq_packages.each do |pkg|
-    describe package(pkg) do
-      it { should be_installed }
-    end
-  end
-
-  describe file('/etc/sysconfig/desktop') do
-    it { should be_file }
-    it { should be_owned_by 'root' }
-    it { should be_grouped_into 'root' }
-    it { should be_mode 0755 }
-    its('content') { should eq 'PREFERRED=/usr/bin/gnome-session' }
-  end
-end
-
 control 'tag:install_dcv_switch_runlevel_to_multiuser_target' do
   title 'Check that runlevel is switched to multi-user.target'
-  only_if { !os_properties.on_docker? }
+  only_if { instance.dcv_install_enabled? && !os_properties.on_docker? }
   only_if { !os_properties.alinux2023? }
 
   describe bash('systemctl get-default') do
@@ -193,6 +168,15 @@ control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
   describe package('nice-dcv-gl') do
     it { should be_installed }
     its('version') { should match /#{node['cluster']['dcv']['gl']['version']}/ }
+  end
+end
+
+control 'tag:install_dcv_gl_deps_downloaded' do
+  title 'Check dcv-gl dependencies are downloaded for offline installation'
+  only_if { instance.dcv_install_enabled? && !os_properties.debian_family? && !os_properties.redhat_on_docker? && os_properties.x86? }
+
+  describe directory("#{node['cluster']['sources_dir']}/dcv-gl-deps") do
+    it { should exist }
   end
 end
 
@@ -229,6 +213,12 @@ control 'tag:config_dcv_correctly_configured' do
     it { should be_owned_by 'root' }
     it { should be_grouped_into 'root' }
     it { should be_mode 0755 }
+
+    it 'should disable GL in virtual sessions when GPU acceleration is not supported' do
+      unless instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+        expect(subject.content).to match(/enable-gl-in-virtual-sessions\s*=\s*"always-off"/)
+      end
+    end
   end
 
   describe directory('/var/spool/parallelcluster/pcluster_dcv_authenticator') do
@@ -295,26 +285,34 @@ control 'tag:config_dcv_services_correctly_configured' do
       end
     end
 
-    if os_properties.alinux2?
-      describe service('gdm') do
-        it { should be_installed }
-        it { should be_enabled }
-        it { should be_running }
-      end
-    end
-
   else
     describe bash('systemctl get-default') do
       its('exit_status') { should eq 0 }
       its('stdout') { should match /multi-user.target/ }
     end
+  end
+end
 
-    if os_properties.alinux2?
-      describe service('gdm') do
-        it { should be_installed }
-        it { should be_enabled }
-        it { should_not be_running }
-      end
-    end
+control 'tag:config_dcv_xorg_running_with_x11_session_type' do
+  title 'Check that Xorg is running and GDM is using X11 session type (not Wayland)'
+  only_if do
+    !os_properties.on_docker? &&
+      instance.head_node? &&
+      instance.dcv_installed? &&
+      node['cluster']['dcv_enabled'] == "head_node" &&
+      instance.graphic? &&
+      instance.nvidia_installed? &&
+      instance.dcv_gpu_accel_supported?
+  end
+
+  describe 'Xorg process should be running' do
+    subject { command('pidof Xorg || pidof X') }
+    its('exit_status') { should eq 0 }
+    its('stdout') { should_not be_empty }
+  end
+
+  describe 'GDM should be using X11 session type, not Wayland' do
+    subject { command("loginctl show-session $(loginctl | grep gdm | awk '{print $1}') -p Type 2>/dev/null | grep -i x11") }
+    its('exit_status') { should eq 0 }
   end
 end

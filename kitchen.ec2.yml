@@ -1,6 +1,13 @@
 <%
-  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.14.0'
+  require 'json'
+  pcluster_version = ENV['KITCHEN_PCLUSTER_VERSION'] || '3.16.0'
   pcluster_prefix = "aws-parallelcluster-#{pcluster_version}"
+
+  # The ExtraChefAttributes used to build the AMI is also used for testing
+  # ('{"cluster": {...}}'); merge its cluster hash so the converge resolves the
+  # AMI-baked versions (e.g. cluster.python-version) instead of the cookbook defaults.
+  extra = ENV['EXTRA_CHEF_ATTRIBUTES'].to_s
+  extra_cluster = extra.empty? ? {} : (JSON.parse(extra)['cluster'] || {}) rescue {}
 %>
 ---
 driver:
@@ -79,35 +86,12 @@ provisioner:
     exit_status: :enabled # Opt-in to the standardized exit codes
     client_fork: false  # Forked instances don't return the real exit code
   log_level: info
+  # Per-platform attributes.cluster (e.g. base_os) deep-merge on top of this.
+  attributes:
+    cluster: <%= extra_cluster.to_json %>
 
 platforms:
-  - name: alinux2
-    driver_plugin: ec2
-    driver:
-      <% if ENV['KITCHEN_ALINUX2_AMI'] %>
-      # Use the Amazon Linux 2 AMI most similar to the base AMI used to build the ParallelCluster image
-      image_id: <%= ENV['KITCHEN_ALINUX2_AMI'] %>
-      <% else %>
-      image_search:
-        name: <% if ENV['KITCHEN_PHASE']=='install' %>amzn2-ami-kernel-5.10-hvm*<% else %><%= pcluster_prefix %>-amzn2-hvm-*<% end %>
-        architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
-      <% end %>
-      block_device_mappings:
-        - device_name: /dev/xvda
-          ebs:
-            volume_size: <% if (ENV['KITCHEN_VOLUME_SIZE'] || '') == '' %> 45 <% else %> <%= ENV['KITCHEN_VOLUME_SIZE'] %> <% end %>
-            volume_type: gp2
-            delete_on_termination: true
-      <% %w(a b c d e f g h i j k l m n o p q r s t u v w x).each_with_index do | c, i | %>
-        - device_name: /dev/xvdb<%= c %>
-          virtual_name: ephemeral<%= i %>
-      <% end %>
-    transport:
-      username: ec2-user
-    attributes:
-      cluster:
-        base_os: alinux2
-  - name: alinux-2023  # We are adding a "-" in the name to avoid having alinux2 as prefix of alinux2023 and be able to distinguish them on Inspec
+  - name: alinux2023
     driver_plugin: ec2
     driver:
       <% if ENV['KITCHEN_ALINUX2023_AMI'] %>

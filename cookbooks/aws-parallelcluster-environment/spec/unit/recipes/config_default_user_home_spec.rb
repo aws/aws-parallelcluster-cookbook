@@ -4,11 +4,13 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       context 'when local' do
+        cached(:exec_tmp_dir) { 'FAKE_EXEC_TMP_DIR' }
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['default_user_home'] = "local"
             node.override['cluster']['cluster_user_home'] = "/home/user"
             node.override['cluster']['cluster_user_local_home'] = "/local/home/user"
+            node.override['cluster']['exec_tmp_dir'] = exec_tmp_dir
           end
           runner.converge(described_recipe)
         end
@@ -31,8 +33,8 @@ describe 'aws-parallelcluster-environment::config_default_user_home' do
             code: <<-CODE
     diff_output=$(diff -r #{original_user_home} #{destination_user_local_home})
     if [[ $diff_output != *"Only in #{original_user_home}"* ]]; then
-      echo "Data integrity check succeeded, removing temporary directory /tmp#{original_user_home}"
-      rm -rf /tmp#{original_user_home}
+      echo "Data integrity check succeeded, removing temporary directory #{exec_tmp_dir}#{original_user_home}"
+      rm -rf #{exec_tmp_dir}#{original_user_home}
     else
       only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{original_user_home}")
       echo "Data integrity check failed comparing #{destination_user_local_home} and #{original_user_home}. Differences:"

@@ -36,19 +36,17 @@ if node['cluster']["directory_service"]["generate_ssh_keys_for_users"] == 'true'
   )
 end
 
-if node['cluster']['scheduler'] == 'slurm'
-  config_files += %w(
-    parallelcluster_clustermgtd_log_rotation
-    parallelcluster_clusterstatusmgtd_log_rotation
-    parallelcluster_slurm_fleet_status_manager_log_rotation
-    parallelcluster_slurm_resume_log_rotation
-    parallelcluster_slurm_suspend_log_rotation
-    parallelcluster_slurmctld_log_rotation
-    parallelcluster_slurmdbd_log_rotation
-    parallelcluster_compute_console_output_log_rotation
-    parallelcluster_clustermgtd_events_log_rotation
-    parallelcluster_slurm_resume_events_log_rotation
-  )
-end
+config_files += %w(
+  parallelcluster_clustermgtd_log_rotation
+  parallelcluster_clusterstatusmgtd_log_rotation
+  parallelcluster_slurm_fleet_status_manager_log_rotation
+  parallelcluster_slurm_resume_log_rotation
+  parallelcluster_slurm_suspend_log_rotation
+  parallelcluster_slurmctld_log_rotation
+  parallelcluster_slurmdbd_log_rotation
+  parallelcluster_compute_console_output_log_rotation
+  parallelcluster_clustermgtd_events_log_rotation
+  parallelcluster_slurm_resume_events_log_rotation
+)
 
 generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)

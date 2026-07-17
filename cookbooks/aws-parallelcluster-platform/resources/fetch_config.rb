@@ -183,6 +183,7 @@ action_class do # rubocop:disable Metrics/BlockLength
       retries 30
       retry_delay 15
       timeout 5
+      flags "-x"
     end
   end
 end

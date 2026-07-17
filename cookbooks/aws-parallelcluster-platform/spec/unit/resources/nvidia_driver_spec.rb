@@ -43,6 +43,41 @@ describe 'nvidia_driver:_nvidia_driver_version' do
   end
 end
 
+describe 'nvidia_driver:nvidia_driver_url' do
+  cached(:driver_version) { 'fake_driver_version' }
+  cached(:s3_base_url) { 'fake_s3_base_url/dependencies/nvidia_driver' }
+  cached(:public_base_url) { 'fake_public_nvidia_url/tesla' }
+
+  {
+    'default S3 base_url' => 'fake_s3_base_url/dependencies/nvidia_driver',
+    'base_url overridden to public NVIDIA Tesla URL' => 'fake_public_nvidia_url/tesla',
+  }.each do |scenario, base_url|
+    context "when driver_base_url is #{scenario}" do
+      cached(:chef_run) do
+        ChefSpec::SoloRunner.new(step_into: ['nvidia_driver']) do |node|
+          node.override['cluster']['nvidia']['driver_version'] = driver_version
+          node.override['cluster']['nvidia']['driver_base_url'] = base_url
+        end
+      end
+
+      cached(:resource) do
+        ConvergeNvidiaDriver.setup(chef_run)
+        chef_run.find_resource('nvidia_driver', 'setup')
+      end
+
+      it 'constructs URL using x86_64 for non-ARM' do
+        allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+        expect(resource.nvidia_driver_url).to eq("#{base_url}/NVIDIA-Linux-x86_64-#{driver_version}.run")
+      end
+
+      it 'constructs URL using aarch64 for ARM' do
+        allow_any_instance_of(Object).to receive(:arm_instance?).and_return(true)
+        expect(resource.nvidia_driver_url).to eq("#{base_url}/NVIDIA-Linux-aarch64-#{driver_version}.run")
+      end
+    end
+  end
+end
+
 describe 'nvidia_driver:nvidia_driver_enabled?' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
@@ -140,11 +175,27 @@ describe 'nvidia_driver:nvidia_arch' do
   end
 end
 
+describe 'nvidia_driver:kernel_modules_to_load' do
+  cached(:chef_run) do
+    ChefSpec::SoloRunner.new(step_into: ['nvidia_driver'])
+  end
+
+  cached(:resource) do
+    ConvergeNvidiaDriver.setup(chef_run)
+    chef_run.find_resource('nvidia_driver', 'setup')
+  end
+
+  it 'returns expected kernel modules' do
+    expect(resource.kernel_modules_to_load).to eq(%w(drm_client_lib))
+  end
+end
+
 describe 'nvidia_driver:setup' do
   for_all_oses do |platform, version|
     cached(:nvidia_arch) { 'nvidia_arch' }
     cached(:nvidia_kernel_module) { 'nvidia_kernel_module' }
     cached(:nvidia_driver_version) { 'nvidia_driver_version' }
+    cached(:kernel_modules_to_load) { %w(module1 module2) }
     cached(:nvidia_driver_url) { "https://us.download.nvidia.com/tesla/#{nvidia_driver_version}/NVIDIA-Linux-#{nvidia_arch}-#{nvidia_driver_version}.run" }
 
     context "on #{platform}#{version} when nvidia_driver not enabled" do
@@ -176,6 +227,7 @@ describe 'nvidia_driver:setup' do
             allow(res).to receive(:nvidia_arch).and_return(nvidia_arch)
             allow(res).to receive(:nvidia_kernel_module).and_return(kernel_module)
             allow(res).to receive(:gcc_major_version_used_by_kernel).and_return(kernel_compiler_version)
+            allow(res).to receive(:kernel_modules_to_load).and_return(kernel_modules_to_load)
           end
 
           stub_command("lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau").and_return(true)
@@ -220,33 +272,24 @@ describe 'nvidia_driver:setup' do
           )
         end
 
-        if platform == 'amazon'
-          compiler_version = version == '2023' ? 'gcc' : 'gcc10'
-          compiler_path = version == '2023' ? 'CC=/usr/bin/gcc' : 'CC=/usr/bin/gcc10-gcc'
-          if version == '2'
-            it "installs #{compiler_version}" do
-              is_expected.to install_package(compiler_version).with_retries(10).with_retry_delay(5)
-            end
-            it 'creates dkms/nvidia.conf' do
-              is_expected.to create_template('/etc/dkms/nvidia.conf').with(
-                source: 'nvidia/amazon/dkms/nvidia.conf.erb',
-                cookbook: 'aws-parallelcluster-platform',
-                owner: 'root',
-                group: 'root',
-                mode: '0644',
-                variables: { compiler_path: compiler_path }
-              )
-            end
-          else
-            # Amazon Linux 2023 is expected to install the compiler and create nvidia conf when kernel version is 6.
-            # Here we are testing with kernel version 5
-            it "does not install #{compiler_version}" do
-              is_expected.not_to install_package(compiler_version).with_retries(10).with_retry_delay(5)
-            end
+        it 'loads kernel modules in they are exposed by the kernel' do
+          kernel_modules_to_load.each do |km|
+            is_expected.to run_execute("Load kernel module if exposed by the kernel: #{km}").with(
+              command: "if modinfo #{km}; then modprobe #{km}; fi"
+            )
+          end
+        end
 
-            it 'does not create dkms/nvidia.conf' do
-              is_expected.not_to create_template('/etc/dkms/nvidia.conf')
-            end
+        if platform == 'amazon'
+          compiler_version = 'gcc'
+          # Amazon Linux 2023 is expected to install the compiler and create nvidia conf when kernel version is 6.
+          # Here we are testing with kernel version 5
+          it "does not install #{compiler_version}" do
+            is_expected.not_to install_package(compiler_version).with_retries(10).with_retry_delay(5)
+          end
+
+          it 'does not create dkms/nvidia.conf' do
+            is_expected.not_to create_template('/etc/dkms/nvidia.conf')
           end
 
           it 'installs nvidia driver' do

@@ -12,7 +12,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if on_docker? || node['cluster']['scheduler'] == 'awsbatch'
+return if on_docker?
 
 # slurm and custom schedulers will have imds access on the head node
 if %w(HeadNode LoginNode).include? node['cluster']['node_type']

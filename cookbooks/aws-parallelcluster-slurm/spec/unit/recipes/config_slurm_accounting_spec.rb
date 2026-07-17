@@ -10,6 +10,7 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
               allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
               allow_any_instance_of(Object).to receive(:dig).and_return(true)
               RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
+              mock_file_exists("/var/spool/slurm.state/clustername", true)
               node.override['cluster']['slurmdbd_service_enabled'] = enable_service
             end
             runner.converge(described_recipe)
@@ -78,10 +79,6 @@ describe 'aws-parallelcluster-slurm::config_slurm_accounting' do
               is_expected.to run_execute("wait for slurm database").with(
                 command: "#{node['cluster']['slurm']['install_dir']}/bin/sacctmgr show clusters -Pn"
               )
-            end
-
-            it "bootstraps the Slurm database idempotently" do
-              is_expected.to run_bash("bootstrap slurm database")
             end
           else
             it 'disables the slurm database daemon' do

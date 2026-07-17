@@ -12,8 +12,6 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if node['cluster']['scheduler'] == 'awsbatch'
-
 case node['cluster']['node_type']
 when 'HeadNode'
   cookbook_file "#{node['cluster']['scripts_dir']}/compute_fleet_status.py" do

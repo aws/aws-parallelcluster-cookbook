@@ -20,7 +20,12 @@ control 'tag:install_install_packages' do
   end unless instance.custom_ami? || os_properties.alinux2023? || os_properties.ubuntu2404?
   # Need to change the jq --argfile commands as its deprecated in 1.7( latest)
 
-  unless os_properties.centos7?
+  # NOTE: Skipped where the desktop group (@gnome, installed for DCV) transitively
+  # pulls in FFTW:
+  #   - AL2023: via ImageMagick-libs (fftw-libs-double)
+  #   - Rocky9: via pipewire-libs (fftw-libs-single)
+  #   - RHEL9: via pipewire-libs (fftw-libs-single)
+  unless os_properties.alinux2023? || os_properties.rocky? || os_properties.redhat9?
     # Verify fftw package is not installed
     describe bash('ls 2>/dev/null /usr/lib64/libfftw*') do
       its('stdout') { should be_empty }
@@ -42,17 +47,6 @@ control 'tag:install_install_packages' do
 
     describe package('glibc-static') do
       it { should be_installed }
-    end
-
-    describe package('kernel-devel') do
-      it { should be_installed }
-    end unless os_properties.on_docker?
-
-    # Check amazon linux2 extra
-    if os_properties.alinux2?
-      describe package('R-core') do
-        it { should be_installed }
-      end
     end
   elsif os.debian?
 

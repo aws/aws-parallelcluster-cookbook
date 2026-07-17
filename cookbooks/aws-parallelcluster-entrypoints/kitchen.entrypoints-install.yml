@@ -2,7 +2,6 @@
 verifier:
   name: inspec
   inspec_tests:
-    - cookbooks/aws-parallelcluster-awsbatch/test
     - cookbooks/aws-parallelcluster-computefleet/test
     - cookbooks/aws-parallelcluster-environment/test
     - cookbooks/aws-parallelcluster-platform/test
@@ -15,7 +14,6 @@ provisioner:
       # The following parameters are required when running install recipes on system tests
       region: us-east-1
       custom_node_package: https://github.com/aws/aws-parallelcluster-node/archive/develop.tar.gz
-      custom_awsbatchcli_package: https://github.com/aws/aws-parallelcluster/archive/develop.tar.gz
 
 suites:
   - name: entrypoints_install

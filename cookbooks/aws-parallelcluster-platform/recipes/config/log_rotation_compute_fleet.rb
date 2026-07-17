@@ -23,11 +23,9 @@ config_files = %w(
   parallelcluster_cloud_init_output_log_rotation
 )
 
-if node['cluster']['scheduler'] == 'slurm'
-  config_files += %w(
-    parallelcluster_computemgtd_log_rotation
-    parallelcluster_slurmd_log_rotation
-  )
-end
+config_files += %w(
+  parallelcluster_computemgtd_log_rotation
+  parallelcluster_slurmd_log_rotation
+)
 
 generate_logrotate_configs(config_files, logrotate_conf_dir, logrotate_template_dir)

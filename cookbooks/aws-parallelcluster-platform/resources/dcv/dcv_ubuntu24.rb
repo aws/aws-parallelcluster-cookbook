@@ -21,8 +21,8 @@ use 'partial/_ubuntu_common'
 
 def dcv_sha256sum
   if arm_instance?
-    '95e4a364a78de6febbdeb877febd998099f59fbb4c4226fe6dd27fa4b5afc809'
+    '47205acfab5d35a7f6fe18f9311295aee51189636a2a76d14e0eca39f780192d'
   else
-    '2cebf01c1fb5389d349ba22fdd8a85dec179bbf24c86f252535e8da43fb4c705'
+    'a39374d39f2d849bd13ee101970bb9eea15a8c5ec743799b7cbb7f562ece9e17'
   end
 end

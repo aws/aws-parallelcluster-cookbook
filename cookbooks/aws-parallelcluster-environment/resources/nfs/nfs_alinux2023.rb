@@ -27,12 +27,3 @@ action :setup do
   action_install_nfs4
   action_disable_start_at_boot
 end
-
-action_class do
-  def override_server_template
-    edit_resource(:template, node['nfs']['config']['server_template']) do
-      source 'nfs/default-nfs-kernel-server.conf.erb'
-      cookbook 'aws-parallelcluster-environment'
-    end
-  end
-end

@@ -26,6 +26,5 @@ end
 
 include_recipe 'aws-parallelcluster-computefleet::config'
 include_recipe 'aws-parallelcluster-slurm::config'
-include_recipe 'aws-parallelcluster-awsbatch::config'
 
 include_recipe "aws-parallelcluster-platform::log_rotation"

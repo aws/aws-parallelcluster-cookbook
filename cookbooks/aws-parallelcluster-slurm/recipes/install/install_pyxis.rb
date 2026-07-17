@@ -15,11 +15,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return unless nvidia_enabled?
+return unless nvidia_enabled? || nvidia_installed?
 return if pyxis_installed?
 
 pyxis_version = node['cluster']['pyxis']['version']
-pyxis_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/pyxis/v#{pyxis_version}.tar.gz"
+pyxis_url = "#{node['cluster']['pyxis']['base_url']}/v#{pyxis_version}.tar.gz"
 pyxis_tarball = "#{node['cluster']['sources_dir']}/pyxis-#{pyxis_version}.tar.gz"
 
 spank_examples_dir = "#{node['cluster']['examples_dir']}/spank"
@@ -37,8 +37,8 @@ bash "Install pyxis" do
   user 'root'
   code <<-PYXIS_INSTALL
     set -e
-    tar xf #{pyxis_tarball} -C /tmp
-    cd /tmp/pyxis-#{pyxis_version}
+    tar xf #{pyxis_tarball} -C #{node['cluster']['exec_tmp_dir']}
+    cd #{node['cluster']['exec_tmp_dir']}/pyxis-#{pyxis_version}
     CPPFLAGS='-I #{node['cluster']['slurm']['install_dir']}/include/' make
     CPPFLAGS='-I #{node['cluster']['slurm']['install_dir']}/include/' make install
   PYXIS_INSTALL

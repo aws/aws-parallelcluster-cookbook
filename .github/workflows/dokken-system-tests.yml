@@ -29,8 +29,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - alinux2
-          - alinux-2023
+          - alinux2023
           - ubuntu2204
           - ubuntu2404
           - rhel8
@@ -79,13 +78,28 @@ jobs:
         with:
           omnitruckUrl: omnitruck.cinc.sh
           project: cinc-workstation
+      # kitchen-dokken 2.23.0 (bundled with cinc-workstation 26.0.2) has a bug:
+      # its check_license method calls license_acceptance_id and product_version
+      # which aren't available in cinc-workstation's class hierarchy.
+      # Since we use Cinc (no license needed), replace the whole method with a no-op.
+      - name: Patch kitchen-dokken check_license for cinc compatibility
+        if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
+        run: |
+          DOKKEN_PROVISIONER=$(find /opt/cinc-workstation/embedded -path '*/kitchen/provisioner/dokken.rb' -type f)
+          echo "Patching: $DOKKEN_PROVISIONER"
+          sudo ruby -i -e '
+            content = File.read(ARGV[0])
+            content.sub!(/def check_license.*?^      end/m, "def check_license\n        # no-op: cinc does not require license acceptance\n      end")
+            File.write(ARGV[0], content)
+          ' "$DOKKEN_PROVISIONER"
+          echo "Verifying patch:"
+          grep -A2 "def check_license" "$DOKKEN_PROVISIONER"
       - name: Kitchen Test Install
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         uses: actionshub/test-kitchen@main
         with:
           os: ${{ matrix.os }}
         env:
-          CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
           KITCHEN_LOCAL_YAML: cookbooks/aws-parallelcluster-entrypoints/kitchen.entrypoints-install.yml
           KITCHEN_GLOBAL_YAML: kitchen.global.yml
@@ -95,7 +109,7 @@ jobs:
       - name: Set Image Id
         if: steps.changed-files-excluding-tests.outputs.any_changed == 'true' && needs.check-labels.outputs.skip_system_tests != 'true'
         run: |
-          PLATFORM=$(echo "${{ matrix.os }}"  | tr a-z A-Z)
+          PLATFORM=$(echo "${{ matrix.os }}" | tr a-z A-Z)
           echo "PLATFORM=${PLATFORM}"
           echo "KITCHEN_${PLATFORM}_IMAGE=pcluster-install/entrypoints-install-${{ matrix.os }}"
           echo "KITCHEN_${PLATFORM}_IMAGE=pcluster-install/entrypoints-install-${{ matrix.os }}" >> $GITHUB_ENV
@@ -106,7 +120,6 @@ jobs:
           os: ${{ matrix.os }}
           suite: slurm-config-head-node-x86-64-docker
         env:
-          CHEF_LICENSE: accept-no-persist
           KITCHEN_YAML: kitchen.docker.yml
           KITCHEN_LOCAL_YAML: kitchen.validate-config.yml
           KITCHEN_GLOBAL_YAML: kitchen.global.yml

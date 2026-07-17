@@ -39,5 +39,7 @@ def arch_suffix
 end
 
 def fabric_manager_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_fabric/#{platform}/#{fabric_manager_package}_#{fabric_manager_version}-1_#{arch_suffix}.deb"
+  base_url = node['cluster']['nvidia']['fabricmanager']['base_url']
+  nvidia_package_url(base_url, platform,
+    "#{fabric_manager_package}_#{fabric_manager_version}-1_#{arch_suffix}.deb")
 end

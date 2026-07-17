@@ -8,13 +8,12 @@ if [ "$(uname)" == "Darwin" ]; then
   PATH="/usr/local/opt/gnu-sed/libexec/gnubin:$PATH"
 fi
 
-if [ -z "$1" ] || [ -z "$2" ]; then
-    echo "New version not specified. Usage: bump-version.sh NEW_PCLUSTER_VERSION NEW_AWSBATCH_CLI_VERSION"
+if [ -z "$1" ]; then
+    echo "New version not specified. Usage: bump-version.sh NEW_PCLUSTER_VERSION"
     exit 1
 fi
 
 NEW_PCLUSTER_VERSION=$1
-NEW_AWSBATCH_CLI_VERSION=$2
 VERSIONS_FILE="cookbooks/aws-parallelcluster-shared/attributes/versions.rb"
 
 CURRENT_PCLUSTER_VERSION=$(sed -ne "s/default\['cluster'\]\['parallelcluster-version'\] = '\(.*\)'/\1/p" ${VERSIONS_FILE})
@@ -29,7 +28,7 @@ sed -i "s/version '${CURRENT_PCLUSTER_VERSION_SHORT}'/version '${NEW_PCLUSTER_VE
 
 sed -i "s/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${CURRENT_PCLUSTER_VERSION}'/ENV\['KITCHEN_PCLUSTER_VERSION'\] || '${NEW_PCLUSTER_VERSION}'/g" kitchen.ec2.yml
 
-COOKBOOKS=("aws-parallelcluster-awsbatch" "aws-parallelcluster-entrypoints" "aws-parallelcluster-slurm" "aws-parallelcluster-platform" "aws-parallelcluster-environment" "aws-parallelcluster-computefleet" "aws-parallelcluster-shared" "aws-parallelcluster-slurm" "aws-parallelcluster-tests")
+COOKBOOKS=("aws-parallelcluster-entrypoints" "aws-parallelcluster-slurm" "aws-parallelcluster-platform" "aws-parallelcluster-environment" "aws-parallelcluster-computefleet" "aws-parallelcluster-shared" "aws-parallelcluster-tests")
 for cookbook in "${COOKBOOKS[@]}"; do
   METADATA_FILES+=("cookbooks/${cookbook}/metadata.rb")
 done
@@ -43,7 +42,3 @@ for COOKBOOK in "${COOKBOOKS[@]}"; do
   # Update dependencies version in specific cookbook metadata
   sed -i "s/depends '${COOKBOOK}', '~> ${CURRENT_PCLUSTER_VERSION_SHORT}'/depends '${COOKBOOK}', '~> ${NEW_PCLUSTER_VERSION_SHORT}'/g" "${METADATA_FILES[@]}"
 done
-
-# Update AWS Batch CLI version
-CURRENT_AWSBATCH_CLI_VERSION=$(sed -ne "s/^default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '\(.*\)'/\1/p" ${VERSIONS_FILE})
-sed -i "s/default\['cluster'\]\['parallelcluster-awsbatch-cli-version'\] = '${CURRENT_AWSBATCH_CLI_VERSION}'/default['cluster']['parallelcluster-awsbatch-cli-version'] = '${NEW_AWSBATCH_CLI_VERSION}'/g" ${VERSIONS_FILE}

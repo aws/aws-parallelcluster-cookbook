@@ -1,0 +1,9 @@
+[Unit]
+Description=Check for recent file modifications to the update_trigger file and trigger update when the config version id has changed.
+
+[Service]
+Type=oneshot
+TimeoutStartSec=<%= node['cluster']['compute_node_bootstrap_timeout'] %>
+ExecStart=<%= node['cluster']['scripts_dir'] %>/pcluster-check-update.sh
+StandardOutput=append:<%= node['cluster']['log_base_dir'] %>/pcluster-check-update.log
+StandardError=append:<%= node['cluster']['log_base_dir'] %>/pcluster-check-update.log

@@ -18,6 +18,8 @@ require 'chef/mixin/shell_out'
 require 'net/http'
 require 'timeout'
 
+SCONTROL_RECONFIGURE_RESOURCE_NAME = 'reload config for running nodes'
+
 # Verify if Scheduling section of cluster configuration and compute node bootstrap_timeout have been updated
 def are_queues_updated?
   require 'yaml'

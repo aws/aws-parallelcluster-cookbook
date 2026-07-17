@@ -1,0 +1,47 @@
+#!/bin/bash
+set -ex
+
+# This script is invoked by the pcluster-check-update systemd service when the cluster
+# config version on the head node differs from the last applied version on this node.
+# It runs on each ComputeFleet and LoginNode instance to monitor the shared location for
+# the latest dna.json and extra.json files and run ParallelCluster cookbook recipes.
+#
+# Usage:   ./cluster-update-action.sh
+
+function run_cookbook_recipes() {
+    LATEST_DNA_LOC=<%= @monitor_shared_dir %>
+    LATEST_DNA_FILE=$LATEST_DNA_LOC/<%= @launch_template_resource_id %>-dna.json
+    LATEST_EXTRA_FILE=$LATEST_DNA_LOC/extra.json
+
+    GET_DNA_FILE=true
+    while $GET_DNA_FILE; do
+        if [[ -f $LATEST_DNA_FILE ]]; then
+          GET_DNA_FILE=false
+          cp $LATEST_DNA_FILE <%= @exec_tmp_dir %>/dna.json
+          chown root:root <%= @exec_tmp_dir %>/dna.json
+          chmod 000644 <%= @exec_tmp_dir %>/dna.json
+          cp $LATEST_EXTRA_FILE <%= @exec_tmp_dir %>/extra.json
+          chown root:root <%= @exec_tmp_dir %>/extra.json
+          chmod 000644 <%= @exec_tmp_dir %>/extra.json
+          mkdir -p /etc/chef/ohai/hints
+          touch /etc/chef/ohai/hints/ec2.json
+          jq -s ".[0] * .[1]" <%= @exec_tmp_dir %>/dna.json <%= @exec_tmp_dir %>/extra.json > /etc/chef/dna.json || ( echo "jq not installed"; cp <%= @exec_tmp_dir %>/dna.json /etc/chef/dna.json )
+          cd /etc/chef
+          cinc-client --local-mode --config /etc/chef/client.rb --log_level info --logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna.json --override-runlist aws-parallelcluster-entrypoints::update && /opt/parallelcluster/scripts/fetch_and_run -postupdate
+
+        fi
+
+        sleep 60
+    done
+}
+
+
+main() {
+  PATH=/usr/local/bin:/bin:/usr/bin:/opt/aws/bin;
+  . /etc/parallelcluster/pcluster_cookbook_environment.sh;
+  echo "We monitor <%= @monitor_shared_dir %> to check for <%= @launch_template_resource_id %>-dna.json has been added and run ParallelCluster cookbook recipes."
+  run_cookbook_recipes
+}
+
+
+main "$@"

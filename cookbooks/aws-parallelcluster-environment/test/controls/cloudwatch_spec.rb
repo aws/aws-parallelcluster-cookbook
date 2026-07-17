@@ -36,7 +36,7 @@ control 'tag:install_cloudwatch_packaged_installed' do
   title "Check if cloudwatch package is installed"
   describe package('amazon-cloudwatch-agent') do
     it { should be_installed }
-  end
+  end unless os_properties.ubuntu_on_docker?
 end
 
 control 'tag:config_cloudwatch_configured' do

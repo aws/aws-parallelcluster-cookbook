@@ -20,6 +20,15 @@ describe 'aws-parallelcluster-platform::directories' do
         is_expected.to create_directory(node['cluster']['sources_dir'])
       end
 
+      it 'creates the executable temp directory with root-owned 0755 permissions' do
+        is_expected.to create_directory(node['cluster']['exec_tmp_dir']).with(
+          owner: 'root',
+          group: 'root',
+          mode: '0755',
+          recursive: true
+        )
+      end
+
       it 'creates scripts directory' do
         is_expected.to create_directory(node['cluster']['scripts_dir'])
       end

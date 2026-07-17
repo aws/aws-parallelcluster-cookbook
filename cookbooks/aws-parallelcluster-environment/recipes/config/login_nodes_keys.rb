@@ -15,7 +15,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-return if on_docker? || node['cluster']['scheduler'] == 'awsbatch'
+return if on_docker?
 
 keys_dir = "#{node['cluster']['shared_dir_login_nodes']}"
 script_dir = "#{keys_dir}/scripts"

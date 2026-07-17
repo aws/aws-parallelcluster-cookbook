@@ -33,7 +33,34 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-cfnbootstrap_version = '2.0-33'
+dependency_package_name = "pypi-cfn-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+dependency_folder_name = dependency_package_name
+
+# Install dependencies from S3 pre-built packages (production mode)
+# When install_python_from_internet is true, dependencies are installed from PyPI instead
+unless node['cluster']['install_python_from_internet']
+  remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
+    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
+    mode '0644'
+    retries 3
+    retry_delay 5
+    action :create_if_missing
+  end
+
+  bash 'pip install cfn dependencies from S3' do
+    user 'root'
+    group 'root'
+    cwd "#{node['cluster']['base_dir']}"
+    code <<-REQ
+      set -e
+      tar xzf cfn-dependencies.tgz
+      cd #{dependency_folder_name}
+      #{virtualenv_path}/bin/pip install * -f ./ --no-index
+    REQ
+  end
+end
+
+cfnbootstrap_version = node['cluster']['cfn_bootstrap']['version']
 cfnbootstrap_package = "aws-cfn-bootstrap-py3-#{cfnbootstrap_version}.tar.gz"
 
 region = node['cluster']['region']
@@ -45,17 +72,21 @@ elsif region.start_with?("us-iso")
   bucket = "s3.#{aws_region}.#{aws_domain}"
 end
 
-remote_file "/tmp/#{cfnbootstrap_package}" do
+remote_file "#{node['cluster']['exec_tmp_dir']}/#{cfnbootstrap_package}" do
   source "https://#{bucket}/cloudformation-examples/#{cfnbootstrap_package}"
   retries 3
   retry_delay 5
 end
 
+# Use --no-build-isolation when installing from S3 pre-built deps, omit when installing from internet
+pip_install_flags = node['cluster']['install_python_from_internet'] ? "" : "--no-build-isolation"
+command = "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package} #{pip_install_flags}".strip
+
 bash "Install CloudFormation helpers from #{cfnbootstrap_package}" do
   user 'root'
   group 'root'
-  cwd '/tmp'
-  code "#{virtualenv_path}/bin/pip install #{cfnbootstrap_package}"
+  cwd node['cluster']['exec_tmp_dir']
+  code command
   creates "#{virtualenv_path}/bin/cfn-hup"
 end
 

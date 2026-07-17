@@ -62,8 +62,6 @@ tox -e py39-nocov
 Or go to any of the cookbooks directories and run ChefSpec
 
 ```bash
-cd cookbooks/aws-parallelcluster-awsbatch
-chef exec rspec
 cd cookbooks/aws-parallelcluster-computefleet
 chef exec rspec
 cd cookbooks/aws-parallelcluster-environment

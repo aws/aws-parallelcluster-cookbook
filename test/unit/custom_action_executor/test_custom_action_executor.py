@@ -41,6 +41,16 @@ from mock.mock import AsyncMock
 # pylint: disable=protected-access
 
 
+@pytest.fixture(autouse=True)
+def exec_tmp_dir(tmp_path, mocker):
+    # In production this directory is created during build-image and baked into the AMI, so the
+    # executor assumes it already exists. Create a writable stand-in here and point the executor at it.
+    exec_dir = tmp_path / "pcluster-exec-tmp"
+    exec_dir.mkdir()
+    mocker.patch("custom_action_executor.PCLUSTER_EXEC_TMP_DIR", str(exec_dir))
+    return exec_dir
+
+
 @pytest.fixture
 def script_runner():
     return ScriptRunner("OnMockTestEvent", "OnMockTestRegionName")

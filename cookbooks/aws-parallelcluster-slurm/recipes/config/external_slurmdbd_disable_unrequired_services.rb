@@ -25,8 +25,6 @@
 serviceList = %w()
 if platform_family?('debian')
   serviceList = %w(apache2 avahi-daemon cups.service ModemManager wpa_supplicant stunnel whoopsie)
-elsif platform?('amazon') && node['platform_version'] == "2"
-  serviceList = %w(cups.service)
 elsif platform?('rocky') && node['platform_version'].to_i == 8
   serviceList = %w(avahi-daemon cups.service ModemManager mlocate-updatedb)
 end

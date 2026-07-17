@@ -24,6 +24,6 @@ end
 
 include_recipe "aws-parallelcluster-platform::finalize"
 
-include_recipe 'aws-parallelcluster-slurm::finalize' if node['cluster']['scheduler'] == 'slurm'
+include_recipe 'aws-parallelcluster-slurm::finalize'
 
 include_recipe "aws-parallelcluster-environment::finalize"

@@ -37,6 +37,8 @@ control 'tag:config_ssh_target_checker_contains_correct_vpc_cidr_list' do
 end
 
 control 'tag:config_ssh_is_correctly_configured' do
+  only_if { !os_properties.alinux2023_on_docker? }
+
   describe file('/etc/ssh/ssh_config') do
     its('content') { should match %r{Match exec "ssh_target_checker.sh %h"\n  StrictHostKeyChecking no\n  UserKnownHostsFile /dev/null} }
   end

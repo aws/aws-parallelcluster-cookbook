@@ -3,20 +3,6 @@ require 'spec_helper'
 describe 'aws-parallelcluster-environment::imds' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      context "when awsbatch scheduler" do
-        cached(:chef_run) do
-          runner = runner(platform: platform, version: version) do |node|
-            node.override['cluster']['scheduler'] = 'awsbatch'
-          end
-          runner.converge(described_recipe)
-        end
-        cached(:node) { chef_run.node }
-
-        it 'does not create imds directory' do
-          is_expected.to_not create_directory("#{node['cluster']['scripts_dir']}/imds")
-        end
-      end
-
       context "when slurm scheduler and head node" do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|

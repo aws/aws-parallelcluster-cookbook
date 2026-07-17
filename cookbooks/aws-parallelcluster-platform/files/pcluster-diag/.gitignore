@@ -1,0 +1,19 @@
+# Local pyenv/pyenv-virtualenv auto-activation file (developer-specific)
+.python-version
+
+# tox / build / test artifacts
+.tox/
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+report.html
+coverage.xml
+.coverage
+.coverage.*
+
+# Diagnostics report output produced by running the tool
+pcluster-diag-output/

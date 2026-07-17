@@ -19,7 +19,6 @@ unified_mode true
 default_action :setup
 
 use 'partial/_install_packages_common.rb'
-use 'partial/_install_packages_debian.rb'
 
 def default_packages
   # environment-modules required by EFA, Intel MPI and ARM PL

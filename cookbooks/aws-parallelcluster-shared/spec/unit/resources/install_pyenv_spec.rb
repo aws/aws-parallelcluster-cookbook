@@ -57,6 +57,43 @@ describe 'install_pyenv:run' do
         end
       end
 
+      context "when install_python_from_internet is enabled" do
+        cached(:python_version) { 'overridden_python_version' }
+        cached(:system_pyenv_root) { 'overridden_pyenv_root' }
+
+        def converge_with_region(platform, version, region, system_pyenv_root, python_version)
+          allow_any_instance_of(Object).to receive(:aws_region).and_return(region)
+          test_runner = runner(platform: platform, version: version, step_into: ['install_pyenv']) do |node|
+            node.override['cluster']['system_pyenv_root'] = system_pyenv_root
+            node.override['cluster']['python-version'] = python_version
+            node.override['cluster']['install_python_from_internet'] = true
+            node.override['cluster']['artifacts_s3_url'] = "https://bucket.s3.#{aws_domain}/archives"
+          end
+          ConvergeInstallPyenv.run(test_runner)
+          test_runner
+        end
+
+        context "in a non-isolated region" do
+          cached(:chef_run) { converge_with_region(platform, version, "us-east-1", system_pyenv_root, python_version) }
+
+          it 'downloads python tarball from python.org instead of S3' do
+            is_expected.to create_if_missing_remote_file("#{system_pyenv_root}/Python-#{python_version}.tgz").with(
+              source: "https://www.python.org/ftp/python/#{python_version}/Python-#{python_version}.tgz"
+            )
+          end
+        end
+
+        context "in an isolated region (us-iso)" do
+          cached(:chef_run) { converge_with_region(platform, version, "us-iso-east-1", system_pyenv_root, python_version) }
+
+          it 'still uses S3 (python.org is not reachable from isolated regions)' do
+            is_expected.to create_if_missing_remote_file("#{system_pyenv_root}/Python-#{python_version}.tgz").with(
+              source: "#{chef_run.node['cluster']['artifacts_s3_url']}/dependencies/python/Python-#{python_version}.tgz"
+            )
+          end
+        end
+      end
+
       context "when python version and pyenv root are set" do
         cached(:python_version) { 'python_version_parameter' }
         cached(:system_pyenv_root) { 'pyenv_root_parameter' }

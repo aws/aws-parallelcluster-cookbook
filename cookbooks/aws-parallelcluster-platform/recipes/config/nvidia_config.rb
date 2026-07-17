@@ -24,3 +24,7 @@ gdrcopy 'Configure gdrcopy' do
 end
 
 include_recipe "aws-parallelcluster-platform::nvidia_uvm"
+
+nvidia_imex 'Configure nvidia-imex' do
+  action :configure
+end

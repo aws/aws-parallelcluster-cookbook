@@ -20,6 +20,16 @@ execute 'stop clustermgtd' do
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
+# Write the new config version to shared storage to signal compute and login nodes to update.
+# Both fleets share the same shared_dir; the systemd timer on each node compares the trigger
+# against a local checkpoint and runs the update recipes when they differ.
+file node['cluster']['update']['trigger_file'] do
+  content node['cluster']['cluster_config_version']
+  owner 'root'
+  group 'root'
+  mode '0644'
+end
+
 ruby_block "update_shared_storages" do
   block do
     run_context.include_recipe 'aws-parallelcluster-environment::update_shared_storages'
@@ -151,6 +161,10 @@ ruby_block "replace slurm queue nodes" do
   end
 end
 
+block_topology 'Update or Cleanup Slurm Topology' do
+  action :update
+end
+
 execute "generate_pcluster_slurm_configs" do
   command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py" \
           " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/" \
@@ -203,8 +217,8 @@ ruby_block "Update Slurm Accounting" do
       run_context.include_recipe "aws-parallelcluster-slurm::config_slurm_accounting"
     end
   end
-  only_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
-end unless on_docker?
+  only_if { !on_docker? && ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
+end
 
 # Cover the following two scenarios:
 # - a cluster without login nodes is updated to have login nodes;
@@ -258,11 +272,18 @@ execute "check slurmctld status" do
   retry_delay 2
 end
 
-execute 'reload config for running nodes' do
+ruby_block "Bootstrap Slurm Accounting Users" do
+  block do
+    run_context.include_recipe "aws-parallelcluster-slurm::bootstrap_slurm_accounting"
+  end
+  only_if { !on_docker? && ::File.exist?(node['cluster']['previous_cluster_config_path']) && is_slurm_database_updated? }
+end
+
+execute SCONTROL_RECONFIGURE_RESOURCE_NAME do
   command "#{node['cluster']['slurm']['install_dir']}/bin/scontrol reconfigure"
   retries 3
   retry_delay 5
-  timeout 300
+  timeout node['cluster']['slurm']['reconfigure_timeout']
   not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
@@ -272,7 +293,6 @@ wait_cluster_ready
 
 execute 'start clustermgtd' do
   command "#{cookbook_virtualenv_path}/bin/supervisorctl start clustermgtd"
-  not_if { ::File.exist?(node['cluster']['previous_cluster_config_path']) && !are_queues_updated? && !are_bulk_custom_slurm_settings_updated? }
 end
 
 # The updated cfnconfig will be used by post update custom scripts
@@ -280,8 +300,4 @@ template "#{node['cluster']['etc_dir']}/cfnconfig" do
   source 'init/cfnconfig.erb'
   cookbook 'aws-parallelcluster-environment'
   mode '0644'
-end
-
-fetch_dna_files 'Cleanup' do
-  action :cleanup
 end

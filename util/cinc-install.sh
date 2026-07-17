@@ -11,7 +11,7 @@
 # - improvement in the dpkg installation to avoid conflicts with other running installations.
 #
 # When updating this modified file, please remember to bump the version and reference it in the CI/CD.
-# - cinc-install.sh v1.3.0
+# - cinc-install.sh v1.4.0
 #
 # WARNING: REQUIRES /bin/bash
 #
@@ -469,7 +469,13 @@ elif test -f "/etc/redhat-release"; then
   platform=`sed 's/^\(.\+\) release.*/\1/' /etc/redhat-release | tr '[A-Z]' '[a-z]'`
   platform_version=`sed 's/^.\+ release \([.0-9]\+\).*/\1/' /etc/redhat-release`
 
-  if test "$platform" = "xenserver"; then
+  if test "$platform" = "rocky linux"; then
+  	source /etc/os-release
+ 	os="${REDHAT_SUPPORT_PRODUCT}"
+  	platform_version="${ROCKY_SUPPORT_PRODUCT_VERSION}"
+        platform=$ID
+
+  elif test "$platform" = "xenserver"; then
     # Current XenServer 6.2 is based on CentOS 5, platform is not reset to "el" server should handle response
     platform="xenserver"
   else
@@ -571,6 +577,12 @@ case $platform in
   # FIXME: should remove this case statement completely
   "el")
     # FIXME:  "el" is deprecated, should use "redhat"
+    platform_version=$major_version
+    ;;
+  # Warning: the official script from CINC doesn't use major version for rocky,
+  # which is wrong according to the directory structure: https://downloads.cinc.sh/files/stable/cinc/18.7.10/rocky/
+  # The behavior should be the same as "el" above. Therefore, the following rocky section is manually added.
+  "rocky")
     platform_version=$major_version
     ;;
   "debian")

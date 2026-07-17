@@ -87,7 +87,7 @@ control 'tag:install_slurm_licence_configured' do
     its('group') { should eq 'root' }
   end
 
-  describe file("#{slurm_license_path}/README.rst") do
+  describe file("#{slurm_license_path}/README.md") do
     it { should exist }
     its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }

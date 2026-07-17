@@ -1,0 +1,8 @@
+# slurm_parallelcluster_topology.conf is managed by the pcluster processes.
+# Do not modify.
+# Please use CustomSlurmSettings in the ParallelCluster configuration file to add user-specific slurm configuration
+# options
+# TOPOLOGY Plugin
+<% unless node['cluster']['p6egb200_block_sizes'].nil? -%>
+TopologyPlugin=topology/block
+<% end -%>

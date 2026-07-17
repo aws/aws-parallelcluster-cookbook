@@ -19,4 +19,4 @@ if node["cluster"]["node_type"] == "HeadNode"
   end
 end
 
-include_recipe "aws-parallelcluster-slurm::enable_chef_error_handler" if node["cluster"]["scheduler"] == "slurm"
+include_recipe "aws-parallelcluster-slurm::enable_chef_error_handler"

@@ -150,7 +150,8 @@ describe 'fetch_config:run' do
           code: "[[ \"$(cat #{config_version_file})\" == \"cluster_config_version\" ]] || exit 1",
           retries: 30,
           retry_delay: 15,
-          timeout: 5
+          timeout: 5,
+          flags: "-x"
         )
       end
 

@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 action :install_package do
-  return unless nvidia_enabled?
+  return unless nvidia_enabled? || nvidia_installed?
 
   bash "Install enroot" do
     user 'root'
@@ -37,11 +37,13 @@ action :install_package do
 end
 
 def enroot_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot_#{package_version}-1_#{arch_suffix}.deb"
+  "#{node['cluster']['enroot']['base_url']}/enroot_#{package_version}-1_#{arch_suffix}.deb"
 end
 
 def enroot_caps_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot/enroot-caps_#{package_version}-1_#{arch_suffix}.deb"
+  base_url = node['cluster']['enroot']['caps_base_url']
+  caps_name = default_artifacts_url?(base_url) ? 'enroot-caps' : 'enroot+caps'
+  "#{base_url}/#{caps_name}_#{package_version}-1_#{arch_suffix}.deb"
 end
 
 def arch_suffix

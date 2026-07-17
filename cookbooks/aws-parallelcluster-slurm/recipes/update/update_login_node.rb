@@ -24,4 +24,4 @@ ruby_block "update_shared_storages" do
   only_if { are_mount_or_unmount_required? && storage_change_supports_live_update? }
 end
 
-save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:DEPLOYED])
+save_instance_config_version_to_dynamodb(DDB_CONFIG_STATUS[:DEPLOYED_UPDATE])

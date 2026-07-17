@@ -46,8 +46,31 @@ control 'tag:config_slurm_correctly_installed_on_compute_node' do
   end
 
   describe 'check cgroup memory resource controller is enabled' do
-    subject { bash("grep memory /proc/cgroups | awk '{print $4}'") }
-    its('exit_status') { should eq 0 }
-    its('stdout.strip') { should cmp 1 }
+    # Check if we're using cgroups v2
+    cgroup_v2 = bash('test -f /sys/fs/cgroup/cgroup.controllers').exit_status == 0
+
+    if cgroup_v2
+      # For cgroups v2, check if memory controller is in available controllers
+      describe bash('cat /sys/fs/cgroup/cgroup.controllers') do
+        its('stdout') { should include 'memory' }
+        its('exit_status') { should eq 0 }
+      end
+    else
+      # Original check for cgroups v1
+      describe bash("grep memory /proc/cgroups | awk '{print $4}'") do
+        its('stdout.strip') { should cmp '1' }
+        its('exit_status') { should eq 0 }
+      end
+    end
+  end
+end
+
+control 'tag:config_slurm_expedited_requeue_enabled' do
+  title 'Check that expedited requeue is enabled by default in slurm.conf'
+
+  only_if { instance.head_node? && node['cluster']['scheduler'] == 'slurm' && !os_properties.on_docker? }
+
+  describe file("#{node['cluster']['slurm']['install_dir']}/etc/slurm.conf") do
+    its('content') { should match /SlurmctldParameters=.*enable_expedited_requeue/ }
   end
 end

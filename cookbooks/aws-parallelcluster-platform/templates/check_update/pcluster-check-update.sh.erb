@@ -1,0 +1,65 @@
+#!/bin/bash
+
+
+# This script checks if a cluster update is needed by comparing the shared update file
+# with the local checkpoint. If they differ, it triggers the update action.
+
+set -e
+
+SHARED_TRIGGER_FILE="<%= node['cluster']['update']['trigger_file'] %>"
+LOCAL_CHECKPOINT="<%= node['cluster']['update']['checkpoint_file'] %>"
+UPDATE_SCRIPT="<%= node['cluster']['scripts_dir'] %>/cluster-update-action.sh"
+FS_TIMEOUT=20
+
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S,%3N') - $1"
+}
+
+log "Starting pcluster-check-update"
+
+# Check if shared file exists
+if ! timeout $FS_TIMEOUT test -f "$SHARED_TRIGGER_FILE"; then
+    log "Shared update file does not exist: $SHARED_TRIGGER_FILE"
+    log "Completed pcluster-check-update - no action needed"
+    exit 0
+fi
+log "Shared update file exists: $SHARED_TRIGGER_FILE"
+
+# Read current cluster config version from shared file
+CURRENT_UPDATE=$(timeout $FS_TIMEOUT cat "$SHARED_TRIGGER_FILE" 2>/dev/null) || {
+    log "[ERROR] Failed to read shared update file: $SHARED_TRIGGER_FILE"
+    log "File info: $(ls -l "$SHARED_TRIGGER_FILE" 2>&1)"
+    log "Completed pcluster-check-update - no action needed"
+    exit 1
+}
+log "Trigger file content: '$CURRENT_UPDATE'"
+
+# Read last applied cluster config version from local checkpoint
+LAST_APPLIED=$(timeout $FS_TIMEOUT cat "$LOCAL_CHECKPOINT" 2>/dev/null || echo "")
+log "Checkpoint file content: '$LAST_APPLIED'"
+
+# Check if update is needed
+if [ "$CURRENT_UPDATE" != "$LAST_APPLIED" ]; then
+    log "Update needed: trigger='$CURRENT_UPDATE' differs from checkpoint='$LAST_APPLIED'"
+    
+    # Write checkpoint before running update
+    log "Writing checkpoint file: $LOCAL_CHECKPOINT"
+    timeout $FS_TIMEOUT sh -c "echo \"$CURRENT_UPDATE\" > \"$LOCAL_CHECKPOINT\"" || {
+        log "[ERROR] Failed to write checkpoint file"
+        exit 1
+    }
+    
+    # Run the update action; on failure clear checkpoint so the next timer tick retries
+    log "Executing update script: $UPDATE_SCRIPT"
+    if "$UPDATE_SCRIPT"; then
+        log "Update script completed successfully"
+    else
+        log "[ERROR] Update script failed. Clearing checkpoint to allow retry."
+        timeout $FS_TIMEOUT sh -c "echo '' > \"$LOCAL_CHECKPOINT\"" || true
+        exit 1
+    fi
+else
+    log "No update needed: trigger and checkpoint match ('$CURRENT_UPDATE')"
+fi
+
+log "Completed pcluster-check-update"

@@ -51,57 +51,27 @@ action :configure do
     )
   end
 
-  action_extra_configuration
-
   template '/etc/cfn/hooks.d/pcluster-update.conf' do
     source "cfn_hup_configuration/cfn-hook-update.conf.erb"
     owner 'root'
     group 'root'
     mode '0400'
     variables(
-      # Common variable
       launch_template_resource_id: node['cluster']['launch_template_id'],
-      # HeadNode and LoginNode specific variables
       stack_id: node['cluster']['stack_arn'],
       region: node['cluster']['region'],
       cloudformation_url: cloudformation_url,
-      cfn_init_role: instance_role_name,
-      # ComputeFleet specific variables
-      update_hook_script_dir: node['cluster']['scripts_dir'],
-      node_bootstrap_timeout: node['cluster']['compute_node_bootstrap_timeout'] || node['cluster']['Timeout']
+      cfn_init_role: instance_role_name
     )
   end
-end
 
-action :extra_configuration do
-  case node['cluster']['node_type']
-  when 'HeadNode'
-    cookbook_file "#{node['cluster']['scripts_dir']}/share_compute_fleet_dna.py" do
-      source 'cfn_hup_configuration/share_compute_fleet_dna.py'
-      owner 'root'
-      group 'root'
-      mode '0700'
-      action :create_if_missing
-    end
-
-    directory "#{node['cluster']['shared_dir']}/dna"
-
-  when 'ComputeFleet'
-    template "#{node['cluster']['scripts_dir']}/cfn-hup-update-action.sh" do
-      source "cfn_hup_configuration/#{node['cluster']['node_type']}/cfn-hup-update-action.sh.erb"
-      owner 'root'
-      group 'root'
-      mode '0700'
-      variables(
-        monitor_shared_dir: monitor_shared_dir,
-        launch_template_resource_id: node['cluster']['launch_template_id']
-      )
-    end
+  cookbook_file "#{node['cluster']['scripts_dir']}/manage_fleet_dna.py" do
+    source 'cfn_hup_configuration/manage_fleet_dna.py'
+    owner 'root'
+    group 'root'
+    mode '0700'
+    action :create_if_missing
   end
-end
 
-action_class do
-  def monitor_shared_dir
-    "#{node['cluster']['shared_dir']}/dna"
-  end
+  directory node['cluster']['update']['dna_dir']
 end

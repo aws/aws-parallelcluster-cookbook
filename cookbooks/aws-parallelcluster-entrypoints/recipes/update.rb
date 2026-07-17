@@ -11,6 +11,12 @@
 # or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
+
+chef_handler 'ErrorHandlers::UpdateFailureHandler' do
+  arguments cleanup_dna_files: true, start_clustermgtd: true
+  type exception: true
+end
+
 include_recipe "aws-parallelcluster-shared::setup_envars"
 
 # Fetch and load cluster configs
@@ -18,9 +24,15 @@ include_recipe 'aws-parallelcluster-platform::update'
 
 include_recipe 'aws-parallelcluster-environment::update'
 
-include_recipe 'aws-parallelcluster-slurm::update' if node['cluster']['scheduler'] == 'slurm'
+include_recipe 'aws-parallelcluster-slurm::update'
 
 # Update node package - useful for development purposes only
 if is_custom_node?
   include_recipe 'aws-parallelcluster-computefleet::update_parallelcluster_node'
+end
+
+# Clean up update failure marker on success (only on HeadNode, which owns the marker lifecycle)
+file "#{node['cluster']['shared_dir']}/update_failed_marker" do
+  action :delete
+  only_if { node['cluster']['node_type'] == 'HeadNode' }
 end

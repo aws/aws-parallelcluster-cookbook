@@ -8,9 +8,7 @@ This repo contains the AWS ParallelCluster Chef cookbook used in AWS ParallelClu
 
 # Code structure
 
-The root folder of the cookbook repository can be considered the main cookbook, since it contains two files: `Berksfile` and `metadata.rb`.
-These files are used by the CLI (build image time) and `user-data.sh` code to [vendor](https://docs.chef.io/workstation/berkshelf/#berks-vendor)
-the other sub-cookbooks and third party cookbooks.
+The root folder of the cookbook repository can be considered the main cookbook.
 
 The main cookbook does not contain any recipe, attribute or library. They are distributed in the functional cookbooks under the `cookbooks` folder
 defined as follows:
@@ -34,9 +32,9 @@ The `test` folder contains Python unit tests files and Kitchen [environment](htt
 
 The `kitchen` folder contains utility files used when running Inspec tests locally.
 
-The `cookbooks/third-party` folder contains cookbooks from marketplace. They must be regularly updated and should not be modified by hand.
+The `iptables`, `line`, `nfs`, `openssh`, `yum`, `yum-eple` are cookbooks from marketplace. They must be regularly updated and should not be modified by hand.
 They have been pre-downloaded and stored in our repository to avoid contacting Chef Marketplace at AMI build time and cluster creation.
-You can find more information about them in the `cookbooks/third-party/THIRD-PARTY-LICENSES.txt` file.
+You can find more information about them in the `cookbooks/THIRD-PARTY-LICENSES.txt` file.
 
 # Development
 
@@ -122,17 +120,17 @@ Examples of submission are:
 # Note that in this case "supervisord" is a pattern, so all the tests starting with "supervisord" string in that yaml file will be executed.
 ./kitchen.docker.sh platform-install test supervisord -c 5 -l debug
 
-# Run converge phase only of kitchen from file kitchen.environment-config.yml in cookbooks/aws-parallelcluster-environment directory, for alinux2 only.
+# Run converge phase only of kitchen from file kitchen.environment-config.yml in cookbooks/aws-parallelcluster-environment directory, for alinux2023 only.
 # This is useful when you want to test recipe execution only.
 # Once you have executed the converge step, you can for example execute multiple times the verify step, to validate the tests you are writing.
-./kitchen.ec2.sh environment-config converge efa-alinux2
+./kitchen.ec2.sh environment-config converge efa-alinux2023
 
 # Run verify phase only from file kitchen.platform-config.yml in cookbooks/aws-parallelcluster-platform directory,
 # useful if you're modifing the test logic without touching the recipes code.
 ./kitchen.ec2.sh platform-config verify sudo -c 5
 
 # Login to the instance created with the converge step
-./kitchen.ec2.sh platform-config login sudo-alinux2
+./kitchen.ec2.sh platform-config login sudo-alinux2023
 ```
 
 A context must have the format `$subject-$phase`. 
@@ -155,6 +153,31 @@ export KITCHEN_SECURITY_GROUP_ID=sg-your-group
 export KITCHEN_INSTANCE_TYPE=t2.large
 export KITCHEN_IAM_PROFILE=test-kitchen  # required for tests with lifecycle hooks
 ```
+
+
+#### Testing against a locally-built AMI with dependency overrides
+
+When validating a dependency upgrade, point the `config` phase at the AMI you built and inject the
+same `ExtraChefAttributes` the build used, so the converge resolves the AMI-baked versions instead
+of the cookbook defaults:
+
+- Override the AMI per OS with `KITCHEN_<OS>_AMI` (e.g. `KITCHEN_ALINUX2023_AMI`, `KITCHEN_RHEL8_AMI`,
+  `KITCHEN_UBUNTU2404_AMI`). If unset, `kitchen.ec2.yml` `image_search` picks the latest matching
+  `aws-parallelcluster-<version>-<os>-*` AMI (version from `KITCHEN_PCLUSTER_VERSION`, default `3.16.0`).
+- Set `EXTRA_CHEF_ATTRIBUTES` (the same JSON used to build the AMI). `kitchen.ec2.yml` parses it and
+  deep-merges its `cluster` hash into the provisioner attributes for the converge (EC2 only — Docker
+  runs are unaffected). Per-platform `attributes.cluster` (e.g. `base_os`) merges on top.
+
+```
+export KITCHEN_ALINUX2023_AMI=ami-0123456789abcdef0
+export EXTRA_CHEF_ATTRIBUTES='{"cluster": {"python-version": "3.14.6", "efs": {"version": "3.1.3"}}}'
+./kitchen.ec2.sh environment-config test efs-alinux2023
+```
+
+If the converge can't find an upgraded component on the AMI (e.g. a `python` venv path under
+`/opt/parallelcluster/pyenv/versions/<python-version>/...` or a version-pinned binary), the AMI and
+the injected attributes disagree — rebuild the AMI with the same overrides, or align
+`EXTRA_CHEF_ATTRIBUTES` to what the AMI actually carries.
 
 ### Kitchen tests definition
 
@@ -215,7 +238,6 @@ controls matching the `/tag:config/` regex.
 ```
 verifier:
   inspec_tests:
-    - cookbooks/aws-parallelcluster-awsbatch/test
     - cookbooks/aws-parallelcluster-platform/test
     - cookbooks/aws-parallelcluster-environment/test
     - cookbooks/aws-parallelcluster-computefleet/test
@@ -259,7 +281,7 @@ the Docker image being committed with the tag `pcluster-${PHASE}/${INSTANCE_NAME
 
 For instance, if you successfully run
 ```
-./kitchen.docker.sh platform-install test directories-alinux2
+./kitchen.docker.sh platform-install test directories-alinux2023
 ```
 an image with tag `pcluster-install/directories-alinux2:latest` will be saved.
 
@@ -306,7 +328,7 @@ In the environment file (i.e. `test/environments/kitchen.rb`), for every value t
 you have to define a line like: `'<suite_name>-<variable_name>/<platform>' => 'placeholder'`. For instance:
 ```
 default_attributes 'kitchen_hooks' => {
-  'ebs_mount-vol_array/alinux2' => 'placeholder',
+  'ebs_mount-vol_array/alinux2023' => 'placeholder',
   ...
 }
 ```
@@ -390,15 +412,6 @@ If you interrupt it and try to run `kitchen verify`, you see authentication fail
 
 This happens because Ubuntu22 does not accept authentication via RSA key. You need to re-create a key pair 
 using `ED25519` key type.
-
-### Known issues with Berks
-
-#### Kitchen doesn't see your changes
-
-If Kitchen doesn't detect your changes, try
-```
-berks shelf uninstall ${COOKBOOK_NAME}
-```
 
 ## About python tests
 

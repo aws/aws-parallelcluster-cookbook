@@ -100,6 +100,10 @@ action_class do
 end
 
 action :setup do
+  unless node['cluster']['dcv']['install_enabled']
+    Chef::Log.warn("Skipping DCV installation because node['cluster']['dcv']['install_enabled'] is set to false")
+    return
+  end
   return if dcv_installed?
   return if redhat_on_docker?
 
@@ -149,7 +153,9 @@ action :setup do
     unless ::File.exist?(dcv_tarball)
       remote_file dcv_tarball do
         source dcv_url
-        checksum dcv_sha256sum
+        # The hardcoded per-arch/os sha only matches the default S3 mirror; skip
+        # verification when base_url is overridden using ExtraChefAttributes.
+        checksum dcv_sha256sum if default_artifacts_url?(node['cluster']['dcv']['base_url'])
         mode '0644'
         retries 3
         retry_delay 5
@@ -184,10 +190,21 @@ end
 
 action :configure do
   if dcv_supported? && (node['cluster']['node_type'] == "HeadNode" || node['cluster']['node_type'] == "LoginNode")
-    if dcv_gpu_accel_supported?
+    is_dcv_gl_supported = dcv_gpu_accel_supported?
+    if is_dcv_gl_supported
       # Enable graphic acceleration in dcv conf file for graphic instances.
       allow_gpu_acceleration
     else
+      # On non-GPU instances, disable the NVIDIA EGL config files to prevent
+      # Xdcv from crashing during GLX initialization (SIGABRT in libnvidia-egl-gbm.so).
+      # The AMI ships NVIDIA libraries for GPU instance types, but on non-GPU instances
+      # there is no hardware to back them and Xdcv crashes when it discovers them via EGL.
+      execute 'disable nvidia egl platform on non-gpu instances' do
+        command "find /usr/share/egl/egl_external_platform.d /etc/egl/egl_external_platform.d -name '*nvidia*' -exec mv {} {}.disabled \\; 2>/dev/null; true"
+        user 'root'
+        only_if { nvidia_installed? }
+      end
+
       bash 'set default systemd runlevel to graphical.target' do
         user 'root'
         code <<-SETUPX
@@ -230,6 +247,7 @@ action :configure do
       owner 'root'
       group 'root'
       mode '0755'
+      variables(is_dcv_gl_supported: is_dcv_gl_supported)
     end
 
     # Create directory for the external authenticator to store access file created by the users
@@ -272,7 +290,7 @@ def dcv_gpu_accel_supported?
 end
 
 def dcv_url
-  "#{node['cluster']['artifacts_s3_url']}/dependencies/dcv/#{dcv_package}.tgz"
+  "#{node['cluster']['dcv']['base_url']}/#{dcv_package}.tgz"
 end
 
 def dcv_tarball

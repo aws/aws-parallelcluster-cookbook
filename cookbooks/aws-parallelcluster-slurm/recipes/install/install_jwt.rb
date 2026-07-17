@@ -15,17 +15,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-jwt_version = '1.17.0'
-jwt_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/jwt/v#{jwt_version}.tar.gz"
+jwt_version = node['cluster']['jwt']['version']
+jwt_url = "#{node['cluster']['jwt']['base_url']}/v#{jwt_version}.tar.gz"
 jwt_tarball = "#{node['cluster']['sources_dir']}/libjwt-#{jwt_version}.tar.gz"
-jwt_sha256 = '617778f9687682220abf9b7daacbe72bab7c2985479f8bee4db9648bd2440687'
 
 remote_file jwt_tarball do
   source jwt_url
   mode '0644'
   retries 3
   retry_delay 5
-  checksum jwt_sha256
+  checksum node['cluster']['jwt']['sha256']
   action :create_if_missing
 end
 

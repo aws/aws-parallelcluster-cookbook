@@ -45,9 +45,8 @@ action :setup do
   package_repos 'update package repos' do
     action :update
   end
-  package prerequisites do
-    retries 3
-    retry_delay 5
+  robust_package 'install efa prerequisites' do
+    packages prerequisites
   end
 
   action_download_and_install

@@ -14,7 +14,6 @@ DevSettings:
       Value: 18cc9113b8ea8b2b185d3c5188e78e8a616a720c
     - Key: parallelcluster:build_status
       Value: available
-  AwsBatchCliPackage: https://github.com/aws/aws-parallelcluster/tarball/62b28264975b1c030a37a39365a4a2496a110f9c
   ClusterTemplate: null
   Cookbook: null
   InstanceTypesData: '{"hpc5a.48xlarge": {"InstanceType": "hpc5a.48xlarge", "CurrentGeneration":

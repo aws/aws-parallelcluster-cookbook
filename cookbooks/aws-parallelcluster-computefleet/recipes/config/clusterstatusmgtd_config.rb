@@ -13,7 +13,7 @@
 # limitations under the License.
 
 # Cluster Status Management Daemon
-return unless node['cluster']['node_type'] == 'HeadNode' && node['cluster']['scheduler'] != 'awsbatch'
+return unless node['cluster']['node_type'] == 'HeadNode'
 
 # create placeholder for computefleet-status.json, so it can be written by clusterstatusmgtd which run as pcluster admin user
 file node['cluster']['computefleet_status_path'] do

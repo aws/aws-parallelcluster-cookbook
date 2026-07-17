@@ -16,29 +16,29 @@
 def dcv_sha256sum
   if arm_instance?
     case el_string
-    when "amzn2"
-      # ALINUX2
-      '894f5a0b2c57bb9433a7124f152b0930d962ab0f2cfc6ea0f1e159893d667e86'
+    when "amzn2023"
+      # ALINUX2023
+      "8c9d29b41ee5f9fdfced4ae257c8e6444298a61da62beb2a38add1783c2e3858"
     when "el8"
       # RHEL and Rocky8
-      '7647d00782fb7f14668571f1e48fffa2b8b587d878b7632b03f40bbb92a757ad'
+      '89fcb456ee47464ff1fd4657e50814e6a9b18dd7a1fc29ba89b6649239103eda'
     when "el9"
       # RHEL and Rocky9
-      'f9b2fa95f84059c7168ef924b7ffe8b6f4d0d69e2e39280096d4bf76fdfb597c'
+      '90b33e27e149ad3ca2ebaf8b562c86ba9115c8c282e5d87bd75cfb8ba3054419'
     else
       ''
     end
   else
     case el_string
-    when "amzn2"
-      # ALINUX2
-      '81e85db767e36c36877879e1d3afc0f20127b9bd81b845fc8599feb9abd04f24'
+    when "amzn2023"
+      # ALINUX2023
+      "d98eb986f3b547af22a7732ca26cb6541c3842b9ed57218f503c9acc3b29e7e2"
     when "el8"
       # RHEL and Rocky8
-      'f879513272ac351712814bd969e3862fc7717ada9cfdf1ec227876b0e8ebc77d'
+      'a3038cb0119c9e287c08afb84c687e48896cb4e7af2f9c8a7724b5ae9226e718'
     when "el9"
       # RHEL and Rocky9
-      '5d631b5c0f2f6b21d0e56023432766994e2de5cc13f22c70a954cd643cde5b84'
+      '830e8113d63c11ae663886b4f85f55fc5ae7b64bc24ec485cba71fa304d87ddf'
     else
       ''
     end
@@ -47,7 +47,7 @@ end
 
 def el_string
   if platform?('amazon')
-    "amzn2"
+    "amzn#{node['platform_version'].to_i}"
   else
     "el#{node['platform_version'].to_i}"
   end
@@ -99,6 +99,27 @@ action_class do
   end
 
   def post_install
+    if x86_instance?
+      # Download dependencies for nice-dcv-gl (for offline installation during cluster creation)
+      dcv_gl_deps_dir = "#{node['cluster']['sources_dir']}/dcv-gl-deps"
+      dcv_gl_package = "#{node['cluster']['sources_dir']}/#{dcv_package}/#{dcv_gl}"
+      directory dcv_gl_deps_dir
+
+      # Use --resolve to download all transitive dependencies
+      download_cmd = "dnf download --destdir=#{dcv_gl_deps_dir} --resolve #{dcv_gl_package}"
+      execute 'download dcv-gl dependencies' do
+        command download_cmd
+        retries 3
+        retry_delay 5
+      end
+
+      # Remove dcv-gl package itself (we only want dependencies in dcv_gl_deps_dir)
+      execute 'remove dcv-gl from deps dir' do
+        command "rm -f #{dcv_gl_deps_dir}/nice-dcv-gl-*.rpm"
+        only_if { ::Dir.exist?(dcv_gl_deps_dir) }
+      end
+    end
+
     # stop firewall
     service "firewalld" do
       action %i(disable stop)
@@ -108,10 +129,23 @@ action_class do
   end
 
   def install_dcv_gl
+    # The following installation happens during cluster creation time.
+    # So `rpm` installation is needed to remove requirement of Internet access.
+    # Install dependencies from downloaded RPMs (offline)
+    dcv_gl_deps_dir = "#{node['cluster']['sources_dir']}/dcv-gl-deps"
+    execute 'install dcv-gl dependencies offline' do
+      command "rpm -ivh #{dcv_gl_deps_dir}/*.rpm"
+      only_if { ::Dir.exist?(dcv_gl_deps_dir) && !::Dir.empty?(dcv_gl_deps_dir) }
+      retries 3
+      retry_delay 5
+    end
+
     package = "#{node['cluster']['sources_dir']}/#{dcv_package}/#{dcv_gl}"
-    package package do
-      action :install
-      source package
+    # Install dcv-gl without repo access
+    execute 'install dcv-gl offline' do
+      command "rpm -ivh #{package}"
+      retries 3
+      retry_delay 5
     end
   end
 end

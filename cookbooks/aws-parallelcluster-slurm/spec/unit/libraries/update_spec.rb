@@ -13,10 +13,10 @@ describe "aws-parallelcluster-slurm:libraries:are_mount_or_unmount_required" do
     it "returns #{expected_result}" do
       if changeset.nil?
         allow(File).to receive(:exist?).with(CHANGE_SET_PATH).and_return(false)
-        allow(File).to receive(:read).with(CHANGE_SET_PATH).and_call_original
+        allow(File).to receive(:read).with(CHANGE_SET_PATH, any_args).and_call_original
       else
         allow(File).to receive(:exist?).with(CHANGE_SET_PATH).and_return(true)
-        allow(File).to receive(:read).with(CHANGE_SET_PATH).and_return(JSON.dump(changeset))
+        allow(File).to receive(:read).with(CHANGE_SET_PATH, any_args).and_return(JSON.dump(changeset))
       end
       result = are_mount_or_unmount_required?
       expect(result).to eq(expected_result)

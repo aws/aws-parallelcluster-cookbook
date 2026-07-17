@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-package_version = '3.4.1'
+package_version = 'enroot_version'
 class ConvergeEnroot
   def self.setup(chef_run)
     chef_run.converge_dsl('aws-parallelcluster-platform') do
@@ -16,16 +16,17 @@ describe 'aws-parallelcluster-platform::enroot:package_version' do
     context "on #{platform}#{version}" do
       cached(:chef_run) do
         allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(false)
-        runner = runner(platform: platform, version: version, step_into: ['enroot'])
-        ConvergeEnroot.setup(runner)
+        runner(platform: platform, version: version, step_into: ['enroot']) do |node|
+          node.override['cluster']['enroot']['version'] = package_version
+        end
       end
       cached(:resource) do
+        ConvergeEnroot.setup(chef_run)
         chef_run.find_resource('enroot', 'setup')
       end
 
-      it 'returns the expected enroot version' do
-        expected_enroot_version = "3.4.1"
-        expect(resource.package_version).to eq(expected_enroot_version)
+      it 'returns the version from the node attribute' do
+        expect(resource.package_version).to eq(package_version)
       end
     end
   end
@@ -193,6 +194,69 @@ describe 'aws-parallelcluster-platform::enroot:setup' do
           it 'does not install Enroot' do
             is_expected.not_to run_bash('Install enroot')
           end
+        end
+      end
+    end
+  end
+end
+
+# Tests for the enroot package URLs (main + caps). Both build from base_url /
+# caps_base_url, which default to the S3 mirror but can be overridden to the
+# NVIDIA public release (so a version not yet mirrored to S3 can be pulled
+# upstream). enroot_caps_url also toggles the filename via default_artifacts_url?:
+# "enroot-caps" (hyphen) on the S3 mirror, "enroot+caps" (plus) on the public repo.
+describe 'enroot package URL construction' do
+  ENROOT_S3_ARTIFACTS_URL = 'https://REGION-aws-parallelcluster.s3.REGION.AWS_DOMAIN'.freeze
+  ENROOT_S3_BASE_URL = "#{ENROOT_S3_ARTIFACTS_URL}/dependencies/enroot".freeze
+  ENROOT_PUBLIC_BASE_URL = 'https://fake-public.example.DOMAIN/releases/download/v9.9.9'.freeze
+  ENROOT_VERSION = '9.9.9'.freeze
+
+  for_all_oses do |platform, version|
+    debian = (platform == 'ubuntu')
+    ext = debian ? 'deb' : 'rpm'
+    arch_suffix = debian ? 'amd64' : 'x86_64'
+    rhel_suffix = debian ? '' : '.el8' # rhel partial pins to el8
+
+    [
+      ['default S3 mirror', ENROOT_S3_BASE_URL, 'enroot-caps'],
+      ['overridden public repo', ENROOT_PUBLIC_BASE_URL, 'enroot+caps'],
+    ].each do |scenario, base_url, expected_caps_name|
+      context "on #{platform}#{version} with #{scenario}" do
+        cached(:chef_run) do
+          stubs_for_resource('enroot') do |res|
+            allow(res).to receive(:enroot_installed).and_return(false)
+          end
+          allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
+          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
+          allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+          runner(platform: platform, version: version, step_into: ['enroot']) do |node|
+            node.override['cluster']['artifacts_s3_url'] = ENROOT_S3_ARTIFACTS_URL
+            node.override['cluster']['enroot']['version'] = ENROOT_VERSION
+            node.override['cluster']['enroot']['base_url'] = base_url
+            node.override['cluster']['enroot']['caps_base_url'] = base_url
+          end
+        end
+        cached(:resource) do
+          ConvergeEnroot.setup(chef_run)
+          chef_run.find_resource('enroot', 'setup')
+        end
+
+        it "builds the main package URL from base_url" do
+          expected_filename = if debian
+                                "enroot_#{ENROOT_VERSION}-1_#{arch_suffix}.#{ext}"
+                              else
+                                "enroot-#{ENROOT_VERSION}-1#{rhel_suffix}.#{arch_suffix}.#{ext}"
+                              end
+          expect(resource.enroot_url).to eq("#{base_url}/#{expected_filename}")
+        end
+
+        it "uses '#{expected_caps_name}' in the caps filename" do
+          expected_filename = if debian
+                                "#{expected_caps_name}_#{ENROOT_VERSION}-1_#{arch_suffix}.#{ext}"
+                              else
+                                "#{expected_caps_name}-#{ENROOT_VERSION}-1#{rhel_suffix}.#{arch_suffix}.#{ext}"
+                              end
+          expect(resource.enroot_caps_url).to eq("#{base_url}/#{expected_filename}")
         end
       end
     end

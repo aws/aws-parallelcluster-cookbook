@@ -2,7 +2,6 @@
 ---
 verifier:
   inspec_tests:
-    - cookbooks/aws-parallelcluster-awsbatch/test
     - cookbooks/aws-parallelcluster-platform/test
     - cookbooks/aws-parallelcluster-environment/test
     - cookbooks/aws-parallelcluster-computefleet/test
@@ -68,18 +67,6 @@ suites:
   - name: slurm-config-head-node-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list
     attributes: *attributes_slurm_config_HeadNode
-
-  - name: awsbatch-config-head-node-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
-    run_list: *_run_list
-    attributes: &attributes_awsbatch_config_HeadNode
-      cluster:
-        << : *_head_node_cluster_attributes
-        scheduler: 'awsbatch'
-        custom_awsbatchcli_package: <%= ENV['CUSTOM_AWSBATCHCLI_URL'] %>
-
-  - name: awsbatch-config-head-node-arm64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
-    run_list: *_run_list
-    attributes: *attributes_awsbatch_config_HeadNode
 
   - name: slurm-config-compute-fleet-x86-64-<%= ENV['KITCHEN_INSTANCE_TYPE'] || 'c5n.xlarge' %>
     run_list: *_run_list

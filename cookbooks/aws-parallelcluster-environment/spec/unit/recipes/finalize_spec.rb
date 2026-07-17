@@ -26,7 +26,8 @@ describe 'aws-parallelcluster-environment::finalize' do
           end
           cached(:node) { chef_run.node }
 
-          ["aws-parallelcluster-environment::finalize_directory_service"].each do |recipe_name|
+          ["aws-parallelcluster-environment::finalize_directory_service",
+           "aws-parallelcluster-environment::finalize_check_update_systemd_service"].each do |recipe_name|
             it "includes the recipe #{recipe_name}" do
               is_expected.to include_recipe(recipe_name)
             end

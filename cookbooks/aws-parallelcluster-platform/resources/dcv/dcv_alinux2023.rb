@@ -19,7 +19,17 @@ end
 use 'partial/_dcv_common'
 use 'partial/_rhel_common'
 
-# DCV is not supported for AL2023
-def dcv_supported?
-  false
+action_class do
+  def pre_install
+    execute 'Install gnome desktop' do
+      command 'dnf groupinstall "Desktop" -y'
+      retries 3
+      retry_delay 5
+    end
+
+    package "xorg-x11-server-Xorg" do
+      retries 3
+      retry_delay 5
+    end
+  end
 end

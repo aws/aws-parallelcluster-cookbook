@@ -13,7 +13,7 @@ key_types = %w(ecdsa ed25519 rsa)
 is_ubuntu = os_properties.ubuntu?
 
 control 'head_node_directory_initialized' do
-  only_if { instance.head_node? && node['cluster']['scheduler'] != 'awsbatch' }
+  only_if { instance.head_node? }
   describe directory("#{node['cluster']['shared_dir_login_nodes']}/scripts") do
     it { should exist }
     its('owner') { should eq 'root' }
@@ -35,7 +35,7 @@ control 'head_node_directory_initialized' do
 end
 
 control 'login_node_configuration_initialized' do
-  only_if { instance.login_node? && node['cluster']['scheduler'] != 'awsbatch' }
+  only_if { instance.login_node? }
 
   key_types.each do |type|
     describe file('/etc/ssh/ssh_host_' + type + '_key') do

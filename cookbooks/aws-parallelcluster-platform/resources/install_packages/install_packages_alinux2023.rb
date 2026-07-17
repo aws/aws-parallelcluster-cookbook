@@ -17,7 +17,6 @@ provides :install_packages, platform: 'amazon' do |node|
 end
 
 use 'partial/_install_packages_common.rb'
-use 'partial/_install_packages_rhel_amazon.rb'
 
 action :install do
   package new_resource.packages do

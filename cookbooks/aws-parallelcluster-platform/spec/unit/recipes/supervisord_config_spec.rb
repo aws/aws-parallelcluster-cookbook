@@ -70,13 +70,16 @@ describe 'aws-parallelcluster-platform::supervisord_config' do
 
         it 'has the correct content' do
           is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
-            .with_content("[program:cfn-hup]")
             .with_content("[program:computemgtd]")
 
           is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
             .with_content("[program:pcluster_dcv_authenticator]")
+
+          is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:cfn-hup]")
         end
       end
+
       context "when login node and dcv configured" do
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
@@ -90,10 +93,12 @@ describe 'aws-parallelcluster-platform::supervisord_config' do
 
         it 'has the correct content' do
           is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
-            .with_content("[program:cfn-hup]")
             .with_content("[program:loginmgtd]")
             .with_content("[program:pcluster_dcv_authenticator]")
             .with_content("--port 8444")
+
+          is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+            .with_content("[program:cfn-hup]")
         end
 
         context "when login node and dcv not configured" do
@@ -110,6 +115,9 @@ describe 'aws-parallelcluster-platform::supervisord_config' do
           it 'has the correct content' do
             is_expected.to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
               .with_content("[program:loginmgtd]")
+
+            is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
+              .with_content("[program:cfn-hup]")
 
             is_expected.not_to render_file('/etc/parallelcluster/parallelcluster_supervisord.conf')
               .with_content("[program:pcluster_dcv_authenticator]")

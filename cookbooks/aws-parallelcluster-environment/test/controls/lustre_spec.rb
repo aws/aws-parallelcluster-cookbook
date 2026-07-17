@@ -1,31 +1,6 @@
 control 'tag:install_lustre_client_installed' do
   title "Verify that lustre client is installed"
   minimal_lustre_client_version = '2.12'
-  if os_properties.centos? && inspec.os.release.to_f >= 7.5
-    describe package('kmod-lustre-client') do
-      it { should be_installed }
-    end
-
-    describe package('lustre-client') do
-      it { should be_installed }
-    end
-
-    if os_properties.centos? && inspec.os.release.to_f >= 7.7
-      describe package('kmod-lustre-client') do
-        its('version') { should cmp >= minimal_lustre_client_version }
-      end
-
-      describe package('lustre-client') do
-        its('version') { should cmp >= minimal_lustre_client_version }
-      end
-
-      describe yum.repo('aws-fsx') do
-        it { should exist }
-        it { should be_enabled }
-        its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
-      end
-    end
-  end
 
   if os_properties.redhat? && inspec.os.release.to_f >= 8.2 && !os_properties.on_docker?
     # TODO: restore installation and check on docker when Lustre is available for RH8.9
@@ -48,6 +23,7 @@ control 'tag:install_lustre_client_installed' do
       end
 
       describe yum.repo('aws-fsx') do
+        before { retry_helpers.wait_for_command("yum -v repolist all 2>/dev/null | grep -q 'aws-fsx'") rescue nil } # rubocop:disable Style/RescueModifier
         it { should exist }
         it { should be_enabled }
         its('baseurl') { should include 'fsx-lustre-client-repo.s3.amazonaws.com' }
@@ -76,13 +52,6 @@ control 'tag:install_lustre_client_installed' do
     describe package('lustre-client') do
       it { should be_installed }
       its('version') { should cmp >= minimal_lustre_client_version }
-    end
-  end
-
-  if os_properties.alinux2?
-    describe yum.repo('amzn2extra-lustre') do
-      it { should exist }
-      it { should be_enabled }
     end
   end
 end

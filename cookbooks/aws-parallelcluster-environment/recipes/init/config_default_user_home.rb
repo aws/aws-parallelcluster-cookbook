@@ -34,13 +34,13 @@ bash "Backup #{node['cluster']['cluster_user_home']}" do
   group 'root'
   code <<-EOH
     set -e
-    if [ -d /tmp#{node['cluster']['cluster_user_home']} ]; then
-      echo "/tmp#{node['cluster']['cluster_user_home']} exists!"
+    if [ -d #{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']} ]; then
+      echo "#{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']} exists!"
       exit 1
     else
-      mkdir -p /tmp#{node['cluster']['cluster_user_home']}
+      mkdir -p #{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']}
     fi
-    rsync -a #{node['cluster']['cluster_user_home']}/ /tmp#{node['cluster']['cluster_user_home']}
+    rsync -a #{node['cluster']['cluster_user_home']}/ #{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']}
   EOH
 end
 
@@ -56,7 +56,7 @@ bash "Move #{node['cluster']['cluster_user_home']}" do
   code <<-EOH
     set -e
     mkdir -p #{node['cluster']['cluster_user_local_home']}
-    rsync -a /tmp#{node['cluster']['cluster_user_home']}/ #{node['cluster']['cluster_user_local_home']}
+    rsync -a #{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']}/ #{node['cluster']['cluster_user_local_home']}
     usermod -d #{node['cluster']['cluster_user_local_home']} #{node['cluster']['cluster_user']}
     chown -R #{node['cluster']['cluster_user']}: #{node['cluster']['cluster_user_local_home']}
   EOH
@@ -74,8 +74,8 @@ bash "Verify data integrity for #{node['cluster']['cluster_user_local_home']}" d
   code <<-EOH
     diff_output=$(diff -r #{node['cluster']['cluster_user_home']} #{node['cluster']['cluster_user_local_home']})
     if [[ $diff_output != *"Only in #{node['cluster']['cluster_user_home']}"* ]]; then
-      echo "Data integrity check succeeded, removing temporary directory /tmp#{node['cluster']['cluster_user_home']}"
-      rm -rf /tmp#{node['cluster']['cluster_user_home']}
+      echo "Data integrity check succeeded, removing temporary directory #{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']}"
+      rm -rf #{node['cluster']['exec_tmp_dir']}#{node['cluster']['cluster_user_home']}
     else
       only_in_cluster_user_home=$(echo "$diff_output" | grep "Only in #{node['cluster']['cluster_user_home']}")
       echo "Data integrity check failed comparing #{node['cluster']['cluster_user_local_home']} and #{node['cluster']['cluster_user_home']}. Differences:"

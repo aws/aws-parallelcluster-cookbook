@@ -24,10 +24,7 @@ property :aws_domain, String
 # https://developer.arm.com/downloads/-/arm-compiler-for-linux
 #
 # Usually we upgrade gcc version as well (see below).
-# We upload ArmPL to a ParallelCluster bucket (account for it in scope of the upgrade) and download it from there
-# to install ArmPL on the AMI.
-# We download gcc directly from gnu.org repository to install correct gcc version on the AMI.
-property :armpl_major_minor_version, String, default: '24.10'
+property :armpl_major_minor_version, String
 property :gcc_patch_version, String, default: '0'
 
 action :setup do
@@ -45,14 +42,10 @@ action :setup do
   build_tools 'Prerequisite: build tools'
   package %w(wget bzip2)
 
-  armpl_version = "#{new_resource.armpl_major_minor_version}"
+  armpl_version = "#{_armpl_major_minor_version}"
   armpl_tarball_name = "arm-performance-libraries_#{armpl_version}_#{package_manager}_gcc.tar"
 
-  armpl_url = %W(
-    #{node['cluster']['artifacts_s3_url']}
-    armpl/#{armpl_platform}
-    #{armpl_tarball_name}
-  ).join('/')
+  armpl_url = armpl_download_url(armpl_tarball_name)
 
   armpl_installer = "#{new_resource.sources_dir}/#{armpl_tarball_name}"
 
@@ -125,8 +118,10 @@ action :setup do
         rm -rf gcc-#{gcc_version}
         tar -xf #{gcc_tarball}
         cd gcc-#{gcc_version}
-        # Patch the download_prerequisites script to download over https and not ftp. This works better in China regions.
-        sed -i "s#ftp://gcc\.gnu\.org/pub/gcc/infrastructure##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
+        # Patch the download_prerequisites script to download GCC dependencies from our public bucket.
+        # This is required to support build image in isolated environments.
+        # Note: gcc 9.3 uses ftp, whereas gcc 11.3 uses http.
+        sed -i "s#\\(ftp\\|http\\)://gcc\.gnu\.org/pub/gcc/infrastructure##{node['cluster']['artifacts_s3_url']}/dependencies/gcc/prerequisites#g" ./contrib/download_prerequisites
         ./contrib/download_prerequisites
         mkdir build && cd build
         ../configure --prefix=/opt/arm/armpl/gcc/#{gcc_version} --disable-bootstrap --enable-checking=release --enable-languages=c,c++,fortran --disable-multilib
@@ -156,7 +151,6 @@ action :setup do
   # save ArmPL and gcc versions on the node environment so that they will be available
   # to dependencies (for instance, test code)
   # Complete versions are intentionally redundant.
-  node.default['cluster']['armpl']['version'] = armpl_version
   node.default['cluster']['armpl']['gcc']['major_minor_version'] = gcc_major_minor_version
   node.default['cluster']['armpl']['gcc']['patch_version'] = new_resource.gcc_patch_version
   node.default['cluster']['armpl']['gcc']['version'] = gcc_version
@@ -174,6 +168,22 @@ action_class do
       'deb'
     else
       'rpm'
+    end
+  end
+
+  def _armpl_major_minor_version
+    new_resource.armpl_major_minor_version || node['cluster']['armpl']['version']
+  end
+
+  # The default S3 mirror partitions tarballs by platform (armpl/<platform>/),
+  # while a public source is not partitioned. Skip the platform segment when
+  # base_url is overridden.
+  def armpl_download_url(tarball_name)
+    base_url = node['cluster']['armpl']['base_url']
+    if default_artifacts_url?(base_url)
+      "#{base_url}/#{armpl_platform}/#{tarball_name}"
+    else
+      "#{base_url}/#{tarball_name}"
     end
   end
 end

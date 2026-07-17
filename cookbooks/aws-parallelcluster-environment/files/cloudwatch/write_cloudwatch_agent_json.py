@@ -13,7 +13,7 @@ import socket
 
 from cloudwatch_agent_common_utils import render_jinja_template
 
-AWS_CLOUDWATCH_CFG_PATH = "/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+AWS_CLOUDWATCH_CFG_PATH = "/etc/parallelcluster/amazon-cloudwatch-agent/amazon-cloudwatch-agent.json"
 DEFAULT_METRICS_COLLECTION_INTERVAL = 60
 
 
@@ -34,7 +34,7 @@ def parse_args():
         choices=["HeadNode", "ComputeFleet", "LoginNode", "ExternalSlurmDbd"],
         help="Role this node plays in the cluster (i.e., is it a compute node or the head node?)",
     )
-    parser.add_argument("--scheduler", required=True, choices=["slurm", "awsbatch"], help="Scheduler")
+    parser.add_argument("--scheduler", required=True, choices=["slurm"], help="Scheduler")
     return parser.parse_args()
 
 
@@ -45,6 +45,7 @@ def gethostname():
 
 def write_config(config):
     """Write config to AWS_CLOUDWATCH_CFG_PATH."""
+    os.makedirs(os.path.dirname(AWS_CLOUDWATCH_CFG_PATH), exist_ok=True)
     with open(AWS_CLOUDWATCH_CFG_PATH, "w+", encoding="utf-8") as output_config_file:
         json.dump(config, output_config_file, indent=4)
 

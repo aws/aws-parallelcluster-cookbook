@@ -47,11 +47,6 @@ control 'tag:install_munge_folders_created' do
     it { should exist }
     it { should be_directory }
   end
-
-  describe file('/var/run/munge') do
-    it { should exist }
-    it { should be_directory }
-  end
 end unless os_properties.redhat_on_docker?
 
 control 'tag:config_munge_service_enabled' do

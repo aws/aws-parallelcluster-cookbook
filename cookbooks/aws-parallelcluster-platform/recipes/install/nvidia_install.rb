@@ -21,6 +21,10 @@ include_recipe "aws-parallelcluster-platform::cuda"
 
 gdrcopy 'Install Nvidia gdrcopy'
 
+nvidia_nvlsm 'Install Nvidia NVLink Subnet Manager'
+
 fabric_manager 'Install Nvidia Fabric Manager'
 
 nvidia_dcgm 'install Nvidia datacenter-gpu-manager'
+
+nvidia_imex 'Install nvidia-imex'

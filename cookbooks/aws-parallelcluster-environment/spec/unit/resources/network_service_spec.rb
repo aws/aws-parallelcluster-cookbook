@@ -27,9 +27,7 @@ describe 'network_service:restart' do
       end
       cached(:node) { chef_run.node }
       cached(:network_service_name) do
-        if platform == 'amazon' && version == '2' || platform == 'centos'
-          'network'
-        elsif platform == 'amazon' && version == '2023'
+        if platform == 'amazon' && version == '2023'
           'systemd-networkd'
         elsif platform == 'ubuntu'
           'systemd-resolved'
@@ -65,9 +63,7 @@ describe 'network_service:reload' do
         ConvergeNetworkService.reload(runner)
       end
       cached(:network_service_name) do
-        if platform == 'amazon' && version == '2' || platform == 'centos'
-          'network'
-        elsif platform == 'amazon' && version == '2023'
+        if platform == 'amazon' && version == '2023'
           'systemd-networkd'
         elsif platform == 'ubuntu'
           'systemd-resolved'

@@ -2,8 +2,8 @@ require 'spec_helper'
 
 # parallelcluster default source dir defined in attributes
 source_dir = '/opt/parallelcluster/sources'
-efa_version = '1.38.1'
-efa_checksum = '83923374afd388b1cfcf4b3a21a2b1ba7cf46a01a587f7b519b8386cb95e4f81'
+efa_version = '1.49.0'
+efa_checksum = 'cf2e9281a2328a243c76f911a490faed43ca0fecfe4733c25e34b2e92a32c309'
 
 class ConvergeEfa
   def self.setup(chef_run, efa_version: nil, efa_checksum: nil)
@@ -55,10 +55,8 @@ describe 'efa:setup' do
       cached(:prerequisites) do
         if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
           %w(environment-modules libibverbs-utils librdmacm-utils rdma-core-devel)
-        elsif platform == 'amazon' && version == '2'
-          %w(environment-modules libibverbs-utils librdmacm-utils)
         else
-          "environment-modules"
+          %w(environment-modules)
         end
       end
       let(:chef_run) do
@@ -100,7 +98,8 @@ describe 'efa:setup' do
             is_expected.not_to write_log('efa installed')
             is_expected.not_to remove_package(%w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
-            is_expected.to install_package(prerequisites)
+            is_expected.to install_robust_package('install efa prerequisites')
+              .with(packages: prerequisites)
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
             is_expected.not_to run_bash('install efa')
           end
@@ -126,7 +125,8 @@ describe 'efa:setup' do
             is_expected.not_to write_log('efa installed')
             is_expected.to remove_package(platform == 'ubuntu' ? ['libopenmpi-dev'] : %w(openmpi-devel openmpi))
             is_expected.to update_package_repos('update package repos')
-            is_expected.to install_package(prerequisites)
+            is_expected.to install_robust_package('install efa prerequisites')
+              .with(packages: prerequisites)
             is_expected.to create_if_missing_remote_file("#{source_dir}/aws-efa-installer.tar.gz")
               .with(source: "https://efa-installer.amazonaws.com/aws-efa-installer-#{efa_version}.tar.gz")
               .with(mode: '0644')

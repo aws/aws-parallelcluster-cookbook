@@ -12,3 +12,6 @@
 # limitations under the License.
 
 include_recipe 'aws-parallelcluster-environment::finalize_directory_service'
+
+# This recipe must always be the last one because once execute, the node starts checking for cluster updates.
+include_recipe 'aws-parallelcluster-environment::finalize_check_update_systemd_service'

@@ -45,3 +45,14 @@ control 'tag:testami_tag:config_services_disabled_on_amazon_family' do
     its(:stdout) { should match /LoadState=masked/ }
   end
 end
+
+control 'tag:testami_tag:config_dnf_makecache_timer_disabled' do
+  title 'Test that dnf-makecache timer is disabled and stopped to reduce HPC jitter'
+
+  only_if { !os_properties.on_docker? }
+
+  describe service('dnf-makecache.timer') do
+    it { should_not be_enabled }
+    it { should_not be_running }
+  end
+end

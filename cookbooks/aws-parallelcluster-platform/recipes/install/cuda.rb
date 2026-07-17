@@ -19,25 +19,20 @@ return unless nvidia_enabled?
 
 # Cuda installer from https://developer.nvidia.com/cuda-toolkit-archive
 # Cuda installer naming: cuda_11.8.0_520.61.05_linux
-cuda_version = '12.8'
-cuda_patch = '0'
-cuda_complete_version = "#{cuda_version}.#{cuda_patch}"
-cuda_version_suffix = '570.86.10'
-cuda_samples_version = '12.8'
-if platform?('amazon') && node['platform_version'] == "2"
-  cuda_version = '12.4'
-  cuda_patch = '1'
-  cuda_complete_version = "#{cuda_version}.#{cuda_patch}"
-  cuda_version_suffix = '550.54.15'
-  cuda_samples_version = '12.4'
-end
+
+cuda_full_version = node['cluster']['nvidia']['cuda']['version']
+cuda_parts = cuda_full_version.split('.')
+cuda_version = "#{cuda_parts[0]}.#{cuda_parts[1]}"
+cuda_version_suffix = node['cluster']['nvidia']['cuda']['driver_version_suffix']
+cuda_samples_version = cuda_version
 cuda_arch = arm_instance? ? 'linux_sbsa' : 'linux'
-cuda_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/cuda_#{cuda_complete_version}_#{cuda_version_suffix}_#{cuda_arch}.run"
-cuda_samples_url = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples/v#{cuda_samples_version}.tar.gz"
+cuda_url = "#{node['cluster']['nvidia']['cuda']['base_url']}/cuda_#{cuda_full_version}_#{cuda_version_suffix}_#{cuda_arch}.run"
+cuda_samples_url = "#{node['cluster']['nvidia']['cuda']['samples_base_url']}/v#{cuda_samples_version}.tar.gz"
 tmp_cuda_run = '/tmp/cuda.run'
 tmp_cuda_sample_archive = '/tmp/cuda-sample.tar.gz'
 
-node.default['cluster']['nvidia']['cuda']['version'] = cuda_version
+# Save resolved CUDA versions to .default so InSpec/build-image tests which run during ParallelClusterTestComponent see them (mirrors Nvidia driver).
+node.default['cluster']['nvidia']['cuda']['version'] = cuda_full_version
 node.default['cluster']['nvidia']['cuda_samples_version'] = cuda_samples_version
 node_attributes 'Save cuda and cuda samples versions for InSpec tests'
 

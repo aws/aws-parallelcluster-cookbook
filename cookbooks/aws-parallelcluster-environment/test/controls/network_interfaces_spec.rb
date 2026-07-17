@@ -12,7 +12,7 @@
 control 'network_interfaces_configuration_script_created' do
   title 'Check script to configure network interface is created'
 
-  describe file('/tmp/configure_nw_interface.sh') do
+  describe file("#{node['cluster']['exec_tmp_dir']}/configure_nw_interface.sh") do
     it { should exist }
     its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
@@ -64,7 +64,7 @@ control 'network_interfaces_configured' do
         its('group') { should eq 'root' }
         its('content') { should match /^ip route del/ }
       end
-    elsif os_properties.amazon_family? || os_properties.centos?
+    elsif os_properties.amazon_family?
       describe file("/etc/sysconfig/network-scripts/ifcfg-#{device_name}") do
         it { should exist }
         its('content') { should match /^DEVICE=#{device_name}/ }

@@ -12,13 +12,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-unless node['cluster']['scheduler'] == 'awsbatch'
-  case node['cluster']['node_type']
-  when 'HeadNode'
-    load_cluster_config(node['cluster']['cluster_config_path'])
-  else
-    raise "node_type must be HeadNode"
-  end
+case node['cluster']['node_type']
+when 'HeadNode'
+  load_cluster_config(node['cluster']['cluster_config_path'])
+else
+  raise "node_type must be HeadNode"
 end
 
-include_recipe 'aws-parallelcluster-slurm::update_computefleet_status' if node['cluster']['scheduler'] == 'slurm'
+include_recipe 'aws-parallelcluster-slurm::update_computefleet_status'

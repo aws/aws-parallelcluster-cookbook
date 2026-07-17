@@ -132,12 +132,8 @@ describe 'gdrcopy:gdrcopy_version' do
         chef_run.find_resource('gdrcopy', 'setup')
       end
 
-      it 'returns the expected gdrcopy version' do
-        expected_gdrcopy_version = if platform == "centos"
-                                     "2.3.1"
-                                   else
-                                     "2.4.4"
-                                   end
+      it 'returns the expected gdrcopy version from node attributes' do
+        expected_gdrcopy_version = chef_run.node['cluster']['nvidia']['gdrcopy']['version']
         expect(resource.gdrcopy_version).to eq(expected_gdrcopy_version)
       end
     end
@@ -156,12 +152,8 @@ describe 'gdrcopy:gdrcopy_checksum' do
         chef_run.find_resource('gdrcopy', 'setup')
       end
 
-      it 'returns the expected gdrcopy checksum' do
-        expected_gdrcopy_checksum = if platform == "centos"
-                                      "59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8"
-                                    else
-                                      "8802f7bc4a589a610118023bdcdd83c10a56dea399acf6eeaac32e8cc10739a8"
-                                    end
+      it 'returns the expected gdrcopy checksum from node attributes' do
+        expected_gdrcopy_checksum = chef_run.node['cluster']['nvidia']['gdrcopy']['sha256']
         expect(resource.gdrcopy_checksum).to eq(expected_gdrcopy_checksum)
       end
     end
@@ -186,17 +178,39 @@ describe 'gdrcopy:setup' do
 
     context "on #{platform}#{version} when gdrcopy enabled" do
       cached(:sources_dir) { 'sources_dir' }
-      cached(:gdrcopy_version) { platform == 'centos' ? '2.3.1' : '2.4.4' }
-      cached(:gdrcopy_checksum) do
-        if platform == 'centos'
-          '59b3cc97a4fc6008a5407506d9e67ecc4144cfad61c261217fabcb671cd30ca8'
-        else
-          '8802f7bc4a589a610118023bdcdd83c10a56dea399acf6eeaac32e8cc10739a8'
-        end
-      end
       cached(:gdrcopy_service) { platform == 'ubuntu' ? 'gdrdrv' : 'gdrcopy' }
+      cached(:gdrcopy_arch) { 'gdrcopy_arch' }
+      cached(:gdrcopy_platform) do
+        platforms = {
+          'amazon2023' => 'amzn-2023',
+          'centos7' => 'el7',
+          'redhat8' => 'el8',
+          'rhel8' => 'el8',
+          'rocky8' => 'el8',
+          'redhat9' => 'el9',
+          'rhel9' => 'el9',
+          'rocky9' => 'el9',
+          'ubuntu22.04' => 'Ubuntu22_04',
+          'ubuntu24.04' => 'Ubuntu24_04',
+        }
+        platforms["#{platform}#{version}"]
+      end
+      cached(:chef_run) do
+        stubs_for_resource('gdrcopy') do |res|
+          allow(res).to receive(:gdrcopy_enabled?).and_return(true)
+          allow(res).to receive(:gdrcopy_arch).and_return(gdrcopy_arch)
+          allow(res).to receive(:gdrcopy_installed?).and_return(false)
+        end
+        runner = runner(platform: platform, version: version, step_into: ['gdrcopy']) do |node|
+          node.override['cluster']['sources_dir'] = sources_dir
+        end
+        ConvergeGdrcopy.setup(runner)
+      end
+      cached(:node) { chef_run.node }
+      cached(:gdrcopy_version) { node['cluster']['nvidia']['gdrcopy']['version'] }
+      cached(:gdrcopy_checksum) { node['cluster']['nvidia']['gdrcopy']['sha256'] }
       cached(:gdrcopy_tarball) { "#{sources_dir}/gdrcopy-#{gdrcopy_version}.tar.gz" }
-      cached(:gdrcopy_url) { "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{gdrcopy_version}.tar.gz" }
+      cached(:gdrcopy_url) { node['cluster']['nvidia']['gdrcopy']['base_url'] }
       cached(:gdrcopy_dependencies) do
         case platform
         when 'ubuntu'
@@ -211,32 +225,6 @@ describe 'gdrcopy:setup' do
           %w(dkms rpm-build make check check-devel subunit subunit-devel)
         end
       end
-      cached(:gdrcopy_arch) { 'gdrcopy_arch' }
-      cached(:gdrcopy_platform) do
-        platforms = {
-          'amazon2' => 'amzn-2',
-          'amazon2023' => 'amzn-2023',
-          'centos7' => 'el7',
-          'rhel8' => 'el8',
-          'rocky8' => 'el8',
-          'rhel9' => 'el9',
-          'rocky9' => 'el9',
-          'ubuntu22.04' => 'Ubuntu22_04',
-          'ubuntu24.04' => 'Ubuntu24_04',
-        }
-        platforms["#{platform}#{version}"]
-      end
-      cached(:chef_run) do
-        stubs_for_resource('gdrcopy') do |res|
-          allow(res).to receive(:gdrcopy_enabled?).and_return(true)
-          allow(res).to receive(:gdrcopy_arch).and_return(gdrcopy_arch)
-        end
-        runner = runner(platform: platform, version: version, step_into: ['gdrcopy']) do |node|
-          node.override['cluster']['sources_dir'] = sources_dir
-        end
-        ConvergeGdrcopy.setup(runner)
-      end
-      cached(:node) { chef_run.node }
 
       it 'sets up gdrcopy' do
         is_expected.to setup_gdrcopy('setup')
@@ -259,7 +247,8 @@ describe 'gdrcopy:setup' do
       end
 
       it 'builds dependencies' do
-        is_expected.to install_package(gdrcopy_dependencies).with_retries(3).with_retry_delay(5)
+        is_expected.to install_robust_package('install gdrcopy build dependencies')
+          .with(packages: gdrcopy_dependencies)
       end
 
       cached(:installation_code) { chef_run.bash('Install NVIDIA GDRCopy').code }
@@ -274,10 +263,10 @@ describe 'gdrcopy:setup' do
 
         if platform == 'ubuntu'
           expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-deb-packages.sh})
-          expect(installation_code).to match(/dpkg -i gdrdrv-dkms_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
-          expect(installation_code).to match(/dpkg -i libgdrapi_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
-          expect(installation_code).to match(/dpkg -i gdrcopy-tests_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}\+cuda\*.deb/)
-          expect(installation_code).to match(/dpkg -i gdrcopy_#{gdrcopy_version}_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+          expect(installation_code).to match(/dpkg -i gdrdrv-dkms_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+          expect(installation_code).to match(/dpkg -i libgdrapi_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
+          expect(installation_code).to match(/dpkg -i gdrcopy-tests_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}\+cuda\*.deb/)
+          expect(installation_code).to match(/dpkg -i gdrcopy_#{gdrcopy_version}-1_#{gdrcopy_arch}.#{gdrcopy_platform}.deb/)
         elsif platform == 'centos'
           expect(installation_code).to match(%r{CUDA=/usr/local/cuda ./build-rpm-packages.sh})
           expect(installation_code).to match(/rpm -q gdrcopy-kmod-#{gdrcopy_version}-1dkms || rpm -Uvh gdrcopy-kmod-#{gdrcopy_version}-1dkms.noarch.#{gdrcopy_platform}.rpm/)
@@ -293,6 +282,22 @@ describe 'gdrcopy:setup' do
 
       it 'disables gdrcopy service' do
         is_expected.to disable_service(gdrcopy_service).with_action(%i(disable stop))
+      end
+    end
+
+    context "on #{platform}#{version} when the target gdrcopy version is already installed" do
+      cached(:chef_run) do
+        stubs_for_resource('gdrcopy') do |res|
+          allow(res).to receive(:gdrcopy_enabled?).and_return(true)
+          allow(res).to receive(:gdrcopy_arch).and_return('gdrcopy_arch')
+          allow(res).to receive(:gdrcopy_installed?).and_return(true)
+        end
+        ConvergeGdrcopy.setup(runner(platform: platform, version: version, step_into: ['gdrcopy']))
+      end
+
+      it 'skips the rebuild and install' do
+        is_expected.not_to run_bash('Install NVIDIA GDRCopy')
+        is_expected.not_to write_node_attributes('dump node attributes')
       end
     end
   end

@@ -11,7 +11,7 @@
 
 control 'tag:install_expected_versions_of_nvidia_driver_installed' do
   only_if do
-    !instance.custom_ami? && !(os_properties.centos7? && os_properties.arm?) &&
+    !instance.custom_ami? &&
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
@@ -37,11 +37,13 @@ end
 
 control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
   only_if do
-    !(os_properties.centos7? && os_properties.arm?) && !instance.custom_ami? &&
+    !instance.custom_ami? &&
       (node['cluster']['nvidia']['enabled'] == 'yes' || node['cluster']['nvidia']['enabled'] == true)
   end
 
-  expected_cuda_version = node['cluster']['nvidia']['cuda']['version']
+  # nvcc and the install dir use major.minor (e.g. 13.3); cuda.version may be a 3-part
+  # value (e.g. 13.3.0) when set via ExtraChefAttributes, so normalize to major.minor.
+  expected_cuda_version = node['cluster']['nvidia']['cuda']['version'].split('.')[0, 2].join('.')
   cmd = %(
     export PATH=/usr/local/cuda-#{expected_cuda_version}/bin:${PATH};
     export LD_LIBRARY_PATH=/usr/local/cuda-#{expected_cuda_version}/lib64:${LD_LIBRARY_PATH}
@@ -56,8 +58,7 @@ end
 
 control 'tag:config_nvidia_uvm_and_persistenced_on_graphic_instances' do
   only_if do
-    !(os_properties.centos7? && os_properties.arm?) &&
-      !instance.custom_ami? && instance.graphic?
+    !instance.custom_ami? && instance.graphic?
   end
 
   describe kernel_module('nvidia_uvm') do

@@ -1,14 +1,9 @@
 ---
 driver:
   name: dokken
-  platform: linux/amd64
   pull_platform_image: false # Use the local images, prevent pull of docker images from Docker Hub,
-  chef_version: 18 # Chef version aligned with the one used to build the images
+  chef_version: 19.3.14
   chef_image: cincproject/cinc
-  env:
-    # Since the kernel version of the docker images is not in the expected pattern,
-    # KERNEL_RELEASE is set in the environment to override the system value.
-    - KERNEL_RELEASE=3.10.0-1160.42.2.el7.x86_64
 
 provisioner:
   name: dokken
@@ -32,13 +27,7 @@ lifecycle:
       docker commit ${docker_id} pcluster-${KITCHEN_PHASE}/${KITCHEN_INSTANCE_NAME}:latest
 
 platforms:
-  - name: alinux2
-    driver:
-      image: <% if ENV['KITCHEN_ALINUX2_IMAGE'] %> <%= ENV['KITCHEN_ALINUX2_IMAGE'] %> <% else %> dokken/amazonlinux-2 <% end %>
-    attributes:
-      cluster:
-        base_os: alinux2
-  - name: alinux-2023
+  - name: alinux2023
     driver:
       image: <% if ENV['KITCHEN_ALINUX2023_IMAGE'] %> <%= ENV['KITCHEN_ALINUX2023_IMAGE'] %> <% else %> dokken/amazonlinux-2023 <% end %>
     attributes:
@@ -59,7 +48,7 @@ platforms:
       cluster:
         base_os: ubuntu2404
         # Since the kernel version of the docker images is not compatible (6.2.0-1016-azure), set a fake kernel value to permit to install Lustre on docker.
-        kernel_release: '5.15.0-1028-aws'
+        kernel_release: '6.8.0-1031-aws'
   - name: rhel8
     driver:
       image: <% if ENV['KITCHEN_RHEL8_IMAGE'] %> <%= ENV['KITCHEN_RHEL8_IMAGE'] %> <% else %> registry.access.redhat.com/ubi8/ubi <% end %>
@@ -95,6 +84,9 @@ platforms:
   - name: rocky9
     driver:
       image: <% if ENV['KITCHEN_ROCKY9_IMAGE'] %> <%= ENV['KITCHEN_ROCKY9_IMAGE'] %> <% else %> dokken/rockylinux-9 <% end %>
+      intermediate_instructions:
+        # xz is absent from the rocky9 dokken image; munge unpacks a .tar.xz tarball.
+        - RUN yum install xz -y
     attributes:
       cluster:
         base_os: rocky9

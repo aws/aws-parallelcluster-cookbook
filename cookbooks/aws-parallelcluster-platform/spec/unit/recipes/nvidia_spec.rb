@@ -15,6 +15,10 @@ describe 'aws-parallelcluster-platform::nvidia_config' do
       is_expected.to configure_gdrcopy('Configure gdrcopy')
     end
 
+    it 'configures nvidia-imex' do
+      is_expected.to configure_nvidia_imex('Configure nvidia-imex')
+    end
+
     it 'loads nvidia-uvm kernel module' do
       is_expected.to load_kernel_module('nvidia-uvm')
     end

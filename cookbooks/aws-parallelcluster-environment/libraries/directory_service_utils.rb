@@ -21,7 +21,7 @@ end
 def _get_cn_subparam(param)
   tokens = param.split(",") unless param.blank?
   tokens.each do |token|
-    return token if token.include? "cn"
+    return token if token.downcase.start_with? "cn"
   end
   ""
 end

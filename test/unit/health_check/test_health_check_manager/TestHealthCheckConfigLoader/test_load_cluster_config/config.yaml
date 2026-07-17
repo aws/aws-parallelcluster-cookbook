@@ -39,7 +39,7 @@ HeadNode:
 Iam: null
 Image:
   CustomAmi: null
-  Os: alinux2
+  Os: alinux2023
 Imds:
   ImdsSupport: v1.0
 Monitoring:

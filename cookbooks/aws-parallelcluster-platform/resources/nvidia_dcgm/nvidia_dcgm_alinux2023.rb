@@ -24,5 +24,5 @@ def _nvidia_dcgm_enabled
 end
 
 def platform
-  'rhel9'
+  'amzn2023'
 end

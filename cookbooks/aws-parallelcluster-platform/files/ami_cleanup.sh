@@ -6,6 +6,7 @@ IS_OFFICIAL_AMI_BUILD=${1:-"false"}
 cloud-init clean -s
 
 rm -rf /var/tmp/* /tmp/*
+rm -rf /opt/parallelcluster/tmp/*
 rm -rf /etc/ssh/ssh_host_*
 rm -f /etc/udev/rules.d/70-persistent-net.rules
 grep -l "Created by cloud-init on instance boot automatically" /etc/sysconfig/network-scripts/ifcfg-* | xargs rm -f

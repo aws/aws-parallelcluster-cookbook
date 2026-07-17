@@ -31,7 +31,7 @@ CONFIGS = [
         "timestamp_format_key": "month_first",
         "file_path": "/var/log/messages",
         "log_stream_name": "system-messages",
-        "schedulers": ["awsbatch", "slurm"],
+        "schedulers": ["slurm"],
         "node_roles": ["ComputeFleet", "HeadNode"],
         "platforms": ["amazon", "centos"],
         "feature_conditions": [{"dna_key": "dcv_enabled", "satisfying_values": ["head_node"]}],
@@ -41,7 +41,7 @@ CONFIGS = [
         "file_path": "/var/log/syslog",
         "log_stream_name": "syslog",
         "log_group_name": "pre-existing",
-        "schedulers": ["awsbatch", "slurm"],
+        "schedulers": ["slurm"],
         "node_roles": ["ComputeFleet", "HeadNode"],
         "platforms": ["ubuntu"],
         "feature_conditions": [{"dna_key": ["directory_service", "enabled"], "satisfying_values": ["true"]}],
@@ -50,9 +50,9 @@ CONFIGS = [
         "timestamp_format_key": "default",
         "file_path": "/var/log/cfn-init.log",
         "log_stream_name": "cfn-init",
-        "schedulers": ["awsbatch"],
+        "schedulers": ["slurm"],
         "node_roles": ["HeadNode"],
-        "platforms": ["amazon", "centos", "ubuntu"],
+        "platforms": ["amazon", "ubuntu"],
         "feature_conditions": [],
     },
 ]
@@ -102,7 +102,7 @@ def test_select_configs_for_platform(platform, length):
 
 @pytest.mark.parametrize(
     "scheduler, length",
-    [("slurm", 2), ("awsbatch", 3)],
+    [("slurm", 3)],
 )
 def test_select_configs_for_scheduler(scheduler, length):
     configs = select_configs_for_scheduler(CONFIGS, scheduler)

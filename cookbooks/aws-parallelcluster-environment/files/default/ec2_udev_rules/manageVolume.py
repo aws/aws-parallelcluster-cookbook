@@ -17,6 +17,7 @@ import time
 import boto3
 import requests
 from botocore.config import Config
+from retrying import retry
 
 METADATA_REQUEST_TIMEOUT = 60
 
@@ -201,12 +202,18 @@ def parse_proxy_config():
     return proxy_config
 
 
+@retry(
+    stop_max_attempt_number=3,
+    wait_fixed=5000,
+)
 def get_metadata_value(token, metadata_path):
-    return requests.get(
+    response = requests.get(
         metadata_path,
         headers=token,
         timeout=METADATA_REQUEST_TIMEOUT,
-    ).text
+    )
+    response.raise_for_status()
+    return response.text
 
 
 def handle_volume(volume_id, attach, detach):

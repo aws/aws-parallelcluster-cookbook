@@ -46,6 +46,8 @@ SCRIPT_LOG_NAME_FETCH_AND_RUN = "fetch_and_run"
 
 DOWNLOAD_SCRIPT_HTTP_TIMEOUT_SECONDS = 60
 
+PCLUSTER_EXEC_TMP_DIR = "/opt/parallelcluster/tmp"
+
 
 @dataclass
 class ScriptDefinition:
@@ -229,7 +231,7 @@ class ScriptRunner:
     async def _download_s3_script(self, exe_script: ExecutableScript):
         s3_client = boto3.resource("s3", region_name=self.region_name)
         bucket_name, key = self._parse_s3_url(exe_script.url)
-        with tempfile.NamedTemporaryFile(delete=False) as file:
+        with tempfile.NamedTemporaryFile(delete=False, dir=PCLUSTER_EXEC_TMP_DIR) as file:
             try:
                 s3_client.Bucket(bucket_name).download_file(key, file.name)
             except (NoCredentialsError, botocore.exceptions.ClientError) as err:
@@ -260,7 +262,7 @@ class ScriptRunner:
                     "status_reason": response.reason,
                 },
             )
-        with tempfile.NamedTemporaryFile(delete=False) as file:
+        with tempfile.NamedTemporaryFile(delete=False, dir=PCLUSTER_EXEC_TMP_DIR) as file:
             file.write(response.content)
         exe_script.path = file.name
         return exe_script

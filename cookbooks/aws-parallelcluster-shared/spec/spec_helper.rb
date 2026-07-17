@@ -1,5 +1,4 @@
 require 'chefspec'
-require 'chefspec/berkshelf'
 
 # Chef::Mixin::ShellOut is required to mock shellout
 include Chef::Mixin::ShellOut
@@ -39,7 +38,6 @@ end
 
 def for_all_oses
   [
-    %w(amazon 2),
     %w(amazon 2023),
     %w(ubuntu 22.04),
     %w(ubuntu 24.04),

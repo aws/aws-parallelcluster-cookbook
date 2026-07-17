@@ -6,20 +6,30 @@
 #   interface
 # - A routing rule to make the OS use the specific routing table for this network interface
 
-set -e
+set -ex
 
 if
-  [ -z "${DEVICE_NAME}" ] ||          # name of the device
   [ -z "${DEVICE_NUMBER}" ] ||        # index of the device
   [ -z "${NETWORK_CARD_INDEX}" ] ||   # index of the network card
   [ -z "${GW_IP_ADDRESS}" ] ||        # gateway ip address
-  [ -z "${DEVICE_IP_ADDRESS}" ] ||    # ip address to assign to the interface
   [ -z "${CIDR_PREFIX_LENGTH}" ] ||   # the prefix length of the device IP cidr block
   [ -z "${NETMASK}" ] ||              # netmask to apply to device ip address
   [ -z "${CIDR_BLOCK}" ]              # (full) subnet cidr block
 then
   echo 'One or more environment variables missing'
   exit 1
+fi
+
+# Check if this is an EFA-only interface (no device name or IP)
+if [ -z "${DEVICE_NAME}" ] && [ -z "${DEVICE_IP_ADDRESS}" ]; then
+  echo "EFA-only interface detected - skipping IP configuration"
+  exit 0
+fi
+
+# If one of these is missing but not both, it is an invalid configuration
+if [ -z "${DEVICE_NAME}" ] || [ -z "${DEVICE_IP_ADDRESS}" ]; then
+    echo "Device name or IP address is missing"
+    exit 1
 fi
 
 STATIC_IP_CONFIG=$(cat<<END

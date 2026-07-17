@@ -75,11 +75,17 @@ def load_cluster_config(config_path)
 end
 
 #
-# Check if custom node is specified in the config
+# Check if a custom node package is specified in the config using DevSettings.
+# We ship a default custom_node_package (the official S3 package), so we
+# compare the effective value against the full default-precedence value:
+# only a value the customer changed counts as custom.
 #
 def is_custom_node?
   custom_node_package = node['cluster']['custom_node_package']
-  !custom_node_package.nil? && !custom_node_package.empty?
+  return false if custom_node_package.nil? || custom_node_package.empty?
+  custom = custom_node_package != node.default['cluster']['custom_node_package']
+  Chef::Log.info("is_custom_node?: #{custom} (package: #{custom_node_package})")
+  custom
 end
 
 def write_sync_file(path)
@@ -104,5 +110,134 @@ def wait_sync_file(path)
     retries 30
     retry_delay 10
     timeout 5
+  end
+end
+
+def login_nodes_enabled?
+  require 'json'
+  lt_config_path = "#{node['cluster']['shared_dir']}/launch-templates-config.json"
+  unless ::File.exist?(lt_config_path)
+    raise "Unable to determine whether login nodes are enabled: launch templates config file #{lt_config_path} does not exist"
+  end
+
+  lt_config = JSON.parse(::File.read(lt_config_path))
+
+  login_pools = lt_config.is_a?(Hash) ? lt_config['LoginPools'] : nil
+  login_pools.is_a?(Hash) && !login_pools.empty?
+end
+
+def cluster_readiness_check_enabled?
+  node['cluster']['cluster_readiness_check_enabled'].to_s.downcase == 'true'
+end
+
+def cluster_readiness_check_ignore_failure?
+  node['cluster']['cluster_readiness_check_ignore_failure'].to_s.downcase == 'true'
+end
+
+# Executes a block with retry logic for handling transient failures.
+#
+# @param max_retries [Integer] Maximum number of retry attempts (default: 10)
+# @param retry_delay [Integer] Seconds to wait between retries (default: 5)
+# @param on_retry [Proc] Optional callback executed after each failed attempt (receives attempt number and exception)
+# @yield The block to execute with retry protection
+# @raise [StandardError] Re-raises the last exception if all retries are exhausted
+#
+# @example Basic usage
+#   with_retries do
+#     some_flaky_operation
+#   end
+#
+# @example Advanced usage
+#   with_retries(max_retries: 5, retry_delay: 10, on_retry: ->(attempt, e) { cleanup }) do
+#     some_flaky_operation
+#   end
+#
+def with_retries(max_retries: 10, retry_delay: 5, on_retry: nil)
+  last_exception = nil
+
+  max_retries.times do |attempt|
+    begin
+      return yield
+    rescue StandardError => e
+      last_exception = e
+      Chef::Log.error("Attempt #{attempt + 1}/#{max_retries} failed: #{e.message}")
+
+      if attempt < max_retries - 1
+        if on_retry
+          Chef::Log.info("Executing on_retry callback...")
+          begin
+            on_retry.call(attempt, e)
+          rescue StandardError => retry_error
+            Chef::Log.error("on_retry callback failed (ignored): #{retry_error.message}")
+          end
+        end
+        Chef::Log.info("Sleeping #{retry_delay}s before next attempt...")
+        sleep retry_delay
+      end
+    end
+  end
+
+  Chef::Log.error("All #{max_retries} retry attempts exhausted")
+  raise last_exception
+end
+
+# Executes a shell command with logging of command, exit status, stdout, and stderr.
+#
+# @param cmd [String] The shell command to execute
+# @param timeout [Integer] Command timeout in seconds (default: nil)
+# @param raise_on_error [Boolean] If true, raises exception on non-zero exit (default: false)
+# @return [Mixlib::ShellOut] The shell_out result object
+#
+# @example Basic usage (non-raising)
+#   run_cmd('dnf clean metadata')
+#
+# @example With timeout and raise on error
+#   run_cmd('dnf install -y package', timeout: 600, raise_on_error: true)
+#
+def run_cmd(cmd, timeout: nil, raise_on_error: false)
+  Chef::Log.info("Executing: #{cmd}")
+  result = raise_on_error ? shell_out!(cmd, timeout: timeout) : shell_out(cmd, timeout: timeout)
+  Chef::Log.info("Exit status: #{result.exitstatus}")
+  Chef::Log.info("Stdout: #{result.stdout}") unless result.stdout.strip.empty?
+  Chef::Log.info("Stderr: #{result.stderr}") unless result.stderr.strip.empty?
+  result
+end
+
+# Installs RPM packages on RHEL/Rocky with a metadata-refresh + mirror-rotation
+# retry strategy that mitigates transient failures caused by out-of-sync RHUI
+# mirrors (e.g. "No match for argument: <pkg>-<version>", or rpm transaction
+# lock contention with the dnf-makecache timer).
+#
+# Strategy:
+#   1. `dnf install -y --refresh <pkgs>` forces DNF to refresh metadata from
+#      the mirror it is currently using.
+#   2. `dnf clean metadata` between attempts forces DNF to re-evaluate
+#      available mirrors and potentially pick a different one next attempt.
+#
+# @param packages [Array<String>, String] Package names (optionally version-pinned)
+# @param max_retries [Integer] Maximum number of retry attempts (default: 10)
+# @param retry_delay [Integer] Seconds to wait between retries (default: 5)
+#
+# @example
+#   dnf_install_with_refresh(%w(dkms rpm-build check check-devel subunit))
+#
+def dnf_install_with_refresh(packages, max_retries: 10, retry_delay: 5)
+  packages = Array(packages)
+  Chef::Log.info("Installing packages with mirror refresh retry: #{packages.join(', ')}")
+
+  on_retry = lambda do |_attempt, _exception|
+    # This cleanup forces DNF to re-evaluate available mirrors
+    # and which mirror to use on the next attempt.
+    run_cmd('dnf clean metadata')
+  end
+
+  with_retries(
+    max_retries: max_retries,
+    retry_delay: retry_delay,
+    on_retry: on_retry
+  ) do
+    # --refresh forces DNF to refresh the metadata from the mirror it's currently using.
+    run_cmd("dnf install -y --refresh #{packages.join(' ')}", raise_on_error: true)
+    Chef::Log.info("Package installation succeeded")
   end
 end

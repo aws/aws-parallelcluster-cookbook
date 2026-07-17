@@ -17,8 +17,6 @@ provides :efs, platform: 'ubuntu' do |node|
   node['platform_version'].to_i >= 22
 end
 
-use 'partial/_get_package_version_dpkg'
 use 'partial/_common'
-use 'partial/_debian'
-use 'partial/_install_from_tar'
+use 'partial/_install_from_repo_debian'
 use 'partial/_mount_umount'

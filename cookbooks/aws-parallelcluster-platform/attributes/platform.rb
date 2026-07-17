@@ -8,21 +8,52 @@ default['cluster']['sysctl']['ipv4']['gc_thresh3'] = 16_384
 
 # ArmPL
 default['conditions']['arm_pl_supported'] = arm_instance?
+default['cluster']['armpl']['version'] = '26.01.1'
+default['cluster']['armpl']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/armpl"
+
+# Stunnel
+default['cluster']['stunnel']['version'] = '5.78'
+default['cluster']['stunnel']['sha256'] = '8727e53bb8b7528f850327a2a149158422c02183bc120d1d733cc65b1e2c349d'
+default['cluster']['stunnel']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/stunnel"
 
 # Enroot
-default['cluster']['enroot']['version'] = '3.4.1'
+default['cluster']['enroot']['version'] = '4.2.1'
+default['cluster']['enroot']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
+default['cluster']['enroot']['caps_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/enroot"
 default['cluster']['enroot']['temporary_dir'] = '/run/enroot'
 default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '570.86.15'
-default['cluster']['nvidia']['dcgm_version'] = '3.3.6'
-if platform?('amazon') && node['platform_version'] == "2"
-  default['cluster']['nvidia']['driver_version'] = '550.127.08'
-end
+default['cluster']['nvidia']['driver_version'] = '580.126.20'
+default['cluster']['nvidia']['dcgm_version'] = '4.6.0-1'
+
+default['cluster']['nvidia']['driver_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver"
+default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
+default['cluster']['nvidia']['fabricmanager']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_fabric"
+
+# CUDA
+default['cluster']['nvidia']['cuda']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda"
+default['cluster']['nvidia']['cuda']['samples_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples"
+default['cluster']['nvidia']['cuda']['version'] = '13.0.2'
+default['cluster']['nvidia']['cuda']['driver_version_suffix'] = '580.95.05'
+
+# GDRCopy
+default['cluster']['nvidia']['gdrcopy']['version'] = '2.6'
+default['cluster']['nvidia']['gdrcopy']['sha256'] = 'c9eaf0593567ac5765d04c48cf7923dacb2644240b35bb5f025edb3bde1d5b4f'
+default['cluster']['nvidia']['gdrcopy']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
+
+# nvidia-imex
+default['cluster']['nvidia']['imex']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_imex"
+default['cluster']['nvidia']['imex']['force_configuration'] = false
+
+# NVIDIA NVLSM
+default['cluster']['nvidia']['nvlsm']['enabled'] = true
+default['cluster']['nvidia']['nvlsm']['version'] = '2025.03.9-1'
+default['cluster']['nvidia']['nvlsm']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_nvlsm"
 
 # DCV
+default['cluster']['dcv']['install_enabled'] = true
 default['cluster']['dcv']['authenticator']['user'] = "dcvextauth"
 default['cluster']['dcv']['authenticator']['user_id'] = node['cluster']['reserved_base_uid'] + 3
 default['cluster']['dcv']['authenticator']['group'] = node['cluster']['dcv']['authenticator']['user']
@@ -32,13 +63,14 @@ default['cluster']['dcv']['authenticator']['certificate'] = "#{node['cluster']['
 default['cluster']['dcv']['authenticator']['private_key'] = "#{node['cluster']['etc_dir']}/ext-auth-private-key.pem"
 default['cluster']['dcv']['authenticator']['virtualenv_name'] = "dcv_authenticator_virtualenv"
 default['cluster']['dcv']['authenticator']['virtualenv_path'] = "#{node['cluster']['system_pyenv_root']}/versions/#{node['cluster']['python-version']}/envs/#{node['cluster']['dcv']['authenticator']['virtualenv_name']}"
-default['cluster']['dcv']['version'] = '2024.0-18131'
+default['cluster']['dcv']['version'] = '2025.0-20103'
+default['cluster']['dcv']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/dcv"
 default['cluster']['dcv_port'] = 8443
 
-default['cluster']['dcv']['server']['version'] = '2024.0.18131-1'
-default['cluster']['dcv']['xdcv']['version'] = '2024.0.631-1'
-default['cluster']['dcv']['gl']['version'] = '2024.0.1078-1'
-default['cluster']['dcv']['web_viewer']['version'] = '2024.0.18131-1'
+default['cluster']['dcv']['server']['version'] = '2025.0.20103-1'
+default['cluster']['dcv']['xdcv']['version'] = '2025.0.688-1'
+default['cluster']['dcv']['gl']['version'] = '2025.0.1112-1'
+default['cluster']['dcv']['web_viewer']['version'] = '2025.0.20103-1'
 
 # OpenSSH settings for AWS ParallelCluster instances
 default['openssh']['server']['protocol'] = '2'
@@ -70,3 +102,8 @@ default['cluster']['cluster_config_version'] = nil
 default['cluster']['instance_types_data_version'] = nil
 default['cluster']['change_set_s3_key'] = nil
 default['cluster']['instance_types_data_s3_key'] = nil
+
+# Intel MPI
+default['cluster']['intelmpi']['version'] = '2021.18'
+default['cluster']['intelmpi']['full_version'] = '2021.18.0.749'
+default['cluster']['intelmpi']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/impi"

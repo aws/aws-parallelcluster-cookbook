@@ -19,19 +19,16 @@ property :packages, [String, Array],
          default: lazy { default_packages },
          description: 'Packages for the node'
 
+action :install do
+  robust_package "install_packages #{new_resource.name}" do
+    packages new_resource.packages
+  end
+end
+
 action :install_base_packages do
   install_packages 'default' do
     action :install
   end unless redhat_on_docker?
-end
-
-action :install_kernel_source do
-  package "install kernel packages" do
-    package_name kernel_source_package
-    version kernel_source_package_version
-    retries 3
-    retry_delay 5
-  end unless on_docker?
 end
 
 action :install_extras do
@@ -40,6 +37,5 @@ end
 
 action :setup do
   action_install_extras
-  action_install_kernel_source
   action_install_base_packages
 end

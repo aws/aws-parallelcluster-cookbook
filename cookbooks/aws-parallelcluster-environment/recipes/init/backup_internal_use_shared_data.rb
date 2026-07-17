@@ -25,8 +25,8 @@ if node['cluster']['node_type'] == 'HeadNode'
       user 'root'
       group 'root'
       code <<-EOH
-        mkdir -p /tmp#{dir}
-        rsync -a #{dir}/ /tmp#{dir}
+        mkdir -p #{node['cluster']['exec_tmp_dir']}#{dir}
+        rsync -a #{dir}/ #{node['cluster']['exec_tmp_dir']}#{dir}
       EOH
     end
   end

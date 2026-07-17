@@ -30,9 +30,9 @@ action :setup do
 end
 
 action :configure do
-  # Start nvidia fabric manager on NVSwitch enabled systems
-  if get_nvswitches > 1
-    service 'nvidia-fabricmanager' do
+  # Start nvidia fabric manager on NVSwitch enabled systems, except for GB200 which does not need it.
+  if enable_fabric_manager? && !is_gb200_node?
+    service fabric_manager_service do
       action %i(start enable)
       supports status: true
     end
@@ -52,12 +52,18 @@ def _nvidia_driver_version
   nvidia_driver_version || node['cluster']['nvidia']['driver_version']
 end
 
-# Get number of nv switches
-def get_nvswitches
-  #  A100 (P4) and H100(P5) systems have NVSwitches
-  # NVSwitch device id is 10de:1af1 for P4 instance
-  # NVSwitch device id is 10de:22a3 for P5 instance
-  nvswitch_check_p4 = shell_out("lspci -d 10de:1af1 | wc -l")
-  nvswitch_check_p5 = shell_out("lspci -d 10de:22a3 | wc -l")
-  nvswitch_check_p4.stdout.strip.to_i + nvswitch_check_p5.stdout.strip.to_i
+def fabric_manager_package
+  'nvidia-fabricmanager'
+end
+
+# The systemd service name for fabric manager.
+# On AL2, the RPM package is named 'nvidia-fabric-manager' but the
+# systemd service unit is 'nvidia-fabricmanager' (no hyphen between
+# 'fabric' and 'manager'), matching all other platforms.
+def fabric_manager_service
+  'nvidia-fabricmanager'
+end
+
+def fabric_manager_version
+  _nvidia_driver_version
 end

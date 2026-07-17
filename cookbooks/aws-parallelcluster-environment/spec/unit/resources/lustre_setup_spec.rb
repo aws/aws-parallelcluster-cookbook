@@ -20,20 +20,6 @@ class Lustre
 end
 
 describe 'lustre:setup' do
-  context "on amazon2" do
-    cached(:chef_run) do
-      runner = runner(
-        platform: 'amazon', version: '2',
-        step_into: ['lustre']
-      )
-      Lustre.setup(runner)
-    end
-
-    it 'installs lustre2.10 extra topic' do
-      is_expected.to install_alinux_extras_topic("lustre")
-    end
-  end
-
   [%w(redhat RHEL), ["rocky", "Rocky Linux"]].each do |platform, platform_string|
     context "on #{platform} lower than 8.2" do
       cached(:chef_run) do

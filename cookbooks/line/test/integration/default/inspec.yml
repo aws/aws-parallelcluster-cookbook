@@ -1,0 +1,7 @@
+---
+name: default
+title: Default line resource tests
+maintainer: Sous Chefs
+license: Apache-2.0
+summary: Verifies the primary line custom resource workflow
+version: 1.0.0

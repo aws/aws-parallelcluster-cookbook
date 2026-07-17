@@ -28,6 +28,15 @@ service 'log4j-cve-2021-44228-hotpatch' do
   action %i(disable stop mask)
 end unless on_docker?
 
+# Disable dnf-makecache timer to reduce system jitter.
+# dnf-makecache periodically refreshes repo metadata, triggering heavy rpm/dnf
+# operations. At scale (500+ nodes), the randomized timer ensures at least one
+# node is always running a cache refresh, causing barrier straggler effects.
+# Cluster nodes do not need periodic repo cache updates.
+service 'dnf-makecache.timer' do
+  action %i(disable stop)
+end unless on_docker?
+
 # Disable services if node['cluster']['disable_services'] is provided
 if node['cluster']['disable_services']
   node['cluster']['disable_services'].split().each do |service_name|

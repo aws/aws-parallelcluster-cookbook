@@ -17,7 +17,7 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 # It is possible to restore the SIT behaviour by setting the use_private_hostname = true as extra_json parameter
-if node['cluster']['scheduler'] == 'slurm' && node['cluster']['use_private_hostname'] == 'false'
+if node['cluster']['use_private_hostname'] == 'false'
   # Heterogeneous Instance Type
 
   if !node['cluster']['dns_domain'].nil? && !node['cluster']['dns_domain'].empty?
