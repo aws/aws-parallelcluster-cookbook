@@ -96,3 +96,34 @@ def test_resolve_supervisorctl(monkeypatch, glob_result, expected):
             _resolve_supervisorctl()
     else:
         assert _resolve_supervisorctl() == expected
+
+
+@pytest.mark.parametrize(
+    "stdout, expected",
+    [
+        ("cfn-hup    RUNNING   pid 3926, uptime 5:58:33", "RUNNING"),
+        ("cfn-hup    STOPPED", "STOPPED"),
+        ("cfn-hup    FATAL     Exited too quickly", "FATAL"),
+    ],
+)
+def test_get_supervisord_program_state_returns_state_token(monkeypatch, stdout, expected):
+    monkeypatch.setattr(services, "_resolve_supervisorctl", lambda: _SUPERVISORCTL)
+    monkeypatch.setattr(
+        services,
+        "run_command",
+        lambda command: subprocess.CompletedProcess(command, 0, stdout=stdout, stderr=""),
+    )
+
+    assert services.get_supervisord_program_state("cfn-hup") == expected
+
+
+def test_get_supervisord_program_state_raises_when_undeterminable(monkeypatch):
+    monkeypatch.setattr(services, "_resolve_supervisorctl", lambda: _SUPERVISORCTL)
+    monkeypatch.setattr(
+        services,
+        "run_command",
+        lambda command: subprocess.CompletedProcess(command, 1, stdout="", stderr=""),
+    )
+
+    with pytest.raises(RuntimeError):
+        services.get_supervisord_program_state("cfn-hup")

@@ -10,7 +10,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Findings reported by a Check: a code and a message, as an error (``E<N>``) or a warning (``W<N>``)."""
+"""Findings reported by a Check: a code and a message (error ``E<N>``, warning ``W<N>``, info ``I<N>``)."""
 
 import copy
 from dataclasses import dataclass
@@ -44,3 +44,11 @@ class CheckWarning(CheckFinding):
     def __init__(self, code: int, message: str):
         """Build a warning finding with code ``W<code>`` and the given ``message``."""
         super().__init__("W{}".format(code), message)
+
+
+class CheckInfo(CheckFinding):
+    """A finding coded ``I<code>`` (e.g. ``CheckInfo(1, ...)`` has code ``I1``)."""
+
+    def __init__(self, code: int, message: str):
+        """Build an informational finding with code ``I<code>`` and the given ``message``."""
+        super().__init__("I{}".format(code), message)

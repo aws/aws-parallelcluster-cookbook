@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import List, Optional
 
-from pcluster_diag.models.finding import CheckError, CheckWarning
+from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
 
 
 class Status(Enum):
@@ -51,6 +51,8 @@ class Result:
             (code + message); None for any other status.
         warnings: The set of non-fatal warnings raised by the Check, each a CheckWarning (code +
             message); present on a WARNING Result and optionally on a FAILURE Result; None otherwise.
+        infos: Informational notes, each a CheckInfo (code + message); used to explain why a SKIPPED_*
+            Result was skipped; None otherwise.
     """
 
     check_id: str
@@ -58,6 +60,7 @@ class Result:
     status: Status
     errors: Optional[List[CheckError]] = None
     warnings: Optional[List[CheckWarning]] = None
+    infos: Optional[List[CheckInfo]] = None
 
     @staticmethod
     def passed(check) -> "Result":
@@ -110,19 +113,21 @@ class Result:
         )
 
     @staticmethod
-    def skipped_by_user(check) -> "Result":
+    def skipped_by_user(check, infos: Optional[List[CheckInfo]] = None) -> "Result":
         """Build a SKIPPED_BY_USER Result for ``check`` (the user did not approve its execution)."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
             status=Status.SKIPPED_BY_USER,
+            infos=infos,
         )
 
     @staticmethod
-    def skipped_not_applicable(check) -> "Result":
+    def skipped_not_applicable(check, infos: Optional[List[CheckInfo]] = None) -> "Result":
         """Build a SKIPPED_NOT_APPLICABLE Result for ``check`` (it does not apply to the context)."""
         return Result(
             check_id=check.identifier,
             check_description=check.description,
             status=Status.SKIPPED_NOT_APPLICABLE,
+            infos=infos,
         )

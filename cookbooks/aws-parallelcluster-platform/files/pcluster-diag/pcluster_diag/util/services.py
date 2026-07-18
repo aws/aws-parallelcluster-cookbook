@@ -15,12 +15,12 @@
 import glob
 from typing import Optional
 
-from pcluster_diag.core.constants import SUPERVISORCTL_GLOB
+from pcluster_diag.core.constants import SUPERVISORCTL_GLOB, SUPERVISORD_RUNNING_STATE
 from pcluster_diag.util.shell import run_command
 
 
-def is_supervisord_program_running(program: str) -> bool:
-    """Return whether the given supervisord program is currently RUNNING.
+def get_supervisord_program_state(program: str) -> str:
+    """Return the supervisord state token for ``program`` (e.g. RUNNING, STOPPED, FATAL, EXITED).
 
     Raises:
         RuntimeError: If supervisorctl cannot report the program status.
@@ -34,7 +34,16 @@ def is_supervisord_program_running(program: str) -> bool:
                 program, result.stdout
             )
         )
-    return state == "RUNNING"
+    return state
+
+
+def is_supervisord_program_running(program: str) -> bool:
+    """Return whether the given supervisord program is currently RUNNING.
+
+    Raises:
+        RuntimeError: If supervisorctl cannot report the program status.
+    """
+    return get_supervisord_program_state(program) == SUPERVISORD_RUNNING_STATE
 
 
 def _resolve_supervisorctl() -> str:

@@ -103,3 +103,63 @@ def test_run_command_without_as_user_leaves_command_unchanged(monkeypatch):
 
     # No privilege dropping when as_user is omitted.
     assert captured["command"] == ["curl", "http://example"]
+
+
+def test_time_command_returns_timing_for_completed_command(monkeypatch):
+    def fake_run(command, **kwargs):
+        return subprocess.CompletedProcess(command, 0, stdout="out", stderr="")
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+
+    timed = shell.time_command(["getent", "passwd", "alice"], timeout=5)
+
+    assert timed.timed_out is False
+    assert timed.returncode == 0
+    assert timed.stdout == "out"
+    assert timed.succeeded is True
+    assert timed.elapsed_seconds >= 0
+
+
+def test_time_command_marks_nonzero_exit_as_not_succeeded(monkeypatch):
+    monkeypatch.setattr(
+        shell.subprocess,
+        "run",
+        lambda command, **kwargs: subprocess.CompletedProcess(command, 2, stdout="", stderr="not found"),
+    )
+
+    timed = shell.time_command(["getent", "passwd", "ghost"])
+
+    assert timed.timed_out is False
+    assert timed.returncode == 2
+    assert timed.succeeded is False
+
+
+def test_time_command_treats_timeout_as_data_not_exception(monkeypatch):
+    def fake_run(command, **kwargs):
+        raise subprocess.TimeoutExpired(cmd=command, timeout=kwargs["timeout"], output="partial", stderr=None)
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+
+    timed = shell.time_command(["id", "alice"], timeout=1)
+
+    # A timeout is returned as a TimedCommand, never raised.
+    assert timed.timed_out is True
+    assert timed.returncode is None
+    assert timed.succeeded is False
+    # Partial output captured on timeout is normalized to a string.
+    assert timed.stdout == "partial"
+    assert timed.stderr == ""
+
+
+def test_time_command_decodes_bytes_output_on_timeout(monkeypatch):
+    def fake_run(command, **kwargs):
+        raise subprocess.TimeoutExpired(
+            cmd=command, timeout=kwargs["timeout"], output=b"bytes-out", stderr=b"bytes-err"
+        )
+
+    monkeypatch.setattr(shell.subprocess, "run", fake_run)
+
+    timed = shell.time_command(["id", "alice"], timeout=1)
+
+    assert timed.stdout == "bytes-out"
+    assert timed.stderr == "bytes-err"

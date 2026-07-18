@@ -14,8 +14,8 @@
 
 import pytest
 
-from pcluster_diag.models.finding import CheckError, CheckWarning
-from pcluster_diag.models.result import INTERNAL_ERROR_CODE, Result, Status
+from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
+from pcluster_diag.models.result import FAILED_STATUSES, INTERNAL_ERROR_CODE, Result, Status
 from tests.sample_data import FakeCheck, sample_result
 
 _SAMPLE_CHECK = FakeCheck(identifier="SampleCheck", description="a sample check")
@@ -66,13 +66,33 @@ def test_error_factory_builds_check_error_result_from_exception():
     ],
     ids=["skipped-by-user", "skipped-not-applicable"],
 )
-def test_skipped_factory_builds_result_with_no_errors(factory, expected_status):
+def test_skipped_factory_defaults_to_no_infos(factory, expected_status):
     result = factory(_SAMPLE_CHECK)
 
     assert result.status is expected_status
     assert result.check_id == _SAMPLE_CHECK.identifier
     assert result.check_description == _SAMPLE_CHECK.description
-    # A skipped Result never carries errors.
+    # A skipped Result carries no findings unless the caller supplies a reason.
+    assert result.infos is None
+    assert result.errors is None
+
+
+@pytest.mark.parametrize(
+    "factory, expected_status",
+    [
+        (Result.skipped_by_user, Status.SKIPPED_BY_USER),
+        (Result.skipped_not_applicable, Status.SKIPPED_NOT_APPLICABLE),
+    ],
+    ids=["skipped-by-user", "skipped-not-applicable"],
+)
+def test_skipped_factory_carries_reason_infos(factory, expected_status):
+    reasons = [CheckInfo(1, "tool unavailable")]
+
+    result = factory(_SAMPLE_CHECK, infos=reasons)
+
+    assert result.status is expected_status
+    assert result.infos == reasons
+    # A skip reason is informational, not an error.
     assert result.errors is None
 
 
@@ -117,3 +137,8 @@ def test_warning_factory_builds_result_with_warnings():
 
     # warnings default to None when omitted.
     assert Result.warning(_SAMPLE_CHECK).warnings is None
+
+
+def test_warning_status_is_not_a_failed_status():
+    # A WARNING is advisory: it does not make the run unsuccessful.
+    assert Status.WARNING not in FAILED_STATUSES
