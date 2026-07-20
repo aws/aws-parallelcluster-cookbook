@@ -33,8 +33,8 @@ describe 'nvidia_repo helpers' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:driver_version) { '999.88.77' }
-      cached(:cuda_version) { '13.0.2' }
-      cached(:cuda_suffix) { '580.95.05' }
+      cached(:cuda_version) { '13.3.1' }
+      cached(:cuda_suffix) { '610.43.02' }
       cached(:driver_base_url) { 'https://driver.example/nvidia_driver' }
       cached(:cuda_base_url) { 'https://cuda.example/cuda' }
       cached(:sources_dir) { '/fake/sources' }
@@ -43,7 +43,7 @@ describe 'nvidia_repo helpers' do
       cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
       cached(:arch) { debian? ? 'amd64' : 'x86_64' }
       cached(:driver_pkg_name) { "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}" }
-      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-0-local" }
+      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-3-local" }
       cached(:driver_pkg_file) do
         debian? ? "#{driver_pkg_name}_1.0-1_#{arch}.deb" : "#{driver_pkg_name}-1.0-1.#{arch}.rpm"
       end
@@ -118,8 +118,8 @@ describe 'nvidia_repo:add' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:driver_version) { '999.88.77' }
-      cached(:cuda_version) { '13.0.2' }
-      cached(:cuda_suffix) { '580.95.05' }
+      cached(:cuda_version) { '13.3.1' }
+      cached(:cuda_suffix) { '610.43.02' }
       cached(:driver_base_url) { 'https://driver.example/nvidia_driver' }
       cached(:cuda_base_url) { 'https://cuda.example/cuda' }
       cached(:sources_dir) { '/fake/sources' }
@@ -128,7 +128,7 @@ describe 'nvidia_repo:add' do
       cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
       cached(:arch) { debian? ? 'amd64' : 'x86_64' }
       cached(:driver_pkg_name) { "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}" }
-      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-0-local" }
+      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-3-local" }
       cached(:driver_pkg_file) do
         debian? ? "#{driver_pkg_name}_1.0-1_#{arch}.deb" : "#{driver_pkg_name}-1.0-1.#{arch}.rpm"
       end
@@ -229,7 +229,7 @@ describe 'nvidia_repo:add skip conditions' do
 
     it 'skips the driver repo but still adds the cuda repo' do
       expect(converged).not_to install_rpm_package(/nvidia-driver-local-repo/)
-      expect(converged).to install_rpm_package(/cuda-repo-amzn2023-13-0-local/)
+      expect(converged).to install_rpm_package(/cuda-repo-amzn2023-13-3-local/)
     end
   end
 
@@ -238,19 +238,19 @@ describe 'nvidia_repo:add skip conditions' do
 
     it 'skips the cuda repo but still adds the driver repo' do
       expect(converged).to install_rpm_package(/nvidia-driver-local-repo/)
-      expect(converged).not_to install_rpm_package(/cuda-repo-amzn2023-13-0-local/)
+      expect(converged).not_to install_rpm_package(/cuda-repo-amzn2023-13-3-local/)
     end
   end
 end
 
 describe 'nvidia_repo: overriding base_url to the official NVIDIA URLs' do
-  cached(:driver_version) { '580.105.08' }
-  cached(:cuda_version) { '13.0.2' }
-  cached(:cuda_suffix) { '580.95.05' }
+  cached(:driver_version) { '580.173.02' }
+  cached(:cuda_version) { '13.3.1' }
+  cached(:cuda_suffix) { '610.43.02' }
   cached(:driver_base_url) { "https://developer.download.nvidia.com/compute/nvidia-driver/#{driver_version}/local_installers" }
   cached(:cuda_base_url) { "https://developer.download.nvidia.com/compute/cuda/#{cuda_version}/local_installers" }
   cached(:driver_pkg_file) { "nvidia-driver-local-repo-amzn2023-#{driver_version}-1.0-1.x86_64.rpm" }
-  cached(:cuda_pkg_file) { "cuda-repo-amzn2023-13-0-local-#{cuda_version}_#{cuda_suffix}-1.x86_64.rpm" }
+  cached(:cuda_pkg_file) { "cuda-repo-amzn2023-13-3-local-#{cuda_version}_#{cuda_suffix}-1.x86_64.rpm" }
 
   cached(:chef_run) do
     allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
@@ -283,14 +283,14 @@ describe 'nvidia_repo:remove' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
       cached(:driver_version) { '999.88.77' }
-      cached(:cuda_version) { '13.0.2' }
-      cached(:cuda_suffix) { '580.95.05' }
+      cached(:cuda_version) { '13.3.1' }
+      cached(:cuda_suffix) { '610.43.02' }
       cached(:sources_dir) { '/fake/sources' }
       cached(:debian?) { platform == 'ubuntu' }
       cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
       cached(:arch) { debian? ? 'amd64' : 'x86_64' }
       cached(:driver_pkg_name) { "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}" }
-      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-0-local" }
+      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-3-local" }
       cached(:driver_pkg_file) do
         debian? ? "#{driver_pkg_name}_1.0-1_#{arch}.deb" : "#{driver_pkg_name}-1.0-1.#{arch}.rpm"
       end
@@ -314,7 +314,7 @@ describe 'nvidia_repo:remove' do
           runner.converge_dsl('aws-parallelcluster-platform') do
             nvidia_repo 'remove' do
               driver_version '999.88.77'
-              cuda_version '13.0.2'
+              cuda_version '13.3.1'
               action :remove
             end
           end
@@ -374,7 +374,7 @@ describe 'nvidia_repo:remove' do
           runner.converge_dsl('aws-parallelcluster-platform') do
             nvidia_repo 'remove' do
               driver_version '999.88.77'
-              cuda_version '13.0.2'
+              cuda_version '13.3.1'
               action :remove
             end
           end
