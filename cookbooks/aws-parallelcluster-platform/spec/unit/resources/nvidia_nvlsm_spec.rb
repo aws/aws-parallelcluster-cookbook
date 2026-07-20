@@ -2,14 +2,6 @@ require 'spec_helper'
 
 cluster_artifacts_s3_url = 'https://aws_region-aws-parallelcluster.s3.AWS_REGION.AWS_DOMAIN'
 source_dir = 'SOURCE_DIR'
-arch_suffix_rhel = {
-  'x86_64' => 'x86_64',
-  'aarch64' => 'aarch64',
-}.freeze
-arch_suffix_debian = {
-  'x86_64' => 'amd64',
-  'aarch64' => 'arm64',
-}.freeze
 
 class ConvergeNvidiaNvlsm
   def self.install(chef_run)
@@ -147,5 +139,3 @@ describe 'nvidia_nvlsm:install' do
     end
   end
 end
-
-

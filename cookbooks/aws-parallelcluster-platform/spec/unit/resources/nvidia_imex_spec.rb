@@ -395,5 +395,3 @@ describe 'nvidia_imex:configure' do
     end
   end
 end
-
-
