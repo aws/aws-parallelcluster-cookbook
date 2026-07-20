@@ -1,11 +1,10 @@
 require 'spec_helper'
 
 class ConvergeFabricManager
-  def self.setup(chef_run, nvidia_driver_version: nil, nvidia_enabled: nil)
+  def self.setup(chef_run, nvidia_enabled: nil)
     chef_run.converge_dsl('aws-parallelcluster-platform') do
       fabric_manager 'setup' do
         nvidia_enabled nvidia_enabled
-        nvidia_driver_version nvidia_driver_version
         action :setup
       end
     end
@@ -16,38 +15,6 @@ class ConvergeFabricManager
       fabric_manager 'configure' do
         action :configure
       end
-    end
-  end
-end
-
-describe 'fabric_manager:_nvidia_driver_version' do
-  cached(:nvidia_driver_attribute) { 'nvidia_driver_attribute' }
-  cached(:nvidia_driver_property) { 'nvidia_driver_property' }
-  cached(:chef_run) do
-    ChefSpec::SoloRunner.new(step_into: ['fabric_manager']) do |node|
-      node.override['cluster']['nvidia']['driver_version'] = nvidia_driver_attribute
-    end
-  end
-
-  context 'when nvidia driver property is set' do
-    cached(:resource) do
-      ConvergeFabricManager.setup(chef_run, nvidia_driver_version: nvidia_driver_property)
-      chef_run.find_resource('fabric_manager', 'setup')
-    end
-
-    it 'takes the value from nvidia driver property' do
-      expect(resource._nvidia_driver_version).to eq(nvidia_driver_property)
-    end
-  end
-
-  context 'when nvidia driver property is not set' do
-    cached(:resource) do
-      ConvergeFabricManager.setup(chef_run)
-      chef_run.find_resource('fabric_manager', 'setup')
-    end
-
-    it 'takes the value from nvidia driver attribute' do
-      expect(resource._nvidia_driver_version).to eq(nvidia_driver_attribute)
     end
   end
 end
@@ -163,12 +130,8 @@ describe 'fabric_manager:_fabric_manager_enabled' do
 end
 
 describe 'fabric_manager:setup' do
-  cached(:nvidia_driver_version) { 'nvidia_driver_version' }
-  cached(:aws_region) { 'test_region' }
-
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:fabric_manager_version) { nvidia_driver_version }
       cached(:fabric_manager_package) { 'nvidia-fabricmanager' }
 
       context 'when fabric manager is to install' do
@@ -178,7 +141,7 @@ describe 'fabric_manager:setup' do
             allow(res).to receive(:fabric_manager_installed?).and_return(false)
           end
           runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
-          ConvergeFabricManager.setup(runner, nvidia_driver_version: nvidia_driver_version)
+          ConvergeFabricManager.setup(runner)
         end
         cached(:node) { chef_run.node }
 
@@ -186,16 +149,23 @@ describe 'fabric_manager:setup' do
           is_expected.to setup_fabric_manager('setup')
         end
 
-        it 'dumps node attributes' do
-          expect(node['cluster']['nvidia']['fabricmanager']['package']).to eq(fabric_manager_package)
-          expect(node['cluster']['nvidia']['fabricmanager']['version']).to eq(fabric_manager_version)
-          is_expected.to write_node_attributes('dump node attributes')
-        end
-
         it 'installs fabric manager package from nvidia repo' do
           is_expected.to install_package(fabric_manager_package)
             .with(retries: 3)
             .with(retry_delay: 5)
+        end
+
+        it 'locks the package version' do
+          if %w(ubuntu).include?(platform)
+            is_expected.to run_execute("apt-mark hold #{fabric_manager_package}")
+              .with(retries: 3)
+              .with(retry_delay: 5)
+          else
+            is_expected.to install_package('yum-plugin-versionlock')
+            is_expected.to run_execute("yum versionlock #{fabric_manager_package}")
+              .with(retries: 3)
+              .with(retry_delay: 5)
+          end
         end
       end
 
@@ -206,7 +176,7 @@ describe 'fabric_manager:setup' do
             allow(res).to receive(:fabric_manager_installed?).and_return(true)
           end
           runner = runner(platform: platform, version: version, step_into: ['fabric_manager'])
-          ConvergeFabricManager.setup(runner, nvidia_driver_version: nvidia_driver_version)
+          ConvergeFabricManager.setup(runner)
         end
         cached(:node) { chef_run.node }
 
@@ -219,13 +189,11 @@ describe 'fabric_manager:setup' do
 end
 
 describe 'fabric_manager:configure' do
-  cached(:nvidia_driver_version) { 'nvidia_driver_version' }
   cached(:fabric_manager_service) { 'nvidia-fabricmanager' }
   [true, false].each do |is_gb200|
     for_all_oses do |platform, version|
       context "on #{platform}#{version} on #{is_gb200} gb200 node" do
         cached(:fabric_manager_package) { 'nvidia-fabricmanager' }
-        cached(:fabric_manager_version) { nvidia_driver_version }
 
         context('when fabric manager is required (multiple GPUs with bridges)') do
           cached(:chef_run) do

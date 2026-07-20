@@ -24,7 +24,6 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
 
   describe package("#{node['cluster']['nvidia']['imex']['package']}") do
     it { should be_installed }
-    its('version') { should match /#{node['cluster']['nvidia']['imex']['version']}/ }
   end
 end
 

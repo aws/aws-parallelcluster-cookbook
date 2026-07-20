@@ -35,7 +35,6 @@ default['cluster']['nvidia']['driver_extra_packages'] = 'nvidia-xconfig'
 
 default['cluster']['nvidia']['driver_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver"
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
-default['cluster']['nvidia']['fabricmanager']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_fabric"
 
 # CUDA
 default['cluster']['nvidia']['cuda']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda"
@@ -49,13 +48,10 @@ default['cluster']['nvidia']['gdrcopy']['sha256'] = 'c9eaf0593567ac5765d04c48cf7
 default['cluster']['nvidia']['gdrcopy']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/gdr_copy/v#{node['cluster']['nvidia']['gdrcopy']['version']}.tar.gz"
 
 # nvidia-imex
-default['cluster']['nvidia']['imex']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_imex"
 default['cluster']['nvidia']['imex']['force_configuration'] = false
 
 # NVIDIA NVLSM
 default['cluster']['nvidia']['nvlsm']['enabled'] = true
-default['cluster']['nvidia']['nvlsm']['version'] = '2025.06.11-1'
-default['cluster']['nvidia']['nvlsm']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_nvlsm"
 
 # DCV
 default['cluster']['dcv']['install_enabled'] = true

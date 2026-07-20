@@ -53,26 +53,6 @@ def nvidia_nvlsm_package
   "nvlsm"
 end
 
-def nvidia_nvlsm_version
-  node['cluster']['nvidia']['nvlsm']['version']
-end
-
-def nvidia_nvlsm_url
-  nvidia_package_url(node['cluster']['nvidia']['nvlsm']['base_url'], platform, nvidia_nvlsm_package_full_name)
-end
-
-def nvidia_nvlsm_package_full_name
-  # OS dependent
-end
-
-def nvidia_nvlsm_checksum
-  # OS dependent
-end
-
-def nvidia_nvlsm_install_commands
-  # OS dependent
-end
-
 def nvidia_nvlsm_install_dependencies_commands
   # OS dependent
 end

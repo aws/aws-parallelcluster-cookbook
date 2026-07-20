@@ -16,15 +16,13 @@ unified_mode true
 default_action :setup
 
 property :nvidia_enabled, [true, false, nil]
-property :nvidia_driver_version, String
 
 action :setup do
   return unless _fabric_manager_enabled
   return if fabric_manager_installed?
 
-  # Share fabric manager package and version with InSpec tests
+  # Share fabric manager package with InSpec tests
   node.default['cluster']['nvidia']['fabricmanager']['package'] = fabric_manager_package
-  node.default['cluster']['nvidia']['fabricmanager']['version'] = fabric_manager_version
   node_attributes "dump node attributes"
 
   package fabric_manager_package do
@@ -60,10 +58,6 @@ def _nvidia_enabled
   nvidia_enabled.nil? ? ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled']) : nvidia_enabled
 end
 
-def _nvidia_driver_version
-  nvidia_driver_version || node['cluster']['nvidia']['driver_version']
-end
-
 def fabric_manager_package
   'nvidia-fabricmanager'
 end
@@ -74,8 +68,4 @@ end
 # 'fabric' and 'manager'), matching all other platforms.
 def fabric_manager_service
   'nvidia-fabricmanager'
-end
-
-def fabric_manager_version
-  _nvidia_driver_version
 end

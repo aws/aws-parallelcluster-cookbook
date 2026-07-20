@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-cluster_artifacts_s3_url = 'https://aws_region-aws-parallelcluster.s3.AWS_REGION.AWS_DOMAIN'
-source_dir = 'SOURCE_DIR'
-
 class ConvergeNvidiaNvlsm
   def self.install(chef_run)
     chef_run.converge_dsl('aws-parallelcluster-platform') do
@@ -94,8 +91,6 @@ describe 'nvidia_nvlsm:install' do
               allow(res).to receive(:nvlsm_installation_enabled?).and_return(true)
             end
             runner = runner(platform: platform, version: version, step_into: ['nvidia_nvlsm']) do |node|
-              node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
-              node.override['cluster']['sources_dir'] = source_dir
               node.automatic['kernel']['machine'] = arch
             end
             ConvergeNvidiaNvlsm.install(runner)
@@ -132,6 +127,19 @@ describe 'nvidia_nvlsm:install' do
             is_expected.to install_package("nvlsm")
               .with(retries: 3)
               .with(retry_delay: 5)
+          end
+
+          it 'locks the package version' do
+            if %w(ubuntu).include?(platform)
+              is_expected.to run_execute("apt-mark hold nvlsm")
+                .with(retries: 3)
+                .with(retry_delay: 5)
+            else
+              is_expected.to install_package('yum-plugin-versionlock')
+              is_expected.to run_execute("yum versionlock nvlsm")
+                .with(retries: 3)
+                .with(retry_delay: 5)
+            end
           end
         end
       end

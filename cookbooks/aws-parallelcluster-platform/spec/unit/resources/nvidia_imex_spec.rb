@@ -1,14 +1,11 @@
 require 'spec_helper'
 
-nvidia_version = "1.2.3"
-SOURCE_DIR = 'SOURCE_DIR'.freeze
 nvidia_imex_dir = "/etc/nvidia-imex"
 imex_main_conf_file = "#{nvidia_imex_dir}/config.cfg"
 imex_nodes_conf_file = "#{nvidia_imex_dir}/nodes_config.cfg"
 imex_service_file = "/etc/systemd/system/nvidia-imex.service"
 imex_binary = '/usr/bin/nvidia-imex'
 imex_ctl_binary = '/usr/bin/nvidia-imex-ctl'
-cluster_artifacts_s3_url = 'https://aws_region-aws-parallelcluster.s3.aws_region.AWS_DOMAIN'
 
 class ConvergeNvidiaImex
   def self.install(chef_run)
@@ -207,33 +204,7 @@ describe 'nvidia_imex:install' do
 
       %w(aarch64 x86_64).each do |arm_or_x86|
         context "when nvidia is enabled on #{arm_or_x86}" do
-          cached(:nvidia_imex_version) { "1.2.3-1" }
           cached(:nvidia_imex_package) { "nvidia-imex" }
-          cached(:nvidia_imex_name) do
-            if %(redhat rocky).include?(platform) || platform == 'amazon' && version == '2023'
-              "#{nvidia_imex_package}-#{nvidia_imex_version}"
-            else
-              "#{nvidia_imex_package}_#{nvidia_imex_version}"
-            end
-          end
-          cached(:url_arch) do
-            if %(redhat rocky amazon).include?(platform)
-              arm_or_x86
-            elsif platform == 'ubuntu'
-              arm_or_x86 == 'x86_64' ? 'amd64' : 'arm64'
-            else
-              arm_or_x86 == 'x86_64' ? 'x86_64' : 'aarch64'
-            end
-          end
-          cached(:url_suffix) do
-            if %(redhat rocky).include?(platform)
-              "rhel#{version}/#{nvidia_imex_name}.#{url_arch}"
-            elsif platform == 'amazon' && version == '2023'
-              "amzn2023/#{nvidia_imex_name}.#{url_arch}"
-            else
-              "#{platform}#{version.delete('.')}/#{nvidia_imex_name}_#{url_arch}"
-            end
-          end
 
           cached(:chef_run) do
             stubs_for_resource('nvidia_imex') do |res|
@@ -246,11 +217,8 @@ describe 'nvidia_imex:install' do
           cached(:node) { chef_run.node }
 
           before do
-            chef_run.node.override['cluster']['artifacts_s3_url'] = cluster_artifacts_s3_url
             chef_run.node.override['cluster']['region'] = 'aws_region'
-            chef_run.node.override['cluster']['sources_dir'] = SOURCE_DIR
             chef_run.node.automatic['kernel']['machine'] = arm_or_x86
-            chef_run.node.override['cluster']['nvidia']['driver_version'] = nvidia_version
             ConvergeNvidiaImex.install(chef_run)
           end
 
@@ -260,10 +228,17 @@ describe 'nvidia_imex:install' do
               .with(retry_delay: 5)
           end
 
-          it 'sets nvidia-imex version' do
-            expect(node.default['cluster']['nvidia']['imex']['version']).to eq(nvidia_imex_version)
-            expect(node.default['cluster']['nvidia']['imex']['package']).to eq(nvidia_imex_package)
-            is_expected.to write_node_attributes('dump node attributes')
+          it 'locks the package version' do
+            if %w(ubuntu).include?(platform)
+              is_expected.to run_execute("apt-mark hold #{nvidia_imex_package}")
+                .with(retries: 3)
+                .with(retry_delay: 5)
+            else
+              is_expected.to install_package('yum-plugin-versionlock')
+              is_expected.to run_execute("yum versionlock #{nvidia_imex_package}")
+                .with(retries: 3)
+                .with(retry_delay: 5)
+            end
           end
         end
       end
