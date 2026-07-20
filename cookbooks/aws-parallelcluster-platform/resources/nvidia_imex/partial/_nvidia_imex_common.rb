@@ -20,7 +20,6 @@ action :install do
   return if on_docker? || imex_installed?
 
   package nvidia_imex_package do
-    version nvidia_imex_full_version
     retries 3
     retry_delay 5
   end

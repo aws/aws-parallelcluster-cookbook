@@ -21,7 +21,6 @@ action :install do
   action_install_nvlsm_dependencies
 
   package nvidia_nvlsm_package do
-    version nvidia_nvlsm_version
     retries 3
     retry_delay 5
   end

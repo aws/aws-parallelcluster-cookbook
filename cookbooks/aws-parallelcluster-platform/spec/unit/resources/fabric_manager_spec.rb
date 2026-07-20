@@ -194,7 +194,6 @@ describe 'fabric_manager:setup' do
 
         it 'installs fabric manager package from nvidia repo' do
           is_expected.to install_package(fabric_manager_package)
-            .with(version: fabric_manager_version)
             .with(retries: 3)
             .with(retry_delay: 5)
         end

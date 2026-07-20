@@ -54,7 +54,7 @@ default['cluster']['nvidia']['imex']['force_configuration'] = false
 
 # NVIDIA NVLSM
 default['cluster']['nvidia']['nvlsm']['enabled'] = true
-default['cluster']['nvidia']['nvlsm']['version'] = '2025.03.9-1'
+default['cluster']['nvidia']['nvlsm']['version'] = '2025.06.11-1'
 default['cluster']['nvidia']['nvlsm']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_nvlsm"
 
 # DCV

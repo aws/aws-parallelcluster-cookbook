@@ -110,7 +110,7 @@ describe 'nvidia_nvlsm:install' do
           end
           cached(:node) { chef_run.node }
 
-          cached(:nvlsm_version) { "2025.03.9-1" }
+          cached(:nvlsm_version) { "2025.06.11-1" }
           cached(:nvlsm_dependencies_installation_commands) do
             if %(redhat rocky amazon).include?(platform)
               "    set -ex\n    yum install -y infiniband-diags libibumad\n"
@@ -139,7 +139,6 @@ describe 'nvidia_nvlsm:install' do
 
           it 'installs nvlsm package from nvidia repo' do
             is_expected.to install_package("nvlsm")
-              .with(version: nvlsm_version)
               .with(retries: 3)
               .with(retry_delay: 5)
           end

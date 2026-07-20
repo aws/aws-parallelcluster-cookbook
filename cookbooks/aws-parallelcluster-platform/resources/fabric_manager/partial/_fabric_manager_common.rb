@@ -28,7 +28,6 @@ action :setup do
   node_attributes "dump node attributes"
 
   package fabric_manager_package do
-    version fabric_manager_version
     retries 3
     retry_delay 5
   end

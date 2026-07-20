@@ -256,7 +256,6 @@ describe 'nvidia_imex:install' do
 
           it 'installs nvidia-imex from nvidia repo' do
             is_expected.to install_package(nvidia_imex_package)
-              .with(version: nvidia_imex_version)
               .with(retries: 3)
               .with(retry_delay: 5)
           end
