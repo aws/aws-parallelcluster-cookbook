@@ -25,7 +25,7 @@ action :install do
     retry_delay 5
   end
 
-  action_lock_package_version
+  package_lock nvidia_nvlsm_package
 end
 
 action :install_nvlsm_dependencies do
@@ -54,7 +54,11 @@ def nvidia_nvlsm_package
 end
 
 def nvidia_nvlsm_install_dependencies_commands
-  # OS dependent
+  if platform_family?('debian')
+    "apt install -y infiniband-diags ibutils"
+  else
+    "yum install -y infiniband-diags libibumad"
+  end
 end
 
 def nvlsm_installation_enabled?

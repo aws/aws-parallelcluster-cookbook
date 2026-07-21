@@ -156,16 +156,7 @@ describe 'fabric_manager:setup' do
         end
 
         it 'locks the package version' do
-          if %w(ubuntu).include?(platform)
-            is_expected.to run_execute("apt-mark hold #{fabric_manager_package}")
-              .with(retries: 3)
-              .with(retry_delay: 5)
-          else
-            is_expected.to install_package('yum-plugin-versionlock')
-            is_expected.to run_execute("yum versionlock #{fabric_manager_package}")
-              .with(retries: 3)
-              .with(retry_delay: 5)
-          end
+          is_expected.to lock_package_lock(fabric_manager_package)
         end
       end
 

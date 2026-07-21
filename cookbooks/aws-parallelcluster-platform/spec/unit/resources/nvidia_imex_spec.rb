@@ -229,16 +229,7 @@ describe 'nvidia_imex:install' do
           end
 
           it 'locks the package version' do
-            if %w(ubuntu).include?(platform)
-              is_expected.to run_execute("apt-mark hold #{nvidia_imex_package}")
-                .with(retries: 3)
-                .with(retry_delay: 5)
-            else
-              is_expected.to install_package('yum-plugin-versionlock')
-              is_expected.to run_execute("yum versionlock #{nvidia_imex_package}")
-                .with(retries: 3)
-                .with(retry_delay: 5)
-            end
+            is_expected.to lock_package_lock(nvidia_imex_package)
           end
         end
       end

@@ -17,8 +17,3 @@ provides :fabric_manager, platform: 'rocky' do |node|
 end
 
 use 'partial/_fabric_manager_common.rb'
-use 'partial/_fabric_manager_install_rhel.rb'
-
-def platform
-  "rhel#{node['platform_version'].to_i}"
-end

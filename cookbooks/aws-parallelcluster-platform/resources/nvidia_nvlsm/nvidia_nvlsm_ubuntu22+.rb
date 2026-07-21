@@ -17,8 +17,3 @@ provides :nvidia_nvlsm, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_nvidia_nvlsm_common.rb'
-use 'partial/_nvidia_nvlsm_debian.rb'
-
-def platform
-  "ubuntu#{node['platform_version'].delete('.')}"
-end

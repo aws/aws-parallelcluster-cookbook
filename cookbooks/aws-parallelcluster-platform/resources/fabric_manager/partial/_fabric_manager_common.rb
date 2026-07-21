@@ -30,7 +30,7 @@ action :setup do
     retry_delay 5
   end
 
-  action_lock_package_version
+  package_lock fabric_manager_package
 end
 
 action :configure do

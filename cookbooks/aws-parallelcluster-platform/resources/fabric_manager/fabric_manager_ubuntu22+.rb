@@ -17,8 +17,3 @@ provides :fabric_manager, platform: 'ubuntu' do |node|
 end
 
 use 'partial/_fabric_manager_common.rb'
-use 'partial/_fabric_manager_install_debian.rb'
-
-def platform
-  "ubuntu#{node['platform_version'].delete('.')}"
-end

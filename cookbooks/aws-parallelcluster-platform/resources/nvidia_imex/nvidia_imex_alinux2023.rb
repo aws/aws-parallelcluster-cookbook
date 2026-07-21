@@ -17,8 +17,3 @@ provides :nvidia_imex, platform: 'amazon' do |node|
 end
 
 use 'partial/_nvidia_imex_common.rb'
-use 'partial/_nvidia_imex_rhel.rb'
-
-def platform
-  "amzn#{node['platform_version'].to_i}"
-end
