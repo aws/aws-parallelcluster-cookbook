@@ -32,9 +32,9 @@ end
 describe 'nvidia_repo helpers' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:driver_version) { '999.88.77' }
-      cached(:cuda_version) { '13.3.1' }
-      cached(:cuda_suffix) { '610.43.02' }
+      cached(:driver_version) { '9.8.7' }
+      cached(:cuda_version) { '1.2.3' }
+      cached(:cuda_suffix) { '4.5.6' }
       cached(:driver_base_url) { 'https://driver.example/nvidia_driver' }
       cached(:cuda_base_url) { 'https://cuda.example/cuda' }
       cached(:sources_dir) { '/fake/sources' }
@@ -43,7 +43,7 @@ describe 'nvidia_repo helpers' do
       cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
       cached(:arch) { debian? ? 'amd64' : 'x86_64' }
       cached(:driver_pkg_name) { "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}" }
-      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-3-local" }
+      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-1-2-local" }
       cached(:driver_pkg_file) do
         debian? ? "#{driver_pkg_name}_1.0-1_#{arch}.deb" : "#{driver_pkg_name}-1.0-1.#{arch}.rpm"
       end
@@ -55,16 +55,23 @@ describe 'nvidia_repo helpers' do
         allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(false)
         allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
         runner = runner(platform: platform, version: version, step_into: ['nvidia_repo']) do |node|
+          node.override['cluster']['nvidia']['driver_version'] = driver_version
           node.override['cluster']['nvidia']['driver_base_url'] = driver_base_url
+          node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
           node.override['cluster']['nvidia']['cuda']['base_url'] = cuda_base_url
           node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
           node.override['cluster']['sources_dir'] = sources_dir
         end
-        ConvergeNvidiaRepo.add(runner, driver_version: driver_version, cuda_version: cuda_version)
+        ConvergeNvidiaRepo.add(runner)
       end
 
       cached(:resource) do
         chef_run.find_resource('nvidia_repo', 'add')
+      end
+
+      it 'takes the driver and cuda versions from the attributes' do
+        expect(resource.driver_version).to eq(driver_version)
+        expect(resource.cuda_version).to eq(cuda_version)
       end
 
       it 'computes the local repo platform' do
@@ -117,9 +124,11 @@ end
 describe 'nvidia_repo:add' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:driver_version) { '999.88.77' }
-      cached(:cuda_version) { '13.3.1' }
-      cached(:cuda_suffix) { '610.43.02' }
+      # Fake versions: tests must not depend on the real versions, they only
+      # verify that the versions configured in the attributes are the ones used.
+      cached(:driver_version) { '9.8.7' }
+      cached(:cuda_version) { '1.2.3' }
+      cached(:cuda_suffix) { '4.5.6' }
       cached(:driver_base_url) { 'https://driver.example/nvidia_driver' }
       cached(:cuda_base_url) { 'https://cuda.example/cuda' }
       cached(:sources_dir) { '/fake/sources' }
@@ -128,7 +137,7 @@ describe 'nvidia_repo:add' do
       cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
       cached(:arch) { debian? ? 'amd64' : 'x86_64' }
       cached(:driver_pkg_name) { "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}" }
-      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-3-local" }
+      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-1-2-local" }
       cached(:driver_pkg_file) do
         debian? ? "#{driver_pkg_name}_1.0-1_#{arch}.deb" : "#{driver_pkg_name}-1.0-1.#{arch}.rpm"
       end
@@ -145,12 +154,14 @@ describe 'nvidia_repo:add' do
         mock_file_exists('/usr/bin/nvidia-smi', false)
         mock_file_exists('/usr/local/cuda', false)
         runner = runner(platform: platform, version: version, step_into: ['nvidia_repo']) do |node|
+          node.override['cluster']['nvidia']['driver_version'] = driver_version
           node.override['cluster']['nvidia']['driver_base_url'] = driver_base_url
+          node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
           node.override['cluster']['nvidia']['cuda']['base_url'] = cuda_base_url
           node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
           node.override['cluster']['sources_dir'] = sources_dir
         end
-        ConvergeNvidiaRepo.add(runner, driver_version: driver_version, cuda_version: cuda_version)
+        ConvergeNvidiaRepo.add(runner)
       end
 
       it 'downloads the driver and cuda local-repo installers' do
@@ -197,13 +208,18 @@ describe 'nvidia_repo:add' do
 end
 
 describe 'nvidia_repo:add skip conditions' do
+  # Fake version: tests must not depend on the real version, they only verify
+  # that the version configured in the attribute is the one being used.
   def converge_add(nvidia_enabled:, on_docker:, nvidia_smi:, cuda:)
     allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(nvidia_enabled)
     allow_any_instance_of(Object).to receive(:on_docker?).and_return(on_docker)
     allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
     mock_file_exists('/usr/bin/nvidia-smi', nvidia_smi)
     mock_file_exists('/usr/local/cuda', cuda)
-    ConvergeNvidiaRepo.add(runner(platform: 'amazon', version: '2023', step_into: ['nvidia_repo']))
+    runner = runner(platform: 'amazon', version: '2023', step_into: ['nvidia_repo']) do |node|
+      node.override['cluster']['nvidia']['cuda']['version'] = '1.2.3'
+    end
+    ConvergeNvidiaRepo.add(runner)
   end
 
   context 'when nvidia is not enabled' do
@@ -229,7 +245,7 @@ describe 'nvidia_repo:add skip conditions' do
 
     it 'skips the driver repo but still adds the cuda repo' do
       expect(converged).not_to install_rpm_package(/nvidia-driver-local-repo/)
-      expect(converged).to install_rpm_package(/cuda-repo-amzn2023-13-3-local/)
+      expect(converged).to install_rpm_package(/cuda-repo-amzn2023-1-2-local/)
     end
   end
 
@@ -238,19 +254,21 @@ describe 'nvidia_repo:add skip conditions' do
 
     it 'skips the cuda repo but still adds the driver repo' do
       expect(converged).to install_rpm_package(/nvidia-driver-local-repo/)
-      expect(converged).not_to install_rpm_package(/cuda-repo-amzn2023-13-3-local/)
+      expect(converged).not_to install_rpm_package(/cuda-repo-amzn2023-1-2-local/)
     end
   end
 end
 
 describe 'nvidia_repo: overriding base_url to the official NVIDIA URLs' do
-  cached(:driver_version) { '580.173.02' }
-  cached(:cuda_version) { '13.3.1' }
-  cached(:cuda_suffix) { '610.43.02' }
+  # Fake versions: tests must not depend on the real versions, they only
+  # verify that the versions configured in the attributes are the ones used.
+  cached(:driver_version) { '9.8.7' }
+  cached(:cuda_version) { '1.2.3' }
+  cached(:cuda_suffix) { '4.5.6' }
   cached(:driver_base_url) { "https://developer.download.nvidia.com/compute/nvidia-driver/#{driver_version}/local_installers" }
   cached(:cuda_base_url) { "https://developer.download.nvidia.com/compute/cuda/#{cuda_version}/local_installers" }
   cached(:driver_pkg_file) { "nvidia-driver-local-repo-amzn2023-#{driver_version}-1.0-1.x86_64.rpm" }
-  cached(:cuda_pkg_file) { "cuda-repo-amzn2023-13-3-local-#{cuda_version}_#{cuda_suffix}-1.x86_64.rpm" }
+  cached(:cuda_pkg_file) { "cuda-repo-amzn2023-1-2-local-#{cuda_version}_#{cuda_suffix}-1.x86_64.rpm" }
 
   cached(:chef_run) do
     allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
@@ -259,11 +277,13 @@ describe 'nvidia_repo: overriding base_url to the official NVIDIA URLs' do
     mock_file_exists('/usr/bin/nvidia-smi', false)
     mock_file_exists('/usr/local/cuda', false)
     runner = runner(platform: 'amazon', version: '2023', step_into: ['nvidia_repo']) do |node|
+      node.override['cluster']['nvidia']['driver_version'] = driver_version
       node.override['cluster']['nvidia']['driver_base_url'] = driver_base_url
+      node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
       node.override['cluster']['nvidia']['cuda']['base_url'] = cuda_base_url
       node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
     end
-    ConvergeNvidiaRepo.add(runner, driver_version: driver_version, cuda_version: cuda_version)
+    ConvergeNvidiaRepo.add(runner)
   end
 
   it 'downloads the driver local repo from the official NVIDIA URL' do
@@ -282,15 +302,17 @@ end
 describe 'nvidia_repo:remove' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
-      cached(:driver_version) { '999.88.77' }
-      cached(:cuda_version) { '13.3.1' }
-      cached(:cuda_suffix) { '610.43.02' }
+      # Fake versions: tests must not depend on the real versions, they only
+      # verify that the versions configured in the attributes are the ones used.
+      cached(:driver_version) { '9.8.7' }
+      cached(:cuda_version) { '1.2.3' }
+      cached(:cuda_suffix) { '4.5.6' }
       cached(:sources_dir) { '/fake/sources' }
       cached(:debian?) { platform == 'ubuntu' }
       cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
       cached(:arch) { debian? ? 'amd64' : 'x86_64' }
       cached(:driver_pkg_name) { "nvidia-driver-local-repo-#{local_repo_platform}-#{driver_version}" }
-      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-13-3-local" }
+      cached(:cuda_pkg_name) { "cuda-repo-#{local_repo_platform}-1-2-local" }
       cached(:driver_pkg_file) do
         debian? ? "#{driver_pkg_name}_1.0-1_#{arch}.deb" : "#{driver_pkg_name}-1.0-1.#{arch}.rpm"
       end
@@ -302,22 +324,14 @@ describe 'nvidia_repo:remove' do
         cached(:chef_run) do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
           runner = runner(platform: platform, version: version, step_into: ['nvidia_repo']) do |node|
+            node.override['cluster']['nvidia']['driver_version'] = driver_version
+            node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
             node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
             node.override['cluster']['sources_dir'] = sources_dir
           end
           runner.node.run_state['nvidia_driver_repo_added'] = true
           runner.node.run_state['nvidia_cuda_repo_added'] = true
-          chef_run_remove(runner)
-        end
-
-        def chef_run_remove(runner)
-          runner.converge_dsl('aws-parallelcluster-platform') do
-            nvidia_repo 'remove' do
-              driver_version '999.88.77'
-              cuda_version '13.3.1'
-              action :remove
-            end
-          end
+          ConvergeNvidiaRepo.remove(runner)
         end
 
         it 'removes the local-repo packages and deletes the installers' do
@@ -367,17 +381,13 @@ describe 'nvidia_repo:remove' do
         cached(:chef_run) do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
           runner = runner(platform: platform, version: version, step_into: ['nvidia_repo']) do |node|
+            node.override['cluster']['nvidia']['driver_version'] = driver_version
+            node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
             node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
             node.override['cluster']['sources_dir'] = sources_dir
           end
           runner.node.run_state['nvidia_driver_repo_added'] = true
-          runner.converge_dsl('aws-parallelcluster-platform') do
-            nvidia_repo 'remove' do
-              driver_version '999.88.77'
-              cuda_version '13.3.1'
-              action :remove
-            end
-          end
+          ConvergeNvidiaRepo.remove(runner)
         end
 
         it 'removes only the driver repo, leaving the cuda repo untouched' do
@@ -404,12 +414,12 @@ describe 'nvidia_repo:remove' do
       context 'when this run did not add the repos' do
         cached(:chef_run) do
           allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
-          runner = runner(platform: platform, version: version, step_into: ['nvidia_repo'])
-          runner.converge_dsl('aws-parallelcluster-platform') do
-            nvidia_repo 'remove' do
-              action :remove
-            end
+          runner = runner(platform: platform, version: version, step_into: ['nvidia_repo']) do |node|
+            node.override['cluster']['nvidia']['driver_version'] = driver_version
+            node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
+            node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
           end
+          ConvergeNvidiaRepo.remove(runner)
         end
 
         it 'removes nothing' do

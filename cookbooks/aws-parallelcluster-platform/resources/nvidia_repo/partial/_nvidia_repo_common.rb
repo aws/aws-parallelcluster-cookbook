@@ -22,8 +22,10 @@ CUDA_REPO_ADDED = 'nvidia_cuda_repo_added'
 
 # Only the driver and CUDA versions are configurable per call; everything else
 # (repo URLs and the CUDA driver-version suffix) is read from node attributes.
-property :driver_version, String, default: node['cluster']['nvidia']['driver_version']
-property :cuda_version, String, default: node['cluster']['nvidia']['cuda']['version']
+# The defaults are lazy so the attributes are read at converge time, honoring
+# any override applied after the resource class is compiled (e.g. in tests).
+property :driver_version, String, default: lazy { node['cluster']['nvidia']['driver_version'] }
+property :cuda_version, String, default: lazy { node['cluster']['nvidia']['cuda']['version'] }
 
 action :add do
   return unless nvidia_enabled?
