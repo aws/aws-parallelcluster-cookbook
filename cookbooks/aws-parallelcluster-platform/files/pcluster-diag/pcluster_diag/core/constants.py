@@ -103,3 +103,13 @@ DIRECTORY_LOOKUP_WARN_THRESHOLD_SECONDS = 2.0
 DIRECTORY_LOOKUP_FAIL_THRESHOLD_SECONDS = 10.0
 # Hard cap so a probe never hangs indefinitely on a stuck directory backend.
 DIRECTORY_LOOKUP_COMMAND_TIMEOUT_SECONDS = 30
+
+# FSx / shared-storage diagnostics
+# `lfs df -h` must return within this or the filesystem is treated as hanging (server/OST unreachable).
+FSX_LFS_DF_TIMEOUT_SECONDS = 30
+# The StorageType value a FSx for Lustre mount carries in the cluster configuration's SharedStorage.
+LUSTRE_STORAGE_TYPE = "FsxLustre"
+# NFS-based shared-storage types, handled with shallow reachability only (not in scope for PR1).
+NFS_STORAGE_TYPES = ("FsxOntap", "FsxOpenZfs", "Efs")
+# The Lustre client package names to probe (rpm on RHEL/AL, dpkg on Debian/Ubuntu).
+LUSTRE_CLIENT_PACKAGES = ("lustre-client", "lustre-client-modules")

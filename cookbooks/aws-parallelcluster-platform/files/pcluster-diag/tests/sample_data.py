@@ -28,6 +28,30 @@ SAMPLE_INSTANCE_ID = "i-0123456789abcdef0"
 SAMPLE_HEAD_NODE_INSTANCE_ID = "i-000000000headnode"
 SAMPLE_CLUSTER_CONFIG = {"Region": "us-east-1"}
 
+# Two FsxLustre SharedStorage mounts, mirroring the recursive-prod-gpu cluster (/fsx and /fsx-efa).
+SAMPLE_FSX_LUSTRE_SHARED_STORAGE = [
+    {
+        "Name": "fsx",
+        "StorageType": "FsxLustre",
+        "MountDir": "/fsx",
+        "FsxLustreSettings": {"FileSystemId": "fs-0123456789abcdef0"},
+    },
+    {
+        "Name": "fsx-efa",
+        "StorageType": "FsxLustre",
+        "MountDir": "/fsx-efa",
+        "FsxLustreSettings": {"FileSystemId": "fs-0fedcba9876543210"},
+    },
+]
+
+
+def sample_context_with_lustre(node_type: NodeType = NodeType.HEAD, shared_storage=None) -> Context:
+    """Return a sample Context whose cluster config carries FsxLustre SharedStorage mounts."""
+    context = sample_context(node_type)
+    storage = SAMPLE_FSX_LUSTRE_SHARED_STORAGE if shared_storage is None else shared_storage
+    context.cluster_config = dict(SAMPLE_CLUSTER_CONFIG, SharedStorage=storage)
+    return context
+
 
 def sample_context(node_type: NodeType = NodeType.HEAD) -> Context:
     """Return a fully-resolved sample Context for ``node_type`` (defaults to the head node)."""
