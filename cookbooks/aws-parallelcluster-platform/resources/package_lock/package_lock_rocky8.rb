@@ -12,25 +12,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-resource_name :package_lock
-provides :package_lock
-unified_mode true
-
-property :package_name, String, name_property: true
-
-default_action :lock
-
-action :lock do
-  if platform_family?('debian')
-    execute "apt-mark hold #{new_resource.package_name}" do
-      retries 3
-      retry_delay 5
-    end
-  else
-    package 'yum-plugin-versionlock'
-    execute "yum versionlock #{new_resource.package_name}" do
-      retries 3
-      retry_delay 5
-    end
-  end
+provides :package_lock, platform: 'rocky' do |node|
+  node['platform_version'].to_i >= 8
 end
+
+use 'partial/_package_lock_common.rb'
+use 'partial/_package_lock_rhel.rb'

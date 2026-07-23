@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-
+#
 # Copyright:: 2025 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License").
@@ -12,9 +12,6 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-provides :nvidia_nvlsm, platform: 'ubuntu' do |node|
-  node['platform_version'].to_i >= 22
+def nvidia_nvlsm_install_dependencies_commands
+  "yum install -y infiniband-diags libibumad"
 end
-
-use 'partial/_nvidia_nvlsm_common.rb'
-use 'partial/_nvidia_nvlsm_debian.rb'

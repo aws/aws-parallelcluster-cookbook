@@ -54,11 +54,7 @@ def nvidia_nvlsm_package
 end
 
 def nvidia_nvlsm_install_dependencies_commands
-  if platform_family?('debian')
-    "apt install -y infiniband-diags ibutils"
-  else
-    "yum install -y infiniband-diags libibumad"
-  end
+  # OS dependent
 end
 
 def nvlsm_installation_enabled?

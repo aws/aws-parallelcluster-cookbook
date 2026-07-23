@@ -17,3 +17,4 @@ provides :nvidia_nvlsm, platform: 'amazon' do |node|
 end
 
 use 'partial/_nvidia_nvlsm_common.rb'
+use 'partial/_nvidia_nvlsm_rhel.rb'
