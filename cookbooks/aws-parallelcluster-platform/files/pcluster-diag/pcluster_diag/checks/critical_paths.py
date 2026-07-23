@@ -34,7 +34,7 @@ from pcluster_diag.models.context import Context, NodeType
 from pcluster_diag.models.expected_path_permissions import ExpectedPathPermissions
 from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Result
-from pcluster_diag.util import filesystem
+from pcluster_diag.util import path_permissions
 
 # The critical paths ParallelCluster provisions, with the ownership/mode set by the cookbook. Add an
 # entry here whenever an investigation traces a failure to a mis-permissioned path.
@@ -101,7 +101,7 @@ class CriticalPathsHaveExpectedPermissions(Check):
     def _inspect(self, critical: ExpectedPathPermissions) -> List[CheckError]:
         """Return the CheckErrors for ``critical``: empty when it exists with the expected ownership and mode."""
         try:
-            observed = filesystem.stat_path(critical.path)
+            observed = path_permissions.stat_path(critical.path)
         except FileNotFoundError:
             return [self.MISSING_PATH.format(critical.path)]
 
