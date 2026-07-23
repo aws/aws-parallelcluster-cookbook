@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 unified_mode true
-default_action :add
+default_action :add_driver_repo
 
-# node.run_state keys recording which local repos this run actually added,
-# so :remove only cleans up what :add installed.
+# The CUDA repo bundles its own driver stack, so the two local repos must never be registered at the same time (see nvidia_install recipe).
+
+# run_state keys tracking the repos this run added, so :remove_* only cleans up what :add_* installed.
 DRIVER_REPO_ADDED = 'nvidia_driver_repo_added'
 CUDA_REPO_ADDED = 'nvidia_cuda_repo_added'
 
@@ -27,69 +28,73 @@ CUDA_REPO_ADDED = 'nvidia_cuda_repo_added'
 property :driver_version, String, default: lazy { node['cluster']['nvidia']['driver_version'] }
 property :cuda_version, String, default: lazy { node['cluster']['nvidia']['cuda']['version'] }
 
-action :add do
+# Register the driver local repo unless the driver is already installed (e.g. pre-baked AMI).
+action :add_driver_repo do
   return unless nvidia_enabled?
   return if on_docker?
+  return if ::File.exist?('/usr/bin/nvidia-smi')
 
-  # Register the NVIDIA driver local repo unless the driver is already installed
-  # (e.g. pre-baked AMI). Track it so :remove only cleans up what this run added.
-  unless ::File.exist?('/usr/bin/nvidia-smi')
-    remote_file driver_repo_package_path do
-      source driver_repo_source_url
-      mode '0644'
-      retries 3
-      retry_delay 5
-    end
-    action_install_driver_repo
-    node.run_state[DRIVER_REPO_ADDED] = true
+  remote_file driver_repo_package_path do
+    source driver_repo_source_url
+    mode '0644'
+    retries 3
+    retry_delay 5
   end
 
-  # Register the CUDA local repo unless CUDA is already installed.
-  unless ::File.exist?('/usr/local/cuda')
-    remote_file cuda_repo_package_path do
-      source cuda_repo_source_url
-      mode '0644'
-      retries 3
-      retry_delay 5
-    end
-    action_install_cuda_repo
-    node.run_state[CUDA_REPO_ADDED] = true
-  end
+  action_install_driver_repo
+  node.run_state[DRIVER_REPO_ADDED] = true
 
-  # Refresh the package manager metadata once, after all local repos have been
-  # enrolled, so their package lists (and, on RHEL, the driver repo's DKMS
-  # module metadata) are visible to the later nvidia_driver / nvidia_cuda installs.
-  action_refresh_repo_cache if node.run_state[DRIVER_REPO_ADDED] || node.run_state[CUDA_REPO_ADDED]
+  # Make the repo packages visible to the driver-stack installs.
+  action_refresh_repo_cache
 end
 
-action :remove do
-  # Only remove each local repo (and its downloaded installer) if this run added it.
-  # After removal, refresh the package manager metadata so the removed repo's package
-  # list stops advertising NVIDIA packages at the repo's (lower) versions, which would
-  # make later installs (e.g. enroot) attempt unwanted downgrades and fail.
-  if node.run_state[DRIVER_REPO_ADDED]
-    package driver_repo_package_name do
-      action local_repo_remove_action
-    end
+# Register the CUDA local repo unless CUDA is already installed.
+action :add_cuda_repo do
+  return unless nvidia_enabled?
+  return if on_docker?
+  return if ::File.exist?('/usr/local/cuda')
 
-    file driver_repo_package_path do
-      action :delete
-    end
-
-    action_refresh_metadata
+  remote_file cuda_repo_package_path do
+    source cuda_repo_source_url
+    mode '0644'
+    retries 3
+    retry_delay 5
   end
 
-  if node.run_state[CUDA_REPO_ADDED]
-    package cuda_repo_package_name do
-      action local_repo_remove_action
-    end
+  action_install_cuda_repo
+  node.run_state[CUDA_REPO_ADDED] = true
 
-    file cuda_repo_package_path do
-      action :delete
-    end
+  action_refresh_repo_cache
+end
 
-    action_refresh_metadata
+# Remove the driver local repo and its installer if this run added them.
+action :remove_driver_repo do
+  return unless node.run_state[DRIVER_REPO_ADDED]
+
+  package driver_repo_package_name do
+    action local_repo_remove_action
   end
+
+  file driver_repo_package_path do
+    action :delete
+  end
+
+  action_refresh_metadata
+end
+
+# Remove the CUDA local repo and its installer if this run added them.
+action :remove_cuda_repo do
+  return unless node.run_state[CUDA_REPO_ADDED]
+
+  package cuda_repo_package_name do
+    action local_repo_remove_action
+  end
+
+  file cuda_repo_package_path do
+    action :delete
+  end
+
+  action_refresh_metadata
 end
 
 # ---------------------------------------------------------------------------

@@ -15,26 +15,32 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Register the NVIDIA local repos (driver and CUDA) up front so that the
-# nvidia_driver and nvidia_cuda resources can install their packages from them.
-# Versions and URLs default to node attributes and can be overridden there.
-nvidia_repo 'Install NVIDIA local repos'
+nvidia_repo 'Add NVIDIA driver local repo' do
+  action :add_driver_repo
+end
 
 nvidia_driver 'Install Nvidia driver'
-
-nvidia_cuda 'Install Nvidia CUDA'
-
-gdrcopy 'Install Nvidia gdrcopy'
 
 nvidia_nvlsm 'Install Nvidia NVLink Subnet Manager'
 
 fabric_manager 'Install Nvidia Fabric Manager'
 
-nvidia_dcgm 'install Nvidia datacenter-gpu-manager'
-
 nvidia_imex 'Install nvidia-imex'
 
-# Remove the NVIDIA local repos now that all NVIDIA packages have been installed
-nvidia_repo 'Remove NVIDIA local repos' do
-  action :remove
+nvidia_repo 'Remove NVIDIA driver local repo' do
+  action :remove_driver_repo
 end
+
+nvidia_repo 'Add NVIDIA CUDA local repo' do
+  action :add_cuda_repo
+end
+
+nvidia_cuda 'Install Nvidia CUDA'
+
+nvidia_repo 'Remove NVIDIA CUDA local repo' do
+  action :remove_cuda_repo
+end
+
+gdrcopy 'Install Nvidia gdrcopy'
+
+nvidia_dcgm 'install Nvidia datacenter-gpu-manager'

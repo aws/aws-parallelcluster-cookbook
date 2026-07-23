@@ -24,8 +24,8 @@ nvidia_local_repo_packages = [
   "cuda-repo-#{local_repo_platform}-#{cuda_version_dashed}-local",
 ]
 
-# No tag:install_ prefix on purpose: the added state only holds between nvidia_repo:add and :remove,
-# so full install builds must not select this control.
+# No tag:install_ prefix on purpose: repos only exist between the nvidia_repo
+# add/remove actions, so full install builds must not select this control.
 control 'tag:nvidia_local_repos_added' do
   only_if do
     !os_properties.on_docker? &&
