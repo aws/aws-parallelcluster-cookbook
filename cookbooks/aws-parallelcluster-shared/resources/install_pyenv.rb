@@ -53,7 +53,8 @@ action :run do
     tar -xzf Python-#{python_version}.tgz
     cd Python-#{python_version}
     ./configure --prefix=#{prefix}/versions/#{python_version}
-    make
+    CORES=$(grep processor /proc/cpuinfo | wc -l)
+    make -j $CORES
     make install
     VENV
     not_if { Dir.glob("#{prefix}/versions/#{python_version}/bin/python*").any? }
