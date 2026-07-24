@@ -10,10 +10,9 @@ default['cluster']['install_python_from_internet'] = false
 # official S3 bucket.
 default['cluster']['install_node_from_internet'] = false
 
-# Official ParallelCluster Node Package
-default['cluster']['custom_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/aws-parallelcluster-node-#{node['cluster']['parallelcluster-node-version']}.tgz"
-
 # ParallelCluster versions
 default['cluster']['parallelcluster-version'] = '3.16.0'
 default['cluster']['parallelcluster-cookbook-version'] = '3.16.0'
 default['cluster']['parallelcluster-node-version'] = '3.16.0'
+
+default['cluster']['official_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/aws-parallelcluster-node-#{node['cluster']['parallelcluster-node-version']}.tgz"

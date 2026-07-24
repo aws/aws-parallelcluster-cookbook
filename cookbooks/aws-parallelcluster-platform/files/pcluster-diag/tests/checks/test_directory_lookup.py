@@ -10,26 +10,18 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for the directory-service checks: lookup latency, cluster-config management, resiliency."""
+"""Unit tests for the merged DirectoryService check: aggregate Result plus per-probe behavior."""
 
 import pytest
 
 from pcluster_diag.checks import directory_lookup
-from pcluster_diag.checks.directory_lookup import (
-    DirectoryBackendIsReachable,
-    DirectoryBindCredentialsAreValid,
-    DirectoryEndpointCertificateIsValid,
-    DirectoryLookupLatency,
-    DirectoryLookupResiliencySettings,
-    DirectoryServiceManagedByClusterConfig,
-    DirectoryUsersResolveUnderSearchBase,
-)
+from pcluster_diag.checks.directory_lookup import DirectoryService
 from pcluster_diag.core.constants import (
     DIRECTORY_LOOKUP_FAIL_THRESHOLD_SECONDS,
     DIRECTORY_LOOKUP_WARN_THRESHOLD_SECONDS,
 )
 from pcluster_diag.models.context import NodeType
-from pcluster_diag.models.result import Status
+from pcluster_diag.models.result import INTERNAL_ERROR_CODE, Status
 from pcluster_diag.models.sssd_backend_status import SssdBackendStatus
 from pcluster_diag.util.ldap import LDAP_INVALID_CREDENTIALS_CODE, ProbeResult
 from pcluster_diag.util.shell import TimedCommand
@@ -65,109 +57,194 @@ def _context_with_directory_service(directory_service=None):
 
 
 def _use_targets(monkeypatch, groups, users):
-    monkeypatch.setattr(DirectoryLookupLatency, "_derive_targets", lambda self, context: (groups, users))
+    monkeypatch.setattr(DirectoryService, "_derive_targets", lambda self, context: (groups, users))
 
 
-# --- DirectoryLookupLatency: description / should_run ----------------------------------
+# --- DirectoryService: description / should_run ---------------------------------------
 
 
 def test_description():
-    assert DirectoryLookupLatency().description == (
-        "Measure directory service (NSS/SSSD/AD) lookup latency for cluster users and groups."
-    )
+    assert DirectoryService().description == "Verify that the directory service (NSS/SSSD/AD) integration is healthy."
 
 
 def test_should_run_when_directory_service_in_cluster_config():
-    assert DirectoryLookupLatency().should_run(_context_with_directory_service()) is True
+    assert DirectoryService().should_run(_context_with_directory_service()) is True
 
 
 def test_should_run_when_ad_configured_only_in_sssd(tmp_path):
     _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\n")
-    assert DirectoryLookupLatency().should_run(sample_context(NodeType.HEAD)) is True
+    assert DirectoryService().should_run(sample_context(NodeType.HEAD)) is True
 
 
 def test_should_not_run_without_any_directory_integration():
     # No DirectoryService in cluster config and no (isolated) sssd.conf on disk.
-    assert DirectoryLookupLatency().should_run(sample_context(NodeType.HEAD)) is False
+    assert DirectoryService().should_run(sample_context(NodeType.HEAD)) is False
 
 
-# --- DirectoryLookupLatency: run -------------------------------------------------------
+# --- DirectoryService.run: aggregation and finding-derived status ---------------------
 
 
-def test_run_not_applicable_when_no_targets_derivable(monkeypatch):
-    _use_targets(monkeypatch, [], [])
+@pytest.fixture
+def _silence_backend_and_nss(monkeypatch):
+    """Make the backend and NSS-plugin probes contribute nothing, so other findings are isolated."""
+    monkeypatch.setattr(
+        directory_lookup, "_sssd_backend_status", lambda: SssdBackendStatus("default: Online status: Online", True)
+    )
+    monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
 
-    result = DirectoryLookupLatency().run(_context_with_directory_service())
 
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryLookupLatency.NO_LOOKUP_TARGETS.code]
+def test_run_passes_when_capability_clean(tmp_path, _silence_backend_and_nss):
+    # AD managed by cluster config, caching on, no ldaps/creds/users/targets => every probe is silent.
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\ncache_credentials = True\n")
 
-
-def test_run_passes_when_all_lookups_fast(monkeypatch):
-    _use_targets(monkeypatch, ["hpc-users"], ["alice"])
-    monkeypatch.setattr(directory_lookup, "time_command", lambda command, timeout: _timed(elapsed=0.2))
-
-    result = DirectoryLookupLatency().run(_context_with_directory_service())
+    result = DirectoryService().run(_context_with_directory_service())
 
     assert result.status is Status.PASSED
     assert result.errors is None
+    assert result.warnings is None
 
 
-def test_run_warns_when_latency_between_thresholds(monkeypatch):
-    # Elevated-but-tolerable latency (between warn and fail thresholds) surfaces as a WARNING.
+def test_run_warns_when_backend_status_cannot_be_assessed(tmp_path, monkeypatch):
+    # sssctl unavailable / no parseable status => cannot assess => WARNING (not silent, not failure).
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\ncache_credentials = True\n")
+    monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
+    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: None)
+
+    result = DirectoryService().run(_context_with_directory_service())
+
+    assert result.status is Status.WARNING
+    assert DirectoryService.BACKEND_STATUS_UNAVAILABLE.code in [warning.code for warning in result.warnings]
+
+
+def test_run_isolates_unexpected_probe_crash_and_keeps_sibling_findings(tmp_path, monkeypatch):
+    # A probe that raises unexpectedly must not sink the other probes' findings: it becomes the shared
+    # E0 finding. With no expected error present, the aggregate is CHECK_ERROR, and a sibling warning
+    # still rides along.
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\n")  # caching off => resiliency warns
+    monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
+    monkeypatch.setattr(
+        directory_lookup,
+        "_sssd_backend_status",
+        lambda: (_ for _ in ()).throw(RuntimeError("boom")),
+    )
+
+    result = DirectoryService().run(_context_with_directory_service())
+
+    assert result.status is Status.CHECK_ERROR
+    assert "E{}".format(INTERNAL_ERROR_CODE) in [error.code for error in result.errors]
+    # The credential-caching advisory from a sibling probe survives the crash.
+    assert DirectoryService.SSSD_CACHE_CREDENTIALS_DISABLED.code in [warning.code for warning in result.warnings]
+
+
+def test_run_failure_dominates_a_concurrent_probe_crash(tmp_path, monkeypatch):
+    # An expected error (backend offline) plus an unexpected crash in another probe: FAILURE wins over
+    # CHECK_ERROR, and both findings are present in errors.
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\ncache_credentials = True\n")
+    monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
+    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: SssdBackendStatus("default: Offline", False))
+    # Make the resiliency probe crash unexpectedly.
+    monkeypatch.setattr(
+        directory_lookup, "_cache_credentials_enabled", lambda: (_ for _ in ()).throw(RuntimeError("boom"))
+    )
+
+    result = DirectoryService().run(_context_with_directory_service())
+
+    assert result.status is Status.FAILURE
+    codes = [error.code for error in result.errors]
+    assert DirectoryService.BACKEND_OFFLINE.code in codes  # the expected error
+    assert "E{}".format(INTERNAL_ERROR_CODE) in codes  # the crash still recorded
+
+
+def test_run_fails_when_any_probe_reports_an_error(tmp_path, monkeypatch):
+    # A backend-offline error dominates: the aggregate status is FAILURE regardless of warnings.
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\n")  # caching off => a warning is also present
+    monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
+    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: SssdBackendStatus("default: Offline", False))
+
+    result = DirectoryService().run(_context_with_directory_service())
+
+    assert result.status is Status.FAILURE
+    assert DirectoryService.BACKEND_OFFLINE.code in [error.code for error in result.errors]
+    # The credential-caching warning still rides along on the FAILURE result.
+    assert DirectoryService.SSSD_CACHE_CREDENTIALS_DISABLED.code in [warning.code for warning in result.warnings]
+
+
+# --- lookup-latency probe -------------------------------------------------------------
+
+
+def test_latency_probe_silent_when_no_targets(monkeypatch):
+    _use_targets(monkeypatch, [], [])
+    errors, warnings = [], []
+
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_latency_probe_silent_when_all_lookups_fast(monkeypatch):
+    _use_targets(monkeypatch, ["hpc-users"], ["alice"])
+    monkeypatch.setattr(directory_lookup, "time_command", lambda command, timeout: _timed(elapsed=0.2))
+    errors, warnings = [], []
+
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_latency_probe_warns_between_thresholds(monkeypatch):
     _use_targets(monkeypatch, ["hpc-users"], [])
     elapsed = DIRECTORY_LOOKUP_WARN_THRESHOLD_SECONDS + 1
     monkeypatch.setattr(directory_lookup, "time_command", lambda command, timeout: _timed(elapsed=elapsed))
+    errors, warnings = [], []
 
-    result = DirectoryLookupLatency().run(_context_with_directory_service())
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), errors, warnings)
 
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [DirectoryLookupLatency.ELEVATED_OR_UNRESOLVED_LOOKUPS.code]
-    assert "elevated or unresolved" in result.warnings[0].message
+    assert errors == []
+    assert [warning.code for warning in warnings] == [DirectoryService.LOOKUP_ELEVATED.code]
+    assert "elevated or unresolved" in warnings[0].message
 
 
-def test_run_fails_when_latency_exceeds_fail_threshold(monkeypatch):
+def test_latency_probe_fails_above_fail_threshold(monkeypatch):
     _use_targets(monkeypatch, ["hpc-users"], [])
     elapsed = DIRECTORY_LOOKUP_FAIL_THRESHOLD_SECONDS + 1
     monkeypatch.setattr(directory_lookup, "time_command", lambda command, timeout: _timed(elapsed=elapsed))
+    errors, warnings = [], []
 
-    result = DirectoryLookupLatency().run(_context_with_directory_service())
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), errors, warnings)
 
-    assert result.status is Status.FAILURE
-    assert [error.code for error in result.errors] == [DirectoryLookupLatency.SLOW_OR_FAILING_LOOKUPS.code]
-    assert "slow or failing" in result.errors[0].message
+    assert [error.code for error in errors] == [DirectoryService.LOOKUP_SLOW_OR_FAILING.code]
+    assert "slow or failing" in errors[0].message
 
 
-def test_run_fails_when_lookup_times_out(monkeypatch):
+def test_latency_probe_fails_on_timeout(monkeypatch):
     _use_targets(monkeypatch, [], ["alice"])
     monkeypatch.setattr(
         directory_lookup,
         "time_command",
         lambda command, timeout: _timed(returncode=None, timed_out=True, elapsed=30.0),
     )
+    errors, warnings = [], []
 
-    result = DirectoryLookupLatency().run(_context_with_directory_service())
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), errors, warnings)
 
-    assert result.status is Status.FAILURE
-    assert [error.code for error in result.errors] == [DirectoryLookupLatency.SLOW_OR_FAILING_LOOKUPS.code]
-    assert "timed out" in result.errors[0].message
+    assert [error.code for error in errors] == [DirectoryService.LOOKUP_SLOW_OR_FAILING.code]
+    assert "timed out" in errors[0].message
 
 
-def test_run_warns_when_name_not_resolvable(monkeypatch):
+def test_latency_probe_warns_when_name_not_resolvable(monkeypatch):
     _use_targets(monkeypatch, [], ["ghost"])
-    # Fast but non-zero exit / empty output => name not resolvable, classified as warn => WARNING.
     monkeypatch.setattr(
         directory_lookup, "time_command", lambda command, timeout: _timed(returncode=2, stdout="", elapsed=0.05)
     )
+    errors, warnings = [], []
 
-    result = DirectoryLookupLatency().run(_context_with_directory_service())
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), errors, warnings)
 
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [DirectoryLookupLatency.ELEVATED_OR_UNRESOLVED_LOOKUPS.code]
-    assert "no entry resolved" in result.warnings[0].message
+    assert [warning.code for warning in warnings] == [DirectoryService.LOOKUP_ELEVATED.code]
+    assert "no entry resolved" in warnings[0].message
 
 
-def test_run_issues_expected_lookup_commands(monkeypatch):
+def test_latency_probe_issues_expected_lookup_commands(monkeypatch):
     _use_targets(monkeypatch, ["hpc-users"], ["alice"])
     commands = []
 
@@ -177,7 +254,7 @@ def test_run_issues_expected_lookup_commands(monkeypatch):
 
     monkeypatch.setattr(directory_lookup, "time_command", fake_time_command)
 
-    DirectoryLookupLatency().run(_context_with_directory_service())
+    DirectoryService()._probe_lookup_latency(_context_with_directory_service(), [], [])
 
     assert commands == [
         ["getent", "group", "hpc-users"],
@@ -186,7 +263,22 @@ def test_run_issues_expected_lookup_commands(monkeypatch):
     ]
 
 
-# --- DirectoryLookupLatency: target derivation and fallback ----------------------------
+def test_latency_probe_uses_fallback_user(monkeypatch):
+    context = _context_with_directory_service({"DomainReadOnlyUser": "svc-bind"})
+    commands = []
+
+    def fake_time_command(command, timeout):
+        commands.append(command)
+        return _timed()
+
+    monkeypatch.setattr(directory_lookup, "time_command", fake_time_command)
+
+    DirectoryService()._probe_lookup_latency(context, [], [])
+
+    assert commands == [["getent", "passwd", "svc-bind"], ["id", "svc-bind"]]
+
+
+# --- lookup-target derivation ---------------------------------------------------------
 
 
 def test_derive_targets_reads_sssd_and_filters_local_accounts(tmp_path):
@@ -197,168 +289,467 @@ def test_derive_targets_reads_sssd_and_filters_local_accounts(tmp_path):
         "simple_allow_users = alice, root, nobody, bob\n",
     )
 
-    groups, users = DirectoryLookupLatency()._derive_targets(sample_context(NodeType.HEAD))
+    groups, users = DirectoryService()._derive_targets(sample_context(NodeType.HEAD))
 
     assert groups == ["hpc-users", "admins"]
     assert users == ["alice", "bob"]  # root and nobody filtered out
 
 
 def test_derive_targets_falls_back_to_domain_read_only_user_from_cluster_config():
-    # No simple_allow_* in sssd.conf; the cluster config manages the integration, so DomainReadOnlyUser
-    # (a DN) is used, reduced to its CN component.
     context = _context_with_directory_service(
         {"DomainReadOnlyUser": "CN=ReadOnlyUser,OU=Users,DC=corp,DC=example,DC=com"}
     )
 
-    groups, users = DirectoryLookupLatency()._derive_targets(context)
+    groups, users = DirectoryService()._derive_targets(context)
 
     assert groups == []
     assert users == ["ReadOnlyUser"]
 
 
 def test_derive_targets_falls_back_to_bind_dn_when_not_managed_by_cluster_config(tmp_path):
-    # No DirectoryService in cluster config and no simple_allow_*: fall back to sssd's ldap_default_bind_dn.
     _write_sssd(
         tmp_path,
         "[domain/default]\nid_provider = ldap\nldap_default_bind_dn = CN=svc-bind,OU=Svc,DC=corp,DC=com\n",
     )
 
-    groups, users = DirectoryLookupLatency()._derive_targets(sample_context(NodeType.HEAD))
+    groups, users = DirectoryService()._derive_targets(sample_context(NodeType.HEAD))
 
     assert groups == []
     assert users == ["svc-bind"]
 
 
 def test_derive_targets_returns_empty_when_no_source_available():
-    # No simple_allow_*, no DirectoryService, no sssd.conf on disk => nothing to probe.
-    assert DirectoryLookupLatency()._derive_targets(sample_context(NodeType.HEAD)) == ([], [])
+    assert DirectoryService()._derive_targets(sample_context(NodeType.HEAD)) == ([], [])
 
 
-def test_run_uses_fallback_user_to_issue_probes(monkeypatch):
-    context = _context_with_directory_service({"DomainReadOnlyUser": "svc-bind"})
-    commands = []
-
-    def fake_time_command(command, timeout):
-        commands.append(command)
-        return _timed()
-
-    monkeypatch.setattr(directory_lookup, "time_command", fake_time_command)
-
-    result = DirectoryLookupLatency().run(context)
-
-    assert result.status is Status.PASSED
-    assert commands == [["getent", "passwd", "svc-bind"], ["id", "svc-bind"]]
+# --- managed-by-cluster-config probe --------------------------------------------------
 
 
-# --- DirectoryServiceManagedByClusterConfig -------------------------------------------
+def test_managed_probe_silent_when_declared_in_cluster_config():
+    warnings = []
+
+    DirectoryService()._probe_managed_by_cluster_config(_context_with_directory_service(), warnings)
+
+    assert warnings == []
 
 
-def test_managed_check_description():
-    assert DirectoryServiceManagedByClusterConfig().description == (
-        "Verify that an Active Directory integration is managed through the cluster configuration."
-    )
-
-
-def test_managed_check_should_run_matches_ad_presence(tmp_path):
-    check = DirectoryServiceManagedByClusterConfig()
-    # DirectoryService in cluster config.
-    assert check.should_run(_context_with_directory_service()) is True
-    # No integration at all.
-    assert check.should_run(sample_context(NodeType.HEAD)) is False
-    # AD only in sssd.conf.
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ad\n")
-    assert check.should_run(sample_context(NodeType.HEAD)) is True
-
-
-def test_managed_check_passes_when_declared_in_cluster_config():
-    result = DirectoryServiceManagedByClusterConfig().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-    assert result.errors is None
-
-
-def test_managed_check_warns_when_ad_not_in_cluster_config(tmp_path):
+def test_managed_probe_warns_when_ad_not_in_cluster_config(tmp_path):
     _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\n")
+    warnings = []
 
-    result = DirectoryServiceManagedByClusterConfig().run(sample_context(NodeType.HEAD))
+    DirectoryService()._probe_managed_by_cluster_config(sample_context(NodeType.HEAD), warnings)
 
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [
-        DirectoryServiceManagedByClusterConfig.AD_NOT_MANAGED_BY_CLUSTER_CONFIG.code
-    ]
-    assert "has no DirectoryService section" in result.warnings[0].message
+    assert [warning.code for warning in warnings] == [DirectoryService.AD_NOT_MANAGED_BY_CLUSTER_CONFIG.code]
+    assert "has no DirectoryService section" in warnings[0].message
 
 
-# --- DirectoryLookupResiliencySettings ------------------------------------------------
+# --- resiliency-settings probe --------------------------------------------------------
 
 
-def test_resiliency_check_description():
-    assert DirectoryLookupResiliencySettings().description == (
-        "Verify the settings that reduce directory-lookup load (Slurm NSS plugin, SSSD credential caching)."
-    )
-
-
-def test_resiliency_check_should_run_matches_ad_presence():
-    check = DirectoryLookupResiliencySettings()
-    assert check.should_run(_context_with_directory_service()) is True
-    assert check.should_run(sample_context(NodeType.HEAD)) is False
-
-
-def test_resiliency_check_passes_when_both_mitigations_enabled(monkeypatch):
+def test_resiliency_probe_silent_when_both_mitigations_enabled(monkeypatch):
     monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
     monkeypatch.setattr(directory_lookup, "_cache_credentials_enabled", lambda: True)
+    warnings = []
 
-    result = DirectoryLookupResiliencySettings().run(_context_with_directory_service())
+    DirectoryService()._probe_resiliency_settings(_context_with_directory_service(), warnings)
 
-    assert result.status is Status.PASSED
-    assert result.errors is None
+    assert warnings == []
 
 
-def test_resiliency_check_warns_when_nss_slurm_disabled(monkeypatch):
+def test_resiliency_probe_warns_when_nss_slurm_disabled(monkeypatch):
     monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: False)
     monkeypatch.setattr(directory_lookup, "_cache_credentials_enabled", lambda: True)
+    warnings = []
 
-    result = DirectoryLookupResiliencySettings().run(_context_with_directory_service())
+    DirectoryService()._probe_resiliency_settings(_context_with_directory_service(), warnings)
 
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [
-        DirectoryLookupResiliencySettings.NSS_SLURM_PLUGIN_DISABLED.code
-    ]
+    assert [warning.code for warning in warnings] == [DirectoryService.NSS_SLURM_PLUGIN_DISABLED.code]
 
 
-def test_resiliency_check_warns_when_cache_credentials_disabled(monkeypatch):
+def test_resiliency_probe_warns_when_cache_credentials_disabled(monkeypatch):
     monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: True)
     monkeypatch.setattr(directory_lookup, "_cache_credentials_enabled", lambda: False)
+    warnings = []
 
-    result = DirectoryLookupResiliencySettings().run(_context_with_directory_service())
+    DirectoryService()._probe_resiliency_settings(_context_with_directory_service(), warnings)
 
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [
-        DirectoryLookupResiliencySettings.SSSD_CACHE_CREDENTIALS_DISABLED.code
-    ]
+    assert [warning.code for warning in warnings] == [DirectoryService.SSSD_CACHE_CREDENTIALS_DISABLED.code]
 
 
-def test_resiliency_check_warns_with_both_advisories(monkeypatch):
+def test_resiliency_probe_warns_with_both_advisories(monkeypatch):
     monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: False)
     monkeypatch.setattr(directory_lookup, "_cache_credentials_enabled", lambda: False)
+    warnings = []
 
-    result = DirectoryLookupResiliencySettings().run(_context_with_directory_service())
+    DirectoryService()._probe_resiliency_settings(_context_with_directory_service(), warnings)
 
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [
-        DirectoryLookupResiliencySettings.NSS_SLURM_PLUGIN_DISABLED.code,
-        DirectoryLookupResiliencySettings.SSSD_CACHE_CREDENTIALS_DISABLED.code,
+    assert [warning.code for warning in warnings] == [
+        DirectoryService.NSS_SLURM_PLUGIN_DISABLED.code,
+        DirectoryService.SSSD_CACHE_CREDENTIALS_DISABLED.code,
     ]
 
 
-def test_resiliency_check_no_nss_advisory_when_slurm_conf_unreadable(monkeypatch):
-    # When slurm.conf cannot be read, nss_slurm state is unknown (None) and must not raise a false warning.
+def test_resiliency_probe_no_nss_advisory_when_slurm_conf_unreadable(monkeypatch):
     monkeypatch.setattr(directory_lookup, "_nss_slurm_enabled", lambda context: None)
     monkeypatch.setattr(directory_lookup, "_cache_credentials_enabled", lambda: True)
+    warnings = []
 
-    result = DirectoryLookupResiliencySettings().run(_context_with_directory_service())
+    DirectoryService()._probe_resiliency_settings(_context_with_directory_service(), warnings)
 
-    assert result.status is Status.PASSED
+    assert warnings == []
+
+
+# --- backend-reachability probe -------------------------------------------------------
+
+
+def _backend(summary, online):
+    return SssdBackendStatus(summary=summary, online=online)
+
+
+def test_backend_probe_fails_when_offline(monkeypatch):
+    monkeypatch.setattr(
+        directory_lookup, "_sssd_backend_status", lambda: _backend("default: Online status: Offline", False)
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_backend_reachable(errors, warnings)
+
+    assert [error.code for error in errors] == [DirectoryService.BACKEND_OFFLINE.code]
+    assert "offline" in errors[0].message
+
+
+def test_backend_probe_silent_when_online(monkeypatch):
+    monkeypatch.setattr(
+        directory_lookup, "_sssd_backend_status", lambda: _backend("default: Online status: Online", True)
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_backend_reachable(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_backend_probe_silent_when_status_unknown(monkeypatch):
+    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: _backend("default: some status", None))
+    errors, warnings = [], []
+
+    DirectoryService()._probe_backend_reachable(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_backend_probe_warns_when_status_undeterminable(monkeypatch):
+    # sssctl unavailable / errored / no AD domain => cannot assess => WARNING.
+    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: None)
+    errors, warnings = [], []
+
+    DirectoryService()._probe_backend_reachable(errors, warnings)
+
+    assert errors == []
+    assert [warning.code for warning in warnings] == [DirectoryService.BACKEND_STATUS_UNAVAILABLE.code]
+
+
+# --- endpoint-certificate probe -------------------------------------------------------
+
+
+def _probe(returncode=0, stdout="", stderr="", timed_out=False):
+    """Build a util.ldap.ProbeResult stub."""
+    return ProbeResult(returncode=returncode, stdout=stdout, stderr=stderr, timed_out=timed_out)
+
+
+# A real Amazon Linux 2023 (OpenSSL 3.x) failure: the trailing "Verify return code" line is a
+# misleading 0, the true failure is only in the "verify error" / "Verification error" lines.
+_AL2023_BAD_CERT_OUTPUT = (
+    "CONNECTED(00000003)\n"
+    "depth=0 CN=microsoftad.example.pcluster\n"
+    "verify error:num=18:self-signed certificate\n"
+    "Verification error: self-signed certificate\n"
+    "---\n"
+    "SSL handshake has read 964 bytes and written 362 bytes\n"
+    "Verify return code: 0 (ok)\n"
+)
+
+
+def test_cert_probe_silent_when_certificate_validates(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
+    monkeypatch.setattr(
+        directory_lookup.ldap,
+        "verify_tls_certificate",
+        lambda *a, **k: _probe(0, "depth=0 CN=ad\nverify return:1\nVerify return code: 0 (ok)"),
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_cert_probe_fails_on_al2023_bad_cert_despite_verify_return_code_zero(tmp_path, monkeypatch):
+    # reqcert unset defaults to hard => an invalid cert is fatal, despite the trailing "return code: 0".
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
+    monkeypatch.setattr(
+        directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(1, _AL2023_BAD_CERT_OUTPUT)
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert [error.code for error in errors] == [DirectoryService.CERTIFICATE_INVALID.code]
+    assert "self-signed certificate" in errors[0].message
+
+
+def test_cert_probe_silent_when_invalid_but_reqcert_relaxed(tmp_path, monkeypatch):
+    _write_sssd(
+        tmp_path,
+        "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\nldap_tls_reqcert = allow\n",
+    )
+    monkeypatch.setattr(
+        directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(1, _AL2023_BAD_CERT_OUTPUT)
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_cert_probe_warns_when_openssl_missing(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
+
+    def raise_not_found(*a, **k):
+        raise FileNotFoundError("openssl")
+
+    monkeypatch.setattr(directory_lookup.ldap, "verify_tls_certificate", raise_not_found)
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert errors == []
+    assert [warning.code for warning in warnings] == [DirectoryService.CERTIFICATE_NOT_VALIDATED.code]
+
+
+def test_cert_probe_silent_when_no_handshake(tmp_path, monkeypatch):
+    # A timeout means the endpoint was unreachable: reachability, not a certificate answer.
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
+    monkeypatch.setattr(directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(None, timed_out=True))
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_cert_probe_silent_when_connection_refused(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
+    monkeypatch.setattr(
+        directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(1, stderr="connect:errno=111")
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_cert_probe_silent_when_no_ldaps_endpoint(tmp_path):
+    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldap://ad.example.com\n")
+    errors, warnings = [], []
+
+    DirectoryService()._probe_endpoint_certificate(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+# --- bind-credentials probe -----------------------------------------------------------
+
+_BIND_SSSD = (
+    "[domain/default]\n"
+    "id_provider = ldap\n"
+    "ldap_uri = ldaps://ad.example.com\n"
+    "ldap_default_bind_dn = CN=svc,DC=corp,DC=com\n"
+    "ldap_default_authtok = s3cret\n"
+)
+
+
+def test_bind_probe_silent_when_bind_succeeds(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _BIND_SSSD)
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(0, "dn: DC=corp,DC=com"))
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_bind_probe_fails_on_invalid_credentials(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _BIND_SSSD)
+    monkeypatch.setattr(
+        directory_lookup.ldap,
+        "ldap_bind_search",
+        lambda *a, **k: _probe(LDAP_INVALID_CREDENTIALS_CODE, stderr="bind failed"),
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert [error.code for error in errors] == [DirectoryService.BIND_CREDENTIALS_INVALID.code]
+
+
+def test_bind_probe_fails_on_other_bind_error(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _BIND_SSSD)
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(None, timed_out=True))
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert [error.code for error in errors] == [DirectoryService.BIND_ERROR.code]
+    assert "timed out" in errors[0].message
+
+
+def test_bind_probe_tries_next_endpoint_when_first_unreachable(tmp_path, monkeypatch):
+    _write_sssd(
+        tmp_path,
+        _BIND_SSSD.replace(
+            "ldap_uri = ldaps://ad.example.com", "ldap_uri = ldaps://a.example.com ldaps://b.example.com"
+        ),
+    )
+    seen = []
+
+    def fake_search(uri, *a, **k):
+        seen.append(uri)
+        return _probe(None, timed_out=True) if uri == "ldaps://a.example.com" else _probe(0, "dn: DC=corp,DC=com")
+
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", fake_search)
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert errors == [] and warnings == []
+    assert seen == ["ldaps://a.example.com", "ldaps://b.example.com"]
+
+
+def test_bind_probe_silent_when_authtok_obfuscated(tmp_path):
+    _write_sssd(tmp_path, _BIND_SSSD + "ldap_default_authtok_type = obfuscated_password\n")
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+def test_bind_probe_warns_when_ldapsearch_missing(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _BIND_SSSD)
+
+    def raise_not_found(*a, **k):
+        raise FileNotFoundError("ldapsearch")
+
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", raise_not_found)
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert errors == []
+    assert [warning.code for warning in warnings] == [DirectoryService.BIND_LDAPSEARCH_UNAVAILABLE.code]
+
+
+def test_bind_probe_silent_when_no_endpoint(tmp_path):
+    _write_sssd(
+        tmp_path,
+        "[domain/default]\nid_provider = ldap\nldap_default_bind_dn = CN=svc,DC=corp\nldap_default_authtok = s3cret\n",
+    )
+    errors, warnings = [], []
+
+    DirectoryService()._probe_bind_credentials(errors, warnings)
+
+    assert errors == [] and warnings == []
+
+
+# --- search-base membership probe -----------------------------------------------------
+
+_MEMBERSHIP_SSSD = _BIND_SSSD + "ldap_search_base = DC=corp,DC=com\nsimple_allow_users = alice, bob\n"
+
+
+def test_membership_probe_silent_when_all_users_found(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(0, "dn: CN=x,DC=corp,DC=com"))
+    warnings = []
+
+    DirectoryService()._probe_users_under_search_base(warnings)
+
+    assert warnings == []
+
+
+def test_membership_probe_warns_when_user_missing(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
+    calls = {"n": 0}
+
+    def fake_search(*a, **k):
+        calls["n"] += 1
+        return _probe(0, "dn: CN=alice,DC=corp,DC=com") if calls["n"] == 1 else _probe(0, "")
+
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", fake_search)
+    warnings = []
+
+    DirectoryService()._probe_users_under_search_base(warnings)
+
+    assert [warning.code for warning in warnings] == [DirectoryService.USER_NOT_UNDER_SEARCH_BASE.code]
+    assert "bob" in warnings[0].message and "alice" not in warnings[0].message
+
+
+def test_membership_probe_silent_when_search_errors(tmp_path, monkeypatch):
+    # A bind/connectivity error is reported by the bind/backend probes, not here.
+    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(1, stderr="server down"))
+    warnings = []
+
+    DirectoryService()._probe_users_under_search_base(warnings)
+
+    assert warnings == []
+
+
+def test_membership_probe_tries_next_endpoint_when_first_search_errors(tmp_path, monkeypatch):
+    _write_sssd(
+        tmp_path,
+        _MEMBERSHIP_SSSD.replace(
+            "ldap_uri = ldaps://ad.example.com", "ldap_uri = ldaps://a.example.com ldaps://b.example.com"
+        ),
+    )
+    seen = []
+
+    def fake_search(uri, *a, **k):
+        seen.append(uri)
+        return _probe(1, stderr="server down") if uri == "ldaps://a.example.com" else _probe(0, "dn: CN=x,DC=corp")
+
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", fake_search)
+    warnings = []
+
+    DirectoryService()._probe_users_under_search_base(warnings)
+
+    assert warnings == []
+    assert seen == ["ldaps://a.example.com", "ldaps://b.example.com", "ldaps://b.example.com"]
+
+
+def test_membership_probe_silent_when_no_base_or_users(tmp_path):
+    _write_sssd(tmp_path, _BIND_SSSD)
+    warnings = []
+
+    DirectoryService()._probe_users_under_search_base(warnings)
+
+    assert warnings == []
+
+
+def test_membership_probe_warns_when_ldapsearch_missing(tmp_path, monkeypatch):
+    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
+
+    def raise_not_found(*a, **k):
+        raise FileNotFoundError("ldapsearch")
+
+    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", raise_not_found)
+    warnings = []
+
+    DirectoryService()._probe_users_under_search_base(warnings)
+
+    assert [warning.code for warning in warnings] == [DirectoryService.SEARCH_BASE_LDAPSEARCH_UNAVAILABLE.code]
 
 
 # --- module-level helpers -------------------------------------------------------------
@@ -442,73 +833,6 @@ def test_parse_online_status(output, expected):
     assert directory_lookup._parse_online_status(output) is expected
 
 
-# --- DirectoryBackendIsReachable ------------------------------------------------------
-
-
-def _backend(summary, online):
-    """Build an SssdBackendStatus stub for monkeypatching _sssd_backend_status."""
-    return SssdBackendStatus(summary=summary, online=online)
-
-
-def test_backend_check_description():
-    assert DirectoryBackendIsReachable().description == (
-        "Verify that SSSD reports the directory backend (AD/LDAP) online."
-    )
-
-
-def test_backend_check_should_run_matches_ad_presence(tmp_path):
-    check = DirectoryBackendIsReachable()
-    assert check.should_run(_context_with_directory_service()) is True
-    assert check.should_run(sample_context(NodeType.HEAD)) is False
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\n")
-    assert check.should_run(sample_context(NodeType.HEAD)) is True
-
-
-def test_backend_check_failures_when_backend_offline(monkeypatch):
-    monkeypatch.setattr(
-        directory_lookup, "_sssd_backend_status", lambda: _backend("default: Online status: Offline", False)
-    )
-
-    result = DirectoryBackendIsReachable().run(_context_with_directory_service())
-
-    assert result.status is Status.FAILURE
-    assert [error.code for error in result.errors] == [DirectoryBackendIsReachable.BACKEND_OFFLINE.code]
-    assert "offline" in result.errors[0].message
-
-
-def test_backend_check_passes_when_backend_online(monkeypatch):
-    monkeypatch.setattr(
-        directory_lookup, "_sssd_backend_status", lambda: _backend("default: Online status: Online", True)
-    )
-
-    result = DirectoryBackendIsReachable().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-    assert result.errors is None
-
-
-def test_backend_check_passes_when_status_unknown(monkeypatch):
-    # online=None (sssctl responded but reported no parseable status) must not warn.
-    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: _backend("default: some status", None))
-
-    result = DirectoryBackendIsReachable().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-
-
-def test_backend_check_skipped_when_status_undeterminable(monkeypatch):
-    # sssctl unavailable / errored / no AD domain -> _sssd_backend_status returns None -> cannot assess.
-    monkeypatch.setattr(directory_lookup, "_sssd_backend_status", lambda: None)
-
-    result = DirectoryBackendIsReachable().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryBackendIsReachable.STATUS_UNAVAILABLE.code]
-
-
-# --- sssctl backend-status helpers ----------------------------------------------------
-
-
 def _sssctl_output(stdout, returncode=0, timed_out=False):
     """Build a TimedCommand as if returned by an sssctl domain-status invocation."""
     return TimedCommand(
@@ -533,7 +857,6 @@ def test_ad_domain_names_returns_only_ldap_ad_domains(tmp_path):
 
 
 def test_ad_domain_names_empty_when_sssd_missing():
-    # The autouse fixture points SSSD_CONF_PATH at a file that does not exist.
     assert directory_lookup._ad_domain_names() == []
 
 
@@ -607,340 +930,13 @@ def test_sssd_backend_status_none_when_output_blank(tmp_path, monkeypatch):
     assert directory_lookup._sssd_backend_status() is None
 
 
-# --- DirectoryEndpointCertificateIsValid ----------------------------------------------
-
-
-def _probe(returncode=0, stdout="", stderr="", timed_out=False):
-    """Build a util.ldap.ProbeResult stub."""
-    return ProbeResult(returncode=returncode, stdout=stdout, stderr=stderr, timed_out=timed_out)
-
-
-def test_cert_check_should_run_only_with_ldaps_endpoint(tmp_path):
-    check = DirectoryEndpointCertificateIsValid()
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
-    assert check.should_run(sample_context(NodeType.HEAD)) is True
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldap://ad.example.com\n")
-    assert check.should_run(sample_context(NodeType.HEAD)) is False
-
-
-# A real Amazon Linux 2023 (OpenSSL 3.x) failure: the trailing "Verify return code" line is a
-# misleading 0, the true failure is only in the "verify error" / "Verification error" lines.
-_AL2023_BAD_CERT_OUTPUT = (
-    "CONNECTED(00000003)\n"
-    "depth=0 CN=microsoftad.example.pcluster\n"
-    "verify error:num=18:self-signed certificate\n"
-    "Verification error: self-signed certificate\n"
-    "---\n"
-    "SSL handshake has read 964 bytes and written 362 bytes\n"
-    "Verify return code: 0 (ok)\n"
-)
-
-
-def test_cert_check_passes_when_certificate_validates(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
-    monkeypatch.setattr(
-        directory_lookup.ldap,
-        "verify_tls_certificate",
-        lambda *a, **k: _probe(0, "depth=0 CN=ad\nverify return:1\nVerify return code: 0 (ok)"),
-    )
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.PASSED
-    assert result.errors is None
-
-
-def test_cert_check_fails_on_al2023_bad_cert_despite_verify_return_code_zero(tmp_path, monkeypatch):
-    # reqcert unset defaults to hard => an invalid cert is fatal. The AL2023 output ends with
-    # "Verify return code: 0 (ok)" but is a genuine failure: the check must not be fooled.
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
-    monkeypatch.setattr(
-        directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(1, _AL2023_BAD_CERT_OUTPUT)
-    )
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.FAILURE
-    assert [error.code for error in result.errors] == [DirectoryEndpointCertificateIsValid.INVALID_CERTIFICATE.code]
-    assert "self-signed certificate" in result.errors[0].message
-
-
-def test_cert_check_passes_when_invalid_but_reqcert_relaxed(tmp_path, monkeypatch):
-    # With a relaxed ldap_tls_reqcert (allow/never/try) SSSD proceeds despite the invalid certificate,
-    # so the check passes rather than flagging it.
-    _write_sssd(
-        tmp_path,
-        "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\nldap_tls_reqcert = allow\n",
-    )
-    monkeypatch.setattr(
-        directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(1, _AL2023_BAD_CERT_OUTPUT)
-    )
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.PASSED
-    assert result.warnings is None
-
-
-def test_cert_check_skipped_when_openssl_missing(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
-
-    def raise_not_found(*a, **k):
-        raise FileNotFoundError("openssl")
-
-    monkeypatch.setattr(directory_lookup.ldap, "verify_tls_certificate", raise_not_found)
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryEndpointCertificateIsValid.OPENSSL_UNAVAILABLE.code]
-
-
-def test_cert_check_skipped_when_no_handshake(tmp_path, monkeypatch):
-    # A timeout means the endpoint was unreachable: not this check's concern.
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
-    monkeypatch.setattr(directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(None, timed_out=True))
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryEndpointCertificateIsValid.NOT_VALIDATED.code]
-
-
-def test_cert_check_skipped_when_connection_refused(tmp_path, monkeypatch):
-    # No TLS handshake evidence (connection refused) => reachability, not a certificate answer.
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldaps://ad.example.com\n")
-    monkeypatch.setattr(
-        directory_lookup.ldap, "verify_tls_certificate", lambda *a, **k: _probe(1, stderr="connect:errno=111")
-    )
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryEndpointCertificateIsValid.NOT_VALIDATED.code]
-
-
-# --- DirectoryBindCredentialsAreValid -------------------------------------------------
-
-_BIND_SSSD = (
-    "[domain/default]\n"
-    "id_provider = ldap\n"
-    "ldap_uri = ldaps://ad.example.com\n"
-    "ldap_default_bind_dn = CN=svc,DC=corp,DC=com\n"
-    "ldap_default_authtok = s3cret\n"
-)
-
-
-def test_bind_check_passes_when_bind_succeeds(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _BIND_SSSD)
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(0, "dn: DC=corp,DC=com"))
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-
-
-def test_bind_check_fails_on_invalid_credentials(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _BIND_SSSD)
-    monkeypatch.setattr(
-        directory_lookup.ldap,
-        "ldap_bind_search",
-        lambda *a, **k: _probe(LDAP_INVALID_CREDENTIALS_CODE, stderr="bind failed"),
-    )
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.FAILURE
-    assert [error.code for error in result.errors] == [DirectoryBindCredentialsAreValid.INVALID_CREDENTIALS.code]
-
-
-def test_bind_check_fails_on_other_bind_error(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _BIND_SSSD)
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(None, timed_out=True))
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.FAILURE
-    assert [error.code for error in result.errors] == [DirectoryBindCredentialsAreValid.BIND_ERROR.code]
-    assert "timed out" in result.errors[0].message
-
-
-def test_bind_check_tries_next_endpoint_when_first_unreachable(tmp_path, monkeypatch):
-    # Two endpoints: the first is unreachable (times out); the bind must still pass on the second.
-    _write_sssd(
-        tmp_path,
-        _BIND_SSSD.replace(
-            "ldap_uri = ldaps://ad.example.com", "ldap_uri = ldaps://a.example.com ldaps://b.example.com"
-        ),
-    )
-    seen = []
-
-    def fake_search(uri, *a, **k):
-        seen.append(uri)
-        return _probe(None, timed_out=True) if uri == "ldaps://a.example.com" else _probe(0, "dn: DC=corp,DC=com")
-
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", fake_search)
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-    assert seen == ["ldaps://a.example.com", "ldaps://b.example.com"]
-
-
-def test_bind_check_skipped_when_authtok_obfuscated(tmp_path):
-    _write_sssd(tmp_path, _BIND_SSSD + "ldap_default_authtok_type = obfuscated_password\n")
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryBindCredentialsAreValid.CANNOT_VERIFY.code]
-
-
-def test_bind_check_skipped_when_ldapsearch_missing(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _BIND_SSSD)
-
-    def raise_not_found(*a, **k):
-        raise FileNotFoundError("ldapsearch")
-
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", raise_not_found)
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-
-
-def test_bind_check_skipped_when_no_endpoint(tmp_path):
-    # Credentials present but no ldap_uri => cannot bind.
-    _write_sssd(
-        tmp_path,
-        "[domain/default]\nid_provider = ldap\nldap_default_bind_dn = CN=svc,DC=corp\nldap_default_authtok = s3cret\n",
-    )
-
-    result = DirectoryBindCredentialsAreValid().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-
-
-# --- DirectoryUsersResolveUnderSearchBase ---------------------------------------------
-
-_MEMBERSHIP_SSSD = _BIND_SSSD + "ldap_search_base = DC=corp,DC=com\nsimple_allow_users = alice, bob\n"
-
-
-def test_membership_check_passes_when_all_users_found(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(0, "dn: CN=x,DC=corp,DC=com"))
-
-    result = DirectoryUsersResolveUnderSearchBase().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-
-
-def test_membership_check_warns_when_user_missing(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
-    # alice resolves (dn present); bob returns an empty (but successful) search => not under base.
-    calls = {"n": 0}
-
-    def fake_search(*a, **k):
-        calls["n"] += 1
-        return _probe(0, "dn: CN=alice,DC=corp,DC=com") if calls["n"] == 1 else _probe(0, "")
-
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", fake_search)
-
-    result = DirectoryUsersResolveUnderSearchBase().run(_context_with_directory_service())
-
-    assert result.status is Status.WARNING
-    assert [warning.code for warning in result.warnings] == [
-        DirectoryUsersResolveUnderSearchBase.USER_NOT_UNDER_BASE.code
-    ]
-    assert "bob" in result.warnings[0].message and "alice" not in result.warnings[0].message
-
-
-def test_membership_check_skipped_when_search_errors(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", lambda *a, **k: _probe(1, stderr="server down"))
-
-    result = DirectoryUsersResolveUnderSearchBase().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-    assert [info.code for info in result.infos] == [DirectoryUsersResolveUnderSearchBase.SEARCH_INCOMPLETE.code]
-
-
-def test_membership_check_tries_next_endpoint_when_first_search_errors(tmp_path, monkeypatch):
-    # Two endpoints: the first cannot complete a search; the second resolves every user => PASSED.
-    _write_sssd(
-        tmp_path,
-        _MEMBERSHIP_SSSD.replace(
-            "ldap_uri = ldaps://ad.example.com", "ldap_uri = ldaps://a.example.com ldaps://b.example.com"
-        ),
-    )
-    seen = []
-
-    def fake_search(uri, *a, **k):
-        seen.append(uri)
-        return _probe(1, stderr="server down") if uri == "ldaps://a.example.com" else _probe(0, "dn: CN=x,DC=corp")
-
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", fake_search)
-
-    result = DirectoryUsersResolveUnderSearchBase().run(_context_with_directory_service())
-
-    assert result.status is Status.PASSED
-    # First endpoint aborts after one failed search; the second resolves both users.
-    assert seen == ["ldaps://a.example.com", "ldaps://b.example.com", "ldaps://b.example.com"]
-
-
-def test_membership_check_skipped_when_no_base_or_users(tmp_path):
-    # Credentials + endpoint but no search base and no allow-listed users.
-    _write_sssd(tmp_path, _BIND_SSSD)
-
-    result = DirectoryUsersResolveUnderSearchBase().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-
-
-# --- LDAP helper functions ------------------------------------------------------------
-
-
 def test_ldap_endpoints_parses_scheme_host_port(tmp_path):
-    # A malformed token (no hostname) is skipped; valid ldaps/ldap tokens are parsed with default ports.
     _write_sssd(tmp_path, "[domain/default]\nldap_uri = ldaps://a.example.com garbage ldap://b.example.com:1389\n")
 
     assert directory_lookup._ldap_endpoints() == [
         ("ldaps://a.example.com", "a.example.com", 636, "ldaps"),
         ("ldap://b.example.com:1389", "b.example.com", 1389, "ldap"),
     ]
-
-
-@pytest.mark.parametrize(
-    "check_cls",
-    [DirectoryBindCredentialsAreValid, DirectoryUsersResolveUnderSearchBase],
-)
-def test_ldap_checks_should_run_matches_ad_presence(check_cls, tmp_path):
-    assert check_cls().should_run(_context_with_directory_service()) is True
-    assert check_cls().should_run(sample_context(NodeType.HEAD)) is False
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\n")
-    assert check_cls().should_run(sample_context(NodeType.HEAD)) is True
-
-
-def test_cert_check_skipped_when_no_ldaps_endpoint(tmp_path):
-    # run() called directly with only a non-TLS endpoint -> nothing to validate.
-    _write_sssd(tmp_path, "[domain/default]\nid_provider = ldap\nldap_uri = ldap://ad.example.com\n")
-
-    result = DirectoryEndpointCertificateIsValid().run(sample_context(NodeType.HEAD))
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
-
-
-def test_membership_check_skipped_when_ldapsearch_missing(tmp_path, monkeypatch):
-    _write_sssd(tmp_path, _MEMBERSHIP_SSSD)
-
-    def raise_not_found(*a, **k):
-        raise FileNotFoundError("ldapsearch")
-
-    monkeypatch.setattr(directory_lookup.ldap, "ldap_bind_search", raise_not_found)
-
-    result = DirectoryUsersResolveUnderSearchBase().run(_context_with_directory_service())
-
-    assert result.status is Status.SKIPPED_NOT_APPLICABLE
 
 
 def test_ldap_bind_credentials_none_when_obfuscated(tmp_path):

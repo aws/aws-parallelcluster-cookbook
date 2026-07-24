@@ -15,8 +15,10 @@
 unified_mode true
 default_action :setup
 
-# Full CUDA toolkit version, e.g. '13.0.2'
-property :cuda_version, String, default: node['cluster']['nvidia']['cuda']['version']
+# Full CUDA toolkit version, e.g. '13.0.2'. The default is lazy so the
+# attribute is read at converge time, honoring any override applied after the
+# resource class is compiled (e.g. in tests).
+property :cuda_version, String, default: lazy { node['cluster']['nvidia']['cuda']['version'] }
 
 action :setup do
   return unless nvidia_enabled?

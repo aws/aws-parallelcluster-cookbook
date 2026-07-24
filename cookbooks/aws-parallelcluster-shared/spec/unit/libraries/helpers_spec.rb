@@ -46,17 +46,11 @@ end
 
 describe 'is_custom_node?' do
   let(:node) { Chef::Node.new }
-  let(:default_base) { 'DEFAULT_BASE_URL' }
-  let(:default_package) { "#{default_base}/node/DEFAULT_NODE_PACKAGE" }
 
-  before { node.default['cluster']['custom_node_package'] = default_package }
+  # Ensure the cluster attribute namespace exists.
+  before { node.override['cluster'] = {} }
 
-  it 'returns false when the package equals the shipped default' do
-    node.override['cluster']['custom_node_package'] = default_package
-    expect(is_custom_node?).to be false
-  end
-
-  it 'returns false when the package is nil' do
+  it 'returns false when the package is unset' do
     expect(is_custom_node?).to be false
   end
 
@@ -65,13 +59,8 @@ describe 'is_custom_node?' do
     expect(is_custom_node?).to be false
   end
 
-  it 'returns true when the customer supplies a different package' do
+  it 'returns true when the customer supplies a package' do
     node.override['cluster']['custom_node_package'] = 'CUSTOM_NODE_PACKAGE'
-    expect(is_custom_node?).to be true
-  end
-
-  it 'returns true when only the path differs but the base is the same' do
-    node.override['cluster']['custom_node_package'] = "#{default_base}/other/CUSTOM_NODE_PACKAGE"
     expect(is_custom_node?).to be true
   end
 end

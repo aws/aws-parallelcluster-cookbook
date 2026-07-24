@@ -32,18 +32,28 @@ describe 'efs:install_utils' do
       cached(:repo_base_url) { "#{efs_domain}/repo/rpm/redhat/#{version.to_i}.*" }
 
       context "utils package not yet installed" do
+        cached(:sources_dir) { 'sources_dir' }
+        cached(:gpg_key_path) { "#{sources_dir}/efs-utils-armored.gpg" }
         cached(:chef_run) do
           mock_already_installed(false)
           runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
             node.override['cluster']['efs']['version'] = utils_version
+            node.override['cluster']['sources_dir'] = sources_dir
           end
           ConvergeEfs.install_utils(runner)
+        end
+
+        it 'imports the efs-utils gpg key before adding the repository' do
+          is_expected.to create_remote_file(gpg_key_path)
+            .with(source: "#{efs_domain}/efs-utils-armored.gpg")
+          is_expected.to run_execute('import efs-utils gpg key')
+            .with(command: "rpm --import #{gpg_key_path}")
         end
 
         it 'adds the efs-utils yum repository' do
           is_expected.to create_yum_repository('efs-utils')
             .with(baseurl: repo_base_url)
-            .with(gpgkey: "#{efs_domain}/efs-utils-armored.gpg")
+            .with(gpgkey: "file://#{gpg_key_path}")
         end
 
         it 'installs the newest amazon-efs-utils within the tracked major' do

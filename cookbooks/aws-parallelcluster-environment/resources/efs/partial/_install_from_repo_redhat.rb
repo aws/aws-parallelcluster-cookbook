@@ -53,10 +53,28 @@ action :install_utils do
 end
 
 action :install_efs_utils_from_repo do
+  # Import the repo's GPG key into the rpm keyring up front, before the repo is
+  # read. With repo_gpgcheck=true the metadata signature is verified on every
+  # `yum repolist`/makecache, and if the key isn't already trusted, dnf on RHEL9
+  # prompts interactively ("Is this ok [y/N]") and hangs non-interactive runs.
+  # Mirrors the official efs-utils installer (rpm --import + local file:// gpgkey).
+  efs_utils_gpg_key = "#{node['cluster']['sources_dir']}/efs-utils-armored.gpg"
+
+  remote_file efs_utils_gpg_key do
+    source "#{efs_domain}/efs-utils-armored.gpg"
+    mode '0644'
+    retries 3
+    retry_delay 5
+  end
+
+  execute "import efs-utils gpg key" do
+    command "rpm --import #{efs_utils_gpg_key}"
+  end
+
   yum_repository "efs-utils" do
     description "efs-utils repository"
     baseurl efs_repo_base_url
-    gpgkey "#{efs_domain}/efs-utils-armored.gpg"
+    gpgkey "file://#{efs_utils_gpg_key}"
     gpgcheck true
     repo_gpgcheck true
     enabled true

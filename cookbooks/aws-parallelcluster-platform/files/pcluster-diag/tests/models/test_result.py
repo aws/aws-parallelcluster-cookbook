@@ -14,6 +14,7 @@
 
 import pytest
 
+from pcluster_diag.core.probe import unexpected_error_finding
 from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
 from pcluster_diag.models.result import FAILED_STATUSES, INTERNAL_ERROR_CODE, Result, Status
 from tests.sample_data import FakeCheck, sample_result
@@ -142,3 +143,34 @@ def test_warning_factory_builds_result_with_warnings():
 def test_warning_status_is_not_a_failed_status():
     # A WARNING is advisory: it does not make the run unsuccessful.
     assert Status.WARNING not in FAILED_STATUSES
+
+
+@pytest.mark.parametrize(
+    "errors, warnings, expected_status",
+    [
+        ([], [], Status.PASSED),
+        ([], [CheckWarning(1, "heads up")], Status.WARNING),
+        ([CheckError(1, "boom")], [], Status.FAILURE),
+        ([unexpected_error_finding("probe crashed")], [], Status.CHECK_ERROR),
+        # An unexpected crash alongside only a warning is still CHECK_ERROR (crash dominates warning).
+        ([unexpected_error_finding("probe crashed")], [CheckWarning(1, "heads up")], Status.CHECK_ERROR),
+        # A real (expected) error dominates a concurrent crash.
+        ([CheckError(1, "boom"), unexpected_error_finding("probe crashed")], [], Status.FAILURE),
+    ],
+    ids=["passed", "warning", "failure", "check-error", "check-error-over-warning", "failure-over-check-error"],
+)
+def test_from_findings_derives_status_by_precedence(errors, warnings, expected_status):
+    result = Result.from_findings(_SAMPLE_CHECK, errors=errors, warnings=warnings)
+
+    assert result.status is expected_status
+    # Every supplied error is preserved regardless of the aggregate label.
+    assert (result.errors or []) == errors
+
+
+def test_from_findings_collapses_duplicate_findings():
+    duplicate = CheckWarning(1, "same message")
+
+    result = Result.from_findings(_SAMPLE_CHECK, warnings=[duplicate, CheckWarning(1, "same message")])
+
+    assert result.status is Status.WARNING
+    assert result.warnings == [duplicate]

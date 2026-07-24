@@ -9,13 +9,13 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
       cached(:virtualenv_path) { 'system_pyenv_root/versions/python_version/envs/node_virtualenv' }
 
       context "when node virtualenv not installed yet and custom node package is not set" do
-        cached(:s3_url) { 'https://REGION-aws-parallelcluster.s3.REGION.test_aws_domain' }
+        cached(:official_node_package) { 'https://REGION-aws-parallelcluster.s3.REGION.test_aws_domain/node.tgz' }
         cached(:chef_run) do
           runner = runner(platform: platform, version: version) do |node|
             node.override['cluster']['system_pyenv_root'] = system_pyenv_root
             node.override['cluster']['python-version'] = python_version
             node.override['cluster']['parallelcluster-node-version'] = node_version
-            node.override['cluster']['s3_url'] = s3_url
+            node.override['cluster']['official_node_package'] = official_node_package
           end
           runner.converge(described_recipe)
         end
@@ -37,11 +37,11 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
           is_expected.to write_node_attributes('dump node attributes')
         end
 
-        # By default (install_python_from_internet false) the node package is
-        # installed from S3 in all regions, not from PyPI.
-        it 'points custom_node_package at the S3 node package' do
-          expect(node['cluster']['custom_node_package'])
-            .to eq("#{s3_url}/parallelcluster/#{node_version}/node/aws-parallelcluster-node-#{node_version}.tgz")
+        # By default (install_node_from_internet false) the node package is
+        # installed from S3 in all regions, not from PyPI. When no custom
+        # package is set, custom_node_package falls back to official_node_package.
+        it 'points custom_node_package at the official S3 node package' do
+          expect(node['cluster']['custom_node_package']).to eq(official_node_package)
         end
 
         it 'installs node from S3 via the custom node recipe' do
@@ -50,6 +50,30 @@ describe 'aws-parallelcluster-computefleet::parallelcluster_node' do
 
         it 'does not install the node package from PyPI' do
           is_expected.not_to run_execute('install aws-parallelcluster-node from Pypi')
+        end
+      end
+
+      context "when a custom node package is set" do
+        cached(:custom_node_package) { 'https://example.com/my-custom-node.tgz' }
+        cached(:official_node_package) { 'https://REGION-aws-parallelcluster.s3.REGION.test_aws_domain/node.tgz' }
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            node.override['cluster']['system_pyenv_root'] = system_pyenv_root
+            node.override['cluster']['python-version'] = python_version
+            node.override['cluster']['parallelcluster-node-version'] = node_version
+            node.override['cluster']['official_node_package'] = official_node_package
+            node.override['cluster']['custom_node_package'] = custom_node_package
+          end
+          runner.converge(described_recipe)
+        end
+        cached(:node) { chef_run.node }
+
+        it 'preserves the customer-supplied custom_node_package' do
+          expect(node['cluster']['custom_node_package']).to eq(custom_node_package)
+        end
+
+        it 'installs node via the custom node recipe' do
+          is_expected.to include_recipe('aws-parallelcluster-computefleet::custom_parallelcluster_node')
         end
       end
 

@@ -38,6 +38,23 @@ FAILED_STATUSES = (Status.FAILURE, Status.CHECK_ERROR)
 INTERNAL_ERROR_CODE = 0
 
 
+def _is_unexpected_error(finding) -> bool:
+    """Return whether ``finding`` is an unexpected-error finding (carries the reserved E0 code)."""
+    return finding.code == "E{}".format(INTERNAL_ERROR_CODE)
+
+
+def _dedupe(findings):
+    """Return ``findings`` with exact duplicates (same code and message) removed, preserving order."""
+    seen = set()
+    unique = []
+    for finding in findings:
+        key = (finding.code, finding.message)
+        if key not in seen:
+            seen.add(key)
+            unique.append(finding)
+    return unique
+
+
 @dataclass
 class Result:
     """The outcome of executing a Check.
@@ -69,6 +86,38 @@ class Result:
             check_id=check.identifier,
             check_description=check.description,
             status=Status.PASSED,
+        )
+
+    @staticmethod
+    def from_findings(check, errors=None, warnings=None, infos=None) -> "Result":
+        """Build a Result for ``check`` whose status is derived from its findings by severity precedence.
+
+        The severity precedence is FAILURE > CHECK_ERROR > WARNING > PASSED:
+
+        - FAILURE when any *expected* error is present (a real problem the check detected);
+        - else CHECK_ERROR when the only errors are *unexpected* ones (code E0, from an isolated probe
+          crash) -- the check could not fully complete, but no real problem was confirmed;
+        - else WARNING when any warning is present;
+        - else PASSED.
+        """
+        errors = _dedupe(errors or [])
+        warnings = _dedupe(warnings or [])
+        infos = _dedupe(infos or [])
+        if any(not _is_unexpected_error(error) for error in errors):
+            status = Status.FAILURE
+        elif errors:
+            status = Status.CHECK_ERROR
+        elif warnings:
+            status = Status.WARNING
+        else:
+            status = Status.PASSED
+        return Result(
+            check_id=check.identifier,
+            check_description=check.description,
+            status=status,
+            errors=errors or None,
+            warnings=warnings or None,
+            infos=infos or None,
         )
 
     @staticmethod

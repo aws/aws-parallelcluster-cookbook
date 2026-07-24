@@ -23,15 +23,7 @@ import click
 from pcluster_diag.checks.cfn_hup import CfnHupRunsOnlyOnHeadNode
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
-from pcluster_diag.checks.directory_lookup import (
-    DirectoryBackendIsReachable,
-    DirectoryBindCredentialsAreValid,
-    DirectoryEndpointCertificateIsValid,
-    DirectoryLookupLatency,
-    DirectoryLookupResiliencySettings,
-    DirectoryServiceManagedByClusterConfig,
-    DirectoryUsersResolveUnderSearchBase,
-)
+from pcluster_diag.checks.directory_lookup import DirectoryService
 from pcluster_diag.checks.imds import Imds
 from pcluster_diag.checks.instance_profile import ImdsRoleMatchesCfnHupConfig
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
@@ -145,11 +137,5 @@ DEFAULT_REGISTRY = (
     .register(ImdsRoleMatchesCfnHupConfig())
     .register(ClusterDaemonsAreRunning())
     .register(ClustermgtdHeartbeatIsHealthy())
-    .register(DirectoryServiceManagedByClusterConfig())
-    .register(DirectoryLookupResiliencySettings())
-    .register(DirectoryLookupLatency())
-    .register(DirectoryBackendIsReachable())
-    .register(DirectoryEndpointCertificateIsValid())
-    .register(DirectoryBindCredentialsAreValid())
-    .register(DirectoryUsersResolveUnderSearchBase())
+    .register(DirectoryService())
 )

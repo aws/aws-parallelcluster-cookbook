@@ -10,30 +10,32 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Checks about the directory service (NSS -> SSSD -> LDAP/AD) integration.
+"""A Check diagnosing the directory service (NSS -> SSSD -> LDAP/AD) integration.
 
 slurmctld resolves users and groups through NSS on its main control thread (e.g. AllowGroups refresh,
 job credential creation). When those lookups are slow, the controller's periodic loop is delayed, node
 pings are missed, and healthy compute nodes can be marked DOWN/NOT_RESPONDING and recycled. This module
 provides:
 
-- ``DirectoryLookupLatency``: times the exact NSS calls slurmctld depends on (``getent group``,
-  ``getent passwd``, ``id``) and flags lookups slow enough to put the controller at risk.
-- ``DirectoryBackendIsReachable``: consults a read-only ``sssctl domain-status`` and fails when SSSD
-  reports the directory backend offline.
-- ``DirectoryServiceManagedByClusterConfig``: warns when an AD/LDAP integration exists on the node but
-  is not declared in the cluster configuration (so ParallelCluster cannot manage or validate it).
-- ``DirectoryLookupResiliencySettings``: warns when the settings that reduce directory-lookup load
-  (the Slurm NSS plugin and SSSD credential caching) are not enabled.
-- ``DirectoryEndpointCertificateIsValid``: runs a read-only openssl TLS handshake and reports when the
-  directory endpoint's certificate does not validate against the configured CA.
-- ``DirectoryBindCredentialsAreValid``: reproduces SSSD's bind with a read-only ``ldapsearch`` to verify
-  the configured bind DN and password.
-- ``DirectoryUsersResolveUnderSearchBase``: searches the configured LDAP base (read-only ``ldapsearch``)
-  to confirm the allow-listed users actually resolve under it.
+- lookup latency: times the exact NSS calls slurmctld depends on (``getent group``, ``getent passwd``,
+  ``id``) and flags lookups slow enough to put the controller at risk;
+- managed-by-cluster-config: warns when an AD/LDAP integration exists on the node but is not declared in
+  the cluster configuration (so ParallelCluster cannot manage or validate it);
+- resiliency settings: warns when the settings that reduce directory-lookup load (the Slurm NSS plugin
+  and SSSD credential caching) are not enabled;
+- backend reachability: consults a read-only ``sssctl domain-status`` and fails when SSSD reports the
+  directory backend offline;
+- endpoint certificate: runs a read-only openssl TLS handshake and fails when the directory endpoint's
+  certificate does not validate against the configured CA;
+- bind credentials: reproduces SSSD's bind with a read-only ``ldapsearch`` to verify the configured bind
+  DN and password;
+- search-base membership: searches the configured LDAP base (read-only ``ldapsearch``) to confirm the
+  allow-listed users resolve under it.
 
-All checks are read-only and safe to run on a production node. The ldapsearch/openssl-based checks are
-best-effort: they record SKIPPED_NOT_APPLICABLE when the tool or the required input is unavailable.
+All probes are read-only and safe to run on a production node. A probe whose sub-feature is simply not
+enabled (e.g. no ``ldaps://`` endpoint to validate, no allow-listed users) contributes nothing. A probe
+that is relevant but cannot reach a verdict because a required tool is unavailable (openssl / ldapsearch /
+sssctl not installed) contributes a WARNING so the coverage gap is visible.
 """
 
 import configparser
@@ -52,9 +54,10 @@ from pcluster_diag.core.constants import (
     SLURM_CONF_RELATIVE_PATH,
     SSSD_CONF_PATH,
 )
+from pcluster_diag.core.probe import run_probe
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
-from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
+from pcluster_diag.models.finding import CheckError, CheckWarning
 from pcluster_diag.models.result import Result
 from pcluster_diag.models.sssd_backend_status import SssdBackendStatus
 from pcluster_diag.util import ldap
@@ -67,64 +70,244 @@ _STATUS_WARN = "warn"
 _STATUS_FAIL = "fail"
 
 
-class DirectoryLookupLatency(Check):
-    """Measure NSS/SSSD/AD lookup latency for the users and groups Slurm resolves."""
+class DirectoryService(Check):
+    """Diagnose the directory service (NSS/SSSD/AD) integration."""
 
-    SLOW_OR_FAILING_LOOKUPS = CheckError(
+    LOOKUP_SLOW_OR_FAILING = CheckError(
         1,
         "Directory lookups are slow or failing: {}. They are expected to resolve quickly and reliably.",
     )
-    ELEVATED_OR_UNRESOLVED_LOOKUPS = CheckWarning(
+    BACKEND_OFFLINE = CheckError(2, "SSSD reports the directory backend offline: {}.")
+    CERTIFICATE_INVALID = CheckError(
+        3,
+        "The directory endpoint TLS certificate did not validate: {}. With ldap_tls_reqcert={}, SSSD "
+        "refuses the connection, so identity lookups fail cluster-wide. Fix the certificate or the "
+        "configured CA (ldap_tls_cacert).",
+    )
+    BIND_CREDENTIALS_INVALID = CheckError(
+        4,
+        "The directory rejected SSSD's configured bind credentials (ldap_default_bind_dn / ldap_default_authtok).",
+    )
+    BIND_ERROR = CheckError(5, "Could not complete the directory bind to verify SSSD's credentials ({}).")
+
+    # --- Warnings (advisories and coverage gaps that do not by themselves break identity) ------
+    LOOKUP_ELEVATED = CheckWarning(
         1,
         "Directory lookups are elevated or unresolved: {}. They are expected to resolve quickly and reliably.",
     )
-    NO_LOOKUP_TARGETS = CheckInfo(
-        1,
-        "No lookup users/groups could be derived: sssd.conf has no simple_allow_groups/simple_allow_users "
-        "and no DomainReadOnlyUser (cluster config) or ldap_default_bind_dn (sssd.conf) fallback.",
+    AD_NOT_MANAGED_BY_CLUSTER_CONFIG = CheckWarning(
+        2,
+        "An Active Directory integration is configured in {} but the cluster configuration has no "
+        "DirectoryService section.",
+    )
+    NSS_SLURM_PLUGIN_DISABLED = CheckWarning(
+        3,
+        "The Slurm NSS plugin is not enabled ({} is absent from LaunchParameters in slurm.conf); it is "
+        "expected to be enabled to reduce directory-lookup load on compute nodes.",
+    )
+    SSSD_CACHE_CREDENTIALS_DISABLED = CheckWarning(
+        4,
+        "SSSD credential caching is not enabled (cache_credentials is not set to True in {}); it is "
+        "expected to be enabled so SSSD can serve cached identities when the backend is slow or briefly "
+        "unavailable.",
+    )
+    USER_NOT_UNDER_SEARCH_BASE = CheckWarning(
+        5,
+        "Allow-listed user(s) not found under the configured LDAP search base '{}': {}. They are "
+        "expected to resolve under the search base (ldap_search_base / ldap_user_search_base).",
+    )
+    BACKEND_STATUS_UNAVAILABLE = CheckWarning(
+        6, "Could not determine the directory backend status: sssctl is unavailable or reported no status."
+    )
+    CERTIFICATE_NOT_VALIDATED = CheckWarning(
+        7,
+        "Could not validate the directory endpoint TLS certificate: openssl is not available.",
+    )
+    BIND_LDAPSEARCH_UNAVAILABLE = CheckWarning(
+        8, "Could not verify the directory bind credentials: ldapsearch is not available."
+    )
+    SEARCH_BASE_LDAPSEARCH_UNAVAILABLE = CheckWarning(
+        9, "Could not check the LDAP search base: ldapsearch is not available."
     )
 
     @property
     def description(self) -> str:
         """Return the human-readable description of this Check."""
-        return "Measure directory service (NSS/SSSD/AD) lookup latency for cluster users and groups."
+        return "Verify that the directory service (NSS/SSSD/AD) integration is healthy."
 
     def should_run(self, context: Context) -> bool:
         """Run only when the node integrates a directory service (via cluster config or sssd.conf)."""
         return _ad_integration_configured(context)
 
     def run(self, context: Context) -> Result:
-        """Time getent/id lookups and fail when any exceeds the fail threshold or times out.
+        """Run every directory probe in isolation, accumulate findings, and derive the aggregate Result."""
+        errors: List[CheckError] = []
+        warnings: List[CheckWarning] = []
 
-        When no lookup targets can be derived, the check does not apply, so it is recorded as
-        SKIPPED_NOT_APPLICABLE. Lookups over the fail threshold (or that time out) produce a FAILURE.
-        Elevated-but-tolerable latency, or a name that does not resolve, produces a WARNING.
+        probes = (
+            ("directory-service management", lambda: self._probe_managed_by_cluster_config(context, warnings)),
+            ("resiliency settings", lambda: self._probe_resiliency_settings(context, warnings)),
+            ("lookup latency", lambda: self._probe_lookup_latency(context, errors, warnings)),
+            ("backend reachability", lambda: self._probe_backend_reachable(errors, warnings)),
+            ("endpoint certificate", lambda: self._probe_endpoint_certificate(errors, warnings)),
+            ("bind credentials", lambda: self._probe_bind_credentials(errors, warnings)),
+            ("search-base membership", lambda: self._probe_users_under_search_base(warnings)),
+        )
+        for label, probe in probes:
+            run_probe(label, probe, errors)
+
+        return Result.from_findings(self, errors=errors, warnings=warnings)
+
+    # --- Probes -------------------------------------------------------------------------------
+
+    def _probe_managed_by_cluster_config(self, context: Context, warnings: List[CheckWarning]) -> None:
+        """Warn when the AD/LDAP integration exists on the node but is not declared in the cluster config."""
+        if _directory_service_config(context):
+            return
+        warnings.append(self.AD_NOT_MANAGED_BY_CLUSTER_CONFIG.format(SSSD_CONF_PATH))
+
+    def _probe_resiliency_settings(self, context: Context, warnings: List[CheckWarning]) -> None:
+        """Warn when the Slurm NSS plugin or SSSD credential caching (which reduce lookup load) is disabled."""
+        if _nss_slurm_enabled(context) is False:
+            warnings.append(self.NSS_SLURM_PLUGIN_DISABLED.format(NSS_SLURM_LAUNCH_PARAMETER))
+        if not _cache_credentials_enabled():
+            warnings.append(self.SSSD_CACHE_CREDENTIALS_DISABLED.format(SSSD_CONF_PATH))
+
+    def _probe_lookup_latency(self, context: Context, errors: List[CheckError], warnings: List[CheckWarning]) -> None:
+        """Time getent/id lookups; fail on slow/timed-out lookups, warn on elevated latency or non-resolution.
+
+        When no lookup targets can be derived, the check does not apply.
         """
         groups, users = self._derive_targets(context)
         if not groups and not users:
-            return Result.skipped_not_applicable(self, infos=[self.NO_LOOKUP_TARGETS])
+            return
 
         probes = []
         for group in groups:
-            probes.append(self._probe(["getent", "group", group], "getent group {}".format(group)))
+            probes.append(self._classify_lookup(["getent", "group", group], "getent group {}".format(group)))
         for user in users:
-            probes.append(self._probe(["getent", "passwd", user], "getent passwd {}".format(user)))
-            probes.append(self._probe(["id", user], "id {}".format(user)))
+            probes.append(self._classify_lookup(["getent", "passwd", user], "getent passwd {}".format(user)))
+            probes.append(self._classify_lookup(["id", user], "id {}".format(user)))
 
         failures = [text for status, text in probes if status == _STATUS_FAIL]
         if failures:
-            return Result.failure(self, errors=[self.SLOW_OR_FAILING_LOOKUPS.format("; ".join(failures))])
+            errors.append(self.LOOKUP_SLOW_OR_FAILING.format("; ".join(failures)))
+            return
 
-        warnings = [text for status, text in probes if status == _STATUS_WARN]
-        if warnings:
-            return Result.warning(self, warnings=[self.ELEVATED_OR_UNRESOLVED_LOOKUPS.format("; ".join(warnings))])
-        return Result.passed(self)
+        elevated = [text for status, text in probes if status == _STATUS_WARN]
+        if elevated:
+            warnings.append(self.LOOKUP_ELEVATED.format("; ".join(elevated)))
 
-    def _probe(self, command: List[str], label: str) -> Tuple[str, str]:
+    def _probe_backend_reachable(self, errors: List[CheckError], warnings: List[CheckWarning]) -> None:
+        """Fail when SSSD reports the backend offline; warn when the status cannot be determined.
+
+        A ``getent``/``id`` lookup can be served from the SSSD cache, so passing latency does not prove the
+        backend is reachable. This consults SSSD directly (``sssctl domain-status``). When sssctl is
+        unavailable or reports no parseable status, the backend cannot be assessed, so it warns.
+        """
+        status = _sssd_backend_status()
+        if status is None:
+            warnings.append(self.BACKEND_STATUS_UNAVAILABLE)
+            return
+        if status.online is False:
+            errors.append(self.BACKEND_OFFLINE.format(status.summary))
+
+    def _probe_endpoint_certificate(self, errors: List[CheckError], warnings: List[CheckWarning]) -> None:
+        """Fail when a directory endpoint's TLS certificate does not validate and ``reqcert`` is strict.
+
+        Contributes nothing when no ``ldaps://`` endpoint is configured.
+        """
+        cacert, reqcert = _ldap_tls_settings()
+        ldaps_endpoints = [(host, port) for _uri, host, port, scheme in _ldap_endpoints() if scheme == "ldaps"]
+        if not ldaps_endpoints:
+            return
+
+        outcome = self._evaluate_endpoints(cacert, ldaps_endpoints)
+        if outcome is None:  # openssl not installed / not on PATH
+            warnings.append(self.CERTIFICATE_NOT_VALIDATED)
+            return
+
+        _validated, problems = outcome
+        if not problems:
+            return
+
+        # SSSD's reqcert default is "hard" when unset; hard/demand make an invalid cert fatal.
+        if reqcert in ("", "hard", "demand"):
+            detail = "; ".join(problems)
+            errors.append(self.CERTIFICATE_INVALID.format(detail, reqcert or "hard (default)"))
+
+    def _probe_bind_credentials(self, errors: List[CheckError], warnings: List[CheckWarning]) -> None:
+        """Fail when the configured bind DN/password is rejected; warn when ldapsearch is unavailable.
+
+        Contributes nothing when no verifiable plaintext bind is configured (missing or obfuscated
+        authtok) or no endpoint is configured. A rejected credential is authoritative regardless of
+        endpoint; only when every endpoint fails to bind for another reason is the last such error a
+        failure.
+        """
+        credentials = _ldap_bind_credentials()
+        endpoints = _ldap_endpoints()
+        if credentials is None or not endpoints:
+            return
+
+        bind_dn, password = credentials
+        cacert, reqcert = _ldap_tls_settings()
+        bind_error = None
+        for uri, _host, _port, _scheme in endpoints:
+            try:
+                probe = ldap.ldap_bind_search(
+                    uri, bind_dn, password, base="", attributes=["1.1"], cacert=cacert, reqcert=reqcert
+                )
+            except OSError as error:  # ldapsearch not installed / not on PATH
+                logger.warning("Could not run ldapsearch to verify bind credentials: %s", error)
+                warnings.append(self.BIND_LDAPSEARCH_UNAVAILABLE)
+                return
+
+            if probe.succeeded:
+                return
+            if probe.returncode == ldap.LDAP_INVALID_CREDENTIALS_CODE:
+                errors.append(self.BIND_CREDENTIALS_INVALID)
+                return
+            bind_error = (
+                "timed out" if probe.timed_out else "exit code {}: {}".format(probe.returncode, probe.stderr.strip())
+            )
+        errors.append(self.BIND_ERROR.format(bind_error))
+
+    def _probe_users_under_search_base(self, warnings: List[CheckWarning]) -> None:
+        """Warn when an allow-listed user is not found under the configured LDAP search base.
+
+        Contributes nothing when the search cannot be set up (no plaintext bind, search base, endpoint, or
+        allow-listed users) or when no endpoint yields a completable search (a bind/connectivity concern
+        reported by the bind/backend probes). Warns when ldapsearch is unavailable.
+        """
+        credentials = _ldap_bind_credentials()
+        base = _ldap_search_base()
+        endpoints = _ldap_endpoints()
+        users = [user for user in _split_csv(_read_sssd_value("simple_allow_users")) if user not in ("root", "nobody")]
+        if credentials is None or not base or not endpoints or not users:
+            return
+
+        bind_dn, password = credentials
+        cacert, reqcert = _ldap_tls_settings()
+        for uri, _host, _port, _scheme in endpoints:
+            try:
+                missing = self._missing_users(uri, users, base, bind_dn, password, cacert, reqcert)
+            except OSError as error:  # ldapsearch not installed / not on PATH
+                logger.warning("Could not run ldapsearch to check the search base: %s", error)
+                warnings.append(self.SEARCH_BASE_LDAPSEARCH_UNAVAILABLE)
+                return
+            if missing is None:
+                continue  # bind/connectivity error on this endpoint: try the next one
+            if missing:
+                warnings.append(self.USER_NOT_UNDER_SEARCH_BASE.format(base, ", ".join(missing)))
+            return
+
+    # --- Probe helpers ------------------------------------------------------------------------
+
+    def _classify_lookup(self, command: List[str], label: str) -> Tuple[str, str]:
         """Run one timed lookup and return ``(status, text)`` classified against the latency thresholds.
 
         ``status`` is one of the ``_STATUS_*`` tokens; ``text`` is a human-readable "``label (detail)``"
-        summary used verbatim in the Result message.
+        summary used verbatim in the finding message.
         """
         timed = time_command(command, timeout=DIRECTORY_LOOKUP_COMMAND_TIMEOUT_SECONDS)
         if timed.timed_out:
@@ -150,8 +333,7 @@ class DirectoryLookupLatency(Check):
         Returns a ``(groups, users)`` tuple. ``root`` and ``nobody`` are filtered out as local accounts.
         When neither simple_allow_* list yields a target (e.g. the cluster uses an LDAP access filter
         instead of the simple access provider), fall back to a single known directory account so the
-        latency probe can still run. Missing/unparseable sources yield empty lists (the Check then
-        reports SKIPPED_NOT_APPLICABLE).
+        latency probe can still run. Missing/unparseable sources yield empty lists.
         """
         groups = _split_csv(_read_sssd_value("simple_allow_groups"))
         users = [user for user in _split_csv(_read_sssd_value("simple_allow_users")) if user not in ("root", "nobody")]
@@ -176,168 +358,6 @@ class DirectoryLookupLatency(Check):
         else:
             raw = _read_sssd_value("ldap_default_bind_dn")
         return _principal_from_dn(raw)
-
-
-class DirectoryServiceManagedByClusterConfig(Check):
-    """Warn when an AD/LDAP integration exists on the node but is not declared in the cluster config."""
-
-    AD_NOT_MANAGED_BY_CLUSTER_CONFIG = CheckWarning(
-        1,
-        "An Active Directory integration is configured in {} but the cluster configuration has no "
-        "DirectoryService section. The integration was set up outside ParallelCluster, so ParallelCluster cannot manage"
-        " or validate it and the configuration may be "
-        "lost on a cluster update. Move the integration into the cluster configuration's DirectoryService section.",
-    )
-
-    @property
-    def description(self) -> str:
-        """Return the human-readable description of this Check."""
-        return "Verify that an Active Directory integration is managed through the cluster configuration."
-
-    def should_run(self, context: Context) -> bool:
-        """Run only when the node has an AD/LDAP integration (via cluster config or sssd.conf)."""
-        return _ad_integration_configured(context)
-
-    def run(self, context: Context) -> Result:
-        """Pass when the integration is declared in the cluster config; warn otherwise."""
-        if _directory_service_config(context):
-            return Result.passed(self)
-        return Result.warning(self, warnings=[self.AD_NOT_MANAGED_BY_CLUSTER_CONFIG.format(SSSD_CONF_PATH)])
-
-
-class DirectoryLookupResiliencySettings(Check):
-    """Warn when the settings that reduce directory-lookup load are not enabled."""
-
-    NSS_SLURM_PLUGIN_DISABLED = CheckWarning(
-        1,
-        "The Slurm NSS plugin is not enabled ({} is absent from LaunchParameters in slurm.conf); it is "
-        "expected to be enabled to reduce directory-lookup load on compute nodes.",
-    )
-    SSSD_CACHE_CREDENTIALS_DISABLED = CheckWarning(
-        2,
-        "SSSD credential caching is not enabled (cache_credentials is not set to True in {}); it is "
-        "expected to be enabled so SSSD can serve cached identities when the backend is slow or briefly "
-        "unavailable.",
-    )
-
-    @property
-    def description(self) -> str:
-        """Return the human-readable description of this Check."""
-        return "Verify the settings that reduce directory-lookup load (Slurm NSS plugin, SSSD credential caching)."
-
-    def should_run(self, context: Context) -> bool:
-        """Run only when the node has an AD/LDAP integration (via cluster config or sssd.conf)."""
-        return _ad_integration_configured(context)
-
-    def run(self, context: Context) -> Result:
-        """Warn when the Slurm NSS plugin or SSSD credential caching is not enabled; pass otherwise."""
-        advisories = []
-        if _nss_slurm_enabled(context) is False:
-            advisories.append(self.NSS_SLURM_PLUGIN_DISABLED.format(NSS_SLURM_LAUNCH_PARAMETER))
-        if not _cache_credentials_enabled():
-            advisories.append(self.SSSD_CACHE_CREDENTIALS_DISABLED.format(SSSD_CONF_PATH))
-        if advisories:
-            return Result.warning(self, warnings=advisories)
-        return Result.passed(self)
-
-
-class DirectoryBackendIsReachable(Check):
-    """Fail when SSSD reports the directory backend offline.
-
-    A ``getent``/``id`` lookup can be served from the SSSD cache, so DirectoryLookupLatency passing does
-    not prove the backend is reachable. This check consults SSSD directly (``sssctl domain-status``): an
-    offline backend means identities are being served from cache and will start failing once it expires,
-    which can stall slurmctld and block logins.
-    """
-
-    BACKEND_OFFLINE = CheckError(
-        1,
-        "SSSD reports the directory backend offline: {}.",
-    )
-    STATUS_UNAVAILABLE = CheckInfo(
-        1, "Could not determine the backend status: sssctl is unavailable or reported no status."
-    )
-
-    @property
-    def description(self) -> str:
-        """Return the human-readable description of this Check."""
-        return "Verify that SSSD reports the directory backend (AD/LDAP) online."
-
-    def should_run(self, context: Context) -> bool:
-        """Run only when the node has an AD/LDAP integration (via cluster config or sssd.conf)."""
-        return _ad_integration_configured(context)
-
-    def run(self, context: Context) -> Result:
-        """Fail when SSSD reports the backend offline; skip when the status cannot be determined.
-
-        The backend state comes from a read-only ``sssctl domain-status``. When sssctl is unavailable,
-        errors, or reports no parseable status (``_sssd_backend_status`` returns None), the check cannot
-        assess anything and records SKIPPED_NOT_APPLICABLE.
-        """
-        status = _sssd_backend_status()
-        if status is None:
-            return Result.skipped_not_applicable(self, infos=[self.STATUS_UNAVAILABLE])
-        if status.online is False:
-            return Result.failure(self, errors=[self.BACKEND_OFFLINE.format(status.summary)])
-        return Result.passed(self)
-
-
-class DirectoryEndpointCertificateIsValid(Check):
-    """Verify the TLS certificate the directory endpoint presents validates against the configured CA.
-
-    SSSD connects to AD/LDAP over TLS (``ldaps://``). If the server certificate does not validate, then
-    with ``ldap_tls_reqcert = demand`` (SSSD's default) SSSD refuses the connection and identity lookups
-    fail cluster-wide, so this check fails. With a relaxed ``reqcert`` (allow/never/try) SSSD proceeds
-    despite the invalid certificate, so the check passes. It runs a read-only openssl TLS handshake.
-    """
-
-    INVALID_CERTIFICATE = CheckError(
-        1,
-        "The directory endpoint TLS certificate did not validate: {}. With ldap_tls_reqcert={}, SSSD "
-        "refuses the connection, so identity lookups fail cluster-wide. Fix the certificate or the "
-        "configured CA (ldap_tls_cacert).",
-    )
-    NO_TLS_ENDPOINT = CheckInfo(1, "No TLS (ldaps://) directory endpoint is configured in ldap_uri.")
-    OPENSSL_UNAVAILABLE = CheckInfo(2, "openssl is not available to validate the endpoint certificate.")
-    NOT_VALIDATED = CheckInfo(3, "No configured directory endpoint could be reached to validate its certificate.")
-
-    @property
-    def description(self) -> str:
-        """Return the human-readable description of this Check."""
-        return "Verify that the directory endpoint's TLS certificate validates against the configured CA."
-
-    def should_run(self, context: Context) -> bool:
-        """Run only when at least one configured directory endpoint uses TLS (``ldaps://``)."""
-        return any(scheme == "ldaps" for _uri, _host, _port, scheme in _ldap_endpoints())
-
-    def run(self, context: Context) -> Result:
-        """Fail when a directory endpoint's TLS certificate does not validate and ``reqcert`` is strict.
-
-        With a relaxed ``reqcert`` an invalid certificate is not flagged (SSSD proceeds anyway).
-        Endpoints that cannot be reached (no handshake / no verify code) are left to
-        DirectoryBackendIsReachable and do not count here; if none could be validated, or openssl is
-        unavailable, the check records SKIPPED_NOT_APPLICABLE.
-        """
-        cacert, reqcert = _ldap_tls_settings()
-        ldaps_endpoints = [(host, port) for _uri, host, port, scheme in _ldap_endpoints() if scheme == "ldaps"]
-        if not ldaps_endpoints:
-            return Result.skipped_not_applicable(self, infos=[self.NO_TLS_ENDPOINT])
-
-        outcome = self._evaluate_endpoints(cacert, ldaps_endpoints)
-        if outcome is None:  # openssl not installed / not on PATH
-            return Result.skipped_not_applicable(self, infos=[self.OPENSSL_UNAVAILABLE])
-
-        validated, problems = outcome
-        if not problems:
-            if validated:
-                return Result.passed(self)
-            return Result.skipped_not_applicable(self, infos=[self.NOT_VALIDATED])
-
-        # SSSD's reqcert default is "hard" when unset; hard/demand make an invalid cert fatal.
-        detail = "; ".join(problems)
-        if reqcert in ("", "hard", "demand"):
-            return Result.failure(self, errors=[self.INVALID_CERTIFICATE.format(detail, reqcert or "hard (default)")])
-        return Result.passed(self)
 
     @staticmethod
     def _evaluate_endpoints(cacert, endpoints) -> Optional[Tuple[int, List[str]]]:
@@ -365,139 +385,6 @@ class DirectoryEndpointCertificateIsValid(Check):
             if validated_state is False:
                 problems.append("{}:{} ({})".format(host, port, ldap.tls_verify_error_reason(combined_output)))
         return validated, problems
-
-
-class DirectoryBindCredentialsAreValid(Check):
-    """Verify SSSD's configured bind DN and password authenticate against the directory.
-
-    SSSD binds to AD/LDAP with ``ldap_default_bind_dn`` / ``ldap_default_authtok`` to resolve identities.
-    If those credentials are wrong or expired, every lookup fails. This check reproduces the bind with a
-    read-only ``ldapsearch``. It can only run when the password is stored in plaintext
-    (``ldap_default_authtok_type = password``); an obfuscated token cannot be verified read-only.
-    """
-
-    INVALID_CREDENTIALS = CheckError(
-        1,
-        "The directory rejected SSSD's configured bind credentials (ldap_default_bind_dn / ldap_default_authtok).",
-    )
-    BIND_ERROR = CheckError(
-        2,
-        "Could not complete the directory bind to verify SSSD's credentials ({}).",
-    )
-    CANNOT_VERIFY = CheckInfo(
-        1,
-        "Cannot verify the bind: ldap_default_bind_dn/ldap_default_authtok is missing or obfuscated "
-        "(only a plaintext authtok can be verified), or no ldap_uri is configured.",
-    )
-    LDAPSEARCH_UNAVAILABLE = CheckInfo(2, "ldapsearch is not available to verify the bind credentials.")
-
-    @property
-    def description(self) -> str:
-        """Return the human-readable description of this Check."""
-        return "Verify that SSSD's configured bind DN and password authenticate against the directory."
-
-    def should_run(self, context: Context) -> bool:
-        """Run only when the node has an AD/LDAP integration (via cluster config or sssd.conf)."""
-        return _ad_integration_configured(context)
-
-    def run(self, context: Context) -> Result:
-        """Fail when the configured bind DN/password is rejected; skip when it cannot be verified.
-
-        Each configured endpoint is tried in turn: a successful bind against any of them passes, and a
-        rejected credential is authoritative regardless of endpoint. Only when every endpoint fails to
-        bind for another reason (unreachable / TLS) is the last such error reported.
-        """
-        credentials = _ldap_bind_credentials()
-        endpoints = _ldap_endpoints()
-        if credentials is None or not endpoints:
-            return Result.skipped_not_applicable(self, infos=[self.CANNOT_VERIFY])
-
-        bind_dn, password = credentials
-        cacert, reqcert = _ldap_tls_settings()
-        bind_error = None
-        for uri, _host, _port, _scheme in endpoints:
-            try:
-                # A base-scoped search of the rootDSE exercises only the bind, and needs no search base.
-                probe = ldap.ldap_bind_search(
-                    uri, bind_dn, password, base="", attributes=["1.1"], cacert=cacert, reqcert=reqcert
-                )
-            except OSError as error:  # ldapsearch not installed / not on PATH
-                logger.warning("Could not run ldapsearch to verify bind credentials: %s", error)
-                return Result.skipped_not_applicable(self, infos=[self.LDAPSEARCH_UNAVAILABLE])
-
-            if probe.succeeded:
-                return Result.passed(self)
-            if probe.returncode == ldap.LDAP_INVALID_CREDENTIALS_CODE:
-                return Result.failure(self, errors=[self.INVALID_CREDENTIALS])
-            bind_error = (
-                "timed out" if probe.timed_out else "exit code {}: {}".format(probe.returncode, probe.stderr.strip())
-            )
-        return Result.failure(self, errors=[self.BIND_ERROR.format(bind_error)])
-
-
-class DirectoryUsersResolveUnderSearchBase(Check):
-    """Verify the allow-listed users are found under the configured LDAP search base.
-
-    SSSD only resolves identities that fall under ``ldap_search_base`` (or ``ldap_user_search_base``). A
-    user configured in ``simple_allow_users`` that does not appear under that base cannot log in, even
-    though the endpoint and credentials are healthy, which points at a mis-scoped search base. This check
-    searches the base directly with a read-only ``ldapsearch``.
-    """
-
-    USER_NOT_UNDER_BASE = CheckWarning(
-        1,
-        "Allow-listed user(s) not found under the configured LDAP search base '{}': {}. They are "
-        "expected to resolve under the search base (ldap_search_base / ldap_user_search_base).",
-    )
-    CANNOT_VERIFY = CheckInfo(
-        1,
-        "Cannot verify search-base membership: a plaintext bind (ldap_default_bind_dn/authtok), a search "
-        "base (ldap_search_base/ldap_user_search_base), an ldap_uri, and simple_allow_users are all "
-        "required.",
-    )
-    LDAPSEARCH_UNAVAILABLE = CheckInfo(2, "ldapsearch is not available to search the configured base.")
-    SEARCH_INCOMPLETE = CheckInfo(3, "A directory search could not be completed (bind or connectivity error).")
-
-    @property
-    def description(self) -> str:
-        """Return the human-readable description of this Check."""
-        return "Verify that allow-listed users are found under the configured LDAP search base."
-
-    def should_run(self, context: Context) -> bool:
-        """Run only when the node has an AD/LDAP integration (via cluster config or sssd.conf)."""
-        return _ad_integration_configured(context)
-
-    def run(self, context: Context) -> Result:
-        """Warn when an allow-listed user is not found under the search base; skip when unverifiable.
-
-        Verification needs a plaintext bind, a search base, an endpoint, and allow-listed users; when any
-        is missing, or a search cannot be completed (bind/connectivity error), the check records
-        SKIPPED_NOT_APPLICABLE rather than reporting a false "not found".
-        """
-        credentials = _ldap_bind_credentials()
-        base = _ldap_search_base()
-        endpoints = _ldap_endpoints()
-        users = [user for user in _split_csv(_read_sssd_value("simple_allow_users")) if user not in ("root", "nobody")]
-        if credentials is None or not base or not endpoints or not users:
-            return Result.skipped_not_applicable(self, infos=[self.CANNOT_VERIFY])
-
-        bind_dn, password = credentials
-        cacert, reqcert = _ldap_tls_settings()
-        # Try each endpoint until one yields a completable search; the membership answer is the same for
-        # any healthy endpoint, so the first that completes is authoritative.
-        for uri, _host, _port, _scheme in endpoints:
-            try:
-                missing = self._missing_users(uri, users, base, bind_dn, password, cacert, reqcert)
-            except OSError as error:  # ldapsearch not installed / not on PATH
-                logger.warning("Could not run ldapsearch to check the search base: %s", error)
-                return Result.skipped_not_applicable(self, infos=[self.LDAPSEARCH_UNAVAILABLE])
-            if missing is None:
-                continue  # bind/connectivity error on this endpoint: try the next one
-            if missing:
-                return Result.warning(self, warnings=[self.USER_NOT_UNDER_BASE.format(base, ", ".join(missing))])
-            return Result.passed(self)
-        # No endpoint yielded a completable search; a bind/connectivity error is not a membership answer.
-        return Result.skipped_not_applicable(self, infos=[self.SEARCH_INCOMPLETE])
 
     @staticmethod
     def _missing_users(uri, users, base, bind_dn, password, cacert, reqcert) -> Optional[List[str]]:

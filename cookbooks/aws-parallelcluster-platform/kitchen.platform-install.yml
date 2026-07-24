@@ -110,7 +110,7 @@ suites:
         - resource:package_repos
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
-        - resource:nvidia_repo:add
+        - resource:nvidia_repo:add_driver_repo
       cluster:
         nvidia:
           enabled: true
@@ -143,8 +143,9 @@ suites:
         - resource:package_repos
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
-        - resource:nvidia_repo:add
+        - resource:nvidia_repo:add_driver_repo
         - resource:nvidia_driver
+        - resource:nvidia_repo:add_cuda_repo
         - resource:nvidia_cuda
       cluster:
         nvidia:
@@ -157,7 +158,9 @@ suites:
       controls:
         - tag:nvidia_local_repos_added
     attributes:
-      resource: nvidia_repo:add
+      resource: nvidia_repo:add_cuda_repo
+      dependencies:
+        - resource:nvidia_repo:add_driver_repo
       cluster:
         nvidia:
           enabled: true
@@ -169,9 +172,11 @@ suites:
       controls:
         - tag:install_nvidia_local_repos_removed
     attributes:
-      resource: nvidia_repo:remove
+      resource: nvidia_repo:remove_cuda_repo
       dependencies:
-        - resource:nvidia_repo:add
+        - resource:nvidia_repo:add_driver_repo
+        - resource:nvidia_repo:remove_driver_repo
+        - resource:nvidia_repo:add_cuda_repo
       cluster:
         nvidia:
           enabled: true
@@ -284,7 +289,7 @@ suites:
         - resource:package_repos
         - 'resource:package { "package_name": "dkms" }'
         - resource:build_tools
-        - resource:nvidia_repo:add
+        - resource:nvidia_repo:add_cuda_repo
       cluster:
         nvidia:
           enabled: true
