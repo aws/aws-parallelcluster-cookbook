@@ -31,3 +31,11 @@ end
 def nvidia_driver_module_stream
   nvidia_open_kernel_modules? ? 'open-dkms' : 'latest-dkms'
 end
+
+# On RHEL family the Xorg NVIDIA driver (xorg-x11-nvidia) is a separate package
+# the driver meta-package does not pull in; it is required to start the X server
+# for DCV GPU acceleration. On Debian/Ubuntu the equivalent
+# (xserver-xorg-video-nvidia) is already a dependency of the driver meta-package.
+def extra_driver_packages
+  %w(nvidia-xconfig xorg-x11-nvidia)
+end

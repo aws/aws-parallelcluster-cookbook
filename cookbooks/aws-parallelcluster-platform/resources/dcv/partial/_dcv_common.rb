@@ -75,6 +75,9 @@ action_class do
     # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
     install_dcv_gl
 
+    # Ensure GDM starts an Xorg server (not Wayland) before launching X
+    disable_wayland
+
     # Configure the X server to start automatically when the Linux server boots and start the X server in background
     bash 'Launch X' do
       user 'root'
@@ -91,6 +94,33 @@ action_class do
       command "pidof X || pidof Xorg"
       retries 10
       retry_delay 5
+    end
+  end
+
+  def gdm_custom_conf
+    '/etc/gdm/custom.conf'
+  end
+
+  # Disable Wayland in GDM so that GDM starts an Xorg server, which DCV GPU
+  # acceleration requires.
+  def disable_wayland
+    conf = gdm_custom_conf
+    bash 'Disable Wayland in GDM' do
+      user 'root'
+      code <<-DISABLEWAYLAND
+        set -e
+        if [ -f #{conf} ]; then
+          sed -i 's/#WaylandEnable=false/WaylandEnable=false/' #{conf}
+          if ! grep -q "^WaylandEnable=false" #{conf}; then
+            sed -i '/\\[daemon\\]/a WaylandEnable=false' #{conf}
+          fi
+        fi
+      DISABLEWAYLAND
+    end
+
+    # Restart GDM so it re-reads the setting and comes up on Xorg.
+    service 'gdm' do
+      action :restart
     end
   end
 
