@@ -85,11 +85,13 @@ class LustreClientIsInstalled(Check):
 
         module_available = all(kernel_module.kernel_module_available(m) for m in lustre.LUSTRE_KERNEL_MODULES)
         if not module_available:
+            # An unavailable module cannot be loaded, so reporting "not loaded" too would just restate the
+            # same root cause. Only inspect the load state when the modules are actually available.
             errors.append(self.NOT_INSTALLED.format(kernel_module.kernel_release() or "unknown"))
-
-        not_loaded = [m for m in lustre.LUSTRE_KERNEL_MODULES if not kernel_module.kernel_module_loaded(m)]
-        if not_loaded:
-            warnings.append(self.MODULES_NOT_LOADED)
+        else:
+            not_loaded = [m for m in lustre.LUSTRE_KERNEL_MODULES if not kernel_module.kernel_module_loaded(m)]
+            if not_loaded:
+                warnings.append(self.MODULES_NOT_LOADED)
 
         version = lustre.lustre_client_version()
         if version:

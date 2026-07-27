@@ -113,13 +113,16 @@ def test_client_modules_available_passes_with_version_info(monkeypatch):
 
 
 def test_client_modules_unavailable_fails_naming_kernel(monkeypatch):
-    _patch_client(monkeypatch, available=False, version=None)
+    # An unavailable module cannot be loaded either; the check must report only the NOT_INSTALLED error
+    # and NOT also the MODULES_NOT_LOADED warning for the same root cause.
+    _patch_client(monkeypatch, available=False, loaded=False, version=None)
 
     result = LustreClientIsInstalled().run(sample_context_with_lustre(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert LustreClientIsInstalled.NOT_INSTALLED.code in _codes(result)
+    assert _codes(result) == [LustreClientIsInstalled.NOT_INSTALLED.code]
     assert "6.1.0-amzn2023" in _messages(result)
+    assert _warn_codes(result) == []
 
 
 def test_client_modules_not_loaded_is_warning_only(monkeypatch):
