@@ -37,7 +37,7 @@ from typing import List
 from pcluster_diag.core.constants import FSX_LFS_DF_TIMEOUT_SECONDS
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
-from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
+from pcluster_diag.models.finding import CheckError, CheckInfo
 from pcluster_diag.models.result import Result
 from pcluster_diag.util import kernel_module, lustre, shared_storage
 from pcluster_diag.util.shell import time_command
@@ -65,7 +65,7 @@ class LustreClientIsInstalled(Check):
         "kernel modules are not available for kernel {} (the client may not be installed, or may not "
         "have rebuilt after a kernel update).",
     )
-    MODULES_NOT_LOADED = CheckWarning(1, "lustre/lnet kernel modules are not loaded.")
+    MODULES_NOT_LOADED = CheckError(2, "Lustre kernel modules are available but not loaded: {}.")
     CLIENT_VERSION = CheckInfo(2, "Lustre client version: {}.")
 
     @property
@@ -78,9 +78,8 @@ class LustreClientIsInstalled(Check):
         return _has_lustre(context)
 
     def run(self, context: Context) -> Result:
-        """Fail when the Lustre kernel modules are unavailable for the running kernel."""
+        """Fail when the Lustre kernel modules are unavailable, or available but not loaded."""
         errors: List[CheckError] = []
-        warnings: List[CheckWarning] = []
         infos: List[CheckInfo] = []
 
         module_available = all(kernel_module.kernel_module_available(m) for m in lustre.LUSTRE_KERNEL_MODULES)
@@ -91,13 +90,13 @@ class LustreClientIsInstalled(Check):
         else:
             not_loaded = [m for m in lustre.LUSTRE_KERNEL_MODULES if not kernel_module.kernel_module_loaded(m)]
             if not_loaded:
-                warnings.append(self.MODULES_NOT_LOADED)
+                errors.append(self.MODULES_NOT_LOADED.format(", ".join(not_loaded)))
 
         version = lustre.lustre_client_version()
         if version:
             infos.append(self.CLIENT_VERSION.format(version))
 
-        return Result.from_findings(self, errors=errors, warnings=warnings, infos=infos)
+        return Result.from_findings(self, errors=errors, infos=infos)
 
 
 class FsxMountsArePresent(Check):

@@ -19,7 +19,6 @@ not drift between test modules.
 
 import subprocess
 
-
 # --- Command doubles ------------------------------------------------------------------
 
 

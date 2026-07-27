@@ -13,9 +13,9 @@
 """Unit tests for the Lustre-specific helpers: lfs df parsing and client detection."""
 
 from pcluster_diag.util import kernel_module, lustre
-from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF, HEALTHY_LFS_DF as _HEALTHY_LFS_DF
+from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF
+from tests.test_helpers import HEALTHY_LFS_DF as _HEALTHY_LFS_DF
 from tests.test_helpers import completed_process as _completed
-
 
 # --- lfs df -h parsing ----------------------------------------------------------------
 

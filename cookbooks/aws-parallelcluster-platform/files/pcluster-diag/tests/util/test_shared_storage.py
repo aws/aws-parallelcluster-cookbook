@@ -17,7 +17,8 @@ import pytest
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.util import shared_storage
 from tests.sample_data import sample_context, sample_context_with_lustre
-from tests.test_helpers import completed_process as _completed, raise_oserror as _raise_oserror
+from tests.test_helpers import completed_process as _completed
+from tests.test_helpers import raise_oserror as _raise_oserror
 
 _PROC_MOUNTS = """\
 proc /proc proc rw,relatime 0 0

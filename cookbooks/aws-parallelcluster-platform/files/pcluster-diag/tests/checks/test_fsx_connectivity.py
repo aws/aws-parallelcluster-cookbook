@@ -23,8 +23,9 @@ from pcluster_diag.checks.fsx_connectivity import (
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.result import Status
 from pcluster_diag.util.shell import TimedCommand
-from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF, HEALTHY_LFS_DF as _HEALTHY_LFS_DF
 from tests.sample_data import sample_context, sample_context_with_lustre
+from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF
+from tests.test_helpers import HEALTHY_LFS_DF as _HEALTHY_LFS_DF
 
 _PROC_MOUNTS_BOTH = """\
 10.0.0.1@tcp:/a /fsx lustre rw 0 0
@@ -112,13 +113,16 @@ def test_client_modules_unavailable_fails_naming_kernel(monkeypatch):
     assert _warn_codes(result) == []
 
 
-def test_client_modules_not_loaded_is_warning_only(monkeypatch):
+def test_client_modules_available_but_not_loaded_fails(monkeypatch):
     _patch_client(monkeypatch, loaded=False)
 
     result = LustreClientIsInstalled().run(sample_context_with_lustre(NodeType.COMPUTE))
 
-    assert result.status is Status.WARNING
-    assert _warn_codes(result) == [LustreClientIsInstalled.MODULES_NOT_LOADED.code]
+    assert result.status is Status.FAILURE
+    assert _codes(result) == [LustreClientIsInstalled.MODULES_NOT_LOADED.code]
+    # The error names the specific modules that are available but not loaded.
+    error_message = result.errors[0].message
+    assert "lustre" in error_message and "lnet" in error_message
 
 
 # --- FsxMountsArePresent --------------------------------------------------------------

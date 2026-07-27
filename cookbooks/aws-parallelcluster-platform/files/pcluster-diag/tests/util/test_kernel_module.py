@@ -15,7 +15,8 @@
 import pytest
 
 from pcluster_diag.util import kernel_module
-from tests.test_helpers import completed_process as _completed, raise_oserror as _raise_oserror
+from tests.test_helpers import completed_process as _completed
+from tests.test_helpers import raise_oserror as _raise_oserror
 
 
 @pytest.mark.parametrize("returncode, expected", [(0, True), (1, False)])
