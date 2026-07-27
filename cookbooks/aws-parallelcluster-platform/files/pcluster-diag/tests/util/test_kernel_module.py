@@ -12,19 +12,10 @@
 
 """Unit tests for the kernel-module and kernel probes."""
 
-import subprocess
-
 import pytest
 
 from pcluster_diag.util import kernel_module
-
-
-def _completed(returncode=0, stdout="", stderr=""):
-    return subprocess.CompletedProcess(args=["cmd"], returncode=returncode, stdout=stdout, stderr=stderr)
-
-
-def _raise_oserror(command):
-    raise FileNotFoundError(command[0])
+from tests.test_helpers import completed_process as _completed, raise_oserror as _raise_oserror
 
 
 @pytest.mark.parametrize("returncode, expected", [(0, True), (1, False)])

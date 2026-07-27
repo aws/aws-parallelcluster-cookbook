@@ -12,33 +12,9 @@
 
 """Unit tests for the Lustre-specific helpers: lfs df parsing and client detection."""
 
-import subprocess
-
 from pcluster_diag.util import kernel_module, lustre
-
-# A representative `lfs df -h` output: one MDT and two OSTs healthy.
-_HEALTHY_LFS_DF = """\
-UUID                       bytes        Used   Available Use% Mounted on
-fs-abc-MDT0000_UUID         2.0G       10.0M        1.9G   1% /fsx[MDT:0]
-fs-abc-OST0000_UUID        10.0T        1.0T        9.0T  10% /fsx[OST:0]
-fs-abc-OST0001_UUID        10.0T        2.0T        8.0T  20% /fsx[OST:1]
-
-filesystem_summary:        20.0T        3.0T       17.0T  15% /fsx
-"""
-
-# An `lfs df -h` output where OST0001 reports an error instead of capacity.
-_DEGRADED_LFS_DF = """\
-UUID                       bytes        Used   Available Use% Mounted on
-fs-abc-MDT0000_UUID         2.0G       10.0M        1.9G   1% /fsx[MDT:0]
-fs-abc-OST0000_UUID        10.0T        1.0T        9.0T  10% /fsx[OST:0]
-fs-abc-OST0001_UUID : Resource temporarily unavailable
-
-filesystem_summary:        10.0T        1.0T        9.0T  10% /fsx
-"""
-
-
-def _completed(returncode=0, stdout="", stderr=""):
-    return subprocess.CompletedProcess(args=["cmd"], returncode=returncode, stdout=stdout, stderr=stderr)
+from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF, HEALTHY_LFS_DF as _HEALTHY_LFS_DF
+from tests.test_helpers import completed_process as _completed
 
 
 # --- lfs df -h parsing ----------------------------------------------------------------

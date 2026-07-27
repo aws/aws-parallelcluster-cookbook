@@ -23,21 +23,8 @@ from pcluster_diag.checks.fsx_connectivity import (
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.result import Status
 from pcluster_diag.util.shell import TimedCommand
+from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF, HEALTHY_LFS_DF as _HEALTHY_LFS_DF
 from tests.sample_data import sample_context, sample_context_with_lustre
-
-_HEALTHY_LFS_DF = """\
-UUID                       bytes        Used   Available Use% Mounted on
-fs-abc-MDT0000_UUID         2.0G       10.0M        1.9G   1% /fsx[MDT:0]
-fs-abc-OST0000_UUID        10.0T        1.0T        9.0T  10% /fsx[OST:0]
-
-filesystem_summary:        12.0T        1.0T       11.0T   9% /fsx
-"""
-
-_DEGRADED_LFS_DF = """\
-UUID                       bytes        Used   Available Use% Mounted on
-fs-abc-MDT0000_UUID         2.0G       10.0M        1.9G   1% /fsx[MDT:0]
-fs-abc-OST0001_UUID : Resource temporarily unavailable
-"""
 
 _PROC_MOUNTS_BOTH = """\
 10.0.0.1@tcp:/a /fsx lustre rw 0 0
