@@ -27,6 +27,7 @@ IMDS_V2 = "v2.0"  # HttpTokens required: only token-backed IMDSv2 requests are a
 _BASE_URL = "http://169.254.169.254/latest"  # nosec B104  link-local IMDS endpoint
 _TOKEN_URL = _BASE_URL + "/api/token"
 _INSTANCE_ID_URL = _BASE_URL + "/meta-data/instance-id"
+_INSTANCE_TYPE_URL = _BASE_URL + "/meta-data/instance-type"
 _METADATA_URL = _BASE_URL + "/meta-data/"
 _INSTANCE_TAGS_URL = _BASE_URL + "/meta-data/tags/instance"
 _IAM_SECURITY_CREDENTIALS_URL = _BASE_URL + "/meta-data/iam/security-credentials/"
@@ -38,6 +39,12 @@ def get_instance_id() -> str:
     """Return the id of the current instance, fetched from IMDSv2."""
     token = fetch_token()
     return _get(_INSTANCE_ID_URL, token)
+
+
+def get_instance_type() -> str:
+    """Return the EC2 instance type of the current instance (e.g. ``t3.xlarge``), from IMDSv2."""
+    token = fetch_token()
+    return _get(_INSTANCE_TYPE_URL, token)
 
 
 def get_iam_role_name() -> Optional[str]:

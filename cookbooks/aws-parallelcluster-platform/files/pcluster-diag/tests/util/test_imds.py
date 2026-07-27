@@ -53,6 +53,22 @@ def test_get_instance_id_uses_token_then_reads_instance_id(monkeypatch):
     # A PUT fetches the token first, then the instance-id GET carries that token.
     assert calls[0][0] == "PUT" and calls[0][1].endswith("/api/token")
     assert calls[1][1].endswith("/meta-data/instance-id")
+
+
+def test_get_instance_type_uses_token_then_reads_instance_type(monkeypatch):
+    calls = []
+
+    def fake_urlopen(request, timeout=None):
+        calls.append((request.get_method(), request.full_url, dict(request.header_items())))
+        if request.full_url.endswith("/api/token"):
+            return _FakeResponse(b"the-token")
+        return _FakeResponse(b"fake.large\n")
+
+    monkeypatch.setattr(imds.urllib.request, "urlopen", fake_urlopen)
+
+    assert imds.get_instance_type() == "fake.large"
+    assert calls[0][0] == "PUT" and calls[0][1].endswith("/api/token")
+    assert calls[1][1].endswith("/meta-data/instance-type")
     assert calls[1][2]["X-aws-ec2-metadata-token"] == "the-token"
 
 

@@ -65,6 +65,7 @@ class ContextBuilder:
                 pcluster_diag_version=self._pcluster_diag_version(),
                 pcluster_version=self._pcluster_version(),
                 instance_id=instance_id,
+                instance_type=self._instance_type(),
                 node_type=node_type,
                 cluster_config=self._cluster_config(),
                 dna_json=dna_json,
@@ -97,6 +98,19 @@ class ContextBuilder:
             return imds.get_instance_id()
         except Exception as error:  # best-effort: a failure must not abort the build
             logger.error("Could not determine the current instance id from IMDS: %s", error)
+            return None
+
+    def _instance_type(self) -> Optional[str]:
+        """Return the current instance type from IMDS, or None (logging an error) if it cannot be determined.
+
+        The instance type is not carried in dna.json (neither the head-node nor the compute-node cluster
+        dict includes it), so it is resolved from IMDS -- the same source the official EFA-Lustre config
+        script uses. Best-effort: a failure must not abort the build.
+        """
+        try:
+            return imds.get_instance_type()
+        except Exception as error:
+            logger.error("Could not determine the current instance type from IMDS: %s", error)
             return None
 
     def _node_type(self, dna_json: dict) -> NodeType:

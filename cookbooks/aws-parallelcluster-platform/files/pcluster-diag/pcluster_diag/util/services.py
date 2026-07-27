@@ -10,13 +10,16 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Helpers for querying the state of supervisord-managed programs."""
+"""Helpers for querying the state of supervisord-managed programs and systemd services."""
 
 import glob
+import logging
 from typing import Optional
 
 from pcluster_diag.core.constants import SUPERVISORCTL_GLOB, SUPERVISORD_RUNNING_STATE
 from pcluster_diag.util.shell import run_command
+
+logger = logging.getLogger(__name__)
 
 
 def get_supervisord_program_state(program: str) -> str:
@@ -44,6 +47,39 @@ def is_supervisord_program_running(program: str) -> bool:
         RuntimeError: If supervisorctl cannot report the program status.
     """
     return get_supervisord_program_state(program) == SUPERVISORD_RUNNING_STATE
+
+
+def systemd_unit_exists(unit: str) -> bool:
+    """Return whether systemd knows about ``unit`` (installed), regardless of its active/failed state.
+
+    ``systemctl list-unit-files <unit>`` lists the unit when it is installed and prints nothing when it is
+    not. A missing ``systemctl`` (non-systemd host) counts as "not installed".
+    """
+    result = _systemctl(["list-unit-files", unit])
+    if result is None or result.returncode != 0:
+        return False
+    return any(line.split()[:1] == [unit] for line in result.stdout.splitlines() if line.strip())
+
+
+def systemd_unit_failed(unit: str) -> bool:
+    """Return whether ``unit`` is in the systemd ``failed`` state (``systemctl is-failed`` prints ``failed``).
+
+    ``is-failed`` exits non-zero for non-failed units, so the textual answer -- not the exit code -- is
+    authoritative. A missing ``systemctl`` counts as "not failed".
+    """
+    result = _systemctl(["is-failed", unit])
+    if result is None:
+        return False
+    return result.stdout.strip() == "failed"
+
+
+def _systemctl(args):
+    """Run ``systemctl <args>`` and return the CompletedProcess, or None when systemctl is unavailable."""
+    try:
+        return run_command(["systemctl", *args])
+    except OSError as error:
+        logger.warning("Could not run systemctl %s: %s", args, error)
+        return None
 
 
 def _resolve_supervisorctl() -> str:

@@ -26,9 +26,10 @@ SAMPLE_PCLUSTER_VERSION = "3.16.0"
 SAMPLE_PCLUSTER_DIAG_VERSION = "1.0.0"
 SAMPLE_INSTANCE_ID = "i-0123456789abcdef0"
 SAMPLE_HEAD_NODE_INSTANCE_ID = "i-000000000headnode"
+SAMPLE_INSTANCE_TYPE = "fake.large"
 SAMPLE_CLUSTER_CONFIG = {"Region": "us-east-1"}
 
-# Two FsxLustre SharedStorage mounts, mirroring the recursive-prod-gpu cluster (/fsx and /fsx-efa).
+# Two FsxLustre SharedStorage mounts (/fsx and /fsx-efa), as a cluster with a plain and an EFA-enabled FSx.
 SAMPLE_FSX_LUSTRE_SHARED_STORAGE = [
     {
         "Name": "fsx",
@@ -53,7 +54,7 @@ def sample_context_with_lustre(node_type: NodeType = NodeType.HEAD, shared_stora
     return context
 
 
-def sample_context(node_type: NodeType = NodeType.HEAD) -> Context:
+def sample_context(node_type: NodeType = NodeType.HEAD, instance_type: str = SAMPLE_INSTANCE_TYPE) -> Context:
     """Return a fully-resolved sample Context for ``node_type`` (defaults to the head node)."""
     return Context(
         timestamp=SAMPLE_TIMESTAMP,
@@ -61,6 +62,7 @@ def sample_context(node_type: NodeType = NodeType.HEAD) -> Context:
         pcluster_version=SAMPLE_PCLUSTER_VERSION,
         head_node_instance_id=SAMPLE_HEAD_NODE_INSTANCE_ID,
         instance_id=SAMPLE_INSTANCE_ID,
+        instance_type=instance_type,
         cluster_config=dict(SAMPLE_CLUSTER_CONFIG),
         dna_json={"cluster": {"node_type": node_type.value}},
         pcluster_diag_version=SAMPLE_PCLUSTER_DIAG_VERSION,
