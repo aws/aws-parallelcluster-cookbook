@@ -25,17 +25,21 @@
 # The no_proxy list excludes S3 endpoints so downloads from S3 go through the VPC Gateway
 # Endpoint directly, not through the proxy.
 #
-# Both leading-dot and bare-host entries are needed for each S3 endpoint:
+# Only REGIONAL S3 endpoints (for the build region) are added to no_proxy. Both leading-dot
+# and bare-host entries are needed for each:
 #   ".s3.{region}.amazonaws.com"  — matches subdomains (virtual-hosted bucket URLs)
 #     e.g., mybucket.s3.us-east-1.amazonaws.com used by remote_file downloads
 #   "s3.{region}.amazonaws.com"   — matches the exact host (path-style URLs)
 #     e.g., s3.us-east-1.amazonaws.com/mybucket/key used by aws s3 presign URLs; cfn-bootstrap
-# # bucket uses https://s3.amazonaws.com/cloudformation-examples/...
+#     bucket uses https://s3.amazonaws.com/cloudformation-examples/...
 #
-# The global .s3.amazonaws.com endpoint does NOT work through the VPC Gateway Endpoint
-# (SSL errors with FSx repos), so it is intentionally left out of no_proxy without the
-# bare-host form and instead goes through the proxy. The proxy allowlist must include
-# s3.amazonaws.com for this to work.
+# The GLOBAL S3 endpoint (s3.amazonaws.com, including virtual-hosted bucket.s3.amazonaws.com
+# URLs) is intentionally NOT in no_proxy, so it goes through the proxy. The regional VPC Gateway
+# Endpoint only serves S3 in the build region; a global-endpoint bucket that lives in another
+# region — e.g. the FSx Lustre client repo (fsx-lustre-client-repo.s3.amazonaws.com), hosted in
+# us-east-1 — is unreachable via the gateway from any other region and fails with SSL/connection
+# errors. Routing the global endpoint through the proxy makes isolated build-image work in every
+# region. The proxy allowlist must include s3.amazonaws.com for this to work.
 #
 # IMDS (169.254.169.254) is excluded so instance metadata queries bypass the proxy.
 #
@@ -53,10 +57,11 @@ ruby_block 'configure proxy from install_http_proxy_address' do
 
       region = node['cluster']['region']
 
-      # S3 endpoints bypass the proxy and use the VPC Gateway Endpoint.
-      # Includes regional (s3.{region}), dash-style (s3-{region}), global (s3.{domain}),
-      # and dualstack (s3.dualstack.{region}) variants used by different AWS services and repos.
-      # China regions use amazonaws.com.cn domain suffix (via aws_domain helper).
+      # Regional S3 endpoints bypass the proxy and use the VPC Gateway Endpoint.
+      # Includes regional (s3.{region}), dash-style (s3-{region}), and dualstack
+      # (s3.dualstack.{region}) variants used by different AWS services and repos.
+      # The global endpoint (s3.{domain}) is intentionally excluded so it goes through the
+      # proxy (see header note). China regions use amazonaws.com.cn suffix (via aws_domain helper).
       domain = aws_domain
       no_proxy = [
         "localhost",
@@ -66,7 +71,6 @@ ruby_block 'configure proxy from install_http_proxy_address' do
         "s3.#{region}.#{domain}",
         ".s3-#{region}.#{domain}",
         "s3-#{region}.#{domain}",
-        ".s3.#{domain}",
         ".s3.dualstack.#{region}.#{domain}",
         "s3.dualstack.#{region}.#{domain}",
       ].join(",")
