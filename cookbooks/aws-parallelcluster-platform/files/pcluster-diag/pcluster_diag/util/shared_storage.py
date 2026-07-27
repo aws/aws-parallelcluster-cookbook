@@ -14,8 +14,8 @@
 
 This module is storage-type agnostic: it discovers the shared-storage mounts declared in the cluster
 configuration and reads the kernel mount table from ``/proc/mounts``. The Lustre-specific parsing lives
-in :mod:`pcluster_diag.util.lustre`; system package/kernel-module probing lives in
-:mod:`pcluster_diag.util.packages`. Every external command is routed through
+in :mod:`pcluster_diag.util.lustre`; kernel-module probing lives in
+:mod:`pcluster_diag.util.kernel_module`. Every external command is routed through
 :mod:`pcluster_diag.util.shell`; the queries here are fast and non-hanging.
 """
 

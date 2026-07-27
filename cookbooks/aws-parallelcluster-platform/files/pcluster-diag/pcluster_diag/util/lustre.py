@@ -13,15 +13,15 @@
 """Lustre-specific helpers: ``lfs df`` parsing and Lustre client detection.
 
 This module holds only the genuinely Lustre-specific logic. Shared-storage enumeration and the
-``/proc/mounts`` table live in :mod:`pcluster_diag.util.shared_storage`; the generic package and
-kernel-module probes this module builds on live in :mod:`pcluster_diag.util.packages`.
+``/proc/mounts`` table live in :mod:`pcluster_diag.util.shared_storage`; the kernel-module probes this
+module builds on live in :mod:`pcluster_diag.util.kernel_module`.
 """
 
 import re
 from dataclasses import dataclass
 from typing import List, Optional
 
-from pcluster_diag.util import packages
+from pcluster_diag.util import kernel_module
 
 # The out-of-tree kernel modules the Lustre client needs to speak Lustre.
 LUSTRE_KERNEL_MODULES = ("lustre", "lnet")
@@ -92,11 +92,6 @@ def _parse_target_line(line: str) -> Optional[LustreTarget]:
     return LustreTarget(uuid=uuid, role=role, available=False, detail=detail)
 
 
-def lustre_client_installed(client_packages) -> bool:
-    """Return whether any of ``client_packages`` (the Lustre client package names) is installed."""
-    return packages.package_installed(client_packages)
-
-
 def lustre_client_version() -> Optional[str]:
     """Return the Lustre client version (from the ``lustre`` kernel module), or None when unavailable."""
-    return packages.module_version("lustre")
+    return kernel_module.module_version("lustre")

@@ -14,7 +14,7 @@
 
 import subprocess
 
-from pcluster_diag.util import lustre, packages
+from pcluster_diag.util import kernel_module, lustre
 
 # A representative `lfs df -h` output: one MDT and two OSTs healthy.
 _HEALTHY_LFS_DF = """\
@@ -84,30 +84,16 @@ def test_parse_lfs_df_skips_single_token_line():
     assert lustre.parse_lfs_df("loneword\n") == []
 
 
-# --- Lustre client detection (delegates to util.packages) -----------------------------
-
-
-def test_lustre_client_installed_true_when_present(monkeypatch):
-    monkeypatch.setattr(
-        packages, "run_command", lambda command: _completed(returncode=0 if command[:2] == ["rpm", "-q"] else 1)
-    )
-
-    assert lustre.lustre_client_installed(["lustre-client"]) is True
-
-
-def test_lustre_client_installed_false_when_absent(monkeypatch):
-    monkeypatch.setattr(packages, "run_command", lambda command: _completed(returncode=1))
-
-    assert lustre.lustre_client_installed(["lustre-client"]) is False
+# --- Lustre client version (delegates to util.kernel_module) -------------------------------
 
 
 def test_lustre_client_version_from_modinfo(monkeypatch):
-    monkeypatch.setattr(packages, "run_command", lambda command: _completed(stdout="2.15.6\n"))
+    monkeypatch.setattr(kernel_module, "run_command", lambda command: _completed(stdout="2.15.6\n"))
 
     assert lustre.lustre_client_version() == "2.15.6"
 
 
 def test_lustre_client_version_none_on_failure(monkeypatch):
-    monkeypatch.setattr(packages, "run_command", lambda command: _completed(returncode=1))
+    monkeypatch.setattr(kernel_module, "run_command", lambda command: _completed(returncode=1))
 
     assert lustre.lustre_client_version() is None

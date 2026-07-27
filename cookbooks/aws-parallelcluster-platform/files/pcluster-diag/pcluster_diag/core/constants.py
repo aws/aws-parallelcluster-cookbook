@@ -111,5 +111,3 @@ FSX_LFS_DF_TIMEOUT_SECONDS = 30
 LUSTRE_STORAGE_TYPE = "FsxLustre"
 # NFS-based shared-storage types, handled with shallow reachability only (not in scope for PR1).
 NFS_STORAGE_TYPES = ("FsxOntap", "FsxOpenZfs", "Efs")
-# The Lustre client package names to probe (rpm on RHEL/AL, dpkg on Debian/Ubuntu).
-LUSTRE_CLIENT_PACKAGES = ("lustre-client", "lustre-client-modules")

@@ -10,12 +10,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Generic OS package and kernel-module probing.
+"""Kernel-module and kernel probing.
 
-Thin, storage-agnostic wrappers over ``rpm``/``dpkg`` (package presence), ``modinfo``/``lsmod`` (kernel
-module availability and load state), and ``uname`` (running kernel release). These are used by the
-Lustre client checks but contain nothing Lustre-specific. Every external command is routed through
-:mod:`pcluster_diag.util.shell`; a missing binary is treated as a negative answer, never an exception.
+Thin wrappers over ``modinfo``/``lsmod`` (kernel module availability and load state) and ``uname``
+(running kernel release). These are used by the Lustre client checks but contain nothing
+Lustre-specific. Every external command is routed through :mod:`pcluster_diag.util.shell`; a missing
+binary is treated as a negative answer, never an exception.
 """
 
 import logging
@@ -33,24 +33,6 @@ def _command_succeeded(command: List[str]) -> bool:
     except OSError as error:
         logger.warning("Could not run %s: %s", command, error)
         return False
-
-
-def rpm_package_installed(package: str) -> bool:
-    """Return whether ``package`` is installed per ``rpm -q`` (False when rpm is unavailable)."""
-    return _command_succeeded(["rpm", "-q", package])
-
-
-def dpkg_package_installed(package: str) -> bool:
-    """Return whether ``package`` is installed per ``dpkg -s`` (False when dpkg is unavailable)."""
-    return _command_succeeded(["dpkg", "-s", package])
-
-
-def package_installed(packages) -> bool:
-    """Return whether any of ``packages`` is installed via rpm (RHEL/AL) or dpkg (Debian/Ubuntu)."""
-    for package in packages:
-        if rpm_package_installed(package) or dpkg_package_installed(package):
-            return True
-    return False
 
 
 def kernel_module_available(module: str) -> bool:

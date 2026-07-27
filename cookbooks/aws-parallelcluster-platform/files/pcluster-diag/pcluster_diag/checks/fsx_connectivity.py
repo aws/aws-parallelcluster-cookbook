@@ -16,11 +16,11 @@ The failure class these checks target (EFA fabric down, an OSS/OST unreachable, 
 manifests as Lustre operations *blocking* rather than erroring quickly. Every command that can hang is
 therefore run through :func:`pcluster_diag.util.shell.time_command` with a bounded timeout, and a
 timeout is treated as a distinct, first-class failure mode rather than an exception. The fast, local
-queries (package/kernel-module presence, reading ``/proc/mounts``) go through ``run_command``.
+queries (kernel-module presence, reading ``/proc/mounts``) go through ``run_command``.
 
 Three checks, in execution order:
 
-- ``LustreClientIsInstalled`` verifies the node can actually speak Lustre (package + kernel modules)
+- ``LustreClientIsInstalled`` verifies the node can actually speak Lustre (kernel modules available)
   before connectivity is probed, so a broken client is reported as its own root cause.
 - ``FsxMountsArePresent`` is a cheap, non-hanging pre-flight confirming each configured Lustre mount is
   actually mounted, so a "not mounted" problem is not misreported downstream as "unreachable".
@@ -34,12 +34,12 @@ when the cluster configures no FsxLustre filesystem. Every probe is read-only.
 import logging
 from typing import List
 
-from pcluster_diag.core.constants import FSX_LFS_DF_TIMEOUT_SECONDS, LUSTRE_CLIENT_PACKAGES
+from pcluster_diag.core.constants import FSX_LFS_DF_TIMEOUT_SECONDS
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
 from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
 from pcluster_diag.models.result import Result
-from pcluster_diag.util import lustre, packages, shared_storage
+from pcluster_diag.util import kernel_module, lustre, shared_storage
 from pcluster_diag.util.shell import time_command
 
 logger = logging.getLogger(__name__)
@@ -51,14 +51,19 @@ def _has_lustre(context: Context) -> bool:
 
 
 class LustreClientIsInstalled(Check):
-    """Verify the Lustre client (package + kernel modules) is present so the node can speak Lustre."""
+    """Verify the Lustre client is present so the node can speak Lustre.
 
-    PACKAGE_MISSING = CheckError(
-        1, "Lustre client package is not installed though a FsxLustre filesystem is configured."
-    )
-    MODULE_UNAVAILABLE = CheckError(
-        2,
-        "Lustre kernel module is not available for kernel {} (client may not have rebuilt after a kernel update).",
+    The kernel module is the authoritative signal: Lustre can only mount if the ``lustre`` and ``lnet``
+    modules are available for the running kernel. We check ``modinfo`` for those modules rather than a
+    package name (package names vary by OS/install source, and a package can be present while the module
+    is not built for the current kernel -- in which case Lustre still cannot mount).
+    """
+
+    NOT_INSTALLED = CheckError(
+        1,
+        "Lustre client is not installed though a FsxLustre filesystem is configured: the lustre/lnet "
+        "kernel modules are not available for kernel {} (the client may not be installed, or may not "
+        "have rebuilt after a kernel update).",
     )
     MODULES_NOT_LOADED = CheckWarning(1, "lustre/lnet kernel modules are not loaded.")
     CLIENT_VERSION = CheckInfo(2, "Lustre client version: {}.")
@@ -66,26 +71,23 @@ class LustreClientIsInstalled(Check):
     @property
     def description(self) -> str:
         """Return the human-readable description of this Check."""
-        return "Verify that the Lustre client package and kernel modules are installed."
+        return "Verify that the Lustre client is installed."
 
     def should_run(self, context: Context) -> bool:
         """Run only when a FsxLustre filesystem is configured."""
         return _has_lustre(context)
 
     def run(self, context: Context) -> Result:
-        """Fail when the client package or a kernel module is missing; warn when modules are not loaded."""
+        """Fail when the Lustre kernel modules are unavailable for the running kernel."""
         errors: List[CheckError] = []
         warnings: List[CheckWarning] = []
         infos: List[CheckInfo] = []
 
-        if not lustre.lustre_client_installed(LUSTRE_CLIENT_PACKAGES):
-            errors.append(self.PACKAGE_MISSING)
+        module_available = all(kernel_module.kernel_module_available(m) for m in lustre.LUSTRE_KERNEL_MODULES)
+        if not module_available:
+            errors.append(self.NOT_INSTALLED.format(kernel_module.kernel_release() or "unknown"))
 
-        unavailable = [m for m in lustre.LUSTRE_KERNEL_MODULES if not packages.kernel_module_available(m)]
-        if unavailable:
-            errors.append(self.MODULE_UNAVAILABLE.format(packages.kernel_release() or "unknown"))
-
-        not_loaded = [module for module in lustre.LUSTRE_KERNEL_MODULES if not packages.kernel_module_loaded(module)]
+        not_loaded = [m for m in lustre.LUSTRE_KERNEL_MODULES if not kernel_module.kernel_module_loaded(m)]
         if not_loaded:
             warnings.append(self.MODULES_NOT_LOADED)
 

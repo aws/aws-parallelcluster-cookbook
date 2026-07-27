@@ -91,11 +91,10 @@ def test_should_run_false_when_no_lustre_configured(check):
 # --- LustreClientIsInstalled ----------------------------------------------------------
 
 
-def _patch_client(monkeypatch, *, installed=True, available=True, loaded=True, version="2.15.6"):
-    monkeypatch.setattr(fsx_connectivity.lustre, "lustre_client_installed", lambda packages: installed)
-    monkeypatch.setattr(fsx_connectivity.packages, "kernel_module_available", lambda module: available)
-    monkeypatch.setattr(fsx_connectivity.packages, "kernel_module_loaded", lambda module: loaded)
-    monkeypatch.setattr(fsx_connectivity.packages, "kernel_release", lambda: "6.1.0-amzn2023")
+def _patch_client(monkeypatch, *, available=True, loaded=True, version="2.15.6"):
+    monkeypatch.setattr(fsx_connectivity.kernel_module, "kernel_module_available", lambda module: available)
+    monkeypatch.setattr(fsx_connectivity.kernel_module, "kernel_module_loaded", lambda module: loaded)
+    monkeypatch.setattr(fsx_connectivity.kernel_module, "kernel_release", lambda: "6.1.0-amzn2023")
     monkeypatch.setattr(fsx_connectivity.lustre, "lustre_client_version", lambda: version)
 
 
@@ -103,7 +102,7 @@ def test_client_description():
     assert "Lustre client" in LustreClientIsInstalled().description
 
 
-def test_client_all_present_passes_with_version_info(monkeypatch):
+def test_client_modules_available_passes_with_version_info(monkeypatch):
     _patch_client(monkeypatch)
 
     result = LustreClientIsInstalled().run(sample_context_with_lustre(NodeType.COMPUTE))
@@ -113,22 +112,13 @@ def test_client_all_present_passes_with_version_info(monkeypatch):
     assert "2.15.6" in result.infos[0].message
 
 
-def test_client_package_missing_fails(monkeypatch):
-    _patch_client(monkeypatch, installed=False)
+def test_client_modules_unavailable_fails_naming_kernel(monkeypatch):
+    _patch_client(monkeypatch, available=False, version=None)
 
     result = LustreClientIsInstalled().run(sample_context_with_lustre(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert LustreClientIsInstalled.PACKAGE_MISSING.code in _codes(result)
-
-
-def test_client_module_unavailable_fails_naming_kernel(monkeypatch):
-    _patch_client(monkeypatch, available=False)
-
-    result = LustreClientIsInstalled().run(sample_context_with_lustre(NodeType.HEAD))
-
-    assert result.status is Status.FAILURE
-    assert LustreClientIsInstalled.MODULE_UNAVAILABLE.code in _codes(result)
+    assert LustreClientIsInstalled.NOT_INSTALLED.code in _codes(result)
     assert "6.1.0-amzn2023" in _messages(result)
 
 
