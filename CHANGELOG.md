@@ -56,6 +56,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Cinc Client to version 19.3.14 (from 18.8.54).
 
 **BUG FIXES**
+- Fix `/etc/profile.d/path.sh` aborting login `sh` (dash) with a syntax error by making the script POSIX sh compatible instead of using bash-only array syntax.
 - Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
 via custom Slurm settings or the cluster name contains upper-case letters.
 - Remove deprecated parameter `AccountingStorageUser` from Slurm configuration that was causing harmless error messages.
