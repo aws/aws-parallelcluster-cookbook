@@ -97,59 +97,7 @@ EOF
     end
   end
 
-  # Disable Wayland in GDM to ensure Xorg is used
-  # This is required for Ubuntu 22.04+ where Wayland is the default
-  # Without this, GDM won't start Xorg on headless GPU instances
-  def disable_wayland
-    bash 'Disable Wayland in GDM' do
-      user 'root'
-      code <<-DISABLEWAYLAND
-        set -e
-        if [ -f /etc/gdm3/custom.conf ]; then
-          sed -i 's/#WaylandEnable=false/WaylandEnable=false/' /etc/gdm3/custom.conf
-          # If the line doesn't exist at all, add it under [daemon] section
-          if ! grep -q "^WaylandEnable=false" /etc/gdm3/custom.conf; then
-            sed -i '/\\[daemon\\]/a WaylandEnable=false' /etc/gdm3/custom.conf
-          fi
-        fi
-      DISABLEWAYLAND
-    end
-  end
-
-  # Override allow_gpu_acceleration to disable Wayland before starting X
-  def allow_gpu_acceleration
-    # Update the xorg.conf to set up NVIDIA drivers.
-    # NOTE: --enable-all-gpus parameter is needed to support servers with more than one NVIDIA GPU.
-    nvidia_xconfig_command = "nvidia-xconfig --preserve-busid --enable-all-gpus"
-    nvidia_xconfig_command += " --use-display-device=none" if node['ec2']['instance_type'].start_with?("g2.")
-    execute "Set up Nvidia drivers for X configuration" do
-      user 'root'
-      command nvidia_xconfig_command
-    end
-
-    # dcvgl package must be installed after NVIDIA and before starting up X
-    # DO NOT install dcv-gl on non-GPU instances, or will run into a black screen issue
-    install_dcv_gl
-
-    # Disable Wayland to ensure GDM starts Xorg
-    disable_wayland
-
-    # Configure the X server to start automatically when the Linux server boots and start the X server in background
-    bash 'Launch X' do
-      user 'root'
-      code <<-SETUPX
-      set -e
-      systemctl set-default graphical.target
-      systemctl isolate graphical.target &
-      SETUPX
-    end
-
-    # Verify that the X server is running
-    execute 'Wait for X to start' do
-      user 'root'
-      command "pidof X || pidof Xorg"
-      retries 10
-      retry_delay 5
-    end
+  def gdm_custom_conf
+    '/etc/gdm3/custom.conf'
   end
 end

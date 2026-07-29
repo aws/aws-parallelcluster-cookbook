@@ -900,6 +900,17 @@ describe 'dcv:configure' do
           )
         end
 
+        it 'disables Wayland in GDM so GDM starts an Xorg server' do
+          gdm_conf = platform == 'ubuntu' ? '/etc/gdm3/custom.conf' : '/etc/gdm/custom.conf'
+          is_expected.to run_bash('Disable Wayland in GDM')
+            .with_user('root')
+            .with_code(/#{Regexp.escape(gdm_conf)}/)
+        end
+
+        it 'restarts GDM so it re-reads the Wayland setting and comes up on Xorg' do
+          is_expected.to restart_service('gdm')
+        end
+
         if platform == 'ubuntu'
           it 'disables RNDFILE from openssl to avoid error during certificate generation' do
             is_expected.to run_execute('No RND')

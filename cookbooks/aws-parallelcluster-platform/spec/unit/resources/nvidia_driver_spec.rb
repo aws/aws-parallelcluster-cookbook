@@ -182,6 +182,10 @@ describe 'nvidia_driver:setup' do
         )
       end
 
+      it 'installs nvidia-xconfig from the NVIDIA local repo on every platform' do
+        is_expected.to install_package('nvidia-xconfig')
+      end
+
       if platform == 'ubuntu'
         it 'installs the open driver meta-package' do
           is_expected.to install_package('nvidia-open')
@@ -198,6 +202,10 @@ describe 'nvidia_driver:setup' do
         it 'rebuilds the initramfs' do
           is_expected.to run_execute('initramfs to remove nouveau').with_command('update-initramfs -u')
         end
+
+        it 'does not install the RHEL-family Xorg NVIDIA driver package' do
+          is_expected.not_to install_package('xorg-x11-nvidia')
+        end
       else
         it 'enables the open-dkms module stream and installs nvidia-open' do
           is_expected.to run_execute('Enable NVIDIA driver module').with(
@@ -208,6 +216,10 @@ describe 'nvidia_driver:setup' do
 
         it 'does not rebuild the initramfs' do
           is_expected.not_to run_execute('initramfs to remove nouveau')
+        end
+
+        it 'installs the Xorg NVIDIA driver package for GPU-accelerated DCV' do
+          is_expected.to install_package('xorg-x11-nvidia')
         end
       end
     end

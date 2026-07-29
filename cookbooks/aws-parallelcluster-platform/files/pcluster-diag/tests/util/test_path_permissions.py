@@ -10,13 +10,13 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for the filesystem ownership/permission helpers."""
+"""Unit tests for the path ownership/permission helpers."""
 
 import os
 
 import pytest
 
-from pcluster_diag.util import filesystem
+from pcluster_diag.util import path_permissions
 
 
 def test_stat_path_reports_owner_group_and_octal_mode(tmp_path, monkeypatch):
@@ -24,10 +24,10 @@ def test_stat_path_reports_owner_group_and_octal_mode(tmp_path, monkeypatch):
     target.write_text("{}", encoding="utf-8")
     os.chmod(target, 0o700)
 
-    monkeypatch.setattr(filesystem.users, "get_username_for_uid", lambda uid: "pcluster-admin")
-    monkeypatch.setattr(filesystem.users, "get_groupname_for_gid", lambda gid: "pcluster-admin")
+    monkeypatch.setattr(path_permissions.users, "get_username_for_uid", lambda uid: "pcluster-admin")
+    monkeypatch.setattr(path_permissions.users, "get_groupname_for_gid", lambda gid: "pcluster-admin")
 
-    result = filesystem.stat_path(str(target))
+    result = path_permissions.stat_path(str(target))
 
     assert result.owner == "pcluster-admin"
     assert result.group == "pcluster-admin"
@@ -47,10 +47,10 @@ def test_stat_path_passes_the_paths_uid_and_gid_to_the_name_lookups(tmp_path, mo
         seen["gid"] = gid
         return "g"
 
-    monkeypatch.setattr(filesystem.users, "get_username_for_uid", fake_username)
-    monkeypatch.setattr(filesystem.users, "get_groupname_for_gid", fake_groupname)
+    monkeypatch.setattr(path_permissions.users, "get_username_for_uid", fake_username)
+    monkeypatch.setattr(path_permissions.users, "get_groupname_for_gid", fake_groupname)
 
-    filesystem.stat_path(str(target))
+    path_permissions.stat_path(str(target))
 
     assert seen["uid"] == target.stat().st_uid
     assert seen["gid"] == target.stat().st_gid
@@ -60,12 +60,12 @@ def test_stat_path_reports_mode_as_four_digit_octal(tmp_path, monkeypatch):
     target = tmp_path / "file"
     target.write_text("x", encoding="utf-8")
     os.chmod(target, 0o600)
-    monkeypatch.setattr(filesystem.users, "get_username_for_uid", lambda uid: "u")
-    monkeypatch.setattr(filesystem.users, "get_groupname_for_gid", lambda gid: "g")
+    monkeypatch.setattr(path_permissions.users, "get_username_for_uid", lambda uid: "u")
+    monkeypatch.setattr(path_permissions.users, "get_groupname_for_gid", lambda gid: "g")
 
-    assert filesystem.stat_path(str(target)).mode == "0600"
+    assert path_permissions.stat_path(str(target)).mode == "0600"
 
 
 def test_stat_path_raises_for_missing_path(tmp_path):
     with pytest.raises(FileNotFoundError):
-        filesystem.stat_path(str(tmp_path / "does-not-exist"))
+        path_permissions.stat_path(str(tmp_path / "does-not-exist"))

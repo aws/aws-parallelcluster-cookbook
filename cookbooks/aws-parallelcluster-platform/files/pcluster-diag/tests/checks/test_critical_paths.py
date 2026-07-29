@@ -20,7 +20,7 @@ from pcluster_diag.core.constants import COMPUTEFLEET_STATUS_PATH, MUNGE_KEY_PAT
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.expected_path_permissions import ExpectedPathPermissions
 from pcluster_diag.models.result import Status
-from pcluster_diag.util.filesystem import PathStat
+from pcluster_diag.util.path_permissions import PathStat
 from tests.sample_data import sample_context
 
 # A single head-node critical path used by most tests (mirrors computefleet-status.json).
@@ -39,14 +39,14 @@ def _check(paths=None):
 
 
 def _fake_stat(monkeypatch, mapping):
-    """Patch filesystem.stat_path: mapping is path -> PathStat, a missing key raises FileNotFoundError."""
+    """Patch path_permissions.stat_path: mapping is path -> PathStat, a missing key raises FileNotFoundError."""
 
     def stat_path(path):
         if path not in mapping:
             raise FileNotFoundError(path)
         return mapping[path]
 
-    monkeypatch.setattr(critical_paths.filesystem, "stat_path", stat_path)
+    monkeypatch.setattr(critical_paths.path_permissions, "stat_path", stat_path)
 
 
 def _codes(result):
@@ -87,7 +87,7 @@ def test_run_passes_when_no_path_applies_to_node_type(monkeypatch):
     # The sample path is HEAD-only, so on a compute node there is nothing to inspect -> PASSED.
     inspected = []
     monkeypatch.setattr(
-        critical_paths.filesystem,
+        critical_paths.path_permissions,
         "stat_path",
         lambda path: inspected.append(path) or PathStat(owner="x", group="x", mode="0000"),
     )
@@ -168,7 +168,7 @@ def test_run_only_inspects_paths_for_current_node_type(monkeypatch):
         inspected.append(path)
         return PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0755")
 
-    monkeypatch.setattr(critical_paths.filesystem, "stat_path", stat_path)
+    monkeypatch.setattr(critical_paths.path_permissions, "stat_path", stat_path)
 
     _check([_HEAD_PATH, compute_path]).run(sample_context(NodeType.HEAD))
 

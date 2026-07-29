@@ -16,7 +16,6 @@ unified_mode true
 default_action :setup
 
 property :nvidia_driver_version, String, default: node['cluster']['nvidia']['driver_version']
-property :extra_driver_packages, String, default: node['cluster']['nvidia']['driver_extra_packages']
 
 action :setup do
   return unless nvidia_driver_enabled?
@@ -81,8 +80,8 @@ action :setup do
     retry_delay 5
   end
 
-  # Install the extra driver packages from the NVIDIA local repo.
-  new_resource.extra_driver_packages.split(',').each do |pkg|
+  # Install the extra packages from the NVIDIA local repo alongside the driver.
+  extra_driver_packages.each do |pkg|
     package pkg do
       retries 3
       retry_delay 5
@@ -131,4 +130,8 @@ end
 
 def kernel_modules_to_load
   %w(drm_client_lib)
+end
+
+def extra_driver_packages
+  %w(nvidia-xconfig)
 end
