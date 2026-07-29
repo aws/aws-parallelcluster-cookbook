@@ -52,7 +52,8 @@ jobs:
           - Python 3.10 Tests
           - Python 3.10 Tests Coverage
           - Code Checks
-          - pcluster-diag Tests
+          - pcluster-diag Tests Python 3.10
+          - pcluster-diag Tests Python 3.14
           - pcluster-diag Tests Coverage
           - pcluster-diag Code Checks
         include:
@@ -71,14 +72,17 @@ jobs:
           - name: Code Checks
             python: '3.10'
             toxenv: code-linters
-          - name: pcluster-diag Tests
+          - name: pcluster-diag Tests Python 3.10
+            python: '3.10'
+            toxenv: pcluster-diag -- -e test
+          - name: pcluster-diag Tests Python 3.14
             python: '3.14'
             toxenv: pcluster-diag -- -e test
           - name: pcluster-diag Tests Coverage
             python: '3.14'
             toxenv: pcluster-diag -- -e test-with-coverage
           - name: pcluster-diag Code Checks
-            python: '3.14'
+            python: '3.10'
             toxenv: pcluster-diag -- -e code-linters
 
     steps:

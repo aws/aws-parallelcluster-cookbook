@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 name = "pcluster-diag"
 description = "Diagnostics tool for AWS ParallelCluster nodes."
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [
     { name = "Amazon Web Services" },
@@ -47,6 +47,9 @@ cache_dir = "tests/.pytest_cache"
 
 [tool.black]
 line-length = 120
+# Without this, black infers the
+# target from requires-python and would rewrite code to newer-only syntax, breaking support for 3.10-3.13.
+target-version = ["py310"]
 
 [tool.isort]
 profile = "black"
