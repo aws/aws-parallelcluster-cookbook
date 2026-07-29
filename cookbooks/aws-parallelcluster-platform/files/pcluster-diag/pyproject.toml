@@ -26,6 +26,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+    "hypothesis~=6.0",
     "pytest~=9.0",
     "pytest-cov~=7.0",
     "tox~=4.0",

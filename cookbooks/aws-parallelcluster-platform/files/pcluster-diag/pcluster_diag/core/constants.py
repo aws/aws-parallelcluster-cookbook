@@ -111,3 +111,21 @@ FSX_LFS_DF_TIMEOUT_SECONDS = 30
 LUSTRE_STORAGE_TYPE = "FsxLustre"
 # NFS-based shared-storage types, handled with shallow reachability only (not in scope for PR1).
 NFS_STORAGE_TYPES = ("FsxOntap", "FsxOpenZfs", "Efs")
+
+# Slurm accounting
+SLURM_ETC_DIR = DEFAULT_SLURM_INSTALL_DIR + "/etc"
+SLURMDBD_CONF_PATH = SLURM_ETC_DIR + "/slurmdbd.conf"
+SLURM_PARALLELCLUSTER_SLURMDBD_CONF_PATH = SLURM_ETC_DIR + "/slurm_parallelcluster_slurmdbd.conf"
+SLURM_STATE_CLUSTERNAME_PATH = SLURM_STATE_SAVE_PATH + "/clustername"
+SLURMCTLD_LOG_PATH = "/var/log/slurmctld.log"
+SLURMDBD_LOG_PATH = "/var/log/slurmdbd.log"
+LOG_SCAN_TAIL_BYTES = 256 * 1024
+DEFAULT_SLURMDBD_PORT = 6819  # port slurmdbd LISTENS on (slurm.conf AccountingStoragePort)
+DEFAULT_DATABASE_PORT = 3306  # MySQL/MariaDB DATABASE port (Database.Uri; conf StoragePort)
+ACCOUNTING_DB_AUTH_TIMEOUT_SECONDS = 10  # hard cap on a credential/auth probe
+ACCOUNTING_QUERY_TIMEOUT_SECONDS = 30  # hard cap on a timed end-to-end accounting query
+ACCOUNTING_QUERY_LATENCY_WARN_THRESHOLD_SECONDS = 5
+ACCOUNTING_QUERY_LATENCY_FAIL_THRESHOLD_SECONDS = 15
+SLURMDBD_CONF_OWNER = SLURM_USER
+SLURMDBD_CONF_GROUP = SLURM_USER
+SLURMDBD_CONF_MODE = "0600"
