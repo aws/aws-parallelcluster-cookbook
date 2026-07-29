@@ -25,8 +25,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Install the NVIDIA driver, CUDA toolkit, Fabric Manager, NVLSM, and IMEX from the distribution package manager using NVIDIA local repo packages instead of the run file installers.
 - On RHEL-family OSes, install the Xorg driver for DCV GPU acceleration and disable Wayland so that GDM always starts Xorg.
   This is now required after switching NVIDIA driver installation to local repo packages; previously it was needed only on Ubuntu.
-- Upgrade NVIDIA driver, Fabric Manager, and IMEX to version 580.173.02 (from 580.126.20).
-- Upgrade CUDA Toolkit to version 13.3.1 (from 13.0.2).
+- Upgrade NVIDIA driver, Fabric Manager, and IMEX to version 595.71.05 (from 580.126.20).
+- Upgrade CUDA Toolkit to version 13.2.2 (from 13.0.2).
 - Upgrade DCGM to version 4.6.0 (from 4.5.1).
 - In GPU Health Check, skip DCGM diagnostics when NVIDIA MIG is enabled because dcgmi diag does not support MIG.
 - Upgrade Slurm to version 25.11.6 (from 25.11.4).
