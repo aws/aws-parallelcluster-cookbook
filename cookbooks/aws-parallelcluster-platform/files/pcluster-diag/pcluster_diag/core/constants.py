@@ -138,10 +138,23 @@ EFA_DRIVER_KERNEL_MODULE = "efa"
 # supports EFA" (it verifies that ``modinfo kefalnd`` succeeds), so it is a prerequisite for any
 # EFA-for-Lustre probing, checked before the data-path probes run.
 EFA_KEFALND_KERNEL_MODULE = "kefalnd"
-# Minimum versions the setup enforces before configuring EFA.
+# Minimum EFA-path versions the setup enforces before configuring EFA.
 MIN_EFA_DRIVER_VERSION = "2.12.1"
 MIN_KEFALND_VERSION_P6 = "1.1.1"  # kefalnd floor, enforced on p6+ instances only
-MIN_LUSTRE_CLIENT_VERSION = "2.15"
+
+# Minimum Lustre *client* version per cluster base_os (dna.json cluster.base_os). This is a general Lustre
+# floor -- NOT the EFA floor -- so it applies to every FsxLustre mount, EFA or not. rhel8/rocky8 ship the
+# 2.12 client (older 4.18 kernel); every other supported base_os ships 2.15. A base_os not in the map (or
+# unknown) uses the default. Source: https://docs.aws.amazon.com/fsx/latest/LustreGuide/lustre-client-matrix.html
+LUSTRE_CLIENT_MIN_VERSION_DEFAULT = "2.15"
+LUSTRE_CLIENT_MIN_VERSION_BY_OS = {
+    "rhel8": "2.12",
+    "rocky8": "2.12",
+}
+# base_os values where EFA-for-Lustre is NOT supported: EFA-for-Lustre requires AL2023 / RHEL 9.5+ /
+# Ubuntu 22.04+ (per configure-efa-clients.html); rhel8/rocky8 run the older 4.18 kernel and are excluded,
+# so the EFA probes are skipped on them.
+EFA_LUSTRE_UNSUPPORTED_OSES = ("rhel8", "rocky8")
 # Instance-family prefixes that require the kefalnd version check (the p6+ families).
 P6PLUS_INSTANCE_PREFIXES = ("p6-b200", "p6e-gb200", "p6-b300")
 

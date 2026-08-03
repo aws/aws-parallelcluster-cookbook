@@ -125,7 +125,7 @@ def test_client_modules_available_reports_version_and_no_error(monkeypatch):
     _patch_client(monkeypatch)
     errors, infos = [], []
 
-    LustreFilesystem()._probe_client(errors, infos)
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD), errors, infos)
 
     assert errors == []
     assert _codes(infos) == [LustreFilesystem.CLIENT_VERSION.code]
@@ -138,7 +138,7 @@ def test_client_modules_unavailable_reports_only_not_installed(monkeypatch):
     _patch_client(monkeypatch, available=False, loaded=False, version=None)
     errors, infos = [], []
 
-    LustreFilesystem()._probe_client(errors, infos)
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD), errors, infos)
 
     assert _codes(errors) == [LustreFilesystem.NOT_INSTALLED.code]
     assert "6.1.0-amzn2023" in _messages(errors)
@@ -148,7 +148,7 @@ def test_client_modules_available_but_not_loaded_fails(monkeypatch):
     _patch_client(monkeypatch, loaded=False)
     errors, infos = [], []
 
-    LustreFilesystem()._probe_client(errors, infos)
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD), errors, infos)
 
     assert _codes(errors) == [LustreFilesystem.MODULES_NOT_LOADED.code]
     # The error names the specific modules that are available but not loaded.
@@ -156,10 +156,41 @@ def test_client_modules_available_but_not_loaded_fails(monkeypatch):
 
 
 def test_client_too_old_version_fails(monkeypatch):
+    # Default base_os (alinux2023) floor is 2.15; a 2.14 client is below it.
     _patch_client(monkeypatch, version="2.14.0")
     errors, infos = [], []
 
-    LustreFilesystem()._probe_client(errors, infos)
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD), errors, infos)
+
+    assert LustreFilesystem.CLIENT_TOO_OLD.code in _codes(errors)
+
+
+def test_client_rhel8_2_12_meets_its_lower_floor(monkeypatch):
+    # rhel8 ships the 2.12 client; the floor for rhel8 is 2.12, so 2.12.x must NOT be flagged too-old.
+    _patch_client(monkeypatch, version="2.12.8")
+    errors, infos = [], []
+
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD, base_os="rhel8"), errors, infos)
+
+    assert LustreFilesystem.CLIENT_TOO_OLD.code not in _codes(errors)
+
+
+def test_client_rhel8_below_2_12_fails(monkeypatch):
+    # Below even the rhel8 2.12 floor -> too old.
+    _patch_client(monkeypatch, version="2.11.0")
+    errors, infos = [], []
+
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD, base_os="rhel8"), errors, infos)
+
+    assert LustreFilesystem.CLIENT_TOO_OLD.code in _codes(errors)
+
+
+def test_client_unknown_base_os_uses_default_floor(monkeypatch):
+    # An unknown/missing base_os falls back to the 2.15 default, so a 2.14 client is flagged too-old.
+    _patch_client(monkeypatch, version="2.14.0")
+    errors, infos = [], []
+
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD, base_os="mystery"), errors, infos)
 
     assert LustreFilesystem.CLIENT_TOO_OLD.code in _codes(errors)
 
@@ -170,7 +201,7 @@ def test_client_unparseable_version_reports_undeterminable_not_too_old(monkeypat
     _patch_client(monkeypatch, version="unknown")
     errors, infos = [], []
 
-    LustreFilesystem()._probe_client(errors, infos)
+    LustreFilesystem()._probe_client(sample_context_with_lustre(NodeType.HEAD), errors, infos)
 
     assert LustreFilesystem.CLIENT_VERSION_UNDETERMINABLE.code in _codes(errors)
     assert LustreFilesystem.CLIENT_TOO_OLD.code not in _codes(errors)
@@ -530,6 +561,26 @@ def test_efa_probe_noop_when_lnetctl_unavailable():
     )
 
     assert errors == [] and warnings == [] and infos == []
+
+
+def test_efa_probe_skipped_on_efa_unsupported_os(monkeypatch):
+    # rhel8 does not support EFA-for-Lustre: the probe reports an info and runs no EFA data-path probes.
+    def _boom_device_count():
+        raise AssertionError("EFA data-path probe must not run on an EFA-unsupported OS")
+
+    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", _boom_device_count)
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(
+        sample_context_with_lustre(NodeType.COMPUTE, base_os="rhel8"),
+        _snapshot(_LNET_TCP_EFA),
+        errors,
+        warnings,
+        infos,
+    )
+
+    assert errors == [] and warnings == []
+    assert LustreFilesystem.EFA_NOT_SUPPORTED_ON_OS.code in _codes(infos)
 
 
 def test_lnet_health_decay_is_warning(monkeypatch):

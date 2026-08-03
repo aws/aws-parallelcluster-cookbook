@@ -23,14 +23,16 @@ executes each probe in isolation and aggregates their findings. The probes are:
 
 - **client** -- the ``lustre``/``lnet`` kernel modules are available for the running kernel (so a broken
   client is reported as its own root cause) and loaded, plus the client version as info, and -- when the
-  client version is known -- that it meets the minimum the official FSx EFA-Lustre client setup enforces;
+  client version is known -- that it meets the per-``base_os`` minimum (rhel8/rocky8 ship the 2.12 client,
+  every other supported OS ships 2.15); this is a general Lustre floor, applied to every FsxLustre mount;
 - **mount presence** -- each configured Lustre ``MountDir`` is actually mounted (a cheap, non-hanging
   ``/proc/mounts`` check, so "not mounted" is not misreported downstream as "unreachable");
 - **filesystem reachability** -- ``lfs df -h`` per mount (the recommended first-line reachability command),
   classifying a hang, an error, or a down target;
 - **LNet transport** -- ``lnetctl net show`` reporting the active LNDs (tcp/efa/o2ib), surfacing the
   EFA-vs-TCP transport state;
-- **EFA mount** -- run whenever EFA-for-Lustre is *expected* (an ``@efa`` LNet net is configured, or the
+- **EFA mount** -- skipped entirely on a ``base_os`` where EFA-for-Lustre is unsupported (rhel8/rocky8).
+  Otherwise run whenever EFA-for-Lustre is *expected* (an ``@efa`` LNet net is configured, or the
   ``configure-efa-fsx-lustre-client`` systemd service is installed on this node). It first verifies the
   EFA prerequisites the way the official FSx EFA-Lustre client setup does -- the ``kefalnd`` module (that
   setup's own definition of "the Lustre client supports EFA"), the EFA driver version, and, on the p6+
@@ -62,14 +64,16 @@ from pcluster_diag.core.constants import (
     EFA_KEFALND_KERNEL_MODULE,
     EFA_LNET_NET,
     EFA_LUSTRE_SYSTEMD_SERVICE,
+    EFA_LUSTRE_UNSUPPORTED_OSES,
     FSX_LFS_CHECK_TIMEOUT_SECONDS,
     FSX_LFS_DF_TIMEOUT_SECONDS,
     FSX_LNET_SHOW_TIMEOUT_SECONDS,
     FSX_OST_QUERY_TIMEOUT_SECONDS,
     HEALTHY_TARGET_STATE,
+    LUSTRE_CLIENT_MIN_VERSION_BY_OS,
+    LUSTRE_CLIENT_MIN_VERSION_DEFAULT,
     MIN_EFA_DRIVER_VERSION,
     MIN_KEFALND_VERSION_P6,
-    MIN_LUSTRE_CLIENT_VERSION,
 )
 from pcluster_diag.core.probe import run_probe
 from pcluster_diag.models.check import Check
@@ -85,6 +89,11 @@ logger = logging.getLogger(__name__)
 def _has_lustre(context: Context) -> bool:
     """Return whether the cluster configuration declares at least one FsxLustre mount."""
     return bool(shared_storage.lustre_mounts(context))
+
+
+def _base_os(context: Context):
+    """Return the cluster ``base_os`` token from dna.json (e.g. ``alinux2023``, ``rhel8``), or None."""
+    return ((context.dna_json or {}).get("cluster") or {}).get("base_os")
 
 
 @dataclass
@@ -241,6 +250,11 @@ class LustreFilesystem(Check):
         "lnetctl is not available on this node, so the LNet transport and EFA probes were skipped "
         "(the Lustre client may not be installed).",
     )
+    EFA_NOT_SUPPORTED_ON_OS = CheckInfo(
+        10,
+        "EFA-for-Lustre is not supported on this OS ({}), so the EFA probes were skipped. EFA-for-Lustre "
+        "requires Amazon Linux 2023, RHEL 9.5+, or Ubuntu 22.04+.",
+    )
 
     @property
     def description(self) -> str:
@@ -261,7 +275,7 @@ class LustreFilesystem(Check):
         lnet = self._lnet_snapshot()
 
         probes = (
-            ("lustre client", lambda: self._probe_client(errors, infos)),
+            ("lustre client", lambda: self._probe_client(context, errors, infos)),
             ("mount presence", lambda: self._probe_mounts(context, errors)),
             ("filesystem reachability", lambda: self._probe_reachable(context, errors)),
             ("lnet transport", lambda: self._probe_lnet(lnet, errors, warnings, infos)),
@@ -292,7 +306,7 @@ class LustreFilesystem(Check):
         nets = lustre.parse_lnet_net_show(result.stdout) if result.returncode == 0 else []
         return _LnetSnapshot(timed_out=False, nets=nets)
 
-    def _probe_client(self, errors: List[CheckError], infos: List[CheckInfo]) -> None:
+    def _probe_client(self, context: Context, errors: List[CheckError], infos: List[CheckInfo]) -> None:
         """Fail when the Lustre kernel modules are unavailable, or available but not loaded.
 
         The kernel module is the authoritative signal: Lustre can only mount if the ``lustre`` and
@@ -313,16 +327,17 @@ class LustreFilesystem(Check):
         version = lustre.lustre_client_version()
         if version:
             infos.append(self.CLIENT_VERSION.format(version))
-            # The FSx EFA-Lustre setup enforces a client-version floor. version_at_least is tri-state:
-            # True (>= floor), False (definitely below -> FAILURE), or None (version present but
-            # unparseable). We do not mask the None case: rather than silently skip it, we report a
-            # CHECK_ERROR (reserved E0) saying the floor could not be evaluated -- distinct from a definite
-            # too-old FAILURE.
-            at_least = kernel_module.version_at_least(version, MIN_LUSTRE_CLIENT_VERSION)
+            # The client-version floor is per base_os (rhel8/rocky8 ship 2.12, others 2.15); an unknown/
+            # missing base_os uses the default. version_at_least is tri-state: True (>= floor), False
+            # (definitely below -> FAILURE), or None (version present but unparseable). We do not mask the
+            # None case: rather than silently skip it, we report a CHECK_ERROR (reserved E0) saying the
+            # floor could not be evaluated -- distinct from a definite too-old FAILURE.
+            minimum = LUSTRE_CLIENT_MIN_VERSION_BY_OS.get(_base_os(context), LUSTRE_CLIENT_MIN_VERSION_DEFAULT)
+            at_least = kernel_module.version_at_least(version, minimum)
             if at_least is None:
-                errors.append(self.CLIENT_VERSION_UNDETERMINABLE.format(version, MIN_LUSTRE_CLIENT_VERSION))
+                errors.append(self.CLIENT_VERSION_UNDETERMINABLE.format(version, minimum))
             elif at_least is False:
-                errors.append(self.CLIENT_TOO_OLD.format(version, MIN_LUSTRE_CLIENT_VERSION))
+                errors.append(self.CLIENT_TOO_OLD.format(version, minimum))
 
     def _probe_mounts(self, context: Context, errors: List[CheckError]) -> None:
         """Fail listing any configured Lustre mount absent from /proc/mounts (a non-hanging check)."""
@@ -408,6 +423,12 @@ class LustreFilesystem(Check):
         """
         if lnet.timed_out or lnet.unavailable:
             # The LNet probe already reported the hang / missing lnetctl; there is nothing to inspect here.
+            return
+        base_os = _base_os(context)
+        if base_os in EFA_LUSTRE_UNSUPPORTED_OSES:
+            # EFA-for-Lustre is not supported on this OS (e.g. rhel8/rocky8), so none of the EFA
+            # prerequisites/data-path probes apply here. Report why and skip.
+            infos.append(self.EFA_NOT_SUPPORTED_ON_OS.format(base_os))
             return
         efa_net = lustre.lnet_net(lnet.nets, EFA_LNET_NET)
         # Query the service once (like the shared lnet snapshot) and reuse it for both the gate and the
