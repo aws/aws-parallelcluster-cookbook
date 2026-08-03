@@ -7,30 +7,27 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Ship the diagnostics tool `pcluster-diag` into ParallelCluster AMIs to run on-demand diagnostics check on the cluster.
+- Ship the diagnostics tool `pcluster-diag` in ParallelCluster AMIs to run on-demand diagnostic checks on the cluster.
   See the `pcluster-diag` README for usage instructions.
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
 - Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 
   removing the dependency on cfn-hup and cfn-init.
-- Upgrade third-party cookbook dependencies:
-  - line-5.0.0 (from line-4.5.21)
-  - nfs-5.1.6 (from nfs-5.1.5)
-  - openssh-2.11.17 (from openssh-2.11.14)
-  - yum-8.0.0 (from yum-7.4.20)
-  - yum-epel-5.0.9 (from yum-epel-5.0.8)
-- Upgrade aws-cfn-bootstrap to version 2.0-40 (from 2.0-38).
 - Move all ParallelCluster-managed bootstrap files off `/tmp` into a dedicated `/opt/parallelcluster/tmp`
   directory. Therefore, Image builds, cluster creations and updates work on custom AMIs that mount `/tmp` with `noexec`.
-- Upgrade mysql-community-client to version 8.4.10 (from 8.4.8).
-- Upgrade DCGM to version 4.6.0 (from 4.5.1).
 
 **CHANGES**
-- Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). The NFSv3 client stack (rpcbind, rpc-statd, lockd) are unchanged, so cluster nodes can still mount external NFSv3 servers.
-- Change the default NFS lock manager port from 32768 to 4045. 32768 is in the Linux ephemeral port range (32768–60999), causing sporadic mount failures because of port collision. This only affects nodes that mount an external NFSv3 server; all ParallelCluster managed storage is mounted over NFSv4 and is unaffected. Customers who mount external NFSv3 servers and restrict NFS ports in a firewall must allow TCP/UDP 4045 instead of 32768.
+- Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). 
+  The NFSv3 client stack (rpcbind, rpc-statd, lockd) is unchanged, so cluster nodes can still mount external NFSv3 servers.
+- Change the default NFS lock manager port from 32768 to 4045, because 32768 falls in the Linux ephemeral port range (32768–60999) and can cause sporadic mount failures from port collisions. 
+  This only affects nodes that mount an external NFSv3 server; all ParallelCluster-managed storage is mounted over NFSv4 and is unaffected. 
+  Customers who mount external NFSv3 servers and restrict NFS ports in a firewall must allow TCP/UDP 4045 instead of 32768.
 - Install the NVIDIA driver, CUDA toolkit, Fabric Manager, NVLSM, and IMEX from the distribution package manager using NVIDIA local repo packages instead of the run file installers.
-- Upgrade NVIDIA driver, Fabric manager and IMEX to version 580.173.02 (from 580.126.20).
+- On RHEL-family OSes, install the Xorg driver for DCV GPU acceleration and disable Wayland so that GDM always starts Xorg.
+  This is now required after switching NVIDIA driver installation to local repo packages; previously it was needed only on Ubuntu.
+- Upgrade NVIDIA driver, Fabric Manager, and IMEX to version 580.173.02 (from 580.126.20).
 - Upgrade CUDA Toolkit to version 13.3.1 (from 13.0.2).
+- Upgrade DCGM to version 4.6.0 (from 4.5.1).
 - In GPU Health Check, skip DCGM diagnostics when NVIDIA MIG is enabled because dcgmi diag does not support MIG.
 - Upgrade Slurm to version 25.11.6 (from 25.11.4).
 - Upgrade EFA installer to 1.49.0 (from 1.47.0).
@@ -40,10 +37,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: libfabric-aws-2.4.0-1
   - Rdma-core: rdma-core-63.0-1
   - Open MPI: openmpi40-aws-4.1.7-3 and openmpi50-aws-5.0.9-11
+- Upgrade mysql-community-client to version 8.4.10 (from 8.4.8).
 - Install the aws-parallelcluster-node package from S3 in all regions instead of PyPI, to support air-gapped and proxied environments.
 - Install amazon-efs-utils from the official EFS endpoint instead of building from source.
-  Need to allowlist the CloudFront domain `amazon-efs-utils.aws.com` in their proxy/egress configuration 
-  for `build-image` with isolated subnets.
+  Users must now allowlist the CloudFront domain `amazon-efs-utils.aws.com` in their proxy/egress configuration
+  when using `build-image` with isolated subnets.
 - Upgrade Cinc Client to version 19.3.14 (from 18.8.54).
 - Upgrade GDRCopy to version 2.6 (from 2.5.2).
 - Upgrade PMIx to version 5.0.11 (from 5.0.10).
@@ -53,20 +51,26 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade Python to version 3.14.6 (from 3.14.2).
 - Upgrade Intel MPI to version 2021.18.0.749 (from 2021.17.2.94).
 - Upgrade Arm Performance Libraries (ArmPL) to version 26.01.1 (from 24.10).
-- Upgrade Cinc Client to version 19.3.14 (from 18.8.54).
+- Upgrade aws-cfn-bootstrap to version 2.0-40 (from 2.0-38).
+- Upgrade third-party cookbook dependencies:
+  - line-5.0.0 (from line-4.5.21)
+  - nfs-5.1.6 (from nfs-5.1.5)
+  - openssh-2.11.17 (from openssh-2.11.14)
+  - yum-8.0.0 (from yum-7.4.20)
+  - yum-epel-5.0.9 (from yum-epel-5.0.8)
 
 **BUG FIXES**
-- Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden 
-via custom Slurm settings or the cluster name contains upper-case letters.
-- Remove deprecated parameter `AccountingStorageUser` from Slurm configuration that was causing harmless error messages.
-- Fix DCV configuration by letting DCV server decide the display-encoders for the instance type.
+- Fix cluster creation failure caused by Slurm accounting bootstrap failing when ClusterName is overridden
+  via custom Slurm settings or when the cluster name contains uppercase letters.
+- Remove the deprecated `AccountingStorageUser` parameter from the Slurm configuration, which was causing harmless error messages.
+- Fix DCV configuration by letting the DCV server decide the display encoders for the instance type.
 - Fix DCV prerequisite installation potentially blocking on interactive prompts by exporting `DEBIAN_FRONTEND=noninteractive` to child processes.
 - Fix Xdcv segfault caused by DCV attempting GL initialization when GPU acceleration is not supported.
 - Fix slurmrestd failing to start on AL2023 because the http-parser library was not discoverable by the dynamic linker.
 - Fix compute node bootstrap hanging without a clear error when the compute subnet cannot reach DynamoDB.
 - Fix login nodes not mounting `/opt/parallelcluster/shared` when EFS is used as the internal shared storage type.
-- Fix SELinux not actually being disabled on RHEL-family OSes (kernels >= 6.4) due to a [deprecated mechanism](https://github.com/SELinuxProject/selinux-kernel/wiki/DEPRECATE-runtime-disable) being silently ignored by newer kernels.
-- Fix `build-image` failure by skipping installation of `fabric-manager`, `gdrcopy` and `dcgm` if parent image has an existing installed version.
+- Fix SELinux not being disabled on RHEL-family OSes (kernels >= 6.4) due to a [deprecated mechanism](https://github.com/SELinuxProject/selinux-kernel/wiki/DEPRECATE-runtime-disable) being silently ignored by newer kernels.
+- Fix `build-image` failure by skipping installation of `fabric-manager`, `gdrcopy`, and `dcgm` if the parent image already has a version installed.
 
 **DEPRECATIONS**
 - Amazon Linux 2 is no longer supported.
