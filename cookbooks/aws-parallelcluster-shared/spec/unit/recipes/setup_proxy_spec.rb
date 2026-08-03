@@ -45,9 +45,13 @@ describe 'aws-parallelcluster-shared::setup_proxy' do
           expect(ENV['no_proxy']).to include("s3.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
           expect(ENV['no_proxy']).to include(".s3-#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
           expect(ENV['no_proxy']).to include("s3-#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
-          expect(ENV['no_proxy']).to include(".s3.#{TEST_AWS_DOMAIN}")
           expect(ENV['no_proxy']).to include(".s3.dualstack.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
           expect(ENV['no_proxy']).to include("s3.dualstack.#{TEST_REGION}.#{TEST_AWS_DOMAIN}")
+          # The global S3 endpoint must NOT be in no_proxy: it has to go through the proxy so that
+          # cross-region/global-endpoint buckets (e.g. the us-east-1 FSx Lustre repo) are reachable
+          # from any build region. Both the leading-dot and bare-host global forms must be absent.
+          expect(ENV['no_proxy']).not_to include(".s3.#{TEST_AWS_DOMAIN}")
+          expect(ENV['no_proxy'].split(',')).not_to include("s3.#{TEST_AWS_DOMAIN}")
         end
 
         # snapd proxy configuration tests
