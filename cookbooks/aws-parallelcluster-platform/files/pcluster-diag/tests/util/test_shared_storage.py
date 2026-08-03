@@ -57,6 +57,21 @@ def test_lustre_mounts_filters_out_non_lustre_types():
     assert [m.mount_dir for m in mounts] == ["/fsx"]
 
 
+def test_shared_storage_mounts_normalizes_relative_mount_dir():
+    # ParallelCluster accepts a relative MountDir (e.g. "fsx") and mounts it at "/fsx"; the mounts we
+    # return must be absolute so they match /proc/mounts and the path passed to `lfs df`.
+    storage = [
+        {"Name": "fsx", "StorageType": "FsxLustre", "MountDir": "fsx"},
+        {"Name": "efs", "StorageType": "Efs", "MountDir": "shared/efs"},
+        {"Name": "abs", "StorageType": "FsxLustre", "MountDir": "/already/abs"},
+    ]
+    context = sample_context_with_lustre(NodeType.HEAD, shared_storage=storage)
+
+    mounts = shared_storage.shared_storage_mounts(context)
+
+    assert [m.mount_dir for m in mounts] == ["/fsx", "/shared/efs", "/already/abs"]
+
+
 def test_shared_storage_mounts_skips_malformed_entries():
     storage = [
         {"StorageType": "FsxLustre"},  # no MountDir

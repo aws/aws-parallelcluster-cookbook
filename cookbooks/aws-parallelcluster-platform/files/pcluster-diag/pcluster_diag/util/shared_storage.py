@@ -84,12 +84,23 @@ def shared_storage_mounts(context: Context) -> List[SharedStorageMount]:
         mounts.append(
             SharedStorageMount(
                 storage_type=storage_type,
-                mount_dir=mount_dir,
+                mount_dir=_absolute_mount_dir(mount_dir),
                 name=entry.get("Name"),
                 file_system_id=settings.get("FileSystemId"),
             )
         )
     return mounts
+
+
+def _absolute_mount_dir(mount_dir: str) -> str:
+    """Return ``mount_dir`` as an absolute path, matching how ParallelCluster mounts shared storage.
+
+    ``MountDir`` in the cluster configuration may be relative (e.g. ``fsx``); ParallelCluster prepends a
+    leading ``/`` when it is not already absolute (see the cookbook's shared-storage mount logic), so a
+    configured ``fsx`` is mounted at ``/fsx``. The checks compare against ``/proc/mounts`` and pass the
+    path to ``lfs df``, both of which use the absolute path, so normalize here.
+    """
+    return mount_dir if mount_dir.startswith("/") else "/" + mount_dir
 
 
 def lustre_mounts(context: Context) -> List[SharedStorageMount]:
