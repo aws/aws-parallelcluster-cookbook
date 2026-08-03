@@ -53,6 +53,7 @@ Both checks run on every node type that has a FsxLustre mount configured, and sk
 """
 
 import logging
+import shutil
 from dataclasses import dataclass, field
 from typing import List
 
@@ -95,10 +96,12 @@ class _LnetSnapshot:
 
     Attributes:
         timed_out: Whether the ``lnetctl`` call exceeded its bounded timeout (LNet may be wedged).
-        nets: The parsed LNet nets (empty when the command timed out or returned non-zero).
+        unavailable: Whether ``lnetctl`` could not be run at all (e.g. the binary is not installed).
+        nets: The parsed LNet nets (empty when the command timed out, was unavailable, or returned non-zero).
     """
 
     timed_out: bool
+    unavailable: bool = False
     nets: list = field(default_factory=list)
 
 
@@ -233,6 +236,11 @@ class LustreFilesystem(Check):
         "is instance-type-specific (some families bind a subset by design). See "
         "https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html",
     )
+    LNETCTL_UNAVAILABLE = CheckInfo(
+        9,
+        "lnetctl is not available on this node, so the LNet transport and EFA probes were skipped "
+        "(the Lustre client may not be installed).",
+    )
 
     @property
     def description(self) -> str:
@@ -272,6 +280,12 @@ class LustreFilesystem(Check):
         ``-v`` is used so per-NI statistics and health values are available; the non-verbose fields (net
         type, nid, interfaces) are a subset, so one verbose call serves both probes.
         """
+        # Check the binary is present before running it: lnetctl is absent when the Lustre client is not
+        # installed, and running a missing binary would raise out of this call (which is outside the
+        # per-probe isolation loop) and sink the whole check. This gate covers both the LNet and EFA
+        # probes, since both only reach lnetctl through this snapshot.
+        if shutil.which("lnetctl") is None:
+            return _LnetSnapshot(timed_out=False, unavailable=True)
         result = time_command(["lnetctl", "net", "show", "-v"], timeout=FSX_LNET_SHOW_TIMEOUT_SECONDS)
         if result.timed_out:
             return _LnetSnapshot(timed_out=True)
@@ -351,6 +365,10 @@ class LustreFilesystem(Check):
         if lnet.timed_out:
             errors.append(self.LNETCTL_TIMED_OUT.format(FSX_LNET_SHOW_TIMEOUT_SECONDS))
             return
+        if lnet.unavailable:
+            # lnetctl is not installed -- report it as info and skip; not a Lustre-health failure by itself.
+            infos.append(self.LNETCTL_UNAVAILABLE)
+            return
 
         active = lustre.active_lnds(lnet.nets)
         if not active:
@@ -388,8 +406,8 @@ class LustreFilesystem(Check):
         the client-side import state, to name -- not fix -- the failures. Read-only: never re-binds devices
         or edits the security group.
         """
-        if lnet.timed_out:
-            # The LNet probe already reported the hang; there is nothing to inspect here.
+        if lnet.timed_out or lnet.unavailable:
+            # The LNet probe already reported the hang / missing lnetctl; there is nothing to inspect here.
             return
         efa_net = lustre.lnet_net(lnet.nets, EFA_LNET_NET)
         # Query the service once (like the shared lnet snapshot) and reuse it for both the gate and the

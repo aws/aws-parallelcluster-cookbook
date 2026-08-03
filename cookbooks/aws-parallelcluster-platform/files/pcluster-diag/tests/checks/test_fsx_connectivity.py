@@ -472,6 +472,9 @@ def _route_time_command(monkeypatch, routes, default=None):
 
     monkeypatch.setattr(fsx_connectivity, "time_command", fake_time_command)
     monkeypatch.setattr(lustre, "time_command", fake_time_command)
+    # Tests that route commands through time_command intend for those binaries to be present, so make the
+    # lnetctl presence gate in _lnet_snapshot pass (the real which() would depend on the test host).
+    monkeypatch.setattr(fsx_connectivity.shutil, "which", lambda name: "/usr/sbin/" + name)
 
 
 # --- LNet-transport probe -------------------------------------------------------------
@@ -503,6 +506,30 @@ def test_lnet_timeout_fails_with_timeout_code():
     LustreFilesystem()._probe_lnet(_LnetSnapshot(timed_out=True), errors, warnings, infos)
 
     assert _codes(errors) == [LustreFilesystem.LNETCTL_TIMED_OUT.code]
+
+
+def test_lnet_unavailable_lnetctl_is_info_not_error():
+    # lnetctl not installed: report an info and skip, without failing the check.
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_lnet(_LnetSnapshot(timed_out=False, unavailable=True), errors, warnings, infos)
+
+    assert errors == []
+    assert LustreFilesystem.LNETCTL_UNAVAILABLE.code in _codes(infos)
+
+
+def test_efa_probe_noop_when_lnetctl_unavailable():
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(
+        sample_context_with_lustre(NodeType.COMPUTE),
+        _LnetSnapshot(timed_out=False, unavailable=True),
+        errors,
+        warnings,
+        infos,
+    )
+
+    assert errors == [] and warnings == [] and infos == []
 
 
 def test_lnet_health_decay_is_warning(monkeypatch):
@@ -966,6 +993,24 @@ def test_run_isolates_unexpected_probe_crash_and_keeps_sibling_findings(monkeypa
     # The mount probe still reported the missing /fsx-efa mount despite the client probe crashing.
     assert result.status is Status.FAILURE
     assert LustreFilesystem.NOT_MOUNTED.code in _codes(result.errors)
+
+
+def test_run_missing_lnetctl_does_not_sink_other_probes(monkeypatch):
+    # lnetctl is not installed (shutil.which returns None). This must NOT abort the whole check: the LNet
+    # snapshot is marked unavailable, the LNet probe records an info and skips, the EFA probe no-ops, and
+    # the mount/reachability probes still run and report their findings.
+    _patch_client(monkeypatch)
+    monkeypatch.setattr(fsx_connectivity.shared_storage, "read_mounts", _mounts_from(_PROC_MOUNTS_BOTH))
+    _route_time_command(monkeypatch, {"df": _timed(stdout=_HEALTHY_LFS_DF)})
+    # Override the helper's truthy which(): lnetctl is not installed on this node.
+    monkeypatch.setattr(fsx_connectivity.shutil, "which", lambda name: None)
+
+    result = LustreFilesystem().run(sample_context_with_lustre(NodeType.COMPUTE))
+
+    # The check completed (was not aborted by the missing binary) and surfaced the lnetctl-unavailable info.
+    assert LustreFilesystem.LNETCTL_UNAVAILABLE.code in _codes(result.infos)
+    # A sibling probe (mount presence) still ran: both /fsx and /fsx-efa are present, so no NOT_MOUNTED.
+    assert LustreFilesystem.NOT_MOUNTED.code not in _codes(result.errors)
 
 
 # --- FsxTargetsAreReachable (unchanged, still its own gated check) --------------------
