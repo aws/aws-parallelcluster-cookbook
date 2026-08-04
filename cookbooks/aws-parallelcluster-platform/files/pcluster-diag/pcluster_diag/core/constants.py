@@ -158,20 +158,21 @@ EFA_LUSTRE_UNSUPPORTED_OSES = ("rhel8", "rocky8")
 # Instance-family prefixes that require the kefalnd version check (the p6+ families).
 P6PLUS_INSTANCE_PREFIXES = ("p6-b200", "p6e-gb200", "p6-b300")
 
-# How many EFA devices the setup binds to LNet, keyed by exact instance type. It binds an
-# instance-type-specific SUBSET on some families (not always all devices), so the "expected bound" count is
-# this table -- NOT the raw device count. Value semantics:
-#   int   -> exactly this many devices are bound (capped at the number actually present)
-#   "all" -> all present EFA devices are bound
-# An instance type NOT in this table has no static expected count -- either its selection is dynamic
-# (e.g. p6e-gb200 binds only host-connected devices, which we cannot count statically) or we have no data
-# for it -- so the underbinding check is skipped for it (only a total absence of bound devices is flagged).
+# How many EFA devices the FSx-for-Lustre EFA client setup binds to LNet by default, keyed by exact
+# instance type. Values mirror the "Default Number of EFA Interfaces" table in
+# https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html#add-efa-interfaces --
+# these are the counts the setup script configures automatically per instance type. An int is exactly the
+# number of devices bound (capped at devices actually present). An instance type NOT in this table follows
+# the doc's dynamic fallback ("Other instances with multiple/single network cards" -> 2/1); we do not
+# encode that fallback because it depends on live NIC count, so unknown types get no static expectation
+# here and the underbinding check only flags a total absence of bound devices.
 EFA_EXPECTED_BOUND_DEVICES = {
     "p5.48xlarge": 8,
     "p5e.48xlarge": 8,
     "p5en.48xlarge": 8,
-    "p6-b200.48xlarge": "all",
-    "p6-b300.48xlarge": "all",
+    "p6-b200.48xlarge": 8,
+    "p6-b300.48xlarge": 16,
+    "p6e-gb200.36xlarge": 8,
 }
 # The systemd oneshot service the FSx EFA-Lustre client setup installs to (re)configure LNet on every
 # boot. Its state is the persistence/health signal for this delivery vehicle.

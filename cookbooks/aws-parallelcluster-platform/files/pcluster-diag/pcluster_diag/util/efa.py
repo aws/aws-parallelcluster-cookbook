@@ -10,7 +10,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""EFA capability helpers: is EFA present and usable on this instance?
+"""EFA capability helpers: checks if EFA is present and usable on this instance.
 
 The home for EFA-capability probing, so new EFA checks can build on it: the ``kefalnd`` module (the EFA
 LND), the EFA driver and ``kefalnd`` module versions, the number of EFA devices the kernel exposes, and
@@ -79,22 +79,18 @@ def _is_efa_device(name: str) -> bool:
 
 
 def expected_bound_device_count(instance_type: Optional[str], available: int) -> Optional[int]:
-    """Return how many EFA devices the official setup binds on ``instance_type``, or None when unknown.
+    """Return how many EFA devices the FSx-for-Lustre EFA setup binds on ``instance_type``, or None.
 
-    ``available`` is the number of EFA devices actually present (an explicit integer count is capped at it,
-    so we never expect more than exist). Returns:
-      - an int: the expected number of bound devices for this instance type;
-      - None: no static expectation -- the type is not in the table, its selection is dynamic (e.g.
-        p6e-gb200 binds only host-connected devices), or the instance type is unknown. The caller then
-        makes no underbinding assertion beyond "at least one device must be bound".
+    Values come from EFA_EXPECTED_BOUND_DEVICES (mirroring the FSx-for-Lustre configure-efa-clients doc).
+    ``available`` is the number of EFA devices actually present; the expected count is capped at it, so we
+    never expect more than exist. Returns None when the instance type is unknown or not in the table -- the
+    caller then makes no underbinding assertion beyond "at least one device must be bound".
     """
     if not instance_type:
         return None
     expected = EFA_EXPECTED_BOUND_DEVICES.get(instance_type)
     if expected is None:
         return None
-    if expected == "all":
-        return available
     return min(expected, available)
 
 

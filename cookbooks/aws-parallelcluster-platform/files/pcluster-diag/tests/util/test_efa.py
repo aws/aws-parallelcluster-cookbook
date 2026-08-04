@@ -95,15 +95,16 @@ def test_is_p6plus_instance(instance_type, expected):
 @pytest.mark.parametrize(
     "instance_type, available, expected",
     [
-        # "bind all" families expect every present device.
+        # Fixed per-instance-type counts from the FSx-for-Lustre configure-efa-clients doc table.
         ("p6-b300.48xlarge", 16, 16),
         ("p6-b200.48xlarge", 8, 8),
-        # subset-binding families expect a fixed count, capped at what is present.
+        ("p6e-gb200.36xlarge", 8, 8),
         ("p5.48xlarge", 16, 8),
         ("p5en.48xlarge", 16, 8),
-        ("p5.48xlarge", 4, 4),  # capped at available when fewer devices are present than the fixed count
-        # no static expectation -> None (dynamic selection, unlisted type, or unknown type).
-        ("p6e-gb200.36xlarge", 16, None),
+        # Expected count is capped at devices actually present.
+        ("p5.48xlarge", 4, 4),
+        ("p6-b300.48xlarge", 8, 8),
+        # Instance types not in the table have no static expectation.
         ("c5n.18xlarge", 2, None),
         (None, 16, None),
     ],

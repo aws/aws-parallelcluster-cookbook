@@ -682,8 +682,8 @@ def test_efa_partial_bind_on_unknown_instance_type_is_not_an_error(monkeypatch):
     assert "1 of 16" in _messages(infos)
 
 
-def test_efa_underbound_fails_on_bind_all_family(monkeypatch):
-    # A "bind all" family (expected == available) with only 1 of 16 bound: the incident signature -> error.
+def test_efa_underbound_fails_when_expected_equals_available(monkeypatch):
+    # p6-b300.48xlarge expects 16 bound (per the FSx doc); only 1 of 16 bound is the incident signature.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,

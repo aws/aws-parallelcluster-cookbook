@@ -422,5 +422,5 @@ def _scan_field(line: str, key: str) -> Optional[str]:
     """Return the value of ``key: value`` in ``line`` (stripped), or None when the line is not that field."""
     prefix = key + ":"
     if line.startswith(prefix):
-        return line[len(prefix):].strip()
+        return line[len(prefix) :].strip()
     return None
