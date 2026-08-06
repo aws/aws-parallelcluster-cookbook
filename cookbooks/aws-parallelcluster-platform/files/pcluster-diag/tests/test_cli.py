@@ -24,11 +24,12 @@ def runner():
     return CliRunner()
 
 
-def test_group_help_lists_run_command(runner):
+@pytest.mark.parametrize("command", ["run", "describe-checks"])
+def test_group_help_lists_commands(runner, command):
     result = runner.invoke(main, ["--help"])
     assert result.exit_code == 0
     assert "Usage:" in result.output
-    assert "run" in result.output
+    assert command in result.output
 
 
 def test_group_version_matches_package_version(runner):
