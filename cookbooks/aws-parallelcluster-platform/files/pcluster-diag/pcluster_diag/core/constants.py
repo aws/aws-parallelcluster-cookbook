@@ -17,6 +17,8 @@ from pcluster_diag.models.context import NodeType
 # General
 PACKAGE_NAME = "pcluster-diag"
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M-%S"
+# Placeholder rendered in a finding message where an expected value is absent (e.g. an unset config key).
+MISSING_VALUE = "<missing>"
 
 # Relevant paths. The base and shared directories mirror the cookbook attributes
 # base_dir and shared_dir (see cookbooks/aws-parallelcluster-shared/attributes/cluster.rb);
@@ -76,7 +78,7 @@ SLURM_CONF_RELATIVE_PATH = "etc/slurm.conf"
 SUPERVISORD_RUNNING_STATE = "RUNNING"
 
 # ParallelCluster management daemons that supervisord must keep RUNNING. cfn-hup is intentionally excluded: it has
-# its own dedicated check (CfnHupRunsOnlyOnHeadNode).
+# its own dedicated check (CfnHup).
 NODE_TYPE_EXPECTED_DAEMONS = {
     NodeType.HEAD: ("clustermgtd", "clusterstatusmgtd"),
     NodeType.COMPUTE: ("computemgtd",),

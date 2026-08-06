@@ -10,7 +10,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Check asserting that IMDS is responsive, exposes instance tags, and enforces per-user access."""
+"""Check asserting that IMDS is responsive, functional, and enforces per-user access."""
 
 import logging
 from typing import List, Optional
@@ -29,11 +29,16 @@ _LOCKDOWN_NODE_TYPES = (NodeType.HEAD, NodeType.LOGIN)
 
 
 class Imds(Check):
-    """Verify IMDS is responsive, exposes instance tags, and matches the Imds/Secured configuration."""
+    """Verify IMDS is responsive and functional.
+
+    Beyond responsiveness this checks that instance tags are reachable, that IMDS reports the instance's
+    IAM role, and that per-user reachability matches the Imds/Secured configuration.
+    """
 
     NOT_RESPONSIVE = CheckError(1, "The IMDS version enabled for the cluster ({}) did not respond.")
     UNEXPECTEDLY_DENIED = CheckError(2, "IMDS is not reachable by user '{}', but it should be.")
     UNEXPECTEDLY_ALLOWED = CheckError(3, "IMDS is reachable by user '{}', but it should be denied.")
+    NO_ROLE_FROM_IMDS = CheckError(4, "IMDS reports no IAM role attached to this instance.")
     TAGS_NOT_AVAILABLE = CheckWarning(1, "Instance tags metadata is not reachable via IMDS.")
 
     @property
@@ -42,10 +47,10 @@ class Imds(Check):
         return "Verify that IMDS is responsive and functional"
 
     def run(self, context: Context) -> Result:
-        """Pass when IMDS is functional and per-user access matches Imds/Secured.
+        """Pass when IMDS is responsive, reports an IAM role, and per-user access matches Imds/Secured.
 
-        Responsiveness and per-user access mismatches are failures; an unreachable instance tags
-        resource is only a warning, so a check carrying warnings alone is still successful.
+        Responsiveness, a missing IAM role, and per-user access mismatches are failures; an unreachable
+        instance tags resource is only a warning, so a check carrying warnings alone is still successful.
         """
         errors: List[CheckFinding] = []
         warnings: List[CheckFinding] = []
@@ -54,12 +59,15 @@ class Imds(Check):
         if not_responsive:
             errors.append(not_responsive)
         else:
-            # Probe the tags resource only when IMDS responds at all (nothing to reach otherwise).
+            # Probe the remaining resources only when IMDS responds at all (nothing to reach otherwise).
             tags_unreachable = self._check_tags(context)
             if tags_unreachable:
                 warnings.append(tags_unreachable)
+            no_iam_role = self._check_reports_iam_role()
+            if no_iam_role:
+                errors.append(no_iam_role)
 
-        errors += self._check_per_user_access(context)
+        errors.extend(self._check_per_user_access(context))
 
         if errors:
             return Result.failure(self, errors=errors, warnings=warnings or None)
@@ -76,6 +84,12 @@ class Imds(Check):
         """Return a TAGS_NOT_AVAILABLE warning when the instance tags resource is unreachable, else None."""
         version = self._imds_version(context)
         return self._probe(imds.get_instance_tags, version, self.TAGS_NOT_AVAILABLE)
+
+    def _check_reports_iam_role(self) -> Optional[CheckFinding]:
+        """Return a NO_ROLE_FROM_IMDS error when a responsive IMDS reports no IAM role, else None."""
+        if imds.get_iam_role_name() is None:
+            return self.NO_ROLE_FROM_IMDS
+        return None
 
     def _check_per_user_access(self, context: Context) -> List[CheckFinding]:
         """Return errors when a user's IMDS reachability does not match what Imds/Secured implies."""
