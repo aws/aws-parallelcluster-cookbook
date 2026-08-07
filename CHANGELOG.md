@@ -7,8 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Ship the diagnostics tool `pcluster-diag` in ParallelCluster AMIs to run on-demand diagnostic checks on the cluster.
-  See the `pcluster-diag` README for usage instructions.
+- Add the `pcluster-diag` diagnostics tool to ParallelCluster AMIs for running on-demand diagnostic checks on cluster nodes.
 - Improve resilience of EBS volume attachment during cluster creation by retrying on transient IMDS connectivity failures.
 - Further reduce transient build-image failures on RHEL and Rocky caused by out-of-sync repo mirrors by resetting metadata upon retry.
 - Improve cluster update resiliency on login nodes by reusing the head-node-driven orchestration already in place on compute nodes, 
@@ -19,9 +18,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). 
   The NFSv3 client stack (rpcbind, rpc-statd, lockd) is unchanged, so cluster nodes can still mount external NFSv3 servers.
-- Change the default NFS lock manager port from 32768 to 4045, because 32768 falls in the Linux ephemeral port range (32768–60999) and can cause sporadic mount failures from port collisions. 
-  This only affects nodes that mount an external NFSv3 server; all ParallelCluster-managed storage is mounted over NFSv4 and is unaffected. 
-  Customers who mount external NFSv3 servers and restrict NFS ports in a firewall must allow TCP/UDP 4045 instead of 32768.
+- Change the default NFS lock manager (lockd) port from 32768 to 4045, to avoid collisions with the Linux ephemeral port range (32768–60999), which can cause sporadic mount failures.
+  This only affects nodes that mount an external NFSv3 server; all ParallelCluster-managed storage is mounted over NFSv4 and is unaffected.
+  If you restrict NFS ports in a firewall, you must open TCP/UDP 4045 or NFSv3 mounts will fail.
 - Install the NVIDIA driver, CUDA toolkit, Fabric Manager, NVLSM, and IMEX from the distribution package manager using NVIDIA local repo packages instead of the run file installers.
 - On RHEL-family OSes, install the Xorg driver for DCV GPU acceleration and disable Wayland so that GDM always starts Xorg.
   This is now required after switching NVIDIA driver installation to local repo packages; previously it was needed only on Ubuntu.
