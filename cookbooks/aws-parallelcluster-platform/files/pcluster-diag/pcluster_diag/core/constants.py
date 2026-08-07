@@ -12,6 +12,8 @@
 
 """Shared constants."""
 
+import stat
+
 from pcluster_diag.models.context import NodeType
 
 # General
@@ -38,6 +40,13 @@ MUNGE_KEY_PATH = "/etc/munge/munge.key"
 
 # Slurm's StateSaveLocation directory.
 SLURM_STATE_SAVE_PATH = "/var/spool/slurm.state"
+
+# Permission bit groups the path expectations are written in terms of.
+OWNER_READ = stat.S_IRUSR
+OWNER_WRITE = stat.S_IWUSR
+OWNER_TRAVERSE = stat.S_IXUSR
+GROUP_OTHER_WRITE = stat.S_IWGRP | stat.S_IWOTH
+GROUP_OTHER_READ_WRITE = stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH
 
 # cfn-hup runs as a supervisord program (not a systemd service) managed via the cookbook virtualenv's
 # supervisorctl, reading the supervisord config installed by the cookbook.
@@ -196,4 +205,6 @@ ACCOUNTING_QUERY_LATENCY_WARN_THRESHOLD_SECONDS = 5
 ACCOUNTING_QUERY_LATENCY_FAIL_THRESHOLD_SECONDS = 15
 SLURMDBD_CONF_OWNER = SLURM_USER
 SLURMDBD_CONF_GROUP = SLURM_USER
-SLURMDBD_CONF_MODE = "0600"
+# slurmdbd validates this mode by equality and exits fatal on anything else ("should be 600 or 640"),
+# so both accepted values are listed here rather than only the one the cookbook sets.
+SLURMDBD_CONF_ALLOWED_MODES = frozenset({"0600", "0640"})

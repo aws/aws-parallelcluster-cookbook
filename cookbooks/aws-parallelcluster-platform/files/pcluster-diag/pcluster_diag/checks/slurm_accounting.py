@@ -27,8 +27,8 @@ from pcluster_diag.core.constants import (
     SLURM_PARALLELCLUSTER_SLURMDBD_CONF_PATH,
     SLURM_STATE_CLUSTERNAME_PATH,
     SLURMCTLD_LOG_PATH,
+    SLURMDBD_CONF_ALLOWED_MODES,
     SLURMDBD_CONF_GROUP,
-    SLURMDBD_CONF_MODE,
     SLURMDBD_CONF_OWNER,
     SLURMDBD_CONF_PATH,
     SLURMDBD_LOG_PATH,
@@ -76,15 +76,15 @@ _ACCOUNTING_CONF_FILES: Tuple[ExpectedPathPermissions, ...] = (
         path=SLURMDBD_CONF_PATH,
         owner=SLURMDBD_CONF_OWNER,
         group=SLURMDBD_CONF_GROUP,
-        mode=SLURMDBD_CONF_MODE,
         node_types=(NodeType.HEAD,),
+        allowed_modes=SLURMDBD_CONF_ALLOWED_MODES,
     ),
     ExpectedPathPermissions(
         path=SLURM_PARALLELCLUSTER_SLURMDBD_CONF_PATH,
         owner=SLURMDBD_CONF_OWNER,
         group=SLURMDBD_CONF_GROUP,
-        mode=SLURMDBD_CONF_MODE,
         node_types=(NodeType.HEAD,),
+        allowed_modes=SLURMDBD_CONF_ALLOWED_MODES,
     ),
 )
 
@@ -422,8 +422,10 @@ class SlurmAccounting(Check):
                     expected.path, observed.owner, observed.group, expected.owner, expected.group
                 )
             )
-        if observed.mode != expected.mode:
-            errors.append(self.CONF_WRONG_MODE.format(expected.path, observed.mode, expected.mode))
+        if expected.is_disallowed_mode(observed.mode):
+            errors.append(
+                self.CONF_WRONG_MODE.format(expected.path, observed.mode, expected.allowed_modes_description())
+            )
         if not _is_readable(expected.path):
             errors.append(self.CONF_FILE_UNREADABLE.format(expected.path))
         return errors

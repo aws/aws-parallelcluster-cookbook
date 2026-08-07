@@ -44,10 +44,35 @@ def stat_path(path: str) -> PathStat:
     return PathStat(
         owner=users.get_username_for_uid(info.st_uid),
         group=users.get_groupname_for_gid(info.st_gid),
-        mode=_octal_mode(info.st_mode),
+        mode=format_bits(stat.S_IMODE(info.st_mode)),
     )
 
 
-def _octal_mode(mode: int) -> str:
-    """Return the permission bits of ``mode`` as a 4-digit octal string (e.g. ``0755``)."""
-    return format(stat.S_IMODE(mode), "04o")
+def format_bits(bits: int) -> str:
+    """Return permission ``bits`` as a 4-digit octal string (e.g. 0o640 -> ``0640``)."""
+    return format(bits, "04o")
+
+
+def parse_mode(mode: str) -> int:
+    """Return the integer permission bits of an octal ``mode`` string (e.g. ``0640`` -> 0o640)."""
+    return int(mode, 8)
+
+
+# Permission bits in report order, with the wording used in findings. Octal alone ("missing 0100") is
+# not actionable in a report, so findings name the access instead.
+_BIT_DESCRIPTIONS = (
+    (stat.S_IRUSR, "owner read"),
+    (stat.S_IWUSR, "owner write"),
+    (stat.S_IXUSR, "owner execute/traverse"),
+    (stat.S_IRGRP, "group read"),
+    (stat.S_IWGRP, "group write"),
+    (stat.S_IXGRP, "group execute/traverse"),
+    (stat.S_IROTH, "other read"),
+    (stat.S_IWOTH, "other write"),
+    (stat.S_IXOTH, "other execute/traverse"),
+)
+
+
+def describe_bits(bits: int) -> str:
+    """Return ``bits`` as the accesses they grant (e.g. 0o022 -> ``group write, other write``)."""
+    return ", ".join(description for bit, description in _BIT_DESCRIPTIONS if bits & bit)

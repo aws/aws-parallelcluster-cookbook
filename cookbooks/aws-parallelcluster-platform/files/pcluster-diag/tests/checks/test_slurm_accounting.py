@@ -560,6 +560,37 @@ def test_config_files_probe_silent_when_correct(monkeypatch):
     assert errors == []
 
 
+def test_accounting_conf_files_declare_their_expectation_as_allowed_modes():
+    # This probe only evaluates allowed_modes, so a required/forbidden-bits entry would go uninspected.
+    for expected in slurm_accounting._ACCOUNTING_CONF_FILES:
+        assert expected.allowed_modes, expected.path
+
+
+@pytest.mark.parametrize("mode", ["0600", "0640"])
+def test_config_files_probe_accepts_every_mode_slurmdbd_allows(monkeypatch, mode):
+    # slurmdbd accepts 600 or 640 and exits fatal on anything else, so 0640 must not be reported.
+    monkeypatch.setattr(slurm_accounting.path_permissions, "stat_path", lambda path: PathStat("slurm", "slurm", mode))
+    monkeypatch.setattr(slurm_accounting, "_is_readable", lambda path: True)
+    errors = []
+
+    SlurmAccounting()._probe_config_files(_local_config(), errors)
+
+    assert errors == []
+
+
+@pytest.mark.parametrize("mode", ["0400", "0644", "0660"])
+def test_config_files_probe_flags_modes_slurmdbd_rejects(monkeypatch, mode):
+    # Anything outside {600, 640} makes slurmdbd exit fatal, including stricter modes such as 0400.
+    monkeypatch.setattr(slurm_accounting.path_permissions, "stat_path", lambda path: PathStat("slurm", "slurm", mode))
+    monkeypatch.setattr(slurm_accounting, "_is_readable", lambda path: True)
+    errors = []
+
+    SlurmAccounting()._probe_config_files(_local_config(), errors)
+
+    assert SlurmAccounting.CONF_WRONG_MODE.code in _codes(errors)
+    assert "should be 0600 or 0640" in " | ".join(error.message for error in errors)
+
+
 # --- configuration-consistency probe --------------------------------------------------
 
 
