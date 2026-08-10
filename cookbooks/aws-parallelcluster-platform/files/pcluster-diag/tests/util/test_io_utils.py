@@ -14,7 +14,7 @@
 
 import pytest
 
-from pcluster_diag.util.io_utils import write_text_file
+from pcluster_diag.util.io_utils import read_ini_option, write_text_file
 
 _TEXT = '{"hello": "world"}'
 
@@ -62,3 +62,43 @@ def test_write_text_file_propagates_os_errors(tmp_path, make_target):
 
     with pytest.raises(OSError):
         write_text_file(target, _TEXT)
+
+
+def _write_ini(tmp_path, body):
+    conf = tmp_path / "config.ini"
+    conf.write_text(body, encoding="utf-8")
+    return str(conf)
+
+
+@pytest.mark.parametrize(
+    "body, expected",
+    [
+        ("[main]\nrole=my-role\n", "my-role"),  # value returned as-is
+        ("[main]\nrole=  my-role  \n", "my-role"),  # surrounding whitespace stripped
+        ("[main]\nstack=arn%3Aaws\nrole=my-role\n", "my-role"),  # % is not interpolated
+        ("[main]\nrole=\n", None),  # empty value treated as unset
+        ("[main]\nregion=us-east-1\n", None),  # option absent from the section
+        ("[other]\nrole=my-role\n", None),  # section absent
+    ],
+    ids=["value", "stripped", "percent-not-interpolated", "empty-value", "option-absent", "section-absent"],
+)
+def test_read_ini_option_returns_value_or_none(tmp_path, body, expected):
+    assert read_ini_option(_write_ini(tmp_path, body), "main", "role") == expected
+
+
+def test_read_ini_option_raises_when_file_missing(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        read_ini_option(str(tmp_path / "absent.ini"), "main", "role")
+
+
+def test_read_ini_option_returns_section_dict_when_option_omitted(tmp_path):
+    # With no option, the whole section is returned as a dict of stripped values.
+    path = _write_ini(tmp_path, "[main]\nrole=  my-role  \nregion=us-east-1\n")
+
+    assert read_ini_option(path, "main") == {"role": "my-role", "region": "us-east-1"}
+
+
+def test_read_ini_option_returns_empty_dict_for_absent_section(tmp_path):
+    path = _write_ini(tmp_path, "[main]\nrole=my-role\n")
+
+    assert read_ini_option(path, "other") == {}

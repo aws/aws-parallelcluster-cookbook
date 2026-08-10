@@ -51,6 +51,15 @@ def _patch_access(monkeypatch, responsive_users):
     monkeypatch.setattr(imds_check.imds, "is_responsive_for_user", lambda user: user in responsive_users)
 
 
+@pytest.fixture(autouse=True)
+def _imds_reports_role(monkeypatch):
+    """Make IMDS report an IAM role by default so tests can focus on the other IMDS behavior.
+
+    Tests that exercise the missing-role case override this with ``get_iam_role_name`` returning None.
+    """
+    monkeypatch.setattr(imds_check.imds, "get_iam_role_name", lambda: "my-instance-role")
+
+
 def test_description():
     assert Imds().description == "Verify that IMDS is responsive and functional"
 
@@ -204,3 +213,42 @@ def test_run_reports_both_functional_and_access_errors(monkeypatch):
     assert result.status is Status.FAILURE
     codes = [error.code for error in result.errors]
     assert codes == [Imds.NOT_RESPONSIVE.code, Imds.UNEXPECTEDLY_ALLOWED.code]
+
+
+def test_run_fails_when_imds_reports_no_role(monkeypatch):
+    # A responsive IMDS that exposes no IAM role for the instance is a functional failure.
+    _patch_functional(monkeypatch)
+    _patch_access(monkeypatch, _PRIVILEGED_USERS)
+    monkeypatch.setattr(imds_check.imds, "get_iam_role_name", lambda: None)
+
+    result = Imds().run(_context(secured=True, node_type=NodeType.HEAD))
+
+    assert result.status is Status.FAILURE
+    assert [error.code for error in result.errors] == [Imds.NO_ROLE_FROM_IMDS.code]
+
+
+def test_run_reports_missing_iam_role_on_any_responsive_node(monkeypatch):
+    # Every cluster node has an instance role, so the role check is not limited to the head node.
+    _patch_functional(monkeypatch)
+    _patch_access(monkeypatch, _ALL_USERS)  # secured=False so every user is reachable: no access error
+    monkeypatch.setattr(imds_check.imds, "get_iam_role_name", lambda: None)
+
+    result = Imds().run(_context(secured=False, node_type=NodeType.COMPUTE))
+
+    assert result.status is Status.FAILURE
+    assert [error.code for error in result.errors] == [Imds.NO_ROLE_FROM_IMDS.code]
+
+
+def test_run_skips_iam_role_check_when_imds_not_responsive(monkeypatch):
+    # The role probe only runs once IMDS responds, so an unresponsive IMDS reports NOT_RESPONSIVE alone.
+    def _raise(_version):
+        raise OSError("connection refused")
+
+    monkeypatch.setattr(imds_check.imds, "list_metadata", _raise)
+    _patch_access(monkeypatch, _PRIVILEGED_USERS)
+    monkeypatch.setattr(imds_check.imds, "get_iam_role_name", lambda: None)
+
+    result = Imds().run(_context(secured=True, node_type=NodeType.HEAD))
+
+    assert result.status is Status.FAILURE
+    assert [error.code for error in result.errors] == [Imds.NOT_RESPONSIVE.code]
