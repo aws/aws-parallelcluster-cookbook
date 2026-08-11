@@ -16,7 +16,16 @@ import pytest
 
 from pcluster_diag.checks import critical_paths
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
-from pcluster_diag.core.constants import COMPUTEFLEET_STATUS_PATH, MUNGE_KEY_PATH, SLURM_STATE_SAVE_PATH
+from pcluster_diag.core.constants import (
+    COMPUTEFLEET_STATUS_PATH,
+    GROUP_OTHER_READ_WRITE,
+    GROUP_OTHER_WRITE,
+    MUNGE_KEY_PATH,
+    OWNER_READ,
+    OWNER_TRAVERSE,
+    OWNER_WRITE,
+    SLURM_STATE_SAVE_PATH,
+)
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.expected_path_permissions import ExpectedPathPermissions
 from pcluster_diag.models.result import Status
@@ -28,8 +37,9 @@ _HEAD_PATH = ExpectedPathPermissions(
     path="/opt/parallelcluster/shared/computefleet-status.json",
     owner="pcluster-admin",
     group="pcluster-admin",
-    mode="0755",
     node_types=(NodeType.HEAD,),
+    required_bits=OWNER_WRITE,
+    forbidden_bits=GROUP_OTHER_WRITE,
 )
 
 
@@ -60,17 +70,124 @@ def _messages(result):
 
 
 @pytest.mark.parametrize(
-    "path, owner, group, mode, node_types",
+    "path, owner, group, required_bits, forbidden_bits, node_types",
     [
-        (COMPUTEFLEET_STATUS_PATH, "pcluster-admin", "pcluster-admin", "0755", (NodeType.HEAD,)),
-        (MUNGE_KEY_PATH, "munge", "munge", "0600", (NodeType.HEAD, NodeType.COMPUTE)),
-        (SLURM_STATE_SAVE_PATH, "slurm", "slurm", "0700", (NodeType.HEAD,)),
+        (
+            COMPUTEFLEET_STATUS_PATH,
+            "pcluster-admin",
+            "pcluster-admin",
+            OWNER_WRITE,
+            GROUP_OTHER_WRITE,
+            (NodeType.HEAD,),
+        ),
+        (
+            MUNGE_KEY_PATH,
+            "munge",
+            "munge",
+            OWNER_READ,
+            GROUP_OTHER_READ_WRITE,
+            (NodeType.HEAD, NodeType.COMPUTE, NodeType.LOGIN),
+        ),
+        (
+            SLURM_STATE_SAVE_PATH,
+            "slurm",
+            "slurm",
+            OWNER_READ | OWNER_WRITE | OWNER_TRAVERSE,
+            GROUP_OTHER_WRITE,
+            (NodeType.HEAD,),
+        ),
     ],
 )
-def test_default_critical_paths_are_registered(path, owner, group, mode, node_types):
+def test_default_critical_paths_are_registered(path, owner, group, required_bits, forbidden_bits, node_types):
     entry = next(c for c in critical_paths.CRITICAL_PATHS if c.path == path)
 
-    assert (entry.owner, entry.group, entry.mode, entry.node_types) == (owner, group, mode, node_types)
+    assert (entry.owner, entry.group, entry.node_types) == (owner, group, node_types)
+    assert (entry.required_bits, entry.forbidden_bits) == (required_bits, forbidden_bits)
+    assert entry.required_bits & entry.forbidden_bits == 0
+    assert entry.allowed_modes is None, "critical paths express themselves in bits, not exact modes"
+
+
+@pytest.mark.parametrize(
+    "path, mode",
+    [
+        # 0755 is the mode Slurm itself uses when it creates the StateSaveLocation (mkdir(path, 0755)).
+        (SLURM_STATE_SAVE_PATH, "0755"),
+        (SLURM_STATE_SAVE_PATH, "0700"),
+        (MUNGE_KEY_PATH, "0400"),
+        (MUNGE_KEY_PATH, "0600"),
+        (COMPUTEFLEET_STATUS_PATH, "0600"),
+        (COMPUTEFLEET_STATUS_PATH, "0755"),
+    ],
+)
+def test_default_critical_paths_accept_every_mode_their_daemon_tolerates(monkeypatch, path, mode):
+    entry = next(c for c in critical_paths.CRITICAL_PATHS if c.path == path)
+    _fake_stat(monkeypatch, {path: PathStat(owner=entry.owner, group=entry.group, mode=mode)})
+
+    result = CriticalPathsHaveExpectedPermissions(critical_paths=[entry]).run(sample_context(NodeType.HEAD))
+
+    assert result.status is Status.PASSED, "mode {} should be tolerated for {}".format(mode, path)
+
+
+@pytest.mark.parametrize(
+    "path, mode, expected_code",
+    [
+        # 0600 strips the traverse bit slurmctld needs: tightening is as fatal as loosening here.
+        (SLURM_STATE_SAVE_PATH, "0600", CriticalPathsHaveExpectedPermissions.MISSING_PERMISSIONS.code),
+        # munged runs unprivileged, so a key it cannot read stops it from starting.
+        (MUNGE_KEY_PATH, "0000", CriticalPathsHaveExpectedPermissions.MISSING_PERMISSIONS.code),
+        (MUNGE_KEY_PATH, "0640", CriticalPathsHaveExpectedPermissions.INSECURE_PERMISSIONS.code),
+        (MUNGE_KEY_PATH, "0604", CriticalPathsHaveExpectedPermissions.INSECURE_PERMISSIONS.code),
+        (COMPUTEFLEET_STATUS_PATH, "0455", CriticalPathsHaveExpectedPermissions.MISSING_PERMISSIONS.code),
+    ],
+)
+def test_default_critical_paths_reject_modes_that_break_their_daemon(monkeypatch, path, mode, expected_code):
+    entry = next(c for c in critical_paths.CRITICAL_PATHS if c.path == path)
+    _fake_stat(monkeypatch, {path: PathStat(owner=entry.owner, group=entry.group, mode=mode)})
+
+    result = CriticalPathsHaveExpectedPermissions(critical_paths=[entry]).run(sample_context(NodeType.HEAD))
+
+    assert result.status is Status.FAILURE
+    assert _codes(result) == [expected_code]
+
+
+@pytest.mark.parametrize(
+    "path, mode, granted",
+    [
+        # slurmctld starts fine on a world-writable StateSaveLocation, and clusterstatusmgtd only needs
+        # owner write, so these expose the path without breaking the cluster.
+        (SLURM_STATE_SAVE_PATH, "0777", "group write, other write"),
+        (COMPUTEFLEET_STATUS_PATH, "0757", "other write"),
+    ],
+)
+def test_over_permissive_mode_is_a_warning_when_the_daemon_keeps_running(monkeypatch, path, mode, granted):
+    entry = next(c for c in critical_paths.CRITICAL_PATHS if c.path == path)
+    _fake_stat(monkeypatch, {path: PathStat(owner=entry.owner, group=entry.group, mode=mode)})
+
+    result = CriticalPathsHaveExpectedPermissions(critical_paths=[entry]).run(sample_context(NodeType.HEAD))
+
+    assert result.status is Status.WARNING
+    assert result.errors is None
+    assert _codes(result) == []
+    assert [w.code for w in result.warnings] == [CriticalPathsHaveExpectedPermissions.OVER_PERMISSIVE.code]
+    assert "should not grant {}".format(granted) in result.warnings[0].message
+
+
+def test_over_permissive_mode_is_a_failure_when_it_stops_the_daemon(monkeypatch):
+    # munged refuses to start from a key others can read, so here it is not merely an advisory.
+    entry = next(c for c in critical_paths.CRITICAL_PATHS if c.path == MUNGE_KEY_PATH)
+    _fake_stat(monkeypatch, {MUNGE_KEY_PATH: PathStat(owner="munge", group="munge", mode="0640")})
+
+    result = CriticalPathsHaveExpectedPermissions(critical_paths=[entry]).run(sample_context(NodeType.HEAD))
+
+    assert result.status is Status.FAILURE
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.INSECURE_PERMISSIONS.code]
+
+
+def test_munge_key_is_inspected_on_every_node_type_that_runs_munged():
+    entry = next(c for c in critical_paths.CRITICAL_PATHS if c.path == MUNGE_KEY_PATH)
+
+    # The cookbook installs the key identically on head, compute and login nodes (setup_munge_key).
+    assert set(entry.node_types) == set(NodeType)
 
 
 def test_description():
@@ -98,7 +215,7 @@ def test_run_passes_when_no_path_applies_to_node_type(monkeypatch):
     assert inspected == []
 
 
-def test_run_passes_when_owner_group_mode_all_match(monkeypatch):
+def test_run_passes_when_ownership_and_permissions_are_satisfied(monkeypatch):
     _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0755")})
 
     result = _check().run(sample_context(NodeType.HEAD))
@@ -128,25 +245,64 @@ def test_run_fails_when_group_wrong(monkeypatch):
     assert "pcluster-admin:root but should be pcluster-admin:pcluster-admin" in _messages(result)
 
 
-def test_run_fails_when_mode_wrong(monkeypatch):
-    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0700")})
+def test_run_fails_when_required_permission_missing(monkeypatch):
+    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0555")})
 
     result = _check().run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
-    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.WRONG_MODE.code]
-    assert "has mode 0700 but should be 0755" in _messages(result)
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.MISSING_PERMISSIONS.code]
+    assert "has mode 0555, which does not grant owner write" in _messages(result)
 
 
-def test_run_reports_both_ownership_and_mode_when_both_wrong(monkeypatch):
-    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="root", group="root", mode="0700")})
+def test_findings_state_the_observation_without_explaining_consequences(monkeypatch):
+    # Findings describe the observation against the expectation; the impact belongs to the status.
+    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0555")})
+
+    message = _messages(_check().run(sample_context(NodeType.HEAD)))
+
+    assert message == "'{}' has mode 0555, which does not grant owner write.".format(_HEAD_PATH.path)
+
+
+def test_run_warns_when_forbidden_permission_granted(monkeypatch):
+    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0757")})
+
+    result = _check().run(sample_context(NodeType.HEAD))
+
+    assert result.status is Status.WARNING
+    assert "which should not grant other write" in result.warnings[0].message
+
+
+def test_run_passes_when_mode_is_stricter_than_the_cookbook_default(monkeypatch):
+    # Tightening 0755 -> 0600 keeps owner write, so it must not be reported as a failure.
+    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0600")})
+
+    result = _check().run(sample_context(NodeType.HEAD))
+
+    assert result.status is Status.PASSED
+
+
+def test_run_reports_both_missing_and_over_permissive_findings(monkeypatch):
+    # 0557 has no owner write (required) and is group/other writable (advisory).
+    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="pcluster-admin", group="pcluster-admin", mode="0557")})
+
+    result = _check().run(sample_context(NodeType.HEAD))
+
+    # A failure outranks a warning, so the check still fails overall.
+    assert result.status is Status.FAILURE
+    assert _codes(result) == [CriticalPathsHaveExpectedPermissions.MISSING_PERMISSIONS.code]
+    assert [w.code for w in result.warnings] == [CriticalPathsHaveExpectedPermissions.OVER_PERMISSIVE.code]
+
+
+def test_run_reports_both_ownership_and_permissions_when_both_wrong(monkeypatch):
+    _fake_stat(monkeypatch, {_HEAD_PATH.path: PathStat(owner="root", group="root", mode="0555")})
 
     result = _check().run(sample_context(NodeType.HEAD))
 
     assert result.status is Status.FAILURE
     assert _codes(result) == [
         CriticalPathsHaveExpectedPermissions.WRONG_OWNERSHIP.code,
-        CriticalPathsHaveExpectedPermissions.WRONG_MODE.code,
+        CriticalPathsHaveExpectedPermissions.MISSING_PERMISSIONS.code,
     ]
 
 
@@ -161,7 +317,7 @@ def test_run_fails_when_path_missing(monkeypatch):
 
 
 def test_run_only_inspects_paths_for_current_node_type(monkeypatch):
-    compute_path = ExpectedPathPermissions("/x", "root", "root", "0644", (NodeType.COMPUTE,))
+    compute_path = ExpectedPathPermissions("/x", "root", "root", (NodeType.COMPUTE,), required_bits=OWNER_READ)
     inspected = []
 
     def stat_path(path):

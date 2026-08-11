@@ -22,7 +22,7 @@ from pcluster_diag import __version__
 from pcluster_diag.core.context_builder import ContextBuilder
 from pcluster_diag.models.context import Context, NodeType
 from pcluster_diag.models.exceptions import ContextBuildError
-from tests.sample_data import SAMPLE_HEAD_NODE_INSTANCE_ID, SAMPLE_INSTANCE_ID
+from tests.sample_data import SAMPLE_HEAD_NODE_INSTANCE_ID, SAMPLE_INSTANCE_ID, SAMPLE_INSTANCE_TYPE
 from tests.stubs import stub_raising, stub_returning
 
 # Shared node_type token -> NodeType mapping exercised by the classification and build tests.
@@ -54,6 +54,7 @@ def _builder_from_fixtures(tmp_path, node_type_token="HeadNode", cluster_config=
     )
     # Stub the network-backed resolvers (IMDS / CloudFormation) so build() stays offline here.
     builder._instance_id = stub_returning(SAMPLE_INSTANCE_ID)
+    builder._instance_type = stub_returning(SAMPLE_INSTANCE_TYPE)
     builder._head_node_instance_id = stub_returning(SAMPLE_HEAD_NODE_INSTANCE_ID)
     return builder
 
@@ -168,6 +169,23 @@ def test_instance_id_reads_from_imds(monkeypatch):
     assert ContextBuilder()._instance_id() == "i-abc123"
 
 
+def test_instance_type_reads_from_imds(monkeypatch):
+    monkeypatch.setattr("pcluster_diag.core.context_builder.imds.get_instance_type", lambda: "fake.large")
+
+    assert ContextBuilder()._instance_type() == "fake.large"
+
+
+def test_instance_type_returns_none_and_logs_on_error(monkeypatch, caplog):
+    monkeypatch.setattr("pcluster_diag.core.context_builder.imds.get_instance_type", stub_raising("imds boom"))
+
+    with caplog.at_level(logging.ERROR, logger="pcluster_diag.core.context_builder"):
+        result = ContextBuilder()._instance_type()
+
+    # A failure to reach IMDS yields None instead of raising, and is logged at error level.
+    assert result is None
+    assert any("instance type" in record.getMessage().lower() for record in caplog.records)
+
+
 def test_head_node_instance_id_reads_stack_output(monkeypatch):
     captured = {}
 
@@ -264,6 +282,7 @@ def _builder_with_failures(failing):
             stub = stub_returning(_VALID_RETURNS[attribute])
         setattr(builder, _ATTRIBUTE_METHOD[attribute], stub)
     builder._instance_id = stub_returning(SAMPLE_INSTANCE_ID)
+    builder._instance_type = stub_returning(SAMPLE_INSTANCE_TYPE)
     builder._head_node_instance_id = stub_returning(SAMPLE_HEAD_NODE_INSTANCE_ID)
     return builder
 

@@ -13,12 +13,13 @@
 """Kernel-module and kernel probing.
 
 Thin wrappers over ``modinfo``/``lsmod`` (kernel module availability and load state) and ``uname``
-(running kernel release). These are used by the Lustre client checks but contain nothing
-Lustre-specific. Every external command is routed through :mod:`pcluster_diag.util.shell`; a missing
-binary is treated as a negative answer, never an exception.
+(running kernel release), plus a small dotted-version comparison for module versions. Every external
+command is routed through the shell helper; a missing binary is treated as a negative answer, never an
+exception.
 """
 
 import logging
+import re
 from typing import List, Optional
 
 from pcluster_diag.util.shell import run_command
@@ -76,3 +77,31 @@ def module_version(module: str) -> Optional[str]:
     if result.returncode != 0:
         return None
     return result.stdout.strip() or None
+
+
+def version_at_least(actual: Optional[str], minimum: str) -> Optional[bool]:
+    """Return whether dotted version ``actual`` is >= ``minimum``, or ``None`` when it cannot be determined.
+
+    Returns True/False for a comparable ``actual``, and ``None`` when ``actual`` is missing or unparseable
+    (rather than conflating "could not determine the version" with "below the minimum"). This lets the
+    caller surface an unparseable version as an undeterminable check instead of a false below-minimum
+    result. Only the leading dotted-numeric prefix is compared (e.g. ``2.15.6-1.fsx23`` -> ``[2, 15, 6]``).
+    """
+    parsed_actual = _numeric_version(actual)
+    parsed_min = _numeric_version(minimum)
+    if parsed_actual is None or parsed_min is None:
+        return None
+    length = max(len(parsed_actual), len(parsed_min))
+    parsed_actual += [0] * (length - len(parsed_actual))
+    parsed_min += [0] * (length - len(parsed_min))
+    return parsed_actual >= parsed_min
+
+
+def _numeric_version(version: Optional[str]) -> Optional[List[int]]:
+    """Return the leading dotted-numeric components of ``version`` (e.g. ``2.15.6-1`` -> ``[2, 15, 6]``)."""
+    if not version:
+        return None
+    match = re.match(r"(\d+(?:\.\d+)*)", version.strip())
+    if not match:
+        return None
+    return [int(part) for part in match.group(1).split(".")]

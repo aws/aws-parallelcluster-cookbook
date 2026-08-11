@@ -4,6 +4,9 @@
 # D102 Missing docstring in public method
 # D103 Missing docstring in public function
 # D104 Missing docstring in public package
+# E203 (whitespace before ':') conflicts with Black's slice formatting (e.g. `x[a :b]`); Black is the
+# formatter of record here, so E203 is disabled per Black's own guidance.
+extend-ignore = E203
 per-file-ignores =
     */__init__.py: D104
     tests/*: D100, D101, D102, D103

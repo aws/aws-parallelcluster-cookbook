@@ -17,6 +17,7 @@ import os
 import pytest
 
 from pcluster_diag.util import path_permissions
+from pcluster_diag.util.path_permissions import describe_bits, format_bits, parse_mode
 
 
 def test_stat_path_reports_owner_group_and_octal_mode(tmp_path, monkeypatch):
@@ -69,3 +70,27 @@ def test_stat_path_reports_mode_as_four_digit_octal(tmp_path, monkeypatch):
 def test_stat_path_raises_for_missing_path(tmp_path):
     with pytest.raises(FileNotFoundError):
         path_permissions.stat_path(str(tmp_path / "does-not-exist"))
+
+
+@pytest.mark.parametrize("mode, expected", [("0640", 0o640), ("0600", 0o600), ("4755", 0o4755)])
+def test_parse_mode(mode, expected):
+    assert parse_mode(mode) == expected
+
+
+@pytest.mark.parametrize("bits, expected", [(0o640, "0640"), (0o2, "0002"), (0, "0000")])
+def test_format_bits(bits, expected):
+    assert format_bits(bits) == expected
+
+
+@pytest.mark.parametrize(
+    "bits, expected",
+    [
+        (0o100, "owner execute/traverse"),
+        (0o400, "owner read"),
+        (0o022, "group write, other write"),
+        (0o040, "group read"),
+        (0, ""),
+    ],
+)
+def test_describe_bits(bits, expected):
+    assert describe_bits(bits) == expected

@@ -138,7 +138,7 @@ def test_select_checks_routes_confirmation_required_check(monkeypatch, confirmed
     [
         "ReservedUsersAndGroups",
         "CriticalPathsHaveExpectedPermissions",
-        "ImdsRoleMatchesCfnHupConfig",
+        "CfnHup",
     ],
 )
 def test_default_registry_wires_in_permission_checks(identifier):

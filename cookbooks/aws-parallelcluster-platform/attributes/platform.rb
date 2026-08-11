@@ -25,7 +25,7 @@ default['cluster']['enroot']['persistent_dir'] = '/var/enroot'
 
 # NVidia
 default['cluster']['nvidia']['enabled'] = 'no'
-default['cluster']['nvidia']['driver_version'] = '580.173.02'
+default['cluster']['nvidia']['driver_version'] = '595.71.05'
 default['cluster']['nvidia']['dcgm_version'] = '4.6.0-1'
 default['cluster']['nvidia']['driver_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_driver"
 default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/nvidia_dcgm"
@@ -33,8 +33,8 @@ default['cluster']['nvidia']['dcgm_base_url'] = "#{node['cluster']['artifacts_s3
 # CUDA
 default['cluster']['nvidia']['cuda']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda"
 default['cluster']['nvidia']['cuda']['samples_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/cuda/samples"
-default['cluster']['nvidia']['cuda']['version'] = '13.3.1'
-default['cluster']['nvidia']['cuda']['driver_version_suffix'] = '610.43.02'
+default['cluster']['nvidia']['cuda']['version'] = '13.2.2'
+default['cluster']['nvidia']['cuda']['driver_version_suffix'] = '595.71.05'
 
 # GDRCopy
 default['cluster']['nvidia']['gdrcopy']['enabled'] = true

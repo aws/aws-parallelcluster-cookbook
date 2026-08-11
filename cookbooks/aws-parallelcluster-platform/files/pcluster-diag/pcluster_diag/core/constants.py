@@ -12,11 +12,15 @@
 
 """Shared constants."""
 
+import stat
+
 from pcluster_diag.models.context import NodeType
 
 # General
 PACKAGE_NAME = "pcluster-diag"
 TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M-%S"
+# Placeholder rendered in a finding message where an expected value is absent (e.g. an unset config key).
+MISSING_VALUE = "<missing>"
 
 # Relevant paths. The base and shared directories mirror the cookbook attributes
 # base_dir and shared_dir (see cookbooks/aws-parallelcluster-shared/attributes/cluster.rb);
@@ -36,6 +40,13 @@ MUNGE_KEY_PATH = "/etc/munge/munge.key"
 
 # Slurm's StateSaveLocation directory.
 SLURM_STATE_SAVE_PATH = "/var/spool/slurm.state"
+
+# Permission bit groups the path expectations are written in terms of.
+OWNER_READ = stat.S_IRUSR
+OWNER_WRITE = stat.S_IWUSR
+OWNER_TRAVERSE = stat.S_IXUSR
+GROUP_OTHER_WRITE = stat.S_IWGRP | stat.S_IWOTH
+GROUP_OTHER_READ_WRITE = stat.S_IRGRP | stat.S_IWGRP | stat.S_IROTH | stat.S_IWOTH
 
 # cfn-hup runs as a supervisord program (not a systemd service) managed via the cookbook virtualenv's
 # supervisorctl, reading the supervisord config installed by the cookbook.
@@ -76,7 +87,7 @@ SLURM_CONF_RELATIVE_PATH = "etc/slurm.conf"
 SUPERVISORD_RUNNING_STATE = "RUNNING"
 
 # ParallelCluster management daemons that supervisord must keep RUNNING. cfn-hup is intentionally excluded: it has
-# its own dedicated check (CfnHupRunsOnlyOnHeadNode).
+# its own dedicated check (CfnHup).
 NODE_TYPE_EXPECTED_DAEMONS = {
     NodeType.HEAD: ("clustermgtd", "clusterstatusmgtd"),
     NodeType.COMPUTE: ("computemgtd",),
@@ -107,7 +118,93 @@ DIRECTORY_LOOKUP_COMMAND_TIMEOUT_SECONDS = 30
 # FSx / shared-storage diagnostics
 # `lfs df -h` must return within this or the filesystem is treated as hanging (server/OST unreachable).
 FSX_LFS_DF_TIMEOUT_SECONDS = 30
+# `lfs check servers` probes every target, so allow it longer than a plain `lfs df`.
+FSX_LFS_CHECK_TIMEOUT_SECONDS = 60
+# `lnetctl net show` is a fast, local query; cap it low so a wedged LNet cannot stall the check.
+FSX_LNET_SHOW_TIMEOUT_SECONDS = 15
+# `lctl get_param` reads client-side import state; bound it so a stuck import cannot hang the check.
+FSX_OST_QUERY_TIMEOUT_SECONDS = 30
+# `lnetctl ping` over EFA; a hang here is the signal the EFA data path is not working.
+FSX_EFA_PING_TIMEOUT_SECONDS = 15
 # The StorageType value a FSx for Lustre mount carries in the cluster configuration's SharedStorage.
 LUSTRE_STORAGE_TYPE = "FsxLustre"
-# NFS-based shared-storage types, handled with shallow reachability only (not in scope for PR1).
+# NFS-based shared-storage types. Reserved for a future NFS reachability check (a sibling of the Lustre
+# checks); not consumed yet.
 NFS_STORAGE_TYPES = ("FsxOntap", "FsxOpenZfs", "Efs")
+# The osc/mdc import ``state:`` value indicating a reachable, fully-connected target.
+HEALTHY_TARGET_STATE = "FULL"
+# --- EFA-for-Lustre client parameters -----------------------------------------------------
+# TODO/TO-CHECK: every value in this section mirrors the FSx EFA-Lustre client setup, which we cannot
+# import. If that setup bumps a version floor, adds/renames a p6+ family, or changes how many EFA devices a
+# family binds, re-sync the constants below or these checks will drift and under/over-report. Source:
+# https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html
+#
+# The LNet net type for the EFA LND (kefalnd).
+EFA_LNET_NET = "efa"
+# EFA/RDMA devices surface here; the count is compared against the devices bound to LNet.
+EFA_INFINIBAND_SYSFS = "/sys/class/infiniband"
+# The EFA driver kernel module (its version gates the EFA-Lustre path).
+EFA_DRIVER_KERNEL_MODULE = "efa"
+# The kefalnd kernel module (the EFA LND). Its presence is how the setup defines "this Lustre client
+# supports EFA" (it verifies that ``modinfo kefalnd`` succeeds), so it is a prerequisite for any
+# EFA-for-Lustre probing, checked before the data-path probes run.
+EFA_KEFALND_KERNEL_MODULE = "kefalnd"
+# Minimum EFA-path versions the setup enforces before configuring EFA.
+MIN_EFA_DRIVER_VERSION = "2.12.1"
+MIN_KEFALND_VERSION_P6 = "1.1.1"  # kefalnd floor, enforced on p6+ instances only
+
+# Minimum Lustre *client* version per cluster base_os (dna.json cluster.base_os). This is a general Lustre
+# floor -- NOT the EFA floor -- so it applies to every FsxLustre mount, EFA or not. rhel8/rocky8 ship the
+# 2.12 client (older 4.18 kernel); every other supported base_os ships 2.15. A base_os not in the map (or
+# unknown) uses the default. Source: https://docs.aws.amazon.com/fsx/latest/LustreGuide/lustre-client-matrix.html
+LUSTRE_CLIENT_MIN_VERSION_DEFAULT = "2.15"
+LUSTRE_CLIENT_MIN_VERSION_BY_OS = {
+    "rhel8": "2.12",
+    "rocky8": "2.12",
+}
+# base_os values where EFA-for-Lustre is NOT supported: EFA-for-Lustre requires AL2023 / RHEL 9.5+ /
+# Ubuntu 22.04+ (per configure-efa-clients.html); rhel8/rocky8 run the older 4.18 kernel and are excluded,
+# so the EFA probes are skipped on them.
+EFA_LUSTRE_UNSUPPORTED_OSES = ("rhel8", "rocky8")
+# Instance-family prefixes that require the kefalnd version check (the p6+ families).
+P6PLUS_INSTANCE_PREFIXES = ("p6-b200", "p6e-gb200", "p6-b300")
+
+# How many EFA devices the FSx-for-Lustre EFA client setup binds to LNet by default, keyed by exact
+# instance type. Values mirror the "Default Number of EFA Interfaces" table in
+# https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html#add-efa-interfaces --
+# these are the counts the setup script configures automatically per instance type. An int is exactly the
+# number of devices bound (capped at devices actually present). An instance type NOT in this table follows
+# the doc's dynamic fallback ("Other instances with multiple/single network cards" -> 2/1); we do not
+# encode that fallback because it depends on live NIC count, so unknown types get no static expectation
+# here and the underbinding check only flags a total absence of bound devices.
+EFA_EXPECTED_BOUND_DEVICES = {
+    "p5.48xlarge": 8,
+    "p5e.48xlarge": 8,
+    "p5en.48xlarge": 8,
+    "p6-b200.48xlarge": 8,
+    "p6-b300.48xlarge": 16,
+    "p6e-gb200.36xlarge": 8,
+}
+# The systemd oneshot service the FSx EFA-Lustre client setup installs to (re)configure LNet on every
+# boot. Its state is the persistence/health signal for this delivery vehicle.
+EFA_LUSTRE_SYSTEMD_SERVICE = "configure-efa-fsx-lustre-client.service"
+
+# Slurm accounting
+SLURM_ETC_DIR = DEFAULT_SLURM_INSTALL_DIR + "/etc"
+SLURMDBD_CONF_PATH = SLURM_ETC_DIR + "/slurmdbd.conf"
+SLURM_PARALLELCLUSTER_SLURMDBD_CONF_PATH = SLURM_ETC_DIR + "/slurm_parallelcluster_slurmdbd.conf"
+SLURM_STATE_CLUSTERNAME_PATH = SLURM_STATE_SAVE_PATH + "/clustername"
+SLURMCTLD_LOG_PATH = "/var/log/slurmctld.log"
+SLURMDBD_LOG_PATH = "/var/log/slurmdbd.log"
+LOG_SCAN_TAIL_BYTES = 256 * 1024
+DEFAULT_SLURMDBD_PORT = 6819  # port slurmdbd LISTENS on (slurm.conf AccountingStoragePort)
+DEFAULT_DATABASE_PORT = 3306  # MySQL/MariaDB DATABASE port (Database.Uri; conf StoragePort)
+ACCOUNTING_DB_AUTH_TIMEOUT_SECONDS = 10  # hard cap on a credential/auth probe
+ACCOUNTING_QUERY_TIMEOUT_SECONDS = 30  # hard cap on a timed end-to-end accounting query
+ACCOUNTING_QUERY_LATENCY_WARN_THRESHOLD_SECONDS = 5
+ACCOUNTING_QUERY_LATENCY_FAIL_THRESHOLD_SECONDS = 15
+SLURMDBD_CONF_OWNER = SLURM_USER
+SLURMDBD_CONF_GROUP = SLURM_USER
+# slurmdbd validates this mode by equality and exits fatal on anything else ("should be 600 or 640"),
+# so both accepted values are listed here rather than only the one the cookbook sets.
+SLURMDBD_CONF_ALLOWED_MODES = frozenset({"0600", "0640"})

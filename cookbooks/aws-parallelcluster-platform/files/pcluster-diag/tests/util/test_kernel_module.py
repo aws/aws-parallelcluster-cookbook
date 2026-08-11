@@ -80,3 +80,22 @@ def test_module_version_none_when_modinfo_missing(monkeypatch):
     monkeypatch.setattr(kernel_module, "run_command", _raise_oserror)
 
     assert kernel_module.module_version("lustre") is None
+
+
+@pytest.mark.parametrize(
+    "actual, minimum, expected",
+    [
+        ("2.15.6", "2.15", True),
+        ("2.15", "2.15", True),
+        ("2.14.9", "2.15", False),
+        ("2.15.6-1.fsx23.el9", "2.15", True),  # only the leading numeric prefix is compared
+        ("1.1.1", "1.1.1", True),
+        ("1.0.0", "1.1.1", False),
+        ("2.12.1", "2.12.1", True),
+        # A version that cannot be determined yields None (undeterminable), not False (below-minimum).
+        (None, "2.15", None),
+        ("not-a-version", "2.15", None),
+    ],
+)
+def test_version_at_least(actual, minimum, expected):
+    assert kernel_module.version_at_least(actual, minimum) is expected

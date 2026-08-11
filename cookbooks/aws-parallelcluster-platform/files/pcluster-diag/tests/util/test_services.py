@@ -127,3 +127,61 @@ def test_get_supervisord_program_state_raises_when_undeterminable(monkeypatch):
 
     with pytest.raises(RuntimeError):
         services.get_supervisord_program_state("cfn-hup")
+
+
+# --- systemd unit helpers -------------------------------------------------------------
+
+_UNIT = "configure-efa-fsx-lustre-client.service"
+
+
+def _fake_systemctl(monkeypatch, returncode, stdout):
+    """Patch services.run_command to answer any ``systemctl`` invocation with the given result."""
+    monkeypatch.setattr(
+        services,
+        "run_command",
+        lambda command: subprocess.CompletedProcess(command, returncode, stdout=stdout, stderr=""),
+    )
+
+
+@pytest.mark.parametrize(
+    "returncode, stdout, expected",
+    [
+        (0, "{}                          enabled\n".format(_UNIT), True),
+        (0, "UNIT FILE                   STATE\n", False),  # header only, unit not listed
+        (1, "", False),  # systemctl error / unit unknown
+    ],
+    ids=["installed", "not-listed", "error"],
+)
+def test_systemd_unit_exists(monkeypatch, returncode, stdout, expected):
+    _fake_systemctl(monkeypatch, returncode, stdout)
+    assert services.systemd_unit_exists(_UNIT) is expected
+
+
+def test_systemd_unit_exists_false_when_systemctl_missing(monkeypatch):
+    def _raise(command):
+        raise OSError("systemctl not found")
+
+    monkeypatch.setattr(services, "run_command", _raise)
+    assert services.systemd_unit_exists(_UNIT) is False
+
+
+@pytest.mark.parametrize(
+    "returncode, stdout, expected",
+    [
+        (1, "failed\n", True),  # is-failed exits non-zero even when the unit IS failed
+        (0, "active\n", False),
+        (3, "inactive\n", False),
+    ],
+    ids=["failed", "active", "inactive"],
+)
+def test_systemd_unit_failed(monkeypatch, returncode, stdout, expected):
+    _fake_systemctl(monkeypatch, returncode, stdout)
+    assert services.systemd_unit_failed(_UNIT) is expected
+
+
+def test_systemd_unit_failed_false_when_systemctl_missing(monkeypatch):
+    def _raise(command):
+        raise OSError("systemctl not found")
+
+    monkeypatch.setattr(services, "run_command", _raise)
+    assert services.systemd_unit_failed(_UNIT) is False

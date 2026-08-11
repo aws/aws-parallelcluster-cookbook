@@ -18,6 +18,7 @@ Defines the `pcluster-diag` command group and registers its subcommands.
 import click
 
 from pcluster_diag import __version__
+from pcluster_diag.commands.describe_checks import describe_checks
 from pcluster_diag.commands.run import run
 from pcluster_diag.core.constants import PACKAGE_NAME
 from pcluster_diag.core.exception_handler import ExceptionHandler
@@ -43,6 +44,7 @@ def main() -> None:
 
 
 main.add_command(run)
+main.add_command(describe_checks)
 
 
 if __name__ == "__main__":

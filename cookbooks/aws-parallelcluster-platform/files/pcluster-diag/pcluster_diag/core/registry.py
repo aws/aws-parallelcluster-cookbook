@@ -20,18 +20,14 @@ from typing import Dict, List, Optional, Set, Tuple
 
 import click
 
-from pcluster_diag.checks.cfn_hup import CfnHupRunsOnlyOnHeadNode
+from pcluster_diag.checks.cfn_hup import CfnHup
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
 from pcluster_diag.checks.directory_lookup import DirectoryService
-from pcluster_diag.checks.fsx_connectivity import (
-    FsxFilesystemsAreReachable,
-    FsxMountsArePresent,
-    LustreClientIsInstalled,
-)
+from pcluster_diag.checks.fsx_connectivity import FsxTargetsAreReachable, LustreFilesystem
 from pcluster_diag.checks.imds import Imds
-from pcluster_diag.checks.instance_profile import ImdsRoleMatchesCfnHupConfig
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
+from pcluster_diag.checks.slurm_accounting import SlurmAccounting
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
 
@@ -136,14 +132,13 @@ class Registry:
 DEFAULT_REGISTRY = (
     Registry()
     .register(Imds())
-    .register(CfnHupRunsOnlyOnHeadNode())
+    .register(CfnHup())
     .register(ReservedUsersAndGroups())
     .register(CriticalPathsHaveExpectedPermissions())
-    .register(ImdsRoleMatchesCfnHupConfig())
     .register(ClusterDaemonsAreRunning())
     .register(ClustermgtdHeartbeatIsHealthy())
     .register(DirectoryService())
-    .register(LustreClientIsInstalled())
-    .register(FsxMountsArePresent())
-    .register(FsxFilesystemsAreReachable())
+    .register(SlurmAccounting())
+    .register(LustreFilesystem())
+    .register(FsxTargetsAreReachable())  # approval_required: heavier per-target probe
 )
