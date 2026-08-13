@@ -190,8 +190,10 @@ class LustreFilesystem(Check):
     )
     EFA_PING_FAILED = CheckError(
         11,
-        "EFA ping from {} to {} failed -- the EFA data path is not working. Check the security group "
-        "has a self-referencing rule by SG-ID (EFA's SRD-over-MAC is not authorized by a 0.0.0.0/0 rule).",
+        "EFA ping from {} to every @efa peer ({}) failed -- the EFA data path is not working. Likely a "
+        "missing self-referencing security-group rule by SG-ID (EFA's SRD-over-MAC is not authorized by a "
+        "0.0.0.0/0 rule); a server target served only on @tcp (e.g. an FSx MDT on a non-EFA NIC) is expected "
+        "to be unreachable over @efa and is not by itself a fault.",
     )
 
     # --- Errors: EFA prerequisites (checked before the EFA data-path probes) ------------------
@@ -577,22 +579,27 @@ class LustreFilesystem(Check):
         return warnings
 
     def _efa_ping_errors(self, nets) -> List[CheckError]:
-        """Ping an @efa peer over EFA (the tutorial's own validation); error when the data path fails.
+        """Ping the @efa peers over EFA (the tutorial's own validation); error when the data path fails.
 
-        Automates ``lnetctl ping --source <local>@efa <peer>@efa``. Discovers a local @efa nid and a peer
-        @efa nid from ``lnetctl``; when either is unavailable there is nothing to ping, so the probe is
-        skipped (a missing peer/local nid is not itself proof the data path is broken).
+        Automates ``lnetctl ping --source <local>@efa <peer>@efa``. Discovers a local @efa nid and the set
+        of peer @efa nids from ``lnetctl``; when either is unavailable there is nothing to ping, so the
+        probe is skipped (a missing peer/local nid is not itself proof the data path is broken).
+
+        Every @efa peer is pinged and the data path is treated as broken only when *all* of them fail.
+        LNet peer discovery can list an @efa NID for a server that does not serve EFA (e.g. an FSx MDT on a
+        plain-ENA NIC): that one NID is unpingable even on a healthy fabric, so failing on it alone would be
+        a false positive. A single successful ping proves the SRD path works.
         """
         local = lustre.local_nids(nets, EFA_LNET_NET)
         if not local:
             return []
-        peer_nid = lustre.efa_peer_nid()
-        if peer_nid is None:
+        peer_nids = lustre.efa_peer_nids()
+        if not peer_nids:
             return []
         source = local[0]
-        if not lustre.efa_ping_works(source, peer_nid):
-            return [self.EFA_PING_FAILED.format(source, peer_nid)]
-        return []
+        if any(lustre.efa_ping_works(source, peer_nid) for peer_nid in peer_nids):
+            return []
+        return [self.EFA_PING_FAILED.format(source, ", ".join(peer_nids))]
 
     def _tcp_fallback_warnings(self, nets) -> List[CheckWarning]:
         """Return a warning per target connected over @tcp while an @efa net is configured."""

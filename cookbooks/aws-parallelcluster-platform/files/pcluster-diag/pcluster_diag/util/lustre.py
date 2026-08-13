@@ -268,12 +268,22 @@ def nids_on_net(nids: List[str], net_type: str) -> List[str]:
 # --- LNet transport: the lnetctl ping reachability probe ------------------------------
 
 
-def efa_peer_nid() -> Optional[str]:
-    """Return an ``@efa`` peer nid from ``lnetctl peer show``, or None when none is available."""
+def efa_peer_nids() -> List[str]:
+    """Return every ``@efa`` peer nid from ``lnetctl peer show`` (empty when none/unavailable).
+
+    LNet peer discovery can list an ``@efa`` NID for a server that does not actually serve EFA (e.g.
+    an FSx MDT whose server NIC is a plain ENA): that NID is unpingable even when the EFA fabric is
+    healthy. Callers therefore probe the whole set rather than trusting any single peer.
+    """
     result = time_command(["lnetctl", "peer", "show"], timeout=FSX_LNET_SHOW_TIMEOUT_SECONDS)
     if result.timed_out or result.returncode != 0:
-        return None
-    efa_peers = nids_on_net(parse_lnet_peer_show(result.stdout), EFA_LNET_NET)
+        return []
+    return nids_on_net(parse_lnet_peer_show(result.stdout), EFA_LNET_NET)
+
+
+def efa_peer_nid() -> Optional[str]:
+    """Return the first ``@efa`` peer nid from ``lnetctl peer show``, or None when none is available."""
+    efa_peers = efa_peer_nids()
     return efa_peers[0] if efa_peers else None
 
 
