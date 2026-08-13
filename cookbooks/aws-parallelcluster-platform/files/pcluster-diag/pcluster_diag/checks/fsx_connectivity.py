@@ -41,16 +41,16 @@ executes each probe in isolation and aggregates their findings. The probes are:
   all (so Lustre falls back to TCP), fewer devices bound than the instance type is expected to bind (the
   expected count comes from a per-instance-family table, NOT the raw device count -- several families bind
   only a subset by design, and instance types with no known/static expectation are not flagged beyond the
-  "none bound" case), and an ``@efa`` interface carrying no traffic at all.
-  ``lnetctl net show -v`` is the only LNet command any probe runs, so the check cannot mutate LNet state.
+  "none bound" case), and a non-working EFA data path (typically a missing self-referencing security-group
+  rule).
   See https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html
 
 :class:`FsxTargetsAreReachable` is kept separate because it is a heavier, opt-in
 (``approval_required``) deep probe (``lfs check servers`` + per-target import state); the framework's
 approval gate is per-check, so folding it into the always-on check would either force the deep probe to
-run every time or gate the whole check behind a prompt. It is currently not registered -- see its docstring.
+run every time or gate the whole check behind a prompt.
 
-:class:`LustreFilesystem` runs on every node type that has a FsxLustre mount configured, and skips
+Both checks run on every node type that has a FsxLustre mount configured, and skip
 (SKIPPED_NOT_APPLICABLE) when the cluster configures no FsxLustre filesystem. Every probe is read-only.
 """
 
@@ -190,8 +190,10 @@ class LustreFilesystem(Check):
     )
     EFA_PING_FAILED = CheckError(
         11,
-        "EFA ping from {} to {} failed -- the EFA data path is not working. Check the security group "
-        "has a self-referencing rule by SG-ID (EFA's SRD-over-MAC is not authorized by a 0.0.0.0/0 rule).",
+        "EFA ping from {} to every @efa peer ({}) failed -- the EFA data path is not working. Likely a "
+        "missing self-referencing security-group rule by SG-ID (EFA's SRD-over-MAC is not authorized by a "
+        "0.0.0.0/0 rule); a server target served only on @tcp (e.g. an FSx MDT on a non-EFA NIC) is expected "
+        "to be unreachable over @efa and is not by itself a fault.",
     )
 
     # --- Errors: EFA prerequisites (checked before the EFA data-path probes) ------------------
@@ -259,7 +261,7 @@ class LustreFilesystem(Check):
     @property
     def description(self) -> str:
         """Return the human-readable description of this Check."""
-        return "Verify that FsxLustre filesystems are installed, mounted, reachable, and configured for EFA."
+        return "Verify that FsxLustre filesystems are installed, mounted, reachable, and riding EFA."
 
     def should_run(self, context: Context) -> bool:
         """Run only when a FsxLustre filesystem is configured."""
@@ -416,10 +418,10 @@ class LustreFilesystem(Check):
         client supports EFA"), the EFA driver version, and on the p6+ families the kefalnd version. A
         missing ``kefalnd`` is reported (``KEFALND_MISSING``) and short-circuits the rest: without it there
         can be no working ``@efa`` net, so the follow-on probes would add nothing. Then it reports the
-        systemd service state and, when a live ``@efa`` net exists, the devices bound to LNet and their
-        traffic counters, to name -- not fix -- the failures. ``lnetctl net show -v`` is the only LNet
-        command run: it is read-only and cannot mutate LNet state, unlike ``lnetctl ping``, which leaves a
-        peer entry behind. Never re-binds devices or edits the security group.
+        systemd service state and, when a live ``@efa`` net exists, automates the FSx tutorial's "Validate
+        FSx with EFA is working" commands (``lnetctl net show --net efa -v``, ``lnetctl ping ...@efa``) and
+        the client-side import state, to name -- not fix -- the failures. Read-only: never re-binds devices
+        or edits the security group.
         """
         if lnet.timed_out or lnet.unavailable:
             # The LNet probe already reported the hang / missing lnetctl; there is nothing to inspect here.
@@ -475,9 +477,8 @@ class LustreFilesystem(Check):
             infos.append(self.BOUND_DEVICES.format(len(bound), available))
 
         warnings.extend(self._traffic_warnings(efa_net))
-        # ``lnetctl net show -v`` is the only LNet command this check runs. _efa_ping_errors (lnetctl peer
-        # show + lnetctl ping) and _tcp_fallback_warnings (lctl get_param ...import) are deliberately not
-        # called; see their docstrings.
+        errors.extend(self._efa_ping_errors(lnet.nets))
+        warnings.extend(self._tcp_fallback_warnings(lnet.nets))
 
     def _probe_efa_prerequisites(self, context: Context, errors: List[CheckError], infos: List[CheckInfo]) -> bool:
         """Verify the EFA-for-Lustre client prerequisites; return whether kefalnd is present.
@@ -578,29 +579,30 @@ class LustreFilesystem(Check):
         return warnings
 
     def _efa_ping_errors(self, nets) -> List[CheckError]:
-        """Ping an @efa peer over EFA and error when the ping fails. NOT EXECUTED.
+        """Ping the @efa peers over EFA (the tutorial's own validation); error when the data path fails.
 
-        Kept for reference but no longer called from ``_probe_efa``: we could not establish a reliable way to
-        pick the nid to ping, so this check is not reliable enough to report.
+        Automates ``lnetctl ping --source <local>@efa <peer>@efa``. Discovers a local @efa nid and the set
+        of peer @efa nids from ``lnetctl``; when either is unavailable there is nothing to ping, so the
+        probe is skipped (a missing peer/local nid is not itself proof the data path is broken).
+
+        Every @efa peer is pinged and the data path is treated as broken only when *all* of them fail.
+        LNet peer discovery can list an @efa NID for a server that does not serve EFA (e.g. an FSx MDT on a
+        plain-ENA NIC): that one NID is unpingable even on a healthy fabric, so failing on it alone would be
+        a false positive. A single successful ping proves the SRD path works.
         """
         local = lustre.local_nids(nets, EFA_LNET_NET)
         if not local:
             return []
-        peer_nid = lustre.efa_peer_nid()
-        if peer_nid is None:
+        peer_nids = lustre.efa_peer_nids()
+        if not peer_nids:
             return []
         source = local[0]
-        if not lustre.efa_ping_works(source, peer_nid):
-            return [self.EFA_PING_FAILED.format(source, peer_nid)]
-        return []
+        if any(lustre.efa_ping_works(source, peer_nid) for peer_nid in peer_nids):
+            return []
+        return [self.EFA_PING_FAILED.format(source, ", ".join(peer_nids))]
 
     def _tcp_fallback_warnings(self, nets) -> List[CheckWarning]:
-        """Return a warning per target connected over @tcp while an @efa net is configured. NOT EXECUTED.
-
-        Kept for reference but no longer called from ``_probe_efa``: we could not establish that the import's
-        connection nid tells us which transport actually carries the data, so this check is not reliable
-        enough to report.
-        """
+        """Return a warning per target connected over @tcp while an @efa net is configured."""
         if lustre.lnet_net(nets, EFA_LNET_NET) is None:
             return []
         result = time_command(
@@ -617,11 +619,6 @@ class LustreFilesystem(Check):
 
 class FsxTargetsAreReachable(Check):
     """Opt-in deep check pinpointing an unreachable OST/MDT -- a common cause of a hung directory listing.
-
-    NOT REGISTERED: kept for reference but left out of ``DEFAULT_REGISTRY``, so nothing here runs. Its
-    import-state findings rest on ``current_connection``/``failover_nids``, which do not carry the meaning
-    they were read with (see :meth:`LustreFilesystem._tcp_fallback_warnings`), and its ``lfs check servers``
-    parsing reports a phantom target for the bare ``lfs check: error:`` line real output contains.
 
     Runs ``lfs check servers`` (the per-target reachability diagnostic) via ``time_command`` and inspects
     client-side import state (``lctl get_param osc.*.import`` / ``mdc.*.import``). Because probing

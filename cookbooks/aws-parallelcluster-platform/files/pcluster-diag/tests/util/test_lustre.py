@@ -266,6 +266,21 @@ def test_parse_lctl_import_empty_when_no_blocks():
 # --- LNet ping (lnetctl peer show + ping) ---------------------------------------------
 
 
+def test_efa_peer_nids_returns_all_efa_peers(monkeypatch):
+    two_efa_peers = (
+        "peer:\n"
+        "    - primary nid: 10.0.1.5@efa\n      peer ni:\n        - nid: 10.0.1.5@efa\n"
+        "    - primary nid: 10.0.1.6@efa\n      peer ni:\n        - nid: 10.0.1.6@efa\n"
+    )
+    monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(stdout=two_efa_peers))
+    assert lustre.efa_peer_nids() == ["10.0.1.5@efa", "10.0.1.6@efa"]
+
+
+def test_efa_peer_nids_empty_on_command_failure(monkeypatch):
+    monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(returncode=1))
+    assert lustre.efa_peer_nids() == []
+
+
 def test_efa_peer_nid_returns_first_efa_peer(monkeypatch):
     monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(stdout=_LNET_PEER_SHOW))
     assert lustre.efa_peer_nid() == "10.0.1.5@efa"
