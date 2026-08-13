@@ -56,3 +56,19 @@ control 'tag:testami_tag:config_dnf_makecache_timer_disabled' do
     it { should_not be_running }
   end
 end
+
+control 'tag:testami_tag:config_fwupd_refresh_timer_disabled' do
+  title 'Test that fwupd-refresh timer is disabled, stopped and masked to reduce HPC jitter'
+
+  only_if { !os_properties.on_docker? }
+
+  describe service('fwupd-refresh.timer') do
+    it { should_not be_enabled }
+    it { should_not be_running }
+  end
+
+  describe bash('systemctl show -p LoadState fwupd-refresh.timer') do
+    its(:exit_status) { should eq 0 }
+    its(:stdout) { should match /LoadState=(masked|not-found)/ }
+  end
+end

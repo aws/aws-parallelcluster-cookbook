@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.17.0
+------
+
+**ENHANCEMENTS**
+- Disable `fwupd-refresh.timer` to improve performance for tightly coupled workloads at scale.
+
 3.16.0
 ------
 
