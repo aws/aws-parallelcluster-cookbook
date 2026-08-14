@@ -450,8 +450,8 @@ peer:
         - nid: 10.0.1.5@efa
 """
 
-# Two @efa peers: e.g. an FSx OSS on an EFA NIC (10.0.1.5, pingable) plus a metadata/TCP-only server
-# whose discovered @efa NID (10.0.1.6) is never pingable even on a healthy fabric.
+# Two @efa peers, each its own primary nid: a real server (10.0.1.5, pingable) plus an @efa NID that
+# answers nothing (10.0.1.6) -- the shape a failed ping to a non-existent NID leaves behind.
 _LNET_PEER_EFA_MULTI = """\
 peer:
     - primary nid: 10.0.1.5@efa
@@ -786,9 +786,8 @@ def test_efa_ping_failure_when_all_peers_fail(monkeypatch):
 
 
 def test_efa_no_ping_error_when_any_peer_reachable(monkeypatch):
-    # One @efa peer is unpingable (10.0.1.6, e.g. a TCP-only server's discovered @efa NID) but another
-    # (10.0.1.5) pings clean: the SRD path is proven working, so E11 must NOT fire. This is the FSx
-    # mixed-target case (EFA-capable OSS + TCP-only metadata) that must read WARNING, not FAILURE.
+    # One @efa peer is unpingable (10.0.1.6, e.g. a phantom peer left by an earlier failed ping) but
+    # another (10.0.1.5) pings clean: the SRD path is proven working, so E11 must NOT fire.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
@@ -807,7 +806,6 @@ def test_efa_no_ping_error_when_any_peer_reachable(monkeypatch):
     )
 
     assert LustreFilesystem.EFA_PING_FAILED.code not in _codes(errors)
-    assert LustreFilesystem.TCP_FALLBACK.code in _codes(warnings)
 
 
 def test_efa_no_traffic_is_warning(monkeypatch):

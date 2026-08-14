@@ -192,8 +192,7 @@ class LustreFilesystem(Check):
         11,
         "EFA ping from {} to every @efa peer ({}) failed -- the EFA data path is not working. Likely a "
         "missing self-referencing security-group rule by SG-ID (EFA's SRD-over-MAC is not authorized by a "
-        "0.0.0.0/0 rule); a server target served only on @tcp (e.g. an FSx MDT on a non-EFA NIC) is expected "
-        "to be unreachable over @efa and is not by itself a fault.",
+        "0.0.0.0/0 rule).",
     )
 
     # --- Errors: EFA prerequisites (checked before the EFA data-path probes) ------------------
@@ -585,10 +584,10 @@ class LustreFilesystem(Check):
         of peer @efa nids from ``lnetctl``; when either is unavailable there is nothing to ping, so the
         probe is skipped (a missing peer/local nid is not itself proof the data path is broken).
 
-        Every @efa peer is pinged and the data path is treated as broken only when *all* of them fail.
-        LNet peer discovery can list an @efa NID for a server that does not serve EFA (e.g. an FSx MDT on a
-        plain-ENA NIC): that one NID is unpingable even on a healthy fabric, so failing on it alone would be
-        a false positive. A single successful ping proves the SRD path works.
+        Every @efa peer is pinged and the data path is treated as broken only when *all* of them fail. The
+        peer table can hold an @efa NID that answers nothing on a healthy fabric (see
+        ``lustre.efa_peer_nids``), so failing on one peer alone would be a false positive. A single
+        successful ping proves the SRD path works.
         """
         local = lustre.local_nids(nets, EFA_LNET_NET)
         if not local:
