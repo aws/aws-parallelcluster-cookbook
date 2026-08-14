@@ -48,9 +48,9 @@ executes each probe in isolation and aggregates their findings. The probes are:
 :class:`FsxTargetsAreReachable` is kept separate because it is a heavier, opt-in
 (``approval_required``) deep probe (``lfs check servers`` + per-target import state); the framework's
 approval gate is per-check, so folding it into the always-on check would either force the deep probe to
-run every time or gate the whole check behind a prompt.
+run every time or gate the whole check behind a prompt. It is currently not registered -- see its docstring.
 
-Both checks run on every node type that has a FsxLustre mount configured, and skip
+:class:`LustreFilesystem` runs on every node type that has a FsxLustre mount configured, and skips
 (SKIPPED_NOT_APPLICABLE) when the cluster configures no FsxLustre filesystem. Every probe is read-only.
 """
 
@@ -417,9 +417,8 @@ class LustreFilesystem(Check):
         missing ``kefalnd`` is reported (``KEFALND_MISSING``) and short-circuits the rest: without it there
         can be no working ``@efa`` net, so the follow-on probes would add nothing. Then it reports the
         systemd service state and, when a live ``@efa`` net exists, automates the FSx tutorial's "Validate
-        FSx with EFA is working" commands (``lnetctl net show --net efa -v``, ``lnetctl ping ...@efa``) and
-        the client-side import state, to name -- not fix -- the failures. Read-only: never re-binds devices
-        or edits the security group.
+        FSx with EFA is working" commands (``lnetctl net show --net efa -v``, ``lnetctl ping ...@efa``), to
+        name -- not fix -- the failures. Read-only: never re-binds devices or edits the security group.
         """
         if lnet.timed_out or lnet.unavailable:
             # The LNet probe already reported the hang / missing lnetctl; there is nothing to inspect here.
@@ -476,7 +475,8 @@ class LustreFilesystem(Check):
 
         warnings.extend(self._traffic_warnings(efa_net))
         errors.extend(self._efa_ping_errors(lnet.nets))
-        warnings.extend(self._tcp_fallback_warnings(lnet.nets))
+        # _tcp_fallback_warnings is deliberately not called: current_connection reads @tcp on a healthy EFA
+        # client, so it would warn on every node. See its docstring.
 
     def _probe_efa_prerequisites(self, context: Context, errors: List[CheckError], infos: List[CheckInfo]) -> bool:
         """Verify the EFA-for-Lustre client prerequisites; return whether kefalnd is present.
@@ -595,7 +595,14 @@ class LustreFilesystem(Check):
         return []
 
     def _tcp_fallback_warnings(self, nets) -> List[CheckWarning]:
-        """Return a warning per target connected over @tcp while an @efa net is configured."""
+        """Return a warning per target connected over @tcp while an @efa net is configured. NOT EXECUTED.
+
+        Kept for reference but no longer called from ``_probe_efa``: ``current_connection`` reads @tcp on a
+        healthy EFA client, because FSx documents the mount target as ``<dns_name>@tcp`` for EFA-enabled
+        file systems too and LNet Multi-Rail selects the rail below ptlrpc, where the import cannot see it.
+        The warning would therefore fire on every healthy node. The signal that does distinguish the two is
+        a per-NI ``send_count``/``recv_count`` delta measured across filesystem I/O.
+        """
         if lustre.lnet_net(nets, EFA_LNET_NET) is None:
             return []
         result = time_command(
@@ -612,6 +619,11 @@ class LustreFilesystem(Check):
 
 class FsxTargetsAreReachable(Check):
     """Opt-in deep check pinpointing an unreachable OST/MDT -- a common cause of a hung directory listing.
+
+    NOT REGISTERED: kept for reference but left out of ``DEFAULT_REGISTRY``, so nothing here runs. Its
+    import-state findings rest on ``current_connection``/``failover_nids``, which do not carry the meaning
+    they were read with (see :meth:`LustreFilesystem._tcp_fallback_warnings`), and its ``lfs check servers``
+    parsing reports a phantom target for the bare ``lfs check: error:`` line real output contains.
 
     Runs ``lfs check servers`` (the per-target reachability diagnostic) via ``time_command`` and inspects
     client-side import state (``lctl get_param osc.*.import`` / ``mdc.*.import``). Because probing

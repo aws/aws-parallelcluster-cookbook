@@ -792,7 +792,9 @@ def test_efa_no_traffic_is_warning(monkeypatch):
     assert LustreFilesystem.NO_TRAFFIC.code in _codes(warnings)
 
 
-def test_efa_tcp_fallback_is_warning(monkeypatch):
+def test_efa_import_over_tcp_is_not_a_finding(monkeypatch):
+    # A healthy EFA client reads @tcp in its import (FSx documents the mount target as @tcp and Multi-Rail
+    # picks the rail below ptlrpc), so the import transport must not produce a finding.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
@@ -809,7 +811,7 @@ def test_efa_tcp_fallback_is_warning(monkeypatch):
         sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_TCP_EFA), errors, warnings, infos
     )
 
-    assert LustreFilesystem.TCP_FALLBACK.code in _codes(warnings)
+    assert LustreFilesystem.TCP_FALLBACK.code not in _codes(warnings)
 
 
 # --- EFA prerequisites & systemd service (checked before the data-path probes) --------
@@ -1064,7 +1066,7 @@ def test_run_missing_lnetctl_does_not_sink_other_probes(monkeypatch):
     assert LustreFilesystem.NOT_MOUNTED.code not in _codes(result.errors)
 
 
-# --- FsxTargetsAreReachable (unchanged, still its own gated check) --------------------
+# --- FsxTargetsAreReachable (kept, but not registered) --------------------------------
 
 
 def test_targets_description():
