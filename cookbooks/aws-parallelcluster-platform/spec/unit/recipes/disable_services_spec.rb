@@ -29,6 +29,12 @@ describe 'aws-parallelcluster-platform::disable_services' do
         is_expected.to stop_service('dnf-makecache.timer')
       end
 
+      it 'disables fwupd-refresh timer' do
+        is_expected.to disable_service('fwupd-refresh.timer')
+        is_expected.to stop_service('fwupd-refresh.timer')
+        is_expected.to mask_service('fwupd-refresh.timer')
+      end
+
       DISABLE_SERVICE_NAME.split().each do |service_name|
         it "disables #{service_name}" do
           is_expected.to disable_service(service_name)

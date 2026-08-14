@@ -37,6 +37,17 @@ service 'dnf-makecache.timer' do
   action %i(disable stop)
 end unless on_docker?
 
+# Disable fwupd-refresh timer to reduce system jitter.
+# fwupd-refresh fetches LVFS metadata and starts the fwupd daemon, which pulls
+# in udisks2 and upower. Persistent=true makes every node run one catch-up
+# refresh shortly after boot, so at scale (500+ nodes) refreshes overlap most
+# MPI collectives, causing barrier straggler effects.
+# EC2 instances have no flashable firmware and fwupdmgr reports no supported
+# devices, so cluster nodes do not need it.
+service 'fwupd-refresh.timer' do
+  action %i(disable stop mask)
+end unless on_docker?
+
 # Disable services if node['cluster']['disable_services'] is provided
 if node['cluster']['disable_services']
   node['cluster']['disable_services'].split().each do |service_name|
