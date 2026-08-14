@@ -3,12 +3,6 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.17.0
-------
-
-**ENHANCEMENTS**
-- Disable `fwupd-refresh.timer` to improve performance for tightly coupled workloads at scale.
-
 3.16.0
 ------
 
@@ -21,6 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Move all ParallelCluster-managed bootstrap files off `/tmp` into a dedicated `/opt/parallelcluster/tmp`
   directory. Therefore, Image builds, cluster creations and updates work on custom AMIs that mount `/tmp` with `noexec`.
   Image builds work on the custom AMIs only if GDRcopy installation is skipped.
+- Disable `fwupd-refresh.timer` to improve performance for tightly coupled workloads at scale.
 
 **CHANGES**
 - Enforce NFSv4-only on the ParallelCluster-managed NFS server (head node). 
