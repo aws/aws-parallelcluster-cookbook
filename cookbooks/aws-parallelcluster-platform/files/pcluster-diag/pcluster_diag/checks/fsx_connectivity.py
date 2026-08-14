@@ -41,8 +41,8 @@ executes each probe in isolation and aggregates their findings. The probes are:
   all (so Lustre falls back to TCP), fewer devices bound than the instance type is expected to bind (the
   expected count comes from a per-instance-family table, NOT the raw device count -- several families bind
   only a subset by design, and instance types with no known/static expectation are not flagged beyond the
-  "none bound" case), and a non-working EFA data path (typically a missing self-referencing security-group
-  rule).
+  "none bound" case), and an ``@efa`` interface carrying no traffic at all.
+  ``lnetctl net show -v`` is the only LNet command any probe runs, so the check cannot mutate LNet state.
   See https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html
 
 :class:`FsxTargetsAreReachable` is kept separate because it is a heavier, opt-in
@@ -259,7 +259,7 @@ class LustreFilesystem(Check):
     @property
     def description(self) -> str:
         """Return the human-readable description of this Check."""
-        return "Verify that FsxLustre filesystems are installed, mounted, reachable, and riding EFA."
+        return "Verify that FsxLustre filesystems are installed, mounted, reachable, and configured for EFA."
 
     def should_run(self, context: Context) -> bool:
         """Run only when a FsxLustre filesystem is configured."""
@@ -416,9 +416,10 @@ class LustreFilesystem(Check):
         client supports EFA"), the EFA driver version, and on the p6+ families the kefalnd version. A
         missing ``kefalnd`` is reported (``KEFALND_MISSING``) and short-circuits the rest: without it there
         can be no working ``@efa`` net, so the follow-on probes would add nothing. Then it reports the
-        systemd service state and, when a live ``@efa`` net exists, automates the FSx tutorial's "Validate
-        FSx with EFA is working" commands (``lnetctl net show --net efa -v``, ``lnetctl ping ...@efa``), to
-        name -- not fix -- the failures. Read-only: never re-binds devices or edits the security group.
+        systemd service state and, when a live ``@efa`` net exists, the devices bound to LNet and their
+        traffic counters, to name -- not fix -- the failures. ``lnetctl net show -v`` is the only LNet
+        command run: it is read-only and cannot mutate LNet state, unlike ``lnetctl ping``, which leaves a
+        peer entry behind. Never re-binds devices or edits the security group.
         """
         if lnet.timed_out or lnet.unavailable:
             # The LNet probe already reported the hang / missing lnetctl; there is nothing to inspect here.
@@ -474,9 +475,9 @@ class LustreFilesystem(Check):
             infos.append(self.BOUND_DEVICES.format(len(bound), available))
 
         warnings.extend(self._traffic_warnings(efa_net))
-        errors.extend(self._efa_ping_errors(lnet.nets))
-        # _tcp_fallback_warnings is deliberately not called: current_connection reads @tcp on a healthy EFA
-        # client, so it would warn on every node. See its docstring.
+        # ``lnetctl net show -v`` is the only LNet command this check runs. _efa_ping_errors (lnetctl peer
+        # show + lnetctl ping) and _tcp_fallback_warnings (lctl get_param ...import) are deliberately not
+        # called; see their docstrings.
 
     def _probe_efa_prerequisites(self, context: Context, errors: List[CheckError], infos: List[CheckInfo]) -> bool:
         """Verify the EFA-for-Lustre client prerequisites; return whether kefalnd is present.
@@ -577,11 +578,10 @@ class LustreFilesystem(Check):
         return warnings
 
     def _efa_ping_errors(self, nets) -> List[CheckError]:
-        """Ping an @efa peer over EFA (the tutorial's own validation); error when the data path fails.
+        """Ping an @efa peer over EFA and error when the ping fails. NOT EXECUTED.
 
-        Automates ``lnetctl ping --source <local>@efa <peer>@efa``. Discovers a local @efa nid and a peer
-        @efa nid from ``lnetctl``; when either is unavailable there is nothing to ping, so the probe is
-        skipped (a missing peer/local nid is not itself proof the data path is broken).
+        Kept for reference but no longer called from ``_probe_efa``: we could not establish a reliable way to
+        pick the nid to ping, so this check is not reliable enough to report.
         """
         local = lustre.local_nids(nets, EFA_LNET_NET)
         if not local:
@@ -597,11 +597,9 @@ class LustreFilesystem(Check):
     def _tcp_fallback_warnings(self, nets) -> List[CheckWarning]:
         """Return a warning per target connected over @tcp while an @efa net is configured. NOT EXECUTED.
 
-        Kept for reference but no longer called from ``_probe_efa``: ``current_connection`` reads @tcp on a
-        healthy EFA client, because FSx documents the mount target as ``<dns_name>@tcp`` for EFA-enabled
-        file systems too and LNet Multi-Rail selects the rail below ptlrpc, where the import cannot see it.
-        The warning would therefore fire on every healthy node. The signal that does distinguish the two is
-        a per-NI ``send_count``/``recv_count`` delta measured across filesystem I/O.
+        Kept for reference but no longer called from ``_probe_efa``: we could not establish that the import's
+        connection nid tells us which transport actually carries the data, so this check is not reliable
+        enough to report.
         """
         if lustre.lnet_net(nets, EFA_LNET_NET) is None:
             return []

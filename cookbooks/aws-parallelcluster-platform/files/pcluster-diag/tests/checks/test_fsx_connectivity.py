@@ -751,16 +751,29 @@ def test_efa_no_devices_bound_fails(monkeypatch):
     assert "16" in _messages(errors)
 
 
-def test_efa_ping_failure_points_at_security_group(monkeypatch):
+def test_efa_probe_runs_no_lnetctl_beyond_net_show(monkeypatch):
+    # `lnetctl net show -v` (already fetched into the snapshot) is the probe's only LNet command: peer show
+    # and ping are not run, so E11 cannot fire even with every ping failing and a @tcp-connected import.
+    from pcluster_diag.util import lustre
+
+    commands = []
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
         {
             "peer show": _timed(stdout=_LNET_PEER_EFA),
             "ping": _timed(returncode=1, stderr="cannot reach"),
-            "import": _timed(stdout=_IMPORT_EFA),
+            "import": _timed(stdout=_IMPORT_TCP_FALLBACK),
         },
     )
+    routed = fsx_connectivity.time_command
+
+    def recording_time_command(command, timeout):
+        commands.append(" ".join(command))
+        return routed(command, timeout)
+
+    monkeypatch.setattr(fsx_connectivity, "time_command", recording_time_command)
+    monkeypatch.setattr(lustre, "time_command", recording_time_command)
     monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
     errors, warnings, infos = [], [], []
 
@@ -768,8 +781,8 @@ def test_efa_ping_failure_points_at_security_group(monkeypatch):
         sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_TCP_EFA), errors, warnings, infos
     )
 
-    assert LustreFilesystem.EFA_PING_FAILED.code in _codes(errors)
-    assert "security group" in _messages(errors)
+    assert [command for command in commands if "lnetctl" in command or "lctl" in command] == []
+    assert LustreFilesystem.EFA_PING_FAILED.code not in _codes(errors)
 
 
 def test_efa_no_traffic_is_warning(monkeypatch):
@@ -793,8 +806,8 @@ def test_efa_no_traffic_is_warning(monkeypatch):
 
 
 def test_efa_import_over_tcp_is_not_a_finding(monkeypatch):
-    # A healthy EFA client reads @tcp in its import (FSx documents the mount target as @tcp and Multi-Rail
-    # picks the rail below ptlrpc), so the import transport must not produce a finding.
+    # A @tcp import connection does not tell us which transport carries the data, so it must not produce a
+    # finding.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
