@@ -24,7 +24,7 @@ from pcluster_diag.checks.cfn_hup import CfnHup
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
 from pcluster_diag.checks.directory_lookup import DirectoryService
-from pcluster_diag.checks.fsx_connectivity import FsxTargetsAreReachable, LustreFilesystem
+from pcluster_diag.checks.fsx_connectivity import LustreFilesystem
 from pcluster_diag.checks.imds import Imds
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
 from pcluster_diag.checks.slurm_accounting import SlurmAccounting
@@ -140,5 +140,6 @@ DEFAULT_REGISTRY = (
     .register(DirectoryService())
     .register(SlurmAccounting())
     .register(LustreFilesystem())
-    .register(FsxTargetsAreReachable())  # approval_required: heavier per-target probe
+    # FsxTargetsAreReachable (approval_required: heavier per-target probe) is deliberately left out: its
+    # findings are not signals we trust yet. See its docstring in checks/fsx_connectivity.py.
 )

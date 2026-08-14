@@ -147,3 +147,8 @@ def test_default_registry_wires_in_permission_checks(identifier):
 
 def test_default_registry_does_not_register_sample_check():
     assert registry_module.DEFAULT_REGISTRY.get("SampleCheck") is None
+
+
+def test_default_registry_wires_in_lustre_but_not_the_target_deep_probe():
+    assert registry_module.DEFAULT_REGISTRY.get("LustreFilesystem") is not None
+    assert registry_module.DEFAULT_REGISTRY.get("FsxTargetsAreReachable") is None
