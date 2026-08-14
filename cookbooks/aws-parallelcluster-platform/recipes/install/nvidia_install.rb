@@ -15,6 +15,10 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Skip the entire NVIDIA software stack when NVIDIA is disabled, or when the
+# driver is already present on the base AMI (e.g. Deep Learning AMIs).
+return if nvidia_disabled? || nvidia_installed?
+
 nvidia_repo 'Add NVIDIA driver local repo' do
   action :add_driver_repo
 end

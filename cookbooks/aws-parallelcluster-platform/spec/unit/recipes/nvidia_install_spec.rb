@@ -3,8 +3,44 @@ require 'spec_helper'
 describe 'aws-parallelcluster-platform::nvidia_install' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
+      context 'when nvidia is disabled' do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            node.override['cluster']['nvidia']['enabled'] = 'no'
+          end
+          runner.converge(described_recipe)
+        end
+
+        it 'skips the entire nvidia software stack' do
+          is_expected.not_to add_driver_repo_nvidia_repo('Add NVIDIA driver local repo')
+          is_expected.not_to setup_nvidia_driver('Install Nvidia driver')
+          is_expected.not_to install_nvidia_imex('Install nvidia-imex')
+          is_expected.not_to setup_nvidia_cuda('Install Nvidia CUDA')
+        end
+      end
+
+      context 'when the nvidia driver is already installed on the base AMI' do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version) do |node|
+            node.override['cluster']['nvidia']['enabled'] = 'yes'
+          end
+          allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(true)
+          runner.converge(described_recipe)
+        end
+
+        it 'skips the entire nvidia software stack' do
+          is_expected.not_to add_driver_repo_nvidia_repo('Add NVIDIA driver local repo')
+          is_expected.not_to setup_nvidia_driver('Install Nvidia driver')
+          is_expected.not_to install_nvidia_imex('Install nvidia-imex')
+          is_expected.not_to setup_nvidia_cuda('Install Nvidia CUDA')
+        end
+      end
+
       cached(:chef_run) do
-        runner = runner(platform: platform, version: version)
+        runner = runner(platform: platform, version: version) do |node|
+          node.override['cluster']['nvidia']['enabled'] = 'yes'
+        end
+        allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
         runner.converge(described_recipe)
       end
       cached(:node) { chef_run.node }
