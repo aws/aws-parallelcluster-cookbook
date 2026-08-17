@@ -153,8 +153,9 @@ def test_list_metadata_retries_transient_error_then_succeeds(monkeypatch):
     assert attempts["count"] == 2
 
 
-def test_get_instance_tags_does_not_retry_http_error(monkeypatch):
-    # A 404 means IMDS responded (tags not exposed): a definitive answer that must not be retried.
+def test_get_instance_tags_retries_http_error_then_reraises(monkeypatch):
+    # The retry is unconditional, so even a definitive 404 is retried up to the attempt limit before
+    # propagating (tags not exposed).
     calls = {"count": 0}
 
     def fake_urlopen(request, timeout=None):
@@ -165,10 +166,10 @@ def test_get_instance_tags_does_not_retry_http_error(monkeypatch):
 
     with pytest.raises(urllib.error.HTTPError):
         imds.get_instance_tags(imds.IMDS_V1)
-    assert calls["count"] == 1
+    assert calls["count"] == 3
 
 
-def test_get_with_retries_reraises_after_exhausting_attempts(monkeypatch):
+def test_get_reraises_after_exhausting_attempts(monkeypatch):
     calls = {"count": 0}
 
     def fake_urlopen(request, timeout=None):
@@ -232,3 +233,37 @@ def test_get_iam_role_name_propagates_non_404_http_errors(monkeypatch):
 
     with pytest.raises(urllib.error.HTTPError):
         imds.get_iam_role_name()
+
+
+def test_get_iam_role_name_retries_transient_timeout_then_succeeds(monkeypatch):
+    # A transient timeout on the credentials GET is retried; the next attempt returns the role.
+    attempts = {"count": 0}
+
+    def fake_urlopen(request, timeout=None):
+        if request.full_url.endswith("/api/token"):
+            return _FakeResponse(b"the-token")
+        attempts["count"] += 1
+        if attempts["count"] == 1:
+            raise urllib.error.URLError("timed out")
+        return _FakeResponse(b"my-instance-role\n")
+
+    monkeypatch.setattr(imds.urllib.request, "urlopen", fake_urlopen)
+
+    assert imds.get_iam_role_name() == "my-instance-role"
+    assert attempts["count"] == 2
+
+
+def test_get_iam_role_name_reraises_after_exhausting_attempts(monkeypatch):
+    calls = {"count": 0}
+
+    def fake_urlopen(request, timeout=None):
+        if request.full_url.endswith("/api/token"):
+            return _FakeResponse(b"the-token")
+        calls["count"] += 1
+        raise urllib.error.URLError("timed out")
+
+    monkeypatch.setattr(imds.urllib.request, "urlopen", fake_urlopen)
+
+    with pytest.raises(urllib.error.URLError):
+        imds.get_iam_role_name()
+    assert calls["count"] == 3
