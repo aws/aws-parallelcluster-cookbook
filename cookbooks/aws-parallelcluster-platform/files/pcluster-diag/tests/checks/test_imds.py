@@ -61,7 +61,7 @@ def _imds_reports_role(monkeypatch):
 
 
 def test_description():
-    assert Imds().description == "Verify that IMDS is responsive and functional"
+    assert Imds().description == "Verify that IMDS is responsive and functional."
 
 
 @pytest.mark.parametrize("node_type", list(NodeType), ids=lambda nt: nt.name)
