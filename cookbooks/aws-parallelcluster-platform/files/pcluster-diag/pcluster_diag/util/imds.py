@@ -33,6 +33,8 @@ _INSTANCE_TAGS_URL = _BASE_URL + "/meta-data/tags/instance"
 _IAM_SECURITY_CREDENTIALS_URL = _BASE_URL + "/meta-data/iam/security-credentials/"
 _TOKEN_TTL_SECONDS = "21600"  # nosec B105  session-token TTL (seconds), not a secret
 _TIMEOUT_SECONDS = 5
+_RETRY_MAX_ATTEMPTS = 3
+_RETRY_WAIT_SECONDS = 1
 
 
 def get_instance_id() -> str:
@@ -68,33 +70,12 @@ def get_iam_role_name() -> Optional[str]:
 
 def list_metadata(imds_version: str) -> str:
     """Return the top-level IMDS metadata listing, using the enabled IMDS version."""
-    return _get_with_retries(_METADATA_URL, imds_version)
+    return _get(_METADATA_URL, _token_for(imds_version))
 
 
 def get_instance_tags(imds_version: str) -> str:
     """Return the IMDS instance tags listing; raises when the tags category is not exposed."""
-    return _get_with_retries(_INSTANCE_TAGS_URL, imds_version)
-
-
-def _is_transient_imds_error(exception: Exception) -> bool:
-    """Return whether ``exception`` is a transient IMDS failure worth retrying.
-
-    Connection-level failures (e.g. timeouts) are transient. An ``HTTPError`` means IMDS answered
-    with a status code, so it is a definitive result and is not retried.
-    """
-    return isinstance(exception, (urllib.error.URLError, TimeoutError)) and not isinstance(
-        exception, urllib.error.HTTPError
-    )
-
-
-@retry(stop_max_attempt_number=3, wait_fixed=1000, retry_on_exception=_is_transient_imds_error)
-def _get_with_retries(url: str, imds_version: str) -> str:
-    """GET ``url`` from IMDS, retrying transient connection failures (e.g. timeouts).
-
-    A fresh token is obtained per attempt for IMDSv2. An HTTP error status is not retried, and the
-    last transient error is re-raised once the attempts are exhausted.
-    """
-    return _get(url, _token_for(imds_version))
+    return _get(_INSTANCE_TAGS_URL, _token_for(imds_version))
 
 
 def _token_for(imds_version: str) -> Optional[str]:
@@ -102,6 +83,7 @@ def _token_for(imds_version: str) -> Optional[str]:
     return fetch_token() if imds_version == IMDS_V2 else None
 
 
+@retry(stop_max_attempt_number=_RETRY_MAX_ATTEMPTS, wait_fixed=_RETRY_WAIT_SECONDS * 1000)
 def fetch_token() -> str:
     """Fetch a short-lived IMDSv2 session token."""
     request = urllib.request.Request(
@@ -139,8 +121,8 @@ def is_responsive_for_user(user: str) -> bool:
     # Exit 0 (reachable) and 7 (curl could-not-connect: lockdown REJECTed the request) are definitive
     # answers and not retried; any other exit (e.g. a timeout) is transient.
     @retry(
-        stop_max_attempt_number=3,
-        wait_fixed=1000,
+        stop_max_attempt_number=_RETRY_MAX_ATTEMPTS,
+        wait_fixed=_RETRY_WAIT_SECONDS * 1000,
         retry_on_result=lambda code: code not in (0, 7),
     )
     def probe() -> int:
@@ -152,6 +134,7 @@ def is_responsive_for_user(user: str) -> bool:
         return False  # Never got a definitive answer within the retry budget (transient timeouts).
 
 
+@retry(stop_max_attempt_number=_RETRY_MAX_ATTEMPTS, wait_fixed=_RETRY_WAIT_SECONDS * 1000)
 def _get(url: str, token: Optional[str] = None) -> str:
     """GET ``url`` from IMDS (with a session token for IMDSv2) and return the stripped body."""
     headers = {"X-aws-ec2-metadata-token": token} if token is not None else {}
