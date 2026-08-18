@@ -171,12 +171,15 @@ P6PLUS_INSTANCE_PREFIXES = ("p6-b200", "p6e-gb200", "p6-b300")
 
 # How many EFA devices the FSx-for-Lustre EFA client setup binds to LNet by default, keyed by exact
 # instance type. Values mirror the "Default Number of EFA Interfaces" table in
-# https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html#add-efa-interfaces --
-# these are the counts the setup script configures automatically per instance type. An int is exactly the
-# number of devices bound (capped at devices actually present). An instance type NOT in this table follows
-# the doc's dynamic fallback ("Other instances with multiple/single network cards" -> 2/1); we do not
-# encode that fallback because it depends on live NIC count, so unknown types get no static expectation
-# here and the underbinding check only flags a total absence of bound devices.
+# https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html -- these are the counts the
+# setup configures automatically per instance type. An int is exactly the number of devices bound (capped
+# at devices actually present). Kept row-for-row with the doc table so it can be verified against that page
+# at a glance; do not collapse rows even when a value equals the node's total device count.
+#
+# An instance type NOT in this table binds ALL present EFA devices -- see expected_bound_device_count().
+# The doc's "Other instances with multiple network cards -> 2" row describes the behaviour of the previous
+# setup script; the current one binds every device on those instance types instead. Confirmed empirically
+# on trn1.32xlarge (8 present, 8 bound on a correctly configured node).
 EFA_EXPECTED_BOUND_DEVICES = {
     "p5.48xlarge": 8,
     "p5e.48xlarge": 8,

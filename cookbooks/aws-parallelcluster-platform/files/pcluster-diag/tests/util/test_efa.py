@@ -104,8 +104,12 @@ def test_is_p6plus_instance(instance_type, expected):
         # Expected count is capped at devices actually present.
         ("p5.48xlarge", 4, 4),
         ("p6-b300.48xlarge", 8, 8),
-        # Instance types not in the table have no static expectation.
-        ("c5n.18xlarge", 2, None),
+        # Instance types not in the table bind ALL present devices: the expectation is derived from the
+        # node, not from the doc's stale "other instances with multiple network cards -> 2" row.
+        ("trn1.32xlarge", 8, 8),
+        ("c5n.18xlarge", 2, 2),
+        ("c5n.18xlarge", 1, 1),
+        # An unknown instance type (IMDS unreachable) yields no expectation at all.
         (None, 16, None),
     ],
 )
