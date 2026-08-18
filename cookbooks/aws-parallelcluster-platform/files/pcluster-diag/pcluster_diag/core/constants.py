@@ -122,8 +122,6 @@ FSX_LFS_DF_TIMEOUT_SECONDS = 30
 FSX_LFS_CHECK_TIMEOUT_SECONDS = 60
 # `lnetctl net show` is a fast, local query; cap it low so a wedged LNet cannot stall the check.
 FSX_LNET_SHOW_TIMEOUT_SECONDS = 15
-# `lctl get_param` reads client-side import state; bound it so a stuck import cannot hang the check.
-FSX_OST_QUERY_TIMEOUT_SECONDS = 30
 # `lnetctl ping` over EFA; a hang here is the signal the EFA data path is not working.
 FSX_EFA_PING_TIMEOUT_SECONDS = 15
 # The StorageType value a FSx for Lustre mount carries in the cluster configuration's SharedStorage.
@@ -131,8 +129,6 @@ LUSTRE_STORAGE_TYPE = "FsxLustre"
 # NFS-based shared-storage types. Reserved for a future NFS reachability check (a sibling of the Lustre
 # checks); not consumed yet.
 NFS_STORAGE_TYPES = ("FsxOntap", "FsxOpenZfs", "Efs")
-# The osc/mdc import ``state:`` value indicating a reachable, fully-connected target.
-HEALTHY_TARGET_STATE = "FULL"
 # --- EFA-for-Lustre client parameters -----------------------------------------------------
 # TODO/TO-CHECK: every value in this section mirrors the FSx EFA-Lustre client setup, which we cannot
 # import. If that setup bumps a version floor, adds/renames a p6+ family, or changes how many EFA devices a
