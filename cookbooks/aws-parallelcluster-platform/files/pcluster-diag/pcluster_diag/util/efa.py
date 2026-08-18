@@ -81,16 +81,26 @@ def _is_efa_device(name: str) -> bool:
 def expected_bound_device_count(instance_type: Optional[str], available: int) -> Optional[int]:
     """Return how many EFA devices the FSx-for-Lustre EFA setup binds on ``instance_type``, or None.
 
-    Values come from EFA_EXPECTED_BOUND_DEVICES (mirroring the FSx-for-Lustre configure-efa-clients doc).
     ``available`` is the number of EFA devices actually present; the expected count is capped at it, so we
-    never expect more than exist. Returns None when the instance type is unknown or not in the table -- the
-    caller then makes no underbinding assertion beyond "at least one device must be bound".
+    never expect more than exist.
+
+    Instance types listed in EFA_EXPECTED_BOUND_DEVICES (mirroring the FSx-for-Lustre
+    configure-efa-clients doc) get that table's count -- these are the families the setup deliberately
+    binds a fixed number of devices on. Every other instance type is expected to bind ALL present devices,
+    derived from the node rather than hardcoded: the doc's "Other instances with multiple network cards
+    -> 2" row describes the previous setup script's behaviour, whereas the current one binds every device
+    on those instance types, so that row is stale and deliberately not encoded.
+
+    Returns None only when the instance type itself is unknown (e.g. IMDS was unreachable at
+    context-build time); the caller then makes no underbinding assertion beyond "at least one device must
+    be bound".
     """
     if not instance_type:
         return None
     expected = EFA_EXPECTED_BOUND_DEVICES.get(instance_type)
     if expected is None:
-        return None
+        # Not one of the fixed-count families: the setup binds every EFA device present on the node.
+        return available
     return min(expected, available)
 
 

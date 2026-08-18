@@ -669,9 +669,10 @@ def test_efa_all_bound_and_pinging_no_error(monkeypatch):
     assert LustreFilesystem.BOUND_DEVICES.code in _codes(infos)
 
 
-def test_efa_partial_bind_on_unknown_instance_type_is_not_an_error(monkeypatch):
-    # 1 of 16 bound on an instance type with no expected-count entry (the sample context's fake type):
-    # we make no underbinding assertion, so it is an info + pass, not an error.
+def test_efa_partial_bind_on_non_fixed_count_instance_type_fails(monkeypatch):
+    # An instance type with no entry in the doc table (the sample context's fake type, like trn1.32xlarge)
+    # is expected to bind ALL present devices, so 1 of 16 bound is the load-order incident signature and
+    # must be an error -- not the silent pass the stale "2 for other instances" doc row used to produce.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
@@ -687,6 +688,35 @@ def test_efa_partial_bind_on_unknown_instance_type_is_not_an_error(monkeypatch):
     LustreFilesystem()._probe_efa(
         sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_EFA_PARTIAL_BIND), errors, warnings, infos
     )
+
+    assert LustreFilesystem.UNDERBOUND_DEVICES.code in _codes(errors)
+    assert "1 of 16" in _messages(errors)
+    # The remediation points at the setup script's own output, not at re-running it (a re-run cannot help
+    # while libcfs is already loaded with the wrong partition count).
+    assert "journalctl -u configure-efa-fsx-lustre-client.service" in _messages(errors)
+    # An instance type absent from the table carries an assertion rather than silence, so a family that
+    # binds a subset by design would false-fire here: the message must name the FSx doc to check against.
+    assert "https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html" in _messages(errors)
+
+
+def test_efa_partial_bind_with_unknown_instance_type_makes_no_assertion(monkeypatch):
+    # IMDS could not report the instance type: we cannot say how many devices should be bound, so a partial
+    # bind is reported as context and passes rather than guessing.
+    _patch_efa_prereqs(monkeypatch)
+    _route_time_command(
+        monkeypatch,
+        {
+            "peer show": _timed(stdout=_LNET_PEER_EFA),
+            "ping": _timed(stdout="ping ok"),
+            "import": _timed(stdout=_IMPORT_EFA),
+        },
+    )
+    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 16)
+    context = sample_context_with_lustre(NodeType.COMPUTE)
+    context.instance_type = None
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(context, _snapshot(_LNET_EFA_PARTIAL_BIND), errors, warnings, infos)
 
     assert LustreFilesystem.NO_DEVICES_BOUND.code not in _codes(errors)
     assert LustreFilesystem.UNDERBOUND_DEVICES.code not in _codes(errors)
@@ -761,6 +791,8 @@ def test_efa_no_devices_bound_fails(monkeypatch):
 
     assert LustreFilesystem.NO_DEVICES_BOUND.code in _codes(errors)
     assert "16" in _messages(errors)
+    # Same remediation shape as the underbound case: read the setup script's output, do not re-run it.
+    assert "journalctl -u configure-efa-fsx-lustre-client.service" in _messages(errors)
 
 
 def test_efa_ping_failure_when_all_peers_fail(monkeypatch):
