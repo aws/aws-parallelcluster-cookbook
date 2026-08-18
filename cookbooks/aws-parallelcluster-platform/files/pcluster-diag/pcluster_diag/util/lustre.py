@@ -342,7 +342,11 @@ def parse_lfs_check_servers(output: str) -> List[ServerCheck]:
             results.append(ServerCheck(target=error_match.group("target"), active=False, detail=detail))
             continue
         tokens = line.split()
-        if len(tokens) < 2:
+        # Only a line whose first token names an MDT/OST is a per-target status row. `lfs` also emits
+        # command-level diagnostics (e.g. `lfs check: error: ...`), which carry no quoted target and would
+        # otherwise be read as a non-active target literally named "lfs". Mirrors _parse_target_line, which
+        # likewise requires a target role before treating a non-capacity row as a target.
+        if len(tokens) < 2 or not _ROLE_RE.search(tokens[0]):
             continue
         status = " ".join(tokens[1:])
         active = "active" in status.lower()
