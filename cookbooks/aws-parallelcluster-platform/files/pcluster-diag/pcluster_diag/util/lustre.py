@@ -10,11 +10,11 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Lustre helpers: ``lfs``/``lctl`` protocol parsing plus the LNet transport layer.
+"""Lustre helpers: ``lfs`` protocol parsing plus the LNet transport layer.
 
-Holds the Lustre-side logic: the ``lfs df`` / ``lfs check servers`` / ``lctl ...import`` protocol parsing,
-and the LNet transport layer (parsing ``lnetctl net show`` / ``lnetctl peer show`` and the ``lnetctl
-ping`` reachability probe) -- LNet is Lustre's own networking layer, driven by ``lnetctl``.
+Holds the Lustre-side logic: the ``lfs df`` / ``lfs check servers`` protocol parsing, and the LNet
+transport layer (parsing ``lnetctl net show`` / ``lnetctl peer show`` and the ``lnetctl ping``
+reachability probe) -- LNet is Lustre's own networking layer, driven by ``lnetctl``.
 """
 
 import logging
@@ -41,9 +41,6 @@ _ROLE_RE = re.compile(r"(MDT|OST)", re.IGNORECASE)
 
 # Matches a `lfs df -h` size column (e.g. "10.0T", "512", "1.5G"); healthy target rows start with one.
 _SIZE_RE = re.compile(r"^\d[\d.]*[KMGTPE]?$")
-
-# Matches the header line that opens each `lctl get_param ...import` block: e.g. `osc.fs-OST0000-osc-ffff.import=`.
-_IMPORT_HEADER_RE = re.compile(r"^(?P<param>\S+)\.import=\s*$")
 
 
 @dataclass
@@ -356,82 +353,3 @@ def parse_lfs_check_servers(output: str) -> List[ServerCheck]:
 def unreachable_servers(output: str) -> List[ServerCheck]:
     """Return the ``lfs check servers`` targets that did not report active (reachable)."""
     return [server for server in parse_lfs_check_servers(output) if not server.active]
-
-
-# --- lctl get_param ...import parsing -------------------------------------------------
-
-# A Lustre network id (e.g. 10.0.0.2@tcp, 10.0.0.2@efa), used to extract connection/failover nids.
-_NID_RE = re.compile(r"[\w.:\-]+@\w+")
-
-
-@dataclass
-class ImportState:
-    """Client-side import state for one target, parsed from ``lctl get_param osc.*.import`` / ``mdc.*.import``.
-
-    Attributes:
-        param: The parameter path identifying the target (e.g. ``osc.fs-OST0000-osc-ffff``).
-        target: The target UUID reported in the import block, or None when absent.
-        state: The import ``state:`` (e.g. ``FULL``, ``DISCONN``, ``RECOVER``), or None when absent.
-        current_connection: The nid the client is currently connected to, or None when absent.
-        failover_nids: The failover nids advertised for the target (may equal ``current_connection``).
-    """
-
-    param: str
-    target: Optional[str] = None
-    state: Optional[str] = None
-    current_connection: Optional[str] = None
-    failover_nids: List[str] = field(default_factory=list)
-
-    @property
-    def healthy(self) -> bool:
-        """Return whether the import reported a fully-connected state (case-insensitive ``FULL``)."""
-        return (self.state or "").upper() == "FULL"
-
-    @property
-    def connected_over(self) -> Optional[str]:
-        """Return the LND net type of the current connection (e.g. ``tcp``, ``efa``), or None."""
-        if not self.current_connection or "@" not in self.current_connection:
-            return None
-        return self.current_connection.rsplit("@", 1)[1]
-
-
-def parse_lctl_import(output: str) -> List[ImportState]:
-    """Parse ``lctl get_param osc.*.import`` / ``mdc.*.import`` output into per-target ``ImportState`` rows.
-
-    The output is a sequence of blocks, each opened by a ``<param>.import=`` header followed by indented
-    fields. Rather than YAML-parse the (not always YAML-clean) import blob, the loanable fields --
-    ``state``, ``target``, ``current_connection``, ``failover_nids`` -- are scanned line by line.
-    """
-    imports: List[ImportState] = []
-    current: Optional[ImportState] = None
-    for raw in output.splitlines():
-        header = _IMPORT_HEADER_RE.match(raw.strip())
-        if header:
-            current = ImportState(param=header.group("param"))
-            imports.append(current)
-            continue
-        if current is None:
-            continue
-        line = raw.strip()
-        target = _scan_field(line, "target")
-        if target is not None:
-            current.target = target
-        state = _scan_field(line, "state")
-        if state is not None:
-            current.state = state
-        connection = _scan_field(line, "current_connection")
-        if connection is not None:
-            nids = _NID_RE.findall(connection)
-            current.current_connection = nids[0] if nids else connection or None
-        failover = _scan_field(line, "failover_nids")
-        if failover is not None:
-            current.failover_nids = _NID_RE.findall(failover)
-    return imports
-
-
-def _scan_field(line: str, key: str) -> Optional[str]:
-    """Return the value of ``key: value`` in ``line`` (stripped), or None when the line is not that field."""
-    prefix = key + ":"
-    if line.startswith(prefix):
-        return line[len(prefix) :].strip()
-    return None

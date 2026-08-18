@@ -59,10 +59,6 @@ def _messages(findings):
     return " | ".join(finding.message for finding in (findings or []))
 
 
-def _info_codes(result):
-    return [finding.code for finding in (result.infos or [])]
-
-
 def _snapshot(stdout):
     """Build an _LnetSnapshot from parsed ``lnetctl net show -v`` output (as the check would fetch it)."""
     from pcluster_diag.util import lustre
@@ -472,26 +468,6 @@ osc.fs-OST0000-osc-ffff.import=
             failover_nids: [ 10.0.1.5@efa ]
 """
 
-_IMPORT_TCP_FALLBACK = """\
-osc.fs-OST0000-osc-ffff.import=
-    import:
-        target: fs-OST0000_UUID
-        state: FULL
-        connection:
-            current_connection: 10.0.1.5@tcp
-            failover_nids: [ 10.0.1.5@tcp ]
-"""
-
-_IMPORT_DISCONN = """\
-osc.fs-OST0000-osc-ffff.import=
-    import:
-        target: fs-OST0000_UUID
-        state: DISCONN
-        connection:
-            current_connection: 10.0.1.5@efa
-            failover_nids: [ 10.0.1.5@efa ]
-"""
-
 _LFS_CHECK_HEALTHY = "fs-OST0000-osc-ffff active.\nfs-MDT0000-mdc-ffff active.\n"
 _LFS_CHECK_BAD = "fs-OST0000-osc-ffff active.\ncheck 'fs-OST000b-osc-ffff': Input/output error (5)\n"
 
@@ -827,7 +803,6 @@ def test_efa_no_ping_error_when_any_peer_reachable(monkeypatch):
             "peer show": _timed(stdout=_LNET_PEER_EFA_MULTI),
             "10.0.1.6@efa": _timed(returncode=1, stderr="cannot reach"),
             "ping": _timed(stdout="ok"),
-            "import": _timed(stdout=_IMPORT_TCP_FALLBACK),
         },
     )
     monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
@@ -858,26 +833,6 @@ def test_efa_no_traffic_is_warning(monkeypatch):
     )
 
     assert LustreFilesystem.NO_TRAFFIC.code in _codes(warnings)
-
-
-def test_efa_tcp_fallback_is_warning(monkeypatch):
-    _patch_efa_prereqs(monkeypatch)
-    _route_time_command(
-        monkeypatch,
-        {
-            "peer show": _timed(stdout=_LNET_PEER_EFA),
-            "ping": _timed(stdout="ok"),
-            "import": _timed(stdout=_IMPORT_TCP_FALLBACK),
-        },
-    )
-    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
-    errors, warnings, infos = [], [], []
-
-    LustreFilesystem()._probe_efa(
-        sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_TCP_EFA), errors, warnings, infos
-    )
-
-    assert LustreFilesystem.TCP_FALLBACK.code in _codes(warnings)
 
 
 # --- EFA prerequisites & systemd service (checked before the data-path probes) --------
@@ -1180,28 +1135,3 @@ def test_targets_lfs_check_timeout_fails(monkeypatch):
 
     assert result.status is Status.FAILURE
     assert _codes(result.errors) == [FsxTargetsAreReachable.LFS_CHECK_TIMED_OUT.code]
-
-
-def test_targets_non_full_import_fails(monkeypatch):
-    _route_time_command(
-        monkeypatch,
-        {"lfs check": _timed(stdout=_LFS_CHECK_HEALTHY), "import": _timed(stdout=_IMPORT_DISCONN)},
-    )
-
-    result = FsxTargetsAreReachable().run(sample_context_with_lustre(NodeType.COMPUTE))
-
-    assert result.status is Status.FAILURE
-    assert FsxTargetsAreReachable.IMPORT_NOT_FULL.code in _codes(result.errors)
-    assert "DISCONN" in _messages(result.errors)
-
-
-def test_targets_failover_pin_is_info(monkeypatch):
-    _route_time_command(
-        monkeypatch,
-        {"lfs check": _timed(stdout=_LFS_CHECK_HEALTHY), "import": _timed(stdout=_IMPORT_EFA)},
-    )
-
-    result = FsxTargetsAreReachable().run(sample_context_with_lustre(NodeType.COMPUTE))
-
-    assert result.status is Status.PASSED
-    assert FsxTargetsAreReachable.FAILOVER_PINNED.code in _info_codes(result)

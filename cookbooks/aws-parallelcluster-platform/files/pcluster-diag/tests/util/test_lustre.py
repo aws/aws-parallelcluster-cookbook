@@ -218,51 +218,6 @@ def test_unreachable_servers_empty_when_all_active():
     assert lustre.unreachable_servers("fs-OST0000-osc-ffff active.\n") == []
 
 
-# --- lctl get_param import parsing ----------------------------------------------------
-
-_LCTL_IMPORT = """\
-osc.fs-OST0000-osc-ffff.import=
-    import:
-        target: fs-OST0000_UUID
-        state: FULL
-        connection:
-            current_connection: 10.0.1.5@efa
-            failover_nids: [ 10.0.1.5@efa ]
-mdc.fs-MDT0000-mdc-ffff.import=
-    import:
-        target: fs-MDT0000_UUID
-        state: DISCONN
-        connection:
-            current_connection: 10.0.1.6@tcp
-            failover_nids: [ 10.0.1.7@tcp ]
-"""
-
-
-def test_parse_lctl_import_extracts_state_and_connection():
-    imports = lustre.parse_lctl_import(_LCTL_IMPORT)
-
-    assert [i.param for i in imports] == ["osc.fs-OST0000-osc-ffff", "mdc.fs-MDT0000-mdc-ffff"]
-    assert imports[0].state == "FULL"
-    assert imports[0].healthy is True
-    assert imports[0].current_connection == "10.0.1.5@efa"
-    assert imports[0].connected_over == "efa"
-    assert imports[0].failover_nids == ["10.0.1.5@efa"]
-
-
-def test_parse_lctl_import_flags_non_full_state():
-    imports = lustre.parse_lctl_import(_LCTL_IMPORT)
-
-    mdt = imports[1]
-    assert mdt.state == "DISCONN"
-    assert mdt.healthy is False
-    assert mdt.connected_over == "tcp"
-    assert mdt.failover_nids == ["10.0.1.7@tcp"]
-
-
-def test_parse_lctl_import_empty_when_no_blocks():
-    assert lustre.parse_lctl_import("some noise\nno import here\n") == []
-
-
 # --- LNet ping (lnetctl peer show + ping) ---------------------------------------------
 
 
