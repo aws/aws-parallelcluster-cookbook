@@ -46,9 +46,9 @@ executes each probe in isolation and aggregates their findings. The probes are:
   See https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html
 
 :class:`FsxTargetsAreReachable` is kept separate because it is a heavier, opt-in
-(``approval_required``) deep probe (``lfs check servers`` + per-target import state); the framework's
-approval gate is per-check, so folding it into the always-on check would either force the deep probe to
-run every time or gate the whole check behind a prompt.
+(``approval_required``) deep probe (``lfs check servers``); the framework's approval gate is per-check, so
+folding it into the always-on check would either force the deep probe to run every time or gate the whole
+check behind a prompt.
 
 Both checks run on every node type that has a FsxLustre mount configured, and skip
 (SKIPPED_NOT_APPLICABLE) when the cluster configures no FsxLustre filesystem. Every probe is read-only.
@@ -68,8 +68,6 @@ from pcluster_diag.core.constants import (
     FSX_LFS_CHECK_TIMEOUT_SECONDS,
     FSX_LFS_DF_TIMEOUT_SECONDS,
     FSX_LNET_SHOW_TIMEOUT_SECONDS,
-    FSX_OST_QUERY_TIMEOUT_SECONDS,
-    HEALTHY_TARGET_STATE,
     LUSTRE_CLIENT_MIN_VERSION_BY_OS,
     LUSTRE_CLIENT_MIN_VERSION_DEFAULT,
     MIN_EFA_DRIVER_VERSION,
@@ -225,7 +223,6 @@ class LustreFilesystem(Check):
         "idle or freshly-booted node; if the node has been driving filesystem I/O it may indicate a silent "
         "TCP fallback.",
     )
-    TCP_FALLBACK = CheckWarning(3, "target {} is connected over @tcp despite EFA being configured (TCP fallback).")
 
     # --- Infos --------------------------------------------------------------------------------
     CLIENT_VERSION = CheckInfo(1, "Lustre client version: {}.")
@@ -485,7 +482,6 @@ class LustreFilesystem(Check):
 
         warnings.extend(self._traffic_warnings(efa_net))
         errors.extend(self._efa_ping_errors(lnet.nets))
-        warnings.extend(self._tcp_fallback_warnings(lnet.nets))
 
     def _probe_efa_prerequisites(self, context: Context, errors: List[CheckError], infos: List[CheckInfo]) -> bool:
         """Verify the EFA-for-Lustre client prerequisites; return whether kefalnd is present.
@@ -608,30 +604,14 @@ class LustreFilesystem(Check):
             return []
         return [self.EFA_PING_FAILED.format(source, ", ".join(peer_nids))]
 
-    def _tcp_fallback_warnings(self, nets) -> List[CheckWarning]:
-        """Return a warning per target connected over @tcp while an @efa net is configured."""
-        if lustre.lnet_net(nets, EFA_LNET_NET) is None:
-            return []
-        result = time_command(
-            ["lctl", "get_param", "osc.*.import", "mdc.*.import"], timeout=FSX_OST_QUERY_TIMEOUT_SECONDS
-        )
-        if result.timed_out or result.returncode != 0:
-            return []
-        return [
-            self.TCP_FALLBACK.format(state.target or state.param)
-            for state in lustre.parse_lctl_import(result.stdout)
-            if state.connected_over == "tcp"
-        ]
-
 
 class FsxTargetsAreReachable(Check):
     """Opt-in deep check pinpointing an unreachable OST/MDT -- a common cause of a hung directory listing.
 
-    Runs ``lfs check servers`` (the per-target reachability diagnostic) via ``time_command`` and inspects
-    client-side import state (``lctl get_param osc.*.import`` / ``mdc.*.import``). Because probing
-    individual targets is heavier and can itself block, this check is gated behind ``approval_required`` so
-    it runs only when the operator opts in (or passes ``--yes``). It is kept separate from
-    :class:`LustreFilesystem` because the approval gate is per-check.
+    Runs ``lfs check servers`` (the per-target reachability diagnostic) via ``time_command``. Because
+    probing individual targets is heavier and can itself block, this check is gated behind
+    ``approval_required`` so it runs only when the operator opts in (or passes ``--yes``). It is kept
+    separate from :class:`LustreFilesystem` because the approval gate is per-check.
     """
 
     LFS_CHECK_TIMED_OUT = CheckError(
@@ -640,12 +620,6 @@ class FsxTargetsAreReachable(Check):
     )
     LFS_CHECK_FAILED = CheckError(2, "lfs check servers failed: {}")
     TARGET_UNREACHABLE = CheckError(3, "target {} is unreachable (lfs check servers: {}).")
-    IMPORT_NOT_FULL = CheckError(4, "target {} import state is {} (not {}) -- the client is not fully connected.")
-    FAILOVER_PINNED = CheckInfo(
-        1,
-        "target {} current_connection {} equals its failover_nids -- no distinct failover NID "
-        "(a primary-server failure has no real failover).",
-    )
 
     @property
     def description(self) -> str:
@@ -661,16 +635,8 @@ class FsxTargetsAreReachable(Check):
         return True
 
     def run(self, context: Context) -> Result:
-        """Aggregate ``lfs check servers`` and import-state findings across every Lustre target."""
-        errors: List[CheckError] = []
-        infos: List[CheckInfo] = []
-
-        errors.extend(self._check_servers())
-        import_errors, import_infos = self._check_imports()
-        errors.extend(import_errors)
-        infos.extend(import_infos)
-
-        return Result.from_findings(self, errors=errors, infos=infos)
+        """Aggregate ``lfs check servers`` findings across every Lustre target."""
+        return Result.from_findings(self, errors=self._check_servers())
 
     def _check_servers(self) -> List[CheckError]:
         """Return CheckErrors from ``lfs check servers``: a hang, a command failure, or per-target errors."""
@@ -683,20 +649,3 @@ class FsxTargetsAreReachable(Check):
             self.TARGET_UNREACHABLE.format(server.target, server.detail)
             for server in lustre.unreachable_servers(result.stdout)
         ]
-
-    def _check_imports(self):
-        """Return (errors, infos) from client-side import state: non-FULL targets and failover pinning."""
-        errors: List[CheckError] = []
-        infos: List[CheckInfo] = []
-        result = time_command(
-            ["lctl", "get_param", "osc.*.import", "mdc.*.import"], timeout=FSX_OST_QUERY_TIMEOUT_SECONDS
-        )
-        if result.timed_out or result.returncode != 0:
-            return errors, infos
-        for state in lustre.parse_lctl_import(result.stdout):
-            name = state.target or state.param
-            if not state.healthy:
-                errors.append(self.IMPORT_NOT_FULL.format(name, state.state or "unknown", HEALTHY_TARGET_STATE))
-            if state.current_connection and state.failover_nids == [state.current_connection]:
-                infos.append(self.FAILOVER_PINNED.format(name, state.current_connection))
-        return errors, infos
