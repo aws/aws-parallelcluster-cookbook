@@ -1122,6 +1122,18 @@ def test_targets_unreachable_server_fails(monkeypatch):
     assert "fs-OST000b-osc-ffff" in _messages(result.errors)
 
 
+def test_targets_command_level_error_line_is_not_a_target(monkeypatch):
+    # Real `lfs check servers` output can carry a command-level diagnostic alongside the per-target rows.
+    # It names no target, so it must not surface as a phantom unreachable target (previously "lfs").
+    noisy = _LFS_CHECK_HEALTHY + "lfs check: error: Input/output error (5)\n"
+    _route_time_command(monkeypatch, {"lfs check": _timed(stdout=noisy)})
+
+    result = FsxTargetsAreReachable().run(sample_context_with_lustre(NodeType.COMPUTE))
+
+    assert result.status is Status.PASSED
+    assert not result.errors
+
+
 def test_targets_lfs_check_timeout_fails(monkeypatch):
     _route_time_command(
         monkeypatch,
