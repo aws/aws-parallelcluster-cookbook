@@ -582,7 +582,7 @@ class LustreFilesystem(Check):
         return warnings
 
     def _efa_ping_errors(self, nets) -> List[CheckError]:
-        """Ping the @efa peers over EFA (the tutorial's own validation); error when the data path fails.
+        """Ping the @efa peers over EFA; error when the data path fails.
 
         Automates ``lnetctl ping --source <local>@efa <peer>@efa``. Discovers a local @efa nid and the set
         of peer @efa nids from ``lnetctl``; when either is unavailable there is nothing to ping, so the
@@ -624,7 +624,7 @@ class FsxTargetsAreReachable(Check):
     @property
     def description(self) -> str:
         """Return the human-readable description of this Check."""
-        return "Deep-probe each FsxLustre OST/MDT for reachability (lfs check servers + import state)."
+        return "Deep-probe each FsxLustre OST/MDT for reachability (lfs check servers)."
 
     def should_run(self, context: Context) -> bool:
         """Run only when a FsxLustre filesystem is configured."""
