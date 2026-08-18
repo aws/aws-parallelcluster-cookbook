@@ -12,6 +12,8 @@
 
 """Unit tests for the Lustre-specific helpers: lfs df parsing and client detection."""
 
+import pytest
+
 from pcluster_diag.util import kernel_module, lustre
 from tests.test_helpers import DEGRADED_LFS_DF as _DEGRADED_LFS_DF
 from tests.test_helpers import HEALTHY_LFS_DF as _HEALTHY_LFS_DF
@@ -193,6 +195,7 @@ _LFS_CHECK_SERVERS = """\
 fs-MDT0000-mdc-ffff active.
 fs-OST0000-osc-ffff active.
 check 'fs-OST000b-osc-ffff': Input/output error (5)
+lfs check: error: Input/output error (5)
 """
 
 
@@ -216,6 +219,19 @@ def test_unreachable_servers_flags_only_errored():
 
 def test_unreachable_servers_empty_when_all_active():
     assert lustre.unreachable_servers("fs-OST0000-osc-ffff active.\n") == []
+
+
+@pytest.mark.parametrize(
+    "line",
+    [
+        # Command-level diagnostics name no target; reading them as one invented a target called "lfs".
+        "lfs check: error: Input/output error (5)",
+        "lfs check: cannot check target 'servers': No such device (19)",
+        "lfs: error: no device found",
+    ],
+)
+def test_parse_lfs_check_servers_ignores_command_level_errors(line):
+    assert lustre.parse_lfs_check_servers(line + "\n") == []
 
 
 # --- LNet ping (lnetctl peer show + ping) ---------------------------------------------
