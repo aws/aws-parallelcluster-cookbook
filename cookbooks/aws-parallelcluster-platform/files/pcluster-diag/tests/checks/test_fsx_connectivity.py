@@ -643,6 +643,9 @@ def test_efa_all_bound_and_pinging_no_error(monkeypatch):
 
     assert errors == []
     assert LustreFilesystem.BOUND_DEVICES.code in _codes(infos)
+    # The instance type is known here, so the confident "matches the expected count" wording is the right
+    # one -- the unverifiable-bind warning must not also fire.
+    assert LustreFilesystem.PARTIAL_BIND_UNVERIFIABLE.code not in _codes(warnings)
 
 
 def test_efa_partial_bind_on_non_fixed_count_instance_type_fails(monkeypatch):
@@ -675,9 +678,9 @@ def test_efa_partial_bind_on_non_fixed_count_instance_type_fails(monkeypatch):
     assert "https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html" in _messages(errors)
 
 
-def test_efa_partial_bind_with_unknown_instance_type_makes_no_assertion(monkeypatch):
+def test_efa_partial_bind_with_unknown_instance_type_warns(monkeypatch):
     # IMDS could not report the instance type: we cannot say how many devices should be bound, so a partial
-    # bind is reported as context and passes rather than guessing.
+    # bind is warned about rather than either guessing an error or passing it off as context.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
@@ -696,8 +699,40 @@ def test_efa_partial_bind_with_unknown_instance_type_makes_no_assertion(monkeypa
 
     assert LustreFilesystem.NO_DEVICES_BOUND.code not in _codes(errors)
     assert LustreFilesystem.UNDERBOUND_DEVICES.code not in _codes(errors)
-    assert LustreFilesystem.BOUND_DEVICES.code in _codes(infos)
-    assert "1 of 16" in _messages(infos)
+    assert LustreFilesystem.PARTIAL_BIND_UNVERIFIABLE.code in _codes(warnings)
+    assert "1 of the 16" in _messages(warnings)
+    # 1 of 16 bound is the under-bind signature: without an expected count to compare against, the report
+    # must not claim the bind matches expectations, and must point at the doc that carries the real count.
+    # It is a warning, not context: an unverifiable partial bind is a risk an operator has to resolve.
+    assert LustreFilesystem.BOUND_DEVICES.code not in _codes(infos)
+    assert LustreFilesystem.ALL_DEVICES_BOUND.code not in _codes(infos)
+    assert "https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html" in _messages(warnings)
+
+
+def test_efa_every_present_device_bound_with_unknown_instance_type_does_not_warn(monkeypatch):
+    # IMDS could not report the instance type, but every EFA device present is bound -- the most any family
+    # can bind -- so no device can be missing and there is nothing to warn about.
+    _patch_efa_prereqs(monkeypatch)
+    _route_time_command(
+        monkeypatch,
+        {
+            "peer show": _timed(stdout=_LNET_PEER_EFA),
+            "ping": _timed(stdout="ping ok"),
+            "import": _timed(stdout=_IMPORT_EFA),
+        },
+    )
+    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
+    context = sample_context_with_lustre(NodeType.COMPUTE)
+    context.instance_type = None
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(context, _snapshot(_LNET_TCP_EFA), errors, warnings, infos)
+
+    assert LustreFilesystem.PARTIAL_BIND_UNVERIFIABLE.code not in _codes(warnings)
+    assert LustreFilesystem.ALL_DEVICES_BOUND.code in _codes(infos)
+    assert "1 of 1" in _messages(infos)
+    # The count is reported without claiming it was checked against an expectation we never computed.
+    assert LustreFilesystem.BOUND_DEVICES.code not in _codes(infos)
 
 
 def test_efa_underbound_fails_when_expected_equals_available(monkeypatch):

@@ -41,8 +41,9 @@ executes each probe in isolation and aggregates their findings. The probes are:
   all (so Lustre falls back to TCP), fewer devices bound than the instance type is expected to bind (the
   expected count comes from a per-instance-family table, NOT the raw device count -- several families bind
   only a subset by design; an instance type absent from that table is expected to bind all present devices,
-  and only a genuinely unknown instance type is left unflagged beyond the "none bound" case), and a
-  non-working EFA data path (typically a missing self-referencing security-group rule).
+  and a genuinely unknown instance type yields a warning when some present device is unbound -- the one case
+  where a by-design subset cannot be told from an under-bind), and a non-working EFA data path (typically a
+  missing self-referencing security-group rule).
   See https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html
 
 :class:`FsxTargetsAreReachable` is kept separate because it is a heavier, opt-in
@@ -223,6 +224,13 @@ class LustreFilesystem(Check):
         "idle or freshly-booted node; if the node has been driving filesystem I/O it may indicate a silent "
         "TCP fallback.",
     )
+    PARTIAL_BIND_UNVERIFIABLE = CheckWarning(
+        3,
+        "Only {} of the {} EFA devices present are bound to LNet, and the instance type could not be "
+        "determined, so this cannot be told apart from a family that binds a subset by design. Confirm the "
+        "expected count against the FSx guide "
+        "https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html",
+    )
 
     # --- Infos --------------------------------------------------------------------------------
     CLIENT_VERSION = CheckInfo(1, "Lustre client version: {}.")
@@ -248,6 +256,11 @@ class LustreFilesystem(Check):
         9,
         "EFA-for-Lustre is not supported on this OS ({}), so the EFA probes were skipped. EFA-for-Lustre "
         "requires Amazon Linux 2023, RHEL 9.5+, or Ubuntu 22.04+.",
+    )
+    ALL_DEVICES_BOUND = CheckInfo(
+        10,
+        "{} of {} EFA devices are bound to LNet: every device present on this node is bound, so none is "
+        "missing. The instance type could not be determined, so the expected count itself was not checked.",
     )
 
     @property
@@ -447,6 +460,27 @@ class LustreFilesystem(Check):
             # devices/traffic, so stop here.
             return
 
+        self._probe_device_binding(context, lnet, errors, warnings, infos)
+
+        warnings.extend(self._traffic_warnings(efa_net))
+        errors.extend(self._efa_ping_errors(lnet.nets))
+
+    def _probe_device_binding(
+        self,
+        context: Context,
+        lnet: _LnetSnapshot,
+        errors: List[CheckError],
+        warnings: List[CheckWarning],
+        infos: List[CheckInfo],
+    ) -> None:
+        """Classify how many EFA devices are bound to LNet against how many the instance type should bind.
+
+        The comparison is against the *expected* count, not the raw device count, because several families
+        bind a subset by design. When the instance type is unknown there is no expected count, and the two
+        possible readings of a partial bind -- a by-design subset or the load-order under-bind -- are
+        indistinguishable, so that case warns; a bind covering every device present cannot be missing
+        anything regardless of instance type, so it does not.
+        """
         bound = lustre.lnet_bound_interfaces(lnet.nets, EFA_LNET_NET)
         available = efa.efa_device_count()
         expected = efa.expected_bound_device_count(context.instance_type, available)
@@ -463,13 +497,17 @@ class LustreFilesystem(Check):
             errors.append(
                 self.UNDERBOUND_DEVICES.format(len(bound), expected, context.instance_type, EFA_LUSTRE_SYSTEMD_SERVICE)
             )
+        elif expected is None and len(bound) < available:
+            # The instance type is unknown AND some present device is unbound: the one binding outcome the
+            # check cannot decide, since a by-design subset and a real under-bind look identical. Warn.
+            warnings.append(self.PARTIAL_BIND_UNVERIFIABLE.format(len(bound), available))
+        elif expected is None:
+            # The instance type is unknown, but every device present is bound -- the maximum any family can
+            # bind -- so no device can be missing and the unknown expected count does not matter.
+            infos.append(self.ALL_DEVICES_BOUND.format(len(bound), available))
         else:
-            # All expected devices are bound, or the instance type is unknown so we have no expectation --
-            # report the count as context and pass.
+            # All expected devices are bound -- report the count as context and pass.
             infos.append(self.BOUND_DEVICES.format(len(bound), available))
-
-        warnings.extend(self._traffic_warnings(efa_net))
-        errors.extend(self._efa_ping_errors(lnet.nets))
 
     def _probe_efa_prerequisites(self, context: Context, errors: List[CheckError], infos: List[CheckInfo]) -> bool:
         """Verify the EFA-for-Lustre client prerequisites; return whether kefalnd is present.
