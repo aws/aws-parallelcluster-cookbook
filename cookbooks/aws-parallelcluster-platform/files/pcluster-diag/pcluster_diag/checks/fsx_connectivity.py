@@ -239,13 +239,6 @@ class LustreFilesystem(Check):
     )
     EFA_DRIVER_VERSION = CheckInfo(6, "EFA driver version: {}.")
     KEFALND_VERSION = CheckInfo(7, "kefalnd (EFA LND) version: {}.")
-    EFA_BINDING_REFERENCE = CheckInfo(
-        8,
-        "EFA-for-Lustre binding follows the FSx guide -- the expected number of EFA devices bound to LNet "
-        "is instance-type-specific (some families bind a subset by design), and any type not listed binds "
-        "all present devices. "
-        "See https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html",
-    )
     LNETCTL_UNAVAILABLE = CheckInfo(
         9,
         "lnetctl is not available on this node, so the LNet transport and EFA probes were skipped "
@@ -457,9 +450,6 @@ class LustreFilesystem(Check):
         bound = lustre.lnet_bound_interfaces(lnet.nets, EFA_LNET_NET)
         available = efa.efa_device_count()
         expected = efa.expected_bound_device_count(context.instance_type, available)
-        # Note (once) that the expected binding is instance-type-specific per the FSx guide, so an operator
-        # reading the device-count findings knows "fewer than all bound" can be intentional.
-        infos.append(self.EFA_BINDING_REFERENCE)
         if available == 0:
             errors.append(self.NO_EFA_DEVICES.format(EFA_INFINIBAND_SYSFS))
         elif not bound:
@@ -471,9 +461,7 @@ class LustreFilesystem(Check):
             # subset by design do not false-fire. On every other family the expectation is "all present
             # devices", so a partial bind (the load-order incident signature) is caught here.
             errors.append(
-                self.UNDERBOUND_DEVICES.format(
-                    len(bound), expected, context.instance_type, EFA_LUSTRE_SYSTEMD_SERVICE
-                )
+                self.UNDERBOUND_DEVICES.format(len(bound), expected, context.instance_type, EFA_LUSTRE_SYSTEMD_SERVICE)
             )
         else:
             # All expected devices are bound, or the instance type is unknown so we have no expectation --
