@@ -191,9 +191,9 @@ class LustreFilesystem(Check):
     )
     EFA_PING_FAILED = CheckError(
         11,
-        "EFA ping from {} to every @efa peer ({}) failed -- the EFA data path is not working. Likely a "
-        "missing self-referencing security-group rule by SG-ID (EFA's SRD-over-MAC is not authorized by a "
-        "0.0.0.0/0 rule).",
+        "EFA ping from {} to every discovered @efa peer ({}) failed -- the EFA data path is not working. "
+        "Likely a missing self-referencing security-group rule by SG-ID (EFA's SRD-over-MAC is not "
+        "authorized by a 0.0.0.0/0 rule).",
     )
 
     # --- Errors: EFA prerequisites (checked before the EFA data-path probes) ------------------
@@ -231,8 +231,19 @@ class LustreFilesystem(Check):
         "expected count against the FSx guide "
         "https://docs.aws.amazon.com/fsx/latest/LustreGuide/configure-efa-clients.html",
     )
+    SOME_EFA_PEERS_UNREACHABLE = CheckWarning(
+        4,
+        "EFA ping from {} failed for {} of the {} discovered @efa peers ({}), while the others answered -- "
+        "the local EFA path works, so whatever is wrong is specific to those peers. Confirm in `lnetctl "
+        "peer show` that those nids belong to peers this node should be reaching: an @efa nid left behind "
+        "by an earlier manual ping, or a rail of a peer that is no longer part of the filesystem, fails "
+        "exactly the same way.",
+    )
 
     # --- Infos --------------------------------------------------------------------------------
+    # I8 is retired: it carried EFA_BINDING_REFERENCE, a static pointer to FSX public doc.
+    # It was removed as we modified W3 (PARTIAL_BIND_UNVERIFIABLE) and E17 (UNDERBOUND_DEVICES)
+    # which points to the said document without causing confusion as unwanted I8 would have.
     CLIENT_VERSION = CheckInfo(1, "Lustre client version: {}.")
     ACTIVE_LNDS = CheckInfo(2, "Active LNet transports: {}.")
     EFA_SERVICE_ABSENT = CheckInfo(
@@ -248,17 +259,17 @@ class LustreFilesystem(Check):
     EFA_DRIVER_VERSION = CheckInfo(6, "EFA driver version: {}.")
     KEFALND_VERSION = CheckInfo(7, "kefalnd (EFA LND) version: {}.")
     LNETCTL_UNAVAILABLE = CheckInfo(
-        8,
+        9,
         "lnetctl is not available on this node, so the LNet transport and EFA probes were skipped "
         "(the Lustre client may not be installed).",
     )
     EFA_NOT_SUPPORTED_ON_OS = CheckInfo(
-        9,
+        10,
         "EFA-for-Lustre is not supported on this OS ({}), so the EFA probes were skipped. EFA-for-Lustre "
         "requires Amazon Linux 2023, RHEL 9.5+, or Ubuntu 22.04+.",
     )
     ALL_DEVICES_BOUND = CheckInfo(
-        10,
+        11,
         "{} of {} EFA devices are bound to LNet: every device present on this node is bound, so none is "
         "missing. The instance type could not be determined, so the expected count itself was not checked.",
     )
@@ -463,7 +474,7 @@ class LustreFilesystem(Check):
         self._probe_device_binding(context, lnet, errors, warnings, infos)
 
         warnings.extend(self._traffic_warnings(efa_net))
-        errors.extend(self._efa_ping_errors(lnet.nets))
+        self._probe_efa_ping(lnet.nets, errors, warnings)
 
     def _probe_device_binding(
         self,
@@ -607,28 +618,48 @@ class LustreFilesystem(Check):
                 warnings.append(self.NO_TRAFFIC.format(ni.nid))
         return warnings
 
-    def _efa_ping_errors(self, nets) -> List[CheckError]:
-        """Ping the @efa peers over EFA; error when the data path fails.
+    def _probe_efa_ping(self, nets, errors: List[CheckError], warnings: List[CheckWarning]) -> None:
+        """Ping the discovered @efa peers over EFA; error when none answers, warn when only some do.
 
-        Automates ``lnetctl ping --source <local>@efa <peer>@efa``. Discovers a local @efa nid and the set
-        of peer @efa nids from ``lnetctl``; when either is unavailable there is nothing to ping, so the
-        probe is skipped (a missing peer/local nid is not itself proof the data path is broken).
+        Automates ``lnetctl ping --source <local>@efa <peer>@efa``. The source is a local @efa nid, which
+        is what pins the probe to the EFA rail: without it LNet is free to answer over @tcp, which is why
+        ``lfs check servers`` cannot stand in for this.
 
-        Every @efa peer is pinged and the data path is treated as broken only when *all* of them fail. The
-        peer table can hold an @efa NID that answers nothing on a healthy fabric (see
-        ``lustre.efa_peer_nids``), so failing on one peer alone would be a false positive. A single
-        successful ping proves the SRD path works.
+        Only peers that are evidence about the data path are pinged. A leftover entry from an earlier
+        failed ping answers nothing even on a healthy fabric (see ``lustre.multi_rail_efa_peer_nids``), and
+        the node's own nids answer trivially -- a self-ping proves nothing about the fabric, yet counted as
+        a success it would downgrade a wholly broken path to a warning -- so both are excluded. When no
+        local nid or no such peer remains there is nothing to ping and the probe is skipped; that is not
+        itself proof the data path is broken.
+
+        Every remaining peer is pinged (no short-circuit) so the report can name exactly which ones failed.
+        All of them failing means the local EFA path is down -- typically the missing self-referencing
+        security-group rule, which breaks every peer at once. Only some failing localizes the problem to
+        those peers instead, which is a warning rather than an error.
+
+        A failed ping is only ever reported as "this nid did not answer over EFA from this node": the exit
+        status cannot say why (an unreachable server, or a rail LNet learned that nothing serves any more
+        both surface as ``errno: -1 ... Input/output error``), and it says nothing about what Lustre does
+        instead, so neither is claimed. The remediation points at ``lnetctl peer show`` rather than at the
+        client's import state for the same reason: a Multi-Rail peer keeps its ``@tcp`` nid as the primary
+        and carries the ``@efa`` nid as a secondary rail, so ``current_connection`` naming a ``@tcp`` nid is
+        not evidence about the EFA rail either way.
         """
         local = lustre.local_nids(nets, EFA_LNET_NET)
         if not local:
-            return []
-        peer_nids = lustre.efa_peer_nids()
+            return
+        own_nids = set(local)
+        peer_nids = [nid for nid in lustre.multi_rail_efa_peer_nids() if nid not in own_nids]
         if not peer_nids:
-            return []
+            return
         source = local[0]
-        if any(lustre.efa_ping_works(source, peer_nid) for peer_nid in peer_nids):
-            return []
-        return [self.EFA_PING_FAILED.format(source, ", ".join(peer_nids))]
+        unreachable = [nid for nid in peer_nids if not lustre.efa_ping_works(source, nid)]
+        if len(unreachable) == len(peer_nids):
+            errors.append(self.EFA_PING_FAILED.format(source, ", ".join(peer_nids)))
+        elif unreachable:
+            warnings.append(
+                self.SOME_EFA_PEERS_UNREACHABLE.format(source, len(unreachable), len(peer_nids), ", ".join(unreachable))
+            )
 
 
 class FsxTargetsAreReachable(Check):

@@ -224,11 +224,26 @@ def local_nids(nets: List[LnetNet], net_type: str) -> List[str]:
 # --- LNet transport: lnetctl peer show parsing ----------------------------------------
 
 
-def parse_lnet_peer_show(output: str) -> List[str]:
-    """Return the peer nids parsed from ``lnetctl peer show`` YAML (empty when unparseable/none).
+@dataclass
+class LnetPeer:
+    """A peer entry parsed from ``lnetctl peer show``.
+
+    Attributes:
+        primary_nid: The nid LNet identifies this peer by (the rail it was first reached on).
+        nids: Every nid on the peer -- the primary first, then each additional ``peer ni`` rail.
+    """
+
+    primary_nid: str
+    nids: List[str] = field(default_factory=list)
+
+
+def parse_lnet_peer_show(output: str) -> List[LnetPeer]:
+    """Parse ``lnetctl peer show`` YAML into ``LnetPeer`` entries (empty when unparseable/none).
 
     ``lnetctl peer show`` emits a top-level ``peer`` list; each entry carries a ``primary nid`` and a
-    ``peer ni`` list of ``nid`` mappings. Both are collected so callers can pick, e.g., the ``@efa`` nids.
+    ``peer ni`` list of ``nid`` mappings. Which nid is the primary is kept rather than flattened away,
+    because that is what tells a real discovered peer apart from a leftover one (see
+    :func:`multi_rail_efa_peer_nids`).
     """
     try:
         data = yaml.safe_load(output)
@@ -237,17 +252,19 @@ def parse_lnet_peer_show(output: str) -> List[str]:
         return []
     if not isinstance(data, dict):
         return []
-    nids: List[str] = []
+    peers: List[LnetPeer] = []
     for entry in data.get("peer") or []:
         if not isinstance(entry, dict):
             continue
         primary = entry.get("primary nid")
-        if primary:
-            nids.append(str(primary))
+        if not primary:
+            continue
+        nids = [str(primary)]
         for peer_ni in entry.get("peer ni") or []:
-            if isinstance(peer_ni, dict) and peer_ni.get("nid"):
+            if isinstance(peer_ni, dict) and peer_ni.get("nid") and str(peer_ni["nid"]) not in nids:
                 nids.append(str(peer_ni["nid"]))
-    return nids
+        peers.append(LnetPeer(primary_nid=str(primary), nids=nids))
+    return peers
 
 
 def nids_on_net(nids: List[str], net_type: str) -> List[str]:
@@ -265,24 +282,27 @@ def nids_on_net(nids: List[str], net_type: str) -> List[str]:
 # --- LNet transport: the lnetctl ping reachability probe ------------------------------
 
 
-def efa_peer_nids() -> List[str]:
-    """Return every ``@efa`` peer nid from ``lnetctl peer show`` (empty when none/unavailable).
-
-    The peer table can hold an ``@efa`` NID that answers nothing even when the fabric is healthy: a
-    failed ``lnetctl ping`` to a NID nothing serves leaves a peer entry behind, carrying that NID as its
-    own primary with no ``@tcp`` rail (a discovered peer instead has a ``@tcp`` primary and ``@efa`` as a
-    secondary rail). Callers therefore probe the whole set rather than trusting any single peer.
-    """
+def lnet_peers() -> List[LnetPeer]:
+    """Return the LNet peer table from ``lnetctl peer show`` (empty when it fails, times out, or is garbage)."""
     result = time_command(["lnetctl", "peer", "show"], timeout=FSX_LNET_SHOW_TIMEOUT_SECONDS)
     if result.timed_out or result.returncode != 0:
         return []
-    return nids_on_net(parse_lnet_peer_show(result.stdout), EFA_LNET_NET)
+    return parse_lnet_peer_show(result.stdout)
 
 
-def efa_peer_nid() -> Optional[str]:
-    """Return the first ``@efa`` peer nid from ``lnetctl peer show``, or None when none is available."""
-    efa_peers = efa_peer_nids()
-    return efa_peers[0] if efa_peers else None
+def multi_rail_efa_peer_nids() -> List[str]:
+    """Return the ``@efa`` rails of the peers LNet actually discovered (empty when there are none).
+
+    A real server reached over EFA is a Multi-Rail peer: LNet contacted it on its ``@tcp`` primary nid and
+    discovery then learned its ``@efa`` rail, so the entry carries a non-``@efa`` primary with an ``@efa``
+    nid among its rails. An entry of the opposite shape -- an ``@efa`` NID as its own primary -- is what a
+    failed ``lnetctl ping`` leaves behind, and that NID answers nothing even on a healthy fabric. Only the
+    discovered shape is evidence about the EFA data path, so callers that ping to prove the path works
+    probe these nids rather than every ``@efa`` nid in the table.
+    """
+    suffix = "@" + EFA_LNET_NET
+    discovered = [nid for peer in lnet_peers() if not peer.primary_nid.endswith(suffix) for nid in peer.nids]
+    return nids_on_net(discovered, EFA_LNET_NET)
 
 
 def efa_ping_works(source_nid: str, peer_nid: str) -> bool:
