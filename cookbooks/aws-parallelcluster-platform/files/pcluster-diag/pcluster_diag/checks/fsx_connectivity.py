@@ -240,12 +240,12 @@ class LustreFilesystem(Check):
     EFA_DRIVER_VERSION = CheckInfo(6, "EFA driver version: {}.")
     KEFALND_VERSION = CheckInfo(7, "kefalnd (EFA LND) version: {}.")
     LNETCTL_UNAVAILABLE = CheckInfo(
-        9,
+        8,
         "lnetctl is not available on this node, so the LNet transport and EFA probes were skipped "
         "(the Lustre client may not be installed).",
     )
     EFA_NOT_SUPPORTED_ON_OS = CheckInfo(
-        10,
+        9,
         "EFA-for-Lustre is not supported on this OS ({}), so the EFA probes were skipped. EFA-for-Lustre "
         "requires Amazon Linux 2023, RHEL 9.5+, or Ubuntu 22.04+.",
     )
