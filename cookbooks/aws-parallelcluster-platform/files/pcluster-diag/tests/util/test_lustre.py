@@ -160,29 +160,52 @@ def test_parse_lnet_net_show_empty_on_garbage():
 
 # --- lnetctl peer show parsing --------------------------------------------------------
 
+# The three entry shapes a real client's peer table mixes: a discovered server (@tcp primary, Multi-Rail,
+# with a 198.19.0.0/16 @tcp1 rail on the filesystem's internal net plus the @efa rail), an entry for that
+# internal net alone (@tcp1 primary, no rail this client can use -- it has no local @tcp1 NI), and a
+# leftover from a failed `lnetctl ping` (@efa primary, Multi-Rail False).
 _LNET_PEER_SHOW = """\
 peer:
-    - primary nid: 10.0.1.5@efa
+    - primary nid: 10.0.1.5@tcp
+      Multi-Rail: True
       peer ni:
-        - nid: 10.0.1.5@efa
         - nid: 10.0.1.5@tcp
-    - primary nid: 10.0.1.6@tcp
+          state: NA
+        - nid: 198.19.0.5@tcp1
+          state: NA
+        - nid: 10.0.1.5@efa
+          state: NA
+    - primary nid: 198.19.1.78@tcp1
+      Multi-Rail: True
       peer ni:
-        - nid: 10.0.1.6@tcp
+        - nid: 198.19.1.78@tcp1
+          state: NA
+    - primary nid: 10.0.1.9@efa
+      Multi-Rail: False
+      peer ni:
+        - nid: 10.0.1.9@efa
+          state: NA
 """
 
 
-def test_parse_lnet_peer_show_collects_nids():
-    nids = lustre.parse_lnet_peer_show(_LNET_PEER_SHOW)
+def test_parse_lnet_peer_show_keeps_primary_and_rails_per_peer():
+    peers = lustre.parse_lnet_peer_show(_LNET_PEER_SHOW)
 
-    assert "10.0.1.5@efa" in nids
-    assert "10.0.1.6@tcp" in nids
+    # Which nid is the primary is what tells a discovered peer from a leftover ping entry, so it is kept
+    # per peer rather than flattened in with the rails.
+    assert [peer.primary_nid for peer in peers] == ["10.0.1.5@tcp", "198.19.1.78@tcp1", "10.0.1.9@efa"]
+    assert peers[0].nids == ["10.0.1.5@tcp", "198.19.0.5@tcp1", "10.0.1.5@efa"]
+    assert peers[1].nids == ["198.19.1.78@tcp1"]
+    assert peers[2].nids == ["10.0.1.9@efa"]
 
 
 def test_nids_on_net_filters_and_dedupes():
-    nids = lustre.parse_lnet_peer_show(_LNET_PEER_SHOW)
+    nids = ["10.0.1.5@efa", "10.0.1.5@tcp", "10.0.1.5@efa", "198.19.0.5@tcp1", "10.0.1.6@tcp"]
 
     assert lustre.nids_on_net(nids, "efa") == ["10.0.1.5@efa"]
+    # The net is matched on the whole "@<net>" suffix, so a @tcp1 nid is not a @tcp nid.
+    assert lustre.nids_on_net(nids, "tcp") == ["10.0.1.5@tcp", "10.0.1.6@tcp"]
+    assert lustre.nids_on_net(nids, "tcp1") == ["198.19.0.5@tcp1"]
 
 
 def test_parse_lnet_peer_show_empty_on_garbage():
@@ -237,35 +260,54 @@ def test_parse_lfs_check_servers_ignores_command_level_errors(line):
 # --- LNet ping (lnetctl peer show + ping) ---------------------------------------------
 
 
-def test_efa_peer_nids_returns_all_efa_peers(monkeypatch):
-    two_efa_peers = (
-        "peer:\n"
-        "    - primary nid: 10.0.1.5@efa\n      peer ni:\n        - nid: 10.0.1.5@efa\n"
-        "    - primary nid: 10.0.1.6@efa\n      peer ni:\n        - nid: 10.0.1.6@efa\n"
+_LNET_PEER_TWO_SERVERS = (
+    "peer:\n"
+    "    - primary nid: 10.0.1.5@tcp\n      Multi-Rail: True\n      peer ni:\n"
+    "        - nid: 10.0.1.5@tcp\n        - nid: 198.19.0.5@tcp1\n        - nid: 10.0.1.5@efa\n"
+    "    - primary nid: 10.0.1.6@tcp\n      Multi-Rail: True\n      peer ni:\n"
+    "        - nid: 10.0.1.6@tcp\n        - nid: 198.19.0.6@tcp1\n        - nid: 10.0.1.6@efa\n"
+)
+
+
+def test_multi_rail_efa_peer_nids_returns_the_efa_rail_of_each_discovered_peer(monkeypatch):
+    monkeypatch.setattr(
+        lustre, "time_command", lambda command, timeout: _completed_timed(stdout=_LNET_PEER_TWO_SERVERS)
     )
-    monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(stdout=two_efa_peers))
-    assert lustre.efa_peer_nids() == ["10.0.1.5@efa", "10.0.1.6@efa"]
+    # Only the @efa rails: the @tcp primary and the @tcp1 rail on the filesystem's internal net are not
+    # EFA and are not probed.
+    assert lustre.multi_rail_efa_peer_nids() == ["10.0.1.5@efa", "10.0.1.6@efa"]
 
 
-def test_efa_peer_nids_empty_on_command_failure(monkeypatch):
-    monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(returncode=1))
-    assert lustre.efa_peer_nids() == []
-
-
-def test_efa_peer_nid_returns_first_efa_peer(monkeypatch):
+def test_multi_rail_efa_peer_nids_skips_leftover_and_efa_less_peers(monkeypatch):
+    # Of the three shapes in a real table, only the discovered server contributes: the @efa NID that is its
+    # own primary is a leftover from a failed `lnetctl ping` (it answers nothing even on a healthy fabric),
+    # and the @tcp1-primary entry has no @efa rail at all.
     monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(stdout=_LNET_PEER_SHOW))
-    assert lustre.efa_peer_nid() == "10.0.1.5@efa"
+    assert lustre.multi_rail_efa_peer_nids() == ["10.0.1.5@efa"]
 
 
-def test_efa_peer_nid_none_when_no_efa_peer(monkeypatch):
-    tcp_only_peer = "peer:\n    - primary nid: 1.2.3.4@tcp\n"
-    monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(stdout=tcp_only_peer))
-    assert lustre.efa_peer_nid() is None
+def test_multi_rail_efa_peer_nids_empty_when_no_peer_has_an_efa_rail(monkeypatch):
+    # An FSx-internal peer as it appears on a live node: reachable only on @tcp1, which this client has no
+    # local NI for, and carrying no @efa rail -- nothing here says anything about the EFA data path.
+    internal_net_peer_only = (
+        "peer:\n"
+        "    - primary nid: 198.19.1.78@tcp1\n      Multi-Rail: True\n      peer ni:\n"
+        "        - nid: 198.19.1.78@tcp1\n          state: NA\n"
+    )
+    monkeypatch.setattr(
+        lustre, "time_command", lambda command, timeout: _completed_timed(stdout=internal_net_peer_only)
+    )
+    assert lustre.multi_rail_efa_peer_nids() == []
 
 
-def test_efa_peer_nid_none_on_command_failure(monkeypatch):
+def test_multi_rail_efa_peer_nids_empty_on_command_failure(monkeypatch):
     monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(returncode=1))
-    assert lustre.efa_peer_nid() is None
+    assert lustre.multi_rail_efa_peer_nids() == []
+
+
+def test_lnet_peers_empty_on_command_failure(monkeypatch):
+    monkeypatch.setattr(lustre, "time_command", lambda command, timeout: _completed_timed(returncode=1))
+    assert lustre.lnet_peers() == []
 
 
 def test_efa_ping_works_true_on_success(monkeypatch):
