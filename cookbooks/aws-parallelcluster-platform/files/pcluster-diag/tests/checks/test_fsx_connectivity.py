@@ -439,23 +439,103 @@ net:
               health value: 1000
 """
 
+# One discovered server, in the shape a real FSx server appears in: LNet reached 10.0.1.5 on its @tcp
+# primary nid and discovery then learned its other rails -- a 198.19.0.0/16 @tcp1 nid on the filesystem's
+# internal net (the client has no local @tcp1 NI, so it is never a probe target) and the @efa rail. Only
+# this Multi-Rail shape is evidence about the EFA data path (see lustre.multi_rail_efa_peer_nids). The
+# second entry is the internal net standing on its own, as live tables carry it: @tcp1 primary, no @efa
+# rail, so it contributes no probe target either.
 _LNET_PEER_EFA = """\
 peer:
-    - primary nid: 10.0.1.5@efa
+    - primary nid: 10.0.1.5@tcp
+      Multi-Rail: True
       peer ni:
+        - nid: 10.0.1.5@tcp
+          state: NA
+        - nid: 198.19.0.5@tcp1
+          state: NA
         - nid: 10.0.1.5@efa
+          state: NA
+    - primary nid: 198.19.1.78@tcp1
+      Multi-Rail: True
+      peer ni:
+        - nid: 198.19.1.78@tcp1
+          state: NA
 """
 
-# Two @efa peers, each its own primary nid: a real server (10.0.1.5, pingable) plus an @efa NID that
-# answers nothing (10.0.1.6) -- the shape a failed ping to a non-existent NID leaves behind.
-_LNET_PEER_EFA_MULTI = """\
+# Two discovered servers, each with an @efa rail: enough to tell "every peer is unreachable over EFA"
+# (a local problem) from "one peer is" (that server's problem).
+_LNET_PEER_EFA_TWO_SERVERS = """\
 peer:
-    - primary nid: 10.0.1.5@efa
+    - primary nid: 10.0.1.5@tcp
       peer ni:
+        - nid: 10.0.1.5@tcp
+        - nid: 198.19.0.5@tcp1
         - nid: 10.0.1.5@efa
-    - primary nid: 10.0.1.6@efa
+    - primary nid: 10.0.1.6@tcp
       peer ni:
+        - nid: 10.0.1.6@tcp
+        - nid: 198.19.0.6@tcp1
         - nid: 10.0.1.6@efa
+"""
+
+# The shape a failed `lnetctl ping` leaves behind: the pinged @efa NID as its own primary, no other rail.
+# It answers nothing even on a healthy fabric, so it is no evidence either way.
+_LNET_PEER_EFA_LEFTOVER = """\
+peer:
+    - primary nid: 10.0.1.9@efa
+      Multi-Rail: False
+      peer ni:
+        - nid: 10.0.1.9@efa
+"""
+
+# A peer table polluted by hand-debugging, as seen on a live node: `lnetctl ping --source <server efa nid>
+# <own efa nid>` cannot use a remote nid as its source, so it fails -- and leaves this node's OWN @efa nid
+# behind as a Multi-Rail False entry that is its own primary. 10.0.1.99@efa is the other way to pollute the
+# table, a ping to a nid nothing serves. Both exclusions are needed here: the self nid answers every ping,
+# and the phantom nid answers none, so counting either one misreads the fabric.
+_LNET_PEER_EFA_POLLUTED = """\
+peer:
+    - primary nid: 10.0.0.1@efa
+      Multi-Rail: False
+      peer ni:
+        - nid: 10.0.0.1@efa
+          state: NA
+    - primary nid: 10.0.1.99@efa
+      Multi-Rail: False
+      peer ni:
+        - nid: 10.0.1.99@efa
+          state: NA
+    - primary nid: 198.19.1.78@tcp1
+      Multi-Rail: True
+      peer ni:
+        - nid: 198.19.1.78@tcp1
+          state: NA
+    - primary nid: 10.0.1.5@tcp
+      Multi-Rail: True
+      peer ni:
+        - nid: 10.0.1.5@tcp
+          state: NA
+        - nid: 198.19.0.5@tcp1
+          state: NA
+        - nid: 10.0.1.5@efa
+          state: NA
+"""
+
+# A peer entry carrying this node's OWN @efa nid (10.0.0.1@efa, the local nid in _LNET_TCP_EFA) as a rail,
+# alongside the real server. The node has no @tcp1 NI of its own, so its entry carries no @tcp1 rail.
+# Pinging yourself always succeeds and proves nothing about the fabric.
+_LNET_PEER_EFA_SELF_AND_SERVER = """\
+peer:
+    - primary nid: 10.0.0.1@tcp
+      peer ni:
+        - nid: 10.0.0.1@tcp
+        - nid: 10.0.0.1@efa
+    - primary nid: 10.0.1.5@tcp
+      peer ni:
+        - nid: 10.0.1.5@tcp
+        - nid: 198.19.0.5@tcp1
+        - nid: 10.0.1.5@efa
 """
 
 _IMPORT_EFA = """\
@@ -828,14 +908,15 @@ def test_efa_ping_failure_when_all_peers_fail(monkeypatch):
     assert "security-group" in _messages(errors)
 
 
-def test_efa_no_ping_error_when_any_peer_reachable(monkeypatch):
-    # One @efa peer is unpingable (10.0.1.6, e.g. a phantom peer left by an earlier failed ping) but
-    # another (10.0.1.5) pings clean: the SRD path is proven working, so E11 must NOT fire.
+def test_efa_one_unreachable_peer_warns_instead_of_failing(monkeypatch):
+    # 10.0.1.6 is unreachable over EFA while 10.0.1.5 pings clean: the local EFA path works, so this is that
+    # one server's problem -- a warning naming it, not the E11 "the data path is down" failure. Under the
+    # old "one success is enough" rule the unreachable peer was reported as nothing at all.
     _patch_efa_prereqs(monkeypatch)
     _route_time_command(
         monkeypatch,
         {
-            "peer show": _timed(stdout=_LNET_PEER_EFA_MULTI),
+            "peer show": _timed(stdout=_LNET_PEER_EFA_TWO_SERVERS),
             "10.0.1.6@efa": _timed(returncode=1, stderr="cannot reach"),
             "ping": _timed(stdout="ok"),
         },
@@ -848,6 +929,85 @@ def test_efa_no_ping_error_when_any_peer_reachable(monkeypatch):
     )
 
     assert LustreFilesystem.EFA_PING_FAILED.code not in _codes(errors)
+    assert LustreFilesystem.SOME_EFA_PEERS_UNREACHABLE.code in _codes(warnings)
+    # The report has to name the peer that failed, not just the count: that is what an operator acts on.
+    assert "10.0.1.6@efa" in _messages(warnings)
+    assert "1 of the 2" in _messages(warnings)
+
+
+def test_efa_ping_ignores_own_local_nid_in_the_peer_table(monkeypatch):
+    # A peer entry for this node's own @efa nid answers trivially. Counting that self-ping as a success let a
+    # genuinely dead data path pass: with the real server (10.0.1.5) unreachable, E11 must still fire.
+    _patch_efa_prereqs(monkeypatch)
+    _route_time_command(
+        monkeypatch,
+        {
+            "peer show": _timed(stdout=_LNET_PEER_EFA_SELF_AND_SERVER),
+            "10.0.0.1@efa 10.0.0.1@efa": _timed(stdout="ok"),
+            "ping": _timed(returncode=1, stderr="cannot reach"),
+        },
+    )
+    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(
+        sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_TCP_EFA), errors, warnings, infos
+    )
+
+    assert LustreFilesystem.EFA_PING_FAILED.code in _codes(errors)
+    assert "10.0.1.5@efa" in _messages(errors)
+    # Not a partial failure either: the self nid is excluded from the probe, so it counts as neither a
+    # reachable peer nor an unreachable one.
+    assert LustreFilesystem.SOME_EFA_PEERS_UNREACHABLE.code not in _codes(warnings)
+
+
+def test_efa_ping_fails_despite_a_peer_table_polluted_by_hand_debugging(monkeypatch):
+    # The live-node case: a failed reverse ping injected this node's own @efa nid into the peer table. That
+    # entry answers every ping, so counting it let a dead data path report PASSED. With the real server
+    # (10.0.1.5) unreachable, the check must report E11 -- the pollution buys the fabric no credit.
+    _patch_efa_prereqs(monkeypatch)
+    _route_time_command(
+        monkeypatch,
+        {
+            "peer show": _timed(stdout=_LNET_PEER_EFA_POLLUTED),
+            "10.0.0.1@efa 10.0.0.1@efa": _timed(stdout="ok"),
+            "ping": _timed(returncode=1, stderr="failed to ping 10.0.1.5@efa: Input/output error"),
+        },
+    )
+    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(
+        sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_TCP_EFA), errors, warnings, infos
+    )
+
+    assert LustreFilesystem.EFA_PING_FAILED.code in _codes(errors)
+    assert "10.0.1.5@efa" in _messages(errors)
+    # Neither injected nid is treated as a peer, so neither shows up in the report...
+    assert "10.0.1.99@efa" not in _messages(errors)
+    # ...and the phantom nid failing alongside the real server is not read as a partial failure either.
+    assert LustreFilesystem.SOME_EFA_PEERS_UNREACHABLE.code not in _codes(warnings)
+
+
+def test_efa_ping_skipped_when_only_a_leftover_peer_entry_exists(monkeypatch):
+    # The peer table holds nothing but an @efa NID that is its own primary -- a leftover from an earlier
+    # failed ping. There is no discovered peer to probe, so no ping runs and nothing is reported.
+    _patch_efa_prereqs(monkeypatch)
+    _route_time_command(monkeypatch, {"peer show": _timed(stdout=_LNET_PEER_EFA_LEFTOVER)})
+
+    def _boom_ping(source_nid, peer_nid):
+        raise AssertionError("a leftover peer entry must not be pinged: it answers nothing when healthy")
+
+    monkeypatch.setattr(fsx_connectivity.lustre, "efa_ping_works", _boom_ping)
+    monkeypatch.setattr(fsx_connectivity.efa, "efa_device_count", lambda: 1)
+    errors, warnings, infos = [], [], []
+
+    LustreFilesystem()._probe_efa(
+        sample_context_with_lustre(NodeType.COMPUTE), _snapshot(_LNET_TCP_EFA), errors, warnings, infos
+    )
+
+    assert LustreFilesystem.EFA_PING_FAILED.code not in _codes(errors)
+    assert LustreFilesystem.SOME_EFA_PEERS_UNREACHABLE.code not in _codes(warnings)
 
 
 def test_efa_no_traffic_is_warning(monkeypatch):
