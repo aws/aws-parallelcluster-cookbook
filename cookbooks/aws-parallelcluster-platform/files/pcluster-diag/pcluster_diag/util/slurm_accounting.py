@@ -26,6 +26,7 @@ from botocore.exceptions import ClientError
 from pcluster_diag.core.constants import (
     DEFAULT_DATABASE_PORT,
     DEFAULT_SLURMDBD_PORT,
+    SCONTROL_PATH,
     SLURM_PARALLELCLUSTER_SLURMDBD_CONF_PATH,
     SLURMDBD_CONF_PATH,
 )
@@ -180,7 +181,7 @@ def accounting_present_on_node() -> bool:
 def _scontrol_config() -> Dict[str, str]:
     """Return the effective Slurm configuration reported by ``scontrol show config`` as a key/value map."""
     try:
-        result = shell.run_command(["scontrol", "show", "config"], timeout=_SCONTROL_CONFIG_TIMEOUT_SECONDS)
+        result = shell.run_command([SCONTROL_PATH, "show", "config"], timeout=_SCONTROL_CONFIG_TIMEOUT_SECONDS)
     except OSError as error:
         logger.info("Could not run 'scontrol show config': %s", error)
         return {}

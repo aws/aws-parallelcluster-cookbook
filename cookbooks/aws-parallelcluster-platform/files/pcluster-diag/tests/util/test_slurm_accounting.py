@@ -19,7 +19,7 @@ from botocore.exceptions import ClientError
 from hypothesis import given
 from hypothesis import strategies as st
 
-from pcluster_diag.core.constants import DEFAULT_DATABASE_PORT, DEFAULT_SLURMDBD_PORT
+from pcluster_diag.core.constants import DEFAULT_DATABASE_PORT, DEFAULT_SLURMDBD_PORT, SCONTROL_PATH
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.util import slurm_accounting as acct
 from tests.sample_data import sample_context
@@ -324,7 +324,7 @@ def test_scontrol_config_issues_expected_command_and_parses_pairs(monkeypatch):
 
     config = acct._scontrol_config()
 
-    assert captured["argv"] == ["scontrol", "show", "config"]
+    assert captured["argv"] == [SCONTROL_PATH, "show", "config"]
     assert config["SlurmUser"] == "slurm"
     assert config["AccountingStoragePort"] == "6819"
     assert "not a kv line" not in config  # lines without '=' are skipped

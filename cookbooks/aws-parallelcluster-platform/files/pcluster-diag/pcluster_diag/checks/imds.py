@@ -44,7 +44,7 @@ class Imds(Check):
     @property
     def description(self) -> str:
         """Return the human-readable description of this Check."""
-        return "Verify that IMDS is responsive and functional"
+        return "Verify that IMDS is responsive and functional."
 
     def run(self, context: Context) -> Result:
         """Pass when IMDS is responsive, reports an IAM role, and per-user access matches Imds/Secured.

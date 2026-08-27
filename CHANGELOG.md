@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.17.0
 ------
 
+**BUG FIXES**
+- Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
+
 3.16.0
 ------
 

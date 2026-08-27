@@ -30,6 +30,7 @@ SHARED_DIR = BASE_DIR + "/shared"
 DEFAULT_DNA_JSON_PATH = "/etc/chef/dna.json"
 DEFAULT_CLUSTER_CONFIG_PATH = SHARED_DIR + "/cluster-config.yaml"
 DEFAULT_BOOTSTRAPPED_PATH = BASE_DIR + "/.bootstrapped"
+SCONTROL_PATH = "/opt/slurm/bin/scontrol"
 
 # Written by clusterstatusmgtd (running as the cluster admin user) to drive compute-fleet status
 # transitions; mirrors the cookbook attribute computefleet_status_path.

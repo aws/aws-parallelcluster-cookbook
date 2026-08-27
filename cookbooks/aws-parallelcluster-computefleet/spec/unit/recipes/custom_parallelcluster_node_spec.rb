@@ -33,7 +33,7 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
   source #{virtualenv_path}/bin/activate
   pip uninstall --yes aws-parallelcluster-node
   if [[ "#{custom_node_s3_url}" =~ ^s3:// ]]; then
-    custom_package_url=$(#{cookbook_virtualenv_path}/bin/aws s3 presign #{custom_node_s3_url} --region #{region})
+    custom_package_url=$(#{cookbook_virtualenv_path}/bin/aws s3 presign #{custom_node_s3_url} --region test_region --endpoint-url https://s3.test_region.test_aws_domain)
   else
     custom_package_url=#{custom_node_s3_url}
   fi

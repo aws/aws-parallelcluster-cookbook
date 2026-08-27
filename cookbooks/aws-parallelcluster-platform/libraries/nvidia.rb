@@ -14,6 +14,10 @@ def nvidia_enabled?
   ['yes', true, 'true'].include?(node['cluster']['nvidia']['enabled'])
 end
 
+def nvidia_disabled?
+  !nvidia_enabled?
+end
+
 # Convert a full CUDA version to its 'major-minor' dashed form used in CUDA repo
 # and package names, e.g. '13-0' for '13.0.2'. The patch level (the '.2') is
 # intentionally dropped because CUDA repos and packages are keyed on major-minor
