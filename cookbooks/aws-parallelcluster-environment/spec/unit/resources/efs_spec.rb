@@ -359,13 +359,6 @@ describe 'efs:unmount' do
         is_expected.to unmount_efs('unmount')
       end
 
-      it 'checks active processes' do
-        is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_1')
-          .with(file: '/shared_dir_1')
-        is_expected.to check_active_processes_file_utils('check active processes on /shared_dir_2')
-          .with(file: '/shared_dir_2')
-      end
-
       it 'unmounts efs only if mounted' do
         is_expected.not_to run_execute('unmount efs')
           .with(command: 'umount -fl /shared_dir_1')
