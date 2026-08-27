@@ -3,11 +3,11 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.16.1
+3.17.0
 ------
 
-**CHANGES**
-- Upgrade Slurm to version 25.11.8 (from 25.11.6).
+**BUG FIXES**
+- Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
 
 3.16.0
 ------
