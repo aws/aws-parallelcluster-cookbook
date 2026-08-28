@@ -74,6 +74,60 @@ if redhat_on_docker?
   end
 end
 
+if alinux2023_on_docker?
+  # Create pcluster-admin user and group
+  group 'pcluster-admin' do
+    gid 400
+  end
+
+  user 'pcluster-admin' do
+    uid 400
+    gid 400
+    home '/home/pcluster-admin'
+    shell '/bin/bash'
+  end
+
+  # Create required directories
+  directory '/opt/parallelcluster/shared' do
+    recursive true
+  end
+
+  # Install Python 3.12 for AL2023 Docker tests
+  package 'python3.12'
+  package 'python3.12-pip'
+
+  # Mock python environment for AL2023 Docker tests
+  # The pyenv/virtualenv setup doesn't work in Docker because it requires S3 access
+  python_version = node['cluster']['python-version']
+  pyenv_root = node['cluster']['system_pyenv_root']
+  virtualenv_path = "#{pyenv_root}/versions/#{python_version}/envs/cookbook_virtualenv"
+
+  directory "#{virtualenv_path}/bin" do
+    recursive true
+  end
+
+  # Create a wrapper script that reports the expected version but uses system Python
+  file "#{virtualenv_path}/bin/python" do
+    content %(#!/bin/bash
+if [[ "$1" == "-V" || "$1" == "--version" ]]; then
+  echo "Python #{python_version}"
+else
+  exec /usr/bin/python3.12 "$@"
+fi
+)
+    mode '0755'
+  end
+
+  link "#{virtualenv_path}/bin/pip" do
+    to '/usr/bin/pip3.12'
+  end
+
+  bash 'Install cookbook requirements for AL2023' do
+    cwd Chef::Config[:file_cache_path]
+    code "/usr/bin/python3.12 -m pip install -r cookbooks/aws-parallelcluster-platform/files/cookbook_virtualenv/requirements.txt"
+  end
+end
+
 file '/usr/bin/ssh-keyscan' do
   content %(
     #!/bin/bash
