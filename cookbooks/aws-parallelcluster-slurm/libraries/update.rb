@@ -21,10 +21,13 @@ require 'timeout'
 SCONTROL_RECONFIGURE_RESOURCE_NAME = 'reload config for running nodes'
 
 # Verify if Scheduling section of cluster configuration and compute node bootstrap_timeout have been updated
+# If the previous cluster config file does not exists, it assumes that queues have not been updated.
 def are_queues_updated?
   require 'yaml'
   config = YAML.safe_load(File.read(node['cluster']['cluster_config_path']))
-  previous_config = YAML.safe_load(File.read(node['cluster']['previous_cluster_config_path']))
+  previous_cluster_config_path = node['cluster']['previous_cluster_config_path']
+  return false unless File.exist?(previous_cluster_config_path)
+  previous_config = YAML.safe_load(File.read(previous_cluster_config_path))
   config["Scheduling"] != previous_config["Scheduling"] or is_compute_node_bootstrap_timeout_updated?(previous_config, config)
 end
 
