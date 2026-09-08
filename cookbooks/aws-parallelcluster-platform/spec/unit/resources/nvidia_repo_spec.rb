@@ -339,13 +339,13 @@ describe 'nvidia_repo:add_cuda_repo skip conditions' do
   end
 end
 
-describe 'nvidia_repo: overriding base_url to the official NVIDIA URLs' do
-  # Fake versions: tests only verify the configured attribute values are used.
+describe 'nvidia_repo: overriding base_url to a public URL' do
+  # Fake versions and URLs: tests only verify the configured attribute values are used.
   cached(:driver_version) { '9.8.7' }
   cached(:cuda_version) { '1.2.3' }
   cached(:cuda_suffix) { '4.5.6' }
-  cached(:driver_base_url) { "https://developer.download.nvidia.com/compute/nvidia-driver/#{driver_version}/local_installers" }
-  cached(:cuda_base_url) { "https://developer.download.nvidia.com/compute/cuda/#{cuda_version}/local_installers" }
+  cached(:driver_base_url) { "https://example.com/compute/nvidia-driver/#{driver_version}/local_installers" }
+  cached(:cuda_base_url) { "https://example.com/compute/cuda/#{cuda_version}/local_installers" }
   cached(:driver_pkg_file) { "nvidia-driver-local-repo-amzn2023-#{driver_version}-1.0-1.x86_64.rpm" }
   cached(:cuda_pkg_file) { "cuda-repo-amzn2023-1-2-local-#{cuda_version}_#{cuda_suffix}-1.x86_64.rpm" }
 
@@ -374,13 +374,13 @@ describe 'nvidia_repo: overriding base_url to the official NVIDIA URLs' do
     ConvergeNvidiaRepo.add_cuda_repo(runner)
   end
 
-  it 'downloads the driver local repo from the official NVIDIA URL' do
+  it 'downloads the driver local repo from the configured URL' do
     expect(driver_run).to create_remote_file(%r{/#{driver_pkg_file}$}).with(
       source: "#{driver_base_url}/#{driver_pkg_file}"
     )
   end
 
-  it 'downloads the cuda local repo from the official NVIDIA URL' do
+  it 'downloads the cuda local repo from the configured URL' do
     expect(cuda_run).to create_remote_file(%r{/#{cuda_pkg_file}$}).with(
       source: "#{cuda_base_url}/#{cuda_pkg_file}"
     )

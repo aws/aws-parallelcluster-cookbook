@@ -50,9 +50,10 @@ describe 'nvidia_cuda helpers' do
   end
 end
 
-describe 'nvidia_cuda: overriding samples_base_url to the official NVIDIA URL' do
+describe 'nvidia_cuda: overriding samples_base_url to a public URL' do
   cached(:cuda_version) { '1.2.3' }
-  cached(:samples_base_url) { 'https://github.com/NVIDIA/cuda-samples/archive/refs/tags' }
+  # Fake URL: test only verifies the configured attribute value is used.
+  cached(:samples_base_url) { 'https://example.com/cuda-samples/archive/refs/tags' }
 
   cached(:chef_run) do
     allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(true)
@@ -66,7 +67,7 @@ describe 'nvidia_cuda: overriding samples_base_url to the official NVIDIA URL' d
     ConvergeNvidiaCuda.setup(runner)
   end
 
-  it 'downloads the cuda samples from the official NVIDIA URL' do
+  it 'downloads the cuda samples from the configured URL' do
     is_expected.to create_remote_file('/tmp/cuda-sample.tar.gz').with(
       source: "#{samples_base_url}/v1.2.tar.gz"
     )
