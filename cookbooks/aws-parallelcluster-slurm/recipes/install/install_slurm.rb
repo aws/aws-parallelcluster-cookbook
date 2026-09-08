@@ -37,14 +37,23 @@ slurm_sha256 = if slurm_branch.empty?
 
 include_recipe 'aws-parallelcluster-slurm::slurm_users'
 
-# Get slurm tarball
-remote_file slurm_tarball do
-  source slurm_url
-  mode '0644'
-  retries 3
-  retry_delay 5
-  checksum slurm_sha256
-  action :create_if_missing
+# Get slurm tarball.
+# When base_url points to an s3:// location (e.g. a private bucket), use remote_object,
+# which performs an authenticated download via `aws s3 cp`.
+if slurm_url.start_with?('s3://')
+  remote_object slurm_tarball do
+    url slurm_url
+    destination slurm_tarball
+  end
+else
+  remote_file slurm_tarball do
+    source slurm_url
+    mode '0644'
+    retries 3
+    retry_delay 5
+    checksum slurm_sha256
+    action :create_if_missing
+  end
 end
 
 # Copy Slurm patches
