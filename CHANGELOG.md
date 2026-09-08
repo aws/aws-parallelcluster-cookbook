@@ -9,6 +9,12 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
 
+3.16.1
+------
+
+**CHANGES**
+- Upgrade Slurm to version 25.11.8 (from 25.11.6).
+
 3.16.0
 ------
 
