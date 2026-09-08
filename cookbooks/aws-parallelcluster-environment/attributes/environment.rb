@@ -82,7 +82,7 @@ default['cluster']['efa']['sha256'] = 'cf2e9281a2328a243c76f911a490faed43ca0fecf
 
 # efs-utils version: repos track the newest release within this major; ADC (raw
 # S3 object) installs this exact version.
-default['cluster']['efs']['version'] = '3.1.3'
+default['cluster']['efs']['version'] = '3.0.0'
 # DevSetting: skip installing amazon-efs-utils entirely.
 default['cluster']['efs']['skip_install'] = false
 
