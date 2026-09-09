@@ -11,7 +11,7 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
       cached(:dependency_pkg_name_suffix) { "pypi-node-dependencies-#{python_version}-#{arch}" }
       cached(:dependency_folder_name_suffix) { dependency_pkg_name_suffix }
       cached(:virtualenv_path) { "#{base_dir}/pyenv/versions/#{python_version}/envs/node_virtualenv" }
-      cached(:cookbook_virtualenv_path) { "#{base_dir}/pyenv/versions/#{python_version}/envs/cookbook_virtualenv" }
+      cached(:aws_cli_bin) { '/usr/local/bin/aws' }
       cached(:custom_node_s3_url) { "#{s3_url}/pyenv/versions/#{python_version}/envs/node_virtualenv" }
       cached(:pip_install_bash_code) do
         <<-REQ
@@ -33,7 +33,7 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
   source #{virtualenv_path}/bin/activate
   pip uninstall --yes aws-parallelcluster-node
   if [[ "#{custom_node_s3_url}" =~ ^s3:// ]]; then
-    custom_package_url=$(#{cookbook_virtualenv_path}/bin/aws s3 presign #{custom_node_s3_url} --region test_region --endpoint-url https://s3.test_region.test_aws_domain)
+    custom_package_url=$(#{aws_cli_bin} s3 presign #{custom_node_s3_url} --region test_region --endpoint-url https://s3.test_region.test_aws_domain)
   else
     custom_package_url=#{custom_node_s3_url}
   fi

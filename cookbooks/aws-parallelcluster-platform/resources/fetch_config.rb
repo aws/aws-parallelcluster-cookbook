@@ -112,7 +112,7 @@ action_class do # rubocop:disable Metrics/BlockLength
   end
 
   def fetch_s3_object(command_label, key, output, version_id = nil)
-    fetch_s3_object_command = "#{cookbook_virtualenv_path}/bin/aws s3api get-object" \
+    fetch_s3_object_command = "#{node['cluster']['aws_cli_bin']} s3api get-object" \
                          " --bucket #{node['cluster']['cluster_s3_bucket']}" \
                          " --key #{key}" \
                          " --region #{node['cluster']['region']}" \
