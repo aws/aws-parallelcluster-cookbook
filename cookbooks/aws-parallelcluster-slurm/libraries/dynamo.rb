@@ -36,7 +36,7 @@ def save_instance_config_version_to_dynamodb(status)
     item = "{\"Id\": {\"S\": \"#{item_id}\"}, \"Data\": {\"M\": #{item_data}}}"
 
     execute "Save cluster config version to DynamoDB" do
-      command "#{cookbook_virtualenv_path}/bin/aws dynamodb put-item" \
+      command "/usr/local/bin/aws dynamodb put-item" \
                 " --table-name #{table_name}"\
                 " --item '#{item}'" \
                 " --region #{node['cluster']['region']}"

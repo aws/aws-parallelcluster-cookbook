@@ -28,7 +28,7 @@ end
 # Retrieve compute and head node info from dynamo db (Slurm only)
 #
 def dynamodb_info(aws_connection_timeout_seconds: 10, aws_read_timeout_seconds: 30, shell_timeout_seconds: 60)
-  cmd = Mixlib::ShellOut.new("#{cookbook_virtualenv_path}/bin/aws dynamodb " \
+  cmd = Mixlib::ShellOut.new("/usr/local/bin/aws dynamodb " \
                       "--region #{node['cluster']['region']} query --table-name #{node['cluster']['slurm_ddb_table']} " \
                       "--index-name InstanceId --key-condition-expression 'InstanceId = :instanceid' " \
                       "--expression-attribute-values '{\":instanceid\": {\"S\":\"#{node['ec2']['instance_id']}\"}}' " \

@@ -10,23 +10,32 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 control 'tag:install_awscli_installed' do
-  title 'awscli package should be installed in cookbook virtualenv'
+  title 'only awscli v2 should be installed, system-wide'
 
   only_if { !os_properties.redhat_on_docker? }
 
-  describe bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/pip list") do
-    its('exit_status') { should eq(0) }
-    its('stdout')      { should match('awscli') }
-  end
-
   describe file('/usr/local/bin/aws') do
     it { should exist }
+  end
+
+  describe bash('/usr/local/bin/aws --version') do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should match(%r{^aws-cli/2\.}) }
+  end
+
+  # AWS CLI v2 is not published on PyPI, so any awscli package in the virtualenv would be v1.
+  describe bash("#{node['cluster']['cookbook_virtualenv_path']}/bin/pip list") do
+    its('exit_status') { should eq(0) }
+    its('stdout')      { should_not match('awscli') }
+  end
+
+  describe file("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws") do
+    it { should_not exist }
   end
 end
 
 control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
   only_if { !os_properties.redhat_on_docker? }
-  virtualenv_path = node['cluster']['cookbook_virtualenv_path']
 
   describe "aws cli can run as cluster default user #{node['cluster']['cluster_user']}" do
     subject { bash("sudo su - #{node['cluster']['cluster_user']} -c 'aws --version'") }
@@ -35,11 +44,6 @@ control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
 
   describe 'aws cli can run as root' do
     subject { bash("sudo su - -c 'aws --version'") }
-    its('exit_status') { should eq 0 }
-  end
-
-  describe 'aws cli can run as root in cookbook virtualenv' do
-    subject { bash("#{virtualenv_path}/bin/aws --version") }
     its('exit_status') { should eq 0 }
   end
 end
