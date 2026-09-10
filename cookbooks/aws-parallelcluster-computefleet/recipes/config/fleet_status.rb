@@ -53,7 +53,7 @@ when 'HeadNode'
   unless on_docker? || kitchen_test? && !node['interact_with_ddb']
     execute 'initialize compute fleet status in DynamoDB' do
       # Initialize the status of the compute fleet in the DynamoDB table. Set it to RUNNING.
-      command "#{node['cluster']['aws_cli_bin']} dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
+      command "/usr/local/bin/aws dynamodb put-item --table-name #{node['cluster']['ddb_table']}"\
               " --item '{\"Id\": {\"S\": \"COMPUTE_FLEET\"}, \"Data\": {\"M\": {\"status\": {\"S\": \"RUNNING\"}, \"lastStatusUpdatedTime\": {\"S\": \"#{Time.now.utc}\"}}}}'" \
               " --region #{node['cluster']['region']}"
       retries 3

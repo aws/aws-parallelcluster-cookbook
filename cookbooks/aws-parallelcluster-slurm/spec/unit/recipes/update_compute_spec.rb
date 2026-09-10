@@ -16,7 +16,7 @@ require 'spec_helper'
 describe 'aws-parallelcluster-slurm::update_compute' do
   for_all_oses do |platform, version|
     node_type = "ComputeFleet"
-    aws_cli_bin = "MOCK_AWS_CLI_BIN"
+    aws_cli_bin = "/usr/local/bin/aws"
     cluster_name = "MOCK_CLUSTER_NAME"
     region = "MOCK_REGION"
     instance_id = "MOCK_INSTANCE_ID"
@@ -33,7 +33,6 @@ describe 'aws-parallelcluster-slurm::update_compute' do
                   allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(are_mount_or_unmount_required)
                   allow_any_instance_of(Object).to receive(:storage_change_supports_live_update?).and_return(storage_change_supports_live_update)
                   allow_any_instance_of(Object).to receive(:dig).and_return(true)
-                  node.override['cluster']['aws_cli_bin'] = aws_cli_bin
                   allow(Time).to receive(:now).and_return(Time.parse(time_now))
                   RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 

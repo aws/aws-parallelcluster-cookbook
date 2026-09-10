@@ -8,7 +8,6 @@ default['cluster']['examples_dir'] = "#{node['cluster']['base_dir']}/examples"
 default['cluster']['shared_dir_login_nodes'] = "#{node['cluster']['base_dir']}/shared_login_nodes"
 default['cluster']['log_base_dir'] = '/var/log/parallelcluster'
 default['cluster']['etc_dir'] = '/etc/parallelcluster'
-default['cluster']['aws_cli_bin'] = '/usr/local/bin/aws'
 
 default['cluster']['exec_tmp_dir'] = "#{node['cluster']['base_dir']}/tmp"
 default['cluster']['tmp_noexec'] = 'false'
