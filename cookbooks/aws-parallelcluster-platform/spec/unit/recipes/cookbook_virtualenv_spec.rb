@@ -17,7 +17,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
       set -e
       tar xzf cookbook-dependencies.tgz
       cd #{dependency_package_name}
-      #{virtualenv_path}/bin/pip install * -f ./ --no-index
+      #{virtualenv_path}/bin/pip install -r #{base_dir}/cookbook-requirements.txt -f ./ --no-index
         REQ
       end
       cached(:pip_install_internet_bash_code) do
@@ -62,6 +62,10 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
               is_expected.to write_node_attributes('dump node attributes')
             end
 
+            it 'creates cookbook requirements file' do
+              is_expected.to create_cookbook_file("#{base_dir}/cookbook-requirements.txt")
+            end
+
             if install_from_internet
               it 'does not download cookbook dependencies from S3' do
                 is_expected.not_to create_remote_file("#{base_dir}/cookbook-dependencies.tgz")
@@ -71,10 +75,6 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
                 is_expected.not_to run_bash("pip install cookbook dependencies from S3")
                   .with(user: 'root', group: 'root', cwd: base_dir)
                   .with(code: pip_install_s3_bash_code)
-              end
-
-              it 'creates cookbook requirements file' do
-                is_expected.to create_cookbook_file("#{base_dir}/cookbook-requirements.txt")
               end
 
               it 'installs python packages from internet' do
@@ -91,10 +91,6 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
                 is_expected.to run_bash("pip install cookbook dependencies from S3")
                   .with(user: 'root', group: 'root', cwd: base_dir)
                   .with(code: pip_install_s3_bash_code)
-              end
-
-              it 'does not create cookbook requirements file' do
-                is_expected.not_to create_cookbook_file("#{base_dir}/cookbook-requirements.txt")
               end
 
               it 'does not install python packages from internet' do

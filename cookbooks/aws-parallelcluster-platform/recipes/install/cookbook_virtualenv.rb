@@ -29,16 +29,16 @@ activate_virtual_env cookbook_virtualenv_name do
   not_if { ::File.exist?("#{cookbook_virtualenv_path}/bin/activate") }
 end
 
+cookbook_file "#{node['cluster']['base_dir']}/cookbook-requirements.txt" do
+  source 'cookbook_virtualenv/requirements.txt'
+  cookbook 'aws-parallelcluster-platform'
+  mode '0644'
+end
+
 # Install dependencies based on install_python_from_internet setting
 # When true, dependencies are installed from PyPI (for testing new Python versions)
 # When false (default), dependencies are installed from S3 pre-built packages (production mode)
 if node['cluster']['install_python_from_internet']
-  cookbook_file "#{node['cluster']['base_dir']}/cookbook-requirements.txt" do
-    source 'cookbook_virtualenv/requirements.txt'
-    cookbook 'aws-parallelcluster-platform'
-    mode '0644'
-  end
-
   bash 'pip install cookbook dependencies from internet' do
     user 'root'
     group 'root'
@@ -64,7 +64,7 @@ else
       set -e
       tar xzf cookbook-dependencies.tgz
       cd #{dependency_package_name}
-      #{virtualenv_path}/bin/pip install * -f ./ --no-index
+      #{virtualenv_path}/bin/pip install -r #{node['cluster']['base_dir']}/cookbook-requirements.txt -f ./ --no-index
     REQ
   end
 end

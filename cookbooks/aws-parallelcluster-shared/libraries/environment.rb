@@ -6,6 +6,8 @@ CLASSIC_AWS_DOMAIN = "amazonaws.com".freeze
 CHINA_AWS_DOMAIN = "amazonaws.com.cn".freeze
 US_ISO_AWS_DOMAIN = "c2s.ic.gov".freeze
 US_ISOB_AWS_DOMAIN = "sc2s.sgov.gov".freeze
+# AWS CLI v2, installed by aws-parallelcluster-platform::awscli
+AWS_CLI_BIN = "/usr/local/bin/aws".freeze
 
 def aws_domain
   # Get the aws domain name

@@ -16,7 +16,7 @@ require 'spec_helper'
 describe 'aws-parallelcluster-slurm::finalize_login_node' do
   for_all_oses do |platform, version|
     node_type = "LoginNode"
-    cookbook_venv_path = "MOCK_COOKBOOK_VENV_PATH"
+    aws_cli_bin = "/usr/local/bin/aws"
     cluster_name = "MOCK_CLUSTER_NAME"
     region = "MOCK_REGION"
     instance_id = "MOCK_INSTANCE_ID"
@@ -28,7 +28,6 @@ describe 'aws-parallelcluster-slurm::finalize_login_node' do
         runner = runner(platform: platform, version: version) do |node|
           allow_any_instance_of(Object).to receive(:are_mount_or_unmount_required?).and_return(false)
           allow_any_instance_of(Object).to receive(:dig).and_return(true)
-          allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
           allow_any_instance_of(Object).to receive(:is_static_node?).and_return(false)
           allow(Time).to receive(:now).and_return(Time.parse(time_now))
           RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
@@ -44,7 +43,7 @@ describe 'aws-parallelcluster-slurm::finalize_login_node' do
 
       status = "DEPLOYED_BOOTSTRAP"
       it "saves the cluster config version to dynamodb with status #{status}" do
-        expected_command = "#{cookbook_venv_path}/bin/aws dynamodb put-item" \
+        expected_command = "#{aws_cli_bin} dynamodb put-item" \
           " --table-name parallelcluster-#{cluster_name}"\
           " --item '{\"Id\": {\"S\": \"CLUSTER_CONFIG.#{instance_id}\"}, \"Data\": {\"M\": {\"cluster_config_version\": {\"S\": \"#{cluster_config_version}\"}, \"status\": {\"S\": \"#{status}\"}, \"node_type\": {\"S\": \"#{node_type}\"}, \"lastUpdateTime\": {\"S\": \"#{time_now}\"}}}}'" \
           " --region #{region}"
