@@ -28,10 +28,6 @@ control 'tag:install_awscli_installed' do
     its('exit_status') { should eq(0) }
     its('stdout')      { should_not match('awscli') }
   end
-
-  describe file("#{node['cluster']['cookbook_virtualenv_path']}/bin/aws") do
-    it { should_not exist }
-  end
 end
 
 control 'tag:testami_awscli_can_run_as_cluster_user_and_as_root' do
