@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.17.0
 ------
 
+**CHANGES**
+- Ship only AWS CLI v2 in ParallelCluster AMIs. AWS CLI v1 is no longer installed in the cookbook Python virtual environment.
+
 **BUG FIXES**
 - Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
 
