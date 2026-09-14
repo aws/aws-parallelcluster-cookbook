@@ -16,7 +16,7 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
-return if ::File.exist?("/usr/local/bin/aws") || redhat_on_docker?
+return if ::File.exist?(AWS_CLI_BIN) || redhat_on_docker?
 
 file_cache_path = Chef::Config[:file_cache_path]
 region = aws_region
@@ -45,7 +45,7 @@ archive_file 'extract awscli bundle' do
 end
 
 bash 'install awscli' do
-  code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
+  code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b #{::File.dirname(AWS_CLI_BIN)}"
 end
 
 if region.start_with?("us-iso")
