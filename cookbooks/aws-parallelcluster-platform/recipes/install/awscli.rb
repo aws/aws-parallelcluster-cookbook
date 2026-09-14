@@ -45,7 +45,7 @@ archive_file 'extract awscli bundle' do
 end
 
 bash 'install awscli' do
-  code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
+  code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b #{::File.dirname(AWS_CLI_BIN)}"
 end
 
 if region.start_with?("us-iso")
