@@ -16,7 +16,7 @@ describe 'aws-parallelcluster-computefleet::clusterstatusmgtd_config' do
         is_expected.to create_file("#{node['cluster']['shared_dir']}/computefleet-status.json")
           .with(user: "#{node['cluster']['cluster_admin_user']}")
           .with(group: "#{node['cluster']['cluster_admin_user']}")
-          .with(mode: '0755')
+          .with(mode: '0644')
       end
 
       it 'creates the clusterstatusmgtd file with the correct attributes' do
