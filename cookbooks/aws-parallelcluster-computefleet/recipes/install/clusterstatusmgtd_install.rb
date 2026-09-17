@@ -27,5 +27,6 @@ cookbook_file "#{node['cluster']['scripts_dir']}/clusterstatusmgtd_logging.conf"
   source 'clusterstatusmgtd/clusterstatusmgtd_logging.conf'
   owner 'root'
   group 'root'
-  mode '0755'
+  # Python logging config file, read by clusterstatusmgtd; not executable, so no execute bit.
+  mode '0644'
 end
