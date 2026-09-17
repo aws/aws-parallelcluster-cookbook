@@ -22,7 +22,7 @@ control 'tag:install_clusterstatusmgtd_files_created' do
 
   describe file('/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf') do
     it { should exist }
-    its('mode') { should cmp '0755' }
+    its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('content') { should_not be_empty }
