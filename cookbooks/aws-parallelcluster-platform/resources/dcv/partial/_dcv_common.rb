@@ -276,7 +276,8 @@ action :configure do
       cookbook 'aws-parallelcluster-platform'
       owner 'root'
       group 'root'
-      mode '0755'
+      # config file read by the DCV server, not executed: owner rw, world read-only
+      mode '0644'
       variables(is_dcv_gl_supported: is_dcv_gl_supported)
     end
 
