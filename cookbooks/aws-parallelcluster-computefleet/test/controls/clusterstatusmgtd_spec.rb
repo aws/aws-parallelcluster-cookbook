@@ -39,7 +39,7 @@ control 'tag:config_clusterstatusmgtd' do
     its('content') { should_not match /^""$/ }
     its('owner') { should eq 'pcluster-admin' }
     its('group') { should eq 'pcluster-admin' }
-    its('mode') { should cmp '0755' }
+    its('mode') { should cmp '0644' }
   end
 
   describe file('/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd') do

@@ -16,11 +16,13 @@
 return unless node['cluster']['node_type'] == 'HeadNode'
 
 # create placeholder for computefleet-status.json, so it can be written by clusterstatusmgtd which run as pcluster admin user
+# This is a JSON data file: clusterstatusmgtd (pcluster admin user) opens it for writing and slurm_fleet_status_manager
+# reads it, but it is never executed. So it needs owner write but no execute bit, and group/other write must not be granted.
 file node['cluster']['computefleet_status_path'] do
   owner node['cluster']['cluster_admin_user']
   group node['cluster']['cluster_admin_user']
   content '{}'
-  mode '0755'
+  mode '0644'
   action :create
 end
 
