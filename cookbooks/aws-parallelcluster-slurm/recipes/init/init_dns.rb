@@ -52,14 +52,28 @@ if node['cluster']['use_private_hostname'] == 'false'
 
   else
     # Head node
-    node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
-    node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+    # node['ec2']['local_hostname'] is populated EC2 instance metadata (IMDS) and
+    # can be transiently nil while IMDS settles during boot.
+    ruby_block "retrieve head node hostname" do
+      block do
+        node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
+        node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+      end
+      retries 5
+      retry_delay 3
+    end
   end
 
 else
   # Single Instance Type
-  node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
-  node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+  ruby_block "retrieve single instance type hostname" do
+    block do
+      node.force_default['cluster']['assigned_hostname'] = node['ec2']['local_hostname']
+      node.force_default['cluster']['assigned_short_hostname'] = node['ec2']['local_hostname'].split('.')[0].to_s
+    end
+    retries 5
+    retry_delay 3
+  end
 end
 
 # Configure short hostname
