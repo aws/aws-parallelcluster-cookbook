@@ -82,15 +82,15 @@ describe 'efs:install_utils' do
         end
       end
 
-      # ADC (us-iso): the per-region S3 bucket is a raw package drop, not a served
-      # yum repo, so download the RPM and install the local file instead.
+      # ADC (us-iso): the per-region S3 bucket only hosts the efs-utils source
+      # tarball, not a served yum repo, so download it and build the RPM locally.
       context "in an ADC (us-iso) region" do
         cached(:iso_region) { 'us-iso-test-1' }
         cached(:iso_domain) { 'test.aws.domain' }
         cached(:sources_dir) { '/fake/sources' }
-        cached(:rpm_file) { "amazon-efs-utils-#{utils_version}-1.x86_64.rpm" }
-        cached(:rpm_url) do
-          "https://s3-efs-utils-mvp-prod-#{iso_region}.s3.#{iso_region}.#{iso_domain}/#{rpm_file}"
+        cached(:tarball) { 'efs-utils-v9-8-7-1.tar.gz' }
+        cached(:tarball_url) do
+          "https://s3.#{iso_region}.#{iso_domain}/s3-efs-utils-mvp-prod-#{iso_region}/linux/#{tarball}"
         end
         cached(:chef_run) do
           mock_already_installed(false)
@@ -107,14 +107,28 @@ describe 'efs:install_utils' do
           is_expected.not_to create_yum_repository('efs-utils')
         end
 
-        it 'downloads the RPM from the EFS per-region S3 bucket' do
-          is_expected.to create_if_missing_remote_file("#{sources_dir}/#{rpm_file}")
-            .with(source: rpm_url)
+        it 'installs the build prerequisites' do
+          is_expected.to install_robust_package('install efs-utils build prerequisites')
+            .with(packages: %w(git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wget perl golang))
         end
 
-        it 'installs the downloaded RPM locally' do
-          is_expected.to run_bash('install amazon-efs-utils from S3 rpm')
-            .with(code: "yum install -y ./#{rpm_file}")
+        it 'downloads the source tarball from the EFS per-region S3 bucket' do
+          is_expected.to create_if_missing_remote_file("#{sources_dir}/#{tarball}")
+            .with(source: tarball_url)
+        end
+
+        it 'builds and installs the RPM from the tarball' do
+          is_expected.to run_bash('install amazon-efs-utils from S3 tarball').with(
+            cwd: sources_dir,
+            code: <<-EFSUTILSINSTALL
+      set -e
+      rm -rf efs-utils
+      tar xf #{sources_dir}/#{tarball}
+      cd efs-utils
+      make rpm
+      yum install -y ./build/amazon-efs-utils*rpm
+            EFSUTILSINSTALL
+          )
         end
       end
     end
