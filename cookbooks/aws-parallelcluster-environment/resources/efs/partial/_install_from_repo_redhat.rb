@@ -14,26 +14,25 @@
 # See the License for the specific language governing permissions and limitations under the License.
 
 # Install amazon-efs-utils from the EFS yum repo instead of building from source.
-# ADC (us-iso*) can't reach CloudFront and its EFS S3 buckets are raw package
-# drops (not a served repo), so there we download the RPM and install the file.
+# ADC (us-iso*) can't reach CloudFront and its EFS S3 buckets only host the
+# efs-utils source tarball (not a served repo), so there we build the RPM locally.
 
 def efs_repo_base_url
   # RHEL/Rocky are el-binary-compatible, so both use the redhat/<major>.* path.
   "#{efs_domain}/repo/rpm/redhat/#{node['platform_version'].to_i}.*"
 end
 
-def efs_rpm_arch
-  arm_instance? ? 'aarch64' : 'x86_64'
+def efs_adc_tarball
+  "efs-utils-v#{_efs_utils_version.tr('.', '-')}-1.tar.gz"
 end
 
-def efs_rpm_file
-  "amazon-efs-utils-#{_efs_utils_version}-1.#{efs_rpm_arch}.rpm"
+def efs_adc_tarball_url
+  "https://s3.#{aws_region}.#{aws_domain}/s3-efs-utils-mvp-prod-#{aws_region}/linux/#{efs_adc_tarball}"
 end
 
-def efs_adc_rpm_url
-  # EFS's per-region prebuilt bucket (s3-efs-utils-mvp-prod-<region>), reachable
-  # from ADC nodes via the S3 gateway endpoint.
-  "https://s3-efs-utils-mvp-prod-#{aws_region}.s3.#{aws_region}.#{aws_domain}/#{efs_rpm_file}"
+def efs_build_prerequisites
+  # This set is provided by EFS team.
+  %w(git rpm-build make rust cargo openssl-devel gcc gcc-c++ cmake wget perl golang)
 end
 
 action :install_utils do
@@ -86,19 +85,31 @@ action :install_efs_utils_from_repo do
 end
 
 action :install_efs_utils_from_s3 do
-  local_rpm = "#{node['cluster']['sources_dir']}/#{efs_rpm_file}"
-  remote_file local_rpm do
-    source efs_adc_rpm_url
+  robust_package 'install efs-utils build prerequisites' do
+    packages efs_build_prerequisites
+  end
+
+  local_tarball = "#{node['cluster']['sources_dir']}/#{efs_adc_tarball}"
+  remote_file local_tarball do
+    source efs_adc_tarball_url
     mode '0644'
     retries 3
     retry_delay 5
     action :create_if_missing
   end
 
-  bash "install amazon-efs-utils from S3 rpm" do
+  # The tarball extracts to efs-utils/; `make rpm` writes the RPMs to build/.
+  bash "install amazon-efs-utils from S3 tarball" do
     user 'root'
     cwd node['cluster']['sources_dir']
-    code "yum install -y ./#{efs_rpm_file}"
+    code <<-EFSUTILSINSTALL
+      set -e
+      rm -rf efs-utils
+      tar xf #{local_tarball}
+      cd efs-utils
+      make rpm
+      yum install -y ./build/amazon-efs-utils*rpm
+    EFSUTILSINSTALL
     retries 3
     retry_delay 5
   end
