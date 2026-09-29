@@ -14,10 +14,20 @@ control 'tag:config_sudo' do
 
   describe file('/etc/sudoers.d/99-parallelcluster-user-tty') do
     it { should exist }
-    its('mode') { should cmp '0600' }
+    its('mode') { should cmp '0440' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('content') { should_not be_empty }
+  end
+end
+
+control 'tag:config_sudoers_files_valid' do
+  title 'Check that every sudoers file passes visudo syntax, ownership and permissions checks'
+
+  describe command('visudo -c') do
+    its('exit_status') { should eq 0 }
+    its('stdout') { should_not match /bad permissions|bad owner/ }
+    its('stderr') { should_not match /bad permissions|bad owner/ }
   end
 end
 

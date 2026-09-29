@@ -39,7 +39,7 @@ describe 'sudo_access:setup' do
             cookbook: 'aws-parallelcluster-platform',
             user: 'root',
             group: 'root',
-            mode: '0600',
+            mode: '0440',
             variables: {
               user_name: default_user,
             }

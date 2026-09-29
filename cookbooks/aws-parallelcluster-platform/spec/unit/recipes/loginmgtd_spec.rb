@@ -39,7 +39,7 @@ describe 'aws-parallelcluster-platform::loginmgtd' do
           source: 'loginmgtd/99-parallelcluster-loginmgtd.erb',
           owner: 'root',
           group: 'root',
-          mode:  '0600'
+          mode:  '0440'
         )
       end
     end

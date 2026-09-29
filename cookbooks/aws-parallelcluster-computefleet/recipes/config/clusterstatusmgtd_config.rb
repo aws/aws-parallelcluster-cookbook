@@ -31,7 +31,7 @@ template '/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd' do
   source 'clusterstatusmgtd/99-parallelcluster-clusterstatusmgtd.erb'
   owner 'root'
   group 'root'
-  mode '0600'
+  mode '0440'
 end
 
 # create log file for clusterstatusmgtd

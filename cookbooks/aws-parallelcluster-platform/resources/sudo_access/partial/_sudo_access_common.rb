@@ -48,7 +48,7 @@ action :disable do
     cookbook 'aws-parallelcluster-platform'
     owner 'root'
     group 'root'
-    mode '0600'
+    mode '0440'
     variables(
       user_name: new_resource.user_name
     )
