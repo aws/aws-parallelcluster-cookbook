@@ -44,5 +44,5 @@ template '/etc/sudoers.d/99-parallelcluster-slurm' do
   source 'slurm/99-parallelcluster-slurm.erb'
   owner 'root'
   group 'root'
-  mode '0600'
+  mode '0440'
 end
