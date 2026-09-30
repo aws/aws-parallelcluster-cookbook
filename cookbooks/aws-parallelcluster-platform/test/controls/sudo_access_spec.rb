@@ -22,7 +22,7 @@ control 'tag:config_sudo_access_disable_action' do
     it { should exist }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('mode') { should cmp '0600' }
+    its('mode') { should cmp '0440' }
     its('content') { should match "#{node['cluster']['cluster_user']} ALL=(ALL) !ALL\n" }
   end
 

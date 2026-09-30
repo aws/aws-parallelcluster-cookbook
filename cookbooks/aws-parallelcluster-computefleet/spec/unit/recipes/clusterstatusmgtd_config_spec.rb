@@ -24,7 +24,7 @@ describe 'aws-parallelcluster-computefleet::clusterstatusmgtd_config' do
           .with(source: 'clusterstatusmgtd/99-parallelcluster-clusterstatusmgtd.erb')
           .with(user: 'root')
           .with(group: 'root')
-          .with(mode: '0600')
+          .with(mode: '0440')
       end
 
       it 'has the correct content' do

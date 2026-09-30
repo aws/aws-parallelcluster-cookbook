@@ -62,7 +62,7 @@ control 'tag:config_slurm_sudoers_correctly_defined' do
 
   describe file("/etc/sudoers.d/99-parallelcluster-slurm") do
     it { should exist }
-    its('mode') { should cmp '0600' }
+    its('mode') { should cmp '0440' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('content') { should match /#{node['cluster']['cluster_admin_user']} ALL = \(root\) NOPASSWD: SLURM_COMMANDS/ }
