@@ -15,7 +15,7 @@ describe 'aws-parallelcluster-platform::sudo_install' do
         is_expected.to create_template('/etc/sudoers.d/99-parallelcluster-secure-path').with(
           owner: 'root',
           group: 'root',
-          mode:  '0600'
+          mode:  '0440'
         )
       end
 

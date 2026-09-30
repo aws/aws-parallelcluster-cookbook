@@ -46,7 +46,7 @@ control 'tag:config_clusterstatusmgtd' do
     it { should exist }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('mode') { should cmp '0600' }
+    its('mode') { should cmp '0440' }
     its('content') { should match %r{Cmnd_Alias CINC_COMMAND = /usr/bin/cinc-client --local-mode --config /etc/chef/client\.rb --log_level info --logfile /var/log/chef-client\.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna\.json --override-runlist  aws-parallelcluster-entrypoints\\:\\:update_computefleet_status} }
     its('content') { should match /#{node['cluster']['cluster_admin_user']} ALL = \(root\) NOPASSWD: CINC_COMMAND/ }
   end

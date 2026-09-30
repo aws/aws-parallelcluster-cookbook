@@ -12,7 +12,7 @@ describe 'aws-parallelcluster-platform::sudo_config' do
           source: 'sudo/99-parallelcluster-user-tty.erb',
           owner: 'root',
           group: 'root',
-          mode:  '0600'
+          mode:  '0440'
         )
       end
     end
