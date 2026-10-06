@@ -47,16 +47,16 @@ Looking at the existing issues is a great way to find something to contribute on
 ## VSCode Developer Environment
 
 We provide a [.devcontainer](../.devcontainer) environment that you can open in VSCode, either automatically via the popup that will
-appear in the bottom right, or the command palette for DevContainer -> Reopen in container. The image comes with ruby 2.7 and dependencies installed and then you will shell in as the VSCode user (uid 1000) and can test style, run Python tests:
+appear in the bottom right, or the command palette for DevContainer -> Reopen in container. The image comes with Python 3.14, ruby and dependencies installed and then you will shell in as the VSCode user (uid 1000) and can test style, run Python tests:
 
 ```bash
 cookstyle .
 ```
 
-or run Python tests (we have version 3.9 in the container)
+or run Python tests (we have version 3.14 in the container)
 
 ```bash
-tox -e py39-nocov
+tox -e py314-nocov
 ```
 
 Or go to any of the cookbooks directories and run ChefSpec
