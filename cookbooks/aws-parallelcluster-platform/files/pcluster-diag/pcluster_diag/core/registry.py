@@ -27,6 +27,7 @@ from pcluster_diag.checks.directory_lookup import DirectoryService
 from pcluster_diag.checks.endpoint_reachability import EndpointsAreReachable
 from pcluster_diag.checks.fsx_connectivity import FsxTargetsAreReachable, LustreFilesystem
 from pcluster_diag.checks.imds import Imds
+from pcluster_diag.checks.network_congestion import NetworkCongestion
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
 from pcluster_diag.checks.slurm_accounting import SlurmAccounting
 from pcluster_diag.models.check import Check
@@ -143,4 +144,5 @@ DEFAULT_REGISTRY = (
     .register(SlurmAccounting())
     .register(LustreFilesystem())
     .register(FsxTargetsAreReachable())  # approval_required: heavier per-target probe
+    .register(NetworkCongestion())
 )
