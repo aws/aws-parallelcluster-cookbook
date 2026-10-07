@@ -15,7 +15,7 @@ import os
 import pytest
 from assertpy import assert_that
 from config_utils import get_template_folder
-from pcluster_slurm_config_generator import generate_slurm_config_files
+from pcluster_slurm_config_generator import _write_rendered_template_to_file, generate_slurm_config_files
 
 
 def _mock_head_node_config(mocker):
@@ -285,3 +285,15 @@ def _assert_files_are_equal(file, expected_file):
         expected_file_content = expected_file_content.replace("<DIR>", os.path.dirname(file))
         file_content = f.read()
         assert_that(file_content).is_equal_to(expected_file_content)
+
+
+def test_write_rendered_template_to_file_logs_content(tmpdir, caplog):
+    filename = str(tmpdir / "slurm_parallelcluster_queue1_partition.conf")
+    content = "NodeName=queue1-st-cr1-[1-2] CPUs=4\nPartitionName=queue1 Nodes=queue1-st-cr1-[1-2]\n"
+
+    with caplog.at_level("INFO"):
+        _write_rendered_template_to_file(content, filename)
+
+    with open(filename, encoding="utf-8") as output_file:
+        assert_that(output_file.read()).is_equal_to(content)
+    assert_that(caplog.text).contains(f"Writing contents of {filename}:\n{content}")
