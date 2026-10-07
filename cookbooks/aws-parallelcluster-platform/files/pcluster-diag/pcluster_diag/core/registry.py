@@ -24,6 +24,7 @@ from pcluster_diag.checks.cfn_hup import CfnHup
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
 from pcluster_diag.checks.directory_lookup import DirectoryService
+from pcluster_diag.checks.endpoint_reachability import EndpointsAreReachable
 from pcluster_diag.checks.fsx_connectivity import FsxTargetsAreReachable, LustreFilesystem
 from pcluster_diag.checks.imds import Imds
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
@@ -132,6 +133,7 @@ class Registry:
 DEFAULT_REGISTRY = (
     Registry()
     .register(Imds())
+    .register(EndpointsAreReachable())
     .register(CfnHup())
     .register(ReservedUsersAndGroups())
     .register(CriticalPathsHaveExpectedPermissions())
