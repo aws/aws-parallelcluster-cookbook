@@ -258,7 +258,7 @@ def _parse_uri(uri, attr) -> str:
 
 
 def _write_rendered_template_to_file(rendered_template, filename):
-    log.info("Writing contents of %s", filename)
+    log.info("Writing contents of %s:\n%s", filename, rendered_template)
     with open(filename, "w", encoding="utf-8") as output_file:
         output_file.write(rendered_template)
 
