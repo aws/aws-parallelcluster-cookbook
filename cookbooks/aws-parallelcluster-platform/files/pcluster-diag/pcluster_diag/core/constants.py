@@ -208,3 +208,19 @@ SLURMDBD_CONF_GROUP = SLURM_USER
 # slurmdbd validates this mode by equality and exits fatal on anything else ("should be 600 or 640"),
 # so both accepted values are listed here rather than only the one the cookbook sets.
 SLURMDBD_CONF_ALLOWED_MODES = frozenset({"0600", "0640"})
+
+# Network congestion
+ETHTOOL_PATH = "/usr/sbin/ethtool"
+PROC_NET_ROUTE_PATH = "/proc/net/route"
+# Primary interface names tried, in order, when the default route cannot be read.
+FALLBACK_PRIMARY_INTERFACES = ("eth0", "ens5")
+# ENA allowance counters: packets dropped OR queued because an instance-level network limit was exceeded.
+# They are cumulative since the last device reset (usually the instance launch).
+# Source: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/monitoring-network-performance-ena.html
+ENA_ALLOWANCE_COUNTERS = (
+    "bw_in_allowance_exceeded",
+    "bw_out_allowance_exceeded",
+    "pps_allowance_exceeded",
+    "conntrack_allowance_exceeded",
+    "linklocal_allowance_exceeded",
+)
