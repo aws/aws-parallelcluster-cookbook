@@ -7,6 +7,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **CHANGES**
+- Upgrade Python to version 3.14.8.
 - Ship only AWS CLI v2 in ParallelCluster AMIs. AWS CLI v1 is no longer installed in the cookbook Python virtual environment.
 - Remove execution permissions for configurations files `/opt/parallelcluster/shared/computefleet-status.json`,
   `/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf` and `/etc/dcv/dcv.conf`

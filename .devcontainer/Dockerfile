@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/ruby:2.7
+FROM public.ecr.aws/docker/library/python:3.14
 
 LABEL maintainer="Amazon Web Services"
 
@@ -16,10 +16,10 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 RUN apt-get update \
  && apt-get -qq install -y --no-install-recommends \
     sudo \
-    python3-pip \
-    python3 && \
+    build-essential \
+    ruby-full \
+    ruby-bundler && \
     pip3 install tox && \
-    ln -s /usr/bin/python3 /usr/bin/python && \
     apt-get clean
 
 ENV CHEF_LICENSE=accept-no-persist

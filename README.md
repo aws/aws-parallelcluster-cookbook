@@ -170,7 +170,7 @@ of the cookbook defaults:
 
 ```
 export KITCHEN_ALINUX2023_AMI=ami-0123456789abcdef0
-export EXTRA_CHEF_ATTRIBUTES='{"cluster": {"python-version": "3.14.6", "efs": {"version": "3.1.3"}}}'
+export EXTRA_CHEF_ATTRIBUTES='{"cluster": {"python-version": "3.14.8", "efs": {"version": "3.1.3"}}}'
 ./kitchen.ec2.sh environment-config test efs-alinux2023
 ```
 
