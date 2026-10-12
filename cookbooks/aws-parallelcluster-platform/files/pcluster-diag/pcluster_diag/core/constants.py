@@ -209,6 +209,10 @@ SLURMDBD_CONF_GROUP = SLURM_USER
 # so both accepted values are listed here rather than only the one the cookbook sets.
 SLURMDBD_CONF_ALLOWED_MODES = frozenset({"0600", "0640"})
 
+# Endpoint reachability
+# Timeout, in seconds, of every network probe: DNS lookup, TCP connect and TLS handshake, direct or through a proxy.
+ENDPOINT_PROBE_TIMEOUT_SECONDS = 5
+
 # Network congestion
 ETHTOOL_PATH = "/usr/sbin/ethtool"
 PROC_NET_ROUTE_PATH = "/proc/net/route"

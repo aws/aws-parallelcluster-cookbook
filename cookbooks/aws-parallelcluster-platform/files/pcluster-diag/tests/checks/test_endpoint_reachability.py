@@ -20,11 +20,13 @@ from pcluster_diag.checks import endpoint_reachability as check_module
 from pcluster_diag.checks.endpoint_reachability import EndpointsAreReachable
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.result import Status
-from pcluster_diag.util.aws_endpoints import Endpoint
+from pcluster_diag.util.aws_endpoints import Endpoint, Service
 from pcluster_diag.util.network import DnsResult, TcpResult, TlsResult
 from tests.sample_data import sample_context
 
 _TWO_ENDPOINTS = [Endpoint("ec2", "ec2.us-east-1.amazonaws.com"), Endpoint("s3", "s3.us-east-1.amazonaws.com")]
+_DS_NEEDED_WHEN = "a DirectoryService is configured"
+_OPTIONAL_ENDPOINT = Endpoint("secretsmanager", "secretsmanager.us-east-1.amazonaws.com", needed_when=_DS_NEEDED_WHEN)
 
 
 def _context():
@@ -79,29 +81,8 @@ def test_all_endpoints_reachable_passes(all_reachable):
     assert "I2" in _codes(result.infos)
 
 
-def test_probe_summary_lists_probed_and_skipped_endpoints(all_reachable, monkeypatch):
-    monkeypatch.setattr(
-        check_module.aws_endpoints, "required_services", lambda cluster_config: ["ec2", "s3", "cloudformation"]
-    )
-    monkeypatch.setattr(
-        check_module.aws_endpoints,
-        "skipped_services",
-        lambda cluster_config: [("secretsmanager", "no DirectoryService is configured")],
-    )
-
-    result = EndpointsAreReachable().run(_context())
-
-    (summary,) = [info for info in result.infos if info.code == "I2"]
-    assert summary.message == (
-        "All probed AWS endpoints are reachable over certificate-verified TLS. "
-        "Probed: ec2 (ec2.us-east-1.amazonaws.com): reachable, s3 (s3.us-east-1.amazonaws.com): reachable. "
-        "Not probed: cloudformation (no endpoint in us-east-1), secretsmanager (no DirectoryService is configured)."
-    )
-
-
-def test_probe_summary_omits_not_probed_when_nothing_is_skipped(all_reachable, monkeypatch):
-    monkeypatch.setattr(check_module.aws_endpoints, "required_services", lambda cluster_config: ["ec2", "s3"])
-    monkeypatch.setattr(check_module.aws_endpoints, "skipped_services", lambda cluster_config: [])
+def test_probe_summary_lists_every_endpoint_with_its_outcome(all_reachable, monkeypatch):
+    monkeypatch.setattr(check_module.aws_endpoints, "services", lambda cluster_config: [Service("ec2"), Service("s3")])
 
     result = EndpointsAreReachable().run(_context())
 
@@ -123,8 +104,7 @@ def test_probe_summary_omits_not_probed_when_nothing_is_skipped(all_reachable, m
 )
 def test_probe_summary_lists_failed_endpoints_with_their_outcome(all_reachable, monkeypatch, failing_layer, outcome):
     s3_host = "s3.us-east-1.amazonaws.com"
-    monkeypatch.setattr(check_module.aws_endpoints, "required_services", lambda cluster_config: ["ec2", "s3"])
-    monkeypatch.setattr(check_module.aws_endpoints, "skipped_services", lambda cluster_config: [])
+    monkeypatch.setattr(check_module.aws_endpoints, "services", lambda cluster_config: [Service("ec2"), Service("s3")])
     if failing_layer == "dns":
         monkeypatch.setattr(
             check_module.network,
@@ -346,7 +326,7 @@ def test_proxy_tunnel_failure_names_the_proxy_and_the_endpoint(all_reachable, mo
 
     assert result.errors[0].message == (
         "The proxy http://proxy.local:3128 did not open a tunnel to the ec2 endpoint "
-        "(ec2.us-east-1.amazonaws.com:443): the proxy answered 'HTTP/1.1 403 Forbidden'"
+        "(ec2.us-east-1.amazonaws.com:443): the proxy answered 'HTTP/1.1 403 Forbidden'."
     )
 
 
@@ -366,7 +346,7 @@ def test_proxy_none_sentinel_is_not_treated_as_proxy(all_reachable):
     assert "I1" not in _codes(result.infos)
 
 
-def test_probes_only_the_services_the_cluster_requires(all_reachable, monkeypatch):
+def test_probes_every_service_required_or_optional(all_reachable, monkeypatch):
     requested = []
 
     def _resolve(region, services):
@@ -375,12 +355,12 @@ def test_probes_only_the_services_the_cluster_requires(all_reachable, monkeypatc
 
     monkeypatch.setattr(check_module.aws_endpoints, "resolve_endpoints", _resolve)
     context = _context()
-    context.cluster_config = dict(context.cluster_config, Monitoring={"Logs": {"CloudWatch": {"Enabled": False}}})
 
     EndpointsAreReachable().run(context)
 
-    assert requested == [check_module.aws_endpoints.required_services(context.cluster_config)]
-    assert "logs" not in requested[0]
+    assert requested == [check_module.aws_endpoints.services(context.cluster_config)]
+    # Optional services (no DirectoryService nor LoginNodes in the sample config) are probed too.
+    assert {"secretsmanager", "autoscaling", "elbv2"} <= {service.name for service in requested[0]}
 
 
 def test_endpoints_are_probed_concurrently(all_reachable, monkeypatch):
@@ -406,3 +386,71 @@ def test_findings_keep_the_endpoint_order(all_reachable, monkeypatch):
     result = EndpointsAreReachable().run(_context())
 
     assert ["ec2" in result.errors[0].message, "s3" in result.errors[1].message] == [True, True]
+
+
+def _fail_host(monkeypatch, failing_host):
+    monkeypatch.setattr(
+        check_module.network,
+        "resolve_host_isolated",
+        lambda host, **kw: DnsResult(resolved=host != failing_host, error="NXDOMAIN"),
+    )
+
+
+def test_optional_endpoint_failure_is_a_warning(all_reachable, monkeypatch):
+    monkeypatch.setattr(
+        check_module.aws_endpoints, "resolve_endpoints", lambda region, services: _TWO_ENDPOINTS + [_OPTIONAL_ENDPOINT]
+    )
+    _fail_host(monkeypatch, _OPTIONAL_ENDPOINT.host)
+
+    result = EndpointsAreReachable().run(_context())
+
+    assert result.status == Status.WARNING
+    assert result.errors is None
+    (warning,) = result.warnings
+    assert warning.code == "W1"
+    assert warning.message == (
+        "DNS resolution for the secretsmanager endpoint (secretsmanager.us-east-1.amazonaws.com) failed: "
+        "NXDOMAIN. The cluster uses this endpoint only when a DirectoryService is configured."
+    )
+
+
+def test_required_endpoint_failure_is_an_error_even_with_an_optional_one(all_reachable, monkeypatch):
+    monkeypatch.setattr(
+        check_module.aws_endpoints, "resolve_endpoints", lambda region, services: _TWO_ENDPOINTS + [_OPTIONAL_ENDPOINT]
+    )
+    failing = {"ec2.us-east-1.amazonaws.com", _OPTIONAL_ENDPOINT.host}
+    monkeypatch.setattr(
+        check_module.network,
+        "resolve_host_isolated",
+        lambda host, **kw: DnsResult(resolved=host not in failing, error="NXDOMAIN"),
+    )
+
+    result = EndpointsAreReachable().run(_context())
+
+    assert result.status == Status.FAILURE
+    assert _codes(result.errors) == {"E1"}
+    assert _codes(result.warnings) == {"W1"}
+
+
+def test_every_probe_uses_the_probe_timeout(monkeypatch):
+    timeouts = []
+
+    def _record(result):
+        def _probe(*args, **kwargs):
+            timeouts.append(kwargs.get("timeout"))
+            return result
+
+        return _probe
+
+    monkeypatch.setattr(check_module.aws_endpoints, "resolve_endpoints", lambda region, services: list(_TWO_ENDPOINTS))
+    monkeypatch.setattr(check_module.network, "resolve_host_isolated", _record(DnsResult(resolved=True, error=None)))
+    monkeypatch.setattr(check_module.network, "tcp_connect", _record(TcpResult(connected=True, error=None)))
+    monkeypatch.setattr(check_module.network, "tls_handshake", _record(TlsResult(connected=True, error=None)))
+    monkeypatch.setattr(check_module.network, "tls_handshake_via_proxy", _record(TlsResult(connected=True, error=None)))
+
+    EndpointsAreReachable().run(_context())
+    EndpointsAreReachable().run(_proxy_context())
+
+    # Direct: DNS, TCP and TLS for each of the 2 endpoints. Proxied: TCP to the proxy, then a tunnel per endpoint.
+    assert len(timeouts) == 2 * 3 + 1 + 2
+    assert set(timeouts) == {check_module.ENDPOINT_PROBE_TIMEOUT_SECONDS}

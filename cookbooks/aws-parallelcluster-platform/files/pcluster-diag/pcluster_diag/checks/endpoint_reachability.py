@@ -18,6 +18,9 @@ endpoint is reported at the *first* layer that fails (a DNS failure is not also 
 which points at the actual root cause -- a missing VPC endpoint / DNS, a blocked security group or route, or a
 TLS-terminating proxy presenting an untrusted certificate.
 
+A failure is an error for an endpoint the cluster configuration requires, and a warning for an optional one: the
+cluster does not need it, but may still use it, e.g. through custom actions.
+
 When a proxy is configured, the endpoints are probed through it, as the ParallelCluster daemons reach them
 (they pass the proxy to every boto3 client): TCP connect to the proxy, then for each endpoint an HTTP CONNECT
 tunnel and the certificate-verified TLS handshake inside it. The proxy resolves the endpoint names, so there is
@@ -27,11 +30,12 @@ no local DNS step.
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from functools import partial
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
+from pcluster_diag.core.constants import ENDPOINT_PROBE_TIMEOUT_SECONDS
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
-from pcluster_diag.models.finding import CheckError, CheckFinding, CheckInfo
+from pcluster_diag.models.finding import CheckError, CheckFinding, CheckInfo, CheckWarning
 from pcluster_diag.models.result import INTERNAL_ERROR_CODE, Result
 from pcluster_diag.util import aws_endpoints, network
 
@@ -42,16 +46,24 @@ class EndpointsAreReachable(Check):
     """Verify DNS, TCP:443, and certificate-verified TLS to each AWS endpoint ParallelCluster uses."""
 
     # --- Errors: per-endpoint, reported at the first failing layer ----------------------------
-    DNS_FAILED = CheckError(1, "DNS resolution for the {} endpoint ({}) failed: {}")
-    TCP_FAILED = CheckError(2, "TCP connection to the {} endpoint ({}:{}) failed: {}")
+    DNS_FAILED = CheckError(1, "DNS resolution for the {} endpoint ({}) failed: {}.")
+    TCP_FAILED = CheckError(2, "TCP connection to the {} endpoint ({}:{}) failed: {}.")
     TLS_CERT_INVALID = CheckError(
         3,
         "TLS certificate verification for the {} endpoint ({}) failed: {}. The endpoint is reachable "
         "but its certificate is not trusted.",
     )
-    TLS_FAILED = CheckError(4, "TLS handshake to the {} endpoint ({}:{}) failed: {}")
+    TLS_FAILED = CheckError(4, "TLS handshake to the {} endpoint ({}:{}) failed: {}.")
     PROXY_UNREACHABLE = CheckError(5, "TCP connection to the proxy {} failed: {}. No endpoint was probed.")
-    PROXY_TUNNEL_FAILED = CheckError(6, "The proxy {} did not open a tunnel to the {} endpoint ({}:{}): {}")
+    PROXY_TUNNEL_FAILED = CheckError(6, "The proxy {} did not open a tunnel to the {} endpoint ({}:{}): {}.")
+
+    # --- Warnings: the same failures for an optional endpoint, with the condition under which it is used ------
+    _OPTIONAL = " The cluster uses this endpoint only when {}."
+    OPTIONAL_DNS_FAILED = CheckWarning(1, DNS_FAILED.message + _OPTIONAL)
+    OPTIONAL_TCP_FAILED = CheckWarning(2, TCP_FAILED.message + _OPTIONAL)
+    OPTIONAL_TLS_CERT_INVALID = CheckWarning(3, TLS_CERT_INVALID.message + _OPTIONAL)
+    OPTIONAL_TLS_FAILED = CheckWarning(4, TLS_FAILED.message + _OPTIONAL)
+    OPTIONAL_PROXY_TUNNEL_FAILED = CheckWarning(5, PROXY_TUNNEL_FAILED.message + _OPTIONAL)
 
     # --- Errors: undeterminable (reserved E0 -> CHECK_ERROR, not FAILURE) ----------------------
     NO_ENDPOINTS = CheckError(
@@ -66,18 +78,19 @@ class EndpointsAreReachable(Check):
 
     # --- Infos --------------------------------------------------------------------------------
     PROXY_CONFIGURED = CheckInfo(1, "A proxy is configured ({}): the endpoints are probed through it.")
-    # Lists every probed endpoint with its outcome, and the endpoints not probed with the reason. When every
-    # endpoint is reachable, the message starts with _ALL_REACHABLE.
-    PROBE_SUMMARY = CheckInfo(2, "{}Probed: {}.{}")
+    # Lists every probed endpoint with its outcome. When every endpoint is reachable, the message starts with
+    # _ALL_REACHABLE.
+    PROBE_SUMMARY = CheckInfo(2, "{}Probed: {}.")
     _ALL_REACHABLE = "All probed AWS endpoints are reachable over certificate-verified TLS. "
 
-    # Outcome shown in the probe summary for each per-endpoint error code.
-    _OUTCOMES = {
-        DNS_FAILED.code: "DNS failed",
-        TCP_FAILED.code: "TCP failed",
-        TLS_CERT_INVALID.code: "certificate not trusted",
-        TLS_FAILED.code: "TLS failed",
-        PROXY_TUNNEL_FAILED.code: "proxy tunnel failed",
+    # For each way a probe can fail: the error for a required endpoint, the warning for an optional one, and the
+    # outcome shown in the probe summary.
+    _FAILURES = {
+        "dns": (DNS_FAILED, OPTIONAL_DNS_FAILED, "DNS failed"),
+        "tcp": (TCP_FAILED, OPTIONAL_TCP_FAILED, "TCP failed"),
+        "certificate": (TLS_CERT_INVALID, OPTIONAL_TLS_CERT_INVALID, "certificate not trusted"),
+        "tls": (TLS_FAILED, OPTIONAL_TLS_FAILED, "TLS failed"),
+        "tunnel": (PROXY_TUNNEL_FAILED, OPTIONAL_PROXY_TUNNEL_FAILED, "proxy tunnel failed"),
     }
 
     @property
@@ -86,9 +99,9 @@ class EndpointsAreReachable(Check):
         return "Verify that the AWS service endpoints ParallelCluster depends on are reachable over TLS."
 
     def run(self, context: Context) -> Result:
-        """Probe every dependent endpoint, directly or through the proxy, and aggregate the findings."""
+        """Probe every endpoint, directly or through the proxy, and aggregate the findings."""
         region = self._region(context)
-        services = aws_endpoints.required_services(context.cluster_config)
+        services = aws_endpoints.services(context.cluster_config)
         endpoints = aws_endpoints.resolve_endpoints(region, services) if region else []
         if not endpoints:
             # Reported as a CHECK_ERROR (reserved E0), distinct from a reachability FAILURE.
@@ -102,7 +115,7 @@ class EndpointsAreReachable(Check):
         if proxy:
             infos.append(self.PROXY_CONFIGURED.format(proxy))
             # Every endpoint is probed through the proxy: when it is unreachable, report it once.
-            proxy_tcp = network.tcp_connect(proxy.host, proxy.port)
+            proxy_tcp = network.tcp_connect(proxy.host, proxy.port, timeout=ENDPOINT_PROBE_TIMEOUT_SECONDS)
             if not proxy_tcp.connected:
                 return Result.from_findings(
                     self, errors=[self.PROXY_UNREACHABLE.format(proxy, proxy_tcp.error)], infos=infos
@@ -112,71 +125,71 @@ class EndpointsAreReachable(Check):
         # its timeout, so probing them one after another would add up the timeouts.
         probe = partial(self._probe_endpoint_via_proxy, proxy=proxy) if proxy else self._probe_endpoint
         with ThreadPoolExecutor(max_workers=len(endpoints)) as executor:
-            findings = list(executor.map(probe, endpoints))
-        errors: List[CheckFinding] = [finding for finding in findings if finding]
+            failures = list(executor.map(probe, endpoints))
+
+        errors: List[CheckFinding] = []
+        warnings: List[CheckFinding] = []
+        for endpoint, failure in zip(endpoints, failures):
+            if not failure:
+                continue
+            kind, args = failure
+            error, warning, _ = self._FAILURES[kind]
+            if endpoint.required:
+                errors.append(error.format(*args))
+            else:
+                warnings.append(warning.format(*args, endpoint.needed_when))
 
         infos.append(
             self.PROBE_SUMMARY.format(
-                "" if errors else self._ALL_REACHABLE,
-                ", ".join(
-                    "{} ({}): {}".format(
-                        endpoint.label, endpoint.host, self._OUTCOMES[finding.code] if finding else "reachable"
-                    )
-                    for endpoint, finding in zip(endpoints, findings)
-                ),
-                self._not_probed(context, region, services, endpoints),
+                "" if errors or warnings else self._ALL_REACHABLE,
+                ", ".join(self._outcome(endpoint, failure) for endpoint, failure in zip(endpoints, failures)),
             )
         )
-        return Result.from_findings(self, errors=errors or None, infos=infos)
+        return Result.from_findings(self, errors=errors or None, warnings=warnings or None, infos=infos)
 
-    @staticmethod
-    def _not_probed(context: Context, region: str, services: List[str], endpoints: List[aws_endpoints.Endpoint]) -> str:
-        """Return a sentence listing the services that were not probed and why, or "" when none was skipped.
+    def _outcome(self, endpoint: aws_endpoints.Endpoint, failure: Optional[Tuple[str, tuple]]) -> str:
+        """Return how ``endpoint`` is shown in the probe summary, e.g. ``logs (host, optional): reachable``."""
+        where = endpoint.host if endpoint.required else "{}, optional".format(endpoint.host)
+        return "{} ({}): {}".format(endpoint.label, where, self._FAILURES[failure[0]][2] if failure else "reachable")
 
-        A service is not probed when the cluster does not use the feature that needs it, or when botocore
-        resolves no endpoint for it in the region.
-        """
-        resolved = {endpoint.label for endpoint in endpoints}
-        skipped = [(service, "no endpoint in {}".format(region)) for service in services if service not in resolved]
-        skipped += aws_endpoints.skipped_services(context.cluster_config)
-        if not skipped:
-            return ""
-        return " Not probed: {}.".format(", ".join("{} ({})".format(service, reason) for service, reason in skipped))
-
-    def _probe_endpoint(self, endpoint: aws_endpoints.Endpoint) -> Optional[CheckFinding]:
+    def _probe_endpoint(self, endpoint: aws_endpoints.Endpoint) -> Optional[Tuple[str, tuple]]:
         """Return the first-layer failure for ``endpoint`` (DNS, then TCP, then TLS), or None if reachable.
 
-        Short-circuits at the first failing layer so the finding names the real root cause rather than a
-        downstream symptom (a DNS failure would otherwise also surface as a TCP failure).
+        The failure is the key of :attr:`_FAILURES` and the arguments of its findings, without the condition under
+        which an optional endpoint is needed. Short-circuits at the first failing layer so the finding names the
+        real root cause rather than a downstream symptom (a DNS failure would otherwise also surface as a TCP
+        failure).
         """
-        dns = network.resolve_host_isolated(endpoint.host)
+        dns = network.resolve_host_isolated(endpoint.host, timeout=ENDPOINT_PROBE_TIMEOUT_SECONDS)
         if not dns.resolved:
-            return self.DNS_FAILED.format(endpoint.label, endpoint.host, dns.error)
+            return "dns", (endpoint.label, endpoint.host, dns.error)
 
-        tcp = network.tcp_connect(endpoint.host, endpoint.port)
+        tcp = network.tcp_connect(endpoint.host, endpoint.port, timeout=ENDPOINT_PROBE_TIMEOUT_SECONDS)
         if not tcp.connected:
-            return self.TCP_FAILED.format(endpoint.label, endpoint.host, endpoint.port, tcp.error)
+            return "tcp", (endpoint.label, endpoint.host, endpoint.port, tcp.error)
 
-        tls = network.tls_handshake(endpoint.host, endpoint.port)
+        tls = network.tls_handshake(endpoint.host, endpoint.port, timeout=ENDPOINT_PROBE_TIMEOUT_SECONDS)
         if not tls.connected:
             if tls.verification_failed:
-                return self.TLS_CERT_INVALID.format(endpoint.label, endpoint.host, tls.error)
-            return self.TLS_FAILED.format(endpoint.label, endpoint.host, endpoint.port, tls.error)
+                return "certificate", (endpoint.label, endpoint.host, tls.error)
+            return "tls", (endpoint.label, endpoint.host, endpoint.port, tls.error)
 
         return None
 
     def _probe_endpoint_via_proxy(
         self, endpoint: aws_endpoints.Endpoint, proxy: network.Proxy
-    ) -> Optional[CheckFinding]:
+    ) -> Optional[Tuple[str, tuple]]:
         """Return the failure for ``endpoint`` probed through ``proxy`` (tunnel, then TLS), or None if reachable."""
-        tls = network.tls_handshake_via_proxy(endpoint.host, endpoint.port, proxy)
+        tls = network.tls_handshake_via_proxy(
+            endpoint.host, endpoint.port, proxy, timeout=ENDPOINT_PROBE_TIMEOUT_SECONDS
+        )
         if tls.connected:
             return None
         if tls.tunnel_failed:
-            return self.PROXY_TUNNEL_FAILED.format(proxy, endpoint.label, endpoint.host, endpoint.port, tls.error)
+            return "tunnel", (proxy, endpoint.label, endpoint.host, endpoint.port, tls.error)
         if tls.verification_failed:
-            return self.TLS_CERT_INVALID.format(endpoint.label, endpoint.host, tls.error)
-        return self.TLS_FAILED.format(endpoint.label, endpoint.host, endpoint.port, tls.error)
+            return "certificate", (endpoint.label, endpoint.host, tls.error)
+        return "tls", (endpoint.label, endpoint.host, endpoint.port, tls.error)
 
     @staticmethod
     def _region(context: Context) -> Optional[str]:
