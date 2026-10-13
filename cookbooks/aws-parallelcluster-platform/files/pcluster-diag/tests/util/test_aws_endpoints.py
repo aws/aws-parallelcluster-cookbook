@@ -72,16 +72,19 @@ def test_services_include_every_service_required_or_optional(cluster_config, exp
     assert aws_endpoints.services(cluster_config) == expected
 
 
-def test_resolve_endpoints_resolves_each_service(monkeypatch):
-    monkeypatch.setattr(aws_endpoints, "_endpoint_host", lambda service, region: f"{service}.{region}.amazonaws.com")
-
-    endpoints = aws_endpoints.resolve_endpoints("us-east-1", [Service("ec2"), Service("s3", _DS_NEEDED_WHEN)])
+def test_resolve_endpoints_resolves_each_service():
+    # botocore resolves the endpoints locally: no network call or credentials are needed. In us-east-1, S3 must
+    # resolve to its regional endpoint, not to the global one botocore uses by default.
+    endpoints = aws_endpoints.resolve_endpoints(
+        "us-east-1", [Service("ec2"), Service("s3"), Service("secretsmanager", _DS_NEEDED_WHEN)]
+    )
 
     assert endpoints == [
         aws_endpoints.Endpoint("ec2", "ec2.us-east-1.amazonaws.com"),
-        aws_endpoints.Endpoint("s3", "s3.us-east-1.amazonaws.com", needed_when=_DS_NEEDED_WHEN),
+        aws_endpoints.Endpoint("s3", "s3.us-east-1.amazonaws.com"),
+        aws_endpoints.Endpoint("secretsmanager", "secretsmanager.us-east-1.amazonaws.com", needed_when=_DS_NEEDED_WHEN),
     ]
-    assert [endpoint.required for endpoint in endpoints] == [True, False]
+    assert [endpoint.required for endpoint in endpoints] == [True, True, False]
 
 
 def test_resolve_endpoints_skips_unresolvable_services(monkeypatch):

@@ -29,8 +29,14 @@ from typing import List, Optional, Tuple
 from urllib.parse import urlparse
 
 import boto3
+from botocore.config import Config
 
 logger = logging.getLogger(__name__)
+
+# Resolve S3 in us-east-1 to its regional endpoint (s3.us-east-1) rather than to the global one (s3.amazonaws.com),
+# which botocore uses by default there: an isolated environment exposes the regional endpoint, through a VPC endpoint
+# or a proxy allowlist, so probing the global one would report a false failure. Other regions are not affected.
+_RESOLVER_CONFIG = Config(s3={"us_east_1_regional_endpoint": "regional"})
 
 # boto3 service names of the endpoints ParallelCluster interacts with: the ones every cluster needs, and the ones
 # needed only when a feature is configured. Mirrors the VPC endpoints required for a subnet without internet access:
@@ -119,7 +125,7 @@ def _endpoint_host(service: str, region: str):
     Reads ``client.meta.endpoint_url`` (no network call, no credentials needed) and extracts the host.
     """
     try:
-        endpoint_url = boto3.client(service, region_name=region).meta.endpoint_url
+        endpoint_url = boto3.client(service, region_name=region, config=_RESOLVER_CONFIG).meta.endpoint_url
     except Exception as error:  # noqa: BLE001  botocore raises varied types for an unknown service/region
         logger.info("Could not resolve endpoint for service %r in %r: %s", service, region, error)
         return None
