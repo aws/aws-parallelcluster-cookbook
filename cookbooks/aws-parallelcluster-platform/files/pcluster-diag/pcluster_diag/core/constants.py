@@ -228,3 +228,17 @@ ENA_ALLOWANCE_COUNTERS = (
     "conntrack_allowance_exceeded",
     "linklocal_allowance_exceeded",
 )
+
+# Cluster events
+CHEF_CLIENT_LOG_PATH = "/var/log/chef-client.log"
+CLUSTERSTATUSMGTD_LOG_PATH = "/var/log/parallelcluster/clusterstatusmgtd"
+CLUSTERMGTD_LOG_PATH = "/var/log/parallelcluster/clustermgtd"
+# logrotate keeps one rotated copy of these logs, named with this suffix (rotate 1, nodateext).
+ROTATED_LOG_SUFFIX = ".1"
+# Timeout, in seconds, of the AWS API calls of the cluster events checks.
+CLUSTER_EVENTS_API_TIMEOUT_SECONDS = 10
+# How long the compute fleet stays in a transitional status when nothing is wrong. clusterstatusmgtd picks up a
+# *_REQUESTED status on its next loop (60 seconds); STARTING and STOPPING last at most one update handler run
+# (update_event_timeout_minutes, 15 minutes) plus one loop.
+FLEET_REQUESTED_STUCK_AFTER_MINUTES = 5
+FLEET_IN_PROGRESS_STUCK_AFTER_MINUTES = 20
