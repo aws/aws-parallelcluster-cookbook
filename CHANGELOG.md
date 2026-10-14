@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.17.0
 ------
 
+**ENHANCEMENTS**
+- Add `pcluster-diag` check verifying the sudoers definitions ParallelCluster relies on.
+
 **CHANGES**
 - Upgrade Python to version 3.14.8.
 - Ship only AWS CLI v2 in ParallelCluster AMIs. AWS CLI v1 is no longer installed in the cookbook Python virtual environment.
