@@ -138,6 +138,7 @@ def test_select_checks_routes_confirmation_required_check(monkeypatch, confirmed
     [
         "ReservedUsersAndGroups",
         "CriticalPathsHaveExpectedPermissions",
+        "Sudoers",
         "CfnHup",
     ],
 )
