@@ -89,19 +89,21 @@ def _patch_table(monkeypatch, item):
     monkeypatch.setattr(fleet_status.boto3, "resource", lambda *args, **kwargs: _FakeResource())
 
 
-def test_get_compute_fleet_status(monkeypatch):
-    _patch_table(
-        monkeypatch,
-        {
-            "Id": "COMPUTE_FLEET",
-            "Data": {"status": "RUNNING", "lastStatusUpdatedTime": "2026-10-12 14:21:40.912+00:00"},
-        },
-    )
+@pytest.mark.parametrize(
+    "updated, expected",
+    [
+        # Written by clusterstatusmgtd.
+        ("2026-10-12 14:21:40.912+00:00", datetime(2026, 10, 12, 14, 21, 40, 912000, tzinfo=timezone.utc)),
+        # Written by the cookbook when it creates the item: the fleet status never changed since.
+        ("2026-10-14 11:19:45 UTC", datetime(2026, 10, 14, 11, 19, 45, tzinfo=timezone.utc)),
+        # Unknown format: the status is still returned.
+        ("yesterday", None),
+    ],
+)
+def test_get_compute_fleet_status(monkeypatch, updated, expected):
+    _patch_table(monkeypatch, {"Id": "COMPUTE_FLEET", "Data": {"status": "RUNNING", "lastStatusUpdatedTime": updated}})
 
-    assert fleet_status.get_compute_fleet_status("table", "us-east-1") == (
-        "RUNNING",
-        datetime(2026, 10, 12, 14, 21, 40, 912000, tzinfo=timezone.utc),
-    )
+    assert fleet_status.get_compute_fleet_status("table", "us-east-1") == ("RUNNING", expected)
 
 
 @pytest.mark.parametrize("item", [None, {"Id": "COMPUTE_FLEET"}])

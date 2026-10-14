@@ -19,11 +19,14 @@ daemons log the status they read on every loop, which shows when a request took 
 """
 
 import ast
+import logging
 import re
 from datetime import datetime
 from typing import List, Optional, Tuple
 
 import boto3
+
+logger = logging.getLogger(__name__)
 
 # A clusterstatusmgtd or clustermgtd log line: "2026-10-12 14:30:02,118 - [module:function] - INFO - message".
 _LOG_LINE = re.compile(
@@ -52,8 +55,25 @@ def get_compute_fleet_status(table_name: str, region: str, config=None) -> Tuple
     data = (item or {}).get("Data") or {}
     if not data.get("status"):
         raise LookupError("the table has no compute fleet status")
-    updated = data.get("lastStatusUpdatedTime")
-    return data["status"], datetime.fromisoformat(updated) if updated else None
+    return data["status"], _parse_update_time(data.get("lastStatusUpdatedTime"))
+
+
+def _parse_update_time(value: Optional[str]) -> Optional[datetime]:
+    """Return the ``lastStatusUpdatedTime`` ``value`` as a datetime, or None if it is missing or not a known format.
+
+    clusterstatusmgtd writes it with Python ("2026-10-14 11:19:45.123456+00:00"), while the cookbook writes it with
+    Ruby when it creates the item ("2026-10-14 11:19:45 UTC"): a fleet whose status never changed has the latter.
+    """
+    if not value:
+        return None
+    text = value.strip()
+    if text.endswith(" UTC"):
+        text = text[: -len(" UTC")] + "+00:00"
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        logger.info("Unknown format of the compute fleet status update time: %r", value)
+        return None
 
 
 def first_log_time(lines: List[str]) -> Optional[str]:
