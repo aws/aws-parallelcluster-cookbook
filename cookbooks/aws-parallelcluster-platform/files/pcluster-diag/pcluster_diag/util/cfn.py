@@ -33,11 +33,11 @@ def get_stack_output(stack_name: str, region: str, output_key: str) -> str:
     raise KeyError("Stack '{}' has no output '{}'.".format(stack_name, output_key))
 
 
-def get_stack_status(stack_name: str, region: str, config=None) -> Tuple[str, Optional[datetime]]:
+def get_stack_status(stack_name: str, region: str) -> Tuple[str, Optional[datetime]]:
     """Return the status of the CloudFormation stack ``stack_name`` and when it was last updated.
 
     The last update time falls back to the creation time for a stack that was never updated.
     """
-    client = boto3.client("cloudformation", region_name=region, config=config)
+    client = boto3.client("cloudformation", region_name=region)
     stack = client.describe_stacks(StackName=stack_name)["Stacks"][0]
     return stack["StackStatus"], stack.get("LastUpdatedTime") or stack.get("CreationTime")

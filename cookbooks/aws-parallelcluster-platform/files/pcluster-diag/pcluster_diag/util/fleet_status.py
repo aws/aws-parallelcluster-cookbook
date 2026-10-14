@@ -18,7 +18,6 @@ PROTECTED on repeated bootstrap failures; both log every change they make. The r
 daemons log the status they read on every loop, which shows when a request took the fleet out of PROTECTED.
 """
 
-import ast
 import logging
 import re
 from datetime import datetime
@@ -37,20 +36,22 @@ _CURRENT = re.compile(r"^Current compute fleet status: (?P<status>\w+)$")
 _INACTIVE_PARTITIONS = "Placing bootstrap failure partitions to INACTIVE: "
 
 PROTECTED = "PROTECTED"
-REQUESTED_STATUSES = ("START_REQUESTED", "STOP_REQUESTED")
-IN_PROGRESS_STATUSES = ("STARTING", "STOPPING")
+# Minutes after which a transitional status means the fleet is stuck. clusterstatusmgtd picks up a *_REQUESTED status
+# on its next loop (60 seconds); STARTING and STOPPING last at most one update handler run
+# (update_event_timeout_minutes, 15 minutes) plus one loop.
+STUCK_AFTER_MINUTES = {"START_REQUESTED": 5, "STOP_REQUESTED": 5, "STARTING": 20, "STOPPING": 20}
 
 # DynamoDB item holding the compute fleet status, as written by the CLI and clusterstatusmgtd.
 _FLEET_ITEM_KEY = {"Id": "COMPUTE_FLEET"}
 
 
-def get_compute_fleet_status(table_name: str, region: str, config=None) -> Tuple[str, Optional[datetime]]:
+def get_compute_fleet_status(table_name: str, region: str) -> Tuple[str, Optional[datetime]]:
     """Return the compute fleet status and when it was last updated, from the cluster DynamoDB table.
 
     Raises:
         LookupError: If the table has no compute fleet status.
     """
-    table = boto3.resource("dynamodb", region_name=region, config=config).Table(table_name)
+    table = boto3.resource("dynamodb", region_name=region).Table(table_name)
     item = table.get_item(ConsistentRead=True, Key=_FLEET_ITEM_KEY).get("Item")
     data = (item or {}).get("Data") or {}
     if not data.get("status"):
@@ -76,21 +77,22 @@ def _parse_update_time(value: Optional[str]) -> Optional[datetime]:
         return None
 
 
-def first_log_time(lines: List[str]) -> Optional[str]:
-    """Return the time of the first log line in ``lines``, or None if there is none."""
-    times = [match["time"] for match in map(_LOG_LINE.match, lines) if match]
+def first_log_time(log: List[str]) -> Optional[str]:
+    """Return the time of the first line of ``log``, or None if it has none."""
+    times = [match["time"] for match in map(_LOG_LINE.match, log) if match]
     return min(times) if times else None
 
 
-def parse_status_changes(lines: List[str]) -> List[dict]:
-    """Return the compute fleet status changes logged in ``lines``, ordered by time.
+def parse_status_changes(log: List[str]) -> List[dict]:
+    """Return the compute fleet status changes logged in ``log``, ordered by time.
 
-    ``lines`` may mix the lines of several logs. A change to PROTECTED carries the partitions clustermgtd made
-    inactive, and a change out of PROTECTED is added when a daemon first reads a start or stop request.
+    ``log`` holds the lines of the clusterstatusmgtd and clustermgtd logs, one log after the other: the changes are
+    sorted by the time of their line. A change to PROTECTED carries the partitions clustermgtd made inactive, and a
+    change out of PROTECTED is added when a daemon first reads a start or stop request.
     """
     # The log time format sorts chronologically; the sort is stable, so lines logged at the same time keep their order.
     entries = sorted(
-        ((match["time"], match["message"]) for match in map(_LOG_LINE.match, lines) if match), key=lambda e: e[0]
+        ((match["time"], match["message"]) for match in map(_LOG_LINE.match, log) if match), key=lambda e: e[0]
     )
     changes: List[dict] = []
     partitions = None
@@ -99,22 +101,14 @@ def parse_status_changes(lines: List[str]) -> List[dict]:
         change = _CHANGE.match(message)
         current = _CURRENT.match(message)
         if message.startswith(_INACTIVE_PARTITIONS):
-            partitions = _partitions(message[len(_INACTIVE_PARTITIONS) :])
+            partitions = message[len(_INACTIVE_PARTITIONS) :]
         elif change:
             entry = {"time": time, "from": change["from"], "to": change["to"]}
             if change["to"] == PROTECTED and partitions is not None:
                 entry["partitions"] = partitions
             changes.append(entry)
             protected = change["to"] == PROTECTED
-        elif current and protected and current["status"] in REQUESTED_STATUSES:
+        elif current and protected and current["status"].endswith("_REQUESTED"):
             changes.append({"time": time, "from": PROTECTED, "to": current["status"]})
             protected = False
     return changes
-
-
-def _partitions(text: str):
-    """Return the partitions logged as ``text`` (a Python list), or the text itself if it cannot be parsed."""
-    try:
-        return ast.literal_eval(text)
-    except (ValueError, SyntaxError):
-        return text

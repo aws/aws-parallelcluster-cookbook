@@ -12,6 +12,8 @@
 
 """Unit tests for reading a log with its rotated copy."""
 
+import pytest
+
 from pcluster_diag.util import log_files
 
 
@@ -20,12 +22,16 @@ def test_read_rotated_log_reads_the_rotated_copy_first(tmp_path):
     (tmp_path / "chef-client.log.1").write_text("old\n")
     log.write_text("new\n")
 
-    assert log_files.read_rotated_log(str(log)) == (["old", "new"], [str(log) + ".1", str(log)])
+    assert log_files.read_rotated_log(str(log)) == ["old", "new"]
 
 
 def test_read_rotated_log_skips_missing_files(tmp_path):
     log = tmp_path / "chef-client.log"
     log.write_text("only\n")
 
-    assert log_files.read_rotated_log(str(log)) == (["only"], [str(log)])
-    assert log_files.read_rotated_log(str(tmp_path / "missing.log")) == ([], [])
+    assert log_files.read_rotated_log(str(log)) == ["only"]
+
+
+def test_read_rotated_log_raises_when_no_file_exists(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        log_files.read_rotated_log(str(tmp_path / "missing.log"))

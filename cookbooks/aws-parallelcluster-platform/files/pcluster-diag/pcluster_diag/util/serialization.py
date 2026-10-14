@@ -14,7 +14,9 @@
 
 import dataclasses
 import json
+from datetime import datetime
 from enum import Enum
+from typing import Optional
 
 
 def to_dict(obj):
@@ -30,3 +32,8 @@ def to_dict(obj):
 def to_json(obj, indent: int = 2) -> str:
     """Serialize ``obj`` to a JSON string, preserving dataclass field declaration order."""
     return json.dumps(to_dict(obj), indent=indent, sort_keys=False)
+
+
+def iso_time(time: Optional[datetime]) -> str:
+    """Return ``time`` in ISO 8601 to the second, or "unknown" if it is None."""
+    return time.isoformat(timespec="seconds") if time else "unknown"

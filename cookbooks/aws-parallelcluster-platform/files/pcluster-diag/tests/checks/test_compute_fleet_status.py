@@ -41,7 +41,7 @@ def _patch(monkeypatch, status, updated, log=None):
     monkeypatch.setattr(
         check_module.log_files,
         "read_rotated_log",
-        lambda path: ((log or []) if path == check_module.CLUSTERMGTD_LOG_PATH else [], [path]),
+        lambda path: (log or []) if path == check_module.CLUSTERMGTD_LOG_PATH else [],
     )
     monkeypatch.setattr(check_module.fleet_status, "get_compute_fleet_status", stub_returning((status, updated)))
     monkeypatch.setattr(check_module, "_now", lambda: _NOW)
@@ -60,12 +60,9 @@ def test_running_fleet_passes_and_reports_the_history(monkeypatch):
     assert result.status == Status.PASSED
     current, history = result.infos
     assert current.message == "Current compute fleet status: RUNNING (since 2026-10-12T16:00:00+00:00)."
-    assert history.message == (
-        "1 compute fleet status changes since 2026-10-12 14:30:02,100 "
-        "(oldest entry in the clusterstatusmgtd and clustermgtd logs)."
-    )
+    assert history.message == "1 compute fleet status changes since 2026-10-12 14:30:02,100."
     assert history.details == [
-        {"time": "2026-10-12 14:30:02,118", "from": "RUNNING", "to": "PROTECTED", "partitions": ["queue"]}
+        {"time": "2026-10-12 14:30:02,118", "from": "RUNNING", "to": "PROTECTED", "partitions": "['queue']"}
     ]
 
 

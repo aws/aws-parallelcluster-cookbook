@@ -40,10 +40,8 @@ def _context():
 
 @pytest.fixture
 def history(monkeypatch):
-    """Patch the cinc log with one successful update, and the stack status with UPDATE_COMPLETE."""
-    monkeypatch.setattr(
-        check_module.log_files, "read_rotated_log", stub_returning((_LOG, ["/var/log/chef-client.log.1"]))
-    )
+    """Patch /var/log/chef-client.log with one successful update, and the stack status with UPDATE_COMPLETE."""
+    monkeypatch.setattr(check_module.log_files, "read_rotated_log", stub_returning(_LOG))
     monkeypatch.setattr(check_module.cfn, "get_stack_status", stub_returning(("UPDATE_COMPLETE", _UPDATED)))
 
 
@@ -58,9 +56,7 @@ def test_reports_the_history_and_the_stack_status(history):
     assert result.status == Status.PASSED
     history_info, stack_info = result.infos
     assert history_info.code == "I1"
-    assert history_info.message == (
-        "1 cluster update runs since 2026-09-30T08:15:00+00:00 (oldest entry in /var/log/chef-client.log.1)."
-    )
+    assert history_info.message == "1 cluster update runs since 2026-09-30T08:15:00+00:00."
     assert history_info.details == [
         {
             "time": "2026-10-05T10:20:31+00:00",
@@ -95,20 +91,25 @@ def test_stack_status_is_omitted_when_it_cannot_be_read(history, monkeypatch):
     assert [info.code for info in result.infos] == ["I1"]
 
 
-def test_no_update_in_the_log(history, monkeypatch):
-    monkeypatch.setattr(
-        check_module.log_files, "read_rotated_log", stub_returning((_LOG[:1], ["/var/log/chef-client.log"]))
-    )
+@pytest.mark.parametrize(
+    "log, expected",
+    [
+        (_LOG[:1], "No cluster update found in /var/log/chef-client.log since 2026-09-30T08:15:00+00:00."),
+        ([], "No cluster update found in /var/log/chef-client.log."),
+    ],
+)
+def test_no_update_in_the_log(history, monkeypatch, log, expected):
+    monkeypatch.setattr(check_module.log_files, "read_rotated_log", stub_returning(log))
 
     result = ClusterUpdateHistory().run(_context())
 
-    assert result.infos[0].message == (
-        "No cluster update found in /var/log/chef-client.log since 2026-09-30T08:15:00+00:00."
-    )
+    assert result.infos[0].message == expected
 
 
 def test_missing_log_is_a_check_error(history, monkeypatch):
-    monkeypatch.setattr(check_module.log_files, "read_rotated_log", stub_returning(([], [])))
+    monkeypatch.setattr(
+        check_module.log_files, "read_rotated_log", stub_raising(FileNotFoundError("the file does not exist"))
+    )
 
     result = ClusterUpdateHistory().run(_context())
 
@@ -116,11 +117,3 @@ def test_missing_log_is_a_check_error(history, monkeypatch):
     assert result.errors[0].message == (
         "Could not read the cluster update history from /var/log/chef-client.log: the file does not exist."
     )
-
-
-def test_empty_log_reports_no_update_without_a_time(history, monkeypatch):
-    monkeypatch.setattr(check_module.log_files, "read_rotated_log", stub_returning(([], ["/var/log/chef-client.log"])))
-
-    result = ClusterUpdateHistory().run(_context())
-
-    assert result.infos[0].message == "No cluster update found in /var/log/chef-client.log."

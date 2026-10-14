@@ -60,7 +60,7 @@ def test_protected_change_carries_the_partitions_and_the_exit_is_inferred():
     changes = fleet_status.parse_status_changes(lines)
 
     assert changes == [
-        {"time": "2026-10-12 14:30:02,118", "from": "RUNNING", "to": "PROTECTED", "partitions": ["queue"]},
+        {"time": "2026-10-12 14:30:02,118", "from": "RUNNING", "to": "PROTECTED", "partitions": "['queue']"},
         {"time": "2026-10-12 16:05:10,402", "from": "PROTECTED", "to": "START_REQUESTED"},
         {"time": "2026-10-12 16:06:10,415", "from": "START_REQUESTED", "to": "STARTING"},
     ]
@@ -72,9 +72,14 @@ def test_request_without_protection_is_not_added():
     assert fleet_status.parse_status_changes(lines) == []
 
 
-class _FakeTable:
+class _FakeDynamoDB:
+    """Fake DynamoDB resource whose table holds ``item``."""
+
     def __init__(self, item):
         self._item = item
+
+    def Table(self, name):  # noqa: N802  boto3 method name
+        return self
 
     def get_item(self, ConsistentRead, Key):  # noqa: N803  boto3 uses PascalCase kwargs
         assert ConsistentRead is True and Key == {"Id": "COMPUTE_FLEET"}
@@ -82,11 +87,7 @@ class _FakeTable:
 
 
 def _patch_table(monkeypatch, item):
-    class _FakeResource:
-        def Table(self, name):  # noqa: N802  boto3 method name
-            return _FakeTable(item)
-
-    monkeypatch.setattr(fleet_status.boto3, "resource", lambda *args, **kwargs: _FakeResource())
+    monkeypatch.setattr(fleet_status.boto3, "resource", lambda *args, **kwargs: _FakeDynamoDB(item))
 
 
 @pytest.mark.parametrize(

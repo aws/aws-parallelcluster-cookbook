@@ -10,7 +10,7 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Unit tests for the parser of the cluster updates in the cinc log."""
+"""Unit tests for the parser of the cluster updates in /var/log/chef-client.log."""
 
 import json
 
@@ -35,20 +35,15 @@ def _line(time, message, level="INFO"):
 
 
 def _update_run(time, config, change_set, failure=None, rollback_failure=False):
-    """Return the cinc log lines of an update run, as fetch_config and the UpdateFailureHandler log them."""
+    """Return the chef-client.log lines of an update run, as fetch_config and the UpdateFailureHandler log them."""
     lines = [
-        _line(time, "Run List override has been provided."),
         _line(time, "Overridden Run List: [recipe[aws-parallelcluster-entrypoints::update]]"),
-        _line(time, "Backing up old configuration from (/opt/parallelcluster/shared/cluster-config.yaml)"),
         _line(time, "Cluster config is:"),
         *config.splitlines(),
         _line(time, "Changeset is:"),
         *json.dumps(change_set, indent=2).splitlines(),
     ]
     if failure:
-        lines.append(
-            _line(time, "ErrorHandlers::UpdateFailureHandler: Started with parameters @cleanup_dna_files=true")
-        )
         lines.append(_line(time, "ErrorHandlers::UpdateFailureHandler: Update failed on HeadNode due to: " + failure))
     if rollback_failure:
         lines.append(_line(time, "ErrorHandlers::UpdateFailureHandler: Rollback failure detected (marker found)"))
@@ -56,7 +51,7 @@ def _update_run(time, config, change_set, failure=None, rollback_failure=False):
 
 
 def _other_run(time, run_list, failure=None):
-    """Return the lines of a cinc run that is not a cluster update, e.g. the compute fleet status update."""
+    """Return the lines of a run that is not a cluster update, e.g. the compute fleet status update."""
     lines = [_line(time, "Overridden Run List: [recipe[{}]]".format(run_list))]
     if failure:
         lines.append(_line(time, "ErrorHandlers::UpdateFailureHandler: Update failed on HeadNode due to: " + failure))
@@ -119,7 +114,7 @@ def test_update_failing_before_logging_its_change_set():
     assert outcome == {"time": "2026-10-12T14:02:06+00:00", "outcome": "failed", "reason": "x"}
 
 
-def test_other_cinc_runs_are_not_updates_and_their_failures_are_ignored():
+def test_other_runs_are_not_updates_and_their_failures_are_ignored():
     lines = _other_run("2026-10-01T09:00:00+00:00", "aws-parallelcluster-entrypoints::init")
     lines += _update_run("2026-10-05T10:20:31+00:00", _NEW_CONFIG, _CHANGE_SET)
     lines += _other_run(
@@ -140,7 +135,13 @@ def test_two_consecutive_successful_updates_are_not_a_rollback():
 
 
 def test_change_set_that_is_not_json_is_kept_as_text():
-    (outcome,) = _outcomes(_update_run("2026-10-05T10:20:31+00:00", _NEW_CONFIG, {})[:-1] + ["not json"])
+    lines = [
+        _line("2026-10-05T10:20:31+00:00", "Overridden Run List: [recipe[aws-parallelcluster-entrypoints::update]]"),
+        _line("2026-10-05T10:20:32+00:00", "Changeset is:"),
+        "not json",
+    ]
+
+    (outcome,) = _outcomes(lines)
 
     assert outcome["changeSet"] == "not json"
 
