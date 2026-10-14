@@ -10,10 +10,10 @@
 
           // Ensure that Python autocomplete works out of the box
           "python.autoComplete.extraPaths": [
-            "/usr/local/lib/python3.8/site-packages"
+            "/usr/local/lib/python3.14/site-packages"
           ],
           "python.analysis.extraPaths": [
-            "/usr/local/lib/python3.8/site-packages"
+            "/usr/local/lib/python3.14/site-packages"
           ]
         },
         // Note to Flux Developers! We can add extensions here that you like
