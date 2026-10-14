@@ -13,10 +13,10 @@
 """Parse the cluster updates the head node ran, and their outcome, from /var/log/chef-client.log.
 
 On every cluster update, cfn-hup runs the cookbook on the head node with the
-``aws-parallelcluster-entrypoints::update`` run list. The run logs the new cluster config and the change set
-(``fetch_config``), and when it fails, the ``UpdateFailureHandler`` logs why. A failed update is rolled back by
-CloudFormation, which makes cfn-hup run the update again with the previous metadata: that rollback run logs the
-previous cluster config, but the same change set, because the change set is always fetched in its latest version.
+``aws-parallelcluster-entrypoints::update`` run list. The run logs the change set (``fetch_config``), and when it
+fails, the ``UpdateFailureHandler`` logs why. A failed update is rolled back by CloudFormation, which makes cfn-hup run
+the update again with the previous metadata: that rollback run logs the same change set, because the change set is
+always fetched in its latest version.
 """
 
 import json
@@ -29,7 +29,6 @@ _LOG_LINE = re.compile(r"^\[(?P<time>[^\]]+)\] (?P<level>[A-Z]+): (?P<message>.*
 # Logged at the start of every run started with --override-runlist.
 _RUN_LIST = "Overridden Run List: "
 _UPDATE_RUN_LIST = "aws-parallelcluster-entrypoints::update]"
-_CONFIG = "Cluster config is:"
 _CHANGE_SET = "Changeset is:"
 _HANDLER = "ErrorHandlers::UpdateFailureHandler: "
 _UPDATE_FAILED = _HANDLER + "Update failed on HeadNode due to: "
@@ -47,15 +46,13 @@ class UpdateRun:
 
     Attributes:
         time: When the run started, as logged.
-        config: The cluster config the run applied, or None if the run failed before fetching it.
-        change_set: The change set the run logged, as text, or None if the run failed before fetching it.
+        change_set: The changes of the change set the run logged, or None if the run failed before fetching it.
         failure: Why the run failed, as logged by the UpdateFailureHandler, or None if it did not fail.
         rollback_failure: Whether the UpdateFailureHandler reported the run as a rollback failure.
     """
 
     time: str
-    config: Optional[str] = None
-    change_set: Optional[str] = None
+    change_set: Optional[Any] = None
     failure: Optional[str] = None
     rollback_failure: bool = False
 
@@ -73,18 +70,17 @@ def parse_update_runs(log: List[str]) -> List[UpdateRun]:
     """Return the update runs logged in ``log``, the lines of /var/log/chef-client.log, oldest first."""
     runs: List[UpdateRun] = []
     run: Optional[UpdateRun] = None
-    block = None  # the multi-line value being read: "config" or "change_set"
-    block_lines: List[str] = []
+    change_set_lines: Optional[List[str]] = None  # the lines of the change set being read
 
     for line in log:
         match = _LOG_LINE.match(line)
         if not match:
-            if block:
-                block_lines.append(line)
+            if change_set_lines is not None:
+                change_set_lines.append(line)
             continue
-        if block:
-            setattr(run, block, "\n".join(block_lines).strip())
-            block, block_lines = None, []
+        if change_set_lines is not None:
+            run.change_set = _change_set("\n".join(change_set_lines))
+            change_set_lines = None
 
         message = match["message"]
         if message.startswith(_RUN_LIST):
@@ -92,39 +88,54 @@ def parse_update_runs(log: List[str]) -> List[UpdateRun]:
             run = UpdateRun(time=match["time"]) if _UPDATE_RUN_LIST in message else None
             if run:
                 runs.append(run)
-        elif run is not None:
-            block = _read_message(run, message)
+        elif run is not None and _read_message(run, message):
+            change_set_lines = []
 
-    if block:
-        setattr(run, block, "\n".join(block_lines).strip())
+    if change_set_lines is not None:
+        run.change_set = _change_set("\n".join(change_set_lines))
     return runs
 
 
-def _read_message(run: UpdateRun, message: str) -> Optional[str]:
-    """Record in ``run`` what ``message`` tells about it; return the multi-line value it starts, if any."""
-    if message == _CONFIG:
-        return "config"
+def _read_message(run: UpdateRun, message: str) -> bool:
+    """Record in ``run`` what ``message`` tells about it; return whether the message starts the change set."""
     if message == _CHANGE_SET:
-        return "change_set"
+        return True
     if message.startswith(_UPDATE_FAILED) and run.failure is None:
         run.failure = message[len(_UPDATE_FAILED) :]
     elif message.startswith(_ROLLBACK_FAILURE):
         run.rollback_failure = True
-    return None
+    return False
 
 
-def _is_rollback(runs: List[UpdateRun], index: int) -> bool:
-    """Return whether ``runs[index]`` rolls back the run before it.
+def _change_set(text: str) -> Any:
+    """Return the changes of the change set logged as ``text``, or ``text`` itself if it does not start with JSON.
 
-    A failed update is always followed by its rollback run. A rollback run also repeats the change set of the update
-    it rolls back, while applying a different config, which shows the update failed even when the head node did not.
+    The change set file has no trailing newline, so the output that cinc writes next follows the JSON: only the JSON
+    at the start of ``text`` is decoded.
     """
-    if index == 0:
-        return False
-    previous, run = runs[index - 1], runs[index]
-    if previous.failure:
-        return True
-    return run.change_set is not None and run.change_set == previous.change_set and run.config != previous.config
+    try:
+        change_set, _ = json.JSONDecoder().raw_decode(text.strip())
+        return change_set.get("changeSet", [])
+    except (ValueError, AttributeError):
+        return text.strip()
+
+
+def _rollbacks(runs: List[UpdateRun]) -> List[bool]:
+    """Return, for each run, whether it rolls back the run before it.
+
+    A failed update is always followed by its rollback run, which repeats the change set of the update: so a run
+    repeating the change set of the run before it is a rollback, even when the head node logged no failure. A run
+    after a rollback is a new update, even when it retries the same change set.
+    """
+    rollbacks: List[bool] = []
+    for index, run in enumerate(runs):
+        previous = runs[index - 1] if index else None
+        rollbacks.append(
+            previous is not None
+            and not rollbacks[-1]
+            and (previous.failure is not None or (run.change_set is not None and run.change_set == previous.change_set))
+        )
+    return rollbacks
 
 
 def update_outcomes(runs: List[UpdateRun]) -> List[dict]:
@@ -133,7 +144,7 @@ def update_outcomes(runs: List[UpdateRun]) -> List[dict]:
     The outcome is ``succeeded`` or ``failed`` for an update, and ``rollback succeeded`` or ``rollback failed`` for
     the run that rolls back a failed update.
     """
-    rollbacks = [_is_rollback(runs, index) for index in range(len(runs))]
+    rollbacks = _rollbacks(runs)
     outcomes = []
     for index, run in enumerate(runs):
         if rollbacks[index]:
@@ -146,14 +157,6 @@ def update_outcomes(runs: List[UpdateRun]) -> List[dict]:
         if run.failure:
             entry["reason"] = run.failure
         if run.change_set is not None:
-            entry["changeSet"] = _change_set(run.change_set)
+            entry["changeSet"] = run.change_set
         outcomes.append(entry)
     return outcomes
-
-
-def _change_set(text: str) -> Any:
-    """Return the changes of the change set ``text`` as logged, or the text itself if it is not valid JSON."""
-    try:
-        return json.loads(text).get("changeSet", [])
-    except (ValueError, AttributeError):
-        return text

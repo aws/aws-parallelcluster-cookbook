@@ -16,8 +16,6 @@ import json
 
 from pcluster_diag.util import update_history
 
-_OLD_CONFIG = "Scheduling:\n  SlurmQueues:\n    - Name: queue\n      MaxCount: 2"
-_NEW_CONFIG = "Scheduling:\n  SlurmQueues:\n    - Name: queue\n      MaxCount: 4"
 _CHANGE_SET = {
     "changeSet": [
         {
@@ -34,12 +32,13 @@ def _line(time, message, level="INFO"):
     return "[{}] {}: {}".format(time, level, message)
 
 
-def _update_run(time, config, change_set, failure=None, rollback_failure=False):
+def _update_run(time, change_set, failure=None, rollback_failure=False):
     """Return the chef-client.log lines of an update run, as fetch_config and the UpdateFailureHandler log them."""
     lines = [
         _line(time, "Overridden Run List: [recipe[aws-parallelcluster-entrypoints::update]]"),
         _line(time, "Cluster config is:"),
-        *config.splitlines(),
+        "Scheduling:",
+        "  Scheduler: slurm",
         _line(time, "Changeset is:"),
         *json.dumps(change_set, indent=2).splitlines(),
     ]
@@ -63,7 +62,7 @@ def _outcomes(lines):
 
 
 def test_successful_update():
-    (outcome,) = _outcomes(_update_run("2026-10-05T10:20:31+00:00", _NEW_CONFIG, _CHANGE_SET))
+    (outcome,) = _outcomes(_update_run("2026-10-05T10:20:31+00:00", _CHANGE_SET))
 
     assert outcome == {
         "time": "2026-10-05T10:20:31+00:00",
@@ -73,8 +72,8 @@ def test_successful_update():
 
 
 def test_update_failed_on_the_head_node_then_rolled_back():
-    lines = _update_run("2026-10-12T14:02:06+00:00", _NEW_CONFIG, _CHANGE_SET, failure="readiness check failed")
-    lines += _update_run("2026-10-12T14:09:13+00:00", _OLD_CONFIG, _CHANGE_SET)
+    lines = _update_run("2026-10-12T14:02:06+00:00", _CHANGE_SET, failure="readiness check failed")
+    lines += _update_run("2026-10-12T14:09:13+00:00", _CHANGE_SET)
 
     failed, rollback = _outcomes(lines)
 
@@ -84,9 +83,9 @@ def test_update_failed_on_the_head_node_then_rolled_back():
 
 
 def test_update_failed_after_the_head_node_is_detected_from_its_rollback():
-    # The head node logged no failure, but the next run repeats the change set with the previous config.
-    lines = _update_run("2026-10-12T14:02:06+00:00", _NEW_CONFIG, _CHANGE_SET)
-    lines += _update_run("2026-10-12T14:09:13+00:00", _OLD_CONFIG, _CHANGE_SET)
+    # The head node logged no failure, but the next run repeats the change set.
+    lines = _update_run("2026-10-12T14:02:06+00:00", _CHANGE_SET)
+    lines += _update_run("2026-10-12T14:09:13+00:00", _CHANGE_SET)
 
     failed, rollback = _outcomes(lines)
 
@@ -95,8 +94,8 @@ def test_update_failed_after_the_head_node_is_detected_from_its_rollback():
 
 
 def test_failed_rollback():
-    lines = _update_run("2026-10-12T14:02:06+00:00", _NEW_CONFIG, _CHANGE_SET, failure="boom")
-    lines += _update_run("2026-10-12T14:09:13+00:00", _OLD_CONFIG, _CHANGE_SET, failure="again", rollback_failure=True)
+    lines = _update_run("2026-10-12T14:02:06+00:00", _CHANGE_SET, failure="boom")
+    lines += _update_run("2026-10-12T14:09:13+00:00", _CHANGE_SET, failure="again", rollback_failure=True)
 
     _, rollback = _outcomes(lines)
 
@@ -116,7 +115,7 @@ def test_update_failing_before_logging_its_change_set():
 
 def test_other_runs_are_not_updates_and_their_failures_are_ignored():
     lines = _other_run("2026-10-01T09:00:00+00:00", "aws-parallelcluster-entrypoints::init")
-    lines += _update_run("2026-10-05T10:20:31+00:00", _NEW_CONFIG, _CHANGE_SET)
+    lines += _update_run("2026-10-05T10:20:31+00:00", _CHANGE_SET)
     lines += _other_run(
         "2026-10-05T10:31:12+00:00", "aws-parallelcluster-entrypoints::update_computefleet_status", failure="fleet"
     )
@@ -125,11 +124,18 @@ def test_other_runs_are_not_updates_and_their_failures_are_ignored():
 
     assert outcome["outcome"] == "succeeded"
 
+def test_retry_after_a_rollback_is_an_update():
+    lines = _update_run("2026-10-12T14:02:06+00:00", _CHANGE_SET, failure="boom")
+    lines += _update_run("2026-10-12T14:09:13+00:00", _CHANGE_SET)
+    lines += _update_run("2026-10-13T09:00:00+00:00", _CHANGE_SET)
+
+    assert [outcome["outcome"] for outcome in _outcomes(lines)] == ["failed", "rollback succeeded", "succeeded"]
+
 
 def test_two_consecutive_successful_updates_are_not_a_rollback():
     second_change_set = {"changeSet": [dict(_CHANGE_SET["changeSet"][0], requestedValue=6, currentValue=4)]}
-    lines = _update_run("2026-10-05T10:20:31+00:00", _NEW_CONFIG, _CHANGE_SET)
-    lines += _update_run("2026-10-06T10:20:31+00:00", _OLD_CONFIG, second_change_set)
+    lines = _update_run("2026-10-05T10:20:31+00:00", _CHANGE_SET)
+    lines += _update_run("2026-10-06T10:20:31+00:00", second_change_set)
 
     assert [outcome["outcome"] for outcome in _outcomes(lines)] == ["succeeded", "succeeded"]
 
