@@ -124,6 +124,7 @@ def test_other_runs_are_not_updates_and_their_failures_are_ignored():
 
     assert outcome["outcome"] == "succeeded"
 
+
 def test_retry_after_a_rollback_is_an_update():
     lines = _update_run("2026-10-12T14:02:06+00:00", _CHANGE_SET, failure="boom")
     lines += _update_run("2026-10-12T14:09:13+00:00", _CHANGE_SET)
