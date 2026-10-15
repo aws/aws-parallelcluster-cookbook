@@ -52,7 +52,7 @@ class ClusterUpdateHistory(Check):
 
     LOG_UNREADABLE = CheckError(INTERNAL_ERROR_CODE, "Could not read the cluster update history from {}: {}.")
 
-    HISTORY = CheckInfo(1, "{} cluster update runs since {}.")
+    HISTORY = CheckInfo(1, "{} cluster update runs since {}; the latest, at {}, {}.")
     NO_HISTORY = CheckInfo(2, "No cluster update found in {}{}.")
     STACK_STATUS = CheckInfo(3, "Current stack status: {} (last updated {}).")
 
@@ -76,7 +76,8 @@ class ClusterUpdateHistory(Check):
         runs = update_history.update_outcomes(update_history.parse_update_runs(lines))
         infos: List[CheckFinding] = []
         if runs:
-            infos.append(self.HISTORY.format(len(runs), since).with_details(runs))
+            latest = runs[-1]
+            infos.append(self.HISTORY.format(len(runs), since, latest["time"], latest["outcome"]))
         else:
             infos.append(self.NO_HISTORY.format(CHEF_CLIENT_LOG_PATH, " since {}".format(since) if since else ""))
 
@@ -87,7 +88,7 @@ class ClusterUpdateHistory(Check):
             infos.append(self.STACK_STATUS.format(status, updated))
             if status in _INCOMPLETE_UPDATE_STATUSES:
                 warnings.append(self.LATEST_UPDATE_INCOMPLETE.format(status, updated))
-        return Result.from_findings(self, warnings=warnings or None, infos=infos)
+        return Result.from_findings(self, warnings=warnings or None, infos=infos, details=runs or None)
 
     @staticmethod
     def _stack_status(context: Context) -> Tuple[Optional[str], Optional[datetime]]:

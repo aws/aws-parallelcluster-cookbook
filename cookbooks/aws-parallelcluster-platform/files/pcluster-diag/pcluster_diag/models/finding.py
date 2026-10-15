@@ -14,32 +14,20 @@
 
 import copy
 from dataclasses import dataclass
-from typing import Any, Optional
 
 
 @dataclass
 class CheckFinding:
-    """A single item reported by a Check: a ``code``, a ``message`` and, optionally, structured ``details``.
-
-    ``details`` carries data too structured for the message, e.g. a history of events; it must be serializable to
-    JSON and is omitted from the report when None.
-    """
+    """A single item reported by a Check: a ``code`` and a ``message``."""
 
     code: str
     message: str
-    details: Optional[Any] = None
 
     def format(self, *args) -> "CheckFinding":
         """Return a copy with ``message`` formatted using ``args``."""
         formatted = copy.copy(self)
         formatted.message = self.message.format(*args)
         return formatted
-
-    def with_details(self, details: Any) -> "CheckFinding":
-        """Return a copy carrying ``details``."""
-        detailed = copy.copy(self)
-        detailed.details = details
-        return detailed
 
 
 class CheckError(CheckFinding):

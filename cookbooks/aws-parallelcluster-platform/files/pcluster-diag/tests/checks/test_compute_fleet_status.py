@@ -61,7 +61,7 @@ def test_running_fleet_passes_and_reports_the_history(monkeypatch):
     current, history = result.infos
     assert current.message == "Current compute fleet status: RUNNING (since 2026-10-12T16:00:00+00:00)."
     assert history.message == "1 compute fleet status changes since 2026-10-12 14:30:02,100."
-    assert history.details == [
+    assert result.details == [
         {"time": "2026-10-12 14:30:02,118", "from": "RUNNING", "to": "PROTECTED", "partitions": "['queue']"}
     ]
 

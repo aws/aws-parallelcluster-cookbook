@@ -56,8 +56,10 @@ def test_reports_the_history_and_the_stack_status(history):
     assert result.status == Status.PASSED
     history_info, stack_info = result.infos
     assert history_info.code == "I1"
-    assert history_info.message == "1 cluster update runs since 2026-09-30T08:15:00+00:00."
-    assert history_info.details == [
+    assert history_info.message == (
+        "1 cluster update runs since 2026-09-30T08:15:00+00:00; the latest, at 2026-10-05T10:20:31+00:00, succeeded."
+    )
+    assert result.details == [
         {
             "time": "2026-10-05T10:20:31+00:00",
             "outcome": "succeeded",

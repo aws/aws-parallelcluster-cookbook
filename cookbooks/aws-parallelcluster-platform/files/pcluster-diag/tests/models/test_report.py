@@ -19,7 +19,9 @@ from unittest.mock import patch
 
 import pytest
 
+from pcluster_diag.models.finding import CheckInfo
 from pcluster_diag.models.report import OUTPUT_DIR_NAME
+from pcluster_diag.models.result import Result, Status
 from pcluster_diag.util.serialization import to_dict
 from tests.sample_data import sample_report
 
@@ -64,6 +66,27 @@ def test_report_save_writes_json_to_the_given_path(tmp_path):
     assert saved == to_dict(report)
     # The report's context carries the same timestamp embedded in the filename.
     assert saved["context"]["timestamp"] == report.context.timestamp
+
+
+def test_report_save_writes_the_details_of_a_check_to_their_own_file(tmp_path):
+    history = [{"time": "2026-10-12T14:02:06+00:00", "outcome": "failed"}]
+    result = Result(
+        check_id="HistoryCheck",
+        check_description="d",
+        status=Status.PASSED,
+        infos=[CheckInfo(1, "1 update")],
+        details=history,
+    )
+    report = sample_report(results=[result])
+
+    path = report.save(tmp_path / "report.json")
+
+    details_path = tmp_path / "pcluster-diag-HistoryCheck-{}.json".format(report.context.timestamp)
+    assert json.loads(details_path.read_text(encoding="utf-8")) == history
+    # The report holds the absolute path of the details instead of the details.
+    saved_result = json.loads(path.read_text(encoding="utf-8"))["results"][0]
+    assert "details" not in saved_result
+    assert saved_result["details_file"] == str(details_path.resolve())
 
 
 def test_best_effort_write_is_enforced_by_caller():

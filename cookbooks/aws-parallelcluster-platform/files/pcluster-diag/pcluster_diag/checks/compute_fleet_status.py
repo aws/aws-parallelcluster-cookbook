@@ -86,9 +86,7 @@ class ComputeFleetStatusHistory(Check):
                     continue
             changes = fleet_status.parse_status_changes(lines)
             if changes:
-                infos.append(
-                    self.HISTORY.format(len(changes), fleet_status.first_log_time(lines)).with_details(changes)
-                )
+                infos.append(self.HISTORY.format(len(changes), fleet_status.first_log_time(lines)))
             else:
                 infos.append(self.NO_HISTORY)
         except OSError as error:
@@ -97,7 +95,9 @@ class ComputeFleetStatusHistory(Check):
         warning = self._status_warning(status, updated, changes) if status else None
         if warning:
             warnings.append(warning)
-        return Result.from_findings(self, errors=errors or None, warnings=warnings or None, infos=infos or None)
+        return Result.from_findings(
+            self, errors=errors or None, warnings=warnings or None, infos=infos or None, details=changes or None
+        )
 
     def _status_warning(self, status: str, updated, changes: List[dict]):
         """Return the warning for a PROTECTED or stuck fleet, or None."""
