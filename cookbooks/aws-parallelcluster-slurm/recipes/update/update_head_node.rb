@@ -117,7 +117,7 @@ ruby_block "replace slurm queue nodes" do
       Chef::Log.info("All queues will be updated in order to update shared storages")
     else
       changes.each do |change|
-        next unless change["updatePolicy"] == "QUEUE_UPDATE_STRATEGY"
+        next unless change["requiresQueueNodesReplacement"]
         queue = change["parameter"][/Scheduling\.SlurmQueues\[([^\]]*)\]/, 1]
         Chef::Log.info("Adding queue (#{queue}) to list of queue to be updated")
         queues.add(queue)
