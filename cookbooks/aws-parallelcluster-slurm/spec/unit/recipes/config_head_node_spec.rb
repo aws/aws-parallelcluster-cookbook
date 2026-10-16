@@ -57,6 +57,11 @@ describe 'aws-parallelcluster-slurm::config_head_node' do
         chef_run
         expect(@included_recipes).to eq(expected_recipes)
       end
+
+      it 'generates the Slurm configuration with GPU settings even if the Nvidia driver is not installed' do
+        is_expected.to run_execute('generate_pcluster_slurm_configs')
+        is_expected.not_to run_execute('generate_pcluster_slurm_configs').with(command: /--no-gpu/)
+      end
     end
   end
 end

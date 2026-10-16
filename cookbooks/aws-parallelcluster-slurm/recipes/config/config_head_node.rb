@@ -60,14 +60,13 @@ end
 
 unless on_docker?
   # Generate pcluster specific configs
-  no_gpu = nvidia_installed? ? "" : "--no-gpu"
   execute "generate_pcluster_slurm_configs" do
     command "#{cookbook_virtualenv_path}/bin/python #{node['cluster']['scripts_dir']}/slurm/pcluster_slurm_config_generator.py"\
             " --output-directory #{node['cluster']['slurm']['install_dir']}/etc/"\
             " --template-directory #{node['cluster']['scripts_dir']}/slurm/templates/"\
             " --input-file #{node['cluster']['cluster_config_path']}"\
             " --instance-types-data #{node['cluster']['instance_types_data_path']}"\
-            " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']} #{no_gpu}"\
+            " --compute-node-bootstrap-timeout #{node['cluster']['compute_node_bootstrap_timeout']}"\
             " --realmemory-to-ec2memory-ratio #{node['cluster']['realmemory_to_ec2memory_ratio']}"\
             " --slurmdbd-user #{node['cluster']['slurm']['user']}"\
             " --cluster-name #{node['cluster']['stack_name']}"

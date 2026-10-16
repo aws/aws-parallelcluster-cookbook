@@ -20,6 +20,7 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               allow_any_instance_of(Object).to receive(:dig).and_return(true)
               allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return(cookbook_venv_path)
               allow_any_instance_of(Object).to receive(:cluster_readiness_check_enabled?).and_return(true)
+              allow_any_instance_of(Object).to receive(:nvidia_installed?).and_return(false)
               allow(Time).to receive(:now).and_return(Time.parse(time_now))
               RSpec::Mocks.configuration.allow_message_expectations_on_nil = true
 
@@ -73,6 +74,11 @@ describe 'aws-parallelcluster-slurm::update_head_node' do
               retries: 10,
               retry_delay: 90
             )
+          end
+
+          it 'generates the Slurm configuration with GPU settings even if the Nvidia driver is not installed' do
+            is_expected.to run_execute('generate_pcluster_slurm_configs')
+            is_expected.not_to run_execute('generate_pcluster_slurm_configs').with(command: /--no-gpu/)
           end
 
           it 'does not cleanup DNA files after update' do

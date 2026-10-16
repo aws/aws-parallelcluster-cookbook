@@ -16,6 +16,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
 - Set mode `0440` on all ParallelCluster-managed files under `/etc/sudoers.d/`.
+- Fix GPU GRES configuration missing from Slurm when the head node does not have the NVIDIA driver installed.
+  The head node now always generates the GPU configuration for compute resources with GPUs.
 
 3.16.1
 ------
