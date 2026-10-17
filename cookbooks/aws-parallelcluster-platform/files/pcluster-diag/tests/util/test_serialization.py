@@ -13,8 +13,9 @@
 """Unit tests for the generic dataclass serialization helpers."""
 
 import json
+from datetime import datetime, timezone
 
-from pcluster_diag.util.serialization import to_dict, to_json
+from pcluster_diag.util.serialization import iso_time, to_dict, to_json
 from tests.sample_data import sample_context, sample_result
 
 
@@ -37,3 +38,8 @@ def test_to_json_is_deterministic_and_valid_json():
     # Two serializations of the same object are identical, and the output is valid JSON.
     assert to_json(result) == text
     assert json.loads(text)["status"] == result.status.value
+
+
+def test_iso_time():
+    assert iso_time(datetime(2026, 10, 12, 14, 10, 5, 123456, tzinfo=timezone.utc)) == "2026-10-12T14:10:05+00:00"
+    assert iso_time(None) == "unknown"
