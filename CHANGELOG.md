@@ -6,6 +6,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.17.0
 ------
 
+**ENHANCEMENTS**
+- Add `pcluster-diag` check verifying the sudoers definitions ParallelCluster relies on.
+
 **CHANGES**
 - When a system service fails to start during node bootstrap or cluster update, log its `systemctl status` and the end of
   its journal to `/var/log/chef-client.log`, so that the cause of the failure is available in CloudWatch logs.
