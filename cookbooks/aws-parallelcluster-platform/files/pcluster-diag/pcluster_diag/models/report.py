@@ -59,7 +59,7 @@ class Report:
     def save(self, path) -> Path:
         """Write this Report as JSON to ``path``, creating parent directories as needed; return ``path``.
 
-        The details of each finding are written to their own file next to the report (see ``_save_details``).
+        The details of each check are written to their own file next to the report (see ``_save_details``).
         Write errors propagate to the caller.
         """
         path = Path(path)
@@ -70,8 +70,9 @@ class Report:
     def _save_details(self, path: Path) -> None:
         """Write the details of each check to ``pcluster-diag-<check id>-<timestamp>.json`` next to the report ``path``.
 
-        The details are replaced in the Result by ``details_file``, the absolute path of their file, so the report
-        holds the current state while a history of any length is kept aside.
+        The details are replaced in the Result by ``details_file``, the absolute path of their file. The report then
+        keeps only the current state of each check, while long data such as an update history goes to the separate
+        file.
         """
         for result in self.results:
             if result.details is None:
