@@ -32,6 +32,7 @@ from pcluster_diag.checks.imds import Imds
 from pcluster_diag.checks.network_congestion import NetworkCongestion
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
 from pcluster_diag.checks.slurm_accounting import SlurmAccounting
+from pcluster_diag.checks.sudoers import Sudoers
 from pcluster_diag.models.check import Check
 from pcluster_diag.models.context import Context
 
@@ -140,6 +141,7 @@ DEFAULT_REGISTRY = (
     .register(CfnHup())
     .register(ReservedUsersAndGroups())
     .register(CriticalPathsHaveExpectedPermissions())
+    .register(Sudoers())
     .register(ClusterDaemonsAreRunning())
     .register(ClustermgtdHeartbeatIsHealthy())
     .register(ClusterUpdateHistory())
