@@ -21,6 +21,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
 - Set mode `0440` on all ParallelCluster-managed files under `/etc/sudoers.d/`.
+- Fix compute nodes not being replaced according to `QueueUpdateStrategy` when updating the `SubnetIds`
+  or the `PlacementGroup` of a queue.
 
 3.16.1
 ------
