@@ -136,6 +136,26 @@ def test_report_save_writes_values_json_cannot_represent_as_strings(tmp_path):
     assert json.loads(details_path.read_text(encoding="utf-8")) == [{"time": "2026-10-20 11:38:40+00:00"}]
 
 
+@pytest.mark.parametrize(
+    "details, expected_text",
+    [
+        pytest.param("line 1\nline 2\n", "line 1\nline 2\n", id="string"),
+        pytest.param({("q1", "cr1"): "RUNNING"}, "{('q1', 'cr1'): 'RUNNING'}", id="keys json cannot represent"),
+    ],
+)
+def test_report_save_writes_text_details_to_a_text_file(tmp_path, details, expected_text):
+    result = Result(check_id="TextCheck", check_description="d", status=Status.PASSED, details=details)
+    report = sample_report(results=[result])
+
+    path = report.save(tmp_path / "report.json")
+
+    text_path = tmp_path / "pcluster-diag-TextCheck-{}.txt".format(report.context.timestamp)
+    assert text_path.read_text(encoding="utf-8") == expected_text
+    assert not (tmp_path / "pcluster-diag-TextCheck-{}.json".format(report.context.timestamp)).exists()
+    saved_result = json.loads(path.read_text(encoding="utf-8"))["results"][0]
+    assert saved_result["details_file"] == str(text_path.resolve())
+
+
 def test_best_effort_write_is_enforced_by_caller():
     """The generic writer does not suppress errors, so save() propagates a failing write."""
     report = sample_report()

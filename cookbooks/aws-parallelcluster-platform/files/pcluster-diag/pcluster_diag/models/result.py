@@ -70,10 +70,11 @@ class Result:
             message); present on a WARNING Result and optionally on a FAILURE Result; None otherwise.
         infos: Informational notes, each a CheckInfo (code + message); used to explain why a SKIPPED_*
             Result was skipped; None otherwise.
-        details: Data too large or structured for the findings, e.g. a history of events; it must be serializable
-            to JSON. When the report is saved, it is moved to its own file, whose path is ``details_file``.
+        details: Data too large or structured for the findings, e.g. a history of events. When the report is
+            saved, it is moved to its own file, whose path is ``details_file``: a text file for a string, or for data
+            JSON cannot represent, a JSON file otherwise.
         details_file: The absolute path of the file holding ``details``; set when the report is saved, None when
-            the Result has no details.
+            the Result has no details or their file could not be written.
     """
 
     check_id: str

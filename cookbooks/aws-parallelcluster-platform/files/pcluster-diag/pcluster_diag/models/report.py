@@ -33,8 +33,9 @@ OUTPUT_DIR_NAME = f"{PACKAGE_NAME}-output"
 # Report filename template; the timestamp comes from the Context so file and content always match.
 _REPORT_FILENAME_TEMPLATE = f"{PACKAGE_NAME}-report-{{timestamp}}.json"
 
-# Filename template of the details of a check, written next to the report and timestamped like it.
-_DETAILS_FILENAME_TEMPLATE = f"{PACKAGE_NAME}-{{check_id}}-{{timestamp}}.json"
+# Filename template of the details of a check, written next to the report and timestamped like it: the extension is
+# txt for details that are text or that JSON cannot represent, json otherwise.
+_DETAILS_FILENAME_TEMPLATE = f"{PACKAGE_NAME}-{{check_id}}-{{timestamp}}.{{extension}}"
 
 
 @dataclass
@@ -71,27 +72,37 @@ class Report:
         return path
 
     def _save_details(self, path: Path) -> None:
-        """Write the details of each check to ``pcluster-diag-<check id>-<timestamp>.json`` next to the report ``path``.
+        """Write the details of each check to ``pcluster-diag-<check id>-<timestamp>.json`` or ``.txt`` by ``path``.
 
         The details are replaced in the Result by ``details_file``, the absolute path of their file. The report then
         keeps only the current state of each check, while long data such as an update history goes to the separate
         file.
 
+        Details that are a string are written as is to a ``.txt`` file. Other details are written as JSON, with the
+        values JSON cannot represent, e.g. datetimes, written as strings; when JSON cannot represent the details at
+        all, e.g. with keys that are not strings, they are written as their string to a ``.txt`` file instead.
+
         The details are removed from the Result even when their file cannot be written, so that the report, and the
         report printed to stdout, never hold them: the Result then has no ``details_file``, and the error is logged.
         A failure to write the details of a check does not prevent writing the details of the others, nor the report.
-        Values that JSON cannot represent, e.g. datetimes, are written as strings.
         """
         for result in self.results:
             if result.details is None:
                 continue
             details, result.details = result.details, None
+            text, extension = str(details), "txt"
+            if not isinstance(details, str):
+                try:
+                    text, extension = json.dumps(details, indent=2, default=str), "json"
+                except (TypeError, ValueError):
+                    # Stays as txt file
+                    pass
             details_path = path.parent / _DETAILS_FILENAME_TEMPLATE.format(
-                check_id=result.check_id, timestamp=self.context.timestamp
+                check_id=result.check_id, timestamp=self.context.timestamp, extension=extension
             )
             try:
-                write_text_file(details_path, json.dumps(details, indent=2, default=str))
-            except (OSError, TypeError, ValueError) as error:
+                write_text_file(details_path, text)
+            except OSError as error:
                 logger.error("Could not write the details of check %s to %s: %s", result.check_id, details_path, error)
                 continue
             result.details_file = str(details_path.resolve())

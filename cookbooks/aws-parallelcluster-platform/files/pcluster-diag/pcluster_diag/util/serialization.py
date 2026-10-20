@@ -45,6 +45,7 @@ def iso_time(time: Optional[datetime]) -> str:
 def log_time(time: str) -> str:
     """Return the time of a log line in UTC (see ``iso_time``), or as is if it is not in a recognized format."""
     try:
-        return iso_time(datetime.fromisoformat(time))
+        # The daemons log the milliseconds after a comma, which fromisoformat accepts only from Python 3.11.
+        return iso_time(datetime.fromisoformat(time.replace(",", ".")))
     except ValueError:
         return time
