@@ -13,6 +13,7 @@
 """Report model aggregating the captured Context and per-Check Results."""
 
 import json
+import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -23,6 +24,8 @@ from pcluster_diag.models.context import Context
 from pcluster_diag.models.result import Result
 from pcluster_diag.util.io_utils import write_text_file
 from pcluster_diag.util.serialization import to_json
+
+logger = logging.getLogger(__name__)
 
 # Directory (under a base directory) that holds report files by default.
 OUTPUT_DIR_NAME = f"{PACKAGE_NAME}-output"
@@ -60,7 +63,7 @@ class Report:
         """Write this Report as JSON to ``path``, creating parent directories as needed; return ``path``.
 
         The details of each check are written to their own file next to the report (see ``_save_details``).
-        Write errors propagate to the caller.
+        Errors writing the report propagate to the caller; errors writing the details of a check are logged.
         """
         path = Path(path)
         self._save_details(path)
@@ -73,13 +76,22 @@ class Report:
         The details are replaced in the Result by ``details_file``, the absolute path of their file. The report then
         keeps only the current state of each check, while long data such as an update history goes to the separate
         file.
+
+        The details are removed from the Result even when their file cannot be written, so that the report, and the
+        report printed to stdout, never hold them: the Result then has no ``details_file``, and the error is logged.
+        A failure to write the details of a check does not prevent writing the details of the others, nor the report.
+        Values that JSON cannot represent, e.g. datetimes, are written as strings.
         """
         for result in self.results:
             if result.details is None:
                 continue
+            details, result.details = result.details, None
             details_path = path.parent / _DETAILS_FILENAME_TEMPLATE.format(
                 check_id=result.check_id, timestamp=self.context.timestamp
             )
-            write_text_file(details_path, json.dumps(result.details, indent=2))
+            try:
+                write_text_file(details_path, json.dumps(details, indent=2, default=str))
+            except (OSError, TypeError, ValueError) as error:
+                logger.error("Could not write the details of check %s to %s: %s", result.check_id, details_path, error)
+                continue
             result.details_file = str(details_path.resolve())
-            result.details = None

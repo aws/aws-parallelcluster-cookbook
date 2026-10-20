@@ -14,11 +14,13 @@
 
 import json
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
+from pcluster_diag.models import report as report_module
 from pcluster_diag.models.finding import CheckInfo
 from pcluster_diag.models.report import OUTPUT_DIR_NAME
 from pcluster_diag.models.result import Result, Status
@@ -87,6 +89,51 @@ def test_report_save_writes_the_details_of_a_check_to_their_own_file(tmp_path):
     saved_result = json.loads(path.read_text(encoding="utf-8"))["results"][0]
     assert "details" not in saved_result
     assert saved_result["details_file"] == str(details_path.resolve())
+
+
+def test_report_save_writes_the_report_when_details_cannot_be_written(tmp_path, caplog):
+    """A details file that cannot be written is logged and skipped: the other details and the report are written."""
+    failing = Result(check_id="FailingCheck", check_description="d", status=Status.PASSED, details=["a"])
+    working = Result(check_id="WorkingCheck", check_description="d", status=Status.PASSED, details=["b"])
+    report = sample_report(results=[failing, working])
+    failing_path = tmp_path / "pcluster-diag-FailingCheck-{}.json".format(report.context.timestamp)
+    working_path = tmp_path / "pcluster-diag-WorkingCheck-{}.json".format(report.context.timestamp)
+    write_text_file = report_module.write_text_file
+
+    def fake_write_text_file(path, text):
+        if Path(path) == failing_path:
+            raise OSError("disk full")
+        write_text_file(path, text)
+
+    with patch.object(report_module, "write_text_file", side_effect=fake_write_text_file):
+        path = report.save(tmp_path / "report.json")
+
+    saved_results = json.loads(path.read_text(encoding="utf-8"))["results"]
+    # Neither the report nor the Results hold the details: only the details that were written have a file.
+    assert saved_results == [
+        {"check_id": "FailingCheck", "check_description": "d", "status": "PASSED"},
+        {
+            "check_id": "WorkingCheck",
+            "check_description": "d",
+            "status": "PASSED",
+            "details_file": str(working_path.resolve()),
+        },
+    ]
+    assert (failing.details, working.details) == (None, None)
+    assert not failing_path.exists()
+    assert json.loads(working_path.read_text(encoding="utf-8")) == ["b"]
+    assert "Could not write the details of check FailingCheck" in caplog.text
+
+
+def test_report_save_writes_values_json_cannot_represent_as_strings(tmp_path):
+    moment = datetime(2026, 10, 20, 11, 38, 40, tzinfo=timezone.utc)
+    result = Result(check_id="TimeCheck", check_description="d", status=Status.PASSED, details=[{"time": moment}])
+    report = sample_report(results=[result])
+
+    report.save(tmp_path / "report.json")
+
+    details_path = tmp_path / "pcluster-diag-TimeCheck-{}.json".format(report.context.timestamp)
+    assert json.loads(details_path.read_text(encoding="utf-8")) == [{"time": "2026-10-20 11:38:40+00:00"}]
 
 
 def test_best_effort_write_is_enforced_by_caller():
