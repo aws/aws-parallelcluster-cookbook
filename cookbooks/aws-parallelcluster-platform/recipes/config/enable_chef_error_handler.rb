@@ -12,6 +12,12 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Log why a systemd service did not start, on every node type.
+chef_handler 'ErrorHandlers::ServiceFailureHandler' do
+  type exception: true
+  action :enable
+end
+
 if node["cluster"]["node_type"] == "HeadNode"
   chef_handler 'WriteChefError::WriteHeadNodeChefError' do
     type exception: true

@@ -25,7 +25,7 @@ describe 'aws-parallelcluster-computefleet::clusterstatusmgtd_install' do
           .with(source: 'clusterstatusmgtd/clusterstatusmgtd_logging.conf')
           .with(user: 'root')
           .with(group: 'root')
-          .with(mode: '0755')
+          .with(mode: '0644')
       end
     end
   end

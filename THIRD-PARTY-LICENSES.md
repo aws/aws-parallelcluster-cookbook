@@ -3,7 +3,7 @@
 ## Contents
 
 - [openpmix; version 5.0.11](#openpmix-version-5011)
-- [Python; version 3.14.6](#python-version-3146)
+- [Python; version 3.14.8](#python-version-3148)
 - [enroot; version 4.2.1-1.el8](#enroot-version-421-1el8)
 - [requests; version 2.32.5](#requests-version-2325)
 - [cookbook-line; version 5.0.0](#cookbook-line-version-500)
@@ -157,13 +157,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-## Python; version 3.14.6
+## Python; version 3.14.8
 
 <https://www.python.org/>
 
 ```text
     * Package Python's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/python/Python-3.14.6.tgz
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/python/Python-3.14.8.tgz
 
 A. HISTORY OF THE SOFTWARE
 ==========================
@@ -1071,8 +1071,8 @@ limitations under the License.
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 ```
 
-- /opt/parallelcluster/pyenv/versions/3.14.6/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.ASF-2 — see [Shared license 1](#shared-license-1)
-- /opt/parallelcluster/pyenv/versions/3.14.6/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.GPL-3 — see [Shared license 2](#shared-license-2)
+- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.ASF-2 — see [Shared license 1](#shared-license-1)
+- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.GPL-3 — see [Shared license 2](#shared-license-2)
 
 ---
 
@@ -1084,7 +1084,7 @@ limitations under the License.
     * Package retrying's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 
------ /opt/parallelcluster/pyenv/versions/3.14.6/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/NOTICE.txt -----
+----- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/NOTICE.txt -----
 
 Copyright 2013 Ray Holder
 Copyright 2015 the "retrying" Contributors
@@ -1092,7 +1092,7 @@ Copyright 2015 the "retrying" Contributors
 SPDX-License-Identifier: Apache-2.0
 ```
 
-- /opt/parallelcluster/pyenv/versions/3.14.6/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/LICENSE.txt — see [Shared license 1](#shared-license-1)
+- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/LICENSE.txt — see [Shared license 1](#shared-license-1)
 
 ---
 
@@ -1104,7 +1104,7 @@ SPDX-License-Identifier: Apache-2.0
     * Package boto3's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 
------ /opt/parallelcluster/pyenv/versions/3.14.6/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.42.28.dist-info/LICENSE -----
+----- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.42.28.dist-info/LICENSE -----
 
 
                                  Apache License
@@ -1284,7 +1284,7 @@ SPDX-License-Identifier: Apache-2.0
 
    END OF TERMS AND CONDITIONS
 
------ /opt/parallelcluster/pyenv/versions/3.14.6/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.42.28.dist-info/NOTICE -----
+----- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.42.28.dist-info/NOTICE -----
 
 boto3
 Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.

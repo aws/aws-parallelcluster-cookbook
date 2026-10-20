@@ -29,6 +29,6 @@ template '/etc/sudoers.d/99-parallelcluster-secure-path' do
   source 'sudo/99-parallelcluster-secure-path.erb'
   owner 'root'
   group 'root'
-  mode '0600'
+  mode '0440'
   variables(secure_path_required_directories: secure_path_required_directories)
 end

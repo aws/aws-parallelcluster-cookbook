@@ -3,11 +3,30 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
-3.17.0
+3.16.2
 ------
+
+**ENHANCEMENTS**
+- Add `pcluster-diag` check verifying the sudoers definitions ParallelCluster relies on.
+
+**CHANGES**
+- When a system service fails to start during node bootstrap or cluster update, log its `systemctl status` and the end of
+  its journal to `/var/log/chef-client.log`, so that the cause of the failure is available in CloudWatch logs.
+- Upgrade Python to version 3.14.8.
+- Ship only AWS CLI v2 in ParallelCluster AMIs. AWS CLI v1 is no longer installed in the cookbook Python virtual environment.
+- Remove execution permissions for configurations files `/opt/parallelcluster/shared/computefleet-status.json`,
+  `/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf` and `/etc/dcv/dcv.conf`
+- Log the content of the Slurm configuration files generated on the head node, to simplify troubleshooting.
 
 **BUG FIXES**
 - Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
+- Set mode `0440` on all ParallelCluster-managed files under `/etc/sudoers.d/`.
+
+3.16.1
+------
+
+**CHANGES**
+- Upgrade Slurm to version 25.11.8 (from 25.11.6).
 
 3.16.0
 ------

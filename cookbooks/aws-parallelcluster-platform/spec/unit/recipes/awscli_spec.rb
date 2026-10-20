@@ -29,13 +29,13 @@ describe 'aws-parallelcluster-platform::awscli' do
           )
         end
 
-        it 'installs awscli into cookbook virtualev path' do
+        it 'installs awscli system-wide' do
           is_expected.to run_bash('install awscli')
             .with_code "#{file_cache_path}/awscli/aws/install -i /usr/local/aws -b /usr/local/bin"
         end
       end
 
-      context "when awscli is not installed" do
+      context "when awscli is already installed" do
         cached(:chef_run) do
           allow(File).to receive(:exist?).with('/usr/local/bin/aws').and_return(true)
           runner(platform: platform, version: version).converge(described_recipe)

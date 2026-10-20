@@ -22,7 +22,7 @@ control 'tag:install_clusterstatusmgtd_files_created' do
 
   describe file('/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf') do
     it { should exist }
-    its('mode') { should cmp '0755' }
+    its('mode') { should cmp '0644' }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
     its('content') { should_not be_empty }
@@ -39,14 +39,14 @@ control 'tag:config_clusterstatusmgtd' do
     its('content') { should_not match /^""$/ }
     its('owner') { should eq 'pcluster-admin' }
     its('group') { should eq 'pcluster-admin' }
-    its('mode') { should cmp '0755' }
+    its('mode') { should cmp '0644' }
   end
 
   describe file('/etc/sudoers.d/99-parallelcluster-clusterstatusmgtd') do
     it { should exist }
     its('owner') { should eq 'root' }
     its('group') { should eq 'root' }
-    its('mode') { should cmp '0600' }
+    its('mode') { should cmp '0440' }
     its('content') { should match %r{Cmnd_Alias CINC_COMMAND = /usr/bin/cinc-client --local-mode --config /etc/chef/client\.rb --log_level info --logfile /var/log/chef-client\.log --force-formatter --no-color --chef-zero-port 8889 --json-attributes /etc/chef/dna\.json --override-runlist  aws-parallelcluster-entrypoints\\:\\:update_computefleet_status} }
     its('content') { should match /#{node['cluster']['cluster_admin_user']} ALL = \(root\) NOPASSWD: CINC_COMMAND/ }
   end

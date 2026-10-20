@@ -6,7 +6,7 @@ on:
     # Inputs the workflow accepts.
     inputs:
       pcluster-version:
-        description: 'The target version of ParallelCluster CLI'
+        description: 'The target version of ParallelCluster Cookbook'
         required: true
         type: string
       branch:

@@ -47,28 +47,32 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         name:
-          - Python 3.8 Tests
-          - Python 3.9 Tests
-          - Python 3.10 Tests
-          - Python 3.10 Tests Coverage
+          - Python 3.11 Tests
+          - Python 3.12 Tests
+          - Python 3.13 Tests
+          - Python 3.14 Tests
+          - Python 3.14 Tests Coverage
           - Code Checks
           - pcluster-diag Tests Python 3.10
           - pcluster-diag Tests Python 3.14
           - pcluster-diag Tests Coverage
           - pcluster-diag Code Checks
         include:
-          - name: Python 3.8 Tests
-            python: 3.8
-            toxenv: py38-nocov
-          - name: Python 3.9 Tests
-            python: 3.9
-            toxenv: py39-nocov
-          - name: Python 3.10 Tests
-            python: '3.10'
-            toxenv: py310-nocov
-          - name: Python 3.10 Tests Coverage
-            python: '3.10'
-            toxenv: py310-cov
+          - name: Python 3.11 Tests
+            python: '3.11'
+            toxenv: py311-nocov
+          - name: Python 3.12 Tests
+            python: '3.12'
+            toxenv: py312-nocov
+          - name: Python 3.13 Tests
+            python: '3.13'
+            toxenv: py313-nocov
+          - name: Python 3.14 Tests
+            python: '3.14'
+            toxenv: py314-nocov
+          - name: Python 3.14 Tests Coverage
+            python: '3.14'
+            toxenv: py314-cov
           - name: Code Checks
             python: '3.10'
             toxenv: code-linters
@@ -82,7 +86,7 @@ jobs:
             python: '3.14'
             toxenv: pcluster-diag -- -e test-with-coverage
           - name: pcluster-diag Code Checks
-            python: '3.10'
+            python: '3.14'
             toxenv: pcluster-diag -- -e code-linters
 
     steps:

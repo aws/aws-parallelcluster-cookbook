@@ -22,7 +22,7 @@ control 'tag:install_sudoers_file_configured' do
 
   describe file('/etc/sudoers.d/99-parallelcluster-secure-path') do
     it { should exist }
-    its('mode') { should cmp '0600' }
+    its('mode') { should cmp '0440' }
     its('content') { should match(%r{Defaults secure_path = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin}) }
   end
 end
