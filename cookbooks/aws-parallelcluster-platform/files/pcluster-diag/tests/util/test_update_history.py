@@ -58,7 +58,7 @@ def _other_run(time, run_list, failure=None):
 
 
 def _outcomes(lines):
-    return update_history.update_outcomes(update_history.parse_update_runs(lines))
+    return update_history.update_outcomes(update_history.parse_update_runs(lines).runs)
 
 
 def test_successful_update():
@@ -153,8 +153,8 @@ def test_change_set_that_is_not_json_is_kept_as_text():
     assert outcome["changeSet"] == "not json"
 
 
-def test_first_log_time():
-    assert update_history.first_log_time(["garbage", _line("2026-09-30T08:15:00+00:00", "x")]) == (
-        "2026-09-30T08:15:00+00:00"
-    )
-    assert update_history.first_log_time([]) is None
+def test_parse_update_runs_returns_the_time_of_the_first_line():
+    lines = iter(["garbage", _line("2026-09-30T08:15:00+00:00", "x"), _line("2026-09-30T09:00:00+00:00", "y")])
+
+    assert update_history.parse_update_runs(lines).first_time == "2026-09-30T08:15:00+00:00"
+    assert update_history.parse_update_runs([]).first_time is None

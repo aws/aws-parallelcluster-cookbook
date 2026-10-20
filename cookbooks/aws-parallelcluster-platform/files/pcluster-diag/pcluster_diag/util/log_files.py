@@ -10,30 +10,39 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Read a log together with the single rotated copy logrotate keeps of it."""
+"""Read a log together with the single rotated copy logrotate keeps of it, one line at a time.
 
-from typing import List
+The logs of a long-living cluster can be large: they are streamed, so that the parsers only keep in memory the lines
+they need.
+"""
+
+import errno
+import os
+from typing import Iterator, List
 
 from pcluster_diag.core.constants import ROTATED_LOG_SUFFIX
 
 
-def read_rotated_log(path: str) -> List[str]:
-    """Return the lines of ``path`` and of its rotated copy, oldest first.
+def read_rotated_log(path: str) -> Iterator[str]:
+    """Return an iterator over the lines of the rotated copy of ``path``, then of ``path``, without newlines.
 
-    A file that does not exist is skipped; any other error reading a file is raised.
+    The files are read one line at a time while iterating. The rotated copy is optional: it is skipped if it does
+    not exist when called, e.g. for a log that was never rotated. Any error reading a file, including a file that
+    disappeared since the call, is raised while iterating.
 
     Raises:
-        FileNotFoundError: If neither ``path`` nor its rotated copy exists.
+        FileNotFoundError: If ``path`` does not exist, when called.
     """
-    lines: List[str] = []
-    found = False
-    for file_path in (path + ROTATED_LOG_SUFFIX, path):
-        try:
-            with open(file_path, encoding="utf-8", errors="replace") as log_file:
-                lines.extend(log_file.read().splitlines())
-        except FileNotFoundError:
-            continue
-        found = True
-    if not found:
-        raise FileNotFoundError("the file does not exist")
-    return lines
+    if not os.path.exists(path):
+        raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
+    rotated_path = path + ROTATED_LOG_SUFFIX
+    paths = [rotated_path, path] if os.path.exists(rotated_path) else [path]
+    return _lines(paths)
+
+
+def _lines(paths: List[str]) -> Iterator[str]:
+    """Yield the lines of the files in ``paths``, one after the other, without newlines."""
+    for file_path in paths:
+        with open(file_path, encoding="utf-8", errors="replace") as log_file:
+            for line in log_file:
+                yield line.rstrip("\n")

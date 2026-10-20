@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 import pytest
 
 from pcluster_diag.util import fleet_status
+from pcluster_diag.util.serialization import log_time
 
 
 def _line(time, message, logger="clusterstatusmgtd:_update_compute_fleet_status"):
@@ -36,7 +37,7 @@ def test_parse_status_changes_merges_the_logs_by_time():
         _change("2026-10-05 10:15:20,000", "RUNNING", "PROTECTED", "clustermgtd:_update_compute_fleet_status")
     ]
 
-    changes = fleet_status.parse_status_changes(clusterstatusmgtd + clustermgtd)
+    changes = fleet_status.parse_status_changes(clusterstatusmgtd + clustermgtd).changes
 
     assert [(change["from"], change["to"]) for change in changes] == [
         ("STOP_REQUESTED", "STOPPING"),
@@ -57,19 +58,34 @@ def test_protected_change_carries_the_partitions_and_the_exit_is_inferred():
         _change("2026-10-12 16:06:10,415", "START_REQUESTED", "STARTING"),
     ]
 
-    changes = fleet_status.parse_status_changes(lines)
+    changes = fleet_status.parse_status_changes(lines).changes
 
+    # The times are the local time of the host: they are compared with the times of the lines of the changes.
     assert changes == [
-        {"time": "2026-10-12 14:30:02,118", "from": "RUNNING", "to": "PROTECTED", "partitions": "['queue']"},
-        {"time": "2026-10-12 16:05:10,402", "from": "PROTECTED", "to": "START_REQUESTED"},
-        {"time": "2026-10-12 16:06:10,415", "from": "START_REQUESTED", "to": "STARTING"},
+        {
+            "time": log_time("2026-10-12 14:30:02,118"),
+            "from": "RUNNING",
+            "to": "PROTECTED",
+            "partitions": "['queue']",
+        },
+        {"time": log_time("2026-10-12 16:05:10,402"), "from": "PROTECTED", "to": "START_REQUESTED"},
+        {"time": log_time("2026-10-12 16:06:10,415"), "from": "START_REQUESTED", "to": "STARTING"},
     ]
 
 
 def test_request_without_protection_is_not_added():
     lines = [_line("2026-10-05 10:15:00,000", "Current compute fleet status: STOP_REQUESTED", "clusterstatusmgtd:x")]
 
-    assert fleet_status.parse_status_changes(lines) == []
+    assert fleet_status.parse_status_changes(lines).changes == []
+
+
+def test_parse_status_changes_ignores_the_status_read_on_every_loop():
+    lines = [
+        _line("2026-10-05 10:{:02d}:00,000".format(m), "Current compute fleet status: RUNNING", "c:x")
+        for m in range(60)
+    ]
+
+    assert fleet_status.parse_status_changes(iter(lines)).changes == []
 
 
 class _FakeDynamoDB:

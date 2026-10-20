@@ -14,7 +14,7 @@
 
 import dataclasses
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -35,5 +35,16 @@ def to_json(obj, indent: int = 2) -> str:
 
 
 def iso_time(time: Optional[datetime]) -> str:
-    """Return ``time`` in ISO 8601 to the second, or "unknown" if it is None."""
-    return time.isoformat(timespec="seconds") if time else "unknown"
+    """Return ``time`` in UTC, in ISO 8601 to the second (e.g. ``2026-10-12T14:10:05+00:00``), or "unknown" if None.
+
+    A time without a timezone is taken as the local time of the node, as logged by the ParallelCluster daemons.
+    """
+    return time.astimezone(timezone.utc).isoformat(timespec="seconds") if time else "unknown"
+
+
+def log_time(time: str) -> str:
+    """Return the time of a log line in UTC (see ``iso_time``), or as is if it is not in a recognized format."""
+    try:
+        return iso_time(datetime.fromisoformat(time))
+    except ValueError:
+        return time

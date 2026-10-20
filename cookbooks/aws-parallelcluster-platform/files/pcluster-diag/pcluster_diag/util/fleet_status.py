@@ -21,9 +21,11 @@ daemons log the status they read on every loop, which shows when a request took 
 import logging
 import re
 from datetime import datetime
-from typing import List, Optional, Tuple
+from typing import Iterable, List, NamedTuple, Optional, Tuple
 
 import boto3
+
+from pcluster_diag.util.serialization import log_time
 
 logger = logging.getLogger(__name__)
 
@@ -36,10 +38,17 @@ _CURRENT = re.compile(r"^Current compute fleet status: (?P<status>\w+)$")
 _INACTIVE_PARTITIONS = "Placing bootstrap failure partitions to INACTIVE: "
 
 PROTECTED = "PROTECTED"
-# Minutes after which a transitional status means the fleet is stuck. clusterstatusmgtd picks up a *_REQUESTED status
-# on its next loop (60 seconds); STARTING and STOPPING last at most one update handler run
-# (update_event_timeout_minutes, 15 minutes) plus one loop.
+# A fleet is stuck when it stays in a transitional status longer than it takes when the daemons work: the minutes
+# after which it is stuck. clusterstatusmgtd picks up a *_REQUESTED status on its next loop (60 seconds); STARTING and
+# STOPPING last at most one update handler run (update_event_timeout_minutes, 15 minutes) plus one loop.
 STUCK_AFTER_MINUTES = {"START_REQUESTED": 5, "STOP_REQUESTED": 5, "STARTING": 20, "STOPPING": 20}
+# What a stuck fleet means, for each transitional status.
+STUCK_CAUSES = {
+    "START_REQUESTED": "clusterstatusmgtd has not picked up the start request",
+    "STOP_REQUESTED": "clusterstatusmgtd has not picked up the stop request",
+    "STARTING": "clusterstatusmgtd has not completed the start of the compute fleet",
+    "STOPPING": "clusterstatusmgtd has not completed the stop of the compute fleet",
+}
 
 # DynamoDB item holding the compute fleet status, as written by the CLI and clusterstatusmgtd.
 _FLEET_ITEM_KEY = {"Id": "COMPUTE_FLEET"}
@@ -77,23 +86,33 @@ def _parse_update_time(value: Optional[str]) -> Optional[datetime]:
         return None
 
 
-def first_log_time(log: List[str]) -> Optional[str]:
-    """Return the time of the first line of ``log``, or None if it has none."""
-    times = [match["time"] for match in map(_LOG_LINE.match, log) if match]
-    return min(times) if times else None
+class StatusLog(NamedTuple):
+    """The compute fleet status changes logged by the daemons, ordered by time, and the time of their first log line."""
+
+    changes: List[dict]
+    first_time: Optional[str]
 
 
-def parse_status_changes(log: List[str]) -> List[dict]:
-    """Return the compute fleet status changes logged in ``log``, ordered by time.
+def parse_status_changes(log: Iterable[str]) -> StatusLog:
+    """Return the compute fleet status changes logged in ``log``, ordered by time, and the time of the first line.
 
     ``log`` holds the lines of the clusterstatusmgtd and clustermgtd logs, one log after the other: the changes are
-    sorted by the time of their line. A change to PROTECTED carries the partitions clustermgtd made inactive, and a
-    change out of PROTECTED is added when a daemon first reads a start or stop request.
+    sorted by the time of their line, so that the changes of one daemon follow from the lines of the other. A change to
+    PROTECTED carries the partitions clustermgtd made inactive, and a change out of PROTECTED is added when a daemon
+    first reads a start or stop request. ``log`` is read once: only the lines about these are kept in memory. The
+    times are in UTC.
     """
-    # The log time format sorts chronologically; the sort is stable, so lines logged at the same time keep their order.
-    entries = sorted(
-        ((match["time"], match["message"]) for match in map(_LOG_LINE.match, log) if match), key=lambda e: e[0]
-    )
+    entries = []
+    first_time: Optional[str] = None
+    for match in map(_LOG_LINE.match, log):
+        if not match:
+            continue
+        # The log time format sorts chronologically, so the first line is the one with the smallest time.
+        first_time = min(first_time or match["time"], match["time"])
+        if _is_status_message(match["message"]):
+            entries.append((match["time"], match["message"]))
+    # The sort is stable, so lines logged at the same time keep their order.
+    entries.sort(key=lambda entry: entry[0])
     changes: List[dict] = []
     partitions = None
     protected = False
@@ -103,12 +122,23 @@ def parse_status_changes(log: List[str]) -> List[dict]:
         if message.startswith(_INACTIVE_PARTITIONS):
             partitions = message[len(_INACTIVE_PARTITIONS) :]
         elif change:
-            entry = {"time": time, "from": change["from"], "to": change["to"]}
+            entry = {"time": log_time(time), "from": change["from"], "to": change["to"]}
             if change["to"] == PROTECTED and partitions is not None:
                 entry["partitions"] = partitions
             changes.append(entry)
             protected = change["to"] == PROTECTED
         elif current and protected and current["status"].endswith("_REQUESTED"):
-            changes.append({"time": time, "from": PROTECTED, "to": current["status"]})
+            changes.append({"time": log_time(time), "from": PROTECTED, "to": current["status"]})
             protected = False
-    return changes
+    return StatusLog(changes, log_time(first_time) if first_time else None)
+
+
+def _is_status_message(message: str) -> bool:
+    """Return whether a log message is about the compute fleet status, rather than the status read on every loop.
+
+    These are the changes, the partitions made inactive, and the start or stop requests read by a daemon.
+    """
+    if message.startswith(_INACTIVE_PARTITIONS) or _CHANGE.match(message):
+        return True
+    current = _CURRENT.match(message)
+    return bool(current) and current["status"].endswith("_REQUESTED")

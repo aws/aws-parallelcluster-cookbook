@@ -15,8 +15,13 @@
 The current status comes from the cluster DynamoDB table, where ``pcluster update-compute-fleet`` writes the start
 and stop requests. The history of changes comes from the clusterstatusmgtd and clustermgtd logs, so it goes back only
 as far as the logs and their rotated copies.
+
+The fleet is stuck when it stays in a transitional status (START_REQUESTED, STOP_REQUESTED, STARTING, STOPPING) longer
+than it takes when the daemons work: clusterstatusmgtd did not pick up the request, or did not complete the start or
+stop of the compute fleet. The limits are in ``fleet_status.STUCK_AFTER_MINUTES``.
 """
 
+import itertools
 from datetime import datetime, timezone
 from typing import List
 
@@ -27,6 +32,9 @@ from pcluster_diag.models.finding import CheckError, CheckFinding, CheckInfo, Ch
 from pcluster_diag.models.result import INTERNAL_ERROR_CODE, Result
 from pcluster_diag.util import fleet_status, log_files
 from pcluster_diag.util.serialization import iso_time
+
+# The logs of the daemons that change the compute fleet status, on the head node.
+_FLEET_STATUS_LOGS = (CLUSTERSTATUSMGTD_LOG_PATH, CLUSTERMGTD_LOG_PATH)
 
 
 def _now() -> datetime:
@@ -40,7 +48,7 @@ class ComputeFleetStatusHistory(Check):
     PROTECTED = CheckWarning(
         1, "The compute fleet is PROTECTED since {}: bootstrap failures put partitions {} in INACTIVE."
     )
-    STUCK = CheckWarning(2, "The compute fleet is in {} since {} ({} minutes).")
+    STUCK = CheckWarning(2, "The compute fleet is stuck in {} since {} ({} minutes): {}.")
 
     STATUS_UNREADABLE = CheckError(
         INTERNAL_ERROR_CODE, "Could not read the compute fleet status from the DynamoDB table {}: {}."
@@ -76,21 +84,19 @@ class ComputeFleetStatusHistory(Check):
         else:
             infos.append(self.CURRENT_STATUS.format(status, iso_time(updated)))
 
-        changes = []
+        # Both logs are parsed together: the changes logged by one daemon follow from the lines of the other.
+        changes: List[dict] = []
         try:
-            lines = []
-            for path in (CLUSTERSTATUSMGTD_LOG_PATH, CLUSTERMGTD_LOG_PATH):
-                try:
-                    lines.extend(log_files.read_rotated_log(path))
-                except FileNotFoundError:
-                    continue
-            changes = fleet_status.parse_status_changes(lines)
-            if changes:
-                infos.append(self.HISTORY.format(len(changes), fleet_status.first_log_time(lines)))
-            else:
-                infos.append(self.NO_HISTORY)
+            lines = itertools.chain.from_iterable(log_files.read_rotated_log(path) for path in _FLEET_STATUS_LOGS)
+            status_log = fleet_status.parse_status_changes(lines)
         except OSError as error:
             errors.append(self.LOGS_UNREADABLE.format(error))
+        else:
+            changes = status_log.changes
+            if changes:
+                infos.append(self.HISTORY.format(len(changes), status_log.first_time or "unknown"))
+            else:
+                infos.append(self.NO_HISTORY)
 
         warning = self._status_warning(status, updated, changes) if status else None
         if warning:
@@ -108,5 +114,5 @@ class ComputeFleetStatusHistory(Check):
         if status in fleet_status.STUCK_AFTER_MINUTES and updated:
             minutes = int((_now() - updated).total_seconds() // 60)
             if minutes > fleet_status.STUCK_AFTER_MINUTES[status]:
-                return self.STUCK.format(status, iso_time(updated), minutes)
+                return self.STUCK.format(status, iso_time(updated), minutes, fleet_status.STUCK_CAUSES[status])
         return None

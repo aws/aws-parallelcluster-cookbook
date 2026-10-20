@@ -13,9 +13,9 @@
 """Unit tests for the generic dataclass serialization helpers."""
 
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
-from pcluster_diag.util.serialization import iso_time, to_dict, to_json
+from pcluster_diag.util.serialization import iso_time, log_time, to_dict, to_json
 from tests.sample_data import sample_context, sample_result
 
 
@@ -43,3 +43,13 @@ def test_to_json_is_deterministic_and_valid_json():
 def test_iso_time():
     assert iso_time(datetime(2026, 10, 12, 14, 10, 5, 123456, tzinfo=timezone.utc)) == "2026-10-12T14:10:05+00:00"
     assert iso_time(None) == "unknown"
+    # Every time is written in UTC.
+    assert iso_time(datetime(2026, 10, 12, 10, 10, 5, tzinfo=timezone(timedelta(hours=-4)))) == (
+        "2026-10-12T14:10:05+00:00"
+    )
+
+
+def test_log_time_converts_to_utc_and_keeps_unknown_times():
+    assert log_time("2026-10-12T10:02:06-04:00") == "2026-10-12T14:02:06+00:00"
+    assert log_time("2026-10-12 14:30:02,118+02:00") == "2026-10-12T12:30:02+00:00"
+    assert log_time("not a time") == "not a time"

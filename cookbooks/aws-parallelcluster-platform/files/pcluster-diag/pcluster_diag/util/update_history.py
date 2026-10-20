@@ -22,7 +22,9 @@ always fetched in its latest version.
 import json
 import re
 from dataclasses import dataclass
-from typing import Any, List, Optional
+from typing import Any, Iterable, List, NamedTuple, Optional
+
+from pcluster_diag.util.serialization import log_time
 
 # A /var/log/chef-client.log line: "[2026-10-12T14:02:06+00:00] INFO: message".
 _LOG_LINE = re.compile(r"^\[(?P<time>[^\]]+)\] (?P<level>[A-Z]+): (?P<message>.*)$")
@@ -57,18 +59,20 @@ class UpdateRun:
     rollback_failure: bool = False
 
 
-def first_log_time(log: List[str]) -> Optional[str]:
-    """Return the time of the first line of ``log``, the lines of /var/log/chef-client.log, or None if it has none."""
-    for line in log:
-        match = _LOG_LINE.match(line)
-        if match:
-            return match["time"]
-    return None
+class UpdateLog(NamedTuple):
+    """The update runs logged in /var/log/chef-client.log, oldest first, and the time of its first line in UTC."""
+
+    runs: List[UpdateRun]
+    first_time: Optional[str]
 
 
-def parse_update_runs(log: List[str]) -> List[UpdateRun]:
-    """Return the update runs logged in ``log``, the lines of /var/log/chef-client.log, oldest first."""
+def parse_update_runs(log: Iterable[str]) -> UpdateLog:
+    """Return the update runs logged in ``log``, the lines of /var/log/chef-client.log, and the time of its first line.
+
+    ``log`` is read once: only the update runs and their change sets are kept in memory.
+    """
     runs: List[UpdateRun] = []
+    first_time: Optional[str] = None
     run: Optional[UpdateRun] = None
     change_set_lines: Optional[List[str]] = None  # the lines of the change set being read
 
@@ -78,6 +82,7 @@ def parse_update_runs(log: List[str]) -> List[UpdateRun]:
             if change_set_lines is not None:
                 change_set_lines.append(line)
             continue
+        first_time = first_time or match["time"]
         if change_set_lines is not None:
             run.change_set = _change_set("\n".join(change_set_lines))
             change_set_lines = None
@@ -93,7 +98,7 @@ def parse_update_runs(log: List[str]) -> List[UpdateRun]:
 
     if change_set_lines is not None:
         run.change_set = _change_set("\n".join(change_set_lines))
-    return runs
+    return UpdateLog(runs, log_time(first_time) if first_time else None)
 
 
 def _read_message(run: UpdateRun, message: str) -> bool:
@@ -153,7 +158,7 @@ def update_outcomes(runs: List[UpdateRun]) -> List[dict]:
             outcome = FAILED
         else:
             outcome = SUCCEEDED
-        entry: dict = {"time": run.time, "outcome": outcome}
+        entry: dict = {"time": log_time(run.time), "outcome": outcome}
         if run.failure:
             entry["reason"] = run.failure
         if run.change_set is not None:

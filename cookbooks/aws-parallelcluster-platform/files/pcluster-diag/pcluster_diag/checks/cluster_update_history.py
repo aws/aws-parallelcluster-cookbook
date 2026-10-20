@@ -68,12 +68,11 @@ class ClusterUpdateHistory(Check):
     def run(self, context: Context) -> Result:
         """Report the update history from /var/log/chef-client.log, and the status of the cluster stack."""
         try:
-            lines = log_files.read_rotated_log(CHEF_CLIENT_LOG_PATH)
+            update_log = update_history.parse_update_runs(log_files.read_rotated_log(CHEF_CLIENT_LOG_PATH))
         except OSError as error:
             return Result.from_findings(self, errors=[self.LOG_UNREADABLE.format(CHEF_CLIENT_LOG_PATH, error)])
-
-        since = update_history.first_log_time(lines)
-        runs = update_history.update_outcomes(update_history.parse_update_runs(lines))
+        since = update_log.first_time
+        runs = update_history.update_outcomes(update_log.runs)
         infos: List[CheckFinding] = []
         if runs:
             latest = runs[-1]

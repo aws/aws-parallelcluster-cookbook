@@ -22,16 +22,23 @@ def test_read_rotated_log_reads_the_rotated_copy_first(tmp_path):
     (tmp_path / "chef-client.log.1").write_text("old\n")
     log.write_text("new\n")
 
-    assert log_files.read_rotated_log(str(log)) == ["old", "new"]
+    assert list(log_files.read_rotated_log(str(log))) == ["old", "new"]
 
 
 def test_read_rotated_log_skips_missing_files(tmp_path):
     log = tmp_path / "chef-client.log"
     log.write_text("only\n")
 
-    assert log_files.read_rotated_log(str(log)) == ["only"]
+    assert list(log_files.read_rotated_log(str(log))) == ["only"]
+
+
+def test_read_rotated_log_raises_when_the_log_does_not_exist_even_with_a_rotated_copy(tmp_path):
+    (tmp_path / "chef-client.log.1").write_text("old\n")
+
+    with pytest.raises(FileNotFoundError, match="chef-client.log"):
+        log_files.read_rotated_log(str(tmp_path / "chef-client.log"))
 
 
 def test_read_rotated_log_raises_when_no_file_exists(tmp_path):
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(FileNotFoundError, match="missing.log"):
         log_files.read_rotated_log(str(tmp_path / "missing.log"))
