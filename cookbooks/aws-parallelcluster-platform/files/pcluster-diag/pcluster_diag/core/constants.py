@@ -228,3 +228,10 @@ ENA_ALLOWANCE_COUNTERS = (
     "conntrack_allowance_exceeded",
     "linklocal_allowance_exceeded",
 )
+
+# Cluster events
+CHEF_CLIENT_LOG_PATH = "/var/log/chef-client.log"
+CLUSTERSTATUSMGTD_LOG_PATH = "/var/log/parallelcluster/clusterstatusmgtd"
+CLUSTERMGTD_LOG_PATH = "/var/log/parallelcluster/clustermgtd"
+# logrotate keeps one rotated copy of these logs, named with this suffix (rotate 1, nodateext).
+ROTATED_LOG_SUFFIX = ".1"

@@ -21,6 +21,8 @@ from typing import Dict, List, Optional, Set, Tuple
 import click
 
 from pcluster_diag.checks.cfn_hup import CfnHup
+from pcluster_diag.checks.cluster_update_history import ClusterUpdateHistory
+from pcluster_diag.checks.compute_fleet_status import ComputeFleetStatusHistory
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
 from pcluster_diag.checks.directory_lookup import DirectoryService
@@ -142,6 +144,8 @@ DEFAULT_REGISTRY = (
     .register(Sudoers())
     .register(ClusterDaemonsAreRunning())
     .register(ClustermgtdHeartbeatIsHealthy())
+    .register(ClusterUpdateHistory())
+    .register(ComputeFleetStatusHistory())
     .register(DirectoryService())
     .register(SlurmAccounting())
     .register(LustreFilesystem())

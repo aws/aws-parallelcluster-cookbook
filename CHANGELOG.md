@@ -3,6 +3,13 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.17.0
+------
+
+**ENHANCEMENTS**
+- Add `pcluster-diag` checks reporting the history of cluster updates and of compute fleet status changes, and warning
+  when the latest cluster update did not complete.
+
 3.16.2
 ------
 
