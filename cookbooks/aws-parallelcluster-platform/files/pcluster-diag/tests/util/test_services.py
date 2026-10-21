@@ -185,3 +185,26 @@ def test_systemd_unit_failed_false_when_systemctl_missing(monkeypatch):
 
     monkeypatch.setattr(services, "run_command", _raise)
     assert services.systemd_unit_failed(_UNIT) is False
+
+
+@pytest.mark.parametrize(
+    "returncode, stdout, expected",
+    [
+        (0, "active\n", "active"),
+        (3, "inactive\n", "inactive"),  # is-active exits non-zero for non-active units
+        (3, "failed\n", "failed"),
+        (4, "", None),
+    ],
+    ids=["active", "inactive", "failed", "no-output"],
+)
+def test_systemd_unit_state(monkeypatch, returncode, stdout, expected):
+    _fake_systemctl(monkeypatch, returncode, stdout)
+    assert services.systemd_unit_state(_UNIT) == expected
+
+
+def test_systemd_unit_state_none_when_systemctl_missing(monkeypatch):
+    def _raise(command):
+        raise OSError("systemctl not found")
+
+    monkeypatch.setattr(services, "run_command", _raise)
+    assert services.systemd_unit_state(_UNIT) is None
