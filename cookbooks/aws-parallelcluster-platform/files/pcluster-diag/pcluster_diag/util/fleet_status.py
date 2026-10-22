@@ -1,0 +1,144 @@
+# Copyright 2026 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License").
+# You may not use this file except in compliance with the
+# License. A copy of the License is located at
+#
+# http://aws.amazon.com/apache2.0/
+#
+# or in the "LICENSE.txt" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+# OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Read the compute fleet status, and parse its changes from the clusterstatusmgtd and clustermgtd logs.
+
+``pcluster update-compute-fleet`` writes START_REQUESTED or STOP_REQUESTED to the cluster DynamoDB table.
+clusterstatusmgtd then moves the fleet to STARTING/STOPPING and RUNNING/STOPPED, and clustermgtd moves it to
+PROTECTED on repeated bootstrap failures; both log every change they make. The request itself is not logged, but both
+daemons log the status they read on every loop, which shows when a request took the fleet out of PROTECTED.
+"""
+
+import logging
+import re
+from datetime import datetime
+from typing import Iterable, List, NamedTuple, Optional, Tuple
+
+import boto3
+
+from pcluster_diag.util.serialization import log_time
+
+logger = logging.getLogger(__name__)
+
+# A clusterstatusmgtd or clustermgtd log line: "2026-10-12 14:30:02,118 - [module:function] - INFO - message".
+_LOG_LINE = re.compile(
+    r"^(?P<time>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2},\d{3}) - \[[^\]]*\] - (?P<level>[A-Z]+) - (?P<message>.*)$"
+)
+_CHANGE = re.compile(r"^Updating compute fleet status from (?P<from>\w+) to (?P<to>\w+)$")
+_CURRENT = re.compile(r"^Current compute fleet status: (?P<status>\w+)$")
+_INACTIVE_PARTITIONS = "Placing bootstrap failure partitions to INACTIVE: "
+
+PROTECTED = "PROTECTED"
+# A fleet is stuck when it stays in a transitional status longer than it takes when the daemons work: the minutes
+# after which it is stuck. clusterstatusmgtd picks up a *_REQUESTED status on its next loop (60 seconds); STARTING and
+# STOPPING last at most one update handler run (update_event_timeout_minutes, 15 minutes) plus one loop.
+STUCK_AFTER_MINUTES = {"START_REQUESTED": 5, "STOP_REQUESTED": 5, "STARTING": 20, "STOPPING": 20}
+# What a stuck fleet means, for each transitional status.
+STUCK_CAUSES = {
+    "START_REQUESTED": "clusterstatusmgtd has not picked up the start request",
+    "STOP_REQUESTED": "clusterstatusmgtd has not picked up the stop request",
+    "STARTING": "clusterstatusmgtd has not completed the start of the compute fleet",
+    "STOPPING": "clusterstatusmgtd has not completed the stop of the compute fleet",
+}
+
+# DynamoDB item holding the compute fleet status, as written by the CLI and clusterstatusmgtd.
+_FLEET_ITEM_KEY = {"Id": "COMPUTE_FLEET"}
+
+
+def get_compute_fleet_status(table_name: str, region: str) -> Tuple[str, Optional[datetime]]:
+    """Return the compute fleet status and when it was last updated, from the cluster DynamoDB table.
+
+    Raises:
+        LookupError: If the table has no compute fleet status.
+    """
+    table = boto3.resource("dynamodb", region_name=region).Table(table_name)
+    item = table.get_item(ConsistentRead=True, Key=_FLEET_ITEM_KEY).get("Item")
+    data = (item or {}).get("Data") or {}
+    if not data.get("status"):
+        raise LookupError("the table has no compute fleet status")
+    return data["status"], _parse_update_time(data.get("lastStatusUpdatedTime"))
+
+
+def _parse_update_time(value: Optional[str]) -> Optional[datetime]:
+    """Return the ``lastStatusUpdatedTime`` ``value`` as a datetime, or None if it is missing or not a known format.
+
+    clusterstatusmgtd writes it with Python ("2026-10-14 11:19:45.123456+00:00"), while the cookbook writes it with
+    Ruby when it creates the item ("2026-10-14 11:19:45 UTC"): a fleet whose status never changed has the latter.
+    """
+    if not value:
+        return None
+    text = value.strip()
+    if text.endswith(" UTC"):
+        text = text[: -len(" UTC")] + "+00:00"
+    try:
+        return datetime.fromisoformat(text)
+    except ValueError:
+        logger.info("Unknown format of the compute fleet status update time: %r", value)
+        return None
+
+
+class StatusLog(NamedTuple):
+    """The compute fleet status changes logged by the daemons, ordered by time, and the time of their first log line."""
+
+    changes: List[dict]
+    first_time: Optional[str]
+
+
+def parse_status_changes(log: Iterable[str]) -> StatusLog:
+    """Return the compute fleet status changes logged in ``log``, ordered by time, and the time of the first line.
+
+    ``log`` holds the lines of the clusterstatusmgtd and clustermgtd logs, one log after the other: the changes are
+    sorted by the time of their line, so that the changes of one daemon follow from the lines of the other. A change to
+    PROTECTED carries the partitions clustermgtd made inactive, and a change out of PROTECTED is added when a daemon
+    first reads a start or stop request. ``log`` is read once: only the lines about these are kept in memory. The
+    times are in UTC.
+    """
+    entries = []
+    first_time: Optional[str] = None
+    for match in map(_LOG_LINE.match, log):
+        if not match:
+            continue
+        # The log time format sorts chronologically, so the first line is the one with the smallest time.
+        first_time = min(first_time or match["time"], match["time"])
+        if _is_status_message(match["message"]):
+            entries.append((match["time"], match["message"]))
+    # The sort is stable, so lines logged at the same time keep their order.
+    entries.sort(key=lambda entry: entry[0])
+    changes: List[dict] = []
+    partitions = None
+    protected = False
+    for time, message in entries:
+        change = _CHANGE.match(message)
+        current = _CURRENT.match(message)
+        if message.startswith(_INACTIVE_PARTITIONS):
+            partitions = message[len(_INACTIVE_PARTITIONS) :]
+        elif change:
+            entry = {"time": log_time(time), "from": change["from"], "to": change["to"]}
+            if change["to"] == PROTECTED and partitions is not None:
+                entry["partitions"] = partitions
+            changes.append(entry)
+            protected = change["to"] == PROTECTED
+        elif current and protected and current["status"].endswith("_REQUESTED"):
+            changes.append({"time": log_time(time), "from": PROTECTED, "to": current["status"]})
+            protected = False
+    return StatusLog(changes, log_time(first_time) if first_time else None)
+
+
+def _is_status_message(message: str) -> bool:
+    """Return whether a log message is about the compute fleet status, rather than the status read on every loop.
+
+    These are the changes, the partitions made inactive, and the start or stop requests read by a daemon.
+    """
+    if message.startswith(_INACTIVE_PARTITIONS) or _CHANGE.match(message):
+        return True
+    current = _CURRENT.match(message)
+    return bool(current) and current["status"].endswith("_REQUESTED")
