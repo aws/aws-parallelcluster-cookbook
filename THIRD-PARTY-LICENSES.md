@@ -10,20 +10,20 @@
 - [python-daemon; version 2.2.4](#python-daemon-version-224)
 - [retrying; version 1.4.2](#retrying-version-142)
 - [boto3; version 1.42.28](#boto3-version-14228)
-- [awscli; version 1.44.18](#awscli-version-14418)
+- [awscli; version 2.38.4](#awscli-version-2384)
 - [pyxis; version 0.24.0](#pyxis-version-0240)
-- [aws-cfn-bootstrap; version 2.0-40](#aws-cfn-bootstrap-version-20-40)
+- [aws-cfn-bootstrap; version 2.0-41](#aws-cfn-bootstrap-version-20-41)
 - [cookbook-nfs; version 5.1.6](#cookbook-nfs-version-516)
 - [cookbook-openssh; version 2.11.17](#cookbook-openssh-version-21117)
 - [cookbook-yum; version 8.0.0](#cookbook-yum-version-800)
 - [cookbook-yum-epel; version 5.0.9](#cookbook-yum-epel-version-509)
 - [cookbook-iptables; version 8.0.0](#cookbook-iptables-version-800)
 - [supervisor; version 4.3.0](#supervisor-version-430)
-- [docutils; version 0.19](#docutils-version-019)
+- [docutils; version 0.22.4](#docutils-version-0224)
 - [jinja2; version 3.1.6](#jinja2-version-316)
 - [click; version 8.3.1](#click-version-831)
 - [Arm Performance Libraries; version 26.01.1](#arm-performance-libraries-version-26011)
-- [Slurm; version 25.11.6](#slurm-version-25116)
+- [Slurm; version 25.11.8](#slurm-version-25118)
 - [stunnel; version 5.78](#stunnel-version-578)
 - [MUNGE; version 0.5.18](#munge-version-0518)
 - [gcc; version 11.3.0](#gcc-version-1130)
@@ -31,18 +31,18 @@
 - [Intel MPI; version 2021.18](#intel-mpi-version-202118)
 - [setuptools; version 80.9.0](#setuptools-version-8090)
 - [jsonschema; version 4.26.0](#jsonschema-version-4260)
-- [efs-utils; version 3.1.3-1.amzn2023](#efs-utils-version-313-1amzn2023)
+- [efs-utils; version 3.3.3-1.amzn2023](#efs-utils-version-333-1amzn2023)
 - [gdrcopy; version 2.6-1](#gdrcopy-version-26-1)
 - [pyyaml; version 6.0.3](#pyyaml-version-603)
 - [chevron; version 0.14.0](#chevron-version-0140)
 - [libjwt; version 1.18.4](#libjwt-version-1184)
 - [Amazon DCV; version 2025.0.20103-1.amzn2023](#amazon-dcv-version-2025020103-1amzn2023)
-- [Nvidia Driver; version 580.173.02](#nvidia-driver-version-58017302)
-- [Cuda Samples; version 13.3](#cuda-samples-version-133)
-- [Nvidia CUDA; version 13.3.1](#nvidia-cuda-version-1331)
-- [NVIDIA Fabric Manager; version 580.173.02-1.amzn2023](#nvidia-fabric-manager-version-58017302-1amzn2023)
-- [NVIDIA IMEX; version 580.173.02-1.amzn2023](#nvidia-imex-version-58017302-1amzn2023)
-- [NVIDIA NVLSM; version 2025.10.14-1](#nvidia-nvlsm-version-20251014-1)
+- [Nvidia Driver; version 595.71.05](#nvidia-driver-version-5957105)
+- [Cuda Samples; version 13.2](#cuda-samples-version-132)
+- [Nvidia CUDA; version 13.2.2](#nvidia-cuda-version-1322)
+- [NVIDIA Fabric Manager; version 595.71.05-1.amzn2023](#nvidia-fabric-manager-version-5957105-1amzn2023)
+- [NVIDIA IMEX; version 595.71.05-1.amzn2023](#nvidia-imex-version-5957105-1amzn2023)
+- [NVIDIA NVLSM; version 2025.10.12-1](#nvidia-nvlsm-version-20251012-1)
 - [NVIDIA DCGM; version 4.6.0-1](#nvidia-dcgm-version-460-1)
 - [EFA Installer; version 1.49.0](#efa-installer-version-1490)
 - [http-parser; version 2.9.4](#http-parser-version-294)
@@ -1292,15 +1292,15 @@ Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 ---
 
-## awscli; version 1.44.18
+## awscli; version 2.38.4
 
-<https://pypi.org/project/awscli/>
+<https://github.com/aws/aws-cli>
 
 ```text
     * Package awscli's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
+      https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.38.4.zip
 
-Copyright 2012-2020 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License"). You
 may not use this file except in compliance with the License. A copy of
@@ -1519,7 +1519,7 @@ language governing permissions and limitations under the License.
 
 ---
 
-## aws-cfn-bootstrap; version 2.0-40
+## aws-cfn-bootstrap; version 2.0-41
 
 <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html>
 
@@ -2202,7 +2202,7 @@ Rushing:
 
 ---
 
-## docutils; version 0.19
+## docutils; version 0.22.4
 
 <https://pypi.org/project/docutils/>
 
@@ -2210,20 +2210,22 @@ Rushing:
     * Package docutils's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 
+.. include:: docs/header0.rst
+
 ==================
  Copying Docutils
 ==================
 
 :Author: David Goodger
 :Contact: goodger@python.org
-:Date: $Date: 2022-05-30 18:54:46 +0200 (Mo, 30. Mai 2022) $
+:Date: $Date: 2024-11-10 00:36:49 +0100 (So, 10. Nov 2024) $
 :Web site: https://docutils.sourceforge.io/
 :Copyright: This document has been placed in the public domain.
 
 Most of the files included in this project have been placed in the
 public domain, and therefore have no license requirements and no
 restrictions on copying or usage; see the `Public Domain Dedication`_
-below.  There are a few exceptions_, listed below.
+below.  There are exceptions_, listed below.
 Files in the Sandbox_ are not distributed with Docutils releases and
 may have different license terms.
 
@@ -2289,7 +2291,7 @@ The exceptions to the `Public Domain Dedication`_ above are:
   (released under a "revised" `BSD 3-Clause License`_ included in the file)
   and smartypants.py © 2004, 2007 Chad Miller.
   Released under the terms of the `BSD 2-Clause License`_
-  (`local copy <licenses/BSD-2-Clause.txt>`__).
+  (`local copy <licenses/BSD-2-Clause.rst>`__).
 
   .. _SmartyPants: http://daringfireball.net/projects/smartypants/
 
@@ -2297,53 +2299,46 @@ The exceptions to the `Public Domain Dedication`_ above are:
 
   Copyright © Jens Jørgen Mortensen, Günter Milde.
   Released under the terms of the `BSD 2-Clause License`_
-  (`local copy <licenses/BSD-2-Clause.txt>`__).
+  (`local copy <licenses/BSD-2-Clause.rst>`__).
 
-* docutils/utils/math/math2html.py,
-  docutils/writers/html5_polyglot/math.css
+* | docutils/utils/math/math2html.py,
+  | docutils/writers/html5_polyglot/math.css
 
   Copyright © 2009,2010 Alex Fernández; 2021 Günter Milde
 
   These files were part of eLyXer_, released under the `GNU
   General Public License`_ version 3 or later. The author relicensed
   them for Docutils under the terms of the `BSD 2-Clause License`_
-  (`local copy <licenses/BSD-2-Clause.txt>`__).
+  (`local copy <licenses/BSD-2-Clause.rst>`__).
 
   .. _eLyXer: https://github.com/alexfernandez/elyxer
 
-* docutils/__main__.py,
-  docutils/parsers/commonmark_wrapper.py,
-  docutils/parsers/recommonmark_wrapper.py,
-  docutils/utils/error_reporting.py,
-  docutils/utils/math/__init__.py,
-  docutils/utils/math/latex2mathml.py,
-  docutils/utils/math/tex2mathml_extern.py,
-  docutils/utils/punctuation_chars.py,
-  docutils/utils/smartquotes.py,
-  docutils/writers/html5_polyglot/__init__.py,
-  docutils/writers/html5_polyglot/*.css,
-  docutils/writers/latex2e/docutils.sty,
-  docutils/writers/xetex/__init__.py,
-  test/test_parsers/test_recommonmark/\*.py,
-  test/test_parsers/test_rst/test_directives/test__init__.py,
-  test/test_parsers/test_rst/test_directives/test_code_parsing.py,
-  test/test_parsers/test_rst/test_line_length_limit_default.py,
-  test/test_parsers/test_rst/test_line_length_limit.py,
-  test/test_writers/test_latex2e_misc.py,
-  test/transforms/test_smartquotes.py,
-  tools/docutils-cli.py,
-  tools/rst2html5.py
+* | docutils/__main__.py,
+  | docutils/parsers/commonmark_wrapper.py,
+  | docutils/parsers/recommonmark_wrapper.py,
+  | docutils/utils/error_reporting.py,
+  | docutils/utils/math/__init__.py,
+  | docutils/utils/math/latex2mathml.py,
+  | docutils/utils/math/tex2mathml_extern.py,
+  | docutils/utils/punctuation_chars.py,
+  | docutils/utils/smartquotes.py,
+  | docutils/writers/html5_polyglot/__init__.py,
+  | docutils/writers/html5_polyglot/\*.css,
+  | docutils/writers/latex2e/docutils.sty,
+  | docutils/writers/xetex/__init__.py,
+  | test/test_parsers/test_recommonmark/\*.py,
+  | test/test_parsers/test_rst/test_directives/test__init__.py,
+  | test/test_parsers/test_rst/test_directives/test_code_parsing.py,
+  | test/test_parsers/test_rst/test_line_length_limit_default.py,
+  | test/test_parsers/test_rst/test_line_length_limit.py,
+  | test/test_writers/test_latex2e_misc.py,
+  | test/transforms/test_smartquotes.py,
+  | tools/docutils-cli.py,
+  | tools/rst2html5.py
 
   Copyright © Günter Milde.
   Released under the terms of the `BSD 2-Clause License`_
-  (`local copy <licenses/BSD-2-Clause.txt>`__).
-
-* docutils/utils/roman.py
-
-  copyright by Mark Pilgrim, released under the
-  `Python 2.1.1 license`_ (`local copy`__).
-
-  __ licenses/python-2-1-1.txt
+  (`local copy <licenses/BSD-2-Clause.rst>`__).
 
 * tools/editors/emacs/rst.el
 
@@ -2351,7 +2346,7 @@ The exceptions to the `Public Domain Dedication`_ above are:
   released under the `GNU General Public License`_ version 3 or later
   (`local copy`__).
 
-  __ licenses/gpl-3-0.txt
+  __ licenses/gpl-3-0.rst
 
 All used licenses are OSI-approved_ and GPL-compatible_.
 
@@ -2360,7 +2355,6 @@ licenses_ directory.
 
 .. _sandbox: https://docutils.sourceforge.io/sandbox/README.html
 .. _licenses: licenses/
-.. _Python 2.1.1 license: https://docs.python.org/3/license.html
 .. _GNU General Public License: https://www.gnu.org/copyleft/gpl.html
 .. _BSD 2-Clause License: http://opensource.org/licenses/BSD-2-Clause
 .. _BSD 3-Clause License: https://opensource.org/licenses/BSD-3-Clause
@@ -4506,7 +4500,7 @@ END OF FILE: third_party_licenses.txt
 
 ---
 
-## Slurm; version 25.11.6
+## Slurm; version 25.11.8
 
 <https://github.com/SchedMD/slurm>
 
@@ -11325,7 +11319,7 @@ THE SOFTWARE.
 
 ---
 
-## efs-utils; version 3.1.3-1.amzn2023
+## efs-utils; version 3.3.3-1.amzn2023
 
 <https://github.com/aws/efs-utils>
 
@@ -12255,13 +12249,13 @@ EULA.
 
 ---
 
-## Nvidia Driver; version 580.173.02
+## Nvidia Driver; version 595.71.05
 
 <https://www.nvidia.com/download/index.aspx?lang=en-us>
 
 ```text
     * Package Nvidia Driver's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-Linux-x86_64-580.173.02.run
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-Linux-x86_64-595.71.05.run
 
 NVIDIA Driver License Agreement
 
@@ -12683,13 +12677,13 @@ driver-licensing@nvidia.com
 
 ---
 
-## Cuda Samples; version 13.3
+## Cuda Samples; version 13.2
 
 <https://github.com/NVIDIA/cuda-samples/>
 
 ```text
     * Package Cuda Samples's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/cuda/samples/v13.3.tar.gz
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/cuda/samples/v13.2.tar.gz
 
 Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
 
@@ -12723,7 +12717,7 @@ https://docs.nvidia.com/cuda/eula/index.html
 
 ---
 
-## Nvidia CUDA; version 13.3.1
+## Nvidia CUDA; version 13.2.2
 
 <https://developer.nvidia.com/cuda-toolkit>
 
@@ -14456,7 +14450,7 @@ conditions:
 
 ---
 
-## NVIDIA Fabric Manager; version 580.173.02-1.amzn2023
+## NVIDIA Fabric Manager; version 595.71.05-1.amzn2023
 
 <https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/>
 
@@ -15227,42 +15221,50 @@ Copyright 1999-2003 The OpenLDAP Foundation, Redwood City,
 California, USA.  All Rights Reserved.  Permission to copy and
 distribute verbatim copies of this document is granted.
 
-7. Licensee's use of libibumad is subject to the terms and conditions of the
-OpenIB.org BSD (FreeBSD variant) License. All third-party software packages are
-copyright by their respective authors. The OpenIB.org BSD (FreeBSD variant) License
-terms and conditions are hereby incorporated into the Agreement by this reference.
-https://github.com/linux-rdma/rdma-core/blob/master/COPYING.BSD_FB
+7. The libibumad sources are chosen to be distributed using the following
+OpenIB.org BSD license.
 
+This software is available to you under a choice of one of two licenses. You
+may chose to be licensed under the terms of the the OpenIB.org BSD license or
+the GNU General Public License (GPL) Version 2, both included below.
 
-		   OpenIB.org BSD license (FreeBSD Variant)
+Copyright (c) 2004-2008 Voltaire, Inc.  All rights reserved.
+
+==================================================================
+
+		       OpenIB.org BSD license
 
 Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+modification, are permitted provided that the following conditions
+are met:
 
-  - Redistributions of source code must retain the above copyright notice,
-    this list of conditions and the following disclaimer.
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
 
-  - Redistributions in binary form must reproduce the above copyright notice,
-    this list of conditions and the following disclaimer in the documentation
-    and/or other materials provided with the distribution.
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
 ```
 
 - /usr/share/licenses/nvidia-fabricmanager/LICENSE — see [Shared license 4](#shared-license-4)
 
 ---
 
-## NVIDIA IMEX; version 580.173.02-1.amzn2023
+## NVIDIA IMEX; version 595.71.05-1.amzn2023
 
 <https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/>
 
@@ -16608,7 +16610,7 @@ That's all there is to it!
 
 ---
 
-## NVIDIA NVLSM; version 2025.10.14-1
+## NVIDIA NVLSM; version 2025.10.12-1
 
 <https://docs.nvidia.com/networking/display/mlnxofedv461000/nvidia+subnet+manager>
 
