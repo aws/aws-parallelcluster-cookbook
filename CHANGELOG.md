@@ -7,20 +7,20 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 ------
 
 **ENHANCEMENTS**
-- Add `pcluster-diag` check verifying the sudoers definitions ParallelCluster relies on.
+- Add a `pcluster-diag` check that verifies the sudoers definitions ParallelCluster relies on.
 
 **CHANGES**
-- When a system service fails to start during node bootstrap or cluster update, log its `systemctl status` and the end of
-  its journal to `/var/log/chef-client.log`, so that the cause of the failure is available in CloudWatch logs.
-- Upgrade Python to version 3.14.8.
+- Log the `systemctl status` output and the last journal entries of any system service that fails to start during
+  node bootstrap or cluster update to `/var/log/chef-client.log`, so that the cause of the failure is available in CloudWatch Logs.
+- Upgrade the Python version used by the virtual environments baked into the AMIs to 3.14.8 (from 3.14.6).
 - Ship only AWS CLI v2 in ParallelCluster AMIs. AWS CLI v1 is no longer installed in the cookbook Python virtual environment.
-- Remove execution permissions for configurations files `/opt/parallelcluster/shared/computefleet-status.json`,
-  `/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf` and `/etc/dcv/dcv.conf`
+- Remove execution permissions from the configuration files `/opt/parallelcluster/shared/computefleet-status.json`,
+  `/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf` and `/etc/dcv/dcv.conf`.
 - Log the content of the Slurm configuration files generated on the head node, to simplify troubleshooting.
 
 **BUG FIXES**
-- Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
-- Set mode `0440` on all ParallelCluster-managed files under `/etc/sudoers.d/`.
+- Fix cluster update hanging when a shared storage is unresponsive, caused by the `fuser` probe run before each unmount.
+- Fix the permissions of ParallelCluster-managed files under `/etc/sudoers.d/` by setting mode `0440` on all of them.
 
 3.16.1
 ------
