@@ -237,14 +237,12 @@ CLUSTERMGTD_LOG_PATH = "/var/log/parallelcluster/clustermgtd"
 ROTATED_LOG_SUFFIX = ".1"
 
 # Installed software
-# The node attributes the cookbook dumps at the end of the AMI build, so they carry the versions it installed
-# (see cookbooks/aws-parallelcluster-shared/resources/node_attributes.rb).
+# The node attributes the cookbook dumps (see cookbooks/aws-parallelcluster-shared/resources/node_attributes.rb).
 NODE_ATTRIBUTES_PATH = "/etc/chef/node_attributes.json"
-# Chef attribute precedence, lowest first: a later level overrides an earlier one.
-# Source: https://docs.chef.io/attribute_precedence/
-NODE_ATTRIBUTES_PRECEDENCE = ("default", "normal", "override", "automatic")
 EFA_INSTALLED_PACKAGES_PATH = "/opt/amazon/efa_installed_packages"
-CUDA_NVCC_PATH_TEMPLATE = "/usr/local/cuda-{}/bin/nvcc"
+# The version-agnostic /usr/local/cuda symlink the CUDA toolkit creates: the cookbook puts it on the users' PATH, and
+# skips installing CUDA when it exists (e.g. on a Deep Learning AMI). See the nvidia_cuda resource.
+CUDA_NVCC_PATH = "/usr/local/cuda/bin/nvcc"
 NVIDIA_DRIVER_KERNEL_MODULE = "nvidia"
 GDRCOPY_KERNEL_MODULE = "gdrdrv"
 PCI_DEVICES_SYSFS = "/sys/bus/pci/devices"
@@ -259,17 +257,13 @@ GB200_PCI_DEVICE_ID = "0x2941"
 NV_FABRICMANAGER_PATH = "/usr/bin/nv-fabricmanager"
 # The kernel modules ParallelCluster installs live under /lib/modules/<kernel release>.
 LIB_MODULES_PATH = "/lib/modules"
-# Hard cap on listing the OS packages: rpm and dpkg read a local database, but it can hold thousands of entries.
-OS_PACKAGES_COMMAND_TIMEOUT_SECONDS = 120
 
 # Critical services
 MUNGE_SERVICE = "munge.service"
 SLURMCTLD_SERVICE = "slurmctld.service"
 SLURMD_SERVICE = "slurmd.service"
-# The NFS server and GDRCopy services are named differently on Ubuntu (see the nfs cookbook attributes and the
-# gdrcopy resource).
-NFS_SERVER_SERVICE = "nfs-server.service"
-NFS_SERVER_SERVICE_UBUNTU = "nfs-kernel-server.service"
+# The NFS server service is read from the node attributes (nfs.service.server, set by the nfs cookbook attributes).
+# The GDRCopy service is named differently on Ubuntu (see the gdrcopy resource).
 GDRCOPY_SERVICE = "gdrcopy.service"
 GDRCOPY_SERVICE_UBUNTU = "gdrdrv.service"
 FABRIC_MANAGER_SERVICE = "nvidia-fabricmanager.service"

@@ -48,15 +48,15 @@ def test_parse_dpkg_packages_keeps_only_installed():
 
 
 @pytest.mark.parametrize(
-    "available, expected_manager, expected_command",
+    "ubuntu, expected_manager, expected_command",
     [
-        ({"rpm"}, "rpm", "rpm"),
-        ({"dpkg-query"}, "dpkg", "dpkg-query"),
-        ({"rpm", "dpkg-query"}, "dpkg", "dpkg-query"),
+        pytest.param(False, "rpm", "rpm", id="rpm-based OS"),
+        pytest.param(True, "dpkg", "dpkg-query", id="Ubuntu"),
     ],
 )
-def test_installed_packages_uses_the_available_manager(monkeypatch, available, expected_manager, expected_command):
-    monkeypatch.setattr(os_packages.shutil, "which", lambda name: "/usr/bin/" + name if name in available else None)
+def test_installed_packages_uses_the_manager_of_the_os(monkeypatch, ubuntu, expected_manager, expected_command):
+    # Both package managers are available: the OS decides.
+    monkeypatch.setattr(os_packages.shutil, "which", lambda name: "/usr/bin/" + name)
     commands = []
 
     def fake_run_command(command, timeout=None):
@@ -66,17 +66,20 @@ def test_installed_packages_uses_the_available_manager(monkeypatch, available, e
 
     monkeypatch.setattr(os_packages, "run_command", fake_run_command)
 
-    packages = os_packages.installed_packages()
+    packages = os_packages.installed_packages(ubuntu)
 
     assert packages.manager == expected_manager
     assert [package.name for package in packages.packages] == ["bash"]
     assert commands == [expected_command]
 
 
-def test_installed_packages_returns_none_without_package_manager(monkeypatch):
-    monkeypatch.setattr(os_packages.shutil, "which", lambda _name: None)
+@pytest.mark.parametrize("ubuntu", [False, True])
+def test_installed_packages_returns_none_without_the_manager_of_the_os(monkeypatch, ubuntu):
+    # Only the package manager of the other OS family is available.
+    available = "rpm" if ubuntu else "dpkg-query"
+    monkeypatch.setattr(os_packages.shutil, "which", lambda name: "/usr/bin/" + name if name == available else None)
 
-    assert os_packages.installed_packages() is None
+    assert os_packages.installed_packages(ubuntu) is None
 
 
 def test_installed_packages_raises_when_manager_fails(monkeypatch):
@@ -86,4 +89,4 @@ def test_installed_packages_raises_when_manager_fails(monkeypatch):
     )
 
     with pytest.raises(RuntimeError, match="rpm failed with exit code 1: db locked"):
-        os_packages.installed_packages()
+        os_packages.installed_packages(ubuntu=False)

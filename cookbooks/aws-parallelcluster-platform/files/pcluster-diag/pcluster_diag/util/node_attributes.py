@@ -16,26 +16,26 @@ import json
 from pathlib import Path
 from typing import Any, Optional
 
-from pcluster_diag.core.constants import NODE_ATTRIBUTES_PATH, NODE_ATTRIBUTES_PRECEDENCE
+from pcluster_diag.core.constants import NODE_ATTRIBUTES_PATH
 
 
 def load_node_attributes(path: str = NODE_ATTRIBUTES_PATH) -> dict:
-    """Return the node attributes in ``path``, with the precedence levels merged as Chef merges them.
+    """Return the ``default`` attributes in ``path``: the cookbook defaults, set by its attribute files and recipes.
 
     The file is a serialized Chef node, which keeps each precedence level apart (``default``, ``normal``,
-    ``override``, ``automatic``). They are deep-merged in precedence order, as the InSpec tests do.
+    ``override``, ``automatic``). The values the checks read are only set at the ``default`` level.
 
     Raises:
         OSError: If the file cannot be read.
-        ValueError: If the file is not a JSON object.
+        ValueError: If the file, or its ``default`` attributes, is not a JSON object.
     """
     content = json.loads(Path(path).read_text(encoding="utf-8"))
     if not isinstance(content, dict):
         raise ValueError("{} does not hold a JSON object".format(path))
-    merged: dict = {}
-    for level in NODE_ATTRIBUTES_PRECEDENCE:
-        merged = _deep_merge(merged, content.get(level) or {})
-    return merged
+    defaults = content.get("default") or {}
+    if not isinstance(defaults, dict):
+        raise ValueError("The default attributes in {} are not a JSON object".format(path))
+    return defaults
 
 
 def attribute(attributes: dict, *keys: str) -> Optional[Any]:
@@ -46,14 +46,3 @@ def attribute(attributes: dict, *keys: str) -> Optional[Any]:
             return None
         value = value[key]
     return value
-
-
-def _deep_merge(base: dict, other: dict) -> dict:
-    """Return ``base`` updated with ``other``, merging nested dicts rather than replacing them."""
-    merged = dict(base)
-    for key, value in other.items():
-        if isinstance(value, dict) and isinstance(merged.get(key), dict):
-            merged[key] = _deep_merge(merged[key], value)
-        else:
-            merged[key] = value
-    return merged

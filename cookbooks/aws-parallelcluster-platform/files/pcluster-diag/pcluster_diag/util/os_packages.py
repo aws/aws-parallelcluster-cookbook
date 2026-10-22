@@ -17,7 +17,6 @@ import shutil
 from dataclasses import dataclass
 from typing import List, Optional
 
-from pcluster_diag.core.constants import OS_PACKAGES_COMMAND_TIMEOUT_SECONDS
 from pcluster_diag.util.shell import run_command
 
 logger = logging.getLogger(__name__)
@@ -51,24 +50,26 @@ class OsPackages:
     packages: List[OsPackage]
 
 
-def installed_packages() -> Optional[OsPackages]:
-    """Return the installed OS packages sorted by name, or None if neither dpkg-query nor rpm is available.
+def installed_packages(ubuntu: bool) -> Optional[OsPackages]:
+    """Return the installed OS packages sorted by name, from dpkg on Ubuntu and rpm on the other OSes.
 
-    dpkg is tried first because Ubuntu can carry an rpm binary, while the RPM-based OSes have no dpkg.
+    Return None if the package manager of the OS is not available.
 
     Raises:
         RuntimeError: If the package manager fails to list the packages.
     """
-    if shutil.which("dpkg-query"):
-        return OsPackages("dpkg", parse_dpkg_packages(_list(_DPKG_COMMAND)))
-    if shutil.which("rpm"):
-        return OsPackages("rpm", parse_rpm_packages(_list(_RPM_COMMAND)))
-    return None
+    if ubuntu:
+        manager, command, parse = "dpkg", _DPKG_COMMAND, parse_dpkg_packages
+    else:
+        manager, command, parse = "rpm", _RPM_COMMAND, parse_rpm_packages
+    if not shutil.which(command[0]):
+        return None
+    return OsPackages(manager, parse(_list(command)))
 
 
 def _list(command: List[str]) -> str:
     """Run the package manager ``command`` and return its output."""
-    result = run_command(command, timeout=OS_PACKAGES_COMMAND_TIMEOUT_SECONDS)
+    result = run_command(command)
     if result.returncode != 0:
         raise RuntimeError(
             "{} failed with exit code {}: {}".format(command[0], result.returncode, result.stderr.strip())

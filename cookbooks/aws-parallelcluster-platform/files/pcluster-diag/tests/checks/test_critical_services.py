@@ -19,7 +19,7 @@ from pcluster_diag.checks.critical_services import CriticalServicesAreRunning
 from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.result import Status
 from tests.sample_data import sample_context
-from tests.stubs import stub_returning
+from tests.stubs import stub_raising, stub_returning
 
 
 def _patch(
@@ -29,8 +29,12 @@ def _patch(
     gpu=False,
     gdrcopy_installed=True,
     fabric_manager_expected=False,
+    nfs_server="nfs-server.service",
 ):
-    """Patch the unit states (``active`` unless overridden), listening ports, GPU, GDRCopy and Fabric Manager."""
+    """Patch the unit states (``active`` unless overridden), listening ports, GPU, GDRCopy, Fabric Manager and NFS.
+
+    ``nfs_server`` is the NFS server service in the node attributes.
+    """
     queried = []
 
     def fake_state(unit):
@@ -46,20 +50,33 @@ def _patch(
     monkeypatch.setattr(
         critical_services.listening_ports, "listening_tcp_ports", stub_returning(None if ports is None else set(ports))
     )
+    monkeypatch.setattr(
+        critical_services, "load_node_attributes", stub_returning({"nfs": {"service": {"server": nfs_server}}})
+    )
     return queried
 
 
 @pytest.mark.parametrize(
-    "node_type, base_os, expected_units",
+    "node_type, base_os, nfs_server, expected_units",
     [
-        (NodeType.HEAD, "alinux2023", ["munge.service", "slurmctld.service", "nfs-server.service"]),
-        (NodeType.HEAD, "ubuntu2404", ["munge.service", "slurmctld.service", "nfs-kernel-server.service"]),
-        (NodeType.COMPUTE, "rhel9", ["munge.service", "slurmd.service"]),
-        (NodeType.LOGIN, "rhel9", ["munge.service"]),
+        (
+            NodeType.HEAD,
+            "alinux2023",
+            "nfs-server.service",
+            ["munge.service", "slurmctld.service", "nfs-server.service"],
+        ),
+        (
+            NodeType.HEAD,
+            "ubuntu2404",
+            "nfs-kernel-server.service",
+            ["munge.service", "slurmctld.service", "nfs-kernel-server.service"],
+        ),
+        (NodeType.COMPUTE, "rhel9", "nfs-server.service", ["munge.service", "slurmd.service"]),
+        (NodeType.LOGIN, "rhel9", "nfs-server.service", ["munge.service"]),
     ],
 )
-def test_services_all_healthy_passes(monkeypatch, node_type, base_os, expected_units):
-    queried = _patch(monkeypatch)
+def test_services_all_healthy_passes(monkeypatch, node_type, base_os, nfs_server, expected_units):
+    queried = _patch(monkeypatch, nfs_server=nfs_server)
 
     result = CriticalServicesAreRunning().run(sample_context(node_type, base_os=base_os))
 
@@ -145,6 +162,7 @@ def test_services_gdrcopy_only_on_gpu_instances_with_it_installed(
     [
         (True, True, True, ["gdrcopy.service", "nvidia-fabricmanager.service"]),
         (True, False, True, ["gdrcopy.service"]),
+        # A missing Fabric Manager is reported by CriticalSoftwareVersions.
         (True, True, False, []),
         (False, True, True, []),
     ],
@@ -166,4 +184,37 @@ def test_services_single_port_not_listening_fails(monkeypatch):
 
     assert [error.message for error in result.errors] == [
         "slurmd.service is active, but no process listens on TCP port 6818."
+    ]
+
+
+@pytest.mark.parametrize(
+    "attributes, reason",
+    [
+        pytest.param(stub_raising(OSError("No such file")), "No such file", id="unreadable"),
+        pytest.param(stub_returning({"nfs": {}}), "no nfs.service.server attribute", id="missing attribute"),
+    ],
+)
+def test_services_nfs_server_unknown_is_a_check_error(monkeypatch, attributes, reason):
+    queried = _patch(monkeypatch)
+    monkeypatch.setattr(critical_services, "load_node_attributes", attributes)
+
+    result = CriticalServicesAreRunning().run(sample_context(NodeType.HEAD, base_os="alinux2023"))
+
+    # The other services are still checked; only the NFS server is skipped.
+    assert queried == ["munge.service", "slurmctld.service"]
+    assert result.status is Status.CHECK_ERROR
+    assert [error.message for error in result.errors] == [
+        "Could not read the NFS server service from the node attributes /etc/chef/node_attributes.json: {}; "
+        "it was not checked.".format(reason)
+    ]
+
+
+def test_services_missing_unit_is_reported_as_not_installed(monkeypatch):
+    # The units are reported missing (systemctl reports them as inactive) and munge is not active.
+    _patch(monkeypatch, states={"munge.service": "inactive"}, gdrcopy_installed=False)
+
+    result = CriticalServicesAreRunning().run(sample_context(NodeType.COMPUTE, base_os="alinux2023"))
+
+    assert [(error.code, error.message) for error in result.errors] == [
+        ("E3", "munge.service is not installed, expected active.")
     ]

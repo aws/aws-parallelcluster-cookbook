@@ -29,7 +29,7 @@ _EXPECTED = {
             "enabled": "yes",
             "driver_version": "595.71.05",
             "cuda": {"version": "13.2.2"},
-            "gdrcopy": {"enabled": True, "version": "2.6"},
+            "gdrcopy": {"version": "2.6"},
         },
     }
 }
@@ -60,13 +60,22 @@ def test_os_packages_reports_count_and_details(monkeypatch):
     ]
 
 
-def test_os_packages_check_error_without_package_manager(monkeypatch):
-    monkeypatch.setattr(installed_software.os_packages, "installed_packages", stub_returning(None))
+@pytest.mark.parametrize("base_os, manager", [("alinux2023", "rpm"), ("ubuntu2404", "dpkg-query")])
+def test_os_packages_check_error_without_package_manager(monkeypatch, base_os, manager):
+    calls = []
 
-    result = InstalledOsPackages().run(sample_context())
+    def fake_installed_packages(ubuntu):
+        calls.append(ubuntu)
 
+    monkeypatch.setattr(installed_software.os_packages, "installed_packages", fake_installed_packages)
+
+    result = InstalledOsPackages().run(sample_context(base_os=base_os))
+
+    assert calls == [base_os.startswith("ubuntu")]
     assert result.status is Status.CHECK_ERROR
-    assert [error.code for error in result.errors] == ["E0"]
+    assert [(error.code, error.message) for error in result.errors] == [
+        ("E0", "{} is not available: the OS packages were not listed.".format(manager))
+    ]
     assert result.details is None
 
 
@@ -89,7 +98,11 @@ def _patch(
         installed_software.kernel_module, "kernel_module_available", stub_returning(modules_for_running_kernel)
     )
     monkeypatch.setattr(installed_software.kernel_module, "kernel_release", stub_returning("6.1.200-1.amzn2023.x86_64"))
-    monkeypatch.setattr(installed_software.software_versions, "kernels_with_module", stub_returning(kernels or []))
+    monkeypatch.setattr(
+        installed_software.kernel_module,
+        "kernels_with_module",
+        stub_returning(["6.1.200-1.amzn2023.x86_64"] if kernels is None else kernels),
+    )
     monkeypatch.setattr(
         installed_software.software_versions, "fabric_manager_expected", stub_returning(fabric_manager_expected)
     )
@@ -126,7 +139,7 @@ def test_versions_all_expected_passes(monkeypatch):
         "gdrcopy_version",
     }
     assert calls["slurm_version"] == ("/opt/slurm",)
-    assert calls["cuda_version"] == ("13.2.2",)
+    assert calls["cuda_version"] == ()
 
 
 def test_versions_reads_slurm_from_the_configured_install_dir(monkeypatch):
@@ -147,7 +160,8 @@ def test_versions_mismatch_is_a_warning(monkeypatch):
     assert result.status is Status.WARNING
     assert [warning.code for warning in result.warnings] == ["W1", "W1"]
     assert result.warnings[0].message.startswith(
-        "EFA 1.47.0 is installed, but ParallelCluster installed version 1.49.0 when the AMI was built."
+        "EFA 1.47.0 is installed, but ParallelCluster expects version 1.49.0: this version was not tested with this "
+        "ParallelCluster version."
     )
     assert result.warnings[1].message.startswith("NVIDIA driver 580.82.07 is installed")
 
@@ -159,7 +173,7 @@ def test_versions_missing_component_is_a_failure(monkeypatch):
 
     assert result.status is Status.FAILURE
     assert [error.message for error in result.errors] == [
-        "Slurm is not installed, or its version cannot be read, but the AMI was built with version 25-11-8-1."
+        "Slurm is not installed, or its version cannot be read: ParallelCluster expects version 25-11-8-1."
     ]
     assert [warning.message.split(" is installed")[0] for warning in result.warnings] == ["CUDA 13.1"]
 
@@ -175,33 +189,36 @@ def test_versions_skip_nvidia_without_gpu(monkeypatch):
 
 
 @pytest.mark.parametrize("enabled", ["no", False, None])
-def test_versions_skip_nvidia_when_disabled_at_build(monkeypatch, enabled):
-    attributes = {"cluster": dict(_EXPECTED["cluster"], nvidia={"enabled": enabled})}
-    calls = _patch(monkeypatch, attributes=attributes)
-
-    result = CriticalSoftwareVersions().run(sample_context())
-
-    assert "The NVIDIA software is not checked: the AMI was built with NVIDIA disabled." in [
-        info.message for info in result.infos
-    ]
-    assert set(calls) == {"slurm_version", "efa_installer_version"}
-
-
-def test_versions_skip_gdrcopy_when_disabled_at_build(monkeypatch):
-    nvidia = dict(_EXPECTED["cluster"]["nvidia"], gdrcopy={"enabled": False, "version": "2.6"})
+def test_versions_check_nvidia_on_gpu_instances_whatever_the_attribute(monkeypatch, enabled):
+    # The attributes dumped when the node is configured reset cluster.nvidia.enabled to its default.
+    nvidia = dict(_EXPECTED["cluster"]["nvidia"], enabled=enabled)
     calls = _patch(monkeypatch, attributes={"cluster": dict(_EXPECTED["cluster"], nvidia=nvidia)})
 
     result = CriticalSoftwareVersions().run(sample_context())
 
-    assert "NVIDIA GDRCopy is not checked: the AMI was built with GDRCopy disabled." in [
-        info.message for info in result.infos
+    assert result.status is Status.PASSED
+    assert {"nvidia_driver_version", "cuda_version", "gdrcopy_version"} <= set(calls)
+
+
+def test_versions_single_error_when_gpu_has_no_nvidia_driver(monkeypatch):
+    calls = _patch(monkeypatch, kernels=[], installed={"nvidia_driver_version": None})
+
+    result = CriticalSoftwareVersions().run(sample_context())
+
+    assert result.status is Status.FAILURE
+    assert [(error.code, error.message) for error in result.errors] == [
+        (
+            "E3",
+            "The instance has an NVIDIA GPU, but no NVIDIA driver is installed for any kernel: the GPUs cannot be "
+            "used. The rest of the NVIDIA software was not checked.",
+        )
     ]
-    assert "gdrcopy_version" not in calls
+    assert set(calls) == {"slurm_version", "efa_installer_version"}
 
 
 def test_versions_not_checked_when_attribute_missing(monkeypatch):
-    attributes = {"cluster": {"slurm": {"version": "25-11-8-1"}, "nvidia": {"enabled": "no"}}}
-    calls = _patch(monkeypatch, attributes=attributes)
+    attributes = {"cluster": {"slurm": {"version": "25-11-8-1"}}}
+    calls = _patch(monkeypatch, attributes=attributes, gpu=False)
 
     result = CriticalSoftwareVersions().run(sample_context())
 
@@ -332,8 +349,8 @@ def test_versions_details_list_every_checked_component(monkeypatch):
 
 
 def test_versions_details_without_nvidia_and_unrecorded_versions(monkeypatch):
-    attributes = {"cluster": {"slurm": {"version": "25-11-8-1"}, "nvidia": {"enabled": "no"}}}
-    _patch(monkeypatch, attributes=attributes)
+    attributes = {"cluster": {"slurm": {"version": "25-11-8-1"}}}
+    _patch(monkeypatch, attributes=attributes, gpu=False)
 
     result = CriticalSoftwareVersions().run(sample_context())
 

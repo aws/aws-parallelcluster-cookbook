@@ -86,21 +86,21 @@ def test_kernel_module_probes_read_modinfo(monkeypatch):
     assert modules == ["nvidia", "gdrdrv"]
 
 
-def test_cuda_version_runs_nvcc_of_the_expected_release(monkeypatch):
-    nvcc = "/usr/local/cuda-13.2/bin/nvcc"
+def test_cuda_version_runs_nvcc_behind_the_cuda_symlink(monkeypatch):
+    nvcc = "/usr/local/cuda/bin/nvcc"
     fake = _fake_run_command(
         {nvcc: (0, "nvcc: NVIDIA (R) Cuda compiler driver\nCuda compilation tools, release 13.2, V13.2.78\n")}
     )
     monkeypatch.setattr(software_versions, "run_command", fake)
 
-    assert software_versions.cuda_version("13.2.2") == "13.2"
+    assert software_versions.cuda_version() == "13.2"
     assert fake.calls == [[nvcc, "--version"]]
 
 
 def test_cuda_version_none_when_not_installed(monkeypatch):
     monkeypatch.setattr(software_versions, "run_command", raise_oserror)
 
-    assert software_versions.cuda_version("13.2.2") is None
+    assert software_versions.cuda_version() is None
 
 
 def _pci_device(root, name, vendor, device_id="0x0000", pci_class="0x000000"):
@@ -130,33 +130,34 @@ def test_has_nvidia_gpu_false_when_sysfs_missing(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize(
-    "version, count, expected",
+    "version, expected",
     [
-        ("25-11-8-1", 3, ["25", "11", "8"]),
-        ("13.2.2", 2, ["13", "2"]),
-        ("2.6", 3, ["2", "6"]),
-        (" 1.49.0 ", 3, ["1", "49", "0"]),
+        ("25-11-8-1", ["25", "11", "8", "1"]),
+        ("13.2.2", ["13", "2", "2"]),
+        ("2.6", ["2", "6"]),
+        (" 1.49.0 ", ["1", "49", "0"]),
     ],
 )
-def test_version_parts(version, count, expected):
-    assert software_versions.version_parts(version, count) == expected
+def test_version_parts(version, expected):
+    assert software_versions.version_parts(version) == expected
 
 
 @pytest.mark.parametrize(
-    "installed, expected, count, match",
+    "installed, expected, match",
     [
-        ("25.11.8", "25-11-8-1", 3, True),
-        ("25.11.6", "25-11-8-1", 3, False),
-        ("595.71.5", "595.71.05", 3, True),
-        ("13.2", "13.2.2", 2, True),
-        ("13.1", "13.2.2", 2, False),
-        ("2.6", "2.6", 2, True),
-        ("1.49.0", "1.49.0", 3, True),
-        ("1.49.0rc1", "1.49.0", 3, False),
+        ("25.11.8", "25-11-8-1", True),
+        ("25.11.6", "25-11-8-1", False),
+        ("595.71.5", "595.71.05", True),
+        ("13.2", "13.2.2", True),
+        ("13.1", "13.2.2", False),
+        ("2.6", "2.6", True),
+        ("2.6.1", "2.6", True),
+        ("1.49.0", "1.49.0", True),
+        ("1.49.0rc1", "1.49.0", False),
     ],
 )
-def test_versions_match(installed, expected, count, match):
-    assert software_versions.versions_match(installed, expected, count) is match
+def test_versions_match(installed, expected, match):
+    assert software_versions.versions_match(installed, expected) is match
 
 
 def test_fabric_manager_version_parses_nv_fabricmanager(monkeypatch):
@@ -196,28 +197,3 @@ def test_fabric_manager_expected(monkeypatch, tmp_path, devices, expected):
     monkeypatch.setattr(software_versions, "PCI_DEVICES_SYSFS", str(tmp_path))
 
     assert software_versions.fabric_manager_expected() is expected
-
-
-def test_kernels_with_module(monkeypatch, tmp_path):
-    for kernel, module_path in [
-        ("6.1.155-176.282.amzn2023.x86_64", "extra/nvidia.ko.xz"),
-        ("6.1.155-176.282.amzn2023.x86_64", "kernel/drivers/infiniband/hw/efa/efa.ko.xz"),
-        ("6.1.200-1.amzn2023.x86_64", "kernel/drivers/infiniband/hw/efa/efa.ko.xz"),
-        ("5.10.0-1.amzn2.x86_64", "updates/dkms/nvidia.ko"),
-    ]:
-        path = tmp_path / kernel / module_path
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text("", encoding="utf-8")
-    (tmp_path / "6.1.200-1.amzn2023.x86_64" / "extra").mkdir()
-    (tmp_path / "6.1.200-1.amzn2023.x86_64" / "extra" / "nvidia-uvm.ko").write_text("", encoding="utf-8")
-    monkeypatch.setattr(software_versions, "LIB_MODULES_PATH", str(tmp_path))
-
-    assert software_versions.kernels_with_module("nvidia") == [
-        "5.10.0-1.amzn2.x86_64",
-        "6.1.155-176.282.amzn2023.x86_64",
-    ]
-    assert software_versions.kernels_with_module("efa") == [
-        "6.1.155-176.282.amzn2023.x86_64",
-        "6.1.200-1.amzn2023.x86_64",
-    ]
-    assert software_versions.kernels_with_module("gdrdrv") == []

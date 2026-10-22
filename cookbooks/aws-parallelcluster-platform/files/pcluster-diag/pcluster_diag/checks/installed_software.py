@@ -13,20 +13,17 @@
 """Checks reporting the OS packages, and the versions of the critical third-party software, installed on the node.
 
 The critical software is the one ParallelCluster installs: Slurm, EFA, the NVIDIA driver, CUDA, GDRCopy and, on
-NVSwitch instances, NVIDIA Fabric Manager. The expected versions are read from the node attributes the cookbook dumps
-to /etc/chef/node_attributes.json: at the end of the AMI build, and again when the node is configured (by the gdrcopy
-resource). They are the versions of the cookbook, which is the one of the AMI, since a cluster can only use the
-ParallelCluster version of its AMI. They are not hardcoded in the tool, so they stay right when the tool is updated
-independently of the AMI.
+NVSwitch instances, NVIDIA Fabric Manager. The expected versions are the ones of the cookbook, read from the node
+attributes in /etc/chef/node_attributes.json, so they stay right when the tool is updated independently of the AMI.
 
-A version that differs from the expected one is a warning, not a failure: the cookbook does not reinstall
-software that is already on the base image (e.g. EFA or the NVIDIA stack on a Deep Learning AMI), so a
-different version is legitimate there, but it was not tested with this ParallelCluster version. The node
-attributes do not keep the versions the cookbook detected on such images, so the warning also shows there.
+A different version is a warning, not a failure: the cookbook does not reinstall software that is already on the base
+image (e.g. a Deep Learning AMI), but that version was not tested with this ParallelCluster version.
 
-The kernel modules ParallelCluster installs (EFA, NVIDIA driver, GDRCopy) are built for the kernel of the AMI. When
-one is missing for the running kernel but installed for another one, the kernel was changed after the AMI was
-built (e.g. by an OS update in a custom action), and the modules do not load.
+The NVIDIA software is checked on every instance with an NVIDIA GPU. An instance with an NVIDIA GPU and no NVIDIA
+driver cannot use its GPUs, which is reported as a single error.
+
+A kernel module (EFA, NVIDIA driver, GDRCopy) missing for the running kernel but installed for another one means the
+kernel was changed after the AMI was built (e.g. by an OS update in a custom action), so the module does not load.
 """
 
 import dataclasses
@@ -46,8 +43,6 @@ from pcluster_diag.models.result import INTERNAL_ERROR_CODE, Result
 from pcluster_diag.util import kernel_module, os_packages, software_versions
 from pcluster_diag.util.node_attributes import attribute, load_node_attributes
 
-# The values the cookbook accepts as "enabled" for its yes/no attributes (see nvidia_enabled? in the cookbook).
-_ENABLED_VALUES = ("yes", True, "true")
 _NVIDIA_DRIVER = "NVIDIA driver"
 _FABRIC_MANAGER = "NVIDIA Fabric Manager"
 _KERNEL = "Kernel"
@@ -69,9 +64,7 @@ def _software_details(
 class InstalledOsPackages(Check):
     """Report the OS packages installed on the node, with their versions."""
 
-    NO_PACKAGE_MANAGER = CheckError(
-        INTERNAL_ERROR_CODE, "Neither dpkg-query nor rpm is available: the OS packages were not listed."
-    )
+    NO_PACKAGE_MANAGER = CheckError(INTERNAL_ERROR_CODE, "{} is not available: the OS packages were not listed.")
 
     PACKAGES = CheckInfo(1, "{} OS packages are installed (from {}).")
 
@@ -85,9 +78,12 @@ class InstalledOsPackages(Check):
 
         A package manager that fails raises, and the Runner records a CHECK_ERROR.
         """
-        packages = os_packages.installed_packages()
+        ubuntu = (context.base_os or "").startswith("ubuntu")
+        packages = os_packages.installed_packages(ubuntu)
         if packages is None:
-            return Result.from_findings(self, errors=[self.NO_PACKAGE_MANAGER])
+            return Result.from_findings(
+                self, errors=[self.NO_PACKAGE_MANAGER.format("dpkg-query" if ubuntu else "rpm")]
+            )
         return Result.from_findings(
             self,
             infos=[self.PACKAGES.format(len(packages.packages), packages.manager)],
@@ -96,16 +92,15 @@ class InstalledOsPackages(Check):
 
 
 class _Component(NamedTuple):
-    """A critical software component, compared on the first ``compared_parts`` components of its version.
+    """A critical software component, whose installed version is compared with the one at ``attribute_path``.
 
-    ``installed_version`` is the probe returning its installed version, given the expected one. ``kernel_module`` is
-    the kernel module the component installs, if any.
+    ``installed_version`` is the probe returning its installed version. ``kernel_module`` is the kernel module the
+    component installs, if any.
     """
 
     name: str
     attribute_path: Tuple[str, ...]
-    compared_parts: int
-    installed_version: Callable[[str], Optional[str]]
+    installed_version: Callable[[], Optional[str]]
     kernel_module: Optional[str] = None
 
 
@@ -114,31 +109,34 @@ class CriticalSoftwareVersions(Check):
 
     NOT_INSTALLED = CheckError(
         1,
-        "{} is not installed, or its version cannot be read, but the AMI was built with version {}.",
+        "{} is not installed, or its version cannot be read: ParallelCluster expects version {}.",
     )
 
-    FABRIC_MANAGER_NOT_INSTALLED = CheckError(
-        2,
-        "NVIDIA Fabric Manager is not installed, or its version cannot be read: on NVSwitch instances, the GPUs "
-        "cannot be used without it.",
-    )
     FABRIC_MANAGER_MISMATCH = CheckError(
-        3,
+        2,
         "NVIDIA Fabric Manager {} does not match the NVIDIA driver {}: on NVSwitch instances they must have the same "
         "version, otherwise the GPUs cannot be used.",
+    )
+    NVIDIA_DRIVER_MISSING = CheckError(
+        3,
+        "The instance has an NVIDIA GPU, but no NVIDIA driver is installed for any kernel: the GPUs cannot be used. "
+        "The rest of the NVIDIA software was not checked.",
+    )
+    FABRIC_MANAGER_NOT_INSTALLED = CheckError(
+        4,
+        "NVIDIA Fabric Manager is not installed, or its version cannot be read: on NVSwitch instances, the GPUs "
+        "cannot be used without it.",
     )
 
     VERSION_MISMATCH = CheckWarning(
         1,
-        "{} {} is installed, but ParallelCluster installed version {} when the AMI was built. The software was "
-        "either on the base image already, or changed after the build; this version was not tested with this "
+        "{} {} is installed, but ParallelCluster expects version {}: this version was not tested with this "
         "ParallelCluster version.",
     )
     KERNEL_CHANGED = CheckWarning(
         2,
         "The {} kernel module is not available for the running kernel {}, but it is installed for kernel {}: the "
-        "kernel was likely changed after the AMI was built, and the kernel modules ParallelCluster installed for "
-        "the kernel of the AMI do not load.",
+        "kernel was likely changed after the AMI was built.",
     )
 
     ATTRIBUTES_UNAVAILABLE = CheckError(
@@ -170,7 +168,7 @@ class CriticalSoftwareVersions(Check):
         infos: List[CheckFinding] = []
         running_kernel = kernel_module.kernel_release()
         details: List[dict] = [_software_details(_KERNEL, running_kernel)]
-        components = self._components(context, attributes, infos)
+        components = self._components(context, errors, infos)
         for component in components:
             expected = attribute(attributes, *component.attribute_path)
             if not expected:
@@ -178,11 +176,11 @@ class CriticalSoftwareVersions(Check):
                 details.append(_software_details(component.name, status=_NOT_CHECKED))
                 continue
             expected = str(expected)
-            installed = component.installed_version(expected)
+            installed = component.installed_version()
             if installed is None:
                 errors.append(self.NOT_INSTALLED.format(component.name, expected))
                 status = _NOT_INSTALLED
-            elif not software_versions.versions_match(installed, expected, component.compared_parts):
+            elif not software_versions.versions_match(installed, expected):
                 warnings.append(self.VERSION_MISMATCH.format(component.name, installed, expected))
                 status = _DIFFERENT_VERSION
             else:
@@ -200,9 +198,7 @@ class CriticalSoftwareVersions(Check):
         for module in [component.kernel_module for component in components if component.kernel_module]:
             if kernel_module.kernel_module_available(module):
                 continue
-            other_kernels = [
-                kernel for kernel in software_versions.kernels_with_module(module) if kernel != running_kernel
-            ]
+            other_kernels = [kernel for kernel in kernel_module.kernels_with_module(module) if kernel != running_kernel]
             if other_kernels:
                 warnings.append(self.KERNEL_CHANGED.format(module, running_kernel, ", ".join(other_kernels)))
         return warnings
@@ -211,6 +207,7 @@ class CriticalSoftwareVersions(Check):
         """Return the errors of NVIDIA Fabric Manager, on the NVSwitch instances where the cookbook runs it.
 
         Its versions are added to ``details``: Fabric Manager is expected to have the version of the NVIDIA driver.
+        Whether its service is active is checked by ``CriticalServicesAreRunning``.
         """
         if not software_versions.fabric_manager_expected():
             return []
@@ -220,7 +217,7 @@ class CriticalSoftwareVersions(Check):
         if fabric_manager is None:
             errors.append(self.FABRIC_MANAGER_NOT_INSTALLED)
             status = _NOT_INSTALLED
-        elif driver and not software_versions.versions_match(fabric_manager, driver, 3):
+        elif driver and not software_versions.versions_match(fabric_manager, driver):
             errors.append(self.FABRIC_MANAGER_MISMATCH.format(fabric_manager, driver))
             status = _DIFFERENT_VERSION
         else:
@@ -228,51 +225,47 @@ class CriticalSoftwareVersions(Check):
         details.append(_software_details(_FABRIC_MANAGER, fabric_manager, driver, status))
         return errors
 
-    def _components(self, context: Context, attributes: dict, infos: List[CheckFinding]) -> List[_Component]:
-        """Return the components that apply to this node, adding to ``infos`` why the NVIDIA ones do not."""
+    def _components(self, context: Context, errors: List[CheckFinding], infos: List[CheckFinding]) -> List[_Component]:
+        """Return the components that apply to this node, adding to ``errors`` or ``infos`` why NVIDIA ones do not."""
         install_dir = (((context.dna_json or {}).get("cluster") or {}).get("slurm") or {}).get(
             "install_dir"
         ) or DEFAULT_SLURM_INSTALL_DIR
         components = [
             _Component(
-                "Slurm", ("cluster", "slurm", "version"), 3, lambda _: software_versions.slurm_version(install_dir)
+                "Slurm",
+                ("cluster", "slurm", "version"),
+                lambda: software_versions.slurm_version(install_dir),
             ),
             _Component(
                 "EFA",
                 ("cluster", "efa", "version"),
-                3,
-                lambda _: software_versions.efa_installer_version(),
+                software_versions.efa_installer_version,
                 EFA_DRIVER_KERNEL_MODULE,
             ),
         ]
 
-        if attribute(attributes, "cluster", "nvidia", "enabled") not in _ENABLED_VALUES:
-            infos.append(self.NOT_CHECKED.format("The NVIDIA software", "the AMI was built with NVIDIA disabled"))
-            return components
         if not software_versions.has_nvidia_gpu():
             infos.append(self.NOT_CHECKED.format("The NVIDIA software", "the instance has no NVIDIA GPU"))
+            return components
+        # A driver installed for another kernel only is checked: it is reported missing for the running kernel, with
+        # the kernel change that explains it.
+        if not kernel_module.kernels_with_module(NVIDIA_DRIVER_KERNEL_MODULE):
+            errors.append(self.NVIDIA_DRIVER_MISSING)
             return components
 
         components += [
             _Component(
                 _NVIDIA_DRIVER,
                 ("cluster", "nvidia", "driver_version"),
-                3,
-                lambda _: software_versions.nvidia_driver_version(),
+                software_versions.nvidia_driver_version,
                 NVIDIA_DRIVER_KERNEL_MODULE,
             ),
-            _Component("CUDA", ("cluster", "nvidia", "cuda", "version"), 2, software_versions.cuda_version),
+            _Component("CUDA", ("cluster", "nvidia", "cuda", "version"), software_versions.cuda_version),
+            _Component(
+                "NVIDIA GDRCopy",
+                ("cluster", "nvidia", "gdrcopy", "version"),
+                software_versions.gdrcopy_version,
+                GDRCOPY_KERNEL_MODULE,
+            ),
         ]
-        if attribute(attributes, "cluster", "nvidia", "gdrcopy", "enabled") in _ENABLED_VALUES:
-            components.append(
-                _Component(
-                    "NVIDIA GDRCopy",
-                    ("cluster", "nvidia", "gdrcopy", "version"),
-                    2,
-                    lambda _: software_versions.gdrcopy_version(),
-                    GDRCOPY_KERNEL_MODULE,
-                )
-            )
-        else:
-            infos.append(self.NOT_CHECKED.format("NVIDIA GDRCopy", "the AMI was built with GDRCopy disabled"))
         return components

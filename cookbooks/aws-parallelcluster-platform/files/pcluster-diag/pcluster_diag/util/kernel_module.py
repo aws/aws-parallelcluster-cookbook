@@ -18,10 +18,13 @@ command is routed through the shell helper; a missing binary is treated as a neg
 exception.
 """
 
+import glob
 import logging
+import os
 import re
 from typing import List, Optional
 
+from pcluster_diag.core.constants import LIB_MODULES_PATH
 from pcluster_diag.util.shell import run_command
 
 logger = logging.getLogger(__name__)
@@ -55,6 +58,14 @@ def kernel_module_loaded(module: str) -> bool:
         if fields and fields[0] == module:
             return True
     return False
+
+
+def kernels_with_module(module: str) -> List[str]:
+    """Return the kernel releases under /lib/modules that have the given kernel module, sorted."""
+    kernels = set()
+    for path in glob.glob(os.path.join(LIB_MODULES_PATH, "*", "**", "{}.ko*".format(module)), recursive=True):
+        kernels.add(os.path.relpath(path, LIB_MODULES_PATH).split(os.sep)[0])
+    return sorted(kernels)
 
 
 def kernel_release() -> Optional[str]:

@@ -74,10 +74,10 @@ def systemd_unit_failed(unit: str) -> bool:
 
 
 def systemd_unit_state(unit: str) -> Optional[str]:
-    """Return the active state of ``unit`` (``systemctl is-active``: active, inactive, failed, ...), or None.
+    """Return the state of ``unit`` printed by ``systemctl is-active`` (active, inactive, failed, ...), or None.
 
-    ``is-active`` exits non-zero for non-active units, so the textual answer -- not the exit code -- is
-    authoritative. None means systemctl is unavailable or printed nothing.
+    The printed state is returned, not the exit code: ``is-active`` exits non-zero for every state other than active.
+    None means systemctl is not available or printed nothing.
     """
     result = _systemctl(["is-active", unit])
     if result is None:

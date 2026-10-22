@@ -25,7 +25,7 @@ def _write(tmp_path, content):
     return str(path)
 
 
-def test_load_merges_precedence_levels_deeply(tmp_path):
+def test_load_returns_the_default_level(tmp_path):
     path = _write(
         tmp_path,
         {
@@ -39,23 +39,18 @@ def test_load_merges_precedence_levels_deeply(tmp_path):
 
     attributes = load_node_attributes(path)
 
-    assert attributes == {
-        "cluster": {
-            "efa": {"version": "1.1.0"},
-            "slurm": {"version": "25-11-8-1"},
-            "nvidia": {"driver_version": "595.71.05"},
-        },
-        "platform": "amazon",
-    }
+    # The other precedence levels are ignored.
+    assert attributes == {"cluster": {"efa": {"version": "1.0.0"}, "slurm": {"version": "25-11-8-1"}}}
 
 
-def test_load_tolerates_missing_levels(tmp_path):
-    assert load_node_attributes(_write(tmp_path, {"default": {"a": 1}})) == {"a": 1}
+def test_load_tolerates_a_missing_default_level(tmp_path):
+    assert load_node_attributes(_write(tmp_path, {"normal": {"a": 1}})) == {}
 
 
-def test_load_rejects_non_object(tmp_path):
+@pytest.mark.parametrize("content", ["[1, 2]", {"default": [1, 2]}])
+def test_load_rejects_non_object(tmp_path, content):
     with pytest.raises(ValueError):
-        load_node_attributes(_write(tmp_path, "[1, 2]"))
+        load_node_attributes(_write(tmp_path, content))
 
 
 def test_load_raises_when_file_missing(tmp_path):

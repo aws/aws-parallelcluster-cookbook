@@ -16,7 +16,6 @@ Every probe returns None when the software is not installed or its version canno
 file is never an exception.
 """
 
-import glob
 import logging
 import os
 import re
@@ -24,13 +23,12 @@ from pathlib import Path
 from typing import List, Optional, Tuple
 
 from pcluster_diag.core.constants import (
-    CUDA_NVCC_PATH_TEMPLATE,
+    CUDA_NVCC_PATH,
     EFA_INSTALLED_PACKAGES_PATH,
     GB200_PCI_DEVICE_ID,
     GDRCOPY_KERNEL_MODULE,
     GPU_3D_CONTROLLER_PCI_CLASS,
     INFINIBAND_CONTROLLER_PCI_CLASS,
-    LIB_MODULES_PATH,
     MELLANOX_PCI_VENDOR_ID,
     NV_FABRICMANAGER_PATH,
     NVIDIA_DRIVER_KERNEL_MODULE,
@@ -74,14 +72,9 @@ def nvidia_driver_version() -> Optional[str]:
     return kernel_module.module_version(NVIDIA_DRIVER_KERNEL_MODULE)
 
 
-def cuda_version(expected_version: str) -> Optional[str]:
-    """Return the release of the CUDA toolkit installed in the directory of ``expected_version``, or None.
-
-    CUDA installs into ``/usr/local/cuda-<major>.<minor>``, so the toolkit is looked up in the directory of the
-    expected release.
-    """
-    nvcc = CUDA_NVCC_PATH_TEMPLATE.format(".".join(version_parts(expected_version, 2)))
-    return _command_output_match([nvcc, "--version"], _CUDA_RELEASE_PATTERN)
+def cuda_version() -> Optional[str]:
+    """Return the release of the CUDA toolkit behind the ``/usr/local/cuda`` symlink (``nvcc --version``), or None."""
+    return _command_output_match([CUDA_NVCC_PATH, "--version"], _CUDA_RELEASE_PATTERN)
 
 
 def gdrcopy_version() -> Optional[str]:
@@ -121,30 +114,26 @@ def fabric_manager_expected() -> bool:
     return gpus > 1 and (nvswitches > 1 or infiniband_controllers > 1) and gb200 <= 1
 
 
-def kernels_with_module(module: str) -> List[str]:
-    """Return the kernel releases under /lib/modules that have the given kernel module, sorted."""
-    kernels = set()
-    for path in glob.glob(os.path.join(LIB_MODULES_PATH, "*", "**", "{}.ko*".format(module)), recursive=True):
-        kernels.add(os.path.relpath(path, LIB_MODULES_PATH).split(os.sep)[0])
-    return sorted(kernels)
-
-
-def version_parts(version: str, count: int) -> List[str]:
-    """Return the first ``count`` components of ``version``, split on dots and dashes.
+def version_parts(version: str) -> List[str]:
+    """Return the components of ``version``, split on dots and dashes.
 
     ParallelCluster writes some versions with dashes (Slurm ``25-11-8-1``) and the software reports them with dots
     (``25.11.8``), so both separators split.
     """
-    return re.split(r"[.-]", version.strip())[:count]
+    return re.split(r"[.-]", version.strip())
 
 
-def versions_match(installed: str, expected: str, count: int) -> bool:
-    """Return whether the first ``count`` components of ``installed`` and ``expected`` are equal.
+def versions_match(installed: str, expected: str) -> bool:
+    """Return whether ``installed`` and ``expected`` are equal on the components of the shorter of the two.
 
-    Numeric components are compared as numbers, so ``595.71.05`` matches ``595.71.5``.
+    The software reports its version with less or more components than ParallelCluster records (CUDA ``13.2`` for
+    ``13.2.2``, Slurm ``25.11.8`` for ``25-11-8-1``). Numeric components are compared as numbers, so ``595.71.05``
+    matches ``595.71.5``.
     """
-    return [_comparable(part) for part in version_parts(installed, count)] == [
-        _comparable(part) for part in version_parts(expected, count)
+    installed_parts, expected_parts = version_parts(installed), version_parts(expected)
+    count = min(len(installed_parts), len(expected_parts))
+    return [_comparable(part) for part in installed_parts[:count]] == [
+        _comparable(part) for part in expected_parts[:count]
     ]
 
 
