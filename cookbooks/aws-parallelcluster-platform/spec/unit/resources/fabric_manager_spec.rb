@@ -158,6 +158,10 @@ describe 'fabric_manager:setup' do
         it 'locks the package version' do
           is_expected.to lock_package_lock(fabric_manager_package)
         end
+
+        it 'disables the nvidia-fabricmanager service enabled by the package preset' do
+          is_expected.to disable_service('nvidia-fabricmanager')
+        end
       end
 
       context 'when fabric manager is already installed (e.g. DLAMI)' do
@@ -173,6 +177,10 @@ describe 'fabric_manager:setup' do
 
         it 'skips the install when fabric manager is already present' do
           is_expected.not_to install_package(fabric_manager_package)
+        end
+
+        it 'leaves the service of the pre-installed fabric manager untouched' do
+          is_expected.not_to disable_service('nvidia-fabricmanager')
         end
       end
     end

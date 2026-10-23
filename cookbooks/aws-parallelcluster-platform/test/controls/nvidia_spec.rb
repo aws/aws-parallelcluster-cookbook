@@ -31,6 +31,10 @@ control 'tag:install_expected_versions_of_nvidia_driver_installed' do
     subject { command('modinfo -F license nvidia').stdout.strip }
     it { should eq expected_nvidia_kernel_license }
   end
+
+  describe service('nvidia-powerd') do
+    it { should_not be_enabled }
+  end
 end
 
 control 'tag:install_expected_versions_of_nvidia_cuda_installed' do
