@@ -88,6 +88,12 @@ action :setup do
     end
   end
 
+  # The NVIDIA driver package enables nvidia-powerd (Dynamic Boost, for notebooks) through its systemd preset.
+  # It is not needed on EC2 instances.
+  service 'nvidia-powerd' do
+    action :disable
+  end
+
   execute 'initramfs to remove nouveau' do
     command 'update-initramfs -u'
     only_if 'lsinitramfs /boot/initrd.img-$(uname -r) | grep nouveau'

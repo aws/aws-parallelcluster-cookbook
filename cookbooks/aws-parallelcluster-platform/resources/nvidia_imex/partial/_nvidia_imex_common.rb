@@ -28,6 +28,13 @@ action :install do
 
   # Create Imex configuration files
   action_create_configuration_files
+
+  # The NVIDIA package enables the service through its systemd preset.
+  # Keep it disabled in the image: the configure action enables it only where IMEX is needed.
+  service nvidia_imex_service do
+    action :disable
+  end
+
   # Save Imex package in Node Attributes for InSpec Tests
   node.default['cluster']['nvidia']['imex']['package'] = nvidia_imex_package
   node_attributes 'dump node attributes'
