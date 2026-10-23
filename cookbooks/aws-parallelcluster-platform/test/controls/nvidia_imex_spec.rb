@@ -25,6 +25,10 @@ control 'tag:install_expected_versions_of_nvidia_imex_installed' do
   describe package("#{node['cluster']['nvidia']['imex']['package']}") do
     it { should be_installed }
   end
+
+  describe service(nvidia_imex_service) do
+    it { should_not be_enabled }
+  end
 end
 
 control 'tag:config_nvidia_fabric_manager_enabled' do
