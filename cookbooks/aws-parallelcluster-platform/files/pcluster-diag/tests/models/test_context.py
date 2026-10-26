@@ -34,3 +34,24 @@ def test_node_type_values(node_type, expected_value):
 def test_context_carries_run_timestamp():
     # The Context records the run timestamp (the same value that names the report file).
     assert sample_context().timestamp == SAMPLE_TIMESTAMP
+
+
+@pytest.mark.parametrize(
+    "cluster, expected",
+    [
+        pytest.param({"base_os": "ubuntu2404"}, "ubuntu2404", id="set"),
+        pytest.param({}, None, id="not set"),
+    ],
+)
+def test_base_os(cluster, expected):
+    context = sample_context()
+    context.dna_json["cluster"] = cluster
+
+    assert context.base_os == expected
+
+
+def test_base_os_without_cluster_section():
+    context = sample_context()
+    context.dna_json = {}
+
+    assert context.base_os is None

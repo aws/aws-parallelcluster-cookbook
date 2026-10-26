@@ -24,11 +24,13 @@ from pcluster_diag.checks.cfn_hup import CfnHup
 from pcluster_diag.checks.cluster_update_history import ClusterUpdateHistory
 from pcluster_diag.checks.compute_fleet_status import ComputeFleetStatusHistory
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
+from pcluster_diag.checks.critical_services import CriticalServicesAreRunning
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
 from pcluster_diag.checks.directory_lookup import DirectoryService
 from pcluster_diag.checks.endpoint_reachability import EndpointsAreReachable
 from pcluster_diag.checks.fsx_connectivity import FsxTargetsAreReachable, LustreFilesystem
 from pcluster_diag.checks.imds import Imds
+from pcluster_diag.checks.installed_software import CriticalSoftwareVersions, InstalledOsPackages
 from pcluster_diag.checks.network_congestion import NetworkCongestion
 from pcluster_diag.checks.reserved_users import ReservedUsersAndGroups
 from pcluster_diag.checks.slurm_accounting import SlurmAccounting
@@ -144,6 +146,9 @@ DEFAULT_REGISTRY = (
     .register(Sudoers())
     .register(ClusterDaemonsAreRunning())
     .register(ClustermgtdHeartbeatIsHealthy())
+    .register(CriticalServicesAreRunning())
+    .register(CriticalSoftwareVersions())
+    .register(InstalledOsPackages())
     .register(ClusterUpdateHistory())
     .register(ComputeFleetStatusHistory())
     .register(DirectoryService())
