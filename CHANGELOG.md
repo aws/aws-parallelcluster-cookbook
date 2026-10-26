@@ -9,6 +9,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **ENHANCEMENTS**
 - Add `pcluster-diag` checks reporting the history of cluster updates and of compute fleet status changes, and warning
   when the latest cluster update did not complete.
+- Add `pcluster-diag` checks reporting the OS packages and the versions of the critical software installed on the node
+  (Slurm, EFA, NVIDIA driver, CUDA, GDRCopy and NVIDIA Fabric Manager), and verifying that the critical system
+  services are running and listening.
 
 3.16.2
 ------
