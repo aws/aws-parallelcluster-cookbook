@@ -12,6 +12,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Add `pcluster-diag` checks reporting the OS packages and the versions of the critical software installed on the node
   (Slurm, EFA, NVIDIA driver, CUDA, GDRCopy and NVIDIA Fabric Manager), and verifying that the critical system
   services are running and listening.
+- Add a `pcluster-diag` check dumping the configuration files of the node with their secrets redacted, to compare a
+  cluster with a test environment. An opt-in check also dumps the AWS resources the cluster configuration references
+  (launch templates, security groups, subnets and their routing, IAM roles and policies, custom action scripts,
+  existing shared storage), warning about the ones the credentials do not allow reading.
 
 3.16.2
 ------

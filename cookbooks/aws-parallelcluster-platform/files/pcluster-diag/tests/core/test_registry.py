@@ -154,5 +154,10 @@ def test_default_registry_wires_in_installed_software_checks(identifier):
     assert registry_module.DEFAULT_REGISTRY.get(identifier) is not None
 
 
+@pytest.mark.parametrize("identifier", ["CoreSettings", "ReferencedResources"])
+def test_default_registry_wires_in_configuration_dump_checks(identifier):
+    assert registry_module.DEFAULT_REGISTRY.get(identifier) is not None
+
+
 def test_default_registry_does_not_register_sample_check():
     assert registry_module.DEFAULT_REGISTRY.get("SampleCheck") is None
