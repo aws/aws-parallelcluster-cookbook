@@ -235,3 +235,41 @@ CLUSTERSTATUSMGTD_LOG_PATH = "/var/log/parallelcluster/clusterstatusmgtd"
 CLUSTERMGTD_LOG_PATH = "/var/log/parallelcluster/clustermgtd"
 # logrotate keeps one rotated copy of these logs, named with this suffix (rotate 1, nodateext).
 ROTATED_LOG_SUFFIX = ".1"
+
+# Installed software
+# The node attributes the cookbook dumps (see cookbooks/aws-parallelcluster-shared/resources/node_attributes.rb).
+NODE_ATTRIBUTES_PATH = "/etc/chef/node_attributes.json"
+EFA_INSTALLED_PACKAGES_PATH = "/opt/amazon/efa_installed_packages"
+# The version-agnostic /usr/local/cuda symlink the CUDA toolkit creates: the cookbook puts it on the users' PATH, and
+# skips installing CUDA when it exists (e.g. on a Deep Learning AMI). See the nvidia_cuda resource.
+CUDA_NVCC_PATH = "/usr/local/cuda/bin/nvcc"
+NVIDIA_DRIVER_KERNEL_MODULE = "nvidia"
+GDRCOPY_KERNEL_MODULE = "gdrdrv"
+PCI_DEVICES_SYSFS = "/sys/bus/pci/devices"
+NVIDIA_PCI_VENDOR_ID = "0x10de"
+# PCI ids the cookbook uses to decide whether NVIDIA Fabric Manager runs on the instance
+# (see cookbooks/aws-parallelcluster-platform/libraries/nvidia.rb, enable_fabric_manager? and is_gb200_node?).
+MELLANOX_PCI_VENDOR_ID = "0x15b3"
+GPU_3D_CONTROLLER_PCI_CLASS = "0x0302"
+NVSWITCH_BRIDGE_PCI_CLASS = "0x0680"
+INFINIBAND_CONTROLLER_PCI_CLASS = "0x0207"
+GB200_PCI_DEVICE_ID = "0x2941"
+NV_FABRICMANAGER_PATH = "/usr/bin/nv-fabricmanager"
+# The kernel modules ParallelCluster installs live under /lib/modules/<kernel release>.
+LIB_MODULES_PATH = "/lib/modules"
+
+# Critical services
+MUNGE_SERVICE = "munge.service"
+SLURMCTLD_SERVICE = "slurmctld.service"
+SLURMD_SERVICE = "slurmd.service"
+# The NFS server service is read from the node attributes (nfs.service.server, set by the nfs cookbook attributes).
+# The GDRCopy service is named differently on Ubuntu (see the gdrcopy resource).
+GDRCOPY_SERVICE = "gdrcopy.service"
+GDRCOPY_SERVICE_UBUNTU = "gdrdrv.service"
+FABRIC_MANAGER_SERVICE = "nvidia-fabricmanager.service"
+# Ports set in slurm.conf (see cookbooks/aws-parallelcluster-slurm/templates/default/slurm/slurm.conf.erb).
+# slurmctld listens on one port of its range.
+SLURMCTLD_PORTS = tuple(range(6820, 6830))
+SLURMD_PORT = 6818
+NFS_SERVER_PORT = 2049
+PROC_NET_TCP_PATHS = ("/proc/net/tcp", "/proc/net/tcp6")
