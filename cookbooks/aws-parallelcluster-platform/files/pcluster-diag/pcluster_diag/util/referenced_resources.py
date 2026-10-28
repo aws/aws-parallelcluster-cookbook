@@ -14,11 +14,11 @@
 
 The resources are the security groups, the subnets with their route tables, network ACLs and VPC endpoints, the IAM
 instance profiles, roles and policies, the scripts of the custom actions and the existing shared storage the cluster
-configuration references, plus the security groups, the subnet and the IAM role of the node itself, the security
-groups the cluster stack manages, and the launch templates of the compute resources and login node pools, with the
-security groups and the instance profiles the nodes launch with. Each resource is read on its own: one that
-cannot be read, e.g. because the credentials do not allow it, is recorded with its error, and the others are still
-read.
+configuration references, with the security groups of the EFS mount targets and of the FSx network interfaces, plus
+the security groups, the subnet and the IAM role of the node itself, the security groups the cluster stack manages,
+and the launch templates of the compute resources and login node pools, with the security groups and the instance
+profiles the nodes launch with. Each resource is read on its own: one that cannot be read, e.g. because the
+credentials do not allow it, is recorded with its error, and the others are still read.
 """
 
 import http.client
@@ -112,6 +112,12 @@ class ResourceReader:
             for storage in shared_storage
             for mount_target in storage.get("MountTargets", [])
             for group_id in mount_target.get("SecurityGroups", [])
+        }
+        security_group_ids |= {
+            group_id
+            for storage in shared_storage
+            for interface in storage.get("NetworkInterfaces", [])
+            for group_id in interface.get("SecurityGroups", [])
         }
         policy_arns = {
             policy.get("Policy")
@@ -357,6 +363,8 @@ class ResourceReader:
                 entry["Description"] = _first(response, list_key)
             if service == "efs":
                 entry["MountTargets"] = self._efs_mount_targets(entry, resource_id)
+            elif service == "fsx" and response:
+                entry["NetworkInterfaces"] = self._fsx_network_interfaces(entry, entry["Description"])
             storages.append(entry)
         return storages
 
@@ -374,6 +382,27 @@ class ResourceReader:
             if groups:
                 mount_target["SecurityGroups"] = groups.get("SecurityGroups", [])
         return mount_targets
+
+    def _fsx_network_interfaces(self, entry: dict, description: dict) -> List[dict]:
+        """Return the network interfaces of an FSx storage, each with its security groups.
+
+        Lustre file systems and File Caches list their network interfaces in their description. ONTAP and OpenZFS
+        volumes don't: the interfaces belong to the volume's parent file system, which is described to get them.
+        """
+        interface_ids = description.get("NetworkInterfaceIds")
+        if interface_ids is None and description.get("FileSystemId"):
+            response = self._call(entry, "fsx", "describe_file_systems", FileSystemIds=[description["FileSystemId"]])
+            interface_ids = _first(response or {}, "FileSystems").get("NetworkInterfaceIds")
+        if not interface_ids:
+            return []
+        response = self._call(entry, "ec2", "describe_network_interfaces", NetworkInterfaceIds=interface_ids)
+        return [
+            {
+                "NetworkInterfaceId": interface["NetworkInterfaceId"],
+                "SecurityGroups": [group["GroupId"] for group in interface.get("Groups", [])],
+            }
+            for interface in (response or {}).get("NetworkInterfaces", [])
+        ]
 
     def _call(self, entry: dict, service: str, operation: str, **kwargs) -> Optional[dict]:
         """Return the response of ``service``'s ``operation``, or None, adding the error to ``entry``, if it fails."""

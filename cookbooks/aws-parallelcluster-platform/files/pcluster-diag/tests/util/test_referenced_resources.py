@@ -126,6 +126,12 @@ def _clients(**overrides):
                 "describe_security_groups": lambda GroupIds: {  # noqa: N803
                     "SecurityGroups": [{"GroupId": GroupIds[0], "IpPermissions": [{"IpProtocol": "-1"}]}]
                 },
+                "describe_network_interfaces": lambda NetworkInterfaceIds: {  # noqa: N803
+                    "NetworkInterfaces": [
+                        {"NetworkInterfaceId": eni, "Groups": [{"GroupId": eni.replace("eni", "sg")}]}
+                        for eni in NetworkInterfaceIds
+                    ]
+                },
             }
         ),
         "cloudformation": _FakeClient({"describe_stack_resource": _stack_resource}),
@@ -157,8 +163,12 @@ def _clients(**overrides):
         ),
         "fsx": _FakeClient(
             {
-                "describe_file_systems": {"FileSystems": [{"FileSystemId": "fs-fsx"}]},
-                "describe_volumes": {"Volumes": [{"VolumeId": "fsvol-1"}]},
+                "describe_file_systems": lambda FileSystemIds: {  # noqa: N803
+                    "FileSystems": [
+                        {"FileSystemId": FileSystemIds[0], "NetworkInterfaceIds": ["eni-" + FileSystemIds[0]]}
+                    ]
+                },
+                "describe_volumes": {"Volumes": [{"VolumeId": "fsvol-1", "FileSystemId": "fs-ontap"}]},
             }
         ),
     }
@@ -224,10 +234,12 @@ def test_read_collects_every_referenced_resource(clients):
     resources = reader.read(_CONFIG, "my-cluster", "i-1")
 
     assert reader.failures == []
-    # From the configuration, the node, the stack and the EFS mount targets, each read once.
+    # From the configuration, the node, the stack, the EFS mount targets and the FSx network interfaces, each read once.
     assert [group["GroupId"] for group in resources["security_groups"]] == [
         "sg-compute",
         "sg-efs",
+        "sg-fs-fsx",
+        "sg-fs-ontap",
         "sg-head",
         "sg-node",
         "sg-queue",
@@ -282,13 +294,22 @@ def test_read_collects_every_referenced_resource(clients):
             "Name": "fsx",
             "StorageType": "FsxLustre",
             "FileSystemId": "fs-fsx",
-            "Description": {"FileSystemId": "fs-fsx"},
+            "Description": {"FileSystemId": "fs-fsx", "NetworkInterfaceIds": ["eni-fs-fsx"]},
+            "NetworkInterfaces": [{"NetworkInterfaceId": "eni-fs-fsx", "SecurityGroups": ["sg-fs-fsx"]}],
         },
-        {"Name": "ontap", "StorageType": "FsxOntap", "VolumeId": "fsvol-1", "Description": {"VolumeId": "fsvol-1"}},
+        {
+            "Name": "ontap",
+            "StorageType": "FsxOntap",
+            "VolumeId": "fsvol-1",
+            "Description": {"VolumeId": "fsvol-1", "FileSystemId": "fs-ontap"},
+            # A volume does not list its network interfaces: they are read from its file system.
+            "NetworkInterfaces": [{"NetworkInterfaceId": "eni-fs-ontap", "SecurityGroups": ["sg-fs-ontap"]}],
+        },
     ]
     assert ("get_object", {"Bucket": "my-bucket", "Key": "start.sh"}) in clients["s3"].calls
     assert ("describe_file_systems", {"FileSystemId": "fs-efs"}) in clients["efs"].calls
     assert ("describe_file_systems", {"FileSystemIds": ["fs-fsx"]}) in clients["fsx"].calls
+    assert ("describe_file_systems", {"FileSystemIds": ["fs-ontap"]}) in clients["fsx"].calls
 
 
 def test_read_records_the_resources_that_cannot_be_read(clients, monkeypatch):
@@ -300,6 +321,7 @@ def test_read_records_the_resources_that_cannot_be_read(clients, monkeypatch):
                 "describe_subnets": _access_denied("DescribeSubnets"),
                 "describe_route_tables": _access_denied("DescribeRouteTables"),
                 "describe_network_acls": _access_denied("DescribeNetworkAcls"),
+                "describe_network_interfaces": _access_denied("DescribeNetworkInterfaces"),
             }
         ),
         iam=_FakeClient(
@@ -329,6 +351,10 @@ def test_read_records_the_resources_that_cannot_be_read(clients, monkeypatch):
     assert resources["iam_instance_profiles"][0]["Errors"]
     assert "Role" not in resources["iam_roles"][0]
     assert "SecurityGroups" not in resources["shared_storage"][0]["MountTargets"][0]
+    assert resources["shared_storage"][1]["NetworkInterfaces"] == []
+    assert resources["shared_storage"][1]["Errors"] == [
+        "ec2:DescribeNetworkInterfaces: {}".format(_access_denied("DescribeNetworkInterfaces"))
+    ]
     # Without the VPC of the subnets, their VPC endpoints are not read.
     assert set(resources["subnets"][0]) == {"SubnetId", "Errors"}
     assert resources["vpcs"] == []
@@ -338,6 +364,7 @@ def test_read_records_the_resources_that_cannot_be_read(clients, monkeypatch):
         ReadFailure("ec2:DescribeSubnets", "AccessDenied"),
         ReadFailure("ec2:DescribeRouteTables", "AccessDenied"),
         ReadFailure("ec2:DescribeNetworkAcls", "AccessDenied"),
+        ReadFailure("ec2:DescribeNetworkInterfaces", "AccessDenied"),
         ReadFailure("iam:GetInstanceProfile", "AccessDenied"),
         ReadFailure("iam:GetRole", "AccessDenied"),
         ReadFailure("iam:GetPolicy", "AccessDenied"),
