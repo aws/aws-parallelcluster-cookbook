@@ -99,3 +99,28 @@ def test_module_version_none_when_modinfo_missing(monkeypatch):
 )
 def test_version_at_least(actual, minimum, expected):
     assert kernel_module.version_at_least(actual, minimum) is expected
+
+
+def test_kernels_with_module(monkeypatch, tmp_path):
+    for kernel, module_path in [
+        ("6.1.155-176.282.amzn2023.x86_64", "extra/nvidia.ko.xz"),
+        ("6.1.155-176.282.amzn2023.x86_64", "kernel/drivers/infiniband/hw/efa/efa.ko.xz"),
+        ("6.1.200-1.amzn2023.x86_64", "kernel/drivers/infiniband/hw/efa/efa.ko.xz"),
+        ("5.10.0-1.amzn2.x86_64", "updates/dkms/nvidia.ko"),
+    ]:
+        path = tmp_path / kernel / module_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("", encoding="utf-8")
+    (tmp_path / "6.1.200-1.amzn2023.x86_64" / "extra").mkdir()
+    (tmp_path / "6.1.200-1.amzn2023.x86_64" / "extra" / "nvidia-uvm.ko").write_text("", encoding="utf-8")
+    monkeypatch.setattr(kernel_module, "LIB_MODULES_PATH", str(tmp_path))
+
+    assert kernel_module.kernels_with_module("nvidia") == [
+        "5.10.0-1.amzn2.x86_64",
+        "6.1.155-176.282.amzn2023.x86_64",
+    ]
+    assert kernel_module.kernels_with_module("efa") == [
+        "6.1.155-176.282.amzn2023.x86_64",
+        "6.1.200-1.amzn2023.x86_64",
+    ]
+    assert kernel_module.kernels_with_module("gdrdrv") == []

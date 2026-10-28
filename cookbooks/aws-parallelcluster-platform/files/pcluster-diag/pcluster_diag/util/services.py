@@ -73,6 +73,18 @@ def systemd_unit_failed(unit: str) -> bool:
     return result.stdout.strip() == "failed"
 
 
+def systemd_unit_state(unit: str) -> Optional[str]:
+    """Return the state of ``unit`` printed by ``systemctl is-active`` (active, inactive, failed, ...), or None.
+
+    The printed state is returned, not the exit code: ``is-active`` exits non-zero for every state other than active.
+    None means systemctl is not available or printed nothing.
+    """
+    result = _systemctl(["is-active", unit])
+    if result is None:
+        return None
+    return result.stdout.strip() or None
+
+
 def _systemctl(args):
     """Run ``systemctl <args>`` and return the CompletedProcess, or None when systemctl is unavailable."""
     try:
