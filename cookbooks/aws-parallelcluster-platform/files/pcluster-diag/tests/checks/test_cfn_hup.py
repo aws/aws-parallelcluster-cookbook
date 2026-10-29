@@ -12,6 +12,8 @@
 
 """Unit tests for the CfnHup check: daemon location on every node and config-role agreement on the head node."""
 
+import dataclasses
+
 import pytest
 
 from pcluster_diag.checks import cfn_hup
@@ -20,7 +22,8 @@ from pcluster_diag.models.context import NodeType
 from pcluster_diag.models.result import Status
 from tests.sample_data import sample_context
 
-_RUNNING_ON_NON_HEAD = CfnHup.RUNNING_ON_NON_HEAD_NODE
+_RUNNING_ON = CfnHup.RUNNING_ON.code
+_NOT_RUNNING_ON = CfnHup.NOT_RUNNING_ON.code
 
 
 def _conf_with_role(role_line="role=my-instance-role"):
@@ -68,15 +71,15 @@ def test_approval_required(node_type):
 
 
 @pytest.mark.parametrize(
-    "node_type, is_running, expected_status, expected_errors",
+    "node_type, is_running, expected_status, expected_codes",
     [
-        (NodeType.COMPUTE, False, Status.PASSED, None),  # compute: not running as expected
-        (NodeType.COMPUTE, True, Status.FAILURE, [_RUNNING_ON_NON_HEAD]),  # compute: running but shouldn't be
-        (NodeType.LOGIN, False, Status.PASSED, None),  # login: not running as expected
-        (NodeType.LOGIN, True, Status.FAILURE, [_RUNNING_ON_NON_HEAD]),  # login: running but shouldn't be
+        (NodeType.COMPUTE, False, Status.PASSED, []),  # compute: not running as expected
+        (NodeType.COMPUTE, True, Status.FAILURE, [_RUNNING_ON]),  # compute: running but shouldn't be
+        (NodeType.LOGIN, False, Status.PASSED, []),  # login: not running as expected
+        (NodeType.LOGIN, True, Status.FAILURE, [_RUNNING_ON]),  # login: running but shouldn't be
     ],
 )
-def test_run_daemon_location_on_non_head_nodes(monkeypatch, node_type, is_running, expected_status, expected_errors):
+def test_run_daemon_location_on_non_head_nodes(monkeypatch, node_type, is_running, expected_status, expected_codes):
     # On non-head nodes only the daemon-location concern is evaluated (the config check is head-only),
     # so the config file is never read here.
     monkeypatch.setattr(cfn_hup, "is_supervisord_program_running", lambda _program: is_running)
@@ -84,8 +87,59 @@ def test_run_daemon_location_on_non_head_nodes(monkeypatch, node_type, is_runnin
     result = CfnHup().run(sample_context(node_type))
 
     assert result.status is expected_status
-    # A failure returns the Check's own constant error; a pass carries none.
-    assert result.errors == expected_errors
+    assert _codes(result) == expected_codes
+
+
+@pytest.mark.parametrize(
+    "node_type, pcluster_version, is_running, expected_codes",
+    [
+        # Before 3.15.0, cfn-hup ran on compute nodes too, and before 3.16.0 on login nodes too.
+        (NodeType.COMPUTE, "3.11.0", True, []),
+        (NodeType.COMPUTE, "3.14.2", True, []),
+        (NodeType.COMPUTE, "3.14.2", False, [_NOT_RUNNING_ON]),
+        (NodeType.COMPUTE, "3.15.0", True, [_RUNNING_ON]),
+        (NodeType.COMPUTE, "3.15.0", False, []),
+        (NodeType.LOGIN, "3.15.1", True, []),
+        (NodeType.LOGIN, "3.15.1", False, [_NOT_RUNNING_ON]),
+        (NodeType.LOGIN, "3.16.0", True, [_RUNNING_ON]),
+        (NodeType.LOGIN, "3.16.0", False, []),
+        # An unparseable version gets the behavior of the current version.
+        (NodeType.COMPUTE, "unknown", True, [_RUNNING_ON]),
+        (NodeType.LOGIN, "unknown", False, []),
+    ],
+)
+def test_run_daemon_location_follows_the_parallelcluster_version(
+    monkeypatch, node_type, pcluster_version, is_running, expected_codes
+):
+    monkeypatch.setattr(cfn_hup, "is_supervisord_program_running", lambda _program: is_running)
+    context = dataclasses.replace(sample_context(node_type), pcluster_version=pcluster_version)
+
+    result = CfnHup().run(context)
+
+    assert _codes(result) == expected_codes
+
+
+@pytest.mark.parametrize(
+    "node_type, pcluster_version, is_running, expected_message",
+    [
+        (NodeType.HEAD, "3.16.0", False, "cfn-hup is not running on the HeadNode, but it should be."),
+        (NodeType.COMPUTE, "3.11.0", False, "cfn-hup is not running on the ComputeFleet, but it should be."),
+        (NodeType.COMPUTE, "3.16.0", True, "cfn-hup is running on the ComputeFleet, but it should not be."),
+        (NodeType.LOGIN, "3.16.0", True, "cfn-hup is running on the LoginNode, but it should not be."),
+    ],
+)
+def test_run_reports_the_node_type_in_daemon_location_errors(
+    monkeypatch, tmp_path, node_type, pcluster_version, is_running, expected_message
+):
+    monkeypatch.setattr(cfn_hup, "is_supervisord_program_running", lambda _program: is_running)
+    # On the head node, the roles agree so that only the daemon-location error is reported.
+    monkeypatch.setattr(cfn_hup.imds, "get_iam_role_name", lambda: "my-instance-role")
+    _use_cfn_hup_conf(monkeypatch, tmp_path, _conf_with_role())
+    context = dataclasses.replace(sample_context(node_type), pcluster_version=pcluster_version)
+
+    result = CfnHup().run(context)
+
+    assert _messages(result) == expected_message
 
 
 @pytest.mark.parametrize(
@@ -94,7 +148,7 @@ def test_run_daemon_location_on_non_head_nodes(monkeypatch, node_type, is_runnin
         # head, cfn-hup running and roles agree: both concerns pass.
         (True, "role-a", "role-a", Status.PASSED, []),
         # head, roles agree but cfn-hup is down: only the daemon-location failure.
-        (False, "role-a", "role-a", Status.FAILURE, [CfnHup.NOT_RUNNING_ON_HEAD_NODE.code]),
+        (False, "role-a", "role-a", Status.FAILURE, [_NOT_RUNNING_ON]),
         # head, cfn-hup running but the configured role is stale: only the role mismatch.
         (True, "new-role", "old-role", Status.FAILURE, [CfnHup.ROLE_MISMATCH.code]),
         # head, cfn-hup down and roles disagree: both problems reported together.
@@ -103,7 +157,7 @@ def test_run_daemon_location_on_non_head_nodes(monkeypatch, node_type, is_runnin
             "new-role",
             "old-role",
             Status.FAILURE,
-            [CfnHup.NOT_RUNNING_ON_HEAD_NODE.code, CfnHup.ROLE_MISMATCH.code],
+            [_NOT_RUNNING_ON, CfnHup.ROLE_MISMATCH.code],
         ),
     ],
     ids=["all-pass", "daemon-down-only", "role-mismatch-only", "both-problems"],
