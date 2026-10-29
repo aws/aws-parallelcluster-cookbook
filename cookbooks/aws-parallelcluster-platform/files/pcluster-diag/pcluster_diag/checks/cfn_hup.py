@@ -19,7 +19,12 @@ from pcluster_diag.models.finding import CheckError
 from pcluster_diag.models.result import Result
 from pcluster_diag.util import imds
 from pcluster_diag.util.io_utils import read_ini_option
+from pcluster_diag.util.kernel_module import version_at_least
 from pcluster_diag.util.services import is_supervisord_program_running
+
+# The ParallelCluster version that removed cfn-hup from each non-head node type: it ran on compute nodes before
+# 3.15.0 and on login nodes before 3.16.0.
+CFN_HUP_REMOVED_IN_VERSION = {NodeType.COMPUTE: "3.15.0", NodeType.LOGIN: "3.16.0"}
 
 
 class CfnHup(Check):
@@ -28,7 +33,8 @@ class CfnHup(Check):
     Two concerns are checked:
 
     - Daemon location (every node type): cfn-hup must be RUNNING on the head node and stopped everywhere
-      else.
+      else, except on the non-head nodes of the ParallelCluster versions that still ran it there (see
+      ``CFN_HUP_REMOVED_IN_VERSION``).
     - Configuration (head node only): cfn-hup calls CloudFormation using the role named on the ``role=``
       line of ``/etc/cfn/cfn-hup.conf``, retrieving its credentials from IMDS by that name. That role must
       match the role IMDS actually reports, otherwise cfn-hup's credential lookup returns 404 and
@@ -36,8 +42,8 @@ class CfnHup(Check):
       reporting no role at all is surfaced by the Imds check.)
     """
 
-    NOT_RUNNING_ON_HEAD_NODE = CheckError(1, "{} is not running on the head node.".format(CFN_HUP_PROGRAM))
-    RUNNING_ON_NON_HEAD_NODE = CheckError(2, "{} is running on a non-head node.".format(CFN_HUP_PROGRAM))
+    NOT_RUNNING_ON = CheckError(1, "{} is not running on the {{}}, but it should be.".format(CFN_HUP_PROGRAM))
+    RUNNING_ON = CheckError(2, "{} is running on the {{}}, but it should not be.".format(CFN_HUP_PROGRAM))
     ROLE_MISMATCH = CheckError(3, "The IAM role reported by IMDS ('{}') does not match the one in {} ('{}').")
 
     @property
@@ -53,12 +59,23 @@ class CfnHup(Check):
         return Result.from_findings(self, errors=errors)
 
     def _check_daemon_location(self, context: Context):
-        """Return the daemon-location errors: cfn-hup must run on the head node and be stopped elsewhere."""
-        should_be_running = context.node_type is NodeType.HEAD
+        """Return the daemon-location errors: cfn-hup must run where the node's ParallelCluster version runs it."""
+        should_be_running = self._should_be_running(context)
         is_running = is_supervisord_program_running(CFN_HUP_PROGRAM)
         if is_running == should_be_running:
             return []
-        return [self.NOT_RUNNING_ON_HEAD_NODE if should_be_running else self.RUNNING_ON_NON_HEAD_NODE]
+        error = self.NOT_RUNNING_ON if should_be_running else self.RUNNING_ON
+        return [error.format(context.node_type.value)]
+
+    @staticmethod
+    def _should_be_running(context: Context) -> bool:
+        """Return whether cfn-hup runs on the node type of ``context`` in its ParallelCluster version.
+
+        An unparseable ParallelCluster version gets the behavior of the current version: cfn-hup on the head node only.
+        """
+        if context.node_type is NodeType.HEAD:
+            return True
+        return version_at_least(context.pcluster_version, CFN_HUP_REMOVED_IN_VERSION[context.node_type]) is False
 
     def _check_config_role(self):
         """Return a ROLE_MISMATCH error when cfn-hup's configured role differs from the role IMDS reports.
