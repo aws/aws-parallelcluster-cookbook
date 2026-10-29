@@ -30,14 +30,19 @@ from pcluster_diag.models.result import Result
 from pcluster_diag.models.sudoer_definition import SudoerDefinition
 from pcluster_diag.util import sudoers as sudoers_policy
 from pcluster_diag.util import virtualenvs
+from pcluster_diag.util.kernel_module import version_at_least
 
 SUDOERS_PATH = "/etc/sudoers"
 SINFO_PATH = "/opt/slurm/bin/sinfo"
 SHUTDOWN_PATH = "/usr/sbin/shutdown"
 LOGINMGTD_TERMINATION_HOOK_PATH = "/etc/parallelcluster/loginmgtd_on_termination.sh"
+# Resolved in run(): clusterstatusmgtd runs cinc-client with --log_level info since ParallelCluster 3.15.0, and with
+# --log_level auto before.
+CINC_LOG_LEVEL = "{cinc_log_level}"
+CINC_LOG_LEVEL_INFO_SINCE = "3.15.0"
 # The exact command line clusterstatusmgtd runs: its sudoers rule pins the arguments, so they must match.
 CLUSTERSTATUSMGTD_CINC_COMMAND = (
-    "/usr/bin/cinc-client --local-mode --config /etc/chef/client.rb --log_level info "
+    "/usr/bin/cinc-client --local-mode --config /etc/chef/client.rb --log_level " + CINC_LOG_LEVEL + " "
     "--logfile /var/log/chef-client.log --force-formatter --no-color --chef-zero-port 8889 "
     "--json-attributes /etc/chef/dna.json "
     "--override-runlist aws-parallelcluster-entrypoints::update_computefleet_status"
@@ -97,7 +102,7 @@ class Sudoers(Check):
             actual_definitions = sudoers_policy.load_definitions(SUDOERS_PATH)
         except sudoers_policy.SudoersExportError as error:
             return Result.from_findings(self, errors=[self.INVALID_SUDOERS.format(error)])
-        expected_definitions = self._resolve_expected_definitions(context.node_type)
+        expected_definitions = self._resolve_expected_definitions(context)
         errors: List[CheckError] = []
         for expected_definition in expected_definitions:
             if expected_definition not in actual_definitions:
@@ -105,13 +110,20 @@ class Sudoers(Check):
         return Result.from_findings(self, errors=errors)
 
     @staticmethod
-    def _resolve_expected_definitions(node_type: NodeType) -> List[SudoerDefinition]:
-        """Return the definitions expected on ``node_type``, with the node virtualenv path filled in."""
+    def _resolve_expected_definitions(context: Context) -> List[SudoerDefinition]:
+        """Return the definitions expected on the node, with its virtualenv path and its version's values filled in.
+
+        An unparseable ParallelCluster version gets the values of the current version.
+        """
         node_virtualenv_bin = virtualenvs.node_virtualenv_bin()
+        older = version_at_least(context.pcluster_version, CINC_LOG_LEVEL_INFO_SINCE) is False
+        cinc_log_level = "auto" if older else "info"
         return [
             dataclasses.replace(
                 definition,
-                command=definition.command.format(node_virtualenv_bin=node_virtualenv_bin),
+                command=definition.command.format(
+                    node_virtualenv_bin=node_virtualenv_bin, cinc_log_level=cinc_log_level
+                ),
             )
-            for definition in EXPECTED_DEFINITIONS[node_type]
+            for definition in EXPECTED_DEFINITIONS[context.node_type]
         ]
