@@ -3,6 +3,12 @@ aws-parallelcluster-cookbook CHANGELOG
 
 This file is used to list changes made in each version of the AWS ParallelCluster cookbook.
 
+3.16.3
+------
+
+**BUG FIXES**
+- Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
+
 3.16.2
 ------
 
@@ -21,7 +27,6 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix cluster update hanging when a shared storage is unresponsive, caused by the `fuser` probe run before each unmount.
 - Fix the permissions of ParallelCluster-managed files under `/etc/sudoers.d/` by setting mode `0440` on all of them.
-- Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
 
 3.16.1
 ------
