@@ -77,8 +77,8 @@ default['cluster']['internal_initial_shared_dir'] = "#{node['cluster']['base_dir
 
 default['cluster']['head_node_private_ip'] = nil
 
-default['cluster']['efa']['version'] = '1.49.0'
-default['cluster']['efa']['sha256'] = 'cf2e9281a2328a243c76f911a490faed43ca0fecfe4733c25e34b2e92a32c309'
+default['cluster']['efa']['version'] = '1.51.0'
+default['cluster']['efa']['sha256'] = '83993044fa4df3dc2f8b5c2f7051d61b9689441be023a2c92ea51d3f53f2465c'
 
 # efs-utils version: repos track the newest release within this major; ADC (raw
 # S3 object) installs this exact version.
