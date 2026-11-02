@@ -6,6 +6,15 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.16.3
 ------
 
+**CHANGES**
+- Upgrade EFA installer to 1.51.0 (from 1.49.0).
+  - Efa-driver: efa-3.3.1
+  - Efa-config: efa-config-1.18-1
+  - Efa-profile: efa-profile-1.7-1
+  - Libfabric-aws: libfabric-aws-2.7.0-1
+  - Rdma-core: rdma-core-65.0-1
+  - Open MPI: openmpi40-aws-4.1.8-1 and openmpi50-aws-5.0.9-11
+
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
 
