@@ -111,6 +111,54 @@ describe 'nvidia_repo helpers' do
   end
 end
 
+describe 'nvidia_repo:cuda_repo_package_file driver version suffix' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:debian?) { platform == 'ubuntu' }
+      cached(:local_repo_platform) { nvidia_local_repo_platform_for(platform, version) }
+      cached(:arch) { debian? ? 'amd64' : 'x86_64' }
+
+      def cuda_repo_package_file_for(platform, version, cuda_version, cuda_suffix)
+        allow_any_instance_of(Object).to receive(:nvidia_enabled?).and_return(false)
+        allow_any_instance_of(Object).to receive(:arm_instance?).and_return(false)
+        chef_run = runner(platform: platform, version: version, step_into: ['nvidia_repo']) do |node|
+          node.override['cluster']['nvidia']['cuda']['version'] = cuda_version
+          node.override['cluster']['nvidia']['cuda']['driver_version_suffix'] = cuda_suffix
+        end
+        ConvergeNvidiaRepo.add_driver_repo(chef_run)
+        chef_run.find_resource('nvidia_repo', 'add_driver_repo').cuda_repo_package_file
+      end
+
+      it 'embeds the driver version before CUDA 13.4' do
+        expected = if debian?
+                     "cuda-repo-#{local_repo_platform}-13-3-local_13.3.1-610.43.02-1_#{arch}.deb"
+                   else
+                     "cuda-repo-#{local_repo_platform}-13-3-local-13.3.1_610.43.02-1.#{arch}.rpm"
+                   end
+        expect(cuda_repo_package_file_for(platform, version, '13.3.1', '610.43.02')).to eq(expected)
+      end
+
+      it 'does not embed the driver version starting with CUDA 13.4' do
+        expected = if debian?
+                     "cuda-repo-#{local_repo_platform}-13-4-local_13.4.1-1_#{arch}.deb"
+                   else
+                     "cuda-repo-#{local_repo_platform}-13-4-local-13.4.1-1.#{arch}.rpm"
+                   end
+        expect(cuda_repo_package_file_for(platform, version, '13.4.1', '595.71.05')).to eq(expected)
+      end
+
+      it 'does not embed the driver version when the suffix is empty' do
+        expected = if debian?
+                     "cuda-repo-#{local_repo_platform}-13-3-local_13.3.1-1_#{arch}.deb"
+                   else
+                     "cuda-repo-#{local_repo_platform}-13-3-local-13.3.1-1.#{arch}.rpm"
+                   end
+        expect(cuda_repo_package_file_for(platform, version, '13.3.1', '')).to eq(expected)
+      end
+    end
+  end
+end
+
 describe 'nvidia_repo:arch_suffix' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do
