@@ -33,18 +33,14 @@ activate_virtual_env virtualenv_name do
   not_if { ::File.exist?("#{virtualenv_path}/bin/activate") }
 end
 
-dependency_package_name = "pypi-cfn-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+dependency_package_name = pypi_dependencies_package_name('cfn')
 dependency_folder_name = dependency_package_name
 
 # Install dependencies from S3 pre-built packages (production mode)
 # When install_python_from_internet is true, dependencies are installed from PyPI instead
 unless node['cluster']['install_python_from_internet']
-  remote_file "#{node['cluster']['base_dir']}/cfn-dependencies.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
+  pypi_dependencies 'cfn' do
+    destination "#{node['cluster']['base_dir']}/cfn-dependencies.tgz"
   end
 
   bash 'pip install cfn dependencies from S3' do

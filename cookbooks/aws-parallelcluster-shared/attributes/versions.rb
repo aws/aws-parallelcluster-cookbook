@@ -16,3 +16,5 @@ default['cluster']['parallelcluster-cookbook-version'] = '3.16.3'
 default['cluster']['parallelcluster-node-version'] = '3.16.3'
 
 default['cluster']['official_node_package'] = "#{node['cluster']['s3_url']}/parallelcluster/#{node['cluster']['parallelcluster-node-version']}/node/aws-parallelcluster-node-#{node['cluster']['parallelcluster-node-version']}.tgz"
+
+default['cluster']['pypi_dependencies_base_url'] = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['cluster']['parallelcluster-version']}"

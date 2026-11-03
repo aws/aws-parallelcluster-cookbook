@@ -104,7 +104,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
 
             if install_from_internet
               it 'does not download cfn_dependencies package from S3' do
-                is_expected.not_to create_remote_file("#{base_dir}/cfn-dependencies.tgz")
+                is_expected.not_to download_pypi_dependencies('cfn')
               end
 
               it 'does not pip install dependencies from S3' do
@@ -116,11 +116,7 @@ describe 'aws-parallelcluster-environment::cfn_bootstrap' do
               end
             else
               it 'downloads cfn_dependencies package from s3' do
-                is_expected.to create_if_missing_remote_file("#{base_dir}/cfn-dependencies.tgz")
-                  .with(source: "#{s3_url}/dependencies/PyPi/#{arch}/#{dependecy_package_name_suffix}.tgz")
-                  .with(mode: '0644')
-                  .with(retries: 3)
-                  .with(retry_delay: 5)
+                is_expected.to download_pypi_dependencies('cfn').with_destination("#{base_dir}/cfn-dependencies.tgz")
               end
 
               it 'pip installs dependencies from S3' do
