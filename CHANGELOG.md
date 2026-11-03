@@ -15,6 +15,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Rdma-core: rdma-core-65.0-1
   - Open MPI: openmpi40-aws-4.1.8-1 and openmpi50-aws-5.0.9-11
 - Upgrade NVIDIA driver, Fabric Manager, and IMEX to version 595.112.07 (from 595.71.05).
+- Upgrade mysql-community-client to version 8.4.13 (from 8.4.10).
 
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
