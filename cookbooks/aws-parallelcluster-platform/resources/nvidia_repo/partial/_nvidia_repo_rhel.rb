@@ -71,7 +71,9 @@ def driver_repo_package_file
 end
 
 # CUDA local-repo installer rpm file, e.g.
-# cuda-repo-amzn2023-13-0-local-13.0.2_580.95.05-1.x86_64.rpm
+# cuda-repo-amzn2023-13-0-local-13.0.2_580.95.05-1.x86_64.rpm (CUDA < 13.4)
+# cuda-repo-amzn2023-13-4-local-13.4.1-1.x86_64.rpm (CUDA >= 13.4)
 def cuda_repo_package_file
-  "#{cuda_repo_package_name}-#{cuda_version}_#{node['cluster']['nvidia']['cuda']['driver_version_suffix']}-1.#{arch_suffix}.rpm"
+  driver_part = cuda_driver_version_suffix ? "_#{cuda_driver_version_suffix}" : ''
+  "#{cuda_repo_package_name}-#{cuda_version}#{driver_part}-1.#{arch_suffix}.rpm"
 end

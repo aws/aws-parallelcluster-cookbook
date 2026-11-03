@@ -125,6 +125,16 @@ def cuda_repo_package_name
   "cuda-repo-#{local_repo_platform}-#{cuda_version_dash(cuda_version)}-local"
 end
 
+# Driver version embedded in the CUDA local-repo installer file name, or nil when there is none.
+# Starting with CUDA 13.4, NVIDIA no longer embeds the driver version in the file name, e.g.
+# cuda-repo-rhel8-13-3-local-13.3.1_610.43.02-1.x86_64.rpm vs cuda-repo-rhel8-13-4-local-13.4.1-1.x86_64.rpm
+def cuda_driver_version_suffix
+  suffix = node['cluster']['nvidia']['cuda']['driver_version_suffix']
+  return if suffix.to_s.empty? || Gem::Version.new(cuda_version) >= Gem::Version.new('13.4')
+
+  suffix
+end
+
 # Local filesystem path of the downloaded CUDA local-repo installer.
 def cuda_repo_package_path
   "#{node['cluster']['sources_dir']}/#{cuda_repo_package_file}"
