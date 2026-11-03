@@ -12,8 +12,8 @@ default['cluster']['armpl']['version'] = '26.01.1'
 default['cluster']['armpl']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/armpl"
 
 # Stunnel
-default['cluster']['stunnel']['version'] = '5.78'
-default['cluster']['stunnel']['sha256'] = '8727e53bb8b7528f850327a2a149158422c02183bc120d1d733cc65b1e2c349d'
+default['cluster']['stunnel']['version'] = '5.82'
+default['cluster']['stunnel']['sha256'] = '8e7438ccd6b3a2ab05182d0846e112a56a7f557ecdee40de07bf67820008bef7'
 default['cluster']['stunnel']['base_url'] = "#{node['cluster']['artifacts_s3_url']}/stunnel"
 
 # Enroot
