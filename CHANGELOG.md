@@ -17,6 +17,7 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade NVIDIA driver, Fabric Manager, and IMEX to version 595.112.07 (from 595.71.05).
 - Upgrade mysql-community-client to version 8.4.13 (from 8.4.10).
 - Upgrade the Python version used by the virtual environments in the AMIs to 3.14.10 (from 3.14.8).
+- Upgrade amazon-efs-utils to version 3.3.5 (from 3.1.3).
 
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
