@@ -14,7 +14,7 @@ control 'tag:install_efs_utils_installed' do
   end
 
   # mount.efs reports the installed efs-utils version, e.g.
-  # "/usr/sbin/mount.efs Version: 3.1.3".
+  # "/usr/sbin/mount.efs Version: 3.3.5".
   describe command('mount.efs --version') do
     its('exit_status') { should eq 0 }
     its('stdout') { should match(/Version:\s*#{efs_major}\./) }
