@@ -69,7 +69,7 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
 
           if install_from_internet
             it 'does not download tarball from S3' do
-              is_expected.not_to create_remote_file("base_dir/node-dependencies.tgz")
+              is_expected.not_to download_pypi_dependencies('node')
             end
 
             it 'does not pip install node dependencies from S3' do
@@ -77,11 +77,7 @@ describe 'aws-parallelcluster-computefleet::custom_parallelcluster_node' do
             end
           else
             it 'downloads tarball from S3' do
-              is_expected.to create_if_missing_remote_file("base_dir/node-dependencies.tgz")
-                .with(source: "#{s3_url}/dependencies/PyPi/#{arch}/#{dependency_pkg_name_suffix}.tgz")
-                .with(mode: '0644')
-                .with(retries: 3)
-                .with(retry_delay: 5)
+              is_expected.to download_pypi_dependencies('node').with_destination('base_dir/node-dependencies.tgz')
             end
 
             it 'pip installs node dependencies from S3' do

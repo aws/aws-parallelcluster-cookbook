@@ -14,6 +14,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - Libfabric-aws: libfabric-aws-2.7.0-1
   - Rdma-core: rdma-core-65.0-1
   - Open MPI: openmpi40-aws-4.1.8-1 and openmpi50-aws-5.0.9-11
+- Install the Python dependencies of the ParallelCluster virtualenvs from bundles published for each release
+  (`parallelcluster/<version>/dependencies/PyPi/` in the ParallelCluster S3 buckets), instead of bundles shared by all
+  the releases using the same Python version, so that updating them does not change the content of older releases.
+  Their location can be overridden with the attribute `pypi_dependencies_base_url`, which also accepts an `s3://` URL.
 
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
