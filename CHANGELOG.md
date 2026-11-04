@@ -20,6 +20,11 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Upgrade amazon-efs-utils to version 3.3.5 (from 3.1.3).
 - Upgrade stunnel to version 5.82 (from 5.78) to address CVE-2026-70368.
 - Upgrade Cinc Client to version 19.4.46 (from 19.3.14).
+- Upgrade Amazon DCV to version 2026.0-25174 (from 2025.0-20103).
+  - server: `2026.0.25174-1`
+  - xdcv: `2026.0.715-1`
+  - gl: `2026.0.1124-1`
+  - web_viewer: `2026.0.25174-1`
 
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
