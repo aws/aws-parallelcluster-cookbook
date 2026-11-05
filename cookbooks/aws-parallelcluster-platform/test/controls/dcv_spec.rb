@@ -9,6 +9,9 @@
 # This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
 # See the License for the specific language governing permissions and limitations under the License.
 
+# Starting from Ubuntu 26.04 DCV supports only Wayland: no xdcv, no dcv-gl and no Xorg session.
+dcv_wayland_only = os_properties.ubuntu? && os.release.to_i >= 26
+
 control 'tag:install_dcv_connect_script_installed' do
   title 'Check pcluster dcv connect script is installed'
   only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? }
@@ -56,7 +59,7 @@ control 'tag:install_dcv_installed' do
   title 'Check dcv is installed'
   only_if { instance.dcv_install_enabled? && !os_properties.redhat_on_docker? && !(os_properties.ubuntu? && os_properties.arm?) && !os_properties.alinux2023? }
 
-  pkgs = %W(nice-dcv-server nice-xdcv nice-dcv-web-viewer)
+  pkgs = dcv_wayland_only ? %w(nice-dcv-server nice-dcv-web-viewer) : %w(nice-dcv-server nice-xdcv nice-dcv-web-viewer)
   pkgs.each do |pkg|
     describe package(pkg) do
       it { should be_installed }
@@ -162,7 +165,8 @@ end
 control 'tag:config_expected_versions_of_nice-dcv-gl_installed' do
   only_if do
     instance.head_node? && instance.dcv_installed? && node['cluster']['dcv_enabled'] == "head_node" &&
-      instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported? && !os_properties.redhat_on_docker?
+      instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported? && !os_properties.redhat_on_docker? &&
+      !dcv_wayland_only
   end
 
   describe package('nice-dcv-gl') do
@@ -278,7 +282,7 @@ control 'tag:config_dcv_services_correctly_configured' do
       end
     end
 
-    if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported?
+    if instance.graphic? && instance.nvidia_installed? && instance.dcv_gpu_accel_supported? && !dcv_wayland_only
       describe 'Ensure local users can access X server (dcv-gl must be installed)' do
         subject { command %?DISPLAY=:0 XAUTHORITY=$(ps aux | grep "X.*\-auth" | grep -v grep | sed -n 's/.*-auth \([^ ]\+\).*/\1/p') xhost | grep "LOCAL:$"? }
         its('exit_status') { should eq(0) }
@@ -302,7 +306,8 @@ control 'tag:config_dcv_xorg_running_with_x11_session_type' do
       node['cluster']['dcv_enabled'] == "head_node" &&
       instance.graphic? &&
       instance.nvidia_installed? &&
-      instance.dcv_gpu_accel_supported?
+      instance.dcv_gpu_accel_supported? &&
+      !dcv_wayland_only
   end
 
   describe 'Xorg process should be running' do
