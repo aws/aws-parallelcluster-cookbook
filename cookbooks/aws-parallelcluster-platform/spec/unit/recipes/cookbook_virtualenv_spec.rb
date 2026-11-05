@@ -68,7 +68,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
 
             if install_from_internet
               it 'does not download cookbook dependencies from S3' do
-                is_expected.not_to create_remote_file("#{base_dir}/cookbook-dependencies.tgz")
+                is_expected.not_to download_pypi_dependencies('cookbook')
               end
 
               it 'does not install python packages from S3' do
@@ -84,7 +84,7 @@ describe 'aws-parallelcluster-platform::cookbook_virtualenv' do
               end
             else
               it 'downloads cookbook dependencies from S3' do
-                is_expected.to create_remote_file_if_missing("#{base_dir}/cookbook-dependencies.tgz")
+                is_expected.to download_pypi_dependencies('cookbook').with_destination("#{base_dir}/cookbook-dependencies.tgz")
               end
 
               it 'installs python packages from S3' do

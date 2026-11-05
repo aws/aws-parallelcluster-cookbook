@@ -23,18 +23,14 @@
 pip_install_flags = node['cluster']['install_python_from_internet'] ? "" : "--no-build-isolation"
 command = "pip install . #{pip_install_flags}".strip
 
-dependency_package_name = "pypi-node-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
+dependency_package_name = pypi_dependencies_package_name('node')
 dependency_folder_name = dependency_package_name
 
 # Install dependencies from S3 pre-built packages (production mode)
 # When install_python_from_internet is true, dependencies are installed from PyPI instead
 unless node['cluster']['install_python_from_internet']
-  remote_file "#{node['cluster']['base_dir']}/node-dependencies.tgz" do
-    source "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
+  pypi_dependencies 'node' do
+    destination "#{node['cluster']['base_dir']}/node-dependencies.tgz"
   end
 
   bash 'pip install node dependencies from S3' do

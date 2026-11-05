@@ -12,8 +12,7 @@
 # limitations under the License.
 
 virtualenv_path = cookbook_virtualenv_path
-dependency_package_name = "pypi-cookbook-dependencies-#{node['cluster']['python-major-minor-version']}-#{node['kernel']['machine']}"
-pypi_s3_uri = "#{node['cluster']['artifacts_s3_url']}/dependencies/PyPi/#{node['kernel']['machine']}/#{dependency_package_name}.tgz"
+dependency_package_name = pypi_dependencies_package_name('cookbook')
 
 node.default['cluster']['cookbook_virtualenv_path'] = virtualenv_path
 node_attributes "dump node attributes"
@@ -48,12 +47,8 @@ if node['cluster']['install_python_from_internet']
     REQ
   end
 else
-  remote_file "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz" do
-    source pypi_s3_uri
-    mode '0644'
-    retries 3
-    retry_delay 5
-    action :create_if_missing
+  pypi_dependencies 'cookbook' do
+    destination "#{node['cluster']['base_dir']}/cookbook-dependencies.tgz"
   end
 
   bash 'pip install cookbook dependencies from S3' do
