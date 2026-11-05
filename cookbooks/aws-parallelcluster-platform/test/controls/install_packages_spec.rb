@@ -17,7 +17,7 @@ control 'tag:install_install_packages' do
   # Verify jq version is updated enough to accept 2 argfile parameters
   describe bash("jq --argfile") do
     its('stderr') { should match /jq: --argfile takes two parameters/ }
-  end unless instance.custom_ami? || os_properties.alinux2023? || os_properties.ubuntu2404?
+  end unless instance.custom_ami? || os_properties.alinux2023? || os_properties.ubuntu2404? || os_properties.ubuntu2604?
   # Need to change the jq --argfile commands as its deprecated in 1.7( latest)
 
   # NOTE: Skipped where the desktop group (@gnome, installed for DCV) transitively
