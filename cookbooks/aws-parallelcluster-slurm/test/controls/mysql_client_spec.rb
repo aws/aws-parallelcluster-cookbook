@@ -18,7 +18,7 @@ control 'tag:install_mysql_client_installed' do
     mysql_packages.concat %w(mysql-community-client-plugins mysql-community-common
        mysql-community-devel mysql-community-libs)
   elsif ubuntu
-    mysql_packages.concat %w(libmysqlclient-dev libmysqlclient21)
+    mysql_packages.concat os_properties.ubuntu2604? ? %w(libmysqlclient-dev libmysqlclient24) : %w(libmysqlclient-dev libmysqlclient21)
   else
     describe "unsupported OS" do
       pending "support for #{os.name}-#{os.release} needs to be implemented"
