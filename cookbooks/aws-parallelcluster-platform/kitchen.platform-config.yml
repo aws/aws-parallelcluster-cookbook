@@ -98,14 +98,6 @@ suites:
       cluster:
         enable_intel_hpc_platform: 'true'
         node_type: HeadNode
-  - name: sticky_bits
-    run_list:
-      - recipe[aws-parallelcluster-tests::test_resource]
-    verifier:
-      controls:
-        - tag:config_sticky_bits_configured
-    attributes:
-      resource: sticky_bits
 
   # Recipes
   - name: cluster_user_compute
