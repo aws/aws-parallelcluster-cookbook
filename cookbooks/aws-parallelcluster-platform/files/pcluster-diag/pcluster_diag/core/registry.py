@@ -23,6 +23,7 @@ import click
 from pcluster_diag.checks.cfn_hup import CfnHup
 from pcluster_diag.checks.cluster_update_history import ClusterUpdateHistory
 from pcluster_diag.checks.compute_fleet_status import ComputeFleetStatusHistory
+from pcluster_diag.checks.configuration_dump import CoreSettings, ReferencedResources
 from pcluster_diag.checks.critical_paths import CriticalPathsHaveExpectedPermissions
 from pcluster_diag.checks.critical_services import CriticalServicesAreRunning
 from pcluster_diag.checks.daemon_health import ClusterDaemonsAreRunning, ClustermgtdHeartbeatIsHealthy
@@ -156,4 +157,6 @@ DEFAULT_REGISTRY = (
     .register(LustreFilesystem())
     .register(FsxTargetsAreReachable())  # approval_required: heavier per-target probe
     .register(NetworkCongestion())
+    .register(CoreSettings())
+    .register(ReferencedResources())  # approval_required: needs more permissions than the head node role
 )
