@@ -29,6 +29,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
 
+**CHANGES**
+- Upgrade DCV to version 2026.0-25174 (from 2025.0-20103).
+
 3.16.2
 ------
 
