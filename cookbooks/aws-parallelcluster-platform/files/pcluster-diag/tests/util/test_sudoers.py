@@ -100,12 +100,24 @@ def definitions(monkeypatch):
     return sudoers.load_definitions("/etc/sudoers")
 
 
-def test_load_definitions_runs_cvtsudoers(monkeypatch):
+@pytest.mark.parametrize(
+    "installed_commands, expected_command",
+    [
+        ({"cvtsudoers"}, "cvtsudoers"),
+        ({"cvtsudoers", "cvtsudoers.ws"}, "cvtsudoers"),
+        # Ubuntu 26.04: sudo-rs is the default sudo and the tools of sudo have a ".ws" suffix.
+        ({"cvtsudoers.ws"}, "cvtsudoers.ws"),
+        # Not installed: running cvtsudoers reports the missing command.
+        (set(), "cvtsudoers"),
+    ],
+)
+def test_load_definitions_runs_cvtsudoers(monkeypatch, installed_commands, expected_command):
     calls = []
+    monkeypatch.setattr(sudoers.shutil, "which", lambda command: command if command in installed_commands else None)
     monkeypatch.setattr(sudoers, "run_command", lambda command, **_: calls.append(command) or _completed(stdout="{}"))
 
     assert sudoers.load_definitions("/etc/sudoers") == []
-    assert calls == [["cvtsudoers", "-f", "json", "-e", "/etc/sudoers"]]
+    assert calls == [[expected_command, "-f", "json", "-e", "/etc/sudoers"]]
 
 
 def test_load_definitions_flattens_each_rule_into_definitions(definitions):

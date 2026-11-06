@@ -20,12 +20,16 @@ membership, Defaults) is not evaluated.
 
 import itertools
 import json
+import shutil
 from typing import List
 
 from pcluster_diag.models.sudoer_definition import SudoerDefinition
 from pcluster_diag.util.shell import run_command
 
 CVTSUDOERS_TIMEOUT_SECONDS = 30
+# Starting from Ubuntu 26.04 the default sudo is sudo-rs, which has no cvtsudoers, and the tools of sudo are
+# installed with a ".ws" suffix.
+CVTSUDOERS_COMMANDS = ("cvtsudoers", "cvtsudoers.ws")
 # A rule naming no runas user runs its commands as root.
 DEFAULT_RUNAS_USER = "root"
 
@@ -70,7 +74,7 @@ def load_definitions(path: str) -> List[SudoerDefinition]:
     #
     # NOPASSWD is exported as {"authenticate": false} and SETENV as {"setenv": true}; a negated member carries
     # "negated": true, and a rule naming no runas user has no "runasusers".
-    result = run_command(["cvtsudoers", "-f", "json", "-e", path], timeout=CVTSUDOERS_TIMEOUT_SECONDS)
+    result = run_command([_cvtsudoers_command(), "-f", "json", "-e", path], timeout=CVTSUDOERS_TIMEOUT_SECONDS)
     if result.returncode != 0:
         raise SudoersExportError(result.stderr.strip() or "cvtsudoers exited with code {}".format(result.returncode))
     return [
@@ -79,6 +83,11 @@ def load_definitions(path: str) -> List[SudoerDefinition]:
         for cmnd_spec in user_spec.get("Cmnd_Specs", [])
         for definition in _definitions(user_spec, cmnd_spec)
     ]
+
+
+def _cvtsudoers_command() -> str:
+    """Return the first cvtsudoers command found in PATH, or ``cvtsudoers`` when none is."""
+    return next((command for command in CVTSUDOERS_COMMANDS if shutil.which(command)), CVTSUDOERS_COMMANDS[0])
 
 
 def _definitions(user_spec: dict, cmnd_spec: dict) -> List[SudoerDefinition]:
