@@ -25,6 +25,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 - Fix the custom action executor logging the session token and the access key id of the node credentials, as part of
   the signed requests used to download custom action scripts from S3.
 
+**CHANGES**
+- Upgrade DCV to version 2026.0-25174 (from 2025.0-20103).
+
 3.16.2
 ------
 
