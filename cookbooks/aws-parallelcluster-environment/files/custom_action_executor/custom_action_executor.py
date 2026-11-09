@@ -929,6 +929,8 @@ def _parse_cli_args():
     return args
 
 
+CREDENTIAL_LEAKING_LOGGERS = ("botocore.auth", "botocore.endpoint")
+
 CUSTOM_LOGGER = {
     "HeadNode": HeadNodeLogger,
     "ComputeFleet": ComputeFleetLogger,
@@ -936,12 +938,21 @@ CUSTOM_LOGGER = {
 }
 
 
+def _configure_logging(verbose: bool):
+    """Configure the logging, at DEBUG level when verbose, keeping the node credentials out of the logs."""
+    if verbose:
+        logging.basicConfig(level=logging.DEBUG)
+        # At DEBUG, these loggers print the signed AWS requests, including the X-Amz-Security-Token header
+        # and the access key id of the node credentials.
+        for logger_name in CREDENTIAL_LEAKING_LOGGERS:
+            logging.getLogger(logger_name).setLevel(logging.INFO)
+
+
 def main():
     try:
         args = _parse_cli_args()
 
-        if args.verbose:
-            logging.basicConfig(level=logging.DEBUG)
+        _configure_logging(args.verbose)
 
         if args.execute_via_cfnconfig:
             logging.warning(

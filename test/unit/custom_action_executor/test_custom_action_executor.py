@@ -10,16 +10,20 @@
 # OR CONDITIONS OF ANY KIND, express or implied. See the License for the specific language governing permissions and
 # limitations under the License.
 import json
+import logging
 import os
 import subprocess  # nosec B404
 import tempfile
 from types import SimpleNamespace
 from unittest.mock import ANY, MagicMock, call
 
+import boto3
 import botocore
 import pytest
 from assertpy import assert_that
+from botocore.awsrequest import AWSResponse
 from custom_action_executor import (
+    CREDENTIAL_LEAKING_LOGGERS,
     SCRIPT_LOG_NAME_FETCH_AND_RUN,
     ActionRunner,
     CfnConfigEnvEnricher,
@@ -33,6 +37,7 @@ from custom_action_executor import (
     LoginNodesLogger,
     ScriptDefinition,
     ScriptRunner,
+    _configure_logging,
     main,
 )
 from mock.mock import AsyncMock
@@ -594,6 +599,77 @@ def test_main_execution_with_arguments(mocker, args):
         main()
 
     assert_that(err.value.code).is_equal_to(1)
+
+
+@pytest.fixture
+def restore_logger_levels():
+    """Restore the levels of the loggers changed by _configure_logging, so that other tests are not affected."""
+    logger_names = ["", *CREDENTIAL_LEAKING_LOGGERS]
+    levels = {name: logging.getLogger(name).level for name in logger_names}
+    yield
+    for name, level in levels.items():
+        logging.getLogger(name).setLevel(level)
+
+
+@pytest.mark.parametrize("verbose", [True, False])
+def test_configure_logging(mocker, restore_logger_levels, verbose):
+    basic_config_mock = mocker.patch("custom_action_executor.logging.basicConfig")
+    levels_before = {name: logging.getLogger(name).level for name in CREDENTIAL_LEAKING_LOGGERS}
+
+    _configure_logging(verbose)
+
+    if verbose:
+        basic_config_mock.assert_called_once_with(level=logging.DEBUG)
+        for name in CREDENTIAL_LEAKING_LOGGERS:
+            assert_that(logging.getLogger(name).level).is_equal_to(logging.INFO)
+    else:
+        basic_config_mock.assert_not_called()
+        for name in CREDENTIAL_LEAKING_LOGGERS:
+            assert_that(logging.getLogger(name).level).is_equal_to(levels_before[name])
+
+
+class _FakeRawResponse:
+    def __init__(self, body):
+        self._body = body
+
+    def stream(self, **kwargs):
+        yield self._body
+
+
+@pytest.mark.parametrize("cap_credential_leaking_loggers", [True, False])
+def test_verbose_logging_does_not_log_credentials(
+    caplog, mocker, restore_logger_levels, cap_credential_leaking_loggers
+):
+    """Run a signed S3 request at DEBUG level and check whether the credentials end up in the logs.
+
+    Without capping CREDENTIAL_LEAKING_LOGGERS the credentials are logged, which proves the check is effective.
+    """
+    session_token = "FAKE-SESSION-TOKEN-0123456789"
+    access_key_id = "AKIAFAKEACCESSKEYID0"
+    if cap_credential_leaking_loggers:
+        _configure_logging(verbose=True)
+    caplog.set_level(logging.DEBUG)
+    body = b'<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>bucket</Name></ListBucketResult>'
+    mocker.patch(
+        "botocore.httpsession.URLLib3Session.send",
+        return_value=AWSResponse("https://bucket.s3.amazonaws.com/", 200, {}, _FakeRawResponse(body)),
+    )
+    s3_client = boto3.client(
+        "s3",
+        region_name="us-east-1",
+        aws_access_key_id=access_key_id,
+        aws_secret_access_key="fake-secret-access-key",
+        aws_session_token=session_token,
+    )
+
+    s3_client.list_objects_v2(Bucket="bucket")
+
+    botocore_debug_records = [
+        record for record in caplog.records if record.name.startswith("botocore") and record.levelno == logging.DEBUG
+    ]
+    assert_that(botocore_debug_records).is_not_empty()
+    credentials_logged = session_token in caplog.text or access_key_id in caplog.text
+    assert_that(credentials_logged).is_equal_to(not cap_credential_leaking_loggers)
 
 
 @pytest.mark.parametrize(

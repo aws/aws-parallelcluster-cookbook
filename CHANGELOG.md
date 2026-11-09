@@ -17,6 +17,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   (launch templates, security groups, subnets and their routing, IAM roles and policies, custom action scripts,
   existing shared storage), warning about the ones the credentials do not allow reading.
 
+**BUG FIXES**
+- Fix the custom action executor logging the session token and the access key id of the node credentials, as part of
+  the signed requests used to download custom action scripts from S3.
+
 3.16.2
 ------
 
