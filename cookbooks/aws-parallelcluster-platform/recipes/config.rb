@@ -17,7 +17,6 @@ include_recipe 'aws-parallelcluster-platform::cluster_user'
 sudo_access "Setup Sudo Access of Default User"
 include_recipe 'aws-parallelcluster-platform::networking'
 include_recipe 'aws-parallelcluster-platform::nvidia_config'
-sticky_bits 'setup sticky bits'
 chrony 'enable Amazon Time Sync' do
   action :enable
 end
