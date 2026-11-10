@@ -34,6 +34,10 @@ DCGMI_LEVEL=2
 ## Lock held by the check running a diagnostic while the DCGM service is running
 DCGM_SERVICE_LOCK_FILE=/var/lock/gpu_health_check_dcgm.lock
 
+## Exit code of dcgmi diag when another diagnostic is running through the DCGM service on the node:
+## "Return: (-34) : The requested operation could not be completed because the affected resource is in use"
+DCGMI_DIAG_RESOURCE_IN_USE_EXIT_CODE=222
+
 function main() {
 
   ## Identify full path of lspci command
@@ -118,6 +122,14 @@ function main() {
 
   dcgmi diag -i $GPU_DEVICE_ORDINAL -r $DCGMI_LEVEL $parameters
   dcgmi_exit_code=$?
+
+  ## The DCGM service may have been started after acquire_dcgm_service_lock, and another check may be running a
+  ## diagnostic through it: this does not mean the GPUs are unhealthy, so the check is skipped.
+  if [ $dcgmi_exit_code -eq $DCGMI_DIAG_RESOURCE_IN_USE_EXIT_CODE ]; then
+    log_warning "Another DCGM diagnostic is already running on the node: skipping execution of the GPU Health Check"
+    tear_down
+    return 0
+  fi
 
   if [ $dcgmi_exit_code -ne 0 ]; then
     log_error "The GPU Health Check failed"
