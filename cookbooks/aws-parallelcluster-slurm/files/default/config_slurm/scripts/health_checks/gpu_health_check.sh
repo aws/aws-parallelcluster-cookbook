@@ -13,10 +13,9 @@
 
 # GPU Health Check
 # Check GPU healthiness by executing NVIDIA DCGM diagnostic tool
-# The diagnostic check targets only GPUs that no other job can use:
-#   * if the job has an exclusive node allocation (SLURM_JOB_OVERSUBSCRIBE=NO), all the GPUs of the node
-#   * otherwise, if the job has GPUs allocated through GRES, the GPUs listed in GPU_DEVICE_ORDINAL
-#   * otherwise, no GPU: the check is skipped
+# The diagnostic check targets only the GPUs allocated to the job, listed by Slurm in SLURM_JOB_GPUS: the GPUs requested
+# through GRES, or all the GPUs of the node with an exclusive node allocation. No other job can use them, so the
+# diagnostic does not interfere with other jobs. If the job has no GPU allocated, the check is skipped.
 # Prerequisite for the diagnostic check are:
 #   * node has NVIDIA GPU
 #   * fabric manager service is running (if node is NVSwitch enabled)
@@ -188,25 +187,18 @@ function start_service() {
 }
 
 function select_target_gpus() {
-  ## With an exclusive node allocation no other job can run on the node, so all the GPUs can be checked.
-  ## Slurm sets SLURM_JOB_OVERSUBSCRIBE to NO when the job requires exclusive node access.
-  if [ "$SLURM_JOB_OVERSUBSCRIBE" = "NO" ]; then
-    ## nvidia-smi --query-gpu=index --format=csv,noheader returns the list of GPU indices,
-    ## that we transform to a comma separated list.
-    GPU_DEVICE_ORDINAL=$(nvidia-smi --query-gpu=index --format=csv,noheader | tr '\n' ',' | sed 's/,$//')
-    log_info "The job has an exclusive node allocation: checking all the GPUs of the node"
-    log_info "The variable GPU_DEVICE_ORDINAL has been initialized using information provided by nvidia-smi"
-    return 0
-  fi
+  log_info "Selecting the GPUs to check from SLURM_JOB_GPUS='${SLURM_JOB_GPUS}'"
 
-  ## With GPUs allocated through GRES, Slurm sets GPU_DEVICE_ORDINAL to the GPUs allocated to the job.
-  if [ -n "$GPU_DEVICE_ORDINAL" ]; then
-    log_info "The job has GPUs allocated through GRES: checking only the GPUs allocated to the job"
+  ## Slurm sets SLURM_JOB_GPUS to the GPUs allocated to the job: the GPUs requested through GRES, or all the GPUs of
+  ## the node with an exclusive node allocation.
+  if [ -n "$SLURM_JOB_GPUS" ]; then
+    GPU_DEVICE_ORDINAL=$SLURM_JOB_GPUS
+    log_info "Checking the GPUs allocated to the job"
     return 0
   fi
 
   ## Otherwise other jobs can use any GPU of the node, and the diagnostic would interfere with them.
-  log_info "The job has no GPU allocated through GRES and no exclusive node allocation"
+  log_info "The job has no GPU allocated"
   return 1
 }
 
