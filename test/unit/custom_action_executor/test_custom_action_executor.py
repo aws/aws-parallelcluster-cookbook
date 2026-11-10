@@ -14,6 +14,7 @@ import logging
 import os
 import subprocess  # nosec B404
 import tempfile
+import uuid
 from types import SimpleNamespace
 from unittest.mock import ANY, MagicMock, call
 
@@ -611,8 +612,9 @@ def restore_logger_levels():
         logging.getLogger(name).setLevel(level)
 
 
+@pytest.mark.usefixtures("restore_logger_levels")
 @pytest.mark.parametrize("verbose", [True, False])
-def test_configure_logging(mocker, restore_logger_levels, verbose):
+def test_configure_logging(mocker, verbose):
     basic_config_mock = mocker.patch("custom_action_executor.logging.basicConfig")
     levels_before = {name: logging.getLogger(name).level for name in CREDENTIAL_LEAKING_LOGGERS}
 
@@ -636,29 +638,29 @@ class _FakeRawResponse:
         yield self._body
 
 
+@pytest.mark.usefixtures("restore_logger_levels")
 @pytest.mark.parametrize("cap_credential_leaking_loggers", [True, False])
-def test_verbose_logging_does_not_log_credentials(
-    caplog, mocker, restore_logger_levels, cap_credential_leaking_loggers
-):
+def test_verbose_logging_does_not_log_credentials(caplog, mocker, cap_credential_leaking_loggers):
     """Run a signed S3 request at DEBUG level and check whether the credentials end up in the logs.
 
     Without capping CREDENTIAL_LEAKING_LOGGERS the credentials are logged, which proves the check is effective.
     """
-    session_token = "FAKE-SESSION-TOKEN-0123456789"
+    # Random fake credentials, to find them in the logs.
+    session_token = f"FAKE-SESSION-TOKEN-{uuid.uuid4().hex}"
     access_key_id = "AKIAFAKEACCESSKEYID0"
     if cap_credential_leaking_loggers:
         _configure_logging(verbose=True)
     caplog.set_level(logging.DEBUG)
-    body = b'<ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Name>bucket</Name></ListBucketResult>'
+    body = b"<ListBucketResult><Name>bucket</Name></ListBucketResult>"
     mocker.patch(
         "botocore.httpsession.URLLib3Session.send",
-        return_value=AWSResponse("https://bucket.s3.amazonaws.com/", 200, {}, _FakeRawResponse(body)),
+        return_value=AWSResponse("https://bucket.s3.example.com/", 200, {}, _FakeRawResponse(body)),
     )
     s3_client = boto3.client(
         "s3",
         region_name="us-east-1",
         aws_access_key_id=access_key_id,
-        aws_secret_access_key="fake-secret-access-key",
+        aws_secret_access_key=uuid.uuid4().hex,
         aws_session_token=session_token,
     )
 
