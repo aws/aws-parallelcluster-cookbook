@@ -220,11 +220,12 @@ function acquire_dcgm_service_lock() {
   systemctl show nvidia-dcgm.service -p ActiveState | grep "=active"
   if [ $? -eq 0 ]; then
     log_info "nvidia-dcgm service is running: only one GPU Health Check can run at a time on the node"
-    exec 9>"${DCGM_SERVICE_LOCK_FILE}"
-    flock -n 9
+    local dcgm_service_lock_fd
+    exec {dcgm_service_lock_fd}>"${DCGM_SERVICE_LOCK_FILE}"
+    flock -n "${dcgm_service_lock_fd}"
     if [ $? -ne 0 ]; then
       log_warning "Another GPU Health Check is running on the node while the nvidia-dcgm service is running." \
-        "Stop the nvidia-dcgm service to allow GPU Health Checks of concurrent jobs to run."
+        "Please stop the nvidia-dcgm service to allow GPU Health Checks of concurrent jobs to run."
       return 1
     fi
   fi
