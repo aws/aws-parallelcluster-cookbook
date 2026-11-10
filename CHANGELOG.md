@@ -20,7 +20,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **CHANGES**
 - Run the GPU health check only for jobs with GPUs allocated through GRES, on the allocated GPUs, and for jobs with an
   exclusive node allocation, on all the GPUs of the node. Skip it for all other jobs. Run the checks of concurrent
-  jobs on the same node at the same time, instead of skipping the check of a job when another check is running.
+  jobs on the same node, targeting different GPUs, at the same time, instead of skipping the check of a job when
+  another check is running.
 
 3.16.2
 ------
