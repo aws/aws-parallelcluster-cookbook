@@ -281,7 +281,9 @@ platforms:
       image_id: <%= ENV['KITCHEN_UBUNTU2604_AMI'] %>
       <% else %>
       image_search:
-        name: <% if ENV['KITCHEN_PHASE']=='install' %>ubuntu/images/hvm-ssd-gp3/ubuntu-resolute-26.04-<% if ENV['KITCHEN_ARCHITECTURE'] == 'x86_64' %>amd64<% else %>arm64<% end %>-server-<% else %><%= pcluster_prefix %>-ubuntu-2604-lts-hvm-*<% end %>
+        # Same base AMI as the ParallelCluster Ubuntu 26.04 custom AMI: the Deep Learning Base OSS Nvidia Driver GPU AMI
+        name: "Deep Learning <% if ENV['KITCHEN_ARCHITECTURE'] != 'x86_64' %>ARM64 <% end %>Base OSS Nvidia Driver GPU AMI (Ubuntu 26.04)*"
+        owner-alias: amazon
         architecture: <%= ENV['KITCHEN_ARCHITECTURE'] %>
       <% end %>
       block_device_mappings:
