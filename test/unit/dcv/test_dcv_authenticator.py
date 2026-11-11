@@ -117,6 +117,28 @@ def test_is_process_valid(user, command, session_id, result):
     )
 
 
+@pytest.mark.parametrize(
+    "user, command, arguments, result",
+    [
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "--session-id mysession --mode system", True),
+        ("gdm-greeter-2", "/usr/lib/aarch64-linux-gnu/dcv/dcvagent", "--session-id mysession --mode system", True),
+        # The options are read in any order
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "--mode system --session-id mysession", True),
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "--session-id wrong --mode system", False),
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent2", "--session-id mysession --mode system", False),
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "--mode system --session-id", False),
+        # Not in system mode: the user running the agent must be the user
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "--mode full --session-id mysession", False),
+        ("gdm-greeter", "/usr/lib/x86_64-linux-gnu/dcv/dcvagent", "--session-id mysession --mode", False),
+    ],
+)
+def test_is_process_valid_with_wayland(user, command, arguments, result):
+    """With Wayland the agent runs as the GDM greeter user in system mode: only the session id is verified."""
+    ps_aux_output = f"{user}   12725  0.1  0.9 641196 145148 ?        SLl  16:03   0:07 {command} {arguments}"
+
+    assert_that(DCVAuthenticator.check_dcv_process(ps_aux_output, "user1", "mysession")).is_equal_to(result)
+
+
 def mock_generate_random_token(mocker, value):
     mocker.patch(AUTH_MODULE_MOCK_PATH + "generate_random_token", return_value=value)
 
