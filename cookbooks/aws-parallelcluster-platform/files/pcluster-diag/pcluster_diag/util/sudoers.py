@@ -74,9 +74,10 @@ def load_definitions(path: str) -> List[SudoerDefinition]:
     #
     # NOPASSWD is exported as {"authenticate": false} and SETENV as {"setenv": true}; a negated member carries
     # "negated": true, and a rule naming no runas user has no "runasusers".
-    result = run_command([_cvtsudoers_command(), "-f", "json", "-e", path], timeout=CVTSUDOERS_TIMEOUT_SECONDS)
+    command = _cvtsudoers_command()
+    result = run_command([command, "-f", "json", "-e", path], timeout=CVTSUDOERS_TIMEOUT_SECONDS)
     if result.returncode != 0:
-        raise SudoersExportError(result.stderr.strip() or "cvtsudoers exited with code {}".format(result.returncode))
+        raise SudoersExportError(result.stderr.strip() or "{} exited with code {}".format(command, result.returncode))
     return [
         definition
         for user_spec in json.loads(result.stdout).get("User_Specs", [])
