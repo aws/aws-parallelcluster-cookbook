@@ -3,48 +3,48 @@
 ## Contents
 
 - [openpmix; version 5.0.11](#openpmix-version-5011)
-- [Python; version 3.14.8](#python-version-3148)
+- [Python; version 3.14.10](#python-version-31410)
 - [enroot; version 4.2.1-1.el8](#enroot-version-421-1el8)
-- [requests; version 2.32.5](#requests-version-2325)
+- [requests; version 2.34.2](#requests-version-2342)
 - [cookbook-line; version 5.0.0](#cookbook-line-version-500)
 - [python-daemon; version 2.2.4](#python-daemon-version-224)
 - [retrying; version 1.4.2](#retrying-version-142)
-- [boto3; version 1.42.28](#boto3-version-14228)
-- [awscli; version 2.38.4](#awscli-version-2384)
+- [boto3; version 1.43.123](#boto3-version-143123)
+- [awscli; version 2.39.7](#awscli-version-2397)
 - [pyxis; version 0.24.0](#pyxis-version-0240)
-- [aws-cfn-bootstrap; version 2.0-41](#aws-cfn-bootstrap-version-20-41)
+- [aws-cfn-bootstrap; version 2.0-42](#aws-cfn-bootstrap-version-20-42)
 - [cookbook-nfs; version 5.1.6](#cookbook-nfs-version-516)
 - [cookbook-openssh; version 2.11.17](#cookbook-openssh-version-21117)
 - [cookbook-yum; version 8.0.0](#cookbook-yum-version-800)
 - [cookbook-yum-epel; version 5.0.9](#cookbook-yum-epel-version-509)
 - [cookbook-iptables; version 8.0.0](#cookbook-iptables-version-800)
 - [supervisor; version 4.3.0](#supervisor-version-430)
-- [docutils; version 0.22.4](#docutils-version-0224)
+- [docutils; version 0.23](#docutils-version-023)
 - [jinja2; version 3.1.6](#jinja2-version-316)
-- [click; version 8.3.1](#click-version-831)
+- [click; version 8.5.0](#click-version-850)
 - [Arm Performance Libraries; version 26.01.1](#arm-performance-libraries-version-26011)
 - [Slurm; version 25.11.8](#slurm-version-25118)
-- [stunnel; version 5.78](#stunnel-version-578)
+- [stunnel; version 5.82](#stunnel-version-582)
 - [MUNGE; version 0.5.18](#munge-version-0518)
 - [gcc; version 11.3.0](#gcc-version-1130)
-- [MySQL; version 8.4.10-1.el9](#mysql-version-8410-1el9)
+- [MySQL; version 8.4.13-1.el9](#mysql-version-8413-1el9)
 - [Intel MPI; version 2021.18](#intel-mpi-version-202118)
-- [setuptools; version 80.9.0](#setuptools-version-8090)
+- [setuptools; version 84.2.1](#setuptools-version-8421)
 - [jsonschema; version 4.26.0](#jsonschema-version-4260)
-- [efs-utils; version 3.3.3-1.amzn2023](#efs-utils-version-333-1amzn2023)
+- [efs-utils; version 3.3.4-1.amzn2023](#efs-utils-version-334-1amzn2023)
 - [gdrcopy; version 2.6-1](#gdrcopy-version-26-1)
 - [pyyaml; version 6.0.3](#pyyaml-version-603)
 - [chevron; version 0.14.0](#chevron-version-0140)
 - [libjwt; version 1.18.4](#libjwt-version-1184)
-- [Amazon DCV; version 2025.0.20103-1.amzn2023](#amazon-dcv-version-2025020103-1amzn2023)
-- [Nvidia Driver; version 595.71.05](#nvidia-driver-version-5957105)
+- [Amazon DCV; version 2026.0.25174-1.amzn2023](#amazon-dcv-version-2026025174-1amzn2023)
+- [Nvidia Driver; version 595.112.07](#nvidia-driver-version-59511207)
 - [Cuda Samples; version 13.2](#cuda-samples-version-132)
 - [Nvidia CUDA; version 13.2.2](#nvidia-cuda-version-1322)
-- [NVIDIA Fabric Manager; version 595.71.05-1.amzn2023](#nvidia-fabric-manager-version-5957105-1amzn2023)
-- [NVIDIA IMEX; version 595.71.05-1.amzn2023](#nvidia-imex-version-5957105-1amzn2023)
-- [NVIDIA NVLSM; version 2025.10.12-1](#nvidia-nvlsm-version-20251012-1)
+- [NVIDIA Fabric Manager; version 595.112.07-1.amzn2023](#nvidia-fabric-manager-version-59511207-1amzn2023)
+- [NVIDIA IMEX; version 595.112.07-1.amzn2023](#nvidia-imex-version-59511207-1amzn2023)
+- [NVIDIA NVLSM; version 2025.12.211-1](#nvidia-nvlsm-version-202512211-1)
 - [NVIDIA DCGM; version 4.6.0-1](#nvidia-dcgm-version-460-1)
-- [EFA Installer; version 1.49.0](#efa-installer-version-1490)
+- [EFA Installer; version 1.51.0](#efa-installer-version-1510)
 - [http-parser; version 2.9.4](#http-parser-version-294)
 - [Shared Licenses](#shared-licenses)
 
@@ -157,13 +157,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-## Python; version 3.14.8
+## Python; version 3.14.10
 
 <https://www.python.org/>
 
 ```text
     * Package Python's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/python/Python-3.14.8.tgz
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/python/Python-3.14.10.tgz
 
 A. HISTORY OF THE SOFTWARE
 ==========================
@@ -662,13 +662,15 @@ This product bundles musl, which is available under a
 
 ---
 
-## requests; version 2.32.5
+## requests; version 2.34.2
 
 <https://pypi.org/project/requests/>
 
 ```text
     * Package requests's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
+
+----- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cookbook_virtualenv/lib/python3.14/site-packages/requests-2.34.2.dist-info/licenses/LICENSE -----
 
 
                                  Apache License
@@ -845,6 +847,11 @@ This product bundles musl, which is available under a
       defend, and hold each Contributor harmless for any liability
       incurred by, or claims asserted against, such Contributor by reason
       of your accepting any such warranty or additional liability.
+
+----- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cookbook_virtualenv/lib/python3.14/site-packages/requests-2.34.2.dist-info/licenses/NOTICE -----
+
+Requests
+Copyright 2019 Kenneth Reitz
 ```
 
 ---
@@ -1071,8 +1078,8 @@ limitations under the License.
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 ```
 
-- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.ASF-2 — see [Shared license 1](#shared-license-1)
-- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.GPL-3 — see [Shared license 2](#shared-license-2)
+- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.ASF-2 — see [Shared license 1](#shared-license-1)
+- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cfn_bootstrap_virtualenv/lib/python3.14/site-packages/python_daemon-2.2.4.dist-info/LICENSE.GPL-3 — see [Shared license 2](#shared-license-2)
 
 ---
 
@@ -1084,7 +1091,7 @@ limitations under the License.
     * Package retrying's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 
------ /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/NOTICE.txt -----
+----- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/NOTICE.txt -----
 
 Copyright 2013 Ray Holder
 Copyright 2015 the "retrying" Contributors
@@ -1092,11 +1099,11 @@ Copyright 2015 the "retrying" Contributors
 SPDX-License-Identifier: Apache-2.0
 ```
 
-- /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/LICENSE.txt — see [Shared license 1](#shared-license-1)
+- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cookbook_virtualenv/lib/python3.14/site-packages/retrying-1.4.2.dist-info/licenses/LICENSE.txt — see [Shared license 1](#shared-license-1)
 
 ---
 
-## boto3; version 1.42.28
+## boto3; version 1.43.123
 
 <https://pypi.org/project/boto3/>
 
@@ -1104,7 +1111,7 @@ SPDX-License-Identifier: Apache-2.0
     * Package boto3's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/PyPi/x86_64/pypi-cookbook-dependencies-3.14-x86_64.tgz
 
------ /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.42.28.dist-info/LICENSE -----
+----- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.43.123.dist-info/LICENSE -----
 
 
                                  Apache License
@@ -1284,7 +1291,7 @@ SPDX-License-Identifier: Apache-2.0
 
    END OF TERMS AND CONDITIONS
 
------ /opt/parallelcluster/pyenv/versions/3.14.8/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.42.28.dist-info/NOTICE -----
+----- /opt/parallelcluster/pyenv/versions/3.14.10/envs/cookbook_virtualenv/lib/python3.14/site-packages/boto3-1.43.123.dist-info/NOTICE -----
 
 boto3
 Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
@@ -1292,13 +1299,13 @@ Copyright 2013-2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
 ---
 
-## awscli; version 2.38.4
+## awscli; version 2.39.7
 
 <https://github.com/aws/aws-cli>
 
 ```text
     * Package awscli's source code may be found at:
-      https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.38.4.zip
+      https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.39.7.zip
 
 Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 
@@ -1519,7 +1526,7 @@ language governing permissions and limitations under the License.
 
 ---
 
-## aws-cfn-bootstrap; version 2.0-41
+## aws-cfn-bootstrap; version 2.0-42
 
 <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-helper-scripts-reference.html>
 
@@ -2202,7 +2209,7 @@ Rushing:
 
 ---
 
-## docutils; version 0.22.4
+## docutils; version 0.23
 
 <https://pypi.org/project/docutils/>
 
@@ -2405,7 +2412,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-## click; version 8.3.1
+## click; version 8.5.0
 
 <https://pypi.org/project/click/>
 
@@ -5237,13 +5244,13 @@ of source files in this program which reference this file.
 
 ---
 
-## stunnel; version 5.78
+## stunnel; version 5.82
 
 <https://www.stunnel.org/>
 
 ```text
     * Package stunnel's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/stunnel/stunnel-5.78.tar.gz
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/stunnel/stunnel-5.82.tar.gz
 
 ----- /usr/local/share/doc/stunnel/COPYING.md -----
 
@@ -5726,17 +5733,17 @@ requirements of the license of GCC.
 
 ---
 
-## MySQL; version 8.4.10-1.el9
+## MySQL; version 8.4.13-1.el9
 
 <https://www.mysql.com/products/community/>
 
-```text
+````text
     * Package MySQL's source code may be found at:
       https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/mysql/source/
 
 Licensing Information User Manual
 
-MySQL 8.4.9 Community
+MySQL 8.4.13 Community
      __________________________________________________________________
 
 Introduction
@@ -5744,18 +5751,18 @@ Introduction
    This License Information User Manual contains Oracle's product license
    and other licensing information, including licensing information for
    third-party software which may be included in this distribution of
-   MySQL 8.4.9 Community.
+   MySQL 8.4.13 Community.
 
-   Last updated: February 2026
+   Last updated: September 2026
 
 Licensing Information
 
-   This release of MySQL 8.4.9 Community is brought to you by the MySQL
+   This release of MySQL 8.4.13 Community is brought to you by the MySQL
    team at Oracle. This software is released under version 2 of the GNU
    General Public License (GPLv2), as set forth below, with the following
    additional permissions:
 
-   This distribution of MySQL 8.4.9 Community is designed to work with
+   This distribution of MySQL 8.4.13 Community is designed to work with
    certain software (including but not limited to OpenSSL) that is
    licensed under separate terms, as designated in a particular file or
    component or in the license documentation. Without limiting your rights
@@ -6960,40 +6967,66 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ICU4C Unicode Libraries
 
-COPYRIGHT AND PERMISSION NOTICE (ICU 58 and later)
+### ICU License
 
-Copyright (c) 1991-2019 Unicode, Inc. All rights reserved.
-Distributed under the Terms of Use in https://www.unicode.org/copyright.html.
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of the Unicode data files and any associated documentation
-(the "Data Files") or Unicode software and any associated documentation
-(the "Software") to deal in the Data Files or Software
-without restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, and/or sell copies of
-the Data Files or Software, and to permit persons to whom the Data Files
-or Software are furnished to do so, provided that either
-(a) this copyright and permission notice appear with all copies
-of the Data Files or Software, or
-(b) this copyright and permission notice appear in associated
-Documentation.
+UNICODE LICENSE V3
 
-THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF
-ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT OF THIRD PARTY RIGHTS.
-IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS
-NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL
-DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE,
-DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
-TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-PERFORMANCE OF THE DATA FILES OR SOFTWARE.
+COPYRIGHT AND PERMISSION NOTICE
 
-Except as contained in this notice, the name of a copyright holder
-shall not be used in advertising or otherwise to promote the sale,
-use or other dealings in these Data Files or Software without prior
-written authorization of the copyright holder.
+```
 
----------------------
+Copyright (C) 1996-2016, International Business Machines
+Copyright (C) 1996-2017, International Business Machines Corporation
+Copyright (C) 1996-2016, International Business Machines Corporation and others.
+ All Rights Reserved.
+Copyright (C) 2007 Google Inc. All rights reserved.
+Copyright (C) 2016 and later: Unicode, Inc. and others.
+Copyright (C) 2001-2004 and onwards Google Inc.
+Copyright (C) 1999-2013 IBM Corp. All rights reserved.
+Copyright (C) IBM Corporation, 2000-2016. All rights reserved.
+Copyright (C) 2006-2012 the V8 project authors. All rights reserved.
+Copyright (C) 2001-2015 IBM and others. All rights reserved.
+Copyright (C) 2010 , Yahoo! Inc.
+Copyright (C) 2008-2014, Google, International Business Machines Corporation and
+ others. All Rights Reserved.
+Copyright (C) 2008-2015, Google, International Business Machines Corporation
+
+NOTICE TO USER: Carefully read the following legal agreement. BY
+DOWNLOADING, INSTALLING, COPYING OR OTHERWISE USING DATA FILES, AND/OR
+SOFTWARE, YOU UNEQUIVOCALLY ACCEPT, AND AGREE TO BE BOUND BY, ALL OF THE
+TERMS AND CONDITIONS OF THIS AGREEMENT. IF YOU DO NOT AGREE, DO NOT
+DOWNLOAD, INSTALL, COPY, DISTRIBUTE OR USE THE DATA FILES OR SOFTWARE.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of data files and any associated documentation (the "Data Files") or
+software and any associated documentation (the "Software") to deal in the
+Data Files or Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, and/or sell
+copies of the Data Files or Software, and to permit persons to whom the
+Data Files or Software are furnished to do so, provided that either (a)
+this copyright and permission notice appear with all copies of the Data
+Files or Software, or (b) this copyright and permission notice appear in
+associated Documentation.
+
+THE DATA FILES AND SOFTWARE ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT OF
+THIRD PARTY RIGHTS.
+
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN THIS NOTICE
+BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL INDIRECT OR CONSEQUENTIAL DAMAGES,
+OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE DATA
+FILES OR SOFTWARE.
+
+Except as contained in this notice, the name of a copyright holder shall
+not be used in advertising or otherwise to promote the sale, use or other
+dealings in these Data Files or Software without prior written
+authorization of the copyright holder.
+
+SPDX-License-Identifier: Unicode-3.0
+----------------------------------------------------------------------
 
 Third-Party Software Licenses
 
@@ -7001,12 +7034,13 @@ This section contains third-party software notices and/or additional
 terms for licensed third-party software components included within ICU
 libraries.
 
-1. ICU License - ICU 1.8.1 to ICU 57.1
+----------------------------------------------------------------------
+
+ICU License - ICU 1.8.1 to ICU 57.1
 
 COPYRIGHT AND PERMISSION NOTICE
 
-Copyright (c) 1995-2016 International Business Machines Corporation and
-others
+Copyright (C) 1995-2016 International Business Machines Corporation and others
 All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining
@@ -7037,7 +7071,9 @@ of the copyright holder.
 All trademarks and registered trademarks mentioned herein are the
 property of their respective owners.
 
-2. Chinese/Japanese Word Break Dictionary Data (cjdict.txt)
+----------------------------------------------------------------------
+
+Chinese/Japanese Word Break Dictionary Data (cjdict.txt)
 
  #     The Google Chrome software developed by Google is licensed under
  # the BSD license. Other software included in this distribution is
@@ -7045,6 +7081,7 @@ property of their respective owners.
  #
  #  The BSD License
  #  http://opensource.org/licenses/bsd-license.php
+
  #  Copyright (C) 2006-2008, Google Inc.
  #
  #  All rights reserved.
@@ -7084,17 +7121,19 @@ property of their respective owners.
  #
  #  * Libtabe (Chinese)
  #    - https://sourceforge.net/project/?group_id=1519
+
  #    - Its license terms and conditions are shown below.
  #
  #  * IPADIC (Japanese)
  #    - http://chasen.aist-nara.ac.jp/chasen/distribution.html
+
  #    - Its license terms and conditions are shown below.
  #
  #  ---------COPYING.libtabe ---- BEGIN--------------------
  #
  #  /*
- #   * Copyright (c) 1999 TaBE Project.
- #   * Copyright (c) 1999 Pai-Hsiang Hsiao.
+ #   * Copyright (C) 1999 TaBE Project.
+ #   * Copyright (C) 1999 Pai-Hsiang Hsiao.
  #   * All rights reserved.
  #   *
  #   * Redistribution and use in source and binary forms, with or without
@@ -7126,7 +7165,7 @@ property of their respective owners.
  #   */
  #
  #  /*
- #   * Copyright (c) 1999 Computer Systems and Communication Lab,
+ #   * Copyright (C) 1999 Computer Systems and Communication Lab,
  #   *                    Institute of Information Science, Academia
  #       *                    Sinica. All rights reserved.
  #   *
@@ -7162,6 +7201,7 @@ property of their respective owners.
  #  Copyright 1996 Chih-Hao Tsai @ Beckman Institute,
  #      University of Illinois
  #  c-tsai4@uiuc.edu  http://casper.beckman.uiuc.edu/~c-tsai4
+
  #
  #  ---------------COPYING.libtabe-----END--------------------------------
  #
@@ -7241,34 +7281,37 @@ property of their respective owners.
  #
  #  ---------------COPYING.ipadic-----END----------------------------------
 
-3. Lao Word Break Dictionary Data (laodict.txt)
+----------------------------------------------------------------------
 
- #  Copyright (c) 2013 International Business Machines Corporation
- #  and others. All Rights Reserved.
+Lao Word Break Dictionary Data (laodict.txt)
+
+ # Copyright (C) 2016 and later: Unicode, Inc. and others.
+ # License & terms of use: http://www.unicode.org/copyright.html
+
+ # Copyright (C) 2015 International Business Machines Corporation
+ # and others. All Rights Reserved.
  #
- # Project: http://code.google.com/p/lao-dictionary/
- # Dictionary: http://lao-dictionary.googlecode.com/git/Lao-Dictionary.txt
- # License:
- # http://lao-dictionary.googlecode.com/git/Lao-Dictionary-LICENSE.txt
- #              (copied below)
+ # Project: https://github.com/rober42539/lao-dictionary
+
+ # Dictionary: https://github.com/rober42539/lao-dictionary/laodict.txt
+
+ # License: https://github.com/rober42539/lao-dictionary/LICENSE.txt
+
+ #          (copied below)
  #
- #  This file is derived from the above dictionary, with slight
- #  modifications.
+ #      This file is derived from the above dictionary version of Nov 22, 2020
  #  ----------------------------------------------------------------------
  #  Copyright (C) 2013 Brian Eugene Wilson, Robert Martin Campbell.
  #  All rights reserved.
  #
  #  Redistribution and use in source and binary forms, with or without
- #  modification,
- #  are permitted provided that the following conditions are met:
+ #  modification, are permitted provided that the following conditions are met:
  #
- #
- # Redistributions of source code must retain the above copyright notice, this
- #  list of conditions and the following disclaimer. Redistributions in
- #  binary form must reproduce the above copyright notice, this list of
- #  conditions and the following disclaimer in the documentation and/or
- #  other materials provided with the distribution.
- #
+ #  Redistributions of source code must retain the above copyright notice, this
+ #  list of conditions and the following disclaimer. Redistributions in binary
+ #  form must reproduce the above copyright notice, this list of conditions and
+ #  the following disclaimer in the documentation and/or other materials
+ #  provided with the distribution.
  #
  # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -7282,20 +7325,20 @@ property of their respective owners.
  # STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  # OF THE POSSIBILITY OF SUCH DAMAGE.
- #
---------------------------------------------------------------------------
+ #  --------------------------------------------------------------------------
 
-4. Burmese Word Break Dictionary Data (burmesedict.txt)
+----------------------------------------------------------------------
 
- #  Copyright (c) 2014 International Business Machines Corporation
+Burmese Word Break Dictionary Data (burmesedict.txt)
+
+ #  Copyright (C) 2014 International Business Machines Corporation
  #  and others. All Rights Reserved.
  #
  #  This list is part of a project hosted at:
  #    github.com/kanyawtech/myanmar-karen-word-lists
  #
- #
---------------------------------------------------------------------------
- #  Copyright (c) 2013, LeRoy Benjamin Sharon
+ #  --------------------------------------------------------------------------
+ #  Copyright (C) 2013, LeRoy Benjamin Sharon
  #  All rights reserved.
  #
  #  Redistribution and use in source and binary forms, with or without
@@ -7324,10 +7367,11 @@ property of their respective owners.
  #  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
  #  THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  #  SUCH DAMAGE.
- #
---------------------------------------------------------------------------
+ #  --------------------------------------------------------------------------
 
-5. Time Zone Database
+----------------------------------------------------------------------
+
+Time Zone Database
 
   ICU uses the public domain data and code derived from Time Zone
 Database for its time zone support. The ownership of the TZ database
@@ -7350,7 +7394,9 @@ Database section 7.
  #    making a contribution to the database or code waives all rights to
  #    future claims in that contribution or in the TZ Database.
 
-6. Google double-conversion
+----------------------------------------------------------------------
+
+Google double-conversion
 
 Copyright 2006-2011, the V8 project authors. All rights reserved.
 Redistribution and use in source and binary forms, with or without
@@ -7378,6 +7424,35 @@ DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+----------------------------------------------------------------------
+
+JSON parsing library (nlohmann/json)
+
+File: vendor/json/upstream/single_include/nlohmann/json.hpp (only for ICU4C)
+
+MIT License
+
+Copyright (C) 2013-2022 Niels Lohmann
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
 
    ======================================================================
    ======================================================================
@@ -11094,7 +11169,7 @@ Written Offer for Source Code
 
     b. in the case of code licensed under the GPL v3 for as long as Oracle
        offers spare parts or customer support for that product model.
-```
+````
 
 ---
 
@@ -11259,7 +11334,7 @@ SPECIFICALLY EXCLUDED AND WILL NOT APPLY TO THE SOFTWARE.
 
 ---
 
-## setuptools; version 80.9.0
+## setuptools; version 84.2.1
 
 <https://pypi.org/project/setuptools/>
 
@@ -11319,7 +11394,7 @@ THE SOFTWARE.
 
 ---
 
-## efs-utils; version 3.3.3-1.amzn2023
+## efs-utils; version 3.3.4-1.amzn2023
 
 <https://github.com/aws/efs-utils>
 
@@ -11834,7 +11909,7 @@ Exhibit B - "Incompatible With Secondary Licenses" Notice
 
 ---
 
-## Amazon DCV; version 2025.0.20103-1.amzn2023
+## Amazon DCV; version 2026.0.25174-1.amzn2023
 
 <https://www.nice-dcv.com/>
 
@@ -12249,13 +12324,13 @@ EULA.
 
 ---
 
-## Nvidia Driver; version 595.71.05
+## Nvidia Driver; version 595.112.07
 
 <https://www.nvidia.com/download/index.aspx?lang=en-us>
 
 ```text
     * Package Nvidia Driver's source code may be found at:
-      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-Linux-x86_64-595.71.05.run
+      https://us-east-1-aws-parallelcluster.s3.us-east-1.amazonaws.com/archives/dependencies/nvidia_driver/NVIDIA-Linux-x86_64-595.112.07.run
 
 NVIDIA Driver License Agreement
 
@@ -14450,7 +14525,7 @@ conditions:
 
 ---
 
-## NVIDIA Fabric Manager; version 595.71.05-1.amzn2023
+## NVIDIA Fabric Manager; version 595.112.07-1.amzn2023
 
 <https://docs.nvidia.com/datacenter/tesla/fabric-manager-user-guide/>
 
@@ -15264,7 +15339,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ---
 
-## NVIDIA IMEX; version 595.71.05-1.amzn2023
+## NVIDIA IMEX; version 595.112.07-1.amzn2023
 
 <https://docs.nvidia.com/multi-node-nvlink-systems/imex-guide/>
 
@@ -16610,7 +16685,7 @@ That's all there is to it!
 
 ---
 
-## NVIDIA NVLSM; version 2025.10.12-1
+## NVIDIA NVLSM; version 2025.12.211-1
 
 <https://docs.nvidia.com/networking/display/mlnxofedv461000/nvidia+subnet+manager>
 
@@ -17403,13 +17478,13 @@ components are licensed to Licensee pursuant to the following terms and conditio
 
 ---
 
-## EFA Installer; version 1.49.0
+## EFA Installer; version 1.51.0
 
 <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/efa-start.html>
 
 ```text
     * Package EFA Installer's source code may be found at:
-      https://efa-installer.amazonaws.com/aws-efa-installer-1.49.0.tar.gz
+      https://efa-installer.amazonaws.com/aws-efa-installer-1.51.0.tar.gz
 
 ----- /opt/amazon/efa/share/doc/libfabric-aws/COPYING -----
 
