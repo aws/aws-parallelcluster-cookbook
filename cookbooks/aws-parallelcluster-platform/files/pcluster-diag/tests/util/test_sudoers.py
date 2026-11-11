@@ -100,12 +100,24 @@ def definitions(monkeypatch):
     return sudoers.load_definitions("/etc/sudoers")
 
 
-def test_load_definitions_runs_cvtsudoers(monkeypatch):
+@pytest.mark.parametrize(
+    "installed_commands, expected_command",
+    [
+        ({"cvtsudoers"}, "cvtsudoers"),
+        ({"cvtsudoers", "cvtsudoers.ws"}, "cvtsudoers"),
+        # Ubuntu 26.04: sudo-rs is the default sudo and the tools of sudo have a ".ws" suffix.
+        ({"cvtsudoers.ws"}, "cvtsudoers.ws"),
+        # Not installed: running cvtsudoers reports the missing command.
+        (set(), "cvtsudoers"),
+    ],
+)
+def test_load_definitions_runs_cvtsudoers(monkeypatch, installed_commands, expected_command):
     calls = []
+    monkeypatch.setattr(sudoers.shutil, "which", lambda command: command if command in installed_commands else None)
     monkeypatch.setattr(sudoers, "run_command", lambda command, **_: calls.append(command) or _completed(stdout="{}"))
 
     assert sudoers.load_definitions("/etc/sudoers") == []
-    assert calls == [["cvtsudoers", "-f", "json", "-e", "/etc/sudoers"]]
+    assert calls == [[expected_command, "-f", "json", "-e", "/etc/sudoers"]]
 
 
 def test_load_definitions_flattens_each_rule_into_definitions(definitions):
@@ -128,13 +140,16 @@ def test_load_definitions_flattens_each_rule_into_definitions(definitions):
 
 
 @pytest.mark.parametrize(
-    "returncode, stderr, message",
+    "installed_commands, returncode, stderr, message",
     [
-        (1, "/etc/sudoers.d/zz:1:37: syntax error\n", "/etc/sudoers.d/zz:1:37: syntax error"),
-        (1, "", "cvtsudoers exited with code 1"),
+        ({"cvtsudoers"}, 1, "/etc/sudoers.d/zz:1:37: syntax error\n", "/etc/sudoers.d/zz:1:37: syntax error"),
+        ({"cvtsudoers"}, 1, "", "^cvtsudoers exited with code 1$"),
+        # The message names the command that ran.
+        ({"cvtsudoers.ws"}, 1, "", "^cvtsudoers.ws exited with code 1$"),
     ],
 )
-def test_load_definitions_raises_when_cvtsudoers_fails(monkeypatch, returncode, stderr, message):
+def test_load_definitions_raises_when_cvtsudoers_fails(monkeypatch, installed_commands, returncode, stderr, message):
+    monkeypatch.setattr(sudoers.shutil, "which", lambda command: command if command in installed_commands else None)
     monkeypatch.setattr(sudoers, "run_command", lambda *_, **__: _completed(returncode, stderr=stderr))
 
     with pytest.raises(sudoers.SudoersExportError, match=message):
