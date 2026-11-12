@@ -18,10 +18,9 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   existing shared storage), warning about the ones the credentials do not allow reading.
 
 **CHANGES**
-- Run the GPU health check only for jobs with GPUs allocated through GRES, on the allocated GPUs, and for jobs with an
-  exclusive node allocation, on all the GPUs of the node. Skip it for all other jobs. Run the checks of concurrent
-  jobs on the same node, targeting different GPUs, at the same time, instead of skipping the check of a job when
-  another check is running.
+- Run the GPU health check only on the GPUs allocated to the job, to avoid interfering with other jobs on the node,
+  and run the checks of concurrent jobs at the same time instead of skipping them. Concurrent checks require the
+  `nvidia-dcgm` service not to be running.
 
 3.16.2
 ------
