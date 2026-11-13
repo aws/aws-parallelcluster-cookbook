@@ -17,6 +17,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   (launch templates, security groups, subnets and their routing, IAM roles and policies, custom action scripts,
   existing shared storage), warning about the ones the credentials do not allow reading.
 
+**CHANGES**
+- Run the GPU health check only on the GPUs allocated to the job, to avoid interfering with other jobs on the node,
+  and run the checks of concurrent jobs at the same time instead of skipping them. Concurrent checks require the
+  `nvidia-dcgm` service not to be running.
 **BUG FIXES**
 - Fix the custom action executor logging the session token and the access key id of the node credentials, as part of
   the signed requests used to download custom action scripts from S3.
