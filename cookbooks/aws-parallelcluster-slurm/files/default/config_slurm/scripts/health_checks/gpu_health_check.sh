@@ -77,7 +77,6 @@ function main() {
   fast_success_exit "$?" "Skipping execution of the GPU Health Check"
 
   ## Services Initialization
-  local nvidia_fabricmanager_service_started
   initialize_nvidia_fabricmanager
   fast_success_exit "$?" "Skipping execution of the GPU Health Check"
 
@@ -237,12 +236,12 @@ function initialize_nvidia_fabricmanager() {
   if [ "${nvswitch_check}" -gt 1 ]; then
     systemctl show nvidia-fabricmanager.service -p ActiveState | grep "=active"
     if [ $? -ne 0 ]; then
+      ## The service is left running after the check, since checks of concurrent jobs may use it.
       log_info "Starting nvidia-fabricmanager since it is not running"
       start_service nvidia-fabricmanager
       if [ $? -ne 0 ]; then
         return 1
       fi
-      nvidia_fabricmanager_service_started=true
     else
       log_info "nvidia-fabricmanager is already running"
     fi
@@ -261,11 +260,6 @@ function tear_down() {
         nvidia-smi -i $gpu_id -pm 0 >/dev/null
       fi
   done
-
-  ## The nvidia-fabricmanager service started by the check is left running, since checks of concurrent jobs may use it.
-  if [ "$nvidia_fabricmanager_service_started" = true ] ; then
-    log_info "Leaving running the nvidia-fabricmanager service, which may be used by GPU Health Checks of concurrent jobs"
-  fi
 }
 
 main "$@"
