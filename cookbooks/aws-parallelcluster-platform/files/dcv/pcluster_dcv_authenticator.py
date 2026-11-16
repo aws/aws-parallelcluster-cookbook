@@ -384,16 +384,30 @@ class DCVAuthenticator(BaseHTTPRequestHandler):
         #     --session-id mysession
         # ubuntu 2949 0.3 0.4 860568 34328 ? Sl 20:10 0:18 /usr/lib/x86_64-linux-gnu/dcv/dcvagent --mode full \
         #     --session-id mysession
+        # With Wayland (Ubuntu 26.04+) the agent of a virtual session runs as the GDM greeter user in system mode:
+        # gdm-greeter 12725 0.1 0.9 641196 145148 ? SLl 16:03 0:07 /usr/lib/x86_64-linux-gnu/dcv/dcvagent \
+        #     --session-id mysession --mode system ...
         fields = row.split()
         command_index = 10
         session_name_index = 14
         user_index = 0
 
-        return (
-            fields[command_index].endswith("/dcv/dcvagent")
-            and fields[user_index] == user
-            and fields[session_name_index] == session_id
-        )
+        if not fields[command_index].endswith("/dcv/dcvagent"):
+            return False
+
+        command = fields[command_index:]
+        if DCVAuthenticator._get_option_value(command, "--mode") == "system":
+            # Wayland: the agent runs as the GDM greeter user, so the session owner cannot be checked here.
+            # DCV still lets only the session owner connect to the session.
+            return DCVAuthenticator._get_option_value(command, "--session-id") == session_id
+
+        # X11: the agent runs as the session owner
+        return fields[user_index] == user and fields[session_name_index] == session_id
+
+    @staticmethod
+    def _get_option_value(command, option):
+        """Return the value following the given option in the command, None if the option is missing."""
+        return command[command.index(option) + 1] if option in command[:-1] else None
 
 
 class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):

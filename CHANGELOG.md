@@ -25,13 +25,10 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   - xdcv: `2026.0.715-1`
   - gl: `2026.0.1124-1`
   - web_viewer: `2026.0.25174-1`
-- On Ubuntu, stop overriding the kernel parameter `fs.protected_regular` to 0. Therefore, all OSes use system default.
+- On Ubuntu, stop setting the kernel parameter `fs.protected_regular` to 0, so that it keeps the OS default value as on the other OSes.
 
 **BUG FIXES**
 - Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
-
-**CHANGES**
-- Upgrade DCV to version 2026.0-25174 (from 2025.0-20103).
 
 3.16.2
 ------
