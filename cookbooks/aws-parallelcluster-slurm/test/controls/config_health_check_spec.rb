@@ -52,9 +52,17 @@ control 'tag:config_gpu_health_check_execution' do
 
   if instance.graphic?
     if instance.dcgmi_gpu_accel_supported?
+      # Job with GPUs allocated: only the allocated GPUs are checked
+      describe command("SLURM_JOB_GPUS=0 #{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
+        its('exit_status') { should eq 0 }
+        its('stdout') { should match /Checking the GPUs allocated to the job/ }
+        its('stdout') { should match /The GPU Health Check succeeded/ }
+      end
+      # Job without GPUs allocated: the check is skipped
       describe command("#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
         its('exit_status') { should eq 0 }
-        its('stdout') { should match /The GPU Health Check succeeded/ }
+        its('stdout') { should match /The job has no GPU allocated/ }
+        its('stdout') { should_not match /Running GPU Health Check/ }
       end
     else
       describe command("#{slurm_install_dir}/etc/pcluster/.slurm_plugin/scripts/health_checks/gpu_health_check.sh") do
