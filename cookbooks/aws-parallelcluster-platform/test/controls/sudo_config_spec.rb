@@ -12,12 +12,20 @@
 control 'tag:config_sudo' do
   title 'Check that sudo has been configured'
 
-  describe file('/etc/sudoers.d/99-parallelcluster-user-tty') do
-    it { should exist }
-    its('mode') { should cmp '0440' }
-    its('owner') { should eq 'root' }
-    its('group') { should eq 'root' }
-    its('content') { should_not be_empty }
+  # Starting from Ubuntu 26.04 the default sudo is sudo-rs, which never requires a tty and rejects the requiretty
+  # setting, so the cookbook does not create the tty sudoers file there.
+  if os_properties.ubuntu? && os.release.to_i >= 26
+    describe file('/etc/sudoers.d/99-parallelcluster-user-tty') do
+      it { should_not exist }
+    end
+  else
+    describe file('/etc/sudoers.d/99-parallelcluster-user-tty') do
+      it { should exist }
+      its('mode') { should cmp '0440' }
+      its('owner') { should eq 'root' }
+      its('group') { should eq 'root' }
+      its('content') { should_not be_empty }
+    end
   end
 end
 
