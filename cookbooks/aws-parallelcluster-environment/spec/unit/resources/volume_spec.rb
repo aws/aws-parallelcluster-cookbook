@@ -112,6 +112,37 @@ describe 'volume:mount' do
             .with(mode: '1777')
         end
       end
+
+      context "when mode is NONE" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version, step_into: ['volume'])
+          runner.converge_dsl('aws-parallelcluster-environment') do
+            volume 'mount' do
+              shared_dir '/SHARED_DIR'
+              device 'DEVICE'
+              fstype 'FSTYPE'
+              options %w(option1 option2)
+              mode 'NONE'
+              action :mount
+            end
+          end
+        end
+        before do
+          stub_command("mount | grep ' /SHARED_DIR '").and_return(false)
+        end
+
+        it 'creates shared directory' do
+          is_expected.to create_directory('/SHARED_DIR')
+            .with(owner: 'root')
+            .with(group: 'root')
+        end
+
+        it 'does not change permissions' do
+          shared_dirs = chef_run.find_resources(:directory).select { |dir| dir.path == '/SHARED_DIR' }
+          expect(shared_dirs).not_to be_empty
+          shared_dirs.each { |dir| expect(dir.mode).to be_nil }
+        end
+      end
     end
   end
 end

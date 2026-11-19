@@ -16,6 +16,7 @@ id_array = node['cluster']['efs_fs_ids'].split(',')
 encryption_array = node['cluster']['efs_encryption_in_transits'].split(',')
 iam_array = node['cluster']['efs_iam_authorizations'].split(',')
 access_point_id_array = node['cluster']['efs_access_point_ids'].split(',')
+mode_array = node['cluster']['efs_mount_dir_permissions'].split(',')
 
 # Identify the previously mounted filesystems and remove them from the set of filesystems to mount
 shared_dir_array.each_with_index do |dir, index|
@@ -25,6 +26,7 @@ shared_dir_array.each_with_index do |dir, index|
   encryption_array.delete_at(index)
   iam_array.delete_at(index)
   access_point_id_array.delete_at(index)
+  mode_array.delete_at(index)
 end
 
 # Mount EFS directories with the efs resource
@@ -34,6 +36,7 @@ efs "mount efs" do
   efs_encryption_in_transit_array encryption_array
   efs_iam_authorization_array iam_array
   efs_access_point_id_array access_point_id_array
+  mode_array mode_array
   action :mount
   not_if { shared_dir_array.empty? }
 end

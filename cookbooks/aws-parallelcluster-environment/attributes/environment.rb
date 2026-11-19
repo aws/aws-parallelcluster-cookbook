@@ -54,6 +54,11 @@ default['cluster']['fsx_volume_junction_paths'] = ''
 default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['raid_shared_dir'] = ''
+# Permissions of the mount directories, one value per shared storage, see libraries/mount_dir_permissions.rb
+default['cluster']['ebs_mount_dir_permissions'] = ''
+default['cluster']['efs_mount_dir_permissions'] = ''
+default['cluster']['fsx_mount_dir_permissions'] = ''
+default['cluster']['raid_mount_dir_permissions'] = ''
 default['cluster']['ephemeral_dir'] = '/scratch'
 
 default['cluster']['scheduler_slots'] = 'vcpus'

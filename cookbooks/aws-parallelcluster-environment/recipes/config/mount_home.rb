@@ -76,7 +76,7 @@ else
         efs_encryption_in_transit_array [node['cluster']['efs_encryption_in_transits'].split(',')[index]]
         efs_iam_authorization_array [node['cluster']['efs_iam_authorizations'].split(',')[index]]
         efs_access_point_id_array [node['cluster']['efs_access_point_ids'].split(',')[index]]
-        mode '755'
+        mode mount_dir_mode(node['cluster']['efs_mount_dir_permissions'].split(',')[index], '755')
         action :mount
       end
       break
@@ -91,7 +91,7 @@ else
         fsx_dns_name_array [node['cluster']['fsx_dns_names'].split(',')[index]]
         fsx_mount_name_array [node['cluster']['fsx_mount_names'].split(',')[index]]
         fsx_volume_junction_path_array [node['cluster']['fsx_volume_junction_paths'].split(',')[index]]
-        mode '755'
+        mode mount_dir_mode(node['cluster']['fsx_mount_dir_permissions'].split(',')[index], '755')
         action :mount
       end
       break
@@ -104,7 +104,7 @@ else
         manage_ebs "add ebs /home" do
           shared_dir_array [dir]
           vol_array [node['cluster']['volume'].split(',')[index]]
-          mode '755'
+          mode mount_dir_mode(node['cluster']['ebs_mount_dir_permissions'].split(',')[index], '755')
           action %i(mount export)
         end
         break
@@ -128,7 +128,7 @@ else
         raid_shared_dir '/home'
         raid_type node['cluster']['raid_type']
         raid_vol_array node['cluster']['raid_vol_ids'].split(',')
-        mode '755'
+        mode mount_dir_mode(node['cluster']['raid_mount_dir_permissions'], '755')
         action %i(mount export)
       end
     when 'ComputeFleet', 'LoginNode'

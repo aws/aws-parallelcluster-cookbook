@@ -16,6 +16,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
   cluster with a test environment. An opt-in check also dumps the AWS resources the cluster configuration references
   (launch templates, security groups, subnets and their routing, IAM roles and policies, custom action scripts,
   existing shared storage), warning about the ones the credentials do not allow reading.
+- Apply the permissions configured with `SharedStorage/MountDirPermissions` to the mount directory of each shared
+  storage, or leave the permissions of the file system unchanged when `SetPermissions` is `false`.
 
 **CHANGES**
 - Run the GPU health check only on the GPUs allocated to the job, to avoid interfering with other jobs on the node,
