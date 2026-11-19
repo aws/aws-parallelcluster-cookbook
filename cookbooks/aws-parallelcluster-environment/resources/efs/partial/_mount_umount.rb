@@ -23,6 +23,8 @@ property :efs_access_point_id_array, Array, required: false
 property :efs_mount_point_array, Array, required: false
 property :efs_unmount_forced_array, Array, required: false
 property :mode, String, default: "1777"
+# Mode of each mount directory, see mount_dir_mode. Missing values fall back to mode.
+property :mode_array, Array, default: []
 
 action :mount do
   return if on_docker?
@@ -38,6 +40,8 @@ action :mount do
     efs_encryption_in_transit = efs_encryption_in_transit_array[index] unless efs_encryption_in_transit_array.nil?
     efs_iam_authorization = efs_iam_authorization_array[index] unless efs_iam_authorization_array.nil?
     efs_access_point_id = efs_access_point_id_array[index] unless efs_access_point_id_array.nil?
+    efs_mode = mount_dir_mode(new_resource.mode_array[index], new_resource.mode)
+    set_permissions = set_mount_dir_permissions?(efs_mode)
 
     # Path needs to be fully qualified, for example "shared/temp" becomes "/shared/temp"
     efs_shared_dir = "/#{efs_shared_dir}" unless efs_shared_dir.start_with?('/')
@@ -62,7 +66,7 @@ action :mount do
     directory efs_shared_dir do
       owner 'root'
       group 'root'
-      mode new_resource.mode
+      mode efs_mode if set_permissions
       recursive true
       action :create
     end unless ::File.directory?(efs_shared_dir)
@@ -93,14 +97,14 @@ action :mount do
       only_if "mount | grep ' #{efs_shared_dir} '"
     end
 
-    # Make sure EFS shared directory permissions are correct
+    # Make sure EFS shared directory permissions are correct, unless they must be left as they are
     directory "change permissions for #{efs_shared_dir}" do
       path efs_shared_dir
       owner 'root'
       group 'root'
-      mode new_resource.mode
+      mode efs_mode
       only_if { node['cluster']['node_type'] == "HeadNode" }
-    end
+    end if set_permissions
   end
 end
 

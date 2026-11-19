@@ -38,12 +38,13 @@ end
 
 action :mount do
   shared_dir = format_directory(new_resource.shared_dir)
+  set_permissions = set_mount_dir_permissions?(new_resource.mode)
 
   # Create the shared directories
   directory shared_dir do
     owner 'root'
     group 'root'
-    mode new_resource.mode
+    mode new_resource.mode if set_permissions
     recursive true
     action :create
   end
@@ -79,8 +80,9 @@ action :mount do
   directory shared_dir do
     owner 'root'
     group 'root'
-    mode new_resource.mode
-    only_if { node['cluster']['node_type'] == "HeadNode" }
+    # A mode is validated when the resource is compiled, so only pass it when it is set
+    mode new_resource.mode if set_permissions
+    only_if { set_permissions && node['cluster']['node_type'] == "HeadNode" }
   end
 end
 

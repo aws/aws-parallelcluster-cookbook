@@ -16,17 +16,21 @@ property :fsx_dns_name_array, Array, required: %i(mount unmount)
 property :fsx_mount_name_array, Array, required: %i(mount unmount)
 property :fsx_volume_junction_path_array, Array, required: %i(mount unmount)
 property :mode, String, default: "1777"
+# Mode of each mount directory, see mount_dir_mode. Missing values fall back to mode.
+property :mode_array, Array, default: []
 
 action :mount do
   return if on_docker?
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|
     fsx = FSx.new(node, new_resource, index)
+    fsx_mode = mount_dir_mode(new_resource.mode_array[index], new_resource.mode)
+    set_permissions = set_mount_dir_permissions?(fsx_mode)
 
     # Create the shared directories
     directory fsx.shared_dir do
       owner 'root'
       group 'root'
-      mode new_resource.mode
+      mode fsx_mode if set_permissions
       recursive true
       action :create
     end
@@ -62,9 +66,9 @@ action :mount do
       path fsx.shared_dir
       owner 'root'
       group 'root'
-      mode new_resource.mode
+      mode fsx_mode
       only_if { fsx.can_change_shared_dir_permissions && node['cluster']['node_type'] == "HeadNode" }
-    end
+    end if set_permissions
   end
 end
 
