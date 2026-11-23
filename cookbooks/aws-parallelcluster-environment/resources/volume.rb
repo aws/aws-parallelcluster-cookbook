@@ -76,14 +76,13 @@ action :mount do
     only_if "mount | grep ' #{shared_dir} '"
   end
 
-  # Make sure shared directory permissions are correct
+  # Make sure shared directory permissions are correct, unless they must be left as they are
   directory shared_dir do
     owner 'root'
     group 'root'
-    # A mode is validated when the resource is compiled, so only pass it when it is set
-    mode new_resource.mode if set_permissions
-    only_if { set_permissions && node['cluster']['node_type'] == "HeadNode" }
-  end
+    mode new_resource.mode
+    only_if { node['cluster']['node_type'] == "HeadNode" }
+  end if set_permissions
 end
 
 action :export do
