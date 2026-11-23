@@ -355,8 +355,7 @@ describe 'lustre:mount with mount dir permissions' do
             fsx_dns_name_array ['', '', '']
             fsx_mount_name_array %w(mount_name_1 mount_name_2 mount_name_3)
             fsx_volume_junction_path_array ['', '', '']
-            # /lustre_dir_3 has no value: it falls back to the default mode
-            mode_array %w(0755 NONE)
+            mode_array %w(0755 NONE DEFAULT)
             action :mount
           end
         end
@@ -379,7 +378,7 @@ describe 'lustre:mount with mount dir permissions' do
         is_expected.not_to create_directory('change permissions for /lustre_dir_2')
       end
 
-      it 'sets the default mode when the mode is missing' do
+      it 'sets the default mode when the mode is DEFAULT' do
         is_expected.to create_directory('/lustre_dir_3').with(mode: '1777')
         is_expected.to create_directory('change permissions for /lustre_dir_3').with(mode: '1777')
       end

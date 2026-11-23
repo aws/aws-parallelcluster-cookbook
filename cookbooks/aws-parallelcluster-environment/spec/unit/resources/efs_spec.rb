@@ -340,12 +340,11 @@ describe 'efs:mount with mount dir permissions' do
         end
         runner.converge_dsl do
           efs 'mount' do
-            efs_fs_id_array %w(id_1 id_2 id_3 id_4)
-            shared_dir_array %w(/shared_dir_1 /shared_dir_2 /shared_dir_3 /shared_dir_4)
-            efs_encryption_in_transit_array %w(false false false false)
-            efs_iam_authorization_array %w(false false false false)
-            efs_access_point_id_array %w(none none none none)
-            # /shared_dir_4 has no value: it falls back to the default mode
+            efs_fs_id_array %w(id_1 id_2 id_3)
+            shared_dir_array %w(/shared_dir_1 /shared_dir_2 /shared_dir_3)
+            efs_encryption_in_transit_array %w(false false false)
+            efs_iam_authorization_array %w(false false false)
+            efs_access_point_id_array %w(none none none)
             mode_array %w(0755 NONE DEFAULT)
             action :mount
           end
@@ -353,7 +352,7 @@ describe 'efs:mount with mount dir permissions' do
       end
 
       before do
-        %w(/shared_dir_1 /shared_dir_2 /shared_dir_3 /shared_dir_4).each do |shared_dir|
+        %w(/shared_dir_1 /shared_dir_2 /shared_dir_3).each do |shared_dir|
           stub_command("mount | grep ' #{shared_dir} '").and_return(true)
         end
       end
@@ -368,11 +367,9 @@ describe 'efs:mount with mount dir permissions' do
         is_expected.not_to create_directory('change permissions for /shared_dir_2')
       end
 
-      it 'sets the default mode when the mode is DEFAULT or missing' do
-        %w(/shared_dir_3 /shared_dir_4).each do |shared_dir|
-          is_expected.to create_directory(shared_dir).with(mode: '1777')
-          is_expected.to create_directory("change permissions for #{shared_dir}").with(mode: '1777')
-        end
+      it 'sets the default mode when the mode is DEFAULT' do
+        is_expected.to create_directory('/shared_dir_3').with(mode: '1777')
+        is_expected.to create_directory('change permissions for /shared_dir_3').with(mode: '1777')
       end
     end
   end

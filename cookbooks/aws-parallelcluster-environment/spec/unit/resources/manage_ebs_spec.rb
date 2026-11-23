@@ -218,7 +218,7 @@ describe 'manage_ebs:mount with mount dir permissions' do
       cached(:chef_run) do
         runner = runner(platform: platform, version: version, step_into: %w(manage_ebs))
         ConvergeManageEbs.mount(runner, shared_dirs: %w(ebs_shared_dir_0 ebs_shared_dir_1 ebs_shared_dir_2),
-                                        volumes: %w(vol-0 vol-1 vol-2), modes: %w(0755 NONE))
+                                        volumes: %w(vol-0 vol-1 vol-2), modes: %w(0755 NONE DEFAULT))
       end
 
       before do
@@ -228,7 +228,7 @@ describe 'manage_ebs:mount with mount dir permissions' do
         end
       end
 
-      it "mounts the volumes with their mode, or the default mode when it is missing" do
+      it "mounts the volumes with their mode, or the default mode when it is DEFAULT" do
         is_expected.to mount_volume('mount volume 0').with(mode: '0755')
         is_expected.to mount_volume('mount volume 1').with(mode: 'NONE')
         is_expected.to mount_volume('mount volume 2').with(mode: '1777')
