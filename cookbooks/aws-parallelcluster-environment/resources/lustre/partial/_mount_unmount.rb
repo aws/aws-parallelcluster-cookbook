@@ -72,6 +72,15 @@ action :mount do
   end
 end
 
+action :change_permissions do
+  return if on_docker?
+  new_resource.fsx_shared_dir_array.each_with_index do |fsx_shared_dir, index|
+    # OpenZFS does not allow changing the permission of the root directory.
+    next if new_resource.fsx_fs_type_array[index] == 'OPENZFS'
+    change_mount_dir_permissions(format_directory(fsx_shared_dir), mount_dir_mode(new_resource.mode_array[index], new_resource.mode))
+  end
+end
+
 action :unmount do
   return if on_docker?
   new_resource.fsx_fs_id_array.dup.each_with_index do |_fsx_fs_id, index|

@@ -375,6 +375,35 @@ describe 'efs:mount with mount dir permissions' do
   end
 end
 
+describe 'efs:change_permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
+          node.override['cluster']['node_type'] = 'HeadNode'
+        end
+        runner.converge_dsl do
+          efs 'change_permissions' do
+            shared_dir_array %w(shared_dir_1 /shared_dir_2 /shared_dir_3)
+            mode_array %w(0750 NONE DEFAULT)
+            action :change_permissions
+          end
+        end
+      end
+
+      it 'changes the permissions of the mount directories, unless the mode is NONE' do
+        is_expected.to create_directory('change permissions for /shared_dir_1').with(path: '/shared_dir_1', mode: '0750')
+        is_expected.not_to create_directory('change permissions for /shared_dir_2')
+        is_expected.to create_directory('change permissions for /shared_dir_3').with(path: '/shared_dir_3', mode: '1777')
+      end
+
+      it 'does not mount' do
+        is_expected.not_to mount_mount('/shared_dir_1')
+      end
+    end
+  end
+end
+
 describe 'efs:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

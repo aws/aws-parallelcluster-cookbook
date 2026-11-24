@@ -386,6 +386,32 @@ describe 'lustre:mount with mount dir permissions' do
   end
 end
 
+describe 'lustre:change_permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: ['lustre']) do |node|
+          node.override['cluster']['node_type'] = 'HeadNode'
+        end
+        runner.converge_dsl('aws-parallelcluster-environment') do
+          lustre 'change_permissions' do
+            fsx_shared_dir_array %w(/lustre_dir /openzfs_dir /ontap_dir)
+            fsx_fs_type_array %w(LUSTRE OPENZFS ONTAP)
+            mode_array %w(0750 0750 NONE)
+            action :change_permissions
+          end
+        end
+      end
+
+      it 'changes the permissions of the mount directories, except for OpenZFS and when the mode is NONE' do
+        is_expected.to create_directory('change permissions for /lustre_dir').with(path: '/lustre_dir', mode: '0750')
+        is_expected.not_to create_directory('change permissions for /openzfs_dir')
+        is_expected.not_to create_directory('change permissions for /ontap_dir')
+      end
+    end
+  end
+end
+
 describe 'lustre:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

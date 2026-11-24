@@ -11,7 +11,7 @@
 provides :manage_ebs
 unified_mode true
 
-property :shared_dir_array, Array, required: %i(mount export unmount unexport)
+property :shared_dir_array, Array, required: %i(mount export unmount unexport change_permissions)
 property :vol_array, Array, required: %i(mount unmount)
 property :mode, String, default: "1777"
 # Mode of each mount directory, see mount_dir_mode. Missing values fall back to mode.
@@ -55,6 +55,13 @@ action :mount do
       retries 10
       retry_delay 6
     end
+  end
+end
+
+action :change_permissions do
+  return if on_docker?
+  new_resource.shared_dir_array.each_with_index do |dir, index|
+    change_mount_dir_permissions(format_directory(dir), mount_dir_mode(new_resource.mode_array[index], new_resource.mode))
   end
 end
 

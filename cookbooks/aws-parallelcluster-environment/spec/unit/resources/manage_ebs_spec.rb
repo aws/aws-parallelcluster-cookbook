@@ -237,6 +237,35 @@ describe 'manage_ebs:mount with mount dir permissions' do
   end
 end
 
+describe 'manage_ebs:change_permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: %w(manage_ebs)) do |node|
+          node.override['cluster']['node_type'] = 'HeadNode'
+        end
+        runner.converge_dsl do
+          manage_ebs 'change_permissions' do
+            shared_dir_array %w(ebs_shared_dir_0 ebs_shared_dir_1)
+            mode_array %w(0750 NONE)
+            action :change_permissions
+          end
+        end
+      end
+
+      it 'changes the permissions of the mount directories, unless the mode is NONE' do
+        is_expected.to create_directory('change permissions for /ebs_shared_dir_0').with(path: '/ebs_shared_dir_0', mode: '0750')
+        is_expected.not_to create_directory('change permissions for /ebs_shared_dir_1')
+      end
+
+      it 'does not attach nor mount volumes' do
+        is_expected.not_to attach_volume('attach volume 0')
+        is_expected.not_to mount_volume('mount volume 0')
+      end
+    end
+  end
+end
+
 describe 'manage_ebs:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

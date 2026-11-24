@@ -30,3 +30,41 @@ end
 def set_mount_dir_permissions?(mode)
   mode != MOUNT_DIR_PERMISSIONS_NONE
 end
+
+# Return the entry of the given mapping entries for the same storage, ignoring the mount directory permissions,
+# so that a change of permissions alone does not unmount and mount the storage again.
+def find_storage_in_mapping(storage_entries, storage)
+  return if storage_entries.nil?
+  storage_entries.find { |entry| entry.except('mount_dir_permissions') == storage.except('mount_dir_permissions') }
+end
+
+# Return, by storage type, the entries of the new mapping for the storage that stays mounted during a cluster update
+# and whose mount directory permissions change, with mount_dir_permissions set to the mode to apply.
+def mount_dir_permissions_changes(previous_mapping, new_mapping)
+  new_mapping.to_h do |storage_type, storages|
+    changes = (storages || []).filter_map do |storage|
+      # The previous entry differs only by the permissions, if any
+      previous_storage = find_storage_in_mapping(previous_mapping[storage_type], storage)
+      next if previous_storage.nil? || previous_storage == storage
+
+      mount_dir = format_directory(storage['mount_dir'] || storage['raid_shared_dir'])
+      mode = mount_dir_mode(storage['mount_dir_permissions'], mount_dir == '/home' ? '755' : '1777')
+      storage.merge('mount_dir_permissions' => mode) if set_mount_dir_permissions?(mode)
+    end
+    [storage_type, changes]
+  end
+end
+
+# Set the mode of a mount directory on the head node, unless the mode is NONE. The mode is stored in the file system,
+# so it applies to every node. Call it from the change_permissions action of a storage resource.
+def change_mount_dir_permissions(shared_dir, dir_mode)
+  return unless set_mount_dir_permissions?(dir_mode)
+
+  directory "change permissions for #{shared_dir}" do
+    path shared_dir
+    owner 'root'
+    group 'root'
+    mode dir_mode
+    only_if { node['cluster']['node_type'] == 'HeadNode' }
+  end
+end
