@@ -53,6 +53,18 @@ def are_mount_or_unmount_required?
   false
 end
 
+# Return true if the change set contains a change of SharedStorage/MountDirPermissions, which the head node applies
+# to the mounted storage without mounting it again.
+def are_mount_dir_permissions_changed?
+  require 'json'
+
+  change_set_path = node["cluster"]["change_set_path"]
+
+  return false unless ::File.exist?(change_set_path)
+
+  JSON.load_file(change_set_path)["changeSet"].any? { |change| change["parameter"].to_s.include?("MountDirPermissions") }
+end
+
 def evaluate_compute_bootstrap_timeout(config)
   config.dig("DevSettings", "Timeouts", "ComputeNodeBootstrapTimeout") or 1800
 end

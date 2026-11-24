@@ -22,6 +22,7 @@ when 'HeadNode'
     raid_shared_dir raid_shared_dir
     raid_type node['cluster']['raid_type']
     raid_vol_array node['cluster']['raid_vol_ids'].split(',')
+    mode mount_dir_mode(node['cluster']['raid_mount_dir_permissions'], '1777')
     action %i(mount export)
     not_if { raid_shared_dir.empty? }
   end

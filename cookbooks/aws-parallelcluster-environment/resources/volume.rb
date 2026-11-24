@@ -38,12 +38,13 @@ end
 
 action :mount do
   shared_dir = format_directory(new_resource.shared_dir)
+  set_permissions = set_mount_dir_permissions?(new_resource.mode)
 
   # Create the shared directories
   directory shared_dir do
     owner 'root'
     group 'root'
-    mode new_resource.mode
+    mode new_resource.mode if set_permissions
     recursive true
     action :create
   end
@@ -75,13 +76,13 @@ action :mount do
     only_if "mount | grep ' #{shared_dir} '"
   end
 
-  # Make sure shared directory permissions are correct
+  # Make sure shared directory permissions are correct, unless they must be left as they are
   directory shared_dir do
     owner 'root'
     group 'root'
     mode new_resource.mode
     only_if { node['cluster']['node_type'] == "HeadNode" }
-  end
+  end if set_permissions
 end
 
 action :export do
