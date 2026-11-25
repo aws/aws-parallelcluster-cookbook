@@ -71,7 +71,9 @@ def driver_repo_package_file
 end
 
 # CUDA local-repo installer deb file, e.g.
-# cuda-repo-ubuntu2204-13-0-local_13.0.2-580.95.05-1_amd64.deb
+# cuda-repo-ubuntu2204-13-0-local_13.0.2-580.95.05-1_amd64.deb (CUDA < 13.4)
+# cuda-repo-ubuntu2204-13-4-local_13.4.1-1_amd64.deb (CUDA >= 13.4)
 def cuda_repo_package_file
-  "#{cuda_repo_package_name}_#{cuda_version}-#{node['cluster']['nvidia']['cuda']['driver_version_suffix']}-1_#{arch_suffix}.deb"
+  driver_part = cuda_driver_version_suffix ? "-#{cuda_driver_version_suffix}" : ''
+  "#{cuda_repo_package_name}_#{cuda_version}#{driver_part}-1_#{arch_suffix}.deb"
 end
