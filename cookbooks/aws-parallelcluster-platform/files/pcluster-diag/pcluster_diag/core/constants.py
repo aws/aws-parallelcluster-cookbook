@@ -273,3 +273,33 @@ SLURMCTLD_PORTS = tuple(range(6820, 6830))
 SLURMD_PORT = 6818
 NFS_SERVER_PORT = 2049
 PROC_NET_TCP_PATHS = ("/proc/net/tcp", "/proc/net/tcp6")
+
+# Configuration dump
+# The launch template of every compute resource and login node pool, kept by the head node.
+LAUNCH_TEMPLATES_CONFIG_PATH = SHARED_DIR + "/launch-templates-config.json"
+# The configuration files of the node, as glob patterns: a pattern matching nothing is skipped, since the files differ
+# by node type. Slurm files are under SLURM_ETC_DIR; the ParallelCluster daemons, under /etc/parallelcluster. dna.json
+# is not one: every report holds it in its context.
+CORE_SETTINGS_FILE_PATTERNS = (
+    "/etc/parallelcluster/cfnconfig",
+    LAUNCH_TEMPLATES_CONFIG_PATH,
+    "/etc/parallelcluster/*.json",
+    "/etc/parallelcluster/slurm_plugin/*.conf",
+    "/etc/parallelcluster/slurm_plugin/*.json",
+    SLURM_ETC_DIR + "/*.conf",
+    SLURM_ETC_DIR + "/pcluster/*.conf",
+    SLURM_ETC_DIR + "/pcluster/.slurm_plugin/*.conf",
+    SSSD_CONF_PATH,
+    CFN_HUP_CONF_PATH,
+    "/etc/cfn/hooks.d/*.conf",
+    "/etc/exports",
+    "/etc/fstab",
+)
+# The security groups the cluster stack creates when the cluster configuration does not set its own.
+MANAGED_SECURITY_GROUP_LOGICAL_IDS = ("HeadNodeSecurityGroup", "ComputeSecurityGroup")
+# Hard cap on each AWS call (connection and read) reading a referenced resource.
+AWS_READ_TIMEOUT_SECONDS = 10
+# A custom action script is read up to this size, so that a large file referenced by mistake does not fill the report.
+CUSTOM_ACTION_SCRIPT_MAX_BYTES = 1024 * 1024
+# The timeout of the custom action executor (DOWNLOAD_SCRIPT_HTTP_TIMEOUT_SECONDS in custom_action_executor.py).
+CUSTOM_ACTION_SCRIPT_TIMEOUT_SECONDS = 60

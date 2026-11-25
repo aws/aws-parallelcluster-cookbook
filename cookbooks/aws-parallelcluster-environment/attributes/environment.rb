@@ -54,6 +54,11 @@ default['cluster']['fsx_volume_junction_paths'] = ''
 default['cluster']['raid_type'] = ''
 default['cluster']['raid_vol_ids'] = ''
 default['cluster']['raid_shared_dir'] = ''
+# Permissions of the mount directories, one value per shared storage, see libraries/mount_dir_permissions.rb
+default['cluster']['ebs_mount_dir_permissions'] = ''
+default['cluster']['efs_mount_dir_permissions'] = ''
+default['cluster']['fsx_mount_dir_permissions'] = ''
+default['cluster']['raid_mount_dir_permissions'] = ''
 default['cluster']['ephemeral_dir'] = '/scratch'
 
 default['cluster']['scheduler_slots'] = 'vcpus'
@@ -77,12 +82,12 @@ default['cluster']['internal_initial_shared_dir'] = "#{node['cluster']['base_dir
 
 default['cluster']['head_node_private_ip'] = nil
 
-default['cluster']['efa']['version'] = '1.49.0'
-default['cluster']['efa']['sha256'] = 'cf2e9281a2328a243c76f911a490faed43ca0fecfe4733c25e34b2e92a32c309'
+default['cluster']['efa']['version'] = '1.51.0'
+default['cluster']['efa']['sha256'] = '83993044fa4df3dc2f8b5c2f7051d61b9689441be023a2c92ea51d3f53f2465c'
 
 # efs-utils version: repos track the newest release within this major; ADC (raw
 # S3 object) installs this exact version.
-default['cluster']['efs']['version'] = '3.1.3'
+default['cluster']['efs']['version'] = '3.3.5'
 # DevSetting: skip installing amazon-efs-utils entirely.
 default['cluster']['efs']['skip_install'] = false
 

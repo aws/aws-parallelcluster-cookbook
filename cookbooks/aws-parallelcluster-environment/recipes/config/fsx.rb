@@ -17,6 +17,7 @@ shared_dir_array = node['cluster']['fsx_shared_dirs'].split(',')
 dns_name_array = node['cluster']['fsx_dns_names'].split(',')
 mount_name_array = node['cluster']['fsx_mount_names'].split(',')
 volume_junction_path_array = node['cluster']['fsx_volume_junction_paths'].split(',')
+mode_array = node['cluster']['fsx_mount_dir_permissions'].split(',')
 
 # Identify the previously mounted filesystems and remove them from the set of filesystems to mount
 shared_dir_array.each_with_index do |dir, index|
@@ -27,6 +28,7 @@ shared_dir_array.each_with_index do |dir, index|
   dns_name_array.delete_at(index)
   mount_name_array.delete_at(index)
   volume_junction_path_array.delete_at(index)
+  mode_array.delete_at(index)
 end
 
 # Mount FSx shared directories with the lustre resource
@@ -37,6 +39,7 @@ lustre "mount fsx" do
   fsx_dns_name_array dns_name_array
   fsx_mount_name_array mount_name_array
   fsx_volume_junction_path_array volume_junction_path_array
+  mode_array mode_array
   action :mount
   not_if { id_array.empty? }
 end

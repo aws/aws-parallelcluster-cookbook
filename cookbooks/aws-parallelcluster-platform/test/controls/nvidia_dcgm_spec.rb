@@ -16,4 +16,11 @@ control 'tag:install_nvidia_dcgmi_installed' do
   describe package('datacenter-gpu-manager-4-cuda13') do
     it { should be_installed }
   end
+
+  # The GPU health check relies on the nvidia-dcgm service not running, to run the diagnostics of concurrent jobs
+  # at the same time: the service allows only one diagnostic per node.
+  describe service('nvidia-dcgm') do
+    it { should_not be_enabled }
+    it { should_not be_running }
+  end
 end

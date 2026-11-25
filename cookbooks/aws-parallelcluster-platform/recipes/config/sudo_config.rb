@@ -12,9 +12,11 @@
 # limitations under the License.
 
 # Ensure cluster user can sudo on SSH
+# Starting from Ubuntu 26.04 the default sudo is sudo-rs, which never requires a tty and rejects the requiretty setting.
 template '/etc/sudoers.d/99-parallelcluster-user-tty' do
   source 'sudo/99-parallelcluster-user-tty.erb'
   owner 'root'
   group 'root'
   mode '0440'
+  not_if { platform?('ubuntu') && node['platform_version'].to_i >= 26 }
 end

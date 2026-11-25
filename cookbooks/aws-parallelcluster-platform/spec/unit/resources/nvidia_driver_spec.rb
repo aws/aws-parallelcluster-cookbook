@@ -141,6 +141,7 @@ describe 'nvidia_driver:setup' do
 
       it 'leaves the shipped driver untouched and records no version' do
         is_expected.not_to write_node_attributes('Save Nvidia driver version for Inspec tests')
+        is_expected.not_to disable_service('nvidia-powerd')
       end
     end
 
@@ -184,6 +185,10 @@ describe 'nvidia_driver:setup' do
 
       it 'installs nvidia-xconfig from the NVIDIA local repo on every platform' do
         is_expected.to install_package('nvidia-xconfig')
+      end
+
+      it 'disables the nvidia-powerd service enabled by the package preset' do
+        is_expected.to disable_service('nvidia-powerd')
       end
 
       if platform == 'ubuntu'

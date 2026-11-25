@@ -12,6 +12,7 @@
 
 """Unit tests for the Sudoers check, driven by sudoers files."""
 
+import dataclasses
 import os
 import shutil
 
@@ -134,6 +135,38 @@ def test_requires_the_exact_definition(policy, actual, run_check):
 
     assert _codes(result) == [Sudoers.NOT_DEFINED.code]
     assert "pcluster-admin ALL = (root) NOPASSWD: /opt/slurm/bin/scontrol" in _messages(result)
+
+
+@pytest.mark.parametrize(
+    "pcluster_version, log_level",
+    [("3.11.0", "auto"), ("3.14.1", "auto"), ("3.15.0", "info"), ("3.16.2", "info"), ("unknown", "info")],
+)
+def test_expects_the_clusterstatusmgtd_log_level_of_the_parallelcluster_version(
+    policy, monkeypatch, pcluster_version, log_level
+):
+    # clusterstatusmgtd runs cinc-client with --log_level info since ParallelCluster 3.15.0, and auto before.
+    command = sudoers_check.CLUSTERSTATUSMGTD_CINC_COMMAND.format(cinc_log_level=log_level)
+    policy([SudoerDefinition("pcluster-admin", "root", command)])
+    expected = SudoerDefinition("pcluster-admin", "root", sudoers_check.CLUSTERSTATUSMGTD_CINC_COMMAND)
+    monkeypatch.setitem(sudoers_check.EXPECTED_DEFINITIONS, NodeType.HEAD, [expected])
+    context = dataclasses.replace(sample_context(), pcluster_version=pcluster_version)
+
+    result = Sudoers().run(context)
+
+    assert result.status is Status.PASSED, _messages(result)
+
+
+def test_fails_when_clusterstatusmgtd_log_level_does_not_match_the_parallelcluster_version(policy, monkeypatch):
+    command = sudoers_check.CLUSTERSTATUSMGTD_CINC_COMMAND.format(cinc_log_level="info")
+    policy([SudoerDefinition("pcluster-admin", "root", command)])
+    expected = SudoerDefinition("pcluster-admin", "root", sudoers_check.CLUSTERSTATUSMGTD_CINC_COMMAND)
+    monkeypatch.setitem(sudoers_check.EXPECTED_DEFINITIONS, NodeType.HEAD, [expected])
+    context = dataclasses.replace(sample_context(), pcluster_version="3.14.0")
+
+    result = Sudoers().run(context)
+
+    assert _codes(result) == [Sudoers.NOT_DEFINED.code]
+    assert "--log_level auto" in _messages(result)
 
 
 def test_fails_when_sudoers_cannot_be_read(monkeypatch, run_check):

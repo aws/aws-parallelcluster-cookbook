@@ -13,6 +13,10 @@ end
 
 action_class do
   def repository_packages
-    %w(libmysqlclient-dev libmysqlclient21)
+    if node['platform_version'].to_i >= 26
+      %w(libmysqlclient-dev libmysqlclient24)
+    else
+      %w(libmysqlclient-dev libmysqlclient21)
+    end
   end
 end

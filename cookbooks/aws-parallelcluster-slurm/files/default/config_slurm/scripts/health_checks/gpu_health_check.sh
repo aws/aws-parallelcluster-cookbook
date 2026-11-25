@@ -13,12 +13,16 @@
 
 # GPU Health Check
 # Check GPU healthiness by executing NVIDIA DCGM diagnostic tool
-# If GPU_DEVICE_ORDINAL is set, the diagnostic check targets the GPU listed in the variable
+# The diagnostic check targets only the GPUs allocated to the job, listed by Slurm in SLURM_JOB_GPUS: the GPUs requested
+# through GRES, or all the GPUs of the node with an exclusive node allocation. No other job can use them, so the
+# diagnostic does not interfere with other jobs. If the job has no GPU allocated, the check is skipped.
 # Prerequisite for the diagnostic check are:
 #   * node has NVIDIA GPU
-#   * DCGM service is running
 #   * fabric manager service is running (if node is NVSwitch enabled)
 #   * persistent mode is enabled for the target GPU
+# The diagnostic check does not need the DCGM service. Without it, checks of concurrent jobs can run on their own GPUs
+# at the same time. With it, DCGM allows only one diagnostic per node, so a check that would run concurrently with
+# another one is skipped.
 
 ## DCGMI run level
 # 1 - Quick (System Validation)
@@ -26,6 +30,13 @@
 # 3 - Long (System HW Diagnostics)
 # 4 - Extended (Longer-running System HW Diagnostics)
 DCGMI_LEVEL=2
+
+## Lock held by the check running a diagnostic while the DCGM service is running
+DCGM_SERVICE_LOCK_FILE=/var/lock/gpu_health_check_dcgm.lock
+
+## Exit code of dcgmi diag when another diagnostic is running through the DCGM service on the node:
+## "Return: (-34) : The requested operation could not be completed because the affected resource is in use"
+DCGMI_DIAG_RESOURCE_IN_USE_EXIT_CODE=222
 
 function main() {
 
@@ -56,21 +67,16 @@ function main() {
   is_dcgm_supported
   fast_success_exit "$?" "The GPU Health Check is running in a NVIDIA GPU not supported by DCGM Diagnostic tool: skipping its execution."
 
-  ## Check if there are GPU associated to the job
-  if [ -z "$GPU_DEVICE_ORDINAL" ]; then
-    ## nvidia-smi --query-gpu=index --format=csv,noheader returns the list of GPU indices,
-    ## that we transform to a comma separated list.
-    GPU_DEVICE_ORDINAL=$(nvidia-smi --query-gpu=index --format=csv,noheader | tr '\n' ',' | sed 's/,$//')
-    log_info "The variable GPU_DEVICE_ORDINAL has been initialized using information provided by nvidia-smi"
-  fi
+  ## Select the GPUs to check: only GPUs that no other job can use
+  select_target_gpus
+  fast_success_exit "$?" "Skipping execution of the GPU Health Check"
   log_info "The value of GPU_DEVICE_ORDINAL is '${GPU_DEVICE_ORDINAL}'"
 
-  ## Services Initialization
-  local dcgm_service_started
-  initialize_dcgm
+  ## If the DCGM service is running, allow only one diagnostic at a time on the node
+  acquire_dcgm_service_lock
   fast_success_exit "$?" "Skipping execution of the GPU Health Check"
 
-  local nvidia_fabricmanager_service_started
+  ## Services Initialization
   initialize_nvidia_fabricmanager
   fast_success_exit "$?" "Skipping execution of the GPU Health Check"
 
@@ -116,6 +122,14 @@ function main() {
   dcgmi diag -i $GPU_DEVICE_ORDINAL -r $DCGMI_LEVEL $parameters
   dcgmi_exit_code=$?
 
+  ## The DCGM service may have been started after acquire_dcgm_service_lock, and another check may be running a
+  ## diagnostic through it: this does not mean the GPUs are unhealthy, so the check is skipped.
+  if [ $dcgmi_exit_code -eq $DCGMI_DIAG_RESOURCE_IN_USE_EXIT_CODE ]; then
+    log_warning "Another DCGM diagnostic is already running on the node: skipping execution of the GPU Health Check"
+    tear_down
+    return 0
+  fi
+
   if [ $dcgmi_exit_code -ne 0 ]; then
     log_error "The GPU Health Check failed"
   else
@@ -131,6 +145,10 @@ function _log() {
 
 function log_info() {
   _log "INFO" "$@"
+}
+
+function log_warning() {
+  _log "WARNING" "$@"
 }
 
 function log_error() {
@@ -179,17 +197,36 @@ function start_service() {
   fi
 }
 
-function initialize_dcgm() {
+function select_target_gpus() {
+  log_info "Selecting the GPUs to check from SLURM_JOB_GPUS='${SLURM_JOB_GPUS}'"
+
+  ## Slurm sets SLURM_JOB_GPUS to the GPUs allocated to the job: the GPUs requested through GRES, or all the GPUs of
+  ## the node with an exclusive node allocation.
+  if [ -n "$SLURM_JOB_GPUS" ]; then
+    GPU_DEVICE_ORDINAL=$SLURM_JOB_GPUS
+    log_info "Checking the GPUs allocated to the job"
+    return 0
+  fi
+
+  ## Otherwise other jobs can use any GPU of the node, and the diagnostic would interfere with them.
+  log_info "The job has no GPU allocated"
+  return 1
+}
+
+function acquire_dcgm_service_lock() {
+  ## The DCGM service allows only one diagnostic per node: if the service is running, the check runs only if no other
+  ## check is running a diagnostic. The lock is released when the check exits.
   systemctl show nvidia-dcgm.service -p ActiveState | grep "=active"
-  if [ $? -ne 0 ]; then
-    log_info "Starting nvidia-dcgm service since it is not running"
-    start_service nvidia-dcgm
+  if [ $? -eq 0 ]; then
+    log_info "nvidia-dcgm service is running: only one GPU Health Check can run at a time on the node"
+    local dcgm_service_lock_fd
+    exec {dcgm_service_lock_fd}>"${DCGM_SERVICE_LOCK_FILE}"
+    flock -n "${dcgm_service_lock_fd}"
     if [ $? -ne 0 ]; then
+      log_warning "Another GPU Health Check is running on the node while the nvidia-dcgm service is running." \
+        "Please stop the nvidia-dcgm service to allow GPU Health Checks of concurrent jobs to run."
       return 1
     fi
-    dcgm_service_started=true
-  else
-    log_info "nvidia-dcgm service if already running"
   fi
 }
 
@@ -199,12 +236,12 @@ function initialize_nvidia_fabricmanager() {
   if [ "${nvswitch_check}" -gt 1 ]; then
     systemctl show nvidia-fabricmanager.service -p ActiveState | grep "=active"
     if [ $? -ne 0 ]; then
+      ## The service is left running after the check, since checks of concurrent jobs may use it.
       log_info "Starting nvidia-fabricmanager since it is not running"
       start_service nvidia-fabricmanager
       if [ $? -ne 0 ]; then
         return 1
       fi
-      nvidia_fabricmanager_service_started=true
     else
       log_info "nvidia-fabricmanager is already running"
     fi
@@ -223,16 +260,6 @@ function tear_down() {
         nvidia-smi -i $gpu_id -pm 0 >/dev/null
       fi
   done
-
-  if [ "$nvidia_fabricmanager_service_started" = true ] ; then
-    log_info "Stopping nvidia-fabricmanager service"
-    systemctl stop nvidia-fabricmanager
-  fi
-
-  if [ "$dcgm_service_started" = true ] ; then
-    log_info "Stopping nvidia-dcgm service"
-    systemctl stop nvidia-dcgm
-  fi
 }
 
 main "$@"
