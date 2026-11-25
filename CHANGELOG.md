@@ -26,6 +26,8 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 **BUG FIXES**
 - Fix the custom action executor logging the session token and the access key id of the node credentials, as part of
   the signed requests used to download custom action scripts from S3.
+- Fix compute nodes not being replaced according to `QueueUpdateStrategy` when updating the `SubnetIds`
+  or the `PlacementGroup` of a queue.
 
 3.16.3
 ------
