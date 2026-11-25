@@ -31,6 +31,11 @@ def set_mount_dir_permissions?(mode)
   mode != MOUNT_DIR_PERMISSIONS_NONE
 end
 
+# Return the default mode of a mount directory: 755 for /home, 1777 otherwise.
+def default_mount_dir_mode(mount_dir)
+  format_directory(mount_dir) == '/home' ? '755' : '1777'
+end
+
 # Return the entry of the given mapping entries for the same storage, ignoring the mount directory permissions,
 # so that a change of permissions alone does not unmount and mount the storage again.
 def find_storage_in_mapping(storage_entries, storage)
@@ -48,7 +53,7 @@ def mount_dir_permissions_changes(previous_mapping, new_mapping)
       next if previous_storage.nil? || previous_storage == storage
 
       mount_dir = format_directory(storage['mount_dir'] || storage['raid_shared_dir'])
-      mode = mount_dir_mode(storage['mount_dir_permissions'], mount_dir == '/home' ? '755' : '1777')
+      mode = mount_dir_mode(storage['mount_dir_permissions'], default_mount_dir_mode(mount_dir))
       storage.merge('mount_dir_permissions' => mode) if set_mount_dir_permissions?(mode)
     end
     [storage_type, changes]

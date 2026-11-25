@@ -77,7 +77,7 @@ action :change_permissions do
   new_resource.fsx_shared_dir_array.each_with_index do |fsx_shared_dir, index|
     # OpenZFS does not allow changing the permission of the root directory.
     next if new_resource.fsx_fs_type_array[index] == 'OPENZFS'
-    change_mount_dir_permissions(format_directory(fsx_shared_dir), mount_dir_mode(new_resource.mode_array[index], new_resource.mode))
+    change_mount_dir_permissions(format_directory(fsx_shared_dir), mount_dir_mode(new_resource.mode_array[index], default_mount_dir_mode(fsx_shared_dir)))
   end
 end
 

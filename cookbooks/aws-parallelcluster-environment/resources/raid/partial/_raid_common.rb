@@ -88,7 +88,7 @@ end
 
 action :change_permissions do
   return if on_docker?
-  change_mount_dir_permissions(format_directory(new_resource.raid_shared_dir), new_resource.mode)
+  change_mount_dir_permissions(format_directory(new_resource.raid_shared_dir), mount_dir_mode(new_resource.mode, default_mount_dir_mode(new_resource.raid_shared_dir)))
 end
 
 action :export do

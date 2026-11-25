@@ -111,7 +111,7 @@ end
 action :change_permissions do
   return if on_docker?
   new_resource.shared_dir_array.each_with_index do |efs_shared_dir, index|
-    change_mount_dir_permissions(format_directory(efs_shared_dir), mount_dir_mode(new_resource.mode_array[index], new_resource.mode))
+    change_mount_dir_permissions(format_directory(efs_shared_dir), mount_dir_mode(new_resource.mode_array[index], default_mount_dir_mode(efs_shared_dir)))
   end
 end
 

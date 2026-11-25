@@ -77,6 +77,38 @@ describe 'raid:mount' do
   end
 end
 
+describe 'raid:change_permissions' do
+  for_all_oses do |platform, version|
+    { '0750' => '0750', 'DEFAULT' => '1777', 'NONE' => nil }.each do |mode, expected_mode|
+      context "on #{platform}#{version} with mode #{mode}" do
+        cached(:chef_run) do
+          runner = runner(platform: platform, version: version, step_into: ['raid']) do |node|
+            node.override['cluster']['node_type'] = 'HeadNode'
+          end
+          runner.converge_dsl do
+            raid 'change_permissions' do
+              raid_shared_dir 'raid_shared_dir'
+              mode mode
+              action :change_permissions
+            end
+          end
+        end
+
+        if expected_mode
+          it 'changes the permissions of the mount directory' do
+            is_expected.to create_directory('change permissions for /raid_shared_dir')
+              .with(path: '/raid_shared_dir', owner: 'root', group: 'root', mode: expected_mode)
+          end
+        else
+          it 'does not change the permissions of the mount directory' do
+            is_expected.not_to create_directory('change permissions for /raid_shared_dir')
+          end
+        end
+      end
+    end
+  end
+end
+
 describe 'raid:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

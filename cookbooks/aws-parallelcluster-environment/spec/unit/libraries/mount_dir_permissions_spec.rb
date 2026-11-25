@@ -15,6 +15,14 @@ describe 'aws-parallelcluster-environment:libraries:mount_dir_mode' do
   end
 end
 
+describe 'aws-parallelcluster-environment:libraries:default_mount_dir_mode' do
+  it 'returns 755 for /home and 1777 for the other mount directories' do
+    expect(default_mount_dir_mode('/home')).to eq('755')
+    expect(default_mount_dir_mode('home')).to eq('755')
+    expect(default_mount_dir_mode('/shared')).to eq('1777')
+  end
+end
+
 describe 'aws-parallelcluster-environment:libraries:find_storage_in_mapping' do
   let(:storage) { { 'efs_fs_id' => 'fs-1', 'mount_dir' => '/efs', 'mount_dir_permissions' => 'DEFAULT' } }
 
