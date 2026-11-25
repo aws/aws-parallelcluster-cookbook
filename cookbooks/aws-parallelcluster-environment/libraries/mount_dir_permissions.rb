@@ -46,18 +46,20 @@ end
 # Return, by storage type, the entries of the new mapping for the storage that stays mounted during a cluster update
 # and whose mount directory permissions change, with mount_dir_permissions set to the mode to apply.
 def mount_dir_permissions_changes(previous_mapping, new_mapping)
-  new_mapping.map do |storage_type, storages|
-    changes = (storages || []).filter_map do |storage|
+  changes = {}
+  new_mapping.each do |storage_type, storages|
+    changes[storage_type] = []
+    (storages || []).each do |storage|
       # The previous entry differs only by the permissions, if any
       previous_storage = find_storage_in_mapping(previous_mapping[storage_type], storage)
       next if previous_storage.nil? || previous_storage == storage
 
       mount_dir = format_directory(storage['mount_dir'] || storage['raid_shared_dir'])
       mode = mount_dir_mode(storage['mount_dir_permissions'], default_mount_dir_mode(mount_dir))
-      storage.merge('mount_dir_permissions' => mode) if set_mount_dir_permissions?(mode)
+      changes[storage_type].push(storage.merge('mount_dir_permissions' => mode)) if set_mount_dir_permissions?(mode)
     end
-    [storage_type, changes]
-  end.to_h
+  end
+  changes
 end
 
 # Set the mode of a mount directory on the head node, unless the mode is NONE. The mode is stored in the file system,

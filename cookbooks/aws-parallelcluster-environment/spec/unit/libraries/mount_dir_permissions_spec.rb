@@ -69,19 +69,19 @@ describe 'aws-parallelcluster-environment:libraries:mount_dir_permissions_change
   end
 
   # The mappings are node attributes in the update recipe, read back as Chef::Node::ImmutableMash
-  def changes_between(previous, new)
-    node = Chef::Node.new
-    node.default['cluster']['previous_mapping'] = previous
-    node.default['cluster']['new_mapping'] = new
-    mount_dir_permissions_changes(node['cluster']['previous_mapping'], node['cluster']['new_mapping'])
-  end
+  let(:node) { Chef::Node.new }
+
+  before { node.override['cluster']['shared_storages_mapping'] = previous_mapping }
 
   it 'returns no storage when nothing changes' do
-    expect(changes_between(previous_mapping, previous_mapping).values.flatten).to be_empty
+    node.override['cluster']['update_shared_storages_mapping'] = previous_mapping
+    changes = mount_dir_permissions_changes(node['cluster']['shared_storages_mapping'], node['cluster']['update_shared_storages_mapping'])
+    expect(changes.values.flatten).to be_empty
   end
 
   it 'returns the storage that stays mounted and whose permissions change, with the mode to set' do
-    changes = changes_between(previous_mapping, new_mapping)
+    node.override['cluster']['update_shared_storages_mapping'] = new_mapping
+    changes = mount_dir_permissions_changes(node['cluster']['shared_storages_mapping'], node['cluster']['update_shared_storages_mapping'])
     expect(changes['ebs']).to eq([ebs('/ebs2', '0700'), ebs('/ebs3', '1777'), ebs('/home', '755')])
     expect(changes['raid'].map { |storage| [storage['raid_shared_dir'], storage['mount_dir_permissions']] }).to eq([%w(raid 0755)])
     expect(changes['efs']).to eq([])
