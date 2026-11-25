@@ -60,6 +60,25 @@ describe 'aws-parallelcluster-environment:libraries:mount_dir_permissions_change
     }
   end
 
+  it 'returns no storage when nothing changes, also with node attributes' do
+    # The mappings are node attributes in the update recipe, read back as Chef::Node::ImmutableMash
+    node = Chef::Node.new
+    node.default['cluster']['previous_mapping'] = previous_mapping
+    node.default['cluster']['new_mapping'] = previous_mapping
+    changes = mount_dir_permissions_changes(node['cluster']['previous_mapping'], node['cluster']['new_mapping'])
+    expect(changes.values.flatten).to be_empty
+  end
+
+  it 'returns the storage whose permissions change, also with node attributes' do
+    node = Chef::Node.new
+    node.default['cluster']['previous_mapping'] = previous_mapping
+    node.default['cluster']['new_mapping'] = new_mapping
+    changes = mount_dir_permissions_changes(node['cluster']['previous_mapping'], node['cluster']['new_mapping'])
+    expect(changes['ebs'].map { |storage| [storage['mount_dir'], storage['mount_dir_permissions']] }).to eq(
+      [%w(/ebs2 0700), %w(/ebs3 1777), %w(/home 755)]
+    )
+  end
+
   it 'returns the storage that stays mounted and whose permissions change, with the mode to set' do
     changes = mount_dir_permissions_changes(previous_mapping, new_mapping)
     expect(changes['ebs']).to eq([ebs('/ebs2', '0700'), ebs('/ebs3', '1777'), ebs('/home', '755')])
