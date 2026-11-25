@@ -138,10 +138,24 @@ def test_select_checks_routes_confirmation_required_check(monkeypatch, confirmed
     [
         "ReservedUsersAndGroups",
         "CriticalPathsHaveExpectedPermissions",
+        "Sudoers",
         "CfnHup",
     ],
 )
 def test_default_registry_wires_in_permission_checks(identifier):
+    assert registry_module.DEFAULT_REGISTRY.get(identifier) is not None
+
+
+@pytest.mark.parametrize(
+    "identifier",
+    ["CriticalServicesAreRunning", "CriticalSoftwareVersions", "InstalledOsPackages"],
+)
+def test_default_registry_wires_in_installed_software_checks(identifier):
+    assert registry_module.DEFAULT_REGISTRY.get(identifier) is not None
+
+
+@pytest.mark.parametrize("identifier", ["CoreSettings", "ReferencedResources"])
+def test_default_registry_wires_in_configuration_dump_checks(identifier):
     assert registry_module.DEFAULT_REGISTRY.get(identifier) is not None
 
 

@@ -231,6 +231,10 @@ describe 'nvidia_imex:install' do
           it 'locks the package version' do
             is_expected.to lock_package_lock(nvidia_imex_package)
           end
+
+          it 'disables the nvidia-imex service enabled by the package preset' do
+            is_expected.to disable_service('nvidia-imex')
+          end
         end
       end
     end

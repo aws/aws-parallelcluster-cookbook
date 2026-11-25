@@ -13,10 +13,12 @@
 # limitations under the License.
 shared_dirs = node['cluster']['ebs_shared_dirs'].split(',')
 volumes = node['cluster']['volume'].split(',')
+modes = node['cluster']['ebs_mount_dir_permissions'].split(',')
 shared_dirs.each_with_index do |dir, index|
   next unless dir == '/home' || dir == 'home'
   shared_dirs.delete(dir)
   volumes.delete_at(index)
+  modes.delete_at(index)
   break
 end
 
@@ -25,6 +27,7 @@ when 'HeadNode'
   manage_ebs "add ebs" do
     shared_dir_array shared_dirs
     vol_array volumes
+    mode_array modes
     action %i(mount export)
     not_if { shared_dirs.empty? }
   end unless on_docker?

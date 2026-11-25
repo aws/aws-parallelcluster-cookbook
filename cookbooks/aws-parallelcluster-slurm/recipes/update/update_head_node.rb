@@ -34,7 +34,7 @@ ruby_block "update_shared_storages" do
   block do
     run_context.include_recipe 'aws-parallelcluster-environment::update_shared_storages'
   end
-  only_if { are_mount_or_unmount_required? }
+  only_if { are_mount_or_unmount_required? || are_mount_dir_permissions_changed? }
 end
 
 ruby_block "replace slurm queue nodes" do

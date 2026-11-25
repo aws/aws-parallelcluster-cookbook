@@ -14,7 +14,7 @@
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from pcluster_diag.models.finding import CheckError, CheckInfo, CheckWarning
 
@@ -70,6 +70,11 @@ class Result:
             message); present on a WARNING Result and optionally on a FAILURE Result; None otherwise.
         infos: Informational notes, each a CheckInfo (code + message); used to explain why a SKIPPED_*
             Result was skipped; None otherwise.
+        details: Data too large or structured for the findings, e.g. a history of events. When the report is
+            saved, it is moved to its own file, whose path is ``details_file``: a text file for a string, or for data
+            JSON cannot represent, a JSON file otherwise.
+        details_file: The absolute path of the file holding ``details``; set when the report is saved, None when
+            the Result has no details or their file could not be written.
     """
 
     check_id: str
@@ -78,6 +83,8 @@ class Result:
     errors: Optional[List[CheckError]] = None
     warnings: Optional[List[CheckWarning]] = None
     infos: Optional[List[CheckInfo]] = None
+    details: Optional[Any] = None
+    details_file: Optional[str] = None
 
     @staticmethod
     def passed(check) -> "Result":
@@ -89,7 +96,7 @@ class Result:
         )
 
     @staticmethod
-    def from_findings(check, errors=None, warnings=None, infos=None) -> "Result":
+    def from_findings(check, errors=None, warnings=None, infos=None, details=None) -> "Result":
         """Build a Result for ``check`` whose status is derived from its findings by severity precedence.
 
         The severity precedence is FAILURE > CHECK_ERROR > WARNING > PASSED:
@@ -118,6 +125,7 @@ class Result:
             errors=errors or None,
             warnings=warnings or None,
             infos=infos or None,
+            details=details,
         )
 
     @staticmethod

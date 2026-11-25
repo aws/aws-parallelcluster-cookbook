@@ -197,8 +197,8 @@ action :setup do
       end
     end
 
-    # Install server, xdcv and web-viewer packages
-    dcv_packages = %W(#{dcv_server} #{xdcv} #{dcv_web_viewer})
+    # Install DCV packages
+    dcv_packages = dcv_package_files
     dcv_packages_path = "#{node['cluster']['sources_dir']}/#{dcv_package}/"
     # Rewrite dcv_packages object by cycling each package file name and appending the path to them
     dcv_packages.map! { |package| dcv_packages_path + package }
@@ -318,6 +318,11 @@ end
 def dcv_gpu_accel_supported?
   unsupported_gpu_accel_list = ["g5g."]
   graphic_instance? && nvidia_installed? && !node['ec2']['instance_type'].start_with?(*unsupported_gpu_accel_list)
+end
+
+# DCV package files to install from the extracted tarball: server, xdcv and web-viewer
+def dcv_package_files
+  %W(#{dcv_server} #{xdcv} #{dcv_web_viewer})
 end
 
 def dcv_url

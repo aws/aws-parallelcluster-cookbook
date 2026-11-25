@@ -17,6 +17,11 @@ chef_handler 'ErrorHandlers::UpdateFailureHandler' do
   type exception: true
 end
 
+# Log why a systemd service did not start during the update, on every node type.
+chef_handler 'ErrorHandlers::ServiceFailureHandler' do
+  type exception: true
+end
+
 include_recipe "aws-parallelcluster-shared::setup_envars"
 
 # Fetch and load cluster configs

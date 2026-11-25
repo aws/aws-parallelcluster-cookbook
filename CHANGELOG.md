@@ -6,18 +6,74 @@ This file is used to list changes made in each version of the AWS ParallelCluste
 3.17.0
 ------
 
+**ENHANCEMENTS**
+- Add `pcluster-diag` checks reporting the history of cluster updates and of compute fleet status changes, and warning
+  when the latest cluster update did not complete.
+- Add `pcluster-diag` checks reporting the OS packages and the versions of the critical software installed on the node
+  (Slurm, EFA, NVIDIA driver, CUDA, GDRCopy and NVIDIA Fabric Manager), and verifying that the critical system
+  services are running and listening.
+- Add a `pcluster-diag` check dumping the configuration files of the node with their secrets redacted, to compare a
+  cluster with a test environment. An opt-in check also dumps the AWS resources the cluster configuration references
+  (launch templates, security groups, subnets and their routing, IAM roles and policies, custom action scripts,
+  existing shared storage), warning about the ones the credentials do not allow reading.
+- Apply the permissions configured with `SharedStorage/MountDirPermissions` to the mount directory of each shared
+  storage, or leave the permissions of the file system unchanged when `SetPermissions` is `false`.
+
 **CHANGES**
-- Upgrade Python to version 3.14.8.
+- Run the GPU health check only on the GPUs allocated to the job, to avoid interfering with other jobs on the node,
+  and run the checks of concurrent jobs at the same time instead of skipping them. Concurrent checks require the
+  `nvidia-dcgm` service not to be running.
+**BUG FIXES**
+- Fix the custom action executor logging the session token and the access key id of the node credentials, as part of
+  the signed requests used to download custom action scripts from S3.
+- Fix compute nodes not being replaced according to `QueueUpdateStrategy` when updating the `SubnetIds`
+  or the `PlacementGroup` of a queue.
+
+3.16.3
+------
+
+**CHANGES**
+- Upgrade EFA installer to 1.51.0 (from 1.49.0).
+  - Efa-driver: efa-3.3.1
+  - Efa-config: efa-config-1.18-1
+  - Efa-profile: efa-profile-1.7-1
+  - Libfabric-aws: libfabric-aws-2.7.0-1
+  - Rdma-core: rdma-core-65.0-1
+  - Open MPI: openmpi40-aws-4.1.8-1 and openmpi50-aws-5.0.9-11
+- Upgrade NVIDIA driver, Fabric Manager, and IMEX to version 595.112.07 (from 595.71.05).
+- Upgrade mysql-community-client to version 8.4.13 (from 8.4.10).
+- Upgrade the Python version used by the virtual environments in the AMIs to 3.14.10 (from 3.14.8).
+- Upgrade amazon-efs-utils to version 3.3.5 (from 3.1.3).
+- Upgrade stunnel to version 5.82 (from 5.78) to address CVE-2026-70368.
+- Upgrade Cinc Client to version 19.4.46 (from 19.3.14).
+- Upgrade Amazon DCV to version 2026.0-25174 (from 2025.0-20103).
+  - server: `2026.0.25174-1`
+  - xdcv: `2026.0.715-1`
+  - gl: `2026.0.1124-1`
+  - web_viewer: `2026.0.25174-1`
+- On Ubuntu, stop setting the kernel parameter `fs.protected_regular` to 0, so that it keeps the OS default value as on the other OSes.
+
+**BUG FIXES**
+- Only enable NVIDIA IMEX service on GB200 compute nodes. Only enable NVIDIA Fabric Manager service on compute nodes with NVSwitch, and do not enable the `nvidia-powerd` service. Since 3.16.0 the services were enabled unnecessarily on all instance types.
+
+3.16.2
+------
+
+**ENHANCEMENTS**
+- Add a `pcluster-diag` check that verifies the sudoers definitions ParallelCluster relies on.
+
+**CHANGES**
+- Log the `systemctl status` output and the last journal entries of any system service that fails to start during
+  node bootstrap or cluster update to `/var/log/chef-client.log`, so that the cause of the failure is available in CloudWatch Logs.
+- Upgrade the Python version used by the virtual environments baked into the AMIs to 3.14.8 (from 3.14.6).
 - Ship only AWS CLI v2 in ParallelCluster AMIs. AWS CLI v1 is no longer installed in the cookbook Python virtual environment.
-- Remove execution permissions for configurations files `/opt/parallelcluster/shared/computefleet-status.json`,
-  `/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf` and `/etc/dcv/dcv.conf`
+- Remove execution permissions from the configuration files `/opt/parallelcluster/shared/computefleet-status.json`,
+  `/opt/parallelcluster/scripts/clusterstatusmgtd_logging.conf` and `/etc/dcv/dcv.conf`.
 - Log the content of the Slurm configuration files generated on the head node, to simplify troubleshooting.
 
 **BUG FIXES**
-- Fix cluster update hanging on the `fuser` probe that ran before every shared storage unmount when the storage was unresponsive.
-- Set mode `0440` on all ParallelCluster-managed files under `/etc/sudoers.d/`.
-- Fix compute nodes not being replaced according to `QueueUpdateStrategy` when updating the `SubnetIds`
-  or the `PlacementGroup` of a queue.
+- Fix cluster update hanging when a shared storage is unresponsive, caused by the `fuser` probe run before each unmount.
+- Fix the permissions of ParallelCluster-managed files under `/etc/sudoers.d/` by setting mode `0440` on all of them.
 
 3.16.1
 ------

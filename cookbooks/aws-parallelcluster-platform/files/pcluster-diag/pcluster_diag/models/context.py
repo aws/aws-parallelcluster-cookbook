@@ -56,3 +56,8 @@ class Context:
     cluster_config: dict
     dna_json: dict
     head_node_instance_id: Optional[str]
+
+    @property
+    def base_os(self) -> Optional[str]:
+        """Return the cluster ``base_os`` from ``dna.json`` (e.g. ``alinux2023``, ``ubuntu2404``), or None."""
+        return ((self.dna_json or {}).get("cluster") or {}).get("base_os")

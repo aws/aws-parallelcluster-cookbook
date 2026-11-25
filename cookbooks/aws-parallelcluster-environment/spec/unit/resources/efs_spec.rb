@@ -329,6 +329,81 @@ describe 'efs:mount' do
   end
 end
 
+describe 'efs:mount with mount dir permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
+          node.override['cluster']['region'] = "REGION"
+          node.override['cluster']['aws_domain'] = "DOMAIN"
+          node.override['cluster']['node_type'] = 'HeadNode'
+        end
+        runner.converge_dsl do
+          efs 'mount' do
+            efs_fs_id_array %w(id_1 id_2 id_3)
+            shared_dir_array %w(/shared_dir_1 /shared_dir_2 /shared_dir_3)
+            efs_encryption_in_transit_array %w(false false false)
+            efs_iam_authorization_array %w(false false false)
+            efs_access_point_id_array %w(none none none)
+            mode_array %w(0755 NONE DEFAULT)
+            action :mount
+          end
+        end
+      end
+
+      before do
+        %w(/shared_dir_1 /shared_dir_2 /shared_dir_3).each do |shared_dir|
+          stub_command("mount | grep ' #{shared_dir} '").and_return(true)
+        end
+      end
+
+      it 'sets the configured mode' do
+        is_expected.to create_directory('/shared_dir_1').with(mode: '0755')
+        is_expected.to create_directory('change permissions for /shared_dir_1').with(mode: '0755')
+      end
+
+      it 'does not change permissions when the mode is NONE' do
+        is_expected.to create_directory('/shared_dir_2').with(mode: nil)
+        is_expected.not_to create_directory('change permissions for /shared_dir_2')
+      end
+
+      it 'sets the default mode when the mode is DEFAULT' do
+        is_expected.to create_directory('/shared_dir_3').with(mode: '1777')
+        is_expected.to create_directory('change permissions for /shared_dir_3').with(mode: '1777')
+      end
+    end
+  end
+end
+
+describe 'efs:change_permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: ['efs']) do |node|
+          node.override['cluster']['node_type'] = 'HeadNode'
+        end
+        runner.converge_dsl do
+          efs 'change_permissions' do
+            shared_dir_array %w(shared_dir_1 /shared_dir_2 /shared_dir_3)
+            mode_array %w(0750 NONE DEFAULT)
+            action :change_permissions
+          end
+        end
+      end
+
+      it 'changes the permissions of the mount directories, unless the mode is NONE' do
+        is_expected.to create_directory('change permissions for /shared_dir_1').with(path: '/shared_dir_1', mode: '0750')
+        is_expected.not_to create_directory('change permissions for /shared_dir_2')
+        is_expected.to create_directory('change permissions for /shared_dir_3').with(path: '/shared_dir_3', mode: '1777')
+      end
+
+      it 'does not mount' do
+        is_expected.not_to mount_mount('/shared_dir_1')
+      end
+    end
+  end
+end
+
 describe 'efs:unmount' do
   for_all_oses do |platform, version|
     context "on #{platform}#{version}" do

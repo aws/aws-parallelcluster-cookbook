@@ -1,11 +1,12 @@
 require 'spec_helper'
 
 class ConvergeManageEbs
-  def self.mount(chef_run, shared_dirs:, volumes:)
+  def self.mount(chef_run, shared_dirs:, volumes:, modes: [])
     chef_run.converge_dsl do
       manage_ebs 'mount' do
         shared_dir_array shared_dirs
         vol_array volumes
+        mode_array modes
         action :mount
       end
     end
@@ -206,6 +207,60 @@ describe 'manage_ebs:mount' do
           retries: 10,
           retry_delay: 6
         )
+      end
+    end
+  end
+end
+
+describe 'manage_ebs:mount with mount dir permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: %w(manage_ebs))
+        ConvergeManageEbs.mount(runner, shared_dirs: %w(ebs_shared_dir_0 ebs_shared_dir_1 ebs_shared_dir_2),
+                                        volumes: %w(vol-0 vol-1 vol-2), modes: %w(0755 NONE DEFAULT))
+      end
+
+      before do
+        allow_any_instance_of(Object).to receive(:cookbook_virtualenv_path).and_return('venv_path')
+        stubs_for_resource('manage_ebs') do |res|
+          allow(res).to receive(:lazy_uuid).and_return('uuid')
+        end
+      end
+
+      it "mounts the volumes with their mode, or the default mode when it is DEFAULT" do
+        is_expected.to mount_volume('mount volume 0').with(mode: '0755')
+        is_expected.to mount_volume('mount volume 1').with(mode: 'NONE')
+        is_expected.to mount_volume('mount volume 2').with(mode: '1777')
+      end
+    end
+  end
+end
+
+describe 'manage_ebs:change_permissions' do
+  for_all_oses do |platform, version|
+    context "on #{platform}#{version}" do
+      cached(:chef_run) do
+        runner = runner(platform: platform, version: version, step_into: %w(manage_ebs)) do |node|
+          node.override['cluster']['node_type'] = 'HeadNode'
+        end
+        runner.converge_dsl do
+          manage_ebs 'change_permissions' do
+            shared_dir_array %w(ebs_shared_dir_0 ebs_shared_dir_1)
+            mode_array %w(0750 NONE)
+            action :change_permissions
+          end
+        end
+      end
+
+      it 'changes the permissions of the mount directories, unless the mode is NONE' do
+        is_expected.to create_directory('change permissions for /ebs_shared_dir_0').with(path: '/ebs_shared_dir_0', mode: '0750')
+        is_expected.not_to create_directory('change permissions for /ebs_shared_dir_1')
+      end
+
+      it 'does not attach nor mount volumes' do
+        is_expected.not_to attach_volume('attach volume 0')
+        is_expected.not_to mount_volume('mount volume 0')
       end
     end
   end

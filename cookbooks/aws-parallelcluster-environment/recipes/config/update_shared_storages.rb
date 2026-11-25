@@ -42,6 +42,42 @@ ruby_block "get storage to mount and unmount" do
     node.default['cluster']['unmount_fsx_fs_id_array'], node.default['cluster']['unmount_fsx_fs_type_array'], node.default['cluster']['unmount_fsx_shared_dir_array'], node.default['cluster']['unmount_fsx_dns_name_array'], node.default['cluster']['unmount_fsx_mount_name_array'], node.default['cluster']['unmount_fsx_volume_junction_path_array'] = get_fsx(UNMOUNT_ACTION)
     # get fsx to mount
     node.default['cluster']['mount_fsx_fs_id_array'], node.default['cluster']['mount_fsx_fs_type_array'], node.default['cluster']['mount_fsx_shared_dir_array'], node.default['cluster']['mount_fsx_dns_name_array'], node.default['cluster']['mount_fsx_mount_name_array'], node.default['cluster']['mount_fsx_volume_junction_path_array'] = get_fsx(MOUNT_ACTION)
+    # get the permissions of the mount directories of the storage to mount
+    node.default['cluster']['mount_ebs_mode_array'] = get_mount_dir_permissions("ebs", MOUNT_ACTION)
+    node.default['cluster']['mount_raid_mode'] = get_mount_dir_permissions("raid", MOUNT_ACTION).first
+    node.default['cluster']['mount_efs_mode_array'] = get_mount_dir_permissions("efs", MOUNT_ACTION)
+    node.default['cluster']['mount_fsx_mode_array'] = get_mount_dir_permissions("fsx", MOUNT_ACTION)
+    # get the storage that stays mounted and whose mount directory permissions change
+    changes = mount_dir_permissions_changes(node['cluster']['shared_storages_mapping'], node['cluster']['update_shared_storages_mapping'])
+    node.default['cluster']['change_permissions_ebs_shared_dir_array'] = (changes['ebs'] || []).map { |storage| storage['mount_dir'] }
+    node.default['cluster']['change_permissions_ebs_mode_array'] = (changes['ebs'] || []).map { |storage| storage['mount_dir_permissions'] }
+    node.default['cluster']['change_permissions_raid_shared_dir'] = (changes['raid'] || []).map { |storage| storage['raid_shared_dir'] }.first
+    node.default['cluster']['change_permissions_raid_mode'] = (changes['raid'] || []).map { |storage| storage['mount_dir_permissions'] }.first
+    node.default['cluster']['change_permissions_efs_shared_dir_array'] = (changes['efs'] || []).map { |storage| storage['mount_dir'] }
+    node.default['cluster']['change_permissions_efs_mode_array'] = (changes['efs'] || []).map { |storage| storage['mount_dir_permissions'] }
+    node.default['cluster']['change_permissions_fsx_shared_dir_array'] = (changes['fsx'] || []).map { |storage| storage['mount_dir'] }
+    node.default['cluster']['change_permissions_fsx_fs_type_array'] = (changes['fsx'] || []).map { |storage| storage['fsx_fs_type'] }
+    node.default['cluster']['change_permissions_fsx_mode_array'] = (changes['fsx'] || []).map { |storage| storage['mount_dir_permissions'] }
+  end
+
+  def get_mount_dir_permissions(storage_type, action)
+    # get the permissions of the mount directories of the storage of the given type to mount or unmount,
+    # in the same order as the get_<storage type> methods
+    if action == UNMOUNT_ACTION
+      in_shared_storages_mapping = node['cluster']['shared_storages_mapping']
+      not_in_shared_storages_mapping = node['cluster']['update_shared_storages_mapping']
+    elsif action == MOUNT_ACTION
+      in_shared_storages_mapping = node['cluster']['update_shared_storages_mapping']
+      not_in_shared_storages_mapping = node['cluster']['shared_storages_mapping']
+    end
+    mode_array = []
+    unless in_shared_storages_mapping[storage_type].nil?
+      in_shared_storages_mapping[storage_type].each do |storage|
+        next if find_storage_in_mapping(not_in_shared_storages_mapping[storage_type], storage)
+        mode_array.push(String(storage["mount_dir_permissions"]))
+      end
+    end
+    mode_array
   end
 
   def get_ebs(action)
@@ -57,7 +93,7 @@ ruby_block "get storage to mount and unmount" do
     vol_array = []
     unless in_shared_storages_mapping["ebs"].nil?
       in_shared_storages_mapping["ebs"].each do |storage|
-        next unless not_in_shared_storages_mapping["ebs"].nil? || !not_in_shared_storages_mapping["ebs"].include?(storage)
+        next if find_storage_in_mapping(not_in_shared_storages_mapping["ebs"], storage)
         shared_dir_array.push(storage["mount_dir"])
         vol_array.push(storage["volume_id"])
       end
@@ -81,7 +117,7 @@ ruby_block "get storage to mount and unmount" do
     efs_access_point_id_array = []
     unless in_shared_storages_mapping["efs"].nil?
       in_shared_storages_mapping["efs"].each do |storage|
-        next unless not_in_shared_storages_mapping["efs"].nil? || !not_in_shared_storages_mapping["efs"].include?(storage)
+        next if find_storage_in_mapping(not_in_shared_storages_mapping["efs"], storage)
         shared_dir_array.push(storage["mount_dir"])
         efs_fs_id_array.push(storage["efs_fs_id"])
         # The EFS resource expects strings for these attributes, not booleans
@@ -110,7 +146,7 @@ ruby_block "get storage to mount and unmount" do
     fsx_volume_junction_path_array = []
     unless in_shared_storages_mapping["fsx"].nil?
       in_shared_storages_mapping["fsx"].each do |storage|
-        next unless not_in_shared_storages_mapping["fsx"].nil? || !not_in_shared_storages_mapping["fsx"].include?(storage)
+        next if find_storage_in_mapping(not_in_shared_storages_mapping["fsx"], storage)
 
         fsx_fs_id_array.push(storage["fsx_fs_id"])
         fsx_fs_type_array.push(storage["fsx_fs_type"])
@@ -137,7 +173,7 @@ ruby_block "get storage to mount and unmount" do
     raid_vol_array = []
     unless in_shared_storages_mapping["raid"].nil?
       in_shared_storages_mapping["raid"].each do |storage|
-        next unless not_in_shared_storages_mapping["raid"].nil? || !not_in_shared_storages_mapping["raid"].include?(storage)
+        next if find_storage_in_mapping(not_in_shared_storages_mapping["raid"], storage)
         raid_shared_dir = storage["raid_shared_dir"]
         raid_type = storage["raid_type"].to_s
         raid_vol_array = storage["raid_vol_array"]
@@ -158,6 +194,7 @@ end
 manage_ebs "add ebs" do
   shared_dir_array(lazy { node['cluster']['mount_shared_dir_array'] })
   vol_array(lazy { node['cluster']['mount_vol_array'] })
+  mode_array(lazy { node['cluster']['mount_ebs_mode_array'] })
   action %i(mount export)
   not_if { node['cluster']['mount_shared_dir_array'].empty? }
 end
@@ -175,6 +212,7 @@ raid "add raid" do
   raid_shared_dir(lazy { node['cluster']['mount_raid_shared_dir'] })
   raid_type(lazy { node['cluster']['mount_raid_type'] })
   raid_vol_array(lazy { node['cluster']['mount_raid_vol_array'] })
+  mode(lazy { mount_dir_mode(node['cluster']['mount_raid_mode'], '1777') })
   action %i(mount export)
   not_if { node['cluster']['mount_raid_shared_dir'].nil? }
 end
@@ -194,6 +232,7 @@ efs "mount efs" do
   efs_encryption_in_transit_array(lazy { node['cluster']['mount_efs_encryption_in_transit_array'] })
   efs_iam_authorization_array(lazy { node['cluster']['mount_efs_iam_authorization_array'] })
   efs_access_point_id_array(lazy { node['cluster']['mount_efs_access_point_id_array'] })
+  mode_array(lazy { node['cluster']['mount_efs_mode_array'] })
   action :mount
   not_if { node['cluster']['mount_efs_shared_dir_array'].empty? }
 end
@@ -218,6 +257,37 @@ lustre "mount fsx" do
   fsx_dns_name_array(lazy { node['cluster']['mount_fsx_dns_name_array'] })
   fsx_mount_name_array(lazy { node['cluster']['mount_fsx_mount_name_array'] })
   fsx_volume_junction_path_array(lazy { node['cluster']['mount_fsx_volume_junction_path_array'] })
+  mode_array(lazy { node['cluster']['mount_fsx_mode_array'] })
   action :mount
   not_if { node['cluster']['mount_fsx_fs_id_array'].empty? }
+end
+
+# Change the permissions of the mount directories of the storage that stays mounted, without mounting it again
+manage_ebs "change permissions of ebs" do
+  shared_dir_array(lazy { node['cluster']['change_permissions_ebs_shared_dir_array'] })
+  mode_array(lazy { node['cluster']['change_permissions_ebs_mode_array'] })
+  action :change_permissions
+  not_if { node['cluster']['change_permissions_ebs_shared_dir_array'].empty? }
+end
+
+raid "change permissions of raid" do
+  raid_shared_dir(lazy { node['cluster']['change_permissions_raid_shared_dir'] })
+  mode(lazy { node['cluster']['change_permissions_raid_mode'] })
+  action :change_permissions
+  not_if { node['cluster']['change_permissions_raid_shared_dir'].nil? }
+end
+
+efs "change permissions of efs" do
+  shared_dir_array(lazy { node['cluster']['change_permissions_efs_shared_dir_array'] })
+  mode_array(lazy { node['cluster']['change_permissions_efs_mode_array'] })
+  action :change_permissions
+  not_if { node['cluster']['change_permissions_efs_shared_dir_array'].empty? }
+end
+
+lustre "change permissions of fsx" do
+  fsx_shared_dir_array(lazy { node['cluster']['change_permissions_fsx_shared_dir_array'] })
+  fsx_fs_type_array(lazy { node['cluster']['change_permissions_fsx_fs_type_array'] })
+  mode_array(lazy { node['cluster']['change_permissions_fsx_mode_array'] })
+  action :change_permissions
+  not_if { node['cluster']['change_permissions_fsx_shared_dir_array'].empty? }
 end

@@ -12,7 +12,7 @@ unified_mode true
 
 default_action :setup
 
-property :raid_shared_dir, String, required: %i(mount unmount export unexport)
+property :raid_shared_dir, String, required: %i(mount unmount export unexport change_permissions)
 property :raid_type, [String, Integer], required: %i(mount)
 property :raid_vol_array, Array, required: %i(mount unmount)
 property :mode, String, default: "1777"
@@ -84,6 +84,11 @@ action :mount do
     retries 10
     retry_delay 6
   end
+end
+
+action :change_permissions do
+  return if on_docker?
+  change_mount_dir_permissions(format_directory(new_resource.raid_shared_dir), new_resource.mode)
 end
 
 action :export do

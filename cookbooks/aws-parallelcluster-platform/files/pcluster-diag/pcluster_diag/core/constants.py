@@ -228,3 +228,78 @@ ENA_ALLOWANCE_COUNTERS = (
     "conntrack_allowance_exceeded",
     "linklocal_allowance_exceeded",
 )
+
+# Cluster events
+CHEF_CLIENT_LOG_PATH = "/var/log/chef-client.log"
+CLUSTERSTATUSMGTD_LOG_PATH = "/var/log/parallelcluster/clusterstatusmgtd"
+CLUSTERMGTD_LOG_PATH = "/var/log/parallelcluster/clustermgtd"
+# logrotate keeps one rotated copy of these logs, named with this suffix (rotate 1, nodateext).
+ROTATED_LOG_SUFFIX = ".1"
+
+# Installed software
+# The node attributes the cookbook dumps (see cookbooks/aws-parallelcluster-shared/resources/node_attributes.rb).
+NODE_ATTRIBUTES_PATH = "/etc/chef/node_attributes.json"
+EFA_INSTALLED_PACKAGES_PATH = "/opt/amazon/efa_installed_packages"
+# The version-agnostic /usr/local/cuda symlink the CUDA toolkit creates: the cookbook puts it on the users' PATH, and
+# skips installing CUDA when it exists (e.g. on a Deep Learning AMI). See the nvidia_cuda resource.
+CUDA_NVCC_PATH = "/usr/local/cuda/bin/nvcc"
+NVIDIA_DRIVER_KERNEL_MODULE = "nvidia"
+GDRCOPY_KERNEL_MODULE = "gdrdrv"
+PCI_DEVICES_SYSFS = "/sys/bus/pci/devices"
+NVIDIA_PCI_VENDOR_ID = "0x10de"
+# PCI ids the cookbook uses to decide whether NVIDIA Fabric Manager runs on the instance
+# (see cookbooks/aws-parallelcluster-platform/libraries/nvidia.rb, enable_fabric_manager? and is_gb200_node?).
+MELLANOX_PCI_VENDOR_ID = "0x15b3"
+GPU_3D_CONTROLLER_PCI_CLASS = "0x0302"
+NVSWITCH_BRIDGE_PCI_CLASS = "0x0680"
+INFINIBAND_CONTROLLER_PCI_CLASS = "0x0207"
+GB200_PCI_DEVICE_ID = "0x2941"
+NV_FABRICMANAGER_PATH = "/usr/bin/nv-fabricmanager"
+# The kernel modules ParallelCluster installs live under /lib/modules/<kernel release>.
+LIB_MODULES_PATH = "/lib/modules"
+
+# Critical services
+MUNGE_SERVICE = "munge.service"
+SLURMCTLD_SERVICE = "slurmctld.service"
+SLURMD_SERVICE = "slurmd.service"
+# The NFS server service is read from the node attributes (nfs.service.server, set by the nfs cookbook attributes).
+# The GDRCopy service is named differently on Ubuntu (see the gdrcopy resource).
+GDRCOPY_SERVICE = "gdrcopy.service"
+GDRCOPY_SERVICE_UBUNTU = "gdrdrv.service"
+FABRIC_MANAGER_SERVICE = "nvidia-fabricmanager.service"
+# Ports set in slurm.conf (see cookbooks/aws-parallelcluster-slurm/templates/default/slurm/slurm.conf.erb).
+# slurmctld listens on one port of its range.
+SLURMCTLD_PORTS = tuple(range(6820, 6830))
+SLURMD_PORT = 6818
+NFS_SERVER_PORT = 2049
+PROC_NET_TCP_PATHS = ("/proc/net/tcp", "/proc/net/tcp6")
+
+# Configuration dump
+# The launch template of every compute resource and login node pool, kept by the head node.
+LAUNCH_TEMPLATES_CONFIG_PATH = SHARED_DIR + "/launch-templates-config.json"
+# The configuration files of the node, as glob patterns: a pattern matching nothing is skipped, since the files differ
+# by node type. Slurm files are under SLURM_ETC_DIR; the ParallelCluster daemons, under /etc/parallelcluster. dna.json
+# is not one: every report holds it in its context.
+CORE_SETTINGS_FILE_PATTERNS = (
+    "/etc/parallelcluster/cfnconfig",
+    LAUNCH_TEMPLATES_CONFIG_PATH,
+    "/etc/parallelcluster/*.json",
+    "/etc/parallelcluster/slurm_plugin/*.conf",
+    "/etc/parallelcluster/slurm_plugin/*.json",
+    SLURM_ETC_DIR + "/*.conf",
+    SLURM_ETC_DIR + "/pcluster/*.conf",
+    SLURM_ETC_DIR + "/pcluster/.slurm_plugin/*.conf",
+    SSSD_CONF_PATH,
+    CFN_HUP_CONF_PATH,
+    "/etc/cfn/hooks.d/*.conf",
+    "/etc/exports",
+    "/etc/fstab",
+)
+# The security groups the cluster stack creates when the cluster configuration does not set its own.
+MANAGED_SECURITY_GROUP_LOGICAL_IDS = ("HeadNodeSecurityGroup", "ComputeSecurityGroup")
+# Hard cap on each AWS call (connection and read) reading a referenced resource.
+AWS_READ_TIMEOUT_SECONDS = 10
+# A custom action script is read up to this size, so that a large file referenced by mistake does not fill the report.
+CUSTOM_ACTION_SCRIPT_MAX_BYTES = 1024 * 1024
+# The timeout of the custom action executor (DOWNLOAD_SCRIPT_HTTP_TIMEOUT_SECONDS in custom_action_executor.py).
+CUSTOM_ACTION_SCRIPT_TIMEOUT_SECONDS = 60

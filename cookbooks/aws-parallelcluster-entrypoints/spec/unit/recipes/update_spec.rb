@@ -71,6 +71,10 @@ describe 'aws-parallelcluster-entrypoints::update' do
                 )
               end
 
+              it "enables the service failure handler" do
+                expect(chef_run).to enable_chef_handler('ErrorHandlers::ServiceFailureHandler').with(type: { exception: true })
+              end
+
               it "deletes the update failed marker on success" do
                 if node_type == 'HeadNode'
                   is_expected.to delete_file("#{node['cluster']['shared_dir']}/update_failed_marker")
